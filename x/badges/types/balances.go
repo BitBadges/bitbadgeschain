@@ -429,13 +429,23 @@ func jsonEqual(a, b interface{}) bool {
 	return string(aJSON) == string(bJSON)
 }
 
-func IncrementBalances(startBalances []*Balance, numIncrements sdkmath.Uint, incrementOwnershipTimesBy sdkmath.Uint, incrementBadgeIdsBy sdkmath.Uint) ([]*Balance, error) {
+func IncrementBalances(ctx sdk.Context, startBalances []*Balance, numIncrements sdkmath.Uint, incrementOwnershipTimesBy sdkmath.Uint, incrementBadgeIdsBy sdkmath.Uint, approvalDurationFromNow sdkmath.Uint) ([]*Balance, error) {
 	balances := DeepCopyBalances(startBalances)
+	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	for _, startBalance := range balances {
-		for _, time := range startBalance.OwnershipTimes {
-			time.Start = time.Start.Add(numIncrements.Mul(incrementOwnershipTimesBy))
-			time.End = time.End.Add(numIncrements.Mul(incrementOwnershipTimesBy))
+		if approvalDurationFromNow.IsZero() || approvalDurationFromNow.IsNil() {
+			for _, time := range startBalance.OwnershipTimes {
+				time.Start = time.Start.Add(numIncrements.Mul(incrementOwnershipTimesBy))
+				time.End = time.End.Add(numIncrements.Mul(incrementOwnershipTimesBy))
+			}
+		} else {
+			startBalance.OwnershipTimes = []*UintRange{
+				{
+					Start: now,
+					End:   now.Add(approvalDurationFromNow),
+				},
+			}
 		}
 
 		for _, badgeId := range startBalance.BadgeIds {

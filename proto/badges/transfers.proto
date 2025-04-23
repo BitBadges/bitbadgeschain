@@ -218,8 +218,10 @@ message IncrementedBalances {
   repeated Balance startBalances = 1;
   // The amount by which to increment badge IDs.
   string incrementBadgeIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // The amount by which to increment ownership times.
+  // The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
   string incrementOwnershipTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The amount of unix milliseconds to approve starting from now. Incompatible with incrementOwnershipTimesBy.
+  string approvalDurationFromNow = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.

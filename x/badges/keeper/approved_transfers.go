@@ -383,10 +383,12 @@ func (k Keeper) handlePredeterminedBalances(
 	} else if predeterminedBalances.IncrementedBalances != nil {
 		i := predeterminedBalances.IncrementedBalances
 		calculatedBalances, err = types.IncrementBalances(
+			ctx,
 			i.StartBalances,
 			numIncrements,
 			i.IncrementOwnershipTimesBy,
 			i.IncrementBadgeIdsBy,
+			i.ApprovalDurationFromNow,
 		)
 		if err != nil {
 			return nil, err
@@ -770,7 +772,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				}
 			} else if approvalCriteria.PredeterminedBalances.IncrementedBalances != nil {
 				err := *new(error)
-				predeterminedBalances, err = types.IncrementBalances(approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances, numIncrements, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy)
+				predeterminedBalances, err = types.IncrementBalances(ctx, approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances, numIncrements, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow)
 				if err != nil {
 					return []*types.Balance{}, err
 				}

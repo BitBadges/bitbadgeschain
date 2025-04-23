@@ -270,6 +270,7 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		},
 		IncrementBadgeIdsBy:       sdkmath.NewUint(math.MaxUint64),
 		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
+		ApprovalDurationFromNow:   sdkmath.NewUint(0),
 	}
 
 	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
@@ -287,6 +288,7 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		},
 		IncrementBadgeIdsBy:       sdkmath.NewUint(math.MaxUint64),
 		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
+		ApprovalDurationFromNow:   sdkmath.NewUint(0),
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)

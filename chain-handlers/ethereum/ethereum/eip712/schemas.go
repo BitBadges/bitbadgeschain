@@ -493,6 +493,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"approvalDurationFromNow": "",
 									"incrementOwnershipTimesBy": ""
 								},
 								"orderCalculationMethod": {
@@ -611,6 +612,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"approvalDurationFromNow": "",
 									"incrementOwnershipTimesBy": ""
 								},
 								"orderCalculationMethod": {
@@ -1182,6 +1184,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"approvalDurationFromNow": "",
 								"incrementOwnershipTimesBy": ""
 							},
 							"orderCalculationMethod": {
@@ -1338,6 +1341,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"approvalDurationFromNow": "",
 								"incrementOwnershipTimesBy": ""
 							},
 							"orderCalculationMethod": {
@@ -1457,6 +1461,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"approvalDurationFromNow": "",
 								"incrementOwnershipTimesBy": ""
 							},
 							"orderCalculationMethod": {
@@ -1731,6 +1736,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"approvalDurationFromNow": "",
 									"incrementOwnershipTimesBy": ""
 								},
 								"orderCalculationMethod": {
@@ -1849,6 +1855,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"approvalDurationFromNow": "",
 									"incrementOwnershipTimesBy": ""
 								},
 								"orderCalculationMethod": {
@@ -2412,6 +2419,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"approvalDurationFromNow": "",
 								"incrementOwnershipTimesBy": ""
 							},
 							"orderCalculationMethod": {
@@ -2890,6 +2898,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"approvalDurationFromNow": "",
 								"incrementOwnershipTimesBy": ""
 							},
 							"orderCalculationMethod": {

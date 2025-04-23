@@ -325,6 +325,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					if coinToTransfer.Denom != "ubadge" {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom must be badge")
 					}
+
+					if coinToTransfer.Amount.GT(sdkmath.NewInt(10000000000)) {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is too large - the max amount is 10000000000ubadge")
+					}
 				}
 			}
 
@@ -433,6 +437,17 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 						}
+
+						if sequentialTransfer.ApprovalDurationFromNow.IsNil() {
+							return sdkerrors.Wrapf(ErrUintUnititialized, "approval duration from now is uninitialized")
+						}
+
+						// Cant use both increment ownership times by and approval duration from now
+						isApprovalDurationZero := sequentialTransfer.ApprovalDurationFromNow.IsZero()
+						isIncrementOwnershipTimesByZero := sequentialTransfer.IncrementOwnershipTimesBy.IsZero()
+						if !isApprovalDurationZero && !isIncrementOwnershipTimesByZero {
+							return sdkerrors.Wrapf(ErrInvalidRequest, "approval duration from now and increment ownership times by cannot both be set")
+						}
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(ctx, manualTransfer.Balances, canChangeValues)
@@ -473,7 +488,9 @@ func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) 
 		(incrementedBalances.IncrementBadgeIdsBy.IsNil() ||
 			incrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
-			incrementedBalances.IncrementOwnershipTimesBy.IsZero()))
+			incrementedBalances.IncrementOwnershipTimesBy.IsZero()) &&
+		(incrementedBalances.ApprovalDurationFromNow.IsNil() ||
+			incrementedBalances.ApprovalDurationFromNow.IsZero()))
 }
 
 func PredeterminedBalancesIsBasicallyNil(predeterminedBalances *PredeterminedBalances) bool {

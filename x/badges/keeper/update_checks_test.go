@@ -1228,6 +1228,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 			},
 			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			ApprovalDurationFromNow:   sdkmath.NewUint(0),
 		},
 		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
@@ -1326,6 +1327,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 			},
 			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			ApprovalDurationFromNow:   sdkmath.NewUint(0),
 		},
 		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
