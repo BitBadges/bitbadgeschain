@@ -385,6 +385,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 			{
 				From:        "Mint",
 				ToAddresses: []string{alice},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				Balances: []*types.Balance{
 					{
 						Amount: sdkmath.NewUint(71),
@@ -613,6 +614,13 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 				From:        "Mint",
 				ToAddresses: []string{alice},
 				Balances:    badgesToCreate,
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      GetBobApproval().ApprovalId,
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+					},
+				},
 			},
 		},
 	})

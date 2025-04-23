@@ -140,5 +140,26 @@ func SortViaPrioritizedApprovals(_approvals []*types.CollectionApproval, transfe
 		approvals = append(prioritizedTransfers, approvals...)
 	}
 
-	return approvals
+	//Filter approvals where approvalCriteria != nil and not in prioritizedApprovals
+	filteredApprovals := []*types.CollectionApproval{}
+	for _, approval := range approvals {
+		if approval.ApprovalCriteria == nil || types.CollectionApprovalHasNoSideEffects(approval.ApprovalCriteria) {
+			filteredApprovals = append(filteredApprovals, approval)
+			continue
+		}
+
+		prioritized := false
+		for _, prioritizedApproval := range prioritizedApprovals {
+			if approval.ApprovalId == prioritizedApproval.ApprovalId && prioritizedApproval.ApprovalLevel == approvalLevel && approverAddress == prioritizedApproval.ApproverAddress {
+				prioritized = true
+				break
+			}
+		}
+
+		if prioritized {
+			filteredApprovals = append(filteredApprovals, approval)
+		}
+	}
+
+	return filteredApprovals
 }

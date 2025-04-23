@@ -972,6 +972,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1032,6 +1033,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1051,6 +1053,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1116,6 +1119,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1176,6 +1180,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1195,6 +1200,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1271,6 +1277,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1291,6 +1298,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1373,6 +1381,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1462,6 +1471,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})

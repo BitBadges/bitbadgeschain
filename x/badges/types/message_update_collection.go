@@ -141,13 +141,15 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	//           and then use that approval to transfer coins without their permissions
 	//           We can allow stuff on a more fine-grained level in the future but for now, we just disallow this
 	for _, incomingApproval := range msg.DefaultBalances.IncomingApprovals {
-		if incomingApproval.ApprovalCriteria != nil {
+		approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(incomingApproval.ApprovalCriteria)
+		if approvalCriteria != nil && !CollectionApprovalHasNoSideEffects(approvalCriteria) {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "incoming approval criteria must be nil for default balances")
 		}
 	}
 
 	for _, outgoingApproval := range msg.DefaultBalances.OutgoingApprovals {
-		if outgoingApproval.ApprovalCriteria != nil {
+		approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(outgoingApproval.ApprovalCriteria)
+		if approvalCriteria != nil && !CollectionApprovalHasNoSideEffects(approvalCriteria) {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "outgoing approval criteria must be nil for default balances")
 		}
 	}

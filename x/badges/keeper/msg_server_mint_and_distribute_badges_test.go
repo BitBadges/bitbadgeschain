@@ -42,6 +42,7 @@ func (suite *TestSuite) TestNewBadges() {
 						OwnershipTimes: GetOneUintRange(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})

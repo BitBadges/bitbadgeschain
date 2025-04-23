@@ -35,6 +35,7 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
+			PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 		},
 		alice,
 		alice,
@@ -218,6 +219,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -253,6 +255,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -608,6 +611,7 @@ func (suite *TestSuite) TestIncrements() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -873,6 +877,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -997,6 +1002,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1045,6 +1051,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 						Leaf: bobLeaf,
@@ -1167,6 +1174,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1290,6 +1298,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1452,6 +1461,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1606,6 +1616,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1758,6 +1769,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1919,6 +1931,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -2306,6 +2319,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2325,6 +2339,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2424,13 +2439,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
 				},
-				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
-					{
-						ApprovalId:      "target approval",
-						ApprovalLevel:   "collection",
-						ApproverAddress: "",
-					},
-				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2564,13 +2573,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
 				},
-				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
-					{
-						ApprovalId:      "random approval",
-						ApprovalLevel:   "collection",
-						ApproverAddress: "",
-					},
-				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2704,6 +2707,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2723,6 +2727,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2742,6 +2747,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -2761,6 +2767,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})

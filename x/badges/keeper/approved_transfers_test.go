@@ -99,22 +99,22 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 		},
 	}
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -129,28 +129,28 @@ func (suite *TestSuite) TestDeductFromOutgoingTwoSeparateTransfers() {
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, aliceBalance, GetTopHalfUintRanges(), GetFullUintRanges(), alice, bob, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -168,17 +168,86 @@ func (suite *TestSuite) TestMaxOneTransfer() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
+}
+
+// Legacy helper
+// Now that we switched to disallowing auto scan for truthy approval criteria, we need to specify the prioritized approvals manually
+func GetDefaultPrioritizedApprovals() []*types.ApprovalIdentifierDetails {
+	prioritizedApprovals := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      "mint-test",
+		},
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      GetBobApproval().ApprovalId,
+		},
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      "test",
+		},
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      "tessdgfst",
+		},
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      "test2",
+		},
+	}
+
+	otherIds := []string{
+		"asadsdas", // most common
+		"fasdfasdf",
+		"target approval",
+		"random approval",
+		"asadsdasfghdsfasdfasdf",
+		"asadsdasfghaaadsd",
+		"asadsdasfghd",
+		"testsdfgsdf",
+		"testsgdfs",
+	}
+
+	for _, otherId := range otherIds {
+		prioritizedApprovals = append(prioritizedApprovals, &types.ApprovalIdentifierDetails{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      otherId,
+		})
+	}
+
+	addresses := []string{bob, alice, charlie}
+
+	for _, address := range addresses {
+		prioritizedApprovals = append(prioritizedApprovals, &types.ApprovalIdentifierDetails{
+			ApprovalLevel:   "incoming",
+			ApproverAddress: address,
+			ApprovalId:      "test",
+		})
+
+		prioritizedApprovals = append(prioritizedApprovals, &types.ApprovalIdentifierDetails{
+			ApprovalLevel:   "outgoing",
+			ApproverAddress: address,
+			ApprovalId:      "test",
+		})
+	}
+	return prioritizedApprovals
 }
 
 func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
@@ -234,16 +303,16 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		},
 	}
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -260,16 +329,16 @@ func (suite *TestSuite) TestRequiresEquals() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -286,16 +355,16 @@ func (suite *TestSuite) TestSpecificApproved() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
 }
@@ -313,10 +382,10 @@ func (suite *TestSuite) TestDefaults() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 }
 
@@ -334,10 +403,10 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserIncomingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -370,10 +439,10 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetBottomHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 // }
 
@@ -403,7 +472,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 // }
 
@@ -450,10 +519,10 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
 
@@ -502,7 +571,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetOneUintRange(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
 
@@ -531,7 +600,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
 
@@ -567,7 +636,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 
-	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	err = DeductUserOutgoingApprovals(suite, suite.ctx, []*types.Balance{}, collection, bobBalance, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -582,7 +651,7 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(2, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing != x[1].Outgoing, "Error deducting outgoing approvals")
@@ -599,7 +668,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().False(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -616,7 +685,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -634,7 +703,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(0, len(x), "Error deducting outgoing approvals")
 }
@@ -681,7 +750,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 		GetFullUintRanges(),
 // 		GetFullUintRanges(),
 // 		bob, alice, alice,
-// 		sdkmath.NewUint(1), []*types.MerkleProof{}, nil, false, false, false)
+// 		sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(), false, false, false)
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
 
@@ -726,6 +795,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -840,6 +910,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -932,6 +1003,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -951,6 +1023,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1043,6 +1116,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})
@@ -1062,6 +1136,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
 			},
 		},
 	})

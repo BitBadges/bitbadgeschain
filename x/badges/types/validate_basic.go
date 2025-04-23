@@ -192,6 +192,48 @@ func ValidateUserIncomingApprovals(ctx sdk.Context, userIncomingApprovals []*Use
 	return err
 }
 
+func MaxNumTransfersIsBasicallyNil(maxNumTransfers *MaxNumTransfers) bool {
+	return maxNumTransfers == nil || ((maxNumTransfers.OverallMaxNumTransfers.IsNil() || maxNumTransfers.OverallMaxNumTransfers.IsZero()) &&
+		(maxNumTransfers.PerToAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerToAddressMaxNumTransfers.IsZero()) &&
+		(maxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerFromAddressMaxNumTransfers.IsZero()) &&
+		(maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsZero()))
+}
+
+func ApprovalAmountsIsBasicallyNil(approvalAmounts *ApprovalAmounts) bool {
+	return approvalAmounts == nil || ((approvalAmounts.OverallApprovalAmount.IsNil() || approvalAmounts.OverallApprovalAmount.IsZero()) &&
+		(approvalAmounts.PerToAddressApprovalAmount.IsNil() || approvalAmounts.PerToAddressApprovalAmount.IsZero()) &&
+		(approvalAmounts.PerFromAddressApprovalAmount.IsNil() || approvalAmounts.PerFromAddressApprovalAmount.IsZero()) &&
+		(approvalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() || approvalAmounts.PerInitiatedByAddressApprovalAmount.IsZero()))
+}
+
+func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool {
+	if approvalCriteria == nil {
+		return true
+	}
+
+	if approvalCriteria.CoinTransfers != nil && len(approvalCriteria.CoinTransfers) > 0 {
+		return false
+	}
+
+	if approvalCriteria.PredeterminedBalances != nil && !PredeterminedBalancesIsBasicallyNil(approvalCriteria.PredeterminedBalances) {
+		return false
+	}
+
+	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
+		return false
+	}
+
+	if approvalCriteria.MaxNumTransfers != nil && !MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
+		return false
+	}
+
+	if approvalCriteria.ApprovalAmounts != nil && !ApprovalAmountsIsBasicallyNil(approvalCriteria.ApprovalAmounts) {
+		return false
+	}
+
+	return true
+}
+
 func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool) error {
 	for i := 0; i < len(collectionApprovals); i++ {
 		if collectionApprovals[i].ApprovalId == "" {
@@ -342,22 +384,9 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			if approvalCriteria.PredeterminedBalances != nil {
-				orderCalculationMethodIsBasicallyNil := !approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex &&
-					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers &&
-					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers &&
-					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers &&
-					!approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers
-
-				sequentialTransferIsBasicallyNil := approvalCriteria.PredeterminedBalances.IncrementedBalances == nil || ((approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances == nil || len(approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances) == 0) &&
-					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsNil() ||
-						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
-					(approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
-						approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy.IsZero()))
-
-				manualBalancesIsBasicallyNil := approvalCriteria.PredeterminedBalances.ManualBalances == nil || len(approvalCriteria.PredeterminedBalances.ManualBalances) == 0
-
-				isBasicallyNil := orderCalculationMethodIsBasicallyNil && sequentialTransferIsBasicallyNil && manualBalancesIsBasicallyNil
-
+				isBasicallyNil := PredeterminedBalancesIsBasicallyNil(approvalCriteria.PredeterminedBalances)
+				manualBalancesIsBasicallyNil := IsManualBalancesBasicallyNil(approvalCriteria.PredeterminedBalances.ManualBalances)
+				sequentialTransferIsBasicallyNil := IsSequentialTransferBasicallyNil(approvalCriteria.PredeterminedBalances.IncrementedBalances)
 				if !isBasicallyNil {
 					orderType := approvalCriteria.PredeterminedBalances.OrderCalculationMethod
 					if orderType == nil {
@@ -425,6 +454,36 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 	}
 
 	return nil
+}
+
+func IsManualBalancesBasicallyNil(manualBalances []*ManualBalances) bool {
+	return manualBalances == nil || len(manualBalances) == 0
+}
+
+func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedOrderCalculationMethod) bool {
+	return orderCalculationMethod == nil || (orderCalculationMethod.UseMerkleChallengeLeafIndex == false &&
+		orderCalculationMethod.UseOverallNumTransfers == false &&
+		orderCalculationMethod.UsePerToAddressNumTransfers == false &&
+		orderCalculationMethod.UsePerFromAddressNumTransfers == false &&
+		orderCalculationMethod.UsePerInitiatedByAddressNumTransfers == false)
+}
+
+func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) bool {
+	return incrementedBalances == nil || ((incrementedBalances.StartBalances == nil || len(incrementedBalances.StartBalances) == 0) &&
+		(incrementedBalances.IncrementBadgeIdsBy.IsNil() ||
+			incrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
+		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
+			incrementedBalances.IncrementOwnershipTimesBy.IsZero()))
+}
+
+func PredeterminedBalancesIsBasicallyNil(predeterminedBalances *PredeterminedBalances) bool {
+	orderCalculationMethodIsBasicallyNil := IsOrderCalculationMethodBasicallyNil(predeterminedBalances.OrderCalculationMethod)
+	sequentialTransferIsBasicallyNil := IsSequentialTransferBasicallyNil(predeterminedBalances.IncrementedBalances)
+	manualBalancesIsBasicallyNil := IsManualBalancesBasicallyNil(predeterminedBalances.ManualBalances)
+
+	isBasicallyNil := orderCalculationMethodIsBasicallyNil && sequentialTransferIsBasicallyNil && manualBalancesIsBasicallyNil
+
+	return isBasicallyNil
 }
 
 func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool, challengeTrackerIdForTransferOrder string) error {

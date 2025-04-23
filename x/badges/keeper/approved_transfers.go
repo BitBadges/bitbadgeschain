@@ -98,7 +98,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
 
-			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, true) //simulate = true
+			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, true) //simulate = true
 			if err != nil {
 				continue
 			}
@@ -201,7 +201,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, false) //simulate = false
+			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, false) //simulate = false
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
 			}
@@ -252,7 +252,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
 		transferStr := "attempting to transfer badge ID " + remainingBalances[0].BadgeIds[0].Start.String()
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found for transfer: %s", transferStr)
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found for transfer...ensure that any approvals with side effects (approval criteria != nil) are specified in prioritizedApprovals: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil

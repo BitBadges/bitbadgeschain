@@ -298,6 +298,10 @@ message CoinTransfer {
   string to = 1;
   // The sdk.Coins to be transferred.
   repeated cosmos.base.v1beta1.Coin coins = 2;
+  // By default, the from address is the initiator of the transaction.
+  // If this is set to true, we will override the from address with the approver address.
+  // Note: This is not applicable for collection approvals (since approverAddress == '').
+  bool overrideFromWithApproverAddress = 3;
 }
 
 // ApprovalCriteria defines the criteria for approving transfers.

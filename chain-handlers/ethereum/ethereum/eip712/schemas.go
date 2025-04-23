@@ -443,6 +443,7 @@ func GetSchemas() []string {
 							"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -560,6 +561,7 @@ func GetSchemas() []string {
 							"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1130,6 +1132,7 @@ func GetSchemas() []string {
 						"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1285,6 +1288,7 @@ func GetSchemas() []string {
 						"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1403,6 +1407,7 @@ func GetSchemas() []string {
 						"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1676,6 +1681,7 @@ func GetSchemas() []string {
 							"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1793,6 +1799,7 @@ func GetSchemas() []string {
 							"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -2355,6 +2362,7 @@ func GetSchemas() []string {
 						"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
@@ -2832,6 +2840,7 @@ func GetSchemas() []string {
 						"coinTransfers": [
 								{
 									"to": "",
+									"overrideFromWithApproverAddress": false,
 									"coins": [
 										{
 											"amount": "",
