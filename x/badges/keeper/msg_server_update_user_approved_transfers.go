@@ -74,6 +74,15 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		userBalance.AutoApproveSelfInitiatedOutgoingTransfers = msg.AutoApproveSelfInitiatedOutgoingTransfers
 	}
 
+	if msg.UpdateAutoApproveAllIncomingTransfers && userBalance.AutoApproveAllIncomingTransfers != msg.AutoApproveAllIncomingTransfers {
+		//Check permission is valid for current time
+		err = k.CheckIfActionPermissionPermits(ctx, userBalance.UserPermissions.CanUpdateAutoApproveAllIncomingTransfers, "can update auto approve all incoming transfers")
+		if err != nil {
+			return nil, err
+		}
+		userBalance.AutoApproveAllIncomingTransfers = msg.AutoApproveAllIncomingTransfers
+	}
+
 	if msg.UpdateUserPermissions {
 		err := k.ValidateUserPermissionsUpdate(ctx, userBalance.UserPermissions, msg.UserPermissions)
 		if err != nil {

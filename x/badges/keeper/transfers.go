@@ -18,6 +18,7 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 		IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
 		AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
 		AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
+		AutoApproveAllIncomingTransfers:           collection.DefaultBalances.AutoApproveAllIncomingTransfers,
 		UserPermissions: collection.DefaultBalances.UserPermissions,
 	}
 }

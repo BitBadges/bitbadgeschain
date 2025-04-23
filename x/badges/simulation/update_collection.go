@@ -31,7 +31,8 @@ func SimulateMsgUniversalUpdateCollection(
 			UpdateCustomDataTimeline:               r.Int63n(2) == 0,
 			UpdateCollectionApprovals:              r.Int63n(2) == 0,
 			UpdateStandardsTimeline:                r.Int63n(2) == 0,
-
+			UpdateValidBadgeIds:                    r.Int63n(2) == 0,
+			
 			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
 			IsArchivedTimeline: []*types.IsArchivedTimeline{
 				{
@@ -39,7 +40,7 @@ func SimulateMsgUniversalUpdateCollection(
 					TimelineTimes: GetTimelineTimes(r, 3),
 				},
 			},
-			BadgeIdsToAdd: GetTimelineTimes(r, 3),
+			ValidBadgeIds: GetTimelineTimes(r, 3),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
 					FromListId:        GetRandomAddresses(r, 1, accs)[0],

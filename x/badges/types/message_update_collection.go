@@ -54,8 +54,8 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
-	if msg.BadgeIdsToAdd != nil {
-		err = ValidateRangesAreValid(msg.BadgeIdsToAdd, false, false)
+	if msg.ValidBadgeIds != nil {
+		err = ValidateRangesAreValid(msg.ValidBadgeIds, false, false)
 		if err != nil {
 			return err
 		}
@@ -131,6 +131,24 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			CanUpdateOutgoingApprovals:                         []*UserOutgoingApprovalPermission{},
 			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*ActionPermission{},
 			CanUpdateAutoApproveSelfInitiatedIncomingTransfers: []*ActionPermission{},
+			CanUpdateAutoApproveAllIncomingTransfers:           []*ActionPermission{},
+		}
+	}
+
+	//IMPORTANT: Default balances should only be able to specify general rules for incoming and outgoing approvals
+	//           They should not be able to specify approval criteria like coin transfers, approval amounts, etc.
+	//           This prevents default approval attacks where a creator can set an approval that approves a coin transfer
+	//           and then use that approval to transfer coins without their permissions
+	//           We can allow stuff on a more fine-grained level in the future but for now, we just disallow this
+	for _, incomingApproval := range msg.DefaultBalances.IncomingApprovals {
+		if incomingApproval.ApprovalCriteria != nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "incoming approval criteria must be nil for default balances")
+		}
+	}
+
+	for _, outgoingApproval := range msg.DefaultBalances.OutgoingApprovals {
+		if outgoingApproval.ApprovalCriteria != nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "outgoing approval criteria must be nil for default balances")
 		}
 	}
 
@@ -193,6 +211,10 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			}
 
 			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers) > 0 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
+			}
+
+			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveAllIncomingTransfers) > 0 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
 			}
 		}

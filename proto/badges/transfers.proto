@@ -46,8 +46,13 @@ message UserBalanceStore {
   // Whether to auto-approve self-initiated incoming transfers for this user (i.e. to == initiatedBy).
   bool autoApproveSelfInitiatedIncomingTransfers = 5;
 
+  // Whether to auto-approve all incoming transfers by default. 
+  // This is just shorthand for adding an accept everything incoming approval
+  // with no restrictions.
+  bool autoApproveAllIncomingTransfers = 6;
+
   // The permissions for this user's actions and transfers.
-  UserPermissions userPermissions = 6;
+  UserPermissions userPermissions = 7;
 }
 
 /*

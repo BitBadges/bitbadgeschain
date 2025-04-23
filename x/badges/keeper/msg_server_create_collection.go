@@ -28,7 +28,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		DefaultBalances: msg.DefaultBalances,
 
 		//Applicable to creations and updates
-		BadgeIdsToAdd:                          msg.BadgeIdsToAdd,
+		ValidBadgeIds:                          msg.ValidBadgeIds,
 		UpdateCollectionPermissions:            true,
 		CollectionPermissions:                  msg.CollectionPermissions,
 		UpdateManagerTimeline:                  true,

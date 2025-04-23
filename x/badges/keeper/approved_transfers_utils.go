@@ -48,6 +48,10 @@ func (k Keeper) DeductUserIncomingApprovals(
 	initiatedBy string,
 	userBalance *types.UserBalanceStore,
 ) error {
+	if userBalance.AutoApproveAllIncomingTransfers {
+		return nil
+	}
+
 	currApprovals := userBalance.IncomingApprovals
 	if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
 		currApprovals = AppendSelfInitiatedIncomingApproval(currApprovals, to)

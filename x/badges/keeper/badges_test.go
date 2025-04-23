@@ -420,7 +420,7 @@ func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
 				{
-					BadgeIds:                  GetTwoUintRanges(),
+					BadgeIds:                  []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 					PermanentlyPermittedTimes: GetFullUintRanges(),
 				},
 				{
@@ -434,9 +434,10 @@ func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
 
 	//Update valid badge IDs
 	err = UpdateCollection(suite, wctx, &types.MsgUniversalUpdateCollection{
-		Creator:       bob,
-		CollectionId:  sdkmath.NewUint(1),
-		BadgeIdsToAdd: GetTwoUintRanges(),
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		UpdateValidBadgeIds: true,
+		ValidBadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
@@ -446,10 +447,10 @@ func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
 
 	//Update valid badge IDs - invalid > 2
 	err = UpdateCollection(suite, wctx, &types.MsgUniversalUpdateCollection{
-		Creator:       bob,
-		CollectionId:  sdkmath.NewUint(1),
-		BadgeIdsToAdd: GetFullUintRanges(),
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		UpdateValidBadgeIds: true,
+		ValidBadgeIds:       GetFullUintRanges(),
 	})
 	suite.Require().Error(err, "Error updating collection permissions")
-
 }

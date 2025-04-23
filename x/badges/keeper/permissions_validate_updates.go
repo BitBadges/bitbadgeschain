@@ -229,6 +229,10 @@ func (k Keeper) ValidateUserPermissionsUpdate(ctx sdk.Context, oldPermissions *t
 		return err
 	}
 
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateAutoApproveAllIncomingTransfers, newPermissions.CanUpdateAutoApproveAllIncomingTransfers); err != nil {
+		return err
+	}
+
 	return nil
 }
 

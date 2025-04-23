@@ -87,8 +87,11 @@ message MsgUniversalUpdateCollection {
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
 
+  // Indicates if the valid badge IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateValidBadgeIds = 5;
+
   // New badge IDs to add to this collection
-  repeated UintRange badgeIdsToAdd = 6; 
+  repeated UintRange validBadgeIds = 6; 
 
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionPermissions = 7;
@@ -166,8 +169,11 @@ message MsgUpdateCollection {
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
+  // Indicates if the valid badge IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateValidBadgeIds = 3;
+
   // New badge IDs to add to this collection
-  repeated UintRange badgeIdsToAdd = 6;
+  repeated UintRange validBadgeIds = 4;
   
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionPermissions = 7;
@@ -249,7 +255,7 @@ message MsgCreateCollection {
   UserBalanceStore defaultBalances = 4;
 
   // New badge IDs to add to this collection
-  repeated UintRange badgeIdsToAdd = 5; 
+  repeated UintRange validBadgeIds = 5; 
   
   // Collection permissions.
   CollectionPermissions collectionPermissions = 6;
@@ -383,16 +389,22 @@ message MsgUpdateUserApprovals {
   
   // Auto-approve setting for self-initiated incoming transfers.
   bool autoApproveSelfInitiatedIncomingTransfers = 10;
-  
+
+  // Indicates if auto-approve settings for all incoming transfers should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateAutoApproveAllIncomingTransfers = 11;
+
+  // Auto-approve setting for all incoming transfers.
+  bool autoApproveAllIncomingTransfers = 12;
+
   // Indicates if user permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateUserPermissions = 11;
+  bool updateUserPermissions = 13;
   
   // New user permissions to set.
-  UserPermissions userPermissions = 12;
+  UserPermissions userPermissions = 14;
 
   // Address of the original creator. Used for CosmWASM purposes. 
   // IMPORTANT: We will override but we must trust the original creator address.
-  string creatorOverride = 13;
+  string creatorOverride = 15;
 }
 
 // MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.

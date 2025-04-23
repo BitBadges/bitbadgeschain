@@ -28,7 +28,7 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:       sample.AccAddress(),
 				CollectionId:  sdkmath.NewUint(1),
-				BadgeIdsToAdd: []*types.UintRange{},
+				ValidBadgeIds: []*types.UintRange{},
 			},
 		},
 	}

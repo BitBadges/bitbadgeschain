@@ -21,7 +21,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:                                msg.Creator,
 		CollectionId:                           msg.CollectionId,
-		BadgeIdsToAdd:                          msg.BadgeIdsToAdd,
+		ValidBadgeIds:                          msg.ValidBadgeIds,
+		UpdateValidBadgeIds:                    msg.UpdateValidBadgeIds,
 		UpdateCollectionPermissions:            msg.UpdateCollectionPermissions,
 		CollectionPermissions:                  msg.CollectionPermissions,
 		UpdateManagerTimeline:                  msg.UpdateManagerTimeline,

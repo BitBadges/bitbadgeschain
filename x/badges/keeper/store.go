@@ -89,6 +89,7 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 			CanUpdateIncomingApprovals:                         []*types.UserIncomingApprovalPermission{},
 			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*types.ActionPermission{},
 			CanUpdateAutoApproveSelfInitiatedIncomingTransfers: []*types.ActionPermission{},
+			CanUpdateAutoApproveAllIncomingTransfers:           []*types.ActionPermission{},
 		}
 	}
 

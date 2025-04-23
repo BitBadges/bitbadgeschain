@@ -135,9 +135,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.CustomDataTimeline = msg.CustomDataTimeline
 	}
 
-	collection, err = k.CreateBadges(ctx, collection, msg.BadgeIdsToAdd)
-	if err != nil {
-		return nil, err
+	if msg.UpdateValidBadgeIds {
+		collection, err = k.CreateBadges(ctx, collection, msg.ValidBadgeIds)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if msg.UpdateCollectionPermissions {

@@ -9,7 +9,7 @@ import (
 )
 
 // Create badges and update the unminted / total supplys for the collection
-func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newBadgeIdsToAdd []*types.UintRange) (*types.BadgeCollection, error) {
+func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newValidBadgeIds []*types.UintRange) (*types.BadgeCollection, error) {
 	//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
 	if !IsStandardBalances(collection) {
 		if len(collection.CollectionApprovals) > 0 {
@@ -18,10 +18,8 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	}
 
 	err := *new(error)
-	currBadgeIds := collection.ValidBadgeIds
 	allBadgeIds := []*types.UintRange{}
-	allBadgeIds = append(allBadgeIds, currBadgeIds...)
-	allBadgeIds = append(allBadgeIds, newBadgeIdsToAdd...)
+	allBadgeIds = append(allBadgeIds, newValidBadgeIds...)
 	allBadgeIds, err = types.SortUintRangesAndMerge(allBadgeIds, true)
 	if err != nil {
 		return &types.BadgeCollection{}, err
@@ -31,13 +29,13 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Badge Ids must be sequential starting from 1")
 	}
 
-	if len(newBadgeIdsToAdd) == 0 {
+	if len(newValidBadgeIds) == 0 {
 		return collection, nil
 	}
 
 	//Check if we are allowed to create these badges
 	detailsToCheck := []*types.UniversalPermissionDetails{}
-	for _, badgeIdRange := range newBadgeIdsToAdd {
+	for _, badgeIdRange := range newValidBadgeIds {
 		detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
 			BadgeId: badgeIdRange,
 		})

@@ -745,13 +745,30 @@ func GetSchemas() []string {
 								}
 							]
 						}
+					],
+					"canUpdateAutoApproveAllIncomingTransfers": [
+						{
+							"permanentlyPermittedTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							],
+							"permanentlyForbiddenTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							]
+						}
 					]
 				},
 				"autoApproveSelfInitiatedIncomingTransfers": true,
-				"autoApproveSelfInitiatedOutgoingTransfers": true
+				"autoApproveSelfInitiatedOutgoingTransfers": true,
+				"autoApproveAllIncomingTransfers": true
 			},
-			
-			"badgeIdsToAdd": [
+			"updateValidBadgeIds": false,
+			"validBadgeIds": [
 				{
 					"start": "",
 					"end": ""
@@ -1469,6 +1486,8 @@ func GetSchemas() []string {
 			"autoApproveSelfInitiatedOutgoingTransfers": false,
 			"updateAutoApproveSelfInitiatedIncomingTransfers": false,
 			"autoApproveSelfInitiatedIncomingTransfers": false,
+			"updateAutoApproveAllIncomingTransfers": false,
+			"autoApproveAllIncomingTransfers": false,
 			"updateUserPermissions": false,
 			"userPermissions": {
 				"canUpdateOutgoingApprovals": [
@@ -1562,6 +1581,22 @@ func GetSchemas() []string {
 					}
 				],
 				"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
+					{
+						"permanentlyPermittedTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						],
+						"permanentlyForbiddenTimes": [
+							{
+								"start": "",
+								"end": ""
+							}
+						]
+					}
+				],
+				"canUpdateAutoApproveAllIncomingTransfers": [
 					{
 						"permanentlyPermittedTimes": [
 							{
@@ -1943,12 +1978,29 @@ func GetSchemas() []string {
 								}
 							]
 						}
+					],
+					"canUpdateAutoApproveAllIncomingTransfers": [
+						{
+							"permanentlyPermittedTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							],
+							"permanentlyForbiddenTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							]
+						}
 					]
 				},
 				"autoApproveSelfInitiatedIncomingTransfers": true,
-				"autoApproveSelfInitiatedOutgoingTransfers": true
+				"autoApproveSelfInitiatedOutgoingTransfers": true,
+				"autoApproveAllIncomingTransfers": true
 			},
-			"badgeIdsToAdd": [
+			"validBadgeIds": [
 				{
 					"start": "",
 					"end": ""
@@ -2417,7 +2469,8 @@ func GetSchemas() []string {
 			"creator": "",
 			"creatorOverride": "",
 			"collectionId": "",
-			"badgeIdsToAdd": [
+			"updateValidBadgeIds": false,
+			"validBadgeIds": [
 				{
 					"start": "",
 					"end": ""

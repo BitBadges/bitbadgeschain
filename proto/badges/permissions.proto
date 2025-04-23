@@ -86,6 +86,9 @@ message UserPermissions {
 
   // Permissions related to updating auto-approval settings for self-initiated incoming transfers (whether they are allowed by default).
   repeated ActionPermission canUpdateAutoApproveSelfInitiatedIncomingTransfers = 4;
+
+  // Permissions related to updating auto-approval settings for all incoming transfers (whether they are allowed by default).
+  repeated ActionPermission canUpdateAutoApproveAllIncomingTransfers = 5;
 }
 
 
