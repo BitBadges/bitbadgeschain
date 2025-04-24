@@ -37,9 +37,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 	approvals := SortViaPrioritizedApprovals(_approvals, transfer, approvalLevel, approverAddress)
 
 	//For each approved transfer, we check if the transfer is allowed
-	//1: If transfer meets all criteria, we deduct, get user approvals to check, and continue (if there are any remaining balances)
-	//2. If transfer does not meet all criteria, we continue and do not mark anything as handled
-	//3. At the end, if there are any unhandled transfers, we throw (not enough approvals = transfer disallowed)
+	// 1: If transfer meets all criteria, we deduct, get user approvals to check, and continue (if there are any remaining balances)
+	// 2. If transfer does not meet all criteria, we continue and do not mark anything as handled
+	// 3. At the end, if there are any unhandled transfers, we throw (not enough approvals = transfer disallowed)
 	userApprovalsToCheck := []*UserApprovalsToCheck{}
 	for _, approval := range approvals {
 		remainingBalances = types.FilterZeroBalances(remainingBalances)
@@ -97,7 +97,6 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
-
 			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, true) //simulate = true
 			if err != nil {
 				continue
@@ -252,7 +251,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
 		transferStr := "attempting to transfer badge ID " + remainingBalances[0].BadgeIds[0].Start.String()
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval found for transfer...ensure that any approvals with side effects (approval criteria != nil) are specified in prioritizedApprovals: %s", transferStr)
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s", transferStr)
 	}
 
 	return userApprovalsToCheck, nil

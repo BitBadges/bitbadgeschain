@@ -19,7 +19,7 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 		AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
 		AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
 		AutoApproveAllIncomingTransfers:           collection.DefaultBalances.AutoApproveAllIncomingTransfers,
-		UserPermissions: collection.DefaultBalances.UserPermissions,
+		UserPermissions:                           collection.DefaultBalances.UserPermissions,
 	}
 }
 
@@ -205,6 +205,7 @@ func (k Keeper) HandleTransfer(
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
 				}
 			} else {
+
 				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalances, newTransfer, to, initiatedBy, toUserBalance)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)

@@ -98,6 +98,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
+		CoinTransfers:                      approvalCriteria.CoinTransfers,
 	}
 }
 
@@ -113,6 +114,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
+		CoinTransfers:                    approvalCriteria.CoinTransfers,
 	}
 }
 
@@ -124,6 +126,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		RequireFromDoesNotEqualInitiatedBy: approvalCriteria.RequireFromDoesNotEqualInitiatedBy,
 		PredeterminedBalances:              approvalCriteria.PredeterminedBalances,
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
+		CoinTransfers:                      approvalCriteria.CoinTransfers,
 	}
 }
 
@@ -135,5 +138,6 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		RequireToDoesNotEqualInitiatedBy: approvalCriteria.RequireToDoesNotEqualInitiatedBy,
 		PredeterminedBalances:            approvalCriteria.PredeterminedBalances,
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
+		CoinTransfers:                    approvalCriteria.CoinTransfers,
 	}
 }

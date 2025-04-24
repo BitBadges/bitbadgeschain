@@ -244,12 +244,12 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be All")
 		}
 
-		if collectionApprovals[i].ApprovalId == "default-outgoing" || collectionApprovals[i].ApprovalId == "default-incoming" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
-		}
+		reservedApprovalIds := []string{"default-outgoing", "default-incoming", "self-initiated-outgoing", "self-initiated-incoming", "all-incoming-transfers"}
 
-		if collectionApprovals[i].ApprovalId == "self-initiated-outgoing" || collectionApprovals[i].ApprovalId == "self-initiated-incoming" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be default-outgoing or default-incoming")
+		for _, reservedApprovalId := range reservedApprovalIds {
+			if collectionApprovals[i].ApprovalId == reservedApprovalId {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be %s", reservedApprovalId)
+			}
 		}
 
 		for j := i + 1; j < len(collectionApprovals); j++ {
