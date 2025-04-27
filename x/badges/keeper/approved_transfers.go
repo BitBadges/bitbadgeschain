@@ -34,7 +34,10 @@ func (k Keeper) DeductAndGetUserApprovals(
 	fromAddress := transfer.From
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
 	remainingBalances := types.DeepCopyBalances(transfer.Balances) //Keep a running tally of all the badges we still have to handle
-	approvals := SortViaPrioritizedApprovals(_approvals, transfer, approvalLevel, approverAddress)
+	approvals, err := SortViaPrioritizedApprovals(_approvals, transfer, approvalLevel, approverAddress)
+	if err != nil {
+		return []*UserApprovalsToCheck{}, err
+	}
 
 	//For each approved transfer, we check if the transfer is allowed
 	// 1: If transfer meets all criteria, we deduct, get user approvals to check, and continue (if there are any remaining balances)
@@ -706,6 +709,10 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 		approvalId = approval.ApprovalId
 		if approvalCriteria == nil || approvalId != precalculationId || approvalId == "" {
 			continue
+		}
+
+		if !approval.Version.Equal(transfer.PrecalculateBalancesFromApproval.Version) {
+			return []*types.Balance{}, sdkerrors.Wrapf(types.ErrMismatchedVersions, "versions are mismatched for a prioritized approval")
 		}
 
 		if approvalCriteria.PredeterminedBalances != nil {

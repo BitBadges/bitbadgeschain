@@ -10,17 +10,16 @@ import (
 )
 
 var (
-	CollectionKey         = []byte{0x01}
-	UserBalanceKey        = []byte{0x02}
-	NextCollectionIdKey   = []byte{0x03}
-	UsedClaimChallengeKey = []byte{0x04}
-	AddressListKey        = []byte{0x06}
-	ApprovalTrackerKey    = []byte{0x07}
-
+	CollectionKey           = []byte{0x01}
+	UserBalanceKey          = []byte{0x02}
+	NextCollectionIdKey     = []byte{0x03}
+	UsedClaimChallengeKey   = []byte{0x04}
+	AddressListKey          = []byte{0x06}
+	ApprovalTrackerKey      = []byte{0x07}
 	AccountGenerationPrefix = []byte{0x08}
 	AddressGenerationPrefix = []byte{0x09}
-
-	NextAddressListIdKey = []byte{0x0A}
+	NextAddressListIdKey    = []byte{0x0A}
+	ApprovalVersionKey      = []byte{0x0B}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}
@@ -62,6 +61,16 @@ func ConstructApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, 
 		level,
 		trackerType,
 		address,
+	}
+	return strings.Join(keyParts, BalanceKeyDelimiter)
+}
+
+func ConstructApprovalVersionKey(collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string) string {
+	keyParts := []string{
+		collectionId.String(),
+		approvalLevel,
+		approverAddress,
+		approvalId,
 	}
 	return strings.Join(keyParts, BalanceKeyDelimiter)
 }
@@ -142,5 +151,12 @@ func approvalTrackerStoreKey(approvalTrackerKey string) []byte {
 	key := make([]byte, len(ApprovalTrackerKey)+len(approvalTrackerKey))
 	copy(key, ApprovalTrackerKey)
 	copy(key[len(ApprovalTrackerKey):], []byte(approvalTrackerKey))
+	return key
+}
+
+func approvalVersionStoreKey(approvalVersionKey string) []byte {
+	key := make([]byte, len(ApprovalVersionKey)+len(approvalVersionKey))
+	copy(key, ApprovalVersionKey)
+	copy(key[len(ApprovalVersionKey):], []byte(approvalVersionKey))
 	return key
 }

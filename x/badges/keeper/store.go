@@ -394,3 +394,61 @@ func (k Keeper) DeleteApprovalTrackerFromStore(ctx sdk.Context, collectionId sdk
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
 }
+
+/** -------------------------------------- VERSION TRACKERS FOR APPROVAL IDS -------------------------------------- */
+
+func (k Keeper) IncrementApprovalVersion(ctx sdk.Context, collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string) sdkmath.Uint {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	version := store.Get(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)))
+	if version == nil {
+		store.Set(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)), []byte("0"))
+		return sdkmath.NewUint(0)
+	} else {
+		versionUint, err := strconv.ParseUint(string(version), 10, 64)
+		if err != nil {
+			panic("Failed to parse version")
+		}
+
+		versionUint++
+		newVersion := sdkmath.NewUint(versionUint)
+		store.Set(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)), []byte(newVersion.String()))
+		return newVersion
+	}
+}
+
+func (k Keeper) GetApprovalTrackerVersionsFromStore(ctx sdk.Context) (versions []sdkmath.Uint, ids []string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, ApprovalVersionKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		version, err := strconv.ParseUint(string(iterator.Value()), 10, 64)
+		if err != nil {
+			panic("Failed to parse version")
+		}
+		versions = append(versions, sdkmath.NewUint(version))
+		ids = append(ids, string(iterator.Key()[1:]))
+	}
+	return
+}
+
+func (k Keeper) SetApprovalTrackerVersionInStore(ctx sdk.Context, key string, version sdkmath.Uint) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(approvalVersionStoreKey(key), []byte(version.String()))
+}
+
+func (k Keeper) GetApprovalTrackerVersionFromStore(ctx sdk.Context, key string) (sdkmath.Uint, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	version := store.Get(approvalVersionStoreKey(key))
+	if version == nil {
+		return sdkmath.NewUint(0), false
+	}
+	versionUint, err := strconv.ParseUint(string(version), 10, 64)
+	if err != nil {
+		panic("Failed to parse version")
+	}
+	return sdkmath.NewUint(versionUint), true
+}

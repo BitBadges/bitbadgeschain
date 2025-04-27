@@ -91,6 +91,14 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			return nil, err
 		}
 		collection.CollectionApprovals = msg.CollectionApprovals
+
+		newApprovalsWithVersion := []*types.CollectionApproval{}
+		for _, approval := range msg.CollectionApprovals {
+			newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "collection", "", approval.ApprovalId)
+			approval.Version = newVersion
+			newApprovalsWithVersion = append(newApprovalsWithVersion, approval)
+		}
+		collection.CollectionApprovals = newApprovalsWithVersion
 	}
 
 	if msg.UpdateCollectionMetadataTimeline {

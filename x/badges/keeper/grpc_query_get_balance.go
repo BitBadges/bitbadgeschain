@@ -28,7 +28,8 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	} else {
 		isStandardBalances := collection.BalancesType == "Standard"
 		if isStandardBalances {
-			balances = k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+			// We technically want to apply versions here, but it doesn't actually set them in store (due to queries)
+			balances, _ = k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
 		} else {
 			return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "unsupported balances type %s %s", collection.BalancesType, collection.CollectionId)
 		}

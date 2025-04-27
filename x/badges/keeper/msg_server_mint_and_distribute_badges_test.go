@@ -20,6 +20,13 @@ func (suite *TestSuite) TestNewBadges() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting badge: %s")
 
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: collection.CollectionApprovals,
+	})
+	suite.Require().Nil(err, "Error updating collection approvals")
+
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -42,7 +49,7 @@ func (suite *TestSuite) TestNewBadges() {
 						OwnershipTimes: GetOneUintRange(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})

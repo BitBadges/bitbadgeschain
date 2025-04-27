@@ -35,7 +35,7 @@ func (suite *TestSuite) TestCreateBadges() {
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+			PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 		},
 	}
 	collectionsToCreate[0].CollectionApprovals[0].FromListId = "Mint"
@@ -83,7 +83,7 @@ func (suite *TestSuite) TestCreateBadges() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -108,7 +109,7 @@ func onlyCheckPrioritizedApprovals(transfer *types.Transfer, approvalLevel strin
 	return onlyCheckPrioritized
 }
 
-func SortViaPrioritizedApprovals(_approvals []*types.CollectionApproval, transfer *types.Transfer, approvalLevel string, approverAddress string) []*types.CollectionApproval {
+func SortViaPrioritizedApprovals(_approvals []*types.CollectionApproval, transfer *types.Transfer, approvalLevel string, approverAddress string) ([]*types.CollectionApproval, error) {
 	prioritizedApprovals := transfer.PrioritizedApprovals
 	onlyCheckPrioritized := onlyCheckPrioritizedApprovals(transfer, approvalLevel)
 
@@ -151,6 +152,14 @@ func SortViaPrioritizedApprovals(_approvals []*types.CollectionApproval, transfe
 		prioritized := false
 		for _, prioritizedApproval := range prioritizedApprovals {
 			if approval.ApprovalId == prioritizedApproval.ApprovalId && prioritizedApproval.ApprovalLevel == approvalLevel && approverAddress == prioritizedApproval.ApproverAddress {
+				if prioritizedApproval.Version.IsNil() {
+					return nil, sdkerrors.Wrapf(types.ErrUintUnititialized, "version is uninitialized")
+				}
+
+				if !prioritizedApproval.Version.Equal(approval.Version) {
+					return nil, sdkerrors.Wrapf(types.ErrMismatchedVersions, "versions are mismatched for a prioritized approval %s %s %s", prioritizedApproval.ApprovalId, prioritizedApproval.ApproverAddress, prioritizedApproval.ApprovalLevel)
+				}
+
 				prioritized = true
 				break
 			}
@@ -161,5 +170,5 @@ func SortViaPrioritizedApprovals(_approvals []*types.CollectionApproval, transfe
 		}
 	}
 
-	return filteredApprovals
+	return filteredApprovals, nil
 }

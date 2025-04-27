@@ -24,5 +24,7 @@ message GenesisState {
   repeated AddressList addressLists = 9;
   repeated ApprovalTracker approvalTrackers = 10;
   repeated string approvalTrackerStoreKeys = 11;
+  repeated string approvalTrackerVersions = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string approvalTrackerVersionsStoreKeys = 13;
   // this line is used by starport scaffolding # genesis/proto/state
 }

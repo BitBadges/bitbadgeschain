@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,7 +38,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, ErrWrongBalancesType
 	}
 
-	userBalance := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
+	userBalance, appliedDefault := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}
@@ -47,6 +48,24 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			return nil, err
 		}
 		userBalance.OutgoingApprovals = msg.OutgoingApprovals
+
+		// If we didn't apply the default, we need to increment the versions
+		// Else, we did apply the default and we should ensure the version is kept at 0 - no need to double increment
+		if !appliedDefault {
+			newOutgoingApprovalsWithVersion := []*types.UserOutgoingApproval{}
+			for _, approval := range msg.OutgoingApprovals {
+				newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, approval.ApprovalId)
+				approval.Version = newVersion
+				newOutgoingApprovalsWithVersion = append(newOutgoingApprovalsWithVersion, approval)
+			}
+			userBalance.OutgoingApprovals = newOutgoingApprovalsWithVersion
+		} else {
+			// We did apply the default, so we need to ensure the version is kept at 0 and no need to increment again
+			for _, approval := range msg.OutgoingApprovals {
+				approval.Version = sdkmath.NewUint(0)
+			}
+			userBalance.OutgoingApprovals = msg.OutgoingApprovals
+		}
 	}
 
 	if msg.UpdateIncomingApprovals {
@@ -54,6 +73,24 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			return nil, err
 		}
 		userBalance.IncomingApprovals = msg.IncomingApprovals
+
+		// If we didn't apply the default, we need to increment the versions
+		// Else, we did apply the default and we should ensure the version is kept at 0 - no need to double increment
+		if !appliedDefault {
+			newIncomingApprovalsWithVersion := []*types.UserIncomingApproval{}
+			for _, approval := range msg.IncomingApprovals {
+				newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, approval.ApprovalId)
+				approval.Version = newVersion
+				newIncomingApprovalsWithVersion = append(newIncomingApprovalsWithVersion, approval)
+			}
+			userBalance.IncomingApprovals = newIncomingApprovalsWithVersion
+		} else {
+			// We did apply the default, so we need to ensure the version is kept at 0 and no need to increment again
+			for _, approval := range msg.IncomingApprovals {
+				approval.Version = sdkmath.NewUint(0)
+			}
+			userBalance.IncomingApprovals = msg.IncomingApprovals
+		}
 	}
 
 	if msg.UpdateAutoApproveSelfInitiatedIncomingTransfers && userBalance.AutoApproveSelfInitiatedIncomingTransfers != msg.AutoApproveSelfInitiatedIncomingTransfers {

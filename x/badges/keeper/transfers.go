@@ -23,20 +23,29 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 	}
 }
 
-func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) *types.UserBalanceStore {
+func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) (*types.UserBalanceStore, bool) {
 	//Mint has unlimited balances
 	if userAddress == "Total" || userAddress == "Mint" {
-		return &types.UserBalanceStore{}
+		return &types.UserBalanceStore{}, false
 	}
 
 	//We get current balances or fallback to default balances
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
+	appliedDefault := false
 	if !found {
 		balance = GetDefaultBalanceStoreForCollection(collection)
+		appliedDefault = true
+		// We need to set the version to "0" for all incoming and outgoing approvals
+		for _, approval := range balance.IncomingApprovals {
+			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
+		}
+		for _, approval := range balance.OutgoingApprovals {
+			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
+		}
 	}
 
-	return balance
+	return balance, appliedDefault
 }
 
 func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.BadgeCollection, userAddress string, balance *types.UserBalanceStore) error {
@@ -48,10 +57,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 	err := *new(error)
 
 	for _, transfer := range transfers {
-		fromUserBalance := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+		fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
 
 		for _, to := range transfer.ToAddresses {
-			toUserBalance := k.GetBalanceOrApplyDefault(ctx, collection, to)
+			toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
 
 			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
 				//Here, we precalculate balances from a specified approval

@@ -599,6 +599,14 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 		}
 	}
 
+	if len(transfer.PrioritizedApprovals) > 0 {
+		for _, prioritizedApproval := range transfer.PrioritizedApprovals {
+			if prioritizedApproval.Version.IsNil() {
+				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
+			}
+		}
+	}
+
 	if transfer.PrecalculateBalancesFromApproval != nil {
 		if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "" && transfer.PrecalculateBalancesFromApproval.ApproverAddress == "" && transfer.PrecalculateBalancesFromApproval.ApprovalId == "" {
 			//basically nil
@@ -611,6 +619,10 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 				if err := ValidateAddress(transfer.PrecalculateBalancesFromApproval.ApproverAddress, false); err != nil {
 					return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
 				}
+			}
+
+			if transfer.PrecalculateBalancesFromApproval.Version.IsNil() {
+				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
 			}
 		}
 	}

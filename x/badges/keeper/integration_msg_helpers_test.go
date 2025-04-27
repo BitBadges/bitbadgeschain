@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -300,11 +301,18 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 		return err
 	}
 
+	newTransfers := []*types.Transfer{}
+	for _, transfer := range msg.Transfers {
+		newTransfer := transfer
+		newTransfer.PrioritizedApprovals = GetDefaultPrioritizedApprovals(sdk.UnwrapSDKContext(ctx), suite.app.BadgesKeeper, msg.CollectionId)
+		newTransfers = append(newTransfers, newTransfer)
+	}
+
 	if len(msg.Transfers) > 0 {
 		_, err = suite.msgServer.TransferBadges(ctx, &types.MsgTransferBadges{
 			Creator:      bob,
 			CollectionId: msg.CollectionId,
-			Transfers:    msg.Transfers,
+			Transfers:    newTransfers,
 		})
 	}
 	return err

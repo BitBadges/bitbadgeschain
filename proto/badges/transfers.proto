@@ -119,6 +119,9 @@ message UserOutgoingApproval {
 
   // The criteria that must be met for this approval to be considered.
   OutgoingApprovalCriteria approvalCriteria = 11;
+
+  // Version of the approval. Maintained internally.
+  string version = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
@@ -149,6 +152,10 @@ message UserIncomingApproval {
 
   // The criteria that must be met for this approval to be considered.
   IncomingApprovalCriteria approvalCriteria = 11;
+  
+
+  // Version of the approval. Maintained internally.
+  string version = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 
@@ -294,7 +301,6 @@ message ApprovalTracker {
   repeated Balance amounts = 2;
 }
 
-
 message CoinTransfer {
   // The address of the recipient of the transfer.
   string to = 1;
@@ -304,6 +310,9 @@ message CoinTransfer {
   // If this is set to true, we will override the from address with the approver address.
   // Note: This is not applicable for collection approvals (since approverAddress == '').
   bool overrideFromWithApproverAddress = 3;
+  // By default, the to address is what is specified in the coin transfer.
+  // If this is set to true, we will override the to address with the initiator of the transaction.
+  bool overrideToWithInitiator = 4;
 }
 
 // ApprovalCriteria defines the criteria for approving transfers.
@@ -395,6 +404,9 @@ message CollectionApproval {
   string approvalId = 11;
   // The criteria that must be met for this approval to be considered.
   ApprovalCriteria approvalCriteria = 12;
+
+  // Version of the approval. Maintained internally.
+  string version = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // ApprovalIdentifierDetails defines the details to identify a specific approval.
@@ -405,6 +417,8 @@ message ApprovalIdentifierDetails {
   string approvalLevel = 2;
   // The address of the approver. Leave blank "" if approvalLevel == "collection".
   string approverAddress = 3;
+  // The version of the approval.
+  string version = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // Transfer defines the details of a transfer of badges.

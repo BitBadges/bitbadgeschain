@@ -61,4 +61,5 @@ var (
 	ErrChallengeTrackerIdIsNil                     = sdkerrors.Register(ModuleName, 1548, "challenge tracker id is nil")
 	ErrIdsContainsInvalidChars                     = sdkerrors.Register(ModuleName, 1549, "ids contains invalid chars")
 	ErrInvalidBadgeId                              = sdkerrors.Register(ModuleName, 1550, "invalid badge id")
+	ErrMismatchedVersions                          = sdkerrors.Register(ModuleName, 1551, "versions are mismatched")
 )

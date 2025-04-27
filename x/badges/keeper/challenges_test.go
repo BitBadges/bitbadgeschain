@@ -35,7 +35,7 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+			PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 		},
 		alice,
 		alice,
@@ -219,7 +219,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -255,7 +255,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -612,7 +612,7 @@ func (suite *TestSuite) TestIncrements() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -870,6 +870,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob},
@@ -880,7 +881,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -996,6 +997,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob},
@@ -1006,7 +1008,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1045,6 +1047,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{alice},
@@ -1055,7 +1058,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 						Leaf: bobLeaf,
@@ -1169,6 +1172,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{alice},
@@ -1179,7 +1183,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1294,6 +1298,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob},
@@ -1304,7 +1309,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1343,6 +1348,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{alice},
@@ -1458,6 +1464,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob, alice},
@@ -1468,7 +1475,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1614,6 +1621,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob, alice},
@@ -1624,7 +1632,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1768,6 +1776,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob, alice},
@@ -1778,7 +1787,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -1930,6 +1939,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
+					Version:         sdkmath.NewUint(0),
 				},
 				From:        "Mint",
 				ToAddresses: []string{bob, alice},
@@ -1940,7 +1950,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 				MerkleProofs: []*types.MerkleProof{
 					{
 
@@ -2331,7 +2341,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2351,7 +2361,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2452,8 +2462,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2562,12 +2573,14 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
 				},
 				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 					{
 						ApprovalId:      "random approval",
 						ApprovalLevel:   "collection",
 						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
 					},
 				},
 				OnlyCheckPrioritizedCollectionApprovals: true,
@@ -2588,8 +2601,9 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2725,7 +2739,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2745,7 +2759,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2765,7 +2779,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2785,7 +2799,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -2837,12 +2851,13 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 			ToAddresses: []string{alice},
 			Balances:    []*types.Balance{},
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
-				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: ""},
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
 			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
 			},
 		}},
 	})

@@ -352,7 +352,8 @@ func GetSchemas() []string {
 					"precalculateBalancesFromApproval": {
 						"approvalId": "",
 						"approvalLevel": "",
-						"approverAddress": ""
+						"approverAddress": "",
+						"version": "0"
 					},
 					"merkleProofs": [
 						{
@@ -370,7 +371,8 @@ func GetSchemas() []string {
 						{
 							"approvalId": "",
 							"approvalLevel": "",
-							"approverAddress": ""
+							"approverAddress": "",
+							"version": "0"
 						}
 					],
 					"onlyCheckPrioritizedCollectionApprovals": false,
@@ -430,6 +432,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
+						"version": "0",
 						"approvalCriteria": {
 							"merkleChallenges": [{
 								"root": "",
@@ -444,6 +447,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -549,6 +553,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
+						"version": "0",
 						"approvalCriteria": {
 							"merkleChallenges": [{
 								"root": "",
@@ -563,6 +568,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1121,6 +1127,7 @@ func GetSchemas() []string {
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
+					"version": "0",
 					"approvalCriteria": {
 						"merkleChallenges": [{
 							"root": "",
@@ -1135,6 +1142,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1278,6 +1286,7 @@ func GetSchemas() []string {
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
+					"version": "0",
 					"approvalCriteria": {
 						"merkleChallenges": [{
 							"root": "",
@@ -1292,6 +1301,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1398,6 +1408,7 @@ func GetSchemas() []string {
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
+					"version": "0",
 					"approvalCriteria": {
 						"merkleChallenges": [{
 							"root": "",
@@ -1412,6 +1423,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1673,6 +1685,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
+						"version": "0",
 						"approvalCriteria": {
 							"merkleChallenges": [{
 								"root": "",
@@ -1687,6 +1700,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -1792,6 +1806,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": "",
 						"approvalId": "",
+						"version": "0",
 						"approvalCriteria": {
 							"merkleChallenges": [{
 								"root": "",
@@ -1806,6 +1821,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -2356,6 +2372,7 @@ func GetSchemas() []string {
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
+					"version": "0",
 					"approvalCriteria": {
 						"merkleChallenges": [{
 							"root": "",
@@ -2370,6 +2387,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",
@@ -2835,6 +2853,7 @@ func GetSchemas() []string {
 					"uri": "",
 					"customData": "",
 					"approvalId": "",
+					"version": "0",
 					"approvalCriteria": {
 						"merkleChallenges": [{
 							"root": "",
@@ -2849,6 +2868,7 @@ func GetSchemas() []string {
 								{
 									"to": "",
 									"overrideFromWithApproverAddress": false,
+									"overrideToWithInitiator": false,
 									"coins": [
 										{
 											"amount": "",

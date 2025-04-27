@@ -401,19 +401,113 @@ func (x *_GenesisState_11_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_GenesisState_12_list)(nil)
+
+type _GenesisState_12_list struct {
+	list *[]string
+}
+
+func (x *_GenesisState_12_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_GenesisState_12_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_GenesisState_12_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_GenesisState_12_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_GenesisState_12_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message GenesisState at list field ApprovalTrackerVersions as it is not of Message kind"))
+}
+
+func (x *_GenesisState_12_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_GenesisState_12_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_GenesisState_12_list) IsValid() bool {
+	return x.list != nil
+}
+
+var _ protoreflect.List = (*_GenesisState_13_list)(nil)
+
+type _GenesisState_13_list struct {
+	list *[]string
+}
+
+func (x *_GenesisState_13_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_GenesisState_13_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_GenesisState_13_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_GenesisState_13_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_GenesisState_13_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message GenesisState at list field ApprovalTrackerVersionsStoreKeys as it is not of Message kind"))
+}
+
+func (x *_GenesisState_13_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_GenesisState_13_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_GenesisState_13_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_GenesisState                           protoreflect.MessageDescriptor
-	fd_GenesisState_params                    protoreflect.FieldDescriptor
-	fd_GenesisState_port_id                   protoreflect.FieldDescriptor
-	fd_GenesisState_collections               protoreflect.FieldDescriptor
-	fd_GenesisState_nextCollectionId          protoreflect.FieldDescriptor
-	fd_GenesisState_balances                  protoreflect.FieldDescriptor
-	fd_GenesisState_balanceStoreKeys          protoreflect.FieldDescriptor
-	fd_GenesisState_challengeTrackers         protoreflect.FieldDescriptor
-	fd_GenesisState_challengeTrackerStoreKeys protoreflect.FieldDescriptor
-	fd_GenesisState_addressLists              protoreflect.FieldDescriptor
-	fd_GenesisState_approvalTrackers          protoreflect.FieldDescriptor
-	fd_GenesisState_approvalTrackerStoreKeys  protoreflect.FieldDescriptor
+	md_GenesisState                                  protoreflect.MessageDescriptor
+	fd_GenesisState_params                           protoreflect.FieldDescriptor
+	fd_GenesisState_port_id                          protoreflect.FieldDescriptor
+	fd_GenesisState_collections                      protoreflect.FieldDescriptor
+	fd_GenesisState_nextCollectionId                 protoreflect.FieldDescriptor
+	fd_GenesisState_balances                         protoreflect.FieldDescriptor
+	fd_GenesisState_balanceStoreKeys                 protoreflect.FieldDescriptor
+	fd_GenesisState_challengeTrackers                protoreflect.FieldDescriptor
+	fd_GenesisState_challengeTrackerStoreKeys        protoreflect.FieldDescriptor
+	fd_GenesisState_addressLists                     protoreflect.FieldDescriptor
+	fd_GenesisState_approvalTrackers                 protoreflect.FieldDescriptor
+	fd_GenesisState_approvalTrackerStoreKeys         protoreflect.FieldDescriptor
+	fd_GenesisState_approvalTrackerVersions          protoreflect.FieldDescriptor
+	fd_GenesisState_approvalTrackerVersionsStoreKeys protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -430,6 +524,8 @@ func init() {
 	fd_GenesisState_addressLists = md_GenesisState.Fields().ByName("addressLists")
 	fd_GenesisState_approvalTrackers = md_GenesisState.Fields().ByName("approvalTrackers")
 	fd_GenesisState_approvalTrackerStoreKeys = md_GenesisState.Fields().ByName("approvalTrackerStoreKeys")
+	fd_GenesisState_approvalTrackerVersions = md_GenesisState.Fields().ByName("approvalTrackerVersions")
+	fd_GenesisState_approvalTrackerVersionsStoreKeys = md_GenesisState.Fields().ByName("approvalTrackerVersionsStoreKeys")
 }
 
 var _ protoreflect.Message = (*fastReflection_GenesisState)(nil)
@@ -563,6 +659,18 @@ func (x *fastReflection_GenesisState) Range(f func(protoreflect.FieldDescriptor,
 			return
 		}
 	}
+	if len(x.ApprovalTrackerVersions) != 0 {
+		value := protoreflect.ValueOfList(&_GenesisState_12_list{list: &x.ApprovalTrackerVersions})
+		if !f(fd_GenesisState_approvalTrackerVersions, value) {
+			return
+		}
+	}
+	if len(x.ApprovalTrackerVersionsStoreKeys) != 0 {
+		value := protoreflect.ValueOfList(&_GenesisState_13_list{list: &x.ApprovalTrackerVersionsStoreKeys})
+		if !f(fd_GenesisState_approvalTrackerVersionsStoreKeys, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -600,6 +708,10 @@ func (x *fastReflection_GenesisState) Has(fd protoreflect.FieldDescriptor) bool 
 		return len(x.ApprovalTrackers) != 0
 	case "badges.GenesisState.approvalTrackerStoreKeys":
 		return len(x.ApprovalTrackerStoreKeys) != 0
+	case "badges.GenesisState.approvalTrackerVersions":
+		return len(x.ApprovalTrackerVersions) != 0
+	case "badges.GenesisState.approvalTrackerVersionsStoreKeys":
+		return len(x.ApprovalTrackerVersionsStoreKeys) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.GenesisState"))
@@ -638,6 +750,10 @@ func (x *fastReflection_GenesisState) Clear(fd protoreflect.FieldDescriptor) {
 		x.ApprovalTrackers = nil
 	case "badges.GenesisState.approvalTrackerStoreKeys":
 		x.ApprovalTrackerStoreKeys = nil
+	case "badges.GenesisState.approvalTrackerVersions":
+		x.ApprovalTrackerVersions = nil
+	case "badges.GenesisState.approvalTrackerVersionsStoreKeys":
+		x.ApprovalTrackerVersionsStoreKeys = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.GenesisState"))
@@ -711,6 +827,18 @@ func (x *fastReflection_GenesisState) Get(descriptor protoreflect.FieldDescripto
 		}
 		listValue := &_GenesisState_11_list{list: &x.ApprovalTrackerStoreKeys}
 		return protoreflect.ValueOfList(listValue)
+	case "badges.GenesisState.approvalTrackerVersions":
+		if len(x.ApprovalTrackerVersions) == 0 {
+			return protoreflect.ValueOfList(&_GenesisState_12_list{})
+		}
+		listValue := &_GenesisState_12_list{list: &x.ApprovalTrackerVersions}
+		return protoreflect.ValueOfList(listValue)
+	case "badges.GenesisState.approvalTrackerVersionsStoreKeys":
+		if len(x.ApprovalTrackerVersionsStoreKeys) == 0 {
+			return protoreflect.ValueOfList(&_GenesisState_13_list{})
+		}
+		listValue := &_GenesisState_13_list{list: &x.ApprovalTrackerVersionsStoreKeys}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.GenesisState"))
@@ -769,6 +897,14 @@ func (x *fastReflection_GenesisState) Set(fd protoreflect.FieldDescriptor, value
 		lv := value.List()
 		clv := lv.(*_GenesisState_11_list)
 		x.ApprovalTrackerStoreKeys = *clv.list
+	case "badges.GenesisState.approvalTrackerVersions":
+		lv := value.List()
+		clv := lv.(*_GenesisState_12_list)
+		x.ApprovalTrackerVersions = *clv.list
+	case "badges.GenesisState.approvalTrackerVersionsStoreKeys":
+		lv := value.List()
+		clv := lv.(*_GenesisState_13_list)
+		x.ApprovalTrackerVersionsStoreKeys = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.GenesisState"))
@@ -842,6 +978,18 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 		}
 		value := &_GenesisState_11_list{list: &x.ApprovalTrackerStoreKeys}
 		return protoreflect.ValueOfList(value)
+	case "badges.GenesisState.approvalTrackerVersions":
+		if x.ApprovalTrackerVersions == nil {
+			x.ApprovalTrackerVersions = []string{}
+		}
+		value := &_GenesisState_12_list{list: &x.ApprovalTrackerVersions}
+		return protoreflect.ValueOfList(value)
+	case "badges.GenesisState.approvalTrackerVersionsStoreKeys":
+		if x.ApprovalTrackerVersionsStoreKeys == nil {
+			x.ApprovalTrackerVersionsStoreKeys = []string{}
+		}
+		value := &_GenesisState_13_list{list: &x.ApprovalTrackerVersionsStoreKeys}
+		return protoreflect.ValueOfList(value)
 	case "badges.GenesisState.port_id":
 		panic(fmt.Errorf("field port_id of message badges.GenesisState is not mutable"))
 	case "badges.GenesisState.nextCollectionId":
@@ -890,6 +1038,12 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 	case "badges.GenesisState.approvalTrackerStoreKeys":
 		list := []string{}
 		return protoreflect.ValueOfList(&_GenesisState_11_list{list: &list})
+	case "badges.GenesisState.approvalTrackerVersions":
+		list := []string{}
+		return protoreflect.ValueOfList(&_GenesisState_12_list{list: &list})
+	case "badges.GenesisState.approvalTrackerVersionsStoreKeys":
+		list := []string{}
+		return protoreflect.ValueOfList(&_GenesisState_13_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.GenesisState"))
@@ -1019,6 +1173,18 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		if len(x.ApprovalTrackerVersions) > 0 {
+			for _, s := range x.ApprovalTrackerVersions {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
+		if len(x.ApprovalTrackerVersionsStoreKeys) > 0 {
+			for _, s := range x.ApprovalTrackerVersionsStoreKeys {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -1047,6 +1213,24 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.ApprovalTrackerVersionsStoreKeys) > 0 {
+			for iNdEx := len(x.ApprovalTrackerVersionsStoreKeys) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.ApprovalTrackerVersionsStoreKeys[iNdEx])
+				copy(dAtA[i:], x.ApprovalTrackerVersionsStoreKeys[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ApprovalTrackerVersionsStoreKeys[iNdEx])))
+				i--
+				dAtA[i] = 0x6a
+			}
+		}
+		if len(x.ApprovalTrackerVersions) > 0 {
+			for iNdEx := len(x.ApprovalTrackerVersions) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.ApprovalTrackerVersions[iNdEx])
+				copy(dAtA[i:], x.ApprovalTrackerVersions[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ApprovalTrackerVersions[iNdEx])))
+				i--
+				dAtA[i] = 0x62
+			}
 		}
 		if len(x.ApprovalTrackerStoreKeys) > 0 {
 			for iNdEx := len(x.ApprovalTrackerStoreKeys) - 1; iNdEx >= 0; iNdEx-- {
@@ -1589,6 +1773,70 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				}
 				x.ApprovalTrackerStoreKeys = append(x.ApprovalTrackerStoreKeys, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
+			case 12:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerVersions", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ApprovalTrackerVersions = append(x.ApprovalTrackerVersions, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
+			case 13:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ApprovalTrackerVersionsStoreKeys", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ApprovalTrackerVersionsStoreKeys = append(x.ApprovalTrackerVersionsStoreKeys, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1643,17 +1891,19 @@ type GenesisState struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Params                    *Params             `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
-	PortId                    string              `protobuf:"bytes,2,opt,name=port_id,json=portId,proto3" json:"port_id,omitempty"`
-	Collections               []*BadgeCollection  `protobuf:"bytes,3,rep,name=collections,proto3" json:"collections,omitempty"`
-	NextCollectionId          string              `protobuf:"bytes,4,opt,name=nextCollectionId,proto3" json:"nextCollectionId,omitempty"`
-	Balances                  []*UserBalanceStore `protobuf:"bytes,5,rep,name=balances,proto3" json:"balances,omitempty"`
-	BalanceStoreKeys          []string            `protobuf:"bytes,6,rep,name=balanceStoreKeys,proto3" json:"balanceStoreKeys,omitempty"`
-	ChallengeTrackers         []string            `protobuf:"bytes,7,rep,name=challengeTrackers,proto3" json:"challengeTrackers,omitempty"`
-	ChallengeTrackerStoreKeys []string            `protobuf:"bytes,8,rep,name=challengeTrackerStoreKeys,proto3" json:"challengeTrackerStoreKeys,omitempty"`
-	AddressLists              []*AddressList      `protobuf:"bytes,9,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
-	ApprovalTrackers          []*ApprovalTracker  `protobuf:"bytes,10,rep,name=approvalTrackers,proto3" json:"approvalTrackers,omitempty"`
-	ApprovalTrackerStoreKeys  []string            `protobuf:"bytes,11,rep,name=approvalTrackerStoreKeys,proto3" json:"approvalTrackerStoreKeys,omitempty"` // this line is used by starport scaffolding # genesis/proto/state
+	Params                           *Params             `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
+	PortId                           string              `protobuf:"bytes,2,opt,name=port_id,json=portId,proto3" json:"port_id,omitempty"`
+	Collections                      []*BadgeCollection  `protobuf:"bytes,3,rep,name=collections,proto3" json:"collections,omitempty"`
+	NextCollectionId                 string              `protobuf:"bytes,4,opt,name=nextCollectionId,proto3" json:"nextCollectionId,omitempty"`
+	Balances                         []*UserBalanceStore `protobuf:"bytes,5,rep,name=balances,proto3" json:"balances,omitempty"`
+	BalanceStoreKeys                 []string            `protobuf:"bytes,6,rep,name=balanceStoreKeys,proto3" json:"balanceStoreKeys,omitempty"`
+	ChallengeTrackers                []string            `protobuf:"bytes,7,rep,name=challengeTrackers,proto3" json:"challengeTrackers,omitempty"`
+	ChallengeTrackerStoreKeys        []string            `protobuf:"bytes,8,rep,name=challengeTrackerStoreKeys,proto3" json:"challengeTrackerStoreKeys,omitempty"`
+	AddressLists                     []*AddressList      `protobuf:"bytes,9,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
+	ApprovalTrackers                 []*ApprovalTracker  `protobuf:"bytes,10,rep,name=approvalTrackers,proto3" json:"approvalTrackers,omitempty"`
+	ApprovalTrackerStoreKeys         []string            `protobuf:"bytes,11,rep,name=approvalTrackerStoreKeys,proto3" json:"approvalTrackerStoreKeys,omitempty"`
+	ApprovalTrackerVersions          []string            `protobuf:"bytes,12,rep,name=approvalTrackerVersions,proto3" json:"approvalTrackerVersions,omitempty"`
+	ApprovalTrackerVersionsStoreKeys []string            `protobuf:"bytes,13,rep,name=approvalTrackerVersionsStoreKeys,proto3" json:"approvalTrackerVersionsStoreKeys,omitempty"` // this line is used by starport scaffolding # genesis/proto/state
 }
 
 func (x *GenesisState) Reset() {
@@ -1753,6 +2003,20 @@ func (x *GenesisState) GetApprovalTrackerStoreKeys() []string {
 	return nil
 }
 
+func (x *GenesisState) GetApprovalTrackerVersions() []string {
+	if x != nil {
+		return x.ApprovalTrackerVersions
+	}
+	return nil
+}
+
+func (x *GenesisState) GetApprovalTrackerVersionsStoreKeys() []string {
+	if x != nil {
+		return x.ApprovalTrackerVersionsStoreKeys
+	}
+	return nil
+}
+
 var File_badges_genesis_proto protoreflect.FileDescriptor
 
 var file_badges_genesis_proto_rawDesc = []byte{
@@ -1766,8 +2030,8 @@ var file_badges_genesis_proto_rawDesc = []byte{
 	0x6e, 0x63, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x16, 0x62, 0x61, 0x64, 0x67,
 	0x65, 0x73, 0x2f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x1a, 0x1a, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x61, 0x64, 0x64, 0x72, 0x65,
-	0x73, 0x73, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xe0,
-	0x04, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12,
+	0x73, 0x73, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xf4,
+	0x05, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12,
 	0x2c, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x0e, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42,
 	0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x17, 0x0a,
@@ -1805,14 +2069,23 @@ var file_badges_genesis_proto_rawDesc = []byte{
 	0x6c, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x65, 0x72, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4b, 0x65, 0x79,
 	0x73, 0x18, 0x0b, 0x20, 0x03, 0x28, 0x09, 0x52, 0x18, 0x61, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61,
 	0x6c, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x65, 0x72, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4b, 0x65, 0x79,
-	0x73, 0x42, 0x6d, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42,
-	0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a,
-	0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58,
-	0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x12, 0x46, 0x0a, 0x17, 0x61, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x54, 0x72, 0x61,
+	0x63, 0x6b, 0x65, 0x72, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x0c, 0x20, 0x03,
+	0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e, 0x74,
+	0x52, 0x17, 0x61, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x65,
+	0x72, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x4a, 0x0a, 0x20, 0x61, 0x70, 0x70,
+	0x72, 0x6f, 0x76, 0x61, 0x6c, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x65, 0x72, 0x56, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x73, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4b, 0x65, 0x79, 0x73, 0x18, 0x0d, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x20, 0x61, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x54, 0x72, 0x61,
+	0x63, 0x6b, 0x65, 0x72, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x53, 0x74, 0x6f, 0x72,
+	0x65, 0x4b, 0x65, 0x79, 0x73, 0x42, 0x6d, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x42, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68,
+	0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02,
+	0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06,
+	0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c,
+	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

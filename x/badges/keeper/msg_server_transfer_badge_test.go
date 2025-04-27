@@ -36,7 +36,7 @@ func (suite *TestSuite) TestTransferBadgesForceful() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -84,7 +84,7 @@ func (suite *TestSuite) TestTransferBadgesHandleDuplicateIDs() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -226,7 +226,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})
@@ -251,7 +251,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(),
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 			},
 		},
 	})

@@ -46,6 +46,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(err)
 		}
 	}
+
+	for idx, version := range genState.ApprovalTrackerVersions {
+		k.SetApprovalTrackerVersionInStore(ctx, genState.ApprovalTrackerVersionsStoreKeys[idx], version)
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -67,6 +71,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.ChallengeTrackers, genesis.ChallengeTrackerStoreKeys = k.GetChallengeTrackersFromStore(ctx)
 	genesis.AddressLists = k.GetAddressListsFromStore(ctx)
 	genesis.ApprovalTrackers, genesis.ApprovalTrackerStoreKeys = k.GetApprovalTrackersFromStore(ctx)
+	genesis.ApprovalTrackerVersions, genesis.ApprovalTrackerVersionsStoreKeys = k.GetApprovalTrackerVersionsFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

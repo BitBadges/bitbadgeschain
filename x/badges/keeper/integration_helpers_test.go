@@ -211,11 +211,13 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 					ApprovalId:      GetBobApproval().ApprovalId,
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
 				},
 				{
 					ApprovalId:      "mint-test",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
 				},
 			},
 		},

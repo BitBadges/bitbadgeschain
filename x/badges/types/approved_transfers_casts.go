@@ -31,6 +31,7 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 		ApprovalId:        transfer.ApprovalId,
 		Uri:               transfer.Uri,
 		CustomData:        transfer.CustomData,
+		Version:           transfer.Version,
 	}
 }
 
@@ -48,6 +49,7 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 		ApprovalId:        transfer.ApprovalId,
 		Uri:               transfer.Uri,
 		CustomData:        transfer.CustomData,
+		Version:           transfer.Version,
 	}
 }
 
@@ -66,6 +68,7 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 		ApprovalId:        transfer.ApprovalId,
 		Uri:               transfer.Uri,
 		CustomData:        transfer.CustomData,
+		Version:           transfer.Version,
 	}
 }
 
@@ -83,6 +86,7 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) 
 		ApprovalId:        transfer.ApprovalId,
 		Uri:               transfer.Uri,
 		CustomData:        transfer.CustomData,
+		Version:           transfer.Version,
 	}
 }
 
