@@ -6,6 +6,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -47,20 +48,32 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		if err := k.ValidateUserOutgoingApprovalsUpdate(ctx, collection, userBalance.OutgoingApprovals, msg.OutgoingApprovals, userBalance.UserPermissions.CanUpdateOutgoingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
-		userBalance.OutgoingApprovals = msg.OutgoingApprovals
 
-		// If we didn't apply the default, we need to increment the versions
-		// Else, we did apply the default and we should ensure the version is kept at 0 - no need to double increment
+		// Create a map of existing approvals for quick lookup
+		existingApprovals := make(map[string]*types.UserOutgoingApproval)
+		for _, approval := range userBalance.OutgoingApprovals {
+			existingApprovals[approval.ApprovalId] = approval
+		}
+
+		// If we didn't apply the default, we need to increment the versions only for changed approvals
 		if !appliedDefault {
 			newOutgoingApprovalsWithVersion := []*types.UserOutgoingApproval{}
-			for _, approval := range msg.OutgoingApprovals {
-				newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, approval.ApprovalId)
-				approval.Version = newVersion
-				newOutgoingApprovalsWithVersion = append(newOutgoingApprovalsWithVersion, approval)
+			for _, newApproval := range msg.OutgoingApprovals {
+				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
+
+				// Only increment version if approval is new or changed
+				if !exists || !proto.Equal(existingApproval, newApproval) {
+					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, newApproval.ApprovalId)
+					newApproval.Version = newVersion
+				} else {
+					// Keep existing version if approval hasn't changed
+					newApproval.Version = existingApproval.Version
+				}
+				newOutgoingApprovalsWithVersion = append(newOutgoingApprovalsWithVersion, newApproval)
 			}
 			userBalance.OutgoingApprovals = newOutgoingApprovalsWithVersion
 		} else {
-			// We did apply the default, so we need to ensure the version is kept at 0 and no need to increment again
+			// We did apply the default, so we need to ensure the version is kept at 0
 			for _, approval := range msg.OutgoingApprovals {
 				approval.Version = sdkmath.NewUint(0)
 			}
@@ -72,20 +85,32 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection, userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
-		userBalance.IncomingApprovals = msg.IncomingApprovals
 
-		// If we didn't apply the default, we need to increment the versions
-		// Else, we did apply the default and we should ensure the version is kept at 0 - no need to double increment
+		// Create a map of existing approvals for quick lookup
+		existingApprovals := make(map[string]*types.UserIncomingApproval)
+		for _, approval := range userBalance.IncomingApprovals {
+			existingApprovals[approval.ApprovalId] = approval
+		}
+
+		// If we didn't apply the default, we need to increment the versions only for changed approvals
 		if !appliedDefault {
 			newIncomingApprovalsWithVersion := []*types.UserIncomingApproval{}
-			for _, approval := range msg.IncomingApprovals {
-				newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, approval.ApprovalId)
-				approval.Version = newVersion
-				newIncomingApprovalsWithVersion = append(newIncomingApprovalsWithVersion, approval)
+			for _, newApproval := range msg.IncomingApprovals {
+				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
+
+				// Only increment version if approval is new or changed
+				if !exists || !proto.Equal(existingApproval, newApproval) {
+					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, newApproval.ApprovalId)
+					newApproval.Version = newVersion
+				} else {
+					// Keep existing version if approval hasn't changed
+					newApproval.Version = existingApproval.Version
+				}
+				newIncomingApprovalsWithVersion = append(newIncomingApprovalsWithVersion, newApproval)
 			}
 			userBalance.IncomingApprovals = newIncomingApprovalsWithVersion
 		} else {
-			// We did apply the default, so we need to ensure the version is kept at 0 and no need to increment again
+			// We did apply the default, so we need to ensure the version is kept at 0
 			for _, approval := range msg.IncomingApprovals {
 				approval.Version = sdkmath.NewUint(0)
 			}
