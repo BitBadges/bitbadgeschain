@@ -31,3 +31,10 @@ ts-client/
 k8s/
 
 output.txt 
+
+export-genesis.json
+
+bitbadgeschaind
+
+genesis-test.json
+scripts-dev/
