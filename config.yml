@@ -44,8 +44,9 @@ genesis:
             params:
                 voting_period: '604800s'
                 max_deposit_period: '604800s'
-                # voting_period: '600s'
-                # max_deposit_period: '600s'
+                # voting_period: '10s'
+                # max_deposit_period: '10s'
+                # expedited_voting_period: '9s'
                 min_deposit:
                     - amount: '10000000000'
                       denom: ustake

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package badges;
+package badges;  
 
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
