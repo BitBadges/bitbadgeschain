@@ -10,7 +10,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/gogoproto/proto"
 )
 
 // Legacy function that is all-inclusive (creates and updates)
@@ -91,7 +90,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
 			return nil, err
 		}
-		collection.CollectionApprovals = msg.CollectionApprovals
 
 		// Create a map of existing approvals for quick lookup
 		existingApprovals := make(map[string]*types.CollectionApproval)
@@ -103,9 +101,8 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		newApprovalsWithVersion := []*types.CollectionApproval{}
 		for _, newApproval := range msg.CollectionApprovals {
 			existingApproval, exists := existingApprovals[newApproval.ApprovalId]
-
 			// Only increment version if approval is new or changed
-			if !exists || !proto.Equal(existingApproval, newApproval) {
+			if !exists || existingApproval.String() != newApproval.String() {
 				newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "collection", "", newApproval.ApprovalId)
 				newApproval.Version = newVersion
 			} else {

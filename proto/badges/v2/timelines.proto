@@ -1,15 +1,14 @@
 syntax = "proto3";
-package badges.v0;
+package badges.v2;
 
 import "google/protobuf/any.proto";
-import "badges/v0/transfers.proto";
-import "badges/v0/balances.proto";
-import "badges/v0/permissions.proto";
-import "badges/v0/metadata.proto";
+import "badges/v2/transfers.proto";
+import "badges/v2/balances.proto";
+import "badges/v2/permissions.proto";
+import "badges/v2/metadata.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v0";
-
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v2";
 
 // CollectionMetadataTimeline defines the metadata for a collection at different timeline times.
 message CollectionMetadataTimeline {
@@ -82,4 +81,3 @@ message StandardsTimeline {
   // The timeline times when the standards are valid. Can not overlap with other timeline elements in same array.
   repeated UintRange timelineTimes = 2;
 }
-

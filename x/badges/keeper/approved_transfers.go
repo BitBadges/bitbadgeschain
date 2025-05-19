@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -39,6 +40,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 		return []*UserApprovalsToCheck{}, err
 	}
 
+	potentialErrors := []string{}
+
 	//For each approved transfer, we check if the transfer is allowed
 	// 1: If transfer meets all criteria, we deduct, get user approvals to check, and continue (if there are any remaining balances)
 	// 2. If transfer does not meet all criteria, we continue and do not mark anything as handled
@@ -50,9 +53,20 @@ func (k Keeper) DeductAndGetUserApprovals(
 			break
 		}
 
+		isPrioritizedApproval := false
+		for _, prioritizedApproval := range transfer.PrioritizedApprovals {
+			if prioritizedApproval.ApprovalId == approval.ApprovalId && prioritizedApproval.ApprovalLevel == approvalLevel && prioritizedApproval.ApproverAddress == approverAddress {
+				isPrioritizedApproval = true
+				break
+			}
+		}
+
 		//Initial checks: Make sure (from, to, initiatedBy) match the approval's collection list IDs
 		doAddressesMatch := k.CheckIfAddressesMatchCollectionListIds(ctx, approval, fromAddress, toAddress, initiatedBy)
 		if !doAddressesMatch {
+			if isPrioritizedApproval {
+				potentialErrors = append(potentialErrors, fmt.Sprintf("addresses do not match (from, to, initiatedBy): %s, %s, %s", fromAddress, toAddress, initiatedBy))
+			}
 			continue
 		}
 
@@ -60,6 +74,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 		currTimeFound, err := types.SearchUintRangesForUint(currTime, approval.TransferTimes)
 		if !currTimeFound || err != nil {
+			if isPrioritizedApproval {
+				potentialErrors = append(potentialErrors, fmt.Sprintf("transfer time not in range"))
+			}
 			continue
 		}
 
@@ -84,24 +101,39 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			approvalCriteria := approval.ApprovalCriteria
 			if approvalCriteria.RequireFromDoesNotEqualInitiatedBy && fromAddress == initiatedBy {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, "from address equals initiated by")
+				}
 				continue
 			}
 
 			if approvalCriteria.RequireFromEqualsInitiatedBy && fromAddress != initiatedBy {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, "from address does not equal initiated by")
+				}
 				continue
 			}
 
 			if approvalCriteria.RequireToDoesNotEqualInitiatedBy && toAddress == initiatedBy {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, "to address equals initiated by")
+				}
 				continue
 			}
 
 			if approvalCriteria.RequireToEqualsInitiatedBy && toAddress != initiatedBy {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, "to address does not equal initiated by")
+				}
 				continue
 			}
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
 			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, true) //simulate = true
 			if err != nil {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, fmt.Sprintf("coin transfer error: %s", err))
+				}
 				continue
 			}
 
@@ -114,6 +146,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			transferBalancesToCheck = types.FilterZeroBalances(transferBalancesToCheck)
 			if len(transferBalancesToCheck) == 0 {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, "no balances to check")
+				}
 				continue
 			}
 
@@ -128,6 +163,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 				true, //simulation = true
 			)
 			if err != nil {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, fmt.Sprintf("merkle challenge error: %s", err))
+				}
 				continue
 			}
 
@@ -165,6 +203,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 					true,
 				)
 				if err != nil {
+					if isPrioritizedApproval {
+						potentialErrors = append(potentialErrors, fmt.Sprintf("get max possible error: %s", err))
+					}
 					failed = true
 					break
 				}
@@ -172,6 +213,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 				//Get max allowed by remaining balances to check
 				transferBalancesToCheck, err = types.GetOverlappingBalances(ctx, maxPossible, transferBalancesToCheck)
 				if err != nil {
+					if isPrioritizedApproval {
+						potentialErrors = append(potentialErrors, fmt.Sprintf("get overlapping balances error: %s", err))
+					}
 					failed = true
 					break
 				}
@@ -187,13 +231,16 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//here, we assert that the transfer can be incremented and is within the threshold for all trackers (this is a simulation)
 			for i, trackerType := range trackerTypes {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], true)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], true, transfer.OverrideTimestamp)
 				if err != nil {
 					failed = true
 					break
 				}
 			}
 			if failed {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, fmt.Sprintf("increment approval and assert within threshold error: %s", err))
+				}
 				continue
 			}
 
@@ -226,7 +273,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			for i, trackerType := range trackerTypes {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], false)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], false, transfer.OverrideTimestamp)
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing approvals")
 				}
@@ -254,7 +301,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
 		transferStr := "attempting to transfer badge ID " + remainingBalances[0].BadgeIds[0].Start.String()
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s", transferStr)
+		potentialErrorsStr := ""
+		if len(potentialErrors) > 0 {
+			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
+		}
+		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s%s", transferStr, potentialErrorsStr)
 	}
 
 	return userApprovalsToCheck, nil
@@ -265,6 +316,52 @@ func isCustomChallengeOrderCalculation(predeterminedBalances *types.Predetermine
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers && trackerType == "to") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy")
+}
+
+func (k Keeper) ResetApprovalTrackerIfNeeded(ctx sdk.Context, approvalTracker *types.ApprovalTracker, resetTimeIntervals *types.ResetTimeIntervals, isNumTransfers bool) types.ApprovalTracker {
+	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	if resetTimeIntervals != nil && resetTimeIntervals.StartTime.GT(sdkmath.NewUint(0)) && resetTimeIntervals.IntervalLength.GT(sdkmath.NewUint(0)) {
+		startTime := resetTimeIntervals.StartTime
+		intervalLength := resetTimeIntervals.IntervalLength
+		lastResetAt := approvalTracker.LastUpdatedAt
+
+		//If the first reset time is in the future, we don't need to reset
+		if startTime.GT(now) {
+			return *approvalTracker
+		}
+
+		//1. Calculate what interval we are in
+		currInterval := now.Sub(startTime).Quo(intervalLength)
+		currIntervalStart := startTime.Add(currInterval.Mul(intervalLength))
+
+		if currIntervalStart.GT(lastResetAt) {
+			if !isNumTransfers {
+				approvalTracker.Amounts = []*types.Balance{}
+			} else {
+				approvalTracker.NumTransfers = sdkmath.NewUint(0)
+			}
+		}
+	}
+
+	// We can set the last updated no matter what
+	// If it is N/A, it doesn't matter
+	// If we need to update it, we update it
+	approvalTracker.LastUpdatedAt = now
+
+	return *approvalTracker
+}
+
+func (k Keeper) GetApprovalTrackerFromStoreAndResetIfNeeded(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId string, amountTrackerId string, level string, trackerType string, address string, resetTimeIntervals *types.ResetTimeIntervals, isNumTransfers bool) (types.ApprovalTracker, error) {
+	approvalTracker, found := k.GetApprovalTrackerFromStore(ctx, collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)
+	if !found {
+		return types.ApprovalTracker{
+			Amounts:       []*types.Balance{},
+			NumTransfers:  sdkmath.NewUint(0),
+			LastUpdatedAt: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
+		}, nil
+	}
+
+	return k.ResetApprovalTrackerIfNeeded(ctx, &approvalTracker, resetTimeIntervals, isNumTransfers), nil
 }
 
 // GetMaxPossible calculates the maximum possible transfer amounts based on approval criteria
@@ -292,13 +389,9 @@ func (k Keeper) GetMaxPossible(
 
 	// Get approval tracker details
 	amountsTrackerId := approval.ApprovalCriteria.ApprovalAmounts.AmountTrackerId
-	amountsTrackerDetails := types.ApprovalTracker{
-		Amounts:      []*types.Balance{},
-		NumTransfers: sdkmath.NewUint(0),
-	}
 
 	// Fetch current approval tracker state
-	fetchedDetails, found := k.GetApprovalTrackerFromStore(
+	amountsTrackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 		ctx,
 		collection.CollectionId,
 		approverAddress,
@@ -307,9 +400,11 @@ func (k Keeper) GetMaxPossible(
 		approvalLevel,
 		trackerType,
 		address,
+		approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals,
+		false,
 	)
-	if found {
-		amountsTrackerDetails = fetchedDetails
+	if err != nil {
+		return nil, err
 	}
 
 	// Calculate current tally for specific badge IDs and times
@@ -346,6 +441,7 @@ func (k Keeper) handlePredeterminedBalances(
 	trackerType string,
 	trackerNumTransfers sdkmath.Uint,
 	challengeNumIncrements sdkmath.Uint,
+	overrideTimestamp sdkmath.Uint,
 ) ([]*types.Balance, error) {
 	if predeterminedBalances == nil {
 		return nil, nil
@@ -390,7 +486,10 @@ func (k Keeper) handlePredeterminedBalances(
 			numIncrements,
 			i.IncrementOwnershipTimesBy,
 			i.IncrementBadgeIdsBy,
-			i.ApprovalDurationFromNow,
+			i.DurationFromTimestamp,
+			i.RecurringOwnershipTimes,
+			overrideTimestamp,
+			i.AllowOverrideTimestamp,
 		)
 		if err != nil {
 			return nil, err
@@ -417,6 +516,7 @@ func emitApprovalEvent(
 	address string,
 	amountsStr string,
 	numTransfersStr string,
+	lastUpdatedAt sdkmath.Uint,
 ) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -431,6 +531,7 @@ func emitApprovalEvent(
 			sdk.NewAttribute("approvedAddress", fmt.Sprint(address)),
 			sdk.NewAttribute("amounts", amountsStr),
 			sdk.NewAttribute("numTransfers", numTransfersStr),
+			sdk.NewAttribute("lastUpdatedAt", fmt.Sprint(lastUpdatedAt)),
 		),
 	)
 }
@@ -450,6 +551,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	trackerType string,
 	address string,
 	simulate bool,
+	overrideTimestamp sdkmath.Uint,
 ) error {
 	approvalCriteria := approval.ApprovalCriteria
 	amountsTrackerId := approvalCriteria.ApprovalAmounts.AmountTrackerId
@@ -465,21 +567,24 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 
 	// Fetch approval tracker details
 	amountsTrackerDetails := types.ApprovalTracker{
-		Amounts:      []*types.Balance{},
-		NumTransfers: sdkmath.NewUint(0),
+		Amounts:       []*types.Balance{},
+		NumTransfers:  sdkmath.NewUint(0),
+		LastUpdatedAt: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
 	}
 
 	maxNumTransfersTrackerDetails := types.ApprovalTracker{
-		Amounts:      []*types.Balance{},
-		NumTransfers: sdkmath.NewUint(0),
+		Amounts:       []*types.Balance{},
+		NumTransfers:  sdkmath.NewUint(0),
+		LastUpdatedAt: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
 	}
 
 	needToFetchApprovalTrackerDetails := maxNumTransfers.GT(sdkmath.NewUint(0)) ||
 		approvedAmount.GT(sdkmath.NewUint(0)) ||
 		isCustomChallengeOrderCalculation(approvalCriteria.PredeterminedBalances, trackerType)
 
+	err := *new(error)
 	if needToFetchApprovalTrackerDetails {
-		fetchedDetails, found := k.GetApprovalTrackerFromStore(
+		amountsTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
 			collection.CollectionId,
 			approverAddress,
@@ -488,12 +593,14 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			approvalLevel,
 			trackerType,
 			address,
+			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals,
+			false,
 		)
-		if found {
-			amountsTrackerDetails = fetchedDetails
+		if err != nil {
+			return err
 		}
 
-		fetchedDetails, found = k.GetApprovalTrackerFromStore(
+		maxNumTransfersTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
 			collection.CollectionId,
 			approverAddress,
@@ -502,20 +609,23 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			approvalLevel,
 			trackerType,
 			address,
+			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals,
+			true,
 		)
-		if found {
-			maxNumTransfersTrackerDetails = fetchedDetails
+		if err != nil {
+			return err
 		}
 	}
 
 	// Handle predetermined balances check
-	_, err := k.handlePredeterminedBalances(
+	_, err = k.handlePredeterminedBalances(
 		ctx,
 		approvalCriteria.PredeterminedBalances,
 		originalTransferBalances,
 		trackerType,
 		maxNumTransfersTrackerDetails.NumTransfers,
 		challengeNumIncrements,
+		overrideTimestamp,
 	)
 	if err != nil {
 		return err
@@ -610,6 +720,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 				amountsStr,
 				numTransfersStr,
+				maxNumTransfersTrackerDetails.LastUpdatedAt,
 			)
 
 			amountsTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers
@@ -639,6 +750,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 				amountsStr,
 				amountsNumTransfersStr,
+				maxNumTransfersTrackerDetails.LastUpdatedAt,
 			)
 			emitApprovalEvent(
 				ctx,
@@ -651,6 +763,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 				maxNumTransfersAmountsStr,
 				numTransfersStr,
+				maxNumTransfersTrackerDetails.LastUpdatedAt,
 			)
 
 			amountsTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers
@@ -697,6 +810,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	precalcDetails *types.ApprovalIdentifierDetails,
 	to string,
 	initiatedBy string,
+	overrideTimestamp sdkmath.Uint,
 ) ([]*types.Balance, error) {
 	approvalId := ""
 	approverAddress := precalcDetails.ApproverAddress
@@ -750,7 +864,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					approvedAddress = initiatedBy
 				}
 
-				numTransfersTracker, found := k.GetApprovalTrackerFromStore(
+				numTransfersTracker, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 					ctx,
 					collection.CollectionId,
 					approverAddress,
@@ -759,12 +873,11 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					approvalLevel,
 					trackerType,
 					approvedAddress,
+					approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals,
+					true,
 				)
-				if !found {
-					numTransfersTracker = types.ApprovalTracker{
-						Amounts:      []*types.Balance{},
-						NumTransfers: sdkmath.NewUint(0),
-					}
+				if err != nil {
+					return nil, err
 				}
 
 				numIncrements = numTransfersTracker.NumTransfers
@@ -778,7 +891,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				}
 			} else if approvalCriteria.PredeterminedBalances.IncrementedBalances != nil {
 				err := *new(error)
-				predeterminedBalances, err = types.IncrementBalances(ctx, approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances, numIncrements, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow)
+				predeterminedBalances, err = types.IncrementBalances(ctx, approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances, numIncrements, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp, approvalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes, overrideTimestamp, approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp)
 				if err != nil {
 					return []*types.Balance{}, err
 				}

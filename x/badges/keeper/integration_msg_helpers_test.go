@@ -140,13 +140,13 @@ func CreateAddressLists(suite *TestSuite, ctx context.Context, msg *types.MsgCre
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []*types.MsgNewCollection) error {
 	for _, collectionToCreate := range collectionsToCreate {
 		balancesType := ""
-		if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(1)) {
+		if sdkmath.NewUint(1).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
 			balancesType = "Standard"
-		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(2)) {
+		} else if sdkmath.NewUint(2).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
 			balancesType = "Off-Chain - Indexed"
-		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(3)) {
+		} else if sdkmath.NewUint(3).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
 			balancesType = "Inherited"
-		} else if collectionToCreate.BalancesType.Equal(sdkmath.NewUint(4)) {
+		} else if sdkmath.NewUint(4).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
 			balancesType = "Off-Chain - Non-Indexed"
 		} else {
 			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
@@ -165,7 +165,6 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			BalancesType:          balancesType,
 			CollectionPermissions: collectionToCreate.Permissions,
 			CollectionApprovals:   collectionToCreate.CollectionApprovals,
-
 			DefaultBalances: &types.UserBalanceStore{
 				Balances:          collectionToCreate.DefaultBalances,
 				OutgoingApprovals: []*types.UserOutgoingApproval{},
@@ -174,7 +173,6 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 				AutoApproveSelfInitiatedIncomingTransfers: true,
 				UserPermissions: nil,
 			},
-
 			CollectionMetadataTimeline:       collectionToCreate.CollectionMetadataTimeline,
 			BadgeMetadataTimeline:            collectionToCreate.BadgeMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,

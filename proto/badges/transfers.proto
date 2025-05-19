@@ -220,6 +220,16 @@ message ManualBalances {
   repeated Balance balances = 1;
 }
 
+// RecurringOwnershipTimes represents a list of recurring ownership times.
+message RecurringOwnershipTimes {
+  // The original start time of the first interval.
+  string startTime = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The interval length in unix milliseconds.
+  string intervalLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Grace period length where you can charge the next interval (nextStartTime - chargePeriodLength) until (nextStartTime) = charge period
+  string chargePeriodLength = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
 // IncrementedBalances represents balances that are incremented by specific amounts, according to the order calculation method.
 message IncrementedBalances {
   repeated Balance startBalances = 1;
@@ -228,7 +238,11 @@ message IncrementedBalances {
   // The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
   string incrementOwnershipTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The amount of unix milliseconds to approve starting from now. Incompatible with incrementOwnershipTimesBy.
-  string approvalDurationFromNow = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string durationFromTimestamp = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Whether to allow overriding the timestamp for the balances (only applicable with durationFromTimestamp set).
+  bool allowOverrideTimestamp = 5;
+  // Recurring ownership times.
+  RecurringOwnershipTimes recurringOwnershipTimes = 6;
 }
 
 // PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
@@ -273,6 +287,16 @@ message ApprovalAmounts {
   // The ID of the amount tracker associated with this approval.
   // We use this ID to track the number of transfers and amounts transferred.
   string amountTrackerId = 6;
+  // Time intervals to reset the trackers at.
+  ResetTimeIntervals resetTimeIntervals = 7;
+}
+
+// Time intervals to reset the trackers at.
+message ResetTimeIntervals {
+  // Original start time of the first interval.
+  string startTime = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Interval length in unix milliseconds.
+  string intervalLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
@@ -291,6 +315,8 @@ message MaxNumTransfers {
   // The ID of the amount tracker associated with this approval.
   // We use this ID to track the number of transfers and amounts transferred.
   string amountTrackerId = 6;
+  // Time intervals to reset the trackers at.
+  ResetTimeIntervals resetTimeIntervals = 7;
 }
 
 // ApprovalTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.
@@ -299,6 +325,8 @@ message ApprovalTracker {
   string numTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // Cumulative balances associated with the transfers that have been processed.
   repeated Balance amounts = 2;
+  // Last updated at time.
+  string lastUpdatedAt = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message CoinTransfer {
@@ -451,6 +479,9 @@ message Transfer {
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
   bool onlyCheckPrioritizedOutgoingApprovals = 10;
+  // The timestamp to override with when calculating the balances.
+  // Only applicable for approvals with predeterminedBalances set that allow setting a custom timestamp for the transfer.
+  string overrideTimestamp = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MerklePathItem represents an item in a Merkle path.

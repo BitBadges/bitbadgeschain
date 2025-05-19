@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"math"
+	"time"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -532,7 +533,7 @@ func (suite *TestSuite) TestIncrements() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -684,7 +685,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -831,7 +832,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -958,7 +959,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -1134,7 +1135,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -1260,7 +1261,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -1427,7 +1428,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -1585,7 +1586,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 			MerkleChallenges: []*types.MerkleChallenge{
@@ -1737,7 +1738,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -2055,7 +2056,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 					},
 					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-					ApprovalDurationFromNow:   sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
 			},
 
@@ -2242,7 +2243,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 			},
 			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-			ApprovalDurationFromNow:   sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
 		},
 		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
@@ -2273,7 +2274,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 				},
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-				ApprovalDurationFromNow:   sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(0),
 			},
 			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 				UseOverallNumTransfers: true,
@@ -2399,7 +2400,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 						},
 						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-						ApprovalDurationFromNow:   sdkmath.NewUint(0),
+						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
 					OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 						UseOverallNumTransfers: true,
@@ -2431,7 +2432,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 						},
 						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-						ApprovalDurationFromNow:   sdkmath.NewUint(0),
+						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
 					OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 						UseOverallNumTransfers: true,
@@ -2511,7 +2512,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 						},
 						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-						ApprovalDurationFromNow:   sdkmath.NewUint(0),
+						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
 					OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 						UseOverallNumTransfers: true,
@@ -2543,7 +2544,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 						},
 						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-						ApprovalDurationFromNow:   sdkmath.NewUint(0),
+						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
 					OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 						UseOverallNumTransfers: true,
@@ -2640,7 +2641,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			},
 			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-			ApprovalDurationFromNow:   sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
 		},
 		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 			UseOverallNumTransfers: true,
@@ -2670,7 +2671,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 				},
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-				ApprovalDurationFromNow:   sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(0),
 			},
 			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 				UseOverallNumTransfers: true,
@@ -2830,7 +2831,7 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 				},
 				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
-				ApprovalDurationFromNow:   sdkmath.NewUint(1000),
+				DurationFromTimestamp:     sdkmath.NewUint(1000),
 			},
 			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
 				UseOverallNumTransfers: true,
@@ -2866,25 +2867,584 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 
 	startTime := aliceBalance.Balances[0].OwnershipTimes[0].Start
 	endTime := aliceBalance.Balances[0].OwnershipTimes[0].End
-	suite.Require().Equal(startTime.Add(sdkmath.NewUint(1000)), endTime)
+	suite.Require().Equal(startTime.Add(sdkmath.NewUint(999)), endTime)
 
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
 	suite.Require().Equal(bobBalance.Balances[0].Amount, sdkmath.NewUint(1))
 	bob0EndTime := bobBalance.Balances[0].OwnershipTimes[0].End
 	bob1StartTime := bobBalance.Balances[1].OwnershipTimes[0].Start
 
-	// 1000 difference between the two transfers + 1 on either end to account for the inclusive end time
-	suite.Require().Equal(bob0EndTime.Add(sdkmath.NewUint(1002)), bob1StartTime)
+	// 1000 difference between the two transfers + 1 on start to account for the inclusive start time
+	suite.Require().Equal(bob0EndTime.Add(sdkmath.NewUint(1001)), bob1StartTime)
 }
 
-func (suite *TestSuite) TesstCantSetBothIncrementOwnershipTimesByAndApprovalDurationFromNow() {
+func (suite *TestSuite) TestCantSetBothIncrementOwnershipTimesByAndApprovalDurationFromNow() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow = sdkmath.NewUint(0)
-	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy = sdkmath.NewUint(1)
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = &types.OutgoingApprovalCriteria{
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				DurationFromTimestamp:     sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(1),
+			},
+		},
+	}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "Error creating badges")
+}
+
+func (suite *TestSuite) TestCantSetBothIncrementOwnershipTimesByAndRecurringOwnershipTimes() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = &types.OutgoingApprovalCriteria{
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				DurationFromTimestamp:     sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(1),
+			},
+		},
+	}
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &types.RecurringOwnershipTimes{
+		StartTime:          sdkmath.NewUint(10),
+		IntervalLength:     sdkmath.NewUint(10),
+		ChargePeriodLength: sdkmath.NewUint(10),
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "Error creating badges")
+}
+
+func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimestampOverride() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = nil
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalId = "asadsdasfghdsfasdfasdf"
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria = &types.ApprovalCriteria{
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(1000),
+				AllowOverrideTimestamp:    true,
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+			OverrideTimestamp: sdkmath.NewUint(10),
+		}},
+	})
+	suite.Require().Nil(err)
+	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
+
+	startTime := aliceBalance.Balances[0].OwnershipTimes[0].Start
+	endTime := aliceBalance.Balances[0].OwnershipTimes[0].End
+	suite.Require().Equal(startTime.Add(sdkmath.NewUint(999)).Uint64(), endTime.Uint64())
+
+	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
+	suite.Require().Equal(bobBalance.Balances[0].Amount.Uint64(), sdkmath.NewUint(1).Uint64())
+	bob0EndTime := bobBalance.Balances[0].OwnershipTimes[0].End
+	bob1StartTime := bobBalance.Balances[1].OwnershipTimes[0].Start
+
+	// 1000 difference between the two transfers + 1 on either end to account for the inclusive end time
+	suite.Require().Equal(bob0EndTime.Add(sdkmath.NewUint(1001)).Uint64(), bob1StartTime.Uint64())
+
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start.Uint64(), sdkmath.NewUint(10).Uint64())
+}
+
+func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimestampOverrideNotAllowed() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = nil
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalId = "asadsdasfghdsfasdfasdf"
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria = &types.ApprovalCriteria{
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(1000),
+				AllowOverrideTimestamp:    false,
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+			OverrideTimestamp: sdkmath.NewUint(10),
+		}},
+	})
+	suite.Require().Nil(err)
+
+	// We did not use the overridden timestamp
+	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().NotEqual(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(10))
+}
+
+func (suite *TestSuite) TestRecurringOwnershipTimes() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = nil
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalId = "asadsdasfghdsfasdfasdf"
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria = &types.ApprovalCriteria{
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(), // doesn't matter
+					},
+				},
+				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(0),
+				AllowOverrideTimestamp:    false,
+				RecurringOwnershipTimes: &types.RecurringOwnershipTimes{
+					StartTime:          sdkmath.NewUint(100),
+					IntervalLength:     sdkmath.NewUint(100),
+					ChargePeriodLength: sdkmath.NewUint(10),
+				},
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// outside grace period
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(9949))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Error(err)
+
+	// before start time
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(1))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Error(err)
+
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(9999))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(10000))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(10000).Add(sdkmath.NewUint(99)))
+
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(10099))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	aliceBalance, _ = GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(10000))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(10000).Add(sdkmath.NewUint(199)))
+
+	// skip a month
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(10299))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	aliceBalance, _ = GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(10000))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(10000).Add(sdkmath.NewUint(199)))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[1].Start, sdkmath.NewUint(10300))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[1].End, sdkmath.NewUint(10300).Add(sdkmath.NewUint(99)))
+}
+
+func (suite *TestSuite) TestSubscriptionApproach() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = nil
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalId = "asadsdasfghdsfasdfasdf"
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria = &types.ApprovalCriteria{
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(), // doesn't matter
+					},
+				},
+				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(1000),
+				AllowOverrideTimestamp:    true,
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "transfer-approval",
+		FromListId:        collectionsToCreate[0].DefaultIncomingApprovals[0].FromListId,
+		InitiatedByListId: collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId,
+		ToListId:          collectionsToCreate[0].DefaultOutgoingApprovals[0].ToListId,
+		BadgeIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TransferTimes:     GetFullUintRanges(),
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(1500))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+			OverrideTimestamp: sdkmath.NewUint(2000),
+		}},
+	})
+	suite.Require().Nil(err)
+
+	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(2000))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(2000).Add(sdkmath.NewUint(999)))
+
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 charlie,
+		CollectionId:            collection.CollectionId,
+		UpdateIncomingApprovals: true,
+		IncomingApprovals: []*types.UserIncomingApproval{
+			{
+				ApprovalId:        "asadsdasfghdsfasdfasdf",
+				FromListId:        "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				BadgeIds:          GetFullUintRanges(),
+
+				ApprovalCriteria: &types.IncomingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(0),
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						OverallApprovalAmount: sdkmath.NewUint(0),
+					},
+					PredeterminedBalances: &types.PredeterminedBalances{
+						IncrementedBalances: &types.IncrementedBalances{
+							StartBalances: []*types.Balance{
+								{Amount: sdkmath.NewUint(1), BadgeIds: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges()},
+							},
+							IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+							IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+							DurationFromTimestamp:     sdkmath.NewUint(0),
+							AllowOverrideTimestamp:    true,
+							RecurringOwnershipTimes: &types.RecurringOwnershipTimes{
+								StartTime:          sdkmath.NewUint(1000),
+								IntervalLength:     sdkmath.NewUint(1000),
+								ChargePeriodLength: sdkmath.NewUint(1000),
+							},
+						},
+						OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+							UseOverallNumTransfers: true,
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      alice,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        alice,
+			ToAddresses: []string{charlie},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "incoming", ApproverAddress: charlie, Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "incoming",
+				ApproverAddress: charlie,
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	aliceBalance, _ = GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(len(aliceBalance.Balances), 0)
+}
+
+func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria = nil
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalId = "asadsdasfghdsfasdfasdf"
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria = &types.ApprovalCriteria{
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{},
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(), // doesn't matter
+					},
+				},
+				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+				DurationFromTimestamp:     sdkmath.NewUint(0),
+				AllowOverrideTimestamp:    false,
+				RecurringOwnershipTimes: &types.RecurringOwnershipTimes{
+					StartTime:          sdkmath.NewUint(100),
+					IntervalLength:     sdkmath.NewUint(100),
+					ChargePeriodLength: sdkmath.NewUint(10),
+				},
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+				UseOverallNumTransfers: true,
+			},
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(99))
+	wctx = sdk.WrapSDKContext(suite.ctx)
+
+	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: collection.CollectionId,
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances:    []*types.Balance{},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
+			},
+			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				ApprovalId:      "asadsdasfghdsfasdfasdf",
+				ApprovalLevel:   "collection",
+				ApproverAddress: "",
+				Version:         sdkmath.NewUint(0),
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(100))
+	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(100).Add(sdkmath.NewUint(99)))
 }

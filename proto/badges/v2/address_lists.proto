@@ -1,19 +1,17 @@
 syntax = "proto3";
-package badges.v0;
+package badges.v2;
 
 import "gogoproto/gogo.proto";
-import "badges/v0/balances.proto";
+import "badges/v2/balances.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v0";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v2";
 
 /* 
   An AddressList is a list of addresses that are referenced by an ID.
-  The list may include only the specified addresses, or it may include all addresses but
-  the specified addresses (depending on if whitelist is true (whitelist) or false (blacklist)).
-  
-  AddressLists are used for defining approvals, as well as being a simplified badge interface.
+  AddressLists are used in defining approvals ia a reusbale identifier. 
+  Note: We also support a reserved ID system by string ID; "Mint", "!Mint" 
 */
 message AddressList {
   // Unique identifier for the address list.
@@ -33,7 +31,4 @@ message AddressList {
   
   // The user or entity who created the address list.
   string createdBy = 6;
-
-  // The alias BitBadges address for the list.
-  string aliasAddress = 7;
 }

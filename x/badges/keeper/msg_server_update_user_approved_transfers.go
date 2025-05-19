@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	"github.com/cosmos/gogoproto/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -62,7 +60,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 
 				// Only increment version if approval is new or changed
-				if !exists || !proto.Equal(existingApproval, newApproval) {
+				if !exists || existingApproval.String() != newApproval.String() {
 					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, newApproval.ApprovalId)
 					newApproval.Version = newVersion
 				} else {
@@ -73,9 +71,9 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			}
 			userBalance.OutgoingApprovals = newOutgoingApprovalsWithVersion
 		} else {
-			// We did apply the default, so we need to ensure the version is kept at 0
+			// We did apply the default, so we need to ensure the version is kept at 0 - just don't double set it
 			for _, approval := range msg.OutgoingApprovals {
-				approval.Version = sdkmath.NewUint(0)
+				approval.Version = k.ResetApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, approval.ApprovalId)
 			}
 			userBalance.OutgoingApprovals = msg.OutgoingApprovals
 		}
@@ -99,7 +97,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 
 				// Only increment version if approval is new or changed
-				if !exists || !proto.Equal(existingApproval, newApproval) {
+				if !exists || existingApproval.String() != newApproval.String() {
 					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, newApproval.ApprovalId)
 					newApproval.Version = newVersion
 				} else {
@@ -110,9 +108,9 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			}
 			userBalance.IncomingApprovals = newIncomingApprovalsWithVersion
 		} else {
-			// We did apply the default, so we need to ensure the version is kept at 0
+			// We did apply the default, so we need to ensure the version is kept at 0 - just don't double set it
 			for _, approval := range msg.IncomingApprovals {
-				approval.Version = sdkmath.NewUint(0)
+				approval.Version = k.ResetApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, approval.ApprovalId)
 			}
 			userBalance.IncomingApprovals = msg.IncomingApprovals
 		}

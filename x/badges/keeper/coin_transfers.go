@@ -58,18 +58,16 @@ func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.Coin
 	} else {
 		for _, coinTransfer := range coinTransfers {
 			coinsToTransfer := coinTransfer.Coins
-			toAddressAcc := sdk.MustAccAddressFromBech32(coinTransfer.To)
+
+			to := coinTransfer.To
 			if coinTransfer.OverrideToWithInitiator {
-				toAddressAcc = sdk.MustAccAddressFromBech32(initiatedBy)
+				to = initiatedBy
 			}
 
+			toAddressAcc := sdk.MustAccAddressFromBech32(to)
 			fromAddressAcc := sdk.MustAccAddressFromBech32(initiatedBy)
 			if coinTransfer.OverrideFromWithApproverAddress {
 				fromAddressAcc = sdk.MustAccAddressFromBech32(approverAddress)
-			}
-
-			if toAddressAcc.Equals(fromAddressAcc) {
-				return sdkerrors.Wrap(types.ErrInvalidAddress, "to address cannot be the same as from address for coin transfers")
 			}
 
 			for _, coin := range coinsToTransfer {

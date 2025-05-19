@@ -101,6 +101,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					transfer.PrecalculateBalancesFromApproval,
 					to,
 					initiatedBy,
+					transfer.OverrideTimestamp,
 				)
 				if err != nil {
 					return err
@@ -206,6 +207,7 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
+				OverrideTimestamp:                       transfer.OverrideTimestamp,
 			}
 
 			if userApproval.Outgoing {

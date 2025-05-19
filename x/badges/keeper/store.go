@@ -417,6 +417,13 @@ func (k Keeper) IncrementApprovalVersion(ctx sdk.Context, collectionId sdkmath.U
 	}
 }
 
+func (k Keeper) ResetApprovalVersion(ctx sdk.Context, collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string) sdkmath.Uint {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)), []byte("0"))
+	return sdkmath.NewUint(0)
+}
+
 func (k Keeper) GetApprovalTrackerVersionsFromStore(ctx sdk.Context) (versions []sdkmath.Uint, ids []string) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})

@@ -429,21 +429,85 @@ func jsonEqual(a, b interface{}) bool {
 	return string(aJSON) == string(bJSON)
 }
 
-func IncrementBalances(ctx sdk.Context, startBalances []*Balance, numIncrements sdkmath.Uint, incrementOwnershipTimesBy sdkmath.Uint, incrementBadgeIdsBy sdkmath.Uint, approvalDurationFromNow sdkmath.Uint) ([]*Balance, error) {
+func IncrementBalances(
+	ctx sdk.Context,
+	startBalances []*Balance,
+	numIncrements sdkmath.Uint,
+	incrementOwnershipTimesBy sdkmath.Uint,
+	incrementBadgeIdsBy sdkmath.Uint,
+	durationFromTimestamp sdkmath.Uint,
+	recurringOwnershipTimes *RecurringOwnershipTimes,
+	overrideTimestamp sdkmath.Uint,
+	allowOverrideTimestamp bool,
+) ([]*Balance, error) {
 	balances := DeepCopyBalances(startBalances)
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	for _, startBalance := range balances {
-		if approvalDurationFromNow.IsZero() || approvalDurationFromNow.IsNil() {
+
+		if recurringOwnershipTimes != nil && !(recurringOwnershipTimes.IntervalLength.IsNil() || recurringOwnershipTimes.IntervalLength.IsZero()) {
+			startTime := recurringOwnershipTimes.StartTime
+			intervalLength := recurringOwnershipTimes.IntervalLength
+			chargePeriodLength := recurringOwnershipTimes.ChargePeriodLength
+
+			// Pre: Assert outside charge periods
+			// Edge case: Handle first charge period (throws with negative interval number if we don't handle this)
+			if now.LT(startTime) {
+				if chargePeriodLength.GT(startTime) {
+					return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				}
+
+				// Check within first charge period
+				firstChargeTime := startTime.Sub(chargePeriodLength)
+				if now.GTE(firstChargeTime) && now.LT(startTime) {
+					startBalance.OwnershipTimes = []*UintRange{
+						{
+							Start: startTime,
+							End:   startTime.Add(intervalLength).Sub(sdkmath.OneUint()),
+						},
+					}
+
+					return balances, nil
+				}
+
+				return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+			}
+
+			//1. Calculate what interval we are in
+			interval := now.Sub(startTime).Quo(intervalLength)
+			nextInterval := interval.Add(sdkmath.OneUint())
+
+			//2. Calculate the new intervals
+			newStartTime := startTime.Add(intervalLength.Mul(nextInterval))
+			newEndTime := newStartTime.Add(intervalLength).Sub(sdkmath.OneUint())
+			chargeAfterTime := newStartTime.Sub(chargePeriodLength)
+
+			//3. Assert that we are in the charge period
+			if now.GTE(chargeAfterTime) && now.LT(newStartTime) {
+				startBalance.OwnershipTimes = []*UintRange{
+					{
+						Start: newStartTime,
+						End:   newEndTime,
+					},
+				}
+			} else {
+				return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+			}
+
+		} else if durationFromTimestamp.IsZero() || durationFromTimestamp.IsNil() {
 			for _, time := range startBalance.OwnershipTimes {
 				time.Start = time.Start.Add(numIncrements.Mul(incrementOwnershipTimesBy))
 				time.End = time.End.Add(numIncrements.Mul(incrementOwnershipTimesBy))
 			}
 		} else {
+			if allowOverrideTimestamp && !overrideTimestamp.IsNil() && overrideTimestamp.GT(sdkmath.ZeroUint()) {
+				now = overrideTimestamp
+			}
+
 			startBalance.OwnershipTimes = []*UintRange{
 				{
 					Start: now,
-					End:   now.Add(approvalDurationFromNow),
+					End:   now.Add(durationFromTimestamp).Sub(sdkmath.OneUint()),
 				},
 			}
 		}

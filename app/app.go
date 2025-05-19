@@ -345,7 +345,7 @@ func New(
 		app.MsgServiceRouter(),
 		app.GetSubspace(wasmtypes.ModuleName),
 	)
-	module.CoreAppModuleBasicAdaptor(wasm.ModuleName, appModule).RegisterInterfaces(app.interfaceRegistry)
+	module.CoreAppModuleBasicAdaptor(wasmtypes.ModuleName, appModule).RegisterInterfaces(app.interfaceRegistry)
 
 	if err := app.RegisterModules(
 		appModule,

@@ -62,4 +62,6 @@ var (
 	ErrIdsContainsInvalidChars                     = sdkerrors.Register(ModuleName, 1549, "ids contains invalid chars")
 	ErrInvalidBadgeId                              = sdkerrors.Register(ModuleName, 1550, "invalid badge id")
 	ErrMismatchedVersions                          = sdkerrors.Register(ModuleName, 1551, "versions are mismatched")
+	ErrOutsideChargePeriod                         = sdkerrors.Register(ModuleName, 1552, "outside charge period")
+	ErrOverrideTimestampNotAllowed                 = sdkerrors.Register(ModuleName, 1553, "override timestamp not allowed")
 )

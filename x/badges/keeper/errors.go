@@ -31,4 +31,5 @@ var (
 	ErrNoMatchingChallengeForChallengeTrackerId = sdkerrors.Register(types.ModuleName, 82, "no matching challenge for challenge tracker id")
 	ErrCoinTransfersDisabled                    = sdkerrors.Register(types.ModuleName, 83, "coin transfers are disabled")
 	ErrInvalidDenom                             = sdkerrors.Register(types.ModuleName, 84, "invalid denom")
+	ErrOverrideTimestampNotAllowed              = sdkerrors.Register(types.ModuleName, 85, "override timestamp not allowed")
 )

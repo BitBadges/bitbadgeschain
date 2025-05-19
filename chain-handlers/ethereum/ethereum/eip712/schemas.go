@@ -377,7 +377,8 @@ func GetSchemas() []string {
 					],
 					"onlyCheckPrioritizedCollectionApprovals": false,
 					"onlyCheckPrioritizedIncomingApprovals": false,
-					"onlyCheckPrioritizedOutgoingApprovals": false
+					"onlyCheckPrioritizedOutgoingApprovals": false,
+					"overrideTimestamp": "0"
 					]
 				}
 			]
@@ -497,8 +498,14 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
-									"approvalDurationFromNow": "",
-									"incrementOwnershipTimesBy": ""
+									"durationFromTimestamp": "",
+									"incrementOwnershipTimesBy": "",
+									"allowOverrideTimestamp": true,
+									"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 								},
 								"orderCalculationMethod": {
 									"useOverallNumTransfers": false,
@@ -514,14 +521,22 @@ func GetSchemas() []string {
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": ""
+								"perInitiatedByAddressApprovalAmount": "",
+								"resetTimeIntervals": {
+									"startTime": "",
+									"intervalLength": ""
+								}
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": ""
+								"perInitiatedByAddressMaxNumTransfers": "",
+								"resetTimeIntervals": {
+									"startTime": "",
+									"intervalLength": ""
+								}
 							},
 							"requireFromEqualsInitiatedBy": false,
 							"requireFromDoesNotEqualInitiatedBy": false
@@ -618,8 +633,14 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
-									"approvalDurationFromNow": "",
-									"incrementOwnershipTimesBy": ""
+									"durationFromTimestamp": "",
+									"incrementOwnershipTimesBy": "",
+									"allowOverrideTimestamp": true,
+									"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 								},
 								"orderCalculationMethod": {
 									"useOverallNumTransfers": false,
@@ -635,14 +656,22 @@ func GetSchemas() []string {
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": ""
+								"perInitiatedByAddressApprovalAmount": "",
+								"resetTimeIntervals": {
+									"startTime": "",
+									"intervalLength": ""
+								}
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": ""
+								"perInitiatedByAddressMaxNumTransfers": "",
+								"resetTimeIntervals": {
+									"startTime": "",
+									"intervalLength": ""
+								}
 							},
 							"requireToEqualsInitiatedBy": false,
 							"requireToDoesNotEqualInitiatedBy": false
@@ -1192,8 +1221,14 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
-								"approvalDurationFromNow": "",
-								"incrementOwnershipTimesBy": ""
+								"durationFromTimestamp": "",
+								"incrementOwnershipTimesBy": "",
+								"allowOverrideTimestamp": true,
+								"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 							},
 							"orderCalculationMethod": {
 								"useOverallNumTransfers": false,
@@ -1209,14 +1244,22 @@ func GetSchemas() []string {
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": ""
+							"perInitiatedByAddressApprovalAmount": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": ""
+							"perInitiatedByAddressMaxNumTransfers": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"requireToEqualsInitiatedBy": false,
 						"requireFromEqualsInitiatedBy": false,
@@ -1351,8 +1394,14 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
-								"approvalDurationFromNow": "",
-								"incrementOwnershipTimesBy": ""
+								"durationFromTimestamp": "",
+								"incrementOwnershipTimesBy": "",
+								"allowOverrideTimestamp": true,
+								"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 							},
 							"orderCalculationMethod": {
 								"useOverallNumTransfers": false,
@@ -1368,14 +1417,22 @@ func GetSchemas() []string {
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": ""
+							"perInitiatedByAddressApprovalAmount": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": ""
+							"perInitiatedByAddressMaxNumTransfers": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"requireToEqualsInitiatedBy": false,
 						"requireToDoesNotEqualInitiatedBy": false
@@ -1473,8 +1530,14 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
-								"approvalDurationFromNow": "",
-								"incrementOwnershipTimesBy": ""
+								"durationFromTimestamp": "",
+								"incrementOwnershipTimesBy": "",
+								"allowOverrideTimestamp": true,
+								"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 							},
 							"orderCalculationMethod": {
 								"useOverallNumTransfers": false,
@@ -1490,14 +1553,22 @@ func GetSchemas() []string {
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": ""
+							"perInitiatedByAddressApprovalAmount": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": ""
+							"perInitiatedByAddressMaxNumTransfers": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"requireFromEqualsInitiatedBy": false,
 						"requireFromDoesNotEqualInitiatedBy": false
@@ -1750,8 +1821,14 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
-									"approvalDurationFromNow": "",
-									"incrementOwnershipTimesBy": ""
+									"durationFromTimestamp": "",
+									"incrementOwnershipTimesBy": "",
+									"allowOverrideTimestamp": true,
+									"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 								},
 								"orderCalculationMethod": {
 									"useOverallNumTransfers": false,
@@ -1767,14 +1844,22 @@ func GetSchemas() []string {
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": ""
+								"perInitiatedByAddressApprovalAmount": "",
+								"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": ""
+								"perInitiatedByAddressMaxNumTransfers": "",
+								"resetTimeIntervals": {
+									"startTime": "",
+									"intervalLength": ""
+								}
 							},
 							"requireFromEqualsInitiatedBy": false,
 							"requireFromDoesNotEqualInitiatedBy": false
@@ -1871,8 +1956,14 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
-									"approvalDurationFromNow": "",
-									"incrementOwnershipTimesBy": ""
+									"durationFromTimestamp": "",
+									"incrementOwnershipTimesBy": "",
+									"allowOverrideTimestamp": true,
+									"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 								},
 								"orderCalculationMethod": {
 									"useOverallNumTransfers": false,
@@ -1888,14 +1979,22 @@ func GetSchemas() []string {
 								"perToAddressApprovalAmount": "",
 								"perFromAddressApprovalAmount": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": ""
+								"perInitiatedByAddressApprovalAmount": "",
+								"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 							},
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
 								"perFromAddressMaxNumTransfers": "",
 								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": ""
+								"perInitiatedByAddressMaxNumTransfers": "",
+								"resetTimeIntervals": {
+									"startTime": "",
+									"intervalLength": ""
+								}
 							},
 							"requireToEqualsInitiatedBy": false,
 							"requireToDoesNotEqualInitiatedBy": false
@@ -2437,8 +2536,14 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
-								"approvalDurationFromNow": "",
-								"incrementOwnershipTimesBy": ""
+								"durationFromTimestamp": "",
+								"incrementOwnershipTimesBy": "",
+								"allowOverrideTimestamp": true,
+								"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 							},
 							"orderCalculationMethod": {
 								"useOverallNumTransfers": false,
@@ -2454,14 +2559,22 @@ func GetSchemas() []string {
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": ""
+							"perInitiatedByAddressApprovalAmount": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": ""
+							"perInitiatedByAddressMaxNumTransfers": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"requireToEqualsInitiatedBy": false,
 						"requireFromEqualsInitiatedBy": false,
@@ -2918,8 +3031,14 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
-								"approvalDurationFromNow": "",
-								"incrementOwnershipTimesBy": ""
+								"durationFromTimestamp": "",
+								"incrementOwnershipTimesBy": "",
+								"allowOverrideTimestamp": true,
+								"recurringOwnershipTimes": { 
+										"startTime": "",
+										"intervalLength": "",
+										"chargePeriodLength": ""
+									}
 							},
 							"orderCalculationMethod": {
 								"useOverallNumTransfers": false,
@@ -2935,14 +3054,22 @@ func GetSchemas() []string {
 							"perToAddressApprovalAmount": "",
 							"perFromAddressApprovalAmount": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": ""
+							"perInitiatedByAddressApprovalAmount": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
 							"perFromAddressMaxNumTransfers": "",
 							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": ""
+							"perInitiatedByAddressMaxNumTransfers": "",
+							"resetTimeIntervals": {
+								"startTime": "",
+								"intervalLength": ""
+								}
 						},
 						"requireToEqualsInitiatedBy": false,
 						"requireFromEqualsInitiatedBy": false,

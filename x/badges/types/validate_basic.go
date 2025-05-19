@@ -196,14 +196,21 @@ func MaxNumTransfersIsBasicallyNil(maxNumTransfers *MaxNumTransfers) bool {
 	return maxNumTransfers == nil || ((maxNumTransfers.OverallMaxNumTransfers.IsNil() || maxNumTransfers.OverallMaxNumTransfers.IsZero()) &&
 		(maxNumTransfers.PerToAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerToAddressMaxNumTransfers.IsZero()) &&
 		(maxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerFromAddressMaxNumTransfers.IsZero()) &&
-		(maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsZero()))
+		(maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsZero()) &&
+		(maxNumTransfers.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(maxNumTransfers.ResetTimeIntervals)))
+}
+
+func IsResetTimeIntervalBasicallyNil(resetTimeInterval *ResetTimeIntervals) bool {
+	return resetTimeInterval == nil || (resetTimeInterval.StartTime.IsNil() || resetTimeInterval.StartTime.IsZero()) &&
+		(resetTimeInterval.IntervalLength.IsNil() || resetTimeInterval.IntervalLength.IsZero())
 }
 
 func ApprovalAmountsIsBasicallyNil(approvalAmounts *ApprovalAmounts) bool {
 	return approvalAmounts == nil || ((approvalAmounts.OverallApprovalAmount.IsNil() || approvalAmounts.OverallApprovalAmount.IsZero()) &&
 		(approvalAmounts.PerToAddressApprovalAmount.IsNil() || approvalAmounts.PerToAddressApprovalAmount.IsZero()) &&
 		(approvalAmounts.PerFromAddressApprovalAmount.IsNil() || approvalAmounts.PerFromAddressApprovalAmount.IsZero()) &&
-		(approvalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() || approvalAmounts.PerInitiatedByAddressApprovalAmount.IsZero()))
+		(approvalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() || approvalAmounts.PerInitiatedByAddressApprovalAmount.IsZero()) &&
+		(approvalAmounts.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(approvalAmounts.ResetTimeIntervals)))
 }
 
 func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool {
@@ -301,8 +308,8 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					return sdkerrors.Wrapf(ErrInvalidRequest, "coin transfer is nil")
 				}
 
-				if ValidateAddress(coinTransfer.To, false) != nil {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid from address")
+				if !coinTransfer.OverrideToWithInitiator && ValidateAddress(coinTransfer.To, false) != nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid to address")
 				}
 
 				for _, coinToTransfer := range coinTransfer.Coins {
@@ -326,8 +333,8 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom must be badge")
 					}
 
-					if coinToTransfer.Amount.GT(sdkmath.NewInt(10000000000)) {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is too large - the max amount is 10000000000ubadge")
+					if coinToTransfer.Amount.GT(sdkmath.NewInt(100000000000)) {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is too large - the max amount is 100000000000ubadge")
 					}
 				}
 			}
@@ -363,6 +370,18 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				if approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() {
 					approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount = sdkmath.NewUint(0)
 				}
+
+				if approvalCriteria.ApprovalAmounts.ResetTimeIntervals == nil {
+					approvalCriteria.ApprovalAmounts.ResetTimeIntervals = &ResetTimeIntervals{}
+				}
+
+				if approvalCriteria.ApprovalAmounts.ResetTimeIntervals.StartTime.IsNil() {
+					approvalCriteria.ApprovalAmounts.ResetTimeIntervals.StartTime = sdkmath.NewUint(0)
+				}
+
+				if approvalCriteria.ApprovalAmounts.ResetTimeIntervals.IntervalLength.IsNil() {
+					approvalCriteria.ApprovalAmounts.ResetTimeIntervals.IntervalLength = sdkmath.NewUint(0)
+				}
 			}
 
 			if canChangeValues {
@@ -384,6 +403,18 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 				if approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() {
 					approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers = sdkmath.NewUint(0)
+				}
+
+				if approvalCriteria.MaxNumTransfers.ResetTimeIntervals == nil {
+					approvalCriteria.MaxNumTransfers.ResetTimeIntervals = &ResetTimeIntervals{}
+				}
+
+				if approvalCriteria.MaxNumTransfers.ResetTimeIntervals.StartTime.IsNil() {
+					approvalCriteria.MaxNumTransfers.ResetTimeIntervals.StartTime = sdkmath.NewUint(0)
+				}
+
+				if approvalCriteria.MaxNumTransfers.ResetTimeIntervals.IntervalLength.IsNil() {
+					approvalCriteria.MaxNumTransfers.ResetTimeIntervals.IntervalLength = sdkmath.NewUint(0)
 				}
 			}
 
@@ -418,7 +449,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						numTrue++
 					}
 
-					if numTrue != 1 {
+					if numTrue > 1 {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
 					}
 
@@ -438,15 +469,61 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
 						}
 
-						if sequentialTransfer.ApprovalDurationFromNow.IsNil() {
+						if sequentialTransfer.DurationFromTimestamp.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "approval duration from now is uninitialized")
 						}
 
+						if sequentialTransfer.RecurringOwnershipTimes != nil {
+							startTimeIsPositive := !sequentialTransfer.RecurringOwnershipTimes.StartTime.IsNil() && !sequentialTransfer.RecurringOwnershipTimes.StartTime.IsZero()
+
+							if sequentialTransfer.RecurringOwnershipTimes.IntervalLength.IsNil() {
+								return sdkerrors.Wrapf(ErrUintUnititialized, "interval length is uninitialized")
+							}
+
+							if sequentialTransfer.RecurringOwnershipTimes.StartTime.IsNil() {
+								return sdkerrors.Wrapf(ErrUintUnititialized, "start time is uninitialized")
+							}
+
+							if sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.IsNil() {
+								return sdkerrors.Wrapf(ErrUintUnititialized, "grace period length is uninitialized")
+							}
+
+							if startTimeIsPositive {
+								if sequentialTransfer.RecurringOwnershipTimes.IntervalLength.IsZero() {
+									return sdkerrors.Wrapf(ErrInvalidRequest, "interval length cannot be zero if start time is positive")
+								}
+
+								if sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.IsZero() {
+									return sdkerrors.Wrapf(ErrInvalidRequest, "grace period length cannot be zero if start time is positive")
+								}
+							}
+
+							// grace period cannot be longer than the interval length
+							if sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.GT(sequentialTransfer.RecurringOwnershipTimes.IntervalLength) {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "grace period length cannot be longer than or equal tothe interval length")
+							}
+						}
+
 						// Cant use both increment ownership times by and approval duration from now
-						isApprovalDurationZero := sequentialTransfer.ApprovalDurationFromNow.IsZero()
-						isIncrementOwnershipTimesByZero := sequentialTransfer.IncrementOwnershipTimesBy.IsZero()
-						if !isApprovalDurationZero && !isIncrementOwnershipTimesByZero {
-							return sdkerrors.Wrapf(ErrInvalidRequest, "approval duration from now and increment ownership times by cannot both be set")
+						isApprovalDurationZero := sequentialTransfer.DurationFromTimestamp.IsZero() || sequentialTransfer.DurationFromTimestamp.IsNil()
+						isIncrementOwnershipTimesByZero := sequentialTransfer.IncrementOwnershipTimesBy.IsZero() || sequentialTransfer.IncrementOwnershipTimesBy.IsNil()
+						isRecurringOwnershipTimesZero := sequentialTransfer.RecurringOwnershipTimes == nil || ((sequentialTransfer.RecurringOwnershipTimes.IntervalLength.IsZero() || sequentialTransfer.RecurringOwnershipTimes.IntervalLength.IsNil()) ||
+							(sequentialTransfer.RecurringOwnershipTimes.StartTime.IsZero() || sequentialTransfer.RecurringOwnershipTimes.StartTime.IsNil()) ||
+							(sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.IsZero() || sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.IsNil()))
+
+						count := 0
+						if !isApprovalDurationZero {
+							count++
+						}
+						if !isIncrementOwnershipTimesByZero {
+							count++
+						}
+						if !isRecurringOwnershipTimesZero {
+							count++
+						}
+
+						if count > 1 {
+							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment ownership times by, approval duration from now, or recurring ownership times can be set")
 						}
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
@@ -489,8 +566,12 @@ func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) 
 			incrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
 			incrementedBalances.IncrementOwnershipTimesBy.IsZero()) &&
-		(incrementedBalances.ApprovalDurationFromNow.IsNil() ||
-			incrementedBalances.ApprovalDurationFromNow.IsZero()))
+		(incrementedBalances.DurationFromTimestamp.IsNil() ||
+			incrementedBalances.DurationFromTimestamp.IsZero()) && (incrementedBalances.RecurringOwnershipTimes == nil ||
+		(incrementedBalances.RecurringOwnershipTimes.StartTime.IsNil() ||
+			incrementedBalances.RecurringOwnershipTimes.StartTime.IsZero()) &&
+			(incrementedBalances.RecurringOwnershipTimes.IntervalLength.IsNil() ||
+				incrementedBalances.RecurringOwnershipTimes.IntervalLength.IsZero())))
 }
 
 func PredeterminedBalancesIsBasicallyNil(predeterminedBalances *PredeterminedBalances) bool {

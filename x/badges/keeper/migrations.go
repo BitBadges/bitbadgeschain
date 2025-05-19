@@ -11,8 +11,8 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 
-	v1types "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	v0types "github.com/bitbadges/bitbadgeschain/x/badges/types/v0"
+	v3types "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	v2types "github.com/bitbadges/bitbadgeschain/x/badges/types/v2"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
@@ -46,43 +46,103 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		// First unmarshal into v0 type
-		var v0Collection v0types.BadgeCollection
-		k.cdc.MustUnmarshal(iterator.Value(), &v0Collection)
+		// First unmarshal into v2 type
+		var v2Collection v2types.BadgeCollection
+		k.cdc.MustUnmarshal(iterator.Value(), &v2Collection)
 
 		// Convert to JSON
-		jsonBytes, err := json.Marshal(v0Collection)
+		jsonBytes, err := json.Marshal(v2Collection)
 		if err != nil {
 			return err
 		}
 
-		// Unmarshal into v1 type
-		var v1Collection v1types.BadgeCollection
-		if err := json.Unmarshal(jsonBytes, &v1Collection); err != nil {
+		// Unmarshal into v3 type
+		var v3Collection v3types.BadgeCollection
+		if err := json.Unmarshal(jsonBytes, &v3Collection); err != nil {
 			return err
 		}
 
 		// Set all approval versions to 0
-		for _, approval := range v1Collection.CollectionApprovals {
-			k.IncrementApprovalVersion(ctx, v1Collection.CollectionId, "collection", "", approval.ApprovalId)
-			approval.Version = sdkmath.NewUint(0)
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow = sdkmath.NewUint(0)
+		for _, approval := range v3Collection.CollectionApprovals {
+			correspondingV2Approval := &v2types.CollectionApproval{}
+			for _, v2Approval := range v2Collection.CollectionApprovals {
+				if v2Approval.ApprovalId == approval.ApprovalId {
+					correspondingV2Approval = v2Approval
+					break
+				}
+			}
+
+			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
+				StartTime:          sdkmath.NewUint(0),
+				IntervalLength:     sdkmath.NewUint(0),
+				ChargePeriodLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
 		}
 
-		for _, approval := range v1Collection.DefaultBalances.IncomingApprovals {
-			k.IncrementApprovalVersion(ctx, v1Collection.CollectionId, "incoming", "", approval.ApprovalId)
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow = sdkmath.NewUint(0)
-			approval.Version = sdkmath.NewUint(0)
+		for _, approval := range v3Collection.DefaultBalances.IncomingApprovals {
+			correspondingV2Approval := &v2types.UserIncomingApproval{}
+			for _, v2Approval := range v2Collection.DefaultBalances.IncomingApprovals {
+				if v2Approval.ApprovalId == approval.ApprovalId {
+					correspondingV2Approval = v2Approval
+					break
+				}
+			}
+
+			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
+				StartTime:          sdkmath.NewUint(0),
+				IntervalLength:     sdkmath.NewUint(0),
+				ChargePeriodLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
 		}
 
-		for _, approval := range v1Collection.DefaultBalances.OutgoingApprovals {
-			k.IncrementApprovalVersion(ctx, v1Collection.CollectionId, "outgoing", "", approval.ApprovalId)
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow = sdkmath.NewUint(0)
-			approval.Version = sdkmath.NewUint(0)
+		for _, approval := range v3Collection.DefaultBalances.OutgoingApprovals {
+			correspondingV2Approval := &v2types.UserOutgoingApproval{}
+			for _, v2Approval := range v2Collection.DefaultBalances.OutgoingApprovals {
+				if v2Approval.ApprovalId == approval.ApprovalId {
+					correspondingV2Approval = v2Approval
+					break
+				}
+			}
+			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
+				StartTime:          sdkmath.NewUint(0),
+				IntervalLength:     sdkmath.NewUint(0),
+				ChargePeriodLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
 		}
 
 		// Save the updated collection
-		if err := k.SetCollectionInStore(ctx, &v1Collection); err != nil {
+		if err := k.SetCollectionInStore(ctx, &v3Collection); err != nil {
 			return err
 		}
 	}
@@ -94,10 +154,8 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-
 	for ; iterator.Valid(); iterator.Next() {
-		var UserBalance v0types.UserBalanceStore
+		var UserBalance v2types.UserBalanceStore
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 
 		// Convert to JSON
@@ -106,55 +164,89 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 			return err
 		}
 
-		// Unmarshal into v1 type
-		var v1Balance v1types.UserBalanceStore
-		if err := json.Unmarshal(jsonBytes, &v1Balance); err != nil {
+		// Unmarshal into v3 type
+		var v3Balance v3types.UserBalanceStore
+		if err := json.Unmarshal(jsonBytes, &v3Balance); err != nil {
 			return err
 		}
 
-		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()[1:]))
-		collectionId := balanceKeyDetails.collectionId
-		approverAddress := balanceKeyDetails.address
-
-		for _, approval := range v1Balance.IncomingApprovals {
-			k.IncrementApprovalVersion(sdkCtx, collectionId, "incoming", approverAddress, approval.ApprovalId)
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow = sdkmath.NewUint(0)
-			approval.Version = sdkmath.NewUint(0)
+		for _, approval := range v3Balance.IncomingApprovals {
+			correspondingV2Approval := &v2types.UserIncomingApproval{}
+			for _, v2Approval := range UserBalance.IncomingApprovals {
+				if v2Approval.ApprovalId == approval.ApprovalId {
+					correspondingV2Approval = v2Approval
+					break
+				}
+			}
+			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
+				StartTime:          sdkmath.NewUint(0),
+				IntervalLength:     sdkmath.NewUint(0),
+				ChargePeriodLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
 		}
 
-		for _, approval := range v1Balance.OutgoingApprovals {
-			k.IncrementApprovalVersion(sdkCtx, collectionId, "outgoing", approverAddress, approval.ApprovalId)
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow = sdkmath.NewUint(0)
-			approval.Version = sdkmath.NewUint(0)
+		for _, approval := range v3Balance.OutgoingApprovals {
+			correspondingV2Approval := &v2types.UserOutgoingApproval{}
+			for _, v2Approval := range UserBalance.OutgoingApprovals {
+				if v2Approval.ApprovalId == approval.ApprovalId {
+					correspondingV2Approval = v2Approval
+					break
+				}
+			}
+			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
+				StartTime:      sdkmath.NewUint(0),
+				IntervalLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
+				StartTime:          sdkmath.NewUint(0),
+				IntervalLength:     sdkmath.NewUint(0),
+				ChargePeriodLength: sdkmath.NewUint(0),
+			}
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
+			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
 		}
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&v1Balance))
+		store.Set(iterator.Key(), k.cdc.MustMarshal(&v3Balance))
 	}
 	return nil
 }
 
 func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper) error {
-	iterator := storetypes.KVStorePrefixIterator(store, AddressListKey)
-	defer iterator.Close()
+	// iterator := storetypes.KVStorePrefixIterator(store, AddressListKey)
+	// defer iterator.Close()
 
-	for ; iterator.Valid(); iterator.Next() {
-		var AddressList v0types.AddressList
-		k.cdc.MustUnmarshal(iterator.Value(), &AddressList)
+	// for ; iterator.Valid(); iterator.Next() {
+	// 	var AddressList v2types.AddressList
+	// 	k.cdc.MustUnmarshal(iterator.Value(), &AddressList)
 
-		// Convert to JSON
-		jsonBytes, err := json.Marshal(AddressList)
-		if err != nil {
-			return err
-		}
+	// 	// Convert to JSON
+	// 	jsonBytes, err := json.Marshal(AddressList)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		// Unmarshal into v1 type
-		var v1AddressList v1types.AddressList
-		if err := json.Unmarshal(jsonBytes, &v1AddressList); err != nil {
-			return err
-		}
+	// 	// Unmarshal into v3 type
+	// 	var v3AddressList v3types.AddressList
+	// 	if err := json.Unmarshal(jsonBytes, &v3AddressList); err != nil {
+	// 		return err
+	// 	}
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&v1AddressList))
-	}
+	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v3AddressList))
+	// }
 	return nil
 }
 
@@ -163,7 +255,7 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var ApprovalTracker v0types.ApprovalTracker
+		var ApprovalTracker v2types.ApprovalTracker
 		k.cdc.MustUnmarshal(iterator.Value(), &ApprovalTracker)
 
 		// Convert to JSON
@@ -172,13 +264,17 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 			return err
 		}
 
-		// Unmarshal into v1 type
-		var v1ApprovalTracker v1types.ApprovalTracker
-		if err := json.Unmarshal(jsonBytes, &v1ApprovalTracker); err != nil {
+		// Unmarshal into v3 type
+		var v3ApprovalTracker v3types.ApprovalTracker
+		if err := json.Unmarshal(jsonBytes, &v3ApprovalTracker); err != nil {
 			return err
 		}
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&v1ApprovalTracker))
+		wctx := sdk.UnwrapSDKContext(ctx)
+		nowUnixMilli := wctx.BlockTime().UnixMilli()
+		v3ApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
+
+		store.Set(iterator.Key(), k.cdc.MustMarshal(&v3ApprovalTracker))
 	}
 	return nil
 }
