@@ -10,9 +10,8 @@ build-darwin:
 build-all: 
 	make build-linux/amd64
 	make build-linux/arm64
-	make build-darwin
 
 do-checksum:
-	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 bitbadgeschain-darwin-amd64 > bitbadgeschain_checksum
+	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 > bitbadgeschain_checksum
 
 build-with-checksum: build-all do-checksum

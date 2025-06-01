@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.CoinTransfer, initiatedBy string, approverAddress string, simulate bool) error {
+func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.CoinTransfer, initiatedBy string, approverAddress string, simulate bool, coinTransfersUsed *[]CoinTransfers) error {
 	if len(coinTransfers) == 0 {
 		return nil
 	}
@@ -75,6 +75,13 @@ func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.Coin
 				if err != nil {
 					return sdkerrors.Wrapf(err, "error sending $BADGE, passed simulation but not actual transfers")
 				}
+
+				*coinTransfersUsed = append(*coinTransfersUsed, CoinTransfers{
+					From:   fromAddressAcc.String(),
+					To:     toAddressAcc.String(),
+					Amount: coin.Amount.String(),
+					Denom:  coin.Denom,
+				})
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
@@ -84,7 +85,11 @@ func (suite *TestSuite) SetupTest() {
 	// 	suite.app.AccountKeeper.SetAccount(suite.ctx, suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress([]byte{byte(i)})))
 	// }
 
-	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", 1000)))
+	// 1 $BADGE = 1 * 1e9 ubadge
+	ubadgeAmount := sdkmath.NewInt(100 * 1e9)
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(alice), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(charlie), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {

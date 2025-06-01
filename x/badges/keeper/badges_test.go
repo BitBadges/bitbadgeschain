@@ -326,7 +326,10 @@ func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
 	}
 
 	collectionsToCreate[0].CollectionApprovals[0].FromListId = "All"
-	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria = nil
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria = &types.ApprovalCriteria{
+		OverridesToIncomingApprovals:   true,
+		OverridesFromOutgoingApprovals: true,
+	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating badge: %s")

@@ -338,7 +338,7 @@ var (
 					PayoutAddress:             "bb18el5ug46umcws58m445ql5scgg2n3tzagfecvl",
 					EnableCoinTransfers:       true,
 					AllowedDenoms:             []string{"ubadge"},
-					FixedCostPerTransfer:      "0ubadge",
+					FixedCostPerTransfer:      "100000000ubadge",
 				}),
 			},
 			{

@@ -6,6 +6,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -40,6 +41,8 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 		},
 		alice,
 		alice,
+		&[]keeper.ApprovalsUsed{},
+		&[]keeper.CoinTransfers{},
 	)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 }
@@ -78,6 +81,8 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 		},
 		alice,
 		alice,
+		&[]keeper.ApprovalsUsed{},
+		&[]keeper.CoinTransfers{},
 	)
 
 	suite.Require().Error(err, "Error getting user balance: %s")
@@ -105,6 +110,8 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 		},
 		alice,
 		alice,
+		&[]keeper.ApprovalsUsed{},
+		&[]keeper.CoinTransfers{},
 	)
 	suite.Require().Error(err, "Error getting user balance: %s")
 }

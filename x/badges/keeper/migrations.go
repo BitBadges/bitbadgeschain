@@ -4,15 +4,14 @@ import (
 	"context"
 	"encoding/json"
 
-	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	storetypes "cosmossdk.io/store/types"
 
-	v3types "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	v2types "github.com/bitbadges/bitbadgeschain/x/badges/types/v2"
+	v4types "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	v3types "github.com/bitbadges/bitbadgeschain/x/badges/types/v3"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
@@ -46,103 +45,61 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		// First unmarshal into v2 type
-		var v2Collection v2types.BadgeCollection
-		k.cdc.MustUnmarshal(iterator.Value(), &v2Collection)
+		// First unmarshal into v3 type
+		var v3Collection v3types.BadgeCollection
+		k.cdc.MustUnmarshal(iterator.Value(), &v3Collection)
 
 		// Convert to JSON
-		jsonBytes, err := json.Marshal(v2Collection)
+		jsonBytes, err := json.Marshal(v3Collection)
 		if err != nil {
 			return err
 		}
 
-		// Unmarshal into v3 type
-		var v3Collection v3types.BadgeCollection
-		if err := json.Unmarshal(jsonBytes, &v3Collection); err != nil {
+		// Unmarshal into v4 type
+		var v4Collection v4types.BadgeCollection
+		if err := json.Unmarshal(jsonBytes, &v4Collection); err != nil {
 			return err
 		}
 
 		// Set all approval versions to 0
-		for _, approval := range v3Collection.CollectionApprovals {
-			correspondingV2Approval := &v2types.CollectionApproval{}
-			for _, v2Approval := range v2Collection.CollectionApprovals {
-				if v2Approval.ApprovalId == approval.ApprovalId {
-					correspondingV2Approval = v2Approval
-					break
-				}
-			}
+		for _, approval := range v4Collection.CollectionApprovals {
+			// correspondingv3Approval := &v3types.CollectionApproval{}
+			// for _, v3Approval := range v3Collection.CollectionApprovals {
+			// 	if v3Approval.ApprovalId == approval.ApprovalId {
+			// 		correspondingv3Approval = v3Approval
+			// 		break
+			// 	}
+			// }
 
-			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
-				StartTime:          sdkmath.NewUint(0),
-				IntervalLength:     sdkmath.NewUint(0),
-				ChargePeriodLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
+			approval.ApprovalCriteria.AutoDeletionOptions = &v4types.AutoDeletionOptions{AfterOneUse: false}
 		}
 
-		for _, approval := range v3Collection.DefaultBalances.IncomingApprovals {
-			correspondingV2Approval := &v2types.UserIncomingApproval{}
-			for _, v2Approval := range v2Collection.DefaultBalances.IncomingApprovals {
-				if v2Approval.ApprovalId == approval.ApprovalId {
-					correspondingV2Approval = v2Approval
-					break
-				}
-			}
+		for _, approval := range v4Collection.DefaultBalances.IncomingApprovals {
+			// correspondingv3Approval := &v3types.UserIncomingApproval{}
+			// for _, v3Approval := range v3Collection.DefaultBalances.IncomingApprovals {
+			// 	if v3Approval.ApprovalId == approval.ApprovalId {
+			// 		correspondingv3Approval = v3Approval
+			// 		break
+			// 	}
+			// }
 
-			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
-				StartTime:          sdkmath.NewUint(0),
-				IntervalLength:     sdkmath.NewUint(0),
-				ChargePeriodLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
+			approval.ApprovalCriteria.AutoDeletionOptions = &v4types.AutoDeletionOptions{AfterOneUse: false}
 		}
 
-		for _, approval := range v3Collection.DefaultBalances.OutgoingApprovals {
-			correspondingV2Approval := &v2types.UserOutgoingApproval{}
-			for _, v2Approval := range v2Collection.DefaultBalances.OutgoingApprovals {
-				if v2Approval.ApprovalId == approval.ApprovalId {
-					correspondingV2Approval = v2Approval
-					break
-				}
-			}
-			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
-				StartTime:          sdkmath.NewUint(0),
-				IntervalLength:     sdkmath.NewUint(0),
-				ChargePeriodLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
+		for _, approval := range v4Collection.DefaultBalances.OutgoingApprovals {
+			// correspondingv3Approval := &v3types.UserOutgoingApproval{}
+			// for _, v3Approval := range v3Collection.DefaultBalances.OutgoingApprovals {
+			// 	if v3Approval.ApprovalId == approval.ApprovalId {
+			// 		correspondingv3Approval = v3Approval
+			// 		break
+			// 	}
+			// }
+
+			approval.ApprovalCriteria.AutoDeletionOptions = &v4types.AutoDeletionOptions{AfterOneUse: false}
 		}
 
 		// Save the updated collection
-		if err := k.SetCollectionInStore(ctx, &v3Collection); err != nil {
+		if err := k.SetCollectionInStore(ctx, &v4Collection); err != nil {
 			return err
 		}
 	}
@@ -155,7 +112,7 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var UserBalance v2types.UserBalanceStore
+		var UserBalance v3types.UserBalanceStore
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 
 		// Convert to JSON
@@ -164,63 +121,35 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 			return err
 		}
 
-		// Unmarshal into v3 type
-		var v3Balance v3types.UserBalanceStore
-		if err := json.Unmarshal(jsonBytes, &v3Balance); err != nil {
+		// Unmarshal into v4 type
+		var v4Balance v4types.UserBalanceStore
+		if err := json.Unmarshal(jsonBytes, &v4Balance); err != nil {
 			return err
 		}
 
-		for _, approval := range v3Balance.IncomingApprovals {
-			correspondingV2Approval := &v2types.UserIncomingApproval{}
-			for _, v2Approval := range UserBalance.IncomingApprovals {
-				if v2Approval.ApprovalId == approval.ApprovalId {
-					correspondingV2Approval = v2Approval
-					break
-				}
-			}
-			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
-				StartTime:          sdkmath.NewUint(0),
-				IntervalLength:     sdkmath.NewUint(0),
-				ChargePeriodLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
+		for _, approval := range v4Balance.IncomingApprovals {
+			// correspondingv3Approval := &v3types.UserIncomingApproval{}
+			// for _, v3Approval := range UserBalance.IncomingApprovals {
+			// 	if v3Approval.ApprovalId == approval.ApprovalId {
+			// 		correspondingv3Approval = v3Approval
+			// 		break
+			// 	}
+			// }
+			approval.ApprovalCriteria.AutoDeletionOptions = &v4types.AutoDeletionOptions{AfterOneUse: false}
 		}
 
-		for _, approval := range v3Balance.OutgoingApprovals {
-			correspondingV2Approval := &v2types.UserOutgoingApproval{}
-			for _, v2Approval := range UserBalance.OutgoingApprovals {
-				if v2Approval.ApprovalId == approval.ApprovalId {
-					correspondingV2Approval = v2Approval
-					break
-				}
-			}
-			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals = &v3types.ResetTimeIntervals{
-				StartTime:      sdkmath.NewUint(0),
-				IntervalLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes = &v3types.RecurringOwnershipTimes{
-				StartTime:          sdkmath.NewUint(0),
-				IntervalLength:     sdkmath.NewUint(0),
-				ChargePeriodLength: sdkmath.NewUint(0),
-			}
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp = false
-			approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp = correspondingV2Approval.ApprovalCriteria.PredeterminedBalances.IncrementedBalances.ApprovalDurationFromNow
+		for _, approval := range v4Balance.OutgoingApprovals {
+			// correspondingv3Approval := &v3types.UserOutgoingApproval{}
+			// for _, v3Approval := range UserBalance.OutgoingApprovals {
+			// 	if v3Approval.ApprovalId == approval.ApprovalId {
+			// 		correspondingv3Approval = v3Approval
+			// 		break
+			// 	}
+			// }
+			approval.ApprovalCriteria.AutoDeletionOptions = &v4types.AutoDeletionOptions{AfterOneUse: false}
 		}
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&v3Balance))
+		store.Set(iterator.Key(), k.cdc.MustMarshal(&v4Balance))
 	}
 	return nil
 }
@@ -230,7 +159,7 @@ func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var AddressList v2types.AddressList
+	// 	var AddressList v3types.AddressList
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &AddressList)
 
 	// 	// Convert to JSON
@@ -239,42 +168,42 @@ func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper
 	// 		return err
 	// 	}
 
-	// 	// Unmarshal into v3 type
-	// 	var v3AddressList v3types.AddressList
-	// 	if err := json.Unmarshal(jsonBytes, &v3AddressList); err != nil {
+	// 	// Unmarshal into v4 type
+	// 	var v4AddressList v4types.AddressList
+	// 	if err := json.Unmarshal(jsonBytes, &v4AddressList); err != nil {
 	// 		return err
 	// 	}
 
-	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v3AddressList))
+	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v4AddressList))
 	// }
 	return nil
 }
 
 func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Keeper) error {
-	iterator := storetypes.KVStorePrefixIterator(store, ApprovalTrackerKey)
-	defer iterator.Close()
+	// iterator := storetypes.KVStorePrefixIterator(store, ApprovalTrackerKey)
+	// defer iterator.Close()
 
-	for ; iterator.Valid(); iterator.Next() {
-		var ApprovalTracker v2types.ApprovalTracker
-		k.cdc.MustUnmarshal(iterator.Value(), &ApprovalTracker)
+	// for ; iterator.Valid(); iterator.Next() {
+	// 	var ApprovalTracker v3types.ApprovalTracker
+	// 	k.cdc.MustUnmarshal(iterator.Value(), &ApprovalTracker)
 
-		// Convert to JSON
-		jsonBytes, err := json.Marshal(ApprovalTracker)
-		if err != nil {
-			return err
-		}
+	// 	// Convert to JSON
+	// 	jsonBytes, err := json.Marshal(ApprovalTracker)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		// Unmarshal into v3 type
-		var v3ApprovalTracker v3types.ApprovalTracker
-		if err := json.Unmarshal(jsonBytes, &v3ApprovalTracker); err != nil {
-			return err
-		}
+	// 	// Unmarshal into v4 type
+	// 	var v4ApprovalTracker v4types.ApprovalTracker
+	// 	if err := json.Unmarshal(jsonBytes, &v4ApprovalTracker); err != nil {
+	// 		return err
+	// 	}
 
-		wctx := sdk.UnwrapSDKContext(ctx)
-		nowUnixMilli := wctx.BlockTime().UnixMilli()
-		v3ApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
+	// 	wctx := sdk.UnwrapSDKContext(ctx)
+	// 	nowUnixMilli := wctx.BlockTime().UnixMilli()
+	// 	v4ApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&v3ApprovalTracker))
-	}
+	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v4ApprovalTracker))
+	// }
 	return nil
 }

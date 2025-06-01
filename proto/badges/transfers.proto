@@ -271,6 +271,12 @@ message PredeterminedBalances {
   PredeterminedOrderCalculationMethod orderCalculationMethod = 3;
 }
 
+// AutoDeletionOptions defines the options for auto-deletion of approvals.
+message AutoDeletionOptions {
+  // After one use?
+  bool afterOneUse = 1;
+}
+
 // ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
 // If any of these are nil or "0", we assume unlimited approvals.
 // If they are set to a value, then the running tally of the amounts transferred for the specified badge IDs and ownership times 
@@ -369,6 +375,9 @@ message ApprovalCriteria {
   bool overridesFromOutgoingApprovals = 10;
   // Overrides the user's incoming approvals for approval.
   bool overridesToIncomingApprovals = 11;
+
+  // Auto-deletion options.
+  AutoDeletionOptions autoDeletionOptions = 12;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -388,6 +397,9 @@ message OutgoingApprovalCriteria {
   bool requireToEqualsInitiatedBy = 6;
   // Require the "to" address to not be equal to the "initiated by" address for approval.
   bool requireToDoesNotEqualInitiatedBy = 7;
+
+  // Auto-deletion options.
+  AutoDeletionOptions autoDeletionOptions = 8;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -407,6 +419,9 @@ message IncomingApprovalCriteria {
   bool requireFromEqualsInitiatedBy = 6;
   // Require the "from" address to not be equal to the "initiated by" address for approval.
   bool requireFromDoesNotEqualInitiatedBy = 7;
+
+  // Auto-deletion options.
+  AutoDeletionOptions autoDeletionOptions = 8;
 }
 
 

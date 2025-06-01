@@ -31,6 +31,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 	initiatedBy string,
 	approvalLevel string,
 	approverAddress string,
+	approvalsUsed *[]ApprovalsUsed,
+	coinTransfersUsed *[]CoinTransfers,
 ) ([]*UserApprovalsToCheck, error) {
 	fromAddress := transfer.From
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
@@ -93,6 +95,27 @@ func (k Keeper) DeductAndGetUserApprovals(
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: underflow error subtracting balances for transfer: %s", transferStr)
 			}
+
+			//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
+			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
+				Address:  fromAddress,
+				Balances: allBalancesForIdsAndTimes,
+				Outgoing: true,
+			})
+
+			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
+				Address:  toAddress,
+				Balances: allBalancesForIdsAndTimes,
+				Outgoing: false,
+			})
+
+			*approvalsUsed = append(*approvalsUsed, ApprovalsUsed{
+				ApprovalId:      approval.ApprovalId,
+				ApprovalLevel:   approvalLevel,
+				ApproverAddress: approverAddress,
+				Version:         approval.Version.String(),
+			})
+
 		} else {
 			//Else, we have a match and we can proceed to check the restrictions
 			//This is split into a two part process:
@@ -129,7 +152,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
-			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, true) //simulate = true
+			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, true, coinTransfersUsed) //simulate = true
 			if err != nil {
 				if isPrioritizedApproval {
 					potentialErrors = append(potentialErrors, fmt.Sprintf("coin transfer error: %s", err))
@@ -250,7 +273,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, false) //simulate = false
+			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, false, coinTransfersUsed) //simulate = false
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
 			}
@@ -295,6 +318,13 @@ func (k Keeper) DeductAndGetUserApprovals(
 					Outgoing: false,
 				})
 			}
+
+			*approvalsUsed = append(*approvalsUsed, ApprovalsUsed{
+				ApprovalId:      approval.ApprovalId,
+				ApprovalLevel:   approvalLevel,
+				ApproverAddress: approverAddress,
+				Version:         approval.Version.String(),
+			})
 		}
 	}
 
@@ -752,6 +782,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				amountsNumTransfersStr,
 				maxNumTransfersTrackerDetails.LastUpdatedAt,
 			)
+
 			emitApprovalEvent(
 				ctx,
 				collection.CollectionId,

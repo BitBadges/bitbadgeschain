@@ -1,4 +1,4 @@
-package v3
+package v4
 
 import (
 	"context"
@@ -10,10 +10,9 @@ import (
 )
 
 const (
-	UpgradeName = "v3"
+	UpgradeName = "v4"
 )
 
-// CreateUpgradeHandler creates an SDK upgrade handler for v1
 func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,

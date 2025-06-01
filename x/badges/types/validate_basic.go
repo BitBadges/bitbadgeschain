@@ -385,6 +385,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			if canChangeValues {
+				if approvalCriteria.AutoDeletionOptions == nil {
+					approvalCriteria.AutoDeletionOptions = &AutoDeletionOptions{}
+				}
+
 				if approvalCriteria.MaxNumTransfers == nil {
 					approvalCriteria.MaxNumTransfers = &MaxNumTransfers{}
 				}

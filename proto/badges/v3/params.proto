@@ -1,10 +1,10 @@
 syntax = "proto3";
-package badges.v2 ;
+package badges.v3;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v2";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v3";
 
 // Params defines the parameters for the module.
 message Params {

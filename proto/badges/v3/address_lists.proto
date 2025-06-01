@@ -1,12 +1,12 @@
 syntax = "proto3";
-package badges.v2;
+package badges.v3;
 
 import "gogoproto/gogo.proto";
-import "badges/v2/balances.proto";
+import "badges/v3/balances.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v2";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v3";
 
 /* 
   An AddressList is a list of addresses that are referenced by an ID.

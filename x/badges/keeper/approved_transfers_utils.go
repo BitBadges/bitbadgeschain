@@ -17,6 +17,8 @@ func (k Keeper) DeductUserOutgoingApprovals(
 	to string,
 	requester string,
 	userBalance *types.UserBalanceStore,
+	approvalsUsed *[]ApprovalsUsed,
+	coinTransfers *[]CoinTransfers,
 ) error {
 	currApprovals := userBalance.OutgoingApprovals
 	if userBalance.AutoApproveSelfInitiatedOutgoingTransfers {
@@ -35,6 +37,8 @@ func (k Keeper) DeductUserOutgoingApprovals(
 		requester,
 		"outgoing",
 		from,
+		approvalsUsed,
+		coinTransfers,
 	)
 	return err
 }
@@ -48,6 +52,8 @@ func (k Keeper) DeductUserIncomingApprovals(
 	to string,
 	initiatedBy string,
 	userBalance *types.UserBalanceStore,
+	approvalsUsed *[]ApprovalsUsed,
+	coinTransfers *[]CoinTransfers,
 ) error {
 	if userBalance.AutoApproveAllIncomingTransfers {
 		return nil
@@ -69,7 +75,9 @@ func (k Keeper) DeductUserIncomingApprovals(
 		to,
 		initiatedBy,
 		"incoming",
-		to,
+			to,
+		approvalsUsed,
+		coinTransfers,
 	)
 	return err
 }
@@ -81,6 +89,8 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 	transfer *types.Transfer,
 	toAddress string,
 	initiatedBy string,
+	approvalsUsed *[]ApprovalsUsed,
+	coinTransfers *[]CoinTransfers,
 ) ([]*UserApprovalsToCheck, error) {
 	return k.DeductAndGetUserApprovals(
 		ctx,
@@ -92,6 +102,8 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 		initiatedBy,
 		"collection",
 		"",
+		approvalsUsed,
+		coinTransfers,
 	)
 }
 

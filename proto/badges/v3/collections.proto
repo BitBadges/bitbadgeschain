@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v2;
+package badges.v3;
 
 import "google/protobuf/any.proto";
-import "badges/v2/transfers.proto";
-import "badges/v2/balances.proto";
-import "badges/v2/permissions.proto";
-import "badges/v2/metadata.proto";
-import "badges/v2/timelines.proto";
+import "badges/v3/transfers.proto";
+import "badges/v3/balances.proto";
+import "badges/v3/permissions.proto";
+import "badges/v3/metadata.proto";
+import "badges/v3/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v2";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v3";
 
 /* 
   A BadgeCollection is the top-level object for a collection of badges. 
