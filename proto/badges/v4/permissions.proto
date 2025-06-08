@@ -1,12 +1,12 @@
 syntax = "proto3";
-package badges.v3;
+package badges.v4;
 
 import "google/protobuf/any.proto";
-import "badges/v3/balances.proto";
-import "badges/v3/address_lists.proto";
+import "badges/v4/balances.proto";
+import "badges/v4/address_lists.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v3";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v4";
 
 
 /* 
