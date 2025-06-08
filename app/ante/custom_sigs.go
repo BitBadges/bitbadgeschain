@@ -466,7 +466,7 @@ func VerifySignature(
 
 			//TODO: Make this num nested structs to account for the nested structs in the EIP712 message?
 			if len(jsonStr) > 1000 {
-				return sdkerrors.Wrapf(types.ErrInvalidChainID, "could not verify standard JSON signature and tx is tooqq expensive for Ethereum EIP712 signature verification")
+				return sdkerrors.Wrapf(types.ErrInvalidChainID, "could not verify standard JSON signature and tx is too expensive for Ethereum EIP712 signature verification")
 			}
 
 			sigHash, _, err := apitypes.TypedDataAndHash(typedData)

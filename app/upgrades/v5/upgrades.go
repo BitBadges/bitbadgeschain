@@ -1,4 +1,4 @@
-package v4
+package v5
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	UpgradeName = "v4"
+	UpgradeName = "v5"
 )
 
 func CreateUpgradeHandler(

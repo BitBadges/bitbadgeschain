@@ -46,6 +46,10 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 
 func MigrateIncomingApprovals(incomingApprovals []*v5types.UserIncomingApproval) []*v5types.UserIncomingApproval {
 	for _, approval := range incomingApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
+
 		for _, challenge := range approval.ApprovalCriteria.MerkleChallenges {
 			challenge.LeafSigner = ""
 		}
@@ -58,6 +62,10 @@ func MigrateIncomingApprovals(incomingApprovals []*v5types.UserIncomingApproval)
 
 func MigrateOutgoingApprovals(outgoingApprovals []*v5types.UserOutgoingApproval) []*v5types.UserOutgoingApproval {
 	for _, approval := range outgoingApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
+
 		for _, challenge := range approval.ApprovalCriteria.MerkleChallenges {
 			challenge.LeafSigner = ""
 		}
@@ -70,6 +78,10 @@ func MigrateOutgoingApprovals(outgoingApprovals []*v5types.UserOutgoingApproval)
 
 func MigrateApprovals(collectionApprovals []*v5types.CollectionApproval) []*v5types.CollectionApproval {
 	for _, approval := range collectionApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
+
 		for _, challenge := range approval.ApprovalCriteria.MerkleChallenges {
 			challenge.LeafSigner = ""
 		}
