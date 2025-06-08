@@ -116,6 +116,111 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 	suite.Require().Error(err, "Error getting user balance: %s")
 }
 
+func (suite *TestSuite) TestLeafSignature() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	aliceLeaf := "-" + alice + "-1-0-0"
+	bobLeaf := "-" + bob + "-1-0-0"
+	charlieLeaf := "-" + charlie + "-1-0-0"
+
+	leafs := [][]byte{[]byte(aliceLeaf), []byte(bobLeaf), []byte(charlieLeaf), []byte(charlieLeaf)}
+	leafHashes := make([][]byte, len(leafs))
+	for i, leaf := range leafs {
+		initialHash := sha256.Sum256(leaf)
+		leafHashes[i] = initialHash[:]
+	}
+
+	levelTwoHashes := make([][]byte, 2)
+	for i := 0; i < len(leafHashes); i += 2 {
+		iHash := sha256.Sum256(append(leafHashes[i], leafHashes[i+1]...))
+		levelTwoHashes[i/2] = iHash[:]
+	}
+
+	rootHashI := sha256.Sum256(append(levelTwoHashes[0], levelTwoHashes[1]...))
+	rootHash := rootHashI[:]
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{}, &types.CollectionApproval{
+
+		ApprovalId: "asadsdas",
+		ApprovalCriteria: &types.ApprovalCriteria{
+
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(10),
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				OverallApprovalAmount: sdkmath.NewUint(10),
+			},
+
+			MerkleChallenges: []*types.MerkleChallenge{
+				{
+
+					Root:                hex.EncodeToString(rootHash),
+					ExpectedProofLength: sdkmath.NewUint(2),
+					MaxUsesPerLeaf:      sdkmath.NewUint(1),
+					LeafSigner:          "0xa612B14Ff99DAe9FBC9613bF4553781086c5F887",
+				},
+			},
+
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+
+		TransferTimes:     GetFullUintRanges(),
+		BadgeIds:          GetOneUintRange(),
+		OwnershipTimes:    GetFullUintRanges(),
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+	})
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	transfers := &types.MsgTransferBadges{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				MerkleProofs: []*types.MerkleProof{
+					{
+
+						Leaf: aliceLeaf,
+						Aunts: []*types.MerklePathItem{
+							{
+								Aunt:    hex.EncodeToString(leafHashes[1]),
+								OnRight: true,
+							},
+							{
+								Aunt:    hex.EncodeToString(levelTwoHashes[1]),
+								OnRight: true,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	err = TransferBadges(suite, wctx, transfers)
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	transfers.Transfers[0].MerkleProofs[0].LeafSignature = "0x53277c915e10b01e32878284293809e171976a8e987f211c3d106a2afccdd85072cfab0f12188ff653f8638d73c0e9b18c8e9892b6aa484799f4076002a66cb71b"
+	err = TransferBadges(suite, wctx, transfers)
+	suite.Require().Nil(err, "Error transferring badge: %s")
+}
+
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
@@ -2980,7 +3085,9 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
 			},
-			OverrideTimestamp: sdkmath.NewUint(10),
+			PrecalculationOptions: &types.PrecalculationOptions{
+				OverrideTimestamp: sdkmath.NewUint(10),
+			},
 		}},
 	})
 	suite.Require().Nil(err)
@@ -3055,7 +3162,9 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
 			},
-			OverrideTimestamp: sdkmath.NewUint(10),
+			PrecalculationOptions: &types.PrecalculationOptions{
+				OverrideTimestamp: sdkmath.NewUint(10),
+			},
 		}},
 	})
 	suite.Require().Nil(err)
@@ -3307,7 +3416,9 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
 			},
-			OverrideTimestamp: sdkmath.NewUint(2000),
+			PrecalculationOptions: &types.PrecalculationOptions{
+				OverrideTimestamp: sdkmath.NewUint(2000),
+			},
 		}},
 	})
 	suite.Require().Nil(err)
@@ -3454,4 +3565,298 @@ func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
 	aliceBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, alice)
 	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].Start, sdkmath.NewUint(100))
 	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(100).Add(sdkmath.NewUint(99)))
+}
+
+func (suite *TestSuite) TestBadgeIdsOverride() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       GetOneUintRange(),
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(10),
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				OverallApprovalAmount: sdkmath.NewUint(10),
+			},
+			PredeterminedBalances: &types.PredeterminedBalances{
+				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+					UseOverallNumTransfers: true,
+				},
+				IncrementedBalances: &types.IncrementedBalances{
+					StartBalances: []*types.Balance{
+						{
+							BadgeIds:       GetOneUintRange(),
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					IncrementBadgeIdsBy:            sdkmath.NewUint(1),
+					IncrementOwnershipTimesBy:      sdkmath.NewUint(0),
+					DurationFromTimestamp:          sdkmath.NewUint(0),
+					AllowOverrideWithAnyValidBadge: true,
+				},
+			},
+
+			MerkleChallenges:               []*types.MerkleChallenge{},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+
+		ApprovalId: "asadsdas",
+
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		BadgeIds:          GetOneUintRange(),
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+	})
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId = "testchallenge"
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err)
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy = sdkmath.NewUint(0)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	msg := &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				MerkleProofs:         []*types.MerkleProof{},
+			},
+		},
+	}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
+	}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Error(err)
+
+	msg.Transfers[0].PrecalculationOptions.BadgeIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Nil(err)
+}
+
+func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(10),
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				OverallApprovalAmount: sdkmath.NewUint(10),
+			},
+			PredeterminedBalances: &types.PredeterminedBalances{
+				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+					UseOverallNumTransfers: true,
+				},
+				IncrementedBalances: &types.IncrementedBalances{
+					StartBalances: []*types.Balance{
+						{
+							BadgeIds:       GetOneUintRange(),
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					IncrementBadgeIdsBy:            sdkmath.NewUint(1),
+					IncrementOwnershipTimesBy:      sdkmath.NewUint(0),
+					DurationFromTimestamp:          sdkmath.NewUint(0),
+					AllowOverrideWithAnyValidBadge: true,
+				},
+			},
+
+			MerkleChallenges:               []*types.MerkleChallenge{},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+
+		ApprovalId: "asadsdas",
+
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		BadgeIds:          GetOneUintRange(),
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+	})
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId = "testchallenge"
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err)
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy = sdkmath.NewUint(0)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	msg := &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				MerkleProofs:         []*types.MerkleProof{},
+			},
+		},
+	}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Error(err, "Error transferring badge: %s")
+
+	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
+	}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Error(err)
+
+	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+	}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Error(err)
+
+	msg.Transfers[0].PrecalculationOptions.BadgeIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Nil(err)
+}
+
+func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+		{
+			Amount:         sdkmath.NewUint(1),
+			BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+			OwnershipTimes: GetFullUintRanges(),
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(10),
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				OverallApprovalAmount: sdkmath.NewUint(10),
+			},
+			PredeterminedBalances: &types.PredeterminedBalances{
+				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+					UseOverallNumTransfers: true,
+				},
+				IncrementedBalances: &types.IncrementedBalances{
+					StartBalances: []*types.Balance{
+						{
+							BadgeIds:       GetOneUintRange(),
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					IncrementBadgeIdsBy:            sdkmath.NewUint(1),
+					IncrementOwnershipTimesBy:      sdkmath.NewUint(0),
+					DurationFromTimestamp:          sdkmath.NewUint(0),
+					AllowOverrideWithAnyValidBadge: true,
+				},
+			},
+
+			MerkleChallenges:               []*types.MerkleChallenge{},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+
+		ApprovalId: "asadsdas",
+
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		BadgeIds:          GetOneUintRange(),
+		FromListId:        "Mint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+	})
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId = "testchallenge"
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err)
+
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy = sdkmath.NewUint(0)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	msg := &types.MsgTransferBadges{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				MerkleProofs:         []*types.MerkleProof{},
+			},
+		},
+	}
+
+	// msg.Transfers[0].PrecalculationOptions.BadgeIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+
+	err = TransferBadges(suite, wctx, msg)
+	suite.Require().Error(err)
 }

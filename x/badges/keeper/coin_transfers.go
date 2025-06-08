@@ -9,7 +9,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.CoinTransfer, initiatedBy string, approverAddress string, simulate bool, coinTransfersUsed *[]CoinTransfers) error {
+func (k Keeper) HandleCoinTransfers(
+	ctx sdk.Context,
+	coinTransfers []*types.CoinTransfer,
+	initiatedBy string,
+	approverAddress string,
+	approvalLevel string,
+	simulate bool,
+	coinTransfersUsed *[]CoinTransfers,
+	collection *types.BadgeCollection,
+) error {
 	if len(coinTransfers) == 0 {
 		return nil
 	}
@@ -31,6 +40,11 @@ func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.Coin
 		for _, coinTransfer := range coinTransfers {
 			fromAddress := initiatedBy
 			if coinTransfer.OverrideFromWithApproverAddress {
+				// collection-level
+				if approverAddress == "" && approvalLevel == "collection" {
+					approverAddress = collection.MintEscrowAddress
+				}
+
 				fromAddress = approverAddress
 				if fromAddress == "" {
 					return sdkerrors.Wrap(types.ErrInvalidAddress, "approver address is required when overrideFromWithApproverAddress is true")
@@ -44,6 +58,11 @@ func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.Coin
 			toTransfer := coinTransfer.Coins
 			fromAddress := initiatedBy
 			if coinTransfer.OverrideFromWithApproverAddress {
+				// collection-level
+				if approverAddress == "" && approvalLevel == "collection" {
+					approverAddress = collection.MintEscrowAddress
+				}
+
 				fromAddress = approverAddress
 			}
 
@@ -67,6 +86,11 @@ func (k Keeper) HandleCoinTransfers(ctx sdk.Context, coinTransfers []*types.Coin
 			toAddressAcc := sdk.MustAccAddressFromBech32(to)
 			fromAddressAcc := sdk.MustAccAddressFromBech32(initiatedBy)
 			if coinTransfer.OverrideFromWithApproverAddress {
+				// collection-level
+				if approverAddress == "" && approvalLevel == "collection" {
+					approverAddress = collection.MintEscrowAddress
+				}
+
 				fromAddressAcc = sdk.MustAccAddressFromBech32(approverAddress)
 			}
 

@@ -22,6 +22,7 @@ type (
 		authority string
 
 		bankKeeper types.BankKeeper
+		accountKeeper types.AccountKeeper
 
 		ApprovedContractAddresses []string
 		PayoutAddress             string
@@ -37,6 +38,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	bankKeeper types.BankKeeper,
+	accountKeeper types.AccountKeeper,
 	ApprovedContractAddresses []string,
 	PayoutAddress string,
 	EnableCoinTransfers bool,
@@ -53,6 +55,7 @@ func NewKeeper(
 		authority:                 authority,
 		logger:                    logger,
 		bankKeeper:                bankKeeper,
+		accountKeeper:             accountKeeper,
 		ApprovedContractAddresses: ApprovedContractAddresses,
 		PayoutAddress:             PayoutAddress,
 		EnableCoinTransfers:       EnableCoinTransfers,

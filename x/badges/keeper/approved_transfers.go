@@ -152,7 +152,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
-			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, true, coinTransfersUsed) //simulate = true
+			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, true, coinTransfersUsed, collection) //simulate = true
 			if err != nil {
 				if isPrioritizedApproval {
 					potentialErrors = append(potentialErrors, fmt.Sprintf("coin transfer error: %s", err))
@@ -254,7 +254,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//here, we assert that the transfer can be incremented and is within the threshold for all trackers (this is a simulation)
 			for i, trackerType := range trackerTypes {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], true, transfer.OverrideTimestamp)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], true, transfer.PrecalculationOptions)
 				if err != nil {
 					failed = true
 					break
@@ -273,7 +273,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, false, coinTransfersUsed) //simulate = false
+			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, false, coinTransfersUsed, collection) //simulate = false
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
 			}
@@ -296,7 +296,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			for i, trackerType := range trackerTypes {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], false, transfer.OverrideTimestamp)
+				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, approverAddress, approvalLevel, trackerType, approvedAddresses[i], false, transfer.PrecalculationOptions)
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing approvals")
 				}
@@ -471,7 +471,8 @@ func (k Keeper) handlePredeterminedBalances(
 	trackerType string,
 	trackerNumTransfers sdkmath.Uint,
 	challengeNumIncrements sdkmath.Uint,
-	overrideTimestamp sdkmath.Uint,
+	precalculationOptions *types.PrecalculationOptions,
+	collection *types.BadgeCollection,
 ) ([]*types.Balance, error) {
 	if predeterminedBalances == nil {
 		return nil, nil
@@ -518,8 +519,11 @@ func (k Keeper) handlePredeterminedBalances(
 			i.IncrementBadgeIdsBy,
 			i.DurationFromTimestamp,
 			i.RecurringOwnershipTimes,
-			overrideTimestamp,
+			precalculationOptions.OverrideTimestamp,
 			i.AllowOverrideTimestamp,
+			precalculationOptions.BadgeIdsOverride,
+			i.AllowOverrideWithAnyValidBadge,
+			collection,
 		)
 		if err != nil {
 			return nil, err
@@ -581,7 +585,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	trackerType string,
 	address string,
 	simulate bool,
-	overrideTimestamp sdkmath.Uint,
+	precalculationOptions *types.PrecalculationOptions,
 ) error {
 	approvalCriteria := approval.ApprovalCriteria
 	amountsTrackerId := approvalCriteria.ApprovalAmounts.AmountTrackerId
@@ -655,7 +659,8 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		trackerType,
 		maxNumTransfersTrackerDetails.NumTransfers,
 		challengeNumIncrements,
-		overrideTimestamp,
+		precalculationOptions,
+		collection,
 	)
 	if err != nil {
 		return err
@@ -841,7 +846,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	precalcDetails *types.ApprovalIdentifierDetails,
 	to string,
 	initiatedBy string,
-	overrideTimestamp sdkmath.Uint,
+	precalculationOptions *types.PrecalculationOptions,
 ) ([]*types.Balance, error) {
 	approvalId := ""
 	approverAddress := precalcDetails.ApproverAddress
@@ -922,7 +927,20 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				}
 			} else if approvalCriteria.PredeterminedBalances.IncrementedBalances != nil {
 				err := *new(error)
-				predeterminedBalances, err = types.IncrementBalances(ctx, approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances, numIncrements, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy, approvalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp, approvalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes, overrideTimestamp, approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp)
+				predeterminedBalances, err = types.IncrementBalances(
+					ctx,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances,
+					numIncrements,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes,
+					precalculationOptions.OverrideTimestamp,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp,
+					precalculationOptions.BadgeIdsOverride,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideWithAnyValidBadge,
+					collection,
+				)
 				if err != nil {
 					return []*types.Balance{}, err
 				}

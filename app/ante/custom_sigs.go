@@ -446,7 +446,6 @@ func VerifySignature(
 			//Standard JSON signature verification
 			isHashSigValid, hashSigErr := sigverify.VerifyEllipticCurveHexSignatureEx(
 				ethcommon.Address(pubKeyBytes),
-				// []byte(jsonHashHexStr),
 				byteStr,
 				"0x"+hexSig,
 			)

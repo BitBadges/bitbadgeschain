@@ -74,4 +74,7 @@ message BadgeCollection {
 
   // The valid badge IDs for this collection.
   repeated UintRange validBadgeIds = 15;
+
+  //The generated address of the badge collection. Also used to escrow Mint balances.
+  string mintEscrowAddress = 16;
 }

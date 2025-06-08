@@ -15,6 +15,7 @@ import "badges/collections.proto";
 import "badges/address_lists.proto";
 import "badges/timelines.proto";
 
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -150,6 +151,9 @@ message MsgUniversalUpdateCollection {
   // Address of the original creator. Used for CosmWASM purposes. 
   // IMPORTANT: We will override but we must trust the original creator address.
   string creatorOverride = 27;
+
+  // Coins to be transferred to the mint escrow address.
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 28;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -232,6 +236,9 @@ message MsgUpdateCollection {
   // Address of the original creator. Used for CosmWASM purposes. 
   // IMPORTANT: We will override but we must trust the original creator address.
   string creatorOverride = 29;
+
+  // Coins to be transferred to the mint escrow address.
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 30;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
@@ -287,6 +294,9 @@ message MsgCreateCollection {
   // Address of the original creator. Used for CosmWASM purposes. 
   // IMPORTANT: We will override but we must trust the original creator address.
   string creatorOverride = 15;
+
+  // Coins to be transferred to the mint escrow address.
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 16;
 }
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.

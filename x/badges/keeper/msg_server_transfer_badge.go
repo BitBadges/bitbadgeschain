@@ -32,7 +32,6 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 	if collectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
-
 	}
 
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
@@ -77,5 +76,6 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 		),
 	)
+
 	return &types.MsgTransferBadgesResponse{}, nil
 }

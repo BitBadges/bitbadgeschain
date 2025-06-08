@@ -88,6 +88,10 @@ message MerkleChallenge {
 
   // The ID of this Merkle challenge for tracking the number of uses per leaf.
   string challengeTrackerId = 7;
+
+  // Leaf must be signed by. Used to protect against man in the middle attacks.`
+  // Scheme we use is sign(leaf + "-" +
+  string leafSigner = 8;
 }
 
 
@@ -243,6 +247,8 @@ message IncrementedBalances {
   bool allowOverrideTimestamp = 5;
   // Recurring ownership times.
   RecurringOwnershipTimes recurringOwnershipTimes = 6;
+  // Allow override of any valid badge
+  bool allowOverrideWithAnyValidBadge = 7;
 }
 
 // PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
@@ -494,9 +500,18 @@ message Transfer {
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
   bool onlyCheckPrioritizedOutgoingApprovals = 10;
+  // The options for precalculating the balances.
+  PrecalculationOptions precalculationOptions = 11;
+  // Affiliate address for the transfer.
+  string affiliateAddress = 12;
+}
+
+// PrecalculationOptions defines the options for precalculating the balances.
+message PrecalculationOptions {
   // The timestamp to override with when calculating the balances.
-  // Only applicable for approvals with predeterminedBalances set that allow setting a custom timestamp for the transfer.
-  string overrideTimestamp = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string overrideTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The badgeIdsOverride to use for the transfer.
+  repeated UintRange badgeIdsOverride = 2;
 }
 
 // MerklePathItem represents an item in a Merkle path.
@@ -513,4 +528,6 @@ message MerkleProof {
   string leaf = 1;
   // List of Merkle path items (aunts) that make up the proof.
   repeated MerklePathItem aunts = 2;
+  // The signature of the leaf node tying the address to the leaf node.
+  string leafSignature = 3;
 }

@@ -6,10 +6,12 @@ import (
 	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/storyicon/sigverify"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	ethcommon "github.com/ethereum/go-ethereum/common"
 )
 
 func (k Keeper) HandleMerkleChallenges(
@@ -75,6 +77,30 @@ func (k Keeper) HandleMerkleChallenges(
 				if proof.Leaf == "" {
 					additionalDetailsErrorStr = "empty leaf"
 					continue
+				}
+
+				if challenge.LeafSigner != "" {
+					leafSignature := proof.LeafSignature
+
+					leafSignerEthAddress := challenge.LeafSigner
+					if leafSignerEthAddress == "" {
+						additionalDetailsErrorStr = "empty leaf signer"
+						continue
+					}
+
+					ethAddress := ethcommon.HexToAddress(leafSignerEthAddress)
+
+					leafSignatureString := proof.Leaf + "-" + creatorAddress
+					isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
+						ethAddress,
+						[]byte(leafSignatureString),
+						leafSignature,
+					)
+
+					if !isValid || err != nil {
+						additionalDetailsErrorStr = "invalid leaf signature"
+						continue
+					}
 				}
 
 				//Get leftmost leaf index for layer === challenge.ExpectedProofLength

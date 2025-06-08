@@ -10,9 +10,11 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -36,12 +38,23 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	appCodec := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
+	addressCodec := address.NewBech32Codec("bb")
+
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
 		bankkeeper.BaseSendKeeper{},
+		accountkeeper.NewAccountKeeper(
+			appCodec,
+			runtime.NewKVStoreService(storeKey),
+			func() sdk.AccountI { return &authtypes.BaseAccount{} },
+			map[string][]string{},
+			addressCodec,
+			"bb",
+			authority.String(),
+		),
 		[]string{},
 		"",
 		true,

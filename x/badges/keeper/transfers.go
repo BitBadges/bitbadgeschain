@@ -62,10 +62,11 @@ type ApprovalsUsed struct {
 }
 
 type CoinTransfers struct {
-	From   string
-	To     string
-	Amount string
-	Denom  string
+	From          string
+	To            string
+	Amount        string
+	Denom         string
+	IsProtocolFee bool
 }
 
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
@@ -119,7 +120,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					transfer.PrecalculateBalancesFromApproval,
 					to,
 					initiatedBy,
-					transfer.OverrideTimestamp,
+					transfer.PrecalculationOptions,
 				)
 				if err != nil {
 					return err
@@ -171,34 +172,54 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				return err
 			}
 
-			if k.PayoutAddress != "" && k.FixedCostPerTransfer != "" {
-				cost, err := sdk.ParseCoinNormalized(k.FixedCostPerTransfer)
-				if err != nil {
-					return err
+			totalUbadgeTransferred := sdkmath.NewUint(0)
+			for _, coinTransfer := range coinTransfers {
+				if coinTransfer.Denom == "ubadge" {
+					amount := sdkmath.NewUintFromString(coinTransfer.Amount)
+					totalUbadgeTransferred = totalUbadgeTransferred.Add(amount)
 				}
-
-				payoutAddressAcc, err := sdk.AccAddressFromBech32(k.PayoutAddress)
-				if err != nil {
-					return err
-				}
-
-				fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
-				if err != nil {
-					return err
-				}
-
-				err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, payoutAddressAcc, sdk.NewCoins(cost))
-				if err != nil {
-					return sdkerrors.Wrapf(err, "error completing required payout. each transfer costs %s", cost)
-				}
-
-				coinTransfers = append(coinTransfers, CoinTransfers{
-					From:   initiatedBy,
-					To:     k.PayoutAddress,
-					Amount: cost.Amount.String(),
-					Denom:  cost.Denom,
-				})
 			}
+
+			// We take max(0.5% or k.FixedCostPerTransfer) as protocol fee
+			fixedCost, err := sdk.ParseCoinNormalized(k.FixedCostPerTransfer)
+			if err != nil {
+				return err
+			}
+
+			cost := fixedCost
+			//0.5% of the total ubadge transferred
+			protocolFee := totalUbadgeTransferred.Mul(sdkmath.NewUint(5)).Quo(sdkmath.NewUint(1000))
+			if protocolFee.GTE(sdkmath.Uint(fixedCost.Amount)) {
+				cost = sdk.NewCoin("ubadge", sdkmath.NewIntFromUint64(protocolFee.Uint64()))
+			}
+
+			payoutAddress := k.PayoutAddress
+			if transfer.AffiliateAddress != "" {
+				payoutAddress = transfer.AffiliateAddress
+			}
+
+			payoutAddressAcc, err := sdk.AccAddressFromBech32(payoutAddress)
+			if err != nil {
+				return err
+			}
+
+			fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
+			if err != nil {
+				return err
+			}
+
+			err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, payoutAddressAcc, sdk.NewCoins(cost))
+			if err != nil {
+				return sdkerrors.Wrapf(err, "error completing required payout. each transfer costs %s", cost)
+			}
+
+			coinTransfers = append(coinTransfers, CoinTransfers{
+				From:          initiatedBy,
+				To:            payoutAddress,
+				Amount:        cost.Amount.String(),
+				Denom:         cost.Denom,
+				IsProtocolFee: true,
+			})
 
 			err = emitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
 			if err != nil {
@@ -290,7 +311,8 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
-				OverrideTimestamp:                       transfer.OverrideTimestamp,
+				PrecalculationOptions:                   transfer.PrecalculationOptions,
+				AffiliateAddress:                        transfer.AffiliateAddress,
 			}
 
 			if userApproval.Outgoing {

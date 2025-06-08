@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -10,6 +11,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 // Legacy function that is all-inclusive (creates and updates)
@@ -33,6 +36,25 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		k.IncrementNextCollectionId(ctx)
 
+		// From cosmos SDK x/group moduleAdd commentMore actions
+		// Generate account address of collection
+		var accountAddr sdk.AccAddress
+		// loop here in the rare case where a ADR-028-derived address creates a
+		// collision with an existing address.
+		for {
+			derivationKey := make([]byte, 8)
+			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
+
+			ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
+			if err != nil {
+				return nil, err
+			}
+			//generate the address from the credential
+			accountAddr = sdk.AccAddress(ac.Address())
+
+			break
+		}
+
 		collection = &types.BadgeCollection{
 			CollectionId:          nextCollectionId,
 			CollectionPermissions: &types.CollectionPermissions{},
@@ -50,6 +72,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 					},
 				},
 			},
+			MintEscrowAddress: accountAddr.String(),
 		}
 	} else {
 		//Update case
@@ -174,6 +197,18 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
+	}
+
+	if len(msg.MintEscrowCoinsToTransfer) > 0 {
+		from := sdk.MustAccAddressFromBech32(msg.Creator)
+		to := sdk.MustAccAddressFromBech32(collection.MintEscrowAddress)
+
+		for _, coin := range msg.MintEscrowCoinsToTransfer {
+			err = k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(*coin))
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	msgBytes, err := json.Marshal(msg)

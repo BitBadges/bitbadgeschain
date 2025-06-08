@@ -41,6 +41,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		StandardsTimeline:                      msg.StandardsTimeline,
 		UpdateIsArchivedTimeline:               msg.UpdateIsArchivedTimeline,
 		IsArchivedTimeline:                     msg.IsArchivedTimeline,
+		MintEscrowCoinsToTransfer:              msg.MintEscrowCoinsToTransfer,
+		CreatorOverride:                        msg.CreatorOverride,
 	}
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)
 	if err != nil {

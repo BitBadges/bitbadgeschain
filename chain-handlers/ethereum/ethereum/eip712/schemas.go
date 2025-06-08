@@ -363,7 +363,8 @@ func GetSchemas() []string {
 									"aunt": "",
 									"onRight": false
 								}
-							]
+							],
+							"leafSignature": ""
 						}
 					],
 					"memo": "",
@@ -378,7 +379,11 @@ func GetSchemas() []string {
 					"onlyCheckPrioritizedCollectionApprovals": false,
 					"onlyCheckPrioritizedIncomingApprovals": false,
 					"onlyCheckPrioritizedOutgoingApprovals": false,
-					"overrideTimestamp": "0"
+					"precalculationOptions": {
+							"overrideTimestamp": "0",
+							"badgeIdsOverride": [{ "start": "", "end": "" }]
+						},
+					"affiliateAddress": ""
 					]
 				}
 			]
@@ -439,6 +444,7 @@ func GetSchemas() []string {
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
+								"leafSigner": "",
 								"maxUsesPerLeaf": "",
 								"challengeTrackerId": "",
 								"uri": "",
@@ -498,6 +504,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"allowOverrideWithAnyValidBadge": false,
 									"durationFromTimestamp": "",
 									"incrementOwnershipTimesBy": "",
 									"allowOverrideTimestamp": true,
@@ -575,6 +582,7 @@ func GetSchemas() []string {
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
+								"leafSigner": "",
 								"maxUsesPerLeaf": "",
 								"challengeTrackerId": "",
 								"uri": "",
@@ -634,6 +642,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"allowOverrideWithAnyValidBadge": false,
 									"durationFromTimestamp": "",
 									"incrementOwnershipTimesBy": "",
 									"allowOverrideTimestamp": true,
@@ -1164,6 +1173,7 @@ func GetSchemas() []string {
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
+							"leafSigner": "",
 							"maxUsesPerLeaf": "",
 							"challengeTrackerId": "",
 							"uri": "",
@@ -1223,6 +1233,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"allowOverrideWithAnyValidBadge": false,
 								"durationFromTimestamp": "",
 								"incrementOwnershipTimesBy": "",
 								"allowOverrideTimestamp": true,
@@ -1296,6 +1307,12 @@ func GetSchemas() []string {
 						}
 					]
 				}
+			],
+			"mintEscrowCoinsToTransfer": [
+				{
+					"amount": "",
+					"denom": ""
+				}
 			]
 		}
 	}`)
@@ -1338,6 +1355,7 @@ func GetSchemas() []string {
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
+							"leafSigner": "",
 							"maxUsesPerLeaf": "",
 							"challengeTrackerId": "",
 							"uri": "",
@@ -1397,6 +1415,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"allowOverrideWithAnyValidBadge": false,
 								"durationFromTimestamp": "",
 								"incrementOwnershipTimesBy": "",
 								"allowOverrideTimestamp": true,
@@ -1475,6 +1494,7 @@ func GetSchemas() []string {
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
+							"leafSigner": "",
 							"maxUsesPerLeaf": "",
 							"challengeTrackerId": "",
 							"uri": "",
@@ -1534,6 +1554,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"allowOverrideWithAnyValidBadge": false,
 								"durationFromTimestamp": "",
 								"incrementOwnershipTimesBy": "",
 								"allowOverrideTimestamp": true,
@@ -1767,6 +1788,7 @@ func GetSchemas() []string {
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
+								"leafSigner": "",
 								"maxUsesPerLeaf": "",
 								"challengeTrackerId": "",
 								"uri": "",
@@ -1826,6 +1848,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"allowOverrideWithAnyValidBadge": false,
 									"durationFromTimestamp": "",
 									"incrementOwnershipTimesBy": "",
 									"allowOverrideTimestamp": true,
@@ -1903,6 +1926,7 @@ func GetSchemas() []string {
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
+								"leafSigner": "",
 								"maxUsesPerLeaf": "",
 								"challengeTrackerId": "",
 								"uri": "",
@@ -1962,6 +1986,7 @@ func GetSchemas() []string {
 										}
 									],
 									"incrementBadgeIdsBy": "",
+									"allowOverrideWithAnyValidBadge": false,
 									"durationFromTimestamp": "",
 									"incrementOwnershipTimesBy": "",
 									"allowOverrideTimestamp": true,
@@ -2484,6 +2509,7 @@ func GetSchemas() []string {
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
+							"leafSigner": "",
 							"maxUsesPerLeaf": "",
 							"challengeTrackerId": "",
 							"uri": "",
@@ -2543,6 +2569,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"allowOverrideWithAnyValidBadge": false,
 								"durationFromTimestamp": "",
 								"incrementOwnershipTimesBy": "",
 								"allowOverrideTimestamp": true,
@@ -2613,6 +2640,12 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					]
+				}
+			],
+			"mintEscrowCoinsToTransfer": [
+				{
+					"amount": "",
+					"denom": ""
 				}
 			]
 		}
@@ -2980,6 +3013,7 @@ func GetSchemas() []string {
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
+							"leafSigner": "",
 							"maxUsesPerLeaf": "",
 							"challengeTrackerId": "",
 							"uri": "",
@@ -3039,6 +3073,7 @@ func GetSchemas() []string {
 									}
 								],
 								"incrementBadgeIdsBy": "",
+								"allowOverrideWithAnyValidBadge": false,
 								"durationFromTimestamp": "",
 								"incrementOwnershipTimesBy": "",
 								"allowOverrideTimestamp": true,
@@ -3111,6 +3146,12 @@ func GetSchemas() []string {
 							"end": ""
 						}
 					]
+				}
+			],
+			"mintEscrowCoinsToTransfer": [
+				{
+					"amount": "",
+					"denom": ""
 				}
 			]
 		}

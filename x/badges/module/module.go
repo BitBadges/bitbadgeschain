@@ -225,6 +225,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.BankKeeper,
+		in.AccountKeeper,
 		in.Config.ApprovedContractAddresses,
 		in.Config.PayoutAddress,
 		in.Config.EnableCoinTransfers,

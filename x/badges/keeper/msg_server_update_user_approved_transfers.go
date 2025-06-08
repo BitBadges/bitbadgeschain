@@ -3,7 +3,9 @@ package keeper
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,7 +25,13 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, err
 	}
 
-	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
+	collectionId := msg.CollectionId
+	if collectionId.Equal(sdkmath.NewUint(0)) {
+		nextCollectionId := k.GetNextCollectionId(ctx)
+		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
+	}
+
+	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return nil, ErrCollectionNotExists
 	}
@@ -168,6 +176,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 			sdk.NewAttribute("msg_type", "update_user_approvals"),
 			sdk.NewAttribute("msg", string(msgBytes)),
+			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 		),
 	)
 
@@ -177,6 +186,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 			sdk.NewAttribute("msg_type", "update_user_approvals"),
 			sdk.NewAttribute("msg", string(msgBytes)),
+			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 		),
 	)
 

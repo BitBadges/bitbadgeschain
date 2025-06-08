@@ -439,6 +439,9 @@ func IncrementBalances(
 	recurringOwnershipTimes *RecurringOwnershipTimes,
 	overrideTimestamp sdkmath.Uint,
 	allowOverrideTimestamp bool,
+	overrideBadgeIds []*UintRange,
+	allowOverrideBadgeIdsWithAnyValidBadgeId bool,
+	collection *BadgeCollection,
 ) ([]*Balance, error) {
 	balances := DeepCopyBalances(startBalances)
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
@@ -512,9 +515,32 @@ func IncrementBalances(
 			}
 		}
 
-		for _, badgeId := range startBalance.BadgeIds {
-			badgeId.Start = badgeId.Start.Add(numIncrements.Mul(incrementBadgeIdsBy))
-			badgeId.End = badgeId.End.Add(numIncrements.Mul(incrementBadgeIdsBy))
+		//Handle badge IDs override
+		if allowOverrideBadgeIdsWithAnyValidBadgeId {
+			//Verify that the badge IDs are valid
+
+			//1. Check size == 1
+			if len(overrideBadgeIds) != 1 {
+				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid badge IDs override (length != 1)")
+			}
+
+			//2. Check that the badge IDs are the same
+			if !overrideBadgeIds[0].Start.Equal(overrideBadgeIds[0].End) {
+				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid badge IDs override (start != end)")
+			}
+
+			//3. Check that the badge IDs are specified as valid in the collection
+			isValid, err := SearchUintRangesForUint(overrideBadgeIds[0].Start, collection.ValidBadgeIds)
+			if err != nil || !isValid {
+				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid badge IDs override (not valid ID in collection)")
+			}
+
+			startBalance.BadgeIds = overrideBadgeIds
+		} else {
+			for _, badgeId := range startBalance.BadgeIds {
+				badgeId.Start = badgeId.Start.Add(numIncrements.Mul(incrementBadgeIdsBy))
+				badgeId.End = badgeId.End.Add(numIncrements.Mul(incrementBadgeIdsBy))
+			}
 		}
 	}
 

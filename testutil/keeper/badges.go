@@ -10,6 +10,7 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,6 +21,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )
 
 func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -35,13 +37,22 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
-
+	addressCodec := address.NewBech32Codec("bb")
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
 		bankkeeper.BaseSendKeeper{},
+		accountkeeper.NewAccountKeeper(
+			appCodec,
+			runtime.NewKVStoreService(storeKey),
+			func() sdk.AccountI { return &authtypes.BaseAccount{} },
+			map[string][]string{},
+			addressCodec,
+			"bb",
+			authority.String(),
+		),
 		[]string{},
 		"",
 		true,

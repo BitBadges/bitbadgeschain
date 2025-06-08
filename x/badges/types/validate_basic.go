@@ -529,6 +529,20 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						if count > 1 {
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment ownership times by, approval duration from now, or recurring ownership times can be set")
 						}
+
+						badgeIdOverrideCount := 0
+						if !sequentialTransfer.IncrementBadgeIdsBy.IsNil() && !sequentialTransfer.IncrementBadgeIdsBy.IsZero() {
+							badgeIdOverrideCount++
+						}
+
+						if sequentialTransfer.AllowOverrideWithAnyValidBadge {
+							badgeIdOverrideCount++
+						}
+
+						if badgeIdOverrideCount > 1 {
+							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment badge ids by, or allow override with any valid badge can be set")
+						}
+
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(ctx, manualTransfer.Balances, canChangeValues)
@@ -566,6 +580,8 @@ func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedO
 
 func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) bool {
 	return incrementedBalances == nil || ((incrementedBalances.StartBalances == nil || len(incrementedBalances.StartBalances) == 0) &&
+		(incrementedBalances.AllowOverrideWithAnyValidBadge == false) &&
+		(incrementedBalances.AllowOverrideTimestamp == false) &&
 		(incrementedBalances.IncrementBadgeIdsBy.IsNil() ||
 			incrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
@@ -708,6 +724,15 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 
 			if transfer.PrecalculateBalancesFromApproval.Version.IsNil() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
+			}
+		}
+	}
+
+	if canChangeValues {
+		if transfer.PrecalculationOptions == nil {
+			transfer.PrecalculationOptions = &PrecalculationOptions{
+				OverrideTimestamp: sdkmath.NewUint(0),
+				BadgeIdsOverride:  nil,
 			}
 		}
 	}

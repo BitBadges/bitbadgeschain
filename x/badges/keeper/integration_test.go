@@ -23,6 +23,8 @@ const (
 	alice   = "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430"
 	bob     = "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q"
 	charlie = "bb1xyxs3skf3f4jfqeuv89yyaqvjc6lffav9altme"
+
+	signer = "bb15cftznlenkhfl0ykzwl525mczzrvt7y87thrwx"
 )
 
 // var DefaultConsensusParams = &abci.ConsensusParams{
@@ -72,11 +74,12 @@ func (suite *TestSuite) SetupTest() {
 	bob_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(bob))
 	alice_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(alice))
 	charlie_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(charlie))
+	signer_acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, sdk.MustAccAddressFromBech32(signer))
 
 	suite.app.AccountKeeper.SetAccount(suite.ctx, bob_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, alice_acc)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, charlie_acc)
-
+	suite.app.AccountKeeper.SetAccount(suite.ctx, signer_acc)
 	//initialize bob with 1000 coins
 
 	suite.ctx = suite.ctx.WithBlockTime(time.Now())
@@ -87,9 +90,11 @@ func (suite *TestSuite) SetupTest() {
 
 	// 1 $BADGE = 1 * 1e9 ubadge
 	ubadgeAmount := sdkmath.NewInt(100 * 1e9)
+
 	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
 	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(alice), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
 	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(charlie), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(signer), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
 }
 
 func TestBadgesKeeperTestSuite(t *testing.T) {
