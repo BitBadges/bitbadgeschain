@@ -15,9 +15,10 @@ import (
 
 // The UserApprovalsToCheck struct is used to keep track of which incoming / outgoing approvals for which addresses we need to check.
 type UserApprovalsToCheck struct {
-	Address  string
-	Balances []*types.Balance
-	Outgoing bool
+	Address       string
+	Balances      []*types.Balance
+	Outgoing      bool
+	UserRoyalties *types.UserRoyalties
 }
 
 // All in one approval deduction function. We also return the user approvals to check (only used when collection approvals)
@@ -33,6 +34,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 	approverAddress string,
 	approvalsUsed *[]ApprovalsUsed,
 	coinTransfersUsed *[]CoinTransfers,
+	royalties *types.UserRoyalties,
 ) ([]*UserApprovalsToCheck, error) {
 	fromAddress := transfer.From
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
@@ -53,6 +55,14 @@ func (k Keeper) DeductAndGetUserApprovals(
 		remainingBalances = types.FilterZeroBalances(remainingBalances)
 		if len(remainingBalances) == 0 {
 			break
+		}
+
+		userRoyalties := &types.UserRoyalties{
+			Percentage:    sdkmath.NewUint(0),
+			PayoutAddress: "",
+		}
+		if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.UserRoyalties != nil {
+			userRoyalties = approval.ApprovalCriteria.UserRoyalties
 		}
 
 		isPrioritizedApproval := false
@@ -98,15 +108,17 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
 			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-				Address:  fromAddress,
-				Balances: allBalancesForIdsAndTimes,
-				Outgoing: true,
+				Address:       fromAddress,
+				Balances:      allBalancesForIdsAndTimes,
+				Outgoing:      true,
+				UserRoyalties: userRoyalties,
 			})
 
 			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-				Address:  toAddress,
-				Balances: allBalancesForIdsAndTimes,
-				Outgoing: false,
+				Address:       toAddress,
+				Balances:      allBalancesForIdsAndTimes,
+				Outgoing:      false,
+				UserRoyalties: userRoyalties,
 			})
 
 			*approvalsUsed = append(*approvalsUsed, ApprovalsUsed{
@@ -115,7 +127,6 @@ func (k Keeper) DeductAndGetUserApprovals(
 				ApproverAddress: approverAddress,
 				Version:         approval.Version.String(),
 			})
-
 		} else {
 			//Else, we have a match and we can proceed to check the restrictions
 			//This is split into a two part process:
@@ -151,8 +162,13 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
+			err = k.CheckMustOwnBadges(ctx, approvalCriteria.MustOwnBadges, initiatedBy)
+			if err != nil {
+				continue
+			}
+
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
-			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, true, coinTransfersUsed, collection) //simulate = true
+			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, true, coinTransfersUsed, collection, royalties) //simulate = true
 			if err != nil {
 				if isPrioritizedApproval {
 					potentialErrors = append(potentialErrors, fmt.Sprintf("coin transfer error: %s", err))
@@ -273,7 +289,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, false, coinTransfersUsed, collection) //simulate = false
+			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, false, coinTransfersUsed, collection, royalties) //simulate = false
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
 			}
@@ -305,17 +321,19 @@ func (k Keeper) DeductAndGetUserApprovals(
 			//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
 			if !approvalCriteria.OverridesFromOutgoingApprovals {
 				userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-					Address:  fromAddress,
-					Balances: transferBalancesToCheck,
-					Outgoing: true,
+					Address:       fromAddress,
+					Balances:      transferBalancesToCheck,
+					Outgoing:      true,
+					UserRoyalties: userRoyalties,
 				})
 			}
 
 			if !approvalCriteria.OverridesToIncomingApprovals {
 				userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-					Address:  toAddress,
-					Balances: transferBalancesToCheck,
-					Outgoing: false,
+					Address:       toAddress,
+					Balances:      transferBalancesToCheck,
+					Outgoing:      false,
+					UserRoyalties: userRoyalties,
 				})
 			}
 
@@ -325,6 +343,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				ApproverAddress: approverAddress,
 				Version:         approval.Version.String(),
 			})
+
 		}
 	}
 
@@ -336,6 +355,20 @@ func (k Keeper) DeductAndGetUserApprovals(
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
 		}
 		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s%s", transferStr, potentialErrorsStr)
+	}
+
+	// cannot have two different user royalty percentages
+	if len(userApprovalsToCheck) > 0 {
+		userRoyalties := userApprovalsToCheck[0].UserRoyalties
+		for _, userApproval := range userApprovalsToCheck {
+			if userApproval.UserRoyalties == nil || userApproval.UserRoyalties.Percentage.IsNil() {
+				continue
+			}
+
+			if !userApproval.UserRoyalties.Percentage.Equal(userRoyalties.Percentage) {
+				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "multiple user-level royalties found - please split your transfer up to use one collection approval w/ royalty per transfer")
+			}
+		}
 	}
 
 	return userApprovalsToCheck, nil

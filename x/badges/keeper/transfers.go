@@ -316,12 +316,12 @@ func (k Keeper) HandleTransfer(
 			}
 
 			if userApproval.Outgoing {
-				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalances, newTransfer, from, to, initiatedBy, fromUserBalance, approvalsUsed, coinTransfers)
+				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalances, newTransfer, from, to, initiatedBy, fromUserBalance, approvalsUsed, coinTransfers, userApproval.UserRoyalties)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
 				}
 			} else {
-				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalances, newTransfer, to, initiatedBy, toUserBalance, approvalsUsed, coinTransfers)
+				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalances, newTransfer, to, initiatedBy, toUserBalance, approvalsUsed, coinTransfers, userApproval.UserRoyalties)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
 				}

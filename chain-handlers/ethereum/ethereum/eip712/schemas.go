@@ -440,7 +440,30 @@ func GetSchemas() []string {
 						"approvalId": "",
 						"version": "0",
 						"approvalCriteria": {
-							"merkleChallenges": [{
+						"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+						"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
@@ -578,7 +601,30 @@ func GetSchemas() []string {
 						"approvalId": "",
 						"version": "0",
 						"approvalCriteria": {
-							"merkleChallenges": [{
+						"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+						"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
@@ -1169,7 +1215,30 @@ func GetSchemas() []string {
 					"approvalId": "",
 					"version": "0",
 					"approvalCriteria": {
-						"merkleChallenges": [{
+					"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+					"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
@@ -1280,6 +1349,10 @@ func GetSchemas() []string {
 						"requireToDoesNotEqualInitiatedBy": false,
 						"requireFromDoesNotEqualInitiatedBy": false,
 						"overridesFromOutgoingApprovals": false,
+						"userRoyalties": {
+							"percentage": "",
+							"payoutAddress": ""
+						},
 						"overridesToIncomingApprovals": false
 					}
 				}
@@ -1351,7 +1424,30 @@ func GetSchemas() []string {
 					"approvalId": "",
 					"version": "0",
 					"approvalCriteria": {
-						"merkleChallenges": [{
+					"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+					"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
@@ -1490,7 +1586,30 @@ func GetSchemas() []string {
 					"approvalId": "",
 					"version": "0",
 					"approvalCriteria": {
-						"merkleChallenges": [{
+					"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+					"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
@@ -1784,7 +1903,30 @@ func GetSchemas() []string {
 						"approvalId": "",
 						"version": "0",
 						"approvalCriteria": {
-							"merkleChallenges": [{
+						"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+						"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
@@ -1922,7 +2064,30 @@ func GetSchemas() []string {
 						"approvalId": "",
 						"version": "0",
 						"approvalCriteria": {
-							"merkleChallenges": [{
+						"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+						"merkleChallenges": [{
 								"root": "",
 								"expectedProofLength": "",
 								"useCreatorAddressAsLeaf": false,
@@ -2505,7 +2670,30 @@ func GetSchemas() []string {
 					"approvalId": "",
 					"version": "0",
 					"approvalCriteria": {
-						"merkleChallenges": [{
+					"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+					"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
@@ -2616,6 +2804,10 @@ func GetSchemas() []string {
 						"requireToDoesNotEqualInitiatedBy": false,
 						"requireFromDoesNotEqualInitiatedBy": false,
 						"overridesFromOutgoingApprovals": false,
+						"userRoyalties": {
+							"percentage": "",
+							"payoutAddress": ""
+						},
 						"overridesToIncomingApprovals": false
 					}
 				}
@@ -3009,7 +3201,30 @@ func GetSchemas() []string {
 					"approvalId": "",
 					"version": "0",
 					"approvalCriteria": {
-						"merkleChallenges": [{
+					"mustOwnBadges": [
+								{
+									"collectionId": "",
+									"amountRange": {
+										"start": "",
+										"end": ""
+									},
+									"ownershipTimes": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"badgeIds": [
+										{
+											"start": "",
+											"end": ""
+										}
+									],
+									"overrideWithCurrentTime": false,
+									"mustSatisfyForAllAssets": false
+								}
+							],	
+					"merkleChallenges": [{
 							"root": "",
 							"expectedProofLength": "",
 							"useCreatorAddressAsLeaf": false,
@@ -3120,6 +3335,10 @@ func GetSchemas() []string {
 						"requireToDoesNotEqualInitiatedBy": false,
 						"requireFromDoesNotEqualInitiatedBy": false,
 						"overridesFromOutgoingApprovals": false,
+						"userRoyalties": {
+							"percentage": "",
+							"payoutAddress": ""
+						},
 						"overridesToIncomingApprovals": false
 					}
 				}

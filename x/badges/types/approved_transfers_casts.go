@@ -104,6 +104,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 		CoinTransfers:                      approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:                approvalCriteria.AutoDeletionOptions,
+		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
 	}
 }
 
@@ -121,6 +122,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 		CoinTransfers:                    approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:              approvalCriteria.AutoDeletionOptions,
+		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
 	}
 }
 
@@ -134,6 +136,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 		CoinTransfers:                      approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:                approvalCriteria.AutoDeletionOptions,
+		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
 	}
 }
 
@@ -147,5 +150,6 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 		CoinTransfers:                    approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:              approvalCriteria.AutoDeletionOptions,
+		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
 	}
 }

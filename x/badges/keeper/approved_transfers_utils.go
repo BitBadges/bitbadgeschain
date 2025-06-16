@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,6 +20,7 @@ func (k Keeper) DeductUserOutgoingApprovals(
 	userBalance *types.UserBalanceStore,
 	approvalsUsed *[]ApprovalsUsed,
 	coinTransfers *[]CoinTransfers,
+	royalties *types.UserRoyalties,
 ) error {
 	currApprovals := userBalance.OutgoingApprovals
 	if userBalance.AutoApproveSelfInitiatedOutgoingTransfers {
@@ -39,6 +41,7 @@ func (k Keeper) DeductUserOutgoingApprovals(
 		from,
 		approvalsUsed,
 		coinTransfers,
+		royalties,
 	)
 	return err
 }
@@ -54,6 +57,7 @@ func (k Keeper) DeductUserIncomingApprovals(
 	userBalance *types.UserBalanceStore,
 	approvalsUsed *[]ApprovalsUsed,
 	coinTransfers *[]CoinTransfers,
+	royalties *types.UserRoyalties,
 ) error {
 	if userBalance.AutoApproveAllIncomingTransfers {
 		return nil
@@ -75,9 +79,10 @@ func (k Keeper) DeductUserIncomingApprovals(
 		to,
 		initiatedBy,
 		"incoming",
-			to,
+		to,
 		approvalsUsed,
 		coinTransfers,
+		royalties,
 	)
 	return err
 }
@@ -92,6 +97,10 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 	approvalsUsed *[]ApprovalsUsed,
 	coinTransfers *[]CoinTransfers,
 ) ([]*UserApprovalsToCheck, error) {
+	blankRoyalties := &types.UserRoyalties{
+		Percentage:    sdkmath.NewUint(0),
+		PayoutAddress: "",
+	}
 	return k.DeductAndGetUserApprovals(
 		ctx,
 		collection,
@@ -104,6 +113,7 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 		"",
 		approvalsUsed,
 		coinTransfers,
+		blankRoyalties,
 	)
 }
 
