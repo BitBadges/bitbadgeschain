@@ -14,13 +14,7 @@ import (
 func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	creator, err := k.GetCreator(ctx, msg.Creator, msg.CreatorOverride)
-	if err != nil {
-		return nil, err
-	}
-	msg.Creator = creator
-
-	err = msg.CheckAndCleanMsg(ctx, true)
+	err := msg.CheckAndCleanMsg(ctx, true)
 	if err != nil {
 		return nil, err
 	}

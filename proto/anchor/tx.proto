@@ -37,7 +37,6 @@ message MsgUpdateParams {
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
 
-//Used for WASM bindings and JSON parsing
 message AnchorCustomMsgType {
   MsgAddCustomData addCustomDataMsg = 1;
 }

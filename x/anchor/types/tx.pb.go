@@ -124,7 +124,6 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
-// Used for WASM bindings and JSON parsing
 type AnchorCustomMsgType struct {
 	AddCustomDataMsg *MsgAddCustomData `protobuf:"bytes,1,opt,name=addCustomDataMsg,proto3" json:"addCustomDataMsg,omitempty"`
 }

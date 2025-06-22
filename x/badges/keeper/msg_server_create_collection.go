@@ -13,12 +13,6 @@ import (
 func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	creator, err := k.GetCreator(ctx, msg.Creator, msg.CreatorOverride)
-	if err != nil {
-		return nil, err
-	}
-	msg.Creator = creator
-
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:      msg.Creator,
 		CollectionId: sdkmath.NewUint(0), //We use 0 to indicate a new collection
@@ -49,7 +43,6 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		IsArchivedTimeline:                     msg.IsArchivedTimeline,
 
 		MintEscrowCoinsToTransfer: msg.MintEscrowCoinsToTransfer,
-		CreatorOverride:           msg.CreatorOverride,
 	}
 
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)

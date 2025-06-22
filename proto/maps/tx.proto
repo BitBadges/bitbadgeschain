@@ -46,8 +46,6 @@ message MsgUpdateParams {
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
 
-
-//Used for WASM bindings and JSON parsing
 message MapCustomMsgType {
   MsgSetValue setValueMsg = 1;
   MsgCreateMap createMapMsg = 2;

@@ -3,8 +3,6 @@ package app
 import (
 	"cosmossdk.io/core/appmodule"
 	storetypes "cosmossdk.io/store/types"
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -31,7 +29,6 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
-	ibccallbacks "github.com/cosmos/ibc-go/modules/apps/callbacks"
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
@@ -46,8 +43,6 @@ import (
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
-	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -179,14 +174,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	mapsIBCModule := ibcfee.NewIBCMiddleware(mapsmodule.NewIBCModule(app.MapsKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 
-	var wasmStack porttypes.IBCModule
-	wasmStackIBCHandler := wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
-	wasmStack = wasmStackIBCHandler
-	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
-	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
-
-	wasmxIBCModule := ibcfee.NewIBCMiddleware(wasmxmodule.NewIBCModule(app.WasmxKeeper), app.IBCFeeKeeper)
-	ibcRouter.AddRoute(wasmxmoduletypes.ModuleName, wasmxIBCModule)
 	// this line is used by starport scaffolding # ibc/app/module
 
 	// Create Interchain Accounts Stack
@@ -194,21 +181,13 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// icaAuthModuleKeeper.SendTx -> icaController.SendPacket -> fee.SendPacket -> channel.SendPacket
 	var icaControllerStack porttypes.IBCModule
 	icaControllerStack = icacontroller.NewIBCMiddleware(noAuthzModule, app.ICAControllerKeeper)
-	// app.ICAAuthModule = icaControllerStack.(ibcmock.IBCModule)
 	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.ICAControllerKeeper)
-	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
-	icaICS4Wrapper := icaControllerStack.(porttypes.ICS4Wrapper)
 	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper)
-	// Since the callbacks middleware itself is an ics4wrapper, it needs to be passed to the ica controller keeper
-	app.ICAControllerKeeper.WithICS4Wrapper(icaICS4Wrapper)
 
 	// Create Transfer Stack
 	var transferStack porttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
-	transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
-	transferICS4Wrapper := transferStack.(porttypes.ICS4Wrapper)
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
-	app.TransferKeeper.WithICS4Wrapper(transferICS4Wrapper)
 
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
 	// channel.RecvPacket -> fee.OnRecvPacket -> icaHost.OnRecvPacket

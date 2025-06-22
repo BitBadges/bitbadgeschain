@@ -126,7 +126,6 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
-// Used for WASM bindings and JSON parsing
 type MapCustomMsgType struct {
 	SetValueMsg  *MsgSetValue  `protobuf:"bytes,1,opt,name=setValueMsg,proto3" json:"setValueMsg,omitempty"`
 	CreateMapMsg *MsgCreateMap `protobuf:"bytes,2,opt,name=createMapMsg,proto3" json:"createMapMsg,omitempty"`

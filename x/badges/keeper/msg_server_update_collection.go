@@ -12,12 +12,6 @@ import (
 func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateCollection) (*types.MsgUpdateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	creator, err := k.GetCreator(ctx, msg.Creator, msg.CreatorOverride)
-	if err != nil {
-		return nil, err
-	}
-	msg.Creator = creator
-
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:                                msg.Creator,
 		CollectionId:                           msg.CollectionId,
@@ -42,7 +36,6 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		UpdateIsArchivedTimeline:               msg.UpdateIsArchivedTimeline,
 		IsArchivedTimeline:                     msg.IsArchivedTimeline,
 		MintEscrowCoinsToTransfer:              msg.MintEscrowCoinsToTransfer,
-		CreatorOverride:                        msg.CreatorOverride,
 	}
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)
 	if err != nil {

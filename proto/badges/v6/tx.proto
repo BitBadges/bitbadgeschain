@@ -1,5 +1,5 @@
 syntax = "proto3";
-package badges;
+package badges.v6;  
 
 import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
@@ -7,17 +7,17 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "badges/params.proto";
 
-import "badges/transfers.proto";
-import "badges/balances.proto";
-import "badges/permissions.proto";
-import "badges/metadata.proto";
-import "badges/collections.proto";
-import "badges/address_lists.proto";
-import "badges/timelines.proto";
+import "badges/v6/transfers.proto";
+import "badges/v6/balances.proto";
+import "badges/v6/permissions.proto";
+import "badges/v6/metadata.proto";
+import "badges/v6/collections.proto";
+import "badges/v6/address_lists.proto";
+import "badges/v6/timelines.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+  option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v6"; 
 
 // Msg defines the Msg service.
 service Msg {
@@ -56,6 +56,18 @@ message MsgUpdateParams {
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
 
+
+
+//Used for WASM bindings and JSON parsing
+message BadgeCustomMsgType {
+  MsgCreateAddressLists createAddressListsMsg = 1;
+  MsgUniversalUpdateCollection universalUpdateCollectionMsg = 2;
+  MsgDeleteCollection deleteCollectionMsg = 3;
+  MsgTransferBadges transferBadgesMsg = 4;
+  MsgUpdateUserApprovals updateUserApprovalsMsg = 5;
+  MsgUpdateCollection updateCollectionMsg = 6;
+  MsgCreateCollection createCollectionMsg = 7;
+}
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
 // It is a universal interface that can be used for both creating and updating collections.
@@ -136,8 +148,12 @@ message MsgUniversalUpdateCollection {
   // New isArchived timeline to set.
   repeated IsArchivedTimeline isArchivedTimeline = 26;
 
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 27;
+
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 27;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 28;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -217,8 +233,12 @@ message MsgUpdateCollection {
   // New isArchived timeline to set.
   repeated IsArchivedTimeline isArchivedTimeline = 28;
 
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 29;
+
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 29;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 30;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
@@ -271,6 +291,10 @@ message MsgCreateCollection {
   // isArchived timeline entries.
   repeated IsArchivedTimeline isArchivedTimeline = 14;
 
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 15;
+
   // Coins to be transferred to the mint escrow address.
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 16;
 }
@@ -291,6 +315,10 @@ message MsgCreateAddressLists {
   
   // Address lists to create.
   repeated AddressList addressLists = 2;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 3;
 }
 
 // MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.
@@ -309,6 +337,10 @@ message MsgTransferBadges {
   
   // Transfers to execute.
   repeated Transfer transfers = 3;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 4;
 }
 
 // MsgTransferBadgesResponse is the response to MsgTransferBadges.
@@ -324,6 +356,10 @@ message MsgDeleteCollection {
   
   // ID of the collection.
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 3;
 }
 
 // MsgDeleteCollectionResponse is the response to MsgDeleteCollection.
@@ -375,6 +411,10 @@ message MsgUpdateUserApprovals {
   
   // New user permissions to set.
   UserPermissions userPermissions = 14;
+
+  // Address of the original creator. Used for CosmWASM purposes. 
+  // IMPORTANT: We will override but we must trust the original creator address.
+  string creatorOverride = 15;
 }
 
 // MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.

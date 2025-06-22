@@ -12,10 +12,9 @@ var _ sdk.Msg = &MsgTransferBadges{}
 
 func NewMsgTransferBadges(creator string, collectionId sdkmath.Uint, transfers []*Transfer, creatorOverride string) *MsgTransferBadges {
 	return &MsgTransferBadges{
-		Creator:         creator,
-		CollectionId:    collectionId,
-		Transfers:       transfers,
-		CreatorOverride: creatorOverride,
+		Creator:      creator,
+		CollectionId: collectionId,
+		Transfers:    transfers,
 	}
 }
 
@@ -54,13 +53,6 @@ func (msg *MsgTransferBadges) CheckAndCleanMsg(ctx sdk.Context, canChangeValues 
 		err = ValidateTransfer(ctx, transfer, canChangeValues)
 		if err != nil {
 			return err
-		}
-	}
-
-	if msg.CreatorOverride != "" {
-		_, err = sdk.AccAddressFromBech32(msg.CreatorOverride)
-		if err != nil {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator override address (%s)", err)
 		}
 	}
 

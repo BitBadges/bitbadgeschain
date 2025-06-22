@@ -360,7 +360,7 @@ func (k Keeper) HandleTransfer(
 	for _, approvalUsed := range *approvalsUsed {
 		if approvalUsed.ApprovalLevel == "incoming" {
 			newIncomingApprovals := []*types.UserIncomingApproval{}
-			for _, incomingApproval := range fromUserBalance.IncomingApprovals {
+			for _, incomingApproval := range toUserBalance.IncomingApprovals {
 				if incomingApproval.ApprovalId != approvalUsed.ApprovalId {
 					newIncomingApprovals = append(newIncomingApprovals, incomingApproval)
 				} else {

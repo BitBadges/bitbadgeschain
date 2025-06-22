@@ -11,8 +11,7 @@ var _ sdk.Msg = &MsgUpdateUserApprovals{}
 
 func NewMsgUpdateUserApprovals(creator string, creatorOverride string) *MsgUpdateUserApprovals {
 	return &MsgUpdateUserApprovals{
-		Creator:         creator,
-		CreatorOverride: creatorOverride,
+		Creator: creator,
 	}
 }
 
@@ -62,13 +61,6 @@ func (msg *MsgUpdateUserApprovals) CheckAndCleanMsg(ctx sdk.Context, canChangeVa
 	err = ValidateUserPermissions(msg.UserPermissions, canChangeValues)
 	if err != nil {
 		return err
-	}
-
-	if msg.CreatorOverride != "" {
-		_, err = sdk.AccAddressFromBech32(msg.CreatorOverride)
-		if err != nil {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator override address (%s)", err)
-		}
 	}
 
 	return nil

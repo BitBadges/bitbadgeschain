@@ -9,10 +9,9 @@ const TypeMsgUpdateCollection = "msg_update_collection"
 
 var _ sdk.Msg = &MsgUpdateCollection{}
 
-func NewMsgUpdateCollection(creator string, creatorOverride string) *MsgUpdateCollection {
+func NewMsgUpdateCollection(creator string) *MsgUpdateCollection {
 	return &MsgUpdateCollection{
-		Creator:         creator,
-		CreatorOverride: creatorOverride,
+		Creator: creator,
 	}
 }
 
@@ -41,13 +40,6 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	if msg.CreatorOverride != "" {
-		_, err = sdk.AccAddressFromBech32(msg.CreatorOverride)
-		if err != nil {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator override address (%s)", err)
-		}
 	}
 
 	return nil

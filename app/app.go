@@ -1,9 +1,7 @@
 package app
 
 import (
-	"fmt"
 	"io"
-	"path/filepath"
 
 	_ "cosmossdk.io/api/cosmos/tx/config/v1" // import for side-effects
 	clienthelpers "cosmossdk.io/client/v2/helpers"
@@ -16,13 +14,10 @@ import (
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	_ "cosmossdk.io/x/feegrant/module" // import for side-effects
-	nftkeeper "cosmossdk.io/x/nft/keeper"
-	_ "cosmossdk.io/x/nft/module" // import for side-effects
-	_ "cosmossdk.io/x/upgrade"    // import for side-effects
+	_ "cosmossdk.io/x/upgrade"         // import for side-effects
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -87,11 +82,6 @@ import (
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
-	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/bitbadges/bitbadgeschain/docs"
@@ -139,7 +129,6 @@ type App struct {
 	EvidenceKeeper       evidencekeeper.Keeper
 	FeeGrantKeeper       feegrantkeeper.Keeper
 	GroupKeeper          groupkeeper.Keeper
-	NFTKeeper            nftkeeper.Keeper
 	CircuitBreakerKeeper circuitkeeper.Keeper
 
 	// IBC
@@ -160,8 +149,6 @@ type App struct {
 	AnchorKeeper anchormodulekeeper.Keeper
 	BadgesKeeper badgesmodulekeeper.Keeper
 	MapsKeeper   mapsmodulekeeper.Keeper
-	WasmKeeper   wasmkeeper.Keeper
-	WasmxKeeper  wasmxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -271,13 +258,11 @@ func New(
 		&app.AuthzKeeper,
 		&app.EvidenceKeeper,
 		&app.FeeGrantKeeper,
-		&app.NFTKeeper,
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.AnchorKeeper,
 		&app.BadgesKeeper,
 		&app.MapsKeeper,
-		&app.WasmxKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
@@ -295,65 +280,6 @@ func New(
 	if err := app.registerIBCModules(appOpts); err != nil {
 		return nil, err
 	}
-
-	keys := storetypes.NewKVStoreKeys(
-		wasmtypes.StoreKey,
-	)
-	app.RegisterStores(keys[wasmtypes.StoreKey])
-	app.ParamsKeeper.Subspace(wasmtypes.ModuleName)
-
-	wasmDir := filepath.Join(DefaultNodeHome, "wasm")
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
-	if err != nil {
-		panic(fmt.Sprintf("error while reading wasm config: %s", err))
-	}
-
-	customEncoderOptions := GetCustomMsgEncodersOptions()
-	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.AnchorKeeper, app.MapsKeeper)
-	wasmOpts := append(customEncoderOptions, customQueryOptions...)
-	// availableCapabilities := []string{"iterator", "staking", "stargate", "cosmwasm_1_1", "cosmwasm_1_2", "bitbadges"}
-
-	storeService := runtime.NewKVStoreService(keys[wasmtypes.StoreKey])
-
-	app.WasmKeeper = wasmkeeper.NewKeeper(
-		app.appCodec,
-		storeService,
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.StakingKeeper,
-		distrkeeper.NewQuerier(app.DistrKeeper),
-		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware
-		app.IBCKeeper.ChannelKeeper,
-		app.IBCKeeper.PortKeeper,
-		app.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName),
-		app.TransferKeeper,
-		app.MsgServiceRouter(),
-		app.GRPCQueryRouter(),
-		wasmDir,
-		wasmConfig,
-		wasmkeeper.BuiltInCapabilities(),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		wasmOpts...,
-	)
-
-	appModule := wasm.NewAppModule(
-		app.appCodec,
-		&app.WasmKeeper,
-		app.StakingKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.MsgServiceRouter(),
-		app.GetSubspace(wasmtypes.ModuleName),
-	)
-	module.CoreAppModuleBasicAdaptor(wasmtypes.ModuleName, appModule).RegisterInterfaces(app.interfaceRegistry)
-
-	if err := app.RegisterModules(
-		appModule,
-	); err != nil {
-		return nil, err
-	}
-
-	app.WasmxKeeper.SetWasmKeeper(app.WasmKeeper)
 
 	// register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
@@ -377,11 +303,7 @@ func New(
 		IBCKeeper:       app.IBCKeeper,
 		SignModeHandler: app.txConfig.SignModeHandler(),
 		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
-
-		WasmConfig:            &wasmConfig,
-		WasmKeeper:            &app.WasmKeeper,
-		TXCounterStoreService: storeService,
-		CircuitKeeper:         &app.CircuitBreakerKeeper,
+		CircuitKeeper:   &app.CircuitBreakerKeeper,
 	}
 
 	if err := options.Validate(); err != nil {
@@ -407,25 +329,6 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		return nil, err
-	}
-
-	// must be before Loading version
-	// requires the snapshot store to be created and registered as a BaseAppOption
-	if manager := app.SnapshotManager(); manager != nil {
-		err := manager.RegisterExtensions(
-			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
-		)
-		if err != nil {
-			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
-		}
-	}
-
-	if loadLatest {
-		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-		// Initialize pinned codes in wasmvm as they are not persisted there
-		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
-			panic(fmt.Sprintf("failed initialize pinned codes %s", err))
-		}
 	}
 
 	return app, nil

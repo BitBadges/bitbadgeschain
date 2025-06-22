@@ -2845,7 +2845,6 @@ func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
 	return file_anchor_tx_proto_rawDescGZIP(), []int{1}
 }
 
-// Used for WASM bindings and JSON parsing
 type AnchorCustomMsgType struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -13,8 +13,7 @@ var _ sdk.Msg = &MsgUniversalUpdateCollection{}
 
 func NewMsgUniversalUpdateCollection(creator string, creatorOverride string) *MsgUniversalUpdateCollection {
 	return &MsgUniversalUpdateCollection{
-		Creator:         creator,
-		CreatorOverride: creatorOverride,
+		Creator: creator,
 	}
 }
 
@@ -256,13 +255,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 
 	if err := ValidateManagerTimeline(msg.ManagerTimeline); err != nil {
 		return err
-	}
-
-	if msg.CreatorOverride != "" {
-		_, err = sdk.AccAddressFromBech32(msg.CreatorOverride)
-		if err != nil {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator override address (%s)", err)
-		}
 	}
 
 	return nil

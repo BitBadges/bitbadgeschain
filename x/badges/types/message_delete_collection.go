@@ -10,11 +10,10 @@ const TypeMsgDeleteCollection = "delete_collection"
 
 var _ sdk.Msg = &MsgDeleteCollection{}
 
-func NewMsgDeleteCollection(creator string, collectionId sdkmath.Uint, creatorOverride string) *MsgDeleteCollection {
+func NewMsgDeleteCollection(creator string, collectionId sdkmath.Uint) *MsgDeleteCollection {
 	return &MsgDeleteCollection{
-		Creator:         creator,
-		CollectionId:    collectionId,
-		CreatorOverride: creatorOverride,
+		Creator:      creator,
+		CollectionId: collectionId,
 	}
 }
 
@@ -49,11 +48,5 @@ func (msg *MsgDeleteCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
-	if msg.CreatorOverride != "" {
-		_, err = sdk.AccAddressFromBech32(msg.CreatorOverride)
-		if err != nil {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator override address (%s)", err)
-		}
-	}
 	return nil
 }

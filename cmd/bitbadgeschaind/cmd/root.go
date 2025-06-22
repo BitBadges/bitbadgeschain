@@ -21,8 +21,6 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/bitbadges/bitbadgeschain/app"
-
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
 )
 
 // NewRootCmd creates a new root command for bitbadgeschaind. It is called once in the main function.
@@ -89,8 +87,6 @@ func NewRootCmd() *cobra.Command {
 		autoCliOpts.Modules[name] = mod
 	}
 
-	moduleBasicManager[wasm.ModuleName] = module.CoreAppModuleBasicAdaptor(wasm.ModuleName, wasm.AppModule{})
-	autoCliOpts.Modules[wasm.ModuleName] = wasm.AppModule{}
 
 	initRootCmd(rootCmd, clientCtx.TxConfig, moduleBasicManager)
 
