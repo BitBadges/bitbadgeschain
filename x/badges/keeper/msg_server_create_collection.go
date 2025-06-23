@@ -43,6 +43,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		IsArchivedTimeline:                     msg.IsArchivedTimeline,
 
 		MintEscrowCoinsToTransfer: msg.MintEscrowCoinsToTransfer,
+		IbcWrapperPathsToAdd:      msg.IbcWrapperPathsToAdd,
 	}
 
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)

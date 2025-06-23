@@ -14,6 +14,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )
 
 func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -37,22 +37,18 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
-	addressCodec := address.NewBech32Codec("bb")
+
+	ak := accountkeeper.NewAccountKeeper(appCodec, runtime.NewKVStoreService(storeKey), func() sdk.AccountI { return &authtypes.BaseAccount{} }, map[string][]string{}, address.NewBech32Codec("bb"), "bb", authority.String())
+
+	bankKeeper := bankkeeper.NewBaseKeeper(appCodec, runtime.NewKVStoreService(storeKey), ak, map[string]bool{}, authority.String(), log.NewNopLogger())
+
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
-		bankkeeper.BaseSendKeeper{},
-		accountkeeper.NewAccountKeeper(
-			appCodec,
-			runtime.NewKVStoreService(storeKey),
-			func() sdk.AccountI { return &authtypes.BaseAccount{} },
-			map[string][]string{},
-			addressCodec,
-			"bb",
-			authority.String(),
-		),
+		bankKeeper,
+		ak,
 		[]string{},
 		"",
 		true,

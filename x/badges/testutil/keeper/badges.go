@@ -38,23 +38,17 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	appCodec := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
-	addressCodec := address.NewBech32Codec("bb")
+	ak := accountkeeper.NewAccountKeeper(appCodec, runtime.NewKVStoreService(storeKey), func() sdk.AccountI { return &authtypes.BaseAccount{} }, map[string][]string{}, address.NewBech32Codec("bb"), "bb", authority.String())
+
+	bankKeeper := bankkeeper.NewBaseKeeper(appCodec, runtime.NewKVStoreService(storeKey), ak, map[string]bool{}, authority.String(), log.NewNopLogger())
 
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
-		bankkeeper.BaseSendKeeper{},
-		accountkeeper.NewAccountKeeper(
-			appCodec,
-			runtime.NewKVStoreService(storeKey),
-			func() sdk.AccountI { return &authtypes.BaseAccount{} },
-			map[string][]string{},
-			addressCodec,
-			"bb",
-			authority.String(),
-		),
+		bankKeeper,
+		ak,
 		[]string{},
 		"",
 		true,

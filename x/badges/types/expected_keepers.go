@@ -16,6 +16,10 @@ type AccountKeeper interface {
 type BankKeeper interface {
 	SpendableCoins(context.Context, sdk.AccAddress) sdk.Coins
 	SendCoins(context.Context, sdk.AccAddress, sdk.AccAddress, sdk.Coins) error
+	MintCoins(context.Context, string, sdk.Coins) error
+	BurnCoins(context.Context, string, sdk.Coins) error
+	SendCoinsFromModuleToAccount(context.Context, string, sdk.AccAddress, sdk.Coins) error
+	SendCoinsFromAccountToModule(context.Context, sdk.AccAddress, string, sdk.Coins) error
 	// Methods imported from bank should be defined here
 }
 

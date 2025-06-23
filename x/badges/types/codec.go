@@ -19,6 +19,8 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateAddressLists{}, "badges/CreateAddressLists", nil)
 	cdc.RegisterConcrete(&MsgCreateCollection{}, "badges/CreateCollection", nil)
 	cdc.RegisterConcrete(&MsgUpdateCollection{}, "badges/UpdateCollection", nil)
+	cdc.RegisterConcrete(&MsgWrapBadges{}, "badges/WrapBadges", nil)
+	cdc.RegisterConcrete(&MsgUnwrapBadges{}, "badges/UnwrapBadges", nil)
 
 	encodingcodec.RegisterLegacyAminoCodec(cdc)
 	// this line is used by starport scaffolding # 2
@@ -33,6 +35,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCreateAddressLists{},
 		&MsgCreateCollection{},
 		&MsgUpdateCollection{},
+		&MsgWrapBadges{},
+		&MsgUnwrapBadges{},
 	)
 	// this line is used by starport scaffolding # 3
 
