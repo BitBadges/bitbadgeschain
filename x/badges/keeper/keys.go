@@ -21,7 +21,7 @@ var (
 	NextAddressListIdKey    = []byte{0x0A}
 	ApprovalVersionKey      = []byte{0x0B}
 
-	IbcWrapperPathGenerationPrefix = []byte{0x0C}
+	WrapperPathGenerationPrefix = []byte{0x0C}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}

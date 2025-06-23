@@ -177,10 +177,10 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			BadgeMetadataTimeline:            collectionToCreate.BadgeMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
 			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
-			CustomDataTimeline:   collectionToCreate.CustomDataTimeline,
-			StandardsTimeline:    collectionToCreate.StandardsTimeline,
-			IbcWrapperPathsToAdd: collectionToCreate.IbcWrapperPathsToAdd,
-			ValidBadgeIds:        allBadgeIds,
+			CustomDataTimeline:          collectionToCreate.CustomDataTimeline,
+			StandardsTimeline:           collectionToCreate.StandardsTimeline,
+			CosmosCoinWrapperPathsToAdd: collectionToCreate.CosmosCoinWrapperPathsToAdd,
+			ValidBadgeIds:               allBadgeIds,
 			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
 
 			// ManagerTimeline: collectionToCreate.ManagerTimeline,
@@ -386,19 +386,5 @@ func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.Msg
 		UserPermissions:       msg.Permissions,
 		UpdateUserPermissions: true,
 	})
-	return err
-}
-
-func WrapBadges(suite *TestSuite, ctx context.Context, msg *types.MsgWrapBadges) error {
-	_, err := suite.msgServer.WrapBadges(ctx, msg)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func UnwrapBadges(suite *TestSuite, ctx context.Context, msg *types.MsgUnwrapBadges) error {
-	_, err := suite.msgServer.UnwrapBadges(ctx, msg)
 	return err
 }

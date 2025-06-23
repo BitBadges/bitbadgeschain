@@ -476,7 +476,7 @@ func (x *_BadgeCollection_15_list) IsValid() bool {
 var _ protoreflect.List = (*_BadgeCollection_17_list)(nil)
 
 type _BadgeCollection_17_list struct {
-	list *[]*IBCWrapperPaths
+	list *[]*CosmosCoinWrapperPath
 }
 
 func (x *_BadgeCollection_17_list) Len() int {
@@ -492,18 +492,18 @@ func (x *_BadgeCollection_17_list) Get(i int) protoreflect.Value {
 
 func (x *_BadgeCollection_17_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*IBCWrapperPaths)
+	concreteValue := valueUnwrapped.Interface().(*CosmosCoinWrapperPath)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_BadgeCollection_17_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*IBCWrapperPaths)
+	concreteValue := valueUnwrapped.Interface().(*CosmosCoinWrapperPath)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_BadgeCollection_17_list) AppendMutable() protoreflect.Value {
-	v := new(IBCWrapperPaths)
+	v := new(CosmosCoinWrapperPath)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -516,7 +516,7 @@ func (x *_BadgeCollection_17_list) Truncate(n int) {
 }
 
 func (x *_BadgeCollection_17_list) NewElement() protoreflect.Value {
-	v := new(IBCWrapperPaths)
+	v := new(CosmosCoinWrapperPath)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -541,7 +541,7 @@ var (
 	fd_BadgeCollection_createdBy                        protoreflect.FieldDescriptor
 	fd_BadgeCollection_validBadgeIds                    protoreflect.FieldDescriptor
 	fd_BadgeCollection_mintEscrowAddress                protoreflect.FieldDescriptor
-	fd_BadgeCollection_ibcWrapperPaths                  protoreflect.FieldDescriptor
+	fd_BadgeCollection_cosmosCoinWrapperPaths           protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -562,7 +562,7 @@ func init() {
 	fd_BadgeCollection_createdBy = md_BadgeCollection.Fields().ByName("createdBy")
 	fd_BadgeCollection_validBadgeIds = md_BadgeCollection.Fields().ByName("validBadgeIds")
 	fd_BadgeCollection_mintEscrowAddress = md_BadgeCollection.Fields().ByName("mintEscrowAddress")
-	fd_BadgeCollection_ibcWrapperPaths = md_BadgeCollection.Fields().ByName("ibcWrapperPaths")
+	fd_BadgeCollection_cosmosCoinWrapperPaths = md_BadgeCollection.Fields().ByName("cosmosCoinWrapperPaths")
 }
 
 var _ protoreflect.Message = (*fastReflection_BadgeCollection)(nil)
@@ -720,9 +720,9 @@ func (x *fastReflection_BadgeCollection) Range(f func(protoreflect.FieldDescript
 			return
 		}
 	}
-	if len(x.IbcWrapperPaths) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_17_list{list: &x.IbcWrapperPaths})
-		if !f(fd_BadgeCollection_ibcWrapperPaths, value) {
+	if len(x.CosmosCoinWrapperPaths) != 0 {
+		value := protoreflect.ValueOfList(&_BadgeCollection_17_list{list: &x.CosmosCoinWrapperPaths})
+		if !f(fd_BadgeCollection_cosmosCoinWrapperPaths, value) {
 			return
 		}
 	}
@@ -771,8 +771,8 @@ func (x *fastReflection_BadgeCollection) Has(fd protoreflect.FieldDescriptor) bo
 		return len(x.ValidBadgeIds) != 0
 	case "badges.BadgeCollection.mintEscrowAddress":
 		return x.MintEscrowAddress != ""
-	case "badges.BadgeCollection.ibcWrapperPaths":
-		return len(x.IbcWrapperPaths) != 0
+	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+		return len(x.CosmosCoinWrapperPaths) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
@@ -819,8 +819,8 @@ func (x *fastReflection_BadgeCollection) Clear(fd protoreflect.FieldDescriptor) 
 		x.ValidBadgeIds = nil
 	case "badges.BadgeCollection.mintEscrowAddress":
 		x.MintEscrowAddress = ""
-	case "badges.BadgeCollection.ibcWrapperPaths":
-		x.IbcWrapperPaths = nil
+	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+		x.CosmosCoinWrapperPaths = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
@@ -909,11 +909,11 @@ func (x *fastReflection_BadgeCollection) Get(descriptor protoreflect.FieldDescri
 	case "badges.BadgeCollection.mintEscrowAddress":
 		value := x.MintEscrowAddress
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeCollection.ibcWrapperPaths":
-		if len(x.IbcWrapperPaths) == 0 {
+	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+		if len(x.CosmosCoinWrapperPaths) == 0 {
 			return protoreflect.ValueOfList(&_BadgeCollection_17_list{})
 		}
-		listValue := &_BadgeCollection_17_list{list: &x.IbcWrapperPaths}
+		listValue := &_BadgeCollection_17_list{list: &x.CosmosCoinWrapperPaths}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -983,10 +983,10 @@ func (x *fastReflection_BadgeCollection) Set(fd protoreflect.FieldDescriptor, va
 		x.ValidBadgeIds = *clv.list
 	case "badges.BadgeCollection.mintEscrowAddress":
 		x.MintEscrowAddress = value.Interface().(string)
-	case "badges.BadgeCollection.ibcWrapperPaths":
+	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
 		lv := value.List()
 		clv := lv.(*_BadgeCollection_17_list)
-		x.IbcWrapperPaths = *clv.list
+		x.CosmosCoinWrapperPaths = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
@@ -1071,11 +1071,11 @@ func (x *fastReflection_BadgeCollection) Mutable(fd protoreflect.FieldDescriptor
 		}
 		value := &_BadgeCollection_15_list{list: &x.ValidBadgeIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.ibcWrapperPaths":
-		if x.IbcWrapperPaths == nil {
-			x.IbcWrapperPaths = []*IBCWrapperPaths{}
+	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+		if x.CosmosCoinWrapperPaths == nil {
+			x.CosmosCoinWrapperPaths = []*CosmosCoinWrapperPath{}
 		}
-		value := &_BadgeCollection_17_list{list: &x.IbcWrapperPaths}
+		value := &_BadgeCollection_17_list{list: &x.CosmosCoinWrapperPaths}
 		return protoreflect.ValueOfList(value)
 	case "badges.BadgeCollection.collectionId":
 		panic(fmt.Errorf("field collectionId of message badges.BadgeCollection is not mutable"))
@@ -1139,8 +1139,8 @@ func (x *fastReflection_BadgeCollection) NewField(fd protoreflect.FieldDescripto
 		return protoreflect.ValueOfList(&_BadgeCollection_15_list{list: &list})
 	case "badges.BadgeCollection.mintEscrowAddress":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeCollection.ibcWrapperPaths":
-		list := []*IBCWrapperPaths{}
+	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+		list := []*CosmosCoinWrapperPath{}
 		return protoreflect.ValueOfList(&_BadgeCollection_17_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -1289,8 +1289,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 2 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.IbcWrapperPaths) > 0 {
-			for _, e := range x.IbcWrapperPaths {
+		if len(x.CosmosCoinWrapperPaths) > 0 {
+			for _, e := range x.CosmosCoinWrapperPaths {
 				l = options.Size(e)
 				n += 2 + l + runtime.Sov(uint64(l))
 			}
@@ -1324,9 +1324,9 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.IbcWrapperPaths) > 0 {
-			for iNdEx := len(x.IbcWrapperPaths) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.IbcWrapperPaths[iNdEx])
+		if len(x.CosmosCoinWrapperPaths) > 0 {
+			for iNdEx := len(x.CosmosCoinWrapperPaths) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.CosmosCoinWrapperPaths[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2101,7 +2101,7 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 17:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IbcWrapperPaths", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CosmosCoinWrapperPaths", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -2128,8 +2128,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.IbcWrapperPaths = append(x.IbcWrapperPaths, &IBCWrapperPaths{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.IbcWrapperPaths[len(x.IbcWrapperPaths)-1]); err != nil {
+				x.CosmosCoinWrapperPaths = append(x.CosmosCoinWrapperPaths, &CosmosCoinWrapperPath{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CosmosCoinWrapperPaths[len(x.CosmosCoinWrapperPaths)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -2168,134 +2168,134 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 	}
 }
 
-var _ protoreflect.List = (*_IBCWrapperPaths_3_list)(nil)
+var _ protoreflect.List = (*_CosmosCoinWrapperPath_3_list)(nil)
 
-type _IBCWrapperPaths_3_list struct {
+type _CosmosCoinWrapperPath_3_list struct {
 	list *[]*UintRange
 }
 
-func (x *_IBCWrapperPaths_3_list) Len() int {
+func (x *_CosmosCoinWrapperPath_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_IBCWrapperPaths_3_list) Get(i int) protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_IBCWrapperPaths_3_list) Set(i int, value protoreflect.Value) {
+func (x *_CosmosCoinWrapperPath_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_IBCWrapperPaths_3_list) Append(value protoreflect.Value) {
+func (x *_CosmosCoinWrapperPath_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_IBCWrapperPaths_3_list) AppendMutable() protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_3_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_IBCWrapperPaths_3_list) Truncate(n int) {
+func (x *_CosmosCoinWrapperPath_3_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_IBCWrapperPaths_3_list) NewElement() protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_3_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_IBCWrapperPaths_3_list) IsValid() bool {
+func (x *_CosmosCoinWrapperPath_3_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_IBCWrapperPaths_4_list)(nil)
+var _ protoreflect.List = (*_CosmosCoinWrapperPath_4_list)(nil)
 
-type _IBCWrapperPaths_4_list struct {
+type _CosmosCoinWrapperPath_4_list struct {
 	list *[]*UintRange
 }
 
-func (x *_IBCWrapperPaths_4_list) Len() int {
+func (x *_CosmosCoinWrapperPath_4_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_IBCWrapperPaths_4_list) Get(i int) protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_4_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_IBCWrapperPaths_4_list) Set(i int, value protoreflect.Value) {
+func (x *_CosmosCoinWrapperPath_4_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_IBCWrapperPaths_4_list) Append(value protoreflect.Value) {
+func (x *_CosmosCoinWrapperPath_4_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_IBCWrapperPaths_4_list) AppendMutable() protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_4_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_IBCWrapperPaths_4_list) Truncate(n int) {
+func (x *_CosmosCoinWrapperPath_4_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_IBCWrapperPaths_4_list) NewElement() protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_4_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_IBCWrapperPaths_4_list) IsValid() bool {
+func (x *_CosmosCoinWrapperPath_4_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_IBCWrapperPaths                protoreflect.MessageDescriptor
-	fd_IBCWrapperPaths_address        protoreflect.FieldDescriptor
-	fd_IBCWrapperPaths_denom          protoreflect.FieldDescriptor
-	fd_IBCWrapperPaths_ownershipTimes protoreflect.FieldDescriptor
-	fd_IBCWrapperPaths_badgeIds       protoreflect.FieldDescriptor
+	md_CosmosCoinWrapperPath                protoreflect.MessageDescriptor
+	fd_CosmosCoinWrapperPath_address        protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_denom          protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_ownershipTimes protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_badgeIds       protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_collections_proto_init()
-	md_IBCWrapperPaths = File_badges_collections_proto.Messages().ByName("IBCWrapperPaths")
-	fd_IBCWrapperPaths_address = md_IBCWrapperPaths.Fields().ByName("address")
-	fd_IBCWrapperPaths_denom = md_IBCWrapperPaths.Fields().ByName("denom")
-	fd_IBCWrapperPaths_ownershipTimes = md_IBCWrapperPaths.Fields().ByName("ownershipTimes")
-	fd_IBCWrapperPaths_badgeIds = md_IBCWrapperPaths.Fields().ByName("badgeIds")
+	md_CosmosCoinWrapperPath = File_badges_collections_proto.Messages().ByName("CosmosCoinWrapperPath")
+	fd_CosmosCoinWrapperPath_address = md_CosmosCoinWrapperPath.Fields().ByName("address")
+	fd_CosmosCoinWrapperPath_denom = md_CosmosCoinWrapperPath.Fields().ByName("denom")
+	fd_CosmosCoinWrapperPath_ownershipTimes = md_CosmosCoinWrapperPath.Fields().ByName("ownershipTimes")
+	fd_CosmosCoinWrapperPath_badgeIds = md_CosmosCoinWrapperPath.Fields().ByName("badgeIds")
 }
 
-var _ protoreflect.Message = (*fastReflection_IBCWrapperPaths)(nil)
+var _ protoreflect.Message = (*fastReflection_CosmosCoinWrapperPath)(nil)
 
-type fastReflection_IBCWrapperPaths IBCWrapperPaths
+type fastReflection_CosmosCoinWrapperPath CosmosCoinWrapperPath
 
-func (x *IBCWrapperPaths) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_IBCWrapperPaths)(x)
+func (x *CosmosCoinWrapperPath) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_CosmosCoinWrapperPath)(x)
 }
 
-func (x *IBCWrapperPaths) slowProtoReflect() protoreflect.Message {
+func (x *CosmosCoinWrapperPath) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_collections_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2307,43 +2307,43 @@ func (x *IBCWrapperPaths) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_IBCWrapperPaths_messageType fastReflection_IBCWrapperPaths_messageType
-var _ protoreflect.MessageType = fastReflection_IBCWrapperPaths_messageType{}
+var _fastReflection_CosmosCoinWrapperPath_messageType fastReflection_CosmosCoinWrapperPath_messageType
+var _ protoreflect.MessageType = fastReflection_CosmosCoinWrapperPath_messageType{}
 
-type fastReflection_IBCWrapperPaths_messageType struct{}
+type fastReflection_CosmosCoinWrapperPath_messageType struct{}
 
-func (x fastReflection_IBCWrapperPaths_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_IBCWrapperPaths)(nil)
+func (x fastReflection_CosmosCoinWrapperPath_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_CosmosCoinWrapperPath)(nil)
 }
-func (x fastReflection_IBCWrapperPaths_messageType) New() protoreflect.Message {
-	return new(fastReflection_IBCWrapperPaths)
+func (x fastReflection_CosmosCoinWrapperPath_messageType) New() protoreflect.Message {
+	return new(fastReflection_CosmosCoinWrapperPath)
 }
-func (x fastReflection_IBCWrapperPaths_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_IBCWrapperPaths
+func (x fastReflection_CosmosCoinWrapperPath_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_CosmosCoinWrapperPath
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_IBCWrapperPaths) Descriptor() protoreflect.MessageDescriptor {
-	return md_IBCWrapperPaths
+func (x *fastReflection_CosmosCoinWrapperPath) Descriptor() protoreflect.MessageDescriptor {
+	return md_CosmosCoinWrapperPath
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_IBCWrapperPaths) Type() protoreflect.MessageType {
-	return _fastReflection_IBCWrapperPaths_messageType
+func (x *fastReflection_CosmosCoinWrapperPath) Type() protoreflect.MessageType {
+	return _fastReflection_CosmosCoinWrapperPath_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_IBCWrapperPaths) New() protoreflect.Message {
-	return new(fastReflection_IBCWrapperPaths)
+func (x *fastReflection_CosmosCoinWrapperPath) New() protoreflect.Message {
+	return new(fastReflection_CosmosCoinWrapperPath)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_IBCWrapperPaths) Interface() protoreflect.ProtoMessage {
-	return (*IBCWrapperPaths)(x)
+func (x *fastReflection_CosmosCoinWrapperPath) Interface() protoreflect.ProtoMessage {
+	return (*CosmosCoinWrapperPath)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -2351,28 +2351,28 @@ func (x *fastReflection_IBCWrapperPaths) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_IBCWrapperPaths) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_CosmosCoinWrapperPath) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Address != "" {
 		value := protoreflect.ValueOfString(x.Address)
-		if !f(fd_IBCWrapperPaths_address, value) {
+		if !f(fd_CosmosCoinWrapperPath_address, value) {
 			return
 		}
 	}
 	if x.Denom != "" {
 		value := protoreflect.ValueOfString(x.Denom)
-		if !f(fd_IBCWrapperPaths_denom, value) {
+		if !f(fd_CosmosCoinWrapperPath_denom, value) {
 			return
 		}
 	}
 	if len(x.OwnershipTimes) != 0 {
-		value := protoreflect.ValueOfList(&_IBCWrapperPaths_3_list{list: &x.OwnershipTimes})
-		if !f(fd_IBCWrapperPaths_ownershipTimes, value) {
+		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes})
+		if !f(fd_CosmosCoinWrapperPath_ownershipTimes, value) {
 			return
 		}
 	}
 	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_IBCWrapperPaths_4_list{list: &x.BadgeIds})
-		if !f(fd_IBCWrapperPaths_badgeIds, value) {
+		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds})
+		if !f(fd_CosmosCoinWrapperPath_badgeIds, value) {
 			return
 		}
 	}
@@ -2389,21 +2389,21 @@ func (x *fastReflection_IBCWrapperPaths) Range(f func(protoreflect.FieldDescript
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_IBCWrapperPaths) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_CosmosCoinWrapperPath) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.IBCWrapperPaths.address":
+	case "badges.CosmosCoinWrapperPath.address":
 		return x.Address != ""
-	case "badges.IBCWrapperPaths.denom":
+	case "badges.CosmosCoinWrapperPath.denom":
 		return x.Denom != ""
-	case "badges.IBCWrapperPaths.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
-	case "badges.IBCWrapperPaths.badgeIds":
+	case "badges.CosmosCoinWrapperPath.badgeIds":
 		return len(x.BadgeIds) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IBCWrapperPaths"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
 		}
-		panic(fmt.Errorf("message badges.IBCWrapperPaths does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.CosmosCoinWrapperPath does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2413,21 +2413,21 @@ func (x *fastReflection_IBCWrapperPaths) Has(fd protoreflect.FieldDescriptor) bo
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_IBCWrapperPaths) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_CosmosCoinWrapperPath) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.IBCWrapperPaths.address":
+	case "badges.CosmosCoinWrapperPath.address":
 		x.Address = ""
-	case "badges.IBCWrapperPaths.denom":
+	case "badges.CosmosCoinWrapperPath.denom":
 		x.Denom = ""
-	case "badges.IBCWrapperPaths.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		x.OwnershipTimes = nil
-	case "badges.IBCWrapperPaths.badgeIds":
+	case "badges.CosmosCoinWrapperPath.badgeIds":
 		x.BadgeIds = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IBCWrapperPaths"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
 		}
-		panic(fmt.Errorf("message badges.IBCWrapperPaths does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.CosmosCoinWrapperPath does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2437,31 +2437,31 @@ func (x *fastReflection_IBCWrapperPaths) Clear(fd protoreflect.FieldDescriptor) 
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_IBCWrapperPaths) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_CosmosCoinWrapperPath) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.IBCWrapperPaths.address":
+	case "badges.CosmosCoinWrapperPath.address":
 		value := x.Address
 		return protoreflect.ValueOfString(value)
-	case "badges.IBCWrapperPaths.denom":
+	case "badges.CosmosCoinWrapperPath.denom":
 		value := x.Denom
 		return protoreflect.ValueOfString(value)
-	case "badges.IBCWrapperPaths.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
-			return protoreflect.ValueOfList(&_IBCWrapperPaths_3_list{})
+			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{})
 		}
-		listValue := &_IBCWrapperPaths_3_list{list: &x.OwnershipTimes}
+		listValue := &_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.IBCWrapperPaths.badgeIds":
+	case "badges.CosmosCoinWrapperPath.badgeIds":
 		if len(x.BadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_IBCWrapperPaths_4_list{})
+			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{})
 		}
-		listValue := &_IBCWrapperPaths_4_list{list: &x.BadgeIds}
+		listValue := &_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IBCWrapperPaths"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
 		}
-		panic(fmt.Errorf("message badges.IBCWrapperPaths does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.CosmosCoinWrapperPath does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2475,25 +2475,25 @@ func (x *fastReflection_IBCWrapperPaths) Get(descriptor protoreflect.FieldDescri
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_IBCWrapperPaths) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_CosmosCoinWrapperPath) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.IBCWrapperPaths.address":
+	case "badges.CosmosCoinWrapperPath.address":
 		x.Address = value.Interface().(string)
-	case "badges.IBCWrapperPaths.denom":
+	case "badges.CosmosCoinWrapperPath.denom":
 		x.Denom = value.Interface().(string)
-	case "badges.IBCWrapperPaths.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		lv := value.List()
-		clv := lv.(*_IBCWrapperPaths_3_list)
+		clv := lv.(*_CosmosCoinWrapperPath_3_list)
 		x.OwnershipTimes = *clv.list
-	case "badges.IBCWrapperPaths.badgeIds":
+	case "badges.CosmosCoinWrapperPath.badgeIds":
 		lv := value.List()
-		clv := lv.(*_IBCWrapperPaths_4_list)
+		clv := lv.(*_CosmosCoinWrapperPath_4_list)
 		x.BadgeIds = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IBCWrapperPaths"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
 		}
-		panic(fmt.Errorf("message badges.IBCWrapperPaths does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.CosmosCoinWrapperPath does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2507,62 +2507,62 @@ func (x *fastReflection_IBCWrapperPaths) Set(fd protoreflect.FieldDescriptor, va
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_IBCWrapperPaths) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_CosmosCoinWrapperPath) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.IBCWrapperPaths.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		if x.OwnershipTimes == nil {
 			x.OwnershipTimes = []*UintRange{}
 		}
-		value := &_IBCWrapperPaths_3_list{list: &x.OwnershipTimes}
+		value := &_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.IBCWrapperPaths.badgeIds":
+	case "badges.CosmosCoinWrapperPath.badgeIds":
 		if x.BadgeIds == nil {
 			x.BadgeIds = []*UintRange{}
 		}
-		value := &_IBCWrapperPaths_4_list{list: &x.BadgeIds}
+		value := &_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.IBCWrapperPaths.address":
-		panic(fmt.Errorf("field address of message badges.IBCWrapperPaths is not mutable"))
-	case "badges.IBCWrapperPaths.denom":
-		panic(fmt.Errorf("field denom of message badges.IBCWrapperPaths is not mutable"))
+	case "badges.CosmosCoinWrapperPath.address":
+		panic(fmt.Errorf("field address of message badges.CosmosCoinWrapperPath is not mutable"))
+	case "badges.CosmosCoinWrapperPath.denom":
+		panic(fmt.Errorf("field denom of message badges.CosmosCoinWrapperPath is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IBCWrapperPaths"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
 		}
-		panic(fmt.Errorf("message badges.IBCWrapperPaths does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.CosmosCoinWrapperPath does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_IBCWrapperPaths) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_CosmosCoinWrapperPath) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.IBCWrapperPaths.address":
+	case "badges.CosmosCoinWrapperPath.address":
 		return protoreflect.ValueOfString("")
-	case "badges.IBCWrapperPaths.denom":
+	case "badges.CosmosCoinWrapperPath.denom":
 		return protoreflect.ValueOfString("")
-	case "badges.IBCWrapperPaths.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_IBCWrapperPaths_3_list{list: &list})
-	case "badges.IBCWrapperPaths.badgeIds":
+		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{list: &list})
+	case "badges.CosmosCoinWrapperPath.badgeIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_IBCWrapperPaths_4_list{list: &list})
+		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IBCWrapperPaths"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
 		}
-		panic(fmt.Errorf("message badges.IBCWrapperPaths does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.CosmosCoinWrapperPath does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_IBCWrapperPaths) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_CosmosCoinWrapperPath) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.IBCWrapperPaths", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.CosmosCoinWrapperPath", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2570,7 +2570,7 @@ func (x *fastReflection_IBCWrapperPaths) WhichOneof(d protoreflect.OneofDescript
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_IBCWrapperPaths) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_CosmosCoinWrapperPath) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -2581,7 +2581,7 @@ func (x *fastReflection_IBCWrapperPaths) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_IBCWrapperPaths) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_CosmosCoinWrapperPath) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -2593,7 +2593,7 @@ func (x *fastReflection_IBCWrapperPaths) SetUnknown(fields protoreflect.RawField
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_IBCWrapperPaths) IsValid() bool {
+func (x *fastReflection_CosmosCoinWrapperPath) IsValid() bool {
 	return x != nil
 }
 
@@ -2603,9 +2603,9 @@ func (x *fastReflection_IBCWrapperPaths) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_IBCWrapperPaths) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*IBCWrapperPaths)
+		x := input.Message.Interface().(*CosmosCoinWrapperPath)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2647,7 +2647,7 @@ func (x *fastReflection_IBCWrapperPaths) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*IBCWrapperPaths)
+		x := input.Message.Interface().(*CosmosCoinWrapperPath)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2723,7 +2723,7 @@ func (x *fastReflection_IBCWrapperPaths) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*IBCWrapperPaths)
+		x := input.Message.Interface().(*CosmosCoinWrapperPath)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2755,10 +2755,10 @@ func (x *fastReflection_IBCWrapperPaths) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: IBCWrapperPaths: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: CosmosCoinWrapperPath: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: IBCWrapperPaths: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: CosmosCoinWrapperPath: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -2996,7 +2996,7 @@ type BadgeCollection struct {
 	// The generated address of the badge collection. Also used to escrow Mint balances.
 	MintEscrowAddress string `protobuf:"bytes,16,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
 	// The IBC wrapper paths for the collection.
-	IbcWrapperPaths []*IBCWrapperPaths `protobuf:"bytes,17,rep,name=ibcWrapperPaths,proto3" json:"ibcWrapperPaths,omitempty"`
+	CosmosCoinWrapperPaths []*CosmosCoinWrapperPath `protobuf:"bytes,17,rep,name=cosmosCoinWrapperPaths,proto3" json:"cosmosCoinWrapperPaths,omitempty"`
 }
 
 func (x *BadgeCollection) Reset() {
@@ -3124,14 +3124,14 @@ func (x *BadgeCollection) GetMintEscrowAddress() string {
 	return ""
 }
 
-func (x *BadgeCollection) GetIbcWrapperPaths() []*IBCWrapperPaths {
+func (x *BadgeCollection) GetCosmosCoinWrapperPaths() []*CosmosCoinWrapperPath {
 	if x != nil {
-		return x.IbcWrapperPaths
+		return x.CosmosCoinWrapperPaths
 	}
 	return nil
 }
 
-type IBCWrapperPaths struct {
+type CosmosCoinWrapperPath struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -3142,8 +3142,8 @@ type IBCWrapperPaths struct {
 	BadgeIds       []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 
-func (x *IBCWrapperPaths) Reset() {
-	*x = IBCWrapperPaths{}
+func (x *CosmosCoinWrapperPath) Reset() {
+	*x = CosmosCoinWrapperPath{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_collections_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3151,39 +3151,39 @@ func (x *IBCWrapperPaths) Reset() {
 	}
 }
 
-func (x *IBCWrapperPaths) String() string {
+func (x *CosmosCoinWrapperPath) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IBCWrapperPaths) ProtoMessage() {}
+func (*CosmosCoinWrapperPath) ProtoMessage() {}
 
-// Deprecated: Use IBCWrapperPaths.ProtoReflect.Descriptor instead.
-func (*IBCWrapperPaths) Descriptor() ([]byte, []int) {
+// Deprecated: Use CosmosCoinWrapperPath.ProtoReflect.Descriptor instead.
+func (*CosmosCoinWrapperPath) Descriptor() ([]byte, []int) {
 	return file_badges_collections_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *IBCWrapperPaths) GetAddress() string {
+func (x *CosmosCoinWrapperPath) GetAddress() string {
 	if x != nil {
 		return x.Address
 	}
 	return ""
 }
 
-func (x *IBCWrapperPaths) GetDenom() string {
+func (x *CosmosCoinWrapperPath) GetDenom() string {
 	if x != nil {
 		return x.Denom
 	}
 	return ""
 }
 
-func (x *IBCWrapperPaths) GetOwnershipTimes() []*UintRange {
+func (x *CosmosCoinWrapperPath) GetOwnershipTimes() []*UintRange {
 	if x != nil {
 		return x.OwnershipTimes
 	}
 	return nil
 }
 
-func (x *IBCWrapperPaths) GetBadgeIds() []*UintRange {
+func (x *CosmosCoinWrapperPath) GetBadgeIds() []*UintRange {
 	if x != nil {
 		return x.BadgeIds
 	}
@@ -3205,7 +3205,7 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x16, 0x62,
 	0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xe9, 0x08, 0x0a, 0x0f,
+	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xfd, 0x08, 0x0a, 0x0f,
 	0x42, 0x61, 0x64, 0x67, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12,
 	0x30, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55,
@@ -3272,29 +3272,31 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x12, 0x2c, 0x0a, 0x11, 0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73,
 	0x63, 0x72, 0x6f, 0x77, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x10, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x11, 0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73, 0x63, 0x72, 0x6f, 0x77, 0x41, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x12, 0x41, 0x0a, 0x0f, 0x69, 0x62, 0x63, 0x57, 0x72, 0x61, 0x70, 0x70,
-	0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x18, 0x11, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x49, 0x42, 0x43, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65,
-	0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x52, 0x0f, 0x69, 0x62, 0x63, 0x57, 0x72, 0x61, 0x70, 0x70,
-	0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x22, 0xab, 0x01, 0x0a, 0x0f, 0x49, 0x42, 0x43, 0x57,
-	0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x61,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x39, 0x0a, 0x0e, 0x6f,
-	0x77, 0x6e, 0x65, 0x72, 0x73, 0x68, 0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x03, 0x20,
-	0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e,
-	0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0e, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68, 0x69,
-	0x70, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x12, 0x2d, 0x0a, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49,
-	0x64, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65,
-	0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x08, 0x62, 0x61, 0x64,
-	0x67, 0x65, 0x49, 0x64, 0x73, 0x42, 0x71, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64,
-	0x67, 0x65, 0x73, 0x42, 0x10, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65,
-	0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64,
-	0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
-	0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x65, 0x73, 0x73, 0x12, 0x55, 0x0a, 0x16, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f,
+	0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x18, 0x11,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50,
+	0x61, 0x74, 0x68, 0x52, 0x16, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57,
+	0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x22, 0xb1, 0x01, 0x0a, 0x15,
+	0x43, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65,
+	0x72, 0x50, 0x61, 0x74, 0x68, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12,
+	0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x39, 0x0a, 0x0e, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68,
+	0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e,
+	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65,
+	0x52, 0x0e, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68, 0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73,
+	0x12, 0x2d, 0x0a, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x18, 0x04, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74,
+	0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x42,
+	0x71, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x10, 0x43,
+	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
+	0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69,
+	0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42,
+	0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50,
+	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3312,7 +3314,7 @@ func file_badges_collections_proto_rawDescGZIP() []byte {
 var file_badges_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_badges_collections_proto_goTypes = []interface{}{
 	(*BadgeCollection)(nil),                  // 0: badges.BadgeCollection
-	(*IBCWrapperPaths)(nil),                  // 1: badges.IBCWrapperPaths
+	(*CosmosCoinWrapperPath)(nil),            // 1: badges.CosmosCoinWrapperPath
 	(*CollectionMetadataTimeline)(nil),       // 2: badges.CollectionMetadataTimeline
 	(*BadgeMetadataTimeline)(nil),            // 3: badges.BadgeMetadataTimeline
 	(*OffChainBalancesMetadataTimeline)(nil), // 4: badges.OffChainBalancesMetadataTimeline
@@ -3337,9 +3339,9 @@ var file_badges_collections_proto_depIdxs = []int32{
 	10, // 8: badges.BadgeCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
 	11, // 9: badges.BadgeCollection.defaultBalances:type_name -> badges.UserBalanceStore
 	12, // 10: badges.BadgeCollection.validBadgeIds:type_name -> badges.UintRange
-	1,  // 11: badges.BadgeCollection.ibcWrapperPaths:type_name -> badges.IBCWrapperPaths
-	12, // 12: badges.IBCWrapperPaths.ownershipTimes:type_name -> badges.UintRange
-	12, // 13: badges.IBCWrapperPaths.badgeIds:type_name -> badges.UintRange
+	1,  // 11: badges.BadgeCollection.cosmosCoinWrapperPaths:type_name -> badges.CosmosCoinWrapperPath
+	12, // 12: badges.CosmosCoinWrapperPath.ownershipTimes:type_name -> badges.UintRange
+	12, // 13: badges.CosmosCoinWrapperPath.badgeIds:type_name -> badges.UintRange
 	14, // [14:14] is the sub-list for method output_type
 	14, // [14:14] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
@@ -3371,7 +3373,7 @@ func file_badges_collections_proto_init() {
 			}
 		}
 		file_badges_collections_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*IBCWrapperPaths); i {
+			switch v := v.(*CosmosCoinWrapperPath); i {
 			case 0:
 				return &v.state
 			case 1:

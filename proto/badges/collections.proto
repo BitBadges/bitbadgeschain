@@ -79,10 +79,10 @@ message BadgeCollection {
   string mintEscrowAddress = 16;
 
   // The IBC wrapper paths for the collection.
-  repeated IBCWrapperPaths ibcWrapperPaths = 17;
+  repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
 }
 
-message IBCWrapperPaths {
+message CosmosCoinWrapperPath {
   string address = 1;
   string denom = 2;
   repeated UintRange ownershipTimes = 3;

@@ -33,8 +33,6 @@ service Msg {
   rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
   rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
   rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
-  rpc WrapBadges(MsgWrapBadges) returns (MsgWrapBadgesResponse);
-  rpc UnwrapBadges(MsgUnwrapBadges) returns (MsgUnwrapBadgesResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -60,7 +58,7 @@ message MsgUpdateParamsResponse {}
 
 
 
-message IBCWrapperPathsAdd {
+message CosmosCoinWrapperPathAddObject {
   string denom = 1;
   repeated UintRange ownershipTimes = 2;
   repeated UintRange badgeIds = 3;
@@ -149,7 +147,7 @@ message MsgUniversalUpdateCollection {
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 27;
 
   // IBC wrapper paths to add.
-  repeated IBCWrapperPathsAdd ibcWrapperPathsToAdd = 28;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 28;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -233,7 +231,7 @@ message MsgUpdateCollection {
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 29;
 
   // IBC wrapper paths to add.
-  repeated IBCWrapperPathsAdd ibcWrapperPathsToAdd = 30;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 30;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
@@ -290,7 +288,7 @@ message MsgCreateCollection {
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 16;
 
   // IBC wrapper paths to add.
-  repeated IBCWrapperPathsAdd ibcWrapperPathsToAdd = 17;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 17;
 }
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.
@@ -399,46 +397,5 @@ message MsgUpdateUserApprovals {
 message MsgUpdateUserApprovalsResponse {}
 
 
-// MsgWrapBadges is used to wrap badges.
-message MsgWrapBadges {
-  option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/WrapBadges";
-
-  // Address of the creator.
-  string creator = 1;
-
-  // Denomination to wrap.
-  string denom = 2;
-
-  // Amount of badges to wrap.
-  repeated Balance balances = 3;
-
-  // Collection ID to wrap badges into.
-  string collectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
-// MsgWrapBadgesResponse is the response to MsgWrapBadges.
-message MsgWrapBadgesResponse {}
-
-// MsgUnwrapBadges is used to unwrap badges.
-message MsgUnwrapBadges {
-  option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/UnwrapBadges";
-
-  // Address of the creator.
-  string creator = 1;
-
-  // Denomination to unwrap.
-  string denom = 2;
-
-  // Amount of badges to unwrap.
-  string amount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-
-  // Collection ID to unwrap badges from.
-  string collectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
-// MsgUnwrapBadgesResponse is the response to MsgUnwrapBadges.
-message MsgUnwrapBadgesResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message

@@ -59,7 +59,7 @@ message MsgNewCollection {
   bool defaultDisapproveSelfInitiated = 17; 
    //The default balances for the user
   repeated Balance defaultBalances = 18;
-  repeated IBCWrapperPathsAdd ibcWrapperPathsToAdd = 19;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 19;
 }
 
 message MsgNewCollectionResponse {

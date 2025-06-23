@@ -344,6 +344,93 @@ func (k Keeper) HandleTransfer(
 		}
 	}
 
+	// Get denomination information
+	denomInfo := &types.CosmosCoinWrapperPath{}
+	isSendingToSpecialAddress := false
+	isSendingFromSpecialAddress := false
+	for _, path := range collection.CosmosCoinWrapperPaths {
+		if path.Address == to {
+			isSendingToSpecialAddress = true
+			denomInfo = path
+		}
+		if path.Address == from {
+			isSendingFromSpecialAddress = true
+			denomInfo = path
+		}
+	}
+
+	if to == from {
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "cannot send to self")
+	}
+
+	if isSendingFromSpecialAddress || isSendingToSpecialAddress {
+		if denomInfo.Denom == "" {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
+		}
+
+		if len(transferBalances) != 1 {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "multiple balances not supported for special addresses")
+		}
+
+		denomBadgeIds := denomInfo.BadgeIds
+		denomOwnershipTimes := denomInfo.OwnershipTimes
+		balanceBadgeIds := transferBalances[0].BadgeIds
+		balanceOwnershipTimes := transferBalances[0].OwnershipTimes
+
+		if len(denomBadgeIds) != len(balanceBadgeIds) {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "badge ids do not match for %s", denomInfo.Address)
+		}
+
+		for i, badgeId := range denomBadgeIds {
+			if !badgeId.Start.Equal(balanceBadgeIds[i].Start) || !badgeId.End.Equal(balanceBadgeIds[i].End) {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "badge ids do not match for %s", denomInfo.Address)
+			}
+		}
+
+		if len(denomOwnershipTimes) != len(balanceOwnershipTimes) {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "ownership times count mismatch for %s", denomInfo.Address)
+		}
+
+		for i, ownershipTime := range denomOwnershipTimes {
+			if !ownershipTime.Start.Equal(balanceOwnershipTimes[i].Start) || !ownershipTime.End.Equal(balanceOwnershipTimes[i].End) {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "ownership times do not match for %s", denomInfo.Address)
+			}
+		}
+
+		balance := transferBalances[0]
+		ibcDenom := "badges:" + collection.CollectionId.String() + ":" + denomInfo.Denom
+		bankKeeper := k.bankKeeper
+		amount := balance.Amount
+		amountInt := amount.BigInt()
+		if isSendingToSpecialAddress {
+			userAddressAcc := sdk.MustAccAddressFromBech32(from)
+
+			err = bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+
+			err = bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+		}
+
+		if isSendingFromSpecialAddress {
+			userAddressAcc := sdk.MustAccAddressFromBech32(to)
+
+			err = bankKeeper.SendCoinsFromAccountToModule(ctx, userAddressAcc, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+
+			err = bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+		}
+	}
+
 	IsDeleteAfterOneUse := func(autoDeletionOptions *types.AutoDeletionOptions) bool {
 		if autoDeletionOptions == nil {
 			return false

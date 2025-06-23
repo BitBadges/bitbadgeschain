@@ -257,7 +257,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	for _, path := range msg.IbcWrapperPathsToAdd {
+	for _, path := range msg.CosmosCoinWrapperPathsToAdd {
 		if path.Denom == "" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "denom cannot be empty")
 		}

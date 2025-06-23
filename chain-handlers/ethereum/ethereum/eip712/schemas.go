@@ -1387,7 +1387,7 @@ func GetSchemas() []string {
 					"denom": ""
 				}
 			],
-			"ibcWrapperPathsToAdd": [
+			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
 					"ownershipTimes": [
@@ -2857,7 +2857,7 @@ func GetSchemas() []string {
 					"denom": ""
 				}
 			],
-			"ibcWrapperPathsToAdd": [
+			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
 					"ownershipTimes": [
@@ -3407,7 +3407,7 @@ func GetSchemas() []string {
 					"denom": ""
 				}
 			],
-			"ibcWrapperPathsToAdd": [
+			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
 					"ownershipTimes": [
@@ -3424,42 +3424,6 @@ func GetSchemas() []string {
 					]
 				}
 			]
-		}
-	}`)
-
-	schemas = append(schemas, `{
-		"type": "badges/WrapBadges",
-		"value": {
-			"creator": "",
-			"denom": "",
-			"balances": [
-				{
-					"amount": "",
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
-				}
-			],
-			"collectionId": ""
-		}
-	}`)
-
-	schemas = append(schemas, `{
-		"type": "badges/UnwrapBadges",
-		"value": {
-			"creator": "",
-			"denom": "",
-			"amount": "",
-			"collectionId": ""
 		}
 	}`)
 

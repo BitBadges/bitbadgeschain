@@ -201,15 +201,15 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	if len(msg.IbcWrapperPathsToAdd) > 0 {
-		pathsToAdd := make([]*types.IBCWrapperPaths, len(msg.IbcWrapperPathsToAdd))
-		for i, path := range msg.IbcWrapperPathsToAdd {
+	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
+		pathsToAdd := make([]*types.CosmosCoinWrapperPath, len(msg.CosmosCoinWrapperPathsToAdd))
+		for i, path := range msg.CosmosCoinWrapperPathsToAdd {
 			var accountAddr sdk.AccAddress
 			for {
 				fullPath := path.Denom
 				fullPathBytes := []byte(fullPath)
 
-				ac, err := authtypes.NewModuleCredential(types.ModuleName, IbcWrapperPathGenerationPrefix, fullPathBytes)
+				ac, err := authtypes.NewModuleCredential(types.ModuleName, WrapperPathGenerationPrefix, fullPathBytes)
 				if err != nil {
 					return nil, err
 				}
@@ -219,7 +219,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				break
 			}
 
-			pathsToAdd[i] = &types.IBCWrapperPaths{
+			pathsToAdd[i] = &types.CosmosCoinWrapperPath{
 				Address:        accountAddr.String(),
 				Denom:          path.Denom,
 				OwnershipTimes: path.OwnershipTimes,
@@ -227,12 +227,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			}
 		}
 
-		collection.IbcWrapperPaths = append(collection.IbcWrapperPaths, pathsToAdd...)
+		collection.CosmosCoinWrapperPaths = append(collection.CosmosCoinWrapperPaths, pathsToAdd...)
 	}
 
 	// Ensure no duplicate denom paths
 	denomPaths := make(map[string]bool)
-	for _, path := range collection.IbcWrapperPaths {
+	for _, path := range collection.CosmosCoinWrapperPaths {
 		if _, ok := denomPaths[path.Denom]; ok {
 			return nil, fmt.Errorf("duplicate ibc wrapper path denom: %s", path.Denom)
 		}
