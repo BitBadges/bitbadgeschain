@@ -189,10 +189,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.CollectionPermissions = msg.CollectionPermissions
 	}
 
-	if err := k.SetCollectionInStore(ctx, collection); err != nil {
-		return nil, err
-	}
-
 	if len(msg.MintEscrowCoinsToTransfer) > 0 {
 		from := sdk.MustAccAddressFromBech32(msg.Creator)
 		to := sdk.MustAccAddressFromBech32(collection.MintEscrowAddress)
@@ -203,6 +199,48 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				return nil, err
 			}
 		}
+	}
+
+	if len(msg.IbcWrapperPathsToAdd) > 0 {
+		pathsToAdd := make([]*types.IBCWrapperPaths, len(msg.IbcWrapperPathsToAdd))
+		for i, path := range msg.IbcWrapperPathsToAdd {
+			var accountAddr sdk.AccAddress
+			for {
+				fullPath := path.Denom
+				fullPathBytes := []byte(fullPath)
+
+				ac, err := authtypes.NewModuleCredential(types.ModuleName, IbcWrapperPathGenerationPrefix, fullPathBytes)
+				if err != nil {
+					return nil, err
+				}
+				//generate the address from the credential
+				accountAddr = sdk.AccAddress(ac.Address())
+
+				break
+			}
+
+			pathsToAdd[i] = &types.IBCWrapperPaths{
+				Address:        accountAddr.String(),
+				Denom:          path.Denom,
+				OwnershipTimes: path.OwnershipTimes,
+				BadgeIds:       path.BadgeIds,
+			}
+		}
+
+		collection.IbcWrapperPaths = append(collection.IbcWrapperPaths, pathsToAdd...)
+	}
+
+	// Ensure no duplicate denom paths
+	denomPaths := make(map[string]bool)
+	for _, path := range collection.IbcWrapperPaths {
+		if _, ok := denomPaths[path.Denom]; ok {
+			return nil, fmt.Errorf("duplicate ibc wrapper path denom: %s", path.Denom)
+		}
+		denomPaths[path.Denom] = true
+	}
+
+	if err := k.SetCollectionInStore(ctx, collection); err != nil {
+		return nil, err
 	}
 
 	msgBytes, err := json.Marshal(msg)

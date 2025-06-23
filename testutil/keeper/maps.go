@@ -13,8 +13,6 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	portkeeper "github.com/cosmos/ibc-go/v8/modules/core/05-port/keeper"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
@@ -23,6 +21,8 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/maps/types"
+
+	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 )
 
 func MapsKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -38,19 +38,16 @@ func MapsKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
 	capabilityKeeper := capabilitykeeper.NewKeeper(appCodec, storeKey, memStoreKey)
-	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
 	scopedKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	portKeeper := portkeeper.NewKeeper(scopedKeeper)
 	scopeModule := capabilityKeeper.ScopeToModule(types.ModuleName)
 
-	badgesKeeper, _ := BadgesKeeper(t)
-
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
-		authority.String(),
+		"",
 		func() *ibckeeper.Keeper {
 			return &ibckeeper.Keeper{
 				PortKeeper: &portKeeper,
@@ -59,7 +56,7 @@ func MapsKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		func(string) capabilitykeeper.ScopedKeeper {
 			return scopeModule
 		},
-		badgesKeeper,
+		badgeskeeper.Keeper{},
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

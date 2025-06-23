@@ -257,5 +257,21 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
+	for _, path := range msg.IbcWrapperPathsToAdd {
+		if path.Denom == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "denom cannot be empty")
+		}
+
+		err = ValidateRangesAreValid(path.BadgeIds, false, true)
+		if err != nil {
+			return err
+		}
+
+		err = ValidateRangesAreValid(path.OwnershipTimes, false, true)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

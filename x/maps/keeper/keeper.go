@@ -49,10 +49,6 @@ func NewKeeper(
 	badgesKeeper badgekeeper.Keeper,
 
 ) Keeper {
-	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
-		panic(fmt.Sprintf("invalid authority address: %s", authority))
-	}
-
 	return Keeper{
 		cdc:                cdc,
 		storeService:       storeService,

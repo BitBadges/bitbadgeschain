@@ -5284,6 +5284,57 @@ func (x *_MsgUpdateCollection_29_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_MsgUpdateCollection_30_list)(nil)
+
+type _MsgUpdateCollection_30_list struct {
+	list *[]*IBCWrapperPathsAdd
+}
+
+func (x *_MsgUpdateCollection_30_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_MsgUpdateCollection_30_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_MsgUpdateCollection_30_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*IBCWrapperPathsAdd)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_MsgUpdateCollection_30_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*IBCWrapperPathsAdd)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_MsgUpdateCollection_30_list) AppendMutable() protoreflect.Value {
+	v := new(IBCWrapperPathsAdd)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_MsgUpdateCollection_30_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_MsgUpdateCollection_30_list) NewElement() protoreflect.Value {
+	v := new(IBCWrapperPathsAdd)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_MsgUpdateCollection_30_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_MsgUpdateCollection                                        protoreflect.MessageDescriptor
 	fd_MsgUpdateCollection_creator                                protoreflect.FieldDescriptor
@@ -5309,6 +5360,7 @@ var (
 	fd_MsgUpdateCollection_updateIsArchivedTimeline               protoreflect.FieldDescriptor
 	fd_MsgUpdateCollection_isArchivedTimeline                     protoreflect.FieldDescriptor
 	fd_MsgUpdateCollection_mintEscrowCoinsToTransfer              protoreflect.FieldDescriptor
+	fd_MsgUpdateCollection_ibcWrapperPathsToAdd                   protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -5337,6 +5389,7 @@ func init() {
 	fd_MsgUpdateCollection_updateIsArchivedTimeline = md_MsgUpdateCollection.Fields().ByName("updateIsArchivedTimeline")
 	fd_MsgUpdateCollection_isArchivedTimeline = md_MsgUpdateCollection.Fields().ByName("isArchivedTimeline")
 	fd_MsgUpdateCollection_mintEscrowCoinsToTransfer = md_MsgUpdateCollection.Fields().ByName("mintEscrowCoinsToTransfer")
+	fd_MsgUpdateCollection_ibcWrapperPathsToAdd = md_MsgUpdateCollection.Fields().ByName("ibcWrapperPathsToAdd")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgUpdateCollection)(nil)
@@ -5542,6 +5595,12 @@ func (x *fastReflection_MsgUpdateCollection) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
+	if len(x.IbcWrapperPathsToAdd) != 0 {
+		value := protoreflect.ValueOfList(&_MsgUpdateCollection_30_list{list: &x.IbcWrapperPathsToAdd})
+		if !f(fd_MsgUpdateCollection_ibcWrapperPathsToAdd, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -5603,6 +5662,8 @@ func (x *fastReflection_MsgUpdateCollection) Has(fd protoreflect.FieldDescriptor
 		return len(x.IsArchivedTimeline) != 0
 	case "badges.MsgUpdateCollection.mintEscrowCoinsToTransfer":
 		return len(x.MintEscrowCoinsToTransfer) != 0
+	case "badges.MsgUpdateCollection.ibcWrapperPathsToAdd":
+		return len(x.IbcWrapperPathsToAdd) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MsgUpdateCollection"))
@@ -5665,6 +5726,8 @@ func (x *fastReflection_MsgUpdateCollection) Clear(fd protoreflect.FieldDescript
 		x.IsArchivedTimeline = nil
 	case "badges.MsgUpdateCollection.mintEscrowCoinsToTransfer":
 		x.MintEscrowCoinsToTransfer = nil
+	case "badges.MsgUpdateCollection.ibcWrapperPathsToAdd":
+		x.IbcWrapperPathsToAdd = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MsgUpdateCollection"))
@@ -5780,6 +5843,12 @@ func (x *fastReflection_MsgUpdateCollection) Get(descriptor protoreflect.FieldDe
 		}
 		listValue := &_MsgUpdateCollection_29_list{list: &x.MintEscrowCoinsToTransfer}
 		return protoreflect.ValueOfList(listValue)
+	case "badges.MsgUpdateCollection.ibcWrapperPathsToAdd":
+		if len(x.IbcWrapperPathsToAdd) == 0 {
+			return protoreflect.ValueOfList(&_MsgUpdateCollection_30_list{})
+		}
+		listValue := &_MsgUpdateCollection_30_list{list: &x.IbcWrapperPathsToAdd}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MsgUpdateCollection"))
@@ -5866,6 +5935,10 @@ func (x *fastReflection_MsgUpdateCollection) Set(fd protoreflect.FieldDescriptor
 		lv := value.List()
 		clv := lv.(*_MsgUpdateCollection_29_list)
 		x.MintEscrowCoinsToTransfer = *clv.list
+	case "badges.MsgUpdateCollection.ibcWrapperPathsToAdd":
+		lv := value.List()
+		clv := lv.(*_MsgUpdateCollection_30_list)
+		x.IbcWrapperPathsToAdd = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MsgUpdateCollection"))
@@ -5950,6 +6023,12 @@ func (x *fastReflection_MsgUpdateCollection) Mutable(fd protoreflect.FieldDescri
 			x.MintEscrowCoinsToTransfer = []*v1beta1.Coin{}
 		}
 		value := &_MsgUpdateCollection_29_list{list: &x.MintEscrowCoinsToTransfer}
+		return protoreflect.ValueOfList(value)
+	case "badges.MsgUpdateCollection.ibcWrapperPathsToAdd":
+		if x.IbcWrapperPathsToAdd == nil {
+			x.IbcWrapperPathsToAdd = []*IBCWrapperPathsAdd{}
+		}
+		value := &_MsgUpdateCollection_30_list{list: &x.IbcWrapperPathsToAdd}
 		return protoreflect.ValueOfList(value)
 	case "badges.MsgUpdateCollection.creator":
 		panic(fmt.Errorf("field creator of message badges.MsgUpdateCollection is not mutable"))
@@ -6045,6 +6124,9 @@ func (x *fastReflection_MsgUpdateCollection) NewField(fd protoreflect.FieldDescr
 	case "badges.MsgUpdateCollection.mintEscrowCoinsToTransfer":
 		list := []*v1beta1.Coin{}
 		return protoreflect.ValueOfList(&_MsgUpdateCollection_29_list{list: &list})
+	case "badges.MsgUpdateCollection.ibcWrapperPathsToAdd":
+		list := []*IBCWrapperPathsAdd{}
+		return protoreflect.ValueOfList(&_MsgUpdateCollection_30_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MsgUpdateCollection"))
@@ -6216,6 +6298,12 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 				n += 2 + l + runtime.Sov(uint64(l))
 			}
 		}
+		if len(x.IbcWrapperPathsToAdd) > 0 {
+			for _, e := range x.IbcWrapperPathsToAdd {
+				l = options.Size(e)
+				n += 2 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -6244,6 +6332,24 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.IbcWrapperPathsToAdd) > 0 {
+			for iNdEx := len(x.IbcWrapperPathsToAdd) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.IbcWrapperPathsToAdd[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x1
+				i--
+				dAtA[i] = 0xf2
+			}
 		}
 		if len(x.MintEscrowCoinsToTransfer) > 0 {
 			for iNdEx := len(x.MintEscrowCoinsToTransfer) - 1; iNdEx >= 0; iNdEx-- {
@@ -7239,6 +7345,40 @@ func (x *fastReflection_MsgUpdateCollection) ProtoMethods() *protoiface.Methods 
 				}
 				x.MintEscrowCoinsToTransfer = append(x.MintEscrowCoinsToTransfer, &v1beta1.Coin{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MintEscrowCoinsToTransfer[len(x.MintEscrowCoinsToTransfer)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 30:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IbcWrapperPathsToAdd", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.IbcWrapperPathsToAdd = append(x.IbcWrapperPathsToAdd, &IBCWrapperPathsAdd{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.IbcWrapperPathsToAdd[len(x.IbcWrapperPathsToAdd)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -17197,6 +17337,8 @@ type MsgUpdateCollection struct {
 	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,28,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
 	// Coins to be transferred to the mint escrow address.
 	MintEscrowCoinsToTransfer []*v1beta1.Coin `protobuf:"bytes,29,rep,name=mintEscrowCoinsToTransfer,proto3" json:"mintEscrowCoinsToTransfer,omitempty"`
+	// IBC wrapper paths to add.
+	IbcWrapperPathsToAdd []*IBCWrapperPathsAdd `protobuf:"bytes,30,rep,name=ibcWrapperPathsToAdd,proto3" json:"ibcWrapperPathsToAdd,omitempty"`
 }
 
 func (x *MsgUpdateCollection) Reset() {
@@ -17376,6 +17518,13 @@ func (x *MsgUpdateCollection) GetIsArchivedTimeline() []*IsArchivedTimeline {
 func (x *MsgUpdateCollection) GetMintEscrowCoinsToTransfer() []*v1beta1.Coin {
 	if x != nil {
 		return x.MintEscrowCoinsToTransfer
+	}
+	return nil
+}
+
+func (x *MsgUpdateCollection) GetIbcWrapperPathsToAdd() []*IBCWrapperPathsAdd {
+	if x != nil {
+		return x.IbcWrapperPathsToAdd
 	}
 	return nil
 }
@@ -18378,7 +18527,7 @@ var file_badges_tx_proto_rawDesc = []byte{
 	0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e,
 	0x74, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22,
-	0x93, 0x0d, 0x0a, 0x13, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6c,
+	0xe3, 0x0d, 0x0a, 0x13, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6c,
 	0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74,
 	0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
 	0x72, 0x12, 0x30, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49,
@@ -18480,7 +18629,12 @@ var file_badges_tx_proto_rawDesc = []byte{
 	0x1d, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62,
 	0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e,
 	0x52, 0x19, 0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73, 0x63, 0x72, 0x6f, 0x77, 0x43, 0x6f, 0x69, 0x6e,
-	0x73, 0x54, 0x6f, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x3a, 0x28, 0x82, 0xe7, 0xb0,
+	0x73, 0x54, 0x6f, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x12, 0x4e, 0x0a, 0x14, 0x69,
+	0x62, 0x63, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x54, 0x6f,
+	0x41, 0x64, 0x64, 0x18, 0x1e, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x62, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x2e, 0x49, 0x42, 0x43, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74,
+	0x68, 0x73, 0x41, 0x64, 0x64, 0x52, 0x14, 0x69, 0x62, 0x63, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65,
+	0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x54, 0x6f, 0x41, 0x64, 0x64, 0x3a, 0x28, 0x82, 0xe7, 0xb0,
 	0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x8a, 0xe7, 0xb0, 0x2a, 0x17, 0x62, 0x61,
 	0x64, 0x67, 0x65, 0x73, 0x2f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65,
 	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x4f, 0x0a, 0x1b, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61,
@@ -18848,50 +19002,51 @@ var file_badges_tx_proto_depIdxs = []int32{
 	31, // 24: badges.MsgUpdateCollection.standardsTimeline:type_name -> badges.StandardsTimeline
 	32, // 25: badges.MsgUpdateCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
 	33, // 26: badges.MsgUpdateCollection.mintEscrowCoinsToTransfer:type_name -> cosmos.base.v1beta1.Coin
-	23, // 27: badges.MsgCreateCollection.defaultBalances:type_name -> badges.UserBalanceStore
-	22, // 28: badges.MsgCreateCollection.validBadgeIds:type_name -> badges.UintRange
-	24, // 29: badges.MsgCreateCollection.collectionPermissions:type_name -> badges.CollectionPermissions
-	25, // 30: badges.MsgCreateCollection.managerTimeline:type_name -> badges.ManagerTimeline
-	26, // 31: badges.MsgCreateCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
-	27, // 32: badges.MsgCreateCollection.badgeMetadataTimeline:type_name -> badges.BadgeMetadataTimeline
-	28, // 33: badges.MsgCreateCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
-	29, // 34: badges.MsgCreateCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
-	30, // 35: badges.MsgCreateCollection.collectionApprovals:type_name -> badges.CollectionApproval
-	31, // 36: badges.MsgCreateCollection.standardsTimeline:type_name -> badges.StandardsTimeline
-	32, // 37: badges.MsgCreateCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
-	33, // 38: badges.MsgCreateCollection.mintEscrowCoinsToTransfer:type_name -> cosmos.base.v1beta1.Coin
-	2,  // 39: badges.MsgCreateCollection.ibcWrapperPathsToAdd:type_name -> badges.IBCWrapperPathsAdd
-	34, // 40: badges.MsgCreateAddressLists.addressLists:type_name -> badges.AddressList
-	35, // 41: badges.MsgTransferBadges.transfers:type_name -> badges.Transfer
-	36, // 42: badges.MsgUpdateUserApprovals.outgoingApprovals:type_name -> badges.UserOutgoingApproval
-	37, // 43: badges.MsgUpdateUserApprovals.incomingApprovals:type_name -> badges.UserIncomingApproval
-	38, // 44: badges.MsgUpdateUserApprovals.userPermissions:type_name -> badges.UserPermissions
-	39, // 45: badges.MsgWrapBadges.balances:type_name -> badges.Balance
-	0,  // 46: badges.Msg.UpdateParams:input_type -> badges.MsgUpdateParams
-	3,  // 47: badges.Msg.UniversalUpdateCollection:input_type -> badges.MsgUniversalUpdateCollection
-	9,  // 48: badges.Msg.CreateAddressLists:input_type -> badges.MsgCreateAddressLists
-	11, // 49: badges.Msg.TransferBadges:input_type -> badges.MsgTransferBadges
-	15, // 50: badges.Msg.UpdateUserApprovals:input_type -> badges.MsgUpdateUserApprovals
-	13, // 51: badges.Msg.DeleteCollection:input_type -> badges.MsgDeleteCollection
-	5,  // 52: badges.Msg.UpdateCollection:input_type -> badges.MsgUpdateCollection
-	7,  // 53: badges.Msg.CreateCollection:input_type -> badges.MsgCreateCollection
-	17, // 54: badges.Msg.WrapBadges:input_type -> badges.MsgWrapBadges
-	19, // 55: badges.Msg.UnwrapBadges:input_type -> badges.MsgUnwrapBadges
-	1,  // 56: badges.Msg.UpdateParams:output_type -> badges.MsgUpdateParamsResponse
-	4,  // 57: badges.Msg.UniversalUpdateCollection:output_type -> badges.MsgUniversalUpdateCollectionResponse
-	10, // 58: badges.Msg.CreateAddressLists:output_type -> badges.MsgCreateAddressListsResponse
-	12, // 59: badges.Msg.TransferBadges:output_type -> badges.MsgTransferBadgesResponse
-	16, // 60: badges.Msg.UpdateUserApprovals:output_type -> badges.MsgUpdateUserApprovalsResponse
-	14, // 61: badges.Msg.DeleteCollection:output_type -> badges.MsgDeleteCollectionResponse
-	6,  // 62: badges.Msg.UpdateCollection:output_type -> badges.MsgUpdateCollectionResponse
-	8,  // 63: badges.Msg.CreateCollection:output_type -> badges.MsgCreateCollectionResponse
-	18, // 64: badges.Msg.WrapBadges:output_type -> badges.MsgWrapBadgesResponse
-	20, // 65: badges.Msg.UnwrapBadges:output_type -> badges.MsgUnwrapBadgesResponse
-	56, // [56:66] is the sub-list for method output_type
-	46, // [46:56] is the sub-list for method input_type
-	46, // [46:46] is the sub-list for extension type_name
-	46, // [46:46] is the sub-list for extension extendee
-	0,  // [0:46] is the sub-list for field type_name
+	2,  // 27: badges.MsgUpdateCollection.ibcWrapperPathsToAdd:type_name -> badges.IBCWrapperPathsAdd
+	23, // 28: badges.MsgCreateCollection.defaultBalances:type_name -> badges.UserBalanceStore
+	22, // 29: badges.MsgCreateCollection.validBadgeIds:type_name -> badges.UintRange
+	24, // 30: badges.MsgCreateCollection.collectionPermissions:type_name -> badges.CollectionPermissions
+	25, // 31: badges.MsgCreateCollection.managerTimeline:type_name -> badges.ManagerTimeline
+	26, // 32: badges.MsgCreateCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
+	27, // 33: badges.MsgCreateCollection.badgeMetadataTimeline:type_name -> badges.BadgeMetadataTimeline
+	28, // 34: badges.MsgCreateCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
+	29, // 35: badges.MsgCreateCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
+	30, // 36: badges.MsgCreateCollection.collectionApprovals:type_name -> badges.CollectionApproval
+	31, // 37: badges.MsgCreateCollection.standardsTimeline:type_name -> badges.StandardsTimeline
+	32, // 38: badges.MsgCreateCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
+	33, // 39: badges.MsgCreateCollection.mintEscrowCoinsToTransfer:type_name -> cosmos.base.v1beta1.Coin
+	2,  // 40: badges.MsgCreateCollection.ibcWrapperPathsToAdd:type_name -> badges.IBCWrapperPathsAdd
+	34, // 41: badges.MsgCreateAddressLists.addressLists:type_name -> badges.AddressList
+	35, // 42: badges.MsgTransferBadges.transfers:type_name -> badges.Transfer
+	36, // 43: badges.MsgUpdateUserApprovals.outgoingApprovals:type_name -> badges.UserOutgoingApproval
+	37, // 44: badges.MsgUpdateUserApprovals.incomingApprovals:type_name -> badges.UserIncomingApproval
+	38, // 45: badges.MsgUpdateUserApprovals.userPermissions:type_name -> badges.UserPermissions
+	39, // 46: badges.MsgWrapBadges.balances:type_name -> badges.Balance
+	0,  // 47: badges.Msg.UpdateParams:input_type -> badges.MsgUpdateParams
+	3,  // 48: badges.Msg.UniversalUpdateCollection:input_type -> badges.MsgUniversalUpdateCollection
+	9,  // 49: badges.Msg.CreateAddressLists:input_type -> badges.MsgCreateAddressLists
+	11, // 50: badges.Msg.TransferBadges:input_type -> badges.MsgTransferBadges
+	15, // 51: badges.Msg.UpdateUserApprovals:input_type -> badges.MsgUpdateUserApprovals
+	13, // 52: badges.Msg.DeleteCollection:input_type -> badges.MsgDeleteCollection
+	5,  // 53: badges.Msg.UpdateCollection:input_type -> badges.MsgUpdateCollection
+	7,  // 54: badges.Msg.CreateCollection:input_type -> badges.MsgCreateCollection
+	17, // 55: badges.Msg.WrapBadges:input_type -> badges.MsgWrapBadges
+	19, // 56: badges.Msg.UnwrapBadges:input_type -> badges.MsgUnwrapBadges
+	1,  // 57: badges.Msg.UpdateParams:output_type -> badges.MsgUpdateParamsResponse
+	4,  // 58: badges.Msg.UniversalUpdateCollection:output_type -> badges.MsgUniversalUpdateCollectionResponse
+	10, // 59: badges.Msg.CreateAddressLists:output_type -> badges.MsgCreateAddressListsResponse
+	12, // 60: badges.Msg.TransferBadges:output_type -> badges.MsgTransferBadgesResponse
+	16, // 61: badges.Msg.UpdateUserApprovals:output_type -> badges.MsgUpdateUserApprovalsResponse
+	14, // 62: badges.Msg.DeleteCollection:output_type -> badges.MsgDeleteCollectionResponse
+	6,  // 63: badges.Msg.UpdateCollection:output_type -> badges.MsgUpdateCollectionResponse
+	8,  // 64: badges.Msg.CreateCollection:output_type -> badges.MsgCreateCollectionResponse
+	18, // 65: badges.Msg.WrapBadges:output_type -> badges.MsgWrapBadgesResponse
+	20, // 66: badges.Msg.UnwrapBadges:output_type -> badges.MsgUnwrapBadgesResponse
+	57, // [57:67] is the sub-list for method output_type
+	47, // [47:57] is the sub-list for method input_type
+	47, // [47:47] is the sub-list for extension type_name
+	47, // [47:47] is the sub-list for extension extendee
+	0,  // [0:47] is the sub-list for field type_name
 }
 
 func init() { file_badges_tx_proto_init() }

@@ -1386,6 +1386,23 @@ func GetSchemas() []string {
 					"amount": "",
 					"denom": ""
 				}
+			],
+			"ibcWrapperPathsToAdd": [
+				{
+					"denom": "",
+					"ownershipTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					],
+					"badgeIds": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
 			]
 		}
 	}`)
@@ -2839,6 +2856,23 @@ func GetSchemas() []string {
 					"amount": "",
 					"denom": ""
 				}
+			],
+			"ibcWrapperPathsToAdd": [
+				{
+					"denom": "",
+					"ownershipTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					],
+					"badgeIds": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
 			]
 		}
 	}`)
@@ -3372,7 +3406,60 @@ func GetSchemas() []string {
 					"amount": "",
 					"denom": ""
 				}
+			],
+			"ibcWrapperPathsToAdd": [
+				{
+					"denom": "",
+					"ownershipTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					],
+					"badgeIds": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
 			]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/WrapBadges",
+		"value": {
+			"creator": "",
+			"denom": "",
+			"balances": [
+				{
+					"amount": "",
+					"badgeIds": [
+						{
+							"start": "",
+							"end": ""
+						}
+					],
+					"ownershipTimes": [
+						{
+							"start": "",
+							"end": ""
+						}
+					]
+				}
+			],
+			"collectionId": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/UnwrapBadges",
+		"value": {
+			"creator": "",
+			"denom": "",
+			"amount": "",
+			"collectionId": ""
 		}
 	}`)
 

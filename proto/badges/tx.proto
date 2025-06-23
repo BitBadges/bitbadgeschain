@@ -231,6 +231,9 @@ message MsgUpdateCollection {
 
   // Coins to be transferred to the mint escrow address.
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 29;
+
+  // IBC wrapper paths to add.
+  repeated IBCWrapperPathsAdd ibcWrapperPathsToAdd = 30;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
