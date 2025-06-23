@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: badges/tx.proto
+// source: badges/v6/tx.proto
 
-package badges
+package badgesv6
 
 import (
 	context "context"
@@ -19,16 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_UpdateParams_FullMethodName              = "/badges.Msg/UpdateParams"
-	Msg_UniversalUpdateCollection_FullMethodName = "/badges.Msg/UniversalUpdateCollection"
-	Msg_CreateAddressLists_FullMethodName        = "/badges.Msg/CreateAddressLists"
-	Msg_TransferBadges_FullMethodName            = "/badges.Msg/TransferBadges"
-	Msg_UpdateUserApprovals_FullMethodName       = "/badges.Msg/UpdateUserApprovals"
-	Msg_DeleteCollection_FullMethodName          = "/badges.Msg/DeleteCollection"
-	Msg_UpdateCollection_FullMethodName          = "/badges.Msg/UpdateCollection"
-	Msg_CreateCollection_FullMethodName          = "/badges.Msg/CreateCollection"
-	Msg_WrapBadges_FullMethodName                = "/badges.Msg/WrapBadges"
-	Msg_UnwrapBadges_FullMethodName              = "/badges.Msg/UnwrapBadges"
+	Msg_UpdateParams_FullMethodName              = "/badges.v6.Msg/UpdateParams"
+	Msg_UniversalUpdateCollection_FullMethodName = "/badges.v6.Msg/UniversalUpdateCollection"
+	Msg_CreateAddressLists_FullMethodName        = "/badges.v6.Msg/CreateAddressLists"
+	Msg_TransferBadges_FullMethodName            = "/badges.v6.Msg/TransferBadges"
+	Msg_UpdateUserApprovals_FullMethodName       = "/badges.v6.Msg/UpdateUserApprovals"
+	Msg_DeleteCollection_FullMethodName          = "/badges.v6.Msg/DeleteCollection"
+	Msg_UpdateCollection_FullMethodName          = "/badges.v6.Msg/UpdateCollection"
+	Msg_CreateCollection_FullMethodName          = "/badges.v6.Msg/CreateCollection"
 )
 
 // MsgClient is the client API for Msg service.
@@ -45,8 +43,6 @@ type MsgClient interface {
 	DeleteCollection(ctx context.Context, in *MsgDeleteCollection, opts ...grpc.CallOption) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(ctx context.Context, in *MsgUpdateCollection, opts ...grpc.CallOption) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(ctx context.Context, in *MsgCreateCollection, opts ...grpc.CallOption) (*MsgCreateCollectionResponse, error)
-	WrapBadges(ctx context.Context, in *MsgWrapBadges, opts ...grpc.CallOption) (*MsgWrapBadgesResponse, error)
-	UnwrapBadges(ctx context.Context, in *MsgUnwrapBadges, opts ...grpc.CallOption) (*MsgUnwrapBadgesResponse, error)
 }
 
 type msgClient struct {
@@ -129,24 +125,6 @@ func (c *msgClient) CreateCollection(ctx context.Context, in *MsgCreateCollectio
 	return out, nil
 }
 
-func (c *msgClient) WrapBadges(ctx context.Context, in *MsgWrapBadges, opts ...grpc.CallOption) (*MsgWrapBadgesResponse, error) {
-	out := new(MsgWrapBadgesResponse)
-	err := c.cc.Invoke(ctx, Msg_WrapBadges_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) UnwrapBadges(ctx context.Context, in *MsgUnwrapBadges, opts ...grpc.CallOption) (*MsgUnwrapBadgesResponse, error) {
-	out := new(MsgUnwrapBadgesResponse)
-	err := c.cc.Invoke(ctx, Msg_UnwrapBadges_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -161,8 +139,6 @@ type MsgServer interface {
 	DeleteCollection(context.Context, *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(context.Context, *MsgUpdateCollection) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error)
-	WrapBadges(context.Context, *MsgWrapBadges) (*MsgWrapBadgesResponse, error)
-	UnwrapBadges(context.Context, *MsgUnwrapBadges) (*MsgUnwrapBadgesResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -193,12 +169,6 @@ func (UnimplementedMsgServer) UpdateCollection(context.Context, *MsgUpdateCollec
 }
 func (UnimplementedMsgServer) CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCollection not implemented")
-}
-func (UnimplementedMsgServer) WrapBadges(context.Context, *MsgWrapBadges) (*MsgWrapBadgesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WrapBadges not implemented")
-}
-func (UnimplementedMsgServer) UnwrapBadges(context.Context, *MsgUnwrapBadges) (*MsgUnwrapBadgesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UnwrapBadges not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -357,47 +327,11 @@ func _Msg_CreateCollection_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_WrapBadges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgWrapBadges)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).WrapBadges(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_WrapBadges_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).WrapBadges(ctx, req.(*MsgWrapBadges))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_UnwrapBadges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUnwrapBadges)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).UnwrapBadges(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_UnwrapBadges_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UnwrapBadges(ctx, req.(*MsgUnwrapBadges))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Msg_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "badges.Msg",
+	ServiceName: "badges.v6.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -432,15 +366,7 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "CreateCollection",
 			Handler:    _Msg_CreateCollection_Handler,
 		},
-		{
-			MethodName: "WrapBadges",
-			Handler:    _Msg_WrapBadges_Handler,
-		},
-		{
-			MethodName: "UnwrapBadges",
-			Handler:    _Msg_UnwrapBadges_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "badges/tx.proto",
+	Metadata: "badges/v6/tx.proto",
 }

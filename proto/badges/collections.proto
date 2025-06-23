@@ -77,4 +77,14 @@ message BadgeCollection {
 
   //The generated address of the badge collection. Also used to escrow Mint balances.
   string mintEscrowAddress = 16;
+
+  // The IBC wrapper paths for the collection.
+  repeated IBCWrapperPaths ibcWrapperPaths = 17;
+}
+
+message IBCWrapperPaths {
+  string address = 1;
+  string denom = 2;
+  repeated UintRange ownershipTimes = 3;
+  repeated UintRange badgeIds = 4;
 }

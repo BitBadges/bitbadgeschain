@@ -10,6 +10,7 @@ import "badges/collections.proto";
 import "gogoproto/gogo.proto";
 import "badges/address_lists.proto";
 import "badges/timelines.proto";
+import "badges/tx.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -58,6 +59,7 @@ message MsgNewCollection {
   bool defaultDisapproveSelfInitiated = 17; 
    //The default balances for the user
   repeated Balance defaultBalances = 18;
+  repeated IBCWrapperPathsAdd ibcWrapperPathsToAdd = 19;
 }
 
 message MsgNewCollectionResponse {

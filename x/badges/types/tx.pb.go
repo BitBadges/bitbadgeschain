@@ -127,6 +127,66 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
+type IBCWrapperPathsAdd struct {
+	Denom          string       `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
+	OwnershipTimes []*UintRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
+	BadgeIds       []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+}
+
+func (m *IBCWrapperPathsAdd) Reset()         { *m = IBCWrapperPathsAdd{} }
+func (m *IBCWrapperPathsAdd) String() string { return proto.CompactTextString(m) }
+func (*IBCWrapperPathsAdd) ProtoMessage()    {}
+func (*IBCWrapperPathsAdd) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{2}
+}
+func (m *IBCWrapperPathsAdd) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *IBCWrapperPathsAdd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_IBCWrapperPathsAdd.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *IBCWrapperPathsAdd) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IBCWrapperPathsAdd.Merge(m, src)
+}
+func (m *IBCWrapperPathsAdd) XXX_Size() int {
+	return m.Size()
+}
+func (m *IBCWrapperPathsAdd) XXX_DiscardUnknown() {
+	xxx_messageInfo_IBCWrapperPathsAdd.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_IBCWrapperPathsAdd proto.InternalMessageInfo
+
+func (m *IBCWrapperPathsAdd) GetDenom() string {
+	if m != nil {
+		return m.Denom
+	}
+	return ""
+}
+
+func (m *IBCWrapperPathsAdd) GetOwnershipTimes() []*UintRange {
+	if m != nil {
+		return m.OwnershipTimes
+	}
+	return nil
+}
+
+func (m *IBCWrapperPathsAdd) GetBadgeIds() []*UintRange {
+	if m != nil {
+		return m.BadgeIds
+	}
+	return nil
+}
+
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
 // It is a universal interface that can be used for both creating and updating collections.
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
@@ -181,13 +241,15 @@ type MsgUniversalUpdateCollection struct {
 	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,26,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
 	// Coins to be transferred to the mint escrow address.
 	MintEscrowCoinsToTransfer []*types.Coin `protobuf:"bytes,27,rep,name=mintEscrowCoinsToTransfer,proto3" json:"mintEscrowCoinsToTransfer,omitempty"`
+	// IBC wrapper paths to add.
+	IbcWrapperPathsToAdd []*IBCWrapperPathsAdd `protobuf:"bytes,28,rep,name=ibcWrapperPathsToAdd,proto3" json:"ibcWrapperPathsToAdd,omitempty"`
 }
 
 func (m *MsgUniversalUpdateCollection) Reset()         { *m = MsgUniversalUpdateCollection{} }
 func (m *MsgUniversalUpdateCollection) String() string { return proto.CompactTextString(m) }
 func (*MsgUniversalUpdateCollection) ProtoMessage()    {}
 func (*MsgUniversalUpdateCollection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{2}
+	return fileDescriptor_bc897b33479788c9, []int{3}
 }
 func (m *MsgUniversalUpdateCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -384,6 +446,13 @@ func (m *MsgUniversalUpdateCollection) GetMintEscrowCoinsToTransfer() []*types.C
 	return nil
 }
 
+func (m *MsgUniversalUpdateCollection) GetIbcWrapperPathsToAdd() []*IBCWrapperPathsAdd {
+	if m != nil {
+		return m.IbcWrapperPathsToAdd
+	}
+	return nil
+}
+
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
 type MsgUniversalUpdateCollectionResponse struct {
 	// ID of the badge collection.
@@ -394,7 +463,7 @@ func (m *MsgUniversalUpdateCollectionResponse) Reset()         { *m = MsgUnivers
 func (m *MsgUniversalUpdateCollectionResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUniversalUpdateCollectionResponse) ProtoMessage()    {}
 func (*MsgUniversalUpdateCollectionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{3}
+	return fileDescriptor_bc897b33479788c9, []int{4}
 }
 func (m *MsgUniversalUpdateCollectionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -477,7 +546,7 @@ func (m *MsgUpdateCollection) Reset()         { *m = MsgUpdateCollection{} }
 func (m *MsgUpdateCollection) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateCollection) ProtoMessage()    {}
 func (*MsgUpdateCollection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{4}
+	return fileDescriptor_bc897b33479788c9, []int{5}
 }
 func (m *MsgUpdateCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -670,7 +739,7 @@ func (m *MsgUpdateCollectionResponse) Reset()         { *m = MsgUpdateCollection
 func (m *MsgUpdateCollectionResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateCollectionResponse) ProtoMessage()    {}
 func (*MsgUpdateCollectionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{5}
+	return fileDescriptor_bc897b33479788c9, []int{6}
 }
 func (m *MsgUpdateCollectionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -729,13 +798,15 @@ type MsgCreateCollection struct {
 	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,14,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
 	// Coins to be transferred to the mint escrow address.
 	MintEscrowCoinsToTransfer []*types.Coin `protobuf:"bytes,16,rep,name=mintEscrowCoinsToTransfer,proto3" json:"mintEscrowCoinsToTransfer,omitempty"`
+	// IBC wrapper paths to add.
+	IbcWrapperPathsToAdd []*IBCWrapperPathsAdd `protobuf:"bytes,17,rep,name=ibcWrapperPathsToAdd,proto3" json:"ibcWrapperPathsToAdd,omitempty"`
 }
 
 func (m *MsgCreateCollection) Reset()         { *m = MsgCreateCollection{} }
 func (m *MsgCreateCollection) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateCollection) ProtoMessage()    {}
 func (*MsgCreateCollection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{6}
+	return fileDescriptor_bc897b33479788c9, []int{7}
 }
 func (m *MsgCreateCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -862,6 +933,13 @@ func (m *MsgCreateCollection) GetMintEscrowCoinsToTransfer() []*types.Coin {
 	return nil
 }
 
+func (m *MsgCreateCollection) GetIbcWrapperPathsToAdd() []*IBCWrapperPathsAdd {
+	if m != nil {
+		return m.IbcWrapperPathsToAdd
+	}
+	return nil
+}
+
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.
 type MsgCreateCollectionResponse struct {
 	// ID of the badge collection.
@@ -872,7 +950,7 @@ func (m *MsgCreateCollectionResponse) Reset()         { *m = MsgCreateCollection
 func (m *MsgCreateCollectionResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateCollectionResponse) ProtoMessage()    {}
 func (*MsgCreateCollectionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{7}
+	return fileDescriptor_bc897b33479788c9, []int{8}
 }
 func (m *MsgCreateCollectionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -913,7 +991,7 @@ func (m *MsgCreateAddressLists) Reset()         { *m = MsgCreateAddressLists{} }
 func (m *MsgCreateAddressLists) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateAddressLists) ProtoMessage()    {}
 func (*MsgCreateAddressLists) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{8}
+	return fileDescriptor_bc897b33479788c9, []int{9}
 }
 func (m *MsgCreateAddressLists) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -964,7 +1042,7 @@ func (m *MsgCreateAddressListsResponse) Reset()         { *m = MsgCreateAddressL
 func (m *MsgCreateAddressListsResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateAddressListsResponse) ProtoMessage()    {}
 func (*MsgCreateAddressListsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{9}
+	return fileDescriptor_bc897b33479788c9, []int{10}
 }
 func (m *MsgCreateAddressListsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1007,7 +1085,7 @@ func (m *MsgTransferBadges) Reset()         { *m = MsgTransferBadges{} }
 func (m *MsgTransferBadges) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadges) ProtoMessage()    {}
 func (*MsgTransferBadges) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{10}
+	return fileDescriptor_bc897b33479788c9, []int{11}
 }
 func (m *MsgTransferBadges) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1058,7 +1136,7 @@ func (m *MsgTransferBadgesResponse) Reset()         { *m = MsgTransferBadgesResp
 func (m *MsgTransferBadgesResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgTransferBadgesResponse) ProtoMessage()    {}
 func (*MsgTransferBadgesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{11}
+	return fileDescriptor_bc897b33479788c9, []int{12}
 }
 func (m *MsgTransferBadgesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1099,7 +1177,7 @@ func (m *MsgDeleteCollection) Reset()         { *m = MsgDeleteCollection{} }
 func (m *MsgDeleteCollection) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteCollection) ProtoMessage()    {}
 func (*MsgDeleteCollection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{12}
+	return fileDescriptor_bc897b33479788c9, []int{13}
 }
 func (m *MsgDeleteCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1143,7 +1221,7 @@ func (m *MsgDeleteCollectionResponse) Reset()         { *m = MsgDeleteCollection
 func (m *MsgDeleteCollectionResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteCollectionResponse) ProtoMessage()    {}
 func (*MsgDeleteCollectionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{13}
+	return fileDescriptor_bc897b33479788c9, []int{14}
 }
 func (m *MsgDeleteCollectionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1208,7 +1286,7 @@ func (m *MsgUpdateUserApprovals) Reset()         { *m = MsgUpdateUserApprovals{}
 func (m *MsgUpdateUserApprovals) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUserApprovals) ProtoMessage()    {}
 func (*MsgUpdateUserApprovals) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{14}
+	return fileDescriptor_bc897b33479788c9, []int{15}
 }
 func (m *MsgUpdateUserApprovals) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1336,7 +1414,7 @@ func (m *MsgUpdateUserApprovalsResponse) Reset()         { *m = MsgUpdateUserApp
 func (m *MsgUpdateUserApprovalsResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateUserApprovalsResponse) ProtoMessage()    {}
 func (*MsgUpdateUserApprovalsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bc897b33479788c9, []int{15}
+	return fileDescriptor_bc897b33479788c9, []int{16}
 }
 func (m *MsgUpdateUserApprovalsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1365,9 +1443,209 @@ func (m *MsgUpdateUserApprovalsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateUserApprovalsResponse proto.InternalMessageInfo
 
+// MsgWrapBadges is used to wrap badges.
+type MsgWrapBadges struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// Denomination to wrap.
+	Denom string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	// Amount of badges to wrap.
+	Balances []*Balance `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
+	// Collection ID to wrap badges into.
+	CollectionId Uint `protobuf:"bytes,4,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgWrapBadges) Reset()         { *m = MsgWrapBadges{} }
+func (m *MsgWrapBadges) String() string { return proto.CompactTextString(m) }
+func (*MsgWrapBadges) ProtoMessage()    {}
+func (*MsgWrapBadges) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{17}
+}
+func (m *MsgWrapBadges) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgWrapBadges) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgWrapBadges.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgWrapBadges) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWrapBadges.Merge(m, src)
+}
+func (m *MsgWrapBadges) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgWrapBadges) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWrapBadges.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgWrapBadges proto.InternalMessageInfo
+
+func (m *MsgWrapBadges) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgWrapBadges) GetDenom() string {
+	if m != nil {
+		return m.Denom
+	}
+	return ""
+}
+
+func (m *MsgWrapBadges) GetBalances() []*Balance {
+	if m != nil {
+		return m.Balances
+	}
+	return nil
+}
+
+// MsgWrapBadgesResponse is the response to MsgWrapBadges.
+type MsgWrapBadgesResponse struct {
+}
+
+func (m *MsgWrapBadgesResponse) Reset()         { *m = MsgWrapBadgesResponse{} }
+func (m *MsgWrapBadgesResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgWrapBadgesResponse) ProtoMessage()    {}
+func (*MsgWrapBadgesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{18}
+}
+func (m *MsgWrapBadgesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgWrapBadgesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgWrapBadgesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgWrapBadgesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWrapBadgesResponse.Merge(m, src)
+}
+func (m *MsgWrapBadgesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgWrapBadgesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWrapBadgesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgWrapBadgesResponse proto.InternalMessageInfo
+
+// MsgUnwrapBadges is used to unwrap badges.
+type MsgUnwrapBadges struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// Denomination to unwrap.
+	Denom string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	// Amount of badges to unwrap.
+	Amount Uint `protobuf:"bytes,3,opt,name=amount,proto3,customtype=Uint" json:"amount"`
+	// Collection ID to unwrap badges from.
+	CollectionId Uint `protobuf:"bytes,4,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgUnwrapBadges) Reset()         { *m = MsgUnwrapBadges{} }
+func (m *MsgUnwrapBadges) String() string { return proto.CompactTextString(m) }
+func (*MsgUnwrapBadges) ProtoMessage()    {}
+func (*MsgUnwrapBadges) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{19}
+}
+func (m *MsgUnwrapBadges) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUnwrapBadges) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUnwrapBadges.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUnwrapBadges) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUnwrapBadges.Merge(m, src)
+}
+func (m *MsgUnwrapBadges) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUnwrapBadges) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUnwrapBadges.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUnwrapBadges proto.InternalMessageInfo
+
+func (m *MsgUnwrapBadges) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUnwrapBadges) GetDenom() string {
+	if m != nil {
+		return m.Denom
+	}
+	return ""
+}
+
+// MsgUnwrapBadgesResponse is the response to MsgUnwrapBadges.
+type MsgUnwrapBadgesResponse struct {
+}
+
+func (m *MsgUnwrapBadgesResponse) Reset()         { *m = MsgUnwrapBadgesResponse{} }
+func (m *MsgUnwrapBadgesResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUnwrapBadgesResponse) ProtoMessage()    {}
+func (*MsgUnwrapBadgesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{20}
+}
+func (m *MsgUnwrapBadgesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUnwrapBadgesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUnwrapBadgesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUnwrapBadgesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUnwrapBadgesResponse.Merge(m, src)
+}
+func (m *MsgUnwrapBadgesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUnwrapBadgesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUnwrapBadgesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUnwrapBadgesResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "badges.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "badges.MsgUpdateParamsResponse")
+	proto.RegisterType((*IBCWrapperPathsAdd)(nil), "badges.IBCWrapperPathsAdd")
 	proto.RegisterType((*MsgUniversalUpdateCollection)(nil), "badges.MsgUniversalUpdateCollection")
 	proto.RegisterType((*MsgUniversalUpdateCollectionResponse)(nil), "badges.MsgUniversalUpdateCollectionResponse")
 	proto.RegisterType((*MsgUpdateCollection)(nil), "badges.MsgUpdateCollection")
@@ -1382,110 +1660,128 @@ func init() {
 	proto.RegisterType((*MsgDeleteCollectionResponse)(nil), "badges.MsgDeleteCollectionResponse")
 	proto.RegisterType((*MsgUpdateUserApprovals)(nil), "badges.MsgUpdateUserApprovals")
 	proto.RegisterType((*MsgUpdateUserApprovalsResponse)(nil), "badges.MsgUpdateUserApprovalsResponse")
+	proto.RegisterType((*MsgWrapBadges)(nil), "badges.MsgWrapBadges")
+	proto.RegisterType((*MsgWrapBadgesResponse)(nil), "badges.MsgWrapBadgesResponse")
+	proto.RegisterType((*MsgUnwrapBadges)(nil), "badges.MsgUnwrapBadges")
+	proto.RegisterType((*MsgUnwrapBadgesResponse)(nil), "badges.MsgUnwrapBadgesResponse")
 }
 
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 1560 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x59, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0xcf, 0x36, 0x4d, 0x1a, 0xbf, 0x38, 0xff, 0x26, 0x4d, 0xb3, 0x5e, 0x37, 0x8e, 0x31, 0x6d,
-	0x95, 0x06, 0x88, 0x9b, 0x80, 0x28, 0x8a, 0x38, 0x10, 0xa7, 0x88, 0xa6, 0x6a, 0x68, 0xb5, 0x71,
-	0x0b, 0xaa, 0x40, 0xd5, 0x78, 0x3d, 0x71, 0x56, 0xb2, 0x77, 0xad, 0x9d, 0x75, 0x68, 0x6f, 0x88,
-	0x23, 0x08, 0x09, 0x09, 0x89, 0xaf, 0x00, 0xc7, 0x1c, 0x90, 0xf8, 0x06, 0xa8, 0xdc, 0x2a, 0xc4,
-	0x01, 0x71, 0xa8, 0x50, 0x7b, 0xc8, 0xd7, 0x40, 0x3b, 0xbb, 0xb3, 0xde, 0x9d, 0xd9, 0xb5, 0xdd,
-	0xfc, 0x39, 0x91, 0x4b, 0x62, 0xcf, 0x7b, 0xbf, 0xf7, 0x7e, 0x6f, 0x66, 0xfc, 0x7e, 0x33, 0xbb,
-	0x30, 0x55, 0xc3, 0xf5, 0x06, 0xa1, 0x65, 0xf7, 0xc9, 0x4a, 0xdb, 0xb1, 0x5d, 0x1b, 0x8d, 0xfa,
-	0x03, 0xda, 0x0c, 0x6e, 0x99, 0x96, 0x5d, 0x66, 0x7f, 0x7d, 0x93, 0x36, 0x6f, 0xd8, 0xb4, 0x65,
-	0xd3, 0x72, 0x8b, 0x36, 0xca, 0xfb, 0xab, 0xde, 0xbf, 0xc0, 0x90, 0xf3, 0x0d, 0x8f, 0xd9, 0xb7,
-	0xb2, 0xff, 0x25, 0x30, 0x5d, 0x6c, 0xd8, 0x0d, 0xdb, 0x1f, 0xf7, 0x3e, 0x05, 0xa3, 0xb3, 0x41,
-	0xd6, 0x36, 0x76, 0x70, 0x8b, 0xbb, 0x5e, 0xe2, 0x54, 0x1c, 0x6c, 0xd1, 0x5d, 0xe2, 0xf0, 0xf1,
-	0xb9, 0x60, 0xbc, 0x86, 0x9b, 0xd8, 0x32, 0x08, 0x1f, 0x56, 0x79, 0x0c, 0xe2, 0xb4, 0x4c, 0x4a,
-	0x4d, 0xdb, 0x12, 0x01, 0x2d, 0xe2, 0xe2, 0x3a, 0x76, 0xb1, 0x00, 0x30, 0xec, 0x66, 0x93, 0x18,
-	0x6e, 0x04, 0xa0, 0x05, 0x16, 0x5c, 0xaf, 0x3b, 0x84, 0xd2, 0xc7, 0x4d, 0x93, 0xba, 0x12, 0x2b,
-	0xb3, 0x45, 0x9a, 0xa6, 0x15, 0xa6, 0x2f, 0x04, 0x93, 0x51, 0xc3, 0x94, 0x94, 0xf7, 0x57, 0x6b,
-	0xc4, 0xc5, 0xab, 0x65, 0xc3, 0x36, 0x2d, 0xdf, 0x5e, 0xfa, 0x59, 0x81, 0xa9, 0x6d, 0xda, 0x78,
-	0xd0, 0xae, 0x63, 0x97, 0xdc, 0x67, 0x75, 0xa2, 0xf7, 0x21, 0x83, 0x3b, 0xee, 0x9e, 0xed, 0x98,
-	0xee, 0x53, 0x55, 0x29, 0x2a, 0x4b, 0x99, 0x8a, 0xfa, 0xe7, 0xaf, 0xef, 0x5c, 0x0c, 0x66, 0x6c,
-	0xc3, 0x4f, 0xbf, 0xe3, 0x3a, 0xa6, 0xd5, 0xd0, 0xbb, 0xae, 0x68, 0x15, 0x46, 0xfd, 0x99, 0x52,
-	0xcf, 0x15, 0x95, 0xa5, 0xf1, 0xb5, 0xc9, 0x15, 0x9f, 0xd4, 0x8a, 0x1f, 0xb7, 0x92, 0x79, 0xf6,
-	0x62, 0x71, 0xe8, 0x97, 0xc3, 0x83, 0x65, 0x45, 0x0f, 0x1c, 0xd7, 0xaf, 0x7f, 0x73, 0x78, 0xb0,
-	0xdc, 0x0d, 0xf1, 0xed, 0xe1, 0xc1, 0x32, 0xaf, 0x44, 0x60, 0x55, 0xca, 0xc1, 0xbc, 0x30, 0xa4,
-	0x13, 0xda, 0xb6, 0x2d, 0x4a, 0x4a, 0xdf, 0x4f, 0xc2, 0x65, 0xcf, 0x66, 0x99, 0xfb, 0xc4, 0xa1,
-	0xb8, 0xe9, 0x3b, 0x6d, 0x86, 0x13, 0x88, 0x54, 0xb8, 0x60, 0x38, 0x04, 0xbb, 0xb6, 0xe3, 0xd7,
-	0xa3, 0xf3, 0xaf, 0xe8, 0x06, 0x64, 0xbb, 0x13, 0xbd, 0x55, 0x67, 0xcc, 0x33, 0x95, 0xac, 0xc7,
-	0xf4, 0x9f, 0x17, 0x8b, 0xe7, 0x1f, 0x98, 0x96, 0xab, 0xc7, 0x3c, 0x50, 0x09, 0xb2, 0x7c, 0x89,
-	0xab, 0x4f, 0xdb, 0x44, 0x1d, 0x66, 0x01, 0x63, 0x63, 0xa8, 0x02, 0x53, 0x75, 0xb2, 0x8b, 0x3b,
-	0x4d, 0xb7, 0x12, 0x0c, 0xab, 0xe7, 0xd9, 0x94, 0xa8, 0x7c, 0x4a, 0x1e, 0x50, 0xe2, 0x04, 0xb6,
-	0x1d, 0xd7, 0x76, 0x88, 0x2e, 0x02, 0xd0, 0x0d, 0x98, 0xed, 0xb0, 0x3a, 0x1e, 0xe2, 0xa6, 0x59,
-	0xaf, 0x78, 0xb0, 0xad, 0x3a, 0x55, 0x47, 0x8a, 0xca, 0xd2, 0x98, 0x9e, 0x64, 0x42, 0x37, 0x61,
-	0x62, 0x3f, 0xe6, 0x3b, 0x5a, 0x1c, 0x5e, 0x1a, 0x5f, 0x9b, 0x09, 0x73, 0x7a, 0xc5, 0x60, 0xab,
-	0x41, 0xf4, 0xb8, 0x1f, 0xfa, 0x08, 0xf2, 0x1d, 0x61, 0xca, 0xee, 0x77, 0xb7, 0xab, 0x7a, 0x81,
-	0xa5, 0xec, 0xe5, 0x82, 0x76, 0x60, 0xce, 0x48, 0xc4, 0x8e, 0xb1, 0xb2, 0x17, 0x38, 0x85, 0x44,
-	0xb4, 0x9e, 0x8c, 0x45, 0xef, 0xc1, 0x9c, 0x9f, 0x73, 0x1b, 0x5b, 0xb8, 0x41, 0x9c, 0x6a, 0xb0,
-	0xb7, 0xd5, 0x0c, 0x23, 0x94, 0x6c, 0x44, 0x1b, 0x30, 0xd5, 0x12, 0xfc, 0x81, 0xcd, 0xc3, 0x3c,
-	0x27, 0x21, 0x20, 0x74, 0xd1, 0x1f, 0xdd, 0x81, 0xa2, 0x58, 0xec, 0x76, 0xf0, 0x23, 0x0d, 0x63,
-	0x8e, 0x33, 0x0e, 0x7d, 0xfd, 0x50, 0x0d, 0x34, 0x23, 0x3d, 0x4a, 0x96, 0x31, 0x2b, 0xc9, 0xd3,
-	0x23, 0x7a, 0xea, 0x3d, 0xa2, 0x74, 0xd7, 0x8f, 0xad, 0xa8, 0x94, 0x64, 0x22, 0xba, 0x7e, 0x89,
-	0x2e, 0xde, 0xfa, 0xd5, 0x12, 0xb1, 0x93, 0x8c, 0x60, 0xb8, 0x7e, 0x89, 0x68, 0x3d, 0x19, 0x8b,
-	0x1e, 0xc2, 0x35, 0x3f, 0xe7, 0xbd, 0xdd, 0xdd, 0xcd, 0x3d, 0x6c, 0x5a, 0x7c, 0x6f, 0x4b, 0x59,
-	0xa6, 0x18, 0xc3, 0x01, 0xbd, 0x91, 0x0b, 0x45, 0xbb, 0x5f, 0xc4, 0x69, 0xc6, 0x7b, 0x89, 0xf3,
-	0xee, 0x17, 0x53, 0xef, 0x1b, 0x11, 0xad, 0x83, 0x1a, 0x2c, 0x76, 0x87, 0xba, 0x76, 0xeb, 0x56,
-	0x34, 0xdb, 0x0c, 0xe3, 0x9f, 0x6a, 0x47, 0x77, 0x00, 0x19, 0x32, 0x0a, 0x31, 0x8e, 0x5a, 0xb8,
-	0xf8, 0x92, 0x87, 0x9e, 0x80, 0x42, 0x1f, 0x42, 0x4e, 0xdc, 0x74, 0x1b, 0xed, 0xb6, 0x63, 0xef,
-	0xe3, 0x26, 0x55, 0xe7, 0x18, 0x91, 0x74, 0x07, 0x74, 0x17, 0x66, 0x8d, 0x04, 0xdc, 0x25, 0x81,
-	0x8a, 0xe4, 0xa2, 0x27, 0xc1, 0xd0, 0x07, 0x30, 0xef, 0xa7, 0xda, 0x71, 0xb1, 0x55, 0xc7, 0x4e,
-	0x9d, 0x86, 0xc5, 0xcd, 0x33, 0x26, 0x69, 0x66, 0xf4, 0x09, 0xcc, 0x50, 0x09, 0xa3, 0x32, 0x16,
-	0x39, 0xce, 0x42, 0x42, 0xe9, 0x32, 0xa6, 0xbb, 0x2c, 0x5b, 0x74, 0xc3, 0x31, 0xf6, 0xcc, 0x7d,
-	0x52, 0x0f, 0xe3, 0xe5, 0xa2, 0xcb, 0x22, 0xdb, 0xbd, 0x65, 0x31, 0x65, 0x94, 0x16, 0x9f, 0x0b,
-	0x19, 0xa7, 0x27, 0xa0, 0xd0, 0x67, 0x90, 0x6b, 0x99, 0x96, 0xfb, 0x31, 0x35, 0x1c, 0xfb, 0xab,
-	0x4d, 0xdb, 0xb4, 0x68, 0xd5, 0xae, 0x06, 0x47, 0x04, 0x35, 0x1f, 0x14, 0x16, 0x28, 0xa8, 0x27,
-	0xc6, 0x2b, 0x81, 0x18, 0xaf, 0x78, 0xbe, 0x7a, 0x3a, 0x76, 0x7d, 0xd5, 0x93, 0x48, 0xae, 0x57,
-	0x9e, 0x40, 0x16, 0x03, 0x81, 0x4c, 0x95, 0xbb, 0xd2, 0xe7, 0x70, 0xa5, 0x97, 0x1c, 0x72, 0xdd,
-	0x94, 0xc4, 0x4f, 0xe9, 0x27, 0x7e, 0xa5, 0x1f, 0x27, 0x60, 0x36, 0x54, 0xe1, 0x53, 0x12, 0xd8,
-	0x14, 0xe1, 0x1b, 0x7e, 0x0d, 0xe1, 0x3b, 0x7f, 0x26, 0x7c, 0x67, 0xc2, 0x77, 0x26, 0x7c, 0x67,
-	0xc2, 0xf7, 0x3f, 0x15, 0xbe, 0xfc, 0x91, 0x84, 0xef, 0xf2, 0xc9, 0x0b, 0xdf, 0xc2, 0x31, 0x84,
-	0x6f, 0x49, 0x14, 0xbe, 0x79, 0x2e, 0x7c, 0xa2, 0xde, 0xdd, 0x83, 0x7c, 0x82, 0x28, 0x1d, 0x43,
-	0xe6, 0xfe, 0x18, 0x63, 0x32, 0xb7, 0xe9, 0xe5, 0x1e, 0x4c, 0xe6, 0xc4, 0x5b, 0xe1, 0xb9, 0x53,
-	0xba, 0x15, 0x4a, 0x52, 0x37, 0x32, 0xa0, 0xd4, 0xa5, 0x0a, 0xd5, 0xe8, 0x31, 0x84, 0x2a, 0x41,
-	0x72, 0x2e, 0xbc, 0xa6, 0xe4, 0xf4, 0x96, 0x89, 0xb1, 0x13, 0x91, 0x89, 0xd4, 0x26, 0x9f, 0x39,
-	0x46, 0x93, 0x1f, 0xa4, 0x19, 0xc3, 0x89, 0x37, 0xe3, 0xe4, 0x86, 0x3a, 0x7e, 0xa4, 0x86, 0x9a,
-	0xd2, 0x12, 0xb3, 0x47, 0x6b, 0x89, 0x89, 0x8d, 0x6d, 0xe2, 0x08, 0x8d, 0x2d, 0xb9, 0x39, 0x4d,
-	0x9e, 0x7c, 0x73, 0x9a, 0x3e, 0x8d, 0xe6, 0x24, 0xf6, 0x8c, 0xa0, 0x39, 0x89, 0xc3, 0xc7, 0x68,
-	0x4e, 0x3f, 0x29, 0x30, 0x17, 0x46, 0x0c, 0x1e, 0xc6, 0xdd, 0x35, 0xa9, 0x4b, 0x7b, 0xb4, 0xa7,
-	0x9b, 0x90, 0xc5, 0x11, 0x4f, 0xf5, 0x1c, 0x2b, 0x7d, 0x96, 0xcf, 0x66, 0x24, 0x8a, 0x1e, 0x73,
-	0x5c, 0x5f, 0x16, 0xeb, 0xcc, 0xc5, 0xea, 0x8c, 0xa6, 0x2f, 0x2d, 0xc2, 0x42, 0x22, 0xaf, 0xf0,
-	0x39, 0xdd, 0x6f, 0x0a, 0xcc, 0x6c, 0xd3, 0x06, 0x9f, 0x44, 0xf6, 0x73, 0xa3, 0x27, 0x7a, 0x77,
-	0x58, 0x81, 0x4c, 0xf8, 0x5c, 0x56, 0x1d, 0x66, 0x45, 0x4e, 0xf3, 0x22, 0x79, 0x5a, 0xbd, 0xeb,
-	0xb2, 0x7e, 0x4d, 0x2c, 0x8f, 0x3f, 0x94, 0x8d, 0x73, 0x2c, 0xe5, 0x21, 0x27, 0x11, 0x0f, 0xcb,
-	0xfa, 0x4e, 0x61, 0x6a, 0x71, 0x8b, 0x34, 0xc9, 0x69, 0x5d, 0x8a, 0xd2, 0xf7, 0x9b, 0x98, 0xb5,
-	0xb4, 0xc0, 0xf6, 0x9b, 0x38, 0x1c, 0x92, 0xfd, 0x7d, 0x0c, 0x2e, 0x85, 0x62, 0xe9, 0xe9, 0x4d,
-	0xf7, 0x17, 0x7c, 0x92, 0x0b, 0x11, 0x1e, 0x90, 0xee, 0x75, 0xdc, 0x86, 0x6d, 0x5a, 0x8d, 0x6e,
-	0x7f, 0x19, 0x8e, 0x1e, 0x90, 0x24, 0x33, 0xba, 0x03, 0x33, 0xb6, 0x84, 0xf1, 0x2f, 0x74, 0x97,
-	0xa3, 0x3a, 0x29, 0x22, 0x75, 0x19, 0xd6, 0x65, 0xb1, 0x65, 0x19, 0x76, 0x2b, 0x16, 0x71, 0x24,
-	0xca, 0x42, 0x32, 0x7b, 0x2c, 0x4c, 0x09, 0x33, 0x2a, 0xb3, 0x10, 0x91, 0xba, 0x0c, 0x43, 0x7b,
-	0x50, 0xf6, 0xd3, 0x6c, 0x74, 0x5c, 0xdb, 0x1f, 0x26, 0x3b, 0xa4, 0xb9, 0xbb, 0x65, 0x99, 0xae,
-	0x89, 0x5d, 0x52, 0xe7, 0xa5, 0x54, 0xc3, 0xad, 0xeb, 0xdf, 0x3c, 0x5f, 0x17, 0x86, 0xbe, 0x80,
-	0xeb, 0x78, 0xe0, 0x1c, 0x63, 0x2c, 0xc7, 0xe0, 0x80, 0xfe, 0x75, 0xf0, 0xc9, 0xe8, 0xe6, 0xc8,
-	0x0c, 0x52, 0x87, 0x04, 0xeb, 0x55, 0x87, 0x9c, 0x03, 0x7a, 0xd7, 0x21, 0x47, 0xaf, 0xc2, 0x55,
-	0x89, 0xd0, 0x46, 0xb3, 0x29, 0x47, 0xf6, 0xaf, 0xba, 0x83, 0x39, 0xa3, 0xdb, 0xb0, 0x88, 0xfb,
-	0xc4, 0xcb, 0xb2, 0x78, 0xfd, 0xdc, 0xba, 0xd7, 0x7f, 0x6f, 0x83, 0x45, 0x8f, 0x6a, 0x13, 0xd1,
-	0xeb, 0xbf, 0x60, 0xf4, 0xce, 0x62, 0x1d, 0xc1, 0x7f, 0x92, 0x1d, 0xed, 0xe6, 0xa3, 0xfb, 0x35,
-	0x7a, 0xa8, 0x13, 0xfd, 0xd7, 0xdf, 0x12, 0x9b, 0x8c, 0x16, 0x3b, 0x71, 0xc7, 0xba, 0x45, 0xa9,
-	0x08, 0x85, 0xe4, 0x3e, 0xc2, 0x5b, 0xcd, 0xda, 0x5f, 0x23, 0x30, 0xbc, 0x4d, 0x1b, 0xe8, 0x36,
-	0x64, 0x63, 0xef, 0x97, 0xba, 0x87, 0xc3, 0xf8, 0xfb, 0x1c, 0x6d, 0x31, 0xc5, 0x10, 0x8a, 0xa5,
-	0x0d, 0xb9, 0xf4, 0x97, 0x3c, 0x57, 0xa2, 0xe8, 0x34, 0x2f, 0xed, 0xed, 0x41, 0xbc, 0xc2, 0x84,
-	0x8f, 0x00, 0x25, 0xe8, 0xec, 0x42, 0x24, 0x86, 0x6c, 0xd6, 0xae, 0xf6, 0x34, 0x87, 0xb1, 0x3f,
-	0x85, 0x49, 0x41, 0x09, 0x73, 0x11, 0x60, 0xdc, 0xa4, 0xbd, 0x91, 0x6a, 0x0a, 0xe3, 0x7d, 0x09,
-	0xb3, 0x49, 0x5d, 0xbd, 0x20, 0x4d, 0x6a, 0xcc, 0xae, 0x5d, 0xeb, 0x6d, 0x0f, 0xc3, 0x57, 0x61,
-	0x5a, 0x52, 0xb8, 0x7c, 0x04, 0x2b, 0x1a, 0xb5, 0x37, 0x7b, 0x18, 0xa3, 0x51, 0xa5, 0x85, 0xcc,
-	0x4b, 0x8c, 0x52, 0xa2, 0xa6, 0x2e, 0x5b, 0x15, 0xa6, 0xa5, 0xbb, 0x5b, 0x5e, 0x5a, 0x95, 0x94,
-	0xa8, 0x69, 0x47, 0x35, 0x6d, 0xe4, 0xeb, 0xc3, 0x83, 0x65, 0xa5, 0x72, 0xf7, 0xd9, 0xcb, 0x82,
-	0xf2, 0xfc, 0x65, 0x41, 0xf9, 0xf7, 0x65, 0x41, 0xf9, 0xe1, 0x55, 0x61, 0xe8, 0xf9, 0xab, 0xc2,
-	0xd0, 0xdf, 0xaf, 0x0a, 0x43, 0x8f, 0xd6, 0x1a, 0xa6, 0xbb, 0xd7, 0xa9, 0xad, 0x18, 0x76, 0xab,
-	0x5c, 0x33, 0x5d, 0xfe, 0x42, 0x98, 0x7f, 0x32, 0xbc, 0x93, 0x7d, 0xf9, 0x49, 0x99, 0xbf, 0xaa,
-	0x7d, 0xda, 0x26, 0xb4, 0x36, 0xca, 0xde, 0xc3, 0xbe, 0xfb, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x2d, 0x25, 0x2e, 0x59, 0xe2, 0x1e, 0x00, 0x00,
+	// 1779 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0xcd, 0x6f, 0x1b, 0x5b,
+	0x15, 0xcf, 0x34, 0x89, 0x1b, 0x9f, 0x38, 0x1f, 0xbe, 0x49, 0xea, 0xb1, 0x9d, 0x38, 0xc1, 0xe4,
+	0x55, 0x79, 0x79, 0xbc, 0xf8, 0x25, 0x20, 0x1e, 0x44, 0x2c, 0xb0, 0xf3, 0x10, 0x4d, 0xd5, 0xb4,
+	0xd5, 0xc4, 0x6d, 0x51, 0x05, 0xaa, 0xae, 0x67, 0x6e, 0x9c, 0x91, 0xec, 0x19, 0x6b, 0xee, 0x38,
+	0x6d, 0x77, 0x88, 0x25, 0x6c, 0x90, 0x40, 0x48, 0xfc, 0x05, 0xb0, 0xcc, 0x02, 0x89, 0x25, 0x12,
+	0x0b, 0xd4, 0x65, 0xc5, 0x0a, 0x21, 0x51, 0xa1, 0x74, 0x91, 0x7f, 0x03, 0xcd, 0x9d, 0xef, 0x7b,
+	0x67, 0x6c, 0xd7, 0x49, 0x56, 0x64, 0xd3, 0x66, 0xee, 0xf9, 0xfa, 0x9d, 0x7b, 0x66, 0xce, 0xef,
+	0xdc, 0x19, 0xc3, 0x42, 0x0b, 0x6b, 0x6d, 0x42, 0x6b, 0xf6, 0x9b, 0x9d, 0x9e, 0x65, 0xda, 0x26,
+	0xca, 0xb8, 0x0b, 0xa5, 0x3c, 0xee, 0xea, 0x86, 0x59, 0x63, 0xff, 0xba, 0xa2, 0x52, 0x41, 0x35,
+	0x69, 0xd7, 0xa4, 0xb5, 0x2e, 0x6d, 0xd7, 0xce, 0x76, 0x9d, 0xff, 0x3c, 0x41, 0xd1, 0x15, 0xbc,
+	0x62, 0x57, 0x35, 0xf7, 0xc2, 0x13, 0x2d, 0xb7, 0xcd, 0xb6, 0xe9, 0xae, 0x3b, 0x7f, 0x79, 0xab,
+	0x4b, 0x5e, 0xd4, 0x1e, 0xb6, 0x70, 0xd7, 0x57, 0xbd, 0xe7, 0x43, 0xb1, 0xb0, 0x41, 0x4f, 0x88,
+	0xe5, 0xaf, 0xaf, 0x78, 0xeb, 0x2d, 0xdc, 0xc1, 0x86, 0x4a, 0xfc, 0x65, 0xd9, 0xf7, 0x41, 0xac,
+	0xae, 0x4e, 0xa9, 0x6e, 0x1a, 0xbc, 0x41, 0x97, 0xd8, 0x58, 0xc3, 0x36, 0xe6, 0x0c, 0x54, 0xb3,
+	0xd3, 0x21, 0xaa, 0x1d, 0x31, 0x28, 0x79, 0x12, 0xac, 0x69, 0x16, 0xa1, 0xf4, 0x55, 0x47, 0xa7,
+	0xb6, 0x80, 0x4a, 0xef, 0x92, 0x8e, 0x6e, 0x04, 0xe1, 0x2b, 0xde, 0x66, 0xb4, 0x30, 0x25, 0xb5,
+	0xb3, 0xdd, 0x16, 0xb1, 0xf1, 0x6e, 0x4d, 0x35, 0x75, 0xc3, 0x95, 0x57, 0xff, 0x24, 0xc1, 0xc2,
+	0x11, 0x6d, 0x3f, 0xeb, 0x69, 0xd8, 0x26, 0x4f, 0x59, 0x9e, 0xe8, 0xfb, 0x90, 0xc5, 0x7d, 0xfb,
+	0xd4, 0xb4, 0x74, 0xfb, 0xad, 0x2c, 0x6d, 0x48, 0x5b, 0xd9, 0x86, 0xfc, 0xcf, 0xbf, 0x7c, 0xb9,
+	0xec, 0xed, 0x58, 0xdd, 0x0d, 0x7f, 0x6c, 0x5b, 0xba, 0xd1, 0x56, 0x42, 0x55, 0xb4, 0x0b, 0x19,
+	0x77, 0xa7, 0xe4, 0x3b, 0x1b, 0xd2, 0xd6, 0xec, 0xde, 0xfc, 0x8e, 0x0b, 0x6a, 0xc7, 0xf5, 0xdb,
+	0xc8, 0xbe, 0xfb, 0xb0, 0x3e, 0xf1, 0xe7, 0xcb, 0xf3, 0x6d, 0x49, 0xf1, 0x14, 0xf7, 0x3f, 0xff,
+	0xd5, 0xe5, 0xf9, 0x76, 0xe8, 0xe2, 0xd7, 0x97, 0xe7, 0xdb, 0x7e, 0x26, 0x1c, 0xaa, 0x6a, 0x11,
+	0x0a, 0xdc, 0x92, 0x42, 0x68, 0xcf, 0x34, 0x28, 0xa9, 0xfe, 0x5e, 0x02, 0x74, 0xd8, 0x38, 0x78,
+	0x61, 0xe1, 0x5e, 0x8f, 0x58, 0x4f, 0xb1, 0x7d, 0x4a, 0xeb, 0x9a, 0x86, 0x96, 0x61, 0x5a, 0x23,
+	0x86, 0xd9, 0x75, 0x73, 0x50, 0xdc, 0x0b, 0xf4, 0x43, 0x98, 0x37, 0x5f, 0x1b, 0xc4, 0xa2, 0xa7,
+	0x7a, 0xaf, 0xa9, 0x77, 0x89, 0x83, 0x76, 0x72, 0x6b, 0x76, 0x2f, 0xef, 0xa3, 0x7d, 0xa6, 0x1b,
+	0xb6, 0x82, 0x8d, 0x36, 0x51, 0x38, 0x45, 0xf4, 0x25, 0xcc, 0x30, 0x9d, 0x43, 0x8d, 0xca, 0x93,
+	0x69, 0x46, 0x81, 0x4a, 0xf5, 0x3f, 0xf3, 0xb0, 0xea, 0x40, 0x36, 0xf4, 0x33, 0x62, 0x51, 0xdc,
+	0x71, 0xb1, 0x1f, 0x04, 0x75, 0x45, 0x32, 0xdc, 0x55, 0x2d, 0x82, 0x6d, 0xd3, 0xf2, 0x20, 0xfa,
+	0x97, 0xe8, 0x2b, 0xc8, 0x85, 0xf5, 0x3f, 0xd4, 0xd8, 0x86, 0x66, 0x1b, 0x39, 0x67, 0x03, 0xff,
+	0xfd, 0x61, 0x7d, 0x8a, 0x45, 0x8b, 0x69, 0xa0, 0x2a, 0xe4, 0xfc, 0x3b, 0xaf, 0xf9, 0xb6, 0x47,
+	0xe4, 0x49, 0xe6, 0x30, 0xb6, 0x86, 0x1a, 0xb0, 0xa0, 0x91, 0x13, 0xdc, 0xef, 0xd8, 0x0d, 0x6f,
+	0x59, 0x9e, 0x62, 0x95, 0x92, 0x83, 0x34, 0x28, 0xb1, 0x3c, 0xd9, 0xb1, 0x6d, 0x5a, 0x44, 0xe1,
+	0x0d, 0xd0, 0x57, 0xb0, 0xd4, 0x67, 0x79, 0x3c, 0xc7, 0x1d, 0x5d, 0x6b, 0xf8, 0xdb, 0x31, 0xbd,
+	0x21, 0x6d, 0xcd, 0x28, 0x49, 0x22, 0xf4, 0x35, 0xcc, 0x9d, 0xc5, 0x74, 0x33, 0x69, 0x5b, 0x17,
+	0xd7, 0x43, 0x3f, 0x86, 0x72, 0x9f, 0xdb, 0xb2, 0xa7, 0xe1, 0x53, 0x24, 0xdf, 0x65, 0x21, 0x07,
+	0xa9, 0xa0, 0x63, 0x58, 0x51, 0x13, 0x6d, 0x67, 0x58, 0xda, 0x6b, 0x3e, 0x84, 0x44, 0x6b, 0x25,
+	0xd9, 0x16, 0x7d, 0x0f, 0x56, 0xdc, 0x98, 0x47, 0xd8, 0xc0, 0x6d, 0x62, 0x35, 0xbd, 0x47, 0x4e,
+	0xce, 0x32, 0x40, 0xc9, 0x42, 0x54, 0x87, 0x85, 0x2e, 0xa7, 0x0f, 0x6c, 0x1f, 0x0a, 0x3e, 0x08,
+	0xce, 0x42, 0xe1, 0xf5, 0xd1, 0x43, 0xd8, 0xe0, 0x93, 0x3d, 0xf2, 0x7a, 0x47, 0xe0, 0x73, 0x96,
+	0x61, 0x18, 0xaa, 0x87, 0x5a, 0x50, 0x52, 0xd3, 0xbd, 0xe4, 0x18, 0xb2, 0xaa, 0xb8, 0x3d, 0xbc,
+	0xa6, 0x32, 0xc0, 0x4b, 0x58, 0x3f, 0x56, 0x51, 0x21, 0xc8, 0x5c, 0xb4, 0x7e, 0x89, 0x2a, 0x4e,
+	0xfd, 0x5a, 0x89, 0xb6, 0xf3, 0x0c, 0x60, 0x50, 0xbf, 0x44, 0x6b, 0x25, 0xd9, 0x16, 0x3d, 0x87,
+	0xfb, 0x6e, 0xcc, 0x27, 0x27, 0x27, 0x07, 0xa7, 0x58, 0x37, 0xfc, 0x7b, 0x5b, 0x88, 0xb2, 0xc0,
+	0x10, 0x8e, 0xa8, 0x8d, 0x6c, 0xd8, 0x30, 0x87, 0x79, 0x5c, 0x64, 0xb8, 0xb7, 0x7c, 0xdc, 0xc3,
+	0x7c, 0x2a, 0x43, 0x3d, 0xa2, 0x7d, 0x90, 0xbd, 0x62, 0xf7, 0xa9, 0x6d, 0x76, 0xbf, 0x89, 0x46,
+	0xcb, 0x33, 0xfc, 0xa9, 0x72, 0xf4, 0x10, 0x90, 0x2a, 0x5a, 0x21, 0x86, 0xb1, 0x14, 0x14, 0x5f,
+	0xd0, 0x50, 0x12, 0xac, 0xd0, 0x8f, 0xa0, 0xc8, 0xdf, 0x74, 0xf5, 0x5e, 0xcf, 0x32, 0xcf, 0x70,
+	0x87, 0xca, 0x2b, 0x0c, 0x48, 0xba, 0x02, 0x7a, 0x04, 0x4b, 0x6a, 0x82, 0xdd, 0x3d, 0x0e, 0x8a,
+	0xa0, 0xa2, 0x24, 0x99, 0xa1, 0x1f, 0x40, 0xc1, 0x0d, 0x75, 0x6c, 0x63, 0x43, 0xc3, 0x96, 0x46,
+	0x83, 0xe4, 0x0a, 0x0c, 0x49, 0x9a, 0x18, 0xfd, 0x14, 0xf2, 0x54, 0xb0, 0x91, 0x19, 0x8a, 0xa2,
+	0x8f, 0x42, 0xb0, 0x52, 0x44, 0x9b, 0xb0, 0x2c, 0x87, 0xb4, 0x6e, 0xa9, 0xa7, 0xfa, 0x19, 0xd1,
+	0x02, 0x7f, 0xc5, 0x68, 0x59, 0x44, 0xb9, 0x53, 0x16, 0x5d, 0xb4, 0x2a, 0xc5, 0xf7, 0x42, 0xb4,
+	0x53, 0x12, 0xac, 0xd0, 0x0b, 0x28, 0x76, 0x75, 0xc3, 0xfe, 0x09, 0x55, 0x2d, 0xf3, 0xf5, 0x81,
+	0xa9, 0x1b, 0xb4, 0x69, 0x36, 0xbd, 0xc9, 0x45, 0x2e, 0x7b, 0x89, 0x79, 0xc4, 0xee, 0xcc, 0x08,
+	0x3b, 0xde, 0x8c, 0xb0, 0xe3, 0xe8, 0x2a, 0xe9, 0xb6, 0xe8, 0x31, 0x2c, 0xeb, 0x2d, 0x35, 0x4a,
+	0xb9, 0x4d, 0xb3, 0xae, 0x69, 0xf2, 0x2a, 0x07, 0x53, 0xa0, 0x65, 0x25, 0xd1, 0x6e, 0x7f, 0xd7,
+	0x99, 0x04, 0x7c, 0xfe, 0x73, 0xe6, 0x80, 0x0d, 0x6f, 0x0e, 0x48, 0xa5, 0xcf, 0xea, 0xcf, 0x60,
+	0x73, 0x10, 0xbd, 0xfa, 0xe3, 0x81, 0x40, 0xa6, 0xd2, 0x30, 0x32, 0xad, 0xfe, 0x6e, 0x0e, 0x96,
+	0x82, 0x61, 0xe3, 0x86, 0x08, 0x3b, 0x85, 0x48, 0x27, 0x3f, 0x81, 0x48, 0xa7, 0x6e, 0x89, 0xf4,
+	0x96, 0x48, 0x6f, 0x89, 0xf4, 0x96, 0x48, 0xff, 0x4f, 0x89, 0xb4, 0x3c, 0x16, 0x91, 0xae, 0x5e,
+	0x3f, 0x91, 0xae, 0x8d, 0x4f, 0xa4, 0xfb, 0x5b, 0x3c, 0xf1, 0x15, 0x7c, 0xe2, 0xe3, 0xf9, 0xee,
+	0x09, 0x94, 0x13, 0x48, 0xe9, 0x0a, 0x34, 0xf7, 0xc7, 0x2c, 0xa3, 0xb9, 0x03, 0x27, 0xf6, 0x68,
+	0x34, 0xc7, 0x9f, 0x32, 0xef, 0xdc, 0xd0, 0x29, 0x53, 0xa0, 0xba, 0xe9, 0x11, 0xa9, 0x2e, 0x95,
+	0xa8, 0x32, 0x57, 0x20, 0xaa, 0x04, 0xca, 0xb9, 0xfb, 0x89, 0x94, 0x33, 0x98, 0x26, 0x66, 0xae,
+	0x85, 0x26, 0x52, 0x9b, 0x7c, 0xf6, 0x0a, 0x4d, 0x7e, 0x94, 0x66, 0x0c, 0xd7, 0xde, 0x8c, 0x93,
+	0x1b, 0xea, 0xec, 0x58, 0x0d, 0x35, 0xa5, 0x25, 0xe6, 0xc6, 0x6b, 0x89, 0x89, 0x8d, 0x6d, 0x6e,
+	0x8c, 0xc6, 0x96, 0xdc, 0x9c, 0xe6, 0xaf, 0xbf, 0x39, 0x2d, 0xde, 0xc0, 0x94, 0x9f, 0x1f, 0x73,
+	0xca, 0x4f, 0x6d, 0x76, 0x7c, 0x0f, 0xf2, 0x9a, 0x1d, 0xbf, 0x7c, 0x85, 0x66, 0xf7, 0x07, 0x09,
+	0x56, 0x02, 0x8f, 0xde, 0x3b, 0xcc, 0x47, 0x3a, 0xb5, 0xe9, 0x80, 0x76, 0xf7, 0x35, 0xe4, 0x70,
+	0x44, 0xd3, 0x7b, 0x53, 0xb8, 0xe4, 0xa7, 0x1d, 0xf1, 0xa2, 0xc4, 0x14, 0xf7, 0xb7, 0xf9, 0x3c,
+	0x8b, 0xb1, 0x3c, 0xa3, 0xe1, 0xab, 0xeb, 0xb0, 0x96, 0x88, 0x2b, 0x78, 0xbd, 0xf9, 0x57, 0x09,
+	0xf2, 0x47, 0xb4, 0xed, 0x17, 0x85, 0x3d, 0xbe, 0xf4, 0x5a, 0xcf, 0x22, 0x3b, 0x90, 0x0d, 0x5e,
+	0x67, 0x7b, 0x6f, 0x36, 0x17, 0xfd, 0x24, 0xfd, 0xb0, 0x4a, 0xa8, 0xb2, 0x7f, 0x9f, 0x4f, 0xcf,
+	0x7f, 0x97, 0x1d, 0xc7, 0x58, 0x2d, 0x43, 0x51, 0x00, 0x1e, 0xa4, 0xf5, 0x1b, 0x89, 0xb1, 0xcf,
+	0x37, 0xa4, 0x43, 0x6e, 0xea, 0x90, 0x95, 0x7e, 0xbf, 0xf1, 0x51, 0xab, 0x6b, 0xec, 0x7e, 0xe3,
+	0x97, 0x03, 0xb0, 0xff, 0x98, 0x81, 0x7b, 0x01, 0xf9, 0x3a, 0xfc, 0x15, 0x76, 0x84, 0xeb, 0x2c,
+	0x44, 0x30, 0x70, 0x3d, 0xe9, 0xdb, 0x6d, 0x53, 0x37, 0xda, 0x61, 0xbf, 0x9a, 0x8c, 0x0e, 0x5c,
+	0x82, 0x18, 0x3d, 0x84, 0xbc, 0x29, 0xd8, 0xb8, 0x07, 0xc4, 0xd5, 0x28, 0xef, 0xf2, 0x96, 0x8a,
+	0x68, 0x16, 0xa2, 0x38, 0x34, 0x54, 0xb3, 0x1b, 0xf3, 0x38, 0x1d, 0x45, 0x21, 0x88, 0x1d, 0x14,
+	0xba, 0x60, 0x93, 0x11, 0x51, 0xf0, 0x96, 0x8a, 0x68, 0x86, 0x4e, 0xa1, 0xe6, 0x86, 0xa9, 0xf7,
+	0x6d, 0xd3, 0x5d, 0x26, 0xc7, 0xa4, 0x73, 0x72, 0x68, 0xe8, 0xb6, 0x8e, 0x6d, 0xa2, 0xf9, 0xa9,
+	0x34, 0x83, 0x5b, 0xd7, 0x3d, 0xc9, 0x7e, 0xaa, 0x19, 0xfa, 0x39, 0x7c, 0x8e, 0x47, 0x8e, 0x31,
+	0xc3, 0x62, 0x8c, 0x6e, 0x30, 0x3c, 0x0f, 0x7f, 0x33, 0xc2, 0x18, 0xd9, 0x51, 0xf2, 0x10, 0xcc,
+	0x06, 0xe5, 0x21, 0xc6, 0x80, 0xc1, 0x79, 0x88, 0xde, 0x9b, 0xf0, 0x99, 0x00, 0xa8, 0xde, 0xe9,
+	0x88, 0x9e, 0xdd, 0xa3, 0xf3, 0x68, 0xca, 0xe8, 0x01, 0xac, 0xe3, 0x21, 0xfe, 0x72, 0xcc, 0xdf,
+	0x30, 0xb5, 0xf0, 0x75, 0x82, 0x73, 0x83, 0x45, 0x47, 0xbf, 0xb9, 0xe8, 0xeb, 0x04, 0x4e, 0xe8,
+	0xcc, 0x76, 0x7d, 0x4e, 0x7f, 0x9e, 0x8d, 0x8a, 0x85, 0xe8, 0xfd, 0x1a, 0x1d, 0x12, 0x79, 0xfd,
+	0xfd, 0x2f, 0xf8, 0x26, 0x53, 0x8a, 0x4d, 0xf0, 0xb1, 0x6e, 0x51, 0xdd, 0x80, 0x4a, 0x72, 0x1f,
+	0x09, 0x5a, 0xcd, 0xdf, 0x25, 0x98, 0x3b, 0xa2, 0x6d, 0x87, 0x3c, 0x87, 0xb6, 0xfa, 0xe0, 0x13,
+	0xd7, 0x9d, 0xe8, 0x27, 0xae, 0x2f, 0x60, 0xc6, 0x9f, 0xc8, 0xbd, 0x6e, 0xbe, 0x10, 0xce, 0x7e,
+	0x6c, 0x5d, 0x09, 0x14, 0x84, 0x26, 0x35, 0x35, 0xb4, 0xa9, 0x56, 0xf9, 0x7c, 0xf3, 0x5e, 0xbe,
+	0x21, 0xe4, 0x6a, 0x81, 0x91, 0x6d, 0xb8, 0x10, 0x64, 0xf7, 0x37, 0xef, 0x83, 0xa3, 0xf1, 0x7a,
+	0xfc, 0xfc, 0x36, 0x21, 0x83, 0xbb, 0x66, 0xdf, 0xb0, 0xdd, 0xaf, 0x5c, 0x1c, 0x58, 0x4f, 0x36,
+	0x46, 0x62, 0x9b, 0x7c, 0x62, 0x4b, 0xc1, 0x3b, 0xc8, 0x10, 0xad, 0xff, 0x21, 0x32, 0xb2, 0xe4,
+	0x27, 0xb7, 0x77, 0x91, 0x81, 0xc9, 0x23, 0xda, 0x46, 0x0f, 0x20, 0x17, 0xfb, 0xa2, 0x1a, 0x9e,
+	0x13, 0xe2, 0x5f, 0x30, 0x4b, 0xeb, 0x29, 0x82, 0x60, 0xce, 0x31, 0xa1, 0x98, 0xfe, 0xfd, 0x70,
+	0x33, 0x6a, 0x9d, 0xa6, 0x55, 0xfa, 0xce, 0x28, 0x5a, 0x41, 0xc0, 0x97, 0x80, 0x12, 0x46, 0xa4,
+	0xb5, 0x88, 0x0f, 0x51, 0x5c, 0xfa, 0x6c, 0xa0, 0x38, 0xf0, 0xfd, 0x18, 0xe6, 0xb9, 0x21, 0xa6,
+	0x18, 0x31, 0x8c, 0x8b, 0x4a, 0xdf, 0x4a, 0x15, 0x05, 0xfe, 0x7e, 0x01, 0x4b, 0x49, 0x84, 0x5c,
+	0x11, 0x36, 0x35, 0x26, 0x2f, 0xdd, 0x1f, 0x2c, 0x0f, 0xdc, 0x37, 0x61, 0x51, 0x18, 0x4e, 0xca,
+	0x11, 0x5b, 0x5e, 0x58, 0xfa, 0xf6, 0x00, 0x61, 0xd4, 0xab, 0x50, 0xc8, 0xb2, 0x80, 0x28, 0xc5,
+	0x6b, 0x6a, 0xd9, 0x9a, 0xb0, 0x28, 0x1c, 0xe3, 0xcb, 0x42, 0x55, 0x52, 0xbc, 0xa6, 0x4e, 0xd9,
+	0x0d, 0x80, 0x48, 0x1b, 0x5a, 0x89, 0x98, 0x84, 0xcb, 0xa5, 0xb5, 0xc4, 0xe5, 0xc0, 0x87, 0xf3,
+	0x2c, 0x44, 0x1f, 0xf6, 0xd8, 0xb3, 0x10, 0x11, 0xc4, 0x9f, 0x85, 0x84, 0xa7, 0xab, 0x34, 0xfd,
+	0xcb, 0xcb, 0xf3, 0x6d, 0xa9, 0xf1, 0xe8, 0xdd, 0x45, 0x45, 0x7a, 0x7f, 0x51, 0x91, 0xfe, 0x7b,
+	0x51, 0x91, 0x7e, 0xfb, 0xb1, 0x32, 0xf1, 0xfe, 0x63, 0x65, 0xe2, 0x5f, 0x1f, 0x2b, 0x13, 0x2f,
+	0xf7, 0xda, 0xba, 0x7d, 0xda, 0x6f, 0xed, 0xa8, 0x66, 0xb7, 0xd6, 0xd2, 0x6d, 0xff, 0x07, 0x19,
+	0xfe, 0x5f, 0xaa, 0x73, 0xe4, 0xac, 0xbd, 0xa9, 0xf9, 0x3f, 0x95, 0x78, 0xdb, 0x23, 0xb4, 0x95,
+	0x61, 0xbf, 0x83, 0xf8, 0xee, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x55, 0x8b, 0x13, 0xd9, 0x62,
+	0x22, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1510,6 +1806,8 @@ type MsgClient interface {
 	DeleteCollection(ctx context.Context, in *MsgDeleteCollection, opts ...grpc.CallOption) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(ctx context.Context, in *MsgUpdateCollection, opts ...grpc.CallOption) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(ctx context.Context, in *MsgCreateCollection, opts ...grpc.CallOption) (*MsgCreateCollectionResponse, error)
+	WrapBadges(ctx context.Context, in *MsgWrapBadges, opts ...grpc.CallOption) (*MsgWrapBadgesResponse, error)
+	UnwrapBadges(ctx context.Context, in *MsgUnwrapBadges, opts ...grpc.CallOption) (*MsgUnwrapBadgesResponse, error)
 }
 
 type msgClient struct {
@@ -1592,6 +1890,24 @@ func (c *msgClient) CreateCollection(ctx context.Context, in *MsgCreateCollectio
 	return out, nil
 }
 
+func (c *msgClient) WrapBadges(ctx context.Context, in *MsgWrapBadges, opts ...grpc.CallOption) (*MsgWrapBadgesResponse, error) {
+	out := new(MsgWrapBadgesResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/WrapBadges", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UnwrapBadges(ctx context.Context, in *MsgUnwrapBadges, opts ...grpc.CallOption) (*MsgUnwrapBadgesResponse, error) {
+	out := new(MsgUnwrapBadgesResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/UnwrapBadges", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
@@ -1604,6 +1920,8 @@ type MsgServer interface {
 	DeleteCollection(context.Context, *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(context.Context, *MsgUpdateCollection) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error)
+	WrapBadges(context.Context, *MsgWrapBadges) (*MsgWrapBadgesResponse, error)
+	UnwrapBadges(context.Context, *MsgUnwrapBadges) (*MsgUnwrapBadgesResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1633,6 +1951,12 @@ func (*UnimplementedMsgServer) UpdateCollection(ctx context.Context, req *MsgUpd
 }
 func (*UnimplementedMsgServer) CreateCollection(ctx context.Context, req *MsgCreateCollection) (*MsgCreateCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCollection not implemented")
+}
+func (*UnimplementedMsgServer) WrapBadges(ctx context.Context, req *MsgWrapBadges) (*MsgWrapBadgesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WrapBadges not implemented")
+}
+func (*UnimplementedMsgServer) UnwrapBadges(ctx context.Context, req *MsgUnwrapBadges) (*MsgUnwrapBadgesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnwrapBadges not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1783,6 +2107,42 @@ func _Msg_CreateCollection_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_WrapBadges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgWrapBadges)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).WrapBadges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/WrapBadges",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).WrapBadges(ctx, req.(*MsgWrapBadges))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UnwrapBadges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUnwrapBadges)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UnwrapBadges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/UnwrapBadges",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UnwrapBadges(ctx, req.(*MsgUnwrapBadges))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "badges.Msg",
@@ -1819,6 +2179,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateCollection",
 			Handler:    _Msg_CreateCollection_Handler,
+		},
+		{
+			MethodName: "WrapBadges",
+			Handler:    _Msg_WrapBadges_Handler,
+		},
+		{
+			MethodName: "UnwrapBadges",
+			Handler:    _Msg_UnwrapBadges_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1888,6 +2256,64 @@ func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *IBCWrapperPathsAdd) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *IBCWrapperPathsAdd) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *IBCWrapperPathsAdd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.BadgeIds) > 0 {
+		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.OwnershipTimes) > 0 {
+		for iNdEx := len(m.OwnershipTimes) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.OwnershipTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Denom) > 0 {
+		i -= len(m.Denom)
+		copy(dAtA[i:], m.Denom)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Denom)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgUniversalUpdateCollection) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1908,6 +2334,22 @@ func (m *MsgUniversalUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, e
 	_ = i
 	var l int
 	_ = l
+	if len(m.IbcWrapperPathsToAdd) > 0 {
+		for iNdEx := len(m.IbcWrapperPathsToAdd) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.IbcWrapperPathsToAdd[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xe2
+		}
+	}
 	if len(m.MintEscrowCoinsToTransfer) > 0 {
 		for iNdEx := len(m.MintEscrowCoinsToTransfer) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -2617,6 +3059,22 @@ func (m *MsgCreateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.IbcWrapperPathsToAdd) > 0 {
+		for iNdEx := len(m.IbcWrapperPathsToAdd) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.IbcWrapperPathsToAdd[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x8a
+		}
+	}
 	if len(m.MintEscrowCoinsToTransfer) > 0 {
 		for iNdEx := len(m.MintEscrowCoinsToTransfer) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -3233,6 +3691,170 @@ func (m *MsgUpdateUserApprovalsResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgWrapBadges) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgWrapBadges) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgWrapBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	if len(m.Balances) > 0 {
+		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Balances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.Denom) > 0 {
+		i -= len(m.Denom)
+		copy(dAtA[i:], m.Denom)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Denom)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgWrapBadgesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgWrapBadgesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgWrapBadgesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUnwrapBadges) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUnwrapBadges) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUnwrapBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	{
+		size := m.Amount.Size()
+		i -= size
+		if _, err := m.Amount.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if len(m.Denom) > 0 {
+		i -= len(m.Denom)
+		copy(dAtA[i:], m.Denom)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Denom)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUnwrapBadgesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUnwrapBadgesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUnwrapBadgesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -3265,6 +3887,31 @@ func (m *MsgUpdateParamsResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	return n
+}
+
+func (m *IBCWrapperPathsAdd) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Denom)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.OwnershipTimes) > 0 {
+		for _, e := range m.OwnershipTimes {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.BadgeIds) > 0 {
+		for _, e := range m.BadgeIds {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -3378,6 +4025,12 @@ func (m *MsgUniversalUpdateCollection) Size() (n int) {
 	}
 	if len(m.MintEscrowCoinsToTransfer) > 0 {
 		for _, e := range m.MintEscrowCoinsToTransfer {
+			l = e.Size()
+			n += 2 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.IbcWrapperPathsToAdd) > 0 {
+		for _, e := range m.IbcWrapperPathsToAdd {
 			l = e.Size()
 			n += 2 + l + sovTx(uint64(l))
 		}
@@ -3598,6 +4251,12 @@ func (m *MsgCreateCollection) Size() (n int) {
 			n += 2 + l + sovTx(uint64(l))
 		}
 	}
+	if len(m.IbcWrapperPathsToAdd) > 0 {
+		for _, e := range m.IbcWrapperPathsToAdd {
+			l = e.Size()
+			n += 2 + l + sovTx(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -3761,6 +4420,70 @@ func (m *MsgUpdateUserApprovalsResponse) Size() (n int) {
 	return n
 }
 
+func (m *MsgWrapBadges) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Denom)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.Balances) > 0 {
+		for _, e := range m.Balances {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgWrapBadgesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUnwrapBadges) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Denom)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.Amount.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgUnwrapBadgesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
 func sovTx(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -3911,6 +4634,156 @@ func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *IBCWrapperPathsAdd) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: IBCWrapperPathsAdd: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: IBCWrapperPathsAdd: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Denom = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnershipTimes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnershipTimes = append(m.OwnershipTimes, &UintRange{})
+			if err := m.OwnershipTimes[len(m.OwnershipTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BadgeIds = append(m.BadgeIds, &UintRange{})
+			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -4668,6 +5541,40 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 			}
 			m.MintEscrowCoinsToTransfer = append(m.MintEscrowCoinsToTransfer, &types.Coin{})
 			if err := m.MintEscrowCoinsToTransfer[len(m.MintEscrowCoinsToTransfer)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 28:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IbcWrapperPathsToAdd", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IbcWrapperPathsToAdd = append(m.IbcWrapperPathsToAdd, &IBCWrapperPathsAdd{})
+			if err := m.IbcWrapperPathsToAdd[len(m.IbcWrapperPathsToAdd)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6057,6 +6964,40 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 17:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IbcWrapperPathsToAdd", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IbcWrapperPathsToAdd = append(m.IbcWrapperPathsToAdd, &IBCWrapperPathsAdd{})
+			if err := m.IbcWrapperPathsToAdd[len(m.IbcWrapperPathsToAdd)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -7121,6 +8062,470 @@ func (m *MsgUpdateUserApprovalsResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgUpdateUserApprovalsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgWrapBadges) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgWrapBadges: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgWrapBadges: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Denom = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Balances = append(m.Balances, &Balance{})
+			if err := m.Balances[len(m.Balances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgWrapBadgesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgWrapBadgesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgWrapBadgesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUnwrapBadges) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUnwrapBadges: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUnwrapBadges: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Denom = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUnwrapBadgesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUnwrapBadgesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUnwrapBadgesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
