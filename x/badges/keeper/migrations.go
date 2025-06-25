@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
@@ -9,8 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	storetypes "cosmossdk.io/store/types"
-
 	v7types "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	v6types "github.com/bitbadges/bitbadgeschain/x/badges/types/v6"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
@@ -81,35 +82,35 @@ func MigrateApprovals(collectionApprovals []*v7types.CollectionApproval) []*v7ty
 }
 
 func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) error {
-	// iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
-	// defer iterator.Close()
-	// for ; iterator.Valid(); iterator.Next() {
-	// 	// First unmarshal into v5 type
-	// 	var v5Collection v5types.BadgeCollection
-	// 	k.cdc.MustUnmarshal(iterator.Value(), &v5Collection)
+	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		// First unmarshal into v6 type
+		var v6Collection v6types.BadgeCollection
+		k.cdc.MustUnmarshal(iterator.Value(), &v6Collection)
 
-	// 	// Convert to JSON
-	// 	jsonBytes, err := json.Marshal(v5Collection)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		// Convert to JSON
+		jsonBytes, err := json.Marshal(v6Collection)
+		if err != nil {
+			return err
+		}
 
-	// 	// Unmarshal into v6 type
-	// 	var v6Collection v7types.BadgeCollection
-	// 	if err := json.Unmarshal(jsonBytes, &v6Collection); err != nil {
-	// 		return err
-	// 	}
+		// Unmarshal into v6 type
+		var v7Collection v7types.BadgeCollection
+		if err := json.Unmarshal(jsonBytes, &v7Collection); err != nil {
+			return err
+		}
 
-	// 	// Set all approval versions to 0
-	// 	v6Collection.CollectionApprovals = MigrateApprovals(v6Collection.CollectionApprovals)
-	// 	v6Collection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(v6Collection.DefaultBalances.IncomingApprovals)
-	// 	v6Collection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(v6Collection.DefaultBalances.OutgoingApprovals)
+		// Set all approval versions to 0
+		v7Collection.CollectionApprovals = MigrateApprovals(v7Collection.CollectionApprovals)
+		v7Collection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(v7Collection.DefaultBalances.IncomingApprovals)
+		v7Collection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(v7Collection.DefaultBalances.OutgoingApprovals)
 
-	// 	// Save the updated collection
-	// 	if err := k.SetCollectionInStore(ctx, &v6Collection); err != nil {
-	// 		return err
-	// 	}
-	// }
+		// Save the updated collection
+		if err := k.SetCollectionInStore(ctx, &v7Collection); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -119,7 +120,7 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var UserBalance v5types.UserBalanceStore
+	// 	var UserBalance v6types.UserBalanceStore
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 
 	// 	// Convert to JSON
@@ -148,7 +149,7 @@ func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var AddressList v5types.AddressList
+	// 	var AddressList v6types.AddressList
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &AddressList)
 
 	// 	// Convert to JSON
@@ -173,7 +174,7 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var ApprovalTracker v5types.ApprovalTracker
+	// 	var ApprovalTracker v6types.ApprovalTracker
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &ApprovalTracker)
 
 	// 	// Convert to JSON
