@@ -353,6 +353,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 		potentialErrorsStr := ""
 		if len(potentialErrors) > 0 {
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
+		} else {
+			potentialErrorsStr = " - auto-scan failed (no prioritized approvals found): "
 		}
 		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s%s", transferStr, potentialErrorsStr)
 	}
