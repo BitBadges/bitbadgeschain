@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+	evmkeyring "github.com/cosmos/evm/crypto/keyring"
 )
 
 // NewRootCmd creates a new root command for bitbadgeschaind. It is called once in the main function.
@@ -87,7 +88,6 @@ func NewRootCmd() *cobra.Command {
 		autoCliOpts.Modules[name] = mod
 	}
 
-
 	initRootCmd(rootCmd, clientCtx.TxConfig, moduleBasicManager)
 
 	overwriteFlagDefaults(rootCmd, map[string]string{
@@ -131,7 +131,10 @@ func ProvideClientContext(
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(app.DefaultNodeHome).
-		WithViper(app.Name) // env variable prefix
+		WithViper(app.Name). // env variable prefix
+		WithBroadcastMode(flags.FlagBroadcastMode).
+		WithKeyringOptions(evmkeyring.Option()).
+		WithLedgerHasProtobuf(true)
 
 	// Read the config again to overwrite the default values with the values from the config file
 	clientCtx, _ = config.ReadFromClientConfig(clientCtx)
@@ -143,6 +146,13 @@ func ProvideClientContext(
 		panic(err)
 	}
 	clientCtx = clientCtx.WithTxConfig(txConfig)
+
+	// Update the coin type for EVM compatibility
+	// TODO:
+	// cfg := sdk.GetConfig()
+	// cfg.SetCoinType(evmtypes.Bip44CoinType)
+	// cfg.SetPurpose(sdk.Purpose)
+	// cfg.Seal()
 
 	return clientCtx
 }

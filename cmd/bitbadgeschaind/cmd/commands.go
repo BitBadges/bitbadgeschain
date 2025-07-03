@@ -24,6 +24,12 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+
+	// EVM imports
+
+	evmcmd "github.com/cosmos/evm/client"
+	evmserver "github.com/cosmos/evm/server"
+	evmsrvflags "github.com/cosmos/evm/server/flags"
 )
 
 func initRootCmd(
@@ -39,7 +45,13 @@ func initRootCmd(
 		snapshot.Cmd(newApp),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	// Replace server.AddCommands with EVM server commands
+	evmserver.AddCommands(
+		rootCmd,
+		evmserver.NewDefaultStartOptions(newApp, app.DefaultNodeHome),
+		appExport,
+		addModuleInitFlags,
+	)
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
 	rootCmd.AddCommand(
@@ -48,7 +60,16 @@ func initRootCmd(
 		queryCommand(),
 		txCommand(),
 		keys.Commands(),
+		// Add EVM key commands
+		evmcmd.KeyCommands(app.DefaultNodeHome, true),
 	)
+
+	// Add EVM tx flags
+	var err error
+	rootCmd, err = evmsrvflags.AddTxFlags(rootCmd)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {

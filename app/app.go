@@ -82,6 +82,10 @@ import (
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
+	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
+	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
+	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/bitbadges/bitbadgeschain/docs"
@@ -149,6 +153,11 @@ type App struct {
 	AnchorKeeper anchormodulekeeper.Keeper
 	BadgesKeeper badgesmodulekeeper.Keeper
 	MapsKeeper   mapsmodulekeeper.Keeper
+
+	EvmKeeper       evmkeeper.Keeper
+	FeeMarketKeeper feemarketkeeper.Keeper
+	ERC20Keeper     erc20keeper.Keeper
+
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -263,6 +272,9 @@ func New(
 		&app.AnchorKeeper,
 		&app.BadgesKeeper,
 		&app.MapsKeeper,
+		&app.EvmKeeper,
+		&app.FeeMarketKeeper,
+		&app.ERC20Keeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)

@@ -3,6 +3,7 @@ package cmd
 import (
 	cmtcfg "github.com/cometbft/cometbft/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+	evmserverconfig "github.com/cosmos/evm/server/config"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -17,14 +18,19 @@ func initCometBFTConfig() *cmtcfg.Config {
 	return cfg
 }
 
+// CustomAppConfig defines the configuration for the application
+type CustomAppConfig struct {
+	serverconfig.Config `mapstructure:",squash"`
+
+	// EVM configuration
+	EVM     evmserverconfig.EVMConfig
+	JSONRPC evmserverconfig.JSONRPCConfig
+	TLS     evmserverconfig.TLSConfig
+}
+
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	// The following code snippet is just for reference.
-	type CustomAppConfig struct {
-		serverconfig.Config `mapstructure:",squash"`
-	}
-
 	// Optionally allow the chain developer to overwrite the SDK's default
 	// server config.
 	srvCfg := serverconfig.DefaultConfig()
@@ -43,11 +49,16 @@ func initAppConfig() (string, interface{}) {
 	// srvCfg.MinGasPrices = "0stake"
 	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
 
+	// Create custom app config with EVM settings
 	customAppConfig := CustomAppConfig{
-		Config: *srvCfg,
+		Config:  *srvCfg,
+		EVM:     *evmserverconfig.DefaultEVMConfig(),
+		JSONRPC: *evmserverconfig.DefaultJSONRPCConfig(),
+		TLS:     *evmserverconfig.DefaultTLSConfig(),
 	}
 
-	customAppTemplate := serverconfig.DefaultConfigTemplate
+	// Add EVM template to existing config
+	customAppTemplate := serverconfig.DefaultConfigTemplate + evmserverconfig.DefaultEVMConfigTemplate
 	// Edit the default template file
 	//
 	// customAppTemplate := serverconfig.DefaultConfigTemplate + `

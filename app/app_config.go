@@ -64,6 +64,20 @@ import (
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
+	erc20types "github.com/cosmos/evm/x/erc20/types"
+	_ "github.com/cosmos/evm/x/vm"
+	_ "github.com/cosmos/evm/x/feemarket"
+	_ "github.com/cosmos/evm/x/erc20"
+
+	evmmodulev1 "github.com/cosmos/evm/x/vm"
+	feemarketmodulev1 "github.com/cosmos/evm/x/feemarket"
+	erc20modulev1 "github.com/cosmos/evm/x/erc20"
+
+	_ "github.com/cosmos/evm/x/vm/core/tracers/js"
+	_ "github.com/cosmos/evm/x/vm/core/tracers/native"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -103,6 +117,9 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		erc20types.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -151,6 +168,9 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		erc20types.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -171,6 +191,9 @@ var (
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: ibcfeetypes.ModuleName},
 		{Account: icatypes.ModuleName},
+		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: feemarkettypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: erc20types.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -318,6 +341,18 @@ var (
 			{
 				Name:   mapsmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&mapsmodulev1.Module{}),
+			},
+			{
+				Name:   evmtypes.ModuleName,
+				Config: appconfig.WrapAny(&evmmodulev1.AppModuleBasic{}),
+			},
+			{
+				Name:   feemarkettypes.ModuleName,
+				Config: appconfig.WrapAny(&feemarketmodulev1.AppModuleBasic{}),
+			},
+			{
+				Name:   erc20types.ModuleName,
+				Config: appconfig.WrapAny(&erc20modulev1.AppModuleBasic{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

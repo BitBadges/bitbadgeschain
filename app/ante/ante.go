@@ -51,6 +51,12 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 				case "/bitcoin.ExtensionOptionsWeb3TxBitcoin":
 					// handle as Cosmos SDK tx, except signature is checked for JSON representation intended to be signed w/ bitcoin (Ledger wallet)
 					anteHandler = newCosmosAnteHandlerEip712(options, "Bitcoin")
+				case "/cosmos.evm.vm.v1.ExtensionOptionsEthereumTx":
+					// handle as *evmtypes.MsgEthereumTx
+					anteHandler = newMonoEVMAnteHandler(options)
+				case "/cosmos.evm.types.v1.ExtensionOptionDynamicFeeTx":
+					// cosmos-sdk tx with dynamic fee extension
+					anteHandler = newCosmosAnteHandler(options)
 				default:
 					return ctx, sdkerrors.Wrapf(
 						types.ErrUnknownRequest,
