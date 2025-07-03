@@ -78,7 +78,7 @@ message BadgeCollection {
   //The generated address of the badge collection. Also used to escrow Mint balances.
   string mintEscrowAddress = 16;
 
-  // The IBC wrapper paths for the collection.
+  // The IBC wrapper (sdk.coin) paths for the collection.
   repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
 }
 
@@ -87,4 +87,12 @@ message CosmosCoinWrapperPath {
   string denom = 2;
   repeated UintRange ownershipTimes = 3;
   repeated UintRange badgeIds = 4;
+  string symbol = 5;
+  repeated DenomUnit denomUnits = 6;
+}
+
+message DenomUnit {
+  string decimals = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string symbol = 2;
+  bool isDefaultDisplay = 3;
 }

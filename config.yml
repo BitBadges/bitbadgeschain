@@ -27,6 +27,11 @@ accounts:
     - name: charlie
       coins:
           - 1ubadge
+    - name: sol
+      address: bb18el5ug46umcws58m445ql5scgg2n3tzagfecvl
+      coins:
+          - 99999999999999996ubadge
+          - 1000000000000000ustake
 client:
     typescript:
         path: ts-client
@@ -42,11 +47,11 @@ genesis:
     app_state:
         gov:
             params:
-                voting_period: '604800s'
-                max_deposit_period: '604800s'
-                # voting_period: '10s'
-                # max_deposit_period: '10s'
-                # expedited_voting_period: '9s'
+                # voting_period: '604800s'
+                # max_deposit_period: '604800s'
+                voting_period: '10s'
+                max_deposit_period: '10s'
+                expedited_voting_period: '9s'
                 min_deposit:
                     - amount: '10000000000'
                       denom: ustake

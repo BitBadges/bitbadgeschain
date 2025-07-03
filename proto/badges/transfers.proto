@@ -281,6 +281,8 @@ message PredeterminedBalances {
 message AutoDeletionOptions {
   // After one use?
   bool afterOneUse = 1;
+  // After overall max number of uses threshold is met?
+  bool afterOverallMaxNumTransfers = 2;
 }
 
 // ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
@@ -521,6 +523,7 @@ message ApprovalIdentifierDetails {
   string version = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
+
 // Transfer defines the details of a transfer of badges.
 message Transfer {
   // The address of the sender of the transfer.
@@ -555,6 +558,8 @@ message Transfer {
   PrecalculationOptions precalculationOptions = 11;
   // Affiliate address for the transfer.
   string affiliateAddress = 12;
+  // The number of times to attempt approval validation. If 0 / not specified, we default to only one.
+  string numAttempts = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // PrecalculationOptions defines the options for precalculating the balances.

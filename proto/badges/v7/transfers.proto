@@ -1,13 +1,13 @@
 syntax = "proto3";
-package badges.v6;  
+package badges.v7;
 
 import "gogoproto/gogo.proto";
-import "badges/v6/permissions.proto";
-import "badges/v6/address_lists.proto";
-import "badges/v6/balances.proto";
+import "badges/v7/permissions.proto";
+import "badges/v7/address_lists.proto";
+import "badges/v7/balances.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v6";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v7";
 
 /*
   UserBalanceStore is the store for the user balances for a collection.
@@ -355,6 +355,37 @@ message CoinTransfer {
   bool overrideToWithInitiator = 4;
 }
 
+/* 
+  MustOwnBadges represents a condition where a user must own specific badges
+  to be approved to transfer.
+
+  - collectionId: The ID of the badge collection for the badges that must be owned
+  - amountRange: The range of badge amounts the user must own (min to max)
+  - ownershipTimes: The time ranges during which the user must own the badges.
+  - badgeIds: The badge IDs the user must own.
+  - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
+  - mustSatisfyForAllAssets: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
+*/
+message MustOwnBadges {
+  // The ID of the badge collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The range of badge amounts the user must own (min to max).
+  UintRange amountRange = 2;
+
+  // The time ranges during which the user must own the badges.
+  repeated UintRange ownershipTimes = 3;
+
+  // The badge IDs the user must own.
+  repeated UintRange badgeIds = 4;
+
+  // If true, override ownershipTimes with the current time.
+  bool overrideWithCurrentTime = 5;
+
+  // If true, the user must meet ownership requirements for all specified badges; else, must meet requirements for any single badge.
+  bool mustSatisfyForAllAssets = 6;
+}
+
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
   // Merkle challenge that must be satisfied for approval.
@@ -384,6 +415,20 @@ message ApprovalCriteria {
 
   // Auto-deletion options.
   AutoDeletionOptions autoDeletionOptions = 12;
+
+  // User level royalties to apply to the transfer.
+  UserRoyalties userRoyalties = 13;
+
+  // Must own badges for approval.
+  repeated MustOwnBadges mustOwnBadges = 14;
+}
+
+// UserRoyalties defines the royalties for a user.
+message UserRoyalties {
+  // Percentage of the transfer amount to apply as royalties. 1 to 10000 represents basis points.
+  string percentage = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Payout address for the royalties.
+  string payoutAddress = 2;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -406,6 +451,9 @@ message OutgoingApprovalCriteria {
 
   // Auto-deletion options.
   AutoDeletionOptions autoDeletionOptions = 8;
+
+  // Must own badges for approval.
+  repeated MustOwnBadges mustOwnBadges = 9;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -428,6 +476,9 @@ message IncomingApprovalCriteria {
 
   // Auto-deletion options.
   AutoDeletionOptions autoDeletionOptions = 8;
+
+  // Must own badges for approval.
+  repeated MustOwnBadges mustOwnBadges = 9;
 }
 
 

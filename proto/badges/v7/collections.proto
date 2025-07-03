@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v6;     
+package badges.v7; 
 
 import "google/protobuf/any.proto";
-import "badges/v6/transfers.proto";
-import "badges/v6/balances.proto";
-import "badges/v6/permissions.proto";
-import "badges/v6/metadata.proto";
-import "badges/v6/timelines.proto";
+import "badges/v7/transfers.proto";
+import "badges/v7/balances.proto";
+import "badges/v7/permissions.proto";
+import "badges/v7/metadata.proto";
+import "badges/v7/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v6";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v7";
 
 /* 
   A BadgeCollection is the top-level object for a collection of badges. 
@@ -74,4 +74,17 @@ message BadgeCollection {
 
   // The valid badge IDs for this collection.
   repeated UintRange validBadgeIds = 15;
+
+  //The generated address of the badge collection. Also used to escrow Mint balances.
+  string mintEscrowAddress = 16;
+
+  // The IBC wrapper paths for the collection.
+  repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
+}
+
+message CosmosCoinWrapperPath {
+  string address = 1;
+  string denom = 2;
+  repeated UintRange ownershipTimes = 3;
+  repeated UintRange badgeIds = 4;
 }

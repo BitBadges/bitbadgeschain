@@ -383,7 +383,8 @@ func GetSchemas() []string {
 							"overrideTimestamp": "0",
 							"badgeIdsOverride": [{ "start": "", "end": "" }]
 						},
-					"affiliateAddress": ""
+					"affiliateAddress": "",
+					"numAttempts": "0"
 					]
 				}
 			]
@@ -557,7 +558,7 @@ func GetSchemas() []string {
 									"intervalLength": ""
 								}
 							},
-							"autoDeletionOptions": { "afterOneUse": true },
+							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
@@ -714,11 +715,11 @@ func GetSchemas() []string {
 								"amountTrackerId": "",
 								"perInitiatedByAddressApprovalAmount": "",
 								"resetTimeIntervals": {
-									"startTime": "",
-									"intervalLength": ""
+								"startTime": "",
+								"intervalLength": ""
 								}
 							},
-							"autoDeletionOptions": { "afterOneUse": true },
+							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
@@ -1332,7 +1333,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 						},
-						"autoDeletionOptions": { "afterOneUse": true },
+						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
@@ -1400,6 +1401,14 @@ func GetSchemas() []string {
 						{
 							"start": "",
 							"end": ""
+						}
+					],
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false
 						}
 					]
 				}
@@ -1558,7 +1567,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 						},
-						"autoDeletionOptions": { "afterOneUse": true },
+						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
@@ -1720,7 +1729,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 						},
-						"autoDeletionOptions": { "afterOneUse": true },
+						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
@@ -2037,7 +2046,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 							},
-							"autoDeletionOptions": { "afterOneUse": true },
+							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
@@ -2198,7 +2207,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 							},
-							"autoDeletionOptions": { "afterOneUse": true },
+							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 							"maxNumTransfers": {
 								"overallMaxNumTransfers": "",
 								"perToAddressMaxNumTransfers": "",
@@ -2804,7 +2813,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 						},
-						"autoDeletionOptions": { "afterOneUse": true },
+						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
@@ -2870,6 +2879,14 @@ func GetSchemas() []string {
 						{
 							"start": "",
 							"end": ""
+						}
+					],
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false
 						}
 					]
 				}
@@ -3352,7 +3369,7 @@ func GetSchemas() []string {
 								"intervalLength": ""
 								}
 						},
-						"autoDeletionOptions": { "afterOneUse": true },
+						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
 						"maxNumTransfers": {
 							"overallMaxNumTransfers": "",
 							"perToAddressMaxNumTransfers": "",
@@ -3420,6 +3437,14 @@ func GetSchemas() []string {
 						{
 							"start": "",
 							"end": ""
+						}
+					],
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false
 						}
 					]
 				}

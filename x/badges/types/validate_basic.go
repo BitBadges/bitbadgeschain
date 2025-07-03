@@ -329,9 +329,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom is uninitialized")
 					}
 
-					if coinToTransfer.Denom != "ubadge" {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom must be badge")
-					}
 
 					if coinToTransfer.Amount.GT(sdkmath.NewInt(100000000000)) {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is too large - the max amount is 100000000000ubadge")
@@ -741,6 +738,17 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
 			}
 		}
+	}
+
+	if canChangeValues {
+		if transfer.NumAttempts.IsNil() {
+			transfer.NumAttempts = sdkmath.NewUint(1)
+		}
+	}
+
+	// Validate the retry fields on the transfer
+	if !transfer.NumAttempts.IsNil() && transfer.NumAttempts.IsZero() {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "numAttempts cannot be zero")
 	}
 
 	if transfer.PrecalculateBalancesFromApproval != nil {

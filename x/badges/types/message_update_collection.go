@@ -271,6 +271,30 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		if err != nil {
 			return err
 		}
+
+		// Validate that only one denom unit per path has isDefaultDisplay set to true
+		defaultDisplayCount := 0
+		decimalsSet := make(map[string]bool)
+		for _, denomUnit := range path.DenomUnits {
+			if denomUnit.IsDefaultDisplay {
+				defaultDisplayCount++
+			}
+
+			// Check that decimals is not 0
+			if denomUnit.Decimals.IsZero() {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "denom unit decimals cannot be 0")
+			}
+
+			// Check for duplicate decimals
+			decimalsStr := denomUnit.Decimals.String()
+			if _, ok := decimalsSet[decimalsStr]; ok {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate denom unit decimals: %s", decimalsStr)
+			}
+			decimalsSet[decimalsStr] = true
+		}
+		if defaultDisplayCount > 1 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
+		}
 	}
 
 	return nil

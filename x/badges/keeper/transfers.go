@@ -73,163 +73,193 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 	err := *new(error)
 
 	for _, transfer := range transfers {
-		fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
-
-		for _, to := range transfer.ToAddresses {
-			approvalsUsed := []ApprovalsUsed{}
-			coinTransfers := []CoinTransfers{}
-
-			toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
-
-			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
-				//Here, we precalculate balances from a specified approval
-				approvals := collection.CollectionApprovals
-				if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "collection" {
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
-						return sdkerrors.Wrapf(ErrNotImplemented, "approver address must be blank for collection level approvals")
-					}
-				} else {
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != to && transfer.PrecalculateBalancesFromApproval.ApproverAddress != transfer.From {
-						return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
-					}
-
-					handled := false
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to && transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
-						userApprovals := toUserBalance.IncomingApprovals
-						approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
-						handled = true
-					}
-
-					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" && !handled && transfer.PrecalculateBalancesFromApproval.ApproverAddress == transfer.From {
-						userApprovals := fromUserBalance.OutgoingApprovals
-						approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
-						handled = true
-					}
-
-					if !handled {
-						return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
-					}
-				}
-
-				//Precaluclate the balances that will be transferred
-				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(
-					ctx,
-					collection,
-					approvals,
-					transfer,
-					transfer.PrecalculateBalancesFromApproval,
-					to,
-					initiatedBy,
-					transfer.PrecalculationOptions,
-				)
-				if err != nil {
-					return err
-				}
-
-				//TODO: Deprecate this in favor of actually calculating the balances in indexer
-				amountsJsonData, err := json.Marshal(transfer)
-				if err != nil {
-					return err
-				}
-				amountsStr := string(amountsJsonData)
-
-				ctx.EventManager().EmitEvent(
-					sdk.NewEvent(sdk.EventTypeMessage,
-						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-						sdk.NewAttribute("creator", initiatedBy),
-						sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-						sdk.NewAttribute("transfer", amountsStr),
-					),
-				)
-
-				ctx.EventManager().EmitEvent(
-					sdk.NewEvent("indexer",
-						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-						sdk.NewAttribute("creator", initiatedBy),
-						sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-						sdk.NewAttribute("transfer", amountsStr),
-					),
-				)
-			}
-
-			fromUserBalance, toUserBalance, err = k.HandleTransfer(
-				ctx,
-				collection,
-				transfer,
-				fromUserBalance,
-				toUserBalance,
-				transfer.From,
-				to,
-				initiatedBy,
-				&approvalsUsed,
-				&coinTransfers,
-			)
-			if err != nil {
-				return err
-			}
-
-			if err := k.SetBalanceForAddress(ctx, collection, to, toUserBalance); err != nil {
-				return err
-			}
-
-			totalUbadgeTransferred := sdkmath.NewUint(0)
-			for _, coinTransfer := range coinTransfers {
-				if coinTransfer.Denom == "ubadge" {
-					amount := sdkmath.NewUintFromString(coinTransfer.Amount)
-					totalUbadgeTransferred = totalUbadgeTransferred.Add(amount)
-				}
-			}
-
-			// We take max(0.5% or k.FixedCostPerTransfer) as protocol fee
-			fixedCost, err := sdk.ParseCoinNormalized(k.FixedCostPerTransfer)
-			if err != nil {
-				return err
-			}
-
-			cost := fixedCost
-			//0.5% of the total ubadge transferred
-			protocolFee := totalUbadgeTransferred.Mul(sdkmath.NewUint(5)).Quo(sdkmath.NewUint(1000))
-			if protocolFee.GTE(sdkmath.Uint(fixedCost.Amount)) {
-				cost = sdk.NewCoin("ubadge", sdkmath.NewIntFromUint64(protocolFee.Uint64()))
-			}
-
-			payoutAddress := k.PayoutAddress
-			if transfer.AffiliateAddress != "" {
-				payoutAddress = transfer.AffiliateAddress
-			}
-
-			payoutAddressAcc, err := sdk.AccAddressFromBech32(payoutAddress)
-			if err != nil {
-				return err
-			}
-
-			fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
-			if err != nil {
-				return err
-			}
-
-			err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, payoutAddressAcc, sdk.NewCoins(cost))
-			if err != nil {
-				return sdkerrors.Wrapf(err, "error completing required payout. each transfer costs %s", cost)
-			}
-
-			coinTransfers = append(coinTransfers, CoinTransfers{
-				From:          initiatedBy,
-				To:            payoutAddress,
-				Amount:        cost.Amount.String(),
-				Denom:         cost.Denom,
-				IsProtocolFee: true,
-			})
-
-			err = emitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
-			if err != nil {
-				return err
-			}
+		numAttempts := sdkmath.NewUint(1)
+		if !transfer.NumAttempts.IsNil() {
+			numAttempts = transfer.NumAttempts
 		}
 
-		if transfer.From != "Mint" {
-			if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
-				return err
+		for i := sdkmath.NewUint(0); i.LT(numAttempts); i = i.Add(sdkmath.NewUint(1)) {
+			fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+
+			for _, to := range transfer.ToAddresses {
+				approvalsUsed := []ApprovalsUsed{}
+				coinTransfers := []CoinTransfers{}
+
+				toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
+
+				if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
+					//Here, we precalculate balances from a specified approval
+					approvals := collection.CollectionApprovals
+					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "collection" {
+						if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
+							return sdkerrors.Wrapf(ErrNotImplemented, "approver address must be blank for collection level approvals")
+						}
+					} else {
+						if transfer.PrecalculateBalancesFromApproval.ApproverAddress != to && transfer.PrecalculateBalancesFromApproval.ApproverAddress != transfer.From {
+							return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
+						}
+
+						handled := false
+						if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to && transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
+							userApprovals := toUserBalance.IncomingApprovals
+							approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
+							handled = true
+						}
+
+						if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" && !handled && transfer.PrecalculateBalancesFromApproval.ApproverAddress == transfer.From {
+							userApprovals := fromUserBalance.OutgoingApprovals
+							approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
+							handled = true
+						}
+
+						if !handled {
+							return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
+						}
+					}
+
+					//Precaluclate the balances that will be transferred
+					transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(
+						ctx,
+						collection,
+						approvals,
+						transfer,
+						transfer.PrecalculateBalancesFromApproval,
+						to,
+						initiatedBy,
+						transfer.PrecalculationOptions,
+					)
+					if err != nil {
+						return err
+					}
+
+					//TODO: Deprecate this in favor of actually calculating the balances in indexer
+					amountsJsonData, err := json.Marshal(transfer)
+					if err != nil {
+						return err
+					}
+					amountsStr := string(amountsJsonData)
+
+					ctx.EventManager().EmitEvent(
+						sdk.NewEvent(sdk.EventTypeMessage,
+							sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+							sdk.NewAttribute("creator", initiatedBy),
+							sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
+							sdk.NewAttribute("transfer", amountsStr),
+						),
+					)
+
+					ctx.EventManager().EmitEvent(
+						sdk.NewEvent("indexer",
+							sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+							sdk.NewAttribute("creator", initiatedBy),
+							sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
+							sdk.NewAttribute("transfer", amountsStr),
+						),
+					)
+				}
+
+				fromUserBalance, toUserBalance, err = k.HandleTransfer(
+					ctx,
+					collection,
+					transfer,
+					fromUserBalance,
+					toUserBalance,
+					transfer.From,
+					to,
+					initiatedBy,
+					&approvalsUsed,
+					&coinTransfers,
+				)
+				if err != nil {
+					return err
+				}
+
+				if err := k.SetBalanceForAddress(ctx, collection, to, toUserBalance); err != nil {
+					return err
+				}
+
+				// Calculate protocol fees for all denoms (0.5% of each denom transferred)
+				protocolFees := sdk.NewCoins()
+				denomAmounts := make(map[string]sdkmath.Uint)
+
+				for _, coinTransfer := range coinTransfers {
+					amount := sdkmath.NewUintFromString(coinTransfer.Amount)
+					//initialize it if it doesn't exist
+					if _, ok := denomAmounts[coinTransfer.Denom]; !ok {
+						denomAmounts[coinTransfer.Denom] = sdkmath.NewUint(0)
+					}
+
+					denomAmounts[coinTransfer.Denom] = denomAmounts[coinTransfer.Denom].Add(amount)
+				}
+
+				// Get fixed cost for ubadge comparison
+				fixedCost, err := sdk.ParseCoinNormalized(k.FixedCostPerTransfer)
+				if err != nil {
+					return err
+				}
+
+				for denom, totalAmount := range denomAmounts {
+					// 0.5% of the total amount for this denom
+					protocolFee := totalAmount.Mul(sdkmath.NewUint(5)).Quo(sdkmath.NewUint(1000))
+
+					// For ubadge, we take max(0.5% or k.FixedCostPerTransfer)
+					if denom == "ubadge" {
+						if protocolFee.GTE(sdkmath.Uint(fixedCost.Amount)) {
+							protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromUint64(protocolFee.Uint64())))
+						} else {
+							protocolFees = protocolFees.Add(fixedCost)
+						}
+					} else {
+						// For other denoms, just use 0.5%
+						if !protocolFee.IsZero() {
+							protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromUint64(protocolFee.Uint64())))
+						}
+					}
+				}
+
+				payoutAddress := k.PayoutAddress
+				if transfer.AffiliateAddress != "" {
+					payoutAddress = transfer.AffiliateAddress
+				}
+
+				payoutAddressAcc, err := sdk.AccAddressFromBech32(payoutAddress)
+				if err != nil {
+					return err
+				}
+
+				fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
+				if err != nil {
+					return err
+				}
+
+				if !protocolFees.IsZero() {
+					err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, payoutAddressAcc, protocolFees)
+					if err != nil {
+						return sdkerrors.Wrapf(err, "error completing required payout. protocol fees: %s", protocolFees)
+					}
+				}
+
+				// Add protocol fee transfers to coinTransfers for each denom
+				for _, protocolFee := range protocolFees {
+					coinTransfers = append(coinTransfers, CoinTransfers{
+						From:          initiatedBy,
+						To:            payoutAddress,
+						Amount:        protocolFee.Amount.String(),
+						Denom:         protocolFee.Denom,
+						IsProtocolFee: true,
+					})
+				}
+
+				err = emitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
+				if err != nil {
+					return err
+				}
+			}
+
+			if transfer.From != "Mint" {
+				if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -313,6 +343,7 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
 				PrecalculationOptions:                   transfer.PrecalculationOptions,
 				AffiliateAddress:                        transfer.AffiliateAddress,
+				NumAttempts:                             transfer.NumAttempts,
 			}
 
 			if userApproval.Outgoing {
@@ -443,6 +474,117 @@ func (k Keeper) HandleTransfer(
 		return false
 	}
 
+	IsDeleteAfterOverallMaxNumTransfersForCollection := func(autoDeletionOptions *types.AutoDeletionOptions, approvalCriteria *types.ApprovalCriteria, approvalUsed ApprovalsUsed) bool {
+		if autoDeletionOptions == nil || !autoDeletionOptions.AfterOverallMaxNumTransfers {
+			return false
+		}
+
+		// Check if overall max number of transfers threshold is set
+		if approvalCriteria == nil || approvalCriteria.MaxNumTransfers == nil || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero() {
+			return false
+		}
+
+		// Get the tracker to check current number of transfers
+		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
+		if maxNumTransfersTrackerId == "" {
+			return false
+		}
+
+		// Get the current tracker details
+		trackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
+			ctx,
+			collection.CollectionId,
+			approvalUsed.ApproverAddress,
+			approvalUsed.ApprovalId,
+			maxNumTransfersTrackerId,
+			approvalUsed.ApprovalLevel,
+			"overall",
+			"",
+			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
+			true,
+		)
+		if err != nil {
+			return false
+		}
+
+		// Check if the current number of transfers has reached or exceeded the threshold
+		return trackerDetails.NumTransfers.GTE(approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers)
+	}
+
+	IsDeleteAfterOverallMaxNumTransfersForOutgoing := func(autoDeletionOptions *types.AutoDeletionOptions, approvalCriteria *types.OutgoingApprovalCriteria, approvalUsed ApprovalsUsed) bool {
+		if autoDeletionOptions == nil || !autoDeletionOptions.AfterOverallMaxNumTransfers {
+			return false
+		}
+
+		// Check if overall max number of transfers threshold is set
+		if approvalCriteria == nil || approvalCriteria.MaxNumTransfers == nil || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero() {
+			return false
+		}
+
+		// Get the tracker to check current number of transfers
+		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
+		if maxNumTransfersTrackerId == "" {
+			return false
+		}
+
+		// Get the current tracker details
+		trackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
+			ctx,
+			collection.CollectionId,
+			approvalUsed.ApproverAddress,
+			approvalUsed.ApprovalId,
+			maxNumTransfersTrackerId,
+			approvalUsed.ApprovalLevel,
+			"overall",
+			"",
+			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
+			true,
+		)
+		if err != nil {
+			return false
+		}
+
+		// Check if the current number of transfers has reached or exceeded the threshold
+		return trackerDetails.NumTransfers.GTE(approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers)
+	}
+
+	IsDeleteAfterOverallMaxNumTransfersForIncoming := func(autoDeletionOptions *types.AutoDeletionOptions, approvalCriteria *types.IncomingApprovalCriteria, approvalUsed ApprovalsUsed) bool {
+		if autoDeletionOptions == nil || !autoDeletionOptions.AfterOverallMaxNumTransfers {
+			return false
+		}
+
+		// Check if overall max number of transfers threshold is set
+		if approvalCriteria == nil || approvalCriteria.MaxNumTransfers == nil || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero() {
+			return false
+		}
+
+		// Get the tracker to check current number of transfers
+		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
+		if maxNumTransfersTrackerId == "" {
+			return false
+		}
+
+		// Get the current tracker details
+		trackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
+			ctx,
+			collection.CollectionId,
+			approvalUsed.ApproverAddress,
+			approvalUsed.ApprovalId,
+			maxNumTransfersTrackerId,
+			approvalUsed.ApprovalLevel,
+			"overall",
+			"",
+			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
+			true,
+		)
+		if err != nil {
+			return false
+		}
+
+		// Check if the current number of transfers has reached or exceeded the threshold
+		return trackerDetails.NumTransfers.GTE(approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers)
+	}
+
 	// Per-transfer, we handle auto-deletions if applicable
 	for _, approvalUsed := range *approvalsUsed {
 		if approvalUsed.ApprovalLevel == "incoming" {
@@ -451,7 +593,19 @@ func (k Keeper) HandleTransfer(
 				if incomingApproval.ApprovalId != approvalUsed.ApprovalId {
 					newIncomingApprovals = append(newIncomingApprovals, incomingApproval)
 				} else {
-					if incomingApproval.ApprovalCriteria == nil || !IsDeleteAfterOneUse(incomingApproval.ApprovalCriteria.AutoDeletionOptions) {
+					shouldDelete := false
+
+					// Check if should delete after one use (doesn't depend on ApprovalCriteria)
+					if incomingApproval.ApprovalCriteria != nil && incomingApproval.ApprovalCriteria.AutoDeletionOptions != nil {
+						shouldDelete = IsDeleteAfterOneUse(incomingApproval.ApprovalCriteria.AutoDeletionOptions)
+					}
+
+					// Check if should delete after overall max transfers (depends on ApprovalCriteria)
+					if !shouldDelete && incomingApproval.ApprovalCriteria != nil {
+						shouldDelete = IsDeleteAfterOverallMaxNumTransfersForIncoming(incomingApproval.ApprovalCriteria.AutoDeletionOptions, incomingApproval.ApprovalCriteria, approvalUsed)
+					}
+
+					if !shouldDelete {
 						newIncomingApprovals = append(newIncomingApprovals, incomingApproval)
 					} else {
 						// Delete the approval
@@ -465,7 +619,19 @@ func (k Keeper) HandleTransfer(
 				if outgoingApproval.ApprovalId != approvalUsed.ApprovalId {
 					newOutgoingApprovals = append(newOutgoingApprovals, outgoingApproval)
 				} else {
-					if outgoingApproval.ApprovalCriteria == nil || !IsDeleteAfterOneUse(outgoingApproval.ApprovalCriteria.AutoDeletionOptions) {
+					shouldDelete := false
+
+					// Check if should delete after one use (doesn't depend on ApprovalCriteria)
+					if outgoingApproval.ApprovalCriteria != nil && outgoingApproval.ApprovalCriteria.AutoDeletionOptions != nil {
+						shouldDelete = IsDeleteAfterOneUse(outgoingApproval.ApprovalCriteria.AutoDeletionOptions)
+					}
+
+					// Check if should delete after overall max transfers (depends on ApprovalCriteria)
+					if !shouldDelete && outgoingApproval.ApprovalCriteria != nil {
+						shouldDelete = IsDeleteAfterOverallMaxNumTransfersForOutgoing(outgoingApproval.ApprovalCriteria.AutoDeletionOptions, outgoingApproval.ApprovalCriteria, approvalUsed)
+					}
+
+					if !shouldDelete {
 						newOutgoingApprovals = append(newOutgoingApprovals, outgoingApproval)
 					} else {
 						// Delete the approval
@@ -480,7 +646,19 @@ func (k Keeper) HandleTransfer(
 				if collectionApproval.ApprovalId != approvalUsed.ApprovalId {
 					newCollectionApprovals = append(newCollectionApprovals, collectionApproval)
 				} else {
-					if collectionApproval.ApprovalCriteria == nil || !IsDeleteAfterOneUse(collectionApproval.ApprovalCriteria.AutoDeletionOptions) {
+					shouldDelete := false
+
+					// Check if should delete after one use (doesn't depend on ApprovalCriteria)
+					if collectionApproval.ApprovalCriteria != nil && collectionApproval.ApprovalCriteria.AutoDeletionOptions != nil {
+						shouldDelete = IsDeleteAfterOneUse(collectionApproval.ApprovalCriteria.AutoDeletionOptions)
+					}
+
+					// Check if should delete after overall max transfers (depends on ApprovalCriteria)
+					if !shouldDelete && collectionApproval.ApprovalCriteria != nil {
+						shouldDelete = IsDeleteAfterOverallMaxNumTransfersForCollection(collectionApproval.ApprovalCriteria.AutoDeletionOptions, collectionApproval.ApprovalCriteria, approvalUsed)
+					}
+
+					if !shouldDelete {
 						newCollectionApprovals = append(newCollectionApprovals, collectionApproval)
 					} else {
 						// Delete the approval

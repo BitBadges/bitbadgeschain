@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	UpgradeName = "v7"
+	UpgradeName = "v8"
 )
 
 func CreateUpgradeHandler(

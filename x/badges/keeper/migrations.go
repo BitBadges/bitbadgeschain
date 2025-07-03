@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
-	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	storetypes "cosmossdk.io/store/types"
-	v7types "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	v6types "github.com/bitbadges/bitbadgeschain/x/badges/types/v6"
+	v8types "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	v7types "github.com/bitbadges/bitbadgeschain/x/badges/types/v7"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
@@ -40,41 +39,57 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 	return nil
 }
 
-func MigrateIncomingApprovals(incomingApprovals []*v7types.UserIncomingApproval) []*v7types.UserIncomingApproval {
+func MigrateIncomingApprovals(incomingApprovals []*v8types.UserIncomingApproval) []*v8types.UserIncomingApproval {
 	for _, approval := range incomingApprovals {
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
 
-		approval.ApprovalCriteria.MustOwnBadges = []*v7types.MustOwnBadges{}
+		if approval.ApprovalCriteria.AutoDeletionOptions == nil {
+			continue
+		}
+
+		approval.ApprovalCriteria.AutoDeletionOptions = &v8types.AutoDeletionOptions{
+			AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
+			AfterOverallMaxNumTransfers: false,
+		}
 	}
 
 	return incomingApprovals
 }
 
-func MigrateOutgoingApprovals(outgoingApprovals []*v7types.UserOutgoingApproval) []*v7types.UserOutgoingApproval {
+func MigrateOutgoingApprovals(outgoingApprovals []*v8types.UserOutgoingApproval) []*v8types.UserOutgoingApproval {
 	for _, approval := range outgoingApprovals {
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
 
-		approval.ApprovalCriteria.MustOwnBadges = []*v7types.MustOwnBadges{}
+		if approval.ApprovalCriteria.AutoDeletionOptions == nil {
+			continue
+		}
+
+		approval.ApprovalCriteria.AutoDeletionOptions = &v8types.AutoDeletionOptions{
+			AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
+			AfterOverallMaxNumTransfers: false,
+		}
 	}
 
 	return outgoingApprovals
 }
 
-func MigrateApprovals(collectionApprovals []*v7types.CollectionApproval) []*v7types.CollectionApproval {
+func MigrateApprovals(collectionApprovals []*v8types.CollectionApproval) []*v8types.CollectionApproval {
 	for _, approval := range collectionApprovals {
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
 
-		approval.ApprovalCriteria.MustOwnBadges = []*v7types.MustOwnBadges{}
+		if approval.ApprovalCriteria.AutoDeletionOptions == nil {
+			continue
+		}
 
-		approval.ApprovalCriteria.UserRoyalties = &v7types.UserRoyalties{
-			PayoutAddress: "",
-			Percentage:    sdkmath.NewUint(0),
+		approval.ApprovalCriteria.AutoDeletionOptions = &v8types.AutoDeletionOptions{
+			AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
+			AfterOverallMaxNumTransfers: false,
 		}
 	}
 
@@ -85,29 +100,34 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		// First unmarshal into v6 type
-		var v6Collection v6types.BadgeCollection
-		k.cdc.MustUnmarshal(iterator.Value(), &v6Collection)
+		// First unmarshal into v7 type
+		var v7Collection v7types.BadgeCollection
+		k.cdc.MustUnmarshal(iterator.Value(), &v7Collection)
 
 		// Convert to JSON
-		jsonBytes, err := json.Marshal(v6Collection)
+		jsonBytes, err := json.Marshal(v7Collection)
 		if err != nil {
 			return err
 		}
 
-		// Unmarshal into v6 type
-		var v7Collection v7types.BadgeCollection
-		if err := json.Unmarshal(jsonBytes, &v7Collection); err != nil {
+		// Unmarshal into v7 type
+		var v8Collection v8types.BadgeCollection
+		if err := json.Unmarshal(jsonBytes, &v8Collection); err != nil {
 			return err
 		}
 
 		// Set all approval versions to 0
-		v7Collection.CollectionApprovals = MigrateApprovals(v7Collection.CollectionApprovals)
-		v7Collection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(v7Collection.DefaultBalances.IncomingApprovals)
-		v7Collection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(v7Collection.DefaultBalances.OutgoingApprovals)
+		v8Collection.CollectionApprovals = MigrateApprovals(v8Collection.CollectionApprovals)
+		v8Collection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(v8Collection.DefaultBalances.IncomingApprovals)
+		v8Collection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(v8Collection.DefaultBalances.OutgoingApprovals)
+
+		for _, cosmosCoinWrapperPath := range v8Collection.CosmosCoinWrapperPaths {
+			cosmosCoinWrapperPath.Symbol = cosmosCoinWrapperPath.Denom
+			cosmosCoinWrapperPath.DenomUnits = []*v8types.DenomUnit{}
+		}
 
 		// Save the updated collection
-		if err := k.SetCollectionInStore(ctx, &v7Collection); err != nil {
+		if err := k.SetCollectionInStore(ctx, &v8Collection); err != nil {
 			return err
 		}
 	}
@@ -120,7 +140,7 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var UserBalance v6types.UserBalanceStore
+	// 	var UserBalance v7types.UserBalanceStore
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 
 	// 	// Convert to JSON
@@ -129,16 +149,16 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 	// 		return err
 	// 	}
 
-	// 	// Unmarshal into v6 type
-	// 	var v6Balance v7types.UserBalanceStore
-	// 	if err := json.Unmarshal(jsonBytes, &v6Balance); err != nil {
+	// 	// Unmarshal into v7 type
+	// 	var v7Balance v8types.UserBalanceStore
+	// 	if err := json.Unmarshal(jsonBytes, &v7Balance); err != nil {
 	// 		return err
 	// 	}
 
-	// 	v6Balance.IncomingApprovals = MigrateIncomingApprovals(v6Balance.IncomingApprovals)
-	// 	v6Balance.OutgoingApprovals = MigrateOutgoingApprovals(v6Balance.OutgoingApprovals)
+	// 	v7Balance.IncomingApprovals = MigrateIncomingApprovals(v7Balance.IncomingApprovals)
+	// 	v7Balance.OutgoingApprovals = MigrateOutgoingApprovals(v7Balance.OutgoingApprovals)
 
-	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v6Balance))
+	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v7Balance))
 	// }
 
 	return nil
@@ -149,7 +169,7 @@ func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var AddressList v6types.AddressList
+	// 	var AddressList v7types.AddressList
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &AddressList)
 
 	// 	// Convert to JSON
@@ -158,13 +178,13 @@ func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper
 	// 		return err
 	// 	}
 
-	// 	// Unmarshal into v6 type
-	// 	var v6AddressList v7types.AddressList
-	// 	if err := json.Unmarshal(jsonBytes, &v6AddressList); err != nil {
+	// 	// Unmarshal into v7 type
+	// 	var v7AddressList v8types.AddressList
+	// 	if err := json.Unmarshal(jsonBytes, &v7AddressList); err != nil {
 	// 		return err
 	// 	}
 
-	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v6AddressList))
+	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v7AddressList))
 	// }
 	return nil
 }
@@ -174,7 +194,7 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 	// defer iterator.Close()
 
 	// for ; iterator.Valid(); iterator.Next() {
-	// 	var ApprovalTracker v6types.ApprovalTracker
+	// 	var ApprovalTracker v7types.ApprovalTracker
 	// 	k.cdc.MustUnmarshal(iterator.Value(), &ApprovalTracker)
 
 	// 	// Convert to JSON
@@ -183,17 +203,17 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 	// 		return err
 	// 	}
 
-	// 	// Unmarshal into v6 type
-	// 	var v6ApprovalTracker v7types.ApprovalTracker
-	// 	if err := json.Unmarshal(jsonBytes, &v6ApprovalTracker); err != nil {
+	// 	// Unmarshal into v7 type
+	// 	var v7ApprovalTracker v8types.ApprovalTracker
+	// 	if err := json.Unmarshal(jsonBytes, &v7ApprovalTracker); err != nil {
 	// 		return err
 	// 	}
 
 	// 	wctx := sdk.UnwrapSDKContext(ctx)
 	// 	nowUnixMilli := wctx.BlockTime().UnixMilli()
-	// 	v6ApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
+	// 	v7ApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
 
-	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v6ApprovalTracker))
+	// 	store.Set(iterator.Key(), k.cdc.MustMarshal(&v7ApprovalTracker))
 	// }
 	return nil
 }

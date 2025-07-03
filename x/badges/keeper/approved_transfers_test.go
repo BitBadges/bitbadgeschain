@@ -38,7 +38,8 @@ func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 		OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 		PrecalculationOptions:                   precalculationOptions,
-	}, from, to, requester, userBalance, approvalsUsed, coinTransfersUsed, userRoyalties	)
+		NumAttempts:                             sdkmath.NewUint(1),
+	}, from, to, requester, userBalance, approvalsUsed, coinTransfersUsed, userRoyalties)
 }
 
 func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, prioritizedApprovals []*types.ApprovalIdentifierDetails,
@@ -62,6 +63,7 @@ func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 		OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 		PrecalculationOptions:                   precalculationOptions,
+		NumAttempts:                             sdkmath.NewUint(1),
 	}, to, requester, userBalance, approvalsUsed, coinTransfersUsed, userRoyalties)
 }
 
@@ -71,7 +73,8 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 	onlyCheckPrioritizedCollectionApprovals bool,
 	onlyCheckProritizedIncomingApprovals bool,
 	onlyCheckPrioritizedOutgoingApprovals bool,
-	precalculationOptions *types.PrecalculationOptions, approvalsUsed *[]keeper.ApprovalsUsed, coinTransfersUsed *[]keeper.CoinTransfers) ([]*keeper.UserApprovalsToCheck, error) {
+	precalculationOptions *types.PrecalculationOptions, approvalsUsed *[]keeper.ApprovalsUsed, coinTransfersUsed *[]keeper.CoinTransfers,
+	numAttempts sdkmath.Uint) ([]*keeper.UserApprovalsToCheck, error) {
 	return suite.app.BadgesKeeper.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection,
 		&types.Transfer{
 			From:        from,
@@ -89,6 +92,7 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 			OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 			OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 			PrecalculationOptions:                   precalculationOptions,
+			NumAttempts:                             numAttempts,
 		}, to, requester, approvalsUsed, coinTransfersUsed)
 }
 
@@ -122,10 +126,10 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, nil)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{})
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{})
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1))
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -679,7 +683,7 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{})
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(2, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing != x[1].Outgoing, "Error deducting outgoing approvals")
@@ -696,7 +700,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{})
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().False(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -713,7 +717,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{})
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -731,7 +735,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{})
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(0, len(x), "Error deducting outgoing approvals")
 }
@@ -1652,4 +1656,684 @@ func (suite *TestSuite) TestAutoDeletingCollectionApprovals() {
 	// We mint to bob in the CreateCollections.transfers so it should be deleted automatically
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Equal(0, len(collection.CollectionApprovals), "Collection approvals should be deleted")
+}
+
+func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	// Set up collection approval with auto-deletion after overall max transfers
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, []*types.CollectionApproval{
+		{
+			FromListId:        "Mint",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "overall-max-test",
+			Version:           sdkmath.NewUint(0),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(3), 
+					AmountTrackerId:        "tracker1",
+				},
+				AutoDeletionOptions: &types.AutoDeletionOptions{
+					AfterOverallMaxNumTransfers: true,
+				},
+			},
+		},
+	}...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// First transfer - should succeed and not delete the approval
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "overall-max-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+		bob,
+	)
+	suite.Require().Nil(err, "First transfer should succeed")
+
+	// Check that approval still exists after first transfer
+	collection, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// Second transfer - should succeed and not delete the approval yet
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "overall-max-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+		bob,
+	)
+	suite.Require().Nil(err, "Second transfer should succeed")
+
+	// Check that approval still exists after second transfer (threshold reached but not exceeded)
+	collection, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// Third transfer - should succeed and delete the approval (threshold exceeded)
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "overall-max-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+		bob,
+	)
+	suite.Require().Nil(err, "Third transfer should succeed")
+
+	// Check that approval is deleted after third transfer (threshold exceeded)
+	collection, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	found := false
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "overall-max-test" {
+			found = true
+			break
+		}
+	}
+	suite.Require().False(found, "Collection approval should be deleted after third transfer")
+
+	// Fourth transfer - should fail because approval is deleted
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "overall-max-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+		bob,
+	)
+	suite.Require().Error(err, "Fourth transfer should fail because approval is deleted")
+}
+
+func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTransfers() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	// Set up incoming approval with auto-deletion after overall max transfers
+	collectionsToCreate[0].DefaultIncomingApprovals[0].FromListId = "Mint"
+	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId = "All"
+	collectionsToCreate[0].DefaultIncomingApprovals[0].BadgeIds = GetFullUintRanges()
+	collectionsToCreate[0].DefaultIncomingApprovals[0].TransferTimes = GetFullUintRanges()
+	collectionsToCreate[0].DefaultIncomingApprovals[0].OwnershipTimes = GetFullUintRanges()
+	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = &types.IncomingApprovalCriteria{
+		AutoDeletionOptions: &types.AutoDeletionOptions{
+			AfterOverallMaxNumTransfers: true,
+		},
+		ApprovalAmounts: &types.ApprovalAmounts{},
+		MaxNumTransfers: &types.MaxNumTransfers{
+			OverallMaxNumTransfers: sdkmath.NewUint(3),
+			AmountTrackerId:        "tracker1",
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+		{
+			FromListId:        "Mint",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "a1",
+			Version:           sdkmath.NewUint(0),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				OverridesFromOutgoingApprovals: true,
+			},
+		},
+	}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Equal(1, len(aliceBalance.IncomingApprovals), "Incoming approvals should exist initially")
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	allApprovals := append([]*types.ApprovalIdentifierDetails{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1))...)
+	allApprovals = append(allApprovals, &types.ApprovalIdentifierDetails{
+		ApprovalId:      collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalId,
+		ApprovalLevel:   "incoming",
+		ApproverAddress: alice,
+		Version:         sdkmath.NewUint(0),
+	})
+
+	// First transfer - should succeed and not delete the approval
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetBottomHalfUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                  allApprovals,
+				OnlyCheckPrioritizedIncomingApprovals: true,
+			},
+		},
+		bob,
+	)
+	suite.Require().Nil(err, "First transfer should succeed")
+
+	// Check that approval still exists after first transfer
+	aliceBalance, _ = GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(1, len(aliceBalance.IncomingApprovals), "Incoming approval should still exist after first transfer")
+
+	// Second transfer - should succeed and not delete the approval yet
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetTopHalfUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                  allApprovals,
+				OnlyCheckPrioritizedIncomingApprovals: true,
+			},
+		},
+		bob,
+	)
+	suite.Require().Nil(err, "Second transfer should succeed")
+
+	// Check that approval still exists after second transfer (threshold reached but not exceeded)
+	aliceBalance, _ = GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(1, len(aliceBalance.IncomingApprovals), "Incoming approval should still exist after second transfer")
+
+	// Third transfer - should succeed and delete the approval (threshold exceeded)
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                  allApprovals,
+				OnlyCheckPrioritizedIncomingApprovals: true,
+			},
+		},
+		bob,
+	)
+	suite.Require().Nil(err, "Third transfer should succeed")
+
+	// Check that approval is deleted after third transfer (threshold exceeded)
+	aliceBalance, _ = GetUserBalance(suite, wctx, collection.CollectionId, alice)
+	suite.Require().Equal(0, len(aliceBalance.IncomingApprovals), "Incoming approval should be deleted after third transfer")
+
+	// Fourth transfer - should fail because approval is deleted
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                  allApprovals,
+				OnlyCheckPrioritizedIncomingApprovals: true,
+			},
+		},
+		bob,
+	)
+	suite.Require().Error(err, "Fourth transfer should fail because approval is deleted")
+}
+
+// TestPrioritizedApprovalRetryLogic tests the retry logic for prioritized approvals
+func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+
+	predeterminedBalances := &types.PredeterminedBalances{
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					BadgeIds:       GetFullUintRanges(),
+					Amount:         sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			AllowOverrideTimestamp:    false,
+			DurationFromTimestamp:     sdkmath.NewUint(0),
+			RecurringOwnershipTimes: &types.RecurringOwnershipTimes{
+				IntervalLength:     sdkmath.NewUint(0),
+				StartTime:          sdkmath.NewUint(0),
+				ChargePeriodLength: sdkmath.NewUint(0),
+			},
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+
+	// Set up approvals that will fail on certain conditions
+	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+		{
+			FromListId:        "Mint",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "retry-test-1",
+			Version:           sdkmath.NewUint(0),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+				RequireFromEqualsInitiatedBy:   true, // This will fail when from != initiatedBy
+				PredeterminedBalances:          predeterminedBalances,
+			},
+		},
+		{
+			FromListId:        "Mint",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "retry-test-2",
+			Version:           sdkmath.NewUint(0),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+				RequireToEqualsInitiatedBy:     true, // This will fail when to != initiatedBy
+				PredeterminedBalances:          predeterminedBalances,
+			},
+		},
+		{
+			FromListId:        "Mint",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "retry-test-3",
+			Version:           sdkmath.NewUint(0),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+				PredeterminedBalances:          predeterminedBalances,
+			},
+			// No criteria - this will always succeed
+		},
+		{
+			FromListId:        "Mint",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "retry-test-4-max-2-allowed",
+			Version:           sdkmath.NewUint(0),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+				PredeterminedBalances:          predeterminedBalances,
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(2),
+				},
+			},
+			// No criteria - this will always succeed
+		},
+	}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// Test 1: Multiple attempts with minimum successful attempts
+	// This should succeed because we have 3 attempts and need 2 successful, and the 3rd approval always succeeds
+	prioritizedApprovals := []*types.ApprovalIdentifierDetails{
+		// {
+		// 	ApprovalId:            "retry-test-1",
+		// 	ApprovalLevel:         "collection",
+		// 	ApproverAddress:       "",
+		// 	Version:               sdkmath.NewUint(0),
+		// 	NumAttempts:           sdkmath.NewUint(3),
+		// 	MinSuccessfulAttempts: sdkmath.NewUint(2),
+		// },
+		// {
+		// 	ApprovalId:            "retry-test-2",
+		// 	ApprovalLevel:         "collection",
+		// 	ApproverAddress:       "",
+		// 	Version:               sdkmath.NewUint(0),
+		// 	NumAttempts:           sdkmath.NewUint(3),
+		// 	MinSuccessfulAttempts: sdkmath.NewUint(2),
+		// },
+		{
+			ApprovalId:      "retry-test-3",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	// This should succeed because the 3rd approval (retry-test-3) will always succeed
+	// and we need 2 successful attempts, so we'll get 2 successful attempts from retry-test-3
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite, suite.ctx, []*types.Balance{}, collection,
+		GetFullUintRanges(), GetFullUintRanges(),
+		"Mint", alice, bob, // from, to, initiatedBy (different addresses to trigger failures)
+		sdkmath.NewUint(1), []*types.MerkleProof{},
+		prioritizedApprovals, false, false, false, &types.PrecalculationOptions{},
+		&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(2),
+	)
+	suite.Require().Nil(err, "Should succeed with retry logic")
+
+	// Test 2: Try-only mode (minSuccessfulAttempts = 0)
+	// prioritizedApprovalsTryOnly := []*types.ApprovalIdentifierDetails{
+	// 	{
+	// 		ApprovalId:      "retry-test-1",
+	// 		ApprovalLevel:   "collection",
+	// 		ApproverAddress: "",
+	// 		Version:         sdkmath.NewUint(0),
+	// 	},
+	// }
+
+	// // This should succeed even though all attempts fail, because minSuccessfulAttempts = 0
+	// _, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+	// 	suite, suite.ctx, []*types.Balance{}, collection,
+	// 	GetFullUintRanges(), GetFullUintRanges(),
+	// 	"Mint", alice, alice, // from, to, initiatedBy (different addresses to trigger failures)
+	// 	sdkmath.NewUint(1), []*types.MerkleProof{},
+	// 	prioritizedApprovalsTryOnly, false, false, false, &types.PrecalculationOptions{},
+	// 	&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(2), sdkmath.NewUint(0),
+	// )
+	// suite.Require().Nil(err, "Should succeed in try-only mode")
+
+	// Test 3: Insufficient successful attempts
+	prioritizedApprovalsInsufficient := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalId:      "retry-test-4-max-2-allowed",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
+				OnlyCheckPrioritizedCollectionApprovals: true,
+				NumAttempts:                             sdkmath.NewUint(2),
+				PrecalculationOptions:                   &types.PrecalculationOptions{},
+			},
+		},
+		alice,
+	)
+
+	suite.Require().Nil(err, "Should succeed with sufficient attempts")
+
+	// This should fail because we need 3 successful attempts but only have 2 attempts
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						BadgeIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
+				OnlyCheckPrioritizedCollectionApprovals: true,
+				NumAttempts:                             sdkmath.NewUint(3),
+				PrecalculationOptions:                   &types.PrecalculationOptions{},
+			},
+		},
+		alice,
+	)
+	suite.Require().Error(err, "Should fail with insufficient attempts")
+
+	// Test 4: All attempts fail and minSuccessfulAttempts > 0
+	prioritizedApprovalsAllFail := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalId:      "retry-test-1",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	// This should fail because all attempts will fail (from != initiatedBy)
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite, suite.ctx, []*types.Balance{}, collection,
+		GetFullUintRanges(), GetFullUintRanges(),
+		"Mint", alice, charlie, // from, to, initiatedBy (different addresses to trigger failures)
+		sdkmath.NewUint(1), []*types.MerkleProof{},
+		prioritizedApprovalsAllFail, false, false, false, &types.PrecalculationOptions{},
+		&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(11),
+	)
+	suite.Require().Error(err, "Should fail when all attempts fail")
+}
+
+// TestPrioritizedApprovalRetryLogicEdgeCases tests edge cases for the retry logic
+func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetCollectionsToCreate()
+
+	// Set up a simple approval that always succeeds
+	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+		{
+			FromListId:        "All",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			BadgeIds:          GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "edge-case-test",
+			Version:           sdkmath.NewUint(0),
+			// No criteria - always succeeds
+		},
+	}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating badges")
+
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// Test 1: Zero attempts (should default to 1)
+	prioritizedApprovalsZeroAttempts := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalId:      "edge-case-test",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite, suite.ctx, []*types.Balance{}, collection,
+		GetFullUintRanges(), GetFullUintRanges(),
+		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
+		prioritizedApprovalsZeroAttempts, false, false, false, &types.PrecalculationOptions{},
+		&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(0),
+	)
+	suite.Require().Nil(err, "Should succeed with zero attempts (defaults to 1)")
+
+	// Test 2: Nil minSuccessfulAttempts (should default to 1)
+	prioritizedApprovalsNilMinSuccess := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalId:      "edge-case-test",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite, suite.ctx, []*types.Balance{}, collection,
+		GetFullUintRanges(), GetFullUintRanges(),
+		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
+		prioritizedApprovalsNilMinSuccess, false, false, false, nil,
+		&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1),
+	)
+	suite.Require().Nil(err, "Should succeed with nil minSuccessfulAttempts (defaults to 1)")
+
+	// Test 3: Single attempt with minSuccessfulAttempts = 1
+	prioritizedApprovalsSingleAttempt := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalId:      "edge-case-test",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite, suite.ctx, []*types.Balance{}, collection,
+		GetFullUintRanges(), GetFullUintRanges(),
+		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
+		prioritizedApprovalsSingleAttempt, false, false, false, nil,
+		&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(1),
+	)
+	suite.Require().Nil(err, "Should succeed with single attempt")
+
+	// Test 4: Large number of attempts
+	prioritizedApprovalsLargeAttempts := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalId:      "edge-case-test",
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			Version:         sdkmath.NewUint(0),
+		},
+	}
+
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(
+		suite, suite.ctx, []*types.Balance{}, collection,
+		GetFullUintRanges(), GetFullUintRanges(),
+		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
+		prioritizedApprovalsLargeAttempts, false, false, false, nil,
+		&[]keeper.ApprovalsUsed{}, &[]keeper.CoinTransfers{}, sdkmath.NewUint(100),
+	)
+	suite.Require().Nil(err, "Should succeed with large number of attempts")
 }

@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v6;  
+package badges.v7;
 
 import "gogoproto/gogo.proto";
-import "badges/v6/params.proto";
-import "badges/v6/collections.proto";
-import "badges/v6/balances.proto";
-import "badges/v6/transfers.proto";
-import "badges/v6/address_lists.proto";
+import "badges/v7/params.proto";
+import "badges/v7/collections.proto";
+import "badges/v7/balances.proto";
+import "badges/v7/transfers.proto";
+import "badges/v7/address_lists.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v6";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v7";
 
 // GenesisState defines the badges module's genesis state.
 message GenesisState {

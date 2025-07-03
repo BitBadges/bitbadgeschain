@@ -2270,12 +2270,65 @@ func (x *_CosmosCoinWrapperPath_4_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_CosmosCoinWrapperPath_6_list)(nil)
+
+type _CosmosCoinWrapperPath_6_list struct {
+	list *[]*DenomUnit
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*DenomUnit)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*DenomUnit)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) AppendMutable() protoreflect.Value {
+	v := new(DenomUnit)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) NewElement() protoreflect.Value {
+	v := new(DenomUnit)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_CosmosCoinWrapperPath_6_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_CosmosCoinWrapperPath                protoreflect.MessageDescriptor
 	fd_CosmosCoinWrapperPath_address        protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_denom          protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_ownershipTimes protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_badgeIds       protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_symbol         protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_denomUnits     protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -2285,6 +2338,8 @@ func init() {
 	fd_CosmosCoinWrapperPath_denom = md_CosmosCoinWrapperPath.Fields().ByName("denom")
 	fd_CosmosCoinWrapperPath_ownershipTimes = md_CosmosCoinWrapperPath.Fields().ByName("ownershipTimes")
 	fd_CosmosCoinWrapperPath_badgeIds = md_CosmosCoinWrapperPath.Fields().ByName("badgeIds")
+	fd_CosmosCoinWrapperPath_symbol = md_CosmosCoinWrapperPath.Fields().ByName("symbol")
+	fd_CosmosCoinWrapperPath_denomUnits = md_CosmosCoinWrapperPath.Fields().ByName("denomUnits")
 }
 
 var _ protoreflect.Message = (*fastReflection_CosmosCoinWrapperPath)(nil)
@@ -2376,6 +2431,18 @@ func (x *fastReflection_CosmosCoinWrapperPath) Range(f func(protoreflect.FieldDe
 			return
 		}
 	}
+	if x.Symbol != "" {
+		value := protoreflect.ValueOfString(x.Symbol)
+		if !f(fd_CosmosCoinWrapperPath_symbol, value) {
+			return
+		}
+	}
+	if len(x.DenomUnits) != 0 {
+		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_6_list{list: &x.DenomUnits})
+		if !f(fd_CosmosCoinWrapperPath_denomUnits, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -2399,6 +2466,10 @@ func (x *fastReflection_CosmosCoinWrapperPath) Has(fd protoreflect.FieldDescript
 		return len(x.OwnershipTimes) != 0
 	case "badges.CosmosCoinWrapperPath.badgeIds":
 		return len(x.BadgeIds) != 0
+	case "badges.CosmosCoinWrapperPath.symbol":
+		return x.Symbol != ""
+	case "badges.CosmosCoinWrapperPath.denomUnits":
+		return len(x.DenomUnits) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2423,6 +2494,10 @@ func (x *fastReflection_CosmosCoinWrapperPath) Clear(fd protoreflect.FieldDescri
 		x.OwnershipTimes = nil
 	case "badges.CosmosCoinWrapperPath.badgeIds":
 		x.BadgeIds = nil
+	case "badges.CosmosCoinWrapperPath.symbol":
+		x.Symbol = ""
+	case "badges.CosmosCoinWrapperPath.denomUnits":
+		x.DenomUnits = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2457,6 +2532,15 @@ func (x *fastReflection_CosmosCoinWrapperPath) Get(descriptor protoreflect.Field
 		}
 		listValue := &_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds}
 		return protoreflect.ValueOfList(listValue)
+	case "badges.CosmosCoinWrapperPath.symbol":
+		value := x.Symbol
+		return protoreflect.ValueOfString(value)
+	case "badges.CosmosCoinWrapperPath.denomUnits":
+		if len(x.DenomUnits) == 0 {
+			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_6_list{})
+		}
+		listValue := &_CosmosCoinWrapperPath_6_list{list: &x.DenomUnits}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2489,6 +2573,12 @@ func (x *fastReflection_CosmosCoinWrapperPath) Set(fd protoreflect.FieldDescript
 		lv := value.List()
 		clv := lv.(*_CosmosCoinWrapperPath_4_list)
 		x.BadgeIds = *clv.list
+	case "badges.CosmosCoinWrapperPath.symbol":
+		x.Symbol = value.Interface().(string)
+	case "badges.CosmosCoinWrapperPath.denomUnits":
+		lv := value.List()
+		clv := lv.(*_CosmosCoinWrapperPath_6_list)
+		x.DenomUnits = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2521,10 +2611,18 @@ func (x *fastReflection_CosmosCoinWrapperPath) Mutable(fd protoreflect.FieldDesc
 		}
 		value := &_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds}
 		return protoreflect.ValueOfList(value)
+	case "badges.CosmosCoinWrapperPath.denomUnits":
+		if x.DenomUnits == nil {
+			x.DenomUnits = []*DenomUnit{}
+		}
+		value := &_CosmosCoinWrapperPath_6_list{list: &x.DenomUnits}
+		return protoreflect.ValueOfList(value)
 	case "badges.CosmosCoinWrapperPath.address":
 		panic(fmt.Errorf("field address of message badges.CosmosCoinWrapperPath is not mutable"))
 	case "badges.CosmosCoinWrapperPath.denom":
 		panic(fmt.Errorf("field denom of message badges.CosmosCoinWrapperPath is not mutable"))
+	case "badges.CosmosCoinWrapperPath.symbol":
+		panic(fmt.Errorf("field symbol of message badges.CosmosCoinWrapperPath is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2548,6 +2646,11 @@ func (x *fastReflection_CosmosCoinWrapperPath) NewField(fd protoreflect.FieldDes
 	case "badges.CosmosCoinWrapperPath.badgeIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &list})
+	case "badges.CosmosCoinWrapperPath.symbol":
+		return protoreflect.ValueOfString("")
+	case "badges.CosmosCoinWrapperPath.denomUnits":
+		list := []*DenomUnit{}
+		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_6_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2637,6 +2740,16 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		l = len(x.Symbol)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if len(x.DenomUnits) > 0 {
+			for _, e := range x.DenomUnits {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -2665,6 +2778,29 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.DenomUnits) > 0 {
+			for iNdEx := len(x.DenomUnits) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.DenomUnits[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x32
+			}
+		}
+		if len(x.Symbol) > 0 {
+			i -= len(x.Symbol)
+			copy(dAtA[i:], x.Symbol)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Symbol)))
+			i--
+			dAtA[i] = 0x2a
 		}
 		if len(x.BadgeIds) > 0 {
 			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
@@ -2893,6 +3029,610 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Symbol", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Symbol = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 6:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DenomUnits", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.DenomUnits = append(x.DenomUnits, &DenomUnit{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DenomUnits[len(x.DenomUnits)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_DenomUnit                  protoreflect.MessageDescriptor
+	fd_DenomUnit_decimals         protoreflect.FieldDescriptor
+	fd_DenomUnit_symbol           protoreflect.FieldDescriptor
+	fd_DenomUnit_isDefaultDisplay protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_badges_collections_proto_init()
+	md_DenomUnit = File_badges_collections_proto.Messages().ByName("DenomUnit")
+	fd_DenomUnit_decimals = md_DenomUnit.Fields().ByName("decimals")
+	fd_DenomUnit_symbol = md_DenomUnit.Fields().ByName("symbol")
+	fd_DenomUnit_isDefaultDisplay = md_DenomUnit.Fields().ByName("isDefaultDisplay")
+}
+
+var _ protoreflect.Message = (*fastReflection_DenomUnit)(nil)
+
+type fastReflection_DenomUnit DenomUnit
+
+func (x *DenomUnit) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_DenomUnit)(x)
+}
+
+func (x *DenomUnit) slowProtoReflect() protoreflect.Message {
+	mi := &file_badges_collections_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_DenomUnit_messageType fastReflection_DenomUnit_messageType
+var _ protoreflect.MessageType = fastReflection_DenomUnit_messageType{}
+
+type fastReflection_DenomUnit_messageType struct{}
+
+func (x fastReflection_DenomUnit_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_DenomUnit)(nil)
+}
+func (x fastReflection_DenomUnit_messageType) New() protoreflect.Message {
+	return new(fastReflection_DenomUnit)
+}
+func (x fastReflection_DenomUnit_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_DenomUnit
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_DenomUnit) Descriptor() protoreflect.MessageDescriptor {
+	return md_DenomUnit
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_DenomUnit) Type() protoreflect.MessageType {
+	return _fastReflection_DenomUnit_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_DenomUnit) New() protoreflect.Message {
+	return new(fastReflection_DenomUnit)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_DenomUnit) Interface() protoreflect.ProtoMessage {
+	return (*DenomUnit)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_DenomUnit) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Decimals != "" {
+		value := protoreflect.ValueOfString(x.Decimals)
+		if !f(fd_DenomUnit_decimals, value) {
+			return
+		}
+	}
+	if x.Symbol != "" {
+		value := protoreflect.ValueOfString(x.Symbol)
+		if !f(fd_DenomUnit_symbol, value) {
+			return
+		}
+	}
+	if x.IsDefaultDisplay != false {
+		value := protoreflect.ValueOfBool(x.IsDefaultDisplay)
+		if !f(fd_DenomUnit_isDefaultDisplay, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_DenomUnit) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "badges.DenomUnit.decimals":
+		return x.Decimals != ""
+	case "badges.DenomUnit.symbol":
+		return x.Symbol != ""
+	case "badges.DenomUnit.isDefaultDisplay":
+		return x.IsDefaultDisplay != false
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.DenomUnit"))
+		}
+		panic(fmt.Errorf("message badges.DenomUnit does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_DenomUnit) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "badges.DenomUnit.decimals":
+		x.Decimals = ""
+	case "badges.DenomUnit.symbol":
+		x.Symbol = ""
+	case "badges.DenomUnit.isDefaultDisplay":
+		x.IsDefaultDisplay = false
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.DenomUnit"))
+		}
+		panic(fmt.Errorf("message badges.DenomUnit does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_DenomUnit) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "badges.DenomUnit.decimals":
+		value := x.Decimals
+		return protoreflect.ValueOfString(value)
+	case "badges.DenomUnit.symbol":
+		value := x.Symbol
+		return protoreflect.ValueOfString(value)
+	case "badges.DenomUnit.isDefaultDisplay":
+		value := x.IsDefaultDisplay
+		return protoreflect.ValueOfBool(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.DenomUnit"))
+		}
+		panic(fmt.Errorf("message badges.DenomUnit does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_DenomUnit) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "badges.DenomUnit.decimals":
+		x.Decimals = value.Interface().(string)
+	case "badges.DenomUnit.symbol":
+		x.Symbol = value.Interface().(string)
+	case "badges.DenomUnit.isDefaultDisplay":
+		x.IsDefaultDisplay = value.Bool()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.DenomUnit"))
+		}
+		panic(fmt.Errorf("message badges.DenomUnit does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_DenomUnit) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "badges.DenomUnit.decimals":
+		panic(fmt.Errorf("field decimals of message badges.DenomUnit is not mutable"))
+	case "badges.DenomUnit.symbol":
+		panic(fmt.Errorf("field symbol of message badges.DenomUnit is not mutable"))
+	case "badges.DenomUnit.isDefaultDisplay":
+		panic(fmt.Errorf("field isDefaultDisplay of message badges.DenomUnit is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.DenomUnit"))
+		}
+		panic(fmt.Errorf("message badges.DenomUnit does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_DenomUnit) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "badges.DenomUnit.decimals":
+		return protoreflect.ValueOfString("")
+	case "badges.DenomUnit.symbol":
+		return protoreflect.ValueOfString("")
+	case "badges.DenomUnit.isDefaultDisplay":
+		return protoreflect.ValueOfBool(false)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.DenomUnit"))
+		}
+		panic(fmt.Errorf("message badges.DenomUnit does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_DenomUnit) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in badges.DenomUnit", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_DenomUnit) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_DenomUnit) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_DenomUnit) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_DenomUnit) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*DenomUnit)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Decimals)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Symbol)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.IsDefaultDisplay {
+			n += 2
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*DenomUnit)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.IsDefaultDisplay {
+			i--
+			if x.IsDefaultDisplay {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x18
+		}
+		if len(x.Symbol) > 0 {
+			i -= len(x.Symbol)
+			copy(dAtA[i:], x.Symbol)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Symbol)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Decimals) > 0 {
+			i -= len(x.Decimals)
+			copy(dAtA[i:], x.Decimals)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Decimals)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*DenomUnit)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: DenomUnit: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: DenomUnit: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Decimals", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Decimals = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Symbol", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Symbol = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IsDefaultDisplay", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.IsDefaultDisplay = bool(v != 0)
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -2995,7 +3735,7 @@ type BadgeCollection struct {
 	ValidBadgeIds []*UintRange `protobuf:"bytes,15,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
 	// The generated address of the badge collection. Also used to escrow Mint balances.
 	MintEscrowAddress string `protobuf:"bytes,16,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
-	// The IBC wrapper paths for the collection.
+	// The IBC wrapper (sdk.coin) paths for the collection.
 	CosmosCoinWrapperPaths []*CosmosCoinWrapperPath `protobuf:"bytes,17,rep,name=cosmosCoinWrapperPaths,proto3" json:"cosmosCoinWrapperPaths,omitempty"`
 }
 
@@ -3140,6 +3880,8 @@ type CosmosCoinWrapperPath struct {
 	Denom          string       `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
 	OwnershipTimes []*UintRange `protobuf:"bytes,3,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	BadgeIds       []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	Symbol         string       `protobuf:"bytes,5,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	DenomUnits     []*DenomUnit `protobuf:"bytes,6,rep,name=denomUnits,proto3" json:"denomUnits,omitempty"`
 }
 
 func (x *CosmosCoinWrapperPath) Reset() {
@@ -3188,6 +3930,71 @@ func (x *CosmosCoinWrapperPath) GetBadgeIds() []*UintRange {
 		return x.BadgeIds
 	}
 	return nil
+}
+
+func (x *CosmosCoinWrapperPath) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *CosmosCoinWrapperPath) GetDenomUnits() []*DenomUnit {
+	if x != nil {
+		return x.DenomUnits
+	}
+	return nil
+}
+
+type DenomUnit struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Decimals         string `protobuf:"bytes,1,opt,name=decimals,proto3" json:"decimals,omitempty"`
+	Symbol           string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	IsDefaultDisplay bool   `protobuf:"varint,3,opt,name=isDefaultDisplay,proto3" json:"isDefaultDisplay,omitempty"`
+}
+
+func (x *DenomUnit) Reset() {
+	*x = DenomUnit{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_badges_collections_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DenomUnit) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DenomUnit) ProtoMessage() {}
+
+// Deprecated: Use DenomUnit.ProtoReflect.Descriptor instead.
+func (*DenomUnit) Descriptor() ([]byte, []int) {
+	return file_badges_collections_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DenomUnit) GetDecimals() string {
+	if x != nil {
+		return x.Decimals
+	}
+	return ""
+}
+
+func (x *DenomUnit) GetSymbol() string {
+	if x != nil {
+		return x.Symbol
+	}
+	return ""
+}
+
+func (x *DenomUnit) GetIsDefaultDisplay() bool {
+	if x != nil {
+		return x.IsDefaultDisplay
+	}
+	return false
 }
 
 var File_badges_collections_proto protoreflect.FileDescriptor
@@ -3277,7 +4084,7 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43, 0x6f,
 	0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50,
 	0x61, 0x74, 0x68, 0x52, 0x16, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57,
-	0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x22, 0xb1, 0x01, 0x0a, 0x15,
+	0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x22, 0xfc, 0x01, 0x0a, 0x15,
 	0x43, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65,
 	0x72, 0x50, 0x61, 0x74, 0x68, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12,
@@ -3288,15 +4095,27 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x52, 0x0e, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68, 0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73,
 	0x12, 0x2d, 0x0a, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x18, 0x04, 0x20, 0x03,
 	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74,
-	0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x42,
-	0x71, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x10, 0x43,
-	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69,
-	0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42,
-	0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61,
-	0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50,
-	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x12,
+	0x16, 0x0a, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x12, 0x31, 0x0a, 0x0a, 0x64, 0x65, 0x6e, 0x6f, 0x6d,
+	0x55, 0x6e, 0x69, 0x74, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x2e, 0x44, 0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x52, 0x0a,
+	0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x73, 0x22, 0x79, 0x0a, 0x09, 0x44, 0x65,
+	0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x12, 0x28, 0x0a, 0x08, 0x64, 0x65, 0x63, 0x69, 0x6d,
+	0x61, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda,
+	0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x08, 0x64, 0x65, 0x63, 0x69, 0x6d, 0x61, 0x6c,
+	0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x12, 0x2a, 0x0a, 0x10, 0x69, 0x73, 0x44,
+	0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x44, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x10, 0x69, 0x73, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x44, 0x69,
+	0x73, 0x70, 0x6c, 0x61, 0x79, 0x42, 0x71, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x42, 0x10, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65,
+	0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
+	0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3311,42 +4130,44 @@ func file_badges_collections_proto_rawDescGZIP() []byte {
 	return file_badges_collections_proto_rawDescData
 }
 
-var file_badges_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_badges_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_badges_collections_proto_goTypes = []interface{}{
 	(*BadgeCollection)(nil),                  // 0: badges.BadgeCollection
 	(*CosmosCoinWrapperPath)(nil),            // 1: badges.CosmosCoinWrapperPath
-	(*CollectionMetadataTimeline)(nil),       // 2: badges.CollectionMetadataTimeline
-	(*BadgeMetadataTimeline)(nil),            // 3: badges.BadgeMetadataTimeline
-	(*OffChainBalancesMetadataTimeline)(nil), // 4: badges.OffChainBalancesMetadataTimeline
-	(*CustomDataTimeline)(nil),               // 5: badges.CustomDataTimeline
-	(*ManagerTimeline)(nil),                  // 6: badges.ManagerTimeline
-	(*CollectionPermissions)(nil),            // 7: badges.CollectionPermissions
-	(*CollectionApproval)(nil),               // 8: badges.CollectionApproval
-	(*StandardsTimeline)(nil),                // 9: badges.StandardsTimeline
-	(*IsArchivedTimeline)(nil),               // 10: badges.IsArchivedTimeline
-	(*UserBalanceStore)(nil),                 // 11: badges.UserBalanceStore
-	(*UintRange)(nil),                        // 12: badges.UintRange
+	(*DenomUnit)(nil),                        // 2: badges.DenomUnit
+	(*CollectionMetadataTimeline)(nil),       // 3: badges.CollectionMetadataTimeline
+	(*BadgeMetadataTimeline)(nil),            // 4: badges.BadgeMetadataTimeline
+	(*OffChainBalancesMetadataTimeline)(nil), // 5: badges.OffChainBalancesMetadataTimeline
+	(*CustomDataTimeline)(nil),               // 6: badges.CustomDataTimeline
+	(*ManagerTimeline)(nil),                  // 7: badges.ManagerTimeline
+	(*CollectionPermissions)(nil),            // 8: badges.CollectionPermissions
+	(*CollectionApproval)(nil),               // 9: badges.CollectionApproval
+	(*StandardsTimeline)(nil),                // 10: badges.StandardsTimeline
+	(*IsArchivedTimeline)(nil),               // 11: badges.IsArchivedTimeline
+	(*UserBalanceStore)(nil),                 // 12: badges.UserBalanceStore
+	(*UintRange)(nil),                        // 13: badges.UintRange
 }
 var file_badges_collections_proto_depIdxs = []int32{
-	2,  // 0: badges.BadgeCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
-	3,  // 1: badges.BadgeCollection.badgeMetadataTimeline:type_name -> badges.BadgeMetadataTimeline
-	4,  // 2: badges.BadgeCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
-	5,  // 3: badges.BadgeCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
-	6,  // 4: badges.BadgeCollection.managerTimeline:type_name -> badges.ManagerTimeline
-	7,  // 5: badges.BadgeCollection.collectionPermissions:type_name -> badges.CollectionPermissions
-	8,  // 6: badges.BadgeCollection.collectionApprovals:type_name -> badges.CollectionApproval
-	9,  // 7: badges.BadgeCollection.standardsTimeline:type_name -> badges.StandardsTimeline
-	10, // 8: badges.BadgeCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
-	11, // 9: badges.BadgeCollection.defaultBalances:type_name -> badges.UserBalanceStore
-	12, // 10: badges.BadgeCollection.validBadgeIds:type_name -> badges.UintRange
+	3,  // 0: badges.BadgeCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
+	4,  // 1: badges.BadgeCollection.badgeMetadataTimeline:type_name -> badges.BadgeMetadataTimeline
+	5,  // 2: badges.BadgeCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
+	6,  // 3: badges.BadgeCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
+	7,  // 4: badges.BadgeCollection.managerTimeline:type_name -> badges.ManagerTimeline
+	8,  // 5: badges.BadgeCollection.collectionPermissions:type_name -> badges.CollectionPermissions
+	9,  // 6: badges.BadgeCollection.collectionApprovals:type_name -> badges.CollectionApproval
+	10, // 7: badges.BadgeCollection.standardsTimeline:type_name -> badges.StandardsTimeline
+	11, // 8: badges.BadgeCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
+	12, // 9: badges.BadgeCollection.defaultBalances:type_name -> badges.UserBalanceStore
+	13, // 10: badges.BadgeCollection.validBadgeIds:type_name -> badges.UintRange
 	1,  // 11: badges.BadgeCollection.cosmosCoinWrapperPaths:type_name -> badges.CosmosCoinWrapperPath
-	12, // 12: badges.CosmosCoinWrapperPath.ownershipTimes:type_name -> badges.UintRange
-	12, // 13: badges.CosmosCoinWrapperPath.badgeIds:type_name -> badges.UintRange
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	13, // 12: badges.CosmosCoinWrapperPath.ownershipTimes:type_name -> badges.UintRange
+	13, // 13: badges.CosmosCoinWrapperPath.badgeIds:type_name -> badges.UintRange
+	2,  // 14: badges.CosmosCoinWrapperPath.denomUnits:type_name -> badges.DenomUnit
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_badges_collections_proto_init() }
@@ -3384,6 +4205,18 @@ func file_badges_collections_proto_init() {
 				return nil
 			}
 		}
+		file_badges_collections_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DenomUnit); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -3391,7 +4224,7 @@ func file_badges_collections_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_badges_collections_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

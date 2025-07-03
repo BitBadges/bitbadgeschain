@@ -224,6 +224,8 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				Denom:          path.Denom,
 				OwnershipTimes: path.OwnershipTimes,
 				BadgeIds:       path.BadgeIds,
+				Symbol:         path.Symbol,
+				DenomUnits:     path.DenomUnits,
 			}
 		}
 
@@ -237,6 +239,53 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			return nil, fmt.Errorf("duplicate ibc wrapper path denom: %s", path.Denom)
 		}
 		denomPaths[path.Denom] = true
+	}
+
+	// Ensure no duplicate symbols (including base symbol and denom unit symbols)
+	symbolPaths := make(map[string]bool)
+	for _, path := range collection.CosmosCoinWrapperPaths {
+		// Check the main path symbol
+		if path.Symbol != "" {
+			if _, ok := symbolPaths[path.Symbol]; ok {
+				return nil, fmt.Errorf("duplicate ibc wrapper path symbol: %s", path.Symbol)
+			}
+			symbolPaths[path.Symbol] = true
+		}
+
+		// Check denom unit symbols
+		for _, denomUnit := range path.DenomUnits {
+			if denomUnit.Symbol != "" {
+				if _, ok := symbolPaths[denomUnit.Symbol]; ok {
+					return nil, fmt.Errorf("duplicate denom unit symbol: %s", denomUnit.Symbol)
+				}
+				symbolPaths[denomUnit.Symbol] = true
+			}
+		}
+
+		// Validate that only one denom unit per path has isDefaultDisplay set to true
+		defaultDisplayCount := 0
+		decimalsSet := make(map[string]bool)
+		for _, denomUnit := range path.DenomUnits {
+			if denomUnit.IsDefaultDisplay {
+				defaultDisplayCount++
+			}
+
+			// Check that decimals is not 0
+			if denomUnit.Decimals.IsZero() {
+				return nil, fmt.Errorf("denom unit decimals cannot be 0")
+			}
+
+			// Check for duplicate decimals
+			decimalsStr := denomUnit.Decimals.String()
+			if _, ok := decimalsSet[decimalsStr]; ok {
+				return nil, fmt.Errorf("duplicate denom unit decimals: %s", decimalsStr)
+			}
+			decimalsSet[decimalsStr] = true
+		}
+
+		if defaultDisplayCount > 1 {
+			return nil, fmt.Errorf("only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
+		}
 	}
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {

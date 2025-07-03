@@ -56,12 +56,12 @@ message MsgUpdateParams {
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
 
-
-
 message CosmosCoinWrapperPathAddObject {
   string denom = 1;
   repeated UintRange ownershipTimes = 2;
   repeated UintRange badgeIds = 3;
+  string symbol = 4;
+  repeated DenomUnit denomUnits = 5;
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.

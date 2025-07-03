@@ -10,6 +10,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// formatDenomForDisplay formats a denom for display in error messages
+// Shows "BADGE" for "ubadge" and prints others as-is
+func formatDenomForDisplay(denom string) string {
+	if denom == "ubadge" {
+		return "BADGE"
+	}
+	return denom
+}
+
 func (k Keeper) HandleCoinTransfers(
 	ctx sdk.Context,
 	coinTransfers []*types.CoinTransfer,
@@ -84,7 +93,7 @@ func (k Keeper) HandleCoinTransfers(
 			for _, coin := range toTransfer {
 				newCoins, underflow := spendableCoinsMap[fromAddress].SafeSub(*coin)
 				if underflow {
-					return sdkerrors.Wrapf(types.ErrUnderflow, "insufficient $BADGE balance to complete transfer")
+					return sdkerrors.Wrapf(types.ErrUnderflow, "insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
 				}
 				spendableCoinsMap[fromAddress] = newCoins
 			}
