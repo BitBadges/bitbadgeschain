@@ -43,6 +43,10 @@ import (
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
+
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -55,6 +59,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		storetypes.NewKVStoreKey(ibcfeetypes.StoreKey),
 		storetypes.NewKVStoreKey(icahosttypes.StoreKey),
 		storetypes.NewKVStoreKey(icacontrollertypes.StoreKey),
+		storetypes.NewKVStoreKey(packetforwardtypes.StoreKey),
 		storetypes.NewMemoryStoreKey(capabilitytypes.MemStoreKey),
 		storetypes.NewTransientStoreKey(paramstypes.TStoreKey),
 	); err != nil {
@@ -99,6 +104,17 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// See: https://docs.cosmos.network/main/modules/gov#proposal-messages
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler)
+
+	//Build custom non-depinject modules
+	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
+		app.appCodec,
+		app.GetKey(packetforwardtypes.StoreKey),
+		app.TransferKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		app.BankKeeper,
+		app.IBCFeeKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
 
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		app.appCodec, app.GetKey(ibcfeetypes.StoreKey),
@@ -151,9 +167,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Create IBC modules with ibcfee middleware
 	transferIBCModule := ibcfee.NewIBCMiddleware(ibctransfer.NewIBCModule(app.TransferKeeper), app.IBCFeeKeeper)
-
-	//TODO: There was some wasmd IBC code that we did not fully copy here (e.g. middlewares, etc)
-
 	// integration point for custom authentication modules
 	var noAuthzModule porttypes.IBCModule
 	icaControllerIBCModule := ibcfee.NewIBCMiddleware(
@@ -188,6 +201,12 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	var transferStack porttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
+	transferStack = packetforward.NewIBCMiddleware(
+		transferStack,
+		app.PacketForwardKeeper,
+		0, // retries on timeout
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
+	)
 
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
 	// channel.RecvPacket -> fee.OnRecvPacket -> icaHost.OnRecvPacket
@@ -211,6 +230,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		capability.NewAppModule(app.appCodec, *app.CapabilityKeeper, false),
 		ibctm.NewAppModule(),
 		solomachine.NewAppModule(),
+		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 	); err != nil {
 		return err
 	}
@@ -223,13 +243,14 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 // This needs to be removed after IBC supports App Wiring.
 func RegisterIBC(registry cdctypes.InterfaceRegistry) map[string]appmodule.AppModule {
 	modules := map[string]appmodule.AppModule{
-		ibcexported.ModuleName:      ibc.AppModule{},
-		ibctransfertypes.ModuleName: ibctransfer.AppModule{},
-		ibcfeetypes.ModuleName:      ibcfee.AppModule{},
-		icatypes.ModuleName:         icamodule.AppModule{},
-		capabilitytypes.ModuleName:  capability.AppModule{},
-		ibctm.ModuleName:            ibctm.AppModule{},
-		solomachine.ModuleName:      solomachine.AppModule{},
+		ibcexported.ModuleName:        ibc.AppModule{},
+		ibctransfertypes.ModuleName:   ibctransfer.AppModule{},
+		ibcfeetypes.ModuleName:        ibcfee.AppModule{},
+		icatypes.ModuleName:           icamodule.AppModule{},
+		capabilitytypes.ModuleName:    capability.AppModule{},
+		ibctm.ModuleName:              ibctm.AppModule{},
+		solomachine.ModuleName:        solomachine.AppModule{},
+		packetforwardtypes.ModuleName: packetforward.AppModule{},
 	}
 
 	for name, m := range modules {

@@ -63,6 +63,10 @@ import (
 	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
+	// import for side-effects
+
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
@@ -103,6 +107,7 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -130,6 +135,7 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -151,6 +157,7 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		packetforwardtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -171,6 +178,7 @@ var (
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: ibcfeetypes.ModuleName},
 		{Account: icatypes.ModuleName},
+		{Account: packetforwardtypes.ModuleName},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -311,7 +319,7 @@ var (
 					ApprovedContractAddresses: []string{},
 					PayoutAddress:             "bb18el5ug46umcws58m445ql5scgg2n3tzagfecvl",
 					EnableCoinTransfers:       true,
-					AllowedDenoms:             []string{"ubadge"},
+					AllowedDenoms:             []string{"ubadge", "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349"},
 					FixedCostPerTransfer:      "100000000ubadge",
 				}),
 			},

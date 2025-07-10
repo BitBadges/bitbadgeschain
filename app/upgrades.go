@@ -3,14 +3,15 @@ package app
 import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	v8 "github.com/bitbadges/bitbadgeschain/app/upgrades/v8"
+	v9 "github.com/bitbadges/bitbadgeschain/app/upgrades/v9"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v8.UpgradeName,
-		v8.CreateUpgradeHandler(
+		v9.UpgradeName,
+		v9.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
 			app.BadgesKeeper,
@@ -37,9 +38,13 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v8.UpgradeName:
+	case v9.UpgradeName:
 		// Add any store upgrades here
-		storeUpgrades = &storetypes.StoreUpgrades{}
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{
+				packetforwardtypes.StoreKey,
+			},
+		}
 	}
 
 	if storeUpgrades != nil {

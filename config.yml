@@ -32,6 +32,7 @@ accounts:
       coins:
           - 99999999999999996ubadge
           - 1000000000000000ustake
+          - 100000000ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349
 client:
     typescript:
         path: ts-client
