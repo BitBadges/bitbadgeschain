@@ -149,7 +149,7 @@ func ValidateNoMissingPermissions(missingPermissions []*UniversalPermissionDetai
 		)
 	}
 
-	return sdkerrors.Wrapf(ErrInvalidPermissions, errMsg)
+	return sdkerrors.Wrap(ErrInvalidPermissions, errMsg)
 }
 
 // ValidateOverlappingPermissions checks that overlapping permissions maintain consistent rules
@@ -204,7 +204,7 @@ func buildPermissionTimeError(perm *UniversalPermissionDetails, permittedChanges
 		))
 	}
 
-	return sdkerrors.Wrapf(ErrInvalidPermissions, strings.Join(errParts, " "))
+	return sdkerrors.Wrap(ErrInvalidPermissions, strings.Join(errParts, " "))
 }
 
 // formatTimeRangeChanges creates a formatted string describing time range changes
