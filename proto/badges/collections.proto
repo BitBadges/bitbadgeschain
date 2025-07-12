@@ -85,10 +85,9 @@ message BadgeCollection {
 message CosmosCoinWrapperPath {
   string address = 1;
   string denom = 2;
-  repeated UintRange ownershipTimes = 3;
-  repeated UintRange badgeIds = 4;
-  string symbol = 5;
-  repeated DenomUnit denomUnits = 6;
+  repeated Balance balances = 3;
+  string symbol = 4;
+  repeated DenomUnit denomUnits = 5;
 }
 
 message DenomUnit {

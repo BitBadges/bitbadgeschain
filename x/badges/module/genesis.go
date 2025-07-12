@@ -17,6 +17,24 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
 
+	// Set params
+	if err := k.SetParams(ctx, genState.Params); err != nil {
+		panic(err)
+	}
+
+	// Set port ID for IBC
+	k.SetPort(ctx, genState.PortId)
+	// Only try to bind to port if it is not already bound, since we may already own
+	// port capability from capability InitGenesis
+	if k.ShouldBound(ctx, genState.PortId) {
+		// module binds to the port on InitChain
+		// and claims the returned capability
+		err := k.BindPort(ctx, genState.PortId)
+		if err != nil {
+			panic("could not claim port capability: " + err.Error())
+		}
+	}
+
 	for _, badge := range genState.Collections {
 		if err := k.SetCollectionInStore(ctx, badge); err != nil {
 			panic(err)
@@ -58,6 +76,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	genesis.NextCollectionId = k.GetNextCollectionId(ctx)
+	genesis.PortId = k.GetPort(ctx)
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	addresses := []string{}

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 
 	_ "cosmossdk.io/api/cosmos/tx/config/v1" // import for side-effects
@@ -18,6 +19,7 @@ import (
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -84,6 +86,10 @@ import (
 
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+
+	wasm "github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -153,6 +159,8 @@ type App struct {
 	AnchorKeeper anchormodulekeeper.Keeper
 	BadgesKeeper badgesmodulekeeper.Keeper
 	MapsKeeper   mapsmodulekeeper.Keeper
+	WasmKeeper   wasmkeeper.Keeper
+	WasmxKeeper  wasmxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -282,7 +290,13 @@ func New(
 	app.BaseApp.SetCircuitBreaker(&app.CircuitBreakerKeeper)
 
 	// register legacy modules
+
 	if err := app.registerIBCModules(appOpts); err != nil {
+		return nil, err
+	}
+
+	storeService, err := app.registerWasmModules(appOpts)
+	if err != nil {
 		return nil, err
 	}
 
@@ -301,14 +315,22 @@ func New(
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders() // use custom AnteHandler
 
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
 	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		SignModeHandler: app.txConfig.SignModeHandler(),
-		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
-		CircuitKeeper:   &app.CircuitBreakerKeeper,
+		AccountKeeper:         app.AccountKeeper,
+		BankKeeper:            app.BankKeeper,
+		FeegrantKeeper:        app.FeeGrantKeeper,
+		IBCKeeper:             app.IBCKeeper,
+		SignModeHandler:       app.txConfig.SignModeHandler(),
+		SigGasConsumer:        ante.DefaultSigVerificationGasConsumer,
+		CircuitKeeper:         &app.CircuitBreakerKeeper,
+		WasmConfig:            &wasmConfig,
+		WasmKeeper:            &app.WasmKeeper,
+		TXCounterStoreService: storeService,
 	}
 
 	if err := options.Validate(); err != nil {
@@ -334,6 +356,25 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		return nil, err
+	}
+
+	// must be before Loading version
+	// requires the snapshot store to be created and registered as a BaseAppOption
+	if manager := app.SnapshotManager(); manager != nil {
+		err := manager.RegisterExtensions(
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
+		}
+	}
+
+	if loadLatest {
+		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
+		// Initialize pinned codes in wasmvm as they are not persisted there
+		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
+			panic(fmt.Sprintf("failed initialize pinned codes %s", err))
+		}
 	}
 
 	return app, nil

@@ -16,6 +16,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -38,6 +41,7 @@ var (
 	_ appmodule.AppModule       = (*AppModule)(nil)
 	_ appmodule.HasBeginBlocker = (*AppModule)(nil)
 	_ appmodule.HasEndBlocker   = (*AppModule)(nil)
+	_ porttypes.IBCModule       = (*IBCModule)(nil)
 )
 
 // ----------------------------------------------------------------------------
@@ -127,7 +131,7 @@ func NewAppModule(
 	}
 }
 
-const ConsensusVersion = 9
+const ConsensusVersion = 10
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
@@ -203,6 +207,9 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+
+	IBCKeeperFn        func() *ibckeeper.Keeper                   `optional:"true"`
+	CapabilityScopedFn func(string) capabilitykeeper.ScopedKeeper `optional:"true"`
 }
 
 type ModuleOutputs struct {
@@ -226,10 +233,9 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		authority.String(),
 		in.BankKeeper,
 		in.AccountKeeper,
-		in.Config.ApprovedContractAddresses,
+		in.IBCKeeperFn,
+		in.CapabilityScopedFn,
 		in.Config.PayoutAddress,
-		in.Config.EnableCoinTransfers,
-		in.Config.AllowedDenoms,
 		in.Config.FixedCostPerTransfer,
 	)
 	m := NewAppModule(

@@ -13,9 +13,14 @@ func (suite *TestSuite) TestWrapBadges() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom:          "1234",
-			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds:       GetOneUintRange(),
+			Denom: "1234",
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:       GetOneUintRange(),
+				},
+			},
 		},
 	}
 
@@ -127,9 +132,14 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom:          "1234",
-			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds:       GetOneUintRange(),
+			Denom: "1234",
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:       GetOneUintRange(),
+				},
+			},
 		},
 	}
 
@@ -226,9 +236,14 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom:          "1234",
-			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds:       GetOneUintRange(),
+			Denom: "1234",
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+					BadgeIds:       GetOneUintRange(),
+				},
+			},
 		},
 	}
 

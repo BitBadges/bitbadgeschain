@@ -47,13 +47,10 @@ func (k Keeper) HandleCoinTransfers(
 		}
 	}
 
-	if !k.EnableCoinTransfers {
-		return sdkerrors.Wrap(ErrCoinTransfersDisabled, "coin transfers are disabled")
-	}
-
-	if len(k.AllowedDenoms) > 0 {
+	allowedDenoms := k.GetAllowedDenoms(ctx)
+	if len(allowedDenoms) > 0 {
 		for _, coinTransfer := range coinTransfers {
-			if !slices.Contains(k.AllowedDenoms, coinTransfer.Coins[0].Denom) {
+			if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
 				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
 			}
 		}

@@ -399,40 +399,53 @@ func (k Keeper) HandleTransfer(
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
 		}
 
-		if len(transferBalances) != 1 {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "multiple balances not supported for special addresses")
-		}
+		conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
 
-		denomBadgeIds := denomInfo.BadgeIds
-		denomOwnershipTimes := denomInfo.OwnershipTimes
-		balanceBadgeIds := transferBalances[0].BadgeIds
-		balanceOwnershipTimes := transferBalances[0].OwnershipTimes
+		// Little hacky but we find the amount for a specific time and ID
+		// Then we will check if it is evenly divisible by the number of transfer balances
 
-		if len(denomBadgeIds) != len(balanceBadgeIds) {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "badge ids do not match for %s", denomInfo.Address)
-		}
+		firstBadgeId := transferBalances[0].BadgeIds[0].Start
+		firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
+		firstAmount := transferBalances[0].Amount
 
-		for i, badgeId := range denomBadgeIds {
-			if !badgeId.Start.Equal(balanceBadgeIds[i].Start) || !badgeId.End.Equal(balanceBadgeIds[i].End) {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "badge ids do not match for %s", denomInfo.Address)
+		multiplier := sdkmath.NewUint(0)
+		for _, balance := range conversionBalances {
+			foundBadgeId, err := types.SearchUintRangesForUint(firstBadgeId, balance.BadgeIds)
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+			foundOwnershipTime, err := types.SearchUintRangesForUint(firstOwnershipTime, balance.OwnershipTimes)
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
+			if foundBadgeId && foundOwnershipTime {
+				multiplier = firstAmount.Quo(balance.Amount)
+				break
 			}
 		}
 
-		if len(denomOwnershipTimes) != len(balanceOwnershipTimes) {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "ownership times count mismatch for %s", denomInfo.Address)
+		if multiplier.IsZero() {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
 		}
 
-		for i, ownershipTime := range denomOwnershipTimes {
-			if !ownershipTime.Start.Equal(balanceOwnershipTimes[i].Start) || !ownershipTime.End.Equal(balanceOwnershipTimes[i].End) {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "ownership times do not match for %s", denomInfo.Address)
-			}
+		conversionBalancesMultiplied := types.DeepCopyBalances(conversionBalances)
+		for _, balance := range conversionBalancesMultiplied {
+			balance.Amount = balance.Amount.Mul(multiplier)
 		}
 
-		balance := transferBalances[0]
+		transferBalancesCopy := types.DeepCopyBalances(transferBalances)
+		remainingBalances, err := types.SubtractBalances(ctx, transferBalancesCopy, conversionBalancesMultiplied)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "conversion is not evenly divisible")
+		}
+
+		if len(remainingBalances) > 0 {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
+		}
+
 		ibcDenom := "badges:" + collection.CollectionId.String() + ":" + denomInfo.Denom
 		bankKeeper := k.bankKeeper
-		amount := balance.Amount
-		amountInt := amount.BigInt()
+		amountInt := multiplier.BigInt()
 		if isSendingToSpecialAddress {
 			userAddressAcc := sdk.MustAccAddressFromBech32(from)
 

@@ -49,10 +49,9 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		bankKeeper,
 		ak,
-		[]string{},
+		nil, // IBCKeeperFn
+		nil, // CapabilityScopedFn
 		"",
-		true,
-		[]string{"ubadge"},
 		"",
 	)
 

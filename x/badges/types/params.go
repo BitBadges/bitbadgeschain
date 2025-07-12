@@ -18,7 +18,9 @@ func NewParams() Params {
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	return NewParams()
+	return Params{
+		AllowedDenoms: []string{"ubadge", "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349"},
+	}
 }
 
 // ParamSetPairs get the params.ParamSet

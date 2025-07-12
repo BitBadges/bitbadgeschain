@@ -12,18 +12,9 @@ message Module {
   // authority defines the custom module authority. If not set, defaults to the governance module.
   string authority = 1;
 
-  // approved_contract_addresses defines the list of contract addresses that are approved to override the creator.
-  repeated string approved_contract_addresses = 2;
-
   // payout_address defines where to send the revenue from the module
-  string payout_address = 3;
-
-  // whether to allow coin_transfers in the approval interface
-  bool enable_coin_transfers = 4;
-
-  // allowed_denoms defines the list of denoms that are allowed to be used in coin_transfers
-  repeated string allowed_denoms = 5;
+  string payout_address = 2;
 
   // fixed_cost_per_transfer defines the fixed cost per transfer
-  string fixed_cost_per_transfer = 6;
+  string fixed_cost_per_transfer = 3;
 }

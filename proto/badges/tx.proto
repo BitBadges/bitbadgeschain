@@ -35,6 +35,17 @@ service Msg {
   rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
 }
 
+//Used for WASM bindings and JSON parsing
+message BadgeCustomMsgType {
+  MsgCreateAddressLists createAddressListsMsg = 1;
+  MsgUniversalUpdateCollection universalUpdateCollectionMsg = 2;
+  MsgDeleteCollection deleteCollectionMsg = 3;
+  MsgTransferBadges transferBadgesMsg = 4;
+  MsgUpdateUserApprovals updateUserApprovalsMsg = 5;
+  MsgUpdateCollection updateCollectionMsg = 6;
+  MsgCreateCollection createCollectionMsg = 7;
+}
+
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
   option (cosmos.msg.v1.signer) = "authority";
@@ -58,10 +69,9 @@ message MsgUpdateParamsResponse {}
 
 message CosmosCoinWrapperPathAddObject {
   string denom = 1;
-  repeated UintRange ownershipTimes = 2;
-  repeated UintRange badgeIds = 3;
-  string symbol = 4;
-  repeated DenomUnit denomUnits = 5;
+  repeated Balance balances = 2;
+  string symbol = 3;
+  repeated DenomUnit denomUnits = 4;
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.

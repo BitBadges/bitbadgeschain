@@ -18,6 +18,11 @@ import (
 
 	circuitante "cosmossdk.io/x/circuit/ante"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
+
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
+	corestoretypes "cosmossdk.io/core/store"
 )
 
 //TODO: We can play around with some more native ones
@@ -28,14 +33,17 @@ import (
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
 // channel keeper, EVM Keeper and Fee Market Keeper.
 type HandlerOptions struct {
-	AccountKeeper   ante.AccountKeeper
-	BankKeeper      authtypes.BankKeeper
-	IBCKeeper       *ibckeeper.Keeper
-	FeegrantKeeper  ante.FeegrantKeeper
-	SignModeHandler *txsigning.HandlerMap
-	SigGasConsumer  func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
-	TxFeeChecker    ante.TxFeeChecker
-	CircuitKeeper   *circuitkeeper.Keeper
+	AccountKeeper         ante.AccountKeeper
+	BankKeeper            authtypes.BankKeeper
+	IBCKeeper             *ibckeeper.Keeper
+	FeegrantKeeper        ante.FeegrantKeeper
+	SignModeHandler       *txsigning.HandlerMap
+	SigGasConsumer        func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
+	TxFeeChecker          ante.TxFeeChecker
+	CircuitKeeper         *circuitkeeper.Keeper
+	WasmConfig            *wasmTypes.WasmConfig
+	WasmKeeper            *wasmkeeper.Keeper
+	TXCounterStoreService corestoretypes.KVStoreService
 }
 
 func (options HandlerOptions) Validate() error {
@@ -51,6 +59,12 @@ func (options HandlerOptions) Validate() error {
 	if options.CircuitKeeper == nil {
 		return sdkerrors.Wrap(types.ErrLogic, "circuit keeper is required for ante builder")
 	}
+	if options.WasmConfig == nil {
+		return sdkerrors.Wrap(types.ErrLogic, "wasm config is required for ante builder")
+	}
+	if options.TXCounterStoreService == nil {
+		return sdkerrors.Wrap(types.ErrLogic, "wasm store service is required for ante builder")
+	}
 	return nil
 }
 
@@ -61,6 +75,10 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 
 		// ante.NewRejectExtensionOptionsDecorator(),
 		// ante.NewMempoolFeeDecorator(),
+
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
+		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
 
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
@@ -87,6 +105,10 @@ func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHa
 		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 		// NOTE: extensions option decorator removed
 		// ante.NewRejectExtensionOptionsDecorator(),
+
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
+		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
 
 		// ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),

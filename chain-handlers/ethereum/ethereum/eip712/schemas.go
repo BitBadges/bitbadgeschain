@@ -1391,16 +1391,21 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"ownershipTimes": [
+					"balances": [
 						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
+							"amount": "",
+							"ownershipTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							],
+							"badgeIds": [
+								{
+									"start": "",
+									"end": ""
+								}
+							]
 						}
 					],
 					"symbol": "",
@@ -2869,16 +2874,21 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"ownershipTimes": [
+					"balances": [
 						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
+							"amount": "",
+							"ownershipTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							],
+							"badgeIds": [
+								{
+									"start": "",
+									"end": ""
+								}
+							]
 						}
 					],
 					"symbol": "",
@@ -3427,16 +3437,21 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"ownershipTimes": [
+					"balances": [
 						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
+							"amount": "",
+							"ownershipTimes": [
+								{
+									"start": "",
+									"end": ""
+								}
+							],
+							"badgeIds": [
+								{
+									"start": "",
+									"end": ""
+								}
+							]
 						}
 					],
 					"symbol": "",

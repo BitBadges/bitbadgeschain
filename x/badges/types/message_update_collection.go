@@ -262,12 +262,8 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return sdkerrors.Wrapf(ErrInvalidRequest, "denom cannot be empty")
 		}
 
-		err = ValidateRangesAreValid(path.BadgeIds, false, true)
-		if err != nil {
-			return err
-		}
-
-		err = ValidateRangesAreValid(path.OwnershipTimes, false, true)
+		// Validate balances
+		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
 		if err != nil {
 			return err
 		}
