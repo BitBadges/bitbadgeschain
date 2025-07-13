@@ -35,7 +35,32 @@ ignite generate proto-go
 -   Add message types to BadgeCustomMsgType for WASM bindings
 -   Add query methods in the Query service if needed
 
-### 2. Update Badges Custom Message Types
+### 2. Update Genesis Files
+
+**Location**: `proto/badges/` and `x/badges/`
+
+**Files to modify**:
+
+-   `proto/badges/genesis.proto` - Add new fields for state persistence
+-   `x/badges/types/genesis.go` - Update default genesis state
+-   `x/badges/module/genesis.go` - Add initialization and export logic
+
+**Commands**:
+
+```bash
+# Generate Go code from proto definitions
+ignite generate proto-go
+```
+
+**Gotchas**:
+
+-   Add imports for new proto files in genesis.proto
+-   Use appropriate field numbers (continue from existing sequence)
+-   Add default values in types/genesis.go
+-   Handle initialization and export in module/genesis.go
+-   Include proper error handling for store operations
+
+### 3. Update Badges Custom Message Types
 
 **Location**: `x/badges/types/`
 
@@ -49,7 +74,7 @@ ignite generate proto-go
 -   Custom message types must be properly integrated with WASM bindings
 -   All fields must be serializable
 
-### 3. Add to EIP712 Schemas
+### 4. Add to EIP712 Schemas
 
 **Location**: `chain-handlers/ethereum/ethereum/eip712/schemas.go`
 
@@ -61,7 +86,7 @@ ignite generate proto-go
 -   Include all optional fields with empty string defaults
 -   Follow the exact structure of existing schemas
 
-### 4. Update Custom Transaction Handler
+### 5. Update Custom Transaction Handler
 
 **Location**: `custom-bindings/custom_tx.go`
 
@@ -73,7 +98,7 @@ ignite generate proto-go
 -   Handle all message variants in the switch statement
 -   Return proper error types
 
-### 5. Add CLI Commands
+### 6. Add CLI Commands
 
 **Location**: `x/badges/client/cli/`
 
@@ -95,7 +120,7 @@ make install
 -   Handle JSON input properly
 -   Include proper validation
 
-### 6. Add Integration Test Helpers
+### 7. Add Integration Test Helpers
 
 **Location**: `x/badges/keeper/integration_msg_helpers_test.go`
 
@@ -107,7 +132,7 @@ make install
 -   Include proper validation calls
 -   Use consistent naming conventions
 
-### 7. Implement Core Functionality
+### 8. Implement Core Functionality
 
 **Location**: `x/badges/keeper/`
 
@@ -132,7 +157,7 @@ go test ./x/badges/keeper/...
 -   Follow existing patterns for state management
 -   Use proper error types from the types package
 
-### 8. Register in Codec
+### 9. Register in Codec
 
 **Location**: `x/badges/types/codec.go`
 
@@ -144,7 +169,7 @@ go test ./x/badges/keeper/...
 -   Use proper concrete type names
 -   Follow existing naming patterns
 
-### 9. Ensure GetSignBytes Uses AminoCdc
+### 10. Ensure GetSignBytes Uses AminoCdc
 
 **Location**: `x/badges/types/`
 
@@ -164,6 +189,7 @@ go test ./x/badges/keeper/...
 -   [ ] EIP712 signature tests
 -   [ ] Authorization tests
 -   [ ] Edge case handling
+-   [ ] Genesis state tests
 
 ## Common Issues and Solutions
 
@@ -172,6 +198,12 @@ go test ./x/badges/keeper/...
 -   Check field numbers are unique
 -   Ensure all imports are correct
 -   Verify syntax is valid protobuf
+
+### Genesis State Issues
+
+-   Ensure all new fields have proper default values
+-   Check that initialization and export logic is complete
+-   Verify store operations handle errors properly
 
 ### WASM Binding Issues
 
@@ -222,17 +254,17 @@ go fmt ./x/badges/...
 ### ✅ Completed Steps:
 
 1. **Proto Definitions**: Added `dynamic_stores.proto`, updated `tx.proto` and `query.proto`
-2. **EIP712 Schemas**: Added schemas for all three dynamic store message types
-3. **Custom Transaction Handler**: Updated `custom_tx.go` with dynamic store handlers
-4. **CLI Commands**: Created CLI commands for create, update, delete, and query operations
-5. **Integration Test Helpers**: Added helper functions in `integration_msg_helpers_test.go`
-6. **Core Functionality**: Implemented message handlers and store methods
-7. **Codec Registration**: Registered new message types in `codec.go`
+2. **Genesis Files**: Updated `genesis.proto`, `types/genesis.go`, and `module/genesis.go`
+3. **EIP712 Schemas**: Added schemas for all three dynamic store message types
+4. **Custom Transaction Handler**: Updated `custom_tx.go` with dynamic store handlers
+5. **CLI Commands**: Created CLI commands for create, update, delete, and query operations
+6. **Integration Test Helpers**: Added helper functions in `integration_msg_helpers_test.go`
+7. **Core Functionality**: Implemented message handlers and store methods
+8. **Codec Registration**: Registered new message types in `codec.go`
 
 ### 🔄 Remaining Steps:
 
-8. **Write Tests**: Need to create comprehensive unit tests
-9. **Genesis Integration**: May need to add dynamic store support to genesis
+9. **Write Tests**: Need to create comprehensive unit tests
 10. **Documentation**: Update API documentation
 
 ### 📝 Notes:
@@ -244,6 +276,7 @@ go fmt ./x/badges/...
 -   **DynamicStore no longer has data or metadata fields.**
 -   **ValidateBasic errs on the side of caution (checks for empty/invalid fields).**
 -   **Test files for Msg types are present in both `/keeper` and `/types` as `msg_*_test.go`.**
+-   **Genesis state now includes dynamic stores and next dynamic store ID.**
 
 ## Next Steps
 
@@ -254,4 +287,3 @@ After completing all steps:
 3. Update documentation
 4. Consider backward compatibility
 5. Review security implications
- 

@@ -581,6 +581,20 @@ func (k Keeper) GetDynamicStoreValuesFromStore(ctx sdk.Context, storeId sdkmath.
 	return
 }
 
+// GetAllDynamicStoreValuesFromStore defines a method for returning all dynamic store values across all stores.
+func (k Keeper) GetAllDynamicStoreValuesFromStore(ctx sdk.Context) (dynamicStoreValues []*types.DynamicStoreValue) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, DynamicStoreValueKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var dynamicStoreValue types.DynamicStoreValue
+		k.cdc.MustUnmarshal(iterator.Value(), &dynamicStoreValue)
+		dynamicStoreValues = append(dynamicStoreValues, &dynamicStoreValue)
+	}
+	return
+}
+
 // StoreHasDynamicStoreValue determines whether the specified dynamic store value exists in the store
 func (k Keeper) StoreHasDynamicStoreValue(ctx sdk.Context, storeId sdkmath.Uint, address string) bool {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))

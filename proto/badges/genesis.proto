@@ -7,6 +7,7 @@ import "badges/collections.proto";
 import "badges/balances.proto";
 import "badges/transfers.proto";
 import "badges/address_lists.proto";
+import "badges/dynamic_stores.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -26,5 +27,8 @@ message GenesisState {
   repeated string approvalTrackerStoreKeys = 11;
   repeated string approvalTrackerVersions = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated string approvalTrackerVersionsStoreKeys = 13;
+  repeated DynamicStore dynamicStores = 14;
+  string nextDynamicStoreId = 15 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated DynamicStoreValue dynamicStoreValues = 16;
   // this line is used by starport scaffolding # genesis/proto/state
 }

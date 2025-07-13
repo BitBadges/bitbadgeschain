@@ -34,7 +34,6 @@ var (
 	BalanceKeyDelimiter = "-"
 )
 
-// StoreKey is the store key string for nft
 const StoreKey = types.ModuleName
 
 type BalanceKeyDetails struct {

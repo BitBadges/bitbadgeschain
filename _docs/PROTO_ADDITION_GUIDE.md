@@ -341,6 +341,241 @@ func (k Keeper) NewField(goCtx context.Context, req *types.QueryNewFieldRequest)
 }
 ```
 
+### Step 4.5: Handle New Stored Value Types
+
+If your new fields introduce new types that need to be stored persistently (like new collections, balances, or custom data structures), you need to handle genesis state integration.
+
+#### When This Applies
+
+This step is necessary when you add:
+
+-   New collection types
+-   New balance types
+-   New address list types
+-   New approval tracker types
+-   New dynamic store types
+-   Any new data structure that needs to persist across chain restarts
+
+#### Required Updates
+
+##### 1. Update Genesis Proto
+
+Add new fields to `proto/badges/genesis.proto`:
+
+```protobuf
+message GenesisState {
+  // ... existing fields ...
+
+  // New stored value types
+  repeated NewDataType newDataTypes = 14;
+  string nextNewDataTypeId = 15 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated NewDataTypeValue newDataTypeValues = 16;
+
+  // this line is used by starport scaffolding # genesis/proto/state
+}
+```
+
+**Important**:
+
+-   Use the next available field number (continue from existing sequence)
+-   Add imports for new proto files if needed
+-   Use `Uint` custom type for ID fields
+-   Use `repeated` for collections of data
+
+##### 2. Update Genesis Types
+
+Add default values in `x/badges/types/genesis.go`:
+
+```go
+func DefaultGenesis() *GenesisState {
+    return &GenesisState{
+        PortId: PortID,
+        // this line is used by starport scaffolding # genesis/types/default
+        Params:               DefaultParams(),
+        NextCollectionId:     types.NewUint(1),
+        NextNewDataTypeId:    types.NewUint(1),  // Add default for new type
+    }
+}
+```
+
+##### 3. Update Genesis Module
+
+Add initialization and export logic in `x/badges/module/genesis.go`:
+
+```go
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+    // ... existing initialization ...
+
+    // Set next new data type ID if defined; default 0
+    if genState.NextNewDataTypeId.Equal(sdkmath.NewUint(0)) {
+        genState.NextNewDataTypeId = sdkmath.NewUint(1)
+    }
+    k.SetNextNewDataTypeId(ctx, genState.NextNewDataTypeId)
+
+    // Initialize new data types
+    for _, newDataType := range genState.NewDataTypes {
+        if err := k.SetNewDataTypeInStore(ctx, *newDataType); err != nil {
+            panic(err)
+        }
+    }
+
+    // Initialize new data type values
+    for _, newDataTypeValue := range genState.NewDataTypeValues {
+        if err := k.SetNewDataTypeValueInStore(ctx, newDataTypeValue.Id, newDataTypeValue.Address, newDataTypeValue.Value); err != nil {
+            panic(err)
+        }
+    }
+}
+
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+    genesis := types.DefaultGenesis()
+    // ... existing export logic ...
+
+    genesis.NextNewDataTypeId = k.GetNextNewDataTypeId(ctx)
+    genesis.NewDataTypes = k.GetNewDataTypesFromStore(ctx)
+    genesis.NewDataTypeValues = k.GetAllNewDataTypeValuesFromStore(ctx)
+
+    return genesis
+}
+```
+
+##### 4. Add Store Methods
+
+Implement storage methods in `x/badges/keeper/store.go`:
+
+```go
+// Set new data type in store
+func (k Keeper) SetNewDataTypeInStore(ctx sdk.Context, newDataType types.NewDataType) error {
+    marshaled_data, err := k.cdc.Marshal(&newDataType)
+    if err != nil {
+        return sdkerrors.Wrap(err, "Marshal types.NewDataType failed")
+    }
+
+    storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+    store := prefix.NewStore(storeAdapter, []byte{})
+    store.Set(newDataTypeStoreKey(newDataType.Id), marshaled_data)
+    return nil
+}
+
+// Get new data type from store
+func (k Keeper) GetNewDataTypeFromStore(ctx sdk.Context, id sdkmath.Uint) (types.NewDataType, bool) {
+    storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+    store := prefix.NewStore(storeAdapter, []byte{})
+    marshaled_data := store.Get(newDataTypeStoreKey(id))
+
+    var newDataType types.NewDataType
+    if len(marshaled_data) == 0 {
+        return newDataType, false
+    }
+    k.cdc.MustUnmarshal(marshaled_data, &newDataType)
+    return newDataType, true
+}
+
+// Get all new data types from store
+func (k Keeper) GetNewDataTypesFromStore(ctx sdk.Context) (newDataTypes []*types.NewDataType) {
+    storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+    store := prefix.NewStore(storeAdapter, []byte{})
+    iterator := storetypes.KVStorePrefixIterator(store, NewDataTypeKey)
+    defer iterator.Close()
+    for ; iterator.Valid(); iterator.Next() {
+        var newDataType types.NewDataType
+        k.cdc.MustUnmarshal(iterator.Value(), &newDataType)
+        newDataTypes = append(newDataTypes, &newDataType)
+    }
+    return
+}
+
+// Get all new data type values from store
+func (k Keeper) GetAllNewDataTypeValuesFromStore(ctx sdk.Context) (newDataTypeValues []*types.NewDataTypeValue) {
+    storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+    store := prefix.NewStore(storeAdapter, []byte{})
+    iterator := storetypes.KVStorePrefixIterator(store, NewDataTypeValueKey)
+    defer iterator.Close()
+    for ; iterator.Valid(); iterator.Next() {
+        var newDataTypeValue types.NewDataTypeValue
+        k.cdc.MustUnmarshal(iterator.Value(), &newDataTypeValue)
+        newDataTypeValues = append(newDataTypeValues, &newDataTypeValue)
+    }
+    return
+}
+```
+
+##### 5. Add Store Keys
+
+Add key definitions in `x/badges/keeper/keys.go`:
+
+```go
+var (
+    // ... existing keys ...
+    NewDataTypeKey      = []byte{0x10}  // Use next available byte
+    NewDataTypeValueKey = []byte{0x11}  // Use next available byte
+)
+
+// Store key functions
+func newDataTypeStoreKey(id sdkmath.Uint) []byte {
+    key := make([]byte, len(NewDataTypeKey)+IDLength)
+    copy(key, NewDataTypeKey)
+    copy(key[len(NewDataTypeKey):], []byte(id.String()))
+    return key
+}
+
+func newDataTypeValueStoreKey(id sdkmath.Uint, address string) []byte {
+    key := make([]byte, len(NewDataTypeValueKey)+IDLength+len(address))
+    copy(key, NewDataTypeValueKey)
+    copy(key[len(NewDataTypeValueKey):], []byte(id.String()))
+    copy(key[len(NewDataTypeValueKey)+IDLength:], []byte(address))
+    return key
+}
+```
+
+##### 6. Regenerate Proto Code
+
+After updating genesis.proto:
+
+```bash
+ignite generate proto-go --yes
+# Remove versioned API folders
+ls api/badges/
+rm -rf api/badges/v*
+# Build verification
+go build ./cmd/bitbadgeschaind
+# Auto-stage generated files
+git add *.pb.go *.pulsar.go
+```
+
+##### 7. Test Genesis Integration
+
+Test that genesis state works correctly:
+
+```bash
+# Test genesis module
+go test ./x/badges/module/... -v
+
+# Test types
+go test ./x/badges/types/... -v
+
+# Test keeper (if you have tests)
+go test ./x/badges/keeper/... -v
+```
+
+#### Common Patterns
+
+-   **Incrementing IDs**: Most new data types use incrementing IDs starting from 1
+-   **Creator-based access**: Only creators can update/delete their data
+-   **Value storage**: For data with per-address values, use separate value storage
+-   **Error handling**: Use panic for genesis errors, return errors for runtime operations
+-   **Key prefixes**: Use unique byte prefixes to avoid key collisions
+
+#### Example: Dynamic Stores
+
+See the implementation of dynamic stores for a complete example:
+
+-   `proto/badges/dynamic_stores.proto` - Data structure definition
+-   `proto/badges/genesis.proto` - Genesis state fields
+-   `x/badges/keeper/store.go` - Storage methods
+-   `x/badges/keeper/keys.go` - Key definitions
+-   `x/badges/module/genesis.go` - Genesis integration
+
 ## Testing Your Changes
 
 ### 1. Compilation Test

@@ -17,6 +17,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
 
+	// Set next dynamic store ID if defined; default 0
+	if genState.NextDynamicStoreId.Equal(sdkmath.NewUint(0)) {
+		genState.NextDynamicStoreId = sdkmath.NewUint(1)
+	}
+	k.SetNextDynamicStoreId(ctx, genState.NextDynamicStoreId)
+
 	// Set params
 	if err := k.SetParams(ctx, genState.Params); err != nil {
 		panic(err)
@@ -68,6 +74,20 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for idx, version := range genState.ApprovalTrackerVersions {
 		k.SetApprovalTrackerVersionInStore(ctx, genState.ApprovalTrackerVersionsStoreKeys[idx], version)
 	}
+
+	// Initialize dynamic stores
+	for _, dynamicStore := range genState.DynamicStores {
+		if err := k.SetDynamicStoreInStore(ctx, *dynamicStore); err != nil {
+			panic(err)
+		}
+	}
+
+	// Initialize dynamic store values
+	for _, dynamicStoreValue := range genState.DynamicStoreValues {
+		if err := k.SetDynamicStoreValueInStore(ctx, dynamicStoreValue.StoreId, dynamicStoreValue.Address, dynamicStoreValue.Value); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -76,6 +96,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	genesis.NextCollectionId = k.GetNextCollectionId(ctx)
+	genesis.NextDynamicStoreId = k.GetNextDynamicStoreId(ctx)
 	genesis.PortId = k.GetPort(ctx)
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
@@ -91,6 +112,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.AddressLists = k.GetAddressListsFromStore(ctx)
 	genesis.ApprovalTrackers, genesis.ApprovalTrackerStoreKeys = k.GetApprovalTrackersFromStore(ctx)
 	genesis.ApprovalTrackerVersions, genesis.ApprovalTrackerVersionsStoreKeys = k.GetApprovalTrackerVersionsFromStore(ctx)
+
+	// Export dynamic stores
+	genesis.DynamicStores = k.GetDynamicStoresFromStore(ctx)
+
+	// Export dynamic store values
+	genesis.DynamicStoreValues = k.GetAllDynamicStoreValuesFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 
