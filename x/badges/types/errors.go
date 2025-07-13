@@ -65,4 +65,5 @@ var (
 	ErrOutsideChargePeriod                         = sdkerrors.Register(ModuleName, 1552, "outside charge period")
 	ErrOverrideTimestampNotAllowed                 = sdkerrors.Register(ModuleName, 1553, "override timestamp not allowed")
 	ErrInvalidBadgeIds                             = sdkerrors.Register(ModuleName, 1554, "invalid badge ids")
+	ErrInvalidDynamicStoreID                       = sdkerrors.Register(ModuleName, 1600, "invalid dynamic store ID")
 )

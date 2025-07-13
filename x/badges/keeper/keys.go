@@ -20,6 +20,9 @@ var (
 	AddressGenerationPrefix = []byte{0x09}
 	NextAddressListIdKey    = []byte{0x0A}
 	ApprovalVersionKey      = []byte{0x0B}
+	DynamicStoreKey         = []byte{0x0D}
+	NextDynamicStoreIdKey   = []byte{0x0E}
+	DynamicStoreValueKey    = []byte{0x0F}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 
@@ -160,5 +163,24 @@ func approvalVersionStoreKey(approvalVersionKey string) []byte {
 	key := make([]byte, len(ApprovalVersionKey)+len(approvalVersionKey))
 	copy(key, ApprovalVersionKey)
 	copy(key[len(ApprovalVersionKey):], []byte(approvalVersionKey))
+	return key
+}
+
+func dynamicStoreStoreKey(storeId sdkmath.Uint) []byte {
+	key := make([]byte, len(DynamicStoreKey)+IDLength)
+	copy(key, DynamicStoreKey)
+	copy(key[len(DynamicStoreKey):], []byte(storeId.String()))
+	return key
+}
+
+func nextDynamicStoreIdKey() []byte {
+	return NextDynamicStoreIdKey
+}
+
+func dynamicStoreValueStoreKey(storeId sdkmath.Uint, address string) []byte {
+	key := make([]byte, len(DynamicStoreValueKey)+IDLength+len(address))
+	copy(key, DynamicStoreValueKey)
+	copy(key[len(DynamicStoreValueKey):], []byte(storeId.String()))
+	copy(key[len(DynamicStoreValueKey)+IDLength:], []byte(address))
 	return key
 }

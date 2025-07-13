@@ -37,6 +37,10 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdCreateAddressLists())
 	cmd.AddCommand(CmdMsgCreateCollection())
 	cmd.AddCommand(CmdMsgUpdateCollection())
+	cmd.AddCommand(CmdCreateDynamicStore())
+	cmd.AddCommand(CmdUpdateDynamicStore())
+	cmd.AddCommand(CmdDeleteDynamicStore())
+	cmd.AddCommand(CmdSetDynamicStoreValue())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

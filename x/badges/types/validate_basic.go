@@ -329,7 +329,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom is uninitialized")
 					}
 
-
 					if coinToTransfer.Amount.GT(sdkmath.NewInt(100000000000)) {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is too large - the max amount is 100000000000ubadge")
 					}
@@ -353,6 +352,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
 				}
 
+				if approvalCriteria.DynamicStoreChallenges == nil {
+					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
+				}
+
 				for _, mustOwnBadgeBalance := range approvalCriteria.MustOwnBadges {
 					if mustOwnBadgeBalance == nil {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
@@ -373,6 +376,33 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					if mustOwnBadgeBalance.CollectionId.IsNil() || mustOwnBadgeBalance.CollectionId.IsZero() {
 						return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized")
 					}
+				}
+
+				// Validate dynamic store challenges
+				if approvalCriteria.DynamicStoreChallenges == nil {
+					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
+				}
+
+				// Check for duplicate store IDs
+				storeIds := make(map[string]bool)
+				for _, challenge := range approvalCriteria.DynamicStoreChallenges {
+					if challenge == nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "dynamic store challenge is nil")
+					}
+
+					if challenge.StoreId.IsNil() {
+						return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is uninitialized")
+					}
+
+					if challenge.StoreId.IsZero() {
+						return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is zero")
+					}
+
+					storeIdStr := challenge.StoreId.String()
+					if storeIds[storeIdStr] {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate dynamic store challenge storeId: %s", storeIdStr)
+					}
+					storeIds[storeIdStr] = true
 				}
 
 				if approvalCriteria.ApprovalAmounts == nil {

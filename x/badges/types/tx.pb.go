@@ -41,6 +41,10 @@ type BadgeCustomMsgType struct {
 	UpdateUserApprovalsMsg       *MsgUpdateUserApprovals       `protobuf:"bytes,5,opt,name=updateUserApprovalsMsg,proto3" json:"updateUserApprovalsMsg,omitempty"`
 	UpdateCollectionMsg          *MsgUpdateCollection          `protobuf:"bytes,6,opt,name=updateCollectionMsg,proto3" json:"updateCollectionMsg,omitempty"`
 	CreateCollectionMsg          *MsgCreateCollection          `protobuf:"bytes,7,opt,name=createCollectionMsg,proto3" json:"createCollectionMsg,omitempty"`
+	CreateDynamicStoreMsg        *MsgCreateDynamicStore        `protobuf:"bytes,8,opt,name=createDynamicStoreMsg,proto3" json:"createDynamicStoreMsg,omitempty"`
+	UpdateDynamicStoreMsg        *MsgUpdateDynamicStore        `protobuf:"bytes,9,opt,name=updateDynamicStoreMsg,proto3" json:"updateDynamicStoreMsg,omitempty"`
+	DeleteDynamicStoreMsg        *MsgDeleteDynamicStore        `protobuf:"bytes,10,opt,name=deleteDynamicStoreMsg,proto3" json:"deleteDynamicStoreMsg,omitempty"`
+	SetDynamicStoreValueMsg      *MsgSetDynamicStoreValue      `protobuf:"bytes,11,opt,name=setDynamicStoreValueMsg,proto3" json:"setDynamicStoreValueMsg,omitempty"`
 }
 
 func (m *BadgeCustomMsgType) Reset()         { *m = BadgeCustomMsgType{} }
@@ -121,6 +125,34 @@ func (m *BadgeCustomMsgType) GetUpdateCollectionMsg() *MsgUpdateCollection {
 func (m *BadgeCustomMsgType) GetCreateCollectionMsg() *MsgCreateCollection {
 	if m != nil {
 		return m.CreateCollectionMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetCreateDynamicStoreMsg() *MsgCreateDynamicStore {
+	if m != nil {
+		return m.CreateDynamicStoreMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetUpdateDynamicStoreMsg() *MsgUpdateDynamicStore {
+	if m != nil {
+		return m.UpdateDynamicStoreMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetDeleteDynamicStoreMsg() *MsgDeleteDynamicStore {
+	if m != nil {
+		return m.DeleteDynamicStoreMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetDynamicStoreValueMsg() *MsgSetDynamicStoreValue {
+	if m != nil {
+		return m.SetDynamicStoreValueMsg
 	}
 	return nil
 }
@@ -1553,6 +1585,382 @@ func (m *MsgUpdateUserApprovalsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateUserApprovalsResponse proto.InternalMessageInfo
 
+// MsgCreateDynamicStore is used to create a new dynamic store.
+type MsgCreateDynamicStore struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// The default value for uninitialized addresses.
+	DefaultValue bool `protobuf:"varint,2,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+}
+
+func (m *MsgCreateDynamicStore) Reset()         { *m = MsgCreateDynamicStore{} }
+func (m *MsgCreateDynamicStore) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateDynamicStore) ProtoMessage()    {}
+func (*MsgCreateDynamicStore) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{18}
+}
+func (m *MsgCreateDynamicStore) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateDynamicStore) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateDynamicStore.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateDynamicStore) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateDynamicStore.Merge(m, src)
+}
+func (m *MsgCreateDynamicStore) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateDynamicStore) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateDynamicStore.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateDynamicStore proto.InternalMessageInfo
+
+func (m *MsgCreateDynamicStore) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgCreateDynamicStore) GetDefaultValue() bool {
+	if m != nil {
+		return m.DefaultValue
+	}
+	return false
+}
+
+// MsgCreateDynamicStoreResponse is the response to MsgCreateDynamicStore.
+type MsgCreateDynamicStoreResponse struct {
+	// ID of the dynamic store.
+	StoreId Uint `protobuf:"bytes,1,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
+}
+
+func (m *MsgCreateDynamicStoreResponse) Reset()         { *m = MsgCreateDynamicStoreResponse{} }
+func (m *MsgCreateDynamicStoreResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateDynamicStoreResponse) ProtoMessage()    {}
+func (*MsgCreateDynamicStoreResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{19}
+}
+func (m *MsgCreateDynamicStoreResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateDynamicStoreResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateDynamicStoreResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateDynamicStoreResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateDynamicStoreResponse.Merge(m, src)
+}
+func (m *MsgCreateDynamicStoreResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateDynamicStoreResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateDynamicStoreResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateDynamicStoreResponse proto.InternalMessageInfo
+
+// MsgUpdateDynamicStore is used to update an existing dynamic store.
+type MsgUpdateDynamicStore struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the dynamic store to update.
+	StoreId Uint `protobuf:"bytes,2,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
+	// The new default value for uninitialized addresses (optional, only set if updating).
+	DefaultValue bool `protobuf:"varint,3,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+}
+
+func (m *MsgUpdateDynamicStore) Reset()         { *m = MsgUpdateDynamicStore{} }
+func (m *MsgUpdateDynamicStore) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDynamicStore) ProtoMessage()    {}
+func (*MsgUpdateDynamicStore) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{20}
+}
+func (m *MsgUpdateDynamicStore) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateDynamicStore) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateDynamicStore.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateDynamicStore) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDynamicStore.Merge(m, src)
+}
+func (m *MsgUpdateDynamicStore) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateDynamicStore) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDynamicStore.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateDynamicStore proto.InternalMessageInfo
+
+func (m *MsgUpdateDynamicStore) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUpdateDynamicStore) GetDefaultValue() bool {
+	if m != nil {
+		return m.DefaultValue
+	}
+	return false
+}
+
+// MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.
+type MsgUpdateDynamicStoreResponse struct {
+}
+
+func (m *MsgUpdateDynamicStoreResponse) Reset()         { *m = MsgUpdateDynamicStoreResponse{} }
+func (m *MsgUpdateDynamicStoreResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDynamicStoreResponse) ProtoMessage()    {}
+func (*MsgUpdateDynamicStoreResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{21}
+}
+func (m *MsgUpdateDynamicStoreResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateDynamicStoreResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateDynamicStoreResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateDynamicStoreResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDynamicStoreResponse.Merge(m, src)
+}
+func (m *MsgUpdateDynamicStoreResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateDynamicStoreResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDynamicStoreResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateDynamicStoreResponse proto.InternalMessageInfo
+
+// MsgDeleteDynamicStore is used to delete a dynamic store.
+type MsgDeleteDynamicStore struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the dynamic store to delete.
+	StoreId Uint `protobuf:"bytes,2,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
+}
+
+func (m *MsgDeleteDynamicStore) Reset()         { *m = MsgDeleteDynamicStore{} }
+func (m *MsgDeleteDynamicStore) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteDynamicStore) ProtoMessage()    {}
+func (*MsgDeleteDynamicStore) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{22}
+}
+func (m *MsgDeleteDynamicStore) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteDynamicStore) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteDynamicStore.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteDynamicStore) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteDynamicStore.Merge(m, src)
+}
+func (m *MsgDeleteDynamicStore) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteDynamicStore) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteDynamicStore.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteDynamicStore proto.InternalMessageInfo
+
+func (m *MsgDeleteDynamicStore) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+// MsgDeleteDynamicStoreResponse is the response to MsgDeleteDynamicStore.
+type MsgDeleteDynamicStoreResponse struct {
+}
+
+func (m *MsgDeleteDynamicStoreResponse) Reset()         { *m = MsgDeleteDynamicStoreResponse{} }
+func (m *MsgDeleteDynamicStoreResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteDynamicStoreResponse) ProtoMessage()    {}
+func (*MsgDeleteDynamicStoreResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{23}
+}
+func (m *MsgDeleteDynamicStoreResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteDynamicStoreResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteDynamicStoreResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteDynamicStoreResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteDynamicStoreResponse.Merge(m, src)
+}
+func (m *MsgDeleteDynamicStoreResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteDynamicStoreResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteDynamicStoreResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteDynamicStoreResponse proto.InternalMessageInfo
+
+// MsgSetDynamicStoreValue is used to set a 0/1 flag for a specific address in a dynamic store.
+type MsgSetDynamicStoreValue struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the dynamic store.
+	StoreId Uint `protobuf:"bytes,2,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
+	// The address for which to set the value.
+	Address string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	// The boolean value to set (true = 1, false = 0).
+	Value bool `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (m *MsgSetDynamicStoreValue) Reset()         { *m = MsgSetDynamicStoreValue{} }
+func (m *MsgSetDynamicStoreValue) String() string { return proto.CompactTextString(m) }
+func (*MsgSetDynamicStoreValue) ProtoMessage()    {}
+func (*MsgSetDynamicStoreValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{24}
+}
+func (m *MsgSetDynamicStoreValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetDynamicStoreValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetDynamicStoreValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetDynamicStoreValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetDynamicStoreValue.Merge(m, src)
+}
+func (m *MsgSetDynamicStoreValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetDynamicStoreValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetDynamicStoreValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetDynamicStoreValue proto.InternalMessageInfo
+
+func (m *MsgSetDynamicStoreValue) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetDynamicStoreValue) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
+}
+
+func (m *MsgSetDynamicStoreValue) GetValue() bool {
+	if m != nil {
+		return m.Value
+	}
+	return false
+}
+
+// MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
+type MsgSetDynamicStoreValueResponse struct {
+}
+
+func (m *MsgSetDynamicStoreValueResponse) Reset()         { *m = MsgSetDynamicStoreValueResponse{} }
+func (m *MsgSetDynamicStoreValueResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetDynamicStoreValueResponse) ProtoMessage()    {}
+func (*MsgSetDynamicStoreValueResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{25}
+}
+func (m *MsgSetDynamicStoreValueResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetDynamicStoreValueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetDynamicStoreValueResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetDynamicStoreValueResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetDynamicStoreValueResponse.Merge(m, src)
+}
+func (m *MsgSetDynamicStoreValueResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetDynamicStoreValueResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetDynamicStoreValueResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetDynamicStoreValueResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*BadgeCustomMsgType)(nil), "badges.BadgeCustomMsgType")
 	proto.RegisterType((*MsgUpdateParams)(nil), "badges.MsgUpdateParams")
@@ -1572,125 +1980,151 @@ func init() {
 	proto.RegisterType((*MsgDeleteCollectionResponse)(nil), "badges.MsgDeleteCollectionResponse")
 	proto.RegisterType((*MsgUpdateUserApprovals)(nil), "badges.MsgUpdateUserApprovals")
 	proto.RegisterType((*MsgUpdateUserApprovalsResponse)(nil), "badges.MsgUpdateUserApprovalsResponse")
+	proto.RegisterType((*MsgCreateDynamicStore)(nil), "badges.MsgCreateDynamicStore")
+	proto.RegisterType((*MsgCreateDynamicStoreResponse)(nil), "badges.MsgCreateDynamicStoreResponse")
+	proto.RegisterType((*MsgUpdateDynamicStore)(nil), "badges.MsgUpdateDynamicStore")
+	proto.RegisterType((*MsgUpdateDynamicStoreResponse)(nil), "badges.MsgUpdateDynamicStoreResponse")
+	proto.RegisterType((*MsgDeleteDynamicStore)(nil), "badges.MsgDeleteDynamicStore")
+	proto.RegisterType((*MsgDeleteDynamicStoreResponse)(nil), "badges.MsgDeleteDynamicStoreResponse")
+	proto.RegisterType((*MsgSetDynamicStoreValue)(nil), "badges.MsgSetDynamicStoreValue")
+	proto.RegisterType((*MsgSetDynamicStoreValueResponse)(nil), "badges.MsgSetDynamicStoreValueResponse")
 }
 
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 1805 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0x4f, 0x6f, 0xdb, 0xc6,
-	0x12, 0xb7, 0x62, 0x5b, 0xb1, 0xc6, 0xf2, 0xbf, 0x75, 0x6c, 0xfd, 0xb1, 0x2d, 0xfb, 0xe9, 0x25,
-	0x86, 0xe3, 0xbc, 0x67, 0xc5, 0x7e, 0x0f, 0x2f, 0x0f, 0x46, 0x0f, 0x95, 0x9c, 0xa2, 0x71, 0x10,
-	0xd7, 0xc1, 0x5a, 0x4e, 0x8a, 0xa0, 0x45, 0xb0, 0x22, 0xd7, 0x12, 0x0b, 0x89, 0x14, 0x48, 0xca,
-	0x8d, 0x6f, 0x45, 0x8f, 0xed, 0xa5, 0xa7, 0x7e, 0x85, 0xf6, 0x54, 0x18, 0x68, 0x81, 0x7e, 0x83,
-	0x22, 0xc7, 0xa0, 0xe8, 0xa1, 0xe8, 0x21, 0x68, 0x93, 0x83, 0x3f, 0x42, 0x4f, 0x05, 0x0a, 0x2e,
-	0xb9, 0x14, 0xc9, 0x25, 0x29, 0xc5, 0x51, 0x7a, 0xa9, 0x2f, 0x89, 0xb9, 0x3b, 0xf3, 0x9b, 0x99,
-	0xfd, 0x33, 0xbf, 0x21, 0x47, 0x30, 0x55, 0x23, 0x72, 0x9d, 0x1a, 0x25, 0xf3, 0xc9, 0x46, 0x5b,
-	0xd7, 0x4c, 0x0d, 0x25, 0xed, 0x81, 0xfc, 0x0c, 0x69, 0x29, 0xaa, 0x56, 0x62, 0xff, 0xda, 0x53,
-	0xf9, 0x8c, 0xa4, 0x19, 0x2d, 0xcd, 0x28, 0xb5, 0x8c, 0x7a, 0xe9, 0x78, 0xd3, 0xfa, 0xcf, 0x99,
-	0xc8, 0xd9, 0x13, 0x8f, 0xd9, 0x53, 0xc9, 0x7e, 0x70, 0xa6, 0xae, 0xd4, 0xb5, 0xba, 0x66, 0x8f,
-	0x5b, 0x7f, 0x39, 0xa3, 0xb3, 0x8e, 0xd5, 0x36, 0xd1, 0x49, 0x8b, 0x8b, 0xce, 0x73, 0x57, 0x74,
-	0xa2, 0x1a, 0x47, 0x54, 0xe7, 0xe3, 0x73, 0xce, 0x78, 0x8d, 0x34, 0x89, 0x2a, 0x51, 0x3e, 0x9c,
-	0xe5, 0x18, 0x54, 0x6f, 0x29, 0x86, 0xa1, 0x68, 0x6a, 0x50, 0xa1, 0x45, 0x4d, 0x22, 0x13, 0x93,
-	0x04, 0x14, 0x24, 0xad, 0xd9, 0xa4, 0x92, 0xe9, 0x51, 0xc8, 0x3b, 0x33, 0x44, 0x96, 0x75, 0x6a,
-	0x18, 0x8f, 0x9b, 0x8a, 0x61, 0x0a, 0x5e, 0x29, 0x2d, 0xda, 0x54, 0x54, 0xd7, 0x7c, 0xc1, 0x59,
-	0x8c, 0x1a, 0x31, 0x68, 0xe9, 0x78, 0xb3, 0x46, 0x4d, 0xb2, 0x59, 0x92, 0x34, 0x45, 0xb5, 0xe7,
-	0x8b, 0xbf, 0x8d, 0x00, 0xaa, 0x58, 0xaa, 0x3b, 0x1d, 0xc3, 0xd4, 0x5a, 0x7b, 0x46, 0xbd, 0x7a,
-	0xd2, 0xa6, 0xe8, 0x00, 0xe6, 0x24, 0x9d, 0x12, 0x93, 0x96, 0x6d, 0x5b, 0xf7, 0x2c, 0x53, 0x7b,
-	0x46, 0x3d, 0x9b, 0x58, 0x49, 0xac, 0x8d, 0x6f, 0x2d, 0x6d, 0xd8, 0xe6, 0x36, 0xf6, 0x8c, 0xfa,
-	0x8e, 0x20, 0x87, 0xc3, 0x75, 0x51, 0x03, 0x16, 0x3b, 0xaa, 0x72, 0x4c, 0x75, 0x83, 0x34, 0x0f,
-	0xdb, 0x32, 0x31, 0xe9, 0x8e, 0x1b, 0xa3, 0x85, 0x7d, 0x89, 0x61, 0x5f, 0xf5, 0x60, 0x1f, 0x46,
-	0x89, 0xe3, 0x58, 0x24, 0xb4, 0x07, 0xb3, 0x32, 0x6d, 0xd2, 0xa0, 0x81, 0x61, 0x66, 0x60, 0xc1,
-	0x63, 0xe0, 0x76, 0x40, 0x0a, 0x87, 0xe9, 0xa1, 0x77, 0x61, 0x86, 0xef, 0x36, 0x5b, 0x2b, 0xb6,
-	0x12, 0x23, 0x0c, 0x2c, 0xe7, 0x01, 0xab, 0xfa, 0x64, 0xb0, 0xa8, 0x83, 0x1e, 0xc0, 0x7c, 0x87,
-	0xb9, 0x7b, 0x68, 0x50, 0xbd, 0xdc, 0x6e, 0xeb, 0xda, 0x31, 0x69, 0x32, 0xb4, 0x51, 0x86, 0x56,
-	0xf0, 0xc6, 0x2e, 0x0a, 0xe2, 0x08, 0x6d, 0x2b, 0xde, 0x4e, 0xc8, 0x82, 0x26, 0x85, 0x78, 0x85,
-	0x75, 0x0c, 0xd3, 0xb3, 0xe0, 0xec, 0x1d, 0xf4, 0xc3, 0x5d, 0x16, 0xe0, 0x76, 0x02, 0x52, 0x38,
-	0x4c, 0xaf, 0xf8, 0x55, 0x02, 0xa6, 0x5c, 0xdb, 0xf7, 0xd9, 0x5d, 0x42, 0xff, 0x83, 0x14, 0xe9,
-	0x98, 0x0d, 0x4d, 0x57, 0xcc, 0x13, 0x76, 0xa8, 0x52, 0x95, 0xec, 0x8f, 0xdf, 0xfd, 0xfb, 0x8a,
-	0x73, 0x2b, 0x9d, 0xa3, 0x73, 0x60, 0xea, 0x8a, 0x5a, 0xc7, 0x5d, 0x51, 0xb4, 0x09, 0x49, 0xfb,
-	0x36, 0x3a, 0xa7, 0x65, 0x92, 0x7b, 0x63, 0xe3, 0x56, 0x52, 0x4f, 0x9f, 0x2f, 0x0f, 0x7d, 0x7d,
-	0x76, 0xba, 0x9e, 0xc0, 0x8e, 0xe0, 0xf6, 0xf5, 0x4f, 0xcf, 0x4e, 0xd7, 0xbb, 0x10, 0x9f, 0x9d,
-	0x9d, 0xae, 0xf3, 0xdb, 0x12, 0xf0, 0xaa, 0x98, 0x83, 0x4c, 0x60, 0x08, 0x53, 0xa3, 0xad, 0xa9,
-	0x06, 0x2d, 0x7e, 0x93, 0x80, 0xc2, 0x0e, 0x73, 0x6e, 0x47, 0x53, 0xd4, 0x87, 0x3a, 0x69, 0xb7,
-	0xa9, 0x7e, 0x9f, 0x98, 0x8d, 0xb2, 0x2c, 0xef, 0xd7, 0x3e, 0xa2, 0x92, 0x89, 0xae, 0xc0, 0xa8,
-	0x4c, 0x55, 0xad, 0x65, 0xc7, 0x83, 0xed, 0x07, 0x74, 0x03, 0xc6, 0x78, 0x4a, 0xc8, 0x5e, 0x5a,
-	0x19, 0x5e, 0x1b, 0xdf, 0x9a, 0xe2, 0x3e, 0x57, 0xec, 0x71, 0xec, 0x0a, 0xa0, 0x79, 0x48, 0x1a,
-	0x27, 0xad, 0x9a, 0xd6, 0x64, 0x67, 0x35, 0x85, 0x9d, 0x27, 0xb4, 0x09, 0xc0, 0xd0, 0x0e, 0x55,
-	0xc5, 0x34, 0xb2, 0x23, 0x0c, 0x66, 0x86, 0xc3, 0xdc, 0xe6, 0x33, 0xd8, 0x23, 0x54, 0xfc, 0x7d,
-	0x12, 0x16, 0xe3, 0xae, 0x10, 0xca, 0xc2, 0x65, 0xb6, 0x5b, 0x9a, 0xee, 0x38, 0xcc, 0x1f, 0xd1,
-	0x4d, 0x48, 0x77, 0xb3, 0xcf, 0xae, 0xcc, 0x96, 0x3a, 0x55, 0x49, 0x5b, 0x4b, 0xfb, 0xcb, 0xf3,
-	0xe5, 0x91, 0x43, 0x45, 0x35, 0xb1, 0x4f, 0x02, 0x15, 0x21, 0xcd, 0x63, 0xb0, 0xf2, 0x87, 0xe3,
-	0xbd, 0x6f, 0x0c, 0x55, 0x60, 0x4a, 0xa6, 0x47, 0xa4, 0xd3, 0x34, 0x2b, 0x7c, 0x3d, 0xec, 0x3b,
-	0x94, 0xe5, 0x81, 0x58, 0xe7, 0xda, 0x99, 0x3b, 0x30, 0x35, 0x9d, 0xe2, 0xa0, 0x02, 0xba, 0xc9,
-	0x0f, 0xfa, 0x03, 0xd2, 0x54, 0x64, 0x76, 0xb1, 0x76, 0x65, 0x83, 0xdd, 0x9e, 0x31, 0x1c, 0x36,
-	0x85, 0x6e, 0xc1, 0xc4, 0xb1, 0x4f, 0x36, 0xe9, 0x5f, 0x3c, 0x16, 0x0c, 0x51, 0xeb, 0x14, 0xfb,
-	0xe5, 0xd0, 0xdb, 0xb0, 0x10, 0xbc, 0x1b, 0xf7, 0xbb, 0x39, 0x9c, 0x5d, 0x86, 0x31, 0x1c, 0x27,
-	0xc2, 0x92, 0x68, 0xa8, 0xee, 0x98, 0x3f, 0x89, 0x86, 0x6a, 0xe3, 0x70, 0x5d, 0xf4, 0x5f, 0x98,
-	0xb3, 0x6d, 0xee, 0x11, 0x95, 0xd4, 0xa9, 0x5e, 0x75, 0x12, 0x7e, 0x36, 0xc5, 0x1c, 0x0a, 0x9f,
-	0x44, 0x65, 0x98, 0x6a, 0x05, 0xe4, 0x81, 0xad, 0x43, 0xc6, 0xbd, 0xcd, 0xfe, 0x69, 0x1c, 0x94,
-	0x47, 0x77, 0x61, 0x45, 0xc8, 0x15, 0x0e, 0x73, 0xb9, 0x98, 0xe3, 0xcc, 0x87, 0x9e, 0x72, 0xa8,
-	0x06, 0x79, 0x29, 0x1a, 0x25, 0xcd, 0x3c, 0x2b, 0x8a, 0xcb, 0x13, 0x94, 0xc4, 0x31, 0x28, 0xdd,
-	0xfd, 0x63, 0x3b, 0x2a, 0x18, 0x99, 0xf0, 0xee, 0x5f, 0xa8, 0x88, 0xb5, 0x7f, 0xb5, 0x50, 0xdd,
-	0x49, 0xe6, 0xe0, 0x52, 0xf7, 0x1a, 0x87, 0x08, 0xe1, 0x70, 0x5d, 0xf4, 0x00, 0x56, 0x6d, 0x9b,
-	0xfb, 0x47, 0x47, 0x3b, 0x0d, 0xa2, 0xa8, 0xfc, 0x6c, 0x0b, 0x56, 0xa6, 0x98, 0x87, 0x7d, 0x4a,
-	0x23, 0x13, 0x56, 0xb4, 0x5e, 0x88, 0xd3, 0xcc, 0xef, 0x35, 0xee, 0x77, 0x2f, 0x4c, 0xdc, 0x13,
-	0x11, 0x6d, 0x43, 0xd6, 0xd9, 0x6c, 0x56, 0x3e, 0xdc, 0xf6, 0x5a, 0x9b, 0x61, 0xfe, 0x47, 0xce,
-	0xa3, 0xbb, 0x80, 0x24, 0x51, 0x0b, 0x31, 0x1f, 0xf3, 0xee, 0xe6, 0x0b, 0x12, 0x38, 0x44, 0x0b,
-	0xbd, 0x05, 0xb9, 0xe0, 0xa1, 0x73, 0x09, 0x32, 0x3b, 0xc7, 0x1c, 0x89, 0x16, 0x40, 0xf7, 0x60,
-	0x56, 0x0a, 0xd1, 0x9b, 0x0f, 0xb8, 0x22, 0x88, 0xe0, 0x30, 0x35, 0xf4, 0x7f, 0xc8, 0xd8, 0xa6,
-	0x0e, 0x4c, 0xa2, 0xca, 0x44, 0x97, 0x0d, 0x37, 0xb8, 0x0c, 0xf3, 0x24, 0x6a, 0xda, 0xaa, 0x33,
-	0x0c, 0x41, 0x27, 0xcb, 0xbc, 0x70, 0xeb, 0x0c, 0x41, 0x0b, 0x8b, 0x3a, 0xdd, 0x6d, 0xd9, 0x35,
-	0xca, 0xba, 0xd4, 0x50, 0x8e, 0xa9, 0xec, 0xe2, 0xe5, 0xbc, 0xdb, 0x22, 0xce, 0x5b, 0xdb, 0xa2,
-	0x88, 0x5a, 0x79, 0xff, 0x5a, 0x88, 0x7a, 0x38, 0x44, 0x0b, 0x3d, 0x84, 0x5c, 0x4b, 0x51, 0xcd,
-	0x77, 0x0c, 0x49, 0xd7, 0x3e, 0xb6, 0x78, 0xd3, 0xa8, 0x6a, 0xbc, 0x4a, 0xca, 0x2e, 0x38, 0x81,
-	0x39, 0x94, 0x6f, 0x55, 0xa8, 0x1b, 0x4e, 0x85, 0xba, 0x61, 0xc9, 0xe2, 0x68, 0x5d, 0xd4, 0x80,
-	0x05, 0x29, 0x8c, 0x8c, 0x8d, 0xaa, 0x56, 0x96, 0xe5, 0xec, 0x22, 0x83, 0x5e, 0xed, 0xee, 0x5c,
-	0x1c, 0x6f, 0xe3, 0x38, 0xa8, 0xed, 0x4d, 0xab, 0x7a, 0xe0, 0xcc, 0x68, 0xd5, 0x0e, 0x2b, 0x4e,
-	0xed, 0x10, 0x49, 0xac, 0xc5, 0xf7, 0xe1, 0x6a, 0x6c, 0xed, 0xea, 0x94, 0x14, 0x02, 0xcd, 0x26,
-	0x7a, 0xd1, 0x6c, 0xf1, 0x8f, 0x09, 0x98, 0x0d, 0xa9, 0xe2, 0x06, 0x4a, 0xe5, 0x11, 0x14, 0x3b,
-	0xfc, 0x0a, 0x14, 0x3b, 0x72, 0x41, 0xb1, 0x17, 0x14, 0x7b, 0x41, 0xb1, 0x17, 0x14, 0xfb, 0x37,
-	0xa5, 0xd8, 0x85, 0x73, 0x51, 0xec, 0xe2, 0xe0, 0x29, 0x76, 0xe9, 0xcd, 0x51, 0x6c, 0x61, 0x70,
-	0x14, 0xbb, 0x16, 0xa4, 0xd8, 0x0c, 0xa7, 0xd8, 0x20, 0xb3, 0xee, 0xc3, 0x42, 0xd8, 0x47, 0x8c,
-	0xf3, 0x13, 0xea, 0xb7, 0x29, 0x46, 0xa8, 0xc1, 0xef, 0x18, 0x31, 0x84, 0x1a, 0x7c, 0xd3, 0xbd,
-	0xf4, 0x86, 0xde, 0x74, 0x05, 0x52, 0x1d, 0xed, 0x93, 0x54, 0x23, 0x29, 0x31, 0xf9, 0x1a, 0x94,
-	0x18, 0x42, 0x6e, 0x97, 0x5f, 0x91, 0xdc, 0xe2, 0x09, 0x69, 0x6c, 0x20, 0x84, 0x14, 0x49, 0x27,
-	0xa9, 0xd7, 0xa0, 0x93, 0x7e, 0xd2, 0x3e, 0x0c, 0x3c, 0xed, 0x87, 0xa7, 0xee, 0xf1, 0x73, 0xa5,
-	0xee, 0x88, 0xe4, 0x9b, 0x3e, 0x5f, 0xf2, 0x0d, 0x4d, 0xa1, 0x13, 0xe7, 0x48, 0xa1, 0xe1, 0x69,
-	0x70, 0x72, 0xf0, 0x69, 0x70, 0xfa, 0xcd, 0xa5, 0xc1, 0x99, 0xbf, 0x20, 0x0d, 0x06, 0xb3, 0x93,
-	0x93, 0x06, 0x85, 0x8f, 0xaf, 0xe7, 0x4f, 0x83, 0x5f, 0x26, 0x60, 0x2e, 0xf4, 0x53, 0x7e, 0x4c,
-	0x22, 0xbc, 0x05, 0x69, 0xe2, 0x91, 0x74, 0xbe, 0x6d, 0xce, 0xf2, 0x95, 0xf0, 0xa0, 0x60, 0x9f,
-	0xe0, 0xf6, 0x7a, 0x30, 0xce, 0x9c, 0x2f, 0x4e, 0xaf, 0xf9, 0xe2, 0x32, 0x2c, 0x85, 0xb7, 0x18,
-	0xf8, 0x67, 0xd9, 0xef, 0x13, 0x30, 0x23, 0x7c, 0x7a, 0x1f, 0xe8, 0xfb, 0xd0, 0x06, 0xa4, 0xdc,
-	0x56, 0x4f, 0x76, 0x98, 0x05, 0x39, 0xcd, 0x83, 0xe4, 0x66, 0x71, 0x57, 0x64, 0x7b, 0x35, 0x18,
-	0x1e, 0xef, 0xf3, 0xf8, 0x7d, 0x2c, 0x2e, 0x40, 0x4e, 0xec, 0x19, 0xf0, 0xb0, 0x3e, 0x4f, 0x30,
-	0x5e, 0x0a, 0xb6, 0x27, 0x06, 0x19, 0x58, 0xf4, 0x79, 0x0b, 0x5a, 0x2d, 0x2e, 0xb1, 0xf3, 0x26,
-	0xf4, 0x4a, 0xb8, 0xb3, 0x3f, 0x8c, 0xc1, 0x7c, 0x78, 0xc3, 0x62, 0xa0, 0x1b, 0xe1, 0x16, 0x7d,
-	0xfb, 0x1d, 0xb3, 0xae, 0x29, 0x6a, 0xbd, 0x9b, 0xc9, 0x86, 0xbd, 0x45, 0x9f, 0x30, 0x8d, 0xee,
-	0xc2, 0x8c, 0x26, 0xe8, 0xd8, 0x2f, 0xa9, 0x8b, 0x5e, 0x46, 0x0e, 0x6a, 0x62, 0x51, 0xad, 0xeb,
-	0xc5, 0xae, 0x2a, 0x69, 0x2d, 0x1f, 0xe2, 0xa8, 0xd7, 0x0b, 0x61, 0xda, 0xf2, 0x42, 0x11, 0x74,
-	0x92, 0xa2, 0x17, 0x41, 0x4d, 0x2c, 0xaa, 0xa1, 0x06, 0x94, 0x6c, 0x33, 0xe5, 0x8e, 0xa9, 0xd9,
-	0xc3, 0xf4, 0x80, 0x36, 0x8f, 0x76, 0x55, 0xc5, 0x54, 0x88, 0x49, 0x65, 0x1e, 0x4a, 0xd5, 0x3d,
-	0xba, 0xf6, 0xdb, 0xf4, 0xab, 0xaa, 0xa1, 0x0f, 0xe0, 0x3a, 0xe9, 0xdb, 0xc6, 0x18, 0xb3, 0xd1,
-	0xbf, 0x42, 0xef, 0x38, 0xf8, 0x62, 0x74, 0x6d, 0xa4, 0xfa, 0x89, 0x43, 0x50, 0x8b, 0x8b, 0x43,
-	0xb4, 0x01, 0xf1, 0x71, 0x88, 0xe8, 0x55, 0xb8, 0x26, 0x38, 0x54, 0x6e, 0x36, 0x45, 0x64, 0xfb,
-	0xf5, 0xbd, 0x3f, 0x61, 0x74, 0x07, 0x96, 0x49, 0x0f, 0xbc, 0x34, 0xc3, 0xeb, 0x25, 0xd6, 0xfd,
-	0xa4, 0x61, 0x1d, 0x30, 0x6f, 0x51, 0x38, 0xe1, 0xfd, 0xa4, 0x11, 0x98, 0xb4, 0xaa, 0xbe, 0x4e,
-	0x40, 0x7e, 0x92, 0x15, 0x91, 0x19, 0xef, 0x79, 0xf5, 0x96, 0x8f, 0x41, 0xf9, 0xed, 0x1b, 0xc1,
-	0x24, 0x93, 0xf7, 0xd5, 0xf6, 0xbe, 0x6c, 0x51, 0x5c, 0x81, 0x42, 0x44, 0xe3, 0xd3, 0x49, 0x35,
-	0x5b, 0x3f, 0x8d, 0xc2, 0xf0, 0x9e, 0x51, 0x47, 0x77, 0x20, 0xed, 0x6b, 0x27, 0x66, 0x84, 0x1e,
-	0xa7, 0x3d, 0x91, 0x5f, 0x8e, 0x98, 0x70, 0xc9, 0x52, 0x83, 0x5c, 0x74, 0x8b, 0xac, 0xaf, 0x5e,
-	0x74, 0xfe, 0x5f, 0x7d, 0x75, 0xac, 0xb9, 0xc1, 0x47, 0x80, 0x42, 0x78, 0x36, 0xbe, 0xa3, 0x9e,
-	0xbf, 0x16, 0xdf, 0x70, 0xe7, 0xd8, 0xef, 0xc1, 0x64, 0x80, 0x09, 0xa3, 0xfb, 0xd3, 0xf9, 0x7f,
-	0x44, 0xb7, 0xae, 0x39, 0xde, 0x87, 0x30, 0x1b, 0x96, 0xd5, 0x7b, 0xb4, 0xa9, 0xf3, 0xab, 0x3d,
-	0xda, 0xd8, 0x1c, 0xbe, 0x0a, 0xd3, 0x02, 0xc3, 0xc5, 0x75, 0xe7, 0xf3, 0xff, 0x8c, 0x6b, 0xdd,
-	0x7b, 0x50, 0x85, 0x8d, 0x8c, 0xeb, 0x81, 0xfb, 0x50, 0x23, 0xb7, 0xad, 0x0a, 0xd3, 0xc2, 0x5b,
-	0x62, 0x5c, 0x2b, 0xdc, 0x87, 0x1a, 0x55, 0xaa, 0xe5, 0x47, 0x3f, 0x39, 0x3b, 0x5d, 0x4f, 0x54,
-	0xee, 0x3d, 0x7d, 0x51, 0x48, 0x3c, 0x7b, 0x51, 0x48, 0xfc, 0xfa, 0xa2, 0x90, 0xf8, 0xe2, 0x65,
-	0x61, 0xe8, 0xd9, 0xcb, 0xc2, 0xd0, 0xcf, 0x2f, 0x0b, 0x43, 0x8f, 0xb6, 0xea, 0x8a, 0xd9, 0xe8,
-	0xd4, 0x36, 0x24, 0xad, 0x55, 0xaa, 0x29, 0x26, 0xff, 0x8d, 0x09, 0xff, 0x4b, 0xb2, 0xde, 0x21,
-	0x4a, 0x4f, 0x4a, 0xfc, 0xd7, 0x1f, 0x27, 0x6d, 0x6a, 0xd4, 0x92, 0xec, 0xa7, 0x1d, 0xff, 0xf9,
-	0x33, 0x00, 0x00, 0xff, 0xff, 0xe7, 0x8f, 0xc0, 0x77, 0x35, 0x23, 0x00, 0x00,
+	// 2088 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5a, 0xcd, 0x6f, 0x1c, 0x49,
+	0x15, 0xcf, 0xc4, 0x5f, 0x33, 0xcf, 0xdf, 0x65, 0xc7, 0xf3, 0x61, 0x7b, 0xec, 0x6d, 0x76, 0x4d,
+	0xd6, 0xbb, 0x78, 0xd6, 0x01, 0xb1, 0xc8, 0xe2, 0x80, 0xc7, 0x46, 0xbb, 0x8e, 0x62, 0x12, 0x95,
+	0xc7, 0x59, 0x88, 0x40, 0xa1, 0xa6, 0xbb, 0x3d, 0xd3, 0x68, 0xa6, 0x7b, 0xd4, 0xdd, 0x63, 0xd6,
+	0x37, 0x40, 0xe2, 0x02, 0x17, 0x4e, 0xfc, 0x0b, 0xc0, 0x05, 0x45, 0x02, 0x09, 0x21, 0xee, 0x68,
+	0xc5, 0x69, 0xc5, 0x09, 0x71, 0x58, 0xa1, 0xe4, 0x90, 0x3f, 0x81, 0x13, 0x12, 0xea, 0xea, 0xaa,
+	0x9e, 0xee, 0xaa, 0xea, 0x9e, 0x89, 0x33, 0xe1, 0x82, 0x2f, 0x89, 0xbb, 0xea, 0xbd, 0x5f, 0xbd,
+	0x57, 0x55, 0xf3, 0xfb, 0xbd, 0xee, 0x2a, 0x58, 0x6c, 0x12, 0xa3, 0x65, 0x7a, 0x35, 0xff, 0xd3,
+	0xbd, 0x9e, 0xeb, 0xf8, 0x0e, 0x9a, 0x0e, 0x1b, 0x2a, 0xcb, 0xa4, 0x6b, 0xd9, 0x4e, 0x8d, 0xfe,
+	0x1b, 0x76, 0x55, 0x8a, 0xba, 0xe3, 0x75, 0x1d, 0xaf, 0xd6, 0xf5, 0x5a, 0xb5, 0xcb, 0xfd, 0xe0,
+	0x3f, 0xd6, 0x51, 0x0e, 0x3b, 0x9e, 0xd2, 0xa7, 0x5a, 0xf8, 0xc0, 0xba, 0x56, 0x5b, 0x4e, 0xcb,
+	0x09, 0xdb, 0x83, 0xbf, 0x58, 0xeb, 0x0a, 0x1b, 0xb5, 0x47, 0x5c, 0xd2, 0xe5, 0xa6, 0x6b, 0x3c,
+	0x14, 0x97, 0xd8, 0xde, 0x85, 0xe9, 0xf2, 0xf6, 0x3b, 0xac, 0xbd, 0x49, 0x3a, 0xc4, 0xd6, 0x4d,
+	0xde, 0x5c, 0xe2, 0x18, 0xa6, 0xdb, 0xb5, 0x3c, 0xcf, 0x72, 0x6c, 0xd1, 0xa1, 0x6b, 0xfa, 0xc4,
+	0x20, 0x3e, 0x11, 0x1c, 0x74, 0xa7, 0xd3, 0x31, 0x75, 0x3f, 0xe6, 0x50, 0x61, 0x3d, 0xc4, 0x30,
+	0x5c, 0xd3, 0xf3, 0x9e, 0x76, 0x2c, 0xcf, 0x97, 0xa2, 0xb2, 0xba, 0x66, 0xc7, 0xb2, 0xa3, 0xe1,
+	0xd7, 0x59, 0xbb, 0x71, 0x65, 0x93, 0xae, 0xa5, 0x3f, 0xf5, 0x7c, 0xc7, 0x8d, 0x3a, 0xab, 0x6c,
+	0xa6, 0x9a, 0xc4, 0x33, 0x6b, 0x97, 0xfb, 0x4d, 0xd3, 0x27, 0xfb, 0x35, 0xdd, 0xb1, 0xec, 0xb0,
+	0x5f, 0xfb, 0xcb, 0x0c, 0xa0, 0x7a, 0xe0, 0x7f, 0xd4, 0xf7, 0x7c, 0xa7, 0x7b, 0xea, 0xb5, 0x1a,
+	0x57, 0x3d, 0x13, 0x9d, 0xc1, 0x1d, 0xdd, 0x35, 0x89, 0x6f, 0x1e, 0x86, 0x81, 0x3c, 0x08, 0xe2,
+	0x38, 0xf5, 0x5a, 0xa5, 0xdc, 0x76, 0xee, 0xee, 0xec, 0xbd, 0xcd, 0xbd, 0x70, 0xcc, 0xbd, 0x53,
+	0xaf, 0x75, 0x24, 0xd9, 0x61, 0xb5, 0x2f, 0x6a, 0xc3, 0x46, 0xdf, 0xb6, 0x2e, 0x4d, 0xd7, 0x23,
+	0x9d, 0xf3, 0x9e, 0x41, 0x7c, 0xf3, 0x28, 0x9a, 0x80, 0x00, 0xfb, 0x36, 0xc5, 0x7e, 0x3b, 0x86,
+	0x7d, 0x9e, 0x66, 0x8e, 0x33, 0x91, 0xd0, 0x29, 0xac, 0x18, 0x66, 0xc7, 0x14, 0x07, 0x98, 0xa0,
+	0x03, 0xac, 0xc7, 0x06, 0x38, 0x16, 0xac, 0xb0, 0xca, 0x0f, 0x7d, 0x04, 0xcb, 0x7c, 0x2b, 0xd0,
+	0xb9, 0xa2, 0x33, 0x31, 0x49, 0xc1, 0xca, 0x31, 0xb0, 0x46, 0xc2, 0x06, 0xcb, 0x3e, 0xe8, 0x31,
+	0xac, 0xf5, 0x69, 0xb8, 0xe7, 0x9e, 0xe9, 0x1e, 0xf6, 0x7a, 0xae, 0x73, 0x49, 0x3a, 0x14, 0x6d,
+	0x8a, 0xa2, 0x55, 0xe3, 0xb9, 0xcb, 0x86, 0x38, 0xc5, 0x3b, 0xc8, 0xb7, 0xaf, 0x98, 0xd0, 0x69,
+	0x29, 0x5f, 0x69, 0x1e, 0x55, 0x7e, 0x01, 0x5c, 0xb8, 0x82, 0x49, 0xb8, 0x19, 0x09, 0xee, 0x48,
+	0xb0, 0xc2, 0x2a, 0xbf, 0xc1, 0x66, 0x3a, 0x0e, 0x77, 0xe8, 0x59, 0xb0, 0x41, 0x03, 0xc0, 0x7c,
+	0xca, 0x66, 0x8a, 0xdb, 0x61, 0xb5, 0x6f, 0x00, 0x1a, 0x86, 0x2e, 0x82, 0x16, 0x24, 0xd0, 0x73,
+	0xc9, 0x0e, 0xab, 0x7d, 0x03, 0xd0, 0x70, 0xfd, 0x45, 0x50, 0x90, 0x40, 0x8f, 0x25, 0x3b, 0xac,
+	0xf6, 0x45, 0xdf, 0x83, 0xa2, 0x67, 0xfa, 0xf1, 0xd6, 0xc7, 0xa4, 0xd3, 0xa7, 0xb0, 0xb3, 0x14,
+	0x76, 0x2b, 0x06, 0x7b, 0xa6, 0xb0, 0xc4, 0x69, 0xfe, 0xda, 0x6f, 0x72, 0xb0, 0x18, 0x25, 0xf8,
+	0x88, 0x52, 0x18, 0xfa, 0x3a, 0x14, 0x48, 0xdf, 0x6f, 0x3b, 0xae, 0xe5, 0x5f, 0xd1, 0x9f, 0x6b,
+	0xa1, 0x5e, 0xfa, 0xfb, 0x1f, 0xbf, 0xb2, 0xca, 0xc8, 0x90, 0xfd, 0x28, 0xcf, 0x7c, 0xd7, 0xb2,
+	0x5b, 0x78, 0x60, 0x8a, 0xf6, 0x61, 0x3a, 0x24, 0x41, 0xf6, 0x3b, 0x5c, 0xe0, 0x51, 0x85, 0xb8,
+	0xf5, 0xc2, 0x67, 0x5f, 0x6c, 0xdd, 0xfa, 0xed, 0xcb, 0x67, 0xbb, 0x39, 0xcc, 0x0c, 0x0f, 0xde,
+	0xfd, 0xd9, 0xcb, 0x67, 0xbb, 0x03, 0x88, 0x5f, 0xbc, 0x7c, 0xb6, 0xcb, 0x49, 0x4a, 0x88, 0x4a,
+	0x2b, 0x43, 0x51, 0x68, 0xc2, 0xa6, 0xd7, 0x73, 0x6c, 0xcf, 0xd4, 0x7e, 0x9f, 0x83, 0xea, 0x11,
+	0x0d, 0xee, 0xc8, 0xb1, 0xec, 0x4f, 0x5c, 0xd2, 0xeb, 0x99, 0xee, 0x23, 0xe2, 0xb7, 0x0f, 0x0d,
+	0xe3, 0x61, 0xf3, 0x47, 0xa6, 0xee, 0xa3, 0x55, 0x98, 0x32, 0x4c, 0xdb, 0xe9, 0x86, 0xf9, 0xe0,
+	0xf0, 0x01, 0xbd, 0x07, 0x79, 0xce, 0xc4, 0xa5, 0xdb, 0xdb, 0x13, 0x77, 0x67, 0xef, 0x2d, 0xf2,
+	0x98, 0xeb, 0x61, 0x3b, 0x8e, 0x0c, 0xd0, 0x1a, 0x4c, 0x7b, 0x57, 0xdd, 0xa6, 0xd3, 0xa1, 0x2c,
+	0x50, 0xc0, 0xec, 0x09, 0xed, 0x03, 0x50, 0xb4, 0x73, 0xdb, 0xf2, 0xbd, 0xd2, 0x24, 0x85, 0x59,
+	0xe6, 0x30, 0xc7, 0xbc, 0x07, 0xc7, 0x8c, 0xb4, 0x7f, 0x2f, 0xc0, 0x46, 0x16, 0x39, 0xa1, 0x12,
+	0xcc, 0xd0, 0x4d, 0xeb, 0xb8, 0x2c, 0x60, 0xfe, 0x88, 0x3e, 0x80, 0xb9, 0x01, 0xe9, 0x9f, 0x18,
+	0x74, 0xaa, 0x0b, 0xf5, 0xb9, 0x60, 0x6a, 0xff, 0xf9, 0xc5, 0xd6, 0xe4, 0xb9, 0x65, 0xfb, 0x38,
+	0x61, 0x81, 0x34, 0x98, 0xe3, 0x39, 0x04, 0xcc, 0xcc, 0xa2, 0x4f, 0xb4, 0xa1, 0x3a, 0x2c, 0x1a,
+	0xe6, 0x05, 0xe9, 0x77, 0xfc, 0x3a, 0x9f, 0x8f, 0x90, 0x9d, 0x4a, 0x3c, 0x91, 0x80, 0x31, 0x58,
+	0x5f, 0xb8, 0x57, 0x45, 0x07, 0xf4, 0x01, 0xa7, 0x90, 0xc7, 0xa4, 0x63, 0x19, 0x94, 0xb2, 0x4e,
+	0x0c, 0x8f, 0xf2, 0x52, 0x1e, 0xab, 0xba, 0xd0, 0x87, 0x30, 0x7f, 0x99, 0xb0, 0x9d, 0x4e, 0x4e,
+	0x1e, 0x4d, 0x86, 0xd8, 0x2d, 0x13, 0x27, 0xed, 0xd0, 0xb7, 0x60, 0x5d, 0x64, 0x9d, 0x47, 0x03,
+	0xe9, 0xa4, 0x34, 0x93, 0xc7, 0x59, 0x26, 0x94, 0x51, 0x94, 0xbe, 0x02, 0xa3, 0x28, 0xbd, 0xb1,
+	0xda, 0x17, 0x7d, 0x8d, 0x33, 0xca, 0x29, 0xb1, 0x49, 0xcb, 0x74, 0x1b, 0x4c, 0x67, 0x29, 0xa3,
+	0xe4, 0xb1, 0xba, 0x13, 0x1d, 0xc2, 0x62, 0x57, 0xb0, 0x07, 0x3a, 0x0f, 0xc5, 0xe8, 0x57, 0x9d,
+	0xec, 0xc6, 0xa2, 0x3d, 0xba, 0x0f, 0xdb, 0x12, 0x0b, 0xb3, 0x82, 0x21, 0xc2, 0x9c, 0xa5, 0x31,
+	0x0c, 0xb5, 0x43, 0x4d, 0xa8, 0xe8, 0xe9, 0x28, 0x73, 0x34, 0x32, 0x4d, 0x9e, 0x1e, 0xd1, 0x12,
+	0x67, 0xa0, 0x0c, 0xd6, 0x8f, 0xae, 0xa8, 0x34, 0xc8, 0x7c, 0x7c, 0xfd, 0x94, 0x26, 0xc1, 0xfa,
+	0x35, 0x95, 0xbe, 0x0b, 0x34, 0xc0, 0xcd, 0xc1, 0xcf, 0x58, 0x61, 0x84, 0xd5, 0xbe, 0xe8, 0x31,
+	0xec, 0x84, 0x63, 0x3e, 0xbc, 0xb8, 0x38, 0x6a, 0x13, 0xcb, 0xe6, 0x7b, 0x5b, 0x1a, 0x65, 0x91,
+	0x46, 0x38, 0xa2, 0x35, 0xf2, 0x61, 0xdb, 0x19, 0x86, 0xb8, 0x44, 0xe3, 0xbe, 0xcb, 0xe3, 0x1e,
+	0x86, 0x89, 0x87, 0x22, 0xa2, 0x03, 0x28, 0xb1, 0xc5, 0xa6, 0x85, 0xd9, 0x71, 0x7c, 0xb4, 0x65,
+	0x1a, 0x7f, 0x6a, 0x3f, 0xba, 0x0f, 0x48, 0x97, 0xbd, 0x10, 0x8d, 0xb1, 0x12, 0x2d, 0xbe, 0x64,
+	0x81, 0x15, 0x5e, 0xe8, 0x9b, 0x50, 0x16, 0x37, 0x5d, 0x54, 0x7a, 0x94, 0xee, 0xd0, 0x40, 0xd2,
+	0x0d, 0xd0, 0x03, 0x58, 0xd1, 0x15, 0x7e, 0x6b, 0x42, 0x28, 0x92, 0x09, 0x56, 0xb9, 0xa1, 0x6f,
+	0x40, 0x31, 0x1c, 0xea, 0xcc, 0x27, 0xb6, 0x41, 0x5c, 0xc3, 0x8b, 0x92, 0x2b, 0xd2, 0x48, 0xd2,
+	0xba, 0x83, 0x0a, 0xce, 0x93, 0x7c, 0x4a, 0x34, 0x8a, 0xa8, 0x82, 0x93, 0xbc, 0xb0, 0xec, 0x33,
+	0x58, 0x96, 0x13, 0xef, 0xd0, 0xd5, 0xdb, 0xd6, 0xa5, 0x69, 0x44, 0x78, 0xe5, 0xf8, 0xb2, 0xc8,
+	0xfd, 0xc1, 0xb2, 0x58, 0xb2, 0x57, 0x25, 0x39, 0x17, 0xb2, 0x1f, 0x56, 0x78, 0xa1, 0x4f, 0xa0,
+	0xdc, 0xb5, 0x6c, 0xff, 0xdb, 0x9e, 0xee, 0x3a, 0x3f, 0x0e, 0x74, 0xd3, 0x6b, 0x38, 0xbc, 0xfe,
+	0x2c, 0xad, 0xb3, 0xc4, 0x98, 0xe4, 0x07, 0xb5, 0xff, 0x1e, 0xab, 0xfd, 0xf7, 0x02, 0x5b, 0x9c,
+	0xee, 0x8b, 0xda, 0xb0, 0xae, 0xab, 0xc4, 0xd8, 0x6b, 0x38, 0x87, 0x86, 0x51, 0xda, 0xa0, 0xd0,
+	0x3b, 0x83, 0x95, 0xcb, 0xd2, 0x6d, 0x9c, 0x05, 0x75, 0xb0, 0x1f, 0x54, 0x0f, 0x5c, 0x19, 0x83,
+	0xda, 0x61, 0x9b, 0xd5, 0x0e, 0xa9, 0xc2, 0xaa, 0x7d, 0x17, 0xde, 0xce, 0x7c, 0x2b, 0x60, 0x25,
+	0x85, 0x24, 0xb3, 0xb9, 0x61, 0x32, 0xab, 0xfd, 0x67, 0x1e, 0x56, 0x14, 0xf5, 0xf1, 0x58, 0xa5,
+	0x3c, 0x45, 0x62, 0x27, 0x5e, 0x41, 0x62, 0x27, 0x6f, 0x24, 0xf6, 0x46, 0x62, 0x6f, 0x24, 0xf6,
+	0x46, 0x62, 0xff, 0x4f, 0x25, 0x76, 0xfd, 0x5a, 0x12, 0xbb, 0x31, 0x7e, 0x89, 0xdd, 0x7c, 0x73,
+	0x12, 0x5b, 0x1d, 0x9f, 0xc4, 0xde, 0x15, 0x25, 0xb6, 0xc8, 0x25, 0x56, 0x54, 0xd6, 0x87, 0xb0,
+	0xae, 0xfa, 0x3c, 0x74, 0x7d, 0x41, 0xfd, 0x43, 0x81, 0x0a, 0xaa, 0xf8, 0x85, 0x28, 0x43, 0x50,
+	0xc5, 0x37, 0xdd, 0xdb, 0x6f, 0xe8, 0x4d, 0x57, 0x12, 0xd5, 0xa9, 0x11, 0x45, 0x35, 0x55, 0x12,
+	0xa7, 0x5f, 0x43, 0x12, 0x15, 0xe2, 0x36, 0xf3, 0x8a, 0xe2, 0x96, 0x2d, 0x48, 0xf9, 0xb1, 0x08,
+	0x52, 0xaa, 0x9c, 0x14, 0x5e, 0x43, 0x4e, 0x46, 0xa1, 0x7d, 0x18, 0x3b, 0xed, 0xab, 0xa9, 0x7b,
+	0xf6, 0x5a, 0xd4, 0x9d, 0x42, 0xbe, 0x73, 0xd7, 0x23, 0x5f, 0x25, 0x85, 0xce, 0x5f, 0x83, 0x42,
+	0xd5, 0x34, 0xb8, 0x30, 0x7e, 0x1a, 0x5c, 0x7a, 0x73, 0x34, 0xb8, 0xfc, 0x3f, 0xa0, 0x41, 0x91,
+	0x9d, 0x18, 0x0d, 0x4a, 0x9f, 0xb5, 0xaf, 0x4f, 0x83, 0xbf, 0xce, 0xc1, 0x1d, 0xe5, 0x21, 0x49,
+	0x06, 0x11, 0x7e, 0x08, 0x73, 0x24, 0x66, 0xc9, 0xbe, 0x6d, 0xae, 0xf0, 0x99, 0x88, 0xa1, 0xe0,
+	0x84, 0xe1, 0xc1, 0xae, 0x98, 0x67, 0x39, 0x91, 0x67, 0x7c, 0x78, 0x6d, 0x0b, 0x36, 0xd5, 0x87,
+	0x37, 0xfc, 0xb3, 0xec, 0x9f, 0x72, 0xb0, 0x2c, 0x1d, 0x6a, 0x8c, 0xf5, 0x7d, 0x68, 0x0f, 0x0a,
+	0xd1, 0x09, 0x5b, 0x69, 0x82, 0x26, 0xb9, 0xc4, 0x93, 0xe4, 0xc3, 0xe2, 0x81, 0xc9, 0xc1, 0x8e,
+	0x98, 0x1e, 0x3f, 0x5e, 0x4b, 0xc6, 0xa8, 0xad, 0x43, 0x59, 0x3e, 0x8d, 0xe1, 0x69, 0xfd, 0x32,
+	0x47, 0x75, 0x49, 0x3c, 0xf8, 0x19, 0x67, 0x62, 0xe9, 0xfb, 0x4d, 0x1c, 0x55, 0xdb, 0xa4, 0xfb,
+	0x4d, 0x3a, 0x85, 0xe2, 0xc1, 0xfe, 0x35, 0x0f, 0x6b, 0xea, 0xa3, 0xa0, 0xb1, 0x2e, 0x44, 0x54,
+	0xf4, 0x3d, 0xec, 0xfb, 0x2d, 0xc7, 0xb2, 0x5b, 0x03, 0x26, 0x9b, 0x88, 0x17, 0x7d, 0x52, 0x37,
+	0xba, 0x0f, 0xcb, 0x8e, 0xe4, 0x13, 0xbe, 0xa4, 0x6e, 0xc4, 0x15, 0x59, 0xf4, 0xc4, 0xb2, 0xdb,
+	0x20, 0x8a, 0x13, 0x5b, 0x77, 0xba, 0x09, 0xc4, 0xa9, 0x78, 0x14, 0x52, 0x77, 0x10, 0x85, 0x25,
+	0xf9, 0x4c, 0xcb, 0x51, 0x88, 0x9e, 0x58, 0x76, 0x43, 0x6d, 0xa8, 0x85, 0xc3, 0x1c, 0xf6, 0x7d,
+	0x27, 0x6c, 0x36, 0xcf, 0xcc, 0xce, 0xc5, 0x89, 0x6d, 0xf9, 0x16, 0xf1, 0x4d, 0x83, 0xa7, 0xd2,
+	0x88, 0xb6, 0x6e, 0xf8, 0x36, 0xfd, 0xaa, 0x6e, 0xe8, 0xfb, 0xf0, 0x2e, 0x19, 0x79, 0x8c, 0x3c,
+	0x1d, 0x63, 0x74, 0x87, 0xe1, 0x79, 0xf0, 0xc9, 0x18, 0x8c, 0x51, 0x18, 0x25, 0x0f, 0xc9, 0x2d,
+	0x2b, 0x0f, 0x79, 0x0c, 0xc8, 0xce, 0x43, 0x46, 0x6f, 0xc0, 0x3b, 0x52, 0x40, 0x87, 0x9d, 0x8e,
+	0x8c, 0x1c, 0xbe, 0xbe, 0x8f, 0x66, 0x8c, 0x3e, 0x86, 0x2d, 0x32, 0x04, 0x6f, 0x8e, 0xe2, 0x0d,
+	0x33, 0x1b, 0x7c, 0xd2, 0x08, 0x36, 0x58, 0xbc, 0x28, 0x9c, 0x8f, 0x7f, 0xd2, 0x10, 0x3a, 0x83,
+	0xaa, 0xaf, 0x2f, 0xd8, 0x2f, 0xd0, 0x22, 0xb2, 0x18, 0xdf, 0xaf, 0xf1, 0xf2, 0x51, 0xb4, 0x3f,
+	0x78, 0x4f, 0x24, 0x99, 0x4a, 0xa2, 0xb6, 0x4f, 0xb0, 0x85, 0xb6, 0x0d, 0xd5, 0x94, 0x23, 0x65,
+	0x4e, 0x35, 0x3f, 0x8d, 0x0b, 0x55, 0xfc, 0xb0, 0x31, 0xbb, 0x62, 0x67, 0xc5, 0x35, 0x3d, 0x91,
+	0xa4, 0x4c, 0x93, 0xc7, 0x89, 0xb6, 0x61, 0x9a, 0x14, 0x1f, 0x49, 0xfb, 0x28, 0xa6, 0x49, 0x89,
+	0x93, 0x55, 0xae, 0xbf, 0x3b, 0x30, 0x43, 0x6f, 0x37, 0xa4, 0x48, 0x2f, 0xef, 0xd4, 0x7e, 0x17,
+	0x26, 0x23, 0x1f, 0xfc, 0x66, 0x24, 0x13, 0xc3, 0xbe, 0x9d, 0x81, 0x2d, 0x25, 0x3d, 0xf1, 0x2a,
+	0x49, 0xcb, 0x11, 0x31, 0x21, 0x56, 0x9c, 0x51, 0xf3, 0x95, 0xf9, 0x79, 0x98, 0x8c, 0x7c, 0xe0,
+	0xfc, 0xfa, 0xc9, 0xa4, 0x07, 0x2a, 0x8f, 0xc6, 0x02, 0x55, 0x9c, 0x7b, 0xf3, 0x40, 0xff, 0x9c,
+	0xa3, 0x87, 0xbc, 0xaa, 0x23, 0xec, 0x31, 0xcc, 0x7b, 0x09, 0x66, 0x58, 0xb1, 0xc3, 0xce, 0x40,
+	0xf9, 0x23, 0x5a, 0x85, 0xa9, 0x4b, 0xba, 0x14, 0x93, 0x74, 0x29, 0xc2, 0x87, 0x83, 0xf7, 0xc5,
+	0xd4, 0xf8, 0x3d, 0x19, 0x55, 0x7c, 0xda, 0x5b, 0xb0, 0x95, 0x76, 0xfa, 0xce, 0xd2, 0xbb, 0xf7,
+	0xb7, 0x3c, 0x4c, 0x9c, 0x7a, 0x2d, 0xf4, 0x31, 0xcc, 0x25, 0x0e, 0xdc, 0x8b, 0xd2, 0x55, 0x83,
+	0xb0, 0xa3, 0xb2, 0x95, 0xd2, 0x11, 0x6d, 0x67, 0x07, 0xca, 0xe9, 0x87, 0xc8, 0x23, 0xdd, 0x83,
+	0xa9, 0xbc, 0x3f, 0xd2, 0x6d, 0x19, 0x3e, 0xe0, 0x13, 0x40, 0x8a, 0x4a, 0x34, 0xfb, 0x36, 0x4f,
+	0xe5, 0x9d, 0xec, 0xcb, 0x3e, 0x1c, 0xfb, 0x3b, 0xb0, 0x20, 0xd4, 0x8a, 0xe9, 0x77, 0x63, 0x2a,
+	0x6f, 0xa5, 0x5f, 0x9b, 0xe1, 0x78, 0x3f, 0x80, 0x15, 0x55, 0xdd, 0x33, 0xe4, 0x8a, 0x4c, 0x65,
+	0x67, 0xc8, 0x15, 0x1a, 0x0e, 0xdf, 0x80, 0x25, 0xa9, 0x06, 0xcc, 0xba, 0x19, 0x54, 0xf9, 0x52,
+	0xd6, 0xb5, 0xa1, 0x18, 0xaa, 0xb4, 0x90, 0x59, 0xf7, 0x6f, 0x12, 0xa8, 0xa9, 0xcb, 0xd6, 0x80,
+	0x25, 0xe9, 0x3b, 0x4a, 0xd6, 0x35, 0x9c, 0x04, 0x6a, 0xea, 0xcb, 0x4c, 0xb4, 0x19, 0x12, 0x9c,
+	0x92, 0x7d, 0x1b, 0x47, 0xb1, 0x19, 0x94, 0x44, 0xfd, 0x04, 0x90, 0x82, 0x7c, 0xb3, 0x2f, 0xe5,
+	0x24, 0xb0, 0xd3, 0xf9, 0x30, 0xc0, 0x56, 0x70, 0x61, 0xf6, 0xdd, 0x9c, 0x04, 0x76, 0x3a, 0x85,
+	0xa1, 0x1f, 0xc2, 0xaa, 0x92, 0xbe, 0x86, 0x5d, 0xd1, 0xa9, 0x7c, 0x79, 0xd8, 0x1d, 0x1e, 0x36,
+	0x42, 0x65, 0xea, 0x27, 0x2f, 0x9f, 0xed, 0xe6, 0xea, 0x0f, 0x3e, 0x7b, 0x5e, 0xcd, 0x7d, 0xfe,
+	0xbc, 0x9a, 0xfb, 0xd7, 0xf3, 0x6a, 0xee, 0x57, 0x2f, 0xaa, 0xb7, 0x3e, 0x7f, 0x51, 0xbd, 0xf5,
+	0x8f, 0x17, 0xd5, 0x5b, 0x4f, 0xee, 0xb5, 0x2c, 0xbf, 0xdd, 0x6f, 0xee, 0xe9, 0x4e, 0xb7, 0xd6,
+	0xb4, 0x7c, 0x7e, 0xe5, 0x90, 0xff, 0xa5, 0xb7, 0x89, 0x65, 0xd7, 0x3e, 0xad, 0xf1, 0xcb, 0x80,
+	0x57, 0x3d, 0xd3, 0x6b, 0x4e, 0xd3, 0xcb, 0x7c, 0x5f, 0xfd, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x90, 0x4d, 0x77, 0x5d, 0x44, 0x29, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1715,6 +2149,10 @@ type MsgClient interface {
 	DeleteCollection(ctx context.Context, in *MsgDeleteCollection, opts ...grpc.CallOption) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(ctx context.Context, in *MsgUpdateCollection, opts ...grpc.CallOption) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(ctx context.Context, in *MsgCreateCollection, opts ...grpc.CallOption) (*MsgCreateCollectionResponse, error)
+	CreateDynamicStore(ctx context.Context, in *MsgCreateDynamicStore, opts ...grpc.CallOption) (*MsgCreateDynamicStoreResponse, error)
+	UpdateDynamicStore(ctx context.Context, in *MsgUpdateDynamicStore, opts ...grpc.CallOption) (*MsgUpdateDynamicStoreResponse, error)
+	DeleteDynamicStore(ctx context.Context, in *MsgDeleteDynamicStore, opts ...grpc.CallOption) (*MsgDeleteDynamicStoreResponse, error)
+	SetDynamicStoreValue(ctx context.Context, in *MsgSetDynamicStoreValue, opts ...grpc.CallOption) (*MsgSetDynamicStoreValueResponse, error)
 }
 
 type msgClient struct {
@@ -1797,6 +2235,42 @@ func (c *msgClient) CreateCollection(ctx context.Context, in *MsgCreateCollectio
 	return out, nil
 }
 
+func (c *msgClient) CreateDynamicStore(ctx context.Context, in *MsgCreateDynamicStore, opts ...grpc.CallOption) (*MsgCreateDynamicStoreResponse, error) {
+	out := new(MsgCreateDynamicStoreResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/CreateDynamicStore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateDynamicStore(ctx context.Context, in *MsgUpdateDynamicStore, opts ...grpc.CallOption) (*MsgUpdateDynamicStoreResponse, error) {
+	out := new(MsgUpdateDynamicStoreResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/UpdateDynamicStore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteDynamicStore(ctx context.Context, in *MsgDeleteDynamicStore, opts ...grpc.CallOption) (*MsgDeleteDynamicStoreResponse, error) {
+	out := new(MsgDeleteDynamicStoreResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/DeleteDynamicStore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetDynamicStoreValue(ctx context.Context, in *MsgSetDynamicStoreValue, opts ...grpc.CallOption) (*MsgSetDynamicStoreValueResponse, error) {
+	out := new(MsgSetDynamicStoreValueResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetDynamicStoreValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
@@ -1809,6 +2283,10 @@ type MsgServer interface {
 	DeleteCollection(context.Context, *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(context.Context, *MsgUpdateCollection) (*MsgUpdateCollectionResponse, error)
 	CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error)
+	CreateDynamicStore(context.Context, *MsgCreateDynamicStore) (*MsgCreateDynamicStoreResponse, error)
+	UpdateDynamicStore(context.Context, *MsgUpdateDynamicStore) (*MsgUpdateDynamicStoreResponse, error)
+	DeleteDynamicStore(context.Context, *MsgDeleteDynamicStore) (*MsgDeleteDynamicStoreResponse, error)
+	SetDynamicStoreValue(context.Context, *MsgSetDynamicStoreValue) (*MsgSetDynamicStoreValueResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1838,6 +2316,18 @@ func (*UnimplementedMsgServer) UpdateCollection(ctx context.Context, req *MsgUpd
 }
 func (*UnimplementedMsgServer) CreateCollection(ctx context.Context, req *MsgCreateCollection) (*MsgCreateCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCollection not implemented")
+}
+func (*UnimplementedMsgServer) CreateDynamicStore(ctx context.Context, req *MsgCreateDynamicStore) (*MsgCreateDynamicStoreResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDynamicStore not implemented")
+}
+func (*UnimplementedMsgServer) UpdateDynamicStore(ctx context.Context, req *MsgUpdateDynamicStore) (*MsgUpdateDynamicStoreResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDynamicStore not implemented")
+}
+func (*UnimplementedMsgServer) DeleteDynamicStore(ctx context.Context, req *MsgDeleteDynamicStore) (*MsgDeleteDynamicStoreResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDynamicStore not implemented")
+}
+func (*UnimplementedMsgServer) SetDynamicStoreValue(ctx context.Context, req *MsgSetDynamicStoreValue) (*MsgSetDynamicStoreValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetDynamicStoreValue not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1988,6 +2478,78 @@ func _Msg_CreateCollection_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateDynamicStore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateDynamicStore)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateDynamicStore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/CreateDynamicStore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateDynamicStore(ctx, req.(*MsgCreateDynamicStore))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateDynamicStore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateDynamicStore)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateDynamicStore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/UpdateDynamicStore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateDynamicStore(ctx, req.(*MsgUpdateDynamicStore))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteDynamicStore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteDynamicStore)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteDynamicStore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/DeleteDynamicStore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteDynamicStore(ctx, req.(*MsgDeleteDynamicStore))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetDynamicStoreValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetDynamicStoreValue)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetDynamicStoreValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetDynamicStoreValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetDynamicStoreValue(ctx, req.(*MsgSetDynamicStoreValue))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "badges.Msg",
@@ -2025,6 +2587,22 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			MethodName: "CreateCollection",
 			Handler:    _Msg_CreateCollection_Handler,
 		},
+		{
+			MethodName: "CreateDynamicStore",
+			Handler:    _Msg_CreateDynamicStore_Handler,
+		},
+		{
+			MethodName: "UpdateDynamicStore",
+			Handler:    _Msg_UpdateDynamicStore_Handler,
+		},
+		{
+			MethodName: "DeleteDynamicStore",
+			Handler:    _Msg_DeleteDynamicStore_Handler,
+		},
+		{
+			MethodName: "SetDynamicStoreValue",
+			Handler:    _Msg_SetDynamicStoreValue_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "badges/tx.proto",
@@ -2050,6 +2628,54 @@ func (m *BadgeCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.SetDynamicStoreValueMsg != nil {
+		{
+			size, err := m.SetDynamicStoreValueMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	if m.DeleteDynamicStoreMsg != nil {
+		{
+			size, err := m.DeleteDynamicStoreMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.UpdateDynamicStoreMsg != nil {
+		{
+			size, err := m.UpdateDynamicStoreMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.CreateDynamicStoreMsg != nil {
+		{
+			size, err := m.CreateDynamicStoreMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
 	if m.CreateCollectionMsg != nil {
 		{
 			size, err := m.CreateCollectionMsg.MarshalToSizedBuffer(dAtA[:i])
@@ -3658,6 +4284,295 @@ func (m *MsgUpdateUserApprovalsResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateDynamicStore) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateDynamicStore) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateDynamicStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.DefaultValue {
+		i--
+		if m.DefaultValue {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateDynamicStoreResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateDynamicStoreResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateDynamicStoreResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.StoreId.Size()
+		i -= size
+		if _, err := m.StoreId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateDynamicStore) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateDynamicStore) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateDynamicStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.DefaultValue {
+		i--
+		if m.DefaultValue {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	{
+		size := m.StoreId.Size()
+		i -= size
+		if _, err := m.StoreId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateDynamicStoreResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateDynamicStoreResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateDynamicStoreResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteDynamicStore) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteDynamicStore) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteDynamicStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.StoreId.Size()
+		i -= size
+		if _, err := m.StoreId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteDynamicStoreResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteDynamicStoreResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteDynamicStoreResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetDynamicStoreValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetDynamicStoreValue) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetDynamicStoreValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Value {
+		i--
+		if m.Value {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size := m.StoreId.Size()
+		i -= size
+		if _, err := m.StoreId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetDynamicStoreValueResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetDynamicStoreValueResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetDynamicStoreValueResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -3701,6 +4616,22 @@ func (m *BadgeCustomMsgType) Size() (n int) {
 	}
 	if m.CreateCollectionMsg != nil {
 		l = m.CreateCollectionMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.CreateDynamicStoreMsg != nil {
+		l = m.CreateDynamicStoreMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.UpdateDynamicStoreMsg != nil {
+		l = m.UpdateDynamicStoreMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.DeleteDynamicStoreMsg != nil {
+		l = m.DeleteDynamicStoreMsg.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.SetDynamicStoreValueMsg != nil {
+		l = m.SetDynamicStoreValueMsg.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -4270,6 +5201,115 @@ func (m *MsgUpdateUserApprovalsResponse) Size() (n int) {
 	return n
 }
 
+func (m *MsgCreateDynamicStore) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.DefaultValue {
+		n += 2
+	}
+	return n
+}
+
+func (m *MsgCreateDynamicStoreResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.StoreId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgUpdateDynamicStore) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.StoreId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if m.DefaultValue {
+		n += 2
+	}
+	return n
+}
+
+func (m *MsgUpdateDynamicStoreResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgDeleteDynamicStore) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.StoreId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgDeleteDynamicStoreResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgSetDynamicStoreValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.StoreId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Value {
+		n += 2
+	}
+	return n
+}
+
+func (m *MsgSetDynamicStoreValueResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
 func sovTx(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -4554,6 +5594,150 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 				m.CreateCollectionMsg = &MsgCreateCollection{}
 			}
 			if err := m.CreateCollectionMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CreateDynamicStoreMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CreateDynamicStoreMsg == nil {
+				m.CreateDynamicStoreMsg = &MsgCreateDynamicStore{}
+			}
+			if err := m.CreateDynamicStoreMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateDynamicStoreMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UpdateDynamicStoreMsg == nil {
+				m.UpdateDynamicStoreMsg = &MsgUpdateDynamicStore{}
+			}
+			if err := m.UpdateDynamicStoreMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeleteDynamicStoreMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DeleteDynamicStoreMsg == nil {
+				m.DeleteDynamicStoreMsg = &MsgDeleteDynamicStore{}
+			}
+			if err := m.DeleteDynamicStoreMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetDynamicStoreValueMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetDynamicStoreValueMsg == nil {
+				m.SetDynamicStoreValueMsg = &MsgSetDynamicStoreValue{}
+			}
+			if err := m.SetDynamicStoreValueMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -8216,6 +9400,762 @@ func (m *MsgUpdateUserApprovalsResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgUpdateUserApprovalsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateDynamicStore) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateDynamicStore: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateDynamicStore: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultValue", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.DefaultValue = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateDynamicStoreResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateDynamicStoreResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateDynamicStoreResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StoreId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.StoreId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateDynamicStore) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateDynamicStore: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateDynamicStore: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StoreId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.StoreId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultValue", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.DefaultValue = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateDynamicStoreResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateDynamicStoreResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateDynamicStoreResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteDynamicStore) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteDynamicStore: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteDynamicStore: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StoreId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.StoreId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteDynamicStoreResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteDynamicStoreResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteDynamicStoreResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetDynamicStoreValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetDynamicStoreValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetDynamicStoreValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StoreId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.StoreId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Value = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetDynamicStoreValueResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetDynamicStoreValueResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetDynamicStoreValueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

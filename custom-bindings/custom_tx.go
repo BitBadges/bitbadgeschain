@@ -76,6 +76,18 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.UpdateUserApprovalsMsg != nil:
 				badgeCustomMsg.UpdateUserApprovalsMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.UpdateUserApprovalsMsg}, nil
+			case badgeCustomMsg.CreateDynamicStoreMsg != nil:
+				badgeCustomMsg.CreateDynamicStoreMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.CreateDynamicStoreMsg}, nil
+			case badgeCustomMsg.UpdateDynamicStoreMsg != nil:
+				badgeCustomMsg.UpdateDynamicStoreMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.UpdateDynamicStoreMsg}, nil
+			case badgeCustomMsg.DeleteDynamicStoreMsg != nil:
+				badgeCustomMsg.DeleteDynamicStoreMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.DeleteDynamicStoreMsg}, nil
+			case badgeCustomMsg.SetDynamicStoreValueMsg != nil:
+				badgeCustomMsg.SetDynamicStoreValueMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetDynamicStoreValueMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}

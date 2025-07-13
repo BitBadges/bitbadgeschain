@@ -10,6 +10,7 @@ import "badges/collections.proto";
 import "badges/balances.proto";
 import "badges/transfers.proto";
 import "badges/address_lists.proto";
+import "badges/dynamic_stores.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -45,6 +46,16 @@ service Query {
   // Queries an addresses balance for a badge collection, specified by its ID.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{collectionId}/{address}";
+	}
+
+  // Queries a dynamic store by ID.
+  rpc GetDynamicStore(QueryGetDynamicStoreRequest) returns (QueryGetDynamicStoreResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_dynamic_store/{storeId}";
+  }
+
+  // Queries a dynamic store value by store ID and address.
+  rpc GetDynamicStoreValue(QueryGetDynamicStoreValueRequest) returns (QueryGetDynamicStoreValueResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_dynamic_store_value/{storeId}/{address}";
 	}
 
   // this line is used by starport scaffolding # 2
@@ -109,5 +120,22 @@ message QueryGetChallengeTrackerRequest {
 
 message QueryGetChallengeTrackerResponse {
   string numUsed = 1 ;
+}
+
+message QueryGetDynamicStoreRequest {
+  string storeId = 1;
+}
+
+message QueryGetDynamicStoreResponse {
+  DynamicStore store = 1;
+}
+
+message QueryGetDynamicStoreValueRequest {
+  string storeId = 1;
+  string address = 2;
+}
+
+message QueryGetDynamicStoreValueResponse {
+  DynamicStoreValue value = 1;
 }
 // this line is used by starport scaffolding # 3

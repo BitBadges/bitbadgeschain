@@ -162,10 +162,38 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
+			// Must own badges check
 			err = k.CheckMustOwnBadges(ctx, approvalCriteria.MustOwnBadges, initiatedBy)
 			if err != nil {
 				continue
 			}
+
+			// Dynamic store challenges check - all challenges must pass
+			for _, challenge := range approvalCriteria.DynamicStoreChallenges {
+				storeId := challenge.StoreId
+				dynamicStoreValue, found := k.GetDynamicStoreValueFromStore(ctx, storeId, initiatedBy)
+				val := false
+				if found {
+					val = dynamicStoreValue.Value
+				} else {
+					dynamicStore, foundStore := k.GetDynamicStoreFromStore(ctx, storeId)
+					if !foundStore {
+						if isPrioritizedApproval {
+							potentialErrors = append(potentialErrors, fmt.Sprintf("dynamic store not found for storeId %s", storeId.String()))
+						}
+						goto skipApproval
+					}
+					val = dynamicStore.DefaultValue
+				}
+				if !val {
+					if isPrioritizedApproval {
+						potentialErrors = append(potentialErrors, fmt.Sprintf("initiator did not pass dynamic store challenge for storeId %s", storeId.String()))
+					}
+					goto skipApproval
+				}
+			}
+
+		skipApproval:
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
 			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, true, coinTransfersUsed, collection, royalties) //simulate = true

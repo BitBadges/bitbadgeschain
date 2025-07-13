@@ -571,7 +571,10 @@ func GetSchemas() []string {
 								}
 							},
 							"requireFromEqualsInitiatedBy": false,
-							"requireFromDoesNotEqualInitiatedBy": false
+							"requireFromDoesNotEqualInitiatedBy": false,
+							"dynamicStoreChallenges": [
+								{ "storeId": "" }
+							]
 						}
 					}
 				],
@@ -732,7 +735,10 @@ func GetSchemas() []string {
 								}
 							},
 							"requireToEqualsInitiatedBy": false,
-							"requireToDoesNotEqualInitiatedBy": false
+							"requireToDoesNotEqualInitiatedBy": false,
+							"dynamicStoreChallenges": [
+								{ "storeId": "" }
+							]
 						}
 					}
 				],
@@ -1354,7 +1360,10 @@ func GetSchemas() []string {
 							"percentage": "",
 							"payoutAddress": ""
 						},
-						"overridesToIncomingApprovals": false
+						"overridesToIncomingApprovals": false,
+						"dynamicStoreChallenges": [
+							{ "storeId": "" }
+						]
 					}
 				}
 			],
@@ -1585,7 +1594,10 @@ func GetSchemas() []string {
 								}
 						},
 						"requireToEqualsInitiatedBy": false,
-						"requireToDoesNotEqualInitiatedBy": false
+						"requireToDoesNotEqualInitiatedBy": false,
+						"dynamicStoreChallenges": [
+							{ "storeId": "" }
+						]
 					}
 				}
 			],
@@ -1747,7 +1759,10 @@ func GetSchemas() []string {
 								}
 						},
 						"requireFromEqualsInitiatedBy": false,
-						"requireFromDoesNotEqualInitiatedBy": false
+						"requireFromDoesNotEqualInitiatedBy": false,
+						"dynamicStoreChallenges": [
+							{ "storeId": "" }
+						]
 					}
 				}
 			],
@@ -2064,7 +2079,10 @@ func GetSchemas() []string {
 								}
 							},
 							"requireFromEqualsInitiatedBy": false,
-							"requireFromDoesNotEqualInitiatedBy": false
+							"requireFromDoesNotEqualInitiatedBy": false,
+							"dynamicStoreChallenges": [
+								{ "storeId": "" }
+							]
 						}
 					}
 				],
@@ -2225,7 +2243,10 @@ func GetSchemas() []string {
 								}
 							},
 							"requireToEqualsInitiatedBy": false,
-							"requireToDoesNotEqualInitiatedBy": false
+							"requireToDoesNotEqualInitiatedBy": false,
+							"dynamicStoreChallenges": [
+								{ "storeId": "" }
+							]
 						}
 					}
 				],
@@ -2839,7 +2860,10 @@ func GetSchemas() []string {
 							"percentage": "",
 							"payoutAddress": ""
 						},
-						"overridesToIncomingApprovals": false
+						"overridesToIncomingApprovals": false,
+						"dynamicStoreChallenges": [
+							{ "storeId": "" }
+						]
 					}
 				}
 			],
@@ -3400,7 +3424,10 @@ func GetSchemas() []string {
 							"percentage": "",
 							"payoutAddress": ""
 						},
-						"overridesToIncomingApprovals": false
+						"overridesToIncomingApprovals": false,
+						"dynamicStoreChallenges": [
+							{ "storeId": "" }
+						]
 					}
 				}
 			],
@@ -3464,6 +3491,41 @@ func GetSchemas() []string {
 					]
 				}
 			]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/CreateDynamicStore",
+		"value": {
+			"creator": "",
+			"defaultValue": false
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/UpdateDynamicStore",
+		"value": {
+			"creator": "",
+			"storeId": "",
+			"defaultValue": false
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/DeleteDynamicStore",
+		"value": {
+			"creator": "",
+			"storeId": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetDynamicStoreValue",
+		"value": {
+			"creator": "",
+			"storeId": "",
+			"address": "",
+			"value": false
 		}
 	}`)
 

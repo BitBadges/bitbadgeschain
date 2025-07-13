@@ -135,6 +135,46 @@ func CreateAddressLists(suite *TestSuite, ctx context.Context, msg *types.MsgCre
 	return err
 }
 
+func CreateDynamicStore(suite *TestSuite, ctx context.Context, msg *types.MsgCreateDynamicStore) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	_, err = suite.msgServer.CreateDynamicStore(ctx, msg)
+	return err
+}
+
+func UpdateDynamicStore(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateDynamicStore) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	_, err = suite.msgServer.UpdateDynamicStore(ctx, msg)
+	return err
+}
+
+func DeleteDynamicStore(suite *TestSuite, ctx context.Context, msg *types.MsgDeleteDynamicStore) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	_, err = suite.msgServer.DeleteDynamicStore(ctx, msg)
+	return err
+}
+
+func SetDynamicStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgSetDynamicStoreValue) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	_, err = suite.msgServer.SetDynamicStoreValue(ctx, msg)
+	return err
+}
+
 /** Legacy casts for test compatibility */
 
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []*types.MsgNewCollection) error {

@@ -388,6 +388,12 @@ message MustOwnBadges {
   bool mustSatisfyForAllAssets = 6;
 }
 
+// DynamicStoreChallenge defines a challenge that requires the initiator to pass a dynamic store check.
+message DynamicStoreChallenge {
+  // The ID of the dynamic store to check.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
   // Merkle challenge that must be satisfied for approval.
@@ -423,6 +429,8 @@ message ApprovalCriteria {
 
   // Must own badges for approval.
   repeated MustOwnBadges mustOwnBadges = 14;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
 }
 
 // UserRoyalties defines the royalties for a user.
@@ -456,6 +464,8 @@ message OutgoingApprovalCriteria {
 
   // Must own badges for approval.
   repeated MustOwnBadges mustOwnBadges = 9;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -481,6 +491,8 @@ message IncomingApprovalCriteria {
 
   // Must own badges for approval.
   repeated MustOwnBadges mustOwnBadges = 9;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
 }
 
 

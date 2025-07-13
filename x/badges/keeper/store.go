@@ -459,3 +459,138 @@ func (k Keeper) GetApprovalTrackerVersionFromStore(ctx sdk.Context, key string) 
 	}
 	return sdkmath.NewUint(versionUint), true
 }
+
+/****************************************DYNAMIC STORES****************************************/
+
+func (k Keeper) SetDynamicStoreInStore(ctx sdk.Context, dynamicStore types.DynamicStore) error {
+	marshaled_dynamic_store, err := k.cdc.Marshal(&dynamicStore)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.DynamicStore failed")
+	}
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(dynamicStoreStoreKey(dynamicStore.StoreId), marshaled_dynamic_store)
+	return nil
+}
+
+func (k Keeper) GetDynamicStoreFromStore(ctx sdk.Context, storeId sdkmath.Uint) (types.DynamicStore, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled_dynamic_store := store.Get(dynamicStoreStoreKey(storeId))
+
+	var dynamicStore types.DynamicStore
+	if len(marshaled_dynamic_store) == 0 {
+		return dynamicStore, false
+	}
+	k.cdc.MustUnmarshal(marshaled_dynamic_store, &dynamicStore)
+	return dynamicStore, true
+}
+
+func (k Keeper) GetDynamicStoresFromStore(ctx sdk.Context) (dynamicStores []*types.DynamicStore) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, DynamicStoreKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var dynamicStore types.DynamicStore
+		k.cdc.MustUnmarshal(iterator.Value(), &dynamicStore)
+		dynamicStores = append(dynamicStores, &dynamicStore)
+	}
+	return
+}
+
+func (k Keeper) StoreHasDynamicStore(ctx sdk.Context, storeId sdkmath.Uint) bool {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	return store.Has(dynamicStoreStoreKey(storeId))
+}
+
+func (k Keeper) DeleteDynamicStoreFromStore(ctx sdk.Context, storeId sdkmath.Uint) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Delete(dynamicStoreStoreKey(storeId))
+}
+
+/****************************************NEXT DYNAMIC STORE ID****************************************/
+
+func (k Keeper) GetNextDynamicStoreId(ctx sdk.Context) sdkmath.Uint {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	nextID := types.NewUintFromString(string((store.Get(nextDynamicStoreIdKey()))))
+	return nextID
+}
+
+func (k Keeper) SetNextDynamicStoreId(ctx sdk.Context, nextID sdkmath.Uint) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(nextDynamicStoreIdKey(), []byte(nextID.String()))
+}
+
+func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
+	nextID := k.GetNextDynamicStoreId(ctx)
+	k.SetNextDynamicStoreId(ctx, nextID.AddUint64(1))
+}
+
+/****************************************DYNAMIC STORE VALUES****************************************/
+
+// Sets a dynamic store value in the store using DynamicStoreValueKey ([]byte{0x0F}) as the prefix.
+func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value bool) error {
+	dynamicStoreValue := types.DynamicStoreValue{
+		StoreId: storeId,
+		Address: address,
+		Value:   value,
+	}
+
+	marshaled_value, err := k.cdc.Marshal(&dynamicStoreValue)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.DynamicStoreValue failed")
+	}
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(dynamicStoreValueStoreKey(storeId, address), marshaled_value)
+	return nil
+}
+
+// Gets a dynamic store value from the store according to the storeId and address.
+func (k Keeper) GetDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmath.Uint, address string) (types.DynamicStoreValue, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled_value := store.Get(dynamicStoreValueStoreKey(storeId, address))
+
+	var dynamicStoreValue types.DynamicStoreValue
+	if len(marshaled_value) == 0 {
+		return dynamicStoreValue, false
+	}
+	k.cdc.MustUnmarshal(marshaled_value, &dynamicStoreValue)
+	return dynamicStoreValue, true
+}
+
+// GetDynamicStoreValuesFromStore defines a method for returning all dynamic store values for a given store.
+func (k Keeper) GetDynamicStoreValuesFromStore(ctx sdk.Context, storeId sdkmath.Uint) (dynamicStoreValues []*types.DynamicStoreValue) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, append(DynamicStoreValueKey, []byte(storeId.String())...))
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var dynamicStoreValue types.DynamicStoreValue
+		k.cdc.MustUnmarshal(iterator.Value(), &dynamicStoreValue)
+		dynamicStoreValues = append(dynamicStoreValues, &dynamicStoreValue)
+	}
+	return
+}
+
+// StoreHasDynamicStoreValue determines whether the specified dynamic store value exists in the store
+func (k Keeper) StoreHasDynamicStoreValue(ctx sdk.Context, storeId sdkmath.Uint, address string) bool {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	return store.Has(dynamicStoreValueStoreKey(storeId, address))
+}
+
+// DeleteDynamicStoreValueFromStore deletes a dynamic store value from the store.
+func (k Keeper) DeleteDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmath.Uint, address string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Delete(dynamicStoreValueStoreKey(storeId, address))
+}

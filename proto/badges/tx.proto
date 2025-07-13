@@ -14,6 +14,7 @@ import "badges/metadata.proto";
 import "badges/collections.proto";
 import "badges/address_lists.proto";
 import "badges/timelines.proto";
+import "badges/dynamic_stores.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
@@ -33,6 +34,10 @@ service Msg {
   rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
   rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
   rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
+  rpc CreateDynamicStore    (MsgCreateDynamicStore) returns (MsgCreateDynamicStoreResponse);
+  rpc UpdateDynamicStore    (MsgUpdateDynamicStore) returns (MsgUpdateDynamicStoreResponse);
+  rpc DeleteDynamicStore    (MsgDeleteDynamicStore) returns (MsgDeleteDynamicStoreResponse);
+  rpc SetDynamicStoreValue  (MsgSetDynamicStoreValue) returns (MsgSetDynamicStoreValueResponse);
 }
 
 //Used for WASM bindings and JSON parsing
@@ -44,6 +49,10 @@ message BadgeCustomMsgType {
   MsgUpdateUserApprovals updateUserApprovalsMsg = 5;
   MsgUpdateCollection updateCollectionMsg = 6;
   MsgCreateCollection createCollectionMsg = 7;
+  MsgCreateDynamicStore createDynamicStoreMsg = 8;
+  MsgUpdateDynamicStore updateDynamicStoreMsg = 9;
+  MsgDeleteDynamicStore deleteDynamicStoreMsg = 10;
+  MsgSetDynamicStoreValue setDynamicStoreValueMsg = 11;
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -406,6 +415,73 @@ message MsgUpdateUserApprovals {
 // MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.
 message MsgUpdateUserApprovalsResponse {}
 
+// MsgCreateDynamicStore is used to create a new dynamic store.
+message MsgCreateDynamicStore {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/CreateDynamicStore";
 
+  // Address of the creator.
+  string creator = 1;
+  // The default value for uninitialized addresses.
+  bool defaultValue = 2;
+}
+
+// MsgCreateDynamicStoreResponse is the response to MsgCreateDynamicStore.
+message MsgCreateDynamicStoreResponse {
+  // ID of the dynamic store.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgUpdateDynamicStore is used to update an existing dynamic store.
+message MsgUpdateDynamicStore {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/UpdateDynamicStore";
+
+  // Address of the creator.
+  string creator = 1;
+  // ID of the dynamic store to update.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The new default value for uninitialized addresses (optional, only set if updating).
+  bool defaultValue = 3;
+}
+
+// MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.
+message MsgUpdateDynamicStoreResponse {}
+
+// MsgDeleteDynamicStore is used to delete a dynamic store.
+message MsgDeleteDynamicStore {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/DeleteDynamicStore";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the dynamic store to delete.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgDeleteDynamicStoreResponse is the response to MsgDeleteDynamicStore.
+message MsgDeleteDynamicStoreResponse {}
+
+// MsgSetDynamicStoreValue is used to set a 0/1 flag for a specific address in a dynamic store.
+message MsgSetDynamicStoreValue {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/SetDynamicStoreValue";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the dynamic store.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The address for which to set the value.
+  string address = 3;
+  
+  // The boolean value to set (true = 1, false = 0).
+  bool value = 4;
+}
+
+// MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
+message MsgSetDynamicStoreValueResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message
