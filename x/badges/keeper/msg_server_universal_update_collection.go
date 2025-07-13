@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"slices"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -194,6 +195,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		to := sdk.MustAccAddressFromBech32(collection.MintEscrowAddress)
 
 		for _, coin := range msg.MintEscrowCoinsToTransfer {
+			allowedDenoms := k.GetParams(ctx).AllowedDenoms
+			if !slices.Contains(allowedDenoms, coin.Denom) {
+				return nil, fmt.Errorf("denom %s is not allowed", coin.Denom)
+			}
+
 			err = k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(*coin))
 			if err != nil {
 				return nil, err

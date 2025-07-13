@@ -231,10 +231,20 @@ See the implementation of existing message types like `MsgTransferBadges`, `MsgC
 
 ```bash
 # Generate proto code
-ignite generate proto-go
+ignite generate proto-go --yes
+
+# Clean up versioned API folders (IMPORTANT!)
+ls api/badges/
+rm -rf api/badges/v*
 
 # Build binary
 make install
+
+# Build verification
+go build ./cmd/bitbadgeschaind
+
+# Auto-stage generated files
+git add *.pb.go *.pulsar.go
 
 # Run tests
 go test ./x/badges/keeper/...
