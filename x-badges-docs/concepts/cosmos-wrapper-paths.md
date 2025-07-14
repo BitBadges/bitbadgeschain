@@ -19,6 +19,18 @@ Cosmos Wrapper Paths enable 1:1 wrapping between BitBadges badges and native Cos
 
 > **Important**: Since wrapper addresses are uncontrollable (no private keys), approval design requires careful consideration. You must override the wrapper address's user-level approvals where necessary using collection approvals to ensure wrapping/unwrapping functions properly.
 
+### Auto-Generating Wrapper Addresses
+
+You can programmatically generate wrapper addresses using the `bitbadgesjs-sdk` npm package:
+
+```typescript
+import { generateAliasAddressForDenom } from 'bitbadgesjs-sdk';
+
+const denom = 'utoken1';
+const wrapperAddress = generateAliasAddressForDenom(denom);
+console.log('Wrapper Address:', wrapperAddress);
+```
+
 ## Proto Definition
 
 ```protobuf
@@ -133,28 +145,32 @@ This creates a system where:
 ## Use Cases
 
 ### IBC Transfers
-- **Cross-chain transfers** - Send wrapped badges to other Cosmos chains
-- **DeFi integration** - Use wrapped badges in Cosmos DeFi protocols
-- **Liquidity provision** - Add wrapped badges to AMM pools
+
+-   **Cross-chain transfers** - Send wrapped badges to other Cosmos chains
+-   **DeFi integration** - Use wrapped badges in Cosmos DeFi protocols
+-   **Liquidity provision** - Add wrapped badges to AMM pools
 
 ### Multi-Chain Ecosystems
-- **Ecosystem bridges** - Connect BitBadges to broader Cosmos ecosystem
-- **Shared liquidity** - Participate in cross-chain liquidity pools
-- **Governance tokens** - Use wrapped badges in governance across chains
+
+-   **Ecosystem bridges** - Connect BitBadges to broader Cosmos ecosystem
+-   **Shared liquidity** - Participate in cross-chain liquidity pools
+-   **Governance tokens** - Use wrapped badges in governance across chains
 
 ### Trading and Exchange
-- **DEX compatibility** - Trade on Cosmos-native decentralized exchanges
-- **Price discovery** - Enable market-driven price discovery
-- **Arbitrage opportunities** - Cross-chain arbitrage possibilities
+
+-   **DEX compatibility** - Trade on Cosmos-native decentralized exchanges
+-   **Price discovery** - Enable market-driven price discovery
+-   **Arbitrage opportunities** - Cross-chain arbitrage possibilities
 
 ### Featured Use Case: List on Osmosis
+
 With BitBadges' existing relayer infrastructure and IBC-compatible wrapped denominations, listing wrapped badges on Osmosis is streamlined:
 
-- **IBC Relayer Ready** - BitBadges already has relayer infrastructure set up for seamless cross-chain transfers
-- **Native IBC Compatibility** - Wrapped badges become native SDK coins that work seamlessly with IBC protocols
-- **Automatic Liquidity** - Create liquidity pools on Osmosis DEX with wrapped badge assets
-- **Streamlined Process** - The technical infrastructure eliminates common barriers to cross-chain trading
-- **Enhanced Discoverability** - Badges gain exposure to the broader Cosmos DeFi ecosystem
+-   **IBC Relayer Ready** - BitBadges already has relayer infrastructure set up for seamless cross-chain transfers
+-   **Native IBC Compatibility** - Wrapped badges become native SDK coins that work seamlessly with IBC protocols
+-   **Automatic Liquidity** - Create liquidity pools on Osmosis DEX with wrapped badge assets
+-   **Streamlined Process** - The technical infrastructure eliminates common barriers to cross-chain trading
+-   **Enhanced Discoverability** - Badges gain exposure to the broader Cosmos DeFi ecosystem
 
 ## Conversion Process
 

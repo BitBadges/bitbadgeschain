@@ -1,4 +1,4 @@
-# Overview
+# 📚 Overview
 
 This directory contains comprehensive developer documentation for the BitBadges blockchain's `x/badges` module.
 
@@ -21,7 +21,7 @@ const res = await BitBadgesApi.getBadgeMetadata(1, 5);
 4. [Messages](./messages/) - Transaction messages and handlers
 5. [Queries](./queries/) - Query types and endpoints
 6. [Events](./events.md) - Event emissions and tracking
-7. [Examples](./examples.md) - Common usage patterns and code examples
+7. [Examples](./examples/) - Common usage patterns and building blocks
 
 ## Message Reference
 

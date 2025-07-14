@@ -5,6 +5,8 @@ This directory contains documentation for standardized protocols that can be imp
 ## Available Protocols
 
 -   **[Subscriptions Protocol](./subscriptions-protocol.md)** - Implementation pattern for subscription-based badge collections with recurring payments and time-based ownership
+-   **[Quest Protocol](./quest-protocol.md)** - Implementation pattern for quest-based badge collections with cryptographic proof verification and coin rewards
+-   **[Tradable Protocol](./tradable-protocol.md)** - Implementation pattern for orderbook-style trading of badges with bids and listings
 
 ## Protocol Overview
 

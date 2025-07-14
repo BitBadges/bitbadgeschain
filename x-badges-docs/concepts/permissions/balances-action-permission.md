@@ -21,7 +21,7 @@ export interface BadgeIdsActionPermission<T extends NumberType> {
 ```
 
 {% content-ref url="../balances-transfers/creating-badges.md" %}
-[creating-badges.md](../balances-transfers/creating-badges.md)
+[Creating Badges](../balances-transfers/creating-badges.md)
 {% endcontent-ref %}
 
 ```json

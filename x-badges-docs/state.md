@@ -1,4 +1,4 @@
-# State
+# 🗃️ State
 
 This document describes how the badges module manages state storage, including key structures and data organization.
 

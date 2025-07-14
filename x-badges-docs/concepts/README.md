@@ -1,4 +1,4 @@
-# Concepts
+# 🧠 Concepts
 
 This directory contains detailed explanations of the core concepts and data structures that form the foundation of the BitBadges module.
 

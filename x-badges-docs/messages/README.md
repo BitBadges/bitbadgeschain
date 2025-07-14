@@ -1,4 +1,4 @@
-# Messages
+# 📨 Messages
 
 This directory contains detailed documentation for all message types supported by the badges module.
 
@@ -29,12 +29,9 @@ This directory contains detailed documentation for all message types supported b
 -   [MsgDeleteDynamicStore](./msg-delete-dynamic-store.md) - Delete dynamic store
 -   [MsgSetDynamicStoreValue](./msg-set-dynamic-store-value.md) - Set individual address values in dynamic store
 
-### System Administration
-
--   [MsgUpdateParams](./msg-update-params.md) - Update module parameters via governance
-
 ## Additional Message Types
 
 The following message types exist in the protocol but may be documented separately:
 
 -   **MsgUniversalUpdateCollection** - Legacy unified create/update interface
+-   **MsgUpdateParams** - Update module parameters via governance

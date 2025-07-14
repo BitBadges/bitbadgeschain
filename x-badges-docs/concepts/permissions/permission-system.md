@@ -190,23 +190,23 @@ The following brute forces badge IDs 1-10.
 There are five categories of permissions, each with different criteria that must be matched with. If you get confused with the different time types, refer to [Different Time Types](../different-time-fields.md) for examples and explanations.
 
 {% content-ref url="action-permission.md" %}
-[action-permission.md](action-permission.md)
+[Action Permission](action-permission.md)
 {% endcontent-ref %}
 
 {% content-ref url="timed-update-permission.md" %}
-[timed-update-permission.md](timed-update-permission.md)
+[Timed Update Permission](timed-update-permission.md)
 {% endcontent-ref %}
 
 {% content-ref url="timed-update-with-badge-ids-permission.md" %}
-[timed-update-with-badge-ids-permission.md](timed-update-with-badge-ids-permission.md)
+[Timed Update with Badge IDs Permission](timed-update-with-badge-ids-permission.md)
 {% endcontent-ref %}
 
 {% content-ref url="balances-action-permission.md" %}
-[balances-action-permission.md](balances-action-permission.md)
+[Balances Action Permission](balances-action-permission.md)
 {% endcontent-ref %}
 
 {% content-ref url="update-approval-permission.md" %}
-[update-approval-permission.md](update-approval-permission.md)
+[Update Approval Permission](update-approval-permission.md)
 {% endcontent-ref %}
 
 ### **Examples**

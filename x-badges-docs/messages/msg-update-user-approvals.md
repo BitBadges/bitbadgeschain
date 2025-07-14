@@ -10,8 +10,8 @@ If you specify `collectionId` as `"0"`, it will automatically lookup the latest 
 
 This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateOutgoingApprovals`, `updateIncomingApprovals`, `updateAutoApproveSelfInitiatedOutgoingTransfers`).
 
-- **If update flag is `true`**: The corresponding value field is processed and the user's settings are updated with the new value
-- **If update flag is `false`**: The corresponding value field is completely ignored, regardless of what data is provided
+-   **If update flag is `true`**: The corresponding value field is processed and the user's settings are updated with the new value
+-   **If update flag is `false`**: The corresponding value field is completely ignored, regardless of what data is provided
 
 This allows you to update only specific approval settings without affecting others, and you can safely leave unused value fields empty or with placeholder data.
 
@@ -52,27 +52,36 @@ bitbadgeschaind tx badges update-user-approved-transfers '[tx-json]' --from user
 ```
 
 ### JSON Example
+
+For complete transaction examples, see [MsgUpdateUserApprovals Examples](../examples/txs/msgupdate-user-approvals/).
+
 ```json
 {
-  "creator": "bb1user123...",
-  "collectionId": "1",
-  "updateOutgoingApprovals": false,
-  "outgoingApprovals": [],
-  "updateIncomingApprovals": false,
-  "incomingApprovals": [],
-  "updateAutoApproveSelfInitiatedOutgoingTransfers": true,
-  "autoApproveSelfInitiatedOutgoingTransfers": true,
-  "updateAutoApproveSelfInitiatedIncomingTransfers": false,
-  "autoApproveSelfInitiatedIncomingTransfers": true,
-  "updateAutoApproveAllIncomingTransfers": false,
-  "autoApproveAllIncomingTransfers": false,
-  "updateUserPermissions": false,
-  "userPermissions": {
-    "canUpdateOutgoingApprovals": [],
-    "canUpdateIncomingApprovals": [],
-    "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
-    "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
-    "canUpdateAutoApproveAllIncomingTransfers": []
-  }
+    "creator": "bb1user123...",
+    "collectionId": "1",
+
+    "updateOutgoingApprovals": false,
+    "outgoingApprovals": [],
+
+    "updateIncomingApprovals": false,
+    "incomingApprovals": [],
+
+    "updateAutoApproveSelfInitiatedOutgoingTransfers": true,
+    "autoApproveSelfInitiatedOutgoingTransfers": true,
+
+    "updateAutoApproveSelfInitiatedIncomingTransfers": false,
+    "autoApproveSelfInitiatedIncomingTransfers": true,
+
+    "updateAutoApproveAllIncomingTransfers": false,
+    "autoApproveAllIncomingTransfers": false,
+
+    "updateUserPermissions": false,
+    "userPermissions": {
+        "canUpdateOutgoingApprovals": [],
+        "canUpdateIncomingApprovals": [],
+        "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
+        "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
+        "canUpdateAutoApproveAllIncomingTransfers": []
+    }
 }
 ```

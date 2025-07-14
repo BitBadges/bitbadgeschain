@@ -1,4 +1,4 @@
-# Events
+# 📡 Events
 
 The badges module emits events for all message operations to enable blockchain monitoring and external application integration.
 

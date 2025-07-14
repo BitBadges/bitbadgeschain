@@ -1,4 +1,4 @@
-# Queries
+# 🔍 Queries
 
 This directory contains detailed documentation for all query types supported by the badges module.
 

@@ -46,6 +46,9 @@ bitbadgeschaind tx badges create-collection '[tx-json]' --from creator-key
 ```
 
 ### JSON Example
+
+For complete transaction examples, see [MsgCreateCollection Examples](../examples/txs/msgcreatecollection/).
+
 ```json
 {
   "creator": "bb1abc123...",
