@@ -3,17 +3,26 @@ package v9
 import (
 	"context"
 
+	sdkmath "cosmossdk.io/math"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
-	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
-	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
+	ibcfeetypes "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 )
 
 const (
@@ -37,7 +46,6 @@ func CreateUpgradeHandler(
 		}
 
 		// For ustake merging
-
 		faucetAddr, err := sdk.AccAddressFromBech32("bb1kx9532ujful8vgg2dht6k544ax4k9qzsp0sany")
 		if err != nil {
 			return nil, err
@@ -59,9 +67,27 @@ func CreateUpgradeHandler(
 			return nil, err
 		}
 
+		// module account permissions
+		moduleNames := []string{
+			authtypes.FeeCollectorName,
+			distrtypes.ModuleName,
+			minttypes.ModuleName,
+			stakingtypes.BondedPoolName,
+			stakingtypes.NotBondedPoolName,
+			govtypes.ModuleName,
+			badgesmoduletypes.ModuleName,
+			ibctransfertypes.ModuleName,
+			ibcfeetypes.ModuleName,
+			icatypes.ModuleName,
+			packetforwardtypes.ModuleName,
+		}
+
+		moduleAddresses := []sdk.AccAddress{}
+		for _, moduleName := range moduleNames {
+			moduleAddresses = append(moduleAddresses, authtypes.NewModuleAddress(moduleName))
+		}
+
 		// Migrate everything from "ustake" to "ubadge"
-		// 1. Set up conversion for ustake -> ubadge
-		//    Note that currently delegated ustake will be converted to ubadge at 1:1 (in delegator shares)
 		for _, balance := range bankKeeper.GetAccountsBalances(sdk.UnwrapSDKContext(ctx)) {
 			address := balance.Address
 			coins := balance.Coins
@@ -73,32 +99,86 @@ func CreateUpgradeHandler(
 					}
 
 					coins := sdk.NewCoins(coin)
-					err = bankKeeper.SendCoinsFromAccountToModule(sdk.UnwrapSDKContext(ctx), accAddr, "transfer", coins)
-					if err != nil {
-						return nil, err
-					}
-
-					err = bankKeeper.BurnCoins(sdk.UnwrapSDKContext(ctx), "transfer", coins)
-					if err != nil {
-						return nil, err
-					}
-
 					ubadgeCoins := sdk.NewCoins(sdk.NewCoin("ubadge", coin.Amount))
-					err = bankKeeper.MintCoins(sdk.UnwrapSDKContext(ctx), "transfer", ubadgeCoins)
-					if err != nil {
-						return nil, err
+
+					isModuleAccount := false
+					moduleName := ""
+					i := 0
+					for _, moduleAddr := range moduleAddresses {
+						if moduleAddr.Equals(accAddr) {
+							isModuleAccount = true
+							moduleName = moduleNames[i]
+						}
+						i++
+					}
+
+					if isModuleAccount {
+						err = bankKeeper.SendCoinsFromAccountToModule(sdk.UnwrapSDKContext(ctx), accAddr, "transfer", coins)
+						if err != nil {
+							return nil, err
+						}
+
+						err = bankKeeper.BurnCoins(sdk.UnwrapSDKContext(ctx), "transfer", coins)
+						if err != nil {
+							return nil, err
+						}
+
+						err = bankKeeper.MintCoins(sdk.UnwrapSDKContext(ctx), "transfer", ubadgeCoins)
+						if err != nil {
+							return nil, err
+						}
+
+						err = bankKeeper.SendCoinsFromModuleToModule(sdk.UnwrapSDKContext(ctx), "transfer", moduleName, ubadgeCoins)
+						if err != nil {
+							return nil, err
+						}
+
+					} else {
+
+						err = bankKeeper.SendCoinsFromAccountToModule(sdk.UnwrapSDKContext(ctx), accAddr, "transfer", coins)
+						if err != nil {
+							return nil, err
+						}
+
+						err = bankKeeper.BurnCoins(sdk.UnwrapSDKContext(ctx), "transfer", coins)
+						if err != nil {
+							return nil, err
+						}
+
+						err = bankKeeper.MintCoins(sdk.UnwrapSDKContext(ctx), "transfer", ubadgeCoins)
+						if err != nil {
+							return nil, err
+						}
+
+						err = bankKeeper.SendCoinsFromModuleToAccount(sdk.UnwrapSDKContext(ctx), "transfer", accAddr, ubadgeCoins)
+						if err != nil {
+							return nil, err
+						}
 					}
 				}
 			}
-
 		}
 
 		// Iterate through all rewards and convert them to ubadge
 		distrKeeper.IterateValidatorCurrentRewards(sdk.UnwrapSDKContext(ctx), func(valAddr sdk.ValAddress, rewards distrtypes.ValidatorCurrentRewards) bool {
-			newRewards := sdk.DecCoins{}
+			ustakeAmount := sdkmath.LegacyNewDec(0)
+			newRewards := sdk.NewDecCoins()
+
+			// Calculate total ustake and build new rewards
 			for _, reward := range rewards.Rewards {
-				reward.Denom = "ubadge"
-				newRewards = newRewards.Add(reward)
+				if reward.Denom == "ustake" {
+					ustakeAmount = ustakeAmount.Add(reward.Amount)
+				} else if reward.Denom == "ubadge" {
+					newRewards = newRewards.Add(reward)
+				} else {
+					// Keep other denoms as they are
+					newRewards = newRewards.Add(reward)
+				}
+			}
+
+			// Add the converted ustake amount to ubadge
+			if ustakeAmount.GT(sdkmath.LegacyNewDec(0)) {
+				newRewards = newRewards.Add(sdk.NewDecCoinFromDec("ubadge", ustakeAmount))
 			}
 
 			distrKeeper.SetValidatorCurrentRewards(sdk.UnwrapSDKContext(ctx), valAddr, distrtypes.ValidatorCurrentRewards{
@@ -109,10 +189,24 @@ func CreateUpgradeHandler(
 		})
 
 		distrKeeper.IterateValidatorOutstandingRewards(sdk.UnwrapSDKContext(ctx), func(valAddr sdk.ValAddress, rewards distrtypes.ValidatorOutstandingRewards) bool {
-			newRewards := sdk.DecCoins{}
+			ustakeAmount := sdkmath.LegacyNewDec(0)
+			newRewards := sdk.NewDecCoins()
+
+			// Calculate total ustake and build new rewards
 			for _, reward := range rewards.Rewards {
-				reward.Denom = "ubadge"
-				newRewards = newRewards.Add(reward)
+				if reward.Denom == "ustake" {
+					ustakeAmount = ustakeAmount.Add(reward.Amount)
+				} else if reward.Denom == "ubadge" {
+					newRewards = newRewards.Add(reward)
+				} else {
+					// Keep other denoms as they are
+					newRewards = newRewards.Add(reward)
+				}
+			}
+
+			// Add the converted ustake amount to ubadge
+			if ustakeAmount.GT(sdkmath.LegacyNewDec(0)) {
+				newRewards = newRewards.Add(sdk.NewDecCoinFromDec("ubadge", ustakeAmount))
 			}
 
 			distrKeeper.SetValidatorOutstandingRewards(sdk.UnwrapSDKContext(ctx), valAddr, distrtypes.ValidatorOutstandingRewards{
@@ -122,16 +216,29 @@ func CreateUpgradeHandler(
 		})
 
 		distrKeeper.IterateValidatorAccumulatedCommissions(sdk.UnwrapSDKContext(ctx), func(valAddr sdk.ValAddress, commission distrtypes.ValidatorAccumulatedCommission) bool {
-			newCommission := distrtypes.ValidatorAccumulatedCommission{
-				Commission: sdk.DecCoins{},
-			}
+			ustakeAmount := sdkmath.LegacyNewDec(0)
+			newCommission := sdk.NewDecCoins()
 
+			// Calculate total ustake and build new commission
 			for _, reward := range commission.Commission {
-				reward.Denom = "ubadge"
-				newCommission.Commission = newCommission.Commission.Add(reward)
+				if reward.Denom == "ustake" {
+					ustakeAmount = ustakeAmount.Add(reward.Amount)
+				} else if reward.Denom == "ubadge" {
+					newCommission = newCommission.Add(reward)
+				} else {
+					// Keep other denoms as they are
+					newCommission = newCommission.Add(reward)
+				}
 			}
 
-			distrKeeper.SetValidatorAccumulatedCommission(sdk.UnwrapSDKContext(ctx), valAddr, newCommission)
+			// Add the converted ustake amount to ubadge
+			if ustakeAmount.GT(sdkmath.LegacyNewDec(0)) {
+				newCommission = newCommission.Add(sdk.NewDecCoinFromDec("ubadge", ustakeAmount))
+			}
+
+			distrKeeper.SetValidatorAccumulatedCommission(sdk.UnwrapSDKContext(ctx), valAddr, distrtypes.ValidatorAccumulatedCommission{
+				Commission: newCommission,
+			})
 			return false
 		})
 
@@ -179,6 +286,7 @@ func CreateUpgradeHandler(
 		if !ustakeDecCoins.IsZero() {
 			// Remove ustake from community pool
 			feePool.CommunityPool = feePool.CommunityPool.Sub(ustakeDecCoins)
+			feePool.CommunityPool = feePool.CommunityPool.Add(sdk.NewDecCoinFromDec("ubadge", ustakeDecCoins[0].Amount))
 			err = distrKeeper.FeePool.Set(sdk.UnwrapSDKContext(ctx), feePool)
 			if err != nil {
 				return nil, err
