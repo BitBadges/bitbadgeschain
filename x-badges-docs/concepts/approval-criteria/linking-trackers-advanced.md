@@ -1,10 +1,27 @@
-# Extending the Approval (Advanced)
+# Extending Approvals (Advanced)
 
-We try to offer as much as we can in the native interface; however, in edge cases, you may run into scenarios where you need more advanced functionality, for example, cross-approval functionality or access to other blockchain data / modules.
+For edge cases requiring advanced functionality beyond native interfaces.
 
-Before trying to extend the approval, please consider workarounds and design considerations. Many approvals that you think may need extension can be altered to fit into the native interfaces by thinking out of the box.
+## When to Extend
 
-If you truly do need a more custom implementation, you will have to build your own smart contract with CosmWASM or an alternative self-implementation and call into the x/badges module. We refer you to the Tutorials section for how to do so.&#x20;
+Consider extending when you need:
 
-Please also let us know if whatever you are missing can be added natively. Our end goal is to have no one ever write a smart contract.
+-   Cross-approval functionality
+-   Access to other blockchain data/modules
+-   Custom logic not covered by native options
 
+## Before Extending
+
+1. **Consider Workarounds**: Many approvals can be adapted to fit native interfaces
+2. **Design Alternatives**: Think creatively about using existing features
+3. **Evaluate Necessity**: Ensure extension is truly required
+
+## Implementation Options
+
+### CosmWASM Smart Contracts
+
+Build custom smart contracts that call into the x/badges module.
+
+### EVM Smart Contracts (Coming Soon)
+
+Build custom EVM contracts that call into the x/badges module.

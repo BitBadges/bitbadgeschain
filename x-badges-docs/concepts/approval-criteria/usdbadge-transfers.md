@@ -1,49 +1,55 @@
-# $BADGE Transfers
+# Coin Transfers
 
-**coinTransfers** are the $BADGE credits to be sent **every** use of the approval. There can be multiple transfers here to implement complex royalty systems, for example. Or, you can leave it blank for no $BADGE transfers. The only allowed denom is "ubadge" which has 9 decimals. 1e9 ubadge = 1 $BADGE.
+Automatic token transfers executed on every approval use. Supports any Cosmos SDK denomination. These are triggered every time an approval is used.
 
-Note: $BADGE refers to the native gas credits token of the blockchain, not a specific badge.
+To get all supported denominations, use the query parameters for the badges module.
 
-This will be executed every time the approval is used.
-
-For collection approvals that **overrideFromWithApproverAddress**, the approver address will be overridden with a special mint escrow address. This address can be used to transfer / send $BADGE via collection approvals for the Mint address. For example, quest payouts are implemented by using this address to send $BADGE from the Mint address to the initiator.
+## Interface
 
 ```typescript
-// To generate the mint escrow address for a collection ID
+interface iCoinTransfer<T extends NumberType> {
+    to: string; // Recipient BitBadges address
+    coins: iCosmosCoin<T>[];
+
+    overrideFromWithApproverAddress: boolean; // By default, this is the initiator address
+    overrideToWithInitiator: boolean; // By default, this is the to address specified
+}
+
+interface iCosmosCoin<T extends NumberType> {
+    amount: T;
+    denom: string; // Any Cosmos SDK denomination (e.g., "ubadge", "uatom", "uosmo")
+}
+```
+
+## Mint Escrow Address
+
+For collection approvals with `overrideFromWithApproverAddress: true`, the approver address is a special mint escrow address.
+
+### Generation
+
+```typescript
 const mintEscrowAddress = generateAlias(
     'badges',
-    getAliasDerivationKeysForCollection(doc.collectionId)
+    getAliasDerivationKeysForCollection(collectionId)
 );
 ```
 
-The Mint escrow address is slightly longer than a normal address and cannot be controlled by any end-user because it has no private key. It is technically an address, so it can receive badges, $BADGE, etc. However, the only way to trigger a $BADGE transfer from the mint escrow address is via collection approvals.
+### Properties
 
-```typescript
-export interface iCoinTransfer<T extends NumberType> {
-    /**
-     * The recipient of the coin transfer. This should be a Bech32 BitBadges address.
-     */
-    to: string;
-    /**
-     * The coins
-     */
-    coins: iCosmosCoin<T>[];
-    /**
-     * Whether or not to override the from address with the approver address.
-     */
-    overrideFromWithApproverAddress: boolean;
-    /**
-     * Whether or not to override the to address with the initiator of the transaction.
-     */
-    overrideToWithInitiator: boolean;
-}
-```
+-   Longer than normal addresses
+-   No private key (cannot be controlled by users)
+-   Can receive Cosmos-native tokens
+-   Only collection approvals can trigger transfers from it
 
-```typescript
-export interface iCosmosCoin<T extends NumberType> {
-    /** The amount of the coin. */
-    amount: T;
-    /** The denomination of the coin. */
-    denom: string;
-}
+## Example
+
+```json
+[
+    {
+        "to": "bb1...",
+        "coins": [{ "amount": "1000000000", "denom": "ubadge" }],
+        "overrideFromWithApproverAddress": false,
+        "overrideToWithInitiator": false
+    }
+]
 ```

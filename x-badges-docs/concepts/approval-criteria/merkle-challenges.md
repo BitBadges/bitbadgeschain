@@ -1,156 +1,323 @@
 # Merkle Challenges
 
+## Overview
+
+Merkle challenges provide cryptographic proof-based approval mechanisms using SHA256 Merkle trees. They enable secure, gas-efficient whitelisting and claim code systems without storing large address lists on-chain.
+
+**Key Benefits**:
+
+-   **Gas Efficiency**: Distribute gas costs among users instead of collection creators
+-   **Security**: Cryptographic proof verification prevents unauthorized access
+-   **Flexibility**: Support both whitelist trees and claim code systems
+-   **Scalability**: Handle large user bases without on-chain storage
+
+## Interface Definition
+
 ```typescript
 export interface MerkleChallenge<T extends NumberType> {
-    root: string;
-    expectedProofLength: T;
-    useCreatorAddressAsLeaf: boolean;
-    maxUsesPerLeaf: T;
-    uri: string;
-    customData: string;
-    challengeTrackerId: string;
-    leafSigner: string;
+    root: string; // SHA256 Merkle tree root hash
+    expectedProofLength: T; // Required proof length (security)
+    useCreatorAddressAsLeaf: boolean; // Use initiator address as leaf?
+    maxUsesPerLeaf: T; // Maximum uses per leaf
+    uri: string; // Metadata URI
+    customData: string; // Custom data field
+    challengeTrackerId: string; // Unique tracker identifier
+    leafSigner: string; // Optional leaf signature authority
 }
 ```
 
-<pre class="language-json"><code class="lang-json"><strong>"merkleChallenge": {
-</strong>   "root": "758691e922381c4327646a86e44dddf8a2e060f9f5559022638cc7fa94c55b77",
-   "expectedProofLength": "1",
-   "useCreatorAddressAsLeaf": true,
-   "maxOneUsePerLeaf": true,
-   "uri": "ipfs://Qmbbe75FaJyTHn7W5q8EaePEZ9M3J5Rj3KGNfApSfJtYyD",
-   "customData": "",
-   "challengeTrackerId": "uniqueId",
-   "leafSigner": "0x"
+## Basic Example
+
+```json
+{
+    "merkleChallenges": [
+        {
+            "root": "758691e922381c4327646a86e44dddf8a2e060f9f5559022638cc7fa94c55b77",
+            "expectedProofLength": "1",
+            "useCreatorAddressAsLeaf": false,
+            "maxUsesPerLeaf": "1",
+            "uri": "ipfs://Qmbbe75FaJyTHn7W5q8EaePEZ9M3J5Rj3KGNfApSfJtYyD",
+            "customData": "",
+            "challengeTrackerId": "uniqueId",
+            "leafSigner": "0x"
+        }
+    ]
 }
-</code></pre>
+```
 
-Merkle challenges allow you to define a SHA256 Merkle tree, and to be approved for each transfer, the initiator of the transfer must provide a valid Merkle path for the tree when they transfer (via **merkleProofs** in [MsgTransferBadges](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md)).
+## Challenge Types
 
-For example, you can create a Merkle tree of claim codes. Then to be able to claim badges, each claimee must provide a valid unused Merkle path from the claim code to the **root**. You distribute the secret leaves / paths in any method you prefer.
+### 1. Claim Code Challenges
 
-Or, you can create an whitelist tree where the user's addresses are the leaves, and they must specify the valid Merkle path from their address to claim. This can be used to distribute gas costs among N users rather than the collection creator defining an address list with N users on-chain and paying all gas fees.
+Create a Merkle tree of secret claim codes that users must provide to claim badges.
 
-#### Expected Proof Length
+**Use Case**: Private claim codes, invitation systems, promotional campaigns
 
-The **expectedProofLength** defines the expected length for the Merkle proofs to be provided. This avoids preimage and second preimage attacks. **All proofs must be of the same length, which means you must design your trees accordingly. THIS IS CRITICAL.**
+**Process**:
 
-**Whitelist Trees**
+1. Generate secret claim codes
+2. Build Merkle tree from hashed codes
+3. Distribute codes privately to users with leaf signatures
+4. Users provide code + Merkle proof in transfer
 
-Whitelist trees can be used to distribute gas costs among N users rather than the collection creator defining an expensive address list with N users on-chain and paying all gas fees. For small N, we recommend not using whitelist trees for user experience.
+### 2. Whitelist Challenges
 
-If defining a whitelist tree, note that the initiator must also be within the **initiatedByList** of the approval for it to make sense. Typically, **initiatedByList** will be set to "All" and then the whitelist tree restricts who can initiate.
+Create a Merkle tree of user addresses for gas-efficient whitelisting.
 
-To create a whitelist tree, you need to set **useCreatorAddressAsLeaf** to true. If **useCreatorAddressAsLeaf** is set to true, we will override the provided leaf of each Merkle proof with the BitBadges address of the initiator of the transfer transaction.
+**Use Case**: Large whitelists, community access, gas cost distribution
 
-**Max Uses per Leaf**
+**Process**:
 
-For whitelist trees (**useCreatorAddressAsLeaf** is true), **maxUsesPerLeaf** can be set to any number. "0" or null means unlimited uses. "1" means max one use per leaf and so on. When **useCreatorAddressAsLeaf** is false, this must be set to "1" to avoid replay attacks. For example, ensure that a code / proof can only be used once because once used once, the blockchain is public and anyone then knows the secret code.
+1. Collect user addresses
+2. Build Merkle tree from hashed addresses
+3. Users provide their address + Merkle proof
+4. System verifies address is in whitelist / valid proof
 
-We track this in a challenge tracker, similar to the approvals trackers previously explained. We simply track if a leaf index (leftmost leaf of expected proof length layer (aka leaf layer) = index 0, ...) has been used and only allow it to be used **maxUsesPerLeaf** many times, if constrained.
+**Gas Cost Distribution**: Instead of the collection creator paying gas to store N addresses on-chain, each user pays their own gas for proof verification.
 
-The identifier for each challenge tracker consists of **challengeTrackerId** along with other identifying details seen below. The full ID contains the **approvalId,** so you know state will always be scoped to an approval and the tracker cannot be used by any other approval.
+## Understanding useCreatorAddressAsLeaf
 
-Like approval trackers, this is increment only and non-deletable. Thus, it is critical to not use a tracker with prior history if you intend for it to start tracking from scratch. This can be achieved by using an unused **challengeTrackerId**. If updating an approval with a challenge, please consider how the challenge tracker is working behind the scenes.
+The `useCreatorAddressAsLeaf` field determines how the system handles the leaf value in Merkle proofs:
+
+### Whitelist Trees (`useCreatorAddressAsLeaf: true`)
+
+**Purpose**: Verify that the transaction initiator is in the whitelist.
+
+**How It Works**:
+
+1. **Automatic Override**: The system expects the provided leaf to be the initiator's BitBadges address ("bb1...")
+2. **Address Verification**: Checks if the initiator's address exists in the Merkle tree
+3. **No Manual Leaf**: Users don't need to provide their address as the leaf - the system handles it
+
+**Recommended Configuration**:
+
+-   Set `initiatedByList` to "All" (whitelist tree handles the restriction)
+-   Set `useCreatorAddressAsLeaf: true`
+-   Build Merkle tree from BitBadges addresses as leaves ["bb1...", "bb2...", "bb3..."]
+
+### Claim Code Trees (`useCreatorAddressAsLeaf: false`)
+
+**Purpose**: Verify that the user possesses a valid claim code.
+
+**How It Works**:
+
+1. **Manual Leaf**: User must provide the actual claim code as the leaf
+2. **Code Verification**: System verifies the provided code exists in the Merkle tree
+3. **User Responsibility**: Users must know and provide their claim code
+
+**Recommended Configuration**:
+
+-   Set `useCreatorAddressAsLeaf: false`
+-   Build Merkle tree from claim codes as leaves ["secret1", "secret2", "secret3"]
+-   Post root hash on-chain as challenge
+-   Distribute codes privately to users with leaf signatures
+
+## Security Features
+
+### Expected Proof Length
+
+**Critical Security Feature**: All proofs must have the same length to prevent preimage and second preimage attacks.
+
+```typescript
+// All proofs must match this length
+expectedProofLength: '2'; // 2-level proof required
+```
+
+**Design Requirement**: Your Merkle tree must be constructed so all leaves are at the same depth.
+
+### Max Uses Per Leaf
+
+Control how many times each leaf can be used:
+
+| Setting         | Behavior          | Use Case             |
+| --------------- | ----------------- | -------------------- |
+| `"0"` or `null` | Unlimited uses    | Public claim codes   |
+| `"1"`           | One-time use      | Single-use codes     |
+| `"5"`           | Five uses maximum | Limited distribution |
+
+**Critical Security Requirement**: For claim code challenges (`useCreatorAddressAsLeaf: false`), `maxUsesPerLeaf` must be `"1"` to prevent replay attacks.
+
+### Replay Attack Protection
+
+**⚠️ CRITICAL SECURITY RISK**: Non-address trees (claim codes) are vulnerable to front-running attacks.
+
+**The Problem**:
+
+1. User submits transaction with valid Merkle proof
+2. Proof becomes visible in mempool (public blockchain)
+3. Malicious actor sees the proof and front-runs the transaction
+4. Original user's transaction fails, attacker gets the badge
+
+**Why This Happens**:
+
+-   Merkle proofs for claim codes are reusable until consumed
+-   Once in mempool, proofs are publicly visible
+-   No built-in protection against proof reuse
+
+**The Solution**: Leaf signatures provide cryptographic protection against this attack.
+
+## Challenge Tracking
+
+### Tracker System
+
+Uses increment-only, immutable trackers to prevent double-spending:
 
 ```typescript
 {
-  collectionId: T;
-  approvalId: string;
-  approvalLevel: "collection" | "incoming" | "outgoing";
-  approverAddress?: string;
-  challengeTrackerId: string;
-  leafIndex: T;
+    collectionId: T;
+    approvalId: string;
+    approvalLevel: 'collection' | 'incoming' | 'outgoing';
+    approverAddress: string; // blank if collection-level
+    challengeTrackerId: string;
+    leafIndex: T; // Leftmost base layer leaf index = 0, rightmost = numLeaves - 1
 }
 ```
 
-**approvalLevel** corresponds to whether it is a collection-level approval, user incoming approval, or user outgoing approval. If it is user level, the **approverAddress** is the user setting the approval. **approverAddress** is blank for collection level.
+Note the fact we use leaf indices to track usage and not leaf values.
 
-Example:
+### Tracker Examples
 
-`1-collection- -approvalId-uniqueID-0` -> USED 1 TIME
+```
+1-collection- -approvalId-uniqueID-0  → USED 1 TIME
+1-collection- -approvalId-uniqueID-1  → UNUSED
+1-collection- -approvalId-uniqueID-2  → USED 3 TIMES
+```
 
-`1-collection- -approvalId-uniqueID-1` -> UNUSED
+**Important**: Trackers are scoped to specific approvals and cannot be shared between different approval configurations.
 
-**Reserving Specific Leafs**
+### Tracker Management
 
-See Predetermined Balances below for reserving specific leaf indices for specific badges / ownership times.
+-   **Increment-Only**: Once used, the number of uses cannot be decremented
+-   **Immutable**: Tracker state cannot be modified
+-   **Best Practice**: Use unique `challengeTrackerId` for fresh tracking of new approvals
 
-**Leaf Signatures**
+## Leaf Signatures
 
-Leaf signatures are a protection against man-in-the-middle attacks. For code-based merkle challenges, there is always a risk that the code is intercepted while the transaction is in the mempool, and the malicious actor can try to claim the badge with the intercepted code before the user can.
+### Protection Against Front-Running
 
-If **leafSigner** is set, the leaf must be signed by the leaf signer. We currently only support leafSigner being an Ethereum address and signatures being ECDSA signatures.
+Leaf signatures provide cryptographic protection against front-running attacks on claim code challenges.
 
-The scheme we currently use is as follows:\
-signature = ETHSign(leaf + "-" + bitbadgesAddressOfInitiator)
+**How It Works**:
 
-Then the user must provide the **leafSignature** in the **merkleProofs** field of the transfer transaction.
+```typescript
+// Signature scheme
+signature = ETHSign(leaf + '-' + bitbadgesAddressOfInitiator);
+```
 
-Note: The bitbadgesAddressOfInitiator is the converted BitBadges address (bb1...) of the initiator of the transfer transaction. This also helps to tie a specific code to a specific BitBadges address to prevent other users from using and intercepting the same code.
+**Security Mechanism**:
 
-This is optional but strongly recommended for code-based merkle challenges.
+1. **Address Binding**: Each proof is cryptographically tied to a specific BitBadges address
+2. **Replay Prevention**: Even if proof is intercepted, it cannot be used by other addresses
+3. **Mempool Safety**: Intercepted proofs in mempool are useless to attackers
 
-#### **Creating a Merkle Tree**
+### Implementation
 
-We provide the **treeOptions** field in the SDK to let you define your own build options for the tree (see [Compatibility](../../../bitbadges-api/concepts/designing-for-compatibility.md) with the BitBadges API / Indexer). You may experiment with this, but please test all Merkle paths and claims work as intended first. The only tested build options so far are what you see below with the fillDefaultHash.
+```typescript
+// Only Ethereum addresses supported currently
+leafSigner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6';
+```
 
-The important part is making sure all leaves are on the same layer and have the same proof length, or else, they will fail on-chain.
+**Critical Benefits**:
+
+-   **Front-Running Protection**: Prevents attackers from stealing badges via mempool interception
+-   **Address-Specific**: Each proof is cryptographically bound to the intended recipient
+-   **Mempool Safety**: Makes intercepted proofs useless to malicious actors
+-   **Required for Claim Codes**: Strongly recommended for all non-address tree challenges
+
+**⚠️ IMPORTANT**: For claim code challenges, leaf signatures are not just recommended—they are essential for security against front-running attacks.
+
+## Merkle Tree Construction
+
+### Standard Configuration
 
 ```typescript
 import { SHA256 } from 'crypto-js';
 import MerkleTree from 'merkletreejs';
 
-const codes = [...]
-const hashedCodes = codes.map(x => SHA256(x).toString());
-const treeOptions = { fillDefaultHash: '0000000000000000000000000000000000000000000000000000000000000000' }
-const codesTree = new MerkleTree(hashedCodes, SHA256, treeOptions);
-const codesRoot = codesTree.getRoot().toString('hex');
-const expectedMerkleProofLength = codesTree.getLayerCount() - 1;
+// For claim codes
+const codes = ['secret1', 'secret2', 'secret3'];
+const hashedCodes = codes.map((x) => SHA256(x).toString());
+
+// For whitelists
+const addresses = ['bb1...', 'bb1...', 'bb1...'];
+const hashedAddresses = addresses.map((x) => SHA256(x));
+
+// Tree options (tested configuration)
+const treeOptions = {
+    fillDefaultHash:
+        '0000000000000000000000000000000000000000000000000000000000000000',
+};
+
+// Build tree
+const tree = new MerkleTree(hashedCodes, SHA256, treeOptions);
+const root = tree.getRoot().toString('hex');
+const expectedProofLength = tree.getLayerCount() - 1;
 ```
 
-For whitelists, replace with this code.
+### Critical Requirements
+
+1. **Same Layer**: All leaves must be at the same depth
+2. **Consistent Proof Length**: All proofs must have identical length
+3. **Test Thoroughly**: Verify all paths work before deployment
+4. **Use Tested Options**: Stick to the `fillDefaultHash` configuration
+
+## Transfer Integration
+
+### Providing Proofs
+
+Include Merkle proofs in [MsgTransferBadges](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md):
 
 ```typescript
-addresses.push(...toAddresses.map((x) => convertToBitBadgesAddress(x)));
-
-const addressesTree = new MerkleTree(
-    addresses.map((x) => SHA256(x)),
-    SHA256,
-    treeOptions
-);
-const addressesRoot = addressesTree.getRoot().toString('hex');
-```
-
-A valid proof can then be created via where codeToSubmit is the code submitted by the user.
-
-```typescript
-const passwordCodeToSubmit = '....'
-const leaf = isWhitelist ? SHA256(chain.bitbadgesAddress).toString() : SHA256(passwordCodeToSubmit).toString();
-const proofObj = tree?.getProof(leaf, whitelistIndex !== undefined && whitelistIndex >= 0 ? whitelistIndex : undefined);
-const isValidProof = proofObj && tree && proofObj.length === tree.getLayerCount() - 1;
-
-const leafSignature = '...';
-
-
-const codeProof = {
-  aunts: proofObj ? proofObj.map((proof) => {
-    return {
-      aunt: proof.data.toString('hex'),
-      onRight: proof.position === 'right'
-    }
-  }) : [],
-  leaf: isWhitelist ? '' : passwordCodeToSubmit,
-  leafSignature //if applicable
-}
-
 const txCosmosMsg: MsgTransferBadges<bigint> = {
-  creator: chain.bitbadgesAddress,
-  collectionId: collectionId,
-  transfers: [{
-    ...
-    merkleProofs: requiresProof ? [codeProof] : [],
-    ...
-  }],
+    creator: chain.bitbadgesAddress,
+    collectionId: collectionId,
+    transfers: [
+        {
+            // ... other fields
+            merkleProofs: [
+                {
+                    aunts: proofObj.map((proof) => ({
+                        aunt: proof.data.toString('hex'),
+                        onRight: proof.position === 'right',
+                    })),
+                    leaf: isWhitelist ? '' : passwordCodeToSubmit,
+                    leafSignature: leafSignature, // if applicable
+                },
+            ],
+        },
+    ],
 };
 ```
+
+### Proof Generation
+
+```typescript
+// Generate proof for user submission
+const passwordCodeToSubmit = 'secretCode123';
+const leaf = isWhitelist
+    ? SHA256(chain.bitbadgesAddress).toString()
+    : SHA256(passwordCodeToSubmit).toString();
+
+const proofObj = tree.getProof(leaf, whitelistIndex);
+const isValidProof = proofObj && proofObj.length === tree.getLayerCount() - 1;
+
+// Create signature if needed
+const leafSignature = signLeaf(leaf + '-' + chain.bitbadgesAddress);
+```
+
+## Best Practices
+
+### Design Considerations
+
+1. **Tree Structure**: Ensure all leaves at same depth
+2. **Proof Length**: Test all proof lengths are identical
+3. **Tracker Management**: Use unique IDs for fresh tracking
+4. **Security**: **MANDATORY** - Enable leaf signatures for claim codes to prevent front-running
+5. **Testing**: Verify all paths work before mainnet
+
+### Performance Optimization
+
+1. **Small Lists**: For <100 users, consider regular address lists
+2. **Gas Distribution**: Merkle trees excel with large user bases
+3. **Proof Verification**: On-chain verification is gas-efficient
+4. **Storage**: No on-chain storage of large lists required

@@ -1,12 +1,16 @@
 # Predetermined Balances
 
-Predetermined balances are a new way of having fine-grained control over the amounts that are approved with each transfer. In a typical tally-based system where you approve X amount to be transferred, you have no control over the combination of amounts that will add up to X. For example, if you approve x100, you can't control whether the transfers are \[x1, x1, x98] or \[x100] or another combination.
+## Overview
 
-Predetermined balances let you explicitly define the amounts that must be transferred and the order of the transfers. For example, you can enforce x1 of badge ID 1 has to be transferred before x1 of badge ID 2, and so on.
+Predetermined balances provide fine-grained control over the exact amounts and order of transfers in an approval. Unlike traditional tally-based systems where you approve a total amount (e.g., 100 badges) without controlling the specific combinations, predetermined balances let you explicitly define:
 
-Although this can be used in tandem with approval amounts, either one or the other is usually used because they both specify amount restrictions.
+-   **Exact amounts** that must be transferred
+-   **Specific order** of transfers
+-   **Precise badge IDs and ownership times** for each transfer
 
-**TLDR; The transfer will fail if the balances are not EXACTLY as defined in the predetermined balances.**
+**Key Principle**: The transfer will fail if the balances are not EXACTLY as defined in the predetermined balances.
+
+## Interface Definition
 
 ```typescript
 export interface PredeterminedBalances<T extends NumberType> {
@@ -16,102 +20,224 @@ export interface PredeterminedBalances<T extends NumberType> {
 }
 ```
 
-## **Defining Balances**
+## Balance Definition Methods
 
-There are two ways to define the balances. Both can not be used together.
+There are two mutually exclusive ways to define balances:
 
--   **Manual Balances:** Simply define an array of balances manually. Each element corresponds to a different set of balances for a unique transfer.
--   ```json
+### 1. Manual Balances
+
+Define an array of specific balance sets manually. Each element corresponds to a different transfer.
+
+```json
+{
     "manualBalances": [
-      {
-        "amount": "1",
-        "badgeIds": [
-          {
-            "start": "1",
-            "end": "1"
-          }
-        ],
-        "ownershipTimes": [
-          {
-            "start": "1691978400000",
-            "end": "1723514400000"
-          }
-        ]
-      },
-      {...},
-      {...},
-    ]
-    ```
--   **Incremented Balances:** Define starting balances and then define how much to increment or calculate the IDs and times by after each transfer. There are different approaches here (incompatible with each other).
-    -   Increments: You can enforce x1 of badge ID 1 has to be transferred before x1 of badge ID 2, and so on. This is typically used for minting badges. You can also customize the ownership times to increment by a certain amount. Or, have them dynamically overriden to be the current time + a interval length (now + 1 month, now + 1 year, etc).
-    -   Duration From Timestamp: If enabled, this will dynamically calculate the ownership times from a timestamp (default: transfer time) + a set duration of time. All ownership times will be overwritten. If the override timestamp is allowed, users can specify a custom timestamp to start from in MsgTransferBadges precalculationOptions.
-    -   Recurring Ownership Times: Recurring ownership times are similar to the above, but they define set intervals + charge periods that are approved. For example, you could approve the ownership times for the 1st to the 30th of the month which repeats indefinitely. The charge period is how long before the next interval starts, the approval can be used. For example, allow this approval to be charged up to 7 days in advance of the next interval.
-    -   Allowing Badge Override: If enabled, users can specify a custom badge ID in MsgTransferBadges precalculationOptions. This will override all the badge IDs in the starting balances to this specified badge ID. This is useful for collection offers. The specified badge IDs must only be a single badge ID and must be a valid badge ID in the collection.
--   ```json
-    "incrementedBalances": {
-      "startBalances": [
         {
-          "amount": "1",
-          "badgeIds": [
-            {
-              "start": "1",
-              "end": "1"
-            }
-          ],
-          "ownershipTimes": [
-            {
-              "start": "1691978400000",
-              "end": "1723514400000"
-            }
-          ]
+            "amount": "1",
+            "badgeIds": [
+                {
+                    "start": "1",
+                    "end": "1"
+                }
+            ],
+            "ownershipTimes": [
+                {
+                    "start": "1691978400000",
+                    "end": "1723514400000"
+                }
+            ]
+        },
+        {
+            "amount": "5",
+            "badgeIds": [
+                {
+                    "start": "2",
+                    "end": "6"
+                }
+            ],
+            "ownershipTimes": [
+                {
+                    "start": "1691978400000",
+                    "end": "1723514400000"
+                }
+            ]
         }
-      ],
-      "incrementBadgeIdsBy": "1",
-      "incrementOwnershipTimesBy": "0",
-      "durationFromTimestamp": "0", // UNIX milliseconds
-      "allowOverrideTimestamp": false,
-      "allowOverrideWithAnyValidBadge": false,
-      "recurringOwnershipTimes": {
-        "startTime": "0",
-        "intervalLength": "0",
-        "chargePeriodLength": "0"
-      }
-    }
-    ```
-
-## **Precalculating Balances**
-
-Predetermined balances can quickly change, such as in between the time a transaction is broadcasted and confirmed. For example, other users' mints get processed, and thus, the badge IDs one should receive changes. This creates a problem because you can't manually specify balances because that results in race conditions and failed transfers / claims.
-
-To combat this, when initiating a transfer, we allow you to specify **precalculateBalancesFromApproval** (in [MsgTransferBadges](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md)). Here, you define which **approvalId** you want to precalculate from, and at execution time, we calculate what the predetermined balances are and override the requested balances to transfer with them. Note this is the unique **approvalId** of the approval, not the tracker ID. Additional override options can be specified in the **precalculationOptions** field as well.
-
-<pre class="language-typescript"><code class="lang-typescript"><strong>precalculateBalancesFromApproval: {
-</strong>    approvalId: string;
-    approvalLevel: string; //"collection" | "incoming" | "outgoing"
-    approverAddress: string; //"" if collection-level
-    version: string; //"1"
+    ]
 }
-</code></pre>
+```
 
-## **Defining Order of Transfers**
+**Use Case**: When you need complete control over each specific transfer amount and timing.
 
-Which balances to assign for a transfer is calculated by a specified order calculation method.
+### 2. Incremented Balances
 
-For manual balances, we want to determine which element index of the array is transferred (e.g. order number = 0 means the balances of manualBalances\[0] will be transferred). For incremented balances, this corresponds to how many times we should increment (e.g. order number = 5 means apply the increments to the starting balances five times).
+Define starting balances and rules for subsequent transfers. Perfect for sequential minting or time-based releases or other common patterns. Note that most options are incompatible with each other.
 
-There are five calculation methods to determine the order method.
+```json
+{
+    "incrementedBalances": {
+        "startBalances": [
+            {
+                "amount": "1",
+                "badgeIds": [
+                    {
+                        "start": "1",
+                        "end": "1"
+                    }
+                ],
+                "ownershipTimes": [
+                    {
+                        "start": "1691978400000",
+                        "end": "1723514400000"
+                    }
+                ]
+            }
+        ],
+        "incrementBadgeIdsBy": "1",
+        "incrementOwnershipTimesBy": "0",
+        "durationFromTimestamp": "0",
+        "allowOverrideTimestamp": false,
+        "allowOverrideWithAnyValidBadge": false,
+        "recurringOwnershipTimes": {
+            "startTime": "0",
+            "intervalLength": "0",
+            "chargePeriodLength": "0"
+        }
+    }
+}
+```
 
-### Defining Order by Number of Transfers
+#### Increment Options
 
-We either use a running tally of the number of transfers to calculate the order number (no previous transfers = order number 0, one previous transfer = order number 1, and so on). This can be done on an overall or per to/from/initiatedBy address basis and is incremented using an approval tracker as explained in [Max Number of Transfers](predetermined-balances.md#max-number-of-transfers).
+| Field                            | Description                                          | Example                                              |
+| -------------------------------- | ---------------------------------------------------- | ---------------------------------------------------- |
+| `incrementBadgeIdsBy`            | Amount to increment badge IDs by after each transfer | `"1"` = next transfer gets badge ID 2, then 3, etc.  |
+| `incrementOwnershipTimesBy`      | Amount to increment ownership times by               | `"86400000"` = add 1 day to ownership times          |
+| `durationFromTimestamp`          | Calculate ownership times from timestamp + duration  | `"2592000000"` = 30 days from transfer time          |
+| `allowOverrideTimestamp`         | Allow custom timestamp override in transfer          | `true` = users can specify custom start time         |
+| `allowOverrideWithAnyValidBadge` | Allow any valid badge ID (one) override              | `true` = users can specify any single valid badge ID |
+| `recurringOwnershipTimes`        | Define recurring time intervals                      | Monthly subscriptions, weekly rewards                |
 
-IMPORTANT: Note the number of transfers is tracked using the same tracker as used within **maxNumTransfers**. Trackers are increment only, immutable, and incremented on an as-needed basis. Be mindful of this. If the tracker has prior history (potentially because **maxNumTransfers** was set), the order numbers will be calculated according to the prior history of this tracker. The opposite is also true. If you are tracking transfers here for predetermined balances, the **maxNumTransfers** restrictions will be calculated according to the tracker's history. Consider this when editing / creating approvals. You do not want to use a tracker that has prior history when you expect it to start from scratch.
+#### Duration From Timestamp
 
-### Reserved Order
+Dynamically calculate ownership times from a timestamp plus a set duration. This overwrites all ownership times in the starting balances.
 
-We also support using the leaf index for the defined Merkle challenge proof (see [Merkle Challenges](predetermined-balances.md#merkle-challenges)) to calculate the order number (e.g. leftmost leaf on expected leaf layer will correspond to order number 0, next leaf will be order number 1, and so on). The leftmost leaf means the leftmost leaf of the **expectedProofLength** layer. The challenge we will use is the one with the corresponding **challengeTrackerId**.
+```json
+{
+    "durationFromTimestamp": "2592000000", // 30 days in milliseconds
+    "allowOverrideTimestamp": true
+}
+```
 
-This is used to reserve specific badges for specific users / claim codes. For example, reserve the badges corresponding to order number 10 (leaf number 10) for address xyz.eth.
+**Behavior**:
+
+-   **Default**: Uses transfer time as the base timestamp
+-   **Override**: If `allowOverrideTimestamp` is true, users can specify a custom timestamp in `MsgTransferBadges` `precalculationOptions`
+-   **Calculation**: `ownershipTime = baseTimestamp + durationFromTimestamp`
+-   **Overwrite**: All ownership times in starting balances are replaced with [{ "start": baseTimestamp, "end": baseTimestamp + durationFromTimestamp }]
+
+#### Recurring Ownership Times
+
+Define repeating time intervals for subscriptions or periodic rewards:
+
+```json
+{
+    "recurringOwnershipTimes": {
+        "startTime": "1691978400000", // When intervals begin
+        "intervalLength": "2592000000", // 30 days in milliseconds
+        "chargePeriodLength": "604800000" // 7 days advance charging
+    }
+}
+```
+
+**Example**: Monthly subscription starting August 13, 2023, with 7-day advance charging period.
+
+## Precalculating Balances
+
+### The Race Condition Problem
+
+Predetermined balances can change rapidly between transaction broadcast and confirmation. For example:
+
+-   Other users' mints get processed
+-   Badge IDs shift due to concurrent activity
+-   Manual balance specification becomes unreliable
+
+### The Solution: Precalculation
+
+Use `precalculateBalancesFromApproval` in [MsgTransferBadges](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md) to dynamically calculate balances at execution time.
+
+```typescript
+{
+  precalculateBalancesFromApproval: {
+    approvalId: string;           // The approval to precalculate from
+    approvalLevel: string;        // "collection" | "incoming" | "outgoing"
+    approverAddress: string;      // "" if collection-level
+    version: string;              // Must specify exact version
+  },
+  precalculationOptions: {
+    // Additional override options dependent on the selections
+  }
+}
+```
+
+## Order Calculation Methods
+
+The system needs to determine which balance set to use for each transfer. This is controlled by the `orderCalculationMethod`.
+
+### How Order Numbers Work
+
+The order number determines which balances to transfer, but it works differently depending on the balance type:
+
+#### Manual Balances
+
+-   **Order number = 0**: Transfer `manualBalances[0]` (first element)
+-   **Order number = 1**: Transfer `manualBalances[1]` (second element)
+-   **Order number = 5**: Transfer `manualBalances[5]` (sixth element)
+
+**Example**: If you have 3 manual balance sets, order numbers 0, 1, and 2 will use each set once. Order number 3 would be out of bounds.
+
+#### Incremented Balances
+
+-   **Order number = 0**: Use starting balances as-is (no increments)
+-   **Order number = 1**: Apply increments once to starting balances
+-   **Order number = 5**: Apply increments five times to starting balances
+
+**Example**: Starting with badge ID 1, increment by 1:
+
+-   Order 0: Badge ID 1
+-   Order 1: Badge ID 2
+-   Order 2: Badge ID 3
+-   Order 5: Badge ID 6
+
+### Transfer-Based Order Numbers
+
+Track the number of transfers to determine order:
+
+| Method                                 | Description           | Use Case                    |
+| -------------------------------------- | --------------------- | --------------------------- |
+| `useOverallNumTransfers`               | Global transfer count | Simple sequential transfers |
+| `usePerToAddressNumTransfers`          | Per-recipient count   | User-specific limits        |
+| `usePerFromAddressNumTransfers`        | Per-sender count      | Sender-specific limits      |
+| `usePerInitiatedByAddressNumTransfers` | Per-initiator count   | Initiator-specific limits   |
+
+**Important**: Uses the same tracker as [Max Number of Transfers](max-number-of-transfers.md). Trackers are:
+
+-   Increment-only and immutable
+-   Shared between predetermined balances and max transfer limits
+-   Must be carefully managed to avoid conflicts
+
+### Merkle-Based Order Numbers
+
+Use Merkle challenge leaf indices (leftmost = 0, rightmost = numLeaves - 1) for reserved transfers:
+
+```typescript
+{
+  "useMerkleChallengeLeafIndex": true,
+  "challengeTrackerId": "uniqueId"
+}
+```
+
+**Use Case**: Reserve specific badge IDs for specific users or claim codes.
+
+## Order Calculation Interface
 
 ```typescript
 export interface PredeterminedOrderCalculationMethod {
@@ -124,10 +250,46 @@ export interface PredeterminedOrderCalculationMethod {
 }
 ```
 
-**Overlap / Out of Bounds**
+## Boundary Handling
 
-In the base approval interface, we specify the bounds for the approval ("Alice" can transfer the IDs 1-10 for Mon-Fri to "Bob" initiated by "Alice"). Typically, the precalculated balances should be completely within these bounds. However, the order number may eventually correspond to balances that have no overlap with these bounds or partially overlap. For example, if you approve x1 of ID 1, then x1 of ID 2 and so on up to x1 of ID 10000, eventually, the order number will be 10001 which corresponds to balances that are out of bounds.
+### Understanding Bounds
 
-If it is completely out of bounds (e.g. order number = 101 but approved badgeIds 1-100 with increments of 1), this is practically ignored. This is because if you try and transfer badge ID 101, it will never match to the current approval.
+Every approval defines bounds through its core fields (badgeIds, ownershipTimes, etc.). For example:
 
-You should try and design your approvals for no partial overlaps. But, in rare cases, this may occur (some in bounds and some out of bounds). In this case, the overall transfer balances still must be **exactly** as defined (in bounds + out of bounds); however, we only approve the in bounds ones for the current approval. The out of bounds ones must be approved by a separate approval.
+-   **Badge IDs**: 1-100
+-   **Ownership Times**: Mon-Fri only
+-   **Transfer Times**: Specific date range
+
+Predetermined balances must work within these bounds, but note that order numbers can eventually exceed them.
+
+### Boundary Scenarios
+
+#### Complete Out-of-Bounds
+
+**Scenario**: Order number corresponds to balances completely outside approval bounds.
+
+**Example**:
+
+-   Approval allows badge IDs 1-100
+-   Increment by 1 for each transfer
+-   Order number 101 would require badge ID 101 (out of bounds)
+
+**Result**: Transfer is ignored because badge ID 101 never matches the approval's badge ID range.
+
+#### Partial Overlap
+
+**Scenario**: Order number corresponds to balances that partially overlap with approval bounds.
+
+**Example**:
+
+-   Approval allows badge IDs 1-100
+-   Transfer requires badge IDs 95-105
+-   Badge IDs 95-100 are in bounds, 101-105 are out of bounds
+
+**Result**:
+
+-   Only in-bounds balances (95-100) are approved by current approval
+-   Out-of-bounds balances (101-105) must be approved by a separate approval
+-   The complete transfer (95-105) must still be exactly as defined
+
+**Important**: The transfer will fail unless all out-of-bounds balances are approved by other approvals.

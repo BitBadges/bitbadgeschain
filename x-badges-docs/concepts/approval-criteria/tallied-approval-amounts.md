@@ -1,92 +1,137 @@
 # Tallied Approval Amounts
 
-Pre-Readings (IMPORTANT): [Approval Trackers](approval-trackers.md)
+Limit transfer amounts using increment-only trackers with thresholds.
+
+## Interface
 
 ```typescript
-export interface ApprovalCriteria<T extends NumberType> {
-  ...
-  approvalAmounts?: ApprovalAmounts<T>;
-  ...
+interface ApprovalCriteria<T extends NumberType> {
+    approvalAmounts?: ApprovalAmounts<T>;
 }
 ```
 
-**Approval Amounts**
+## How It Works
 
-Approval amounts (**approvalAmounts**) allow you to specify the threshold amount that can be transferred for this approval. This is similar to other interfaces (such as approvals for ERC721), except we use an increment + threshold system as opposed to a decrement + greater than 0 system. This is facilitated via the concept of [Approval Trackers](approval-trackers.md).
+Specify maximum amounts that can be transferred using four tracker types:
 
-The amounts approved are scoped to the **badgeIds** and **ownershipTimes** defined by the base approval (see transferability page). Also, note that the to addresses are bounded to the addresses in the **toList,** from addresses from the **fromList**, and initiated by addresses from the **initiatedByList**.
+-   **Overall** (`trackerType = "overall"`): Universal limit for all transfers
+-   **Per To Address** (`trackerType = "to"`): Limit per unique recipient
+-   **Per From Address** (`trackerType = "from"`): Limit per unique sender
+-   **Per Initiated By Address** (`trackerType = "initiatedBy"`): Limit per unique initiator
 
-We define four levels (**trackerType** = "overall", "to", "from", "initiatedBy") that you can specify for approval amounts as seen below. You can define multiple if desired, and to be approved, the transfer must satisfy all.
+"0" means unlimited and not tracked. "N" means max N amount allowed.
 
-* **Overall**: Overall will increment a universal, cumulative approval tracker for all transfers that match this approval, regardless of who sends, receives, or initiates them.
-* **Per To Address**: If you specify an approval amount per to address, we will create unique cumulative trackers for every unique "to" address.
-* **Per From Address**: Creates unique cumulative tallies for every unique "from" address.
-* **Per Initiated By Address**: Creates unique cumulative tallies for every unique "initiatedBy" address.
-
-If the amount set is nil value or "0", this means there is no limit (no amount restrictions).
-
-**Example**
+## Example
 
 ```json
-"collectionApprovals": [
-    {
-      "fromListId": "Bob",
-      "toListId": "AllWithMint",
-      "initiatedByListId": "AllWithMint",
-      "transferTimes": [
-        {
-          "start": "1691931600000",
-          "end": "1723554000000"
-        }
-      ],
-      "ownershipTimes": [
-        {
-          "start": "1",
-          "end": "18446744073709551615"
-        }
-      ],
-      "badgeIds": [
-        {
-          "start": "1",
-          "end": "100"
-        }
-      ],
-      "approvalId": "uniqueID",
-      "version": "1",
-      
-      "approvalCriteria": {
-        "approvalAmounts": {
-           "overallApprovalAmount": "1000", //overall limit of x1000
-           "perFromAddressApprovalAmount": "0", //no limit
-           "perToAddressApprovalAmount": "0",
-           "perInitiatedByAddressApprovalAmount": "10", //limit of x10 per initiator
-           "amountTrackerId": "uniqueID",
-           "resetTimeIntervals": {
-              "startTime": "0",
-              "intervalLength": "0"
-            }
-        },
-        ...
-      }
-      ...
+{
+    "approvalAmounts": {
+        "overallApprovalAmount": "1000",
+        "perFromAddressApprovalAmount": "0",
+        "perToAddressApprovalAmount": "0",
+        "perInitiatedByAddressApprovalAmount": "10",
+        "amountTrackerId": "uniqueID"
     }
-  
+}
 ```
 
-Let's say we have the **approvalAmounts** defined above and Alice initiates a transfer of x10 from Bob. There are two separate trackers that get incremented here.
+## Tracker Types
 
-\#1) Tracker with the following ID `1-collection- -approvalId-uniqueID-overall-` gets incremented to x10 out of 1000. Any subsequent transfers (say from Charlie) will also increment this overall universal tracker as well.
+### Overall Tracker
 
-\#2) Tracker with ID `1-collection- -approvalId-uniqueID-initiatedBy-alice`gets incremented to x10 out of 10 used. Alice has now fully used up her threshold for this tracker. This tracker is only incremented when Alice initiates the transfer. If Charlie initiates a transfer, his unique initiatedBy tracker will get incremented which is separate from Alice's.
+-   **ID**: `1-collection- -approvalId-uniqueID-overall-`
+-   **Behavior**: Increments for all transfers regardless of sender/recipient/initiator
+-   **Use Case**: Global collection limits
 
-Since there was an unlimited amount approved for the "to" and "from" trackers, we do not increment anything for those trackers (as-needed basis).
+### Per-To Address Tracker
 
-**Resets + ID Changes**
+-   **ID**: `1-collection- -approvalId-uniqueID-to-recipientAddress`
+-   **Behavior**: Separate tracker for each unique recipient
+-   **Use Case**: Limit how much each user can receive
 
-Let's say we update the **amountTrackerId** to "uniqueID2" from "uniqueID". This makes all tracker IDs different, and thus, all tallies will start from scratch.
+### Per-From Address Tracker
 
-`1-collection- -approvalId-uniqueID-initiatedBy-alice` ->
+-   **ID**: `1-collection- -approvalId-uniqueID-from-senderAddress`
+-   **Behavior**: Separate tracker for each unique sender
+-   **Use Case**: Limit how much each user can send
 
-`1-collection- -approvalId-uniqueID2-initiatedBy-alice`
+### Per-InitiatedBy Address Tracker
 
-If in the future, you change back to "uniqueID", the starting point will be the previous tally. Using the examples above, x10/10 used for Alice's initiated by tracker.
+-   **ID**: `1-collection- -approvalId-uniqueID-initiatedBy-initiatorAddress`
+-   **Behavior**: Separate tracker for each unique initiator
+-   **Use Case**: Limit how much each user can initiate
+
+## Detailed Example
+
+Using the approval amounts defined above, when Alice initiates a transfer of x10 from Bob:
+
+### Two Trackers Get Incremented
+
+**#1) Overall Tracker**
+
+-   **ID**: `1-collection- -approvalId-uniqueID-overall-`
+-   **Before**: 0/1000
+-   **After**: 10/1000
+-   **Behavior**: Any subsequent transfers (from Charlie, etc.) will also increment this universal tracker
+
+**#2) Per-Initiator Tracker**
+
+-   **ID**: `1-collection- -approvalId-uniqueID-initiatedBy-alice`
+-   **Before**: 0/10
+-   **After**: 10/10 (fully used)
+-   **Behavior**: Only incremented when Alice initiates. Charlie's transfers use a separate tracker: `1-collection- -approvalId-uniqueID-initiatedBy-charlie`
+
+### Amount Tracking with Balance Type
+
+Trackers store amounts using the balance type structure. Above, we simplified it to just the amount.
+
+```json
+{
+    "amounts": [
+        {
+            "amount": 10n,
+            "badgeIds": [{ "start": 1n, "end": 1n }],
+            "ownershipTimes": [{ "start": 1n, "end": 100000000000n }]
+        }
+    ]
+}
+```
+
+**What Gets Incremented**:
+
+-   **Amount**: The total quantity transferred
+-   **Badge IDs**: Specific badge IDs that were transferred
+-   **Ownership Times**: The ownership time ranges that were transferred
+
+### Unlimited Trackers (No Increment)
+
+Since "to" and "from" trackers are set to "0" (unlimited), no tracking occurs for these types.
+
+## Tracker Behavior
+
+-   **As-Needed**: Only increment trackers when necessary (unlimited = no tracking)
+-   **Separate Counts**: Each tracker type maintains independent tallies
+-   **Address Scoped**: Per-address trackers create unique counters per address
+-   **Balance Tracking**: Increments for specific badge IDs and ownership times transferred
+
+## Resets and ID Changes
+
+### Changing Tracker ID
+
+When you update `amountTrackerId` from "uniqueID" to "uniqueID2":
+
+```
+1-collection- -approvalId-uniqueID-initiatedBy-alice
+↓
+1-collection- -approvalId-uniqueID2-initiatedBy-alice
+```
+
+**Result**: All tracker IDs change, so all tallies start from scratch.
+
+### Reusing Old IDs
+
+If you later change back to "uniqueID", the starting point will be the previous tally:
+
+-   Alice's initiatedBy tracker: 10/10 used (not 0/10)
+
+**Important**: Never reuse tracker IDs unless you want to continue from the previous state. They are increment-only.

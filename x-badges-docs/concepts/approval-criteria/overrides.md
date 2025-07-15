@@ -1,17 +1,40 @@
 # Override User Level Approvals
 
-As mentioned in the transferability page, the collection-wide approvals can override the user-level approvals. This is done via **overridesFromOutgoingApprovals** or **overridesToIncomingApprovals**.
+Collection-level approvals can override user-level approvals to force transfers.
 
-If set to true, we will not check the user's incoming / outgoing approvals for the approved balances respectively. Essentially, it is **forcefully** transferred without needing user approvals. This can be leveraged to implement forcefully revoking a badge, freezing a badge, etc.
+## Interface
 
-IMPORTANT: The Mint address has its own approvals store, but since it is not a real address, they are always empty. **Thus, it is important that when you define approvals from the Mint address, you always override the outgoing approvals of the Mint address.** Or else, the approval will not work.
+```typescript
+interface ApprovalCriteria<T extends NumberType> {
+    overridesFromOutgoingApprovals?: boolean;
+    overridesToIncomingApprovals?: boolean;
+}
+```
 
-* <pre class="language-json"><code class="lang-json"><strong>"fromListId": "Mint", //represents the list with the "Mint" addres
-  </strong>...
-  "approvalCriteria": {
-    "overridesFromOutgoingApprovals": true
-    ...
-  }
-  </code></pre>
+## How It Works
 
-<figure><img src="../../../../.gitbook/assets/image (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1)  (18).png" alt=""><figcaption></figcaption></figure>
+-   **`overridesFromOutgoingApprovals: true`**: Skip sender's outgoing approvals
+-   **`overridesToIncomingApprovals: true`**: Skip recipient's incoming approvals
+
+This enables forced transfers without user consent.
+
+## Use Cases
+
+-   **Force Revoke**: Remove badges from users
+-   **Freeze Badges**: Prevent transfers regardless of user settings
+-   **Emergency Actions**: Administrative control over transfers
+
+## Mint Address Requirement
+
+**CRITICAL**: Mint address approvals must always override outgoing approvals:
+
+```json
+{
+    "fromListId": "Mint",
+    "approvalCriteria": {
+        "overridesFromOutgoingApprovals": true
+    }
+}
+```
+
+The Mint address has no user-level approvals, so overrides are required for functionality.
