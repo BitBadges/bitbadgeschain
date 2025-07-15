@@ -17,6 +17,11 @@ This directory contains detailed documentation for all message types supported b
 ### User Approval Management
 
 -   [MsgUpdateUserApprovals](./msg-update-user-approvals.md) - Update user transfer approval settings
+-   [MsgSetIncomingApproval](./msg-set-incoming-approval.md) - Set a single incoming approval (helper)
+-   [MsgDeleteIncomingApproval](./msg-delete-incoming-approval.md) - Delete a single incoming approval (helper)
+-   [MsgSetOutgoingApproval](./msg-set-outgoing-approval.md) - Set a single outgoing approval (helper)
+-   [MsgDeleteOutgoingApproval](./msg-delete-outgoing-approval.md) - Delete a single outgoing approval (helper)
+-   [MsgPurgeApprovals](./msg-purge-approvals.md) - Purge expired approvals (helper)
 
 ### Address List Management
 

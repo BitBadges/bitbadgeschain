@@ -31,6 +31,11 @@ service Msg {
   rpc CreateAddressLists (MsgCreateAddressLists) returns (MsgCreateAddressListsResponse);
   rpc TransferBadges(MsgTransferBadges) returns (MsgTransferBadgesResponse);
   rpc UpdateUserApprovals(MsgUpdateUserApprovals) returns (MsgUpdateUserApprovalsResponse);
+  rpc SetIncomingApproval(MsgSetIncomingApproval) returns (MsgSetIncomingApprovalResponse);
+  rpc DeleteIncomingApproval(MsgDeleteIncomingApproval) returns (MsgDeleteIncomingApprovalResponse);
+  rpc SetOutgoingApproval(MsgSetOutgoingApproval) returns (MsgSetOutgoingApprovalResponse);
+  rpc DeleteOutgoingApproval(MsgDeleteOutgoingApproval) returns (MsgDeleteOutgoingApprovalResponse);
+  rpc PurgeApprovals(MsgPurgeApprovals) returns (MsgPurgeApprovalsResponse);
   rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
   rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
   rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
@@ -53,6 +58,11 @@ message BadgeCustomMsgType {
   MsgUpdateDynamicStore updateDynamicStoreMsg = 9;
   MsgDeleteDynamicStore deleteDynamicStoreMsg = 10;
   MsgSetDynamicStoreValue setDynamicStoreValueMsg = 11;
+  MsgSetIncomingApproval setIncomingApprovalMsg = 12;
+  MsgDeleteIncomingApproval deleteIncomingApprovalMsg = 13;
+  MsgSetOutgoingApproval setOutgoingApprovalMsg = 14;
+  MsgDeleteOutgoingApproval deleteOutgoingApprovalMsg = 15;
+  MsgPurgeApprovals purgeApprovalsMsg = 16;
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -414,6 +424,108 @@ message MsgUpdateUserApprovals {
 
 // MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.
 message MsgUpdateUserApprovalsResponse {}
+
+// MsgSetIncomingApproval is a helper message to set a single incoming approval.
+message MsgSetIncomingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/SetIncomingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The incoming approval to set.
+  UserIncomingApproval approval = 3;
+}
+
+// MsgSetIncomingApprovalResponse is the response to MsgSetIncomingApproval.
+message MsgSetIncomingApprovalResponse {}
+
+// MsgDeleteIncomingApproval is a helper message to delete a single incoming approval.
+message MsgDeleteIncomingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/DeleteIncomingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The ID of the approval to delete.
+  string approvalId = 3;
+}
+
+// MsgDeleteIncomingApprovalResponse is the response to MsgDeleteIncomingApproval.
+message MsgDeleteIncomingApprovalResponse {}
+
+// MsgSetOutgoingApproval is a helper message to set a single outgoing approval.
+message MsgSetOutgoingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/SetOutgoingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The outgoing approval to set.
+  UserOutgoingApproval approval = 3;
+}
+
+// MsgSetOutgoingApprovalResponse is the response to MsgSetOutgoingApproval.
+message MsgSetOutgoingApprovalResponse {}
+
+// MsgDeleteOutgoingApproval is a helper message to delete a single outgoing approval.
+message MsgDeleteOutgoingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/DeleteOutgoingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The ID of the approval to delete.
+  string approvalId = 3;
+}
+
+// MsgDeleteOutgoingApprovalResponse is the response to MsgDeleteOutgoingApproval.
+message MsgDeleteOutgoingApprovalResponse {}
+
+// MsgPurgeApprovals is a helper message to purge expired approvals.
+message MsgPurgeApprovals {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/PurgeApprovals";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // Whether to purge expired approvals (approvals with no future valid transfer times).
+  bool purgeExpired = 3;
+  
+  // Address of the user whose approvals to purge. If empty, defaults to creator.
+  string approverAddress = 4;
+  
+  // Whether to purge counterparty approvals (approvals where the creator is the only initiator).
+  bool purgeCounterpartyApprovals = 5;
+  
+  // Specific approvals to purge. If empty, purges all applicable approvals based on other flags.
+  repeated ApprovalIdentifierDetails approvalsToPurge = 6;
+}
+
+// MsgPurgeApprovalsResponse is the response to MsgPurgeApprovals.
+message MsgPurgeApprovalsResponse {
+  // Number of approvals purged.
+  string numPurged = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
 
 // MsgCreateDynamicStore is used to create a new dynamic store.
 message MsgCreateDynamicStore {

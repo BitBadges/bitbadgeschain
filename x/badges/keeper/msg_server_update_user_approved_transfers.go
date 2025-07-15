@@ -11,6 +11,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// Helper function to create and execute an UpdateUserApprovals message
+func (k msgServer) executeUpdateUserApprovals(ctx sdk.Context, creator string, collectionId sdkmath.Uint, updateMsg *types.MsgUpdateUserApprovals) error {
+	// Set the basic fields
+	updateMsg.Creator = creator
+	updateMsg.CollectionId = collectionId
+
+	// Execute the update
+	_, err := k.UpdateUserApprovals(ctx, updateMsg)
+	return err
+}
+
 func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

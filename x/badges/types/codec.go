@@ -23,6 +23,11 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateDynamicStore{}, "badges/UpdateDynamicStore", nil)
 	cdc.RegisterConcrete(&MsgDeleteDynamicStore{}, "badges/DeleteDynamicStore", nil)
 	cdc.RegisterConcrete(&MsgSetDynamicStoreValue{}, "badges/SetDynamicStoreValue", nil)
+	cdc.RegisterConcrete(&MsgSetIncomingApproval{}, "badges/SetIncomingApproval", nil)
+	cdc.RegisterConcrete(&MsgDeleteIncomingApproval{}, "badges/DeleteIncomingApproval", nil)
+	cdc.RegisterConcrete(&MsgSetOutgoingApproval{}, "badges/SetOutgoingApproval", nil)
+	cdc.RegisterConcrete(&MsgDeleteOutgoingApproval{}, "badges/DeleteOutgoingApproval", nil)
+	cdc.RegisterConcrete(&MsgPurgeApprovals{}, "badges/PurgeApprovals", nil)
 
 	encodingcodec.RegisterLegacyAminoCodec(cdc)
 	// this line is used by starport scaffolding # 2
@@ -41,6 +46,11 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpdateDynamicStore{},
 		&MsgDeleteDynamicStore{},
 		&MsgSetDynamicStoreValue{},
+		&MsgSetIncomingApproval{},
+		&MsgDeleteIncomingApproval{},
+		&MsgSetOutgoingApproval{},
+		&MsgDeleteOutgoingApproval{},
+		&MsgPurgeApprovals{},
 	)
 	// this line is used by starport scaffolding # 3
 

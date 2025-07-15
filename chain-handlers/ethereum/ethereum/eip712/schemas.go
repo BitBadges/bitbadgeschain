@@ -8,7 +8,319 @@ package eip712
 	This is because that is what the SDK does.
 */
 
-//TODO: Store JSONs in a file directory not directly here
+// getMerkleChallengeSchema returns the schema for a Merkle challenge
+func getMerkleChallengeSchema() string {
+	return `{
+		"root": "",
+		"expectedProofLength": "",
+		"useCreatorAddressAsLeaf": false,
+		"leafSigner": "",
+		"maxUsesPerLeaf": "",
+		"challengeTrackerId": "",
+		"uri": "",
+		"customData": ""
+	}`
+}
+
+// getMustOwnBadgesSchema returns the schema for must own badges criteria
+func getMustOwnBadgesSchema() string {
+	return `{
+		"collectionId": "",
+		"amountRange": ` + getUintRangeSchema() + `,
+		"ownershipTimes": [` + getUintRangeSchema() + `],
+		"badgeIds": [` + getUintRangeSchema() + `],
+		"overrideWithCurrentTime": false,
+		"mustSatisfyForAllAssets": false
+	}`
+}
+
+// getCoinTransferSchema returns the schema for coin transfers
+func getCoinTransferSchema() string {
+	return `{
+		"to": "",
+		"overrideFromWithApproverAddress": false,
+		"overrideToWithInitiator": false,
+		"coins": [
+			{
+				"amount": "",
+				"denom": ""
+			}
+		]
+	}`
+}
+
+// getBalanceSchema returns the schema for a balance
+func getBalanceSchema() string {
+	return `{
+		"amount": "",
+		"ownershipTimes": [` + getUintRangeSchema() + `],
+		"badgeIds": [` + getUintRangeSchema() + `]
+	}`
+}
+
+// getPredeterminedBalancesSchema returns the schema for predetermined balances
+func getPredeterminedBalancesSchema() string {
+	return `{
+		"manualBalances": [
+			{
+				"balances": [
+					` + getBalanceSchema() + `
+				]
+			}
+		],
+		"incrementedBalances": {
+			"startBalances": [
+				` + getBalanceSchema() + `
+			],
+			"incrementBadgeIdsBy": "",
+			"allowOverrideWithAnyValidBadge": false,
+			"durationFromTimestamp": "",
+			"incrementOwnershipTimesBy": "",
+			"allowOverrideTimestamp": true,
+			"recurringOwnershipTimes": { 
+				"startTime": "",
+				"intervalLength": "",
+				"chargePeriodLength": ""
+			}
+		},
+		"orderCalculationMethod": {
+			"useOverallNumTransfers": false,
+			"usePerToAddressNumTransfers": false,
+			"usePerFromAddressNumTransfers": false,
+			"usePerInitiatedByAddressNumTransfers": false,
+			"challengeTrackerId": "",
+			"useMerkleChallengeLeafIndex": false
+		}
+	}`
+}
+
+// getApprovalAmountsSchema returns the schema for approval amounts
+func getApprovalAmountsSchema() string {
+	return `{
+		"overallApprovalAmount": "",
+		"perToAddressApprovalAmount": "",
+		"perFromAddressApprovalAmount": "",
+		"amountTrackerId": "",
+		"perInitiatedByAddressApprovalAmount": "",
+		"resetTimeIntervals": {
+			"startTime": "",
+			"intervalLength": ""
+		}
+	}`
+}
+
+// getMaxNumTransfersSchema returns the schema for max number of transfers
+func getMaxNumTransfersSchema() string {
+	return `{
+		"overallMaxNumTransfers": "",
+		"perToAddressMaxNumTransfers": "",
+		"perFromAddressMaxNumTransfers": "",
+		"amountTrackerId": "",
+		"perInitiatedByAddressMaxNumTransfers": "",
+		"resetTimeIntervals": {
+			"startTime": "",
+			"intervalLength": ""
+		}
+	}`
+}
+
+// getAutoDeletionOptionsSchema returns the schema for auto deletion options
+func getAutoDeletionOptionsSchema() string {
+	return `{ 
+		"afterOneUse": true, 
+		"afterOverallMaxNumTransfers": false, 
+		"allowCounterpartyPurge": false, 
+		"allowPurgeIfExpired": false 
+	}`
+}
+
+// getDynamicStoreChallengeSchema returns the schema for dynamic store challenges
+func getDynamicStoreChallengeSchema() string {
+	return `{ "storeId": "" }`
+}
+
+// getBaseApprovalCriteriaSchema returns the base approval criteria schema without collection-specific fields
+func getBaseApprovalCriteriaSchema() string {
+	return `{
+		"mustOwnBadges": [
+			` + getMustOwnBadgesSchema() + `
+		],
+		"merkleChallenges": [
+			` + getMerkleChallengeSchema() + `
+		],
+		"coinTransfers": [
+			` + getCoinTransferSchema() + `
+		],
+		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
+		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
+		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
+		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
+		"dynamicStoreChallenges": [
+			` + getDynamicStoreChallengeSchema() + `
+		]
+	}`
+}
+
+// getCollectionApprovalCriteriaSchema returns the schema for collection approval criteria
+func getCollectionApprovalCriteriaSchema() string {
+	return `{
+		"mustOwnBadges": [
+			` + getMustOwnBadgesSchema() + `
+		],
+		"merkleChallenges": [
+			` + getMerkleChallengeSchema() + `
+		],
+		"coinTransfers": [
+			` + getCoinTransferSchema() + `
+		],
+		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
+		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
+		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
+		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
+		"requireToEqualsInitiatedBy": false,
+		"requireFromEqualsInitiatedBy": false,
+		"requireToDoesNotEqualInitiatedBy": false,
+		"requireFromDoesNotEqualInitiatedBy": false,
+		"overridesFromOutgoingApprovals": false,
+		"userRoyalties": {
+			"percentage": "",
+			"payoutAddress": ""
+		},
+		"overridesToIncomingApprovals": false,
+		"dynamicStoreChallenges": [
+			` + getDynamicStoreChallengeSchema() + `
+		]
+	}`
+}
+
+// getOutgoingApprovalCriteriaSchema returns the schema for outgoing approval criteria
+func getOutgoingApprovalCriteriaSchema() string {
+	return `{
+		"mustOwnBadges": [
+			` + getMustOwnBadgesSchema() + `
+		],
+		"merkleChallenges": [
+			` + getMerkleChallengeSchema() + `
+		],
+		"coinTransfers": [
+			` + getCoinTransferSchema() + `
+		],
+		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
+		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
+		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
+		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
+		"requireToEqualsInitiatedBy": false,
+		"requireToDoesNotEqualInitiatedBy": false,
+		"dynamicStoreChallenges": [
+			` + getDynamicStoreChallengeSchema() + `
+		]
+	}`
+}
+
+// getIncomingApprovalCriteriaSchema returns the schema for incoming approval criteria
+func getIncomingApprovalCriteriaSchema() string {
+	return `{
+		"mustOwnBadges": [
+			` + getMustOwnBadgesSchema() + `
+		],
+		"merkleChallenges": [
+			` + getMerkleChallengeSchema() + `
+		],
+		"coinTransfers": [
+			` + getCoinTransferSchema() + `
+		],
+		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
+		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
+		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
+		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
+		"requireFromEqualsInitiatedBy": false,
+		"requireFromDoesNotEqualInitiatedBy": false,
+		"dynamicStoreChallenges": [
+			` + getDynamicStoreChallengeSchema() + `
+		]
+	}`
+}
+
+// getUintRangeSchema returns the schema for a uint range
+func getUintRangeSchema() string {
+	return `{"start": "", "end": ""}`
+}
+
+// getCollectionApprovalSchema returns the schema for collection approval
+func getCollectionApprovalSchema() string {
+	return `{
+		"fromListId": "",
+		"toListId": "",
+		"initiatedByListId": "",
+		"transferTimes": [` + getUintRangeSchema() + `],
+		"badgeIds": [` + getUintRangeSchema() + `],
+		"ownershipTimes": [` + getUintRangeSchema() + `],
+		"uri": "",
+		"customData": "",
+		"approvalId": "",
+		"version": "0",
+		"approvalCriteria": ` + getCollectionApprovalCriteriaSchema() + `
+	}`
+}
+
+// getIncomingApprovalSchema returns the schema for an incoming approval object
+func getIncomingApprovalSchema() string {
+	return `{
+		"fromListId": "",
+		"initiatedByListId": "",
+		"transferTimes": [` + getUintRangeSchema() + `],
+		"badgeIds": [` + getUintRangeSchema() + `],
+		"ownershipTimes": [` + getUintRangeSchema() + `],
+		"uri": "",
+		"customData": "",
+		"approvalId": "",
+		"version": "0",
+		"approvalCriteria": ` + getIncomingApprovalCriteriaSchema() + `
+	}`
+}
+
+// getOutgoingApprovalSchema returns the schema for an outgoing approval object
+func getOutgoingApprovalSchema() string {
+	return `{
+		"toListId": "",
+		"initiatedByListId": "",
+		"transferTimes": [` + getUintRangeSchema() + `],
+		"badgeIds": [` + getUintRangeSchema() + `],
+		"ownershipTimes": [` + getUintRangeSchema() + `],
+		"uri": "",
+		"customData": "",
+		"approvalId": "",
+		"version": "0",
+		"approvalCriteria": ` + getOutgoingApprovalCriteriaSchema() + `
+	}`
+}
+
+// getCollectionPermissionsSchema returns the schema for collection permissions
+func getCollectionPermissionsSchema() string {
+	return `{
+		"canDeleteCollection": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canArchiveCollection": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateOffChainBalancesMetadata": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateStandards": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCustomData": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateManager": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCollectionMetadata": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateValidBadgeIds": [{"badgeIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateBadgeMetadata": [{"badgeIds": [` + getUintRangeSchema() + `], "timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "badgeIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
+	}`
+}
+
+// getUserPermissionsSchema returns the schema for user permissions
+func getUserPermissionsSchema() string {
+	return `{
+		"canUpdateOutgoingApprovals": [{"toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "badgeIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateIncomingApprovals": [{"fromListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "badgeIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateAutoApproveAllIncomingTransfers": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
+	}`
+}
 
 // GetSchemas returns all the schemas for the EIP712 types
 func GetSchemas() []string {
@@ -19,115 +331,59 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"mapId": "",
-			"inheritManagerTimelineFrom": "",
-			"managerTimeline": [
+					"inheritManagerTimelineFrom": "",
+		"managerTimeline": [
+			{
+				"manager": "",
+				"timelineTimes": [`+getUintRangeSchema()+`]
+			}
+		],
+		"updateCriteria": {
+			"managerOnly": false,
+			"collectionId": "",
+			"creatorOnly": false,
+			"firstComeFirstServe": false
+		},
+		"valueOptions": {
+			"noDuplicates": false,
+			"permanentOnceSet": false,
+			"expectUint": false,
+			"expectBoolean": false,
+			"expectAddress": false,
+			"expectUri": false
+		},
+		"defaultValue": "",
+		"metadataTimeline": [
+			{
+				"metadata": {
+					"uri": "",
+					"customData": ""
+				},
+				"timelineTimes": [`+getUintRangeSchema()+`]
+			}
+		],
+		"permissions": {
+			"canUpdateMetadata": [
 				{
-					"manager": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`],
+					"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+					"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"updateCriteria": {
-				"managerOnly": false,
-				"collectionId": "",
-				"creatorOnly": false,
-				"firstComeFirstServe": false
-			},
-			"valueOptions": {
-				"noDuplicates": false,
-				"permanentOnceSet": false,
-				"expectUint": false,
-				"expectBoolean": false,
-				"expectAddress": false,
-				"expectUri": false
-			},
-			"defaultValue": "",
-			"metadataTimeline": [
+			"canUpdateManager": [
 				{
-					"metadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`],
+					"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+					"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"permissions": {
-				"canUpdateMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateManager": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canDeleteMap": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				]
-			},
+			"canDeleteMap": [
+				{
+					"timelineTimes": [`+getUintRangeSchema()+`],
+					"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+					"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
+				}
+			]
 		}
 	}`)
 
@@ -140,12 +396,7 @@ func GetSchemas() []string {
 			"managerTimeline": [
 				{
 					"manager": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateMetadataTimeline": false,
@@ -155,80 +406,30 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updatePermissions": false,
 			"permissions": {
 				"canUpdateMetadata": [
 					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
+						"timelineTimes": [`+getUintRangeSchema()+`],
+						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 					}
 				],
 				"canUpdateManager": [
 					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
+						"timelineTimes": [`+getUintRangeSchema()+`],
+						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 					}
 				],
 				"canDeleteMap": [
 					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
+						"timelineTimes": [`+getUintRangeSchema()+`],
+						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 					}
 				]
 			}
@@ -251,7 +452,7 @@ func GetSchemas() []string {
 			"key": "",
 			"value": "",
 			"options": {
-				"useMostRecentCollectionId": false,
+				"useMostRecentCollectionId": false
 			}
 		}
 	}`)
@@ -299,7 +500,6 @@ func GetSchemas() []string {
 		"type": "badges/CreateAddressLists",
 		"value": {
 			"creator": "",
-			
 			"addressLists": [
 				{
 					"listId": "",
@@ -317,7 +517,6 @@ func GetSchemas() []string {
 		"type": "badges/DeleteCollection",
 		"value": {
 			"creator": "",
-			
 			"collectionId": ""
 		}
 	}`)
@@ -326,28 +525,13 @@ func GetSchemas() []string {
 		"type": "badges/TransferBadges",
 		"value": {
 			"creator": "",
-			
 			"collectionId": "",
 			"transfers": [
 				{
 					"from": "",
 					"toAddresses": [],
 					"balances": [
-						{
-							"amount": "",
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
+						`+getBalanceSchema()+`
 					],
 					"precalculateBalancesFromApproval": {
 						"approvalId": "",
@@ -380,12 +564,11 @@ func GetSchemas() []string {
 					"onlyCheckPrioritizedIncomingApprovals": false,
 					"onlyCheckPrioritizedOutgoingApprovals": false,
 					"precalculationOptions": {
-							"overrideTimestamp": "0",
-							"badgeIdsOverride": [{ "start": "", "end": "" }]
-						},
+						"overrideTimestamp": "0",
+						"badgeIdsOverride": [`+getUintRangeSchema()+`]
+					},
 					"affiliateAddress": "",
 					"numAttempts": "0"
-					]
 				}
 			]
 		}
@@ -395,737 +578,32 @@ func GetSchemas() []string {
 		"type": "badges/UniversalUpdateCollection",
 		"value": {
 			"creator": "",
-			
 			"collectionId": "",
 			"balancesType": "",
 			"defaultBalances": {
-				"balances": [	{
-					"amount": "",
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
-				}],
-				"incomingApprovals":  [
-					{
-						"fromListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"uri": "",
-						"customData": "",
-						"approvalId": "",
-						"version": "0",
-						"approvalCriteria": {
-						"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-						"merkleChallenges": [{
-								"root": "",
-								"expectedProofLength": "",
-								"useCreatorAddressAsLeaf": false,
-								"leafSigner": "",
-								"maxUsesPerLeaf": "",
-								"challengeTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}],
-							"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-							"predeterminedBalances": {
-								"manualBalances": [
-									{
-										"balances": [
-											{
-												"amount": "",
-												"ownershipTimes": [
-													{
-														"start": "",
-														"end": ""
-													}
-												],
-												"badgeIds": [
-													{
-														"start": "",
-														"end": ""
-													}
-												]
-											}
-										]
-									}
-								],
-								"incrementedBalances": {
-									"startBalances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									],
-									"incrementBadgeIdsBy": "",
-									"allowOverrideWithAnyValidBadge": false,
-									"durationFromTimestamp": "",
-									"incrementOwnershipTimesBy": "",
-									"allowOverrideTimestamp": true,
-									"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-								},
-								"orderCalculationMethod": {
-									"useOverallNumTransfers": false,
-									"usePerToAddressNumTransfers": false,
-									"usePerFromAddressNumTransfers": false,
-									"usePerInitiatedByAddressNumTransfers": false,
-									"challengeTrackerId": "",
-									"useMerkleChallengeLeafIndex": false
-								}
-							},
-							"approvalAmounts": {
-								"overallApprovalAmount": "",
-								"perToAddressApprovalAmount": "",
-								"perFromAddressApprovalAmount": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": "",
-								"resetTimeIntervals": {
-									"startTime": "",
-									"intervalLength": ""
-								}
-							},
-							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-							"maxNumTransfers": {
-								"overallMaxNumTransfers": "",
-								"perToAddressMaxNumTransfers": "",
-								"perFromAddressMaxNumTransfers": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": "",
-								"resetTimeIntervals": {
-									"startTime": "",
-									"intervalLength": ""
-								}
-							},
-							"requireFromEqualsInitiatedBy": false,
-							"requireFromDoesNotEqualInitiatedBy": false,
-							"dynamicStoreChallenges": [
-								{ "storeId": "" }
-							]
-						}
-					}
+				"balances": [
+					`+getBalanceSchema()+`
+				],
+				"incomingApprovals": [
+					`+getIncomingApprovalSchema()+`
 				],
 				"outgoingApprovals": [
-					{
-						"toListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"uri": "",
-						"customData": "",
-						"approvalId": "",
-						"version": "0",
-						"approvalCriteria": {
-						"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-						"merkleChallenges": [{
-								"root": "",
-								"expectedProofLength": "",
-								"useCreatorAddressAsLeaf": false,
-								"leafSigner": "",
-								"maxUsesPerLeaf": "",
-								"challengeTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}],
-							"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-							"predeterminedBalances": {
-								"manualBalances": [
-									{
-										"balances": [
-											{
-												"amount": "",
-												"ownershipTimes": [
-													{
-														"start": "",
-														"end": ""
-													}
-												],
-												"badgeIds": [
-													{
-														"start": "",
-														"end": ""
-													}
-												]
-											}
-										]
-									}
-								],
-								"incrementedBalances": {
-									"startBalances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									],
-									"incrementBadgeIdsBy": "",
-									"allowOverrideWithAnyValidBadge": false,
-									"durationFromTimestamp": "",
-									"incrementOwnershipTimesBy": "",
-									"allowOverrideTimestamp": true,
-									"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-								},
-								"orderCalculationMethod": {
-									"useOverallNumTransfers": false,
-									"usePerToAddressNumTransfers": false,
-									"usePerFromAddressNumTransfers": false,
-									"usePerInitiatedByAddressNumTransfers": false,
-									"challengeTrackerId": "",
-									"useMerkleChallengeLeafIndex": false
-								}
-							},
-							"approvalAmounts": {
-								"overallApprovalAmount": "",
-								"perToAddressApprovalAmount": "",
-								"perFromAddressApprovalAmount": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": "",
-								"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-							},
-							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-							"maxNumTransfers": {
-								"overallMaxNumTransfers": "",
-								"perToAddressMaxNumTransfers": "",
-								"perFromAddressMaxNumTransfers": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": "",
-								"resetTimeIntervals": {
-									"startTime": "",
-									"intervalLength": ""
-								}
-							},
-							"requireToEqualsInitiatedBy": false,
-							"requireToDoesNotEqualInitiatedBy": false,
-							"dynamicStoreChallenges": [
-								{ "storeId": "" }
-							]
-						}
-					}
+					`+getOutgoingApprovalSchema()+`
 				],
-				"userPermissions": {
-					"canUpdateOutgoingApprovals": [
-						{
-							"toListId": "",
-							"initiatedByListId": "",
-							"transferTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"approvalId": "",
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateIncomingApprovals": [
-						{
-							"fromListId": "",
-							"initiatedByListId": "",
-							"transferTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"approvalId": "",
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
-						{
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
-						{
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateAutoApproveAllIncomingTransfers": [
-						{
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					]
-				},
+				"userPermissions": `+getUserPermissionsSchema()+`,
 				"autoApproveSelfInitiatedIncomingTransfers": true,
 				"autoApproveSelfInitiatedOutgoingTransfers": true,
 				"autoApproveAllIncomingTransfers": true
 			},
 			"updateValidBadgeIds": false,
-			"validBadgeIds": [
-				{
-					"start": "",
-					"end": ""
-				}
-			],
+			"validBadgeIds": [`+getUintRangeSchema()+`],
 			"updateCollectionPermissions": false,
-			"collectionPermissions": {
-				"canDeleteCollection": [
-					{
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canArchiveCollection": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateOffChainBalancesMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateStandards": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCustomData": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateManager": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCollectionMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateValidBadgeIds": [
-					{
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateBadgeMetadata": [
-					{
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCollectionApprovals": [
-					{
-						"fromListId": "",
-						"toListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"approvalId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				]
-			},
+			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
 			"updateManagerTimeline": false,
 			"managerTimeline": [
 				{
 					"manager": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateCollectionMetadataTimeline": false,
@@ -1135,12 +613,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateBadgeMetadataTimeline": false,
@@ -1150,20 +623,10 @@ func GetSchemas() []string {
 						{
 							"uri": "",
 							"customData": "",
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
+							"badgeIds": [`+getUintRangeSchema()+`]
 						}
 					],
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateOffChainBalancesMetadataTimeline": false,
@@ -1173,222 +636,32 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateCustomDataTimeline": false,
 			"customDataTimeline": [
 				{
 					"customData": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateCollectionApprovals": false,
 			"collectionApprovals": [
-				{
-					"fromListId": "",
-					"toListId": "",
-					"initiatedByListId": "",
-					"transferTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"uri": "",
-					"customData": "",
-					"approvalId": "",
-					"version": "0",
-					"approvalCriteria": {
-					"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-					"merkleChallenges": [{
-							"root": "",
-							"expectedProofLength": "",
-							"useCreatorAddressAsLeaf": false,
-							"leafSigner": "",
-							"maxUsesPerLeaf": "",
-							"challengeTrackerId": "",
-							"uri": "",
-							"customData": ""
-						}],
-						"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-						"predeterminedBalances": {
-							"manualBalances": [
-								{
-									"balances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									]
-								}
-							],
-							"incrementedBalances": {
-								"startBalances": [
-									{
-										"amount": "",
-										"ownershipTimes": [
-											{
-												"start": "",
-												"end": ""
-											}
-										],
-										"badgeIds": [
-											{
-												"start": "",
-												"end": ""
-											}
-										]
-									}
-								],
-								"incrementBadgeIdsBy": "",
-								"allowOverrideWithAnyValidBadge": false,
-								"durationFromTimestamp": "",
-								"incrementOwnershipTimesBy": "",
-								"allowOverrideTimestamp": true,
-								"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-							},
-							"orderCalculationMethod": {
-								"useOverallNumTransfers": false,
-								"usePerToAddressNumTransfers": false,
-								"usePerFromAddressNumTransfers": false,
-								"usePerInitiatedByAddressNumTransfers": false,
-								"challengeTrackerId": "",
-								"useMerkleChallengeLeafIndex": false
-							}
-						},
-						"approvalAmounts": {
-							"overallApprovalAmount": "",
-							"perToAddressApprovalAmount": "",
-							"perFromAddressApprovalAmount": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-						"maxNumTransfers": {
-							"overallMaxNumTransfers": "",
-							"perToAddressMaxNumTransfers": "",
-							"perFromAddressMaxNumTransfers": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"requireToEqualsInitiatedBy": false,
-						"requireFromEqualsInitiatedBy": false,
-						"requireToDoesNotEqualInitiatedBy": false,
-						"requireFromDoesNotEqualInitiatedBy": false,
-						"overridesFromOutgoingApprovals": false,
-						"userRoyalties": {
-							"percentage": "",
-							"payoutAddress": ""
-						},
-						"overridesToIncomingApprovals": false,
-						"dynamicStoreChallenges": [
-							{ "storeId": "" }
-						]
-					}
-				}
+				`+getCollectionApprovalSchema()+`
 			],
 			"updateStandardsTimeline": false,
 			"standardsTimeline": [
 				{
 					"standards": [],
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateIsArchivedTimeline": false,
 			"isArchivedTimeline": [
 				{
 					"isArchived": false,
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"mintEscrowCoinsToTransfer": [
@@ -1401,21 +674,7 @@ func GetSchemas() []string {
 				{
 					"denom": "",
 					"balances": [
-						{
-							"amount": "",
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
+						`+getBalanceSchema()+`
 					],
 					"symbol": "",
 					"denomUnits": [
@@ -1434,337 +693,14 @@ func GetSchemas() []string {
 		"type": "badges/UpdateUserApprovals",
 		"value": {
 			"creator": "",
-			
 			"collectionId": "",
 			"updateOutgoingApprovals": false,
 			"outgoingApprovals": [
-				{
-					"toListId": "",
-					"initiatedByListId": "",
-					"transferTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"uri": "",
-					"customData": "",
-					"approvalId": "",
-					"version": "0",
-					"approvalCriteria": {
-					"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-					"merkleChallenges": [{
-							"root": "",
-							"expectedProofLength": "",
-							"useCreatorAddressAsLeaf": false,
-							"leafSigner": "",
-							"maxUsesPerLeaf": "",
-							"challengeTrackerId": "",
-							"uri": "",
-							"customData": ""
-						}],
-						"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-						"predeterminedBalances": {
-							"manualBalances": [
-								{
-									"balances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									]
-								}
-							],
-							"incrementedBalances": {
-								"startBalances": [
-									{
-										"amount": "",
-										"ownershipTimes": [
-											{
-												"start": "",
-												"end": ""
-											}
-										],
-										"badgeIds": [
-											{
-												"start": "",
-												"end": ""
-											}
-										]
-									}
-								],
-								"incrementBadgeIdsBy": "",
-								"allowOverrideWithAnyValidBadge": false,
-								"durationFromTimestamp": "",
-								"incrementOwnershipTimesBy": "",
-								"allowOverrideTimestamp": true,
-								"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-							},
-							"orderCalculationMethod": {
-								"useOverallNumTransfers": false,
-								"usePerToAddressNumTransfers": false,
-								"usePerFromAddressNumTransfers": false,
-								"usePerInitiatedByAddressNumTransfers": false,
-								"challengeTrackerId": "",
-								"useMerkleChallengeLeafIndex": false
-							}
-						},
-						"approvalAmounts": {
-							"overallApprovalAmount": "",
-							"perToAddressApprovalAmount": "",
-							"perFromAddressApprovalAmount": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-						"maxNumTransfers": {
-							"overallMaxNumTransfers": "",
-							"perToAddressMaxNumTransfers": "",
-							"perFromAddressMaxNumTransfers": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"requireToEqualsInitiatedBy": false,
-						"requireToDoesNotEqualInitiatedBy": false,
-						"dynamicStoreChallenges": [
-							{ "storeId": "" }
-						]
-					}
-				}
+				`+getOutgoingApprovalSchema()+`
 			],
 			"updateIncomingApprovals": false,
 			"incomingApprovals": [
-				{
-					"fromListId": "",
-					"initiatedByListId": "",
-					"transferTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"uri": "",
-					"customData": "",
-					"approvalId": "",
-					"version": "0",
-					"approvalCriteria": {
-					"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-					"merkleChallenges": [{
-							"root": "",
-							"expectedProofLength": "",
-							"useCreatorAddressAsLeaf": false,
-							"leafSigner": "",
-							"maxUsesPerLeaf": "",
-							"challengeTrackerId": "",
-							"uri": "",
-							"customData": ""
-						}],
-						"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-						"predeterminedBalances": {
-							"manualBalances": [
-								{
-									"balances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									]
-								}
-							],
-							"incrementedBalances": {
-								"startBalances": [
-									{
-										"amount": "",
-										"ownershipTimes": [
-											{
-												"start": "",
-												"end": ""
-											}
-										],
-										"badgeIds": [
-											{
-												"start": "",
-												"end": ""
-											}
-										]
-									}
-								],
-								"incrementBadgeIdsBy": "",
-								"allowOverrideWithAnyValidBadge": false,
-								"durationFromTimestamp": "",
-								"incrementOwnershipTimesBy": "",
-								"allowOverrideTimestamp": true,
-								"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-							},
-							"orderCalculationMethod": {
-								"useOverallNumTransfers": false,
-								"usePerToAddressNumTransfers": false,
-								"usePerFromAddressNumTransfers": false,
-								"usePerInitiatedByAddressNumTransfers": false,
-								"challengeTrackerId": "",
-								"useMerkleChallengeLeafIndex": false
-							}
-						},
-						"approvalAmounts": {
-							"overallApprovalAmount": "",
-							"perToAddressApprovalAmount": "",
-							"perFromAddressApprovalAmount": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-						"maxNumTransfers": {
-							"overallMaxNumTransfers": "",
-							"perToAddressMaxNumTransfers": "",
-							"perFromAddressMaxNumTransfers": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"requireFromEqualsInitiatedBy": false,
-						"requireFromDoesNotEqualInitiatedBy": false,
-						"dynamicStoreChallenges": [
-							{ "storeId": "" }
-						]
-					}
-				}
+				`+getIncomingApprovalSchema()+`
 			],
 			"updateAutoApproveSelfInitiatedOutgoingTransfers": false,
 			"autoApproveSelfInitiatedOutgoingTransfers": false,
@@ -1773,130 +709,7 @@ func GetSchemas() []string {
 			"updateAutoApproveAllIncomingTransfers": false,
 			"autoApproveAllIncomingTransfers": false,
 			"updateUserPermissions": false,
-			"userPermissions": {
-				"canUpdateOutgoingApprovals": [
-					{
-						"toListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"approvalId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateIncomingApprovals": [
-					{
-						"fromListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"approvalId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
-					{
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
-					{
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateAutoApproveAllIncomingTransfers": [
-					{
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				]
-			}
+			"userPermissions": `+getUserPermissionsSchema()+`
 		}
 	}`)
 
@@ -1904,733 +717,28 @@ func GetSchemas() []string {
 		"type": "badges/CreateCollection",
 		"value": {
 			"creator": "",
-			
 			"balancesType": "",
 			"defaultBalances": {
-				"balances": [	{
-					"amount": "",
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
-				}],
-				"incomingApprovals":  [
-					{
-						"fromListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"uri": "",
-						"customData": "",
-						"approvalId": "",
-						"version": "0",
-						"approvalCriteria": {
-						"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-						"merkleChallenges": [{
-								"root": "",
-								"expectedProofLength": "",
-								"useCreatorAddressAsLeaf": false,
-								"leafSigner": "",
-								"maxUsesPerLeaf": "",
-								"challengeTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}],
-							"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-							"predeterminedBalances": {
-								"manualBalances": [
-									{
 										"balances": [
-											{
-												"amount": "",
-												"ownershipTimes": [
-													{
-														"start": "",
-														"end": ""
-													}
-												],
-												"badgeIds": [
-													{
-														"start": "",
-														"end": ""
-													}
-												]
-											}
-										]
-									}
-								],
-								"incrementedBalances": {
-									"startBalances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									],
-									"incrementBadgeIdsBy": "",
-									"allowOverrideWithAnyValidBadge": false,
-									"durationFromTimestamp": "",
-									"incrementOwnershipTimesBy": "",
-									"allowOverrideTimestamp": true,
-									"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-								},
-								"orderCalculationMethod": {
-									"useOverallNumTransfers": false,
-									"usePerToAddressNumTransfers": false,
-									"usePerFromAddressNumTransfers": false,
-									"usePerInitiatedByAddressNumTransfers": false,
-									"challengeTrackerId": "",
-									"useMerkleChallengeLeafIndex": false
-								}
-							},
-							"approvalAmounts": {
-								"overallApprovalAmount": "",
-								"perToAddressApprovalAmount": "",
-								"perFromAddressApprovalAmount": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": "",
-								"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-							},
-							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-							"maxNumTransfers": {
-								"overallMaxNumTransfers": "",
-								"perToAddressMaxNumTransfers": "",
-								"perFromAddressMaxNumTransfers": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": "",
-								"resetTimeIntervals": {
-									"startTime": "",
-									"intervalLength": ""
-								}
-							},
-							"requireFromEqualsInitiatedBy": false,
-							"requireFromDoesNotEqualInitiatedBy": false,
-							"dynamicStoreChallenges": [
-								{ "storeId": "" }
-							]
-						}
-					}
+					`+getBalanceSchema()+`
+				],
+				"incomingApprovals": [
+					`+getIncomingApprovalSchema()+`
 				],
 				"outgoingApprovals": [
-					{
-						"toListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"uri": "",
-						"customData": "",
-						"approvalId": "",
-						"version": "0",
-						"approvalCriteria": {
-						"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-						"merkleChallenges": [{
-								"root": "",
-								"expectedProofLength": "",
-								"useCreatorAddressAsLeaf": false,
-								"leafSigner": "",
-								"maxUsesPerLeaf": "",
-								"challengeTrackerId": "",
-								"uri": "",
-								"customData": ""
-							}],
-							"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-							"predeterminedBalances": {
-								"manualBalances": [
-									{
-										"balances": [
-											{
-												"amount": "",
-												"ownershipTimes": [
-													{
-														"start": "",
-														"end": ""
-													}
-												],
-												"badgeIds": [
-													{
-														"start": "",
-														"end": ""
-													}
-												]
-											}
-										]
-									}
-								],
-								"incrementedBalances": {
-									"startBalances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									],
-									"incrementBadgeIdsBy": "",
-									"allowOverrideWithAnyValidBadge": false,
-									"durationFromTimestamp": "",
-									"incrementOwnershipTimesBy": "",
-									"allowOverrideTimestamp": true,
-									"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-								},
-								"orderCalculationMethod": {
-									"useOverallNumTransfers": false,
-									"usePerToAddressNumTransfers": false,
-									"usePerFromAddressNumTransfers": false,
-									"usePerInitiatedByAddressNumTransfers": false,
-									"challengeTrackerId": "",
-									"useMerkleChallengeLeafIndex": false
-								}
-							},
-							"approvalAmounts": {
-								"overallApprovalAmount": "",
-								"perToAddressApprovalAmount": "",
-								"perFromAddressApprovalAmount": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressApprovalAmount": "",
-								"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-							},
-							"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-							"maxNumTransfers": {
-								"overallMaxNumTransfers": "",
-								"perToAddressMaxNumTransfers": "",
-								"perFromAddressMaxNumTransfers": "",
-								"amountTrackerId": "",
-								"perInitiatedByAddressMaxNumTransfers": "",
-								"resetTimeIntervals": {
-									"startTime": "",
-									"intervalLength": ""
-								}
-							},
-							"requireToEqualsInitiatedBy": false,
-							"requireToDoesNotEqualInitiatedBy": false,
-							"dynamicStoreChallenges": [
-								{ "storeId": "" }
-							]
-						}
-					}
+					`+getOutgoingApprovalSchema()+`
 				],
-				"userPermissions": {
-					"canUpdateOutgoingApprovals": [
-						{
-							"toListId": "",
-							"initiatedByListId": "",
-							"transferTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-						  "approvalId": "",
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateIncomingApprovals": [
-						{
-							"fromListId": "",
-							"initiatedByListId": "",
-							"transferTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"approvalId": "",
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [
-						{
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [
-						{
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					],
-					"canUpdateAutoApproveAllIncomingTransfers": [
-						{
-							"permanentlyPermittedTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"permanentlyForbiddenTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
-					]
-				},
+				"userPermissions": `+getUserPermissionsSchema()+`,
 				"autoApproveSelfInitiatedIncomingTransfers": true,
 				"autoApproveSelfInitiatedOutgoingTransfers": true,
 				"autoApproveAllIncomingTransfers": true
 			},
-			"validBadgeIds": [
-				{
-					"start": "",
-					"end": ""
-				}
-			],
-			"collectionPermissions": {
-				"canDeleteCollection": [
-					{
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canArchiveCollection": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateOffChainBalancesMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateStandards": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCustomData": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateManager": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCollectionMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateValidBadgeIds": [
-					{
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateBadgeMetadata": [
-					{
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCollectionApprovals": [
-					{
-						"fromListId": "",
-						"toListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"approvalId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				]
-			},
+			"validBadgeIds": [`+getUintRangeSchema()+`],
+			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
 			"managerTimeline": [
 				{
 					"manager": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"collectionMetadataTimeline": [
@@ -2639,12 +747,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"badgeMetadataTimeline": [
@@ -2653,20 +756,10 @@ func GetSchemas() []string {
 						{
 							"uri": "",
 							"customData": "",
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
+							"badgeIds": [`+getUintRangeSchema()+`]
 						}
 					],
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"offChainBalancesMetadataTimeline": [
@@ -2675,218 +768,28 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"customDataTimeline": [
 				{
 					"customData": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"collectionApprovals": [
-				{
-					"fromListId": "",
-					"toListId": "",
-					"initiatedByListId": "",
-					"transferTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"uri": "",
-					"customData": "",
-					"approvalId": "",
-					"version": "0",
-					"approvalCriteria": {
-					"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-					"merkleChallenges": [{
-							"root": "",
-							"expectedProofLength": "",
-							"useCreatorAddressAsLeaf": false,
-							"leafSigner": "",
-							"maxUsesPerLeaf": "",
-							"challengeTrackerId": "",
-							"uri": "",
-							"customData": ""
-						}],
-						"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-						"predeterminedBalances": {
-							"manualBalances": [
-								{
-									"balances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									]
-								}
-							],
-							"incrementedBalances": {
-								"startBalances": [
-									{
-										"amount": "",
-										"ownershipTimes": [
-											{
-												"start": "",
-												"end": ""
-											}
-										],
-										"badgeIds": [
-											{
-												"start": "",
-												"end": ""
-											}
-										]
-									}
-								],
-								"incrementBadgeIdsBy": "",
-								"allowOverrideWithAnyValidBadge": false,
-								"durationFromTimestamp": "",
-								"incrementOwnershipTimesBy": "",
-								"allowOverrideTimestamp": true,
-								"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-							},
-							"orderCalculationMethod": {
-								"useOverallNumTransfers": false,
-								"usePerToAddressNumTransfers": false,
-								"usePerFromAddressNumTransfers": false,
-								"usePerInitiatedByAddressNumTransfers": false,
-								"challengeTrackerId": "",
-								"useMerkleChallengeLeafIndex": false
-							}
-						},
-						"approvalAmounts": {
-							"overallApprovalAmount": "",
-							"perToAddressApprovalAmount": "",
-							"perFromAddressApprovalAmount": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-						"maxNumTransfers": {
-							"overallMaxNumTransfers": "",
-							"perToAddressMaxNumTransfers": "",
-							"perFromAddressMaxNumTransfers": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"requireToEqualsInitiatedBy": false,
-						"requireFromEqualsInitiatedBy": false,
-						"requireToDoesNotEqualInitiatedBy": false,
-						"requireFromDoesNotEqualInitiatedBy": false,
-						"overridesFromOutgoingApprovals": false,
-						"userRoyalties": {
-							"percentage": "",
-							"payoutAddress": ""
-						},
-						"overridesToIncomingApprovals": false,
-						"dynamicStoreChallenges": [
-							{ "storeId": "" }
-						]
-					}
-				}
+				`+getCollectionApprovalSchema()+`
 			],
 			"standardsTimeline": [
 				{
 					"standards": [],
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"isArchivedTimeline": [
 				{
 					"isArchived": false,
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"mintEscrowCoinsToTransfer": [
@@ -2899,21 +802,7 @@ func GetSchemas() []string {
 				{
 					"denom": "",
 					"balances": [
-						{
-							"amount": "",
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
+						`+getBalanceSchema()+`
 					],
 					"symbol": "",
 					"denomUnits": [
@@ -2932,264 +821,16 @@ func GetSchemas() []string {
 		"type": "badges/UpdateCollection",
 		"value": {
 			"creator": "",
-			
 			"collectionId": "",
 			"updateValidBadgeIds": false,
-			"validBadgeIds": [
-				{
-					"start": "",
-					"end": ""
-				}
-			],
+			"validBadgeIds": [`+getUintRangeSchema()+`],
 			"updateCollectionPermissions": false,
-			"collectionPermissions": {
-				"canDeleteCollection": [
-					{
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canArchiveCollection": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateOffChainBalancesMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateStandards": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCustomData": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateManager": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCollectionMetadata": [
-					{
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateValidBadgeIds": [
-					{
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateBadgeMetadata": [
-					{
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"timelineTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				],
-				"canUpdateCollectionApprovals": [
-					{
-						"fromListId": "",
-						"toListId": "",
-						"initiatedByListId": "",
-						"transferTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"badgeIds": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"ownershipTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"approvalId": "",
-						"permanentlyPermittedTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						],
-						"permanentlyForbiddenTimes": [
-							{
-								"start": "",
-								"end": ""
-							}
-						]
-					}
-				]
-			},
+			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
 			"updateManagerTimeline": false,
 			"managerTimeline": [
 				{
 					"manager": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateCollectionMetadataTimeline": false,
@@ -3199,12 +840,7 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateBadgeMetadataTimeline": false,
@@ -3214,20 +850,10 @@ func GetSchemas() []string {
 						{
 							"uri": "",
 							"customData": "",
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
+							"badgeIds": [`+getUintRangeSchema()+`]
 						}
 					],
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateOffChainBalancesMetadataTimeline": false,
@@ -3237,222 +863,32 @@ func GetSchemas() []string {
 						"uri": "",
 						"customData": ""
 					},
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateCustomDataTimeline": false,
 			"customDataTimeline": [
 				{
 					"customData": "",
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateCollectionApprovals": false,
 			"collectionApprovals": [
-				{
-					"fromListId": "",
-					"toListId": "",
-					"initiatedByListId": "",
-					"transferTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"badgeIds": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"ownershipTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					],
-					"uri": "",
-					"customData": "",
-					"approvalId": "",
-					"version": "0",
-					"approvalCriteria": {
-					"mustOwnBadges": [
-								{
-									"collectionId": "",
-									"amountRange": {
-										"start": "",
-										"end": ""
-									},
-									"ownershipTimes": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"badgeIds": [
-										{
-											"start": "",
-											"end": ""
-										}
-									],
-									"overrideWithCurrentTime": false,
-									"mustSatisfyForAllAssets": false
-								}
-							],	
-					"merkleChallenges": [{
-							"root": "",
-							"expectedProofLength": "",
-							"useCreatorAddressAsLeaf": false,
-							"leafSigner": "",
-							"maxUsesPerLeaf": "",
-							"challengeTrackerId": "",
-							"uri": "",
-							"customData": ""
-						}],
-						"coinTransfers": [
-								{
-									"to": "",
-									"overrideFromWithApproverAddress": false,
-									"overrideToWithInitiator": false,
-									"coins": [
-										{
-											"amount": "",
-											"denom": "",
-										}
-									]
-								}
-							],
-						"predeterminedBalances": {
-							"manualBalances": [
-								{
-									"balances": [
-										{
-											"amount": "",
-											"ownershipTimes": [
-												{
-													"start": "",
-													"end": ""
-												}
-											],
-											"badgeIds": [
-												{
-													"start": "",
-													"end": ""
-												}
-											]
-										}
-									]
-								}
-							],
-							"incrementedBalances": {
-								"startBalances": [
-									{
-										"amount": "",
-										"ownershipTimes": [
-											{
-												"start": "",
-												"end": ""
-											}
-										],
-										"badgeIds": [
-											{
-												"start": "",
-												"end": ""
-											}
-										]
-									}
-								],
-								"incrementBadgeIdsBy": "",
-								"allowOverrideWithAnyValidBadge": false,
-								"durationFromTimestamp": "",
-								"incrementOwnershipTimesBy": "",
-								"allowOverrideTimestamp": true,
-								"recurringOwnershipTimes": { 
-										"startTime": "",
-										"intervalLength": "",
-										"chargePeriodLength": ""
-									}
-							},
-							"orderCalculationMethod": {
-								"useOverallNumTransfers": false,
-								"usePerToAddressNumTransfers": false,
-								"usePerFromAddressNumTransfers": false,
-								"usePerInitiatedByAddressNumTransfers": false,
-								"challengeTrackerId": "",
-								"useMerkleChallengeLeafIndex": false
-							}
-						},
-						"approvalAmounts": {
-							"overallApprovalAmount": "",
-							"perToAddressApprovalAmount": "",
-							"perFromAddressApprovalAmount": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressApprovalAmount": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"autoDeletionOptions": { "afterOneUse": true, "afterOverallMaxNumTransfers": false },
-						"maxNumTransfers": {
-							"overallMaxNumTransfers": "",
-							"perToAddressMaxNumTransfers": "",
-							"perFromAddressMaxNumTransfers": "",
-							"amountTrackerId": "",
-							"perInitiatedByAddressMaxNumTransfers": "",
-							"resetTimeIntervals": {
-								"startTime": "",
-								"intervalLength": ""
-								}
-						},
-						"requireToEqualsInitiatedBy": false,
-						"requireFromEqualsInitiatedBy": false,
-						"requireToDoesNotEqualInitiatedBy": false,
-						"requireFromDoesNotEqualInitiatedBy": false,
-						"overridesFromOutgoingApprovals": false,
-						"userRoyalties": {
-							"percentage": "",
-							"payoutAddress": ""
-						},
-						"overridesToIncomingApprovals": false,
-						"dynamicStoreChallenges": [
-							{ "storeId": "" }
-						]
-					}
-				}
+				`+getCollectionApprovalSchema()+`
 			],
 			"updateStandardsTimeline": false,
 			"standardsTimeline": [
 				{
 					"standards": [],
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"updateIsArchivedTimeline": false,
 			"isArchivedTimeline": [
 				{
 					"isArchived": false,
-					"timelineTimes": [
-						{
-							"start": "",
-							"end": ""
-						}
-					]
+					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
 			"mintEscrowCoinsToTransfer": [
@@ -3465,21 +901,7 @@ func GetSchemas() []string {
 				{
 					"denom": "",
 					"balances": [
-						{
-							"amount": "",
-							"ownershipTimes": [
-								{
-									"start": "",
-									"end": ""
-								}
-							],
-							"badgeIds": [
-								{
-									"start": "",
-									"end": ""
-								}
-							]
-						}
+						`+getBalanceSchema()+`
 					],
 					"symbol": "",
 					"denomUnits": [
@@ -3526,6 +948,61 @@ func GetSchemas() []string {
 			"storeId": "",
 			"address": "",
 			"value": false
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetIncomingApproval",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"approval": `+getIncomingApprovalSchema()+`
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/DeleteIncomingApproval",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"approvalId": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetOutgoingApproval",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"approval": `+getOutgoingApprovalSchema()+`
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/DeleteOutgoingApproval",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"approvalId": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/PurgeApprovals",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"purgeExpired": false,
+			"approverAddress": "",
+			"purgeCounterpartyApprovals": false,
+			"approvalsToPurge": [
+				{
+					"approvalId": "",
+					"approvalLevel": "",
+					"approverAddress": "",
+					"version": "0"
+				}
+			]
 		}
 	}`)
 

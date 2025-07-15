@@ -41,6 +41,11 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdUpdateDynamicStore())
 	cmd.AddCommand(CmdDeleteDynamicStore())
 	cmd.AddCommand(CmdSetDynamicStoreValue())
+	cmd.AddCommand(CmdSetIncomingApproval())
+	cmd.AddCommand(CmdDeleteIncomingApproval())
+	cmd.AddCommand(CmdSetOutgoingApproval())
+	cmd.AddCommand(CmdDeleteOutgoingApproval())
+	cmd.AddCommand(CmdPurgeApprovals())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

@@ -88,6 +88,21 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.SetDynamicStoreValueMsg != nil:
 				badgeCustomMsg.SetDynamicStoreValueMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetDynamicStoreValueMsg}, nil
+			case badgeCustomMsg.SetIncomingApprovalMsg != nil:
+				badgeCustomMsg.SetIncomingApprovalMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetIncomingApprovalMsg}, nil
+			case badgeCustomMsg.DeleteIncomingApprovalMsg != nil:
+				badgeCustomMsg.DeleteIncomingApprovalMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.DeleteIncomingApprovalMsg}, nil
+			case badgeCustomMsg.SetOutgoingApprovalMsg != nil:
+				badgeCustomMsg.SetOutgoingApprovalMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetOutgoingApprovalMsg}, nil
+			case badgeCustomMsg.DeleteOutgoingApprovalMsg != nil:
+				badgeCustomMsg.DeleteOutgoingApprovalMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.DeleteOutgoingApprovalMsg}, nil
+			case badgeCustomMsg.PurgeApprovalsMsg != nil:
+				badgeCustomMsg.PurgeApprovalsMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.PurgeApprovalsMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}

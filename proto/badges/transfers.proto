@@ -283,6 +283,10 @@ message AutoDeletionOptions {
   bool afterOneUse = 1;
   // After overall max number of uses threshold is met?
   bool afterOverallMaxNumTransfers = 2;
+  // Allow counterparty to purge this approval if they are the only initiator
+  bool allowCounterpartyPurge = 3;
+  // Allow others to call PurgeApprovals on behalf of this approval owner
+  bool allowPurgeIfExpired = 4;
 }
 
 // ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
