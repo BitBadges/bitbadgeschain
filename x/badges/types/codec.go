@@ -28,6 +28,14 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetOutgoingApproval{}, "badges/SetOutgoingApproval", nil)
 	cdc.RegisterConcrete(&MsgDeleteOutgoingApproval{}, "badges/DeleteOutgoingApproval", nil)
 	cdc.RegisterConcrete(&MsgPurgeApprovals{}, "badges/PurgeApprovals", nil)
+	cdc.RegisterConcrete(&MsgSetValidBadgeIds{}, "badges/SetValidBadgeIds", nil)
+	cdc.RegisterConcrete(&MsgSetManager{}, "badges/SetManager", nil)
+	cdc.RegisterConcrete(&MsgSetCollectionMetadata{}, "badges/SetCollectionMetadata", nil)
+	cdc.RegisterConcrete(&MsgSetBadgeMetadata{}, "badges/SetBadgeMetadata", nil)
+	cdc.RegisterConcrete(&MsgSetCustomData{}, "badges/SetCustomData", nil)
+	cdc.RegisterConcrete(&MsgSetStandards{}, "badges/SetStandards", nil)
+	cdc.RegisterConcrete(&MsgSetCollectionApprovals{}, "badges/SetCollectionApprovals", nil)
+	cdc.RegisterConcrete(&MsgSetIsArchived{}, "badges/SetIsArchived", nil)
 
 	encodingcodec.RegisterLegacyAminoCodec(cdc)
 	// this line is used by starport scaffolding # 2
@@ -51,6 +59,14 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSetOutgoingApproval{},
 		&MsgDeleteOutgoingApproval{},
 		&MsgPurgeApprovals{},
+		&MsgSetValidBadgeIds{},
+		&MsgSetManager{},
+		&MsgSetCollectionMetadata{},
+		&MsgSetBadgeMetadata{},
+		&MsgSetCustomData{},
+		&MsgSetStandards{},
+		&MsgSetCollectionApprovals{},
+		&MsgSetIsArchived{},
 	)
 	// this line is used by starport scaffolding # 3
 

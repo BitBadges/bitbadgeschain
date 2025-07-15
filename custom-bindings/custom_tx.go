@@ -103,6 +103,30 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.PurgeApprovalsMsg != nil:
 				badgeCustomMsg.PurgeApprovalsMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.PurgeApprovalsMsg}, nil
+			case badgeCustomMsg.SetValidBadgeIdsMsg != nil:
+				badgeCustomMsg.SetValidBadgeIdsMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetValidBadgeIdsMsg}, nil
+			case badgeCustomMsg.SetManagerMsg != nil:
+				badgeCustomMsg.SetManagerMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetManagerMsg}, nil
+			case badgeCustomMsg.SetCollectionMetadataMsg != nil:
+				badgeCustomMsg.SetCollectionMetadataMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetCollectionMetadataMsg}, nil
+			case badgeCustomMsg.SetBadgeMetadataMsg != nil:
+				badgeCustomMsg.SetBadgeMetadataMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetBadgeMetadataMsg}, nil
+			case badgeCustomMsg.SetCustomDataMsg != nil:
+				badgeCustomMsg.SetCustomDataMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetCustomDataMsg}, nil
+			case badgeCustomMsg.SetStandardsMsg != nil:
+				badgeCustomMsg.SetStandardsMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetStandardsMsg}, nil
+			case badgeCustomMsg.SetCollectionApprovalsMsg != nil:
+				badgeCustomMsg.SetCollectionApprovalsMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetCollectionApprovalsMsg}, nil
+			case badgeCustomMsg.SetIsArchivedMsg != nil:
+				badgeCustomMsg.SetIsArchivedMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetIsArchivedMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}

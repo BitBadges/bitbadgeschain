@@ -428,3 +428,85 @@ func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.Msg
 	})
 	return err
 }
+
+// Helper functions for UniversalUpdateCollection subsets using native messages
+
+func SetValidBadgeIds(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, validBadgeIds []*types.UintRange) error {
+	msg := &types.MsgSetValidBadgeIds{
+		Creator:       creator,
+		CollectionId:  collectionId,
+		ValidBadgeIds: validBadgeIds,
+	}
+	_, err := suite.msgServer.SetValidBadgeIds(ctx, msg)
+	return err
+}
+
+func SetManager(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, managerTimeline []*types.ManagerTimeline) error {
+	msg := &types.MsgSetManager{
+		Creator:         creator,
+		CollectionId:    collectionId,
+		ManagerTimeline: managerTimeline,
+	}
+	_, err := suite.msgServer.SetManager(ctx, msg)
+	return err
+}
+
+func SetCollectionMetadata(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, collectionMetadataTimeline []*types.CollectionMetadataTimeline) error {
+	msg := &types.MsgSetCollectionMetadata{
+		Creator:                    creator,
+		CollectionId:               collectionId,
+		CollectionMetadataTimeline: collectionMetadataTimeline,
+	}
+	_, err := suite.msgServer.SetCollectionMetadata(ctx, msg)
+	return err
+}
+
+func SetBadgeMetadata(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, badgeMetadataTimeline []*types.BadgeMetadataTimeline) error {
+	msg := &types.MsgSetBadgeMetadata{
+		Creator:               creator,
+		CollectionId:          collectionId,
+		BadgeMetadataTimeline: badgeMetadataTimeline,
+	}
+	_, err := suite.msgServer.SetBadgeMetadata(ctx, msg)
+	return err
+}
+
+func SetCustomData(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, customDataTimeline []*types.CustomDataTimeline) error {
+	msg := &types.MsgSetCustomData{
+		Creator:            creator,
+		CollectionId:       collectionId,
+		CustomDataTimeline: customDataTimeline,
+	}
+	_, err := suite.msgServer.SetCustomData(ctx, msg)
+	return err
+}
+
+func SetStandards(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, standardsTimeline []*types.StandardsTimeline) error {
+	msg := &types.MsgSetStandards{
+		Creator:           creator,
+		CollectionId:      collectionId,
+		StandardsTimeline: standardsTimeline,
+	}
+	_, err := suite.msgServer.SetStandards(ctx, msg)
+	return err
+}
+
+func SetCollectionApprovals(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, collectionApprovals []*types.CollectionApproval) error {
+	msg := &types.MsgSetCollectionApprovals{
+		Creator:             creator,
+		CollectionId:        collectionId,
+		CollectionApprovals: collectionApprovals,
+	}
+	_, err := suite.msgServer.SetCollectionApprovals(ctx, msg)
+	return err
+}
+
+func SetIsArchived(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, isArchivedTimeline []*types.IsArchivedTimeline) error {
+	msg := &types.MsgSetIsArchived{
+		Creator:            creator,
+		CollectionId:       collectionId,
+		IsArchivedTimeline: isArchivedTimeline,
+	}
+	_, err := suite.msgServer.SetIsArchived(ctx, msg)
+	return err
+}

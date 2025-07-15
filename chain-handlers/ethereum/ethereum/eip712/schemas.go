@@ -1006,5 +1006,126 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	// UniversalUpdateCollection helper message types
+	schemas = append(schemas, `{
+		"type": "badges/SetValidBadgeIds",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"validBadgeIds": [`+getUintRangeSchema()+`],
+			"canUpdateValidBadgeIds": [{"badgeIds": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetManager",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"managerTimeline": [
+				{
+					"manager": "",
+					"timelineTimes": [`+getUintRangeSchema()+`]
+				}
+			],
+			"canUpdateManager": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetCollectionMetadata",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"collectionMetadataTimeline": [
+				{
+					"collectionMetadata": {
+						"uri": "",
+						"customData": ""
+					},
+					"timelineTimes": [`+getUintRangeSchema()+`]
+				}
+			],
+			"canUpdateCollectionMetadata": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetBadgeMetadata",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"badgeMetadataTimeline": [
+				{
+					"badgeMetadata": [
+						{
+							"uri": "",
+							"customData": ""
+						}
+					],
+					"timelineTimes": [`+getUintRangeSchema()+`]
+				}
+			],
+			"canUpdateBadgeMetadata": [{"badgeIds": [`+getUintRangeSchema()+`], "timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetCustomData",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"customDataTimeline": [
+				{
+					"customData": "",
+					"timelineTimes": [`+getUintRangeSchema()+`]
+				}
+			],
+			"canUpdateCustomData": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetStandards",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"standardsTimeline": [
+				{
+					"standards": [],
+					"timelineTimes": [`+getUintRangeSchema()+`]
+				}
+			],
+			"canUpdateStandards": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetCollectionApprovals",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"collectionApprovals": [
+				`+getCollectionApprovalSchema()+`
+			],
+			"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [`+getUintRangeSchema()+`], "badgeIds": [`+getUintRangeSchema()+`], "ownershipTimes": [`+getUintRangeSchema()+`], "approvalId": "", "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/SetIsArchived",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"isArchivedTimeline": [
+				{
+					"isArchived": false,
+					"timelineTimes": [`+getUintRangeSchema()+`]
+				}
+			],
+			"canArchiveCollection": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
 	return schemas
 }

@@ -50,6 +50,15 @@ type BadgeCustomMsgType struct {
 	SetOutgoingApprovalMsg       *MsgSetOutgoingApproval       `protobuf:"bytes,14,opt,name=setOutgoingApprovalMsg,proto3" json:"setOutgoingApprovalMsg,omitempty"`
 	DeleteOutgoingApprovalMsg    *MsgDeleteOutgoingApproval    `protobuf:"bytes,15,opt,name=deleteOutgoingApprovalMsg,proto3" json:"deleteOutgoingApprovalMsg,omitempty"`
 	PurgeApprovalsMsg            *MsgPurgeApprovals            `protobuf:"bytes,16,opt,name=purgeApprovalsMsg,proto3" json:"purgeApprovalsMsg,omitempty"`
+	// Helper message types for UniversalUpdateCollection subsets
+	SetValidBadgeIdsMsg       *MsgSetValidBadgeIds       `protobuf:"bytes,17,opt,name=setValidBadgeIdsMsg,proto3" json:"setValidBadgeIdsMsg,omitempty"`
+	SetManagerMsg             *MsgSetManager             `protobuf:"bytes,18,opt,name=setManagerMsg,proto3" json:"setManagerMsg,omitempty"`
+	SetCollectionMetadataMsg  *MsgSetCollectionMetadata  `protobuf:"bytes,19,opt,name=setCollectionMetadataMsg,proto3" json:"setCollectionMetadataMsg,omitempty"`
+	SetBadgeMetadataMsg       *MsgSetBadgeMetadata       `protobuf:"bytes,20,opt,name=setBadgeMetadataMsg,proto3" json:"setBadgeMetadataMsg,omitempty"`
+	SetCustomDataMsg          *MsgSetCustomData          `protobuf:"bytes,21,opt,name=setCustomDataMsg,proto3" json:"setCustomDataMsg,omitempty"`
+	SetStandardsMsg           *MsgSetStandards           `protobuf:"bytes,22,opt,name=setStandardsMsg,proto3" json:"setStandardsMsg,omitempty"`
+	SetCollectionApprovalsMsg *MsgSetCollectionApprovals `protobuf:"bytes,23,opt,name=setCollectionApprovalsMsg,proto3" json:"setCollectionApprovalsMsg,omitempty"`
+	SetIsArchivedMsg          *MsgSetIsArchived          `protobuf:"bytes,24,opt,name=setIsArchivedMsg,proto3" json:"setIsArchivedMsg,omitempty"`
 }
 
 func (m *BadgeCustomMsgType) Reset()         { *m = BadgeCustomMsgType{} }
@@ -193,6 +202,62 @@ func (m *BadgeCustomMsgType) GetDeleteOutgoingApprovalMsg() *MsgDeleteOutgoingAp
 func (m *BadgeCustomMsgType) GetPurgeApprovalsMsg() *MsgPurgeApprovals {
 	if m != nil {
 		return m.PurgeApprovalsMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetValidBadgeIdsMsg() *MsgSetValidBadgeIds {
+	if m != nil {
+		return m.SetValidBadgeIdsMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetManagerMsg() *MsgSetManager {
+	if m != nil {
+		return m.SetManagerMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetCollectionMetadataMsg() *MsgSetCollectionMetadata {
+	if m != nil {
+		return m.SetCollectionMetadataMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetBadgeMetadataMsg() *MsgSetBadgeMetadata {
+	if m != nil {
+		return m.SetBadgeMetadataMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetCustomDataMsg() *MsgSetCustomData {
+	if m != nil {
+		return m.SetCustomDataMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetStandardsMsg() *MsgSetStandards {
+	if m != nil {
+		return m.SetStandardsMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetCollectionApprovalsMsg() *MsgSetCollectionApprovals {
+	if m != nil {
+		return m.SetCollectionApprovalsMsg
+	}
+	return nil
+}
+
+func (m *BadgeCustomMsgType) GetSetIsArchivedMsg() *MsgSetIsArchived {
+	if m != nil {
+		return m.SetIsArchivedMsg
 	}
 	return nil
 }
@@ -2500,6 +2565,846 @@ func (m *MsgSetDynamicStoreValueResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetDynamicStoreValueResponse proto.InternalMessageInfo
 
+// MsgSetValidBadgeIds sets the validBadgeIds and canUpdateValidBadgeIds permission
+type MsgSetValidBadgeIds struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New badge IDs to add to this collection
+	ValidBadgeIds []*UintRange `protobuf:"bytes,3,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	// Permission to update valid badge IDs
+	CanUpdateValidBadgeIds []*BadgeIdsActionPermission `protobuf:"bytes,4,rep,name=canUpdateValidBadgeIds,proto3" json:"canUpdateValidBadgeIds,omitempty"`
+}
+
+func (m *MsgSetValidBadgeIds) Reset()         { *m = MsgSetValidBadgeIds{} }
+func (m *MsgSetValidBadgeIds) String() string { return proto.CompactTextString(m) }
+func (*MsgSetValidBadgeIds) ProtoMessage()    {}
+func (*MsgSetValidBadgeIds) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{36}
+}
+func (m *MsgSetValidBadgeIds) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetValidBadgeIds) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetValidBadgeIds.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetValidBadgeIds) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetValidBadgeIds.Merge(m, src)
+}
+func (m *MsgSetValidBadgeIds) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetValidBadgeIds) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetValidBadgeIds.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetValidBadgeIds proto.InternalMessageInfo
+
+func (m *MsgSetValidBadgeIds) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetValidBadgeIds) GetValidBadgeIds() []*UintRange {
+	if m != nil {
+		return m.ValidBadgeIds
+	}
+	return nil
+}
+
+func (m *MsgSetValidBadgeIds) GetCanUpdateValidBadgeIds() []*BadgeIdsActionPermission {
+	if m != nil {
+		return m.CanUpdateValidBadgeIds
+	}
+	return nil
+}
+
+// MsgSetValidBadgeIdsResponse is the response to MsgSetValidBadgeIds.
+type MsgSetValidBadgeIdsResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetValidBadgeIdsResponse) Reset()         { *m = MsgSetValidBadgeIdsResponse{} }
+func (m *MsgSetValidBadgeIdsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetValidBadgeIdsResponse) ProtoMessage()    {}
+func (*MsgSetValidBadgeIdsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{37}
+}
+func (m *MsgSetValidBadgeIdsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetValidBadgeIdsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetValidBadgeIdsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetValidBadgeIdsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetValidBadgeIdsResponse.Merge(m, src)
+}
+func (m *MsgSetValidBadgeIdsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetValidBadgeIdsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetValidBadgeIdsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetValidBadgeIdsResponse proto.InternalMessageInfo
+
+// MsgSetManager sets the manager timeline and canUpdateManager permission
+type MsgSetManager struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New manager timeline to set.
+	ManagerTimeline []*ManagerTimeline `protobuf:"bytes,3,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
+	// Permission to update manager timeline
+	CanUpdateManager []*TimedUpdatePermission `protobuf:"bytes,4,rep,name=canUpdateManager,proto3" json:"canUpdateManager,omitempty"`
+}
+
+func (m *MsgSetManager) Reset()         { *m = MsgSetManager{} }
+func (m *MsgSetManager) String() string { return proto.CompactTextString(m) }
+func (*MsgSetManager) ProtoMessage()    {}
+func (*MsgSetManager) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{38}
+}
+func (m *MsgSetManager) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetManager) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetManager.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetManager) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetManager.Merge(m, src)
+}
+func (m *MsgSetManager) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetManager) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetManager.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetManager proto.InternalMessageInfo
+
+func (m *MsgSetManager) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetManager) GetManagerTimeline() []*ManagerTimeline {
+	if m != nil {
+		return m.ManagerTimeline
+	}
+	return nil
+}
+
+func (m *MsgSetManager) GetCanUpdateManager() []*TimedUpdatePermission {
+	if m != nil {
+		return m.CanUpdateManager
+	}
+	return nil
+}
+
+// MsgSetManagerResponse is the response to MsgSetManager.
+type MsgSetManagerResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetManagerResponse) Reset()         { *m = MsgSetManagerResponse{} }
+func (m *MsgSetManagerResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetManagerResponse) ProtoMessage()    {}
+func (*MsgSetManagerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{39}
+}
+func (m *MsgSetManagerResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetManagerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetManagerResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetManagerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetManagerResponse.Merge(m, src)
+}
+func (m *MsgSetManagerResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetManagerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetManagerResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetManagerResponse proto.InternalMessageInfo
+
+// MsgSetCollectionMetadata sets the collection metadata timeline and canUpdateCollectionMetadata permission
+type MsgSetCollectionMetadata struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New collection metadata timeline to set.
+	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,3,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
+	// Permission to update collection metadata timeline
+	CanUpdateCollectionMetadata []*TimedUpdatePermission `protobuf:"bytes,4,rep,name=canUpdateCollectionMetadata,proto3" json:"canUpdateCollectionMetadata,omitempty"`
+}
+
+func (m *MsgSetCollectionMetadata) Reset()         { *m = MsgSetCollectionMetadata{} }
+func (m *MsgSetCollectionMetadata) String() string { return proto.CompactTextString(m) }
+func (*MsgSetCollectionMetadata) ProtoMessage()    {}
+func (*MsgSetCollectionMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{40}
+}
+func (m *MsgSetCollectionMetadata) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetCollectionMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetCollectionMetadata.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetCollectionMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetCollectionMetadata.Merge(m, src)
+}
+func (m *MsgSetCollectionMetadata) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetCollectionMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetCollectionMetadata.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetCollectionMetadata proto.InternalMessageInfo
+
+func (m *MsgSetCollectionMetadata) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetCollectionMetadata) GetCollectionMetadataTimeline() []*CollectionMetadataTimeline {
+	if m != nil {
+		return m.CollectionMetadataTimeline
+	}
+	return nil
+}
+
+func (m *MsgSetCollectionMetadata) GetCanUpdateCollectionMetadata() []*TimedUpdatePermission {
+	if m != nil {
+		return m.CanUpdateCollectionMetadata
+	}
+	return nil
+}
+
+// MsgSetCollectionMetadataResponse is the response to MsgSetCollectionMetadata.
+type MsgSetCollectionMetadataResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetCollectionMetadataResponse) Reset()         { *m = MsgSetCollectionMetadataResponse{} }
+func (m *MsgSetCollectionMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetCollectionMetadataResponse) ProtoMessage()    {}
+func (*MsgSetCollectionMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{41}
+}
+func (m *MsgSetCollectionMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetCollectionMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetCollectionMetadataResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetCollectionMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetCollectionMetadataResponse.Merge(m, src)
+}
+func (m *MsgSetCollectionMetadataResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetCollectionMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetCollectionMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetCollectionMetadataResponse proto.InternalMessageInfo
+
+// MsgSetBadgeMetadata sets the badge metadata timeline and canUpdateBadgeMetadata permission
+type MsgSetBadgeMetadata struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New badge metadata timeline to set.
+	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	// Permission to update badge metadata timeline
+	CanUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission `protobuf:"bytes,4,rep,name=canUpdateBadgeMetadata,proto3" json:"canUpdateBadgeMetadata,omitempty"`
+}
+
+func (m *MsgSetBadgeMetadata) Reset()         { *m = MsgSetBadgeMetadata{} }
+func (m *MsgSetBadgeMetadata) String() string { return proto.CompactTextString(m) }
+func (*MsgSetBadgeMetadata) ProtoMessage()    {}
+func (*MsgSetBadgeMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{42}
+}
+func (m *MsgSetBadgeMetadata) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetBadgeMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetBadgeMetadata.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetBadgeMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetBadgeMetadata.Merge(m, src)
+}
+func (m *MsgSetBadgeMetadata) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetBadgeMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetBadgeMetadata.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetBadgeMetadata proto.InternalMessageInfo
+
+func (m *MsgSetBadgeMetadata) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetBadgeMetadata) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+	if m != nil {
+		return m.BadgeMetadataTimeline
+	}
+	return nil
+}
+
+func (m *MsgSetBadgeMetadata) GetCanUpdateBadgeMetadata() []*TimedUpdateWithBadgeIdsPermission {
+	if m != nil {
+		return m.CanUpdateBadgeMetadata
+	}
+	return nil
+}
+
+// MsgSetBadgeMetadataResponse is the response to MsgSetBadgeMetadata.
+type MsgSetBadgeMetadataResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetBadgeMetadataResponse) Reset()         { *m = MsgSetBadgeMetadataResponse{} }
+func (m *MsgSetBadgeMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetBadgeMetadataResponse) ProtoMessage()    {}
+func (*MsgSetBadgeMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{43}
+}
+func (m *MsgSetBadgeMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetBadgeMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetBadgeMetadataResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetBadgeMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetBadgeMetadataResponse.Merge(m, src)
+}
+func (m *MsgSetBadgeMetadataResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetBadgeMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetBadgeMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetBadgeMetadataResponse proto.InternalMessageInfo
+
+// MsgSetCustomData sets the custom data timeline and canUpdateCustomData permission
+type MsgSetCustomData struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New custom data timeline to set.
+	CustomDataTimeline []*CustomDataTimeline `protobuf:"bytes,3,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
+	// Permission to update custom data timeline
+	CanUpdateCustomData []*TimedUpdatePermission `protobuf:"bytes,4,rep,name=canUpdateCustomData,proto3" json:"canUpdateCustomData,omitempty"`
+}
+
+func (m *MsgSetCustomData) Reset()         { *m = MsgSetCustomData{} }
+func (m *MsgSetCustomData) String() string { return proto.CompactTextString(m) }
+func (*MsgSetCustomData) ProtoMessage()    {}
+func (*MsgSetCustomData) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{44}
+}
+func (m *MsgSetCustomData) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetCustomData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetCustomData.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetCustomData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetCustomData.Merge(m, src)
+}
+func (m *MsgSetCustomData) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetCustomData) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetCustomData.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetCustomData proto.InternalMessageInfo
+
+func (m *MsgSetCustomData) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetCustomData) GetCustomDataTimeline() []*CustomDataTimeline {
+	if m != nil {
+		return m.CustomDataTimeline
+	}
+	return nil
+}
+
+func (m *MsgSetCustomData) GetCanUpdateCustomData() []*TimedUpdatePermission {
+	if m != nil {
+		return m.CanUpdateCustomData
+	}
+	return nil
+}
+
+// MsgSetCustomDataResponse is the response to MsgSetCustomData.
+type MsgSetCustomDataResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetCustomDataResponse) Reset()         { *m = MsgSetCustomDataResponse{} }
+func (m *MsgSetCustomDataResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetCustomDataResponse) ProtoMessage()    {}
+func (*MsgSetCustomDataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{45}
+}
+func (m *MsgSetCustomDataResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetCustomDataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetCustomDataResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetCustomDataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetCustomDataResponse.Merge(m, src)
+}
+func (m *MsgSetCustomDataResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetCustomDataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetCustomDataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetCustomDataResponse proto.InternalMessageInfo
+
+// MsgSetStandards sets the standards timeline and canUpdateStandards permission
+type MsgSetStandards struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New standards timeline to set.
+	StandardsTimeline []*StandardsTimeline `protobuf:"bytes,3,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
+	// Permission to update standards timeline
+	CanUpdateStandards []*TimedUpdatePermission `protobuf:"bytes,4,rep,name=canUpdateStandards,proto3" json:"canUpdateStandards,omitempty"`
+}
+
+func (m *MsgSetStandards) Reset()         { *m = MsgSetStandards{} }
+func (m *MsgSetStandards) String() string { return proto.CompactTextString(m) }
+func (*MsgSetStandards) ProtoMessage()    {}
+func (*MsgSetStandards) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{46}
+}
+func (m *MsgSetStandards) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetStandards) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetStandards.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetStandards) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetStandards.Merge(m, src)
+}
+func (m *MsgSetStandards) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetStandards) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetStandards.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetStandards proto.InternalMessageInfo
+
+func (m *MsgSetStandards) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetStandards) GetStandardsTimeline() []*StandardsTimeline {
+	if m != nil {
+		return m.StandardsTimeline
+	}
+	return nil
+}
+
+func (m *MsgSetStandards) GetCanUpdateStandards() []*TimedUpdatePermission {
+	if m != nil {
+		return m.CanUpdateStandards
+	}
+	return nil
+}
+
+// MsgSetStandardsResponse is the response to MsgSetStandards.
+type MsgSetStandardsResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetStandardsResponse) Reset()         { *m = MsgSetStandardsResponse{} }
+func (m *MsgSetStandardsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetStandardsResponse) ProtoMessage()    {}
+func (*MsgSetStandardsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{47}
+}
+func (m *MsgSetStandardsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetStandardsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetStandardsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetStandardsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetStandardsResponse.Merge(m, src)
+}
+func (m *MsgSetStandardsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetStandardsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetStandardsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetStandardsResponse proto.InternalMessageInfo
+
+// MsgSetCollectionApprovals sets the collection approvals and canUpdateCollectionApprovals permission
+type MsgSetCollectionApprovals struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New collection approvals to set.
+	CollectionApprovals []*CollectionApproval `protobuf:"bytes,3,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	// Permission to update collection approvals
+	CanUpdateCollectionApprovals []*CollectionApprovalPermission `protobuf:"bytes,4,rep,name=canUpdateCollectionApprovals,proto3" json:"canUpdateCollectionApprovals,omitempty"`
+}
+
+func (m *MsgSetCollectionApprovals) Reset()         { *m = MsgSetCollectionApprovals{} }
+func (m *MsgSetCollectionApprovals) String() string { return proto.CompactTextString(m) }
+func (*MsgSetCollectionApprovals) ProtoMessage()    {}
+func (*MsgSetCollectionApprovals) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{48}
+}
+func (m *MsgSetCollectionApprovals) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetCollectionApprovals) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetCollectionApprovals.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetCollectionApprovals) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetCollectionApprovals.Merge(m, src)
+}
+func (m *MsgSetCollectionApprovals) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetCollectionApprovals) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetCollectionApprovals.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetCollectionApprovals proto.InternalMessageInfo
+
+func (m *MsgSetCollectionApprovals) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetCollectionApprovals) GetCollectionApprovals() []*CollectionApproval {
+	if m != nil {
+		return m.CollectionApprovals
+	}
+	return nil
+}
+
+func (m *MsgSetCollectionApprovals) GetCanUpdateCollectionApprovals() []*CollectionApprovalPermission {
+	if m != nil {
+		return m.CanUpdateCollectionApprovals
+	}
+	return nil
+}
+
+// MsgSetCollectionApprovalsResponse is the response to MsgSetCollectionApprovals.
+type MsgSetCollectionApprovalsResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetCollectionApprovalsResponse) Reset()         { *m = MsgSetCollectionApprovalsResponse{} }
+func (m *MsgSetCollectionApprovalsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetCollectionApprovalsResponse) ProtoMessage()    {}
+func (*MsgSetCollectionApprovalsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{49}
+}
+func (m *MsgSetCollectionApprovalsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetCollectionApprovalsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetCollectionApprovalsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetCollectionApprovalsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetCollectionApprovalsResponse.Merge(m, src)
+}
+func (m *MsgSetCollectionApprovalsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetCollectionApprovalsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetCollectionApprovalsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetCollectionApprovalsResponse proto.InternalMessageInfo
+
+// MsgSetIsArchived sets the isArchived timeline and canArchiveCollection permission
+type MsgSetIsArchived struct {
+	// Address of the creator.
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// ID of the collection.
+	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	// New isArchived timeline to set.
+	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,3,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
+	// Permission to archive collection
+	CanArchiveCollection []*TimedUpdatePermission `protobuf:"bytes,4,rep,name=canArchiveCollection,proto3" json:"canArchiveCollection,omitempty"`
+}
+
+func (m *MsgSetIsArchived) Reset()         { *m = MsgSetIsArchived{} }
+func (m *MsgSetIsArchived) String() string { return proto.CompactTextString(m) }
+func (*MsgSetIsArchived) ProtoMessage()    {}
+func (*MsgSetIsArchived) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{50}
+}
+func (m *MsgSetIsArchived) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetIsArchived) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetIsArchived.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetIsArchived) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetIsArchived.Merge(m, src)
+}
+func (m *MsgSetIsArchived) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetIsArchived) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetIsArchived.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetIsArchived proto.InternalMessageInfo
+
+func (m *MsgSetIsArchived) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetIsArchived) GetIsArchivedTimeline() []*IsArchivedTimeline {
+	if m != nil {
+		return m.IsArchivedTimeline
+	}
+	return nil
+}
+
+func (m *MsgSetIsArchived) GetCanArchiveCollection() []*TimedUpdatePermission {
+	if m != nil {
+		return m.CanArchiveCollection
+	}
+	return nil
+}
+
+// MsgSetIsArchivedResponse is the response to MsgSetIsArchived.
+type MsgSetIsArchivedResponse struct {
+	// ID of the badge collection.
+	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+}
+
+func (m *MsgSetIsArchivedResponse) Reset()         { *m = MsgSetIsArchivedResponse{} }
+func (m *MsgSetIsArchivedResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetIsArchivedResponse) ProtoMessage()    {}
+func (*MsgSetIsArchivedResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc897b33479788c9, []int{51}
+}
+func (m *MsgSetIsArchivedResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetIsArchivedResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetIsArchivedResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetIsArchivedResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetIsArchivedResponse.Merge(m, src)
+}
+func (m *MsgSetIsArchivedResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetIsArchivedResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetIsArchivedResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetIsArchivedResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*BadgeCustomMsgType)(nil), "badges.BadgeCustomMsgType")
 	proto.RegisterType((*MsgUpdateParams)(nil), "badges.MsgUpdateParams")
@@ -2537,165 +3442,222 @@ func init() {
 	proto.RegisterType((*MsgDeleteDynamicStoreResponse)(nil), "badges.MsgDeleteDynamicStoreResponse")
 	proto.RegisterType((*MsgSetDynamicStoreValue)(nil), "badges.MsgSetDynamicStoreValue")
 	proto.RegisterType((*MsgSetDynamicStoreValueResponse)(nil), "badges.MsgSetDynamicStoreValueResponse")
+	proto.RegisterType((*MsgSetValidBadgeIds)(nil), "badges.MsgSetValidBadgeIds")
+	proto.RegisterType((*MsgSetValidBadgeIdsResponse)(nil), "badges.MsgSetValidBadgeIdsResponse")
+	proto.RegisterType((*MsgSetManager)(nil), "badges.MsgSetManager")
+	proto.RegisterType((*MsgSetManagerResponse)(nil), "badges.MsgSetManagerResponse")
+	proto.RegisterType((*MsgSetCollectionMetadata)(nil), "badges.MsgSetCollectionMetadata")
+	proto.RegisterType((*MsgSetCollectionMetadataResponse)(nil), "badges.MsgSetCollectionMetadataResponse")
+	proto.RegisterType((*MsgSetBadgeMetadata)(nil), "badges.MsgSetBadgeMetadata")
+	proto.RegisterType((*MsgSetBadgeMetadataResponse)(nil), "badges.MsgSetBadgeMetadataResponse")
+	proto.RegisterType((*MsgSetCustomData)(nil), "badges.MsgSetCustomData")
+	proto.RegisterType((*MsgSetCustomDataResponse)(nil), "badges.MsgSetCustomDataResponse")
+	proto.RegisterType((*MsgSetStandards)(nil), "badges.MsgSetStandards")
+	proto.RegisterType((*MsgSetStandardsResponse)(nil), "badges.MsgSetStandardsResponse")
+	proto.RegisterType((*MsgSetCollectionApprovals)(nil), "badges.MsgSetCollectionApprovals")
+	proto.RegisterType((*MsgSetCollectionApprovalsResponse)(nil), "badges.MsgSetCollectionApprovalsResponse")
+	proto.RegisterType((*MsgSetIsArchived)(nil), "badges.MsgSetIsArchived")
+	proto.RegisterType((*MsgSetIsArchivedResponse)(nil), "badges.MsgSetIsArchivedResponse")
 }
 
 func init() { proto.RegisterFile("badges/tx.proto", fileDescriptor_bc897b33479788c9) }
 
 var fileDescriptor_bc897b33479788c9 = []byte{
-	// 2442 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5b, 0xcd, 0x6f, 0x1c, 0x49,
-	0x15, 0xcf, 0xc4, 0x5f, 0x33, 0xcf, 0xe3, 0xaf, 0xb2, 0x63, 0xcf, 0x8c, 0xed, 0xb1, 0x33, 0xbb,
-	0x6b, 0x1c, 0xef, 0xe2, 0x59, 0x07, 0xc4, 0x22, 0x0b, 0x21, 0xfc, 0xb1, 0xca, 0x3a, 0x8a, 0x37,
-	0x51, 0x79, 0x9c, 0x85, 0x08, 0x14, 0x7a, 0xa6, 0xcb, 0xe3, 0x46, 0x33, 0xdd, 0xa3, 0xee, 0x1e,
-	0x13, 0xdf, 0x00, 0x89, 0x0b, 0x5c, 0x38, 0xf1, 0x2f, 0xb0, 0x5c, 0x50, 0x24, 0x90, 0x10, 0xff,
-	0x00, 0x5a, 0x89, 0xcb, 0x8a, 0x13, 0xe2, 0xb0, 0x42, 0x09, 0x52, 0xfe, 0x03, 0x38, 0x21, 0xa1,
-	0xae, 0xae, 0xea, 0xe9, 0xae, 0x8f, 0x9e, 0x89, 0x33, 0xd9, 0xcb, 0xe6, 0x92, 0xb8, 0xab, 0xde,
-	0xfb, 0xd5, 0x7b, 0x55, 0xd5, 0xef, 0xf7, 0xaa, 0xeb, 0x0d, 0xcc, 0xd4, 0x0d, 0xb3, 0x49, 0xbc,
-	0xaa, 0xff, 0x64, 0xbb, 0xe3, 0x3a, 0xbe, 0x83, 0xc6, 0xc3, 0x86, 0xd2, 0x9c, 0xd1, 0xb6, 0x6c,
-	0xa7, 0x4a, 0xff, 0x0d, 0xbb, 0x4a, 0x4b, 0x0d, 0xc7, 0x6b, 0x3b, 0x5e, 0xb5, 0xed, 0x35, 0xab,
-	0x17, 0x3b, 0xc1, 0x7f, 0xac, 0xa3, 0x18, 0x76, 0x3c, 0xa6, 0x4f, 0xd5, 0xf0, 0x81, 0x75, 0x2d,
-	0x34, 0x9d, 0xa6, 0x13, 0xb6, 0x07, 0x7f, 0xb1, 0xd6, 0x79, 0x36, 0x6a, 0xc7, 0x70, 0x8d, 0x36,
-	0x17, 0x5d, 0xe4, 0xa6, 0xb8, 0x86, 0xed, 0x9d, 0x11, 0x97, 0xb7, 0xdf, 0x60, 0xed, 0x75, 0xa3,
-	0x65, 0xd8, 0x0d, 0xc2, 0x9b, 0x0b, 0x1c, 0x83, 0xb8, 0x6d, 0xcb, 0xf3, 0x2c, 0xc7, 0x16, 0x15,
-	0xda, 0xc4, 0x37, 0x4c, 0xc3, 0x37, 0x04, 0x85, 0x86, 0xd3, 0x6a, 0x91, 0x86, 0x1f, 0x53, 0x28,
-	0xb1, 0x1e, 0xc3, 0x34, 0x5d, 0xe2, 0x79, 0x8f, 0x5b, 0x96, 0xe7, 0x4b, 0x56, 0x59, 0x6d, 0xd2,
-	0xb2, 0xec, 0x68, 0xf8, 0x65, 0xd6, 0x6e, 0x5e, 0xda, 0x46, 0xdb, 0x6a, 0x3c, 0xf6, 0x7c, 0xc7,
-	0x8d, 0x3a, 0xcb, 0x6c, 0xa6, 0xea, 0x86, 0x47, 0xaa, 0x17, 0x3b, 0x75, 0xe2, 0x1b, 0x3b, 0xd5,
-	0x86, 0x63, 0xd9, 0x61, 0x7f, 0xe5, 0x3f, 0x00, 0x68, 0x3f, 0xd0, 0x3f, 0xe8, 0x7a, 0xbe, 0xd3,
-	0x3e, 0xf6, 0x9a, 0xb5, 0xcb, 0x0e, 0x41, 0x27, 0x70, 0xa3, 0xe1, 0x12, 0xc3, 0x27, 0x7b, 0xa1,
-	0x21, 0xf7, 0x02, 0x3b, 0x8e, 0xbd, 0x66, 0x21, 0xb3, 0x9e, 0xd9, 0x9c, 0xbc, 0xbd, 0xba, 0x1d,
-	0x8e, 0xb9, 0x7d, 0xec, 0x35, 0x0f, 0x24, 0x39, 0xac, 0xd6, 0x45, 0xe7, 0xb0, 0xd2, 0xb5, 0xad,
-	0x0b, 0xe2, 0x7a, 0x46, 0xeb, 0xb4, 0x63, 0x1a, 0x3e, 0x39, 0x88, 0x26, 0x20, 0xc0, 0xbe, 0x4e,
-	0xb1, 0xdf, 0x8e, 0x61, 0x9f, 0xea, 0xc4, 0x71, 0x2a, 0x12, 0x3a, 0x86, 0x79, 0x93, 0xb4, 0x88,
-	0x38, 0xc0, 0x08, 0x1d, 0x60, 0x39, 0x36, 0xc0, 0xa1, 0x20, 0x85, 0x55, 0x7a, 0xe8, 0x0e, 0xcc,
-	0xf1, 0xad, 0x40, 0xe7, 0x8a, 0xce, 0xc4, 0x28, 0x05, 0x2b, 0xc6, 0xc0, 0x6a, 0x09, 0x19, 0x2c,
-	0xeb, 0xa0, 0x87, 0xb0, 0xd8, 0xa5, 0xe6, 0x9e, 0x7a, 0xc4, 0xdd, 0xeb, 0x74, 0x5c, 0xe7, 0xc2,
-	0x68, 0x51, 0xb4, 0x31, 0x8a, 0x56, 0x8e, 0xfb, 0x2e, 0x0b, 0x62, 0x8d, 0x76, 0xe0, 0x6f, 0x57,
-	0x31, 0xa1, 0xe3, 0x92, 0xbf, 0xd2, 0x3c, 0xaa, 0xf4, 0x02, 0xb8, 0x70, 0x05, 0x93, 0x70, 0x13,
-	0x12, 0xdc, 0x81, 0x20, 0x85, 0x55, 0x7a, 0xbd, 0xcd, 0x74, 0x18, 0xee, 0xd0, 0x93, 0x60, 0x83,
-	0x06, 0x80, 0x59, 0xcd, 0x66, 0x8a, 0xcb, 0x61, 0xb5, 0x6e, 0x00, 0x1a, 0x9a, 0x2e, 0x82, 0xe6,
-	0x24, 0xd0, 0x53, 0x49, 0x0e, 0xab, 0x75, 0x03, 0xd0, 0x70, 0xfd, 0x45, 0x50, 0x90, 0x40, 0x0f,
-	0x25, 0x39, 0xac, 0xd6, 0x45, 0x3f, 0x80, 0x25, 0x8f, 0xf8, 0xf1, 0xd6, 0x87, 0x46, 0xab, 0x4b,
-	0x61, 0x27, 0x29, 0xec, 0x5a, 0x0c, 0xf6, 0x44, 0x21, 0x89, 0x75, 0xfa, 0xc1, 0x7e, 0xf2, 0x88,
-	0x7f, 0x64, 0x37, 0x9c, 0xb6, 0x65, 0x37, 0xf9, 0x96, 0x08, 0x90, 0xf3, 0xd2, 0x7e, 0x3a, 0x91,
-	0x05, 0xb1, 0x46, 0x1b, 0x3d, 0x86, 0x62, 0xe8, 0x8b, 0x0a, 0x7a, 0x8a, 0x42, 0xdf, 0x94, 0xe6,
-	0x42, 0x42, 0xd7, 0x63, 0x30, 0xc3, 0xef, 0x77, 0xfd, 0xa6, 0x23, 0xa0, 0x4f, 0xab, 0x0c, 0x17,
-	0x05, 0xb1, 0x46, 0xbb, 0x67, 0xb8, 0x0a, 0x7a, 0x46, 0x63, 0xb8, 0x84, 0xae, 0xc7, 0x08, 0x42,
-	0x41, 0xa7, 0xeb, 0x36, 0x49, 0xe2, 0xe5, 0x9d, 0x95, 0x42, 0xc1, 0x83, 0x84, 0x0c, 0x96, 0x75,
-	0x2a, 0xbf, 0xcb, 0xc0, 0x4c, 0xb4, 0x37, 0x1f, 0x50, 0xf6, 0x41, 0xdf, 0x82, 0x9c, 0xd1, 0xf5,
-	0xcf, 0x1d, 0xd7, 0xf2, 0x2f, 0x69, 0xa4, 0xcd, 0xed, 0x17, 0xfe, 0xfe, 0xa7, 0xaf, 0x2f, 0x30,
-	0x1e, 0x63, 0xf1, 0xf4, 0xc4, 0x77, 0x2d, 0xbb, 0x89, 0x7b, 0xa2, 0x68, 0x07, 0xc6, 0x43, 0xfe,
-	0x62, 0x21, 0x74, 0x9a, 0x5b, 0x12, 0xe2, 0xee, 0xe7, 0x3e, 0xfb, 0x62, 0xed, 0xda, 0xa7, 0x2f,
-	0x9e, 0x6e, 0x65, 0x30, 0x13, 0xdc, 0xbd, 0xf5, 0x8b, 0x17, 0x4f, 0xb7, 0x7a, 0x10, 0xbf, 0x7a,
-	0xf1, 0x74, 0x8b, 0xf3, 0x8b, 0x60, 0x55, 0xa5, 0x08, 0x4b, 0x42, 0x13, 0x26, 0x5e, 0xc7, 0xb1,
-	0x3d, 0x52, 0xf9, 0x43, 0x06, 0xca, 0x07, 0xd4, 0xb8, 0x03, 0xc7, 0xb2, 0x3f, 0x71, 0x8d, 0x4e,
-	0x87, 0xb8, 0x0f, 0x0c, 0xff, 0x7c, 0xcf, 0x34, 0xef, 0xd7, 0x7f, 0x42, 0x1a, 0x3e, 0x5a, 0x80,
-	0x31, 0x93, 0xd8, 0x4e, 0x3b, 0xf4, 0x07, 0x87, 0x0f, 0xe8, 0x5d, 0xc8, 0x72, 0x12, 0x2d, 0x5c,
-	0x5f, 0x1f, 0xd9, 0x9c, 0xbc, 0x3d, 0xc3, 0x6d, 0xde, 0x0f, 0xdb, 0x71, 0x24, 0x80, 0x16, 0x61,
-	0xdc, 0xbb, 0x6c, 0xd7, 0x9d, 0x16, 0x0d, 0xe0, 0x39, 0xcc, 0x9e, 0xd0, 0x0e, 0x00, 0x45, 0x3b,
-	0xb5, 0x2d, 0xdf, 0x2b, 0x8c, 0x52, 0x98, 0x39, 0x0e, 0x73, 0xc8, 0x7b, 0x70, 0x4c, 0xa8, 0xf2,
-	0xdf, 0x69, 0x58, 0x49, 0xe3, 0x15, 0x54, 0x80, 0x09, 0x1a, 0x6f, 0x1c, 0x97, 0x19, 0xcc, 0x1f,
-	0xd1, 0xfb, 0x90, 0xef, 0xf1, 0xf5, 0x91, 0x49, 0xa7, 0x3a, 0xb7, 0x9f, 0x0f, 0xa6, 0xf6, 0x9f,
-	0x5f, 0xac, 0x8d, 0x9e, 0x5a, 0xb6, 0x8f, 0x13, 0x12, 0xa8, 0x02, 0x79, 0xee, 0x43, 0x40, 0xaa,
-	0xcc, 0xfa, 0x44, 0x1b, 0xda, 0x87, 0x19, 0x93, 0x9c, 0x19, 0xdd, 0x96, 0xbf, 0xcf, 0xe7, 0x23,
-	0x24, 0x96, 0x02, 0x77, 0x24, 0x08, 0xf6, 0xac, 0x2f, 0x0c, 0x33, 0xa2, 0x02, 0x7a, 0x9f, 0x47,
-	0xff, 0x87, 0x46, 0xcb, 0x32, 0x29, 0xdb, 0x1c, 0x99, 0x1e, 0xa5, 0x94, 0x2c, 0x56, 0x75, 0xa1,
-	0x0f, 0x60, 0xea, 0x22, 0x21, 0x3b, 0x9e, 0x9c, 0x3c, 0xea, 0x8c, 0x61, 0x37, 0x09, 0x4e, 0xca,
-	0xa1, 0xef, 0xc1, 0xb2, 0x48, 0x18, 0x0f, 0x7a, 0x59, 0x0f, 0x65, 0x88, 0x2c, 0x4e, 0x13, 0xa1,
-	0x64, 0xa0, 0xd4, 0x15, 0xc8, 0x40, 0xa9, 0x8d, 0xd5, 0xba, 0xe8, 0x9b, 0x9c, 0x0c, 0x8e, 0x0d,
-	0xdb, 0x68, 0x12, 0xb7, 0xc6, 0x52, 0x24, 0x4a, 0x06, 0x59, 0xac, 0xee, 0x44, 0x7b, 0x30, 0xd3,
-	0x16, 0xe4, 0x81, 0xce, 0xc3, 0x52, 0xf4, 0x26, 0x27, 0xbb, 0xb1, 0x28, 0x8f, 0xee, 0xc2, 0xba,
-	0x44, 0xa0, 0x2c, 0xd7, 0x8b, 0x30, 0x27, 0xa9, 0x0d, 0x7d, 0xe5, 0x50, 0x1d, 0x4a, 0x0d, 0x3d,
-	0x4a, 0x9e, 0x5a, 0x56, 0x91, 0xa7, 0x47, 0x94, 0xc4, 0x29, 0x28, 0xbd, 0xf5, 0xa3, 0x2b, 0x2a,
-	0x0d, 0x32, 0x15, 0x5f, 0x3f, 0xa5, 0x48, 0xb0, 0x7e, 0x75, 0xa5, 0xee, 0x34, 0x35, 0x70, 0xb5,
-	0xf7, 0x1a, 0x2b, 0x84, 0xb0, 0x5a, 0x17, 0x3d, 0x84, 0x8d, 0x70, 0xcc, 0xfb, 0x67, 0x67, 0x07,
-	0xe7, 0x86, 0x65, 0xf3, 0xbd, 0x2d, 0x8d, 0x32, 0x43, 0x2d, 0x1c, 0x50, 0x1a, 0xf9, 0xb0, 0xee,
-	0xf4, 0x43, 0x9c, 0xa5, 0x76, 0x6f, 0x72, 0xbb, 0xfb, 0x61, 0xe2, 0xbe, 0x88, 0x68, 0x17, 0x0a,
-	0x6c, 0xb1, 0x69, 0x4e, 0x7d, 0x18, 0x1f, 0x6d, 0x8e, 0xda, 0xaf, 0xed, 0x47, 0x77, 0x01, 0x35,
-	0x64, 0x2d, 0x44, 0x6d, 0x2c, 0x45, 0x8b, 0x2f, 0x49, 0x60, 0x85, 0x16, 0xfa, 0x0e, 0x14, 0xc5,
-	0x4d, 0x17, 0x51, 0x50, 0xe1, 0x06, 0x35, 0x44, 0x2f, 0x80, 0xee, 0xc1, 0x7c, 0x43, 0xa1, 0xb7,
-	0x28, 0x98, 0x22, 0x89, 0x60, 0x95, 0x1a, 0xfa, 0x36, 0x2c, 0x85, 0x43, 0x9d, 0xf8, 0x86, 0x6d,
-	0x1a, 0xae, 0xe9, 0x45, 0xce, 0x2d, 0x51, 0x4b, 0x74, 0xdd, 0x01, 0xe3, 0x7a, 0x92, 0x4e, 0x81,
-	0x5a, 0x11, 0x31, 0xae, 0xa4, 0x85, 0x65, 0x9d, 0xde, 0xb2, 0x1c, 0x79, 0x7b, 0x6e, 0xe3, 0xdc,
-	0xba, 0x20, 0x66, 0x84, 0x57, 0x8c, 0x2f, 0x8b, 0xdc, 0x1f, 0x2c, 0x8b, 0x25, 0x6b, 0x95, 0x92,
-	0x73, 0x21, 0xeb, 0x61, 0x85, 0x16, 0xfa, 0x04, 0x8a, 0x6d, 0xcb, 0xf6, 0x3f, 0xf4, 0x1a, 0xae,
-	0xf3, 0xd3, 0x80, 0x37, 0xbd, 0x9a, 0xc3, 0x8f, 0x0e, 0x85, 0x65, 0xe6, 0x18, 0xa3, 0xfc, 0xe0,
-	0xd8, 0xb6, 0xcd, 0x8e, 0x6d, 0xdb, 0x81, 0x2c, 0xd6, 0xeb, 0xa2, 0x73, 0x58, 0x6e, 0xa8, 0xc8,
-	0xd8, 0xab, 0x39, 0x7b, 0xa6, 0x59, 0x58, 0xa1, 0xd0, 0x1b, 0xbd, 0x95, 0x4b, 0xe3, 0x6d, 0x9c,
-	0x06, 0xb5, 0xbb, 0x13, 0x64, 0x0f, 0x9c, 0x19, 0x83, 0xdc, 0x61, 0x9d, 0xe5, 0x0e, 0x5a, 0x62,
-	0xad, 0x7c, 0x1f, 0xde, 0x4e, 0x3d, 0xd0, 0xb1, 0x94, 0x42, 0xa2, 0xd9, 0x4c, 0x3f, 0x9a, 0xad,
-	0xfc, 0x6f, 0x0a, 0xe6, 0x15, 0x47, 0x9b, 0xa1, 0x52, 0xb9, 0x86, 0x62, 0x47, 0x5e, 0x82, 0x62,
-	0x47, 0xdf, 0x50, 0xec, 0x1b, 0x8a, 0x7d, 0x43, 0xb1, 0x6f, 0x28, 0xf6, 0x2b, 0x4a, 0xb1, 0xcb,
-	0x57, 0xa2, 0xd8, 0x95, 0xe1, 0x53, 0xec, 0xea, 0xeb, 0xa3, 0xd8, 0xf2, 0xf0, 0x28, 0x76, 0x53,
-	0xa4, 0xd8, 0x25, 0x4e, 0xb1, 0x22, 0xb3, 0xde, 0x87, 0x65, 0xd5, 0x97, 0xbd, 0xab, 0x13, 0xea,
-	0x1f, 0x73, 0x94, 0x50, 0xc5, 0x8f, 0x7b, 0x29, 0x84, 0x2a, 0x9e, 0x74, 0xaf, 0xbf, 0xa6, 0x93,
-	0xae, 0x44, 0xaa, 0x63, 0x03, 0x92, 0xaa, 0x96, 0x12, 0xc7, 0x5f, 0x81, 0x12, 0x15, 0xe4, 0x36,
-	0xf1, 0x92, 0xe4, 0x96, 0x4e, 0x48, 0xd9, 0xa1, 0x10, 0x92, 0x96, 0x4e, 0x72, 0xaf, 0x40, 0x27,
-	0x83, 0x84, 0x7d, 0x18, 0x7a, 0xd8, 0x57, 0x87, 0xee, 0xc9, 0x2b, 0x85, 0x6e, 0x4d, 0xf0, 0xcd,
-	0x5f, 0x2d, 0xf8, 0x2a, 0x43, 0xe8, 0xd4, 0x15, 0x42, 0xa8, 0x3a, 0x0c, 0x4e, 0x0f, 0x3f, 0x0c,
-	0xce, 0xbe, 0xbe, 0x30, 0x38, 0xf7, 0x25, 0x84, 0x41, 0x31, 0x3a, 0xb1, 0x30, 0x28, 0xdd, 0x48,
-	0x5c, 0x3d, 0x0c, 0xfe, 0x36, 0x03, 0x37, 0x94, 0xf7, 0x5b, 0x29, 0x81, 0xf0, 0x03, 0xc8, 0x1b,
-	0x31, 0x49, 0xf6, 0x6d, 0x73, 0x9e, 0xcf, 0x44, 0x0c, 0x05, 0x27, 0x04, 0x77, 0xb7, 0x44, 0x3f,
-	0x8b, 0x09, 0x3f, 0xe3, 0xc3, 0x57, 0xd6, 0x60, 0x55, 0x7d, 0xef, 0xc6, 0x3f, 0xcb, 0xfe, 0x39,
-	0x03, 0x73, 0xd2, 0x7d, 0xd4, 0x50, 0xcf, 0x43, 0xdb, 0x90, 0x8b, 0x2e, 0x47, 0x0b, 0x23, 0xd4,
-	0xc9, 0x59, 0xee, 0x24, 0x1f, 0x16, 0xf7, 0x44, 0x76, 0x37, 0x44, 0xf7, 0xf8, 0xcd, 0x68, 0xd2,
-	0xc6, 0xca, 0x32, 0x14, 0xe5, 0x8b, 0x34, 0xee, 0xd6, 0xaf, 0x33, 0x94, 0x97, 0xc4, 0x3b, 0xbb,
-	0x61, 0x3a, 0xa6, 0xdf, 0x6f, 0xe2, 0xa8, 0x95, 0x55, 0xba, 0xdf, 0xa4, 0x0b, 0x44, 0x6e, 0xec,
-	0x5f, 0xb3, 0xb0, 0xa8, 0xbe, 0xc5, 0x1b, 0xea, 0x42, 0x44, 0x49, 0x9f, 0x78, 0x59, 0xc1, 0x0f,
-	0xa7, 0xba, 0x6e, 0x74, 0x17, 0xe6, 0x1c, 0x49, 0x27, 0x3c, 0xa4, 0xae, 0xc4, 0x19, 0x59, 0xba,
-	0x1d, 0x91, 0xd5, 0x7a, 0x56, 0x88, 0x77, 0x3d, 0xfc, 0x2b, 0xb4, 0xae, 0x3b, 0xb0, 0xc2, 0x92,
-	0x74, 0xc6, 0x65, 0x2b, 0xa4, 0xcb, 0x25, 0x59, 0x0d, 0x9d, 0x43, 0x35, 0x1c, 0x66, 0xaf, 0xeb,
-	0x3b, 0x61, 0x33, 0x39, 0x21, 0xad, 0xb3, 0x23, 0xdb, 0xf2, 0x2d, 0xc3, 0x27, 0x26, 0x77, 0xa5,
-	0x16, 0x6d, 0xdd, 0xf0, 0x34, 0xfd, 0xb2, 0x6a, 0xe8, 0x87, 0x70, 0xcb, 0x18, 0x78, 0x8c, 0x2c,
-	0x1d, 0x63, 0x70, 0x85, 0xfe, 0x7e, 0xf0, 0xc9, 0xe8, 0x8d, 0x91, 0x1b, 0xc4, 0x0f, 0x49, 0x2d,
-	0xcd, 0x0f, 0x79, 0x0c, 0x48, 0xf7, 0x43, 0x46, 0xaf, 0xc1, 0x3b, 0x92, 0x41, 0x7b, 0xad, 0x96,
-	0x8c, 0x1c, 0x1e, 0xdf, 0x07, 0x13, 0x46, 0x1f, 0xc1, 0x9a, 0xd1, 0x07, 0x2f, 0x4f, 0xf1, 0xfa,
-	0x89, 0xf5, 0x3e, 0x69, 0x04, 0x1b, 0x2c, 0x9e, 0x14, 0x4e, 0xc5, 0x3f, 0x69, 0x08, 0x9d, 0x41,
-	0xd6, 0xd7, 0x15, 0xe4, 0xc3, 0x3b, 0xcb, 0xa5, 0xf8, 0x7e, 0x8d, 0xa7, 0x8f, 0xa2, 0xfc, 0xee,
-	0xbb, 0x62, 0x90, 0x29, 0x25, 0x72, 0xfb, 0x44, 0xb4, 0xa8, 0xac, 0x43, 0x59, 0x53, 0x0d, 0xc0,
-	0x43, 0xcd, 0xdf, 0x32, 0x34, 0xd4, 0x28, 0x2e, 0x78, 0x87, 0x1c, 0x6a, 0xb2, 0x06, 0xc3, 0x65,
-	0x95, 0x14, 0xe9, 0x6f, 0x68, 0x24, 0xad, 0xf7, 0x57, 0x61, 0x32, 0xf3, 0x57, 0x75, 0x5b, 0x1d,
-	0xa3, 0xb7, 0xa2, 0xf6, 0xd6, 0x79, 0xa8, 0x2e, 0x97, 0x01, 0xb8, 0x13, 0x47, 0x26, 0xbb, 0xbf,
-	0x8b, 0xb5, 0xec, 0x6e, 0x8b, 0x8e, 0xad, 0x26, 0xd8, 0x42, 0xf2, 0xed, 0x2d, 0xb8, 0xa9, 0xbf,
-	0x2e, 0x97, 0x97, 0x53, 0x0c, 0xbd, 0x5f, 0xe6, 0x72, 0x4a, 0x61, 0x7f, 0xb0, 0xe5, 0x14, 0xd5,
-	0x7a, 0xcb, 0x29, 0x01, 0x2a, 0x97, 0xf3, 0xb5, 0xba, 0xfc, 0x8a, 0xcb, 0x29, 0xf9, 0x16, 0x5f,
-	0x4e, 0xad, 0x7b, 0xff, 0xbe, 0x4e, 0x93, 0xb1, 0x64, 0x45, 0xc0, 0xb0, 0xef, 0x99, 0x69, 0x7d,
-	0xc1, 0x87, 0x4f, 0x3a, 0x96, 0x4b, 0x4c, 0x46, 0xfc, 0x89, 0x36, 0xb4, 0x09, 0x33, 0xa1, 0xa3,
-	0xc4, 0x65, 0x29, 0x23, 0x3d, 0x7d, 0xe7, 0xb0, 0xd8, 0x8c, 0xbe, 0x0b, 0x25, 0xaa, 0x79, 0xe0,
-	0x74, 0x6d, 0x9f, 0xb8, 0x1d, 0xc3, 0xf5, 0x2f, 0x45, 0x3a, 0x4f, 0x91, 0x40, 0xc7, 0x30, 0xcb,
-	0xa7, 0xd4, 0xab, 0x39, 0xd4, 0x6d, 0x46, 0xe8, 0x51, 0xe5, 0xc5, 0x5e, 0x34, 0xe5, 0xc4, 0xf6,
-	0xad, 0x33, 0x8b, 0xb8, 0x87, 0xc4, 0x37, 0xac, 0x96, 0x87, 0x25, 0x55, 0x7d, 0xe6, 0x98, 0x9c,
-	0xd0, 0xca, 0x1d, 0xba, 0x89, 0x84, 0xba, 0x0b, 0x9e, 0xfc, 0x6f, 0x41, 0xce, 0xee, 0xb6, 0x69,
-	0xa7, 0x3a, 0xf3, 0xef, 0x75, 0x57, 0x7e, 0x1e, 0x4f, 0xfb, 0xe3, 0x55, 0x37, 0xe9, 0xdf, 0x3f,
-	0xd8, 0xa7, 0x0a, 0x5a, 0x9a, 0x43, 0xd7, 0x2c, 0x8b, 0x13, 0x6d, 0xfd, 0x32, 0xfc, 0xf8, 0x48,
-	0x95, 0x3b, 0xb1, 0x0c, 0x3f, 0x51, 0x62, 0xc4, 0x1d, 0xda, 0x80, 0x09, 0x5a, 0xe6, 0xa7, 0x39,
-	0xc8, 0xf0, 0xce, 0xca, 0xef, 0x43, 0x67, 0xe4, 0x0a, 0xa8, 0x14, 0x67, 0x62, 0xd8, 0xd7, 0x53,
-	0xb0, 0x25, 0xa7, 0x47, 0x5e, 0xc6, 0x69, 0xd9, 0x22, 0x76, 0xac, 0x51, 0x14, 0x6b, 0xf1, 0x37,
-	0xe9, 0x97, 0xa1, 0x33, 0x72, 0xe5, 0xd5, 0xab, 0x3b, 0xa3, 0x37, 0x54, 0x1e, 0x8d, 0x19, 0xaa,
-	0x28, 0x00, 0xe3, 0x86, 0xfe, 0x25, 0x43, 0x4b, 0x66, 0x54, 0xb5, 0x5c, 0x43, 0x98, 0xf7, 0x02,
-	0x4c, 0xb0, 0xa3, 0x23, 0x0b, 0x61, 0xfc, 0x11, 0x2d, 0xc0, 0xd8, 0x05, 0x5d, 0x8a, 0x51, 0xba,
-	0x14, 0xe1, 0xc3, 0xee, 0x7b, 0xa2, 0x6b, 0xcb, 0xbd, 0x70, 0x2d, 0xd9, 0x57, 0xb9, 0x09, 0x6b,
-	0xba, 0x32, 0x34, 0xe6, 0xde, 0xed, 0x4f, 0xf3, 0x30, 0x72, 0xec, 0x35, 0xd1, 0x47, 0x90, 0x4f,
-	0x94, 0x2f, 0x2d, 0x49, 0x35, 0x77, 0x61, 0x47, 0x69, 0x4d, 0xd3, 0x11, 0x6d, 0x67, 0x07, 0x8a,
-	0xfa, 0x92, 0x9c, 0x81, 0x0a, 0x42, 0x4b, 0xef, 0x0d, 0x54, 0x36, 0xca, 0x07, 0x7c, 0x04, 0x48,
-	0x71, 0xae, 0x4f, 0x2f, 0x6b, 0x2d, 0xbd, 0x93, 0x5e, 0xf5, 0xca, 0xb1, 0x3f, 0x86, 0x69, 0xe1,
-	0xe4, 0xad, 0x2f, 0x12, 0x2d, 0xdd, 0xd4, 0xd7, 0x8f, 0x72, 0xbc, 0x1f, 0xc1, 0xbc, 0xea, 0x14,
-	0xd9, 0xa7, 0x56, 0xb4, 0xb4, 0xd1, 0xa7, 0x96, 0x34, 0x06, 0xaf, 0xca, 0x1c, 0xfb, 0x94, 0x0e,
-	0x26, 0xe0, 0x53, 0x92, 0x35, 0x74, 0x06, 0x8b, 0x9a, 0x44, 0xad, 0x7f, 0x05, 0x61, 0xe9, 0x56,
-	0xff, 0x22, 0xc3, 0xa4, 0x1b, 0x52, 0xfa, 0xd0, 0xa7, 0x90, 0x50, 0x74, 0x43, 0xc7, 0xe2, 0x3d,
-	0x37, 0xa4, 0x11, 0xfa, 0xd7, 0x13, 0x2a, 0xdc, 0xd0, 0x8e, 0xf3, 0x31, 0x4c, 0x0b, 0x99, 0x82,
-	0xbe, 0xac, 0x30, 0xb1, 0x79, 0x34, 0xcc, 0x57, 0x83, 0x59, 0xe9, 0x7b, 0x49, 0x5a, 0x01, 0x74,
-	0xe9, 0xad, 0xb4, 0xea, 0xe8, 0x18, 0xaa, 0xf4, 0x9a, 0xa6, 0x95, 0x19, 0x27, 0x50, 0xb5, 0x2f,
-	0x65, 0x0d, 0x66, 0xa5, 0x3b, 0x87, 0xb4, 0x6a, 0xe3, 0x04, 0xaa, 0xf6, 0xc3, 0x5f, 0xf4, 0xaa,
-	0x27, 0x18, 0x23, 0xbd, 0xe8, 0x58, 0xf1, 0xaa, 0x2b, 0x69, 0xf8, 0x11, 0x20, 0x05, 0xb5, 0xa6,
-	0xd7, 0x1e, 0x27, 0xb0, 0xf5, 0x6c, 0x17, 0x60, 0x2b, 0x98, 0x2e, 0xbd, 0x04, 0x39, 0x81, 0xad,
-	0x27, 0x28, 0xf4, 0x63, 0x58, 0x50, 0x92, 0x53, 0xbf, 0x4a, 0xe4, 0xd2, 0xd7, 0xfa, 0x95, 0x2a,
-	0xb3, 0x11, 0x4a, 0x63, 0x3f, 0x7b, 0xf1, 0x74, 0x2b, 0xb3, 0x7f, 0xef, 0xb3, 0x67, 0xe5, 0xcc,
-	0xe7, 0xcf, 0xca, 0x99, 0x7f, 0x3d, 0x2b, 0x67, 0x7e, 0xf3, 0xbc, 0x7c, 0xed, 0xf3, 0xe7, 0xe5,
-	0x6b, 0xff, 0x78, 0x5e, 0xbe, 0xf6, 0xe8, 0x76, 0xd3, 0xf2, 0xcf, 0xbb, 0xf5, 0xed, 0x86, 0xd3,
-	0xae, 0xd6, 0x2d, 0x9f, 0xff, 0xb2, 0x82, 0xff, 0xd5, 0x38, 0x37, 0x2c, 0xbb, 0xfa, 0xa4, 0xca,
-	0x7f, 0xf3, 0x70, 0xd9, 0x21, 0x5e, 0x7d, 0x9c, 0xfe, 0x66, 0xe1, 0x1b, 0xff, 0x0f, 0x00, 0x00,
-	0xff, 0xff, 0xaa, 0x28, 0x44, 0xe0, 0x2b, 0x32, 0x00, 0x00,
+	// 3095 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5c, 0xcd, 0x6f, 0x24, 0x47,
+	0x15, 0xdf, 0xf1, 0x78, 0xbd, 0x9e, 0xb7, 0xfe, 0x2c, 0x7f, 0x8d, 0xc7, 0xf6, 0xd8, 0xdb, 0xd9,
+	0x2c, 0x5e, 0x27, 0xb1, 0xe3, 0x05, 0x11, 0x34, 0x20, 0x84, 0x3f, 0xa2, 0xc4, 0xc9, 0x3a, 0xbb,
+	0x94, 0xed, 0x4d, 0x88, 0x82, 0x96, 0x9e, 0x99, 0xf6, 0xb8, 0xd1, 0x4c, 0xf7, 0xa8, 0xbb, 0xc7,
+	0xc4, 0x37, 0x40, 0xe2, 0x02, 0x42, 0xe2, 0xc4, 0x05, 0x89, 0x03, 0x42, 0x02, 0x2e, 0x68, 0x25,
+	0x90, 0x10, 0x67, 0x24, 0x14, 0xc4, 0x81, 0x88, 0x13, 0xca, 0x21, 0xa0, 0x5d, 0xa4, 0xfd, 0x13,
+	0x38, 0x21, 0xa1, 0xae, 0xae, 0xea, 0xee, 0xfa, 0xea, 0x99, 0x9d, 0x9d, 0xcd, 0x85, 0xbd, 0x24,
+	0x3b, 0x5d, 0xef, 0xfd, 0xea, 0xbd, 0x57, 0xdd, 0xef, 0xbd, 0x7a, 0xf5, 0xca, 0x30, 0x59, 0x35,
+	0xeb, 0x0d, 0xcb, 0xdf, 0x0a, 0x3e, 0xdc, 0x6c, 0x7b, 0x6e, 0xe0, 0xa2, 0x91, 0xe8, 0x41, 0x69,
+	0xda, 0x6c, 0xd9, 0x8e, 0xbb, 0x45, 0xfe, 0x1b, 0x0d, 0x95, 0x16, 0x6a, 0xae, 0xdf, 0x72, 0xfd,
+	0xad, 0x96, 0xdf, 0xd8, 0x3a, 0xdf, 0x0e, 0xff, 0x47, 0x07, 0x16, 0xa3, 0x81, 0xfb, 0xe4, 0xd7,
+	0x56, 0xf4, 0x83, 0x0e, 0xcd, 0x36, 0xdc, 0x86, 0x1b, 0x3d, 0x0f, 0xff, 0x45, 0x9f, 0xce, 0xd0,
+	0x59, 0xdb, 0xa6, 0x67, 0xb6, 0x18, 0xe9, 0x3c, 0x13, 0xc5, 0x33, 0x1d, 0xff, 0xd4, 0xf2, 0xd8,
+	0xf3, 0x39, 0xfa, 0xbc, 0x6a, 0x36, 0x4d, 0xa7, 0x66, 0xb1, 0xc7, 0x45, 0x86, 0x61, 0x79, 0x2d,
+	0xdb, 0xf7, 0x6d, 0xd7, 0x11, 0x19, 0x5a, 0x56, 0x60, 0xd6, 0xcd, 0xc0, 0x14, 0x18, 0x6a, 0x6e,
+	0xb3, 0x69, 0xd5, 0x82, 0x14, 0x43, 0x89, 0x8e, 0x98, 0xf5, 0xba, 0x67, 0xf9, 0xfe, 0xfd, 0xa6,
+	0xed, 0x07, 0x92, 0x54, 0x76, 0xcb, 0x6a, 0xda, 0x4e, 0x3c, 0xfd, 0x12, 0x7d, 0x5e, 0xbf, 0x70,
+	0xcc, 0x96, 0x5d, 0xbb, 0xef, 0x07, 0xae, 0x17, 0x0f, 0x96, 0xa9, 0xa5, 0xaa, 0xa6, 0x6f, 0x6d,
+	0x9d, 0x6f, 0x57, 0xad, 0xc0, 0xdc, 0xde, 0xaa, 0xb9, 0xb6, 0x13, 0x8d, 0x1b, 0xff, 0x9c, 0x04,
+	0xb4, 0x1b, 0xf2, 0xef, 0x75, 0xfc, 0xc0, 0x6d, 0x1d, 0xfa, 0x8d, 0xe3, 0x8b, 0xb6, 0x85, 0x8e,
+	0x60, 0xae, 0xe6, 0x59, 0x66, 0x60, 0xed, 0x44, 0x82, 0xdc, 0x0e, 0xe5, 0x38, 0xf4, 0x1b, 0xc5,
+	0xdc, 0x5a, 0x6e, 0xfd, 0xea, 0xad, 0x95, 0xcd, 0x68, 0xce, 0xcd, 0x43, 0xbf, 0xb1, 0x27, 0xd1,
+	0x61, 0x35, 0x2f, 0x3a, 0x83, 0xe5, 0x8e, 0x63, 0x9f, 0x5b, 0x9e, 0x6f, 0x36, 0x4f, 0xda, 0x75,
+	0x33, 0xb0, 0xf6, 0x62, 0x03, 0x84, 0xd8, 0x43, 0x04, 0xfb, 0x7a, 0x0a, 0xfb, 0x44, 0x47, 0x8e,
+	0x33, 0x91, 0xd0, 0x21, 0xcc, 0xd4, 0xad, 0xa6, 0x25, 0x4e, 0x90, 0x27, 0x13, 0x2c, 0xa5, 0x26,
+	0xd8, 0x17, 0xa8, 0xb0, 0x8a, 0x0f, 0xbd, 0x01, 0xd3, 0xec, 0x55, 0x20, 0xb6, 0x22, 0x96, 0x18,
+	0x26, 0x60, 0x8b, 0x29, 0xb0, 0x63, 0x8e, 0x06, 0xcb, 0x3c, 0xe8, 0x1e, 0xcc, 0x77, 0x88, 0xb8,
+	0x27, 0xbe, 0xe5, 0xed, 0xb4, 0xdb, 0x9e, 0x7b, 0x6e, 0x36, 0x09, 0xda, 0x65, 0x82, 0x56, 0x4e,
+	0xeb, 0x2e, 0x13, 0x62, 0x0d, 0x77, 0xa8, 0x6f, 0x47, 0x61, 0xd0, 0x11, 0x49, 0x5f, 0xc9, 0x8e,
+	0x2a, 0xbe, 0x10, 0x2e, 0x5a, 0x41, 0x1e, 0xee, 0x8a, 0x04, 0xb7, 0x27, 0x50, 0x61, 0x15, 0x5f,
+	0xf2, 0x32, 0xed, 0x47, 0x6f, 0xe8, 0x51, 0xf8, 0x82, 0x86, 0x80, 0xa3, 0x9a, 0x97, 0x29, 0x4d,
+	0x87, 0xd5, 0xbc, 0x21, 0x68, 0x24, 0xba, 0x08, 0x5a, 0x90, 0x40, 0x4f, 0x24, 0x3a, 0xac, 0xe6,
+	0x0d, 0x41, 0xa3, 0xf5, 0x17, 0x41, 0x41, 0x02, 0xdd, 0x97, 0xe8, 0xb0, 0x9a, 0x17, 0x7d, 0x03,
+	0x16, 0x7c, 0x2b, 0x48, 0x3f, 0xbd, 0x67, 0x36, 0x3b, 0x04, 0xf6, 0x2a, 0x81, 0x5d, 0x4d, 0xc1,
+	0x1e, 0x29, 0x28, 0xb1, 0x8e, 0x3f, 0x7c, 0x9f, 0x7c, 0x2b, 0x38, 0x70, 0x6a, 0x6e, 0xcb, 0x76,
+	0x1a, 0xec, 0x95, 0x08, 0x91, 0xc7, 0xa4, 0xf7, 0xe9, 0x48, 0x26, 0xc4, 0x1a, 0x6e, 0x74, 0x1f,
+	0x16, 0x23, 0x5d, 0x54, 0xd0, 0xe3, 0x04, 0xfa, 0x9a, 0x64, 0x0b, 0x09, 0x5d, 0x8f, 0x41, 0x05,
+	0xbf, 0xd3, 0x09, 0x1a, 0xae, 0x80, 0x3e, 0xa1, 0x12, 0x5c, 0x24, 0xc4, 0x1a, 0xee, 0x44, 0x70,
+	0x15, 0xf4, 0xa4, 0x46, 0x70, 0x09, 0x5d, 0x8f, 0x11, 0xba, 0x82, 0x76, 0xc7, 0x6b, 0x58, 0xdc,
+	0xc7, 0x3b, 0x25, 0xb9, 0x82, 0xbb, 0x1c, 0x0d, 0x96, 0x79, 0xc2, 0x6f, 0xcc, 0xb7, 0x82, 0x7b,
+	0x66, 0xd3, 0xae, 0x13, 0xff, 0x70, 0x50, 0x27, 0x50, 0xd3, 0xd2, 0x37, 0x76, 0x24, 0x50, 0x61,
+	0x15, 0x1f, 0xfa, 0x32, 0x8c, 0xfb, 0x56, 0x70, 0x68, 0x3a, 0x66, 0xc3, 0xf2, 0x42, 0x20, 0x44,
+	0x80, 0xe6, 0x78, 0x20, 0x3a, 0x8e, 0x79, 0x5a, 0xf4, 0x01, 0x14, 0x7d, 0x2b, 0x48, 0x7d, 0xb4,
+	0x34, 0x5c, 0x85, 0x38, 0x33, 0x04, 0x67, 0x8d, 0xc7, 0x91, 0x49, 0xb1, 0x16, 0x81, 0x6a, 0x4a,
+	0x84, 0x4d, 0x03, 0xcf, 0xaa, 0x34, 0xe5, 0xa8, 0xb0, 0x8a, 0x0f, 0xed, 0xc3, 0x54, 0x38, 0x15,
+	0x09, 0x57, 0xfb, 0x14, 0x6b, 0x8e, 0x60, 0x15, 0x05, 0x21, 0x63, 0x12, 0x2c, 0x71, 0xa0, 0x1d,
+	0x98, 0xf4, 0xad, 0xe0, 0x28, 0x30, 0x9d, 0xba, 0xe9, 0x45, 0xa6, 0x9f, 0x27, 0x20, 0x0b, 0x3c,
+	0x48, 0x4c, 0x81, 0x45, 0xfa, 0xf0, 0x5d, 0xe3, 0x74, 0xe6, 0x5e, 0x89, 0x05, 0xe9, 0x5d, 0x3b,
+	0x52, 0xd2, 0x62, 0x3d, 0x06, 0xd5, 0xf4, 0xc0, 0xdf, 0xf1, 0x6a, 0x67, 0xf6, 0xb9, 0x55, 0x0f,
+	0x71, 0x8b, 0x2a, 0x4d, 0x13, 0x12, 0x2c, 0x71, 0x18, 0xbf, 0xca, 0xc1, 0x64, 0xec, 0x04, 0xef,
+	0x92, 0x34, 0x07, 0x7d, 0x11, 0x0a, 0x66, 0x27, 0x38, 0x73, 0x3d, 0x3b, 0xb8, 0x20, 0x21, 0xbd,
+	0xb0, 0x5b, 0xfc, 0xfb, 0xef, 0x5f, 0x99, 0xa5, 0x09, 0x13, 0x0d, 0xdc, 0x47, 0x81, 0x67, 0x3b,
+	0x0d, 0x9c, 0x90, 0xa2, 0x6d, 0x18, 0x89, 0x12, 0x25, 0x1a, 0xab, 0x27, 0x98, 0x1c, 0x11, 0xee,
+	0x6e, 0xe1, 0xa3, 0x4f, 0x57, 0x2f, 0xfd, 0xfa, 0xf1, 0x83, 0x8d, 0x1c, 0xa6, 0x84, 0x95, 0x9b,
+	0xdf, 0x7f, 0xfc, 0x60, 0x23, 0x81, 0xf8, 0xe1, 0xe3, 0x07, 0x1b, 0x2c, 0x91, 0x11, 0xa4, 0x32,
+	0x16, 0x61, 0x41, 0x78, 0x84, 0x2d, 0xbf, 0xed, 0x3a, 0xbe, 0x65, 0xfc, 0x36, 0x07, 0xe5, 0x3d,
+	0x22, 0xdc, 0x9e, 0x6b, 0x3b, 0xef, 0x7a, 0x66, 0xbb, 0x6d, 0x79, 0x77, 0xcd, 0xe0, 0x6c, 0xa7,
+	0x5e, 0xbf, 0x53, 0xfd, 0xb6, 0x55, 0x0b, 0xd0, 0x2c, 0x5c, 0xae, 0x5b, 0x8e, 0xdb, 0x8a, 0xf4,
+	0xc1, 0xd1, 0x0f, 0xf4, 0x12, 0x8c, 0xb2, 0x6c, 0xad, 0x38, 0xb4, 0x96, 0x5f, 0xbf, 0x7a, 0x6b,
+	0x92, 0xc9, 0xbc, 0x1b, 0x3d, 0xc7, 0x31, 0x01, 0x9a, 0x87, 0x11, 0xff, 0xa2, 0x55, 0x75, 0x9b,
+	0x24, 0x53, 0x28, 0x60, 0xfa, 0x0b, 0x6d, 0x03, 0x10, 0xb4, 0x13, 0xc7, 0x0e, 0xfc, 0xe2, 0x30,
+	0x81, 0x99, 0x66, 0x30, 0xfb, 0x6c, 0x04, 0xa7, 0x88, 0x8c, 0xff, 0x4c, 0xc0, 0x72, 0x56, 0x02,
+	0x83, 0x8a, 0x70, 0x85, 0x04, 0x36, 0xd7, 0xa3, 0x02, 0xb3, 0x9f, 0xe8, 0x55, 0x18, 0x4b, 0x12,
+	0xc3, 0x83, 0x3a, 0x31, 0x75, 0x61, 0x77, 0x2c, 0x34, 0xed, 0x27, 0x9f, 0xae, 0x0e, 0x9f, 0xd8,
+	0x4e, 0x80, 0x39, 0x0a, 0x64, 0xc0, 0x18, 0xd3, 0x21, 0xcc, 0xde, 0xa8, 0xf4, 0xdc, 0x33, 0xb4,
+	0x0b, 0x93, 0x75, 0xeb, 0xd4, 0xec, 0x34, 0x83, 0x5d, 0x66, 0x8f, 0x61, 0xfe, 0x5d, 0x0a, 0xb3,
+	0x0a, 0x3a, 0x16, 0xc5, 0x33, 0x91, 0x01, 0xbd, 0xca, 0xd2, 0x0c, 0xce, 0xfd, 0x90, 0xdc, 0x65,
+	0x14, 0xab, 0x86, 0xd0, 0x6b, 0x30, 0x7e, 0xce, 0xd1, 0x8e, 0xf0, 0xc6, 0x23, 0xca, 0x98, 0x4e,
+	0xc3, 0xc2, 0x3c, 0x1d, 0xfa, 0x1a, 0x2c, 0x89, 0x99, 0xc9, 0xdd, 0x24, 0xbd, 0x26, 0xa9, 0xc8,
+	0x28, 0xce, 0x22, 0x21, 0x59, 0x87, 0x92, 0x57, 0xc8, 0x3a, 0x94, 0xdc, 0x58, 0xcd, 0x8b, 0xbe,
+	0xc0, 0xb2, 0x0e, 0xea, 0x3d, 0x8f, 0x69, 0x2e, 0x4e, 0xb2, 0x8e, 0x51, 0xac, 0x1e, 0x0c, 0x9d,
+	0x4d, 0x4b, 0xa0, 0x07, 0x62, 0x87, 0xc4, 0xd9, 0xf0, 0xc3, 0x58, 0xa4, 0x47, 0x6f, 0xc1, 0x9a,
+	0x94, 0xa9, 0x51, 0xa7, 0x18, 0x63, 0x5e, 0x25, 0x32, 0x74, 0xa5, 0x43, 0x55, 0x28, 0xd5, 0xf4,
+	0x28, 0x63, 0x44, 0x32, 0x43, 0x36, 0x8f, 0x48, 0x89, 0x33, 0x50, 0x92, 0xf5, 0xe3, 0xfc, 0x77,
+	0x3c, 0xc9, 0x78, 0x7a, 0xfd, 0x94, 0x24, 0xe1, 0xfa, 0x55, 0x95, 0xbc, 0x13, 0x44, 0xc0, 0x95,
+	0xe4, 0x33, 0x56, 0x10, 0x61, 0x35, 0x2f, 0xba, 0x07, 0x37, 0xa2, 0x39, 0xef, 0x9c, 0x9e, 0xee,
+	0x9d, 0x99, 0xb6, 0xc3, 0xde, 0x6d, 0x69, 0x96, 0x49, 0x22, 0x61, 0x8f, 0xd4, 0x28, 0x80, 0x35,
+	0xb7, 0x1b, 0xe2, 0x14, 0x91, 0x7b, 0x9d, 0xc9, 0xdd, 0x0d, 0x13, 0x77, 0x45, 0x44, 0x15, 0x28,
+	0xd2, 0xc5, 0x8e, 0x63, 0x5b, 0x3c, 0xdb, 0x34, 0x91, 0x5f, 0x3b, 0x8e, 0xde, 0x02, 0x54, 0x93,
+	0xb9, 0x10, 0x91, 0xb1, 0x14, 0x2f, 0xbe, 0x44, 0x81, 0x15, 0x5c, 0xe8, 0x2b, 0xb0, 0x28, 0xbe,
+	0x74, 0x71, 0x20, 0x23, 0xb1, 0x79, 0x14, 0xeb, 0x09, 0xd0, 0x6d, 0x98, 0xa9, 0x29, 0xf8, 0xe6,
+	0x05, 0x51, 0x24, 0x12, 0xac, 0x62, 0x43, 0x5f, 0x82, 0x85, 0x68, 0xaa, 0x38, 0x56, 0xc7, 0xca,
+	0x2d, 0x10, 0x49, 0x74, 0xc3, 0x61, 0x6a, 0xe7, 0x4b, 0x3c, 0x45, 0x22, 0x45, 0x9c, 0xda, 0x49,
+	0x5c, 0x58, 0xe6, 0x49, 0x96, 0x25, 0x09, 0xc4, 0x31, 0xde, 0x62, 0x7a, 0x59, 0xe4, 0xf1, 0x70,
+	0x59, 0x6c, 0x99, 0xab, 0xc4, 0xdb, 0x42, 0xe6, 0xc3, 0x0a, 0x2e, 0xf4, 0x2e, 0x2c, 0xb6, 0x6c,
+	0x27, 0x78, 0xdd, 0xaf, 0x79, 0xee, 0x77, 0xc2, 0xb8, 0xe9, 0x1f, 0xbb, 0x6c, 0x8f, 0x5a, 0x5c,
+	0xa2, 0x8a, 0xd1, 0x90, 0x5f, 0x35, 0x7d, 0x6b, 0x93, 0xd6, 0x07, 0x36, 0x43, 0x5a, 0xac, 0xe7,
+	0x45, 0x67, 0xb0, 0x54, 0x53, 0x05, 0x63, 0xff, 0xd8, 0xdd, 0xa9, 0xd7, 0x8b, 0xcb, 0x04, 0xfa,
+	0x46, 0xb2, 0x72, 0x59, 0x71, 0x1b, 0x67, 0x41, 0x55, 0xb6, 0xc3, 0xec, 0x81, 0x45, 0xc6, 0x30,
+	0x77, 0x58, 0xa3, 0xb9, 0x83, 0x36, 0xb0, 0x1a, 0xef, 0xc1, 0xf5, 0xcc, 0xca, 0x01, 0x4d, 0x29,
+	0xa4, 0x30, 0x9b, 0xeb, 0x16, 0x66, 0x8d, 0xff, 0x8e, 0xc3, 0x8c, 0x62, 0x0f, 0x3d, 0xd0, 0x50,
+	0xae, 0x09, 0xb1, 0xf9, 0x27, 0x08, 0xb1, 0xc3, 0xcf, 0x43, 0xec, 0xf3, 0x10, 0xfb, 0x3c, 0xc4,
+	0x3e, 0x0f, 0xb1, 0xff, 0xa7, 0x21, 0x76, 0xa9, 0xaf, 0x10, 0xbb, 0x3c, 0xf8, 0x10, 0xbb, 0xf2,
+	0xec, 0x42, 0x6c, 0x79, 0x70, 0x21, 0x76, 0x5d, 0x0c, 0xb1, 0x0b, 0x2c, 0xc4, 0x8a, 0x91, 0xf5,
+	0x0e, 0x2c, 0xa9, 0x4a, 0xc8, 0xfd, 0x07, 0xd4, 0xdf, 0x15, 0x48, 0x40, 0x15, 0xab, 0xc8, 0x19,
+	0x01, 0x55, 0xdc, 0xe9, 0x0e, 0x3d, 0xa3, 0x9d, 0xae, 0x14, 0x54, 0x2f, 0xf7, 0x18, 0x54, 0xb5,
+	0x21, 0x71, 0xe4, 0x29, 0x42, 0xa2, 0x22, 0xb8, 0x5d, 0x79, 0xc2, 0xe0, 0x96, 0x1d, 0x90, 0x46,
+	0x07, 0x12, 0x90, 0xb4, 0xe1, 0xa4, 0xf0, 0x14, 0xe1, 0xa4, 0x17, 0xb7, 0x0f, 0x03, 0x77, 0xfb,
+	0x6a, 0xd7, 0x7d, 0xb5, 0x2f, 0xd7, 0xad, 0x71, 0xbe, 0x63, 0xfd, 0x39, 0x5f, 0xa5, 0x0b, 0x1d,
+	0xef, 0xc3, 0x85, 0xaa, 0xdd, 0xe0, 0xc4, 0xe0, 0xdd, 0xe0, 0xd4, 0xb3, 0x73, 0x83, 0xd3, 0x9f,
+	0x81, 0x1b, 0x14, 0xbd, 0x13, 0x75, 0x83, 0xd2, 0xd1, 0x57, 0xff, 0x6e, 0xf0, 0xa7, 0x39, 0x98,
+	0x53, 0x1e, 0xa4, 0x66, 0x38, 0xc2, 0xd7, 0x60, 0xcc, 0x4c, 0x51, 0xd2, 0xda, 0xe6, 0x0c, 0xb3,
+	0x44, 0x0a, 0x05, 0x73, 0x84, 0x95, 0x0d, 0x51, 0xcf, 0x45, 0x4e, 0xcf, 0xf4, 0xf4, 0xc6, 0x2a,
+	0xac, 0xa8, 0x0f, 0x78, 0x59, 0x59, 0xf6, 0x0f, 0x39, 0x98, 0x96, 0x0e, 0x3e, 0x07, 0xba, 0x1f,
+	0xda, 0x84, 0x42, 0x7c, 0x0a, 0x5f, 0xcc, 0x13, 0x25, 0xa7, 0x98, 0x92, 0x6c, 0x5a, 0x9c, 0x90,
+	0x54, 0x6e, 0x88, 0xea, 0xb1, 0x23, 0x78, 0x5e, 0x46, 0x63, 0x09, 0x16, 0xe5, 0x13, 0x5b, 0xa6,
+	0xd6, 0x8f, 0x72, 0x24, 0x2e, 0x89, 0x87, 0xc3, 0x83, 0x54, 0x4c, 0xff, 0xbe, 0x89, 0xb3, 0x1a,
+	0x2b, 0xe4, 0x7d, 0x93, 0x4e, 0xaa, 0x99, 0xb0, 0x7f, 0x1e, 0x85, 0x79, 0xf5, 0x71, 0xf1, 0x40,
+	0x17, 0x22, 0x4e, 0xfa, 0xc4, 0x53, 0x31, 0xb6, 0x39, 0xd5, 0x0d, 0xa3, 0xb7, 0x60, 0xda, 0x95,
+	0x78, 0xa2, 0x4d, 0xea, 0x72, 0x3a, 0x22, 0x4b, 0xc7, 0x70, 0x32, 0x5b, 0x22, 0x85, 0x78, 0xa8,
+	0xc8, 0xaa, 0xd0, 0xba, 0xe1, 0x50, 0x0a, 0x5b, 0xe2, 0x19, 0x91, 0xa5, 0x90, 0x4e, 0x31, 0x65,
+	0x36, 0x74, 0x06, 0x5b, 0xd1, 0x34, 0x3b, 0x9d, 0xc0, 0x8d, 0x1e, 0x5b, 0x47, 0x56, 0xf3, 0xf4,
+	0xc0, 0xb1, 0x03, 0xdb, 0x0c, 0xac, 0x3a, 0x53, 0xe5, 0x38, 0x7e, 0x75, 0xa3, 0xdd, 0xf4, 0x93,
+	0xb2, 0xa1, 0x0f, 0xe0, 0xa6, 0xd9, 0xf3, 0x1c, 0xa3, 0x64, 0x8e, 0xde, 0x19, 0xba, 0xeb, 0xc1,
+	0x8c, 0x91, 0xcc, 0x51, 0xe8, 0x45, 0x0f, 0x89, 0x2d, 0x4b, 0x0f, 0x79, 0x0e, 0xc8, 0xd6, 0x43,
+	0x46, 0x3f, 0x86, 0x17, 0x25, 0x81, 0x76, 0x9a, 0x4d, 0x19, 0x39, 0xda, 0xbe, 0xf7, 0x46, 0x8c,
+	0xde, 0x84, 0x55, 0xb3, 0x0b, 0xde, 0x18, 0xc1, 0xeb, 0x46, 0x96, 0x94, 0x34, 0xc2, 0x17, 0x2c,
+	0x9d, 0x14, 0x8e, 0xa7, 0x4b, 0x1a, 0xc2, 0x60, 0x98, 0xf5, 0x75, 0x04, 0xfa, 0x09, 0xfe, 0x88,
+	0x52, 0xe0, 0xc0, 0x22, 0x7d, 0xe5, 0x25, 0xd1, 0xc9, 0x94, 0xb8, 0xdc, 0x9e, 0xf3, 0x16, 0xc6,
+	0x1a, 0x94, 0x35, 0x6d, 0x27, 0xcc, 0xd5, 0xfc, 0x35, 0x47, 0x5c, 0x8d, 0xa2, 0x93, 0x60, 0xc0,
+	0xae, 0x66, 0xd4, 0xa4, 0xb8, 0xb4, 0x65, 0x27, 0xfb, 0x0b, 0x8d, 0xa9, 0xf5, 0xfa, 0x2a, 0x44,
+	0xa6, 0xfa, 0xaa, 0xda, 0x22, 0x52, 0xe1, 0x6d, 0x51, 0xdb, 0xde, 0x30, 0x50, 0x95, 0xcb, 0x00,
+	0x4c, 0x89, 0x83, 0x3a, 0x3d, 0xbf, 0x4b, 0x3d, 0xa9, 0x6c, 0x8a, 0x8a, 0xad, 0x70, 0xd1, 0x42,
+	0xd2, 0xed, 0x05, 0xb8, 0xa6, 0xef, 0xcb, 0x90, 0x97, 0x53, 0x74, 0xbd, 0x9f, 0xe5, 0x72, 0x4a,
+	0x6e, 0xbf, 0xb7, 0xe5, 0x14, 0xd9, 0x92, 0xe5, 0x94, 0x00, 0x95, 0xcb, 0xf9, 0x4c, 0x55, 0x7e,
+	0xca, 0xe5, 0x94, 0x74, 0x4b, 0x2f, 0xa7, 0x56, 0xbd, 0x7f, 0x0f, 0x91, 0x64, 0x8c, 0x6f, 0x3d,
+	0x19, 0xf4, 0x39, 0x33, 0x69, 0x64, 0x79, 0xfd, 0xc3, 0xb6, 0xed, 0x59, 0x75, 0x1a, 0xf8, 0xb9,
+	0x67, 0x68, 0x1d, 0x26, 0x23, 0x45, 0x2d, 0x8f, 0xa6, 0x8c, 0x64, 0xf7, 0x5d, 0xc0, 0xe2, 0x63,
+	0xf4, 0x55, 0x28, 0x11, 0xce, 0x3d, 0xb7, 0xe3, 0x04, 0x96, 0xd7, 0x36, 0xbd, 0xe0, 0x42, 0x0c,
+	0xe7, 0x19, 0x14, 0xe8, 0x10, 0xa6, 0x98, 0x49, 0xfd, 0x63, 0x97, 0xa8, 0x4d, 0x03, 0x7a, 0xdc,
+	0x76, 0xb1, 0x13, 0x9b, 0xdc, 0x72, 0x02, 0xfb, 0xd4, 0xb6, 0xbc, 0x7d, 0x2b, 0x30, 0xed, 0xa6,
+	0x8f, 0x25, 0x56, 0x7d, 0xe6, 0xc8, 0x1b, 0xd4, 0x78, 0x83, 0xbc, 0x44, 0x42, 0x83, 0x0f, 0x4b,
+	0xfe, 0x37, 0xa0, 0xe0, 0x74, 0x5a, 0x64, 0x50, 0x9d, 0xf9, 0x27, 0xc3, 0xc6, 0xf7, 0xd2, 0x69,
+	0x7f, 0xba, 0xbd, 0x2b, 0xbb, 0xfe, 0x41, 0x4b, 0x15, 0xa4, 0x07, 0x8c, 0xac, 0xd9, 0x28, 0xe6,
+	0x9e, 0x75, 0xcb, 0xf0, 0xd3, 0x33, 0x19, 0x6f, 0xa4, 0x32, 0x7c, 0xae, 0x97, 0x8d, 0x29, 0x74,
+	0x03, 0xae, 0x90, 0x7e, 0x52, 0xcd, 0x46, 0x86, 0x0d, 0x1a, 0xbf, 0x89, 0x94, 0x91, 0x5b, 0xed,
+	0x32, 0x94, 0x49, 0x61, 0x0f, 0x65, 0x60, 0x4b, 0x4a, 0xe7, 0x9f, 0x44, 0x69, 0x59, 0x22, 0xba,
+	0xad, 0x51, 0x74, 0x05, 0xb2, 0x2f, 0xe9, 0x07, 0x91, 0x32, 0x72, 0x8b, 0xdf, 0xd3, 0x2b, 0xa3,
+	0x17, 0x54, 0x9e, 0x8d, 0x0a, 0xaa, 0xe8, 0x34, 0x64, 0x82, 0xfe, 0x31, 0x47, 0x5a, 0x66, 0x54,
+	0x4d, 0x83, 0x03, 0xb0, 0x7b, 0x11, 0xae, 0xd0, 0xad, 0x23, 0x75, 0x61, 0xec, 0x27, 0x9a, 0x85,
+	0xcb, 0xe7, 0x64, 0x29, 0x86, 0xc9, 0x52, 0x44, 0x3f, 0x2a, 0x2f, 0x8b, 0xaa, 0x2d, 0x25, 0xee,
+	0x5a, 0x92, 0xcf, 0xb8, 0x06, 0xab, 0xba, 0x7e, 0x47, 0xa6, 0xde, 0xcf, 0x87, 0xc8, 0x3e, 0x4c,
+	0xec, 0x80, 0x1b, 0xa8, 0x4f, 0x93, 0x2a, 0x7d, 0xf9, 0x1e, 0x2b, 0x7d, 0xef, 0xc1, 0x7c, 0xcd,
+	0x74, 0x4e, 0x14, 0x87, 0x75, 0xd1, 0xde, 0x66, 0x8d, 0x2b, 0x77, 0x1d, 0xd4, 0xfd, 0x1d, 0xa1,
+	0xae, 0x87, 0x35, 0xfc, 0xfa, 0xad, 0xa1, 0x68, 0x08, 0x5a, 0x8a, 0x90, 0x3a, 0x04, 0xfb, 0x2f,
+	0x45, 0xfc, 0x78, 0x08, 0xc6, 0xb9, 0x56, 0xc1, 0x81, 0xda, 0x5a, 0x51, 0xc7, 0xcc, 0x3f, 0x61,
+	0x1d, 0xf3, 0x00, 0xa6, 0x62, 0xab, 0x51, 0x62, 0x6a, 0xef, 0xb8, 0xbc, 0x18, 0xd2, 0xd6, 0x69,
+	0x17, 0x59, 0x62, 0x6c, 0x89, 0xad, 0x62, 0x88, 0x66, 0x9e, 0x4e, 0xcc, 0x4c, 0x69, 0x8c, 0x03,
+	0xe2, 0x08, 0x52, 0x9d, 0x93, 0xfd, 0x9b, 0xf6, 0x93, 0x21, 0x28, 0xea, 0xba, 0x27, 0x07, 0x6a,
+	0xe5, 0xec, 0x52, 0x6f, 0x7e, 0x20, 0xa5, 0xde, 0xfb, 0xb0, 0x14, 0xdb, 0x53, 0x86, 0xe8, 0x6d,
+	0x45, 0xb2, 0x10, 0x2a, 0xaf, 0x88, 0x8b, 0xb3, 0x9c, 0x2c, 0x8e, 0x4c, 0x6e, 0x1c, 0xc3, 0x9a,
+	0xb6, 0x33, 0xb5, 0xff, 0x25, 0xfb, 0x53, 0xec, 0x7f, 0xb8, 0x92, 0xf5, 0x40, 0x57, 0x4b, 0x5b,
+	0x34, 0xcf, 0x3f, 0x45, 0xd1, 0xdc, 0x4c, 0xf9, 0x26, 0x8e, 0x91, 0xae, 0xcc, 0x4d, 0xc5, 0xca,
+	0xbc, 0x6b, 0x07, 0x67, 0xcc, 0x83, 0x28, 0x9d, 0x14, 0x07, 0x94, 0xe9, 0xa4, 0x38, 0xca, 0xc4,
+	0x49, 0xf1, 0xcd, 0xbd, 0xfd, 0x2f, 0xcb, 0x2f, 0x86, 0x60, 0x4a, 0x6c, 0xf1, 0x1d, 0xe8, 0x9a,
+	0xa8, 0xab, 0xff, 0xf9, 0xbe, 0xaa, 0xff, 0x77, 0x60, 0x26, 0x79, 0xcf, 0xe3, 0xe1, 0xde, 0xbe,
+	0x10, 0x15, 0x67, 0xe5, 0x45, 0xd1, 0xf0, 0xb3, 0xa9, 0x2f, 0x23, 0x26, 0x33, 0x6e, 0xc7, 0xde,
+	0x26, 0x69, 0x83, 0xee, 0xdf, 0xe4, 0x3f, 0x1b, 0x22, 0x4d, 0xc4, 0xe9, 0x86, 0xe8, 0x81, 0x5a,
+	0x5c, 0x79, 0xaa, 0x91, 0xef, 0xe3, 0x54, 0xe3, 0x10, 0x50, 0x6c, 0xb4, 0x98, 0xa1, 0x37, 0x6b,
+	0x2b, 0x18, 0x2b, 0xd7, 0x45, 0x63, 0xcf, 0x24, 0xc6, 0x8e, 0xa9, 0x8c, 0xb7, 0x59, 0x16, 0x96,
+	0x74, 0x8b, 0xf7, 0x6f, 0xea, 0xbf, 0x0d, 0x91, 0x0d, 0x86, 0xba, 0x5d, 0x7c, 0xa0, 0x46, 0xd7,
+	0x1c, 0x4c, 0xe5, 0xfb, 0x3b, 0x98, 0x3a, 0x83, 0x65, 0x85, 0x43, 0x17, 0x2b, 0xbe, 0xd7, 0xf5,
+	0xb0, 0xa9, 0xa5, 0xc8, 0x44, 0xd2, 0xef, 0x9e, 0xd5, 0x36, 0x33, 0x4e, 0xc8, 0xee, 0x59, 0xd3,
+	0x7f, 0xdf, 0xff, 0x42, 0xfd, 0x32, 0x76, 0x43, 0xc9, 0x29, 0xd9, 0xa0, 0xdd, 0x90, 0xe2, 0x84,
+	0x2e, 0xdf, 0xd7, 0x09, 0xdd, 0xd7, 0x61, 0xb6, 0x66, 0x3a, 0xf4, 0x71, 0x62, 0x87, 0xde, 0xbe,
+	0x0c, 0x25, 0x6b, 0xa6, 0x23, 0x4a, 0xa4, 0x4a, 0x1c, 0x51, 0xea, 0x96, 0x42, 0xdf, 0x46, 0xbf,
+	0xf5, 0x97, 0x69, 0xc8, 0x1f, 0xfa, 0x0d, 0xf4, 0x26, 0x8c, 0x71, 0x37, 0x1a, 0x16, 0xa4, 0xfb,
+	0x5e, 0xd1, 0x40, 0x69, 0x55, 0x33, 0x10, 0xcb, 0xe0, 0xc2, 0xa2, 0xbe, 0x4b, 0xbf, 0xa7, 0xcb,
+	0x88, 0xa5, 0x97, 0x7b, 0xba, 0xb2, 0xc8, 0x26, 0x7c, 0x1f, 0x90, 0xe2, 0xa8, 0x2f, 0xfb, 0x4a,
+	0x65, 0xe9, 0xc5, 0xec, 0x1b, 0x97, 0x0c, 0xfb, 0x1d, 0x98, 0x10, 0x0e, 0xe3, 0xf4, 0x17, 0x14,
+	0x4b, 0xd7, 0xf4, 0x77, 0x17, 0x19, 0xde, 0x37, 0x61, 0x46, 0x75, 0xb0, 0xd4, 0xe5, 0x9e, 0x62,
+	0xe9, 0x46, 0x97, 0x7b, 0x8c, 0x29, 0x78, 0x55, 0x31, 0xb9, 0xcb, 0xb5, 0x35, 0x0e, 0x3e, 0xa3,
+	0x7e, 0x8b, 0x4e, 0x61, 0x5e, 0x53, 0xbb, 0xed, 0x7e, 0x7b, 0xad, 0x74, 0xb3, 0xfb, 0x05, 0x37,
+	0x5e, 0x0d, 0xa9, 0xa2, 0xd8, 0xe5, 0x12, 0x9b, 0xa8, 0x86, 0xae, 0xb0, 0x97, 0xa8, 0x21, 0xcd,
+	0xd0, 0xfd, 0x2e, 0x9b, 0x42, 0x0d, 0xed, 0x3c, 0xef, 0xc0, 0x84, 0x50, 0x3c, 0xd4, 0x5f, 0x69,
+	0xe3, 0x5e, 0x1e, 0x4d, 0x31, 0xec, 0x18, 0xa6, 0xa4, 0x23, 0xd4, 0xac, 0xcb, 0xb7, 0xa5, 0x17,
+	0xb2, 0x6e, 0xe6, 0xa6, 0x50, 0xa5, 0xcf, 0x34, 0xeb, 0x8a, 0x2b, 0x87, 0xaa, 0xfd, 0x28, 0x8f,
+	0x61, 0x4a, 0x6a, 0x43, 0xca, 0xba, 0xe9, 0xca, 0xa1, 0x6a, 0x7b, 0x01, 0xe2, 0x4f, 0x9d, 0x2b,
+	0x22, 0x65, 0x5f, 0x78, 0x55, 0x7c, 0xea, 0xca, 0xca, 0xdc, 0xfb, 0x80, 0x14, 0xd5, 0xb6, 0xec,
+	0x7b, 0xaf, 0x1c, 0xb6, 0xbe, 0x00, 0x16, 0x62, 0x2b, 0x8a, 0x5f, 0xd9, 0xd7, 0x5f, 0x39, 0x6c,
+	0x7d, 0xcd, 0x0a, 0x7d, 0x0b, 0x66, 0x95, 0xf5, 0xaa, 0x6e, 0xb7, 0x60, 0x4b, 0x9f, 0xeb, 0x76,
+	0x4d, 0x36, 0xb5, 0x96, 0x52, 0xc9, 0x28, 0xeb, 0x46, 0x25, 0xb7, 0x96, 0xda, 0x62, 0xca, 0x2e,
+	0x40, 0xaa, 0x2c, 0xa2, 0xbe, 0x58, 0x59, 0x5a, 0x51, 0xdf, 0xb7, 0x64, 0x18, 0x35, 0x98, 0x53,
+	0xef, 0xff, 0xbb, 0xde, 0xaf, 0x2c, 0xad, 0x77, 0xbd, 0x81, 0xc9, 0xab, 0xcf, 0xef, 0x58, 0xb3,
+	0xae, 0x59, 0x8a, 0xea, 0xab, 0xb7, 0x69, 0x6f, 0xc3, 0xb8, 0xb0, 0xe1, 0xd2, 0xdd, 0xb6, 0x2c,
+	0xad, 0x69, 0xef, 0x61, 0x32, 0xb0, 0x37, 0x61, 0x8c, 0xdb, 0x4a, 0xe8, 0x2e, 0x5d, 0x96, 0x56,
+	0x75, 0xb7, 0x31, 0x53, 0xbe, 0x51, 0x93, 0x29, 0x77, 0xbf, 0x7b, 0xc9, 0xf9, 0xc6, 0x2e, 0xe9,
+	0x61, 0xa4, 0x7e, 0x3a, 0xd1, 0xd3, 0x5d, 0xc1, 0x14, 0xd5, 0x97, 0xd3, 0x9e, 0xd2, 0xe5, 0xef,
+	0x3e, 0x7e, 0xb0, 0x91, 0xdb, 0xbd, 0xfd, 0xd1, 0xc3, 0x72, 0xee, 0xe3, 0x87, 0xe5, 0xdc, 0xbf,
+	0x1e, 0x96, 0x73, 0x3f, 0x79, 0x54, 0xbe, 0xf4, 0xf1, 0xa3, 0xf2, 0xa5, 0x7f, 0x3c, 0x2a, 0x5f,
+	0x7a, 0xff, 0x56, 0xc3, 0x0e, 0xce, 0x3a, 0xd5, 0xcd, 0x9a, 0xdb, 0xda, 0xaa, 0xda, 0x01, 0xfb,
+	0xb3, 0x13, 0xec, 0x5f, 0xb5, 0x33, 0xd3, 0x76, 0xb6, 0x3e, 0xdc, 0x62, 0x7f, 0x10, 0xe2, 0xa2,
+	0x6d, 0xf9, 0xd5, 0x11, 0xf2, 0x07, 0x1d, 0x3e, 0xff, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5b,
+	0xec, 0x79, 0x42, 0x48, 0x43, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2729,6 +3691,15 @@ type MsgClient interface {
 	UpdateDynamicStore(ctx context.Context, in *MsgUpdateDynamicStore, opts ...grpc.CallOption) (*MsgUpdateDynamicStoreResponse, error)
 	DeleteDynamicStore(ctx context.Context, in *MsgDeleteDynamicStore, opts ...grpc.CallOption) (*MsgDeleteDynamicStoreResponse, error)
 	SetDynamicStoreValue(ctx context.Context, in *MsgSetDynamicStoreValue, opts ...grpc.CallOption) (*MsgSetDynamicStoreValueResponse, error)
+	// Helper message types for UniversalUpdateCollection subsets
+	SetValidBadgeIds(ctx context.Context, in *MsgSetValidBadgeIds, opts ...grpc.CallOption) (*MsgSetValidBadgeIdsResponse, error)
+	SetManager(ctx context.Context, in *MsgSetManager, opts ...grpc.CallOption) (*MsgSetManagerResponse, error)
+	SetCollectionMetadata(ctx context.Context, in *MsgSetCollectionMetadata, opts ...grpc.CallOption) (*MsgSetCollectionMetadataResponse, error)
+	SetBadgeMetadata(ctx context.Context, in *MsgSetBadgeMetadata, opts ...grpc.CallOption) (*MsgSetBadgeMetadataResponse, error)
+	SetCustomData(ctx context.Context, in *MsgSetCustomData, opts ...grpc.CallOption) (*MsgSetCustomDataResponse, error)
+	SetStandards(ctx context.Context, in *MsgSetStandards, opts ...grpc.CallOption) (*MsgSetStandardsResponse, error)
+	SetCollectionApprovals(ctx context.Context, in *MsgSetCollectionApprovals, opts ...grpc.CallOption) (*MsgSetCollectionApprovalsResponse, error)
+	SetIsArchived(ctx context.Context, in *MsgSetIsArchived, opts ...grpc.CallOption) (*MsgSetIsArchivedResponse, error)
 }
 
 type msgClient struct {
@@ -2892,6 +3863,78 @@ func (c *msgClient) SetDynamicStoreValue(ctx context.Context, in *MsgSetDynamicS
 	return out, nil
 }
 
+func (c *msgClient) SetValidBadgeIds(ctx context.Context, in *MsgSetValidBadgeIds, opts ...grpc.CallOption) (*MsgSetValidBadgeIdsResponse, error) {
+	out := new(MsgSetValidBadgeIdsResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetValidBadgeIds", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetManager(ctx context.Context, in *MsgSetManager, opts ...grpc.CallOption) (*MsgSetManagerResponse, error) {
+	out := new(MsgSetManagerResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetManager", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetCollectionMetadata(ctx context.Context, in *MsgSetCollectionMetadata, opts ...grpc.CallOption) (*MsgSetCollectionMetadataResponse, error) {
+	out := new(MsgSetCollectionMetadataResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetCollectionMetadata", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetBadgeMetadata(ctx context.Context, in *MsgSetBadgeMetadata, opts ...grpc.CallOption) (*MsgSetBadgeMetadataResponse, error) {
+	out := new(MsgSetBadgeMetadataResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetBadgeMetadata", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetCustomData(ctx context.Context, in *MsgSetCustomData, opts ...grpc.CallOption) (*MsgSetCustomDataResponse, error) {
+	out := new(MsgSetCustomDataResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetCustomData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetStandards(ctx context.Context, in *MsgSetStandards, opts ...grpc.CallOption) (*MsgSetStandardsResponse, error) {
+	out := new(MsgSetStandardsResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetStandards", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetCollectionApprovals(ctx context.Context, in *MsgSetCollectionApprovals, opts ...grpc.CallOption) (*MsgSetCollectionApprovalsResponse, error) {
+	out := new(MsgSetCollectionApprovalsResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetCollectionApprovals", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetIsArchived(ctx context.Context, in *MsgSetIsArchived, opts ...grpc.CallOption) (*MsgSetIsArchivedResponse, error) {
+	out := new(MsgSetIsArchivedResponse)
+	err := c.cc.Invoke(ctx, "/badges.Msg/SetIsArchived", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
@@ -2913,6 +3956,15 @@ type MsgServer interface {
 	UpdateDynamicStore(context.Context, *MsgUpdateDynamicStore) (*MsgUpdateDynamicStoreResponse, error)
 	DeleteDynamicStore(context.Context, *MsgDeleteDynamicStore) (*MsgDeleteDynamicStoreResponse, error)
 	SetDynamicStoreValue(context.Context, *MsgSetDynamicStoreValue) (*MsgSetDynamicStoreValueResponse, error)
+	// Helper message types for UniversalUpdateCollection subsets
+	SetValidBadgeIds(context.Context, *MsgSetValidBadgeIds) (*MsgSetValidBadgeIdsResponse, error)
+	SetManager(context.Context, *MsgSetManager) (*MsgSetManagerResponse, error)
+	SetCollectionMetadata(context.Context, *MsgSetCollectionMetadata) (*MsgSetCollectionMetadataResponse, error)
+	SetBadgeMetadata(context.Context, *MsgSetBadgeMetadata) (*MsgSetBadgeMetadataResponse, error)
+	SetCustomData(context.Context, *MsgSetCustomData) (*MsgSetCustomDataResponse, error)
+	SetStandards(context.Context, *MsgSetStandards) (*MsgSetStandardsResponse, error)
+	SetCollectionApprovals(context.Context, *MsgSetCollectionApprovals) (*MsgSetCollectionApprovalsResponse, error)
+	SetIsArchived(context.Context, *MsgSetIsArchived) (*MsgSetIsArchivedResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -2969,6 +4021,30 @@ func (*UnimplementedMsgServer) DeleteDynamicStore(ctx context.Context, req *MsgD
 }
 func (*UnimplementedMsgServer) SetDynamicStoreValue(ctx context.Context, req *MsgSetDynamicStoreValue) (*MsgSetDynamicStoreValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetDynamicStoreValue not implemented")
+}
+func (*UnimplementedMsgServer) SetValidBadgeIds(ctx context.Context, req *MsgSetValidBadgeIds) (*MsgSetValidBadgeIdsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetValidBadgeIds not implemented")
+}
+func (*UnimplementedMsgServer) SetManager(ctx context.Context, req *MsgSetManager) (*MsgSetManagerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetManager not implemented")
+}
+func (*UnimplementedMsgServer) SetCollectionMetadata(ctx context.Context, req *MsgSetCollectionMetadata) (*MsgSetCollectionMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCollectionMetadata not implemented")
+}
+func (*UnimplementedMsgServer) SetBadgeMetadata(ctx context.Context, req *MsgSetBadgeMetadata) (*MsgSetBadgeMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetBadgeMetadata not implemented")
+}
+func (*UnimplementedMsgServer) SetCustomData(ctx context.Context, req *MsgSetCustomData) (*MsgSetCustomDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCustomData not implemented")
+}
+func (*UnimplementedMsgServer) SetStandards(ctx context.Context, req *MsgSetStandards) (*MsgSetStandardsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetStandards not implemented")
+}
+func (*UnimplementedMsgServer) SetCollectionApprovals(ctx context.Context, req *MsgSetCollectionApprovals) (*MsgSetCollectionApprovalsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCollectionApprovals not implemented")
+}
+func (*UnimplementedMsgServer) SetIsArchived(ctx context.Context, req *MsgSetIsArchived) (*MsgSetIsArchivedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetIsArchived not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -3281,6 +4357,150 @@ func _Msg_SetDynamicStoreValue_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_SetValidBadgeIds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetValidBadgeIds)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetValidBadgeIds(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetValidBadgeIds",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetValidBadgeIds(ctx, req.(*MsgSetValidBadgeIds))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetManager_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetManager)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetManager(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetManager",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetManager(ctx, req.(*MsgSetManager))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetCollectionMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetCollectionMetadata)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetCollectionMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetCollectionMetadata",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetCollectionMetadata(ctx, req.(*MsgSetCollectionMetadata))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetBadgeMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetBadgeMetadata)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetBadgeMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetBadgeMetadata",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetBadgeMetadata(ctx, req.(*MsgSetBadgeMetadata))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetCustomData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetCustomData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetCustomData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetCustomData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetCustomData(ctx, req.(*MsgSetCustomData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetStandards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetStandards)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetStandards(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetStandards",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetStandards(ctx, req.(*MsgSetStandards))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetCollectionApprovals_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetCollectionApprovals)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetCollectionApprovals(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetCollectionApprovals",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetCollectionApprovals(ctx, req.(*MsgSetCollectionApprovals))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetIsArchived_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetIsArchived)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetIsArchived(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/badges.Msg/SetIsArchived",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetIsArchived(ctx, req.(*MsgSetIsArchived))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "badges.Msg",
@@ -3354,6 +4574,38 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			MethodName: "SetDynamicStoreValue",
 			Handler:    _Msg_SetDynamicStoreValue_Handler,
 		},
+		{
+			MethodName: "SetValidBadgeIds",
+			Handler:    _Msg_SetValidBadgeIds_Handler,
+		},
+		{
+			MethodName: "SetManager",
+			Handler:    _Msg_SetManager_Handler,
+		},
+		{
+			MethodName: "SetCollectionMetadata",
+			Handler:    _Msg_SetCollectionMetadata_Handler,
+		},
+		{
+			MethodName: "SetBadgeMetadata",
+			Handler:    _Msg_SetBadgeMetadata_Handler,
+		},
+		{
+			MethodName: "SetCustomData",
+			Handler:    _Msg_SetCustomData_Handler,
+		},
+		{
+			MethodName: "SetStandards",
+			Handler:    _Msg_SetStandards_Handler,
+		},
+		{
+			MethodName: "SetCollectionApprovals",
+			Handler:    _Msg_SetCollectionApprovals_Handler,
+		},
+		{
+			MethodName: "SetIsArchived",
+			Handler:    _Msg_SetIsArchived_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "badges/tx.proto",
@@ -3379,6 +4631,118 @@ func (m *BadgeCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.SetIsArchivedMsg != nil {
+		{
+			size, err := m.SetIsArchivedMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
+	}
+	if m.SetCollectionApprovalsMsg != nil {
+		{
+			size, err := m.SetCollectionApprovalsMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
+	}
+	if m.SetStandardsMsg != nil {
+		{
+			size, err := m.SetStandardsMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb2
+	}
+	if m.SetCustomDataMsg != nil {
+		{
+			size, err := m.SetCustomDataMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xaa
+	}
+	if m.SetBadgeMetadataMsg != nil {
+		{
+			size, err := m.SetBadgeMetadataMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
+	}
+	if m.SetCollectionMetadataMsg != nil {
+		{
+			size, err := m.SetCollectionMetadataMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x9a
+	}
+	if m.SetManagerMsg != nil {
+		{
+			size, err := m.SetManagerMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x92
+	}
+	if m.SetValidBadgeIdsMsg != nil {
+		{
+			size, err := m.SetValidBadgeIdsMsg.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
+	}
 	if m.PurgeApprovalsMsg != nil {
 		{
 			size, err := m.PurgeApprovalsMsg.MarshalToSizedBuffer(dAtA[:i])
@@ -5790,6 +7154,814 @@ func (m *MsgSetDynamicStoreValueResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgSetValidBadgeIds) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetValidBadgeIds) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetValidBadgeIds) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateValidBadgeIds) > 0 {
+		for iNdEx := len(m.CanUpdateValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.ValidBadgeIds) > 0 {
+		for iNdEx := len(m.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetValidBadgeIdsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetValidBadgeIdsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetValidBadgeIdsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetManager) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetManager) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetManager) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateManager) > 0 {
+		for iNdEx := len(m.CanUpdateManager) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateManager[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.ManagerTimeline) > 0 {
+		for iNdEx := len(m.ManagerTimeline) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ManagerTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetManagerResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetManagerResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetManagerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetCollectionMetadata) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetCollectionMetadata) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetCollectionMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateCollectionMetadata) > 0 {
+		for iNdEx := len(m.CanUpdateCollectionMetadata) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateCollectionMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.CollectionMetadataTimeline) > 0 {
+		for iNdEx := len(m.CollectionMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CollectionMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetCollectionMetadataResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetCollectionMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetCollectionMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetBadgeMetadata) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetBadgeMetadata) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetBadgeMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateBadgeMetadata) > 0 {
+		for iNdEx := len(m.CanUpdateBadgeMetadata) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateBadgeMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.BadgeMetadataTimeline) > 0 {
+		for iNdEx := len(m.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.BadgeMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetBadgeMetadataResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetBadgeMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetBadgeMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetCustomData) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetCustomData) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetCustomData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateCustomData) > 0 {
+		for iNdEx := len(m.CanUpdateCustomData) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateCustomData[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.CustomDataTimeline) > 0 {
+		for iNdEx := len(m.CustomDataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CustomDataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetCustomDataResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetCustomDataResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetCustomDataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetStandards) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetStandards) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetStandards) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateStandards) > 0 {
+		for iNdEx := len(m.CanUpdateStandards) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateStandards[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.StandardsTimeline) > 0 {
+		for iNdEx := len(m.StandardsTimeline) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.StandardsTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetStandardsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetStandardsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetStandardsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetCollectionApprovals) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetCollectionApprovals) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetCollectionApprovals) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanUpdateCollectionApprovals) > 0 {
+		for iNdEx := len(m.CanUpdateCollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanUpdateCollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.CollectionApprovals) > 0 {
+		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CollectionApprovals[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetCollectionApprovalsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetCollectionApprovalsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetCollectionApprovalsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetIsArchived) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetIsArchived) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetIsArchived) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CanArchiveCollection) > 0 {
+		for iNdEx := len(m.CanArchiveCollection) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanArchiveCollection[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.IsArchivedTimeline) > 0 {
+		for iNdEx := len(m.IsArchivedTimeline) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.IsArchivedTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetIsArchivedResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetIsArchivedResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetIsArchivedResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.CollectionId.Size()
+		i -= size
+		if _, err := m.CollectionId.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -5869,6 +8041,38 @@ func (m *BadgeCustomMsgType) Size() (n int) {
 	}
 	if m.PurgeApprovalsMsg != nil {
 		l = m.PurgeApprovalsMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetValidBadgeIdsMsg != nil {
+		l = m.SetValidBadgeIdsMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetManagerMsg != nil {
+		l = m.SetManagerMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetCollectionMetadataMsg != nil {
+		l = m.SetCollectionMetadataMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetBadgeMetadataMsg != nil {
+		l = m.SetBadgeMetadataMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetCustomDataMsg != nil {
+		l = m.SetCustomDataMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetStandardsMsg != nil {
+		l = m.SetStandardsMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetCollectionApprovalsMsg != nil {
+		l = m.SetCollectionApprovalsMsg.Size()
+		n += 2 + l + sovTx(uint64(l))
+	}
+	if m.SetIsArchivedMsg != nil {
+		l = m.SetIsArchivedMsg.Size()
 		n += 2 + l + sovTx(uint64(l))
 	}
 	return n
@@ -6701,6 +8905,310 @@ func (m *MsgSetDynamicStoreValueResponse) Size() (n int) {
 	return n
 }
 
+func (m *MsgSetValidBadgeIds) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.ValidBadgeIds) > 0 {
+		for _, e := range m.ValidBadgeIds {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateValidBadgeIds) > 0 {
+		for _, e := range m.CanUpdateValidBadgeIds {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetValidBadgeIdsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetManager) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.ManagerTimeline) > 0 {
+		for _, e := range m.ManagerTimeline {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateManager) > 0 {
+		for _, e := range m.CanUpdateManager {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetManagerResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetCollectionMetadata) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.CollectionMetadataTimeline) > 0 {
+		for _, e := range m.CollectionMetadataTimeline {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateCollectionMetadata) > 0 {
+		for _, e := range m.CanUpdateCollectionMetadata {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetCollectionMetadataResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetBadgeMetadata) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.BadgeMetadataTimeline) > 0 {
+		for _, e := range m.BadgeMetadataTimeline {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateBadgeMetadata) > 0 {
+		for _, e := range m.CanUpdateBadgeMetadata {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetBadgeMetadataResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetCustomData) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.CustomDataTimeline) > 0 {
+		for _, e := range m.CustomDataTimeline {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateCustomData) > 0 {
+		for _, e := range m.CanUpdateCustomData {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetCustomDataResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetStandards) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.StandardsTimeline) > 0 {
+		for _, e := range m.StandardsTimeline {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateStandards) > 0 {
+		for _, e := range m.CanUpdateStandards {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetStandardsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetCollectionApprovals) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.CollectionApprovals) > 0 {
+		for _, e := range m.CollectionApprovals {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanUpdateCollectionApprovals) > 0 {
+		for _, e := range m.CanUpdateCollectionApprovals {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetCollectionApprovalsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgSetIsArchived) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	if len(m.IsArchivedTimeline) > 0 {
+		for _, e := range m.IsArchivedTimeline {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.CanArchiveCollection) > 0 {
+		for _, e := range m.CanArchiveCollection {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgSetIsArchivedResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.CollectionId.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
 func sovTx(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -7309,6 +9817,294 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 				m.PurgeApprovalsMsg = &MsgPurgeApprovals{}
 			}
 			if err := m.PurgeApprovalsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 17:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetValidBadgeIdsMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetValidBadgeIdsMsg == nil {
+				m.SetValidBadgeIdsMsg = &MsgSetValidBadgeIds{}
+			}
+			if err := m.SetValidBadgeIdsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 18:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetManagerMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetManagerMsg == nil {
+				m.SetManagerMsg = &MsgSetManager{}
+			}
+			if err := m.SetManagerMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 19:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetCollectionMetadataMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetCollectionMetadataMsg == nil {
+				m.SetCollectionMetadataMsg = &MsgSetCollectionMetadata{}
+			}
+			if err := m.SetCollectionMetadataMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 20:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetBadgeMetadataMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetBadgeMetadataMsg == nil {
+				m.SetBadgeMetadataMsg = &MsgSetBadgeMetadata{}
+			}
+			if err := m.SetBadgeMetadataMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 21:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetCustomDataMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetCustomDataMsg == nil {
+				m.SetCustomDataMsg = &MsgSetCustomData{}
+			}
+			if err := m.SetCustomDataMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 22:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetStandardsMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetStandardsMsg == nil {
+				m.SetStandardsMsg = &MsgSetStandards{}
+			}
+			if err := m.SetStandardsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 23:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetCollectionApprovalsMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetCollectionApprovalsMsg == nil {
+				m.SetCollectionApprovalsMsg = &MsgSetCollectionApprovals{}
+			}
+			if err := m.SetCollectionApprovalsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 24:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetIsArchivedMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetIsArchivedMsg == nil {
+				m.SetIsArchivedMsg = &MsgSetIsArchived{}
+			}
+			if err := m.SetIsArchivedMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -12835,6 +15631,2150 @@ func (m *MsgSetDynamicStoreValueResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgSetDynamicStoreValueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetValidBadgeIds: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetValidBadgeIds: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ValidBadgeIds = append(m.ValidBadgeIds, &UintRange{})
+			if err := m.ValidBadgeIds[len(m.ValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidBadgeIds", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateValidBadgeIds = append(m.CanUpdateValidBadgeIds, &BadgeIdsActionPermission{})
+			if err := m.CanUpdateValidBadgeIds[len(m.CanUpdateValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetValidBadgeIdsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetValidBadgeIdsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetValidBadgeIdsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetManager) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetManager: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetManager: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ManagerTimeline", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ManagerTimeline = append(m.ManagerTimeline, &ManagerTimeline{})
+			if err := m.ManagerTimeline[len(m.ManagerTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateManager", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateManager = append(m.CanUpdateManager, &TimedUpdatePermission{})
+			if err := m.CanUpdateManager[len(m.CanUpdateManager)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetManagerResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetManagerResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetManagerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetCollectionMetadata) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetCollectionMetadata: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetCollectionMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionMetadataTimeline", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionMetadataTimeline = append(m.CollectionMetadataTimeline, &CollectionMetadataTimeline{})
+			if err := m.CollectionMetadataTimeline[len(m.CollectionMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateCollectionMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateCollectionMetadata = append(m.CanUpdateCollectionMetadata, &TimedUpdatePermission{})
+			if err := m.CanUpdateCollectionMetadata[len(m.CanUpdateCollectionMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetCollectionMetadataResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetCollectionMetadataResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetCollectionMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetBadgeMetadata: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetBadgeMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BadgeMetadataTimeline = append(m.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
+			if err := m.BadgeMetadataTimeline[len(m.BadgeMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateBadgeMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateBadgeMetadata = append(m.CanUpdateBadgeMetadata, &TimedUpdateWithBadgeIdsPermission{})
+			if err := m.CanUpdateBadgeMetadata[len(m.CanUpdateBadgeMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetBadgeMetadataResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetBadgeMetadataResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetBadgeMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetCustomData) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetCustomData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetCustomData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CustomDataTimeline", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CustomDataTimeline = append(m.CustomDataTimeline, &CustomDataTimeline{})
+			if err := m.CustomDataTimeline[len(m.CustomDataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateCustomData", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateCustomData = append(m.CanUpdateCustomData, &TimedUpdatePermission{})
+			if err := m.CanUpdateCustomData[len(m.CanUpdateCustomData)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetCustomDataResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetCustomDataResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetCustomDataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetStandards) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetStandards: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetStandards: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StandardsTimeline", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StandardsTimeline = append(m.StandardsTimeline, &StandardsTimeline{})
+			if err := m.StandardsTimeline[len(m.StandardsTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateStandards", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateStandards = append(m.CanUpdateStandards, &TimedUpdatePermission{})
+			if err := m.CanUpdateStandards[len(m.CanUpdateStandards)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetStandardsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetStandardsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetStandardsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetCollectionApprovals) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetCollectionApprovals: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetCollectionApprovals: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionApprovals = append(m.CollectionApprovals, &CollectionApproval{})
+			if err := m.CollectionApprovals[len(m.CollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateCollectionApprovals", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanUpdateCollectionApprovals = append(m.CanUpdateCollectionApprovals, &CollectionApprovalPermission{})
+			if err := m.CanUpdateCollectionApprovals[len(m.CanUpdateCollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetCollectionApprovalsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetCollectionApprovalsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetCollectionApprovalsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetIsArchived) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetIsArchived: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetIsArchived: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IsArchivedTimeline", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IsArchivedTimeline = append(m.IsArchivedTimeline, &IsArchivedTimeline{})
+			if err := m.IsArchivedTimeline[len(m.IsArchivedTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanArchiveCollection", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanArchiveCollection = append(m.CanArchiveCollection, &TimedUpdatePermission{})
+			if err := m.CanArchiveCollection[len(m.CanArchiveCollection)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetIsArchivedResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetIsArchivedResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetIsArchivedResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CollectionId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
