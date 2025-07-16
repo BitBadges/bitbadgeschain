@@ -157,41 +157,6 @@ When a list ID has the `"!"` prefix, the final whitelist boolean is inverted:
 -   Whitelist becomes blacklist behavior
 -   Blacklist becomes whitelist behavior
 
-## Usage in Approval Configurations
-
-Address lists are referenced by ID in three approval contexts:
-
-### Collection Approvals
-
-```protobuf
-message CollectionApproval {
-  string fromListId = 1;        // Who can send badges
-  string toListId = 2;          // Who can receive badges
-  string initiatedByListId = 3; // Who can initiate transfers
-  // ... other fields
-}
-```
-
-### User Outgoing Approvals
-
-```protobuf
-message UserOutgoingApproval {
-  string toListId = 1;          // Who user can send to
-  string initiatedByListId = 2; // Who can initiate on user's behalf
-  // ... other fields
-}
-```
-
-### User Incoming Approvals
-
-```protobuf
-message UserIncomingApproval {
-  string fromListId = 1;        // Who can send to user
-  string initiatedByListId = 2; // Who can initiate transfers to user
-  // ... other fields
-}
-```
-
 ## Address List Creation
 
 ### User-Created Lists

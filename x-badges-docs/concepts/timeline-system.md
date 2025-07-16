@@ -2,24 +2,6 @@
 
 BitBadges uses timeline-based fields to allow dynamic, time-dependent values for various attributes. This feature enables automatic updates to field values based on the current time, without requiring additional blockchain transactions.
 
-## Key Concepts
-
-### Time Representation
-
--   Times are represented as UNIX time (milliseconds since the epoch)
--   Epoch: Midnight at the beginning of January 1, 1970, UTC
--   Time fields use UintRange format with valid values from 1 to 18446744073709551615 (Go MaxUint64)
-
-### Value Assignment
-
--   Values are assigned to specific time ranges
--   No overlapping time ranges are allowed for a single field
--   Current value determined by finding the timeline entry that includes current time
-
-### Default Behavior
-
--   If no value is set for the current time, the field assumes an empty/null/default value
-
 ## Structure
 
 Timeline-based fields extend the `TimelineItem` interface:
@@ -94,27 +76,6 @@ In this example:
 -   From time 1 to March 31, 2023, the collection metadata URI is 'ipfs://abc123'
 -   From April 1, 2023 onwards, the collection metadata URI is 'ipfs://xyz456'
 -   The change happens automatically without additional transactions
-
-### Manager Timeline
-
-```json
-{
-    "managerTimeline": [
-        {
-            "timelineTimes": [{ "start": "1", "end": "1672531199000" }],
-            "manager": "bb1alice..."
-        },
-        {
-            "timelineTimes": [
-                { "start": "1672531200000", "end": "18446744073709551615" }
-            ],
-            "manager": "bb1bob..."
-        }
-    ]
-}
-```
-
-This setup transfers management from Alice to Bob on January 1, 2023.
 
 ## Key Principles
 

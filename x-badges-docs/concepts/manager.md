@@ -2,32 +2,6 @@
 
 The manager is the central authority for a collection, controlling all administrative operations and having exclusive rights to perform updates, deletions, and other management tasks.
 
-## Key Concepts
-
-### Manager Authority
-
--   **Exclusive control** - Only the current manager can perform administrative operations
--   **Timeline-based** - Manager can change over time using `managerTimeline`
--   **Administrative operations** - Updates, deletions, approval management, permission changes
--   **Permission-controlled** - Manager changes are governed by `canUpdateManager` permission
-
-See [Permissions](permissions/) for more details on how permissions work.
-
-### Current Manager Determination
-
-The current manager is determined by finding the manager entry in `managerTimeline` that includes the current time:
-
-```javascript
-function getCurrentManager(managerTimeline, currentTime) {
-    for (const entry of managerTimeline) {
-        if (timeInRange(currentTime, entry.timelineTimes)) {
-            return entry.manager;
-        }
-    }
-    return null; // No manager defined for current time
-}
-```
-
 ## Manager Timeline
 
 ### Structure
@@ -173,34 +147,6 @@ During collection creation:
     }
 }
 ```
-
-### Scheduled Management Transfer
-
-```json
-{
-    "updateManagerTimeline": true,
-    "managerTimeline": [
-        {
-            "timelineTimes": [{ "start": "1", "end": "1672531199000" }],
-            "manager": "bb1alice..."
-        },
-        {
-            "timelineTimes": [
-                { "start": "1672531200000", "end": "1704067199000" }
-            ],
-            "manager": "bb1bob..."
-        },
-        {
-            "timelineTimes": [
-                { "start": "1704067200000", "end": "18446744073709551615" }
-            ],
-            "manager": "bb1charlie..."
-        }
-    ]
-}
-```
-
-This creates a management succession plan: Alice → Bob → Charlie.
 
 ### Decentralized Management Transition
 

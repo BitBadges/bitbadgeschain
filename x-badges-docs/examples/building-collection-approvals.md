@@ -16,7 +16,7 @@ It is typically recommended to split into two categories:
 
 ## Code Example
 
-Mix and match the approvals as you see fit. See the examples in the [approvals](./approvals/) section for a bunch of examples.
+Mix and match the approvals as you see fit. See the examples in the Approvals folder for a bunch of examples.
 
 -   [Transferable Approval](./approvals/transferable-approval.md)
 -   [Burnable Approval](./approvals/burnable-approval.md)

@@ -8,33 +8,15 @@ Transferability in BitBadges is controlled through a hierarchical approval syste
 
 ### Approval Levels
 
-| Level          | Description                              | Fields                                  |
-| -------------- | ---------------------------------------- | --------------------------------------- |
-| **Collection** | Global rules for the entire collection   | All fields                              |
-| **Incoming**   | User-specific rules for receiving badges | `toList` = user's address, no overrides |
-| **Outgoing**   | User-specific rules for sending badges   | `fromList` = user's address, overrides  |
+| Level          | Description                              | Fields                                    |
+| -------------- | ---------------------------------------- | ----------------------------------------- |
+| **Collection** | Global rules for the entire collection   | All fields                                |
+| **Incoming**   | User-specific rules for receiving badges | `toList` = user's address, no overrides   |
+| **Outgoing**   | User-specific rules for sending badges   | `fromList` = user's address, no overrides |
 
 **Key Rule**: A transfer must satisfy collection-level approvals AND (unless overridden) user-level incoming/outgoing approvals.
 
-## Core Concepts
-
-### ⚠️ Important Distinctions
-
--   **Approvals ≠ Escrows**: Approvals are just intentions - they don't guarantee underlying balances exist
--   **Mint Address**: Has unlimited balances and requires special handling (override the sender approvals since the Mint address is not a user)
--   **Default Behavior**: Unhandled transfers are **disapproved** by default
--   **Not Auto-Deleted Unless Set**: Approvals have auto-deletion functionality, but if not set, they are not deleted
-
-### Mint Address - Special Handling Required
-
-The Mint address is a special case that requires careful attention:
-
--   **Unlimited Balances**: The Mint address has unlimited balances for all badge IDs and ownership times
--   **No User Approvals**: Since it's not a real address, the Mint address cannot set its own user-level incoming/outgoing approvals
--   **Must Override**: When transferring from the Mint address, you **must** override the outgoing approvals using `overrideFromOutgoingApprovals: true`
--   **Exclusive fromList**: For safety, approvals from the Mint address should only include "Mint" in the `fromList` - never mix with regular addresses
-
-### Approval Structure
+## Approval Structure
 
 ```typescript
 interface CollectionApproval<T extends NumberType> {
@@ -144,7 +126,7 @@ The transfer approval system operates in two modes to balance efficiency and pre
 
 By default, the system automatically scans through available approvals to find a match for the transfer. This mode:
 
--   **Works with**: Approvals using [Empty Approval Criteria](../examples/empty-approval-criteria.md) (no side effects)
+-   **Works with**: Approvals using [Empty Approval Criteria](../examples/empty-approval-criteria.md) (no side effects). For example, when you approve all incoming transfers w/ no restrictions, this has no side effects.
 -   **Behavior**: Automatically finds and uses the first matching approval
 -   **Use case**: Simple transfers without custom logic or side effects
 -   **No versioning required**: The system handles approval selection automatically

@@ -2,6 +2,8 @@
 
 Require transfer initiators to pass boolean checks against dynamic stores. Typically, these are used with smart contracts.
 
+Dynamic stores are simply standalone (address -> approved) stores. They are controlled by whoever creates them. These are powerful for creating dynamic approval criteria with smart contracts and other custom use cases.
+
 ## How It Works
 
 Dynamic store challenges check if the transfer initiator has a `true` value in specified dynamic stores. The system:

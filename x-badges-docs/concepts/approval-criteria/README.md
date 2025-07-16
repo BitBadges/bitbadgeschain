@@ -72,7 +72,6 @@ For custom logic beyond native options:
 
 -   Use CosmWASM smart contracts
 -   Leverage Merkle challenges for commit-reveal mechanisms
--   Implement custom zero-knowledge circuits
 
 ### Cross-Approval Logic
 

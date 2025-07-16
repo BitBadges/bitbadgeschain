@@ -2,6 +2,8 @@
 
 A badge collection is the primary entity that defines a group of related badges with shared properties and rules. We refer you to other pages for more details on the different concepts that make up a collection.
 
+Note: This is what is stored on-chain in storage for a collection. You may typically interact with similar concepts but moreso in Messages and Queries format.
+
 ## Proto Definition
 
 ```protobuf

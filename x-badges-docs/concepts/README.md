@@ -2,10 +2,6 @@
 
 This directory contains detailed explanations of the core concepts and data structures that form the foundation of the BitBadges module.
 
-## Overview
-
-Each concept is documented in its own file for better organization and easier navigation:
-
 -   **[UintRange](uintrange.md)** - Representing ranges of unsigned integers
 -   **[Timeline System](timeline-system.md)** - How properties change over time with immutable historical records
 -   **[Badge Collections](badge-collections.md)** - The primary entity that defines groups of related badges

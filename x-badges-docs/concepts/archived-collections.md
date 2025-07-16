@@ -2,23 +2,6 @@
 
 Collections can be archived to temporarily or permanently disable all transactions while keeping the collection data verifiable and public on-chain.
 
-## Key Concepts
-
-### Archive State
-
--   Controlled by the `isArchivedTimeline` field
--   When archived, all transactions fail until unarchived
--   Collection remains readable and verifiable on-chain
--   Does not delete the collection, only makes it read-only
-
-### Timeline-Based Archiving
-
-Collections can be archived for specific time periods:
-
--   **Temporary archiving** - Archive for maintenance or security
--   **Permanent archiving** - Sunset collections while preserving data
--   **Scheduled archiving** - Pre-planned archive periods
-
 ## Implementation
 
 ### isArchivedTimeline Structure

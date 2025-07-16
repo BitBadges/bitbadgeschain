@@ -11,10 +11,6 @@ message UintRange {
 }
 ```
 
-## Overview
-
-The `UintRange` represents an **inclusive** range of numbers from a start value to an end value. Both the start and end values are included in the range.
-
 ## Usage Patterns
 
 UintRanges are used to represent:
@@ -82,19 +78,6 @@ const multipleBadges: UintRange[] = [
     { start: '1', end: '10' },
     { start: '20', end: '50' },
 ];
-```
-
-### Time Range Examples
-
-```typescript
-// Transfer time range (UNIX milliseconds)
-const transferTimes: UintRange[] = [
-    { start: '1630000000000', end: '1640000000000' },
-    // This represents 2021-08-26 to 2021-12-20
-];
-
-// Permanent validity
-const permanent: UintRange[] = [{ start: '1', end: '18446744073709551615' }];
 ```
 
 ### Go Code Examples

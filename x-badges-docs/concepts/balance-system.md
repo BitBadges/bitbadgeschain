@@ -6,15 +6,15 @@ The Balance system in BitBadges is designed to represent ownership of badges acr
 
 ```typescript
 export interface Balance<T extends NumberType> {
-  amount: T;
-  badgeIds: UintRange<T>[];
-  ownershipTimes: UintRange<T>[];
+    amount: T;
+    badgeIds: UintRange<T>[];
+    ownershipTimes: UintRange<T>[];
 }
 ```
 
-- `amount`: The quantity of badges owned
-- `badgeIds`: An array of ID ranges representing the badges owned
-- `ownershipTimes`: An array of time ranges during which the badges are owned
+-   `amount`: The quantity of badges owned
+-   `badgeIds`: An array of ID ranges representing the badges owned
+-   `ownershipTimes`: An array of time ranges during which the badges are owned
 
 ## Interpreting Balances
 
@@ -24,11 +24,11 @@ When interpreting balances, it's crucial to understand that multiple ranges of b
 
 ```javascript
 for (balance of balances) {
-  for (badgeIdRange of balance.badgeIds) {
-    for (ownershipTimeRange of balance.ownershipTimes) {
-      // User owns x(balance.amount) of (badgeIdRange) for the times (ownershipTimeRange)
+    for (badgeIdRange of balance.badgeIds) {
+        for (ownershipTimeRange of balance.ownershipTimes) {
+            // User owns x(balance.amount) of (badgeIdRange) for the times (ownershipTimeRange)
+        }
     }
-  }
 }
 ```
 
@@ -38,9 +38,15 @@ Consider the following balance:
 
 ```json
 {
-  "amount": 1,
-  "badgeIds": [{ "start": 1, "end": 10 }, { "start": 20, "end": 30 }],
-  "ownershipTimes": [{ "start": 20, "end": 50 }, { "start": 100, "end": 200 }]
+    "amount": 1,
+    "badgeIds": [
+        { "start": 1, "end": 10 },
+        { "start": 20, "end": 30 }
+    ],
+    "ownershipTimes": [
+        { "start": 20, "end": 50 },
+        { "start": 100, "end": 200 }
+    ]
 }
 ```
 
@@ -57,16 +63,19 @@ When subtracting balances, you may need to represent the result as multiple Bala
 
 ```json
 [
-  {
-    "amount": 1,
-    "badgeIds": [{ "start": 1, "end": 10 }, { "start": 20, "end": 30 }],
-    "ownershipTimes": [{ "start": 100, "end": 200 }]
-  },
-  {
-    "amount": 1,
-    "badgeIds": [{ "start": 20, "end": 30 }],
-    "ownershipTimes": [{ "start": 20, "end": 50 }]
-  }
+    {
+        "amount": 1,
+        "badgeIds": [
+            { "start": 1, "end": 10 },
+            { "start": 20, "end": 30 }
+        ],
+        "ownershipTimes": [{ "start": 100, "end": 200 }]
+    },
+    {
+        "amount": 1,
+        "badgeIds": [{ "start": 20, "end": 30 }],
+        "ownershipTimes": [{ "start": 20, "end": 50 }]
+    }
 ]
 ```
 
@@ -76,9 +85,12 @@ When duplicate badge IDs are specified in balances, they are combined and their 
 
 ```json
 {
-  "amount": 1,
-  "badgeIds": [{ "start": 1, "end": 10 }, { "start": 1, "end": 10 }],
-  "ownershipTimes": [{ "start": 100, "end": 200 }]
+    "amount": 1,
+    "badgeIds": [
+        { "start": 1, "end": 10 },
+        { "start": 1, "end": 10 }
+    ],
+    "ownershipTimes": [{ "start": 100, "end": 200 }]
 }
 ```
 
@@ -86,9 +98,9 @@ This is equivalent to and will be treated as:
 
 ```json
 {
-  "amount": 2,
-  "badgeIds": [{ "start": 1, "end": 10 }],
-  "ownershipTimes": [{ "start": 100, "end": 200 }]
+    "amount": 2,
+    "badgeIds": [{ "start": 1, "end": 10 }],
+    "ownershipTimes": [{ "start": 100, "end": 200 }]
 }
 ```
 
@@ -99,5 +111,3 @@ This is equivalent to and will be treated as:
 3. **Avoid Duplicates**: While the system handles duplicates by combining them, it's more efficient to represent balances without duplicates in the first place
 4. **Time-Aware Operations**: Always consider the time dimension when performing operations on balances, as ownership can vary over time
 5. **Range Calculations**: Familiarize yourself with range operations, as they are crucial for correctly manipulating and interpreting balances
-
-By understanding these concepts and following these practices, you can effectively work with the BitBadges balance system, enabling complex ownership structures and time-based badge management.

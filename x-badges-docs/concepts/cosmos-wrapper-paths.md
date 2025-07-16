@@ -2,26 +2,11 @@
 
 Cosmos Wrapper Paths enable 1:1 wrapping between BitBadges badges and native Cosmos SDK coin asset types, making badges IBC-compatible. These paths automatically mint and burn badges when transferring to/from specific wrapper addresses. These transfers to/from are handled within the badges module, so you can set up customizable logic for how these transfers are handled.
 
-## Key Concepts
-
-### Automatic Conversion
-
--   **1:1 wrapping** - One native coin unit is wrapped and unwrapped for the set conversion rate
--   **Automatic minting/burning** - Transfers to/from wrapper addresses trigger automatic conversion
--   **IBC compatibility** - Wrapped assets become native SDK coins that work with IBC
--   **Bidirectional** - Can wrap badges to coins and unwrap coins back to badges based on the conversion rate
-
-### Generated Wrapper Address
-
--   **Non-controllable** - Generated addresses have no known private keys
--   **Collection-specific** - Each wrapper path has its own unique address dependent on the denom
--   **Automatic processing** - Transfers to this address trigger wrapping/unwrapping
-
 > **Important**: Since wrapper addresses are uncontrollable (no private keys), approval design requires careful consideration. You must override the wrapper address's user-level approvals where necessary using collection approvals to ensure wrapping/unwrapping functions properly.
 
 ### Auto-Generating Wrapper Addresses
 
-You can programmatically generate wrapper addresses using the `bitbadgesjs-sdk` npm package:
+You can programmatically generate wrapper addresses using the `bitbadgesjs-sdk` npm package. Note that the address is generated based on the denom set. It is just the custom denom, not the full `badges:collectionId:denom` format.
 
 ```typescript
 import { generateAliasAddressForDenom } from 'bitbadgesjs-sdk';
