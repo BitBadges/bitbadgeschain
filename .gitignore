@@ -21,6 +21,8 @@ x/badges/keeper/coverage*
 # Ignore all files starting with cover.
 cover.*
 
+*-output.txt
+
 commands.txt
 
 proposal.json
