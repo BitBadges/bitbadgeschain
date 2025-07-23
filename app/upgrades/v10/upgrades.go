@@ -19,7 +19,7 @@ func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
 	badgesKeeper keeper.Keeper,
-	wasmKeeper wasmkeeper.Keeper,
+	// wasmKeeper wasmkeeper.Keeper,
 ) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// Run migrations
@@ -28,9 +28,9 @@ func CreateUpgradeHandler(
 		}
 
 		// Migrate WASM permissions from Everybody to Nobody
-		if err := migrateWasmPermissions(ctx, wasmKeeper); err != nil {
-			return nil, err
-		}
+		// if err := migrateWasmPermissions(ctx, wasmKeeper); err != nil {
+		// 	return nil, err
+		// }
 
 		// Run module migrations
 		return mm.RunMigrations(ctx, configurator, fromVM)

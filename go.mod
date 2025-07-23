@@ -49,7 +49,6 @@ require (
 	github.com/btcsuite/btcd/btcutil v1.1.6
 	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
 	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8 v8.2.0
-	github.com/cosmos/ibc-go/modules/apps/callbacks v0.2.1-0.20231113120333-342c00b0f8bd
 	github.com/ethereum/go-ethereum v1.14.7
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.4

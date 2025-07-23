@@ -67,10 +67,10 @@ import (
 
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	// wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
-	_ "github.com/bitbadges/bitbadgeschain/x/wasmx/module" // import for side-effects
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	// _ "github.com/bitbadges/bitbadgeschain/x/wasmx/module" // import for side-effects
+	// wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -113,8 +113,8 @@ var (
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
+		// wasmtypes.ModuleName,
+		// wasmxmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -143,8 +143,8 @@ var (
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
+		// wasmtypes.ModuleName,
+		// wasmxmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -167,8 +167,8 @@ var (
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
+		// wasmtypes.ModuleName,
+		// wasmxmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -190,8 +190,8 @@ var (
 		{Account: ibcfeetypes.ModuleName},
 		{Account: icatypes.ModuleName},
 		{Account: packetforwardtypes.ModuleName},
-		{Account: wasmtypes.ModuleName},
-		{Account: wasmxmoduletypes.ModuleName},
+		// {Account: wasmtypes.ModuleName},
+		// {Account: wasmxmoduletypes.ModuleName},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -341,3 +341,5 @@ var (
 		},
 	})
 )
+
+// {Account: wasmxmoduletypes.ModuleName

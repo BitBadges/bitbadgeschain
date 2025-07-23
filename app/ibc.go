@@ -3,7 +3,6 @@ package app
 import (
 	"cosmossdk.io/core/appmodule"
 	storetypes "cosmossdk.io/store/types"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -45,17 +44,12 @@ import (
 	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
-	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
 	badgesmodule "github.com/bitbadges/bitbadgeschain/x/badges/module"
-
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
 
 	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward"
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
-	ibccallbacks "github.com/cosmos/ibc-go/modules/apps/callbacks"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -195,18 +189,18 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
 	mapsIBCModule := ibcfee.NewIBCMiddleware(mapsmodule.NewIBCModule(app.MapsKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
-	wasmxIBCModule := ibcfee.NewIBCMiddleware(wasmxmodule.NewIBCModule(app.WasmxKeeper), app.IBCFeeKeeper)
-	ibcRouter.AddRoute(wasmxmoduletypes.ModuleName, wasmxIBCModule)
+	// wasmxIBCModule := ibcfee.NewIBCMiddleware(wasmxmodule.NewIBCModule(app.WasmxKeeper), app.IBCFeeKeeper)
+	// ibcRouter.AddRoute(wasmxmoduletypes.ModuleName, wasmxIBCModule)
 	badgesIBCModule := ibcfee.NewIBCMiddleware(badgesmodule.NewIBCModule(app.BadgesKeeper), app.IBCFeeKeeper)
 	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
 
 	// this line is used by starport scaffolding # ibc/app/module
 
-	var wasmStack porttypes.IBCModule
-	wasmStackIBCHandler := wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
-	wasmStack = wasmStackIBCHandler
-	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
-	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
+	// var wasmStack porttypes.IBCModule
+	// wasmStackIBCHandler := wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
+	// wasmStack = wasmStackIBCHandler
+	// wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
+	// ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
 
 	// Create Interchain Accounts Stack
 	// SendPacket, since it is originating from the application to core IBC:
@@ -214,7 +208,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	var icaControllerStack porttypes.IBCModule
 	icaControllerStack = icacontroller.NewIBCMiddleware(noAuthzModule, app.ICAControllerKeeper)
 	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.ICAControllerKeeper)
-	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
+	// icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
 	icaICS4Wrapper := icaControllerStack.(porttypes.ICS4Wrapper)
 	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper)
 	app.ICAControllerKeeper.WithICS4Wrapper(icaICS4Wrapper)
@@ -223,7 +217,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	var transferStack porttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
-	transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
+	// transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
 	transferICS4Wrapper := transferStack.(porttypes.ICS4Wrapper)
 	transferStack = packetforward.NewIBCMiddleware(
 		transferStack,
