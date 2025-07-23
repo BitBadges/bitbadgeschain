@@ -16,16 +16,6 @@ import (
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
 func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 
-	// Set default params with allowed denoms if not already set
-	params := k.GetParams(ctx)
-	if len(params.AllowedDenoms) == 0 {
-		// Set default allowed denoms from the previous module config
-		params.AllowedDenoms = []string{"ubadge", "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349"}
-		if err := k.SetParams(ctx, params); err != nil {
-			return err
-		}
-	}
-
 	// Get all collections
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -146,30 +136,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
-
-		// Migrate CosmosCoinWrapperPaths balances
-		for i, path := range newCollection.CosmosCoinWrapperPaths {
-			if len(path.Balances) == 0 {
-				// Convert old structure to new structure
-				// Assume old paths were array length 1 with amount = 1n and badgeIds/ownershipTimes as specified
-				// Get the old path data from the original collection
-				if i < len(oldCollection.CosmosCoinWrapperPaths) {
-					oldPath := oldCollection.CosmosCoinWrapperPaths[i]
-
-					// Convert old types to new types
-					badgeIds := convertUintRanges(oldPath.BadgeIds)
-					ownershipTimes := convertUintRanges(oldPath.OwnershipTimes)
-
-					newCollection.CosmosCoinWrapperPaths[i].Balances = []*newtypes.Balance{
-						{
-							Amount:         newtypes.NewUintFromString("1"),
-							BadgeIds:       badgeIds,
-							OwnershipTimes: ownershipTimes,
-						},
-					}
-				}
-			}
-		}
 
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {
