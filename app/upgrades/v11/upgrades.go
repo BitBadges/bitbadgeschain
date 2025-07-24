@@ -1,4 +1,4 @@
-package v10
+package v11
 
 import (
 	"context"
@@ -12,8 +12,23 @@ import (
 )
 
 const (
-	UpgradeName = "v10"
+	UpgradeName = "v11"
 )
+
+// This is in a separate function so we can test it locally with a snapshot
+func CustomUpgradeHandlerLogic(ctx context.Context, badgesKeeper keeper.Keeper, wasmKeeper wasmkeeper.Keeper) error {
+	// Run migrations
+	if err := badgesKeeper.MigrateBadgesKeeper(sdk.UnwrapSDKContext(ctx)); err != nil {
+		return err
+	}
+
+	// Migrate WASM permissions from Everybody to Nobody
+	if err := migrateWasmPermissions(ctx, wasmKeeper); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func CreateUpgradeHandler(
 	mm *module.Manager,
@@ -22,13 +37,9 @@ func CreateUpgradeHandler(
 	wasmKeeper wasmkeeper.Keeper,
 ) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		// Run migrations
-		if err := badgesKeeper.MigrateBadgesKeeper(sdk.UnwrapSDKContext(ctx)); err != nil {
-			return nil, err
-		}
 
-		// Migrate WASM permissions from Everybody to Nobody
-		if err := migrateWasmPermissions(ctx, wasmKeeper); err != nil {
+		// Run custom upgrade logic
+		if err := CustomUpgradeHandlerLogic(ctx, badgesKeeper, wasmKeeper); err != nil {
 			return nil, err
 		}
 
@@ -53,8 +64,12 @@ func migrateWasmPermissions(ctx context.Context, wasmKeeper wasmkeeper.Keeper) e
 		params = wasmKeeper.GetParams(ctx)
 	}()
 
-	// Update the permission
-	params.InstantiateDefaultPermission = wasmtypes.AccessTypeNobody
+	chainId := sdk.UnwrapSDKContext(ctx).ChainID()
+	if chainId == "bitbadges-1" {
+		params.InstantiateDefaultPermission = wasmtypes.AccessTypeNobody
+	} else {
+		params.InstantiateDefaultPermission = wasmtypes.AccessTypeEverybody
+	}
 
 	// Set the updated parameters
 	if err := wasmKeeper.SetParams(ctx, params); err != nil {

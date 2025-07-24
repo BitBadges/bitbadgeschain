@@ -1,14 +1,14 @@
 syntax = "proto3";
-package badges.v9;
+package badges.v10;
 
 import "google/protobuf/any.proto";
-import "badges/v9/transfers.proto";
-import "badges/v9/balances.proto";
-import "badges/v9/permissions.proto";
-import "badges/v9/metadata.proto";
+import "badges/v10/transfers.proto";
+import "badges/v10/balances.proto";
+import "badges/v10/permissions.proto";
+import "badges/v10/metadata.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v9";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v10";
 
 // CollectionMetadataTimeline defines the metadata for a collection at different timeline times.
 message CollectionMetadataTimeline {

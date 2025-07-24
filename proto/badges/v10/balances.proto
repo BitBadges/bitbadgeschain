@@ -1,11 +1,11 @@
 syntax = "proto3";
-package badges.v9;  
+package badges.v10;  
 
 import "gogoproto/gogo.proto";
-import "badges/v9/params.proto";
+import "badges/v10/params.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v9";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v10";
 
 /* 
   The UintRange is a range of IDs from some start to some end (inclusive).

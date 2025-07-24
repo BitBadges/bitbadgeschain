@@ -1,13 +1,13 @@
 syntax = "proto3";
-package badges.v9;
+package badges.v10;
 
 import "gogoproto/gogo.proto";
-import "badges/v9/permissions.proto";
-import "badges/v9/address_lists.proto";
-import "badges/v9/balances.proto";
+import "badges/v10/permissions.proto";
+import "badges/v10/address_lists.proto";
+import "badges/v10/balances.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v9";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v10";
 
 /*
   UserBalanceStore is the store for the user balances for a collection.
@@ -283,6 +283,10 @@ message AutoDeletionOptions {
   bool afterOneUse = 1;
   // After overall max number of uses threshold is met?
   bool afterOverallMaxNumTransfers = 2;
+  // Allow counterparty to purge this approval if they are the only initiator
+  bool allowCounterpartyPurge = 3;
+  // Allow others to call PurgeApprovals on behalf of this approval owner
+  bool allowPurgeIfExpired = 4;
 }
 
 // ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
@@ -388,6 +392,12 @@ message MustOwnBadges {
   bool mustSatisfyForAllAssets = 6;
 }
 
+// DynamicStoreChallenge defines a challenge that requires the initiator to pass a dynamic store check.
+message DynamicStoreChallenge {
+  // The ID of the dynamic store to check.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
   // Merkle challenge that must be satisfied for approval.
@@ -423,6 +433,8 @@ message ApprovalCriteria {
 
   // Must own badges for approval.
   repeated MustOwnBadges mustOwnBadges = 14;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
 }
 
 // UserRoyalties defines the royalties for a user.
@@ -456,6 +468,8 @@ message OutgoingApprovalCriteria {
 
   // Must own badges for approval.
   repeated MustOwnBadges mustOwnBadges = 9;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -481,6 +495,8 @@ message IncomingApprovalCriteria {
 
   // Must own badges for approval.
   repeated MustOwnBadges mustOwnBadges = 9;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
 }
 
 

@@ -3,16 +3,14 @@ package app
 import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	v10 "github.com/bitbadges/bitbadgeschain/app/upgrades/v10"
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	v11 "github.com/bitbadges/bitbadgeschain/app/upgrades/v11"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v10.UpgradeName,
-		v10.CreateUpgradeHandler(
+		v11.UpgradeName,
+		v11.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
 			app.BadgesKeeper,
@@ -35,12 +33,12 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v10.UpgradeName:
+	case v11.UpgradeName:
 		// Add any store upgrades here
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{
-				wasmxmoduletypes.ModuleName,
-				wasmtypes.ModuleName,
+				WasmStoreKey,
+				WasmxStoreKey,
 			},
 		}
 	}

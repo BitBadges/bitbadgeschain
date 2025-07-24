@@ -1,7 +1,7 @@
 syntax = "proto3";
-package badges.v9;
+package badges.v10;
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v9";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v10";
 
 message BadgesPacketData {
     oneof packet {

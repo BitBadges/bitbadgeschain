@@ -28,10 +28,21 @@ import (
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 )
 
+// Little hacky workaround but with 711316 hard-fork, there is an out-of-date store that
+// was a pain to upgrade without complex migrations that probably involved forking the SDK.
+//
+// Problem was we had it -> removed it but never properly removed the store -> tried to readd it
+//
+// This is a simple solution to just reinitialize new modules with different store keys
+const (
+	WasmStoreKey  = "wasm-store"
+	WasmxStoreKey = "wasmx-store"
+)
+
 // registerIBCModules register IBC keepers and non dependency inject modules.
 func (app *App) registerWasmModules(appOpts servertypes.AppOptions) (store.KVStoreService, error) {
-	wasmKey := storetypes.NewKVStoreKey(wasmtypes.StoreKey)
-	wasmxKey := storetypes.NewKVStoreKey(wasmxmoduletypes.StoreKey)
+	wasmKey := storetypes.NewKVStoreKey(WasmStoreKey)
+	wasmxKey := storetypes.NewKVStoreKey(WasmxStoreKey)
 
 	// set up non depinject support modules store keys
 	if err := app.RegisterStores(
@@ -80,7 +91,7 @@ func (app *App) registerWasmModules(appOpts servertypes.AppOptions) (store.KVSto
 
 	app.WasmxKeeper = wasmxkeeper.NewKeeper(
 		app.appCodec,
-		storeService,
+		runtime.NewKVStoreService(wasmxKey),
 		app.Logger(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		func() *ibckeeper.Keeper { return app.IBCKeeper },

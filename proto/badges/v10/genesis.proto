@@ -1,15 +1,16 @@
 syntax = "proto3";
-package badges.v9;
+package badges.v10;
 
 import "gogoproto/gogo.proto";
-import "badges/v9/params.proto";
-import "badges/v9/collections.proto";
-import "badges/v9/balances.proto";
-import "badges/v9/transfers.proto";
-import "badges/v9/address_lists.proto";
+import "badges/v10/params.proto";
+import "badges/v10/collections.proto";
+import "badges/v10/balances.proto";
+import "badges/v10/transfers.proto";
+import "badges/v10/address_lists.proto";
+import "badges/v10/dynamic_stores.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v9";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v10";
 
 // GenesisState defines the badges module's genesis state.
 message GenesisState {
@@ -26,5 +27,8 @@ message GenesisState {
   repeated string approvalTrackerStoreKeys = 11;
   repeated string approvalTrackerVersions = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated string approvalTrackerVersionsStoreKeys = 13;
+  repeated DynamicStore dynamicStores = 14;
+  string nextDynamicStoreId = 15 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated DynamicStoreValue dynamicStoreValues = 16;
   // this line is used by starport scaffolding # genesis/proto/state
 }

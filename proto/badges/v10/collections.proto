@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v9;
+package badges.v10;
 
 import "google/protobuf/any.proto";
-import "badges/v9/transfers.proto";
-import "badges/v9/balances.proto";
-import "badges/v9/permissions.proto";
-import "badges/v9/metadata.proto";
-import "badges/v9/timelines.proto";
+import "badges/v10/transfers.proto";
+import "badges/v10/balances.proto";
+import "badges/v10/permissions.proto";
+import "badges/v10/metadata.proto";
+import "badges/v10/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v9";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v10";
 
 /* 
   A BadgeCollection is the top-level object for a collection of badges. 
@@ -85,10 +85,9 @@ message BadgeCollection {
 message CosmosCoinWrapperPath {
   string address = 1;
   string denom = 2;
-  repeated UintRange ownershipTimes = 3;
-  repeated UintRange badgeIds = 4;
-  string symbol = 5;
-  repeated DenomUnit denomUnits = 6;
+  repeated Balance balances = 3;
+  string symbol = 4;
+  repeated DenomUnit denomUnits = 5;
 }
 
 message DenomUnit {

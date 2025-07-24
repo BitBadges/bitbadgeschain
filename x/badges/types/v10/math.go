@@ -1,4 +1,4 @@
-package v9
+package v10
 
 import (
 	sdkmath "cosmossdk.io/math"
