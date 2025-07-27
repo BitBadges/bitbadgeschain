@@ -447,6 +447,10 @@ func (k Keeper) HandleTransfer(
 		bankKeeper := k.bankKeeper
 		amountInt := multiplier.BigInt()
 		if isSendingToSpecialAddress {
+			if from == "Mint" {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "the Mint address cannot perform wrap / unwrap actions")
+			}
+
 			userAddressAcc := sdk.MustAccAddressFromBech32(from)
 
 			err = bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
