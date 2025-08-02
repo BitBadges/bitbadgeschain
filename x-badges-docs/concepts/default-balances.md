@@ -27,7 +27,7 @@ Default balances follow the same `UserBalanceStore` structure:
 
 Default balances **cannot** include:
 
--   **Approval criteria** with complex conditions (merkle challenges, dynamic store challenges, etc.)
+-   **Approval criteria** with complex conditions (merkle challenges, ETH signature challenges, dynamic store challenges, etc.)
 -   **Coin transfers** or native token requirements
 -   **Badge ownership** requirements or other side effects
 -   **Advanced conditional logic**

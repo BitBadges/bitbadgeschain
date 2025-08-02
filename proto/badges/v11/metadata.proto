@@ -1,0 +1,47 @@
+syntax = "proto3";
+package badges.v11;
+
+import "google/protobuf/any.proto";
+import "badges/v11/balances.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v11";
+
+/* 
+  This message defines the metadata for specific badge IDs.
+  The interpretation of this metadata should follow the collection standard.
+*/
+message BadgeMetadata {
+  // The URI (Uniform Resource Identifier) associated with the badge metadata.
+  string uri = 1;
+  
+  // Custom data or additional information related to the badge metadata.
+  string customData = 2;
+  
+  // The badge IDs to which this metadata applies.
+  repeated UintRange badgeIds = 3;
+}
+
+/* 
+  This message defines the metadata for the collection.
+  The interpretation of this metadata should follow the collection standard.
+*/
+message CollectionMetadata {
+  // The URI (Uniform Resource Identifier) associated with the collection metadata.
+  string uri = 1;
+  
+  // Custom data or additional information related to the collection metadata.
+  string customData = 2;
+}
+
+/* 
+  This message defines the metadata for off-chain balances (if using an off-chain balances type).
+  The interpretation of this metadata should follow the collection standard.
+*/
+message OffChainBalancesMetadata {
+  // The URI (Uniform Resource Identifier) associated with the off-chain balances metadata.
+  string uri = 1;
+  
+  // Custom data or additional information related to the off-chain balances metadata.
+  string customData = 2;
+}

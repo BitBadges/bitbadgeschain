@@ -23,6 +23,11 @@ type BankKeeper interface {
 	// Methods imported from bank should be defined here
 }
 
+// DistributionKeeper defines the expected interface for the Distribution module.
+type DistributionKeeper interface {
+	FundCommunityPool(context.Context, sdk.Coins, sdk.AccAddress) error
+}
+
 // ParamSubspace defines the expected Subspace interface for parameters.
 type ParamSubspace interface {
 	Get(context.Context, []byte, interface{})

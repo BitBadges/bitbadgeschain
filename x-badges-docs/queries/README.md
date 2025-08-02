@@ -20,11 +20,12 @@ This directory contains detailed documentation for all query types supported by 
 
 -   [GetApprovalTracker](./get-approval-tracker.md) - Get approval usage tracking data and limits
 -   [GetChallengeTracker](./get-challenge-tracker.md) - Get challenge completion tracking status
+-   [GetETHSignatureTracker](./get-eth-signature-tracker.md) - Get ETH signature challenge usage tracking status
 
 ### Dynamic Store Queries
 
 -   [GetDynamicStore](./get-dynamic-store.md) - Get dynamic store configuration and metadata
--   [GetDynamicStoreValue](./get-dynamic-store-value.md) - Get boolean value for specific address in store
+-   [GetDynamicStoreValue](./get-dynamic-store-value.md) - Get numeric value for specific address in store
 
 ### System Queries
 

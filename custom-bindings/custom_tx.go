@@ -88,6 +88,12 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.SetDynamicStoreValueMsg != nil:
 				badgeCustomMsg.SetDynamicStoreValueMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetDynamicStoreValueMsg}, nil
+			case badgeCustomMsg.IncrementStoreValueMsg != nil:
+				badgeCustomMsg.IncrementStoreValueMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.IncrementStoreValueMsg}, nil
+			case badgeCustomMsg.DecrementStoreValueMsg != nil:
+				badgeCustomMsg.DecrementStoreValueMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.DecrementStoreValueMsg}, nil
 			case badgeCustomMsg.SetIncomingApprovalMsg != nil:
 				badgeCustomMsg.SetIncomingApprovalMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetIncomingApprovalMsg}, nil

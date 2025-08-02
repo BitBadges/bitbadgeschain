@@ -172,7 +172,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			for _, challenge := range approvalCriteria.DynamicStoreChallenges {
 				storeId := challenge.StoreId
 				dynamicStoreValue, found := k.GetDynamicStoreValueFromStore(ctx, storeId, initiatedBy)
-				val := false
+				var val sdkmath.Uint
 				if found {
 					val = dynamicStoreValue.Value
 				} else {
@@ -185,11 +185,25 @@ func (k Keeper) DeductAndGetUserApprovals(
 					}
 					val = dynamicStore.DefaultValue
 				}
-				if !val {
+				if val.Equal(sdkmath.NewUint(0)) {
 					if isPrioritizedApproval {
-						potentialErrors = append(potentialErrors, fmt.Sprintf("initiator did not pass dynamic store challenge for storeId %s", storeId.String()))
+						potentialErrors = append(potentialErrors, fmt.Sprintf("initiator has no remaining uses for dynamic store challenge storeId %s", storeId.String()))
 					}
 					goto skipApproval
+				}
+
+				// Decrement the usage count
+				newValue := val.SubUint64(1)
+				if found {
+					// Update existing value
+					if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+						return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String())
+					}
+				} else {
+					// Create new value with decremented default
+					if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+						return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String())
+					}
 				}
 			}
 
@@ -232,6 +246,24 @@ func (k Keeper) DeductAndGetUserApprovals(
 			if err != nil {
 				if isPrioritizedApproval {
 					potentialErrors = append(potentialErrors, fmt.Sprintf("merkle challenge error: %s", err))
+				}
+				continue
+			}
+
+			// Handle ETH signature challenges
+			err = k.HandleETHSignatureChallenges(
+				ctx,
+				collection.CollectionId,
+				transfer,
+				approval,
+				initiatedBy,
+				approverAddress,
+				approvalLevel,
+				true, //simulation = true
+			)
+			if err != nil {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, fmt.Sprintf("eth signature challenge error: %s", err))
 				}
 				continue
 			}
@@ -326,6 +358,21 @@ func (k Keeper) DeductAndGetUserApprovals(
 			//If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
 			//    If so, useLeafIndexForNumIncrements will be true
 			challengeNumIncrements, err = k.HandleMerkleChallenges(
+				ctx,
+				collection.CollectionId,
+				transfer,
+				approval,
+				initiatedBy,
+				approverAddress,
+				approvalLevel,
+				false, //simulation = false
+			)
+			if err != nil {
+				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "%s", transferStr)
+			}
+
+			// Handle ETH signature challenges
+			err = k.HandleETHSignatureChallenges(
 				ctx,
 				collection.CollectionId,
 				transfer,
@@ -930,7 +977,9 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 
 		if approvalCriteria.PredeterminedBalances != nil {
 			numIncrements := sdkmath.NewUint(0)
+			hasOrderCalculationMethod := false
 			if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+				hasOrderCalculationMethod = true
 
 				//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
 				//If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
@@ -950,9 +999,12 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 
 				numIncrements = numIncrementsFetched
 			} else {
-				trackerType := "overall"
+				trackerType := ""
 				approvedAddress := ""
-				if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers {
+
+				if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers {
+					trackerType = "overall"
+				} else if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers {
 					trackerType = "from"
 					approvedAddress = transfer.From
 				} else if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers {
@@ -961,6 +1013,10 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				} else if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers {
 					trackerType = "initiatedBy"
 					approvedAddress = initiatedBy
+				}
+
+				if trackerType != "" {
+					hasOrderCalculationMethod = true
 				}
 
 				numTransfersTracker, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
@@ -980,6 +1036,10 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				}
 
 				numIncrements = numTransfersTracker.NumTransfers
+			}
+
+			if !hasOrderCalculationMethod {
+				return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "no order calculation method found for approval id: %s", precalculationId)
 			}
 
 			//calculate the current approved balances from the numIncrements and predeterminedBalances

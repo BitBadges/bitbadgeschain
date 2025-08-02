@@ -327,11 +327,8 @@ var (
 				Config: appconfig.WrapAny(&anchormodulev1.Module{}),
 			},
 			{
-				Name: badgesmoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&badgesmodulev1.Module{
-					PayoutAddress:        "bb18el5ug46umcws58m445ql5scgg2n3tzagfecvl",
-					FixedCostPerTransfer: "100000000ubadge",
-				}),
+				Name:   badgesmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&badgesmodulev1.Module{}),
 			},
 			{
 				Name:   mapsmoduletypes.ModuleName,

@@ -22,6 +22,16 @@ func getMerkleChallengeSchema() string {
 	}`
 }
 
+// getETHSignatureChallengeSchema returns the schema for an ETH signature challenge
+func getETHSignatureChallengeSchema() string {
+	return `{
+		"signer": "",
+		"challengeTrackerId": "",
+		"uri": "",
+		"customData": ""
+	}`
+}
+
 // getMustOwnBadgesSchema returns the schema for must own badges criteria
 func getMustOwnBadgesSchema() string {
 	return `{
@@ -157,6 +167,9 @@ func getBaseApprovalCriteriaSchema() string {
 		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
 		"dynamicStoreChallenges": [
 			` + getDynamicStoreChallengeSchema() + `
+		],
+		"ethSignatureChallenges": [
+			` + getETHSignatureChallengeSchema() + `
 		]
 	}`
 }
@@ -189,6 +202,9 @@ func getCollectionApprovalCriteriaSchema() string {
 		"overridesToIncomingApprovals": false,
 		"dynamicStoreChallenges": [
 			` + getDynamicStoreChallengeSchema() + `
+		],
+		"ethSignatureChallenges": [
+			` + getETHSignatureChallengeSchema() + `
 		]
 	}`
 }
@@ -213,6 +229,9 @@ func getOutgoingApprovalCriteriaSchema() string {
 		"requireToDoesNotEqualInitiatedBy": false,
 		"dynamicStoreChallenges": [
 			` + getDynamicStoreChallengeSchema() + `
+		],
+		"ethSignatureChallenges": [
+			` + getETHSignatureChallengeSchema() + `
 		]
 	}`
 }
@@ -237,6 +256,9 @@ func getIncomingApprovalCriteriaSchema() string {
 		"requireFromDoesNotEqualInitiatedBy": false,
 		"dynamicStoreChallenges": [
 			` + getDynamicStoreChallengeSchema() + `
+		],
+		"ethSignatureChallenges": [
+			` + getETHSignatureChallengeSchema() + `
 		]
 	}`
 }
@@ -551,6 +573,12 @@ func GetSchemas() []string {
 							"leafSignature": ""
 						}
 					],
+					"ethSignatureProofs": [
+						{
+							"nonce": "",
+							"signature": ""
+						}
+					],
 					"memo": "",
 					"prioritizedApprovals": [
 						{
@@ -685,7 +713,10 @@ func GetSchemas() []string {
 						}
 					]
 				}
-			]
+			],
+			"invariants": {
+				"noCustomOwnershipTimes": false
+			}
 		}
 	}`)
 
@@ -813,7 +844,10 @@ func GetSchemas() []string {
 						}
 					]
 				}
-			]
+			],
+			"invariants": {
+				"noCustomOwnershipTimes": false
+			}
 		}
 	}`)
 
@@ -912,7 +946,10 @@ func GetSchemas() []string {
 						}
 					]
 				}
-			]
+			],
+			"invariants": {
+				"noCustomOwnershipTimes": false
+			}
 		}
 	}`)
 
@@ -920,7 +957,7 @@ func GetSchemas() []string {
 		"type": "badges/CreateDynamicStore",
 		"value": {
 			"creator": "",
-			"defaultValue": false
+			"defaultValue": ""
 		}
 	}`)
 
@@ -929,7 +966,7 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"storeId": "",
-			"defaultValue": false
+			"defaultValue": ""
 		}
 	}`)
 
@@ -947,7 +984,28 @@ func GetSchemas() []string {
 			"creator": "",
 			"storeId": "",
 			"address": "",
-			"value": false
+			"value": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/IncrementStoreValue",
+		"value": {
+			"creator": "",
+			"storeId": "",
+			"address": "",
+			"amount": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/DecrementStoreValue",
+		"value": {
+			"creator": "",
+			"storeId": "",
+			"address": "",
+			"amount": "",
+			"setToZeroOnUnderflow": false
 		}
 	}`)
 

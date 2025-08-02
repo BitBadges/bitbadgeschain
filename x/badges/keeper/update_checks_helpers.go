@@ -263,6 +263,11 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 }
 
 func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval, CanUpdateCollectionApprovals []*types.CollectionApprovalPermission) error {
+	// Validate new approvals with invariants
+	if err := types.ValidateCollectionApprovalsWithInvariants(ctx, newApprovals, true, collection); err != nil {
+		return err
+	}
+
 	detailsToCheck, err := k.GetDetailsToCheck(ctx, collection, oldApprovals, newApprovals)
 	if err != nil {
 		return err

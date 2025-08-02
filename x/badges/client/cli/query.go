@@ -30,6 +30,7 @@ func GetQueryCmd() *cobra.Command {
 	cmd.AddCommand(CmdGetAddressList())
 	cmd.AddCommand(CmdGetApprovalTrackers())
 	cmd.AddCommand(CmdGetChallengeTracker())
+	cmd.AddCommand(CmdGetETHSignatureTracker())
 	cmd.AddCommand(CmdGetDynamicStore())
 	cmd.AddCommand(CmdGetDynamicStoreValue())
 	// this line is used by starport scaffolding # 1

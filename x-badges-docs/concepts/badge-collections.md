@@ -59,5 +59,9 @@ message BadgeCollection {
 
   // The IBC wrapper (sdk.coin) paths for the collection.
   repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
+
+  // Collection-level invariants that cannot be broken.
+  // These are set upon genesis and cannot be modified.
+  CollectionInvariants invariants = 18;
 }
 ```

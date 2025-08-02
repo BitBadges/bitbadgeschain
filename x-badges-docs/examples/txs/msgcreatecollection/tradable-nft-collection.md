@@ -130,6 +130,7 @@ This example demonstrates creating a tradable collection that supports orderbook
                 "approvalId": "a4ab9bc5e8752842a35a79238de4f627677ceae1d8fa9de44b52416e085f7f11",
                 "approvalCriteria": {
                     "merkleChallenges": [],
+                    "ethSignatureChallenges": [],
                     "predeterminedBalances": {
                         "manualBalances": [],
                         "incrementedBalances": {
@@ -222,6 +223,7 @@ This example demonstrates creating a tradable collection that supports orderbook
                 "approvalId": "transferable-approval",
                 "approvalCriteria": {
                     "merkleChallenges": [],
+                    "ethSignatureChallenges": [],
                     "predeterminedBalances": {
                         "manualBalances": [],
                         "incrementedBalances": {

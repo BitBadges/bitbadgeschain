@@ -42,5 +42,16 @@ func (msg *MsgCreateCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	// Validate invariants if present
+	if msg.Invariants != nil && msg.Invariants.NoCustomOwnershipTimes {
+		// Create a temporary collection to validate invariants
+		tempCollection := &BadgeCollection{
+			Invariants: msg.Invariants,
+		}
+		if err := ValidateCollectionApprovalsWithInvariants(sdk.Context{}, msg.CollectionApprovals, false, tempCollection); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

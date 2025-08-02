@@ -11,10 +11,4 @@ message Module {
 
   // authority defines the custom module authority. If not set, defaults to the governance module.
   string authority = 1;
-
-  // payout_address defines where to send the revenue from the module
-  string payout_address = 2;
-
-  // fixed_cost_per_transfer defines the fixed cost per transfer
-  string fixed_cost_per_transfer = 3;
 }

@@ -37,6 +37,7 @@ This example demonstrates how to update user outgoing approvals to control what 
                 "approvalId": "87bc6dd97492b913b3d2b6c91c71b7a2bc98d41a715e49285180e8db9f4ea0bb",
                 "approvalCriteria": {
                     "merkleChallenges": [],
+                    "ethSignatureChallenges": [],
                     "predeterminedBalances": {
                         "manualBalances": [],
                         "incrementedBalances": {

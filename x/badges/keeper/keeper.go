@@ -32,12 +32,10 @@ type (
 
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
+		distributionKeeper types.DistributionKeeper
 
 		ibcKeeperFn        func() *ibckeeper.Keeper
 		capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper
-
-		PayoutAddress        string
-		FixedCostPerTransfer string
 	}
 )
 
@@ -48,26 +46,24 @@ func NewKeeper(
 	authority string,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
+	distributionKeeper types.DistributionKeeper,
 	ibcKeeperFn func() *ibckeeper.Keeper,
 	capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper,
-	PayoutAddress string,
-	FixedCostPerTransfer string,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
 	}
 
 	return Keeper{
-		cdc:                  cdc,
-		storeService:         storeService,
-		authority:            authority,
-		logger:               logger,
-		bankKeeper:           bankKeeper,
-		accountKeeper:        accountKeeper,
-		ibcKeeperFn:          ibcKeeperFn,
-		capabilityScopedFn:   capabilityScopedFn,
-		PayoutAddress:        PayoutAddress,
-		FixedCostPerTransfer: FixedCostPerTransfer,
+		cdc:                cdc,
+		storeService:       storeService,
+		authority:          authority,
+		logger:             logger,
+		bankKeeper:         bankKeeper,
+		accountKeeper:      accountKeeper,
+		distributionKeeper: distributionKeeper,
+		ibcKeeperFn:        ibcKeeperFn,
+		capabilityScopedFn: capabilityScopedFn,
 	}
 }
 

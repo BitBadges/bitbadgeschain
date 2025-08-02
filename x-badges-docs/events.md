@@ -162,7 +162,36 @@ Attributes:
   - action: "set_dynamic_store_value"
   - store_id: string
   - address: string (target address)
-  - value: string ("true"/"false")
+  - value: string (numeric value)
+  - msg: string (JSON-encoded message)
+```
+
+#### IncrementStoreValue
+
+```
+Type: "message"
+Attributes:
+  - module: "badges"
+  - sender: string (incrementer address)
+  - action: "increment_store_value"
+  - store_id: string
+  - address: string (target address)
+  - amount: string (increment amount)
+  - msg: string (JSON-encoded message)
+```
+
+#### DecrementStoreValue
+
+```
+Type: "message"
+Attributes:
+  - module: "badges"
+  - sender: string (decrementer address)
+  - action: "decrement_store_value"
+  - store_id: string
+  - address: string (target address)
+  - amount: string (decrement amount)
+  - set_to_zero_on_underflow: string ("true"/"false")
   - msg: string (JSON-encoded message)
 ```
 

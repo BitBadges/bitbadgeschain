@@ -80,6 +80,16 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
+	// For new collections (CollectionId = 0), we need to create a temporary collection to validate invariants
+	if msg.CollectionId.IsZero() && msg.Invariants != nil && msg.Invariants.NoCustomOwnershipTimes {
+		tempCollection := &BadgeCollection{
+			Invariants: msg.Invariants,
+		}
+		if err := ValidateCollectionApprovalsWithInvariants(ctx, msg.CollectionApprovals, canChangeValues, tempCollection); err != nil {
+			return err
+		}
+	}
+
 	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
 		return err
 	}

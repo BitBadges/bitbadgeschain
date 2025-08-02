@@ -23,6 +23,7 @@ var (
 	DynamicStoreKey         = []byte{0x0D}
 	NextDynamicStoreIdKey   = []byte{0x0E}
 	DynamicStoreValueKey    = []byte{0x0F}
+	ETHSignatureTrackerKey  = []byte{0x10}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 
@@ -94,6 +95,14 @@ func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallen
 	address_for_challenge_str := addressForChallenge
 	challenge_level_str := approvalLevel
 	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
+}
+
+func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, signature string) string {
+	collection_id_str := collectionId.String()
+	challenge_id_str := challengeId
+	address_for_challenge_str := addressForChallenge
+	challenge_level_str := approvalLevel
+	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + signature
 }
 
 // Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.
@@ -181,5 +190,12 @@ func dynamicStoreValueStoreKey(storeId sdkmath.Uint, address string) []byte {
 	copy(key, DynamicStoreValueKey)
 	copy(key[len(DynamicStoreValueKey):], []byte(storeId.String()))
 	copy(key[len(DynamicStoreValueKey)+IDLength:], []byte(address))
+	return key
+}
+
+func ethSignatureTrackerStoreKey(ethSignatureTrackerKey string) []byte {
+	key := make([]byte, len(ETHSignatureTrackerKey)+len(ethSignatureTrackerKey))
+	copy(key, ETHSignatureTrackerKey)
+	copy(key[len(ETHSignatureTrackerKey):], []byte(ethSignatureTrackerKey))
 	return key
 }

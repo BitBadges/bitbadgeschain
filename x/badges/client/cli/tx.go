@@ -41,6 +41,8 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdUpdateDynamicStore())
 	cmd.AddCommand(CmdDeleteDynamicStore())
 	cmd.AddCommand(CmdSetDynamicStoreValue())
+	cmd.AddCommand(CmdIncrementStoreValue())
+	cmd.AddCommand(CmdDecrementStoreValue())
 	cmd.AddCommand(CmdSetIncomingApproval())
 	cmd.AddCommand(CmdDeleteIncomingApproval())
 	cmd.AddCommand(CmdSetOutgoingApproval())

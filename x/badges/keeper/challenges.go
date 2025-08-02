@@ -180,6 +180,95 @@ func (k Keeper) HandleMerkleChallenges(
 	return numIncrements, nil
 }
 
+func (k Keeper) HandleETHSignatureChallenges(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	transfer *types.Transfer,
+	approval *types.CollectionApproval,
+	creatorAddress string,
+	approverAddress string,
+	approvalLevel string,
+	simulation bool,
+) error {
+	challenges := approval.ApprovalCriteria.EthSignatureChallenges
+	ethSignatureProofs := transfer.EthSignatureProofs
+
+	for _, challenge := range challenges {
+		if challenge == nil || challenge.Signer == "" {
+			return sdkerrors.Wrapf(types.ErrChallengeTrackerIdIsNil, "challenge is nil or has empty signer")
+		}
+
+		challengeId := challenge.ChallengeTrackerId
+		signerAddress := challenge.Signer
+		hasValidSolution := false
+
+		// We check that 1 of N proofs is valid
+		for _, proof := range ethSignatureProofs {
+			if proof.Nonce == "" || proof.Signature == "" {
+				continue
+			}
+
+			// Verify the signature
+			ethAddress := ethcommon.HexToAddress(signerAddress)
+			signatureString := proof.Nonce + "-" + creatorAddress
+
+			isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
+				ethAddress,
+				[]byte(signatureString),
+				proof.Signature,
+			)
+
+			if !isValid || err != nil {
+				continue
+			}
+
+			// Check if this signature has already been used
+			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Signature)
+			numUsed, exists := k.GetETHSignatureTrackerFromStore(ctx, signatureKey)
+			if !exists {
+				numUsed = sdkmath.NewUint(0)
+			}
+
+			// Each signature can only be used once
+			if numUsed.GT(sdkmath.NewUint(0)) {
+				continue
+			}
+
+			// Increment the usage count if we are doing it for real
+			if !simulation {
+				newNumUsed, err := k.IncrementETHSignatureTrackerInStore(ctx, signatureKey)
+				if err != nil {
+					continue
+				}
+
+				// Currently added for indexer, but note that it is planned to be deprecated
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
+						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+						sdk.NewAttribute("creator", creatorAddress),
+						sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+						sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
+						sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
+						sdk.NewAttribute("signature", fmt.Sprint(proof.Signature)),
+						sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+						sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
+						sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+					),
+				)
+			}
+
+			hasValidSolution = true
+			break
+		}
+
+		if !hasValidSolution {
+			return sdkerrors.Wrapf(ErrNoValidSolutionForChallenge, "invalid ETH signature - signature not provided or already used")
+		}
+	}
+
+	return nil
+}
+
 func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.MerklePathItem) error {
 	hashedMsgLeaf := sha256.Sum256([]byte(leaf))
 	currHash := hashedMsgLeaf[:]

@@ -31,6 +31,7 @@ message MsgCreateCollection {
   repeated IsArchivedTimeline isArchivedTimeline = 14;
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 16;
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 17;
+  CollectionInvariants invariants = 18;
 }
 
 message MsgCreateCollectionResponse {
@@ -51,45 +52,48 @@ For complete transaction examples, see [MsgCreateCollection Examples](../example
 
 ```json
 {
-  "creator": "bb1abc123...",
-  "balancesType": "Standard",
-  "defaultBalances": {
-    "balances": [],
-    "outgoingApprovals": [],
-    "incomingApprovals": [],
-    "autoApproveSelfInitiatedOutgoingTransfers": false,
-    "autoApproveSelfInitiatedIncomingTransfers": true,
-    "autoApproveAllIncomingTransfers": false,
-    "userPermissions": {
-      "canUpdateOutgoingApprovals": [],
-      "canUpdateIncomingApprovals": [],
-      "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
-      "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
-      "canUpdateAutoApproveAllIncomingTransfers": []
+    "creator": "bb1abc123...",
+    "balancesType": "Standard",
+    "defaultBalances": {
+        "balances": [],
+        "outgoingApprovals": [],
+        "incomingApprovals": [],
+        "autoApproveSelfInitiatedOutgoingTransfers": false,
+        "autoApproveSelfInitiatedIncomingTransfers": true,
+        "autoApproveAllIncomingTransfers": false,
+        "userPermissions": {
+            "canUpdateOutgoingApprovals": [],
+            "canUpdateIncomingApprovals": [],
+            "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
+            "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
+            "canUpdateAutoApproveAllIncomingTransfers": []
+        }
+    },
+    "validBadgeIds": [{ "start": "1", "end": "100" }],
+    "collectionPermissions": {
+        "canDeleteCollection": [],
+        "canArchiveCollection": [],
+        "canUpdateOffChainBalancesMetadata": [],
+        "canUpdateStandards": [],
+        "canUpdateCustomData": [],
+        "canUpdateManager": [],
+        "canUpdateCollectionMetadata": [],
+        "canUpdateValidBadgeIds": [],
+        "canUpdateBadgeMetadata": [],
+        "canUpdateCollectionApprovals": []
+    },
+    "managerTimeline": [],
+    "collectionMetadataTimeline": [],
+    "badgeMetadataTimeline": [],
+    "offChainBalancesMetadataTimeline": [],
+    "customDataTimeline": [],
+    "collectionApprovals": [],
+    "standardsTimeline": [],
+    "isArchivedTimeline": [],
+    "mintEscrowCoinsToTransfer": [],
+    "cosmosCoinWrapperPathsToAdd": [],
+    "invariants": {
+        "noCustomOwnershipTimes": false
     }
-  },
-  "validBadgeIds": [{"start": "1", "end": "100"}],
-  "collectionPermissions": {
-    "canDeleteCollection": [],
-    "canArchiveCollection": [],
-    "canUpdateOffChainBalancesMetadata": [],
-    "canUpdateStandards": [],
-    "canUpdateCustomData": [],
-    "canUpdateManager": [],
-    "canUpdateCollectionMetadata": [],
-    "canUpdateValidBadgeIds": [],
-    "canUpdateBadgeMetadata": [],
-    "canUpdateCollectionApprovals": []
-  },
-  "managerTimeline": [],
-  "collectionMetadataTimeline": [],
-  "badgeMetadataTimeline": [],
-  "offChainBalancesMetadataTimeline": [],
-  "customDataTimeline": [],
-  "collectionApprovals": [],
-  "standardsTimeline": [],
-  "isArchivedTimeline": [],
-  "mintEscrowCoinsToTransfer": [],
-  "cosmosCoinWrapperPathsToAdd": []
 }
 ```

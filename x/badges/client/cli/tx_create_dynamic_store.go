@@ -3,6 +3,7 @@ package cli
 import (
 	"strconv"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -19,7 +20,7 @@ func CmdCreateDynamicStore() *cobra.Command {
 		Short: "Broadcast message createDynamicStore",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			defaultValue, err := strconv.ParseBool(args[0])
+			defaultValue, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
@@ -31,7 +32,7 @@ func CmdCreateDynamicStore() *cobra.Command {
 
 			msg := types.NewMsgCreateDynamicStore(
 				clientCtx.GetFromAddress().String(),
-				defaultValue,
+				sdkmath.NewUint(defaultValue),
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

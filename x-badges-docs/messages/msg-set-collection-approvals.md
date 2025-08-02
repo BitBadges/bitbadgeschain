@@ -67,6 +67,7 @@ bitbadgeschaind tx badges set-collection-approvals '[tx-json]' --from manager-ke
             "approvalCriteria": {
                 "mustOwnBadges": [],
                 "merkleChallenges": [],
+                "ethSignatureChallenges": [],
                 "coinTransfers": [],
                 "predeterminedBalances": null,
                 "approvalAmounts": null,

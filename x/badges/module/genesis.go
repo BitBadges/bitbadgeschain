@@ -88,6 +88,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(err)
 		}
 	}
+
+	// Initialize ETH signature trackers
+	for idx, numUsed := range genState.EthSignatureTrackers {
+		if err := k.SetETHSignatureTrackerInStore(ctx, genState.EthSignatureTrackerStoreKeys[idx], numUsed); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -118,6 +125,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	// Export dynamic store values
 	genesis.DynamicStoreValues = k.GetAllDynamicStoreValuesFromStore(ctx)
+
+	// Export ETH signature trackers
+	genesis.EthSignatureTrackers, genesis.EthSignatureTrackerStoreKeys = k.GetETHSignatureTrackersFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

@@ -8,6 +8,7 @@ This directory contains detailed documentation for all message types supported b
 
 -   [MsgCreateCollection](./msg-create-collection.md) - Create new badge collection
 -   [MsgUpdateCollection](./msg-update-collection.md) - Update existing collection properties
+-   [MsgUniversalUpdateCollection](./msg-universal-update-collection.md) - Universal create/update interface with invariants support
 -   [MsgDeleteCollection](./msg-delete-collection.md) - Archive/delete collection
 
 ### Helper Collection Update Messages
@@ -40,14 +41,15 @@ This directory contains detailed documentation for all message types supported b
 
 ### Dynamic Store Management
 
--   [MsgCreateDynamicStore](./msg-create-dynamic-store.md) - Create boolean flag stores for approval criteria
+-   [MsgCreateDynamicStore](./msg-create-dynamic-store.md) - Create numeric stores for approval criteria
 -   [MsgUpdateDynamicStore](./msg-update-dynamic-store.md) - Update dynamic store configuration
 -   [MsgDeleteDynamicStore](./msg-delete-dynamic-store.md) - Delete dynamic store
 -   [MsgSetDynamicStoreValue](./msg-set-dynamic-store-value.md) - Set individual address values in dynamic store
+-   [MsgIncrementStoreValue](./msg-increment-store-value.md) - Increase values for addresses
+-   [MsgDecrementStoreValue](./msg-decrement-store-value.md) - Decrease values for addresses
 
 ## Additional Message Types
 
 The following message types exist in the protocol but may be documented separately:
 
--   **MsgUniversalUpdateCollection** - Legacy unified create/update interface
 -   **MsgUpdateParams** - Update module parameters via governance

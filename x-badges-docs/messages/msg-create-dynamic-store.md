@@ -1,13 +1,13 @@
 # MsgCreateDynamicStore
 
-Creates a new dynamic store for boolean key-value storage.
+Creates a new dynamic store for numeric key-value storage.
 
 ## Proto Definition
 
 ```protobuf
 message MsgCreateDynamicStore {
   string creator = 1; // Address creating the dynamic store
-  bool defaultValue = 2; // Default value for uninitialized addresses
+  string defaultValue = 2; // Default numeric value for uninitialized addresses
 }
 
 message MsgCreateDynamicStoreResponse {
@@ -26,6 +26,6 @@ bitbadgeschaind tx badges create-dynamic-store [default-value] --from creator-ke
 ```json
 {
   "creator": "bb1...",
-  "defaultValue": false
+  "defaultValue": "0"
 }
 ```

@@ -30,5 +30,7 @@ message GenesisState {
   repeated DynamicStore dynamicStores = 14;
   string nextDynamicStoreId = 15 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated DynamicStoreValue dynamicStoreValues = 16;
+  repeated string ethSignatureTrackers = 17 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string ethSignatureTrackerStoreKeys = 18;
   // this line is used by starport scaffolding # genesis/proto/state
 }

@@ -17,20 +17,20 @@ func TestKeeper_MsgUpdateDynamicStore(t *testing.T) {
 	wctx := sdk.WrapSDKContext(ctx)
 
 	creator := "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q"
-	msgCreate := types.NewMsgCreateDynamicStore(creator, false)
+	msgCreate := types.NewMsgCreateDynamicStore(creator, sdkmath.NewUint(0))
 	resp, err := suite.msgServer.CreateDynamicStore(wctx, msgCreate)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	msg := types.NewMsgUpdateDynamicStore(creator, resp.StoreId, false)
+	msg := types.NewMsgUpdateDynamicStore(creator, resp.StoreId, sdkmath.NewUint(0))
 	_, err = suite.msgServer.UpdateDynamicStore(wctx, msg)
 	require.NoError(t, err)
 
-	msg = types.NewMsgUpdateDynamicStore("", resp.StoreId, false)
+	msg = types.NewMsgUpdateDynamicStore("", resp.StoreId, sdkmath.NewUint(0))
 	_, err = suite.msgServer.UpdateDynamicStore(wctx, msg)
 	require.Error(t, err)
 
-	msg = types.NewMsgUpdateDynamicStore(creator, sdkmath.NewUint(0), false)
+	msg = types.NewMsgUpdateDynamicStore(creator, sdkmath.NewUint(0), sdkmath.NewUint(0))
 	_, err = suite.msgServer.UpdateDynamicStore(wctx, msg)
 	require.Error(t, err)
 }

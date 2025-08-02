@@ -139,6 +139,12 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 				return nil, err
 			}
 			return json.Marshal(badgeTypes.QueryGetChallengeTrackerResponse{NumUsed: res.NumUsed})
+		case custom.QueryGetETHSignatureTracker != nil:
+			res, err := keeper.GetETHSignatureTracker(ctx, custom.QueryGetETHSignatureTracker)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(badgeTypes.QueryGetETHSignatureTrackerResponse{NumUsed: res.NumUsed})
 		}
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
@@ -150,6 +156,7 @@ type badgeCustomQuery struct {
 	QueryAddressList         *badgeTypes.QueryGetAddressListRequest      `json:"queryAddressList,omitempty"`
 	QueryApprovalTracker     *badgeTypes.QueryGetApprovalTrackerRequest  `json:"queryApprovalTracker,omitempty"`
 	QueryGetChallengeTracker *badgeTypes.QueryGetChallengeTrackerRequest `json:"queryGetChallengeTracker,omitempty"`
+	QueryGetETHSignatureTracker *badgeTypes.QueryGetETHSignatureTrackerRequest `json:"queryGetETHSignatureTracker,omitempty"`
 }
 
 type anchorCustomQuery struct {

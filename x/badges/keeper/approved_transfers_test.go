@@ -786,7 +786,10 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
 
-const ProtocolFee = 100000000
+// ProtocolFee is now calculated as 0.5% of the transfer amount
+// For 100 ubadge: 0.5% = 0.5, rounded down to 0
+// For 200 ubadge: 0.5% = 1
+// For 300 ubadge: 0.5% = 1.5, rounded down to 1
 
 func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -837,7 +840,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-100-ProtocolFee), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-100-0), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 
 }
@@ -952,7 +955,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-200-ProtocolFee), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-200-1), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "ubadge").Amount, "Error deducting outgoing approvals")
 }
@@ -1065,7 +1068,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-300-(ProtocolFee*2)), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-300-1), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "ubadge").Amount, "Error deducting outgoing approvals")
 }
@@ -1178,7 +1181,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-300-(ProtocolFee*2)), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-300-1), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "ubadge").Amount, "Error deducting outgoing approvals")
 }
@@ -1678,7 +1681,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 				OverridesFromOutgoingApprovals: true,
 				OverridesToIncomingApprovals:   true,
 				MaxNumTransfers: &types.MaxNumTransfers{
-					OverallMaxNumTransfers: sdkmath.NewUint(3), 
+					OverallMaxNumTransfers: sdkmath.NewUint(3),
 					AmountTrackerId:        "tracker1",
 				},
 				AutoDeletionOptions: &types.AutoDeletionOptions{

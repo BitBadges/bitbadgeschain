@@ -515,7 +515,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						numTrue++
 					}
 
-					if numTrue > 1 {
+					if numTrue != 1 {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
 					}
 
@@ -628,6 +628,25 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 	return nil
 }
 
+// ValidateCollectionApprovalsWithInvariants validates collection approvals and checks invariants
+func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool, collection *BadgeCollection) error {
+	// First validate the basic collection approvals
+	if err := ValidateCollectionApprovals(ctx, collectionApprovals, canChangeValues); err != nil {
+		return err
+	}
+
+	// Check invariants if collection is provided
+	if collection != nil && collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
+		for _, collectionApproval := range collectionApprovals {
+			if err := ValidateNoCustomOwnershipTimesInvariant(collectionApproval.OwnershipTimes, true); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func IsManualBalancesBasicallyNil(manualBalances []*ManualBalances) bool {
 	return manualBalances == nil || len(manualBalances) == 0
 }
@@ -731,6 +750,25 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 	}
 
 	return balances, nil
+}
+
+// ValidateTransferWithInvariants validates a transfer and checks invariants
+func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *BadgeCollection) error {
+	// First validate the basic transfer
+	if err := ValidateTransfer(ctx, transfer, canChangeValues); err != nil {
+		return err
+	}
+
+	// Check invariants if collection is provided
+	if collection != nil && collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
+		for _, balance := range transfer.Balances {
+			if err := ValidateNoCustomOwnershipTimesInvariant(balance.OwnershipTimes, true); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool) error {
@@ -839,6 +877,29 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool)
 				badgeMetadata.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)
 			}
 		}
+	}
+
+	return nil
+}
+
+// IsFullOwnershipTimesRange checks if the ownership times represent a full range from 1 to MaxUint64
+func IsFullOwnershipTimesRange(ownershipTimes []*UintRange) bool {
+	if len(ownershipTimes) != 1 {
+		return false
+	}
+
+	range_ := ownershipTimes[0]
+	return range_.Start.Equal(sdkmath.NewUint(1)) && range_.End.Equal(sdkmath.NewUint(math.MaxUint64))
+}
+
+// ValidateNoCustomOwnershipTimesInvariant validates that all ownership times are full ranges when the invariant is enabled
+func ValidateNoCustomOwnershipTimesInvariant(ownershipTimes []*UintRange, invariantEnabled bool) error {
+	if !invariantEnabled {
+		return nil
+	}
+
+	if !IsFullOwnershipTimesRange(ownershipTimes) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "noCustomOwnershipTimes invariant is enabled: ownership times must be full range [{ start: 1, end: 18446744073709551615 }]")
 	}
 
 	return nil

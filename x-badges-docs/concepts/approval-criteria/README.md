@@ -36,6 +36,8 @@ export interface iApprovalCriteria<T extends NumberType> {
     userRoyalties?: iUserRoyalties<T>;
     /** The list of dynamic store challenges that the initiator must pass for approval. */
     dynamicStoreChallenges?: iDynamicStoreChallenge<T>[];
+    /** The list of ETH signature challenges that require valid Ethereum signatures for approval. */
+    ethSignatureChallenges?: iETHSignatureChallenge<T>[];
 }
 ```
 
@@ -46,7 +48,8 @@ export interface iApprovalCriteria<T extends NumberType> {
 -   **[Max Number of Transfers](max-number-of-transfers.md)** - Transfer count limits
 -   **[Predetermined Balances](predetermined-balances.md)** - Exact balance requirements
 -   **[Merkle Challenges](merkle-challenges.md)** - Cryptographic proof requirements
--   **[Dynamic Store Challenges](dynamic-store-challenges.md)** - On-chain boolean checks
+-   **[Dynamic Store Challenges](dynamic-store-challenges.md)** - On-chain numeric checks
+-   **[ETH Signature Challenges](eth-signature-challenges.md)** - Ethereum signature requirements
 -   **[Badge Ownership](badge-ownership.md)** - Required badge holdings
 -   **[$BADGE Transfers](usdbadge-transfers.md)** - Automatic token transfers
 -   **[Overrides](overrides.md)** - Bypassing user-level approvals

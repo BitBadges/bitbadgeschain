@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -16,12 +17,12 @@ func TestKeeper_MsgCreateDynamicStore(t *testing.T) {
 	wctx := sdk.WrapSDKContext(ctx)
 
 	creator := "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q"
-	msg := types.NewMsgCreateDynamicStore(creator, false)
+	msg := types.NewMsgCreateDynamicStore(creator, sdkmath.NewUint(0))
 	resp, err := suite.msgServer.CreateDynamicStore(wctx, msg)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	msg = types.NewMsgCreateDynamicStore("", false)
+	msg = types.NewMsgCreateDynamicStore("", sdkmath.NewUint(0))
 	_, err = suite.msgServer.CreateDynamicStore(wctx, msg)
 	require.Error(t, err)
 }

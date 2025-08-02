@@ -305,6 +305,12 @@ const isValidProof = proofObj && proofObj.length === tree.getLayerCount() - 1;
 const leafSignature = signLeaf(leaf + '-' + chain.bitbadgesAddress);
 ```
 
+## Comparison with ETH Signature Challenges
+
+Merkle challenges and ETH signature challenges are very similar. The main difference is that Merkle challenges must also check that the signed message was pre-committed to in the tree, whereas ETH signature challenges only need to check that the signature is valid and not used before.
+
+For more information, see [ETH Signature Challenges](eth-signature-challenges.md).
+
 ## Best Practices
 
 ### Design Considerations

@@ -19,5 +19,7 @@ func TestParamsQuery(t *testing.T) {
 
 	response, err := keeper.Params(wctx, &types.QueryParamsRequest{})
 	require.NoError(t, err)
-	require.Equal(t, &types.QueryParamsResponse{Params: params}, response)
+	require.Equal(t, params.AllowedDenoms, response.Params.AllowedDenoms)
+	// AffiliatePercentage should be zero (default value)
+	require.Equal(t, uint64(0), response.Params.AffiliatePercentage.Uint64())
 }

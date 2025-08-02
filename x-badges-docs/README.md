@@ -29,6 +29,7 @@ const res = await BitBadgesApi.getBadgeMetadata(1, 5);
 
 -   [MsgCreateCollection](./messages/msg-create-collection.md) - Create new badge collection
 -   [MsgUpdateCollection](./messages/msg-update-collection.md) - Update existing collection
+-   [MsgUniversalUpdateCollection](./messages/msg-universal-update-collection.md) - Universal create/update interface with invariants support
 -   [MsgDeleteCollection](./messages/msg-delete-collection.md) - Delete collection
 
 ### Badge Transfers
@@ -46,6 +47,8 @@ const res = await BitBadgesApi.getBadgeMetadata(1, 5);
 -   [MsgUpdateDynamicStore](./messages/msg-update-dynamic-store.md) - Update dynamic store properties
 -   [MsgDeleteDynamicStore](./messages/msg-delete-dynamic-store.md) - Delete dynamic store
 -   [MsgSetDynamicStoreValue](./messages/msg-set-dynamic-store-value.md) - Set address-specific store values
+-   [MsgIncrementStoreValue](./messages/msg-increment-store-value.md) - Increase values for addresses
+-   [MsgDecrementStoreValue](./messages/msg-decrement-store-value.md) - Decrease values for addresses
 -   [More messages...](./messages/) - See full message reference
 
 ## Query Reference

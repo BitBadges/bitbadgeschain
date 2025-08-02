@@ -17,6 +17,7 @@ import (
 	accountkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	distributionkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 
@@ -42,6 +43,8 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	bankKeeper := bankkeeper.NewBaseKeeper(appCodec, runtime.NewKVStoreService(storeKey), ak, map[string]bool{}, authority.String(), log.NewNopLogger())
 
+	dk := distributionkeeper.Keeper{}
+
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
@@ -49,10 +52,9 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		bankKeeper,
 		ak,
+		dk,  // DistributionKeeper
 		nil, // IBCKeeperFn
 		nil, // CapabilityScopedFn
-		"",
-		"",
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

@@ -4,16 +4,16 @@ Updates an existing badge collection's properties.
 
 ## Update Flag Pattern
 
-This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateValidBadgeIds`, `updateCollectionPermissions`). 
+This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateValidBadgeIds`, `updateCollectionPermissions`).
 
-- **If update flag is `true`**: The corresponding value field is processed and the collection is updated with the new value
-- **If update flag is `false`**: The corresponding value field is completely ignored, regardless of what data is provided
+-   **If update flag is `true`**: The corresponding value field is processed and the collection is updated with the new value
+-   **If update flag is `false`**: The corresponding value field is completely ignored, regardless of what data is provided
 
 This allows you to update only specific fields without affecting others, and you can safely leave unused value fields empty or with placeholder data.
 
 ## Authorization & Permissions
 
-Updates can only be performed by the **current manager** of the collection. All updates must obey the previously set permissions - meaning the permission settings that were in effect *before* this message was started.
+Updates can only be performed by the **current manager** of the collection. All updates must obey the previously set permissions - meaning the permission settings that were in effect _before_ this message was started.
 
 **Important**: If you update the permissions in the current message, those new permissions are applied last and will not be applicable until the following transaction. This prevents circumventing permission restrictions within the same transaction.
 
@@ -45,6 +45,7 @@ message MsgUpdateCollection {
   repeated IsArchivedTimeline isArchivedTimeline = 28;
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 29;
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 30;
+  CollectionInvariants invariants = 31;
 }
 
 message MsgUpdateCollectionResponse {
@@ -60,42 +61,46 @@ bitbadgeschaind tx badges update-collection '[tx-json]' --from manager-key
 ```
 
 ### JSON Example
+
 ```json
 {
-  "creator": "bb1abc123...",
-  "collectionId": "1",
-  "updateValidBadgeIds": true,
-  "validBadgeIds": [{"start": "1", "end": "200"}],
-  "updateCollectionPermissions": false,
-  "collectionPermissions": {
-    "canDeleteCollection": [],
-    "canArchiveCollection": [],
-    "canUpdateOffChainBalancesMetadata": [],
-    "canUpdateStandards": [],
-    "canUpdateCustomData": [],
-    "canUpdateManager": [],
-    "canUpdateCollectionMetadata": [],
-    "canUpdateValidBadgeIds": [],
-    "canUpdateBadgeMetadata": [],
-    "canUpdateCollectionApprovals": []
-  },
-  "updateManagerTimeline": false,
-  "managerTimeline": [],
-  "updateCollectionMetadataTimeline": false,
-  "collectionMetadataTimeline": [],
-  "updateBadgeMetadataTimeline": false,
-  "badgeMetadataTimeline": [],
-  "updateOffChainBalancesMetadataTimeline": false,
-  "offChainBalancesMetadataTimeline": [],
-  "updateCustomDataTimeline": false,
-  "customDataTimeline": [],
-  "updateCollectionApprovals": false,
-  "collectionApprovals": [],
-  "updateStandardsTimeline": false,
-  "standardsTimeline": [],
-  "updateIsArchivedTimeline": false,
-  "isArchivedTimeline": [],
-  "mintEscrowCoinsToTransfer": [],
-  "cosmosCoinWrapperPathsToAdd": []
+    "creator": "bb1abc123...",
+    "collectionId": "1",
+    "updateValidBadgeIds": true,
+    "validBadgeIds": [{ "start": "1", "end": "200" }],
+    "updateCollectionPermissions": false,
+    "collectionPermissions": {
+        "canDeleteCollection": [],
+        "canArchiveCollection": [],
+        "canUpdateOffChainBalancesMetadata": [],
+        "canUpdateStandards": [],
+        "canUpdateCustomData": [],
+        "canUpdateManager": [],
+        "canUpdateCollectionMetadata": [],
+        "canUpdateValidBadgeIds": [],
+        "canUpdateBadgeMetadata": [],
+        "canUpdateCollectionApprovals": []
+    },
+    "updateManagerTimeline": false,
+    "managerTimeline": [],
+    "updateCollectionMetadataTimeline": false,
+    "collectionMetadataTimeline": [],
+    "updateBadgeMetadataTimeline": false,
+    "badgeMetadataTimeline": [],
+    "updateOffChainBalancesMetadataTimeline": false,
+    "offChainBalancesMetadataTimeline": [],
+    "updateCustomDataTimeline": false,
+    "customDataTimeline": [],
+    "updateCollectionApprovals": false,
+    "collectionApprovals": [],
+    "updateStandardsTimeline": false,
+    "standardsTimeline": [],
+    "updateIsArchivedTimeline": false,
+    "isArchivedTimeline": [],
+    "mintEscrowCoinsToTransfer": [],
+    "cosmosCoinWrapperPathsToAdd": [],
+    "invariants": {
+        "noCustomOwnershipTimes": false
+    }
 }
 ```

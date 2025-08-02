@@ -80,6 +80,10 @@ message BadgeCollection {
 
   // The IBC wrapper (sdk.coin) paths for the collection.
   repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
+
+  // Collection-level invariants that cannot be broken.
+  // These are set upon genesis and cannot be modified.
+  CollectionInvariants invariants = 18;
 }
 
 message CosmosCoinWrapperPath {
@@ -94,4 +98,11 @@ message DenomUnit {
   string decimals = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string symbol = 2;
   bool isDefaultDisplay = 3;
+}
+
+// CollectionInvariants defines the invariants that apply to a collection.
+message CollectionInvariants {
+  // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
+  // This prevents time-based restrictions on badge ownership.
+  bool noCustomOwnershipTimes = 1;
 }

@@ -1,6 +1,6 @@
 # MsgSetDynamicStoreValue
 
-Sets a boolean value for a specific address in a dynamic store.
+Sets a numeric value for a specific address in a dynamic store.
 
 ## Proto Definition
 
@@ -9,7 +9,7 @@ message MsgSetDynamicStoreValue {
   string creator = 1; // Address setting the value (must be store creator)
   string storeId = 2; // ID of the dynamic store
   string address = 3; // Address to set the value for
-  bool value = 4; // Boolean value to set (true/false)
+  string value = 4; // Numeric value to set
 }
 
 message MsgSetDynamicStoreValueResponse {}
@@ -28,6 +28,6 @@ bitbadgeschaind tx badges set-dynamic-store-value [store-id] [address] [value] -
   "creator": "bb1...",
   "storeId": "1",
   "address": "bb1...",
-  "value": true
+  "value": "100"
 }
 ```

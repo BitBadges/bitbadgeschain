@@ -131,6 +131,7 @@ This example demonstrates creating a quest collection.
                             "leafSigner": "0xa612B14Ff99DAe9FBC9613bF4553781086c5F887"
                         }
                     ],
+                    "ethSignatureChallenges": [],
                     "predeterminedBalances": {
                         "manualBalances": [],
                         "incrementedBalances": {

@@ -94,6 +94,31 @@ message MerkleChallenge {
   string leafSigner = 8;
 }
 
+/*
+  ETHSignatureChallenge defines a rule for the approval in the form of an Ethereum signature challenge.
+
+  An ETH signature challenge is a challenge where the user must provide a valid Ethereum signature for a specific nonce.
+  The signature scheme is ETHSign(nonce + "-" + creatorAddress) and each signature can only be used once.
+  All challenges must be met with valid solutions for the transfer to be approved.
+
+  IMPORTANT: We track the usage of each signature to prevent replay attacks. Each signature can only be used once.
+  If you update the challenge ID, then the used signatures tracker will reset and start a new tally.
+  We recommend using a unique challenge ID for each challenge to prevent overlap and unexpected behavior.
+*/
+message ETHSignatureChallenge {
+  // The Ethereum address that must sign the nonce for verification.
+  string signer = 1;
+
+  // The ID of this ETH signature challenge for tracking the number of uses per signature.
+  string challengeTrackerId = 2;
+
+  // The URI associated with this ETH signature challenge, optionally providing metadata about the challenge.
+  string uri = 3;
+
+  // Arbitrary custom data associated with this ETH signature challenge.
+  string customData = 4;
+}
+
 
 // UserOutgoingApproval defines the rules for the approval of an outgoing transfer from a user.
 message UserOutgoingApproval {
@@ -435,6 +460,8 @@ message ApprovalCriteria {
   repeated MustOwnBadges mustOwnBadges = 14;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
+  // ETH signature challenges that the initiator must pass for approval.
+  repeated ETHSignatureChallenge ethSignatureChallenges = 16;
 }
 
 // UserRoyalties defines the royalties for a user.
@@ -470,6 +497,8 @@ message OutgoingApprovalCriteria {
   repeated MustOwnBadges mustOwnBadges = 9;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
+  // ETH signature challenges that the initiator must pass for approval.
+  repeated ETHSignatureChallenge ethSignatureChallenges = 11;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -497,6 +526,8 @@ message IncomingApprovalCriteria {
   repeated MustOwnBadges mustOwnBadges = 9;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
+  // ETH signature challenges that the initiator must pass for approval.
+  repeated ETHSignatureChallenge ethSignatureChallenges = 11;
 }
 
 
@@ -553,29 +584,31 @@ message Transfer {
   ApprovalIdentifierDetails precalculateBalancesFromApproval = 4;
   // The Merkle proofs / solutions for all Merkle challenges required for the transfer.
   repeated MerkleProof merkleProofs = 5;
+  // The ETH signature proofs / solutions for all ETH signature challenges required for the transfer.
+  repeated ETHSignatureProof ethSignatureProofs = 6;
   // The memo for the transfer.
-  string memo = 6;
+  string memo = 7;
   // The prioritized approvals for the transfer. By default, we scan linearly through the approvals and use the first match.
   // This field can be used to prioritize specific approvals and scan through them first.
-  repeated ApprovalIdentifierDetails prioritizedApprovals = 7;
+  repeated ApprovalIdentifierDetails prioritizedApprovals = 8;
   // Whether to only check prioritized approvals for the transfer. 
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
-  bool onlyCheckPrioritizedCollectionApprovals = 8;
+  bool onlyCheckPrioritizedCollectionApprovals = 9;
   // Whether to only check prioritized approvals for the transfer. 
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
-  bool onlyCheckPrioritizedIncomingApprovals = 9;
+  bool onlyCheckPrioritizedIncomingApprovals = 10;
   // Whether to only check prioritized approvals for the transfer. 
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
-  bool onlyCheckPrioritizedOutgoingApprovals = 10;
+  bool onlyCheckPrioritizedOutgoingApprovals = 11;
   // The options for precalculating the balances.
-  PrecalculationOptions precalculationOptions = 11;
+  PrecalculationOptions precalculationOptions = 12;
   // Affiliate address for the transfer.
-  string affiliateAddress = 12;
+  string affiliateAddress = 13;
   // The number of times to attempt approval validation. If 0 / not specified, we default to only one.
-  string numAttempts = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string numAttempts = 14 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // PrecalculationOptions defines the options for precalculating the balances.
@@ -602,4 +635,12 @@ message MerkleProof {
   repeated MerklePathItem aunts = 2;
   // The signature of the leaf node tying the address to the leaf node.
   string leafSignature = 3;
+}
+
+// ETHSignatureProof represents an Ethereum signature proof for a challenge.
+message ETHSignatureProof {
+  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + creatorAddress).
+  string nonce = 1;
+  // The Ethereum signature of the nonce.
+  string signature = 2;
 }

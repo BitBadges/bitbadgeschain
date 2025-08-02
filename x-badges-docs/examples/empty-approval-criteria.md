@@ -62,6 +62,12 @@ const EmptyApprovalCriteria = {
         },
         // No coin transfers to execute
         coinTransfers: [],
+
+        // No ETH signature challenges to be completed
+        ethSignatureChallenges: [],
+        // No dynamic store challenges to be completed
+        dynamicStoreChallenges: [],
+
         // No address matching requirements
         requireToEqualsInitiatedBy: false,
         requireFromEqualsInitiatedBy: false,

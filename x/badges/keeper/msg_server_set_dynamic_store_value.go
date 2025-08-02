@@ -45,12 +45,7 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 			sdk.NewAttribute("msg_type", "set_dynamic_store_value"),
 			sdk.NewAttribute("store_id", msg.StoreId.String()),
 			sdk.NewAttribute("address", msg.Address),
-			sdk.NewAttribute("value", func() string {
-				if msg.Value {
-					return "1"
-				}
-				return "0"
-			}()),
+			sdk.NewAttribute("value", msg.Value.String()),
 		),
 	)
 

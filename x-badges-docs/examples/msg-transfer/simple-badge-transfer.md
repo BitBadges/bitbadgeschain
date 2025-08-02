@@ -50,6 +50,7 @@ This transfer creates badge ID 1 from collection 20 and sends it to the creator 
                     "version": "0"
                 },
                 "merkleProofs": [],
+                "ethSignatureProofs": [],
                 "memo": "",
                 "prioritizedApprovals": [
                     {
@@ -95,6 +96,7 @@ This transfer creates badge ID 1 from collection 20 and sends it to the creator 
 ### Additional Settings
 
 -   `"merkleProofs": []` - No merkle proofs required for this simple transfer
+-   `"ethSignatureProofs": []` - No ETH signature proofs required for this simple transfer
 -   `"memo": ""` - No memo attached
 -   `"numAttempts": "1"` - Single transfer attempt
 

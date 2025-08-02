@@ -33,6 +33,7 @@ This transfer creates badges from collection 20 and sends them to the creator ad
                     "version": "0"
                 },
                 "merkleProofs": [],
+                "ethSignatureProofs": [],
                 "memo": "",
                 "prioritizedApprovals": [
                     {
@@ -84,7 +85,7 @@ This example demonstrates "prioritized non-auto-scan" behavior where:
 -   Only the specified approval is checked (no automatic scanning of other approvals)
 -   The system doesn't automatically look for other valid approvals
 -   Transfer is limited to what the specified approval allows
--   Can use approvals with side effects and custom criteria like merkle challenges
+-   Can use approvals with side effects and custom criteria like merkle challenges and ETH signature challenges
 -   Shows proper versioning of approvals
 
 ## Usage

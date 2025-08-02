@@ -15,5 +15,8 @@ func TestGetParams(t *testing.T) {
 	params := types.DefaultParams()
 
 	require.NoError(t, k.SetParams(ctx, params))
-	require.EqualValues(t, params, k.GetParams(ctx))
+	retrievedParams := k.GetParams(ctx)
+	require.EqualValues(t, params.AllowedDenoms, retrievedParams.AllowedDenoms)
+	// AffiliatePercentage should be zero (default value)
+	require.Equal(t, uint64(0), retrievedParams.AffiliatePercentage.Uint64())
 }

@@ -1,17 +1,17 @@
 # Dynamic Store Challenges
 
-Require transfer initiators to pass boolean checks against dynamic stores. Typically, these are used with smart contracts.
+Require transfer initiators to pass checks against dynamic stores. Typically, these are used with smart contracts.
 
-Dynamic stores are simply standalone (address -> approved) stores. They are controlled by whoever creates them. These are powerful for creating dynamic approval criteria with smart contracts and other custom use cases.
+Dynamic stores are simply standalone (address -> number) stores where the number is the amount of uses an initiator has left. They are controlled by whoever creates them. These are powerful for creating dynamic approval criteria with smart contracts and other custom use cases.
 
 ## How It Works
 
-Dynamic store challenges check if the transfer initiator has a `true` value in specified dynamic stores. The system:
+Dynamic store challenges check if the transfer initiator has a value greater than 0 in specified dynamic stores. The system:
 
 1. **Checks Initiator**: Looks up the initiator's address in the specified dynamic store
-2. **Evaluates Boolean**: Returns `true` or `false` for the initiator
-3. **Requires All True**: All challenges must return `true` for approval
-4. **Fails if Any False**: If any challenge returns `false`, transfer is denied
+2. **Evaluates Number**: Returns the numeric value for the initiator
+3. **Requires All > 0**: All challenges must return a value greater than 0 for approval
+4. **Fails if Any ≤ 0**: If any challenge returns 0 or less, transfer is denied
 
 ## Interface
 
@@ -26,8 +26,8 @@ interface DynamicStoreChallenge<T extends NumberType> {
 ```json
 {
     "dynamicStoreChallenges": [
-        { "storeId": "1" }, // Member status store
-        { "storeId": "2" } // Subscription status store
+        { "storeId": "1" }, // Member points store (must have > 0 points)
+        { "storeId": "2" } // Subscription level store (must have > 0 level)
     ]
 }
 ```
@@ -36,16 +36,27 @@ interface DynamicStoreChallenge<T extends NumberType> {
 
 ### Creating Stores
 
-Use [MsgCreateDynamicStore](../../messages/msg-create-dynamic-store.md) to create new dynamic stores with default boolean values.
+Use [MsgCreateDynamicStore](../../messages/msg-create-dynamic-store.md) to create new dynamic stores with default numeric values.
 
 ### Setting Values
 
-Use [MsgSetDynamicStoreValue](../../messages/msg-set-dynamic-store-value.md) to set boolean values for specific addresses.
+Use [MsgSetDynamicStoreValue](../../messages/msg-set-dynamic-store-value.md) to set numeric values for specific addresses.
+
+### Incrementing Values
+
+Use [MsgIncrementStoreValue](../../messages/msg-increment-store-value.md) to increase values for specific addresses.
+
+### Decrementing Values
+
+Use [MsgDecrementStoreValue](../../messages/msg-decrement-store-value.md) to decrease values for specific addresses.
 
 ### Querying Values
 
 Use [GetDynamicStoreValue](../../queries/get-dynamic-store-value.md) to check current values for addresses.
 
-## Alternative
+## Alternatives
 
-For fully off-chain solutions, consider [Merkle Challenges](merkle-challenges.md) to save gas costs.
+For fully off-chain solutions, consider:
+
+-   [Merkle Challenges](merkle-challenges.md) to save gas costs
+-   [ETH Signature Challenges](eth-signature-challenges.md) for direct authorization

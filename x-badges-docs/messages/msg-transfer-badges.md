@@ -25,29 +25,31 @@ message Transfer {
   ApprovalIdentifierDetails precalculateBalancesFromApproval = 4;
   // The Merkle proofs / solutions for all Merkle challenges required for the transfer.
   repeated MerkleProof merkleProofs = 5;
+  // The ETH signature proofs / solutions for all ETH signature challenges required for the transfer.
+  repeated ETHSignatureProof ethSignatureProofs = 6;
   // The memo for the transfer.
-  string memo = 6;
+  string memo = 7;
   // The prioritized approvals for the transfer. By default, we scan linearly through the approvals and use the first match.
   // This field can be used to prioritize specific approvals and scan through them first.
-  repeated ApprovalIdentifierDetails prioritizedApprovals = 7;
+  repeated ApprovalIdentifierDetails prioritizedApprovals = 8;
   // Whether to only check prioritized approvals for the transfer.
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals.
-  bool onlyCheckPrioritizedCollectionApprovals = 8;
+  bool onlyCheckPrioritizedCollectionApprovals = 9;
   // Whether to only check prioritized approvals for the transfer.
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals.
-  bool onlyCheckPrioritizedIncomingApprovals = 9;
+  bool onlyCheckPrioritizedIncomingApprovals = 10;
   // Whether to only check prioritized approvals for the transfer.
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals.
-  bool onlyCheckPrioritizedOutgoingApprovals = 10;
+  bool onlyCheckPrioritizedOutgoingApprovals = 11;
   // The options for precalculating the balances.
-  PrecalculationOptions precalculationOptions = 11;
+  PrecalculationOptions precalculationOptions = 12;
   // Affiliate address for the transfer.
-  string affiliateAddress = 12;
+  string affiliateAddress = 13;
   // The number of times to attempt approval validation. If 0 / not specified, we default to only one.
-  string numAttempts = 13;
+  string numAttempts = 14;
 }
 
 message PrecalculationOptions {
@@ -188,11 +190,21 @@ Transfers fail at the first validation step that doesn't pass:
 3. **Blocked by Sender** - Sender's outgoing approvals reject the transfer
 4. **Blocked by Recipient** - Recipient's incoming approvals reject the transfer
 
+### ETH Signature Proofs
+
+ETH Signature Proofs are required when transfers use [ETH Signature Challenges](../concepts/approval-criteria/eth-signature-challenges.md). Each proof contains:
+
+- **`nonce`**: The unique identifier that was signed
+- **`signature`**: The Ethereum signature of the message `nonce + "-" + creatorAddress`
+
+**Important**: Each signature can only be used once per challenge tracker. The system tracks used signatures to prevent replay attacks.
+
 ### Related Documentation
 
 -   [Transferability / Approvals](../concepts/transferability-approvals.md) - Approval system overview
 -   [Collection Approvals](../concepts/approval-criteria/README.md) - Collection-level controls
 -   [User Approvals](../examples/building-user-approvals.md) - User-level settings
+-   [ETH Signature Challenges](../concepts/approval-criteria/eth-signature-challenges.md) - Ethereum signature requirements
 
 ## Collection ID Auto-Lookup
 
@@ -239,6 +251,13 @@ bitbadgeschaind tx badges transfer-badges '[tx-json]' --from sender-key
             },
             // Supply all merkle proofs for any merkle challenges that need to be satisfied
             "merkleProofs": [],
+            // Supply all ETH signature proofs for any ETH signature challenges that need to be satisfied
+            "ethSignatureProofs": [
+                {
+                    "nonce": "unique-nonce-001",
+                    "signature": "0x..."
+                }
+            ],
             // Memo for the transfer (can be left blank)
             "memo": "",
 

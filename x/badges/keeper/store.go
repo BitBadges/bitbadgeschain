@@ -23,8 +23,23 @@ import (
 
 /****************************************COLLECTIONS****************************************/
 
+// validateCollectionBeforeStore validates a collection before storing it
+func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types.BadgeCollection) error {
+	// Validate collection approvals with invariants
+	if collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
+		if err := types.ValidateCollectionApprovalsWithInvariants(ctx, collection.CollectionApprovals, false, collection); err != nil {
+			return sdkerrors.Wrap(err, "collection approval validation failed")
+		}
+	}
+	return nil
+}
+
 // Sets a badge in the store using BadgeKey ([]byte{0x01}) as the prefix. No check if store has key already.
 func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.BadgeCollection) error {
+	// Validate collection before storing
+	if err := k.validateCollectionBeforeStore(ctx, collection); err != nil {
+		return err
+	}
 	marshaled_badge, err := k.cdc.Marshal(collection)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.BadgeCollection failed")
@@ -80,8 +95,50 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.
 
 /****************************************USER BALANCES****************************************/
 
+// validateUserBalanceBeforeStore validates a user balance before storing it
+func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey string, userBalance *types.UserBalanceStore, collection *types.BadgeCollection) error {
+	// Get collection if not provided
+	if collection == nil {
+		collectionId := GetDetailsFromBalanceKey(balanceKey).collectionId
+		var found bool
+		collection, found = k.GetCollectionFromStore(ctx, collectionId)
+		if !found {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "collection not found for balance validation")
+		}
+	}
+
+	// Check invariants if enabled
+	if collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
+		// Validate incoming approvals
+		for _, incomingApproval := range userBalance.IncomingApprovals {
+			if err := types.ValidateNoCustomOwnershipTimesInvariant(incomingApproval.OwnershipTimes, true); err != nil {
+				return sdkerrors.Wrap(err, "incoming approval ownership times validation failed")
+			}
+		}
+
+		// Validate outgoing approvals
+		for _, outgoingApproval := range userBalance.OutgoingApprovals {
+			if err := types.ValidateNoCustomOwnershipTimesInvariant(outgoingApproval.OwnershipTimes, true); err != nil {
+				return sdkerrors.Wrap(err, "outgoing approval ownership times validation failed")
+			}
+		}
+
+		// Validate balances ownership times
+		for _, balance := range userBalance.Balances {
+			if err := types.ValidateNoCustomOwnershipTimesInvariant(balance.OwnershipTimes, true); err != nil {
+				return sdkerrors.Wrap(err, "balance ownership times validation failed")
+			}
+		}
+	}
+	return nil
+}
+
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
 func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore) error {
+	// Validate user balance before storing
+	if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, UserBalance, nil); err != nil {
+		return err
+	}
 	//HACK: We always store a non-nil permissions object to avoid the case where everything is nil -> marshaled len = 0 -> default balances get populated again
 	if UserBalance.UserPermissions == nil {
 		UserBalance.UserPermissions = &types.UserPermissions{
@@ -535,7 +592,7 @@ func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
 /****************************************DYNAMIC STORE VALUES****************************************/
 
 // Sets a dynamic store value in the store using DynamicStoreValueKey ([]byte{0x0F}) as the prefix.
-func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value bool) error {
+func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value sdkmath.Uint) error {
 	dynamicStoreValue := types.DynamicStoreValue{
 		StoreId: storeId,
 		Address: address,
@@ -607,4 +664,64 @@ func (k Keeper) DeleteDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmat
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(dynamicStoreValueStoreKey(storeId, address))
+}
+
+/****************************************ETH SIGNATURE TRACKERS****************************************/
+
+// SetETHSignatureTrackerInStore sets an ETH signature tracker in the store using ETHSignatureTrackerKey ([]byte{0x10}) as the prefix.
+func (k Keeper) SetETHSignatureTrackerInStore(ctx sdk.Context, key string, numUsed sdkmath.Uint) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(ethSignatureTrackerStoreKey(key), []byte(numUsed.String()))
+	return nil
+}
+
+// GetETHSignatureTrackerFromStore gets an ETH signature tracker from the store.
+func (k Keeper) GetETHSignatureTrackerFromStore(ctx sdk.Context, key string) (sdkmath.Uint, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled_data := store.Get(ethSignatureTrackerStoreKey(key))
+
+	if len(marshaled_data) == 0 {
+		return sdkmath.NewUint(0), false
+	}
+
+	numUsed, err := sdkmath.ParseUint(string(marshaled_data))
+	if err != nil {
+		return sdkmath.NewUint(0), false
+	}
+	return numUsed, true
+}
+
+// GetETHSignatureTrackersFromStore gets all ETH signature trackers from the store.
+func (k Keeper) GetETHSignatureTrackersFromStore(ctx sdk.Context) (numUsed []sdkmath.Uint, ids []string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, ETHSignatureTrackerKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		tracker, err := sdkmath.ParseUint(string(iterator.Value()))
+		if err != nil {
+			continue
+		}
+		numUsed = append(numUsed, tracker)
+		ids = append(ids, string(iterator.Key()[len(ETHSignatureTrackerKey):]))
+	}
+	return
+}
+
+// IncrementETHSignatureTrackerInStore increments the usage count for an ETH signature tracker.
+func (k Keeper) IncrementETHSignatureTrackerInStore(ctx sdk.Context, key string) (sdkmath.Uint, error) {
+	currentNumUsed, exists := k.GetETHSignatureTrackerFromStore(ctx, key)
+	if !exists {
+		currentNumUsed = sdkmath.NewUint(0)
+	}
+
+	newNumUsed := currentNumUsed.Add(sdkmath.NewUint(1))
+	err := k.SetETHSignatureTrackerInStore(ctx, key, newNumUsed)
+	if err != nil {
+		return sdkmath.NewUint(0), err
+	}
+
+	return newNumUsed, nil
 }
