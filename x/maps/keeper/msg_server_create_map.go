@@ -31,7 +31,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 		}
 	}
 
-	//Numeric map IDs are reserved for specific badge collections
+	//Numeric map IDs are reserved for specific collections
 	collId, err := sdkmath.ParseUint(msg.MapId)
 	if err == nil {
 		currCollectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{
@@ -44,7 +44,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 		//Check if user is manager of collection in x/badges
 		currManager := badgetypes.GetCurrentManager(ctx, currCollectionRes.Collection)
 		if currManager != msg.Creator {
-			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Numeric map IDs are reserved for specific badge collections. To create a map for this collection, you must be the manager of the collection")
+			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Numeric map IDs are reserved for specific collections. To create a map for this collection, you must be the manager of the collection")
 		}
 	}
 
