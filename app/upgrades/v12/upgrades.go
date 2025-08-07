@@ -4,7 +4,6 @@ import (
 	"context"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -15,7 +14,7 @@ const (
 )
 
 // This is in a separate function so we can test it locally with a snapshot
-func CustomUpgradeHandlerLogic(ctx context.Context, badgesKeeper keeper.Keeper, wasmKeeper wasmkeeper.Keeper) error {
+func CustomUpgradeHandlerLogic(ctx context.Context, badgesKeeper keeper.Keeper) error {
 	// Run migrations
 	if err := badgesKeeper.MigrateBadgesKeeper(sdk.UnwrapSDKContext(ctx)); err != nil {
 		return err
@@ -30,6 +29,11 @@ func CreateUpgradeHandler(
 	badgesKeeper keeper.Keeper,
 ) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		err := CustomUpgradeHandlerLogic(ctx, badgesKeeper)
+		if err != nil {
+			return nil, err
+		}
+
 		// Run module migrations
 		return mm.RunMigrations(ctx, configurator, fromVM)
 	}

@@ -33,7 +33,6 @@ func (app *App) RegisterUpgradeHandlers() {
 
 	switch upgradeInfo.Name {
 	case v12.UpgradeName:
-		// Add any store upgrades here
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{},
 		}
