@@ -6,7 +6,7 @@ Additional restrictions and conditions that determine whether a transfer is appr
 
 ```typescript
 export interface iApprovalCriteria<T extends NumberType> {
-    /** The $BADGE transfers to be executed upon every approval. */
+    /** The BADGE or other sdk.Coin transfers to be executed upon every approval. */
     coinTransfers?: iCoinTransfer<T>[];
     /** The list of merkle challenges that need valid proofs to be approved. */
     merkleChallenges?: iMerkleChallenge<T>[];
@@ -51,7 +51,7 @@ export interface iApprovalCriteria<T extends NumberType> {
 -   **[Dynamic Store Challenges](dynamic-store-challenges.md)** - On-chain numeric checks
 -   **[ETH Signature Challenges](eth-signature-challenges.md)** - Ethereum signature requirements
 -   **[Token Ownership](badge-ownership.md)** - Required token holdings
--   **[$BADGE Transfers](usdbadge-transfers.md)** - Automatic token transfers
+-   **[Cosmos Coin Transfers](usdbadge-transfers.md)** - Payments per approval (BADGE or other sdk.Coin)
 -   **[Overrides](overrides.md)** - Bypassing user-level approvals
 -   **[Requires](requires.md)** - Address relationship restrictions
 -   **[Auto-Deletion Options](auto-deletion-options.md)** - Automatic approval cleanup

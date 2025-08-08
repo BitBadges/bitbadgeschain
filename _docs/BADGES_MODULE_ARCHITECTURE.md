@@ -4,22 +4,23 @@ This document provides a high-level architectural overview of the BitBadges `x/b
 
 ## Table of Contents
 
-- [Architectural Principles](#architectural-principles)
-- [Core Components](#core-components)
-- [Data Flow Patterns](#data-flow-patterns)
-- [State Management Architecture](#state-management-architecture)
-- [Cross-Chain Integration Architecture](#cross-chain-integration-architecture)
-- [Scalability Considerations](#scalability-considerations)
-- [Security Architecture](#security-architecture)
+-   [Architectural Principles](#architectural-principles)
+-   [Core Components](#core-components)
+-   [Data Flow Patterns](#data-flow-patterns)
+-   [State Management Architecture](#state-management-architecture)
+-   [Cross-Chain Integration Architecture](#cross-chain-integration-architecture)
+-   [Scalability Considerations](#scalability-considerations)
+-   [Security Architecture](#security-architecture)
 
 ## Architectural Principles
 
 ### 1. Timeline-Driven Design
 
 The module is built around the concept that most properties can change over time, providing:
-- **Immutable History**: Once a timeline point has passed, it cannot be modified
-- **Scheduled Changes**: Future property changes can be pre-programmed
-- **Predictable Behavior**: Users can rely on announced future changes
+
+-   **Immutable History**: Once a timeline point has passed, it cannot be modified
+-   **Scheduled Changes**: Future property changes can be pre-programmed
+-   **Predictable Behavior**: Users can rely on announced future changes
 
 ```
 Timeline Architecture:
@@ -53,16 +54,18 @@ Transfer Approval Flow:
 ### 3. Range-Based Efficiency
 
 Everything is expressed as ranges (UintRange) for computational efficiency:
-- Token IDs: `[1-1000]` instead of 1000 individual IDs
-- Time ranges: `[start_time-end_time]` for temporal validity
-- Amount ranges: `[min_amount-max_amount]` for quantities
+
+-   Token IDs: `[1-1000]` instead of 1000 individual IDs
+-   Time ranges: `[start_time-end_time]` for temporal validity
+-   Amount ranges: `[min_amount-max_amount]` for quantities
 
 ### 4. Default Inheritance Pattern
 
 Users inherit collection defaults until they explicitly override them:
-- Minimizes storage requirements
-- Provides consistent default behavior
-- Lazy initialization for state efficiency
+
+-   Minimizes storage requirements
+-   Provides consistent default behavior
+-   Lazy initialization for state efficiency
 
 ## Core Components
 
@@ -76,7 +79,7 @@ type CollectionManager struct {
     ManagerTimeline        []ManagerTimeline
     MetadataTimeline       []CollectionMetadataTimeline
     PermissionsTimeline    []CollectionPermissions
-    
+
     // Static properties
     CollectionId           Uint
     BalanceType           BalanceType
@@ -85,10 +88,11 @@ type CollectionManager struct {
 ```
 
 **Key Functions**:
-- Collection creation and updates
-- Timeline property management
-- Permission enforcement
-- Archive status control
+
+-   Collection creation and updates
+-   Timeline property management
+-   Permission enforcement
+-   Archive status control
 
 ### 2. Balance Engine
 
@@ -98,17 +102,18 @@ type CollectionManager struct {
 type BalanceEngine struct {
     // User balances with full temporal context
     UserBalances map[string]UserBalanceStore
-    
+
     // Collection defaults
     DefaultBalances UserBalanceStore
 }
 ```
 
 **Key Functions**:
-- Balance queries with time filtering
-- Transfer execution and validation
-- Default inheritance resolution
-- Balance versioning for approval invalidation
+
+-   Balance queries with time filtering
+-   Transfer execution and validation
+-   Default inheritance resolution
+-   Balance versioning for approval invalidation
 
 ### 3. Approval Processor
 
@@ -118,9 +123,9 @@ type BalanceEngine struct {
 type ApprovalProcessor struct {
     // Three-tier approval system
     CollectionApprovals   []CollectionApproval
-    OutgoingApprovals     []UserOutgoingApproval  
+    OutgoingApprovals     []UserOutgoingApproval
     IncomingApprovals     []UserIncomingApproval
-    
+
     // Usage tracking
     ApprovalTrackers      map[string]ApprovalTracker
     ChallengeTrackers     map[string]ChallengeTracker
@@ -128,10 +133,11 @@ type ApprovalProcessor struct {
 ```
 
 **Key Functions**:
-- Multi-level approval validation
-- Merkle challenge verification
-- Usage limit enforcement
-- Approval criteria evaluation
+
+-   Multi-level approval validation
+-   Merkle challenge verification
+-   Usage limit enforcement
+-   Approval criteria evaluation
 
 ### 4. Address List Manager
 
@@ -144,9 +150,10 @@ type AddressListManager struct {
 ```
 
 **Key Functions**:
-- Address list creation and management
-- Whitelist/blacklist logic evaluation
-- Address pattern matching (wildcards, etc.)
+
+-   Address list creation and management
+-   Whitelist/blacklist logic evaluation
+-   Address pattern matching (wildcards, etc.)
 
 ### 5. Dynamic Store Engine
 
@@ -160,9 +167,10 @@ type DynamicStoreEngine struct {
 ```
 
 **Key Functions**:
-- Store creation and management
-- Value setting and retrieval
-- Integration with approval criteria
+
+-   Store creation and management
+-   Value setting and retrieval
+-   Integration with approval criteria
 
 ## Data Flow Patterns
 
@@ -281,7 +289,7 @@ Query Request
 ```
 Application Layer
 ├── Collection Management
-├── Balance Tracking  
+├── Balance Tracking
 ├── Approval Processing
 └── Dynamic Stores
 
@@ -304,7 +312,7 @@ Storage Layer
 Prefix-Based Key Structure:
 ┌─────────────────────────────────────────────────┐
 │ 0x01 │ Collections                               │
-├─────────────────────────────────────────────────┤  
+├─────────────────────────────────────────────────┤
 │ 0x02 │ User Balances                             │
 ├─────────────────────────────────────────────────┤
 │ 0x03 │ Address Lists                             │
@@ -327,7 +335,7 @@ userBalanceKey := concat(
     address,              // "bb1abc123..."
 )
 
-// Example: Approval Tracker Key  
+// Example: Approval Tracker Key
 approvalTrackerKey := concat(
     ApprovalTrackerPrefix, // 0x04
     collectionId,          // "1"
@@ -348,24 +356,24 @@ func (k Keeper) ExecuteTransfer(ctx sdk.Context, transfer Transfer) error {
     if err := k.ValidateTransfer(ctx, transfer); err != nil {
         return err
     }
-    
+
     // Phase 2: State modifications (atomic)
     return k.executeInTransaction(ctx, func() error {
         // Update sender balances
         if err := k.UpdateSenderBalance(ctx, transfer); err != nil {
             return err
         }
-        
+
         // Update recipient balances
         if err := k.UpdateRecipientBalance(ctx, transfer); err != nil {
             return err
         }
-        
+
         // Update approval trackers
         if err := k.UpdateApprovalTrackers(ctx, transfer); err != nil {
             return err
         }
-        
+
         // All succeed or all fail
         return nil
     })
@@ -388,7 +396,7 @@ Signature Verification Layer:
 │ Unified Verification Engine                                     │
 ├─────────────────────────────────────────────────────────────────┤
 │ • Schema validation                                             │
-│ • Signature verification                                        │  
+│ • Signature verification                                        │
 │ • Address format handling                                       │
 │ • Cross-chain message routing                                   │
 └─────────────────────────────────────────────────────────────────┘
@@ -406,7 +414,7 @@ IBC Packet Flow:
         ▼                                               ▼
 ┌─────────────────┐                         ┌─────────────────┐
 │ Token Lock      │                         │ Token Unlock    │
-│ • Escrow badges │                         │ • Mint/Release  │
+│ • Escrow tokens │                         │ • Mint/Release  │
 │ • Create packet │                         │ • Verify packet │
 │ • Send via IBC  │                         │ • Update state  │
 └─────────────────┘                         └─────────────────┘
@@ -438,9 +446,10 @@ WASM Binding Architecture:
 ### 1. Range-Based Computation
 
 Instead of iterating individual elements:
-- Token IDs stored as ranges: O(1) vs O(n)
-- Time ranges for temporal queries: O(log n) vs O(n)
-- Amount ranges for balance operations: O(1) vs O(n)
+
+-   Token IDs stored as ranges: O(1) vs O(n)
+-   Time ranges for temporal queries: O(log n) vs O(n)
+-   Amount ranges for balance operations: O(1) vs O(n)
 
 ### 2. Lazy State Initialization
 
@@ -456,10 +465,10 @@ User Balance Lifecycle:
 
 ### 3. Efficient Query Patterns
 
-- **Direct lookups**: O(1) for collections, balances by ID
-- **Prefix iteration**: O(k) where k = number of results
-- **Binary search**: O(log n) for range queries
-- **Pagination support**: Prevents large result set issues
+-   **Direct lookups**: O(1) for collections, balances by ID
+-   **Prefix iteration**: O(k) where k = number of results
+-   **Binary search**: O(log n) for range queries
+-   **Pagination support**: Prevents large result set issues
 
 ### 4. State Pruning Strategy
 
@@ -469,7 +478,7 @@ State Retention Policy:
 │ Current State: Always retained                                  │
 ├─────────────────────────────────────────────────────────────────┤
 │ Recent History: Configurable retention period                   │
-├─────────────────────────────────────────────────────────────────┤  
+├─────────────────────────────────────────────────────────────────┤
 │ Archived Data: Optional long-term storage                       │
 ├─────────────────────────────────────────────────────────────────┤
 │ Pruned Data: Removed to reduce storage burden                   │
@@ -504,7 +513,7 @@ Validation Stack:
 ┌─────────────────┐
 │ Message Format  │ ← Basic format and required fields
 ├─────────────────┤
-│ Business Rules  │ ← Timeline, range, and logic validation  
+│ Business Rules  │ ← Timeline, range, and logic validation
 ├─────────────────┤
 │ Permission      │ ← Authorization and access control
 ├─────────────────┤
@@ -514,16 +523,16 @@ Validation Stack:
 
 ### 3. Replay Attack Prevention
 
-- **Approval versioning**: Increments on approval changes
-- **Merkle challenge tracking**: Per-leaf usage counters
-- **Transaction nonces**: Standard Cosmos SDK protection
-- **Timeline immutability**: Prevents historical manipulation
+-   **Approval versioning**: Increments on approval changes
+-   **Merkle challenge tracking**: Per-leaf usage counters
+-   **Transaction nonces**: Standard Cosmos SDK protection
+-   **Timeline immutability**: Prevents historical manipulation
 
 ### 4. Economic Security
 
-- **Gas metering**: All operations have appropriate gas costs
-- **Spam prevention**: Creation costs and rate limiting
-- **Resource bounds**: Practical limits on collection sizes
-- **Fee mechanisms**: Optional protocol fees for sustainability
+-   **Gas metering**: All operations have appropriate gas costs
+-   **Spam prevention**: Creation costs and rate limiting
+-   **Resource bounds**: Practical limits on collection sizes
+-   **Fee mechanisms**: Optional protocol fees for sustainability
 
 This architecture provides a robust foundation for the complex token management system while maintaining performance, security, and extensibility for future enhancements.

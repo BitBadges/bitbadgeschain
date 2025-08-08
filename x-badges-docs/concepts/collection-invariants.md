@@ -40,7 +40,7 @@ Any other ownership time configuration will cause validation to fail.
 
 #### Use Cases:
 
--   **Preventing Time-Based Restrictions**: Ensures badges cannot have time-limited ownership periods
+-   **Preventing Time-Based Restrictions**: Ensures tokens cannot have time-limited ownership periods
 -   **Simplifying Ownership Model**: Eliminates complexity around time-based approval restrictions
 -   **Compliance Requirements**: Some applications may require permanent, unrestricted ownership
 

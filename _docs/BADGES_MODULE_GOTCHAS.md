@@ -153,7 +153,7 @@ err := k.UpdateUserApprovals(ctx, msg)
 **Issue**: Users automatically inherit collection default balances, which can lead to unexpected behavior if not properly configured.
 
 ```go
-// ❌ Dangerous default - gives everyone unlimited badges
+// ❌ Dangerous default - gives everyone unlimited tokens
 defaultBalances := UserBalanceStore{
     Balances: []Balance{
         {
