@@ -3681,13 +3681,13 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// A BadgeCollection is the top-level object for a collection of badges.
+// A BadgeCollection is the top-level object for a collection of tokens.
 // It defines everything about the collection, such as the manager, metadata, etc.
 //
 // All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. the first collection has ID 1).
 //
 // All collections can have a manager who is responsible for managing the collection and can be granted certain admin
-// permissions, such as the ability to mint new badges.
+// permissions, such as the ability to mint new tokens.
 //
 // Certain fields are timeline-based, which means they may have different values at different block heights.
 // We fetch the value according to the current time.
@@ -3705,7 +3705,7 @@ type BadgeCollection struct {
 	CollectionId string `protobuf:"bytes,1,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
 	// The metadata for the collection itself, which can vary over time.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	// The metadata for each badge in the collection, also subject to changes over time.
+	// The metadata for each token in the collection, also subject to changes over time.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
 	// The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
 	BalancesType string `protobuf:"bytes,4,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
@@ -3729,11 +3729,11 @@ type BadgeCollection struct {
 	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,12,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
 	// The default store of a balance for a user, upon genesis.
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,13,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
-	// The user or entity who created the badge collection.
+	// The user or entity who created the collection.
 	CreatedBy string `protobuf:"bytes,14,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	// The valid badge IDs for this collection.
+	// The valid token IDs for this collection.
 	ValidBadgeIds []*UintRange `protobuf:"bytes,15,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
-	// The generated address of the badge collection. Also used to escrow Mint balances.
+	// The generated address of the collection. Also used to escrow Mint balances.
 	MintEscrowAddress string `protobuf:"bytes,16,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
 	// The IBC wrapper (sdk.coin) paths for the collection.
 	CosmosCoinWrapperPaths []*CosmosCoinWrapperPath `protobuf:"bytes,17,rep,name=cosmosCoinWrapperPaths,proto3" json:"cosmosCoinWrapperPaths,omitempty"`

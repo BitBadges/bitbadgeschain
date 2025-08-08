@@ -107,7 +107,7 @@ func TestMsgTransferBadges_ValidateBasic(t *testing.T) {
 			err: types.ErrAmountEqualsZero,
 		},
 		{
-			name: "invalid badge range",
+			name: "invalid ID range",
 			msg: types.MsgTransferBadges{
 				Creator: sample.AccAddress(),
 

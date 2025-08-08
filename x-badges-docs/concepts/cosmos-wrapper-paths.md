@@ -1,6 +1,6 @@
 # Cosmos Wrapper Paths
 
-Cosmos Wrapper Paths enable 1:1 wrapping between BitBadges badges and native Cosmos SDK coin asset types, making badges IBC-compatible. These paths automatically mint and burn badges when transferring to/from specific wrapper addresses. These transfers to/from are handled within the badges module, so you can set up customizable logic for how these transfers are handled.
+Cosmos Wrapper Paths enable 1:1 wrapping between BitBadges tokens and native Cosmos SDK coin asset types, making tokens IBC-compatible. These paths automatically mint and burn tokens when transferring to/from specific wrapper addresses. These transfers to/from are handled within the badges module, so you can set up customizable logic for how these transfers are handled.
 
 > **Important**: Since wrapper addresses are uncontrollable (no private keys), approval design requires careful consideration. You must override the wrapper address's user-level approvals where necessary using collection approvals to ensure wrapping/unwrapping functions properly.
 
@@ -45,7 +45,7 @@ message DenomUnit {
 
 ### Balances
 
--   **Custom conversion rates** - Defines which badges and ownership times participate in wrapping and how many badges are wrapped for each native coin unit
+-   **Custom conversion rates** - Defines which tokens and ownership times participate in wrapping and how many tokens are wrapped for each native coin unit
 
 ### Denomination Units
 
@@ -131,15 +131,15 @@ This creates a system where:
 
 ### IBC Transfers
 
--   **Cross-chain transfers** - Send wrapped badges to other Cosmos chains
--   **DeFi integration** - Use wrapped badges in Cosmos DeFi protocols
--   **Liquidity provision** - Add wrapped badges to AMM pools
+-   **Cross-chain transfers** - Send wrapped tokens to other Cosmos chains
+-   **DeFi integration** - Use wrapped tokens in Cosmos DeFi protocols
+-   **Liquidity provision** - Add wrapped tokens to AMM pools
 
 ### Multi-Chain Ecosystems
 
 -   **Ecosystem bridges** - Connect BitBadges to broader Cosmos ecosystem
 -   **Shared liquidity** - Participate in cross-chain liquidity pools
--   **Governance tokens** - Use wrapped badges in governance across chains
+-   **Governance tokens** - Use wrapped tokens in governance across chains
 
 ### Trading and Exchange
 
@@ -149,28 +149,28 @@ This creates a system where:
 
 ### Featured Use Case: List on Osmosis
 
-With BitBadges' existing relayer infrastructure and IBC-compatible wrapped denominations, listing wrapped badges on Osmosis is streamlined:
+With BitBadges' existing relayer infrastructure and IBC-compatible wrapped denominations, listing wrapped tokens on Osmosis is streamlined:
 
 -   **IBC Relayer Ready** - BitBadges already has relayer infrastructure set up for seamless cross-chain transfers
--   **Native IBC Compatibility** - Wrapped badges become native SDK coins that work seamlessly with IBC protocols
--   **Automatic Liquidity** - Create liquidity pools on Osmosis DEX with wrapped badge assets
+-   **Native IBC Compatibility** - Wrapped tokens become native SDK coins that work seamlessly with IBC protocols
+-   **Automatic Liquidity** - Create liquidity pools on Osmosis DEX with wrapped token assets
 -   **Streamlined Process** - The technical infrastructure eliminates common barriers to cross-chain trading
--   **Enhanced Discoverability** - Badges gain exposure to the broader Cosmos DeFi ecosystem
+-   **Enhanced Discoverability** - Tokens gain exposure to the broader Cosmos DeFi ecosystem
 
 ## Conversion Process
 
-### Badge to Coin (Wrapping)
+### Token to Coin (Wrapping)
 
-1. User transfers badges to the wrapper address
-2. System burns the badges from user's balance
+1. User transfers tokens to the wrapper address
+2. System burns the tokens from user's balance
 3. System mints equivalent native coins
 4. Coins are credited to the user's account
 
-### Coin to Badge (Unwrapping)
+### Coin to Token (Unwrapping)
 
 1. User transfers coins to the wrapper address
 2. System burns the native coins
-3. System mints equivalent badges
-4. Badges are credited to the user's balance
+3. System mints equivalent tokens
+4. Tokens are credited to the user's balance
 
-Cosmos Wrapper Paths provide seamless interoperability between BitBadges and the broader Cosmos ecosystem while maintaining the unique properties of both badge and coin systems.
+Cosmos Wrapper Paths provide seamless interoperability between BitBadges and the broader Cosmos ecosystem while maintaining the unique properties of both token and coin systems.

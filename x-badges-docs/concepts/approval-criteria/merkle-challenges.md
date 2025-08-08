@@ -49,7 +49,7 @@ export interface MerkleChallenge<T extends NumberType> {
 
 ### 1. Claim Code Challenges
 
-Create a Merkle tree of secret claim codes that users must provide to claim badges.
+Create a Merkle tree of secret claim codes that users must provide to claim tokens.
 
 **Use Case**: Private claim codes, invitation systems, promotional campaigns
 
@@ -146,7 +146,7 @@ Control how many times each leaf can be used:
 1. User submits transaction with valid Merkle proof
 2. Proof becomes visible in mempool (public blockchain)
 3. Malicious actor sees the proof and front-runs the transaction
-4. Original user's transaction fails, attacker gets the badge
+4. Original user's transaction fails, attacker gets the token
 
 **Why This Happens**:
 
@@ -219,7 +219,7 @@ leafSigner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6';
 
 **Critical Benefits**:
 
--   **Front-Running Protection**: Prevents attackers from stealing badges via mempool interception
+-   **Front-Running Protection**: Prevents attackers from stealing tokens via mempool interception
 -   **Address-Specific**: Each proof is cryptographically bound to the intended recipient
 -   **Mempool Safety**: Makes intercepted proofs useless to malicious actors
 -   **Required for Claim Codes**: Strongly recommended for all non-address tree challenges

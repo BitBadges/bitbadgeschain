@@ -40,7 +40,7 @@ func (suite *TestSuite) TestTransferBadgesForceful() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge")
+	suite.Require().Nil(err, "Error transferring token")
 
 	bobbalance, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	fetchedBalance, err = types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetOneUintRange(), bobbalance.Balances)
@@ -88,7 +88,7 @@ func (suite *TestSuite) TestTransferBadgesHandleDuplicateIDs() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge")
+	suite.Require().Error(err, "Error transferring token")
 
 }
 
@@ -130,7 +130,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedCollectionLevel() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge")
+	suite.Require().Error(err, "Error transferring token")
 }
 
 func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
@@ -172,7 +172,7 @@ func (suite *TestSuite) TestTransferBadgesNotApprovedIncoming() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge")
+	suite.Require().Error(err, "Error transferring token")
 }
 
 func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
@@ -210,7 +210,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 		BadgeMetadataTimeline:            collection.BadgeMetadataTimeline,
 		OffChainBalancesMetadataTimeline: collection.OffChainBalancesMetadataTimeline,
 	})
-	suite.Require().Nil(err, "Error transferring badge")
+	suite.Require().Nil(err, "Error transferring token")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -230,7 +230,7 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge")
+	suite.Require().Nil(err, "Error transferring token")
 
 	unmintedSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -255,5 +255,5 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge")
+	suite.Require().Error(err, "Error transferring token")
 }

@@ -35,7 +35,7 @@ message CollectionApprovalTimeline {
 
 
 message MsgNewCollection {
-  // See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+  // See collections.proto for more details about these MsgNewBadge fields. Defines the token details. Leave unneeded fields empty.
   string creator = 1; 
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
@@ -46,15 +46,15 @@ message MsgNewCollection {
   CollectionPermissions permissions = 9;
   repeated StandardsTimeline standardsTimeline = 10;
 
-  //Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+  //Token supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
   //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
   repeated Balance badgesToCreate = 11;
   repeated Transfer transfers = 12;
   repeated ContractAddressTimeline contractAddressTimeline = 13;
   repeated AddressList addressLists = 14;
 
-  repeated UserOutgoingApproval defaultOutgoingApprovals = 15; //The user's approved transfers for each badge ID.
-  repeated UserIncomingApproval defaultIncomingApprovals = 16; //The user's approved incoming transfers for each badge ID.
+  repeated UserOutgoingApproval defaultOutgoingApprovals = 15; //The user's approved transfers for each token ID.
+  repeated UserIncomingApproval defaultIncomingApprovals = 16; //The user's approved incoming transfers for each token ID.
 
   bool defaultDisapproveSelfInitiated = 17; 
    //The default balances for the user
@@ -67,7 +67,7 @@ message MsgNewCollectionResponse {
   ]; //ID of created badge collecon
 }
 
-//This handles both minting more of existing badges and creating new badges.
+//This handles both minting more of existing badges and creating new tokens.
 message MsgMintAndDistributeBadges {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];

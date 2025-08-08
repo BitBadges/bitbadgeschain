@@ -100,7 +100,7 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	err := CreateCollections(suite, wctx, GetCollectionsToCreate())
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -137,7 +137,7 @@ func (suite *TestSuite) TestDeductFromOutgoingTwoSeparateTransfers() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	err := CreateCollections(suite, wctx, GetCollectionsToCreate())
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -178,7 +178,7 @@ func (suite *TestSuite) TestMaxOneTransfer() {
 	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers = sdkmath.NewUint(1)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -323,7 +323,7 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -357,7 +357,7 @@ func (suite *TestSuite) TestRequiresEquals() {
 	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria.RequireFromDoesNotEqualInitiatedBy = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -383,7 +383,7 @@ func (suite *TestSuite) TestSpecificApproved() {
 	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId = alice
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -409,7 +409,7 @@ func (suite *TestSuite) TestDefaults() {
 	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId = alice
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -430,7 +430,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 	collectionsToCreate[0].DefaultDisapproveSelfInitiated = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -466,7 +466,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "error creating badges")
+// 	suite.Require().Nil(err, "error creating tokens")
 
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -499,7 +499,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "error creating badges")
+// 	suite.Require().Nil(err, "error creating tokens")
 
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -546,7 +546,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "error creating badges")
+// 	suite.Require().Nil(err, "error creating tokens")
 
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -598,7 +598,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "error creating badges")
+// 	suite.Require().Nil(err, "error creating tokens")
 
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -627,7 +627,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 	})
 
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "error creating badges")
+// 	suite.Require().Nil(err, "error creating tokens")
 
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -663,7 +663,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 	collectionsToCreate[0].DefaultOutgoingApprovals = newOutgoingTimeline
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -679,7 +679,7 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 	// collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -696,7 +696,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -713,7 +713,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -731,7 +731,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -771,7 +771,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 	}
 
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "error creating badges")
+// 	suite.Require().Nil(err, "error creating tokens")
 
 // 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -811,7 +811,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
@@ -865,7 +865,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
@@ -926,7 +926,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
@@ -1019,7 +1019,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
@@ -1132,7 +1132,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
@@ -1191,7 +1191,7 @@ func (suite *TestSuite) TestVersionControlCollectionApprovals() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	version, found := suite.app.BadgesKeeper.GetApprovalTrackerVersionFromStore(suite.ctx, keeper.ConstructApprovalVersionKey(sdkmath.NewUint(1), "collection", "", "test"))
 	suite.Require().True(found, "Error getting approval tracker version")
@@ -1243,7 +1243,7 @@ func (suite *TestSuite) TestVersionControlUserApprovals() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	defaultApproval := &types.UserIncomingApproval{
 		FromListId:        "AllWithoutMint",
@@ -1337,7 +1337,7 @@ func (suite *TestSuite) TestMaxOneTransferWithResetIntervals() {
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -1392,7 +1392,7 @@ func (suite *TestSuite) TestResetIntervalsWithFutureTime() {
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	bobBalance, _ := GetUserBalance(suite, wctx, collection.CollectionId, bob)
@@ -1461,7 +1461,7 @@ func (suite *TestSuite) TestAutoDeletingOutgoingApprovals() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(1, len(bobBalance.OutgoingApprovals), "Outgoing approvals should not be deleted")
@@ -1571,7 +1571,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovals() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().Equal(1, len(aliceBalance.IncomingApprovals), "Incoming approvals should not be deleted")
@@ -1654,7 +1654,7 @@ func (suite *TestSuite) TestAutoDeletingCollectionApprovals() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	// We mint to bob in the CreateCollections.transfers so it should be deleted automatically
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
@@ -1692,7 +1692,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 	}...)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -1870,7 +1870,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	aliceBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().Equal(1, len(aliceBalance.IncomingApprovals), "Incoming approvals should exist initially")
@@ -2092,7 +2092,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
@@ -2260,7 +2260,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 

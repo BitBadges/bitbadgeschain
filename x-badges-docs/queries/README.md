@@ -10,7 +10,7 @@ This directory contains detailed documentation for all query types supported by 
 
 ### Balance Queries
 
--   [GetBalance](./get-balance.md) - Get user badge balances for a collection
+-   [GetBalance](./get-balance.md) - Get user balances for a collection
 
 ### Address List Queries
 

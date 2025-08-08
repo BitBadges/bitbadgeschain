@@ -1,13 +1,13 @@
 # Quest Protocol
 
-The Quest Protocol is a standardized way to create quest-based badge collections that reward users with badges and coins for completing cryptographically verified tasks. Quest collections are designed for achievement-based systems where users complete quests (tasks) and provide cryptographic proofs (Merkle proofs) to claim badges along with coin incentives.
+The Quest Protocol is a standardized way to create quest-based collections that reward users with tokens and coins for completing cryptographically verified tasks. Quest collections are designed for achievement-based systems where users complete quests (tasks) and provide cryptographic proofs (Merkle proofs) to claim tokens along with coin incentives.
 
 ## Protocol Requirements
 
 ### Collection Standards
 
 -   Must include "Quests" in the `standardsTimeline` for the current time period
--   Must have exactly one valid badge ID: `{"start": "1", "end": "1"}`
+-   Must have exactly one valid token ID: `{"start": "1", "end": "1"}`
 
 ### Quest Approval Requirements
 
@@ -22,14 +22,14 @@ The Quest Protocol is a standardized way to create quest-based badge collections
     -   `overrideToWithInitiator`: true (coins go to the quest completer)
 -   **Max Transfers**: Must have `overallMaxNumTransfers` > 0
 -   **Predetermined Balances**: Must have:
-    -   Exactly one `startBalance` with amount 1 for badge ID 1
-    -   `incrementBadgeIdsBy`: 0 (no badge ID incrementing)
+    -   Exactly one `startBalance` with amount 1 for token ID 1
+    -   `incrementBadgeIdsBy`: 0 (no token ID incrementing)
     -   `incrementOwnershipTimesBy`: 0 (no time incrementing)
     -   `durationFromTimestamp`: 0 (no time-based duration)
     -   `allowOverrideTimestamp`: false (no timestamp overrides)
     -   All `recurringOwnershipTimes` fields set to 0 (no recurring)
 -   **Additional Constraints**:
-    -   `mustOwnBadges`: empty (no prerequisite badges)
+    -   `mustOwnBadges`: empty (no prerequisite tokens)
     -   `requireToEqualsInitiatedBy`: false (no address matching required)
 
 ## Validation Functions
@@ -67,7 +67,7 @@ export const doesCollectionFollowQuestProtocol = (
         return false;
     }
 
-    // Assert valid badge IDs are only 1n-1n
+    // Assert valid token IDs are only 1n-1n
     const badgeIds = UintRangeArray.From(collection.validBadgeIds)
         .sortAndMerge()
         .convert(BigInt);
@@ -112,7 +112,7 @@ export const isQuestApproval = (approval: iCollectionApproval<bigint>) => {
         return false;
     }
 
-    // Must not require owning other badges
+    // Must not require owning other tokens
     if (approvalCriteria.mustOwnBadges?.length) {
         return false;
     }
@@ -220,4 +220,4 @@ export const isQuestApproval = (approval: iCollectionApproval<bigint>) => {
 
 ## Implementation Example
 
-For a complete implementation example, see the [Quest Badge Collection Example](../../examples/txs/msgcreatecollection/quest-badge-collection.md).
+For a complete implementation example, see the [Quest Token Collection Example](../../examples/txs/msgcreatecollection/quest-badge-collection.md).

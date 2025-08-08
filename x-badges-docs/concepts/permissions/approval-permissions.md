@@ -89,7 +89,7 @@ To lock specific criteria, specify the target and set all other criteria to maxi
 
 ## Examples
 
-### Lock Specific Badge Range
+### Lock Specific ID Range
 
 ```json
 {
@@ -145,10 +145,10 @@ Lock a specific approval by its unique ID:
 
 ### 2. Range Lock with Overlap Protection
 
-Lock a badge range AND all overlapping approvals:
+Lock a token range AND all overlapping approvals:
 
 ```json
-// Lock badge range
+// Lock token range
 {
     "badgeIds": [{ "start": "1", "end": "10" }],
     "approvalId": "All"

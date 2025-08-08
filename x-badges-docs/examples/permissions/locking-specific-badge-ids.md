@@ -1,12 +1,12 @@
-# Locking Specific Badge IDs
+# Locking Specific Token IDs
 
-This example demonstrates how to permanently lock approvals for specific badge IDs while keeping other badge approvals updatable.
+This example demonstrates how to permanently lock approvals for specific token IDs while keeping other approvals updatable.
 
 ## Overview
 
-By targeting specific `badgeIds`, you can freeze approvals for those badges permanently while allowing updates to approvals for other badge IDs.
+By targeting specific `badgeIds`, you can freeze approvals for those tokens permanently while allowing updates to approvals for other token IDs.
 
-## Lock Badge IDs 1-100
+## Lock Token IDs 1-100
 
 ```typescript
 const FullTimeRanges = [
@@ -36,7 +36,7 @@ const collectionPermissions = {
             badgeIds: [
                 {
                     start: '1',
-                    end: '100', // Only targets badges 1-100
+                    end: '100', // Only targets tokens 1-100
                 },
             ],
             ownershipTimes: FullTimeRanges,
@@ -50,7 +50,7 @@ const collectionPermissions = {
 };
 ```
 
-## Lock All Badges EXCEPT 1-100
+## Lock All Tokens EXCEPT 1-100
 
 ```typescript
 const collectionPermissions = {
@@ -73,7 +73,7 @@ const collectionPermissions = {
             badgeIds: [
                 {
                     start: '101',
-                    end: '18446744073709551615', // All badges except 1-100
+                    end: '18446744073709551615', // All tokens except 1-100
                 },
             ],
             ownershipTimes: FullTimeRanges,
@@ -108,15 +108,15 @@ const createCollection = {
 
 ## Use Cases
 
-- **Lock Founder Badges**: Prevent modification of special badge 1-100 transfer rules
-- **Preserve Rare Items**: Keep limited edition badges (1-100) immutable
+- **Lock Founder Tokens**: Prevent modification of special token 1-100 transfer rules
+- **Preserve Rare Items**: Keep limited edition tokens (1-100) immutable
 - **Tier-Based Control**: Lock specific tiers while allowing others to evolve
 
 ## Important Notes
 
-### ⚠️ Badge Range Targeting
+### ⚠️ ID Range Targeting
 
-The permission only applies to approvals that overlap with the specified badge ID ranges. Approvals targeting badge IDs outside the range remain updatable.
+The permission only applies to approvals that overlap with the specified token ID ranges. Approvals targeting token IDs outside the range remain updatable.
 
 ## Related Examples
 
@@ -126,4 +126,4 @@ The permission only applies to approvals that overlap with the specified badge I
 ## Related Concepts
 
 - [Permissions System](../../concepts/permissions/README.md) - Permission mechanics
-- [Timed Update With Badge IDs Permission](../../concepts/permissions/timed-update-with-badge-ids-permission.md) - Badge-specific controls
+- [Timed Update With Token IDs Permission](../../concepts/permissions/timed-update-with-badge-ids-permission.md) - Token-specific controls

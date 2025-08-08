@@ -10,7 +10,7 @@ export interface iApprovalCriteria<T extends NumberType> {
     coinTransfers?: iCoinTransfer<T>[];
     /** The list of merkle challenges that need valid proofs to be approved. */
     merkleChallenges?: iMerkleChallenge<T>[];
-    /** The list of must own badges that need valid proofs to be approved. */
+    /** The list of must own tokens that need valid proofs to be approved. */
     mustOwnBadges?: iMustOwnBadge<T>[];
     /** The predetermined balances for each transfer. These allow approvals to use predetermined balance amounts rather than an incrementing tally system. */
     predeterminedBalances?: iPredeterminedBalances<T>;
@@ -50,7 +50,7 @@ export interface iApprovalCriteria<T extends NumberType> {
 -   **[Merkle Challenges](merkle-challenges.md)** - Cryptographic proof requirements
 -   **[Dynamic Store Challenges](dynamic-store-challenges.md)** - On-chain numeric checks
 -   **[ETH Signature Challenges](eth-signature-challenges.md)** - Ethereum signature requirements
--   **[Badge Ownership](badge-ownership.md)** - Required badge holdings
+-   **[Token Ownership](badge-ownership.md)** - Required token holdings
 -   **[$BADGE Transfers](usdbadge-transfers.md)** - Automatic token transfers
 -   **[Overrides](overrides.md)** - Bypassing user-level approvals
 -   **[Requires](requires.md)** - Address relationship restrictions

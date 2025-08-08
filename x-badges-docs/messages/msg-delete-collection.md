@@ -1,6 +1,6 @@
 # MsgDeleteCollection
 
-Deletes a badge collection.
+Deletes a collection.
 
 ## Authorization
 

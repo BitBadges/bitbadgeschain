@@ -13,7 +13,7 @@ func (suite *TestSuite) TestUpdateManager() {
 	collectionsToCreate := GetCollectionsToCreate()
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge")
+	suite.Require().Nil(err, "Error creating token")
 
 	err = UpdateManager(suite, wctx, &types.MsgUpdateManager{
 		Creator:      bob,

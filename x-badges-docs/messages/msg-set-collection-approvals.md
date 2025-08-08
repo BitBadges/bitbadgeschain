@@ -3,7 +3,7 @@ This message is a streamlined alternative to [MsgUpdateCollection](./msg-update-
 
 # MsgSetCollectionApprovals
 
-Sets the collection approvals and update permissions for a badge collection. This is a convenience message that focuses specifically on collection approvals management.
+Sets the collection approvals and update permissions for a collection. This is a convenience message that focuses specifically on collection approvals management.
 
 ## Overview
 
@@ -37,7 +37,7 @@ message MsgSetCollectionApprovals {
 }
 
 message MsgSetCollectionApprovalsResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 ```

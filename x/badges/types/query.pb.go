@@ -1074,7 +1074,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
-	// Queries a badge collection by ID.
+	// Queries a collection by ID.
 	GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error)
 	// Queries an address list by ID.
 	GetAddressList(ctx context.Context, in *QueryGetAddressListRequest, opts ...grpc.CallOption) (*QueryGetAddressListResponse, error)
@@ -1084,7 +1084,7 @@ type QueryClient interface {
 	GetChallengeTracker(ctx context.Context, in *QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*QueryGetChallengeTrackerResponse, error)
 	// Queries the number of times a given signature has been used for a given ETH signature challenge.
 	GetETHSignatureTracker(ctx context.Context, in *QueryGetETHSignatureTrackerRequest, opts ...grpc.CallOption) (*QueryGetETHSignatureTrackerResponse, error)
-	// Queries an addresses balance for a badge collection, specified by its ID.
+	// Queries an addresses balance for a collection, specified by its ID.
 	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
 	// Queries a dynamic store by ID.
 	GetDynamicStore(ctx context.Context, in *QueryGetDynamicStoreRequest, opts ...grpc.CallOption) (*QueryGetDynamicStoreResponse, error)
@@ -1185,7 +1185,7 @@ func (c *queryClient) GetDynamicStoreValue(ctx context.Context, in *QueryGetDyna
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
-	// Queries a badge collection by ID.
+	// Queries a collection by ID.
 	GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error)
 	// Queries an address list by ID.
 	GetAddressList(context.Context, *QueryGetAddressListRequest) (*QueryGetAddressListResponse, error)
@@ -1195,7 +1195,7 @@ type QueryServer interface {
 	GetChallengeTracker(context.Context, *QueryGetChallengeTrackerRequest) (*QueryGetChallengeTrackerResponse, error)
 	// Queries the number of times a given signature has been used for a given ETH signature challenge.
 	GetETHSignatureTracker(context.Context, *QueryGetETHSignatureTrackerRequest) (*QueryGetETHSignatureTrackerResponse, error)
-	// Queries an addresses balance for a badge collection, specified by its ID.
+	// Queries an addresses balance for a collection, specified by its ID.
 	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)
 	// Queries a dynamic store by ID.
 	GetDynamicStore(context.Context, *QueryGetDynamicStoreRequest) (*QueryGetDynamicStoreResponse, error)

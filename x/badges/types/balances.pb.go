@@ -26,7 +26,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // The UintRange is a range of IDs from some start to some end (inclusive).
 // uintRanges are one of the core types used.
 //
-// They are used for everything from badge IDs to time ranges to min/max balance amounts.
+// They are used for everything from token IDs to time ranges to min/max balance amounts.
 //
 // See the BitBadges documentation for more information.
 type UintRange struct {
@@ -69,18 +69,18 @@ func (m *UintRange) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UintRange proto.InternalMessageInfo
 
-// Balance represents the balance of a badge for a specific user.
-// The user amounts xAmount of a badge for the badgeID specified for the time ranges specified.
+// Balance represents the balance of a token for a specific user.
+// The user amounts xAmount of a token for the badgeID specified for the time ranges specified.
 //
-// Example: User A owns x10 of badge IDs 1-10 from 1/1/2020 to 1/1/2021.
+// Example: User A owns x10 of token IDs 1-10 from 1/1/2020 to 1/1/2021.
 //
-// If times or badgeIDs have len > 1, then the user owns all badge IDs specified for all time ranges specified.
+// If times or badgeIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
 type Balance struct {
-	// The amount of the badge owned by the user.
+	// The amount of the token owned by the user.
 	Amount Uint `protobuf:"bytes,1,opt,name=amount,proto3,customtype=Uint" json:"amount"`
-	// The time ranges during which the user owns the badge.
+	// The time ranges during which the user owns the token.
 	OwnershipTimes []*UintRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	// The badge IDs for which the user owns the badge.
+	// The token IDs for which the user owns the token.
 	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 

@@ -14,10 +14,10 @@ func (suite *TestSuite) TestArchiveCollection() {
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	_, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err, "Error getting badge: %s")
+	suite.Require().Nil(err, "Error getting token: %s")
 
 	err = ArchiveCollection(suite, wctx, &types.MsgArchiveCollection{
 		Creator:      bob,
@@ -33,7 +33,7 @@ func (suite *TestSuite) TestArchiveCollection() {
 
 	//Still should be able to get collection
 	_, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err, "Error getting badge: %s")
+	suite.Require().Nil(err, "Error getting token: %s")
 
 	err = UpdateManager(suite, wctx, &types.MsgUpdateManager{
 		Creator:      bob,

@@ -279,7 +279,7 @@ permission := ActionPermission{
 ```go
 // ❌ This could be expensive for large ranges
 badgeIds := []UintRange{{Start: NewUint(1), End: NewUint(1000000)}}
-// Processing 1M badge IDs individually would be prohibitively expensive
+// Processing 1M token IDs individually would be prohibitively expensive
 ```
 
 **Solution**: The module uses range-based algorithms, but be aware of practical limits.
@@ -415,7 +415,7 @@ func TestTransfer(t *testing.T) {
 
 ### "Approval not satisfied"
 - Verify all three approval levels (collection, outgoing, incoming)
-- Check approval criteria (Merkle proofs, must-own badges, etc.)
+- Check approval criteria (Merkle proofs, must-own tokens, etc.)
 - Ensure approval versions are current
 
 ### "Permission denied"

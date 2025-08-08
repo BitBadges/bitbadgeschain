@@ -3,18 +3,18 @@ This message is a streamlined alternative to [MsgUpdateCollection](./msg-update-
 
 # MsgSetBadgeMetadata
 
-Sets the badge metadata timeline and update permissions for a badge collection. This is a convenience message that focuses specifically on badge metadata management.
+Sets the token metadata timeline and update permissions for a collection. This is a convenience message that focuses specifically on token metadata management.
 
 ## Overview
 
 This message allows you to:
 
--   Set badge metadata timeline for the collection
--   Configure permissions to update the badge metadata in the future
+-   Set token metadata timeline for the collection
+-   Configure permissions to update the token metadata in the future
 
 ## Authorization & Permissions
 
-Updates can only be performed by the **current manager** of the collection. The manager must have permission to update the badge metadata timeline according to the collection's current permission settings.
+Updates can only be performed by the **current manager** of the collection. The manager must have permission to update the token metadata timeline according to the collection's current permission settings.
 
 ## Proto Definition
 
@@ -29,15 +29,15 @@ message MsgSetBadgeMetadata {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  // New badge metadata timeline to set.
+  // New token metadata timeline to set.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
 
-  // Permission to update badge metadata timeline
+  // Permission to update token metadata timeline
   repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 4;
 }
 
 message MsgSetBadgeMetadataResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 ```
@@ -60,7 +60,7 @@ bitbadgeschaind tx badges set-badge-metadata '[tx-json]' --from manager-key
             "badgeMetadata": [
                 {
                     "uri": "https://example.com/badge1.json",
-                    "customData": "{\"description\": \"First badge\"}",
+                    "customData": "{\"description\": \"First token\"}",
                     "badgeIds": [{ "start": "1", "end": "10" }]
                 }
             ],

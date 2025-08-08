@@ -32,7 +32,7 @@ func getETHSignatureChallengeSchema() string {
 	}`
 }
 
-// getMustOwnBadgesSchema returns the schema for must own badges criteria
+// getMustOwnBadgesSchema returns the schema for must own tokens criteria
 func getMustOwnBadgesSchema() string {
 	return `{
 		"collectionId": "",

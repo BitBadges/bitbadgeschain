@@ -11,8 +11,8 @@ Transferability in BitBadges is controlled through a hierarchical approval syste
 | Level          | Description                              | Fields                                    |
 | -------------- | ---------------------------------------- | ----------------------------------------- |
 | **Collection** | Global rules for the entire collection   | All fields                                |
-| **Incoming**   | User-specific rules for receiving badges | `toList` = user's address, no overrides   |
-| **Outgoing**   | User-specific rules for sending badges   | `fromList` = user's address, no overrides |
+| **Incoming**   | User-specific rules for receiving tokens | `toList` = user's address, no overrides   |
+| **Outgoing**   | User-specific rules for sending tokens   | `fromList` = user's address, no overrides |
 
 **Key Rule**: A transfer must satisfy collection-level approvals AND (unless overridden) user-level incoming/outgoing approvals.
 
@@ -25,7 +25,7 @@ interface CollectionApproval<T extends NumberType> {
     fromListId: string; // Who can send?
     initiatedByListId: string; // Who can initiate?
     transferTimes: UintRange<T>[]; // When can transfer happen?
-    badgeIds: UintRange<T>[]; // Which badge IDs?
+    badgeIds: UintRange<T>[]; // Which token IDs?
     ownershipTimes: UintRange<T>[]; // Which ownership times?
     approvalId: string; // Unique identifier
 
@@ -51,11 +51,11 @@ Every approval defines **Who? When? What?** through these fields:
 
 | Field               | Type                            | Purpose                                 | Example                                            |
 | ------------------- | ------------------------------- | --------------------------------------- | -------------------------------------------------- |
-| `toListId`          | Address List ID                 | Who can receive badges                  | `"All"`, `"Mint"`, `"bb1..."`                      |
-| `fromListId`        | Address List ID                 | Who can send badges                     | `"Mint"`, `"!Mint"`                                |
+| `toListId`          | Address List ID                 | Who can receive tokens                  | `"All"`, `"Mint"`, `"bb1..."`                      |
+| `fromListId`        | Address List ID                 | Who can send tokens                     | `"Mint"`, `"!Mint"`                                |
 | `initiatedByListId` | Address List ID                 | Who can initiate transfer               | `"All"`, `"bb1..."`                                |
 | `transferTimes`     | UintRange[] (UNIX Milliseconds) | When transfer can occur                 | `[{start: "1691931600000", end: "1723554000000"}]` |
-| `badgeIds`          | UintRange[] (Badge IDs)         | Which badge IDs                         | `[{start: "1", end: "100"}]`                       |
+| `badgeIds`          | UintRange[] (Token IDs)         | Which token IDs                         | `[{start: "1", end: "100"}]`                       |
 | `ownershipTimes`    | UintRange[] (UNIX Milliseconds) | Which ownership times to be transferred | `[{start: "1", end: "18446744073709551615"}]`      |
 
 ### Example Approval
@@ -72,7 +72,7 @@ Every approval defines **Who? When? What?** through these fields:
 }
 ```
 
-**Translation**: Allow anyone to claim badges 1-100 from the Mint address between Aug 13, 2023 and Aug 13, 2024.
+**Translation**: Allow anyone to claim tokens 1-100 from the Mint address between Aug 13, 2023 and Aug 13, 2024.
 
 ## Approval Matching Process
 

@@ -136,10 +136,10 @@ message MsgUniversalUpdateCollection {
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
 
-  // Indicates if the valid badge IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateValidBadgeIds = 5;
 
-  // New badge IDs to add to this collection
+  // New token IDs to add to this collection
   repeated UintRange validBadgeIds = 6; 
 
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
@@ -160,10 +160,10 @@ message MsgUniversalUpdateCollection {
   // New collection metadata timeline to set.
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
   
-  // Indicates if the badge metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateBadgeMetadataTimeline = 13;
   
-  // New badge metadata timeline to set.
+  // New token metadata timeline to set.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
   
   // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
@@ -209,7 +209,7 @@ message MsgUniversalUpdateCollection {
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
 message MsgUniversalUpdateCollectionResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -224,10 +224,10 @@ message MsgUpdateCollection {
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // Indicates if the valid badge IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateValidBadgeIds = 3;
 
-  // New badge IDs to add to this collection
+  // New token IDs to add to this collection
   repeated UintRange validBadgeIds = 4;
   
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
@@ -248,10 +248,10 @@ message MsgUpdateCollection {
   // New collection metadata timeline to set.
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
   
-  // Indicates if the badge metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateBadgeMetadataTimeline = 13;
   
-  // New badge metadata timeline to set.
+  // New token metadata timeline to set.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
   
   // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
@@ -297,7 +297,7 @@ message MsgUpdateCollection {
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
 message MsgUpdateCollectionResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -315,7 +315,7 @@ message MsgCreateCollection {
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
 
-  // New badge IDs to add to this collection
+  // New token IDs to add to this collection
   repeated UintRange validBadgeIds = 5; 
   
   // Collection permissions.
@@ -327,7 +327,7 @@ message MsgCreateCollection {
   // Collection metadata timeline entries.
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;
   
-  // Badge metadata timeline entries.
+  // Token metadata timeline entries.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
   
   // Off-chain balances metadata timeline entries.
@@ -357,7 +357,7 @@ message MsgCreateCollection {
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.
 message MsgCreateCollectionResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -376,7 +376,7 @@ message MsgCreateAddressLists {
 // MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.
 message MsgCreateAddressListsResponse {}
 
-// MsgTransferBadges is used to transfer badges.
+// MsgTransferBadges is used to transfer tokens.
 message MsgTransferBadges {
   option (cosmos.msg.v1.signer) = "creator";
     option (amino.name) = "badges/TransferBadges";
@@ -690,16 +690,16 @@ message MsgSetValidBadgeIds {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New badge IDs to add to this collection
+  // New token IDs to add to this collection
   repeated UintRange validBadgeIds = 3;
   
-  // Permission to update valid badge IDs
+  // Permission to update valid token IDs
   repeated BadgeIdsActionPermission canUpdateValidBadgeIds = 4;
 }
 
 // MsgSetValidBadgeIdsResponse is the response to MsgSetValidBadgeIds.
 message MsgSetValidBadgeIdsResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -723,7 +723,7 @@ message MsgSetManager {
 
 // MsgSetManagerResponse is the response to MsgSetManager.
 message MsgSetManagerResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -747,11 +747,11 @@ message MsgSetCollectionMetadata {
 
 // MsgSetCollectionMetadataResponse is the response to MsgSetCollectionMetadata.
 message MsgSetCollectionMetadataResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetBadgeMetadata sets the badge metadata timeline and canUpdateBadgeMetadata permission
+// MsgSetBadgeMetadata sets the token metadata timeline and canUpdateBadgeMetadata permission
 message MsgSetBadgeMetadata {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetBadgeMetadata";
@@ -762,16 +762,16 @@ message MsgSetBadgeMetadata {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New badge metadata timeline to set.
+  // New token metadata timeline to set.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   
-  // Permission to update badge metadata timeline
+  // Permission to update token metadata timeline
   repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 4;
 }
 
 // MsgSetBadgeMetadataResponse is the response to MsgSetBadgeMetadata.
 message MsgSetBadgeMetadataResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -795,7 +795,7 @@ message MsgSetCustomData {
 
 // MsgSetCustomDataResponse is the response to MsgSetCustomData.
 message MsgSetCustomDataResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -819,7 +819,7 @@ message MsgSetStandards {
 
 // MsgSetStandardsResponse is the response to MsgSetStandards.
 message MsgSetStandardsResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -843,7 +843,7 @@ message MsgSetCollectionApprovals {
 
 // MsgSetCollectionApprovalsResponse is the response to MsgSetCollectionApprovals.
 message MsgSetCollectionApprovalsResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
@@ -867,6 +867,6 @@ message MsgSetIsArchived {
 
 // MsgSetIsArchivedResponse is the response to MsgSetIsArchived.
 message MsgSetIsArchivedResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

@@ -214,11 +214,11 @@ func (suite *TestSuite) TestLeafSignature() {
 	}
 
 	err = TransferBadges(suite, wctx, transfers)
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	transfers.Transfers[0].MerkleProofs[0].LeafSignature = "0x53277c915e10b01e32878284293809e171976a8e987f211c3d106a2afccdd85072cfab0f12188ff653f8638d73c0e9b18c8e9892b6aa484799f4076002a66cb71b"
 	err = TransferBadges(suite, wctx, transfers)
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
@@ -316,7 +316,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -352,7 +352,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -388,7 +388,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
@@ -487,7 +487,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestWrongExpectedProofLength() {
@@ -593,7 +593,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestIncrements() {
@@ -709,7 +709,7 @@ func (suite *TestSuite) TestIncrements() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -745,7 +745,7 @@ func (suite *TestSuite) TestIncrements() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
@@ -859,7 +859,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -894,7 +894,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
@@ -1014,7 +1014,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1141,7 +1141,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1190,7 +1190,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1316,7 +1316,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1442,7 +1442,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1491,7 +1491,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
@@ -1622,7 +1622,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1779,7 +1779,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -1934,7 +1934,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -2097,7 +2097,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -2230,7 +2230,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2265,7 +2265,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2300,7 +2300,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2335,7 +2335,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMultipleApprovalCriteria() {
@@ -2438,7 +2438,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2458,7 +2458,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2478,7 +2478,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
@@ -2581,7 +2581,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount)
@@ -2700,7 +2700,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2720,7 +2720,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	bobBalance, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount)
@@ -2836,7 +2836,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2856,7 +2856,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
@@ -2876,7 +2876,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2896,7 +2896,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -2916,7 +2916,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
@@ -3005,7 +3005,7 @@ func (suite *TestSuite) TestCantSetBothIncrementOwnershipTimesByAndApprovalDurat
 	}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Error(err, "Error creating badges")
+	suite.Require().Error(err, "Error creating tokens")
 }
 
 func (suite *TestSuite) TestCantSetBothIncrementOwnershipTimesByAndRecurringOwnershipTimes() {
@@ -3028,7 +3028,7 @@ func (suite *TestSuite) TestCantSetBothIncrementOwnershipTimesByAndRecurringOwne
 	}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Error(err, "Error creating badges")
+	suite.Require().Error(err, "Error creating tokens")
 }
 
 func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimestampOverride() {
@@ -3651,7 +3651,7 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 	}
 
 	err = TransferBadges(suite, wctx, msg)
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
 		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
@@ -3750,7 +3750,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 	}
 
 	err = TransferBadges(suite, wctx, msg)
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
 		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},

@@ -137,7 +137,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 	}
 
 	//It is first match only, so we can do this
-	//To help with determinism in comparing later, we sort by badge ID
+	//To help with determinism in comparing later, we sort by token ID
 	returnArr := []*types.UniversalPermissionDetails{}
 	for _, handledItem := range handled {
 		idxToInsert := 0
@@ -202,8 +202,8 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 		firstMatchesForNew := GetFirstMatchOnlyWithApprovalCriteria(ctx, newApprovalsCasted)
 
 		//Step 2:
-		//For every badge, we need to check if the new provided value is different in any way from the old value for each badge ID
-		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
+		//For every token, we need to check if the new provided value is different in any way from the old value for each token ID
+		//The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
 		//Note this okay since we already converted everything to first match only in the previous step
 		detailsToReturn := []*types.UniversalPermissionDetails{}
 		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
@@ -323,15 +323,15 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.BadgeMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each badge ID)
+		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each token ID)
 		oldBadgeMetadata := oldValue.([]*types.BadgeMetadata)
 		firstMatchesForOld := types.GetFirstMatchOnly(ctx, k.CastBadgeMetadataToUniversalPermission(oldBadgeMetadata))
 
 		newBadgeMetadata := newValue.([]*types.BadgeMetadata)
 		firstMatchesForNew := types.GetFirstMatchOnly(ctx, k.CastBadgeMetadataToUniversalPermission(newBadgeMetadata))
 
-		//For every badge, we need to check if the new provided value is different in any way from the old value for each specific badge ID
-		//The overlapObjects from GetOverlapsAndNonOverlaps will return which badge IDs overlap
+		//For every token, we need to check if the new provided value is different in any way from the old value for each specific token ID
+		//The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
 		detailsToReturn := []*types.UniversalPermissionDetails{}
 		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
 		for _, overlapObject := range overlapObjects {
@@ -362,7 +362,7 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 		return err
 	}
 
-	err = k.CheckIfTimedUpdateWithBadgeIdsPermissionPermits(ctx, detailsToCheck, canUpdateBadgeMetadata, "update badge metadata")
+	err = k.CheckIfTimedUpdateWithBadgeIdsPermissionPermits(ctx, detailsToCheck, canUpdateBadgeMetadata, "update token metadata")
 	if err != nil {
 		return err
 	}

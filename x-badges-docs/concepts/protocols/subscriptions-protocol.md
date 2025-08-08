@@ -1,10 +1,10 @@
 # Subscriptions Protocol
 
-The Subscriptions Protocol enables collections to implement subscription-based badge ownership with recurring payments, time-limited access, and a tipping system for automatic renewal. This protocol standardizes how subscription badges are created, distributed, and renewed.
+The Subscriptions Protocol enables collections to implement subscription-based token ownership with recurring payments, time-limited access, and a tipping system for automatic renewal. This protocol standardizes how subscription tokens are created, distributed, and renewed.
 
 ## Protocol Overview
 
-Subscription collections allow users to pay a recurring fee + tip to maintain ownership of badges for specific time periods. The protocol ensures predictable behavior for subscription management across different applications.
+Subscription collections allow users to pay a recurring fee + tip to maintain ownership of tokens for specific time periods. The protocol ensures predictable behavior for subscription management across different applications.
 
 ## Protocol Requirements
 
@@ -23,10 +23,10 @@ Collections must include "Subscriptions" in their standards timeline:
 }
 ```
 
-### Badge ID Configuration
+### Token ID Configuration
 
--   **Single Badge ID**: Only one badge ID range (1-1) is permitted
--   **Valid Badge IDs**: Must match exactly with subscription approval badge IDs
+-   **Single Token ID**: Only one token ID range (1-1) is permitted
+-   **Valid Token IDs**: Must match exactly with subscription approval token IDs
 
 ### Collection Approvals
 
@@ -76,16 +76,16 @@ Must use `incrementedBalances` with specific configuration:
 **Key Requirements:**
 
 -   **Amount**: Must be exactly 1
--   **Badge IDs**: Single badge ID (1-1)
+-   **Token IDs**: Single token ID (1-1)
 -   **Duration**: Must be greater than 0 (subscription period length)
 -   **Override Timestamp**: Must be true for faucet functionality
--   **No Increments**: Badge ID and ownership time increments must be 0
+-   **No Increments**: Token ID and ownership time increments must be 0
 -   **No Recurring**: Recurring ownership times must be all 0
 
 ##### Restrictions
 
 -   **No Merkle Challenges**: Cannot include merkle challenges
--   **No Badge Requirements**: Cannot include mustOwnBadges requirements
+-   **No Token Requirements**: Cannot include mustOwnBadges requirements
 -   **No Address Restrictions**: Cannot require from/to equals initiated by
 -   **No Override Approvals**: Cannot override incoming approvals
 
@@ -98,8 +98,8 @@ Users manage their subscriptions through incoming approvals that complement the 
 #### Basic Configuration
 
 -   **fromListId**: Must be "Mint"
--   **Badge IDs**: Must match subscription approval badge IDs exactly
--   **Single Badge**: Only one badge ID range permitted
+-   **Token IDs**: Must match subscription approval token IDs exactly
+-   **Single Token**: Only one token ID range permitted
 
 #### Coin Transfer Configuration
 
@@ -184,10 +184,10 @@ function doesCollectionFollowSubscriptionProtocol(collection) {
 
     if (subscriptionApprovals.length < 1) return false;
 
-    // Validate single badge ID requirement
+    // Validate single token ID requirement
     if (collection.validBadgeIds.length !== 1) return false;
 
-    // Ensure approval badge IDs match collection badge IDs
+    // Ensure approval token IDs match collection token IDs
     const allApprovalBadgeIds = subscriptionApprovals
         .map((approval) => approval.badgeIds)
         .flat();
@@ -242,7 +242,7 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
     // Must be from Mint
     if (userApproval.fromListId !== 'Mint') return false;
 
-    // Badge IDs must match subscription
+    // Token IDs must match subscription
     if (!badgeIdsMatch(userApproval.badgeIds, subscriptionApproval.badgeIds)) {
         return false;
     }
@@ -355,4 +355,4 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
 4. **Flexibility**: Configurable subscription periods and pricing
 5. **Validation**: Built-in compliance checking for protocol adherence
 
-The Subscriptions Protocol provides a robust foundation for implementing subscription-based badge systems while maintaining the flexibility and security of the BitBadges approval system.
+The Subscriptions Protocol provides a robust foundation for implementing subscription-based token systems while maintaining the flexibility and security of the BitBadges approval system.

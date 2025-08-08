@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Create badges and update the unminted / total supplys for the collection
+// Create tokens and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newValidBadgeIds []*types.UintRange) (*types.BadgeCollection, error) {
 	//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
 	if !IsStandardBalances(collection) {
@@ -26,14 +26,14 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 	}
 
 	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
-		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Badge Ids must be sequential starting from 1")
+		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Ids must be sequential starting from 1")
 	}
 
 	if len(newValidBadgeIds) == 0 {
 		return collection, nil
 	}
 
-	//Check if we are allowed to create these badges
+	//Check if we are allowed to create these tokens
 	detailsToCheck := []*types.UniversalPermissionDetails{}
 	for _, badgeIdRange := range newValidBadgeIds {
 		detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
@@ -41,7 +41,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		})
 	}
 
-	err = k.CheckIfBadgeIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidBadgeIds, "can create more badges")
+	err = k.CheckIfBadgeIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidBadgeIds, "can create more tokens")
 	if err != nil {
 		return &types.BadgeCollection{}, err
 	}

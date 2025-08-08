@@ -16,7 +16,7 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 		PayoutAddress: charlie,
 	}
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	charlieAddr, err := sdk.AccAddressFromBech32(charlie)
 	suite.Require().Nil(err, "error getting charlie address")
@@ -99,7 +99,7 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "test2"
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	charlieAddr, err := sdk.AccAddressFromBech32(charlie)
 	suite.Require().Nil(err, "error getting charlie address")

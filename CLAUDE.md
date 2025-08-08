@@ -71,7 +71,7 @@ git add *.pb.go *.pulsar.go
 This is a Cosmos SDK blockchain built with Ignite CLI that implements cross-chain digital token (badges) issuance and management.
 
 ### Key Modules
-- **x/badges** - Core badge functionality (collections, transfers, balances, permissions)
+- **x/badges** - Core token functionality (collections, transfers, balances, permissions)
 - **x/maps** - Key-value mapping functionality  
 - **x/anchor** - Anchoring and verification system
 - **x/wasmx** - Extended WASM functionality

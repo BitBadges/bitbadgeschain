@@ -1,6 +1,6 @@
 # MsgUpdateCollection
 
-Updates an existing badge collection's properties.
+Updates an existing collection's properties.
 
 ## Update Flag Pattern
 

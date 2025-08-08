@@ -11,7 +11,7 @@ Invariants are collection-level properties that are set during genesis (collecti
 ```protobuf
 message CollectionInvariants {
   // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
-  // This prevents time-based restrictions on badge ownership.
+  // This prevents time-based restrictions on token ownership.
   bool noCustomOwnershipTimes = 1;
 }
 ```
@@ -99,7 +99,7 @@ The `noCustomOwnershipTimes` invariant is validated at several points:
 
 1. **Collection Creation**: When creating a new collection
 2. **Collection Updates**: When updating collection approvals
-3. **Transfer Execution**: When processing badge transfers
+3. **Transfer Execution**: When processing token transfers
 4. **Approval Updates**: When updating user or collection approvals
 
 ## Error Messages
@@ -112,7 +112,7 @@ noCustomOwnershipTimes invariant is enabled: ownership times must be full range 
 
 ## Related Concepts
 
--   [Badge Collections](./badge-collections.md)
+-   [Collections](./badge-collections.md)
 -   [Transferability Approvals](./transferability-approvals.md)
 -   [Time Fields](./time-fields.md)
 -   [UintRange](./uintrange.md)

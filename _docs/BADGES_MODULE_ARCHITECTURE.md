@@ -33,7 +33,7 @@ Timeline Architecture:
 
 ### 2. Three-Tier Approval System
 
-All badge transfers must satisfy three independent approval levels:
+All token transfers must satisfy three independent approval levels:
 
 ```
 Transfer Approval Flow:
@@ -53,7 +53,7 @@ Transfer Approval Flow:
 ### 3. Range-Based Efficiency
 
 Everything is expressed as ranges (UintRange) for computational efficiency:
-- Badge IDs: `[1-1000]` instead of 1000 individual IDs
+- Token IDs: `[1-1000]` instead of 1000 individual IDs
 - Time ranges: `[start_time-end_time]` for temporal validity
 - Amount ranges: `[min_amount-max_amount]` for quantities
 
@@ -68,7 +68,7 @@ Users inherit collection defaults until they explicitly override them:
 
 ### 1. Collection Manager
 
-**Responsibility**: Manages the lifecycle and properties of badge collections
+**Responsibility**: Manages the lifecycle and properties of collections
 
 ```go
 type CollectionManager struct {
@@ -92,7 +92,7 @@ type CollectionManager struct {
 
 ### 2. Balance Engine
 
-**Responsibility**: Tracks badge ownership with temporal and quantity precision
+**Responsibility**: Tracks token ownership with temporal and quantity precision
 
 ```go
 type BalanceEngine struct {
@@ -405,7 +405,7 @@ IBC Packet Flow:
         │                                               │
         ▼                                               ▼
 ┌─────────────────┐                         ┌─────────────────┐
-│ Badge Lock      │                         │ Badge Unlock    │
+│ Token Lock      │                         │ Token Unlock    │
 │ • Escrow badges │                         │ • Mint/Release  │
 │ • Create packet │                         │ • Verify packet │
 │ • Send via IBC  │                         │ • Update state  │
@@ -421,7 +421,7 @@ WASM Binding Architecture:
 ├─────────────────────────────────────────────────────────────────┤
 │ Custom Query Bindings    │ Custom Message Bindings             │
 │ • Get collection info    │ • Create collection                  │
-│ • Query balances         │ • Transfer badges                    │
+│ • Query balances         │ • Transfer tokens                    │
 │ • Check approvals        │ • Update approvals                   │
 │ • Dynamic store queries  │ • Set dynamic store values           │
 └─────────────────────────────────────────────────────────────────┘
@@ -438,7 +438,7 @@ WASM Binding Architecture:
 ### 1. Range-Based Computation
 
 Instead of iterating individual elements:
-- Badge IDs stored as ranges: O(1) vs O(n)
+- Token IDs stored as ranges: O(1) vs O(n)
 - Time ranges for temporal queries: O(log n) vs O(n)
 - Amount ranges for balance operations: O(1) vs O(n)
 
@@ -492,7 +492,7 @@ Permission Hierarchy:
 ├─────────────────────────────────────────────────────────────────┤
 │ Individual Users                                                │
 │ • Personal approval settings                                    │
-│ • Badge transfers                                               │
+│ • Token transfers                                               │
 │ • Dynamic store interactions                                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -526,4 +526,4 @@ Validation Stack:
 - **Resource bounds**: Practical limits on collection sizes
 - **Fee mechanisms**: Optional protocol fees for sustainability
 
-This architecture provides a robust foundation for the complex badge management system while maintaining performance, security, and extensibility for future enhancements.
+This architecture provides a robust foundation for the complex token management system while maintaining performance, security, and extensibility for future enhancements.

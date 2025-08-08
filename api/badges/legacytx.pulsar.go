@@ -13559,7 +13559,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
+// The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the tokens module.
 type UserOutgoingApprovalTimeline struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -13694,7 +13694,7 @@ type MsgNewCollection struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+	// See collections.proto for more details about these MsgNewBadge fields. Defines the token details. Leave unneeded fields empty.
 	Creator                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionMetadataTimeline       []*CollectionMetadataTimeline       `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	BadgeMetadataTimeline            []*BadgeMetadataTimeline            `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
@@ -13704,14 +13704,14 @@ type MsgNewCollection struct {
 	CollectionApprovals              []*CollectionApproval               `protobuf:"bytes,8,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	Permissions                      *CollectionPermissions              `protobuf:"bytes,9,opt,name=permissions,proto3" json:"permissions,omitempty"`
 	StandardsTimeline                []*StandardsTimeline                `protobuf:"bytes,10,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
-	// Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+	// Token supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
 	// If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
 	BadgesToCreate                 []*Balance                 `protobuf:"bytes,11,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
 	Transfers                      []*Transfer                `protobuf:"bytes,12,rep,name=transfers,proto3" json:"transfers,omitempty"`
 	ContractAddressTimeline        []*ContractAddressTimeline `protobuf:"bytes,13,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
 	AddressLists                   []*AddressList             `protobuf:"bytes,14,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
-	DefaultOutgoingApprovals       []*UserOutgoingApproval    `protobuf:"bytes,15,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"` //The user's approved transfers for each badge ID.
-	DefaultIncomingApprovals       []*UserIncomingApproval    `protobuf:"bytes,16,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"` //The user's approved incoming transfers for each badge ID.
+	DefaultOutgoingApprovals       []*UserOutgoingApproval    `protobuf:"bytes,15,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"` //The user's approved transfers for each token ID.
+	DefaultIncomingApprovals       []*UserIncomingApproval    `protobuf:"bytes,16,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"` //The user's approved incoming transfers for each token ID.
 	DefaultDisapproveSelfInitiated bool                       `protobuf:"varint,17,opt,name=defaultDisapproveSelfInitiated,proto3" json:"defaultDisapproveSelfInitiated,omitempty"`
 	// The default balances for the user
 	DefaultBalances             []*Balance                        `protobuf:"bytes,18,rep,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
@@ -13899,7 +13899,7 @@ func (x *MsgNewCollectionResponse) GetCollectionId() string {
 	return ""
 }
 
-// This handles both minting more of existing badges and creating new badges.
+// This handles both minting more of existing badges and creating new tokens.
 type MsgMintAndDistributeBadges struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

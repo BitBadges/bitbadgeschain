@@ -87,7 +87,7 @@ const EmptyApprovalCriteria = {
             percentage: '0',
             payoutAddress: '',
         },
-        // No badges to check ownership of
+        // No tokens to check ownership of
         mustOwnBadges: [],
     },
 };

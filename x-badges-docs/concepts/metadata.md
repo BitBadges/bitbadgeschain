@@ -1,6 +1,6 @@
 # Metadata
 
-BitBadges allows defining metadata for both collections and individual badges using timeline-based metadata fields. This enables rich, dynamic content that can change over time while maintaining on-chain verifiability.
+BitBadges allows defining metadata for both collections and individual tokens using timeline-based metadata fields. This enables rich, dynamic content that can change over time while maintaining on-chain verifiability.
 
 ## Metadata Timelines
 
@@ -25,9 +25,9 @@ The `collectionMetadataTimeline` defines metadata for the entire collection over
 ]
 ```
 
-### Badge Metadata Timeline
+### Token Metadata Timeline
 
-The `badgeMetadataTimeline` defines metadata for individual badges over time. The order of `badgeMetadata` entries matters, as it uses a **first-match approach** via linear scan for specific badge IDs. BitBadges uses the `{id}` placeholder in the badge metadata URI to replace with the actual badge ID.
+The `badgeMetadataTimeline` defines metadata for individual tokens over time. The order of `badgeMetadata` entries matters, as it uses a **first-match approach** via linear scan for specific token IDs. BitBadges uses the `{id}` placeholder in the token metadata URI to replace with the actual token ID.
 
 ```json
 "badgeMetadataTimeline": [
@@ -75,16 +75,16 @@ export interface Metadata<T extends NumberType> {
 
 ## Key Features
 
-### Dynamic Badge ID Replacement
+### Dynamic Token ID Replacement
 
--   If the badge metadata URI includes `"{id}"`, it's replaced with the actual badge ID
--   Example: `"...abc.com/metadata/{id}"` becomes `"...abc.com/metadata/1"` for badge ID 1
+-   If the token metadata URI includes `"{id}"`, it's replaced with the actual token ID
+-   Example: `"...abc.com/metadata/{id}"` becomes `"...abc.com/metadata/1"` for token ID 1
 -   Enables efficient metadata generation for large collections
 
-### First-Match Badge Metadata
+### First-Match Token Metadata
 
--   Badge metadata entries are evaluated in order
--   First matching entry for a badge ID is used
+-   Token metadata entries are evaluated in order
+-   First matching entry for a token ID is used
 -   Allows specific overrides before general rules
 
 ## Permission Control
@@ -103,7 +103,7 @@ Metadata updates are controlled by collection permissions:
 ]
 ```
 
-### Badge Metadata Permission
+### Token Metadata Permission
 
 ```json
 "canUpdateBadgeMetadata": [

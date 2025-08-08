@@ -1,17 +1,17 @@
-# Simple Badge Transfer
+# Simple Token Transfer
 
-This example demonstrates a basic badge transfer from the mint to a specific address.
+This example demonstrates a basic token transfer from the mint to a specific address.
 
 ## Overview
 
-This transfer creates badge ID 1 from collection 20 and sends it to the creator address. The badge has full ownership time range and uses collection-level approval.
+This transfer creates token ID 1 from collection 20 and sends it to the creator address. The token has full ownership time range and uses collection-level approval.
 
 ## Transfer Details
 
 -   **Collection ID**: 20
--   **Badge ID**: 1
+-   **Token ID**: 1
 -   **Amount**: 1
--   **From**: Mint (new badge creation)
+-   **From**: Mint (new token creation)
 -   **To**: Creator address
 -   **Approval**: Collection-level approval (assumes user-level approvals successfully auto-scan)
 
@@ -75,7 +75,7 @@ This transfer creates badge ID 1 from collection 20 and sends it to the creator 
 
 ### Transfer Source
 
--   `"from": "Mint"` - Indicates this is a new badge creation from the mint
+-   `"from": "Mint"` - Indicates this is a new token creation from the mint
 
 ### Destination
 
@@ -83,9 +83,9 @@ This transfer creates badge ID 1 from collection 20 and sends it to the creator 
 
 ### Balance Specification
 
--   `"amount": "1"` - Transfer 1 badge
+-   `"amount": "1"` - Transfer 1 token
 -   `"ownershipTimes"` - Full ownership time range (1 to max uint64)
--   `"badgeIds"` - Specific badge ID range (1 to 1)
+-   `"badgeIds"` - Specific token ID range (1 to 1)
 
 ### Approval Configuration
 
@@ -102,4 +102,4 @@ This transfer creates badge ID 1 from collection 20 and sends it to the creator 
 
 ## Usage
 
-This example can be used as a template for basic badge minting operations where you want to create a new badge and transfer it to a specific address using collection-level approval.
+This example can be used as a template for basic token minting operations where you want to create a new token and transfer it to a specific address using collection-level approval.

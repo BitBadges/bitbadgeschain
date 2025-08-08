@@ -1,6 +1,6 @@
 # MsgSetIncomingApproval
 
-A helper message to set a single incoming approval for badge transfers. This is a developer-friendly wrapper around `MsgUpdateUserApprovals` that simplifies setting individual incoming approvals. For more information, we refer to the [MsgUpdateUserApprovals](./msg-update-user-approvals.md) documentation.
+A helper message to set a single incoming approval for token transfers. This is a developer-friendly wrapper around `MsgUpdateUserApprovals` that simplifies setting individual incoming approvals. For more information, we refer to the [MsgUpdateUserApprovals](./msg-update-user-approvals.md) documentation.
 
 ## Overview
 

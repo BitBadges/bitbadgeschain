@@ -8,7 +8,7 @@ For detailed information about each field, see the corresponding concepts docume
 
 | Field                         | Concepts Link                                               |
 | ----------------------------- | ----------------------------------------------------------- |
-| `validBadgeIds`               | [Valid Badge IDs](../concepts/valid-badge-ids.md)           |
+| `validBadgeIds`               | [Valid Token IDs](../concepts/valid-badge-ids.md)           |
 | `balancesType`                | [Balances Type](../concepts/balances-type.md)               |
 | `managerTimeline`             | [Manager](../concepts/manager.md)                           |
 | `collectionMetadataTimeline`  | [Metadata](../concepts/metadata.md)                         |
@@ -65,7 +65,7 @@ const BaseCollectionDetails = {
             timelineTimes: FullTimeRanges,
             badgeMetadata: [
                 {
-                    uri: 'ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/{id}', // Points to a valid .json metadata file (replacing {id} with the badge ID)
+                    uri: 'ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/{id}', // Points to a valid .json metadata file (replacing {id} with the token ID)
                     badgeIds: [
                         {
                             start: '1',
@@ -115,7 +115,7 @@ const BaseCollectionDetails = {
         },
     ],
 
-    // If you want to add paths to wrap badges as Cosmos coins, you can do so here.
+    // If you want to add paths to wrap tokens as Cosmos coins, you can do so here.
     cosmosCoinWrapperPathsToAdd: [],
 
     defaultBalances: {

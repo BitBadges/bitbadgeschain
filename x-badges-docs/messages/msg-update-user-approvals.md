@@ -1,6 +1,6 @@
 # MsgUpdateUserApprovals
 
-Updates a user's approval settings for badge transfers.
+Updates a user's approval settings for token transfers.
 
 ## Collection ID Auto-Lookup
 

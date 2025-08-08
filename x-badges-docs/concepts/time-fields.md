@@ -1,6 +1,6 @@
 # Different Time Fields
 
-BitBadges uses various time-related fields to manage permissions, timelines, transfers, and ownership. Understanding these fields is crucial for effectively managing collections and badges.
+BitBadges uses various time-related fields to manage permissions, timelines, transfers, and ownership. Understanding these fields is crucial for effectively managing collections and tokens.
 
 ## Time Representation
 
@@ -23,17 +23,17 @@ Time fields use UintRange format with valid values from 1 to 1844674407370955161
 ### 3. timelineTimes
 
 -   **Purpose**: Specifies when a field is scheduled to have a specific value in a timeline-based field
--   **Usage**: Scheduling changes to collection or badge properties over time
+-   **Usage**: Scheduling changes to collection or token properties over time
 
 ### 4. transferTimes
 
 -   **Purpose**: Defines when a transfer transaction can occur (i.e. when an approval is valid)
--   **Usage**: Setting periods when badges can be transferred between addresses
+-   **Usage**: Setting periods when tokens can be transferred between addresses
 
 ### 5. ownershipTimes
 
--   **Purpose**: Specifies the times that a user owns a badge
--   **Usage**: Defining the duration of badge ownership for users
+-   **Purpose**: Specifies the times that a user owns a token
+-   **Usage**: Defining the duration of token ownership for users
 
 ## Important Note
 
@@ -43,7 +43,7 @@ The `timelineTimes` in permissions correspond to the updatability of the timelin
 
 ### Example 1: Presidential Election Badges
 
-Scenario: Users participate in a US presidential election by casting votes through badge transfers.
+Scenario: Users participate in a US presidential election by casting votes through token transfers.
 
 -   T1: Conclusion of voting
 -   T2: Start of presidential term
@@ -87,7 +87,7 @@ isArchived: true for [{ start: 1, end: MAX_TIME }]
 1. **Clear Timelines**: Always define clear and non-overlapping time ranges for each field to avoid confusion and conflicts
 2. **Permission Management**: Carefully consider the implications of setting `permanentlyPermittedTimes` and `permanentlyForbiddenTimes`, as these can significantly impact the flexibility of your collection
 3. **Timeline Planning**: When using `timelineTimes`, plan your collection's lifecycle in advance to minimize the need for frequent updates
-4. **Transfer Windows**: Use `transferTimes` to create specific windows for badge transfers, which can be useful for time-limited events or phased distributions
-5. **Ownership Tracking**: Leverage `ownershipTimes` to create badges with time-bound ownership, useful for temporary privileges or rotating responsibilities
+4. **Transfer Windows**: Use `transferTimes` to create specific windows for token transfers, which can be useful for time-limited events or phased distributions
+5. **Ownership Tracking**: Leverage `ownershipTimes` to create tokens with time-bound ownership, useful for temporary privileges or rotating responsibilities
 6. **Permission Locking**: Be cautious when permanently locking permissions, as this action is irreversible and may limit future flexibility
 7. **Time Synchronization**: Ensure all systems interacting with your BitBadges collection are properly time-synchronized to avoid discrepancies in time-based operations

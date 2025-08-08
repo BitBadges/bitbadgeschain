@@ -44,18 +44,18 @@ The manager role can be granted various permissions, allowing for flexible admin
 2. **Collection Archiving** - Archive a collection, making it read-only and rejecting all transactions until unarchived
 3. **Core Collection Updates** - Modifying essential details such as metadata URLs and collection standards
 4. **Manager Role Transfer** - The ability to pass the manager role to another address
-5. **Badge Creation** - Permission to mint additional badges within the collection
+5. **Token Creation** - Permission to mint additional tokens within the collection
 6. **Custom Permissions** - Collection-specific permissions depending on setup
 
 ### Metadata Management
 
 -   **Collection Metadata Updates** - Modify collection-level metadata and URIs
--   **Badge Metadata Updates** - Update individual badge metadata (with badge-specific permissions)
+-   **Token Metadata Updates** - Update individual token metadata (with token-specific permissions)
 -   **Timeline Management** - Schedule metadata changes over time
 
 ### Transferability Control
 
--   **Approval Settings** - Modify the collection's approval settings that determine how badges can be transferred
+-   **Approval Settings** - Modify the collection's approval settings that determine how tokens can be transferred
 -   **Transfer Rules** - Update transferability conditions and restrictions
 -   **Permission Updates** - Configure transferability permissions
 
@@ -79,7 +79,7 @@ Permissions can be customized based on various factors:
 
 ### Permission Dimensions
 
--   **Badge Specificity** - Which particular badges within the collection can be affected
+-   **Token Specificity** - Which particular tokens within the collection can be affected
 -   **Time Constraints** - When can certain actions be performed
 -   **Value Limitations** - What specific values or ranges are allowed for updates
 -   **Conditional Triggers** - Under what circumstances can certain permissions be exercised

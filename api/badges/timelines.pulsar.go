@@ -4691,15 +4691,15 @@ func (x *CollectionMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// BadgeMetadataTimeline defines the metadata for badges at different timeline times.
+// BadgeMetadataTimeline defines the metadata for tokens at different timeline times.
 type BadgeMetadataTimeline struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The badge metadata for a specific timeline element.
+	// The token metadata for a specific timeline element.
 	BadgeMetadata []*BadgeMetadata `protobuf:"bytes,1,rep,name=badgeMetadata,proto3" json:"badgeMetadata,omitempty"`
-	// The timeline times when the badge metadata is valid. Can not overlap with other timeline elements in same array.
+	// The timeline times when the token metadata is valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 

@@ -33,12 +33,12 @@ Collections marked with the **Tradable** standard are marked as tradable on the 
 
 ### 2. NFT Standard
 
-Collections marked with the **NFT** standard are expected to be non-fungible tokens with supply = 1 for every badge ID.
+Collections marked with the **NFT** standard are expected to be non-fungible tokens with supply = 1 for every token ID.
 
 -   **Requirements**:
-    -   Each badge ID must have supply = 1 and full ownership times
-    -   No fungible badge IDs allowed
-    -   Maintains uniqueness across all badge IDs in the collection
+    -   Each token ID must have supply = 1 and full ownership times
+    -   No fungible token IDs allowed
+    -   Maintains uniqueness across all token IDs in the collection
 
 ### 3. Cosmos Wrappable Standard
 
@@ -55,7 +55,7 @@ Collections marked with the **Subscriptions** standard are designed for recurrin
 
 -   **Requirements**:
     -   Must support time-based ownership periods for subscription-like behavior
-    -   Must be able to handle recurring badge issuance and expiration
+    -   Must be able to handle recurring token issuance and expiration
     -   Should support dynamic content updates based on subscription status
 -   **Implementation**: See [Subscriptions Protocol](protocols/subscriptions-protocol.md) for detailed implementation requirements and validation logic
 
@@ -65,7 +65,7 @@ Collections marked with the **Quests** standard are designed for achievement-bas
 
 -   **Requirements**:
     -   Should implement quest completion tracking and reward distribution
-    -   Must support achievement-based badge issuance
+    -   Must support achievement-based token issuance
     -   Should handle quest progression and milestone tracking
 
 ### Using BitBadges Standards

@@ -38,11 +38,11 @@ func (suite *TestSuite) TestWrapBadges() {
 		},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance")
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalanceBefore.Balances[0].Amount, "Error creating badges")
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalanceBefore.Balances[0].Amount, "Error creating tokens")
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
@@ -65,9 +65,9 @@ func (suite *TestSuite) TestWrapBadges() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error wrapping badges")
+	suite.Require().Nil(err, "Error wrapping tokens")
 
-	//1. ensure badges were burned
+	//1. ensure tokens were burned
 	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance")
 
@@ -75,16 +75,16 @@ func (suite *TestSuite) TestWrapBadges() {
 	suite.Require().Nil(err, "Error subtracting balances")
 
 	// len 1, amount 1, badgeIds 1, full ownership times
-	suite.Require().Equal(1, len(diffInBalances), "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].Amount, "Error burning badges")
-	suite.Require().Equal(1, len(diffInBalances[0].BadgeIds), "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].Start, "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].End, "Error burning badges")
-	suite.Require().Equal(GetFullUintRanges(), diffInBalances[0].OwnershipTimes, "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].OwnershipTimes[0].Start, "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(18446744073709551615), diffInBalances[0].OwnershipTimes[0].End, "Error burning badges")
+	suite.Require().Equal(1, len(diffInBalances), "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].Amount, "Error burning tokens")
+	suite.Require().Equal(1, len(diffInBalances[0].BadgeIds), "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].Start, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].End, "Error burning tokens")
+	suite.Require().Equal(GetFullUintRanges(), diffInBalances[0].OwnershipTimes, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].OwnershipTimes[0].Start, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(18446744073709551615), diffInBalances[0].OwnershipTimes[0].End, "Error burning tokens")
 
-	// //2. ensure badges were wrapped
+	// //2. ensure tokens were wrapped
 	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 
@@ -94,9 +94,9 @@ func (suite *TestSuite) TestWrapBadges() {
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
-	suite.Require().Equal(sdkmath.NewUint(1), bobAmount, "Error wrapping badges")
+	suite.Require().Equal(sdkmath.NewUint(1), bobAmount, "Error wrapping tokens")
 
-	// Unwrap the badges
+	// Unwrap the tokens
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -114,16 +114,16 @@ func (suite *TestSuite) TestWrapBadges() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error unwrapping badges")
+	suite.Require().Nil(err, "Error unwrapping tokens")
 
-	// Ensure badges were unwrapped
+	// Ensure tokens were unwrapped
 	bobBalanceAfterUnwrap, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance")
-	suite.Require().Equal(bobBalanceBefore.Balances, bobBalanceAfterUnwrap.Balances, "Error unwrapping badges")
+	suite.Require().Equal(bobBalanceBefore.Balances, bobBalanceAfterUnwrap.Balances, "Error unwrapping tokens")
 
 	// Ensure the denom was burned
 	bobBalanceDenomAfterUnwrap := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
-	suite.Require().Equal(sdkmath.NewInt(0), bobBalanceDenomAfterUnwrap.Amount, "Error unwrapping badges")
+	suite.Require().Equal(sdkmath.NewInt(0), bobBalanceDenomAfterUnwrap.Amount, "Error unwrapping tokens")
 }
 
 func (suite *TestSuite) TestWrapBadgesErrors() {
@@ -157,11 +157,11 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 		},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance")
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalanceBefore.Balances[0].Amount, "Error creating badges")
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalanceBefore.Balances[0].Amount, "Error creating tokens")
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
@@ -191,9 +191,9 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error wrapping badges")
+	suite.Require().Error(err, "Error wrapping tokens")
 
-	// Test wrong badge IDs
+	// Test wrong token IDs
 	newBalancesClone := make([]*types.Balance, len(balances))
 	copy(newBalancesClone, balances)
 	newBalancesClone[0].BadgeIds[0].Start = sdkmath.NewUint(2)
@@ -210,7 +210,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error wrapping badges")
+	suite.Require().Error(err, "Error wrapping tokens")
 
 	// Test wrong ownership times
 	newBalancesClone[0].OwnershipTimes[0].Start = sdkmath.NewUint(2)
@@ -227,7 +227,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error wrapping badges")
+	suite.Require().Error(err, "Error wrapping tokens")
 }
 
 func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
@@ -261,11 +261,11 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 		},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating badges")
+	suite.Require().Nil(err, "error creating tokens")
 
 	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance")
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalanceBefore.Balances[0].Amount, "Error creating badges")
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalanceBefore.Balances[0].Amount, "Error creating tokens")
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
@@ -288,9 +288,9 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error wrapping badges")
+	suite.Require().Nil(err, "Error wrapping tokens")
 
-	//1. ensure badges were burned
+	//1. ensure tokens were burned
 	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance")
 
@@ -298,16 +298,16 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	suite.Require().Nil(err, "Error subtracting balances")
 
 	// len 1, amount 1, badgeIds 1, full ownership times
-	suite.Require().Equal(1, len(diffInBalances), "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].Amount, "Error burning badges")
-	suite.Require().Equal(1, len(diffInBalances[0].BadgeIds), "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].Start, "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].End, "Error burning badges")
-	suite.Require().Equal(GetFullUintRanges(), diffInBalances[0].OwnershipTimes, "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].OwnershipTimes[0].Start, "Error burning badges")
-	suite.Require().Equal(sdkmath.NewUint(18446744073709551615), diffInBalances[0].OwnershipTimes[0].End, "Error burning badges")
+	suite.Require().Equal(1, len(diffInBalances), "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].Amount, "Error burning tokens")
+	suite.Require().Equal(1, len(diffInBalances[0].BadgeIds), "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].Start, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].End, "Error burning tokens")
+	suite.Require().Equal(GetFullUintRanges(), diffInBalances[0].OwnershipTimes, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].OwnershipTimes[0].Start, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(18446744073709551615), diffInBalances[0].OwnershipTimes[0].End, "Error burning tokens")
 
-	// //2. ensure badges were wrapped
+	// //2. ensure tokens were wrapped
 	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 
@@ -317,7 +317,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
-	suite.Require().Equal(sdkmath.NewUint(1), bobAmount, "Error wrapping badges")
+	suite.Require().Equal(sdkmath.NewUint(1), bobAmount, "Error wrapping tokens")
 
 	// Transfer some of the balance to alice
 	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
@@ -325,7 +325,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	err = suite.app.BankKeeper.SendCoins(suite.ctx, bobAccAddr, aliceAccAddr, sdk.Coins{sdk.NewCoin(fullDenom, sdkmath.NewIntFromBigInt(bobAmount.BigInt()))})
 	suite.Require().Nil(err, "Error sending coins")
 
-	// Unwrap the badges - bob should fail
+	// Unwrap the tokens - bob should fail
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -343,9 +343,9 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error unwrapping badges")
+	suite.Require().Error(err, "Error unwrapping tokens")
 
-	// Unwrap the badges - alice should succeed
+	// Unwrap the tokens - alice should succeed
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
@@ -363,5 +363,5 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error unwrapping badges")
+	suite.Require().Nil(err, "Error unwrapping tokens")
 }

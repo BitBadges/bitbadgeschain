@@ -1,10 +1,10 @@
 # Burnable Approval
 
-This example demonstrates how to create a burnable approval that allows badges to be sent to the burn address (0x0000000000000000000000000000000000000000), effectively removing them from circulation.
+This example demonstrates how to create a burnable approval that allows tokens to be sent to the burn address (0x0000000000000000000000000000000000000000), effectively removing them from circulation.
 
 ## Overview
 
-A burnable approval enables badges to be permanently destroyed by sending them to the zero address.
+A burnable approval enables tokens to be permanently destroyed by sending them to the zero address.
 
 ## Code Example
 

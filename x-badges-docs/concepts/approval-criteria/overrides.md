@@ -20,8 +20,8 @@ This enables forced transfers without user consent.
 
 ## Use Cases
 
--   **Force Revoke**: Remove badges from users
--   **Freeze Badges**: Prevent transfers regardless of user settings
+-   **Force Revoke**: Remove tokens from users
+-   **Freeze Tokens**: Prevent transfers regardless of user settings
 -   **Emergency Actions**: Administrative control over transfers
 
 ## Mint Address Requirement

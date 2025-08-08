@@ -2,11 +2,11 @@
 
 ## Overview
 
-Predetermined balances provide fine-grained control over the exact amounts and order of transfers in an approval. Unlike traditional tally-based systems where you approve a total amount (e.g., 100 badges) without controlling the specific combinations, predetermined balances let you explicitly define:
+Predetermined balances provide fine-grained control over the exact amounts and order of transfers in an approval. Unlike traditional tally-based systems where you approve a total amount (e.g., 100 tokens) without controlling the specific combinations, predetermined balances let you explicitly define:
 
 -   **Exact amounts** that must be transferred
 -   **Specific order** of transfers
--   **Precise badge IDs and ownership times** for each transfer
+-   **Precise token IDs and ownership times** for each transfer
 
 **Key Principle**: The transfer will fail if the balances are not EXACTLY as defined in the predetermined balances.
 
@@ -109,11 +109,11 @@ Define starting balances and rules for subsequent transfers. Perfect for sequent
 
 | Field                            | Description                                          | Example                                              |
 | -------------------------------- | ---------------------------------------------------- | ---------------------------------------------------- |
-| `incrementBadgeIdsBy`            | Amount to increment badge IDs by after each transfer | `"1"` = next transfer gets badge ID 2, then 3, etc.  |
+| `incrementBadgeIdsBy`            | Amount to increment token IDs by after each transfer | `"1"` = next transfer gets token ID 2, then 3, etc.  |
 | `incrementOwnershipTimesBy`      | Amount to increment ownership times by               | `"86400000"` = add 1 day to ownership times          |
 | `durationFromTimestamp`          | Calculate ownership times from timestamp + duration  | `"2592000000"` = 30 days from transfer time          |
 | `allowOverrideTimestamp`         | Allow custom timestamp override in transfer          | `true` = users can specify custom start time         |
-| `allowOverrideWithAnyValidBadge` | Allow any valid badge ID (one) override              | `true` = users can specify any single valid badge ID |
+| `allowOverrideWithAnyValidBadge` | Allow any valid token ID (one) override              | `true` = users can specify any single valid token ID |
 | `recurringOwnershipTimes`        | Define recurring time intervals                      | Monthly subscriptions, weekly rewards                |
 
 #### Duration From Timestamp
@@ -157,7 +157,7 @@ Define repeating time intervals for subscriptions or periodic rewards:
 Predetermined balances can change rapidly between transaction broadcast and confirmation. For example:
 
 -   Other users' mints get processed
--   Badge IDs shift due to concurrent activity
+-   Token IDs shift due to concurrent activity
 -   Manual balance specification becomes unreliable
 
 ### The Solution: Precalculation
@@ -200,12 +200,12 @@ The order number determines which balances to transfer, but it works differently
 -   **Order number = 1**: Apply increments once to starting balances
 -   **Order number = 5**: Apply increments five times to starting balances
 
-**Example**: Starting with badge ID 1, increment by 1:
+**Example**: Starting with token ID 1, increment by 1:
 
--   Order 0: Badge ID 1
--   Order 1: Badge ID 2
--   Order 2: Badge ID 3
--   Order 5: Badge ID 6
+-   Order 0: Token ID 1
+-   Order 1: Token ID 2
+-   Order 2: Token ID 3
+-   Order 5: Token ID 6
 
 ### Transfer-Based Order Numbers
 
@@ -235,7 +235,7 @@ Use Merkle challenge leaf indices (leftmost = 0, rightmost = numLeaves - 1) for 
 }
 ```
 
-**Use Case**: Reserve specific badge IDs for specific users or claim codes.
+**Use Case**: Reserve specific token IDs for specific users or claim codes.
 
 ## Order Calculation Interface
 
@@ -256,7 +256,7 @@ export interface PredeterminedOrderCalculationMethod {
 
 Every approval defines bounds through its core fields (badgeIds, ownershipTimes, etc.). For example:
 
--   **Badge IDs**: 1-100
+-   **Token IDs**: 1-100
 -   **Ownership Times**: Mon-Fri only
 -   **Transfer Times**: Specific date range
 
@@ -270,11 +270,11 @@ Predetermined balances must work within these bounds, but note that order number
 
 **Example**:
 
--   Approval allows badge IDs 1-100
+-   Approval allows token IDs 1-100
 -   Increment by 1 for each transfer
--   Order number 101 would require badge ID 101 (out of bounds)
+-   Order number 101 would require token ID 101 (out of bounds)
 
-**Result**: Transfer is ignored because badge ID 101 never matches the approval's badge ID range.
+**Result**: Transfer is ignored because token ID 101 never matches the approval's token ID range.
 
 #### Partial Overlap
 
@@ -282,9 +282,9 @@ Predetermined balances must work within these bounds, but note that order number
 
 **Example**:
 
--   Approval allows badge IDs 1-100
--   Transfer requires badge IDs 95-105
--   Badge IDs 95-100 are in bounds, 101-105 are out of bounds
+-   Approval allows token IDs 1-100
+-   Transfer requires token IDs 95-105
+-   Token IDs 95-100 are in bounds, 101-105 are out of bounds
 
 **Result**:
 

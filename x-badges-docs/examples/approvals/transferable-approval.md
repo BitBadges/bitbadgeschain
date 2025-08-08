@@ -1,10 +1,10 @@
 # Transferable Approval
 
-This example demonstrates how to create a basic transferable approval that allows badges to be freely transferred between any users after minting.
+This example demonstrates how to create a basic transferable approval that allows tokens to be freely transferred between any users after minting.
 
 ## Overview
 
-A transferable approval enables badges to be moved between addresses without restrictions.
+A transferable approval enables tokens to be moved between addresses without restrictions.
 
 ## Code Example
 

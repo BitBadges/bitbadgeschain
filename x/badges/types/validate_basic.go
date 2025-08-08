@@ -284,7 +284,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 		}
 
 		if err := ValidateRangesAreValid(collectionApproval.BadgeIds, false, false); err != nil {
-			return sdkerrors.Wrapf(err, "invalid badge IDs")
+			return sdkerrors.Wrapf(err, "invalid token IDs")
 		}
 
 		if err := ValidateRangesAreValid(collectionApproval.TransferTimes, false, false); err != nil {
@@ -362,7 +362,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					}
 
 					if err := ValidateRangesAreValid(mustOwnBadgeBalance.BadgeIds, false, false); err != nil {
-						return sdkerrors.Wrapf(err, "invalid badge IDs")
+						return sdkerrors.Wrapf(err, "invalid token IDs")
 					}
 
 					if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnershipTimes, false, false); err != nil {
@@ -602,7 +602,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						}
 
 						if badgeIdOverrideCount > 1 {
-							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment badge ids by, or allow override with any valid badge can be set")
+							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment token ids by, or allow override with any valid ID can be set")
 						}
 
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
@@ -735,7 +735,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 
 		err = ValidateRangesAreValid(balance.BadgeIds, false, true)
 		if err != nil {
-			return balances, sdkerrors.Wrapf(err, "invalid balance badge ids")
+			return balances, sdkerrors.Wrapf(err, "invalid balance token ids")
 		}
 
 		err = ValidateRangesAreValid(balance.OwnershipTimes, false, true)
@@ -864,11 +864,11 @@ func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool)
 
 			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, false, false)
 			if err != nil {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid badgeIds")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid IDIds")
 			}
 
 			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds, badgeMetadata.BadgeIds); err != nil {
-				return sdkerrors.Wrapf(err, "badge metadata has duplicate badge ids")
+				return sdkerrors.Wrapf(err, "token metadata has duplicate token ids")
 			}
 
 			handledBadgeIds = append(handledBadgeIds, SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)...)

@@ -15,10 +15,10 @@ func (suite *TestSuite) TestNewBadges() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err, "Error getting badge: %s")
+	suite.Require().Nil(err, "Error getting token: %s")
 
 	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
 		Creator:             bob,
@@ -53,7 +53,7 @@ func (suite *TestSuite) TestNewBadges() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 }
 
 func (suite *TestSuite) TestNewBadgesNotManager() {
@@ -62,7 +62,7 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      alice,
@@ -88,7 +88,7 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 }
 
 func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
@@ -128,7 +128,7 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 }
 
 func (suite *TestSuite) TestNewBadgesNotAllowed() {
@@ -137,7 +137,7 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
 		Creator:      bob,
@@ -177,7 +177,7 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 }
 
 func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
@@ -186,7 +186,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
 		Creator:      bob,
@@ -217,7 +217,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
@@ -230,7 +230,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
@@ -243,7 +243,7 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 
 	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
 		Creator:      bob,
@@ -256,5 +256,5 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 }

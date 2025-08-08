@@ -37,5 +37,5 @@ Custom data fields appear in:
 
 -   **Collections** - `customDataTimeline` for collection-level data
 -   **Address Lists** - `customData` for list-specific information
--   **Badge Metadata** - `customData` within badge metadata structures
+-   **Token Metadata** - `customData` within token metadata structures
 -   **Messages** - Various transaction messages include custom data fields

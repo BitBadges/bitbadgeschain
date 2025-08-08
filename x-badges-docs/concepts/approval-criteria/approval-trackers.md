@@ -6,7 +6,7 @@ Track transfer amounts and counts using increment-only tallies with thresholds.
 
 Trackers use an incrementing tally system with thresholds:
 
-1. **Setup**: Approved for x10 of badge IDs 1-10 with tracker ID "xyz"
+1. **Setup**: Approved for x10 of token IDs 1-10 with tracker ID "xyz"
 2. **Transfer x5**: Tracker "xyz" goes from 0/10 → 5/10
 3. **Transfer x5**: Tracker "xyz" goes to 10/10
 4. **Transfer x1**: Exceeds threshold, transfer fails

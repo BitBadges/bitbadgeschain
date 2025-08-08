@@ -3,7 +3,7 @@ This message is a streamlined alternative to [MsgUpdateCollection](./msg-update-
 
 # MsgSetStandards
 
-Sets the standards timeline and update permissions for a badge collection. This is a convenience message that focuses specifically on standards management.
+Sets the standards timeline and update permissions for a collection. This is a convenience message that focuses specifically on standards management.
 
 ## Overview
 
@@ -37,7 +37,7 @@ message MsgSetStandards {
 }
 
 message MsgSetStandardsResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 ```
