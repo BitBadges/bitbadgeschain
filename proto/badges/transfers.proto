@@ -415,6 +415,9 @@ message MustOwnBadges {
 
   // If true, the user must meet ownership requirements for all specified badges; else, must meet requirements for any single badge.
   bool mustSatisfyForAllAssets = 6;
+
+  // The party to check ownership for. Options are "initiator", "sender", or "recipient". Defaults to "initiator" if empty.
+  string ownershipCheckParty = 7;
 }
 
 // DynamicStoreChallenge defines a challenge that requires the initiator to pass a dynamic store check.

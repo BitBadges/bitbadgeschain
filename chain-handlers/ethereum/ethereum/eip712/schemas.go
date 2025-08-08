@@ -40,7 +40,8 @@ func getMustOwnBadgesSchema() string {
 		"ownershipTimes": [` + getUintRangeSchema() + `],
 		"badgeIds": [` + getUintRangeSchema() + `],
 		"overrideWithCurrentTime": false,
-		"mustSatisfyForAllAssets": false
+		"mustSatisfyForAllAssets": false,
+		"ownershipCheckParty": ""
 	}`
 }
 

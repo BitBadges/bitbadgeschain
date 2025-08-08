@@ -1,6 +1,6 @@
 # Badge Ownership
 
-Require specific badge holdings from the initiator as a prerequisite for transfer approval. This approval criteria checks on-chain badge balances to ensure users own required badges before allowing transfers.
+Require specific badge holdings from the specified party as a prerequisite for transfer approval. This approval criteria checks on-chain badge balances to ensure the specified party owns required badges before allowing transfers.
 
 ## Overview
 
@@ -12,6 +12,7 @@ Badge ownership requirements enable gating mechanisms where users must possess s
 -   **Collection Dependencies**: Create relationships between different badge collections
 -   **On-Chain Verification**: Automatic balance checking without external data
 -   **Flexible Requirements**: Support for amount ranges, time-based ownership, and multiple badge types
+-   **Party-Specific Checks**: Check ownership for initiator, sender, or recipient
 
 ## Interface
 
@@ -24,6 +25,7 @@ interface MustOwnBadges<T extends NumberType> {
 
     overrideWithCurrentTime: boolean; // Use current block time. Overrides ownershipTimes with [{ start: currentTime, end: currentTime }]
     mustSatisfyForAllAssets: boolean; // All vs one badge requirement
+    ownershipCheckParty: string; // Which party to check ownership for: "initiator", "sender", "recipient" (default: "initiator" if empty)
 }
 ```
 
@@ -68,6 +70,17 @@ interface MustOwnBadges<T extends NumberType> {
 -   **True**: User must own ALL specified badge combinations
 -   **False**: User must own AT LEAST ONE of the specified badge combinations
 
+### ownershipCheckParty
+
+-   **Type**: `string`
+-   **Description**: Specifies which party of the transfer to check ownership for
+-   **Options**:
+    -   `"initiator"` (default): Check ownership for the address that initiated the transfer
+    -   `"sender"`: Check ownership for the address sending the badges
+    -   `"recipient"`: Check ownership for the address receiving the badges
+-   **Default**: `"initiator"` (if empty or not specified)
+-   **Example**: `"sender"` to require the sender to own specific badges before allowing the transfer
+
 ## Example
 
 Require users to own specific badges to access premium features or exclusive transfers.
@@ -81,7 +94,55 @@ Require users to own specific badges to access premium features or exclusive tra
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
             "badgeIds": [{ "start": "1", "end": "1" }],
             "overrideWithCurrentTime": false,
-            "mustSatisfyForAllAssets": true
+            "mustSatisfyForAllAssets": true,
+            "ownershipCheckParty": "initiator"
+        }
+    ]
+}
+```
+
+### Party-Specific Examples
+
+#### Check Initiator Ownership (Default)
+
+```json
+{
+    "mustOwnBadges": [
+        {
+            "collectionId": "1",
+            "amountRange": { "start": "1", "end": "1" },
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipCheckParty": "initiator"
+        }
+    ]
+}
+```
+
+#### Check Sender Ownership
+
+```json
+{
+    "mustOwnBadges": [
+        {
+            "collectionId": "1",
+            "amountRange": { "start": "1", "end": "1" },
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipCheckParty": "sender"
+        }
+    ]
+}
+```
+
+#### Check Recipient Ownership
+
+```json
+{
+    "mustOwnBadges": [
+        {
+            "collectionId": "1",
+            "amountRange": { "start": "1", "end": "1" },
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipCheckParty": "recipient"
         }
     ]
 }

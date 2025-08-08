@@ -163,7 +163,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// Must own badges check
-			err = k.CheckMustOwnBadges(ctx, approvalCriteria.MustOwnBadges, initiatedBy)
+			err = k.CheckMustOwnBadges(ctx, approvalCriteria.MustOwnBadges, initiatedBy, fromAddress, toAddress)
 			if err != nil {
 				continue
 			}
