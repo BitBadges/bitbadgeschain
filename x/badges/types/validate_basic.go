@@ -356,24 +356,24 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
 				}
 
-				for _, mustOwnBadgeBalance := range approvalCriteria.MustOwnBadges {
-					if mustOwnBadgeBalance == nil {
+				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnBadges {
+					if mustOwnTokenBalance == nil {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
 					}
 
-					if err := ValidateRangesAreValid(mustOwnBadgeBalance.BadgeIds, false, false); err != nil {
+					if err := ValidateRangesAreValid(mustOwnTokenBalance.BadgeIds, false, false); err != nil {
 						return sdkerrors.Wrapf(err, "invalid token IDs")
 					}
 
-					if err := ValidateRangesAreValid(mustOwnBadgeBalance.OwnershipTimes, false, false); err != nil {
+					if err := ValidateRangesAreValid(mustOwnTokenBalance.OwnershipTimes, false, false); err != nil {
 						return sdkerrors.Wrapf(err, "invalid owned times")
 					}
 
-					if err := ValidateRangesAreValid([]*UintRange{mustOwnBadgeBalance.AmountRange}, true, true); err != nil {
+					if err := ValidateRangesAreValid([]*UintRange{mustOwnTokenBalance.AmountRange}, true, true); err != nil {
 						return sdkerrors.Wrapf(err, "invalid transfer times")
 					}
 
-					if mustOwnBadgeBalance.CollectionId.IsNil() || mustOwnBadgeBalance.CollectionId.IsZero() {
+					if mustOwnTokenBalance.CollectionId.IsNil() || mustOwnTokenBalance.CollectionId.IsZero() {
 						return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized")
 					}
 				}
