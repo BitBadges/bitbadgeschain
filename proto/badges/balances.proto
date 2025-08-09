@@ -40,5 +40,5 @@ message Balance {
   repeated UintRange ownershipTimes = 2;
 
   // The token IDs for which the user owns the token.
-  repeated UintRange badgeIds = 3;
+  repeated UintRange tokenIds = 3;
 }

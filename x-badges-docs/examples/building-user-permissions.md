@@ -14,7 +14,7 @@ const userPermissions = {
             toListId: 'All', // Can specify recipients
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: FullTimeRanges,
+            tokenIds: FullTimeRanges,
             ownershipTimes: FullTimeRanges,
             approvalId: 'All',
             permanentlyPermittedTimes: [],
@@ -27,7 +27,7 @@ const userPermissions = {
             //  toListId: 'user-address', // Locked to user's address
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: FullTimeRanges,
+            tokenIds: FullTimeRanges,
             ownershipTimes: FullTimeRanges,
             approvalId: 'All',
             permanentlyPermittedTimes: [],

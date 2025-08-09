@@ -24,7 +24,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 				Creator:                          "invalid_address",
 				CollectionId:                     sdkmath.NewUint(1),
 				UpdateCollectionMetadataTimeline: true,
-				UpdateBadgeMetadataTimeline:      true,
+				UpdateTokenMetadataTimeline:      true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -32,12 +32,12 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
-				BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+				TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 					{
-						BadgeMetadata: []*types.BadgeMetadata{
+						TokenMetadata: []*types.TokenMetadata{
 							{
 								Uri: "https://example.com/{id}",
-								BadgeIds: []*types.UintRange{
+								TokenIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 
@@ -56,7 +56,7 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 				Creator:                          sample.AccAddress(),
 				CollectionId:                     sdkmath.NewUint(1),
 				UpdateCollectionMetadataTimeline: true,
-				UpdateBadgeMetadataTimeline:      true,
+				UpdateTokenMetadataTimeline:      true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -70,12 +70,12 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
-				BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+				TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 					{
-						BadgeMetadata: []*types.BadgeMetadata{
+						TokenMetadata: []*types.TokenMetadata{
 							{
 								Uri: "https://example.com/{id}",
-								BadgeIds: []*types.UintRange{
+								TokenIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 

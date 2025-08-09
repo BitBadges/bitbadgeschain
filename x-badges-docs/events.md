@@ -70,7 +70,7 @@ Attributes:
 
 ### Token Transfers
 
-#### TransferBadges
+#### TransferTokens
 
 ```
 Type: "message"

@@ -19,11 +19,11 @@ message MsgCreateCollection {
   string creator = 1; // Address creating the collection
   string balancesType = 2; // "Standard", "Off-Chain - Indexed", etc.
   UserBalanceStore defaultBalances = 4;
-  repeated UintRange validBadgeIds = 5; // Token ID ranges to include
+  repeated UintRange validTokenIds = 5; // Token ID ranges to include
   CollectionPermissions collectionPermissions = 6;
   repeated ManagerTimeline managerTimeline = 7;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 9;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 10;
   repeated CustomDataTimeline customDataTimeline = 11;
   repeated CollectionApproval collectionApprovals = 12;
@@ -69,7 +69,7 @@ For complete transaction examples, see [MsgCreateCollection Examples](../example
             "canUpdateAutoApproveAllIncomingTransfers": []
         }
     },
-    "validBadgeIds": [{ "start": "1", "end": "100" }],
+    "validTokenIds": [{ "start": "1", "end": "100" }],
     "collectionPermissions": {
         "canDeleteCollection": [],
         "canArchiveCollection": [],
@@ -78,13 +78,13 @@ For complete transaction examples, see [MsgCreateCollection Examples](../example
         "canUpdateCustomData": [],
         "canUpdateManager": [],
         "canUpdateCollectionMetadata": [],
-        "canUpdateValidBadgeIds": [],
-        "canUpdateBadgeMetadata": [],
+        "canUpdateValidTokenIds": [],
+        "canUpdateTokenMetadata": [],
         "canUpdateCollectionApprovals": []
     },
     "managerTimeline": [],
     "collectionMetadataTimeline": [],
-    "badgeMetadataTimeline": [],
+    "tokenMetadataTimeline": [],
     "offChainBalancesMetadataTimeline": [],
     "customDataTimeline": [],
     "collectionApprovals": [],

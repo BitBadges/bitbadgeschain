@@ -50,15 +50,15 @@ func BlankUniversalMsg() *MsgUniversalUpdateCollection {
 		DefaultBalances: &UserBalanceStore{},
 
 		//Applicable to creations and updates
-		ValidBadgeIds:                          []*UintRange{},
+		ValidTokenIds:                          []*UintRange{},
 		UpdateCollectionPermissions:            false,
 		CollectionPermissions:                  &CollectionPermissions{},
 		UpdateManagerTimeline:                  false,
 		ManagerTimeline:                        []*ManagerTimeline{},
 		UpdateCollectionMetadataTimeline:       false,
 		CollectionMetadataTimeline:             []*CollectionMetadataTimeline{},
-		UpdateBadgeMetadataTimeline:            false,
-		BadgeMetadataTimeline:                  []*BadgeMetadataTimeline{},
+		UpdateTokenMetadataTimeline:            false,
+		TokenMetadataTimeline:                  []*TokenMetadataTimeline{},
 		UpdateOffChainBalancesMetadataTimeline: false,
 		OffChainBalancesMetadataTimeline:       []*OffChainBalancesMetadataTimeline{},
 		UpdateCustomDataTimeline:               false,

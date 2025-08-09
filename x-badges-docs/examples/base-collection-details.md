@@ -8,11 +8,11 @@ For detailed information about each field, see the corresponding concepts docume
 
 | Field                         | Concepts Link                                               |
 | ----------------------------- | ----------------------------------------------------------- |
-| `validBadgeIds`               | [Valid Token IDs](../concepts/valid-badge-ids.md)           |
+| `validTokenIds`               | [Valid Token IDs](../concepts/valid-badge-ids.md)           |
 | `balancesType`                | [Balances Type](../concepts/balances-type.md)               |
 | `managerTimeline`             | [Manager](../concepts/manager.md)                           |
 | `collectionMetadataTimeline`  | [Metadata](../concepts/metadata.md)                         |
-| `badgeMetadataTimeline`       | [Metadata](../concepts/metadata.md)                         |
+| `tokenMetadataTimeline`       | [Metadata](../concepts/metadata.md)                         |
 | `customDataTimeline`          | [Custom Data](../concepts/custom-data.md)                   |
 | `standardsTimeline`           | [Standards](../concepts/standards.md)                       |
 | `isArchivedTimeline`          | [Archived Collections](../concepts/archived-collections.md) |
@@ -35,7 +35,7 @@ const FullTimeRanges = [
 ];
 
 const BaseCollectionDetails = {
-    validBadgeIds: [
+    validTokenIds: [
         {
             start: '1',
             end: '100', // Set to your max ID
@@ -60,13 +60,13 @@ const BaseCollectionDetails = {
             },
         },
     ],
-    badgeMetadataTimeline: [
+    tokenMetadataTimeline: [
         {
             timelineTimes: FullTimeRanges,
-            badgeMetadata: [
+            tokenMetadata: [
                 {
                     uri: 'ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/{id}', // Points to a valid .json metadata file (replacing {id} with the token ID)
-                    badgeIds: [
+                    tokenIds: [
                         {
                             start: '1',
                             end: '100',
@@ -77,7 +77,7 @@ const BaseCollectionDetails = {
                 // You can have multiple entries. This is useful for placeholder metadata.
                 {
                     uri: 'ipfs://QmSTZZPgYF58gS9bM7q3nWVegUJH51WBdT91fz7q94qDwS', // Placeholder metadata
-                    badgeIds: [
+                    tokenIds: [
                         {
                             start: '101',
                             end: '100000000',

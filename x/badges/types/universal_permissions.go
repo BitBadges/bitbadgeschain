@@ -15,7 +15,7 @@ import (
 //This is used in many places around the codebase
 
 type UniversalPermission struct {
-	BadgeIds        []*UintRange
+	TokenIds        []*UintRange
 	TimelineTimes   []*UintRange
 	TransferTimes   []*UintRange
 	OwnershipTimes  []*UintRange
@@ -28,7 +28,7 @@ type UniversalPermission struct {
 	PermanentlyPermittedTimes []*UintRange
 	PermanentlyForbiddenTimes []*UintRange
 
-	UsesBadgeIds        bool
+	UsesTokenIds        bool
 	UsesTimelineTimes   bool
 	UsesTransferTimes   bool
 	UsesToList          bool
@@ -323,7 +323,7 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 	toRemove := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
 
-		badgeIds := GetUintRangesWithOptions(permission.BadgeIds, permission.UsesBadgeIds)
+		tokenIds := GetUintRangesWithOptions(permission.TokenIds, permission.UsesTokenIds)
 		timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
 		transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
 		ownershipTimes := GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
@@ -337,7 +337,7 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 
 		approvalIdList := GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
 
-		for _, badgeId := range badgeIds {
+		for _, badgeId := range tokenIds {
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
 					for _, ownershipTime := range ownershipTimes {

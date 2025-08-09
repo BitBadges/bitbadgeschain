@@ -6,7 +6,7 @@ Token ID action permissions control which token-specific actions can be performe
 
 ```
 For each token action request:
-    Check if token ID matches any badgeIds criteria
+    Check if token ID matches any tokenIds criteria
         → If no match: ALLOW (neutral state)
         → If match: Check if current time is in permanentlyPermittedTimes
             → If yes: ALLOW
@@ -32,8 +32,8 @@ Execute/Deny
 ## Interface
 
 ```typescript
-interface BadgeIdsActionPermission {
-    badgeIds: UintRange[];
+interface TokenIdsActionPermission {
+    tokenIds: UintRange[];
     permanentlyPermittedTimes: UintRange[];
     permanentlyForbiddenTimes: UintRange[];
 }
@@ -43,7 +43,7 @@ interface BadgeIdsActionPermission {
 
 | Action                   | Description            | Use Case      |
 | ------------------------ | ---------------------- | ------------- |
-| `canUpdateValidBadgeIds` | Update valid token IDs | Configuration |
+| `canUpdateValidTokenIds` | Update valid token IDs | Configuration |
 
 ## Examples
 
@@ -51,9 +51,9 @@ interface BadgeIdsActionPermission {
 
 ```json
 {
-    "canUpdateValidBadgeIds": [
+    "canUpdateValidTokenIds": [
         {
-            "badgeIds": [{ "start": "1", "end": "18446744073709551615" }],
+            "tokenIds": [{ "start": "1", "end": "18446744073709551615" }],
             "permanentlyPermittedTimes": [],
             "permanentlyForbiddenTimes": [
                 { "start": "1", "end": "18446744073709551615" }
@@ -67,9 +67,9 @@ interface BadgeIdsActionPermission {
 
 ```json
 {
-    "canUpdateValidBadgeIds": [
+    "canUpdateValidTokenIds": [
         {
-            "badgeIds": [{ "start": "1", "end": "100" }],
+            "tokenIds": [{ "start": "1", "end": "100" }],
             "permanentlyPermittedTimes": [],
             "permanentlyForbiddenTimes": [
                 { "start": "1", "end": "18446744073709551615" }
@@ -83,9 +83,9 @@ interface BadgeIdsActionPermission {
 
 ```json
 {
-    "canUpdateValidBadgeIds": [
+    "canUpdateValidTokenIds": [
         {
-            "badgeIds": [{ "start": "101", "end": "18446744073709551615" }],
+            "tokenIds": [{ "start": "101", "end": "18446744073709551615" }],
             "permanentlyPermittedTimes": [
                 { "start": "1", "end": "18446744073709551615" }
             ],

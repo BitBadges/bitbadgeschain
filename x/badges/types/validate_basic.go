@@ -283,7 +283,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidAddress, "initiated by list id is uninitialized")
 		}
 
-		if err := ValidateRangesAreValid(collectionApproval.BadgeIds, false, false); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, false); err != nil {
 			return sdkerrors.Wrapf(err, "invalid token IDs")
 		}
 
@@ -348,20 +348,20 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 			if canChangeValues {
 
-				if approvalCriteria.MustOwnBadges == nil {
-					approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
+				if approvalCriteria.MustOwnTokens == nil {
+					approvalCriteria.MustOwnTokens = []*MustOwnTokens{}
 				}
 
 				if approvalCriteria.DynamicStoreChallenges == nil {
 					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
 				}
 
-				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnBadges {
+				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnTokens {
 					if mustOwnTokenBalance == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
+						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnTokens balance is nil")
 					}
 
-					if err := ValidateRangesAreValid(mustOwnTokenBalance.BadgeIds, false, false); err != nil {
+					if err := ValidateRangesAreValid(mustOwnTokenBalance.TokenIds, false, false); err != nil {
 						return sdkerrors.Wrapf(err, "invalid token IDs")
 					}
 
@@ -527,7 +527,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 							return err
 						}
 
-						if sequentialTransfer.IncrementBadgeIdsBy.IsNil() {
+						if sequentialTransfer.IncrementTokenIdsBy.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
 						}
 
@@ -593,11 +593,11 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						}
 
 						badgeIdOverrideCount := 0
-						if !sequentialTransfer.IncrementBadgeIdsBy.IsNil() && !sequentialTransfer.IncrementBadgeIdsBy.IsZero() {
+						if !sequentialTransfer.IncrementTokenIdsBy.IsNil() && !sequentialTransfer.IncrementTokenIdsBy.IsZero() {
 							badgeIdOverrideCount++
 						}
 
-						if sequentialTransfer.AllowOverrideWithAnyValidBadge {
+						if sequentialTransfer.AllowOverrideWithAnyValidToken {
 							badgeIdOverrideCount++
 						}
 
@@ -629,7 +629,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 }
 
 // ValidateCollectionApprovalsWithInvariants validates collection approvals and checks invariants
-func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool, collection *BadgeCollection) error {
+func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool, collection *TokenCollection) error {
 	// First validate the basic collection approvals
 	if err := ValidateCollectionApprovals(ctx, collectionApprovals, canChangeValues); err != nil {
 		return err
@@ -661,10 +661,10 @@ func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedO
 
 func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) bool {
 	return incrementedBalances == nil || ((incrementedBalances.StartBalances == nil || len(incrementedBalances.StartBalances) == 0) &&
-		(incrementedBalances.AllowOverrideWithAnyValidBadge == false) &&
+		(incrementedBalances.AllowOverrideWithAnyValidToken == false) &&
 		(incrementedBalances.AllowOverrideTimestamp == false) &&
-		(incrementedBalances.IncrementBadgeIdsBy.IsNil() ||
-			incrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
+		(incrementedBalances.IncrementTokenIdsBy.IsNil() ||
+			incrementedBalances.IncrementTokenIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
 			incrementedBalances.IncrementOwnershipTimesBy.IsZero()) &&
 		(incrementedBalances.DurationFromTimestamp.IsNil() ||
@@ -733,7 +733,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 			return balances, sdkerrors.Wrapf(ErrAmountEqualsZero, "amount is uninitialized")
 		}
 
-		err = ValidateRangesAreValid(balance.BadgeIds, false, true)
+		err = ValidateRangesAreValid(balance.TokenIds, false, true)
 		if err != nil {
 			return balances, sdkerrors.Wrapf(err, "invalid balance token ids")
 		}
@@ -744,7 +744,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 		}
 	}
 
-	balances, err = HandleDuplicateBadgeIds(ctx, balances, canChangeValues)
+	balances, err = HandleDuplicateTokenIds(ctx, balances, canChangeValues)
 	if err != nil {
 		return balances, err
 	}
@@ -753,7 +753,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 }
 
 // ValidateTransferWithInvariants validates a transfer and checks invariants
-func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *BadgeCollection) error {
+func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *TokenCollection) error {
 	// First validate the basic transfer
 	if err := ValidateTransfer(ctx, transfer, canChangeValues); err != nil {
 		return err
@@ -843,7 +843,7 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 		if transfer.PrecalculationOptions == nil {
 			transfer.PrecalculationOptions = &PrecalculationOptions{
 				OverrideTimestamp: sdkmath.NewUint(0),
-				BadgeIdsOverride:  nil,
+				TokenIdsOverride:  nil,
 			}
 		}
 	}
@@ -851,30 +851,30 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 	return nil
 }
 
-func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool) error {
+func ValidateTokenMetadata(tokenMetadata []*TokenMetadata, canChangeValues bool) error {
 	err := *new(error)
 
-	handledBadgeIds := []*UintRange{}
-	if len(badgeMetadata) > 0 {
-		for _, badgeMetadata := range badgeMetadata {
+	handledTokenIds := []*UintRange{}
+	if len(tokenMetadata) > 0 {
+		for _, tokenMetadata := range tokenMetadata {
 			//Validate well-formedness of the message entries
-			if err := ValidateURI(badgeMetadata.Uri); err != nil {
+			if err := ValidateURI(tokenMetadata.Uri); err != nil {
 				return err
 			}
 
-			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, false, false)
+			err = ValidateRangesAreValid(tokenMetadata.TokenIds, false, false)
 			if err != nil {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid IDIds")
 			}
 
-			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds, badgeMetadata.BadgeIds); err != nil {
+			if err := AssertRangesDoNotOverlapAtAll(handledTokenIds, tokenMetadata.TokenIds); err != nil {
 				return sdkerrors.Wrapf(err, "token metadata has duplicate token ids")
 			}
 
-			handledBadgeIds = append(handledBadgeIds, SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)...)
+			handledTokenIds = append(handledTokenIds, SortUintRangesAndMergeAdjacentAndIntersecting(tokenMetadata.TokenIds)...)
 
 			if canChangeValues {
-				badgeMetadata.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)
+				tokenMetadata.TokenIds = SortUintRangesAndMergeAdjacentAndIntersecting(tokenMetadata.TokenIds)
 			}
 		}
 	}

@@ -16,8 +16,8 @@ var _ = strconv.Itoa(0)
 
 func CmdSetCustomData() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-setcustomdata [tx-json]",
-		Short: "Broadcast message setSetCustomData",
+		Use:   "set-custom-data [tx-json]",
+		Short: "Broadcast message setCustomData",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

@@ -42,7 +42,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -52,7 +52,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	}
 
 	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -75,7 +75,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -118,7 +118,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -128,7 +128,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(0),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(2),
 					End:   sdkmath.NewUint(2),
@@ -149,7 +149,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(0),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(2),
 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -159,7 +159,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -188,7 +188,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(0),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(2),
 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -198,7 +198,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -208,7 +208,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 
 	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(1),
@@ -220,7 +220,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(5),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -230,7 +230,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		// {
 		// 	Amount: sdkmath.NewUint(10),
 		// 	OwnershipTimes: GetFullUintRanges(),
-		// 	BadgeIds: []*types.UintRange{
+		// 	TokenIds: []*types.UintRange{
 		// 		{
 		// 			Start: sdkmath.NewUint(1),
 		// 			End:   sdkmath.NewUint(1),
@@ -240,7 +240,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 
 	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(2),
 				End:   sdkmath.NewUint(math.MaxUint64),
@@ -252,7 +252,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(5),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -262,7 +262,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		// {
 		// 	Amount: sdkmath.NewUint(10),
 		// 	OwnershipTimes: GetFullUintRanges(),
-		// 	BadgeIds: []*types.UintRange{
+		// 	TokenIds: []*types.UintRange{
 		// 		{
 		// 			Start: sdkmath.NewUint(1),
 		// 			End:   sdkmath.NewUint(1),
@@ -272,7 +272,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 	})
 
 	balances, err = types.UpdateBalance(suite.ctx, &types.Balance{
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(2),
 				End:   sdkmath.NewUint(2),
@@ -284,7 +284,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(5),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(1),
@@ -298,7 +298,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 		{
 			Amount:         sdkmath.NewUint(10),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				// {
 				// 	Start: sdkmath.NewUint(1),
 				// 	End:   sdkmath.NewUint(1),
@@ -323,7 +323,7 @@ func (suite *TestSuite) TestDefaultBalances() {
 				{
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
-					BadgeIds:       GetFullUintRanges(),
+					TokenIds:       GetFullUintRanges(),
 				},
 			},
 		},
@@ -337,7 +337,7 @@ func (suite *TestSuite) TestDefaultBalances() {
 		{
 			Amount:         sdkmath.NewUint(1),
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 		},
 	})
 }
@@ -348,7 +348,7 @@ func GetBobApproval() *types.CollectionApproval {
 		ToListId:          "All",
 		InitiatedByListId: bob,
 		ApprovalId:        "bob-approved",
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		TransferTimes:     GetFullUintRanges(),
 		ApprovalCriteria: &types.ApprovalCriteria{
@@ -378,7 +378,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 	suite.Require().Nil(err, "Error getting collection: %s")
 	suite.Require().Greater(len(collection.CollectionApprovals), 0, "Error getting collection: %s")
 
-	err = TransferBadges(suite, suite.ctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, suite.ctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -389,7 +389,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 				Balances: []*types.Balance{
 					{
 						Amount: sdkmath.NewUint(71),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(72),
@@ -404,7 +404,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(45),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(85),
 								End:   sdkmath.NewUint(99),
@@ -419,7 +419,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(80),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(37),
 								End:   sdkmath.NewUint(42),
@@ -434,7 +434,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(99),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(9),
@@ -449,7 +449,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(14),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(11),
 								End:   sdkmath.NewUint(25),
@@ -464,7 +464,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(70),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(9),
 								End:   sdkmath.NewUint(88),
@@ -479,7 +479,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(49),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(24),
@@ -494,7 +494,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(70),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(78),
@@ -509,7 +509,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					},
 					{
 						Amount: sdkmath.NewUint(66),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(80),
@@ -557,7 +557,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 					End:   sdkmath.NewUint(127),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(26),
 					End:   sdkmath.NewUint(72),
@@ -578,7 +578,7 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 
 		badgesToCreate = append(badgesToCreate, &types.Balance{
 			Amount: sdkmath.NewUint(rand.Uint64()),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(start),
 					End:   sdkmath.NewUint(end),
@@ -606,7 +606,7 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 	})
 	suite.Require().Nil(err, "Error updating collection: %s")
 
-	err = TransferBadges(suite, suite.ctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, suite.ctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -654,7 +654,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 
 			userBalance.Balances, err = types.AddBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
-				BadgeIds: []*types.UintRange{
+				TokenIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(start),
 						End:   sdkmath.NewUint(end),
@@ -683,7 +683,7 @@ func (suite *TestSuite) TestBalancesFuzz() {
 
 			userBalance.Balances, err = types.SubtractBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
-				BadgeIds: []*types.UintRange{
+				TokenIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(start),
 						End:   sdkmath.NewUint(end),
@@ -758,7 +758,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 
 			userBalance.Balances, err = types.AddBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
-				BadgeIds: []*types.UintRange{
+				TokenIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(start),
 						End:   sdkmath.NewUint(end),
@@ -798,7 +798,7 @@ func (suite *TestSuite) TestBalancesWithTimesFuzz() {
 
 			userBalance.Balances, err = types.SubtractBalance(suite.ctx, userBalance.Balances, &types.Balance{
 				Amount: amount,
-				BadgeIds: []*types.UintRange{
+				TokenIds: []*types.UintRange{
 					{
 						Start: sdkmath.NewUint(start),
 						End:   sdkmath.NewUint(end),

@@ -48,7 +48,7 @@ This transfer creates tokens from collection 20 and sends them to the creator ad
                 "onlyCheckPrioritizedOutgoingApprovals": false,
                 "precalculationOptions": {
                     "overrideTimestamp": "0",
-                    "badgeIdsOverride": []
+                    "tokenIdsOverride": []
                 },
                 "affiliateAddress": "",
                 "numAttempts": "1"
@@ -76,7 +76,7 @@ This transfer creates tokens from collection 20 and sends them to the creator ad
 ### Precalculation Options
 
 -   `"overrideTimestamp": "0"` - Use current timestamp for calculations
--   `"badgeIdsOverride": []` - No token ID overrides, use approval criteria
+-   `"tokenIdsOverride": []` - No token ID overrides, use approval criteria
 
 ### Non-Auto-Scan Behavior
 

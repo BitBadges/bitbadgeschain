@@ -6,19 +6,19 @@ Valid Token IDs define the range of token IDs that exist within a collection. Th
 
 ### During Collection Creation
 
-Use the `validBadgeIds` field in [MsgCreateCollection](../../messages/msg-create-collection.md):
+Use the `validTokenIds` field in [MsgCreateCollection](../../messages/msg-create-collection.md):
 
 ```json
 {
     "creator": "bb1...",
-    "validBadgeIds": [
+    "validTokenIds": [
         {
             "start": "1",
             "end": "100"
         }
     ],
     "collectionPermissions": {
-        "canUpdateValidBadgeIds": [
+        "canUpdateValidTokenIds": [
             // { ... }
         ]
     }
@@ -27,13 +27,13 @@ Use the `validBadgeIds` field in [MsgCreateCollection](../../messages/msg-create
 
 ### During Collection Updates
 
-Use the `validBadgeIds` field in [MsgUpdateCollection](../../messages/msg-update-collection.md):
+Use the `validTokenIds` field in [MsgUpdateCollection](../../messages/msg-update-collection.md):
 
 ```json
 {
     "creator": "bb1...",
     "collectionId": "1",
-    "validBadgeIds": [
+    "validTokenIds": [
         {
             "start": "101",
             "end": "200"
@@ -44,14 +44,14 @@ Use the `validBadgeIds` field in [MsgUpdateCollection](../../messages/msg-update
 
 ## Permission Control
 
-Updates to valid token IDs must obey the `canUpdateValidBadgeIds` permission:
+Updates to valid token IDs must obey the `canUpdateValidTokenIds` permission:
 
 ### Permission Structure
 
 ```json
-"canUpdateValidBadgeIds": [
+"canUpdateValidTokenIds": [
   {
-    "badgeIds": [{"start": "1", "end": "1000"}],
+    "tokenIds": [{"start": "1", "end": "1000"}],
     "permanentlyPermittedTimes": [{"start": "1", "end": "18446744073709551615"}],
     "permanentlyForbiddenTimes": []
   }
@@ -60,7 +60,7 @@ Updates to valid token IDs must obey the `canUpdateValidBadgeIds` permission:
 
 ### Permission Behaviors
 
-Note that the `canUpdateValidBadgeIds` permission applies to the updatability of the `validBadgeIds` field.
+Note that the `canUpdateValidTokenIds` permission applies to the updatability of the `validTokenIds` field.
 
 We find the first-match for (current time, token ID) for each token ID that is changed, and check the permission for that time. If no time matches, the permission is default enabled. See [Permissions](permissions/) for more details.
 
@@ -75,5 +75,5 @@ Typically, the desired functionality falls into one of the following categories:
 
 1. **Plan ahead**: Consider future expansion when setting initial token ID ranges
 2. **Sequential additions**: Always add token IDs sequentially to maintain the no-gaps requirement
-3. **Permission management**: Carefully configure `canUpdateValidBadgeIds` permissions based on collection lifecycle
+3. **Permission management**: Carefully configure `canUpdateValidTokenIds` permissions based on collection lifecycle
 4. **Documentation**: Clearly document the intended use of different token ID ranges

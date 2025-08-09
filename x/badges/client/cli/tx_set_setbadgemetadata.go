@@ -14,10 +14,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdSetBadgeMetadata() *cobra.Command {
+func CmdSetTokenMetadata() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-setbadgemetadata [tx-json]",
-		Short: "Broadcast message setSetBadgeMetadata",
+		Use:   "set-token-metadata [tx-json]",
+		Short: "Broadcast message setTokenMetadata",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -27,7 +27,7 @@ func CmdSetBadgeMetadata() *cobra.Command {
 
 			txJSON := args[0]
 
-			var txData types.MsgSetBadgeMetadata
+			var txData types.MsgSetTokenMetadata
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}

@@ -44,7 +44,7 @@ curl "https://lcd.bitbadges.io/bitbadges/bitbadgeschain/badges/get_approvals_tra
     "amounts": [
       {
         "amount": "100",
-        "badgeIds": [{"start": "1", "end": "10"}],
+        "tokenIds": [{"start": "1", "end": "10"}],
         "ownershipTimes": [{"start": "1672531200000", "end": "18446744073709551615"}]
       }
     ],

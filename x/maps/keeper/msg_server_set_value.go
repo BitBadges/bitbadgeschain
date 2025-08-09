@@ -64,7 +64,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		return nil, sdkerrors.Wrap(ErrValueAlreadySet, "Value cannot be the same as the current value")
 	}
 
-	collection := &badgetypes.BadgeCollection{}
+	collection := &badgetypes.TokenCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
 		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
 		if err != nil {

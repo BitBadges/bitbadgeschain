@@ -27,10 +27,10 @@ The `collectionMetadataTimeline` defines metadata for the entire collection over
 
 ### Token Metadata Timeline
 
-The `badgeMetadataTimeline` defines metadata for individual tokens over time. The order of `badgeMetadata` entries matters, as it uses a **first-match approach** via linear scan for specific token IDs. BitBadges uses the `{id}` placeholder in the token metadata URI to replace with the actual token ID.
+The `tokenMetadataTimeline` defines metadata for individual tokens over time. The order of `tokenMetadata` entries matters, as it uses a **first-match approach** via linear scan for specific token IDs. BitBadges uses the `{id}` placeholder in the token metadata URI to replace with the actual token ID.
 
 ```json
-"badgeMetadataTimeline": [
+"tokenMetadataTimeline": [
   {
     "timelineTimes": [
       {
@@ -38,10 +38,10 @@ The `badgeMetadataTimeline` defines metadata for individual tokens over time. Th
         "end": "18446744073709551615"
       }
     ],
-    "badgeMetadata": [
+    "tokenMetadata": [
       {
         "uri": "ipfs://Qmf8xxN2fwXGgouue3qsJtN8ZRSsnoHxM9mGcynTPhh6Ub/{id}",
-        "badgeIds": [
+        "tokenIds": [
           {
             "start": "1",
             "end": "10000000000000"
@@ -106,9 +106,9 @@ Metadata updates are controlled by collection permissions:
 ### Token Metadata Permission
 
 ```json
-"canUpdateBadgeMetadata": [
+"canUpdateTokenMetadata": [
   {
-    "badgeIds": [{"start": "1", "end": "100"}],
+    "tokenIds": [{"start": "1", "end": "100"}],
     "timelineTimes": [{"start": "1", "end": "18446744073709551615"}],
     "permanentlyPermittedTimes": [{"start": "1", "end": "18446744073709551615"}],
     "permanentlyForbiddenTimes": []

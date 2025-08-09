@@ -36,9 +36,9 @@ const collectionPermissions = {
     canUpdateCustomData: [],
     canUpdateManager: [],
     canUpdateCollectionMetadata: [],
-    canUpdateBadgeMetadata: [],
+    canUpdateTokenMetadata: [],
     canUpdateCollectionApprovals: [],
-    canUpdateValidBadgeIds: [],
+    canUpdateValidTokenIds: [],
 };
 ```
 
@@ -70,7 +70,7 @@ const permanentlyForbiddenTimes = FullTimeRanges;
 // Part 2. For what values (if any) does this apply? This is dependent on the permission type.
 const {
     timelineTimes,
-    badgeIds,
+    tokenIds,
     fromListId,
     toListId,
     initiatedByListId,
@@ -82,7 +82,7 @@ const {
 
 ## Main Permissions To Consider
 
-1. Should the number of token IDs in the collection be expandable? frozen upon genesis? -> Handle with `canUpdateValidBadgeIds`
+1. Should the number of token IDs in the collection be expandable? frozen upon genesis? -> Handle with `canUpdateValidTokenIds`
 2. What about the transferability? -> Handle with `canUpdateCollectionApprovals`
     - Should the transferability be frozen upon genesis?
     - Should we disallow updating transferability for only some token IDs? some approvals? Mint? Post-Mint?

@@ -33,7 +33,7 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 			Balances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetTopHalfUintRanges(),
+					TokenIds:       GetTopHalfUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -74,7 +74,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 			Balances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetTopHalfUintRanges(),
+					TokenIds:       GetTopHalfUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -96,7 +96,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 			Balances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetTopHalfUintRanges(),
+					TokenIds:       GetTopHalfUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -168,7 +168,7 @@ func (suite *TestSuite) TestLeafSignature() {
 		},
 
 		TransferTimes:     GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		OwnershipTimes:    GetFullUintRanges(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
@@ -178,7 +178,7 @@ func (suite *TestSuite) TestLeafSignature() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 
-	transfers := &types.MsgTransferBadges{
+	transfers := &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -188,7 +188,7 @@ func (suite *TestSuite) TestLeafSignature() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -213,11 +213,11 @@ func (suite *TestSuite) TestLeafSignature() {
 		},
 	}
 
-	err = TransferBadges(suite, wctx, transfers)
+	err = TransferTokens(suite, wctx, transfers)
 	suite.Require().Error(err, "Error transferring token: %s")
 
 	transfers.Transfers[0].MerkleProofs[0].LeafSignature = "0x53277c915e10b01e32878284293809e171976a8e987f211c3d106a2afccdd85072cfab0f12188ff653f8638d73c0e9b18c8e9892b6aa484799f4076002a66cb71b"
-	err = TransferBadges(suite, wctx, transfers)
+	err = TransferTokens(suite, wctx, transfers)
 	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
@@ -272,7 +272,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 		},
 
 		TransferTimes:     GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		OwnershipTimes:    GetFullUintRanges(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
@@ -283,7 +283,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -293,7 +293,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -318,7 +318,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -328,7 +328,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -354,7 +354,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 	})
 	suite.Require().Nil(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -364,7 +364,7 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -444,7 +444,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -454,7 +454,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -464,7 +464,7 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -540,7 +540,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -550,7 +550,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -560,7 +560,7 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -638,12 +638,12 @@ func (suite *TestSuite) TestIncrements() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -665,7 +665,7 @@ func (suite *TestSuite) TestIncrements() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -676,7 +676,7 @@ func (suite *TestSuite) TestIncrements() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -686,7 +686,7 @@ func (suite *TestSuite) TestIncrements() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -711,7 +711,7 @@ func (suite *TestSuite) TestIncrements() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -721,7 +721,7 @@ func (suite *TestSuite) TestIncrements() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -790,12 +790,12 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -817,7 +817,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -827,7 +827,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -837,7 +837,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -861,7 +861,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -871,7 +871,7 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -937,12 +937,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -964,7 +964,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -974,7 +974,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -990,7 +990,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1020,7 +1020,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       GetOneUintRange(),
+		TokenIds:       GetOneUintRange(),
 		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 }
@@ -1064,12 +1064,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -1091,7 +1091,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -1101,7 +1101,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1117,7 +1117,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1147,11 +1147,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       GetOneUintRange(),
+		TokenIds:       GetOneUintRange(),
 		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1167,7 +1167,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1196,7 +1196,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       GetTwoUintRanges(),
+		TokenIds:       GetTwoUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
@@ -1240,12 +1240,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -1266,7 +1266,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -1276,7 +1276,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1292,7 +1292,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1322,7 +1322,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       GetTwoUintRanges(),
+		TokenIds:       GetTwoUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 	}}, aliceBalance.Balances)
 }
@@ -1366,12 +1366,12 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -1392,7 +1392,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		ApprovalId:        "asadsdas",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -1402,7 +1402,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1418,7 +1418,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1448,11 +1448,11 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 	suite.Require().Nil(err, "Error getting user balance: %s")
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       GetOneUintRange(),
+		TokenIds:       GetOneUintRange(),
 		OwnershipTimes: GetFullUintRanges(),
 	}}, bobBalance.Balances)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1468,7 +1468,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1533,12 +1533,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -1558,7 +1558,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -1568,7 +1568,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1584,7 +1584,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1632,7 +1632,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetOneUintRange()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -1640,7 +1640,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -1674,7 +1674,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].BadgesToCreate = append(collectionsToCreate[0].BadgesToCreate, &types.Balance{
 		Amount:         sdkmath.NewUint(1),
-		BadgeIds:       GetFullUintRanges(),
+		TokenIds:       GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 	})
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
@@ -1691,12 +1691,12 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -1715,7 +1715,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		ApprovalId:        "asadsdas",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -1725,7 +1725,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1741,7 +1741,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1789,7 +1789,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetOneUintRange()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -1797,7 +1797,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetOneUintRange()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -1843,12 +1843,12 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -1870,7 +1870,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -1880,7 +1880,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1896,7 +1896,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1944,7 +1944,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetOneUintRange()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -1952,7 +1952,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetTwoUintRanges()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -1999,7 +1999,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 					{
 						Balances: []*types.Balance{
 							{
-								BadgeIds:       GetOneUintRange(),
+								TokenIds:       GetOneUintRange(),
 								Amount:         sdkmath.NewUint(1),
 								OwnershipTimes: GetFullUintRanges(),
 							},
@@ -2009,7 +2009,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 					{
 						Balances: []*types.Balance{
 							{
-								BadgeIds:       GetTopHalfUintRanges(),
+								TokenIds:       GetTopHalfUintRanges(),
 								Amount:         sdkmath.NewUint(1),
 								OwnershipTimes: GetFullUintRanges(),
 							},
@@ -2033,7 +2033,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -2043,7 +2043,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2059,7 +2059,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2107,7 +2107,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetOneUintRange()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -2115,7 +2115,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 
 	AssertBalancesEqual(suite, []*types.Balance{{
 		Amount: sdkmath.NewUint(1),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			GetTopHalfUintRanges()[0],
 		},
 		OwnershipTimes: GetFullUintRanges(),
@@ -2161,12 +2161,12 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetBottomHalfUintRanges(),
+							TokenIds:       GetBottomHalfUintRanges(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:       sdkmath.NewUint(1),
+					IncrementTokenIdsBy:       sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 					DurationFromTimestamp:     sdkmath.NewUint(0),
 				},
@@ -2187,7 +2187,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)}},
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -2197,7 +2197,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	suite.Require().Nil(err)
 	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2207,7 +2207,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(10000),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2232,7 +2232,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2241,7 +2241,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 				ToAddresses: []string{bob, alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						Amount:         sdkmath.NewUint(2),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -2267,7 +2267,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2276,7 +2276,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 				ToAddresses: []string{bob, alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -2302,7 +2302,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2311,7 +2311,7 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 				ToAddresses: []string{bob, alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -2348,12 +2348,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
 				{
-					BadgeIds:       GetBottomHalfUintRanges(),
+					TokenIds:       GetBottomHalfUintRanges(),
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 			DurationFromTimestamp:     sdkmath.NewUint(0),
 		},
@@ -2379,12 +2379,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 			IncrementedBalances: &types.IncrementedBalances{
 				StartBalances: []*types.Balance{
 					{
-						BadgeIds:       GetTopHalfUintRanges(),
+						TokenIds:       GetTopHalfUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(0),
 			},
@@ -2410,7 +2410,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 		ApprovalId: "asadsdas",
 
 		TransferTimes:     GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		OwnershipTimes:    GetFullUintRanges(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
@@ -2421,7 +2421,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	suite.Require().Nil(err)
 
 	//Fails because we do not take overflows
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2431,7 +2431,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2440,7 +2440,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2450,7 +2450,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2460,7 +2460,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	})
 	suite.Require().Nil(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2470,7 +2470,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetTopHalfUintRanges(),
+						TokenIds:       GetTopHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2495,7 +2495,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			ApprovalId:        "asadsdas",
 
 			TransferTimes:  GetFullUintRanges(),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
@@ -2505,12 +2505,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
 							{
-								BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+								TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 								Amount:         sdkmath.NewUint(1),
 								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
-						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+						IncrementTokenIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
@@ -2527,7 +2527,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			ApprovalId:        "target approval",
 
 			TransferTimes:  GetFullUintRanges(),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
@@ -2537,12 +2537,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
 							{
-								BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1000), End: sdkmath.NewUint(1000)}},
+								TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1000), End: sdkmath.NewUint(1000)}},
 								Amount:         sdkmath.NewUint(1),
 								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
-						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+						IncrementTokenIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
@@ -2559,11 +2559,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 
 	bobBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount)
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].BadgeIds[0].Start)
-	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[0].BadgeIds[0].End)
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].TokenIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[0].TokenIds[0].End)
 
 	//Fails because we do not take overflows
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2585,12 +2585,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 
 	bobBalance, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount)
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].BadgeIds[0].Start)
-	suite.Require().Equal(sdkmath.NewUint(999), bobBalance.Balances[0].BadgeIds[0].End)
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].TokenIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(999), bobBalance.Balances[0].TokenIds[0].End)
 
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[1].Amount)
-	suite.Require().Equal(sdkmath.NewUint(1001), bobBalance.Balances[1].BadgeIds[0].Start)
-	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[1].BadgeIds[0].End)
+	suite.Require().Equal(sdkmath.NewUint(1001), bobBalance.Balances[1].TokenIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[1].TokenIds[0].End)
 }
 
 func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyCheckPrioritized() {
@@ -2607,7 +2607,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			ApprovalId:        "asadsdas",
 
 			TransferTimes:  GetFullUintRanges(),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
@@ -2617,12 +2617,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
 							{
-								BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+								TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 								Amount:         sdkmath.NewUint(1),
 								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
-						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+						IncrementTokenIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
@@ -2639,7 +2639,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			ApprovalId:        "target approval",
 
 			TransferTimes:  GetFullUintRanges(),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 			ApprovalCriteria: &types.ApprovalCriteria{
 				ApprovalAmounts: &types.ApprovalAmounts{},
@@ -2649,12 +2649,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 					IncrementedBalances: &types.IncrementedBalances{
 						StartBalances: []*types.Balance{
 							{
-								BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1000), End: sdkmath.NewUint(1000)}},
+								TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1000), End: sdkmath.NewUint(1000)}},
 								Amount:         sdkmath.NewUint(1),
 								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
-						IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+						IncrementTokenIdsBy:       sdkmath.NewUint(0),
 						IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 						DurationFromTimestamp:     sdkmath.NewUint(0),
 					},
@@ -2671,10 +2671,10 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 
 	bobBalance, _ := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount)
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].BadgeIds[0].Start)
-	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[0].BadgeIds[0].End)
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].TokenIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[0].TokenIds[0].End)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2702,7 +2702,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2724,12 +2724,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 
 	bobBalance, _ = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount)
-	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].BadgeIds[0].Start)
-	suite.Require().Equal(sdkmath.NewUint(999), bobBalance.Balances[0].BadgeIds[0].End)
+	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].TokenIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(999), bobBalance.Balances[0].TokenIds[0].End)
 
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[1].Amount)
-	suite.Require().Equal(sdkmath.NewUint(1001), bobBalance.Balances[1].BadgeIds[0].Start)
-	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[1].BadgeIds[0].End)
+	suite.Require().Equal(sdkmath.NewUint(1001), bobBalance.Balances[1].TokenIds[0].Start)
+	suite.Require().Equal(sdkmath.NewUint(math.MaxUint64), bobBalance.Balances[1].TokenIds[0].End)
 }
 
 func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
@@ -2746,12 +2746,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
 				{
-					BadgeIds:       GetBottomHalfUintRanges(),
+					TokenIds:       GetBottomHalfUintRanges(),
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 			DurationFromTimestamp:     sdkmath.NewUint(0),
 		},
@@ -2776,12 +2776,12 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 			IncrementedBalances: &types.IncrementedBalances{
 				StartBalances: []*types.Balance{
 					{
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(0),
 			},
@@ -2808,7 +2808,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 		ApprovalId: "asadsdasfghd",
 
 		TransferTimes:     GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		OwnershipTimes:    GetFullUintRanges(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
@@ -2819,7 +2819,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	suite.Require().Nil(err)
 
 	//Fails because we do not take overflows
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2829,7 +2829,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2838,7 +2838,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	})
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2848,7 +2848,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2858,7 +2858,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	})
 	suite.Require().Nil(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2868,7 +2868,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2878,7 +2878,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	})
 	suite.Require().Nil(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2888,7 +2888,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2898,7 +2898,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	})
 	suite.Require().Nil(err, "Error transferring token: %s")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -2908,7 +2908,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -2937,11 +2937,11 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 				StartBalances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(1000),
 			},
@@ -2956,7 +2956,7 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3049,11 +3049,11 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 				StartBalances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(1000),
 				AllowOverrideTimestamp:    true,
@@ -3069,7 +3069,7 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3126,11 +3126,11 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 				StartBalances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(1000),
 				AllowOverrideTimestamp:    false,
@@ -3146,7 +3146,7 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3192,11 +3192,11 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 				StartBalances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(), // doesn't matter
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(0),
 				AllowOverrideTimestamp:    false,
@@ -3221,7 +3221,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(9949))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3245,7 +3245,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(1))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3268,7 +3268,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(9999))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3295,7 +3295,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(10099))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3323,7 +3323,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(10299))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3368,11 +3368,11 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 				StartBalances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(), // doesn't matter
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(1000),
 				AllowOverrideTimestamp:    true,
@@ -3387,7 +3387,7 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 		FromListId:        collectionsToCreate[0].DefaultIncomingApprovals[0].FromListId,
 		InitiatedByListId: collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId,
 		ToListId:          collectionsToCreate[0].DefaultOutgoingApprovals[0].ToListId,
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		TransferTimes:     GetFullUintRanges(),
 	})
@@ -3400,7 +3400,7 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(1500))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3438,7 +3438,7 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 				InitiatedByListId: "AllWithoutMint",
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 
 				ApprovalCriteria: &types.IncomingApprovalCriteria{
 					MaxNumTransfers: &types.MaxNumTransfers{
@@ -3450,9 +3450,9 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 					PredeterminedBalances: &types.PredeterminedBalances{
 						IncrementedBalances: &types.IncrementedBalances{
 							StartBalances: []*types.Balance{
-								{Amount: sdkmath.NewUint(1), BadgeIds: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges()},
+								{Amount: sdkmath.NewUint(1), TokenIds: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges()},
 							},
-							IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+							IncrementTokenIdsBy:       sdkmath.NewUint(0),
 							IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 							DurationFromTimestamp:     sdkmath.NewUint(0),
 							AllowOverrideTimestamp:    true,
@@ -3472,7 +3472,7 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 	})
 	suite.Require().Nil(err)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3514,11 +3514,11 @@ func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
 				StartBalances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(), // doesn't matter
 					},
 				},
-				IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+				IncrementTokenIdsBy:       sdkmath.NewUint(0),
 				IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 				DurationFromTimestamp:     sdkmath.NewUint(0),
 				AllowOverrideTimestamp:    false,
@@ -3542,7 +3542,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
 	suite.ctx = suite.ctx.WithBlockTime(time.UnixMilli(99))
 	wctx = sdk.WrapSDKContext(suite.ctx)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: collection.CollectionId,
 		Transfers: []*types.Transfer{{
@@ -3567,7 +3567,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
 	suite.Require().Equal(aliceBalance.Balances[0].OwnershipTimes[0].End, sdkmath.NewUint(100).Add(sdkmath.NewUint(99)))
 }
 
-func (suite *TestSuite) TestBadgeIdsOverride() {
+func (suite *TestSuite) TestTokenIdsOverride() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
@@ -3575,7 +3575,7 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(1),
-			BadgeIds:       GetOneUintRange(),
+			TokenIds:       GetOneUintRange(),
 			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
@@ -3594,15 +3594,15 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:            sdkmath.NewUint(1),
+					IncrementTokenIdsBy:            sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy:      sdkmath.NewUint(0),
 					DurationFromTimestamp:          sdkmath.NewUint(0),
-					AllowOverrideWithAnyValidBadge: true,
+					AllowOverrideWithAnyValidToken: true,
 				},
 			},
 
@@ -3615,7 +3615,7 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -3625,12 +3625,12 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err)
 
-	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy = sdkmath.NewUint(0)
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementTokenIdsBy = sdkmath.NewUint(0)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 
-	msg := &types.MsgTransferBadges{
+	msg := &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -3640,7 +3640,7 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -3650,23 +3650,23 @@ func (suite *TestSuite) TestBadgeIdsOverride() {
 		},
 	}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err, "Error transferring token: %s")
 
 	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
-		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
+		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
 	}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions.BadgeIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Nil(err)
 }
 
-func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
+func (suite *TestSuite) TestTokenIdsOverrideWithMoreThanOneBadge() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
@@ -3674,7 +3674,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(1),
-			BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+			TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
@@ -3693,15 +3693,15 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:            sdkmath.NewUint(1),
+					IncrementTokenIdsBy:            sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy:      sdkmath.NewUint(0),
 					DurationFromTimestamp:          sdkmath.NewUint(0),
-					AllowOverrideWithAnyValidBadge: true,
+					AllowOverrideWithAnyValidToken: true,
 				},
 			},
 
@@ -3714,7 +3714,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -3724,12 +3724,12 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err)
 
-	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy = sdkmath.NewUint(0)
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementTokenIdsBy = sdkmath.NewUint(0)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 
-	msg := &types.MsgTransferBadges{
+	msg := &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -3739,7 +3739,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -3749,30 +3749,30 @@ func (suite *TestSuite) TestBadgeIdsOverrideWithMoreThanOneBadge() {
 		},
 	}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err, "Error transferring token: %s")
 
 	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
-		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
+		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
 	}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
 	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
-		BadgeIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 	}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions.BadgeIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Nil(err)
 }
 
-func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
+func (suite *TestSuite) TestTokenIdsOverrideNoPrecalcSpecified() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 
@@ -3780,7 +3780,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(1),
-			BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
+			TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
@@ -3799,15 +3799,15 @@ func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
 				IncrementedBalances: &types.IncrementedBalances{
 					StartBalances: []*types.Balance{
 						{
-							BadgeIds:       GetOneUintRange(),
+							TokenIds:       GetOneUintRange(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
 					},
-					IncrementBadgeIdsBy:            sdkmath.NewUint(1),
+					IncrementTokenIdsBy:            sdkmath.NewUint(1),
 					IncrementOwnershipTimesBy:      sdkmath.NewUint(0),
 					DurationFromTimestamp:          sdkmath.NewUint(0),
-					AllowOverrideWithAnyValidBadge: true,
+					AllowOverrideWithAnyValidToken: true,
 				},
 			},
 
@@ -3820,7 +3820,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
 
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "Mint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -3830,12 +3830,12 @@ func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err)
 
-	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy = sdkmath.NewUint(0)
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementTokenIdsBy = sdkmath.NewUint(0)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
 
-	msg := &types.MsgTransferBadges{
+	msg := &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -3845,7 +3845,7 @@ func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -3855,8 +3855,8 @@ func (suite *TestSuite) TestBadgeIdsOverrideNoPrecalcSpecified() {
 		},
 	}
 
-	// msg.Transfers[0].PrecalculationOptions.BadgeIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	// msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
-	err = TransferBadges(suite, wctx, msg)
+	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 }

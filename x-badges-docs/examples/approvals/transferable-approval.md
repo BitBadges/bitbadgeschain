@@ -15,7 +15,7 @@ const transferableApproval = new CollectionApproval({
     initiatedByListId: 'All',
     transferTimes: UintRangeArray.FullRanges(),
     ownershipTimes: UintRangeArray.FullRanges(),
-    badgeIds: UintRangeArray.FullRanges(),
+    tokenIds: UintRangeArray.FullRanges(),
     approvalId: 'transferable-approval',
     version: 0n,
     approvalCriteria: undefined, // No additional restrictions

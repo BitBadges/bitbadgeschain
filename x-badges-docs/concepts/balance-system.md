@@ -7,13 +7,13 @@ The Balance system in BitBadges is designed to represent ownership of tokens acr
 ```typescript
 export interface Balance<T extends NumberType> {
     amount: T;
-    badgeIds: UintRange<T>[];
+    tokenIds: UintRange<T>[];
     ownershipTimes: UintRange<T>[];
 }
 ```
 
 -   `amount`: The quantity of tokens owned
--   `badgeIds`: An array of ID ranges representing the tokens owned
+-   `tokenIds`: An array of ID ranges representing the tokens owned
 -   `ownershipTimes`: An array of time ranges during which the tokens are owned
 
 ## Interpreting Balances
@@ -24,7 +24,7 @@ When interpreting balances, it's crucial to understand that multiple ranges of t
 
 ```javascript
 for (balance of balances) {
-    for (badgeIdRange of balance.badgeIds) {
+    for (badgeIdRange of balance.tokenIds) {
         for (ownershipTimeRange of balance.ownershipTimes) {
             // User owns x(balance.amount) of (badgeIdRange) for the times (ownershipTimeRange)
         }
@@ -39,7 +39,7 @@ Consider the following balance:
 ```json
 {
     "amount": 1,
-    "badgeIds": [
+    "tokenIds": [
         { "start": 1, "end": 10 },
         { "start": 20, "end": 30 }
     ],
@@ -65,7 +65,7 @@ When subtracting balances, you may need to represent the result as multiple Bala
 [
     {
         "amount": 1,
-        "badgeIds": [
+        "tokenIds": [
             { "start": 1, "end": 10 },
             { "start": 20, "end": 30 }
         ],
@@ -73,7 +73,7 @@ When subtracting balances, you may need to represent the result as multiple Bala
     },
     {
         "amount": 1,
-        "badgeIds": [{ "start": 20, "end": 30 }],
+        "tokenIds": [{ "start": 20, "end": 30 }],
         "ownershipTimes": [{ "start": 20, "end": 50 }]
     }
 ]
@@ -86,7 +86,7 @@ When duplicate token IDs are specified in balances, they are combined and their 
 ```json
 {
     "amount": 1,
-    "badgeIds": [
+    "tokenIds": [
         { "start": 1, "end": 10 },
         { "start": 1, "end": 10 }
     ],
@@ -99,7 +99,7 @@ This is equivalent to and will be treated as:
 ```json
 {
     "amount": 2,
-    "badgeIds": [{ "start": 1, "end": 10 }],
+    "tokenIds": [{ "start": 1, "end": 10 }],
     "ownershipTimes": [{ "start": 100, "end": 200 }]
 }
 ```

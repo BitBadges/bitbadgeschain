@@ -79,7 +79,7 @@ Only increment when necessary (e.g., if no amount restrictions, don't track amou
         "amounts": [
             {
                 "amount": 50,
-                "badgeIds": [{ "start": 1, "end": 10 }],
+                "tokenIds": [{ "start": 1, "end": 10 }],
                 "ownershipTimes": [{ "start": 1, "end": 100000000000 }]
             }
         ],
@@ -90,7 +90,7 @@ Only increment when necessary (e.g., if no amount restrictions, don't track amou
         "amounts": [
             {
                 "amount": 15,
-                "badgeIds": [{ "start": 1, "end": 5 }],
+                "tokenIds": [{ "start": 1, "end": 5 }],
                 "ownershipTimes": [{ "start": 1, "end": 100000000000 }]
             }
         ],

@@ -62,8 +62,8 @@ There are **five types** of permissions, each with different criteria:
 
 -   **[Action Permissions](action-permissions.md)** - Simple time-based permissions (no criteria)
 -   **[Timeline Permissions](timeline-permissions.md)** - Control timeline updates (timelineTimes)
--   **[Timeline with Token IDs](timeline-permissions.md)** - Control token-specific timeline updates (timelineTimes + badgeIds)
--   **[Token ID Action Permissions](badge-id-permissions.md)** - Control token-specific actions (badgeIds)
+-   **[Timeline with Token IDs](timeline-permissions.md)** - Control token-specific timeline updates (timelineTimes + tokenIds)
+-   **[Token ID Action Permissions](badge-id-permissions.md)** - Control token-specific actions (tokenIds)
 -   **[Approval Permissions](approval-permissions.md)** - Control approval updates (transfer criteria + approvalId)
 
 ### Correct Categorization
@@ -86,13 +86,13 @@ Based on the proto definitions:
 -   `canUpdateManager`
 -   `canUpdateCollectionMetadata`
 
-**Timeline with Token IDs** (timelineTimes + badgeIds + time control):
+**Timeline with Token IDs** (timelineTimes + tokenIds + time control):
 
--   `canUpdateBadgeMetadata`
+-   `canUpdateTokenMetadata`
 
-**Token ID Action Permissions** (badgeIds + time control):
+**Token ID Action Permissions** (tokenIds + time control):
 
--   `canUpdateValidBadgeIds`
+-   `canUpdateValidTokenIds`
 
 **Approval Permissions** (transfer criteria + approvalId + time control):
 
@@ -125,10 +125,10 @@ When can the token metadata be updated? And which (token IDs, timeline time) pai
 
 ```json
 {
-    "canUpdateBadgeMetadata": [
+    "canUpdateTokenMetadata": [
         {
             "timelineTimes": [{ "start": "1", "end": "18446744073709551615" }],
-            "badgeIds": [{ "start": "1", "end": "100" }],
+            "tokenIds": [{ "start": "1", "end": "100" }],
 
             "permanentlyPermittedTimes": [],
             "permanentlyForbiddenTimes": [
@@ -179,10 +179,10 @@ All criteria in a permission element must match for it to be applied. Partial ma
 ### Example: Token Metadata Permissions
 
 ```json
-"canUpdateBadgeMetadata": [
+"canUpdateTokenMetadata": [
     {
         "timelineTimes": [{ "start": "1", "end": "10" }],
-        "badgeIds": [{ "start": "1", "end": "10" }],
+        "tokenIds": [{ "start": "1", "end": "10" }],
         "permanentlyPermittedTimes": [{ "start": "1", "end": "18446744073709551615" }],
         "permanentlyForbiddenTimes": []
     }
@@ -212,7 +212,7 @@ To lock specific criteria, you must specify the target and set all other criteri
     "fromListId": "All",
     "toListId": "All",
     "initiatedByListId": "All",
-    "badgeIds": [{ "start": "1", "end": "10" }],
+    "tokenIds": [{ "start": "1", "end": "10" }],
     "transferTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "approvalId": "All",

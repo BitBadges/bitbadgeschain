@@ -26,7 +26,7 @@ const collectionPermissions = {
             toListId: 'All',
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: FullTimeRanges,
+            tokenIds: FullTimeRanges,
             ownershipTimes: FullTimeRanges,
             approvalId: 'All',
             permanentlyPermittedTimes: [],
@@ -49,7 +49,7 @@ const collectionPermissions = {
             toListId: 'All',
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: FullTimeRanges,
+            tokenIds: FullTimeRanges,
             ownershipTimes: FullTimeRanges,
             approvalId: 'initial-mint', // Only lock initial mint approval
             permanentlyPermittedTimes: [],
@@ -83,7 +83,7 @@ const collectionPermissions = {
             toListId: 'All',
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: [
+            tokenIds: [
                 {
                     start: '1',
                     end: '100',

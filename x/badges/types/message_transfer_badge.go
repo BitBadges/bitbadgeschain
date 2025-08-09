@@ -6,27 +6,27 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgTransferBadges = "transfer_badge"
+const TypeMsgTransferTokens = "transfer_badge"
 
-var _ sdk.Msg = &MsgTransferBadges{}
+var _ sdk.Msg = &MsgTransferTokens{}
 
-func NewMsgTransferBadges(creator string, collectionId sdkmath.Uint, transfers []*Transfer, creatorOverride string) *MsgTransferBadges {
-	return &MsgTransferBadges{
+func NewMsgTransferTokens(creator string, collectionId sdkmath.Uint, transfers []*Transfer, creatorOverride string) *MsgTransferTokens {
+	return &MsgTransferTokens{
 		Creator:      creator,
 		CollectionId: collectionId,
 		Transfers:    transfers,
 	}
 }
 
-func (msg *MsgTransferBadges) Route() string {
+func (msg *MsgTransferTokens) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgTransferBadges) Type() string {
-	return TypeMsgTransferBadges
+func (msg *MsgTransferTokens) Type() string {
+	return TypeMsgTransferTokens
 }
 
-func (msg *MsgTransferBadges) GetSigners() []sdk.AccAddress {
+func (msg *MsgTransferTokens) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -34,12 +34,12 @@ func (msg *MsgTransferBadges) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgTransferBadges) GetSignBytes() []byte {
+func (msg *MsgTransferTokens) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgTransferBadges) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
+func (msg *MsgTransferTokens) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -59,6 +59,6 @@ func (msg *MsgTransferBadges) CheckAndCleanMsg(ctx sdk.Context, canChangeValues 
 	return nil
 }
 
-func (msg *MsgTransferBadges) ValidateBasic() error {
+func (msg *MsgTransferTokens) ValidateBasic() error {
 	return msg.CheckAndCleanMsg(sdk.Context{}, false)
 }

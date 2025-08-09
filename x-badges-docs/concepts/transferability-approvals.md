@@ -25,7 +25,7 @@ interface CollectionApproval<T extends NumberType> {
     fromListId: string; // Who can send?
     initiatedByListId: string; // Who can initiate?
     transferTimes: UintRange<T>[]; // When can transfer happen?
-    badgeIds: UintRange<T>[]; // Which token IDs?
+    tokenIds: UintRange<T>[]; // Which token IDs?
     ownershipTimes: UintRange<T>[]; // Which ownership times?
     approvalId: string; // Unique identifier
 
@@ -55,7 +55,7 @@ Every approval defines **Who? When? What?** through these fields:
 | `fromListId`        | Address List ID                 | Who can send tokens                     | `"Mint"`, `"!Mint"`                                |
 | `initiatedByListId` | Address List ID                 | Who can initiate transfer               | `"All"`, `"bb1..."`                                |
 | `transferTimes`     | UintRange[] (UNIX Milliseconds) | When transfer can occur                 | `[{start: "1691931600000", end: "1723554000000"}]` |
-| `badgeIds`          | UintRange[] (Token IDs)         | Which token IDs                         | `[{start: "1", end: "100"}]`                       |
+| `tokenIds`          | UintRange[] (Token IDs)         | Which token IDs                         | `[{start: "1", end: "100"}]`                       |
 | `ownershipTimes`    | UintRange[] (UNIX Milliseconds) | Which ownership times to be transferred | `[{start: "1", end: "18446744073709551615"}]`      |
 
 ### Example Approval
@@ -66,7 +66,7 @@ Every approval defines **Who? When? What?** through these fields:
     "toListId": "All",
     "initiatedByListId": "All",
     "transferTimes": [{ "start": "1691931600000", "end": "1723554000000" }],
-    "badgeIds": [{ "start": "1", "end": "100" }],
+    "tokenIds": [{ "start": "1", "end": "100" }],
     "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "approvalId": "mint-to-all"
 }
@@ -102,10 +102,10 @@ For optimal design, you should try to design transfers such that they only use s
 
 ### Prioritized Approvals
 
-In MsgTransferBadges, you can specify which approvals to prioritize. This allows you to prioritize certain approvals over others.
+In MsgTransferTokens, you can specify which approvals to prioritize. This allows you to prioritize certain approvals over others.
 
 ```typescript
-// In MsgTransferBadges
+// In MsgTransferTokens
 {
   prioritizedApprovals: [{
     approvalId: "approval1",
@@ -150,7 +150,7 @@ The versioning control ensures that before submitting, the user knows the exact 
 ]
 ```
 
-See [MsgTransferBadges](../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md) for the complete message structure.
+See [MsgTransferTokens](../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md) for the complete message structure.
 
 ## Related Topics
 

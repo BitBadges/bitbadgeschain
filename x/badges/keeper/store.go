@@ -24,7 +24,7 @@ import (
 /****************************************COLLECTIONS****************************************/
 
 // validateCollectionBeforeStore validates a collection before storing it
-func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types.BadgeCollection) error {
+func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types.TokenCollection) error {
 	// Validate collection approvals with invariants
 	if collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
 		if err := types.ValidateCollectionApprovalsWithInvariants(ctx, collection.CollectionApprovals, false, collection); err != nil {
@@ -35,14 +35,14 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 }
 
 // Sets a badge in the store using BadgeKey ([]byte{0x01}) as the prefix. No check if store has key already.
-func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.BadgeCollection) error {
+func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCollection) error {
 	// Validate collection before storing
 	if err := k.validateCollectionBeforeStore(ctx, collection); err != nil {
 		return err
 	}
 	marshaled_badge, err := k.cdc.Marshal(collection)
 	if err != nil {
-		return sdkerrors.Wrap(err, "Marshal types.BadgeCollection failed")
+		return sdkerrors.Wrap(err, "Marshal types.TokenCollection failed")
 	}
 
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
@@ -52,12 +52,12 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.BadgeCol
 }
 
 // Gets a badge from the store according to the collectionId.
-func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.BadgeCollection, bool) {
+func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.TokenCollection, bool) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_collection := store.Get(collectionStoreKey(collectionId))
 
-	var collection types.BadgeCollection
+	var collection types.TokenCollection
 	if len(marshaled_collection) == 0 {
 		return &collection, false
 	}
@@ -66,13 +66,13 @@ func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uin
 }
 
 // GetCollectionsFromStore defines a method for returning all tokens information by key.
-func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.BadgeCollection) {
+func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.TokenCollection) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var collection types.BadgeCollection
+		var collection types.TokenCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &collection)
 		collections = append(collections, &collection)
 	}
@@ -96,7 +96,7 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.
 /****************************************USER BALANCES****************************************/
 
 // validateUserBalanceBeforeStore validates a user balance before storing it
-func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey string, userBalance *types.UserBalanceStore, collection *types.BadgeCollection) error {
+func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey string, userBalance *types.UserBalanceStore, collection *types.TokenCollection) error {
 	// Get collection if not provided
 	if collection == nil {
 		collectionId := GetDetailsFromBalanceKey(balanceKey).collectionId

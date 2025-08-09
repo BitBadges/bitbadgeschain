@@ -69,7 +69,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	// suite.Require().Nil(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
+func (suite *TestSuite) TestNewCollectionDuplicateTokenIds() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	_, err := sdk.AccAddressFromBech32(alice)
@@ -83,7 +83,7 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: []*types.UintRange{
+					TokenIds: []*types.UintRange{
 						GetOneUintRange()[0],
 						GetOneUintRange()[0],
 					},
@@ -97,7 +97,7 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewCollectionNonSequentialBadgeIds() {
+func (suite *TestSuite) TestNewCollectionNonSequentialTokenIds() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	_, err := sdk.AccAddressFromBech32(alice)
@@ -108,7 +108,7 @@ func (suite *TestSuite) TestNewCollectionNonSequentialBadgeIds() {
 
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				GetOneUintRange()[0],
 				GetOneUintRange()[0],
 				{Start: sdkmath.NewUint(3), End: sdkmath.NewUint(3)},

@@ -13,10 +13,10 @@ This directory contains detailed documentation for all message types supported b
 
 ### Helper Collection Update Messages
 
--   [MsgSetValidBadgeIds](./msg-set-valid-badge-ids.md) - Update valid token IDs and permissions
+-   [MsgSetValidTokenIds](./msg-set-valid-badge-ids.md) - Update valid token IDs and permissions
 -   [MsgSetManager](./msg-set-manager.md) - Update manager timeline and permissions
 -   [MsgSetCollectionMetadata](./msg-set-collection-metadata.md) - Update collection metadata timeline and permissions
--   [MsgSetBadgeMetadata](./msg-set-badge-metadata.md) - Update token metadata timeline and permissions
+-   [MsgSetTokenMetadata](./msg-set-badge-metadata.md) - Update token metadata timeline and permissions
 -   [MsgSetCustomData](./msg-set-custom-data.md) - Update custom data timeline and permissions
 -   [MsgSetStandards](./msg-set-standards.md) - Update standards timeline and permissions
 -   [MsgSetCollectionApprovals](./msg-set-collection-approvals.md) - Update collection approvals and permissions
@@ -24,7 +24,7 @@ This directory contains detailed documentation for all message types supported b
 
 ### Token Transfers
 
--   [MsgTransferBadges](./msg-transfer-badges.md) - Transfer tokens between addresses with approval validation
+-   [MsgTransferTokens](./msg-transfer-badges.md) - Transfer tokens between addresses with approval validation
 
 ### User Approval Management
 

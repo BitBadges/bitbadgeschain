@@ -374,7 +374,7 @@ func (x *_CollectionPermissions_7_list) IsValid() bool {
 var _ protoreflect.List = (*_CollectionPermissions_8_list)(nil)
 
 type _CollectionPermissions_8_list struct {
-	list *[]*BadgeIdsActionPermission
+	list *[]*TokenIdsActionPermission
 }
 
 func (x *_CollectionPermissions_8_list) Len() int {
@@ -390,18 +390,18 @@ func (x *_CollectionPermissions_8_list) Get(i int) protoreflect.Value {
 
 func (x *_CollectionPermissions_8_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeIdsActionPermission)
+	concreteValue := valueUnwrapped.Interface().(*TokenIdsActionPermission)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_CollectionPermissions_8_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeIdsActionPermission)
+	concreteValue := valueUnwrapped.Interface().(*TokenIdsActionPermission)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_CollectionPermissions_8_list) AppendMutable() protoreflect.Value {
-	v := new(BadgeIdsActionPermission)
+	v := new(TokenIdsActionPermission)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -414,7 +414,7 @@ func (x *_CollectionPermissions_8_list) Truncate(n int) {
 }
 
 func (x *_CollectionPermissions_8_list) NewElement() protoreflect.Value {
-	v := new(BadgeIdsActionPermission)
+	v := new(TokenIdsActionPermission)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -425,7 +425,7 @@ func (x *_CollectionPermissions_8_list) IsValid() bool {
 var _ protoreflect.List = (*_CollectionPermissions_9_list)(nil)
 
 type _CollectionPermissions_9_list struct {
-	list *[]*TimedUpdateWithBadgeIdsPermission
+	list *[]*TimedUpdateWithTokenIdsPermission
 }
 
 func (x *_CollectionPermissions_9_list) Len() int {
@@ -441,18 +441,18 @@ func (x *_CollectionPermissions_9_list) Get(i int) protoreflect.Value {
 
 func (x *_CollectionPermissions_9_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*TimedUpdateWithBadgeIdsPermission)
+	concreteValue := valueUnwrapped.Interface().(*TimedUpdateWithTokenIdsPermission)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_CollectionPermissions_9_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*TimedUpdateWithBadgeIdsPermission)
+	concreteValue := valueUnwrapped.Interface().(*TimedUpdateWithTokenIdsPermission)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_CollectionPermissions_9_list) AppendMutable() protoreflect.Value {
-	v := new(TimedUpdateWithBadgeIdsPermission)
+	v := new(TimedUpdateWithTokenIdsPermission)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -465,7 +465,7 @@ func (x *_CollectionPermissions_9_list) Truncate(n int) {
 }
 
 func (x *_CollectionPermissions_9_list) NewElement() protoreflect.Value {
-	v := new(TimedUpdateWithBadgeIdsPermission)
+	v := new(TimedUpdateWithTokenIdsPermission)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -533,8 +533,8 @@ var (
 	fd_CollectionPermissions_canUpdateCustomData               protoreflect.FieldDescriptor
 	fd_CollectionPermissions_canUpdateManager                  protoreflect.FieldDescriptor
 	fd_CollectionPermissions_canUpdateCollectionMetadata       protoreflect.FieldDescriptor
-	fd_CollectionPermissions_canUpdateValidBadgeIds            protoreflect.FieldDescriptor
-	fd_CollectionPermissions_canUpdateBadgeMetadata            protoreflect.FieldDescriptor
+	fd_CollectionPermissions_canUpdateValidTokenIds            protoreflect.FieldDescriptor
+	fd_CollectionPermissions_canUpdateTokenMetadata            protoreflect.FieldDescriptor
 	fd_CollectionPermissions_canUpdateCollectionApprovals      protoreflect.FieldDescriptor
 )
 
@@ -548,8 +548,8 @@ func init() {
 	fd_CollectionPermissions_canUpdateCustomData = md_CollectionPermissions.Fields().ByName("canUpdateCustomData")
 	fd_CollectionPermissions_canUpdateManager = md_CollectionPermissions.Fields().ByName("canUpdateManager")
 	fd_CollectionPermissions_canUpdateCollectionMetadata = md_CollectionPermissions.Fields().ByName("canUpdateCollectionMetadata")
-	fd_CollectionPermissions_canUpdateValidBadgeIds = md_CollectionPermissions.Fields().ByName("canUpdateValidBadgeIds")
-	fd_CollectionPermissions_canUpdateBadgeMetadata = md_CollectionPermissions.Fields().ByName("canUpdateBadgeMetadata")
+	fd_CollectionPermissions_canUpdateValidTokenIds = md_CollectionPermissions.Fields().ByName("canUpdateValidTokenIds")
+	fd_CollectionPermissions_canUpdateTokenMetadata = md_CollectionPermissions.Fields().ByName("canUpdateTokenMetadata")
 	fd_CollectionPermissions_canUpdateCollectionApprovals = md_CollectionPermissions.Fields().ByName("canUpdateCollectionApprovals")
 }
 
@@ -660,15 +660,15 @@ func (x *fastReflection_CollectionPermissions) Range(f func(protoreflect.FieldDe
 			return
 		}
 	}
-	if len(x.CanUpdateValidBadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_CollectionPermissions_8_list{list: &x.CanUpdateValidBadgeIds})
-		if !f(fd_CollectionPermissions_canUpdateValidBadgeIds, value) {
+	if len(x.CanUpdateValidTokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_CollectionPermissions_8_list{list: &x.CanUpdateValidTokenIds})
+		if !f(fd_CollectionPermissions_canUpdateValidTokenIds, value) {
 			return
 		}
 	}
-	if len(x.CanUpdateBadgeMetadata) != 0 {
-		value := protoreflect.ValueOfList(&_CollectionPermissions_9_list{list: &x.CanUpdateBadgeMetadata})
-		if !f(fd_CollectionPermissions_canUpdateBadgeMetadata, value) {
+	if len(x.CanUpdateTokenMetadata) != 0 {
+		value := protoreflect.ValueOfList(&_CollectionPermissions_9_list{list: &x.CanUpdateTokenMetadata})
+		if !f(fd_CollectionPermissions_canUpdateTokenMetadata, value) {
 			return
 		}
 	}
@@ -707,10 +707,10 @@ func (x *fastReflection_CollectionPermissions) Has(fd protoreflect.FieldDescript
 		return len(x.CanUpdateManager) != 0
 	case "badges.CollectionPermissions.canUpdateCollectionMetadata":
 		return len(x.CanUpdateCollectionMetadata) != 0
-	case "badges.CollectionPermissions.canUpdateValidBadgeIds":
-		return len(x.CanUpdateValidBadgeIds) != 0
-	case "badges.CollectionPermissions.canUpdateBadgeMetadata":
-		return len(x.CanUpdateBadgeMetadata) != 0
+	case "badges.CollectionPermissions.canUpdateValidTokenIds":
+		return len(x.CanUpdateValidTokenIds) != 0
+	case "badges.CollectionPermissions.canUpdateTokenMetadata":
+		return len(x.CanUpdateTokenMetadata) != 0
 	case "badges.CollectionPermissions.canUpdateCollectionApprovals":
 		return len(x.CanUpdateCollectionApprovals) != 0
 	default:
@@ -743,10 +743,10 @@ func (x *fastReflection_CollectionPermissions) Clear(fd protoreflect.FieldDescri
 		x.CanUpdateManager = nil
 	case "badges.CollectionPermissions.canUpdateCollectionMetadata":
 		x.CanUpdateCollectionMetadata = nil
-	case "badges.CollectionPermissions.canUpdateValidBadgeIds":
-		x.CanUpdateValidBadgeIds = nil
-	case "badges.CollectionPermissions.canUpdateBadgeMetadata":
-		x.CanUpdateBadgeMetadata = nil
+	case "badges.CollectionPermissions.canUpdateValidTokenIds":
+		x.CanUpdateValidTokenIds = nil
+	case "badges.CollectionPermissions.canUpdateTokenMetadata":
+		x.CanUpdateTokenMetadata = nil
 	case "badges.CollectionPermissions.canUpdateCollectionApprovals":
 		x.CanUpdateCollectionApprovals = nil
 	default:
@@ -807,17 +807,17 @@ func (x *fastReflection_CollectionPermissions) Get(descriptor protoreflect.Field
 		}
 		listValue := &_CollectionPermissions_7_list{list: &x.CanUpdateCollectionMetadata}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.CollectionPermissions.canUpdateValidBadgeIds":
-		if len(x.CanUpdateValidBadgeIds) == 0 {
+	case "badges.CollectionPermissions.canUpdateValidTokenIds":
+		if len(x.CanUpdateValidTokenIds) == 0 {
 			return protoreflect.ValueOfList(&_CollectionPermissions_8_list{})
 		}
-		listValue := &_CollectionPermissions_8_list{list: &x.CanUpdateValidBadgeIds}
+		listValue := &_CollectionPermissions_8_list{list: &x.CanUpdateValidTokenIds}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.CollectionPermissions.canUpdateBadgeMetadata":
-		if len(x.CanUpdateBadgeMetadata) == 0 {
+	case "badges.CollectionPermissions.canUpdateTokenMetadata":
+		if len(x.CanUpdateTokenMetadata) == 0 {
 			return protoreflect.ValueOfList(&_CollectionPermissions_9_list{})
 		}
-		listValue := &_CollectionPermissions_9_list{list: &x.CanUpdateBadgeMetadata}
+		listValue := &_CollectionPermissions_9_list{list: &x.CanUpdateTokenMetadata}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.CollectionPermissions.canUpdateCollectionApprovals":
 		if len(x.CanUpdateCollectionApprovals) == 0 {
@@ -873,14 +873,14 @@ func (x *fastReflection_CollectionPermissions) Set(fd protoreflect.FieldDescript
 		lv := value.List()
 		clv := lv.(*_CollectionPermissions_7_list)
 		x.CanUpdateCollectionMetadata = *clv.list
-	case "badges.CollectionPermissions.canUpdateValidBadgeIds":
+	case "badges.CollectionPermissions.canUpdateValidTokenIds":
 		lv := value.List()
 		clv := lv.(*_CollectionPermissions_8_list)
-		x.CanUpdateValidBadgeIds = *clv.list
-	case "badges.CollectionPermissions.canUpdateBadgeMetadata":
+		x.CanUpdateValidTokenIds = *clv.list
+	case "badges.CollectionPermissions.canUpdateTokenMetadata":
 		lv := value.List()
 		clv := lv.(*_CollectionPermissions_9_list)
-		x.CanUpdateBadgeMetadata = *clv.list
+		x.CanUpdateTokenMetadata = *clv.list
 	case "badges.CollectionPermissions.canUpdateCollectionApprovals":
 		lv := value.List()
 		clv := lv.(*_CollectionPermissions_10_list)
@@ -947,17 +947,17 @@ func (x *fastReflection_CollectionPermissions) Mutable(fd protoreflect.FieldDesc
 		}
 		value := &_CollectionPermissions_7_list{list: &x.CanUpdateCollectionMetadata}
 		return protoreflect.ValueOfList(value)
-	case "badges.CollectionPermissions.canUpdateValidBadgeIds":
-		if x.CanUpdateValidBadgeIds == nil {
-			x.CanUpdateValidBadgeIds = []*BadgeIdsActionPermission{}
+	case "badges.CollectionPermissions.canUpdateValidTokenIds":
+		if x.CanUpdateValidTokenIds == nil {
+			x.CanUpdateValidTokenIds = []*TokenIdsActionPermission{}
 		}
-		value := &_CollectionPermissions_8_list{list: &x.CanUpdateValidBadgeIds}
+		value := &_CollectionPermissions_8_list{list: &x.CanUpdateValidTokenIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.CollectionPermissions.canUpdateBadgeMetadata":
-		if x.CanUpdateBadgeMetadata == nil {
-			x.CanUpdateBadgeMetadata = []*TimedUpdateWithBadgeIdsPermission{}
+	case "badges.CollectionPermissions.canUpdateTokenMetadata":
+		if x.CanUpdateTokenMetadata == nil {
+			x.CanUpdateTokenMetadata = []*TimedUpdateWithTokenIdsPermission{}
 		}
-		value := &_CollectionPermissions_9_list{list: &x.CanUpdateBadgeMetadata}
+		value := &_CollectionPermissions_9_list{list: &x.CanUpdateTokenMetadata}
 		return protoreflect.ValueOfList(value)
 	case "badges.CollectionPermissions.canUpdateCollectionApprovals":
 		if x.CanUpdateCollectionApprovals == nil {
@@ -999,11 +999,11 @@ func (x *fastReflection_CollectionPermissions) NewField(fd protoreflect.FieldDes
 	case "badges.CollectionPermissions.canUpdateCollectionMetadata":
 		list := []*TimedUpdatePermission{}
 		return protoreflect.ValueOfList(&_CollectionPermissions_7_list{list: &list})
-	case "badges.CollectionPermissions.canUpdateValidBadgeIds":
-		list := []*BadgeIdsActionPermission{}
+	case "badges.CollectionPermissions.canUpdateValidTokenIds":
+		list := []*TokenIdsActionPermission{}
 		return protoreflect.ValueOfList(&_CollectionPermissions_8_list{list: &list})
-	case "badges.CollectionPermissions.canUpdateBadgeMetadata":
-		list := []*TimedUpdateWithBadgeIdsPermission{}
+	case "badges.CollectionPermissions.canUpdateTokenMetadata":
+		list := []*TimedUpdateWithTokenIdsPermission{}
 		return protoreflect.ValueOfList(&_CollectionPermissions_9_list{list: &list})
 	case "badges.CollectionPermissions.canUpdateCollectionApprovals":
 		list := []*CollectionApprovalPermission{}
@@ -1119,14 +1119,14 @@ func (x *fastReflection_CollectionPermissions) ProtoMethods() *protoiface.Method
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.CanUpdateValidBadgeIds) > 0 {
-			for _, e := range x.CanUpdateValidBadgeIds {
+		if len(x.CanUpdateValidTokenIds) > 0 {
+			for _, e := range x.CanUpdateValidTokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.CanUpdateBadgeMetadata) > 0 {
-			for _, e := range x.CanUpdateBadgeMetadata {
+		if len(x.CanUpdateTokenMetadata) > 0 {
+			for _, e := range x.CanUpdateTokenMetadata {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -1182,9 +1182,9 @@ func (x *fastReflection_CollectionPermissions) ProtoMethods() *protoiface.Method
 				dAtA[i] = 0x52
 			}
 		}
-		if len(x.CanUpdateBadgeMetadata) > 0 {
-			for iNdEx := len(x.CanUpdateBadgeMetadata) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.CanUpdateBadgeMetadata[iNdEx])
+		if len(x.CanUpdateTokenMetadata) > 0 {
+			for iNdEx := len(x.CanUpdateTokenMetadata) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.CanUpdateTokenMetadata[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1198,9 +1198,9 @@ func (x *fastReflection_CollectionPermissions) ProtoMethods() *protoiface.Method
 				dAtA[i] = 0x4a
 			}
 		}
-		if len(x.CanUpdateValidBadgeIds) > 0 {
-			for iNdEx := len(x.CanUpdateValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.CanUpdateValidBadgeIds[iNdEx])
+		if len(x.CanUpdateValidTokenIds) > 0 {
+			for iNdEx := len(x.CanUpdateValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.CanUpdateValidTokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1615,7 +1615,7 @@ func (x *fastReflection_CollectionPermissions) ProtoMethods() *protoiface.Method
 				iNdEx = postIndex
 			case 8:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidBadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidTokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -1642,14 +1642,14 @@ func (x *fastReflection_CollectionPermissions) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.CanUpdateValidBadgeIds = append(x.CanUpdateValidBadgeIds, &BadgeIdsActionPermission{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CanUpdateValidBadgeIds[len(x.CanUpdateValidBadgeIds)-1]); err != nil {
+				x.CanUpdateValidTokenIds = append(x.CanUpdateValidTokenIds, &TokenIdsActionPermission{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CanUpdateValidTokenIds[len(x.CanUpdateValidTokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
 			case 9:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CanUpdateBadgeMetadata", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CanUpdateTokenMetadata", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -1676,8 +1676,8 @@ func (x *fastReflection_CollectionPermissions) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.CanUpdateBadgeMetadata = append(x.CanUpdateBadgeMetadata, &TimedUpdateWithBadgeIdsPermission{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CanUpdateBadgeMetadata[len(x.CanUpdateBadgeMetadata)-1]); err != nil {
+				x.CanUpdateTokenMetadata = append(x.CanUpdateTokenMetadata, &TimedUpdateWithTokenIdsPermission{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CanUpdateTokenMetadata[len(x.CanUpdateTokenMetadata)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -3057,7 +3057,7 @@ var (
 	fd_CollectionApprovalPermission_toListId                  protoreflect.FieldDescriptor
 	fd_CollectionApprovalPermission_initiatedByListId         protoreflect.FieldDescriptor
 	fd_CollectionApprovalPermission_transferTimes             protoreflect.FieldDescriptor
-	fd_CollectionApprovalPermission_badgeIds                  protoreflect.FieldDescriptor
+	fd_CollectionApprovalPermission_tokenIds                  protoreflect.FieldDescriptor
 	fd_CollectionApprovalPermission_ownershipTimes            protoreflect.FieldDescriptor
 	fd_CollectionApprovalPermission_approvalId                protoreflect.FieldDescriptor
 	fd_CollectionApprovalPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
@@ -3071,7 +3071,7 @@ func init() {
 	fd_CollectionApprovalPermission_toListId = md_CollectionApprovalPermission.Fields().ByName("toListId")
 	fd_CollectionApprovalPermission_initiatedByListId = md_CollectionApprovalPermission.Fields().ByName("initiatedByListId")
 	fd_CollectionApprovalPermission_transferTimes = md_CollectionApprovalPermission.Fields().ByName("transferTimes")
-	fd_CollectionApprovalPermission_badgeIds = md_CollectionApprovalPermission.Fields().ByName("badgeIds")
+	fd_CollectionApprovalPermission_tokenIds = md_CollectionApprovalPermission.Fields().ByName("tokenIds")
 	fd_CollectionApprovalPermission_ownershipTimes = md_CollectionApprovalPermission.Fields().ByName("ownershipTimes")
 	fd_CollectionApprovalPermission_approvalId = md_CollectionApprovalPermission.Fields().ByName("approvalId")
 	fd_CollectionApprovalPermission_permanentlyPermittedTimes = md_CollectionApprovalPermission.Fields().ByName("permanentlyPermittedTimes")
@@ -3167,9 +3167,9 @@ func (x *fastReflection_CollectionApprovalPermission) Range(f func(protoreflect.
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_CollectionApprovalPermission_5_list{list: &x.BadgeIds})
-		if !f(fd_CollectionApprovalPermission_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_CollectionApprovalPermission_5_list{list: &x.TokenIds})
+		if !f(fd_CollectionApprovalPermission_tokenIds, value) {
 			return
 		}
 	}
@@ -3220,8 +3220,8 @@ func (x *fastReflection_CollectionApprovalPermission) Has(fd protoreflect.FieldD
 		return x.InitiatedByListId != ""
 	case "badges.CollectionApprovalPermission.transferTimes":
 		return len(x.TransferTimes) != 0
-	case "badges.CollectionApprovalPermission.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.CollectionApprovalPermission.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.CollectionApprovalPermission.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
 	case "badges.CollectionApprovalPermission.approvalId":
@@ -3254,8 +3254,8 @@ func (x *fastReflection_CollectionApprovalPermission) Clear(fd protoreflect.Fiel
 		x.InitiatedByListId = ""
 	case "badges.CollectionApprovalPermission.transferTimes":
 		x.TransferTimes = nil
-	case "badges.CollectionApprovalPermission.badgeIds":
-		x.BadgeIds = nil
+	case "badges.CollectionApprovalPermission.tokenIds":
+		x.TokenIds = nil
 	case "badges.CollectionApprovalPermission.ownershipTimes":
 		x.OwnershipTimes = nil
 	case "badges.CollectionApprovalPermission.approvalId":
@@ -3295,11 +3295,11 @@ func (x *fastReflection_CollectionApprovalPermission) Get(descriptor protoreflec
 		}
 		listValue := &_CollectionApprovalPermission_4_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.CollectionApprovalPermission.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.CollectionApprovalPermission.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_CollectionApprovalPermission_5_list{})
 		}
-		listValue := &_CollectionApprovalPermission_5_list{list: &x.BadgeIds}
+		listValue := &_CollectionApprovalPermission_5_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.CollectionApprovalPermission.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
@@ -3352,10 +3352,10 @@ func (x *fastReflection_CollectionApprovalPermission) Set(fd protoreflect.FieldD
 		lv := value.List()
 		clv := lv.(*_CollectionApprovalPermission_4_list)
 		x.TransferTimes = *clv.list
-	case "badges.CollectionApprovalPermission.badgeIds":
+	case "badges.CollectionApprovalPermission.tokenIds":
 		lv := value.List()
 		clv := lv.(*_CollectionApprovalPermission_5_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.CollectionApprovalPermission.ownershipTimes":
 		lv := value.List()
 		clv := lv.(*_CollectionApprovalPermission_6_list)
@@ -3396,11 +3396,11 @@ func (x *fastReflection_CollectionApprovalPermission) Mutable(fd protoreflect.Fi
 		}
 		value := &_CollectionApprovalPermission_4_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.CollectionApprovalPermission.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.CollectionApprovalPermission.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_CollectionApprovalPermission_5_list{list: &x.BadgeIds}
+		value := &_CollectionApprovalPermission_5_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.CollectionApprovalPermission.ownershipTimes":
 		if x.OwnershipTimes == nil {
@@ -3450,7 +3450,7 @@ func (x *fastReflection_CollectionApprovalPermission) NewField(fd protoreflect.F
 	case "badges.CollectionApprovalPermission.transferTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CollectionApprovalPermission_4_list{list: &list})
-	case "badges.CollectionApprovalPermission.badgeIds":
+	case "badges.CollectionApprovalPermission.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CollectionApprovalPermission_5_list{list: &list})
 	case "badges.CollectionApprovalPermission.ownershipTimes":
@@ -3551,8 +3551,8 @@ func (x *fastReflection_CollectionApprovalPermission) ProtoMethods() *protoiface
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -3663,9 +3663,9 @@ func (x *fastReflection_CollectionApprovalPermission) ProtoMethods() *protoiface
 				dAtA[i] = 0x32
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3897,7 +3897,7 @@ func (x *fastReflection_CollectionApprovalPermission) ProtoMethods() *protoiface
 				iNdEx = postIndex
 			case 5:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -3924,8 +3924,8 @@ func (x *fastReflection_CollectionApprovalPermission) ProtoMethods() *protoiface
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -4358,7 +4358,7 @@ var (
 	fd_UserOutgoingApprovalPermission_toListId                  protoreflect.FieldDescriptor
 	fd_UserOutgoingApprovalPermission_initiatedByListId         protoreflect.FieldDescriptor
 	fd_UserOutgoingApprovalPermission_transferTimes             protoreflect.FieldDescriptor
-	fd_UserOutgoingApprovalPermission_badgeIds                  protoreflect.FieldDescriptor
+	fd_UserOutgoingApprovalPermission_tokenIds                  protoreflect.FieldDescriptor
 	fd_UserOutgoingApprovalPermission_ownershipTimes            protoreflect.FieldDescriptor
 	fd_UserOutgoingApprovalPermission_approvalId                protoreflect.FieldDescriptor
 	fd_UserOutgoingApprovalPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
@@ -4371,7 +4371,7 @@ func init() {
 	fd_UserOutgoingApprovalPermission_toListId = md_UserOutgoingApprovalPermission.Fields().ByName("toListId")
 	fd_UserOutgoingApprovalPermission_initiatedByListId = md_UserOutgoingApprovalPermission.Fields().ByName("initiatedByListId")
 	fd_UserOutgoingApprovalPermission_transferTimes = md_UserOutgoingApprovalPermission.Fields().ByName("transferTimes")
-	fd_UserOutgoingApprovalPermission_badgeIds = md_UserOutgoingApprovalPermission.Fields().ByName("badgeIds")
+	fd_UserOutgoingApprovalPermission_tokenIds = md_UserOutgoingApprovalPermission.Fields().ByName("tokenIds")
 	fd_UserOutgoingApprovalPermission_ownershipTimes = md_UserOutgoingApprovalPermission.Fields().ByName("ownershipTimes")
 	fd_UserOutgoingApprovalPermission_approvalId = md_UserOutgoingApprovalPermission.Fields().ByName("approvalId")
 	fd_UserOutgoingApprovalPermission_permanentlyPermittedTimes = md_UserOutgoingApprovalPermission.Fields().ByName("permanentlyPermittedTimes")
@@ -4461,9 +4461,9 @@ func (x *fastReflection_UserOutgoingApprovalPermission) Range(f func(protoreflec
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_UserOutgoingApprovalPermission_4_list{list: &x.BadgeIds})
-		if !f(fd_UserOutgoingApprovalPermission_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_UserOutgoingApprovalPermission_4_list{list: &x.TokenIds})
+		if !f(fd_UserOutgoingApprovalPermission_tokenIds, value) {
 			return
 		}
 	}
@@ -4512,8 +4512,8 @@ func (x *fastReflection_UserOutgoingApprovalPermission) Has(fd protoreflect.Fiel
 		return x.InitiatedByListId != ""
 	case "badges.UserOutgoingApprovalPermission.transferTimes":
 		return len(x.TransferTimes) != 0
-	case "badges.UserOutgoingApprovalPermission.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.UserOutgoingApprovalPermission.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.UserOutgoingApprovalPermission.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
 	case "badges.UserOutgoingApprovalPermission.approvalId":
@@ -4544,8 +4544,8 @@ func (x *fastReflection_UserOutgoingApprovalPermission) Clear(fd protoreflect.Fi
 		x.InitiatedByListId = ""
 	case "badges.UserOutgoingApprovalPermission.transferTimes":
 		x.TransferTimes = nil
-	case "badges.UserOutgoingApprovalPermission.badgeIds":
-		x.BadgeIds = nil
+	case "badges.UserOutgoingApprovalPermission.tokenIds":
+		x.TokenIds = nil
 	case "badges.UserOutgoingApprovalPermission.ownershipTimes":
 		x.OwnershipTimes = nil
 	case "badges.UserOutgoingApprovalPermission.approvalId":
@@ -4582,11 +4582,11 @@ func (x *fastReflection_UserOutgoingApprovalPermission) Get(descriptor protorefl
 		}
 		listValue := &_UserOutgoingApprovalPermission_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.UserOutgoingApprovalPermission.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.UserOutgoingApprovalPermission.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_UserOutgoingApprovalPermission_4_list{})
 		}
-		listValue := &_UserOutgoingApprovalPermission_4_list{list: &x.BadgeIds}
+		listValue := &_UserOutgoingApprovalPermission_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.UserOutgoingApprovalPermission.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
@@ -4637,10 +4637,10 @@ func (x *fastReflection_UserOutgoingApprovalPermission) Set(fd protoreflect.Fiel
 		lv := value.List()
 		clv := lv.(*_UserOutgoingApprovalPermission_3_list)
 		x.TransferTimes = *clv.list
-	case "badges.UserOutgoingApprovalPermission.badgeIds":
+	case "badges.UserOutgoingApprovalPermission.tokenIds":
 		lv := value.List()
 		clv := lv.(*_UserOutgoingApprovalPermission_4_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.UserOutgoingApprovalPermission.ownershipTimes":
 		lv := value.List()
 		clv := lv.(*_UserOutgoingApprovalPermission_5_list)
@@ -4681,11 +4681,11 @@ func (x *fastReflection_UserOutgoingApprovalPermission) Mutable(fd protoreflect.
 		}
 		value := &_UserOutgoingApprovalPermission_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.UserOutgoingApprovalPermission.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.UserOutgoingApprovalPermission.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_UserOutgoingApprovalPermission_4_list{list: &x.BadgeIds}
+		value := &_UserOutgoingApprovalPermission_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.UserOutgoingApprovalPermission.ownershipTimes":
 		if x.OwnershipTimes == nil {
@@ -4731,7 +4731,7 @@ func (x *fastReflection_UserOutgoingApprovalPermission) NewField(fd protoreflect
 	case "badges.UserOutgoingApprovalPermission.transferTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserOutgoingApprovalPermission_3_list{list: &list})
-	case "badges.UserOutgoingApprovalPermission.badgeIds":
+	case "badges.UserOutgoingApprovalPermission.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserOutgoingApprovalPermission_4_list{list: &list})
 	case "badges.UserOutgoingApprovalPermission.ownershipTimes":
@@ -4828,8 +4828,8 @@ func (x *fastReflection_UserOutgoingApprovalPermission) ProtoMethods() *protoifa
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -4940,9 +4940,9 @@ func (x *fastReflection_UserOutgoingApprovalPermission) ProtoMethods() *protoifa
 				dAtA[i] = 0x2a
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5135,7 +5135,7 @@ func (x *fastReflection_UserOutgoingApprovalPermission) ProtoMethods() *protoifa
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -5162,8 +5162,8 @@ func (x *fastReflection_UserOutgoingApprovalPermission) ProtoMethods() *protoifa
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -5596,7 +5596,7 @@ var (
 	fd_UserIncomingApprovalPermission_fromListId                protoreflect.FieldDescriptor
 	fd_UserIncomingApprovalPermission_initiatedByListId         protoreflect.FieldDescriptor
 	fd_UserIncomingApprovalPermission_transferTimes             protoreflect.FieldDescriptor
-	fd_UserIncomingApprovalPermission_badgeIds                  protoreflect.FieldDescriptor
+	fd_UserIncomingApprovalPermission_tokenIds                  protoreflect.FieldDescriptor
 	fd_UserIncomingApprovalPermission_ownershipTimes            protoreflect.FieldDescriptor
 	fd_UserIncomingApprovalPermission_approvalId                protoreflect.FieldDescriptor
 	fd_UserIncomingApprovalPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
@@ -5609,7 +5609,7 @@ func init() {
 	fd_UserIncomingApprovalPermission_fromListId = md_UserIncomingApprovalPermission.Fields().ByName("fromListId")
 	fd_UserIncomingApprovalPermission_initiatedByListId = md_UserIncomingApprovalPermission.Fields().ByName("initiatedByListId")
 	fd_UserIncomingApprovalPermission_transferTimes = md_UserIncomingApprovalPermission.Fields().ByName("transferTimes")
-	fd_UserIncomingApprovalPermission_badgeIds = md_UserIncomingApprovalPermission.Fields().ByName("badgeIds")
+	fd_UserIncomingApprovalPermission_tokenIds = md_UserIncomingApprovalPermission.Fields().ByName("tokenIds")
 	fd_UserIncomingApprovalPermission_ownershipTimes = md_UserIncomingApprovalPermission.Fields().ByName("ownershipTimes")
 	fd_UserIncomingApprovalPermission_approvalId = md_UserIncomingApprovalPermission.Fields().ByName("approvalId")
 	fd_UserIncomingApprovalPermission_permanentlyPermittedTimes = md_UserIncomingApprovalPermission.Fields().ByName("permanentlyPermittedTimes")
@@ -5699,9 +5699,9 @@ func (x *fastReflection_UserIncomingApprovalPermission) Range(f func(protoreflec
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_UserIncomingApprovalPermission_4_list{list: &x.BadgeIds})
-		if !f(fd_UserIncomingApprovalPermission_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_UserIncomingApprovalPermission_4_list{list: &x.TokenIds})
+		if !f(fd_UserIncomingApprovalPermission_tokenIds, value) {
 			return
 		}
 	}
@@ -5750,8 +5750,8 @@ func (x *fastReflection_UserIncomingApprovalPermission) Has(fd protoreflect.Fiel
 		return x.InitiatedByListId != ""
 	case "badges.UserIncomingApprovalPermission.transferTimes":
 		return len(x.TransferTimes) != 0
-	case "badges.UserIncomingApprovalPermission.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.UserIncomingApprovalPermission.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.UserIncomingApprovalPermission.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
 	case "badges.UserIncomingApprovalPermission.approvalId":
@@ -5782,8 +5782,8 @@ func (x *fastReflection_UserIncomingApprovalPermission) Clear(fd protoreflect.Fi
 		x.InitiatedByListId = ""
 	case "badges.UserIncomingApprovalPermission.transferTimes":
 		x.TransferTimes = nil
-	case "badges.UserIncomingApprovalPermission.badgeIds":
-		x.BadgeIds = nil
+	case "badges.UserIncomingApprovalPermission.tokenIds":
+		x.TokenIds = nil
 	case "badges.UserIncomingApprovalPermission.ownershipTimes":
 		x.OwnershipTimes = nil
 	case "badges.UserIncomingApprovalPermission.approvalId":
@@ -5820,11 +5820,11 @@ func (x *fastReflection_UserIncomingApprovalPermission) Get(descriptor protorefl
 		}
 		listValue := &_UserIncomingApprovalPermission_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.UserIncomingApprovalPermission.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.UserIncomingApprovalPermission.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_UserIncomingApprovalPermission_4_list{})
 		}
-		listValue := &_UserIncomingApprovalPermission_4_list{list: &x.BadgeIds}
+		listValue := &_UserIncomingApprovalPermission_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.UserIncomingApprovalPermission.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
@@ -5875,10 +5875,10 @@ func (x *fastReflection_UserIncomingApprovalPermission) Set(fd protoreflect.Fiel
 		lv := value.List()
 		clv := lv.(*_UserIncomingApprovalPermission_3_list)
 		x.TransferTimes = *clv.list
-	case "badges.UserIncomingApprovalPermission.badgeIds":
+	case "badges.UserIncomingApprovalPermission.tokenIds":
 		lv := value.List()
 		clv := lv.(*_UserIncomingApprovalPermission_4_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.UserIncomingApprovalPermission.ownershipTimes":
 		lv := value.List()
 		clv := lv.(*_UserIncomingApprovalPermission_5_list)
@@ -5919,11 +5919,11 @@ func (x *fastReflection_UserIncomingApprovalPermission) Mutable(fd protoreflect.
 		}
 		value := &_UserIncomingApprovalPermission_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.UserIncomingApprovalPermission.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.UserIncomingApprovalPermission.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_UserIncomingApprovalPermission_4_list{list: &x.BadgeIds}
+		value := &_UserIncomingApprovalPermission_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.UserIncomingApprovalPermission.ownershipTimes":
 		if x.OwnershipTimes == nil {
@@ -5969,7 +5969,7 @@ func (x *fastReflection_UserIncomingApprovalPermission) NewField(fd protoreflect
 	case "badges.UserIncomingApprovalPermission.transferTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserIncomingApprovalPermission_3_list{list: &list})
-	case "badges.UserIncomingApprovalPermission.badgeIds":
+	case "badges.UserIncomingApprovalPermission.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserIncomingApprovalPermission_4_list{list: &list})
 	case "badges.UserIncomingApprovalPermission.ownershipTimes":
@@ -6066,8 +6066,8 @@ func (x *fastReflection_UserIncomingApprovalPermission) ProtoMethods() *protoifa
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -6178,9 +6178,9 @@ func (x *fastReflection_UserIncomingApprovalPermission) ProtoMethods() *protoifa
 				dAtA[i] = 0x2a
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -6373,7 +6373,7 @@ func (x *fastReflection_UserIncomingApprovalPermission) ProtoMethods() *protoifa
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -6400,8 +6400,8 @@ func (x *fastReflection_UserIncomingApprovalPermission) ProtoMethods() *protoifa
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -6574,183 +6574,183 @@ func (x *fastReflection_UserIncomingApprovalPermission) ProtoMethods() *protoifa
 	}
 }
 
-var _ protoreflect.List = (*_BadgeIdsActionPermission_1_list)(nil)
+var _ protoreflect.List = (*_TokenIdsActionPermission_1_list)(nil)
 
-type _BadgeIdsActionPermission_1_list struct {
+type _TokenIdsActionPermission_1_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeIdsActionPermission_1_list) Len() int {
+func (x *_TokenIdsActionPermission_1_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeIdsActionPermission_1_list) Get(i int) protoreflect.Value {
+func (x *_TokenIdsActionPermission_1_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_1_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenIdsActionPermission_1_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeIdsActionPermission_1_list) Append(value protoreflect.Value) {
+func (x *_TokenIdsActionPermission_1_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeIdsActionPermission_1_list) AppendMutable() protoreflect.Value {
+func (x *_TokenIdsActionPermission_1_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_1_list) Truncate(n int) {
+func (x *_TokenIdsActionPermission_1_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeIdsActionPermission_1_list) NewElement() protoreflect.Value {
+func (x *_TokenIdsActionPermission_1_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_1_list) IsValid() bool {
+func (x *_TokenIdsActionPermission_1_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeIdsActionPermission_2_list)(nil)
+var _ protoreflect.List = (*_TokenIdsActionPermission_2_list)(nil)
 
-type _BadgeIdsActionPermission_2_list struct {
+type _TokenIdsActionPermission_2_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeIdsActionPermission_2_list) Len() int {
+func (x *_TokenIdsActionPermission_2_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeIdsActionPermission_2_list) Get(i int) protoreflect.Value {
+func (x *_TokenIdsActionPermission_2_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_2_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenIdsActionPermission_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeIdsActionPermission_2_list) Append(value protoreflect.Value) {
+func (x *_TokenIdsActionPermission_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeIdsActionPermission_2_list) AppendMutable() protoreflect.Value {
+func (x *_TokenIdsActionPermission_2_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_2_list) Truncate(n int) {
+func (x *_TokenIdsActionPermission_2_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeIdsActionPermission_2_list) NewElement() protoreflect.Value {
+func (x *_TokenIdsActionPermission_2_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_2_list) IsValid() bool {
+func (x *_TokenIdsActionPermission_2_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeIdsActionPermission_3_list)(nil)
+var _ protoreflect.List = (*_TokenIdsActionPermission_3_list)(nil)
 
-type _BadgeIdsActionPermission_3_list struct {
+type _TokenIdsActionPermission_3_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeIdsActionPermission_3_list) Len() int {
+func (x *_TokenIdsActionPermission_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeIdsActionPermission_3_list) Get(i int) protoreflect.Value {
+func (x *_TokenIdsActionPermission_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_3_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenIdsActionPermission_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeIdsActionPermission_3_list) Append(value protoreflect.Value) {
+func (x *_TokenIdsActionPermission_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeIdsActionPermission_3_list) AppendMutable() protoreflect.Value {
+func (x *_TokenIdsActionPermission_3_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_3_list) Truncate(n int) {
+func (x *_TokenIdsActionPermission_3_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeIdsActionPermission_3_list) NewElement() protoreflect.Value {
+func (x *_TokenIdsActionPermission_3_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeIdsActionPermission_3_list) IsValid() bool {
+func (x *_TokenIdsActionPermission_3_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_BadgeIdsActionPermission                           protoreflect.MessageDescriptor
-	fd_BadgeIdsActionPermission_badgeIds                  protoreflect.FieldDescriptor
-	fd_BadgeIdsActionPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
-	fd_BadgeIdsActionPermission_permanentlyForbiddenTimes protoreflect.FieldDescriptor
+	md_TokenIdsActionPermission                           protoreflect.MessageDescriptor
+	fd_TokenIdsActionPermission_tokenIds                  protoreflect.FieldDescriptor
+	fd_TokenIdsActionPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
+	fd_TokenIdsActionPermission_permanentlyForbiddenTimes protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_permissions_proto_init()
-	md_BadgeIdsActionPermission = File_badges_permissions_proto.Messages().ByName("BadgeIdsActionPermission")
-	fd_BadgeIdsActionPermission_badgeIds = md_BadgeIdsActionPermission.Fields().ByName("badgeIds")
-	fd_BadgeIdsActionPermission_permanentlyPermittedTimes = md_BadgeIdsActionPermission.Fields().ByName("permanentlyPermittedTimes")
-	fd_BadgeIdsActionPermission_permanentlyForbiddenTimes = md_BadgeIdsActionPermission.Fields().ByName("permanentlyForbiddenTimes")
+	md_TokenIdsActionPermission = File_badges_permissions_proto.Messages().ByName("TokenIdsActionPermission")
+	fd_TokenIdsActionPermission_tokenIds = md_TokenIdsActionPermission.Fields().ByName("tokenIds")
+	fd_TokenIdsActionPermission_permanentlyPermittedTimes = md_TokenIdsActionPermission.Fields().ByName("permanentlyPermittedTimes")
+	fd_TokenIdsActionPermission_permanentlyForbiddenTimes = md_TokenIdsActionPermission.Fields().ByName("permanentlyForbiddenTimes")
 }
 
-var _ protoreflect.Message = (*fastReflection_BadgeIdsActionPermission)(nil)
+var _ protoreflect.Message = (*fastReflection_TokenIdsActionPermission)(nil)
 
-type fastReflection_BadgeIdsActionPermission BadgeIdsActionPermission
+type fastReflection_TokenIdsActionPermission TokenIdsActionPermission
 
-func (x *BadgeIdsActionPermission) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_BadgeIdsActionPermission)(x)
+func (x *TokenIdsActionPermission) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TokenIdsActionPermission)(x)
 }
 
-func (x *BadgeIdsActionPermission) slowProtoReflect() protoreflect.Message {
+func (x *TokenIdsActionPermission) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_permissions_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6762,43 +6762,43 @@ func (x *BadgeIdsActionPermission) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_BadgeIdsActionPermission_messageType fastReflection_BadgeIdsActionPermission_messageType
-var _ protoreflect.MessageType = fastReflection_BadgeIdsActionPermission_messageType{}
+var _fastReflection_TokenIdsActionPermission_messageType fastReflection_TokenIdsActionPermission_messageType
+var _ protoreflect.MessageType = fastReflection_TokenIdsActionPermission_messageType{}
 
-type fastReflection_BadgeIdsActionPermission_messageType struct{}
+type fastReflection_TokenIdsActionPermission_messageType struct{}
 
-func (x fastReflection_BadgeIdsActionPermission_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_BadgeIdsActionPermission)(nil)
+func (x fastReflection_TokenIdsActionPermission_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TokenIdsActionPermission)(nil)
 }
-func (x fastReflection_BadgeIdsActionPermission_messageType) New() protoreflect.Message {
-	return new(fastReflection_BadgeIdsActionPermission)
+func (x fastReflection_TokenIdsActionPermission_messageType) New() protoreflect.Message {
+	return new(fastReflection_TokenIdsActionPermission)
 }
-func (x fastReflection_BadgeIdsActionPermission_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeIdsActionPermission
+func (x fastReflection_TokenIdsActionPermission_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenIdsActionPermission
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_BadgeIdsActionPermission) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeIdsActionPermission
+func (x *fastReflection_TokenIdsActionPermission) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenIdsActionPermission
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_BadgeIdsActionPermission) Type() protoreflect.MessageType {
-	return _fastReflection_BadgeIdsActionPermission_messageType
+func (x *fastReflection_TokenIdsActionPermission) Type() protoreflect.MessageType {
+	return _fastReflection_TokenIdsActionPermission_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_BadgeIdsActionPermission) New() protoreflect.Message {
-	return new(fastReflection_BadgeIdsActionPermission)
+func (x *fastReflection_TokenIdsActionPermission) New() protoreflect.Message {
+	return new(fastReflection_TokenIdsActionPermission)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_BadgeIdsActionPermission) Interface() protoreflect.ProtoMessage {
-	return (*BadgeIdsActionPermission)(x)
+func (x *fastReflection_TokenIdsActionPermission) Interface() protoreflect.ProtoMessage {
+	return (*TokenIdsActionPermission)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -6806,22 +6806,22 @@ func (x *fastReflection_BadgeIdsActionPermission) Interface() protoreflect.Proto
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_BadgeIdsActionPermission) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeIdsActionPermission_1_list{list: &x.BadgeIds})
-		if !f(fd_BadgeIdsActionPermission_badgeIds, value) {
+func (x *fastReflection_TokenIdsActionPermission) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_TokenIdsActionPermission_1_list{list: &x.TokenIds})
+		if !f(fd_TokenIdsActionPermission_tokenIds, value) {
 			return
 		}
 	}
 	if len(x.PermanentlyPermittedTimes) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeIdsActionPermission_2_list{list: &x.PermanentlyPermittedTimes})
-		if !f(fd_BadgeIdsActionPermission_permanentlyPermittedTimes, value) {
+		value := protoreflect.ValueOfList(&_TokenIdsActionPermission_2_list{list: &x.PermanentlyPermittedTimes})
+		if !f(fd_TokenIdsActionPermission_permanentlyPermittedTimes, value) {
 			return
 		}
 	}
 	if len(x.PermanentlyForbiddenTimes) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeIdsActionPermission_3_list{list: &x.PermanentlyForbiddenTimes})
-		if !f(fd_BadgeIdsActionPermission_permanentlyForbiddenTimes, value) {
+		value := protoreflect.ValueOfList(&_TokenIdsActionPermission_3_list{list: &x.PermanentlyForbiddenTimes})
+		if !f(fd_TokenIdsActionPermission_permanentlyForbiddenTimes, value) {
 			return
 		}
 	}
@@ -6838,19 +6838,19 @@ func (x *fastReflection_BadgeIdsActionPermission) Range(f func(protoreflect.Fiel
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_BadgeIdsActionPermission) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_TokenIdsActionPermission) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.BadgeIdsActionPermission.badgeIds":
-		return len(x.BadgeIds) != 0
-	case "badges.BadgeIdsActionPermission.permanentlyPermittedTimes":
+	case "badges.TokenIdsActionPermission.tokenIds":
+		return len(x.TokenIds) != 0
+	case "badges.TokenIdsActionPermission.permanentlyPermittedTimes":
 		return len(x.PermanentlyPermittedTimes) != 0
-	case "badges.BadgeIdsActionPermission.permanentlyForbiddenTimes":
+	case "badges.TokenIdsActionPermission.permanentlyForbiddenTimes":
 		return len(x.PermanentlyForbiddenTimes) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeIdsActionPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenIdsActionPermission"))
 		}
-		panic(fmt.Errorf("message badges.BadgeIdsActionPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenIdsActionPermission does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -6860,19 +6860,19 @@ func (x *fastReflection_BadgeIdsActionPermission) Has(fd protoreflect.FieldDescr
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeIdsActionPermission) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_TokenIdsActionPermission) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.BadgeIdsActionPermission.badgeIds":
-		x.BadgeIds = nil
-	case "badges.BadgeIdsActionPermission.permanentlyPermittedTimes":
+	case "badges.TokenIdsActionPermission.tokenIds":
+		x.TokenIds = nil
+	case "badges.TokenIdsActionPermission.permanentlyPermittedTimes":
 		x.PermanentlyPermittedTimes = nil
-	case "badges.BadgeIdsActionPermission.permanentlyForbiddenTimes":
+	case "badges.TokenIdsActionPermission.permanentlyForbiddenTimes":
 		x.PermanentlyForbiddenTimes = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeIdsActionPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenIdsActionPermission"))
 		}
-		panic(fmt.Errorf("message badges.BadgeIdsActionPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenIdsActionPermission does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -6882,31 +6882,31 @@ func (x *fastReflection_BadgeIdsActionPermission) Clear(fd protoreflect.FieldDes
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_BadgeIdsActionPermission) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenIdsActionPermission) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.BadgeIdsActionPermission.badgeIds":
-		if len(x.BadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_BadgeIdsActionPermission_1_list{})
+	case "badges.TokenIdsActionPermission.tokenIds":
+		if len(x.TokenIds) == 0 {
+			return protoreflect.ValueOfList(&_TokenIdsActionPermission_1_list{})
 		}
-		listValue := &_BadgeIdsActionPermission_1_list{list: &x.BadgeIds}
+		listValue := &_TokenIdsActionPermission_1_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeIdsActionPermission.permanentlyPermittedTimes":
+	case "badges.TokenIdsActionPermission.permanentlyPermittedTimes":
 		if len(x.PermanentlyPermittedTimes) == 0 {
-			return protoreflect.ValueOfList(&_BadgeIdsActionPermission_2_list{})
+			return protoreflect.ValueOfList(&_TokenIdsActionPermission_2_list{})
 		}
-		listValue := &_BadgeIdsActionPermission_2_list{list: &x.PermanentlyPermittedTimes}
+		listValue := &_TokenIdsActionPermission_2_list{list: &x.PermanentlyPermittedTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeIdsActionPermission.permanentlyForbiddenTimes":
+	case "badges.TokenIdsActionPermission.permanentlyForbiddenTimes":
 		if len(x.PermanentlyForbiddenTimes) == 0 {
-			return protoreflect.ValueOfList(&_BadgeIdsActionPermission_3_list{})
+			return protoreflect.ValueOfList(&_TokenIdsActionPermission_3_list{})
 		}
-		listValue := &_BadgeIdsActionPermission_3_list{list: &x.PermanentlyForbiddenTimes}
+		listValue := &_TokenIdsActionPermission_3_list{list: &x.PermanentlyForbiddenTimes}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeIdsActionPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenIdsActionPermission"))
 		}
-		panic(fmt.Errorf("message badges.BadgeIdsActionPermission does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.TokenIdsActionPermission does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -6920,25 +6920,25 @@ func (x *fastReflection_BadgeIdsActionPermission) Get(descriptor protoreflect.Fi
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeIdsActionPermission) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_TokenIdsActionPermission) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.BadgeIdsActionPermission.badgeIds":
+	case "badges.TokenIdsActionPermission.tokenIds":
 		lv := value.List()
-		clv := lv.(*_BadgeIdsActionPermission_1_list)
-		x.BadgeIds = *clv.list
-	case "badges.BadgeIdsActionPermission.permanentlyPermittedTimes":
+		clv := lv.(*_TokenIdsActionPermission_1_list)
+		x.TokenIds = *clv.list
+	case "badges.TokenIdsActionPermission.permanentlyPermittedTimes":
 		lv := value.List()
-		clv := lv.(*_BadgeIdsActionPermission_2_list)
+		clv := lv.(*_TokenIdsActionPermission_2_list)
 		x.PermanentlyPermittedTimes = *clv.list
-	case "badges.BadgeIdsActionPermission.permanentlyForbiddenTimes":
+	case "badges.TokenIdsActionPermission.permanentlyForbiddenTimes":
 		lv := value.List()
-		clv := lv.(*_BadgeIdsActionPermission_3_list)
+		clv := lv.(*_TokenIdsActionPermission_3_list)
 		x.PermanentlyForbiddenTimes = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeIdsActionPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenIdsActionPermission"))
 		}
-		panic(fmt.Errorf("message badges.BadgeIdsActionPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenIdsActionPermission does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -6952,63 +6952,63 @@ func (x *fastReflection_BadgeIdsActionPermission) Set(fd protoreflect.FieldDescr
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeIdsActionPermission) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenIdsActionPermission) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeIdsActionPermission.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.TokenIdsActionPermission.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_BadgeIdsActionPermission_1_list{list: &x.BadgeIds}
+		value := &_TokenIdsActionPermission_1_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeIdsActionPermission.permanentlyPermittedTimes":
+	case "badges.TokenIdsActionPermission.permanentlyPermittedTimes":
 		if x.PermanentlyPermittedTimes == nil {
 			x.PermanentlyPermittedTimes = []*UintRange{}
 		}
-		value := &_BadgeIdsActionPermission_2_list{list: &x.PermanentlyPermittedTimes}
+		value := &_TokenIdsActionPermission_2_list{list: &x.PermanentlyPermittedTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeIdsActionPermission.permanentlyForbiddenTimes":
+	case "badges.TokenIdsActionPermission.permanentlyForbiddenTimes":
 		if x.PermanentlyForbiddenTimes == nil {
 			x.PermanentlyForbiddenTimes = []*UintRange{}
 		}
-		value := &_BadgeIdsActionPermission_3_list{list: &x.PermanentlyForbiddenTimes}
+		value := &_TokenIdsActionPermission_3_list{list: &x.PermanentlyForbiddenTimes}
 		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeIdsActionPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenIdsActionPermission"))
 		}
-		panic(fmt.Errorf("message badges.BadgeIdsActionPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenIdsActionPermission does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_BadgeIdsActionPermission) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenIdsActionPermission) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeIdsActionPermission.badgeIds":
+	case "badges.TokenIdsActionPermission.tokenIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeIdsActionPermission_1_list{list: &list})
-	case "badges.BadgeIdsActionPermission.permanentlyPermittedTimes":
+		return protoreflect.ValueOfList(&_TokenIdsActionPermission_1_list{list: &list})
+	case "badges.TokenIdsActionPermission.permanentlyPermittedTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeIdsActionPermission_2_list{list: &list})
-	case "badges.BadgeIdsActionPermission.permanentlyForbiddenTimes":
+		return protoreflect.ValueOfList(&_TokenIdsActionPermission_2_list{list: &list})
+	case "badges.TokenIdsActionPermission.permanentlyForbiddenTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeIdsActionPermission_3_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenIdsActionPermission_3_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeIdsActionPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenIdsActionPermission"))
 		}
-		panic(fmt.Errorf("message badges.BadgeIdsActionPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenIdsActionPermission does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_BadgeIdsActionPermission) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_TokenIdsActionPermission) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.BadgeIdsActionPermission", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.TokenIdsActionPermission", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -7016,7 +7016,7 @@ func (x *fastReflection_BadgeIdsActionPermission) WhichOneof(d protoreflect.Oneo
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_BadgeIdsActionPermission) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_TokenIdsActionPermission) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -7027,7 +7027,7 @@ func (x *fastReflection_BadgeIdsActionPermission) GetUnknown() protoreflect.RawF
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeIdsActionPermission) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_TokenIdsActionPermission) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -7039,7 +7039,7 @@ func (x *fastReflection_BadgeIdsActionPermission) SetUnknown(fields protoreflect
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_BadgeIdsActionPermission) IsValid() bool {
+func (x *fastReflection_TokenIdsActionPermission) IsValid() bool {
 	return x != nil
 }
 
@@ -7049,9 +7049,9 @@ func (x *fastReflection_BadgeIdsActionPermission) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_TokenIdsActionPermission) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*BadgeIdsActionPermission)
+		x := input.Message.Interface().(*TokenIdsActionPermission)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -7063,8 +7063,8 @@ func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Met
 		var n int
 		var l int
 		_ = l
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -7091,7 +7091,7 @@ func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Met
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeIdsActionPermission)
+		x := input.Message.Interface().(*TokenIdsActionPermission)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -7142,9 +7142,9 @@ func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Met
 				dAtA[i] = 0x12
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -7169,7 +7169,7 @@ func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Met
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeIdsActionPermission)
+		x := input.Message.Interface().(*TokenIdsActionPermission)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -7201,15 +7201,15 @@ func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Met
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeIdsActionPermission: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenIdsActionPermission: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeIdsActionPermission: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenIdsActionPermission: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -7236,8 +7236,8 @@ func (x *fastReflection_BadgeIdsActionPermission) ProtoMethods() *protoiface.Met
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -8746,236 +8746,236 @@ func (x *fastReflection_TimedUpdatePermission) ProtoMethods() *protoiface.Method
 	}
 }
 
-var _ protoreflect.List = (*_TimedUpdateWithBadgeIdsPermission_1_list)(nil)
+var _ protoreflect.List = (*_TimedUpdateWithTokenIdsPermission_1_list)(nil)
 
-type _TimedUpdateWithBadgeIdsPermission_1_list struct {
+type _TimedUpdateWithTokenIdsPermission_1_list struct {
 	list *[]*UintRange
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) Len() int {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) Get(i int) protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) Set(i int, value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) Append(value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) AppendMutable() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) Truncate(n int) {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) NewElement() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_1_list) IsValid() bool {
+func (x *_TimedUpdateWithTokenIdsPermission_1_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_TimedUpdateWithBadgeIdsPermission_2_list)(nil)
+var _ protoreflect.List = (*_TimedUpdateWithTokenIdsPermission_2_list)(nil)
 
-type _TimedUpdateWithBadgeIdsPermission_2_list struct {
+type _TimedUpdateWithTokenIdsPermission_2_list struct {
 	list *[]*UintRange
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) Len() int {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) Get(i int) protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) Set(i int, value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) Append(value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) AppendMutable() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) Truncate(n int) {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) NewElement() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_2_list) IsValid() bool {
+func (x *_TimedUpdateWithTokenIdsPermission_2_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_TimedUpdateWithBadgeIdsPermission_3_list)(nil)
+var _ protoreflect.List = (*_TimedUpdateWithTokenIdsPermission_3_list)(nil)
 
-type _TimedUpdateWithBadgeIdsPermission_3_list struct {
+type _TimedUpdateWithTokenIdsPermission_3_list struct {
 	list *[]*UintRange
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) Len() int {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) Get(i int) protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) Set(i int, value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) Append(value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) AppendMutable() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) Truncate(n int) {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) NewElement() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_3_list) IsValid() bool {
+func (x *_TimedUpdateWithTokenIdsPermission_3_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_TimedUpdateWithBadgeIdsPermission_4_list)(nil)
+var _ protoreflect.List = (*_TimedUpdateWithTokenIdsPermission_4_list)(nil)
 
-type _TimedUpdateWithBadgeIdsPermission_4_list struct {
+type _TimedUpdateWithTokenIdsPermission_4_list struct {
 	list *[]*UintRange
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) Len() int {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) Get(i int) protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) Set(i int, value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) Append(value protoreflect.Value) {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) AppendMutable() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) Truncate(n int) {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) NewElement() protoreflect.Value {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TimedUpdateWithBadgeIdsPermission_4_list) IsValid() bool {
+func (x *_TimedUpdateWithTokenIdsPermission_4_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_TimedUpdateWithBadgeIdsPermission                           protoreflect.MessageDescriptor
-	fd_TimedUpdateWithBadgeIdsPermission_badgeIds                  protoreflect.FieldDescriptor
-	fd_TimedUpdateWithBadgeIdsPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
-	fd_TimedUpdateWithBadgeIdsPermission_permanentlyForbiddenTimes protoreflect.FieldDescriptor
-	fd_TimedUpdateWithBadgeIdsPermission_timelineTimes             protoreflect.FieldDescriptor
+	md_TimedUpdateWithTokenIdsPermission                           protoreflect.MessageDescriptor
+	fd_TimedUpdateWithTokenIdsPermission_tokenIds                  protoreflect.FieldDescriptor
+	fd_TimedUpdateWithTokenIdsPermission_permanentlyPermittedTimes protoreflect.FieldDescriptor
+	fd_TimedUpdateWithTokenIdsPermission_permanentlyForbiddenTimes protoreflect.FieldDescriptor
+	fd_TimedUpdateWithTokenIdsPermission_timelineTimes             protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_permissions_proto_init()
-	md_TimedUpdateWithBadgeIdsPermission = File_badges_permissions_proto.Messages().ByName("TimedUpdateWithBadgeIdsPermission")
-	fd_TimedUpdateWithBadgeIdsPermission_badgeIds = md_TimedUpdateWithBadgeIdsPermission.Fields().ByName("badgeIds")
-	fd_TimedUpdateWithBadgeIdsPermission_permanentlyPermittedTimes = md_TimedUpdateWithBadgeIdsPermission.Fields().ByName("permanentlyPermittedTimes")
-	fd_TimedUpdateWithBadgeIdsPermission_permanentlyForbiddenTimes = md_TimedUpdateWithBadgeIdsPermission.Fields().ByName("permanentlyForbiddenTimes")
-	fd_TimedUpdateWithBadgeIdsPermission_timelineTimes = md_TimedUpdateWithBadgeIdsPermission.Fields().ByName("timelineTimes")
+	md_TimedUpdateWithTokenIdsPermission = File_badges_permissions_proto.Messages().ByName("TimedUpdateWithTokenIdsPermission")
+	fd_TimedUpdateWithTokenIdsPermission_tokenIds = md_TimedUpdateWithTokenIdsPermission.Fields().ByName("tokenIds")
+	fd_TimedUpdateWithTokenIdsPermission_permanentlyPermittedTimes = md_TimedUpdateWithTokenIdsPermission.Fields().ByName("permanentlyPermittedTimes")
+	fd_TimedUpdateWithTokenIdsPermission_permanentlyForbiddenTimes = md_TimedUpdateWithTokenIdsPermission.Fields().ByName("permanentlyForbiddenTimes")
+	fd_TimedUpdateWithTokenIdsPermission_timelineTimes = md_TimedUpdateWithTokenIdsPermission.Fields().ByName("timelineTimes")
 }
 
-var _ protoreflect.Message = (*fastReflection_TimedUpdateWithBadgeIdsPermission)(nil)
+var _ protoreflect.Message = (*fastReflection_TimedUpdateWithTokenIdsPermission)(nil)
 
-type fastReflection_TimedUpdateWithBadgeIdsPermission TimedUpdateWithBadgeIdsPermission
+type fastReflection_TimedUpdateWithTokenIdsPermission TimedUpdateWithTokenIdsPermission
 
-func (x *TimedUpdateWithBadgeIdsPermission) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_TimedUpdateWithBadgeIdsPermission)(x)
+func (x *TimedUpdateWithTokenIdsPermission) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TimedUpdateWithTokenIdsPermission)(x)
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) slowProtoReflect() protoreflect.Message {
+func (x *TimedUpdateWithTokenIdsPermission) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_permissions_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -8987,43 +8987,43 @@ func (x *TimedUpdateWithBadgeIdsPermission) slowProtoReflect() protoreflect.Mess
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_TimedUpdateWithBadgeIdsPermission_messageType fastReflection_TimedUpdateWithBadgeIdsPermission_messageType
-var _ protoreflect.MessageType = fastReflection_TimedUpdateWithBadgeIdsPermission_messageType{}
+var _fastReflection_TimedUpdateWithTokenIdsPermission_messageType fastReflection_TimedUpdateWithTokenIdsPermission_messageType
+var _ protoreflect.MessageType = fastReflection_TimedUpdateWithTokenIdsPermission_messageType{}
 
-type fastReflection_TimedUpdateWithBadgeIdsPermission_messageType struct{}
+type fastReflection_TimedUpdateWithTokenIdsPermission_messageType struct{}
 
-func (x fastReflection_TimedUpdateWithBadgeIdsPermission_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_TimedUpdateWithBadgeIdsPermission)(nil)
+func (x fastReflection_TimedUpdateWithTokenIdsPermission_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TimedUpdateWithTokenIdsPermission)(nil)
 }
-func (x fastReflection_TimedUpdateWithBadgeIdsPermission_messageType) New() protoreflect.Message {
-	return new(fastReflection_TimedUpdateWithBadgeIdsPermission)
+func (x fastReflection_TimedUpdateWithTokenIdsPermission_messageType) New() protoreflect.Message {
+	return new(fastReflection_TimedUpdateWithTokenIdsPermission)
 }
-func (x fastReflection_TimedUpdateWithBadgeIdsPermission_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_TimedUpdateWithBadgeIdsPermission
+func (x fastReflection_TimedUpdateWithTokenIdsPermission_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TimedUpdateWithTokenIdsPermission
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Descriptor() protoreflect.MessageDescriptor {
-	return md_TimedUpdateWithBadgeIdsPermission
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Descriptor() protoreflect.MessageDescriptor {
+	return md_TimedUpdateWithTokenIdsPermission
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Type() protoreflect.MessageType {
-	return _fastReflection_TimedUpdateWithBadgeIdsPermission_messageType
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Type() protoreflect.MessageType {
+	return _fastReflection_TimedUpdateWithTokenIdsPermission_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) New() protoreflect.Message {
-	return new(fastReflection_TimedUpdateWithBadgeIdsPermission)
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) New() protoreflect.Message {
+	return new(fastReflection_TimedUpdateWithTokenIdsPermission)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Interface() protoreflect.ProtoMessage {
-	return (*TimedUpdateWithBadgeIdsPermission)(x)
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Interface() protoreflect.ProtoMessage {
+	return (*TimedUpdateWithTokenIdsPermission)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -9031,28 +9031,28 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Interface() protorefl
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_1_list{list: &x.BadgeIds})
-		if !f(fd_TimedUpdateWithBadgeIdsPermission_badgeIds, value) {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_1_list{list: &x.TokenIds})
+		if !f(fd_TimedUpdateWithTokenIdsPermission_tokenIds, value) {
 			return
 		}
 	}
 	if len(x.PermanentlyPermittedTimes) != 0 {
-		value := protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_2_list{list: &x.PermanentlyPermittedTimes})
-		if !f(fd_TimedUpdateWithBadgeIdsPermission_permanentlyPermittedTimes, value) {
+		value := protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_2_list{list: &x.PermanentlyPermittedTimes})
+		if !f(fd_TimedUpdateWithTokenIdsPermission_permanentlyPermittedTimes, value) {
 			return
 		}
 	}
 	if len(x.PermanentlyForbiddenTimes) != 0 {
-		value := protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_3_list{list: &x.PermanentlyForbiddenTimes})
-		if !f(fd_TimedUpdateWithBadgeIdsPermission_permanentlyForbiddenTimes, value) {
+		value := protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_3_list{list: &x.PermanentlyForbiddenTimes})
+		if !f(fd_TimedUpdateWithTokenIdsPermission_permanentlyForbiddenTimes, value) {
 			return
 		}
 	}
 	if len(x.TimelineTimes) != 0 {
-		value := protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_4_list{list: &x.TimelineTimes})
-		if !f(fd_TimedUpdateWithBadgeIdsPermission_timelineTimes, value) {
+		value := protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_4_list{list: &x.TimelineTimes})
+		if !f(fd_TimedUpdateWithTokenIdsPermission_timelineTimes, value) {
 			return
 		}
 	}
@@ -9069,21 +9069,21 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Range(f func(protoref
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.TimedUpdateWithBadgeIdsPermission.badgeIds":
-		return len(x.BadgeIds) != 0
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.tokenIds":
+		return len(x.TokenIds) != 0
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes":
 		return len(x.PermanentlyPermittedTimes) != 0
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes":
 		return len(x.PermanentlyForbiddenTimes) != 0
-	case "badges.TimedUpdateWithBadgeIdsPermission.timelineTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.timelineTimes":
 		return len(x.TimelineTimes) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithBadgeIdsPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithTokenIdsPermission"))
 		}
-		panic(fmt.Errorf("message badges.TimedUpdateWithBadgeIdsPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TimedUpdateWithTokenIdsPermission does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -9093,21 +9093,21 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Has(fd protoreflect.F
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.TimedUpdateWithBadgeIdsPermission.badgeIds":
-		x.BadgeIds = nil
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.tokenIds":
+		x.TokenIds = nil
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes":
 		x.PermanentlyPermittedTimes = nil
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes":
 		x.PermanentlyForbiddenTimes = nil
-	case "badges.TimedUpdateWithBadgeIdsPermission.timelineTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.timelineTimes":
 		x.TimelineTimes = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithBadgeIdsPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithTokenIdsPermission"))
 		}
-		panic(fmt.Errorf("message badges.TimedUpdateWithBadgeIdsPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TimedUpdateWithTokenIdsPermission does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -9117,37 +9117,37 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Clear(fd protoreflect
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.TimedUpdateWithBadgeIdsPermission.badgeIds":
-		if len(x.BadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_1_list{})
+	case "badges.TimedUpdateWithTokenIdsPermission.tokenIds":
+		if len(x.TokenIds) == 0 {
+			return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_1_list{})
 		}
-		listValue := &_TimedUpdateWithBadgeIdsPermission_1_list{list: &x.BadgeIds}
+		listValue := &_TimedUpdateWithTokenIdsPermission_1_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes":
 		if len(x.PermanentlyPermittedTimes) == 0 {
-			return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_2_list{})
+			return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_2_list{})
 		}
-		listValue := &_TimedUpdateWithBadgeIdsPermission_2_list{list: &x.PermanentlyPermittedTimes}
+		listValue := &_TimedUpdateWithTokenIdsPermission_2_list{list: &x.PermanentlyPermittedTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes":
 		if len(x.PermanentlyForbiddenTimes) == 0 {
-			return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_3_list{})
+			return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_3_list{})
 		}
-		listValue := &_TimedUpdateWithBadgeIdsPermission_3_list{list: &x.PermanentlyForbiddenTimes}
+		listValue := &_TimedUpdateWithTokenIdsPermission_3_list{list: &x.PermanentlyForbiddenTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.TimedUpdateWithBadgeIdsPermission.timelineTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.timelineTimes":
 		if len(x.TimelineTimes) == 0 {
-			return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_4_list{})
+			return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_4_list{})
 		}
-		listValue := &_TimedUpdateWithBadgeIdsPermission_4_list{list: &x.TimelineTimes}
+		listValue := &_TimedUpdateWithTokenIdsPermission_4_list{list: &x.TimelineTimes}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithBadgeIdsPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithTokenIdsPermission"))
 		}
-		panic(fmt.Errorf("message badges.TimedUpdateWithBadgeIdsPermission does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.TimedUpdateWithTokenIdsPermission does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -9161,29 +9161,29 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Get(descriptor protor
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.TimedUpdateWithBadgeIdsPermission.badgeIds":
+	case "badges.TimedUpdateWithTokenIdsPermission.tokenIds":
 		lv := value.List()
-		clv := lv.(*_TimedUpdateWithBadgeIdsPermission_1_list)
-		x.BadgeIds = *clv.list
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes":
+		clv := lv.(*_TimedUpdateWithTokenIdsPermission_1_list)
+		x.TokenIds = *clv.list
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes":
 		lv := value.List()
-		clv := lv.(*_TimedUpdateWithBadgeIdsPermission_2_list)
+		clv := lv.(*_TimedUpdateWithTokenIdsPermission_2_list)
 		x.PermanentlyPermittedTimes = *clv.list
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes":
 		lv := value.List()
-		clv := lv.(*_TimedUpdateWithBadgeIdsPermission_3_list)
+		clv := lv.(*_TimedUpdateWithTokenIdsPermission_3_list)
 		x.PermanentlyForbiddenTimes = *clv.list
-	case "badges.TimedUpdateWithBadgeIdsPermission.timelineTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.timelineTimes":
 		lv := value.List()
-		clv := lv.(*_TimedUpdateWithBadgeIdsPermission_4_list)
+		clv := lv.(*_TimedUpdateWithTokenIdsPermission_4_list)
 		x.TimelineTimes = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithBadgeIdsPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithTokenIdsPermission"))
 		}
-		panic(fmt.Errorf("message badges.TimedUpdateWithBadgeIdsPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TimedUpdateWithTokenIdsPermission does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -9197,72 +9197,72 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Set(fd protoreflect.F
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.TimedUpdateWithBadgeIdsPermission.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.TimedUpdateWithTokenIdsPermission.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_TimedUpdateWithBadgeIdsPermission_1_list{list: &x.BadgeIds}
+		value := &_TimedUpdateWithTokenIdsPermission_1_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes":
 		if x.PermanentlyPermittedTimes == nil {
 			x.PermanentlyPermittedTimes = []*UintRange{}
 		}
-		value := &_TimedUpdateWithBadgeIdsPermission_2_list{list: &x.PermanentlyPermittedTimes}
+		value := &_TimedUpdateWithTokenIdsPermission_2_list{list: &x.PermanentlyPermittedTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes":
 		if x.PermanentlyForbiddenTimes == nil {
 			x.PermanentlyForbiddenTimes = []*UintRange{}
 		}
-		value := &_TimedUpdateWithBadgeIdsPermission_3_list{list: &x.PermanentlyForbiddenTimes}
+		value := &_TimedUpdateWithTokenIdsPermission_3_list{list: &x.PermanentlyForbiddenTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.TimedUpdateWithBadgeIdsPermission.timelineTimes":
+	case "badges.TimedUpdateWithTokenIdsPermission.timelineTimes":
 		if x.TimelineTimes == nil {
 			x.TimelineTimes = []*UintRange{}
 		}
-		value := &_TimedUpdateWithBadgeIdsPermission_4_list{list: &x.TimelineTimes}
+		value := &_TimedUpdateWithTokenIdsPermission_4_list{list: &x.TimelineTimes}
 		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithBadgeIdsPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithTokenIdsPermission"))
 		}
-		panic(fmt.Errorf("message badges.TimedUpdateWithBadgeIdsPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TimedUpdateWithTokenIdsPermission does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.TimedUpdateWithBadgeIdsPermission.badgeIds":
+	case "badges.TimedUpdateWithTokenIdsPermission.tokenIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_1_list{list: &list})
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes":
+		return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_1_list{list: &list})
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_2_list{list: &list})
-	case "badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes":
+		return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_2_list{list: &list})
+	case "badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_3_list{list: &list})
-	case "badges.TimedUpdateWithBadgeIdsPermission.timelineTimes":
+		return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_3_list{list: &list})
+	case "badges.TimedUpdateWithTokenIdsPermission.timelineTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_TimedUpdateWithBadgeIdsPermission_4_list{list: &list})
+		return protoreflect.ValueOfList(&_TimedUpdateWithTokenIdsPermission_4_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithBadgeIdsPermission"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TimedUpdateWithTokenIdsPermission"))
 		}
-		panic(fmt.Errorf("message badges.TimedUpdateWithBadgeIdsPermission does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TimedUpdateWithTokenIdsPermission does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.TimedUpdateWithBadgeIdsPermission", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.TimedUpdateWithTokenIdsPermission", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -9270,7 +9270,7 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) WhichOneof(d protoref
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -9281,7 +9281,7 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) GetUnknown() protoref
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -9293,7 +9293,7 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) SetUnknown(fields pro
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) IsValid() bool {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) IsValid() bool {
 	return x != nil
 }
 
@@ -9303,9 +9303,9 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_TimedUpdateWithTokenIdsPermission) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*TimedUpdateWithBadgeIdsPermission)
+		x := input.Message.Interface().(*TimedUpdateWithTokenIdsPermission)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -9317,8 +9317,8 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *proto
 		var n int
 		var l int
 		_ = l
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -9351,7 +9351,7 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *proto
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*TimedUpdateWithBadgeIdsPermission)
+		x := input.Message.Interface().(*TimedUpdateWithTokenIdsPermission)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -9418,9 +9418,9 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *proto
 				dAtA[i] = 0x12
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -9445,7 +9445,7 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *proto
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*TimedUpdateWithBadgeIdsPermission)
+		x := input.Message.Interface().(*TimedUpdateWithTokenIdsPermission)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -9477,15 +9477,15 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *proto
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TimedUpdateWithBadgeIdsPermission: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TimedUpdateWithTokenIdsPermission: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TimedUpdateWithBadgeIdsPermission: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TimedUpdateWithTokenIdsPermission: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -9512,8 +9512,8 @@ func (x *fastReflection_TimedUpdateWithBadgeIdsPermission) ProtoMethods() *proto
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -9669,13 +9669,13 @@ const (
 
 // CollectionPermissions defines the permissions for the collection (i.e., what the manager can and cannot do).
 //
-// There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithBadgeIdsPermission, BadgeIdsActionPermission, and CollectionApprovalPermission.
+// There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithTokenIdsPermission, TokenIdsActionPermission, and CollectionApprovalPermission.
 //
 // The permission type allows fine-grained access control for each action.
 // - ActionPermission: defines when the manager can perform an action.
 // - TimedUpdatePermission: defines when the manager can update a timeline-based field and what times of the timeline can be updated.
-// - TimedUpdateWithBadgeIdsPermission: defines when the manager can update a timeline-based field for specific tokens and what times of the timeline can be updated.
-// - BadgeIdsActionPermission: defines when the manager can perform an action for specific tokens
+// - TimedUpdateWithTokenIdsPermission: defines when the manager can update a timeline-based field for specific tokens and what times of the timeline can be updated.
+// - TokenIdsActionPermission: defines when the manager can perform an action for specific tokens
 // - CollectionApprovalPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs. locked.
 //
 // Note there are a few different times here which could get confusing:
@@ -9710,9 +9710,9 @@ type CollectionPermissions struct {
 	// Permissions related to updating the metadata of the collection.
 	CanUpdateCollectionMetadata []*TimedUpdatePermission `protobuf:"bytes,7,rep,name=canUpdateCollectionMetadata,proto3" json:"canUpdateCollectionMetadata,omitempty"`
 	// Permissions related to creating more tokens for the collection.
-	CanUpdateValidBadgeIds []*BadgeIdsActionPermission `protobuf:"bytes,8,rep,name=canUpdateValidBadgeIds,proto3" json:"canUpdateValidBadgeIds,omitempty"`
+	CanUpdateValidTokenIds []*TokenIdsActionPermission `protobuf:"bytes,8,rep,name=canUpdateValidTokenIds,proto3" json:"canUpdateValidTokenIds,omitempty"`
 	// Permissions related to updating token metadata for specific tokens.
-	CanUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission `protobuf:"bytes,9,rep,name=canUpdateBadgeMetadata,proto3" json:"canUpdateBadgeMetadata,omitempty"`
+	CanUpdateTokenMetadata []*TimedUpdateWithTokenIdsPermission `protobuf:"bytes,9,rep,name=canUpdateTokenMetadata,proto3" json:"canUpdateTokenMetadata,omitempty"`
 	// Permissions related to updating collection approvals.
 	CanUpdateCollectionApprovals []*CollectionApprovalPermission `protobuf:"bytes,10,rep,name=canUpdateCollectionApprovals,proto3" json:"canUpdateCollectionApprovals,omitempty"`
 }
@@ -9786,16 +9786,16 @@ func (x *CollectionPermissions) GetCanUpdateCollectionMetadata() []*TimedUpdateP
 	return nil
 }
 
-func (x *CollectionPermissions) GetCanUpdateValidBadgeIds() []*BadgeIdsActionPermission {
+func (x *CollectionPermissions) GetCanUpdateValidTokenIds() []*TokenIdsActionPermission {
 	if x != nil {
-		return x.CanUpdateValidBadgeIds
+		return x.CanUpdateValidTokenIds
 	}
 	return nil
 }
 
-func (x *CollectionPermissions) GetCanUpdateBadgeMetadata() []*TimedUpdateWithBadgeIdsPermission {
+func (x *CollectionPermissions) GetCanUpdateTokenMetadata() []*TimedUpdateWithTokenIdsPermission {
 	if x != nil {
-		return x.CanUpdateBadgeMetadata
+		return x.CanUpdateTokenMetadata
 	}
 	return nil
 }
@@ -9889,7 +9889,7 @@ func (x *UserPermissions) GetCanUpdateAutoApproveAllIncomingTransfers() []*Actio
 //
 // Each transfer is broken down to a (from, to, initiatedBy, transferTime, badgeId) tuple.
 // For a transfer to match, we need to match ALL of the fields in the combination.
-// These are determined by the fromListId, toListId, initiatedByListId, transferTimes, badgeIds fields.
+// These are determined by the fromListId, toListId, initiatedByListId, transferTimes, tokenIds fields.
 // AddressLists are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressLists).
 //
 // TimelineTimes: which timeline times of the collection's approvalsTimeline field can be updated or not?
@@ -9915,7 +9915,7 @@ type CollectionApprovalPermission struct {
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,5,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
@@ -9977,9 +9977,9 @@ func (x *CollectionApprovalPermission) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (x *CollectionApprovalPermission) GetBadgeIds() []*UintRange {
+func (x *CollectionApprovalPermission) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -10025,7 +10025,7 @@ type UserOutgoingApprovalPermission struct {
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
@@ -10080,9 +10080,9 @@ func (x *UserOutgoingApprovalPermission) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (x *UserOutgoingApprovalPermission) GetBadgeIds() []*UintRange {
+func (x *UserOutgoingApprovalPermission) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -10130,7 +10130,7 @@ type UserIncomingApprovalPermission struct {
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
@@ -10185,9 +10185,9 @@ func (x *UserIncomingApprovalPermission) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (x *UserIncomingApprovalPermission) GetBadgeIds() []*UintRange {
+func (x *UserIncomingApprovalPermission) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -10220,26 +10220,26 @@ func (x *UserIncomingApprovalPermission) GetPermanentlyForbiddenTimes() []*UintR
 	return nil
 }
 
-// BadgeIdsActionPermission defines the permissions for updating a timeline-based field for specific tokens and specific token ownership times.
+// TokenIdsActionPermission defines the permissions for updating a timeline-based field for specific tokens and specific token ownership times.
 // Currently, this is only used for creating new tokens.
 //
-// Ex: If you want to lock the ability to create new tokens for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-type BadgeIdsActionPermission struct {
+// Ex: If you want to lock the ability to create new tokens for tokenIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
+// you could set the combination (tokenIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
+type TokenIdsActionPermission struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,1,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
 	// Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
 	PermanentlyForbiddenTimes []*UintRange `protobuf:"bytes,3,rep,name=permanentlyForbiddenTimes,proto3" json:"permanentlyForbiddenTimes,omitempty"`
 }
 
-func (x *BadgeIdsActionPermission) Reset() {
-	*x = BadgeIdsActionPermission{}
+func (x *TokenIdsActionPermission) Reset() {
+	*x = TokenIdsActionPermission{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_permissions_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -10247,32 +10247,32 @@ func (x *BadgeIdsActionPermission) Reset() {
 	}
 }
 
-func (x *BadgeIdsActionPermission) String() string {
+func (x *TokenIdsActionPermission) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BadgeIdsActionPermission) ProtoMessage() {}
+func (*TokenIdsActionPermission) ProtoMessage() {}
 
-// Deprecated: Use BadgeIdsActionPermission.ProtoReflect.Descriptor instead.
-func (*BadgeIdsActionPermission) Descriptor() ([]byte, []int) {
+// Deprecated: Use TokenIdsActionPermission.ProtoReflect.Descriptor instead.
+func (*TokenIdsActionPermission) Descriptor() ([]byte, []int) {
 	return file_badges_permissions_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *BadgeIdsActionPermission) GetBadgeIds() []*UintRange {
+func (x *TokenIdsActionPermission) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
 
-func (x *BadgeIdsActionPermission) GetPermanentlyPermittedTimes() []*UintRange {
+func (x *TokenIdsActionPermission) GetPermanentlyPermittedTimes() []*UintRange {
 	if x != nil {
 		return x.PermanentlyPermittedTimes
 	}
 	return nil
 }
 
-func (x *BadgeIdsActionPermission) GetPermanentlyForbiddenTimes() []*UintRange {
+func (x *TokenIdsActionPermission) GetPermanentlyForbiddenTimes() []*UintRange {
 	if x != nil {
 		return x.PermanentlyForbiddenTimes
 	}
@@ -10385,17 +10385,17 @@ func (x *TimedUpdatePermission) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific tokens.
+// TimedUpdateWithTokenIdsPermission defines the permissions for updating a timeline-based field for specific tokens.
 //
-// Ex: If you want to lock the ability to update the metadata for badgeIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (badgeIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-type TimedUpdateWithBadgeIdsPermission struct {
+// Ex: If you want to lock the ability to update the metadata for tokenIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
+// you could set the combination (tokenIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
+type TimedUpdateWithTokenIdsPermission struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,1,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
 	// Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
@@ -10404,8 +10404,8 @@ type TimedUpdateWithBadgeIdsPermission struct {
 	TimelineTimes []*UintRange `protobuf:"bytes,4,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) Reset() {
-	*x = TimedUpdateWithBadgeIdsPermission{}
+func (x *TimedUpdateWithTokenIdsPermission) Reset() {
+	*x = TimedUpdateWithTokenIdsPermission{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_permissions_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -10413,39 +10413,39 @@ func (x *TimedUpdateWithBadgeIdsPermission) Reset() {
 	}
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) String() string {
+func (x *TimedUpdateWithTokenIdsPermission) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TimedUpdateWithBadgeIdsPermission) ProtoMessage() {}
+func (*TimedUpdateWithTokenIdsPermission) ProtoMessage() {}
 
-// Deprecated: Use TimedUpdateWithBadgeIdsPermission.ProtoReflect.Descriptor instead.
-func (*TimedUpdateWithBadgeIdsPermission) Descriptor() ([]byte, []int) {
+// Deprecated: Use TimedUpdateWithTokenIdsPermission.ProtoReflect.Descriptor instead.
+func (*TimedUpdateWithTokenIdsPermission) Descriptor() ([]byte, []int) {
 	return file_badges_permissions_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) GetBadgeIds() []*UintRange {
+func (x *TimedUpdateWithTokenIdsPermission) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) GetPermanentlyPermittedTimes() []*UintRange {
+func (x *TimedUpdateWithTokenIdsPermission) GetPermanentlyPermittedTimes() []*UintRange {
 	if x != nil {
 		return x.PermanentlyPermittedTimes
 	}
 	return nil
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) GetPermanentlyForbiddenTimes() []*UintRange {
+func (x *TimedUpdateWithTokenIdsPermission) GetPermanentlyForbiddenTimes() []*UintRange {
 	if x != nil {
 		return x.PermanentlyForbiddenTimes
 	}
 	return nil
 }
 
-func (x *TimedUpdateWithBadgeIdsPermission) GetTimelineTimes() []*UintRange {
+func (x *TimedUpdateWithTokenIdsPermission) GetTimelineTimes() []*UintRange {
 	if x != nil {
 		return x.TimelineTimes
 	}
@@ -10739,10 +10739,10 @@ var file_badges_permissions_proto_goTypes = []interface{}{
 	(*CollectionApprovalPermission)(nil),      // 2: badges.CollectionApprovalPermission
 	(*UserOutgoingApprovalPermission)(nil),    // 3: badges.UserOutgoingApprovalPermission
 	(*UserIncomingApprovalPermission)(nil),    // 4: badges.UserIncomingApprovalPermission
-	(*BadgeIdsActionPermission)(nil),          // 5: badges.BadgeIdsActionPermission
+	(*TokenIdsActionPermission)(nil),          // 5: badges.TokenIdsActionPermission
 	(*ActionPermission)(nil),                  // 6: badges.ActionPermission
 	(*TimedUpdatePermission)(nil),             // 7: badges.TimedUpdatePermission
-	(*TimedUpdateWithBadgeIdsPermission)(nil), // 8: badges.TimedUpdateWithBadgeIdsPermission
+	(*TimedUpdateWithTokenIdsPermission)(nil), // 8: badges.TimedUpdateWithTokenIdsPermission
 	(*UintRange)(nil),                         // 9: badges.UintRange
 }
 var file_badges_permissions_proto_depIdxs = []int32{
@@ -10753,8 +10753,8 @@ var file_badges_permissions_proto_depIdxs = []int32{
 	7,  // 4: badges.CollectionPermissions.canUpdateCustomData:type_name -> badges.TimedUpdatePermission
 	7,  // 5: badges.CollectionPermissions.canUpdateManager:type_name -> badges.TimedUpdatePermission
 	7,  // 6: badges.CollectionPermissions.canUpdateCollectionMetadata:type_name -> badges.TimedUpdatePermission
-	5,  // 7: badges.CollectionPermissions.canUpdateValidBadgeIds:type_name -> badges.BadgeIdsActionPermission
-	8,  // 8: badges.CollectionPermissions.canUpdateBadgeMetadata:type_name -> badges.TimedUpdateWithBadgeIdsPermission
+	5,  // 7: badges.CollectionPermissions.canUpdateValidTokenIds:type_name -> badges.TokenIdsActionPermission
+	8,  // 8: badges.CollectionPermissions.canUpdateTokenMetadata:type_name -> badges.TimedUpdateWithTokenIdsPermission
 	2,  // 9: badges.CollectionPermissions.canUpdateCollectionApprovals:type_name -> badges.CollectionApprovalPermission
 	3,  // 10: badges.UserPermissions.canUpdateOutgoingApprovals:type_name -> badges.UserOutgoingApprovalPermission
 	4,  // 11: badges.UserPermissions.canUpdateIncomingApprovals:type_name -> badges.UserIncomingApprovalPermission
@@ -10762,32 +10762,32 @@ var file_badges_permissions_proto_depIdxs = []int32{
 	6,  // 13: badges.UserPermissions.canUpdateAutoApproveSelfInitiatedIncomingTransfers:type_name -> badges.ActionPermission
 	6,  // 14: badges.UserPermissions.canUpdateAutoApproveAllIncomingTransfers:type_name -> badges.ActionPermission
 	9,  // 15: badges.CollectionApprovalPermission.transferTimes:type_name -> badges.UintRange
-	9,  // 16: badges.CollectionApprovalPermission.badgeIds:type_name -> badges.UintRange
+	9,  // 16: badges.CollectionApprovalPermission.tokenIds:type_name -> badges.UintRange
 	9,  // 17: badges.CollectionApprovalPermission.ownershipTimes:type_name -> badges.UintRange
 	9,  // 18: badges.CollectionApprovalPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
 	9,  // 19: badges.CollectionApprovalPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
 	9,  // 20: badges.UserOutgoingApprovalPermission.transferTimes:type_name -> badges.UintRange
-	9,  // 21: badges.UserOutgoingApprovalPermission.badgeIds:type_name -> badges.UintRange
+	9,  // 21: badges.UserOutgoingApprovalPermission.tokenIds:type_name -> badges.UintRange
 	9,  // 22: badges.UserOutgoingApprovalPermission.ownershipTimes:type_name -> badges.UintRange
 	9,  // 23: badges.UserOutgoingApprovalPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
 	9,  // 24: badges.UserOutgoingApprovalPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
 	9,  // 25: badges.UserIncomingApprovalPermission.transferTimes:type_name -> badges.UintRange
-	9,  // 26: badges.UserIncomingApprovalPermission.badgeIds:type_name -> badges.UintRange
+	9,  // 26: badges.UserIncomingApprovalPermission.tokenIds:type_name -> badges.UintRange
 	9,  // 27: badges.UserIncomingApprovalPermission.ownershipTimes:type_name -> badges.UintRange
 	9,  // 28: badges.UserIncomingApprovalPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
 	9,  // 29: badges.UserIncomingApprovalPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
-	9,  // 30: badges.BadgeIdsActionPermission.badgeIds:type_name -> badges.UintRange
-	9,  // 31: badges.BadgeIdsActionPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
-	9,  // 32: badges.BadgeIdsActionPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
+	9,  // 30: badges.TokenIdsActionPermission.tokenIds:type_name -> badges.UintRange
+	9,  // 31: badges.TokenIdsActionPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
+	9,  // 32: badges.TokenIdsActionPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
 	9,  // 33: badges.ActionPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
 	9,  // 34: badges.ActionPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
 	9,  // 35: badges.TimedUpdatePermission.permanentlyPermittedTimes:type_name -> badges.UintRange
 	9,  // 36: badges.TimedUpdatePermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
 	9,  // 37: badges.TimedUpdatePermission.timelineTimes:type_name -> badges.UintRange
-	9,  // 38: badges.TimedUpdateWithBadgeIdsPermission.badgeIds:type_name -> badges.UintRange
-	9,  // 39: badges.TimedUpdateWithBadgeIdsPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
-	9,  // 40: badges.TimedUpdateWithBadgeIdsPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
-	9,  // 41: badges.TimedUpdateWithBadgeIdsPermission.timelineTimes:type_name -> badges.UintRange
+	9,  // 38: badges.TimedUpdateWithTokenIdsPermission.tokenIds:type_name -> badges.UintRange
+	9,  // 39: badges.TimedUpdateWithTokenIdsPermission.permanentlyPermittedTimes:type_name -> badges.UintRange
+	9,  // 40: badges.TimedUpdateWithTokenIdsPermission.permanentlyForbiddenTimes:type_name -> badges.UintRange
+	9,  // 41: badges.TimedUpdateWithTokenIdsPermission.timelineTimes:type_name -> badges.UintRange
 	42, // [42:42] is the sub-list for method output_type
 	42, // [42:42] is the sub-list for method input_type
 	42, // [42:42] is the sub-list for extension type_name
@@ -10864,7 +10864,7 @@ func file_badges_permissions_proto_init() {
 			}
 		}
 		file_badges_permissions_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BadgeIdsActionPermission); i {
+			switch v := v.(*TokenIdsActionPermission); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -10900,7 +10900,7 @@ func file_badges_permissions_proto_init() {
 			}
 		}
 		file_badges_permissions_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TimedUpdateWithBadgeIdsPermission); i {
+			switch v := v.(*TimedUpdateWithTokenIdsPermission); i {
 			case 0:
 				return &v.state
 			case 1:

@@ -14,7 +14,7 @@ const EmptyApprovalCriteria = {
             manualBalances: [],
             incrementedBalances: {
                 startBalances: [],
-                incrementBadgeIdsBy: '0',
+                incrementTokenIdsBy: '0',
                 incrementOwnershipTimesBy: '0',
                 durationFromTimestamp: '0',
                 allowOverrideTimestamp: false,
@@ -23,7 +23,7 @@ const EmptyApprovalCriteria = {
                     intervalLength: '0',
                     chargePeriodLength: '0',
                 },
-                allowOverrideWithAnyValidBadge: false,
+                allowOverrideWithAnyValidToken: false,
             },
             orderCalculationMethod: {
                 useOverallNumTransfers: false,
@@ -88,7 +88,7 @@ const EmptyApprovalCriteria = {
             payoutAddress: '',
         },
         // No tokens to check ownership of
-        mustOwnBadges: [],
+        mustOwnTokens: [],
     },
 };
 ```

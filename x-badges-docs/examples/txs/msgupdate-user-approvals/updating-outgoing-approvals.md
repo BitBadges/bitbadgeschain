@@ -20,7 +20,7 @@ This example demonstrates how to update user outgoing approvals to control what 
                         "end": "18446744073709551615"
                     }
                 ],
-                "badgeIds": [
+                "tokenIds": [
                     {
                         "start": "1",
                         "end": "20"
@@ -42,7 +42,7 @@ This example demonstrates how to update user outgoing approvals to control what 
                         "manualBalances": [],
                         "incrementedBalances": {
                             "startBalances": [],
-                            "incrementBadgeIdsBy": "0",
+                            "incrementTokenIdsBy": "0",
                             "incrementOwnershipTimesBy": "0",
                             "durationFromTimestamp": "0",
                             "allowOverrideTimestamp": false,
@@ -51,7 +51,7 @@ This example demonstrates how to update user outgoing approvals to control what 
                                 "intervalLength": "0",
                                 "chargePeriodLength": "0"
                             },
-                            "allowOverrideWithAnyValidBadge": false
+                            "allowOverrideWithAnyValidToken": false
                         },
                         "orderCalculationMethod": {
                             "useOverallNumTransfers": false,
@@ -91,7 +91,7 @@ This example demonstrates how to update user outgoing approvals to control what 
                         "afterOneUse": false,
                         "afterOverallMaxNumTransfers": false
                     },
-                    "mustOwnBadges": []
+                    "mustOwnTokens": []
                 },
                 "version": "0"
             }

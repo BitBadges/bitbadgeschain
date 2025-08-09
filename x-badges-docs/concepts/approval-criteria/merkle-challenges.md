@@ -265,10 +265,10 @@ const expectedProofLength = tree.getLayerCount() - 1;
 
 ### Providing Proofs
 
-Include Merkle proofs in [MsgTransferBadges](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md):
+Include Merkle proofs in [MsgTransferTokens](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md):
 
 ```typescript
-const txCosmosMsg: MsgTransferBadges<bigint> = {
+const txCosmosMsg: MsgTransferTokens<bigint> = {
     creator: chain.bitbadgesAddress,
     collectionId: collectionId,
     transfers: [

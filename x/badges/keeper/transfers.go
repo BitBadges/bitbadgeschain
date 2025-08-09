@@ -14,7 +14,7 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
-func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *types.UserBalanceStore {
+func GetDefaultBalanceStoreForCollection(collection *types.TokenCollection) *types.UserBalanceStore {
 	return &types.UserBalanceStore{
 		Balances:          collection.DefaultBalances.Balances,
 		OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
@@ -26,7 +26,7 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 	}
 }
 
-func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) (*types.UserBalanceStore, bool) {
+func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool) {
 	//Mint has unlimited balances
 	if userAddress == "Total" || userAddress == "Mint" {
 		return &types.UserBalanceStore{}, false
@@ -51,7 +51,7 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Badg
 	return balance, appliedDefault
 }
 
-func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.BadgeCollection, userAddress string, balance *types.UserBalanceStore) error {
+func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.TokenCollection, userAddress string, balance *types.UserBalanceStore) error {
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	return k.SetUserBalanceInStore(ctx, balanceKey, balance)
 }
@@ -71,7 +71,7 @@ type CoinTransfers struct {
 	IsProtocolFee bool
 }
 
-func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
+func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollection, transfers []*types.Transfer, initiatedBy string) error {
 	err := *new(error)
 
 	// Validate transfers with invariants
@@ -362,7 +362,7 @@ func emitUsedApprovalDetailsEvent(ctx sdk.Context, collectionId sdkmath.Uint, fr
 // Step 3: If all good, we can transfer the balances
 func (k Keeper) HandleTransfer(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	transfer *types.Transfer,
 	fromUserBalance *types.UserBalanceStore,
 	toUserBalance *types.UserBalanceStore,
@@ -454,13 +454,13 @@ func (k Keeper) HandleTransfer(
 		// Little hacky but we find the amount for a specific time and ID
 		// Then we will check if it is evenly divisible by the number of transfer balances
 
-		firstBadgeId := transferBalances[0].BadgeIds[0].Start
+		firstBadgeId := transferBalances[0].TokenIds[0].Start
 		firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
 		firstAmount := transferBalances[0].Amount
 
 		multiplier := sdkmath.NewUint(0)
 		for _, balance := range conversionBalances {
-			foundBadgeId, err := types.SearchUintRangesForUint(firstBadgeId, balance.BadgeIds)
+			foundBadgeId, err := types.SearchUintRangesForUint(firstBadgeId, balance.TokenIds)
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 			}

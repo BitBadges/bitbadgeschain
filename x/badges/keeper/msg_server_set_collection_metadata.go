@@ -38,8 +38,8 @@ func (k msgServer) SetCollectionMetadata(goCtx context.Context, msg *types.MsgSe
 			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
 			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateValidTokenIds:            collection.CollectionPermissions.CanUpdateValidTokenIds,
+			CanUpdateTokenMetadata:            collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}

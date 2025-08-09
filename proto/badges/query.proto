@@ -80,7 +80,7 @@ message QueryGetCollectionRequest {
 }
 
 message QueryGetCollectionResponse {
-  BadgeCollection collection = 1;
+  TokenCollection collection = 1;
 }
 
 message QueryGetBalanceRequest {

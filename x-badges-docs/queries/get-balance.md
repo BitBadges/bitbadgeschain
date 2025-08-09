@@ -45,7 +45,7 @@ curl "https://lcd.bitbadges.io/bitbadges/bitbadgeschain/badges/get_balance/1/bb1
         "balances": [
             {
                 "amount": "1",
-                "badgeIds": [{ "start": "1", "end": "1" }],
+                "tokenIds": [{ "start": "1", "end": "1" }],
                 "ownershipTimes": [
                     { "start": "1672531200000", "end": "18446744073709551615" }
                 ]

@@ -82,9 +82,9 @@ interface TimedUpdatePermission {
 Control token metadata timeline updates:
 
 ```typescript
-interface TimedUpdateWithBadgeIdsPermission {
+interface TimedUpdateWithTokenIdsPermission {
     timelineTimes: UintRange[];
-    badgeIds: UintRange[];
+    tokenIds: UintRange[];
     permanentlyPermittedTimes: UintRange[];
     permanentlyForbiddenTimes: UintRange[];
 }
@@ -92,7 +92,7 @@ interface TimedUpdateWithBadgeIdsPermission {
 
 **Available Actions:**
 
--   `canUpdateBadgeMetadata`
+-   `canUpdateTokenMetadata`
 
 ## Examples
 
@@ -132,10 +132,10 @@ interface TimedUpdateWithBadgeIdsPermission {
 
 ```json
 {
-    "canUpdateBadgeMetadata": [
+    "canUpdateTokenMetadata": [
         {
             "timelineTimes": [{ "start": "1", "end": "18446744073709551615" }],
-            "badgeIds": [{ "start": "1", "end": "100" }],
+            "tokenIds": [{ "start": "1", "end": "100" }],
             "permanentlyPermittedTimes": [],
             "permanentlyForbiddenTimes": [
                 { "start": "1", "end": "18446744073709551615" }

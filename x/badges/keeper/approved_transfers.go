@@ -24,7 +24,7 @@ type UserApprovalsToCheck struct {
 // All in one approval deduction function. We also return the user approvals to check (only used when collection approvals)
 func (k Keeper) DeductAndGetUserApprovals(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	originalTransferBalances []*types.Balance,
 	transfer *types.Transfer,
 	_approvals []*types.CollectionApproval,
@@ -92,11 +92,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 			continue
 		}
 
-		transferStr := "attempting to transfer ID " + approval.BadgeIds[0].Start.String()
+		transferStr := "attempting to transfer ID " + approval.TokenIds[0].Start.String()
 
-		//If there are no restrictions or criteria, it is a full match and we can deduct all the overlapping (badgeIds, ownershipTimes) from the remaining balances
+		//If there are no restrictions or criteria, it is a full match and we can deduct all the overlapping (tokenIds, ownershipTimes) from the remaining balances
 		if approval.ApprovalCriteria == nil {
-			allBalancesForIdsAndTimes, err := types.GetBalancesForIds(ctx, approval.BadgeIds, approval.OwnershipTimes, remainingBalances)
+			allBalancesForIdsAndTimes, err := types.GetBalancesForIds(ctx, approval.TokenIds, approval.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
 			}
@@ -163,7 +163,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// Must own badges check
-			err = k.CheckMustOwnBadges(ctx, approvalCriteria.MustOwnBadges, initiatedBy, fromAddress, toAddress)
+			err = k.CheckMustOwnTokens(ctx, approvalCriteria.MustOwnTokens, initiatedBy, fromAddress, toAddress)
 			if err != nil {
 				continue
 			}
@@ -220,7 +220,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//Get max balances allowed for this approvalCriteria element
 			//Get the max balances allowed for this approvalCriteria element WITHOUT incrementing
-			transferBalancesToCheck, err := types.GetBalancesForIds(ctx, approval.BadgeIds, approval.OwnershipTimes, remainingBalances)
+			transferBalancesToCheck, err := types.GetBalancesForIds(ctx, approval.TokenIds, approval.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
 			}
@@ -424,7 +424,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
-		transferStr := "attempting to transfer ID " + remainingBalances[0].BadgeIds[0].Start.String()
+		transferStr := "attempting to transfer ID " + remainingBalances[0].TokenIds[0].Start.String()
 		potentialErrorsStr := ""
 		if len(potentialErrors) > 0 {
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
@@ -507,7 +507,7 @@ func (k Keeper) GetApprovalTrackerFromStoreAndResetIfNeeded(ctx sdk.Context, col
 // GetMaxPossible calculates the maximum possible transfer amounts based on approval criteria
 func (k Keeper) GetMaxPossible(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	approval *types.CollectionApproval,
 	transfer *types.Transfer,
 	originalTransferBalances []*types.Balance,
@@ -550,7 +550,7 @@ func (k Keeper) GetMaxPossible(
 	// Calculate current tally for specific IDs and times
 	currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(
 		ctx,
-		approval.BadgeIds,
+		approval.TokenIds,
 		approval.OwnershipTimes,
 		amountsTrackerDetails.Amounts,
 	)
@@ -562,7 +562,7 @@ func (k Keeper) GetMaxPossible(
 	allApprovals := []*types.Balance{{
 		Amount:         approvedAmount,
 		OwnershipTimes: approval.OwnershipTimes,
-		BadgeIds:       approval.BadgeIds,
+		TokenIds:       approval.TokenIds,
 	}}
 
 	maxBalancesWeCanAdd, err := types.SubtractBalances(ctx, currTallyForCurrentIdsAndTimes, allApprovals)
@@ -582,7 +582,7 @@ func (k Keeper) handlePredeterminedBalances(
 	trackerNumTransfers sdkmath.Uint,
 	challengeNumIncrements sdkmath.Uint,
 	precalculationOptions *types.PrecalculationOptions,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 ) ([]*types.Balance, error) {
 	if predeterminedBalances == nil {
 		return nil, nil
@@ -626,13 +626,13 @@ func (k Keeper) handlePredeterminedBalances(
 			i.StartBalances,
 			numIncrements,
 			i.IncrementOwnershipTimesBy,
-			i.IncrementBadgeIdsBy,
+			i.IncrementTokenIdsBy,
 			i.DurationFromTimestamp,
 			i.RecurringOwnershipTimes,
 			precalculationOptions.OverrideTimestamp,
 			i.AllowOverrideTimestamp,
-			precalculationOptions.BadgeIdsOverride,
-			i.AllowOverrideWithAnyValidBadge,
+			precalculationOptions.TokenIdsOverride,
+			i.AllowOverrideWithAnyValidToken,
 			collection,
 		)
 		if err != nil {
@@ -683,7 +683,7 @@ func emitApprovalEvent(
 // IncrementApprovalsAndAssertWithinThreshold handles approval tracking and threshold checks
 func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	approval *types.CollectionApproval,
 	originalTransferBalances []*types.Balance,
 	approvedAmount sdkmath.Uint,
@@ -780,7 +780,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	if approvedAmount.GT(sdkmath.NewUint(0)) {
 		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(
 			ctx,
-			approval.BadgeIds,
+			approval.TokenIds,
 			approval.OwnershipTimes,
 			amountsTrackerDetails.Amounts,
 		)
@@ -791,7 +791,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		thresholdAmounts := []*types.Balance{{
 			Amount:         approvedAmount,
 			OwnershipTimes: approval.OwnershipTimes,
-			BadgeIds:       approval.BadgeIds,
+			TokenIds:       approval.TokenIds,
 		}}
 
 		_, err = types.AddBalancesAndAssertDoesntExceedThreshold(
@@ -950,7 +950,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 
 func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	approvals []*types.CollectionApproval,
 	transfer *types.Transfer,
 	precalcDetails *types.ApprovalIdentifierDetails,
@@ -1055,13 +1055,13 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances,
 					numIncrements,
 					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementOwnershipTimesBy,
-					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementTokenIdsBy,
 					approvalCriteria.PredeterminedBalances.IncrementedBalances.DurationFromTimestamp,
 					approvalCriteria.PredeterminedBalances.IncrementedBalances.RecurringOwnershipTimes,
 					precalculationOptions.OverrideTimestamp,
 					approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideTimestamp,
-					precalculationOptions.BadgeIdsOverride,
-					approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideWithAnyValidBadge,
+					precalculationOptions.TokenIdsOverride,
+					approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideWithAnyValidToken,
 					collection,
 				)
 				if err != nil {

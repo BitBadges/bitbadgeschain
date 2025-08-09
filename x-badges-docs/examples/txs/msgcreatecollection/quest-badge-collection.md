@@ -25,7 +25,7 @@ This example demonstrates creating a quest collection.
                 "canUpdateAutoApproveAllIncomingTransfers": []
             }
         },
-        "validBadgeIds": [
+        "validTokenIds": [
             {
                 "start": "1",
                 "end": "1"
@@ -39,8 +39,8 @@ This example demonstrates creating a quest collection.
             "canUpdateCustomData": [],
             "canUpdateManager": [],
             "canUpdateCollectionMetadata": [],
-            "canUpdateValidBadgeIds": [],
-            "canUpdateBadgeMetadata": [],
+            "canUpdateValidTokenIds": [],
+            "canUpdateTokenMetadata": [],
             "canUpdateCollectionApprovals": []
         },
         "managerTimeline": [
@@ -68,13 +68,13 @@ This example demonstrates creating a quest collection.
                 ]
             }
         ],
-        "badgeMetadataTimeline": [
+        "tokenMetadataTimeline": [
             {
-                "badgeMetadata": [
+                "tokenMetadata": [
                     {
                         "uri": "ipfs://QmRbRYYyphz73apphqP3QQmkeZxbtMWmAxasGfhcw1RApD",
                         "customData": "",
-                        "badgeIds": [
+                        "tokenIds": [
                             {
                                 "start": "1",
                                 "end": "18446744073709551615"
@@ -103,7 +103,7 @@ This example demonstrates creating a quest collection.
                         "end": "18446744073709551615"
                     }
                 ],
-                "badgeIds": [
+                "tokenIds": [
                     {
                         "start": "1",
                         "end": "1"
@@ -144,7 +144,7 @@ This example demonstrates creating a quest collection.
                                             "end": "18446744073709551615"
                                         }
                                     ],
-                                    "badgeIds": [
+                                    "tokenIds": [
                                         {
                                             "start": "1",
                                             "end": "1"
@@ -152,7 +152,7 @@ This example demonstrates creating a quest collection.
                                     ]
                                 }
                             ],
-                            "incrementBadgeIdsBy": "0",
+                            "incrementTokenIdsBy": "0",
                             "incrementOwnershipTimesBy": "0",
                             "durationFromTimestamp": "0",
                             "allowOverrideTimestamp": false,
@@ -161,7 +161,7 @@ This example demonstrates creating a quest collection.
                                 "intervalLength": "0",
                                 "chargePeriodLength": "0"
                             },
-                            "allowOverrideWithAnyValidBadge": false
+                            "allowOverrideWithAnyValidToken": false
                         },
                         "orderCalculationMethod": {
                             "useOverallNumTransfers": true,
@@ -221,7 +221,7 @@ This example demonstrates creating a quest collection.
                         "percentage": "0",
                         "payoutAddress": ""
                     },
-                    "mustOwnBadges": []
+                    "mustOwnTokens": []
                 },
                 "version": "0"
             }
@@ -255,7 +255,7 @@ This example demonstrates creating a quest collection.
 
 This example creates a quest collection with the following characteristics:
 
--   **Single Token**: Only token ID 1 is valid (`validBadgeIds: [{"start": "1", "end": "1"}]`)
+-   **Single Token**: Only token ID 1 is valid (`validTokenIds: [{"start": "1", "end": "1"}]`)
 -   **Quest Standard**: Uses the "Quests" standard for quest-related functionality
 -   **Merkle Proof Verification**: Requires users to provide valid Merkle proofs (BitBadges claims) to claim tokens
 -   **Coin Rewards**: Transfers 5000000000 ubadge coins to successful claimants and properly handles the Mint escrow coins

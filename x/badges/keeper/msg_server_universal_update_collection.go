@@ -25,7 +25,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-	collection := &types.BadgeCollection{}
+	collection := &types.TokenCollection{}
 	if msg.CollectionId.Equal(sdkmath.NewUint(0)) {
 		//Creation case
 		nextCollectionId := k.GetNextCollectionId(ctx)
@@ -50,7 +50,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			break
 		}
 
-		collection = &types.BadgeCollection{
+		collection = &types.TokenCollection{
 			CollectionId:          nextCollectionId,
 			CollectionPermissions: &types.CollectionPermissions{},
 			BalancesType:          msg.BalancesType,
@@ -146,11 +146,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline
 	}
 
-	if msg.UpdateBadgeMetadataTimeline {
-		if err := k.ValidateBadgeMetadataUpdate(ctx, collection.BadgeMetadataTimeline, msg.BadgeMetadataTimeline, collection.CollectionPermissions.CanUpdateBadgeMetadata); err != nil {
+	if msg.UpdateTokenMetadataTimeline {
+		if err := k.ValidateTokenMetadataUpdate(ctx, collection.TokenMetadataTimeline, msg.TokenMetadataTimeline, collection.CollectionPermissions.CanUpdateTokenMetadata); err != nil {
 			return nil, err
 		}
-		collection.BadgeMetadataTimeline = msg.BadgeMetadataTimeline
+		collection.TokenMetadataTimeline = msg.TokenMetadataTimeline
 	}
 
 	if msg.UpdateManagerTimeline {
@@ -174,8 +174,8 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.CustomDataTimeline = msg.CustomDataTimeline
 	}
 
-	if msg.UpdateValidBadgeIds {
-		collection, err = k.CreateBadges(ctx, collection, msg.ValidBadgeIds)
+	if msg.UpdateValidTokenIds {
+		collection, err = k.CreateBadges(ctx, collection, msg.ValidTokenIds)
 		if err != nil {
 			return nil, err
 		}

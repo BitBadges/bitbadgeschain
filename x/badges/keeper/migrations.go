@@ -52,7 +52,324 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 	return nil
 }
 
-func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
+func MigrateTokenIdsActionPermission(tokenIdsActionPermission *oldtypes.BadgeIdsActionPermission) *newtypes.TokenIdsActionPermission {
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(tokenIdsActionPermission)
+	if err != nil {
+		return nil
+	}
+
+	var newTokenIdsActionPermission newtypes.TokenIdsActionPermission
+	if err := json.Unmarshal(jsonBytes, &newTokenIdsActionPermission); err != nil {
+		return nil
+	}
+
+	newTokenIdsActionPermission.TokenIds = convertUintRanges(tokenIdsActionPermission.BadgeIds)
+
+	return &newTokenIdsActionPermission
+}
+
+func MigrateTimedUpdateWithTokenIdsPermission(timedUpdateWithTokenIdsPermission *oldtypes.TimedUpdateWithBadgeIdsPermission) *newtypes.TimedUpdateWithTokenIdsPermission {
+
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(timedUpdateWithTokenIdsPermission)
+	if err != nil {
+		return nil
+	}
+
+	var newTimedUpdateWithTokenIdsPermission newtypes.TimedUpdateWithTokenIdsPermission
+	if err := json.Unmarshal(jsonBytes, &newTimedUpdateWithTokenIdsPermission); err != nil {
+		return nil
+	}
+
+	newTimedUpdateWithTokenIdsPermission.TokenIds = convertUintRanges(timedUpdateWithTokenIdsPermission.BadgeIds)
+
+	return &newTimedUpdateWithTokenIdsPermission
+}
+
+func MigrateCollectionApprovalPermission(collectionApprovalPermission *oldtypes.CollectionApprovalPermission) *newtypes.CollectionApprovalPermission {
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(collectionApprovalPermission)
+	if err != nil {
+		return nil
+	}
+
+	var newCollectionApprovalPermission newtypes.CollectionApprovalPermission
+	if err := json.Unmarshal(jsonBytes, &newCollectionApprovalPermission); err != nil {
+		return nil
+	}
+
+	newCollectionApprovalPermission.TokenIds = convertUintRanges(collectionApprovalPermission.BadgeIds)
+
+	return &newCollectionApprovalPermission
+}
+
+func MigrateUserOutgoingApprovalPermission(userOutgoingApprovalPermission *oldtypes.UserOutgoingApprovalPermission) *newtypes.UserOutgoingApprovalPermission {
+
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(userOutgoingApprovalPermission)
+	if err != nil {
+		return nil
+	}
+
+	var newUserOutgoingApprovalPermission newtypes.UserOutgoingApprovalPermission
+	if err := json.Unmarshal(jsonBytes, &newUserOutgoingApprovalPermission); err != nil {
+		return nil
+	}
+
+	return &newUserOutgoingApprovalPermission
+}
+
+func MigrateUserIncomingApprovalPermission(userIncomingApprovalPermission *oldtypes.UserIncomingApprovalPermission) *newtypes.UserIncomingApprovalPermission {
+
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(userIncomingApprovalPermission)
+	if err != nil {
+		return nil
+	}
+
+	var newUserIncomingApprovalPermission newtypes.UserIncomingApprovalPermission
+	if err := json.Unmarshal(jsonBytes, &newUserIncomingApprovalPermission); err != nil {
+		return nil
+	}
+
+	return &newUserIncomingApprovalPermission
+}
+
+func MigrateUserPermissions(userPermissions *oldtypes.UserPermissions) *newtypes.UserPermissions {
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(userPermissions)
+	if err != nil {
+		return nil
+	}
+
+	var newUserPermissions newtypes.UserPermissions
+	if err := json.Unmarshal(jsonBytes, &newUserPermissions); err != nil {
+		return nil
+	}
+
+	for _, canUpdateOutgoingApprovals := range userPermissions.CanUpdateOutgoingApprovals {
+		newUserPermissions.CanUpdateOutgoingApprovals = append(newUserPermissions.CanUpdateOutgoingApprovals, MigrateUserOutgoingApprovalPermission(canUpdateOutgoingApprovals))
+	}
+
+	for _, canUpdateIncomingApprovals := range userPermissions.CanUpdateIncomingApprovals {
+		newUserPermissions.CanUpdateIncomingApprovals = append(newUserPermissions.CanUpdateIncomingApprovals, MigrateUserIncomingApprovalPermission(canUpdateIncomingApprovals))
+	}
+
+	return &newUserPermissions
+}
+
+func MigrateCollectionPermissions(collectionPermissions *oldtypes.CollectionPermissions) *newtypes.CollectionPermissions {
+	//try to marshal as much as possible
+	jsonBytes, err := json.Marshal(collectionPermissions)
+	if err != nil {
+		return nil
+	}
+
+	var newCollectionPermissions newtypes.CollectionPermissions
+	if err := json.Unmarshal(jsonBytes, &newCollectionPermissions); err != nil {
+		return nil
+	}
+
+	for _, canUpdateValidTokenIds := range collectionPermissions.CanUpdateValidBadgeIds {
+		newCollectionPermissions.CanUpdateValidTokenIds = append(newCollectionPermissions.CanUpdateValidTokenIds, MigrateTokenIdsActionPermission(canUpdateValidTokenIds))
+	}
+
+	for _, canUpdateTokenMetadata := range collectionPermissions.CanUpdateBadgeMetadata {
+		newCollectionPermissions.CanUpdateTokenMetadata = append(newCollectionPermissions.CanUpdateTokenMetadata, MigrateTimedUpdateWithTokenIdsPermission(canUpdateTokenMetadata))
+	}
+
+	for _, canUpdateCollectionApprovals := range collectionPermissions.CanUpdateCollectionApprovals {
+		newCollectionPermissions.CanUpdateCollectionApprovals = append(newCollectionPermissions.CanUpdateCollectionApprovals, MigrateCollectionApprovalPermission(canUpdateCollectionApprovals))
+	}
+
+	return &newCollectionPermissions
+}
+
+func MigrateTokenMetadata(tokenMetadata *oldtypes.BadgeMetadata) *newtypes.TokenMetadata {
+	return &newtypes.TokenMetadata{
+		TokenIds:   convertUintRanges(tokenMetadata.BadgeIds),
+		Uri:        tokenMetadata.Uri,
+		CustomData: tokenMetadata.CustomData,
+	}
+}
+
+func MigrateTokenMetadataTimeline(tokenMetadataTimeline []*oldtypes.BadgeMetadataTimeline) []*newtypes.TokenMetadataTimeline {
+
+	if tokenMetadataTimeline == nil {
+		return nil
+	}
+
+	newTokenMetadataTimeline := make([]*newtypes.TokenMetadataTimeline, len(tokenMetadataTimeline))
+	for i, tokenMetadata := range tokenMetadataTimeline {
+		newTokenMetadataArray := make([]*newtypes.TokenMetadata, len(tokenMetadata.BadgeMetadata))
+		for j, metadata := range tokenMetadata.BadgeMetadata {
+			newTokenMetadataArray[j] = MigrateTokenMetadata(metadata)
+		}
+
+		newTokenMetadataTimeline[i] = &newtypes.TokenMetadataTimeline{
+			TimelineTimes: convertUintRanges(tokenMetadata.TimelineTimes),
+			TokenMetadata: newTokenMetadataArray,
+		}
+	}
+
+	return newTokenMetadataTimeline
+}
+
+func MigrateBalancesType(balances []*oldtypes.Balance) []*newtypes.Balance {
+	if balances == nil {
+		return nil
+	}
+
+	newBalances := make([]*newtypes.Balance, len(balances))
+	for i, balance := range balances {
+		newBalances[i] = &newtypes.Balance{
+			Amount:         balance.Amount,
+			TokenIds:       convertUintRanges(balance.BadgeIds),
+			OwnershipTimes: convertUintRanges(balance.OwnershipTimes),
+		}
+	}
+
+	return newBalances
+}
+
+func MigrateCosmosCoinWrapperPath(cosmosCoinWrapperPath *oldtypes.CosmosCoinWrapperPath) *newtypes.CosmosCoinWrapperPath {
+	//marshal as much as possible
+	jsonBytes, err := json.Marshal(cosmosCoinWrapperPath)
+	if err != nil {
+		return nil
+	}
+
+	var newCosmosCoinWrapperPath newtypes.CosmosCoinWrapperPath
+	if err := json.Unmarshal(jsonBytes, &newCosmosCoinWrapperPath); err != nil {
+		return nil
+	}
+
+	newCosmosCoinWrapperPath.Balances = MigrateBalancesType(cosmosCoinWrapperPath.Balances)
+
+	return &newCosmosCoinWrapperPath
+}
+
+func MigrateMustOwnTokens(mustOwnTokens []*oldtypes.MustOwnBadges) []*newtypes.MustOwnTokens {
+	if mustOwnTokens == nil {
+		return nil
+	}
+
+	newMustOwnTokens := make([]*newtypes.MustOwnTokens, len(mustOwnTokens))
+	for i, mustOwnToken := range mustOwnTokens {
+		// marshal as much as possible
+		jsonBytes, err := json.Marshal(mustOwnToken)
+		if err != nil {
+			return nil
+		}
+
+		var newMustOwnToken newtypes.MustOwnTokens
+		if err := json.Unmarshal(jsonBytes, &newMustOwnToken); err != nil {
+			return nil
+		}
+
+		newMustOwnToken.TokenIds = convertUintRanges(mustOwnToken.BadgeIds)
+		newMustOwnTokens[i] = &newMustOwnToken
+	}
+
+	return newMustOwnTokens
+}
+
+func MigrateApprovalCriteria(approvalCriteria *oldtypes.ApprovalCriteria) *newtypes.ApprovalCriteria {
+	if approvalCriteria == nil {
+		return nil
+	}
+
+	// marshal as much as possible
+	jsonBytes, err := json.Marshal(approvalCriteria)
+	if err != nil {
+		return nil
+	}
+
+	var newApprovalCriteria newtypes.ApprovalCriteria
+	if err := json.Unmarshal(jsonBytes, &newApprovalCriteria); err != nil {
+		return nil
+	}
+
+	newApprovalCriteria.MustOwnTokens = MigrateMustOwnTokens(approvalCriteria.MustOwnBadges)
+	if newApprovalCriteria.PredeterminedBalances != nil {
+		if newApprovalCriteria.PredeterminedBalances.IncrementedBalances != nil {
+			newApprovalCriteria.PredeterminedBalances.IncrementedBalances.IncrementTokenIdsBy = approvalCriteria.PredeterminedBalances.IncrementedBalances.IncrementBadgeIdsBy
+			newApprovalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideWithAnyValidToken = approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowOverrideWithAnyValidBadge
+			newApprovalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances = MigrateBalancesType(approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances)
+
+		}
+
+		for i, manualBalance := range approvalCriteria.PredeterminedBalances.ManualBalances {
+			newApprovalCriteria.PredeterminedBalances.ManualBalances[i].Balances = MigrateBalancesType(manualBalance.Balances)
+		}
+	}
+
+	return &newApprovalCriteria
+}
+
+func MigrateIncomingApprovalCriteria(approvalCriteria *oldtypes.IncomingApprovalCriteria) *newtypes.IncomingApprovalCriteria {
+	if approvalCriteria == nil {
+		return nil
+	}
+
+	// marshal as much as possible
+	jsonBytes, err := json.Marshal(approvalCriteria)
+	if err != nil {
+		return nil
+	}
+
+	var newApprovalCriteria newtypes.IncomingApprovalCriteria
+	if err := json.Unmarshal(jsonBytes, &newApprovalCriteria); err != nil {
+		return nil
+	}
+
+	newApprovalCriteria.MustOwnTokens = MigrateMustOwnTokens(approvalCriteria.MustOwnBadges)
+
+	return &newApprovalCriteria
+}
+
+func MigrateOutgoingApprovalCriteria(approvalCriteria *oldtypes.OutgoingApprovalCriteria) *newtypes.OutgoingApprovalCriteria {
+	if approvalCriteria == nil {
+		return nil
+	}
+
+	// marshal as much as possible
+	jsonBytes, err := json.Marshal(approvalCriteria)
+	if err != nil {
+		return nil
+	}
+
+	var newApprovalCriteria newtypes.OutgoingApprovalCriteria
+	if err := json.Unmarshal(jsonBytes, &newApprovalCriteria); err != nil {
+		return nil
+	}
+
+	newApprovalCriteria.MustOwnTokens = MigrateMustOwnTokens(approvalCriteria.MustOwnBadges)
+
+	return &newApprovalCriteria
+}
+
+func MigrateIncomingApprovals(incomingApprovals []*oldtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
+
+	newIncomingApprovals := make([]*newtypes.UserIncomingApproval, len(incomingApprovals))
+	for i, approval := range incomingApprovals {
+		// marshal as much as possible
+		jsonBytes, err := json.Marshal(approval)
+		if err != nil {
+			return nil
+		}
+
+		var newApproval newtypes.UserIncomingApproval
+		if err := json.Unmarshal(jsonBytes, &newApproval); err != nil {
+			return nil
+		}
+
+		newApproval.ApprovalCriteria = MigrateIncomingApprovalCriteria(approval.ApprovalCriteria)
+		newApproval.TokenIds = convertUintRanges(approval.BadgeIds)
+		newIncomingApprovals[i] = &newApproval
+	}
+
 	// for _, approval := range incomingApprovals {
 	// 	if approval.ApprovalCriteria == nil {
 	// 		continue
@@ -68,45 +385,52 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 	// 	}
 	// }
 
-	return incomingApprovals
+	return newIncomingApprovals
 }
 
-func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval) []*newtypes.UserOutgoingApproval {
-	// for _, approval := range outgoingApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+func MigrateOutgoingApprovals(outgoingApprovals []*oldtypes.UserOutgoingApproval) []*newtypes.UserOutgoingApproval {
 
-	// 	if approval.ApprovalCriteria.AutoDeletionOptions == nil {
-	// 		continue
-	// 	}
+	newOutgoingApprovals := make([]*newtypes.UserOutgoingApproval, len(outgoingApprovals))
+	for i, approval := range outgoingApprovals {
+		// marshal as much as possible
+		jsonBytes, err := json.Marshal(approval)
+		if err != nil {
+			return nil
+		}
 
-	// 	approval.ApprovalCriteria.AutoDeletionOptions = &newtypes.AutoDeletionOptions{
-	// 		AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
-	// 		AfterOverallMaxNumTransfers: false,
-	// 	}
-	// }
+		var newApproval newtypes.UserOutgoingApproval
+		if err := json.Unmarshal(jsonBytes, &newApproval); err != nil {
+			return nil
+		}
 
-	return outgoingApprovals
+		newApproval.ApprovalCriteria = MigrateOutgoingApprovalCriteria(approval.ApprovalCriteria)
+		newApproval.TokenIds = convertUintRanges(approval.BadgeIds)
+		newOutgoingApprovals[i] = &newApproval
+	}
+
+	return newOutgoingApprovals
 }
 
-func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*newtypes.CollectionApproval {
-	// for _, approval := range collectionApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+func MigrateApprovals(collectionApprovals []*oldtypes.CollectionApproval) []*newtypes.CollectionApproval {
+	newCollectionApprovals := make([]*newtypes.CollectionApproval, len(collectionApprovals))
+	for i, approval := range collectionApprovals {
+		// marshal as much as possible
+		jsonBytes, err := json.Marshal(approval)
+		if err != nil {
+			return nil
+		}
 
-	// 	if approval.ApprovalCriteria.AutoDeletionOptions == nil {
-	// 		continue
-	// 	}
+		var newApproval newtypes.CollectionApproval
+		if err := json.Unmarshal(jsonBytes, &newApproval); err != nil {
+			return nil
+		}
 
-	// 	approval.ApprovalCriteria.AutoDeletionOptions = &newtypes.AutoDeletionOptions{
-	// 		AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
-	// 		AfterOverallMaxNumTransfers: false,
-	// 	}
-	// }
+		newApproval.TokenIds = convertUintRanges(approval.BadgeIds)
+		newApproval.ApprovalCriteria = MigrateApprovalCriteria(approval.ApprovalCriteria)
+		newCollectionApprovals[i] = &newApproval
+	}
 
-	return collectionApprovals
+	return newCollectionApprovals
 }
 
 // convertUintRange converts old v9 UintRange to new UintRange
@@ -140,17 +464,21 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		}
 
 		// Unmarshal into new type
-		var newCollection newtypes.BadgeCollection
+		var newCollection newtypes.TokenCollection
 		if err := json.Unmarshal(jsonBytes, &newCollection); err != nil {
 			return err
 		}
 
-		// newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
-		// newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
-		// newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
-
-		newCollection.Invariants = &newtypes.CollectionInvariants{
-			NoCustomOwnershipTimes: false,
+		newCollection.CollectionPermissions = MigrateCollectionPermissions(oldCollection.CollectionPermissions)
+		newCollection.TokenMetadataTimeline = MigrateTokenMetadataTimeline(oldCollection.BadgeMetadataTimeline)
+		newCollection.ValidTokenIds = convertUintRanges(oldCollection.ValidBadgeIds)
+		newCollection.CollectionApprovals = MigrateApprovals(oldCollection.CollectionApprovals)
+		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(oldCollection.DefaultBalances.IncomingApprovals)
+		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(oldCollection.DefaultBalances.OutgoingApprovals)
+		newCollection.DefaultBalances.Balances = MigrateBalancesType(oldCollection.DefaultBalances.Balances)
+		newCollection.DefaultBalances.UserPermissions = MigrateUserPermissions(oldCollection.DefaultBalances.UserPermissions)
+		for _, cosmosCoinWrapperPath := range oldCollection.CosmosCoinWrapperPaths {
+			newCollection.CosmosCoinWrapperPaths = append(newCollection.CosmosCoinWrapperPaths, MigrateCosmosCoinWrapperPath(cosmosCoinWrapperPath))
 		}
 
 		// Save the updated collection
@@ -177,15 +505,17 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 		}
 
 		// Unmarshal into old type
-		var oldBalance newtypes.UserBalanceStore
-		if err := json.Unmarshal(jsonBytes, &oldBalance); err != nil {
+		var newBalance newtypes.UserBalanceStore
+		if err := json.Unmarshal(jsonBytes, &newBalance); err != nil {
 			return err
 		}
 
-		// oldBalance.IncomingApprovals = MigrateIncomingApprovals(oldBalance.IncomingApprovals)
-		// oldBalance.OutgoingApprovals = MigrateOutgoingApprovals(oldBalance.OutgoingApprovals)
+		newBalance.Balances = MigrateBalancesType(UserBalance.Balances)
+		newBalance.IncomingApprovals = MigrateIncomingApprovals(UserBalance.IncomingApprovals)
+		newBalance.OutgoingApprovals = MigrateOutgoingApprovals(UserBalance.OutgoingApprovals)
+		newBalance.UserPermissions = MigrateUserPermissions(UserBalance.UserPermissions)
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&oldBalance))
+		store.Set(iterator.Key(), k.cdc.MustMarshal(&newBalance))
 	}
 
 	return nil
@@ -237,9 +567,7 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 			return err
 		}
 
-		wctx := sdk.UnwrapSDKContext(ctx)
-		nowUnixMilli := wctx.BlockTime().UnixMilli()
-		oldApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
+		oldApprovalTracker.Amounts = MigrateBalancesType(ApprovalTracker.Amounts)
 
 		store.Set(iterator.Key(), k.cdc.MustMarshal(&oldApprovalTracker))
 	}
@@ -267,47 +595,8 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 			return err
 		}
 
-		// Convert boolean defaultValue to uint
-		if oldDynamicStore.DefaultValue {
-			newDynamicStore.DefaultValue = sdkmath.NewUint(1)
-		} else {
-			newDynamicStore.DefaultValue = sdkmath.NewUint(0)
-		}
-
 		// Save the updated dynamic store
 		if err := k.SetDynamicStoreInStore(sdk.UnwrapSDKContext(ctx), newDynamicStore); err != nil {
-			return err
-		}
-	}
-
-	// Migrate dynamic store values
-	valueIterator := storetypes.KVStorePrefixIterator(store, DynamicStoreValueKey)
-	defer valueIterator.Close()
-	for ; valueIterator.Valid(); valueIterator.Next() {
-		var oldDynamicStoreValue oldtypes.DynamicStoreValue
-		k.cdc.MustUnmarshal(valueIterator.Value(), &oldDynamicStoreValue)
-
-		// Convert to JSON
-		jsonBytes, err := json.Marshal(oldDynamicStoreValue)
-		if err != nil {
-			return err
-		}
-
-		// Unmarshal into new type
-		var newDynamicStoreValue newtypes.DynamicStoreValue
-		if err := json.Unmarshal(jsonBytes, &newDynamicStoreValue); err != nil {
-			return err
-		}
-
-		// Convert boolean value to uint
-		if oldDynamicStoreValue.Value {
-			newDynamicStoreValue.Value = sdkmath.NewUint(1)
-		} else {
-			newDynamicStoreValue.Value = sdkmath.NewUint(0)
-		}
-
-		// Save the updated dynamic store value
-		if err := k.SetDynamicStoreValueInStore(sdk.UnwrapSDKContext(ctx), newDynamicStoreValue.StoreId, newDynamicStoreValue.Address, newDynamicStoreValue.Value); err != nil {
 			return err
 		}
 	}

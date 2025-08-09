@@ -14,10 +14,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdSetValidBadgeIds() *cobra.Command {
+func CmdSetValidTokenIds() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-valid-badge-ids [tx-json]",
-		Short: "Broadcast message setValidBadgeIds",
+		Short: "Broadcast message setValidTokenIds",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -27,7 +27,7 @@ func CmdSetValidBadgeIds() *cobra.Command {
 
 			txJSON := args[0]
 
-			var txData types.MsgSetValidBadgeIds
+			var txData types.MsgSetValidTokenIds
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}

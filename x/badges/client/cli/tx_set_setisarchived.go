@@ -16,8 +16,8 @@ var _ = strconv.Itoa(0)
 
 func CmdSetIsArchived() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-setisarchived [tx-json]",
-		Short: "Broadcast message setSetIsArchived",
+		Use:   "set-is-archived [tx-json]",
+		Short: "Broadcast message setIsArchived",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

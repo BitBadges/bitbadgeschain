@@ -16,8 +16,8 @@ var _ = strconv.Itoa(0)
 
 func CmdSetCollectionApprovals() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-setcollectionapprovals [tx-json]",
-		Short: "Broadcast message setSetCollectionApprovals",
+		Use:   "set-collection-approvals [tx-json]",
+		Short: "Broadcast message setCollectionApprovals",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

@@ -587,130 +587,130 @@ func (x *fastReflection_CollectionMetadataTimeline) ProtoMethods() *protoiface.M
 	}
 }
 
-var _ protoreflect.List = (*_BadgeMetadataTimeline_1_list)(nil)
+var _ protoreflect.List = (*_TokenMetadataTimeline_1_list)(nil)
 
-type _BadgeMetadataTimeline_1_list struct {
-	list *[]*BadgeMetadata
+type _TokenMetadataTimeline_1_list struct {
+	list *[]*TokenMetadata
 }
 
-func (x *_BadgeMetadataTimeline_1_list) Len() int {
+func (x *_TokenMetadataTimeline_1_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeMetadataTimeline_1_list) Get(i int) protoreflect.Value {
+func (x *_TokenMetadataTimeline_1_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeMetadataTimeline_1_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenMetadataTimeline_1_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeMetadata)
+	concreteValue := valueUnwrapped.Interface().(*TokenMetadata)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeMetadataTimeline_1_list) Append(value protoreflect.Value) {
+func (x *_TokenMetadataTimeline_1_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeMetadata)
+	concreteValue := valueUnwrapped.Interface().(*TokenMetadata)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeMetadataTimeline_1_list) AppendMutable() protoreflect.Value {
-	v := new(BadgeMetadata)
+func (x *_TokenMetadataTimeline_1_list) AppendMutable() protoreflect.Value {
+	v := new(TokenMetadata)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeMetadataTimeline_1_list) Truncate(n int) {
+func (x *_TokenMetadataTimeline_1_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeMetadataTimeline_1_list) NewElement() protoreflect.Value {
-	v := new(BadgeMetadata)
+func (x *_TokenMetadataTimeline_1_list) NewElement() protoreflect.Value {
+	v := new(TokenMetadata)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeMetadataTimeline_1_list) IsValid() bool {
+func (x *_TokenMetadataTimeline_1_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeMetadataTimeline_2_list)(nil)
+var _ protoreflect.List = (*_TokenMetadataTimeline_2_list)(nil)
 
-type _BadgeMetadataTimeline_2_list struct {
+type _TokenMetadataTimeline_2_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeMetadataTimeline_2_list) Len() int {
+func (x *_TokenMetadataTimeline_2_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeMetadataTimeline_2_list) Get(i int) protoreflect.Value {
+func (x *_TokenMetadataTimeline_2_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeMetadataTimeline_2_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenMetadataTimeline_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeMetadataTimeline_2_list) Append(value protoreflect.Value) {
+func (x *_TokenMetadataTimeline_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeMetadataTimeline_2_list) AppendMutable() protoreflect.Value {
+func (x *_TokenMetadataTimeline_2_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeMetadataTimeline_2_list) Truncate(n int) {
+func (x *_TokenMetadataTimeline_2_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeMetadataTimeline_2_list) NewElement() protoreflect.Value {
+func (x *_TokenMetadataTimeline_2_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeMetadataTimeline_2_list) IsValid() bool {
+func (x *_TokenMetadataTimeline_2_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_BadgeMetadataTimeline               protoreflect.MessageDescriptor
-	fd_BadgeMetadataTimeline_badgeMetadata protoreflect.FieldDescriptor
-	fd_BadgeMetadataTimeline_timelineTimes protoreflect.FieldDescriptor
+	md_TokenMetadataTimeline               protoreflect.MessageDescriptor
+	fd_TokenMetadataTimeline_tokenMetadata protoreflect.FieldDescriptor
+	fd_TokenMetadataTimeline_timelineTimes protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_timelines_proto_init()
-	md_BadgeMetadataTimeline = File_badges_timelines_proto.Messages().ByName("BadgeMetadataTimeline")
-	fd_BadgeMetadataTimeline_badgeMetadata = md_BadgeMetadataTimeline.Fields().ByName("badgeMetadata")
-	fd_BadgeMetadataTimeline_timelineTimes = md_BadgeMetadataTimeline.Fields().ByName("timelineTimes")
+	md_TokenMetadataTimeline = File_badges_timelines_proto.Messages().ByName("TokenMetadataTimeline")
+	fd_TokenMetadataTimeline_tokenMetadata = md_TokenMetadataTimeline.Fields().ByName("tokenMetadata")
+	fd_TokenMetadataTimeline_timelineTimes = md_TokenMetadataTimeline.Fields().ByName("timelineTimes")
 }
 
-var _ protoreflect.Message = (*fastReflection_BadgeMetadataTimeline)(nil)
+var _ protoreflect.Message = (*fastReflection_TokenMetadataTimeline)(nil)
 
-type fastReflection_BadgeMetadataTimeline BadgeMetadataTimeline
+type fastReflection_TokenMetadataTimeline TokenMetadataTimeline
 
-func (x *BadgeMetadataTimeline) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_BadgeMetadataTimeline)(x)
+func (x *TokenMetadataTimeline) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TokenMetadataTimeline)(x)
 }
 
-func (x *BadgeMetadataTimeline) slowProtoReflect() protoreflect.Message {
+func (x *TokenMetadataTimeline) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_timelines_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -722,43 +722,43 @@ func (x *BadgeMetadataTimeline) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_BadgeMetadataTimeline_messageType fastReflection_BadgeMetadataTimeline_messageType
-var _ protoreflect.MessageType = fastReflection_BadgeMetadataTimeline_messageType{}
+var _fastReflection_TokenMetadataTimeline_messageType fastReflection_TokenMetadataTimeline_messageType
+var _ protoreflect.MessageType = fastReflection_TokenMetadataTimeline_messageType{}
 
-type fastReflection_BadgeMetadataTimeline_messageType struct{}
+type fastReflection_TokenMetadataTimeline_messageType struct{}
 
-func (x fastReflection_BadgeMetadataTimeline_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_BadgeMetadataTimeline)(nil)
+func (x fastReflection_TokenMetadataTimeline_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TokenMetadataTimeline)(nil)
 }
-func (x fastReflection_BadgeMetadataTimeline_messageType) New() protoreflect.Message {
-	return new(fastReflection_BadgeMetadataTimeline)
+func (x fastReflection_TokenMetadataTimeline_messageType) New() protoreflect.Message {
+	return new(fastReflection_TokenMetadataTimeline)
 }
-func (x fastReflection_BadgeMetadataTimeline_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeMetadataTimeline
+func (x fastReflection_TokenMetadataTimeline_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenMetadataTimeline
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_BadgeMetadataTimeline) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeMetadataTimeline
+func (x *fastReflection_TokenMetadataTimeline) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenMetadataTimeline
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_BadgeMetadataTimeline) Type() protoreflect.MessageType {
-	return _fastReflection_BadgeMetadataTimeline_messageType
+func (x *fastReflection_TokenMetadataTimeline) Type() protoreflect.MessageType {
+	return _fastReflection_TokenMetadataTimeline_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_BadgeMetadataTimeline) New() protoreflect.Message {
-	return new(fastReflection_BadgeMetadataTimeline)
+func (x *fastReflection_TokenMetadataTimeline) New() protoreflect.Message {
+	return new(fastReflection_TokenMetadataTimeline)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_BadgeMetadataTimeline) Interface() protoreflect.ProtoMessage {
-	return (*BadgeMetadataTimeline)(x)
+func (x *fastReflection_TokenMetadataTimeline) Interface() protoreflect.ProtoMessage {
+	return (*TokenMetadataTimeline)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -766,16 +766,16 @@ func (x *fastReflection_BadgeMetadataTimeline) Interface() protoreflect.ProtoMes
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_BadgeMetadataTimeline) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if len(x.BadgeMetadata) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeMetadataTimeline_1_list{list: &x.BadgeMetadata})
-		if !f(fd_BadgeMetadataTimeline_badgeMetadata, value) {
+func (x *fastReflection_TokenMetadataTimeline) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.TokenMetadata) != 0 {
+		value := protoreflect.ValueOfList(&_TokenMetadataTimeline_1_list{list: &x.TokenMetadata})
+		if !f(fd_TokenMetadataTimeline_tokenMetadata, value) {
 			return
 		}
 	}
 	if len(x.TimelineTimes) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeMetadataTimeline_2_list{list: &x.TimelineTimes})
-		if !f(fd_BadgeMetadataTimeline_timelineTimes, value) {
+		value := protoreflect.ValueOfList(&_TokenMetadataTimeline_2_list{list: &x.TimelineTimes})
+		if !f(fd_TokenMetadataTimeline_timelineTimes, value) {
 			return
 		}
 	}
@@ -792,17 +792,17 @@ func (x *fastReflection_BadgeMetadataTimeline) Range(f func(protoreflect.FieldDe
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_BadgeMetadataTimeline) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_TokenMetadataTimeline) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.BadgeMetadataTimeline.badgeMetadata":
-		return len(x.BadgeMetadata) != 0
-	case "badges.BadgeMetadataTimeline.timelineTimes":
+	case "badges.TokenMetadataTimeline.tokenMetadata":
+		return len(x.TokenMetadata) != 0
+	case "badges.TokenMetadataTimeline.timelineTimes":
 		return len(x.TimelineTimes) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadataTimeline"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadataTimeline"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadataTimeline does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadataTimeline does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -812,17 +812,17 @@ func (x *fastReflection_BadgeMetadataTimeline) Has(fd protoreflect.FieldDescript
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadataTimeline) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_TokenMetadataTimeline) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.BadgeMetadataTimeline.badgeMetadata":
-		x.BadgeMetadata = nil
-	case "badges.BadgeMetadataTimeline.timelineTimes":
+	case "badges.TokenMetadataTimeline.tokenMetadata":
+		x.TokenMetadata = nil
+	case "badges.TokenMetadataTimeline.timelineTimes":
 		x.TimelineTimes = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadataTimeline"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadataTimeline"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadataTimeline does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadataTimeline does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -832,25 +832,25 @@ func (x *fastReflection_BadgeMetadataTimeline) Clear(fd protoreflect.FieldDescri
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_BadgeMetadataTimeline) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenMetadataTimeline) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.BadgeMetadataTimeline.badgeMetadata":
-		if len(x.BadgeMetadata) == 0 {
-			return protoreflect.ValueOfList(&_BadgeMetadataTimeline_1_list{})
+	case "badges.TokenMetadataTimeline.tokenMetadata":
+		if len(x.TokenMetadata) == 0 {
+			return protoreflect.ValueOfList(&_TokenMetadataTimeline_1_list{})
 		}
-		listValue := &_BadgeMetadataTimeline_1_list{list: &x.BadgeMetadata}
+		listValue := &_TokenMetadataTimeline_1_list{list: &x.TokenMetadata}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeMetadataTimeline.timelineTimes":
+	case "badges.TokenMetadataTimeline.timelineTimes":
 		if len(x.TimelineTimes) == 0 {
-			return protoreflect.ValueOfList(&_BadgeMetadataTimeline_2_list{})
+			return protoreflect.ValueOfList(&_TokenMetadataTimeline_2_list{})
 		}
-		listValue := &_BadgeMetadataTimeline_2_list{list: &x.TimelineTimes}
+		listValue := &_TokenMetadataTimeline_2_list{list: &x.TimelineTimes}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadataTimeline"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadataTimeline"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadataTimeline does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadataTimeline does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -864,21 +864,21 @@ func (x *fastReflection_BadgeMetadataTimeline) Get(descriptor protoreflect.Field
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadataTimeline) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_TokenMetadataTimeline) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.BadgeMetadataTimeline.badgeMetadata":
+	case "badges.TokenMetadataTimeline.tokenMetadata":
 		lv := value.List()
-		clv := lv.(*_BadgeMetadataTimeline_1_list)
-		x.BadgeMetadata = *clv.list
-	case "badges.BadgeMetadataTimeline.timelineTimes":
+		clv := lv.(*_TokenMetadataTimeline_1_list)
+		x.TokenMetadata = *clv.list
+	case "badges.TokenMetadataTimeline.timelineTimes":
 		lv := value.List()
-		clv := lv.(*_BadgeMetadataTimeline_2_list)
+		clv := lv.(*_TokenMetadataTimeline_2_list)
 		x.TimelineTimes = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadataTimeline"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadataTimeline"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadataTimeline does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadataTimeline does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -892,54 +892,54 @@ func (x *fastReflection_BadgeMetadataTimeline) Set(fd protoreflect.FieldDescript
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadataTimeline) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenMetadataTimeline) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeMetadataTimeline.badgeMetadata":
-		if x.BadgeMetadata == nil {
-			x.BadgeMetadata = []*BadgeMetadata{}
+	case "badges.TokenMetadataTimeline.tokenMetadata":
+		if x.TokenMetadata == nil {
+			x.TokenMetadata = []*TokenMetadata{}
 		}
-		value := &_BadgeMetadataTimeline_1_list{list: &x.BadgeMetadata}
+		value := &_TokenMetadataTimeline_1_list{list: &x.TokenMetadata}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeMetadataTimeline.timelineTimes":
+	case "badges.TokenMetadataTimeline.timelineTimes":
 		if x.TimelineTimes == nil {
 			x.TimelineTimes = []*UintRange{}
 		}
-		value := &_BadgeMetadataTimeline_2_list{list: &x.TimelineTimes}
+		value := &_TokenMetadataTimeline_2_list{list: &x.TimelineTimes}
 		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadataTimeline"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadataTimeline"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadataTimeline does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadataTimeline does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_BadgeMetadataTimeline) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenMetadataTimeline) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeMetadataTimeline.badgeMetadata":
-		list := []*BadgeMetadata{}
-		return protoreflect.ValueOfList(&_BadgeMetadataTimeline_1_list{list: &list})
-	case "badges.BadgeMetadataTimeline.timelineTimes":
+	case "badges.TokenMetadataTimeline.tokenMetadata":
+		list := []*TokenMetadata{}
+		return protoreflect.ValueOfList(&_TokenMetadataTimeline_1_list{list: &list})
+	case "badges.TokenMetadataTimeline.timelineTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeMetadataTimeline_2_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenMetadataTimeline_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadataTimeline"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadataTimeline"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadataTimeline does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadataTimeline does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_BadgeMetadataTimeline) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_TokenMetadataTimeline) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.BadgeMetadataTimeline", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.TokenMetadataTimeline", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -947,7 +947,7 @@ func (x *fastReflection_BadgeMetadataTimeline) WhichOneof(d protoreflect.OneofDe
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_BadgeMetadataTimeline) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_TokenMetadataTimeline) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -958,7 +958,7 @@ func (x *fastReflection_BadgeMetadataTimeline) GetUnknown() protoreflect.RawFiel
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadataTimeline) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_TokenMetadataTimeline) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -970,7 +970,7 @@ func (x *fastReflection_BadgeMetadataTimeline) SetUnknown(fields protoreflect.Ra
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_BadgeMetadataTimeline) IsValid() bool {
+func (x *fastReflection_TokenMetadataTimeline) IsValid() bool {
 	return x != nil
 }
 
@@ -980,9 +980,9 @@ func (x *fastReflection_BadgeMetadataTimeline) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_TokenMetadataTimeline) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*BadgeMetadataTimeline)
+		x := input.Message.Interface().(*TokenMetadataTimeline)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -994,8 +994,8 @@ func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Method
 		var n int
 		var l int
 		_ = l
-		if len(x.BadgeMetadata) > 0 {
-			for _, e := range x.BadgeMetadata {
+		if len(x.TokenMetadata) > 0 {
+			for _, e := range x.TokenMetadata {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -1016,7 +1016,7 @@ func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Method
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeMetadataTimeline)
+		x := input.Message.Interface().(*TokenMetadataTimeline)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1051,9 +1051,9 @@ func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Method
 				dAtA[i] = 0x12
 			}
 		}
-		if len(x.BadgeMetadata) > 0 {
-			for iNdEx := len(x.BadgeMetadata) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeMetadata[iNdEx])
+		if len(x.TokenMetadata) > 0 {
+			for iNdEx := len(x.TokenMetadata) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenMetadata[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1078,7 +1078,7 @@ func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Method
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeMetadataTimeline)
+		x := input.Message.Interface().(*TokenMetadataTimeline)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1110,15 +1110,15 @@ func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Method
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeMetadataTimeline: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenMetadataTimeline: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeMetadataTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenMetadataTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadata", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenMetadata", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -1145,8 +1145,8 @@ func (x *fastReflection_BadgeMetadataTimeline) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeMetadata = append(x.BadgeMetadata, &BadgeMetadata{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeMetadata[len(x.BadgeMetadata)-1]); err != nil {
+				x.TokenMetadata = append(x.TokenMetadata, &TokenMetadata{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenMetadata[len(x.TokenMetadata)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -4691,20 +4691,20 @@ func (x *CollectionMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// BadgeMetadataTimeline defines the metadata for tokens at different timeline times.
-type BadgeMetadataTimeline struct {
+// TokenMetadataTimeline defines the metadata for tokens at different timeline times.
+type TokenMetadataTimeline struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// The token metadata for a specific timeline element.
-	BadgeMetadata []*BadgeMetadata `protobuf:"bytes,1,rep,name=badgeMetadata,proto3" json:"badgeMetadata,omitempty"`
+	TokenMetadata []*TokenMetadata `protobuf:"bytes,1,rep,name=tokenMetadata,proto3" json:"tokenMetadata,omitempty"`
 	// The timeline times when the token metadata is valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (x *BadgeMetadataTimeline) Reset() {
-	*x = BadgeMetadataTimeline{}
+func (x *TokenMetadataTimeline) Reset() {
+	*x = TokenMetadataTimeline{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_timelines_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4712,25 +4712,25 @@ func (x *BadgeMetadataTimeline) Reset() {
 	}
 }
 
-func (x *BadgeMetadataTimeline) String() string {
+func (x *TokenMetadataTimeline) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BadgeMetadataTimeline) ProtoMessage() {}
+func (*TokenMetadataTimeline) ProtoMessage() {}
 
-// Deprecated: Use BadgeMetadataTimeline.ProtoReflect.Descriptor instead.
-func (*BadgeMetadataTimeline) Descriptor() ([]byte, []int) {
+// Deprecated: Use TokenMetadataTimeline.ProtoReflect.Descriptor instead.
+func (*TokenMetadataTimeline) Descriptor() ([]byte, []int) {
 	return file_badges_timelines_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *BadgeMetadataTimeline) GetBadgeMetadata() []*BadgeMetadata {
+func (x *TokenMetadataTimeline) GetTokenMetadata() []*TokenMetadata {
 	if x != nil {
-		return x.BadgeMetadata
+		return x.TokenMetadata
 	}
 	return nil
 }
 
-func (x *BadgeMetadataTimeline) GetTimelineTimes() []*UintRange {
+func (x *TokenMetadataTimeline) GetTimelineTimes() []*UintRange {
 	if x != nil {
 		return x.TimelineTimes
 	}
@@ -5118,7 +5118,7 @@ func file_badges_timelines_proto_rawDescGZIP() []byte {
 var file_badges_timelines_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_badges_timelines_proto_goTypes = []interface{}{
 	(*CollectionMetadataTimeline)(nil),       // 0: badges.CollectionMetadataTimeline
-	(*BadgeMetadataTimeline)(nil),            // 1: badges.BadgeMetadataTimeline
+	(*TokenMetadataTimeline)(nil),            // 1: badges.TokenMetadataTimeline
 	(*OffChainBalancesMetadataTimeline)(nil), // 2: badges.OffChainBalancesMetadataTimeline
 	(*CustomDataTimeline)(nil),               // 3: badges.CustomDataTimeline
 	(*ManagerTimeline)(nil),                  // 4: badges.ManagerTimeline
@@ -5127,14 +5127,14 @@ var file_badges_timelines_proto_goTypes = []interface{}{
 	(*StandardsTimeline)(nil),                // 7: badges.StandardsTimeline
 	(*CollectionMetadata)(nil),               // 8: badges.CollectionMetadata
 	(*UintRange)(nil),                        // 9: badges.UintRange
-	(*BadgeMetadata)(nil),                    // 10: badges.BadgeMetadata
+	(*TokenMetadata)(nil),                    // 10: badges.TokenMetadata
 	(*OffChainBalancesMetadata)(nil),         // 11: badges.OffChainBalancesMetadata
 }
 var file_badges_timelines_proto_depIdxs = []int32{
 	8,  // 0: badges.CollectionMetadataTimeline.collectionMetadata:type_name -> badges.CollectionMetadata
 	9,  // 1: badges.CollectionMetadataTimeline.timelineTimes:type_name -> badges.UintRange
-	10, // 2: badges.BadgeMetadataTimeline.badgeMetadata:type_name -> badges.BadgeMetadata
-	9,  // 3: badges.BadgeMetadataTimeline.timelineTimes:type_name -> badges.UintRange
+	10, // 2: badges.TokenMetadataTimeline.tokenMetadata:type_name -> badges.TokenMetadata
+	9,  // 3: badges.TokenMetadataTimeline.timelineTimes:type_name -> badges.UintRange
 	11, // 4: badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata:type_name -> badges.OffChainBalancesMetadata
 	9,  // 5: badges.OffChainBalancesMetadataTimeline.timelineTimes:type_name -> badges.UintRange
 	9,  // 6: badges.CustomDataTimeline.timelineTimes:type_name -> badges.UintRange
@@ -5172,7 +5172,7 @@ func file_badges_timelines_proto_init() {
 			}
 		}
 		file_badges_timelines_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BadgeMetadataTimeline); i {
+			switch v := v.(*TokenMetadataTimeline); i {
 			case 0:
 				return &v.state
 			case 1:

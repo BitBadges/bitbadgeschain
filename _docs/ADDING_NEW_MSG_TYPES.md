@@ -225,7 +225,7 @@ go test ./x/badges/keeper/...
 
 ## Example Implementation
 
-See the implementation of existing message types like `MsgTransferBadges`, `MsgCreateCollection`, etc. for reference patterns.
+See the implementation of existing message types like `MsgTransferTokens`, `MsgCreateCollection`, etc. for reference patterns.
 
 ## Commands Reference
 

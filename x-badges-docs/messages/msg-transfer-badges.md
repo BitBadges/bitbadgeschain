@@ -1,17 +1,17 @@
-# MsgTransferBadges
+# MsgTransferTokens
 
 Executes token transfers between addresses.
 
 ## Proto Definition
 
 ```protobuf
-message MsgTransferBadges {
+message MsgTransferTokens {
   string creator = 1; // Address initiating the transfer
   string collectionId = 2; // Collection containing tokens to transfer
   repeated Transfer transfers = 3; // Transfer operations (must pass approvals)
 }
 
-message MsgTransferBadgesResponse {}
+message MsgTransferTokensResponse {}
 
 message Transfer {
   // The address of the sender of the transfer.
@@ -56,7 +56,7 @@ message PrecalculationOptions {
   // The timestamp to override with when calculating the balances.
   string overrideTimestamp = 1;
   // The IDs to override with when calculating the balances.
-  repeated UintRange badgeIdsOverride = 2;
+  repeated UintRange tokenIdsOverride = 2;
 }
 ```
 
@@ -234,7 +234,7 @@ bitbadgeschaind tx badges transfer-badges '[tx-json]' --from sender-key
                     "ownershipTimes": [
                         { "start": "1", "end": "18446744073709551615" }
                     ],
-                    "badgeIds": [{ "start": "1", "end": "5" }]
+                    "tokenIds": [{ "start": "1", "end": "5" }]
                 }
             ],
             // Specific approval to calculate balances dynamically for (from the approvalCriteria.predeterminedBalances)
@@ -247,7 +247,7 @@ bitbadgeschaind tx badges transfer-badges '[tx-json]' --from sender-key
             // Additional options dependent on what is allowed (e.g. allow timestamp override, token ID override, etc.)
             "precalculationOptions": {
                 "overrideTimestamp": "0",
-                "badgeIdsOverride": []
+                "tokenIdsOverride": []
             },
             // Supply all merkle proofs for any merkle challenges that need to be satisfied
             "merkleProofs": [],

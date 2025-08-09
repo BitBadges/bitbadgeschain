@@ -11,7 +11,7 @@ import (
 // DeductUserOutgoingApprovals will check if the current transfer is approved from the from's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserOutgoingApprovals(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	originalTransferBalances []*types.Balance,
 	transfer *types.Transfer,
 	from string,
@@ -49,7 +49,7 @@ func (k Keeper) DeductUserOutgoingApprovals(
 // DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserIncomingApprovals(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	originalTransferBalances []*types.Balance,
 	transfer *types.Transfer,
 	to string,
@@ -90,7 +90,7 @@ func (k Keeper) DeductUserIncomingApprovals(
 // DeductCollectionApprovalsAndGetUserApprovalsToCheck will check if the current transfer is allowed via the collection's approved transfers and handle any tallying accordingly
 func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	transfer *types.Transfer,
 	toAddress string,
 	initiatedBy string,

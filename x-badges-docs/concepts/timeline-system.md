@@ -25,10 +25,10 @@ message CollectionMetadataTimeline {
   CollectionMetadata collectionMetadata = 2;
 }
 
-message BadgeMetadataTimeline {
+message TokenMetadataTimeline {
   repeated UintRange timelineTimes = 1;
-  repeated UintRange badgeIds = 2;
-  BadgeMetadata badgeMetadata = 3;
+  repeated UintRange tokenIds = 2;
+  TokenMetadata tokenMetadata = 3;
 }
 ```
 
@@ -38,7 +38,7 @@ The collection interface includes the following timeline-based fields:
 
 -   `managerTimeline: ManagerTimeline<T>[]`
 -   `collectionMetadataTimeline: CollectionMetadataTimeline<T>[]`
--   `badgeMetadataTimeline: BadgeMetadataTimeline<T>[]`
+-   `tokenMetadataTimeline: TokenMetadataTimeline<T>[]`
 -   `offChainBalancesMetadataTimeline: OffChainBalancesMetadataTimeline<T>[]`
 -   `customDataTimeline: CustomDataTimeline<T>[]`
 -   `standardsTimeline: StandardsTimeline<T>[]`

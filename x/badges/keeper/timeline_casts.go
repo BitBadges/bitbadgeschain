@@ -8,22 +8,22 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//For TimedUpdates that involve checking additonal information (i.e. TimedUpdateWithBadgeIds, CollectionApprovals, UserIncomingApprovals, etc.)
+//For TimedUpdates that involve checking additonal information (i.e. TimedUpdateWithTokenIds, CollectionApprovals, UserIncomingApprovals, etc.)
 //We cast the values to a UniversalPermission struct, which is compatible with the permissions.go file in types
 //This allows us to easily check overlaps and get the correct permissions
 
 //HACK: We use the ArbitraryValue field to store the original value, so we can cast it back later
 //HACK: We cast to a UniversalPermission for reusable code.
 
-func (k Keeper) CastBadgeMetadataToUniversalPermission(badgeMetadata []*types.BadgeMetadata) []*types.UniversalPermission {
+func (k Keeper) CastTokenMetadataToUniversalPermission(tokenMetadata []*types.TokenMetadata) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
-	for _, badgeMetadata := range badgeMetadata {
-		marshaledMetadata, _ := json.Marshal(badgeMetadata)
+	for _, tokenMetadata := range tokenMetadata {
+		marshaledMetadata, _ := json.Marshal(tokenMetadata)
 		stringifiedMetadata := string(marshaledMetadata)
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:       badgeMetadata.BadgeIds,
-			UsesBadgeIds:   true,
+			TokenIds:       tokenMetadata.TokenIds,
+			UsesTokenIds:   true,
 			ArbitraryValue: stringifiedMetadata,
 		})
 	}
@@ -54,14 +54,14 @@ func (k Keeper) CastCollectionApprovalToUniversalPermission(ctx sdk.Context, app
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:            approval.BadgeIds,
+			TokenIds:            approval.TokenIds,
 			TransferTimes:       approval.TransferTimes,
 			OwnershipTimes:      approval.OwnershipTimes,
 			FromList:            fromList,
 			ToList:              toList,
 			InitiatedByList:     initiatedByList,
 			ApprovalIdList:      approvalTrackerList,
-			UsesBadgeIds:        true,
+			UsesTokenIds:        true,
 			UsesTransferTimes:   true,
 			UsesToList:          true,
 			UsesFromList:        true,

@@ -10,13 +10,13 @@ message QueryGetCollectionRequest {
 }
 
 message QueryGetCollectionResponse {
-  BadgeCollection collection = 1;
+  TokenCollection collection = 1;
 }
 
-message BadgeCollection {
+message TokenCollection {
   string collectionId = 1; // Unique identifier for this collection
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 2; // Collection metadata over time
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3; // Token metadata over time
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 3; // Token metadata over time
   string balancesType = 4; // Type of balances ("Standard", "Off-Chain - Indexed", etc.)
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5; // Off-chain balance metadata
   repeated CustomDataTimeline customDataTimeline = 7; // Arbitrary custom data over time
@@ -27,7 +27,7 @@ message BadgeCollection {
   repeated IsArchivedTimeline isArchivedTimeline = 12; // Archive status over time
   UserBalanceStore defaultBalances = 13; // Default balance store for users
   string createdBy = 14; // Creator of the collection
-  repeated UintRange validBadgeIds = 15; // Valid token ID ranges
+  repeated UintRange validTokenIds = 15; // Valid token ID ranges
   string mintEscrowAddress = 16; // Generated escrow address for the collection
 }
 

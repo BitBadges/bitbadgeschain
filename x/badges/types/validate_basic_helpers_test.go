@@ -35,13 +35,13 @@ func GetValidCollectionMetadataTimeline() []*types.CollectionMetadataTimeline {
 	}
 }
 
-func GetValidBadgeMetadataTimeline() []*types.BadgeMetadataTimeline {
-	return []*types.BadgeMetadataTimeline{
+func GetValidTokenMetadataTimeline() []*types.TokenMetadataTimeline {
+	return []*types.TokenMetadataTimeline{
 		{
-			BadgeMetadata: []*types.BadgeMetadata{
+			TokenMetadata: []*types.TokenMetadata{
 				{
 					Uri: "https://example.com/{id}",
-					BadgeIds: []*types.UintRange{
+					TokenIds: []*types.UintRange{
 						{
 							Start: sdkmath.NewUint(1),
 

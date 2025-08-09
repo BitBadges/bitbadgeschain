@@ -37,9 +37,9 @@ func (k msgServer) SetManager(goCtx context.Context, msg *types.MsgSetManager) (
 			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
 			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds:            collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:            collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}

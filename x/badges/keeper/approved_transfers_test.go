@@ -12,7 +12,7 @@ import (
 )
 
 // For legacy conversions
-func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string,
+func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.TokenCollection, userBalance *types.UserBalanceStore, tokenIds []*types.UintRange, times []*types.UintRange, from string, to string,
 	requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, prioritizedApprovals []*types.ApprovalIdentifierDetails,
 	onlyCheckPrioritizedCollectionApprovals bool,
 	onlyCheckProritizedIncomingApprovals bool,
@@ -27,7 +27,7 @@ func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		ToAddresses: []string{to},
 		Balances: []*types.Balance{
 			{
-				BadgeIds:       badgeIds,
+				TokenIds:       tokenIds,
 				OwnershipTimes: times,
 				Amount:         amount,
 			},
@@ -42,7 +42,7 @@ func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 	}, from, to, requester, userBalance, approvalsUsed, coinTransfersUsed, userRoyalties)
 }
 
-func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.BadgeCollection, userBalance *types.UserBalanceStore, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, prioritizedApprovals []*types.ApprovalIdentifierDetails,
+func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.TokenCollection, userBalance *types.UserBalanceStore, tokenIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, prioritizedApprovals []*types.ApprovalIdentifierDetails,
 	onlyCheckPrioritizedCollectionApprovals bool,
 	onlyCheckProritizedIncomingApprovals bool,
 	onlyCheckPrioritizedOutgoingApprovals bool,
@@ -52,7 +52,7 @@ func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		ToAddresses: []string{to},
 		Balances: []*types.Balance{
 			{
-				BadgeIds:       badgeIds,
+				TokenIds:       tokenIds,
 				OwnershipTimes: times,
 				Amount:         amount,
 			},
@@ -68,7 +68,7 @@ func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 }
 
 func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance,
-	collection *types.BadgeCollection, badgeIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string,
+	collection *types.TokenCollection, tokenIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string,
 	amount sdkmath.Uint, solutions []*types.MerkleProof, prioritizedApprovals []*types.ApprovalIdentifierDetails,
 	onlyCheckPrioritizedCollectionApprovals bool,
 	onlyCheckProritizedIncomingApprovals bool,
@@ -81,7 +81,7 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 			ToAddresses: []string{to},
 			Balances: []*types.Balance{
 				{
-					BadgeIds:       badgeIds,
+					TokenIds:       tokenIds,
 					OwnershipTimes: times,
 					Amount:         amount,
 				},
@@ -108,7 +108,7 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 
 	overallTransferBalances := []*types.Balance{
 		{
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 			Amount:         sdkmath.NewUint(1),
 		},
@@ -295,11 +295,11 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		StartBalances: []*types.Balance{
 			{
 				OwnershipTimes: GetFullUintRanges(),
-				BadgeIds:       GetFullUintRanges(),
+				TokenIds:       GetFullUintRanges(),
 				Amount:         sdkmath.NewUint(1),
 			},
 		},
-		IncrementBadgeIdsBy:       sdkmath.NewUint(math.MaxUint64),
+		IncrementTokenIdsBy:       sdkmath.NewUint(math.MaxUint64),
 		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
 		DurationFromTimestamp:     sdkmath.NewUint(0),
 	}
@@ -313,11 +313,11 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 		StartBalances: []*types.Balance{
 			{
 				OwnershipTimes: GetFullUintRanges(),
-				BadgeIds:       GetFullUintRanges(),
+				TokenIds:       GetFullUintRanges(),
 				Amount:         sdkmath.NewUint(1),
 			},
 		},
-		IncrementBadgeIdsBy:       sdkmath.NewUint(math.MaxUint64),
+		IncrementTokenIdsBy:       sdkmath.NewUint(math.MaxUint64),
 		IncrementOwnershipTimesBy: sdkmath.NewUint(math.MaxUint64),
 		DurationFromTimestamp:     sdkmath.NewUint(0),
 	}
@@ -331,7 +331,7 @@ func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	overallTransferBalances := []*types.Balance{
 		{
 			OwnershipTimes: GetFullUintRanges(),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			Amount:         sdkmath.NewUint(1),
 		},
 	}
@@ -452,7 +452,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 				ToListId:          "AllWithoutMint",
 // 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
-// 				BadgeIds: []*types.UintRange{
+// 				TokenIds: []*types.UintRange{
 // 					{
 // 						Start: sdkmath.NewUint(1),
 // 						End:   sdkmath.NewUint(1),
@@ -488,7 +488,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 			ToListId:          "AllWithoutMint",
 // 			InitiatedByListId: alice,
 // 			TransferTimes:        []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 			BadgeIds:             GetFullUintRanges(),
+// 			TokenIds:             GetFullUintRanges(),
 // 			OwnershipTimes: GetFullUintRanges(),
 // 			IsApproved: false,
 
@@ -519,7 +519,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				OwnershipTimes: 			GetFullUintRanges(),
-// 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				TokenIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 
 // 				ApprovalId: "test",
 // 				AmountTrackerId:                 "test",
@@ -538,8 +538,8 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				OwnershipTimes: 			GetFullUintRanges(),
-// 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
-// 				BadgeIdsOptions: &types.ValueOptions{ InvertDefault: true },
+// 				TokenIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				TokenIdsOptions: &types.ValueOptions{ InvertDefault: true },
 // 				IsApproved:      false,
 // 			},
 // 	}
@@ -569,7 +569,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 				InitiatedByListId: alice,
 // 				TransferTimes:        GetFullUintRanges(),
 // 				OwnershipTimes: GetFullUintRanges(),
-// 				BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 				TokenIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 				IsApproved: false,
 
 // 			},
@@ -578,7 +578,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 					InitiatedByListId: alice,
 // 					TransferTimes:        GetFullUintRanges(),
 // 					OwnershipTimes: GetFullUintRanges(),
-// 					BadgeIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+// 					TokenIds:             []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 // 					InitiatedByListOptions: &types.ValueOptions{ InvertDefault: true },
 // 					IsApproved:         true,
 // 					ApprovalId: "test",
@@ -622,7 +622,7 @@ func (suite *TestSuite) TestDefaultsNotAutoApplies() {
 // 			InitiatedByListId: "AllWithoutMint",
 // 			TransferTimes:        GetFullUintRanges(),
 // 			OwnershipTimes: GetFullUintRanges(),
-// 			BadgeIds:             GetFullUintRanges(),
+// 			TokenIds:             GetFullUintRanges(),
 // 			IsApproved: false,
 // 	})
 
@@ -647,7 +647,7 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 			InitiatedByListId: alice,
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
-			BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 
 			ApprovalId: "test",
 			ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -751,7 +751,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 			FromListId: "AllWithMint",
 // 			ToListId:   "AllWithMint",
 // 			InitiatedByListId: "AllWithMint",
-// 			BadgeIds: 					 GetFullUintRanges(),
+// 			TokenIds: 					 GetFullUintRanges(),
 // 			TransferTimes:        GetFullUintRanges(),
 // 			OwnershipTimes: GetFullUintRanges(),
 //
@@ -818,7 +818,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 	suite.Require().Equal(sdkmath.NewInt(100000000000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -828,7 +828,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -872,7 +872,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
 	suite.Require().Equal(sdkmath.NewInt(100000000000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -882,7 +882,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsUnderflow() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -933,7 +933,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 	suite.Require().Equal(sdkmath.NewInt(100000000000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -943,7 +943,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -992,7 +992,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 		InitiatedByListId: "AllWithoutMint",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		ApprovalId:        "test2",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
@@ -1026,7 +1026,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 	suite.Require().Equal(sdkmath.NewInt(100000000000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1036,7 +1036,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -1046,7 +1046,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 	})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1056,7 +1056,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetTwoUintRanges(),
+						TokenIds:       GetTwoUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -1105,7 +1105,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 		InitiatedByListId: "AllWithoutMint",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		ApprovalId:        "test2",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
@@ -1139,7 +1139,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 	suite.Require().Equal(sdkmath.NewInt(100000000000), bobBalanceBefore.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000), aliceBalanceBefore.Amount, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1149,7 +1149,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -1159,7 +1159,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 	})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1169,7 +1169,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetTwoUintRanges(),
+						TokenIds:       GetTwoUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -1198,7 +1198,7 @@ func (suite *TestSuite) TestVersionControlCollectionApprovals() {
 	suite.Require().Equal(sdkmath.NewUint(0), version, "Error getting approval tracker version")
 
 	// Update the collection approvals
-	collectionsToCreate[0].CollectionApprovals[0].BadgeIds = GetTwoUintRanges()
+	collectionsToCreate[0].CollectionApprovals[0].TokenIds = GetTwoUintRanges()
 	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
 		CollectionId:        sdkmath.NewUint(1),
 		Creator:             bob,
@@ -1250,7 +1250,7 @@ func (suite *TestSuite) TestVersionControlUserApprovals() {
 		InitiatedByListId: "AllWithoutMint",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 
 		ApprovalId: "test",
 		ApprovalCriteria: &types.IncomingApprovalCriteria{
@@ -1278,7 +1278,7 @@ func (suite *TestSuite) TestVersionControlUserApprovals() {
 	suite.Require().True(found, "Error getting approval tracker version")
 	suite.Require().Equal(sdkmath.NewUint(0), version, "Error getting approval tracker version")
 
-	defaultApproval.BadgeIds = GetOneUintRange()
+	defaultApproval.TokenIds = GetOneUintRange()
 	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
 		Creator:                 bob,
 		CollectionId:            sdkmath.NewUint(1),
@@ -1435,7 +1435,7 @@ func (suite *TestSuite) TestAutoDeletingOutgoingApprovals() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "a1",
@@ -1449,7 +1449,7 @@ func (suite *TestSuite) TestAutoDeletingOutgoingApprovals() {
 			FromListId:        "!Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "a2",
@@ -1477,7 +1477,7 @@ func (suite *TestSuite) TestAutoDeletingOutgoingApprovals() {
 					ToAddresses: []string{alice},
 					Balances: []*types.Balance{
 						{
-							BadgeIds:       GetFullUintRanges(),
+							TokenIds:       GetFullUintRanges(),
 							Amount:         sdkmath.NewUint(1),
 							OwnershipTimes: GetFullUintRanges(),
 						},
@@ -1509,7 +1509,7 @@ func (suite *TestSuite) TestAutoDeletingOutgoingApprovals() {
 						Balances: []*types.Balance{
 							{
 								Amount:         sdkmath.NewUint(1),
-								BadgeIds:       GetFullUintRanges(),
+								TokenIds:       GetFullUintRanges(),
 								OwnershipTimes: GetFullUintRanges(),
 							},
 						},
@@ -1545,7 +1545,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovals() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "a1",
@@ -1559,7 +1559,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovals() {
 			FromListId:        "!Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "a2",
@@ -1585,7 +1585,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovals() {
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetBottomHalfUintRanges(),
 					},
@@ -1638,7 +1638,7 @@ func (suite *TestSuite) TestAutoDeletingCollectionApprovals() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "a1",
@@ -1672,7 +1672,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "overall-max-test",
@@ -1706,7 +1706,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -1738,7 +1738,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 				ToAddresses: []string{charlie},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -1770,7 +1770,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -1811,7 +1811,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 				ToAddresses: []string{charlie},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -1839,7 +1839,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 	// Set up incoming approval with auto-deletion after overall max transfers
 	collectionsToCreate[0].DefaultIncomingApprovals[0].FromListId = "Mint"
 	collectionsToCreate[0].DefaultIncomingApprovals[0].InitiatedByListId = "All"
-	collectionsToCreate[0].DefaultIncomingApprovals[0].BadgeIds = GetFullUintRanges()
+	collectionsToCreate[0].DefaultIncomingApprovals[0].TokenIds = GetFullUintRanges()
 	collectionsToCreate[0].DefaultIncomingApprovals[0].TransferTimes = GetFullUintRanges()
 	collectionsToCreate[0].DefaultIncomingApprovals[0].OwnershipTimes = GetFullUintRanges()
 	collectionsToCreate[0].DefaultIncomingApprovals[0].ApprovalCriteria = &types.IncomingApprovalCriteria{
@@ -1858,7 +1858,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "a1",
@@ -1895,7 +1895,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetBottomHalfUintRanges(),
 					},
@@ -1922,7 +1922,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetTopHalfUintRanges(),
 					},
@@ -1949,7 +1949,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -1976,7 +1976,7 @@ func (suite *TestSuite) TestAutoDeletingIncomingApprovalsAfterOverallMaxNumTrans
 				ToAddresses: []string{alice},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 						OwnershipTimes: GetFullUintRanges(),
 					},
@@ -2000,12 +2000,12 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 		IncrementedBalances: &types.IncrementedBalances{
 			StartBalances: []*types.Balance{
 				{
-					BadgeIds:       GetFullUintRanges(),
+					TokenIds:       GetFullUintRanges(),
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 			AllowOverrideTimestamp:    false,
 			DurationFromTimestamp:     sdkmath.NewUint(0),
@@ -2026,7 +2026,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "retry-test-1",
@@ -2042,7 +2042,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "retry-test-2",
@@ -2058,7 +2058,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "retry-test-3",
@@ -2074,7 +2074,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 			FromListId:        "Mint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "retry-test-4-max-2-allowed",
@@ -2175,7 +2175,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				ToAddresses: []string{charlie},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
@@ -2201,7 +2201,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				ToAddresses: []string{charlie},
 				Balances: []*types.Balance{
 					{
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 						Amount:         sdkmath.NewUint(1),
 					},
@@ -2250,7 +2250,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 			FromListId:        "All",
 			ToListId:          "All",
 			InitiatedByListId: "All",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "edge-case-test",

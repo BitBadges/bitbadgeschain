@@ -22,7 +22,7 @@ const (
 	Msg_UpdateParams_FullMethodName              = "/badges.Msg/UpdateParams"
 	Msg_UniversalUpdateCollection_FullMethodName = "/badges.Msg/UniversalUpdateCollection"
 	Msg_CreateAddressLists_FullMethodName        = "/badges.Msg/CreateAddressLists"
-	Msg_TransferBadges_FullMethodName            = "/badges.Msg/TransferBadges"
+	Msg_TransferTokens_FullMethodName            = "/badges.Msg/TransferTokens"
 	Msg_UpdateUserApprovals_FullMethodName       = "/badges.Msg/UpdateUserApprovals"
 	Msg_DeleteCollection_FullMethodName          = "/badges.Msg/DeleteCollection"
 	Msg_UpdateCollection_FullMethodName          = "/badges.Msg/UpdateCollection"
@@ -38,7 +38,7 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	UniversalUpdateCollection(ctx context.Context, in *MsgUniversalUpdateCollection, opts ...grpc.CallOption) (*MsgUniversalUpdateCollectionResponse, error)
 	CreateAddressLists(ctx context.Context, in *MsgCreateAddressLists, opts ...grpc.CallOption) (*MsgCreateAddressListsResponse, error)
-	TransferBadges(ctx context.Context, in *MsgTransferBadges, opts ...grpc.CallOption) (*MsgTransferBadgesResponse, error)
+	TransferTokens(ctx context.Context, in *MsgTransferTokens, opts ...grpc.CallOption) (*MsgTransferTokensResponse, error)
 	UpdateUserApprovals(ctx context.Context, in *MsgUpdateUserApprovals, opts ...grpc.CallOption) (*MsgUpdateUserApprovalsResponse, error)
 	DeleteCollection(ctx context.Context, in *MsgDeleteCollection, opts ...grpc.CallOption) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(ctx context.Context, in *MsgUpdateCollection, opts ...grpc.CallOption) (*MsgUpdateCollectionResponse, error)
@@ -80,9 +80,9 @@ func (c *msgClient) CreateAddressLists(ctx context.Context, in *MsgCreateAddress
 	return out, nil
 }
 
-func (c *msgClient) TransferBadges(ctx context.Context, in *MsgTransferBadges, opts ...grpc.CallOption) (*MsgTransferBadgesResponse, error) {
-	out := new(MsgTransferBadgesResponse)
-	err := c.cc.Invoke(ctx, Msg_TransferBadges_FullMethodName, in, out, opts...)
+func (c *msgClient) TransferTokens(ctx context.Context, in *MsgTransferTokens, opts ...grpc.CallOption) (*MsgTransferTokensResponse, error) {
+	out := new(MsgTransferTokensResponse)
+	err := c.cc.Invoke(ctx, Msg_TransferTokens_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	UniversalUpdateCollection(context.Context, *MsgUniversalUpdateCollection) (*MsgUniversalUpdateCollectionResponse, error)
 	CreateAddressLists(context.Context, *MsgCreateAddressLists) (*MsgCreateAddressListsResponse, error)
-	TransferBadges(context.Context, *MsgTransferBadges) (*MsgTransferBadgesResponse, error)
+	TransferTokens(context.Context, *MsgTransferTokens) (*MsgTransferTokensResponse, error)
 	UpdateUserApprovals(context.Context, *MsgUpdateUserApprovals) (*MsgUpdateUserApprovalsResponse, error)
 	DeleteCollection(context.Context, *MsgDeleteCollection) (*MsgDeleteCollectionResponse, error)
 	UpdateCollection(context.Context, *MsgUpdateCollection) (*MsgUpdateCollectionResponse, error)
@@ -155,8 +155,8 @@ func (UnimplementedMsgServer) UniversalUpdateCollection(context.Context, *MsgUni
 func (UnimplementedMsgServer) CreateAddressLists(context.Context, *MsgCreateAddressLists) (*MsgCreateAddressListsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAddressLists not implemented")
 }
-func (UnimplementedMsgServer) TransferBadges(context.Context, *MsgTransferBadges) (*MsgTransferBadgesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TransferBadges not implemented")
+func (UnimplementedMsgServer) TransferTokens(context.Context, *MsgTransferTokens) (*MsgTransferTokensResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferTokens not implemented")
 }
 func (UnimplementedMsgServer) UpdateUserApprovals(context.Context, *MsgUpdateUserApprovals) (*MsgUpdateUserApprovalsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserApprovals not implemented")
@@ -237,20 +237,20 @@ func _Msg_CreateAddressLists_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_TransferBadges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgTransferBadges)
+func _Msg_TransferTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferTokens)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).TransferBadges(ctx, in)
+		return srv.(MsgServer).TransferTokens(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_TransferBadges_FullMethodName,
+		FullMethod: Msg_TransferTokens_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).TransferBadges(ctx, req.(*MsgTransferBadges))
+		return srv.(MsgServer).TransferTokens(ctx, req.(*MsgTransferTokens))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -347,8 +347,8 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreateAddressLists_Handler,
 		},
 		{
-			MethodName: "TransferBadges",
-			Handler:    _Msg_TransferBadges_Handler,
+			MethodName: "TransferTokens",
+			Handler:    _Msg_TransferTokens_Handler,
 		},
 		{
 			MethodName: "UpdateUserApprovals",

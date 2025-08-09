@@ -14,566 +14,566 @@ import (
 	sync "sync"
 )
 
-var _ protoreflect.List = (*_BadgeCollection_2_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_2_list)(nil)
 
-type _BadgeCollection_2_list struct {
+type _TokenCollection_2_list struct {
 	list *[]*CollectionMetadataTimeline
 }
 
-func (x *_BadgeCollection_2_list) Len() int {
+func (x *_TokenCollection_2_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_2_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_2_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_2_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CollectionMetadataTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_2_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CollectionMetadataTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_2_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_2_list) AppendMutable() protoreflect.Value {
 	v := new(CollectionMetadataTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_2_list) Truncate(n int) {
+func (x *_TokenCollection_2_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_2_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_2_list) NewElement() protoreflect.Value {
 	v := new(CollectionMetadataTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_2_list) IsValid() bool {
+func (x *_TokenCollection_2_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_3_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_3_list)(nil)
 
-type _BadgeCollection_3_list struct {
-	list *[]*BadgeMetadataTimeline
+type _TokenCollection_3_list struct {
+	list *[]*TokenMetadataTimeline
 }
 
-func (x *_BadgeCollection_3_list) Len() int {
+func (x *_TokenCollection_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_3_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_3_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeMetadataTimeline)
+	concreteValue := valueUnwrapped.Interface().(*TokenMetadataTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_3_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeMetadataTimeline)
+	concreteValue := valueUnwrapped.Interface().(*TokenMetadataTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_3_list) AppendMutable() protoreflect.Value {
-	v := new(BadgeMetadataTimeline)
+func (x *_TokenCollection_3_list) AppendMutable() protoreflect.Value {
+	v := new(TokenMetadataTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_3_list) Truncate(n int) {
+func (x *_TokenCollection_3_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_3_list) NewElement() protoreflect.Value {
-	v := new(BadgeMetadataTimeline)
+func (x *_TokenCollection_3_list) NewElement() protoreflect.Value {
+	v := new(TokenMetadataTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_3_list) IsValid() bool {
+func (x *_TokenCollection_3_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_5_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_5_list)(nil)
 
-type _BadgeCollection_5_list struct {
+type _TokenCollection_5_list struct {
 	list *[]*OffChainBalancesMetadataTimeline
 }
 
-func (x *_BadgeCollection_5_list) Len() int {
+func (x *_TokenCollection_5_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_5_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_5_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_5_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_5_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*OffChainBalancesMetadataTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_5_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_5_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*OffChainBalancesMetadataTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_5_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_5_list) AppendMutable() protoreflect.Value {
 	v := new(OffChainBalancesMetadataTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_5_list) Truncate(n int) {
+func (x *_TokenCollection_5_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_5_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_5_list) NewElement() protoreflect.Value {
 	v := new(OffChainBalancesMetadataTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_5_list) IsValid() bool {
+func (x *_TokenCollection_5_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_7_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_7_list)(nil)
 
-type _BadgeCollection_7_list struct {
+type _TokenCollection_7_list struct {
 	list *[]*CustomDataTimeline
 }
 
-func (x *_BadgeCollection_7_list) Len() int {
+func (x *_TokenCollection_7_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_7_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_7_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_7_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_7_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CustomDataTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_7_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_7_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CustomDataTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_7_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_7_list) AppendMutable() protoreflect.Value {
 	v := new(CustomDataTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_7_list) Truncate(n int) {
+func (x *_TokenCollection_7_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_7_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_7_list) NewElement() protoreflect.Value {
 	v := new(CustomDataTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_7_list) IsValid() bool {
+func (x *_TokenCollection_7_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_8_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_8_list)(nil)
 
-type _BadgeCollection_8_list struct {
+type _TokenCollection_8_list struct {
 	list *[]*ManagerTimeline
 }
 
-func (x *_BadgeCollection_8_list) Len() int {
+func (x *_TokenCollection_8_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_8_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_8_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_8_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_8_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*ManagerTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_8_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_8_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*ManagerTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_8_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_8_list) AppendMutable() protoreflect.Value {
 	v := new(ManagerTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_8_list) Truncate(n int) {
+func (x *_TokenCollection_8_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_8_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_8_list) NewElement() protoreflect.Value {
 	v := new(ManagerTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_8_list) IsValid() bool {
+func (x *_TokenCollection_8_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_10_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_10_list)(nil)
 
-type _BadgeCollection_10_list struct {
+type _TokenCollection_10_list struct {
 	list *[]*CollectionApproval
 }
 
-func (x *_BadgeCollection_10_list) Len() int {
+func (x *_TokenCollection_10_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_10_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_10_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_10_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_10_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CollectionApproval)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_10_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_10_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CollectionApproval)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_10_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_10_list) AppendMutable() protoreflect.Value {
 	v := new(CollectionApproval)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_10_list) Truncate(n int) {
+func (x *_TokenCollection_10_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_10_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_10_list) NewElement() protoreflect.Value {
 	v := new(CollectionApproval)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_10_list) IsValid() bool {
+func (x *_TokenCollection_10_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_11_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_11_list)(nil)
 
-type _BadgeCollection_11_list struct {
+type _TokenCollection_11_list struct {
 	list *[]*StandardsTimeline
 }
 
-func (x *_BadgeCollection_11_list) Len() int {
+func (x *_TokenCollection_11_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_11_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_11_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_11_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_11_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*StandardsTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_11_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_11_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*StandardsTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_11_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_11_list) AppendMutable() protoreflect.Value {
 	v := new(StandardsTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_11_list) Truncate(n int) {
+func (x *_TokenCollection_11_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_11_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_11_list) NewElement() protoreflect.Value {
 	v := new(StandardsTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_11_list) IsValid() bool {
+func (x *_TokenCollection_11_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_12_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_12_list)(nil)
 
-type _BadgeCollection_12_list struct {
+type _TokenCollection_12_list struct {
 	list *[]*IsArchivedTimeline
 }
 
-func (x *_BadgeCollection_12_list) Len() int {
+func (x *_TokenCollection_12_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_12_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_12_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_12_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_12_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*IsArchivedTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_12_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_12_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*IsArchivedTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_12_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_12_list) AppendMutable() protoreflect.Value {
 	v := new(IsArchivedTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_12_list) Truncate(n int) {
+func (x *_TokenCollection_12_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_12_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_12_list) NewElement() protoreflect.Value {
 	v := new(IsArchivedTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_12_list) IsValid() bool {
+func (x *_TokenCollection_12_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_15_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_15_list)(nil)
 
-type _BadgeCollection_15_list struct {
+type _TokenCollection_15_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeCollection_15_list) Len() int {
+func (x *_TokenCollection_15_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_15_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_15_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_15_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_15_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_15_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_15_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_15_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_15_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_15_list) Truncate(n int) {
+func (x *_TokenCollection_15_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_15_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_15_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_15_list) IsValid() bool {
+func (x *_TokenCollection_15_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_BadgeCollection_17_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_17_list)(nil)
 
-type _BadgeCollection_17_list struct {
+type _TokenCollection_17_list struct {
 	list *[]*CosmosCoinWrapperPath
 }
 
-func (x *_BadgeCollection_17_list) Len() int {
+func (x *_TokenCollection_17_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeCollection_17_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_17_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeCollection_17_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_17_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CosmosCoinWrapperPath)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeCollection_17_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_17_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CosmosCoinWrapperPath)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeCollection_17_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_17_list) AppendMutable() protoreflect.Value {
 	v := new(CosmosCoinWrapperPath)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_17_list) Truncate(n int) {
+func (x *_TokenCollection_17_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeCollection_17_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_17_list) NewElement() protoreflect.Value {
 	v := new(CosmosCoinWrapperPath)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeCollection_17_list) IsValid() bool {
+func (x *_TokenCollection_17_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_BadgeCollection                                  protoreflect.MessageDescriptor
-	fd_BadgeCollection_collectionId                     protoreflect.FieldDescriptor
-	fd_BadgeCollection_collectionMetadataTimeline       protoreflect.FieldDescriptor
-	fd_BadgeCollection_badgeMetadataTimeline            protoreflect.FieldDescriptor
-	fd_BadgeCollection_balancesType                     protoreflect.FieldDescriptor
-	fd_BadgeCollection_offChainBalancesMetadataTimeline protoreflect.FieldDescriptor
-	fd_BadgeCollection_customDataTimeline               protoreflect.FieldDescriptor
-	fd_BadgeCollection_managerTimeline                  protoreflect.FieldDescriptor
-	fd_BadgeCollection_collectionPermissions            protoreflect.FieldDescriptor
-	fd_BadgeCollection_collectionApprovals              protoreflect.FieldDescriptor
-	fd_BadgeCollection_standardsTimeline                protoreflect.FieldDescriptor
-	fd_BadgeCollection_isArchivedTimeline               protoreflect.FieldDescriptor
-	fd_BadgeCollection_defaultBalances                  protoreflect.FieldDescriptor
-	fd_BadgeCollection_createdBy                        protoreflect.FieldDescriptor
-	fd_BadgeCollection_validBadgeIds                    protoreflect.FieldDescriptor
-	fd_BadgeCollection_mintEscrowAddress                protoreflect.FieldDescriptor
-	fd_BadgeCollection_cosmosCoinWrapperPaths           protoreflect.FieldDescriptor
+	md_TokenCollection                                  protoreflect.MessageDescriptor
+	fd_TokenCollection_collectionId                     protoreflect.FieldDescriptor
+	fd_TokenCollection_collectionMetadataTimeline       protoreflect.FieldDescriptor
+	fd_TokenCollection_tokenMetadataTimeline            protoreflect.FieldDescriptor
+	fd_TokenCollection_balancesType                     protoreflect.FieldDescriptor
+	fd_TokenCollection_offChainBalancesMetadataTimeline protoreflect.FieldDescriptor
+	fd_TokenCollection_customDataTimeline               protoreflect.FieldDescriptor
+	fd_TokenCollection_managerTimeline                  protoreflect.FieldDescriptor
+	fd_TokenCollection_collectionPermissions            protoreflect.FieldDescriptor
+	fd_TokenCollection_collectionApprovals              protoreflect.FieldDescriptor
+	fd_TokenCollection_standardsTimeline                protoreflect.FieldDescriptor
+	fd_TokenCollection_isArchivedTimeline               protoreflect.FieldDescriptor
+	fd_TokenCollection_defaultBalances                  protoreflect.FieldDescriptor
+	fd_TokenCollection_createdBy                        protoreflect.FieldDescriptor
+	fd_TokenCollection_validTokenIds                    protoreflect.FieldDescriptor
+	fd_TokenCollection_mintEscrowAddress                protoreflect.FieldDescriptor
+	fd_TokenCollection_cosmosCoinWrapperPaths           protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_collections_proto_init()
-	md_BadgeCollection = File_badges_collections_proto.Messages().ByName("BadgeCollection")
-	fd_BadgeCollection_collectionId = md_BadgeCollection.Fields().ByName("collectionId")
-	fd_BadgeCollection_collectionMetadataTimeline = md_BadgeCollection.Fields().ByName("collectionMetadataTimeline")
-	fd_BadgeCollection_badgeMetadataTimeline = md_BadgeCollection.Fields().ByName("badgeMetadataTimeline")
-	fd_BadgeCollection_balancesType = md_BadgeCollection.Fields().ByName("balancesType")
-	fd_BadgeCollection_offChainBalancesMetadataTimeline = md_BadgeCollection.Fields().ByName("offChainBalancesMetadataTimeline")
-	fd_BadgeCollection_customDataTimeline = md_BadgeCollection.Fields().ByName("customDataTimeline")
-	fd_BadgeCollection_managerTimeline = md_BadgeCollection.Fields().ByName("managerTimeline")
-	fd_BadgeCollection_collectionPermissions = md_BadgeCollection.Fields().ByName("collectionPermissions")
-	fd_BadgeCollection_collectionApprovals = md_BadgeCollection.Fields().ByName("collectionApprovals")
-	fd_BadgeCollection_standardsTimeline = md_BadgeCollection.Fields().ByName("standardsTimeline")
-	fd_BadgeCollection_isArchivedTimeline = md_BadgeCollection.Fields().ByName("isArchivedTimeline")
-	fd_BadgeCollection_defaultBalances = md_BadgeCollection.Fields().ByName("defaultBalances")
-	fd_BadgeCollection_createdBy = md_BadgeCollection.Fields().ByName("createdBy")
-	fd_BadgeCollection_validBadgeIds = md_BadgeCollection.Fields().ByName("validBadgeIds")
-	fd_BadgeCollection_mintEscrowAddress = md_BadgeCollection.Fields().ByName("mintEscrowAddress")
-	fd_BadgeCollection_cosmosCoinWrapperPaths = md_BadgeCollection.Fields().ByName("cosmosCoinWrapperPaths")
+	md_TokenCollection = File_badges_collections_proto.Messages().ByName("TokenCollection")
+	fd_TokenCollection_collectionId = md_TokenCollection.Fields().ByName("collectionId")
+	fd_TokenCollection_collectionMetadataTimeline = md_TokenCollection.Fields().ByName("collectionMetadataTimeline")
+	fd_TokenCollection_tokenMetadataTimeline = md_TokenCollection.Fields().ByName("tokenMetadataTimeline")
+	fd_TokenCollection_balancesType = md_TokenCollection.Fields().ByName("balancesType")
+	fd_TokenCollection_offChainBalancesMetadataTimeline = md_TokenCollection.Fields().ByName("offChainBalancesMetadataTimeline")
+	fd_TokenCollection_customDataTimeline = md_TokenCollection.Fields().ByName("customDataTimeline")
+	fd_TokenCollection_managerTimeline = md_TokenCollection.Fields().ByName("managerTimeline")
+	fd_TokenCollection_collectionPermissions = md_TokenCollection.Fields().ByName("collectionPermissions")
+	fd_TokenCollection_collectionApprovals = md_TokenCollection.Fields().ByName("collectionApprovals")
+	fd_TokenCollection_standardsTimeline = md_TokenCollection.Fields().ByName("standardsTimeline")
+	fd_TokenCollection_isArchivedTimeline = md_TokenCollection.Fields().ByName("isArchivedTimeline")
+	fd_TokenCollection_defaultBalances = md_TokenCollection.Fields().ByName("defaultBalances")
+	fd_TokenCollection_createdBy = md_TokenCollection.Fields().ByName("createdBy")
+	fd_TokenCollection_validTokenIds = md_TokenCollection.Fields().ByName("validTokenIds")
+	fd_TokenCollection_mintEscrowAddress = md_TokenCollection.Fields().ByName("mintEscrowAddress")
+	fd_TokenCollection_cosmosCoinWrapperPaths = md_TokenCollection.Fields().ByName("cosmosCoinWrapperPaths")
 }
 
-var _ protoreflect.Message = (*fastReflection_BadgeCollection)(nil)
+var _ protoreflect.Message = (*fastReflection_TokenCollection)(nil)
 
-type fastReflection_BadgeCollection BadgeCollection
+type fastReflection_TokenCollection TokenCollection
 
-func (x *BadgeCollection) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_BadgeCollection)(x)
+func (x *TokenCollection) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TokenCollection)(x)
 }
 
-func (x *BadgeCollection) slowProtoReflect() protoreflect.Message {
+func (x *TokenCollection) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_collections_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -585,43 +585,43 @@ func (x *BadgeCollection) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_BadgeCollection_messageType fastReflection_BadgeCollection_messageType
-var _ protoreflect.MessageType = fastReflection_BadgeCollection_messageType{}
+var _fastReflection_TokenCollection_messageType fastReflection_TokenCollection_messageType
+var _ protoreflect.MessageType = fastReflection_TokenCollection_messageType{}
 
-type fastReflection_BadgeCollection_messageType struct{}
+type fastReflection_TokenCollection_messageType struct{}
 
-func (x fastReflection_BadgeCollection_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_BadgeCollection)(nil)
+func (x fastReflection_TokenCollection_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TokenCollection)(nil)
 }
-func (x fastReflection_BadgeCollection_messageType) New() protoreflect.Message {
-	return new(fastReflection_BadgeCollection)
+func (x fastReflection_TokenCollection_messageType) New() protoreflect.Message {
+	return new(fastReflection_TokenCollection)
 }
-func (x fastReflection_BadgeCollection_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeCollection
+func (x fastReflection_TokenCollection_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenCollection
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_BadgeCollection) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeCollection
+func (x *fastReflection_TokenCollection) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenCollection
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_BadgeCollection) Type() protoreflect.MessageType {
-	return _fastReflection_BadgeCollection_messageType
+func (x *fastReflection_TokenCollection) Type() protoreflect.MessageType {
+	return _fastReflection_TokenCollection_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_BadgeCollection) New() protoreflect.Message {
-	return new(fastReflection_BadgeCollection)
+func (x *fastReflection_TokenCollection) New() protoreflect.Message {
+	return new(fastReflection_TokenCollection)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_BadgeCollection) Interface() protoreflect.ProtoMessage {
-	return (*BadgeCollection)(x)
+func (x *fastReflection_TokenCollection) Interface() protoreflect.ProtoMessage {
+	return (*TokenCollection)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -629,100 +629,100 @@ func (x *fastReflection_BadgeCollection) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_BadgeCollection) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_TokenCollection) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.CollectionId != "" {
 		value := protoreflect.ValueOfString(x.CollectionId)
-		if !f(fd_BadgeCollection_collectionId, value) {
+		if !f(fd_TokenCollection_collectionId, value) {
 			return
 		}
 	}
 	if len(x.CollectionMetadataTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_2_list{list: &x.CollectionMetadataTimeline})
-		if !f(fd_BadgeCollection_collectionMetadataTimeline, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_2_list{list: &x.CollectionMetadataTimeline})
+		if !f(fd_TokenCollection_collectionMetadataTimeline, value) {
 			return
 		}
 	}
-	if len(x.BadgeMetadataTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_3_list{list: &x.BadgeMetadataTimeline})
-		if !f(fd_BadgeCollection_badgeMetadataTimeline, value) {
+	if len(x.TokenMetadataTimeline) != 0 {
+		value := protoreflect.ValueOfList(&_TokenCollection_3_list{list: &x.TokenMetadataTimeline})
+		if !f(fd_TokenCollection_tokenMetadataTimeline, value) {
 			return
 		}
 	}
 	if x.BalancesType != "" {
 		value := protoreflect.ValueOfString(x.BalancesType)
-		if !f(fd_BadgeCollection_balancesType, value) {
+		if !f(fd_TokenCollection_balancesType, value) {
 			return
 		}
 	}
 	if len(x.OffChainBalancesMetadataTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_5_list{list: &x.OffChainBalancesMetadataTimeline})
-		if !f(fd_BadgeCollection_offChainBalancesMetadataTimeline, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_5_list{list: &x.OffChainBalancesMetadataTimeline})
+		if !f(fd_TokenCollection_offChainBalancesMetadataTimeline, value) {
 			return
 		}
 	}
 	if len(x.CustomDataTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_7_list{list: &x.CustomDataTimeline})
-		if !f(fd_BadgeCollection_customDataTimeline, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_7_list{list: &x.CustomDataTimeline})
+		if !f(fd_TokenCollection_customDataTimeline, value) {
 			return
 		}
 	}
 	if len(x.ManagerTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_8_list{list: &x.ManagerTimeline})
-		if !f(fd_BadgeCollection_managerTimeline, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_8_list{list: &x.ManagerTimeline})
+		if !f(fd_TokenCollection_managerTimeline, value) {
 			return
 		}
 	}
 	if x.CollectionPermissions != nil {
 		value := protoreflect.ValueOfMessage(x.CollectionPermissions.ProtoReflect())
-		if !f(fd_BadgeCollection_collectionPermissions, value) {
+		if !f(fd_TokenCollection_collectionPermissions, value) {
 			return
 		}
 	}
 	if len(x.CollectionApprovals) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_10_list{list: &x.CollectionApprovals})
-		if !f(fd_BadgeCollection_collectionApprovals, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_10_list{list: &x.CollectionApprovals})
+		if !f(fd_TokenCollection_collectionApprovals, value) {
 			return
 		}
 	}
 	if len(x.StandardsTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_11_list{list: &x.StandardsTimeline})
-		if !f(fd_BadgeCollection_standardsTimeline, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_11_list{list: &x.StandardsTimeline})
+		if !f(fd_TokenCollection_standardsTimeline, value) {
 			return
 		}
 	}
 	if len(x.IsArchivedTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_12_list{list: &x.IsArchivedTimeline})
-		if !f(fd_BadgeCollection_isArchivedTimeline, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_12_list{list: &x.IsArchivedTimeline})
+		if !f(fd_TokenCollection_isArchivedTimeline, value) {
 			return
 		}
 	}
 	if x.DefaultBalances != nil {
 		value := protoreflect.ValueOfMessage(x.DefaultBalances.ProtoReflect())
-		if !f(fd_BadgeCollection_defaultBalances, value) {
+		if !f(fd_TokenCollection_defaultBalances, value) {
 			return
 		}
 	}
 	if x.CreatedBy != "" {
 		value := protoreflect.ValueOfString(x.CreatedBy)
-		if !f(fd_BadgeCollection_createdBy, value) {
+		if !f(fd_TokenCollection_createdBy, value) {
 			return
 		}
 	}
-	if len(x.ValidBadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_15_list{list: &x.ValidBadgeIds})
-		if !f(fd_BadgeCollection_validBadgeIds, value) {
+	if len(x.ValidTokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_TokenCollection_15_list{list: &x.ValidTokenIds})
+		if !f(fd_TokenCollection_validTokenIds, value) {
 			return
 		}
 	}
 	if x.MintEscrowAddress != "" {
 		value := protoreflect.ValueOfString(x.MintEscrowAddress)
-		if !f(fd_BadgeCollection_mintEscrowAddress, value) {
+		if !f(fd_TokenCollection_mintEscrowAddress, value) {
 			return
 		}
 	}
 	if len(x.CosmosCoinWrapperPaths) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeCollection_17_list{list: &x.CosmosCoinWrapperPaths})
-		if !f(fd_BadgeCollection_cosmosCoinWrapperPaths, value) {
+		value := protoreflect.ValueOfList(&_TokenCollection_17_list{list: &x.CosmosCoinWrapperPaths})
+		if !f(fd_TokenCollection_cosmosCoinWrapperPaths, value) {
 			return
 		}
 	}
@@ -739,45 +739,45 @@ func (x *fastReflection_BadgeCollection) Range(f func(protoreflect.FieldDescript
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_BadgeCollection) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_TokenCollection) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.BadgeCollection.collectionId":
+	case "badges.TokenCollection.collectionId":
 		return x.CollectionId != ""
-	case "badges.BadgeCollection.collectionMetadataTimeline":
+	case "badges.TokenCollection.collectionMetadataTimeline":
 		return len(x.CollectionMetadataTimeline) != 0
-	case "badges.BadgeCollection.badgeMetadataTimeline":
-		return len(x.BadgeMetadataTimeline) != 0
-	case "badges.BadgeCollection.balancesType":
+	case "badges.TokenCollection.tokenMetadataTimeline":
+		return len(x.TokenMetadataTimeline) != 0
+	case "badges.TokenCollection.balancesType":
 		return x.BalancesType != ""
-	case "badges.BadgeCollection.offChainBalancesMetadataTimeline":
+	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
 		return len(x.OffChainBalancesMetadataTimeline) != 0
-	case "badges.BadgeCollection.customDataTimeline":
+	case "badges.TokenCollection.customDataTimeline":
 		return len(x.CustomDataTimeline) != 0
-	case "badges.BadgeCollection.managerTimeline":
+	case "badges.TokenCollection.managerTimeline":
 		return len(x.ManagerTimeline) != 0
-	case "badges.BadgeCollection.collectionPermissions":
+	case "badges.TokenCollection.collectionPermissions":
 		return x.CollectionPermissions != nil
-	case "badges.BadgeCollection.collectionApprovals":
+	case "badges.TokenCollection.collectionApprovals":
 		return len(x.CollectionApprovals) != 0
-	case "badges.BadgeCollection.standardsTimeline":
+	case "badges.TokenCollection.standardsTimeline":
 		return len(x.StandardsTimeline) != 0
-	case "badges.BadgeCollection.isArchivedTimeline":
+	case "badges.TokenCollection.isArchivedTimeline":
 		return len(x.IsArchivedTimeline) != 0
-	case "badges.BadgeCollection.defaultBalances":
+	case "badges.TokenCollection.defaultBalances":
 		return x.DefaultBalances != nil
-	case "badges.BadgeCollection.createdBy":
+	case "badges.TokenCollection.createdBy":
 		return x.CreatedBy != ""
-	case "badges.BadgeCollection.validBadgeIds":
-		return len(x.ValidBadgeIds) != 0
-	case "badges.BadgeCollection.mintEscrowAddress":
+	case "badges.TokenCollection.validTokenIds":
+		return len(x.ValidTokenIds) != 0
+	case "badges.TokenCollection.mintEscrowAddress":
 		return x.MintEscrowAddress != ""
-	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		return len(x.CosmosCoinWrapperPaths) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
 		}
-		panic(fmt.Errorf("message badges.BadgeCollection does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenCollection does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -787,45 +787,45 @@ func (x *fastReflection_BadgeCollection) Has(fd protoreflect.FieldDescriptor) bo
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeCollection) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_TokenCollection) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.BadgeCollection.collectionId":
+	case "badges.TokenCollection.collectionId":
 		x.CollectionId = ""
-	case "badges.BadgeCollection.collectionMetadataTimeline":
+	case "badges.TokenCollection.collectionMetadataTimeline":
 		x.CollectionMetadataTimeline = nil
-	case "badges.BadgeCollection.badgeMetadataTimeline":
-		x.BadgeMetadataTimeline = nil
-	case "badges.BadgeCollection.balancesType":
+	case "badges.TokenCollection.tokenMetadataTimeline":
+		x.TokenMetadataTimeline = nil
+	case "badges.TokenCollection.balancesType":
 		x.BalancesType = ""
-	case "badges.BadgeCollection.offChainBalancesMetadataTimeline":
+	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
 		x.OffChainBalancesMetadataTimeline = nil
-	case "badges.BadgeCollection.customDataTimeline":
+	case "badges.TokenCollection.customDataTimeline":
 		x.CustomDataTimeline = nil
-	case "badges.BadgeCollection.managerTimeline":
+	case "badges.TokenCollection.managerTimeline":
 		x.ManagerTimeline = nil
-	case "badges.BadgeCollection.collectionPermissions":
+	case "badges.TokenCollection.collectionPermissions":
 		x.CollectionPermissions = nil
-	case "badges.BadgeCollection.collectionApprovals":
+	case "badges.TokenCollection.collectionApprovals":
 		x.CollectionApprovals = nil
-	case "badges.BadgeCollection.standardsTimeline":
+	case "badges.TokenCollection.standardsTimeline":
 		x.StandardsTimeline = nil
-	case "badges.BadgeCollection.isArchivedTimeline":
+	case "badges.TokenCollection.isArchivedTimeline":
 		x.IsArchivedTimeline = nil
-	case "badges.BadgeCollection.defaultBalances":
+	case "badges.TokenCollection.defaultBalances":
 		x.DefaultBalances = nil
-	case "badges.BadgeCollection.createdBy":
+	case "badges.TokenCollection.createdBy":
 		x.CreatedBy = ""
-	case "badges.BadgeCollection.validBadgeIds":
-		x.ValidBadgeIds = nil
-	case "badges.BadgeCollection.mintEscrowAddress":
+	case "badges.TokenCollection.validTokenIds":
+		x.ValidTokenIds = nil
+	case "badges.TokenCollection.mintEscrowAddress":
 		x.MintEscrowAddress = ""
-	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		x.CosmosCoinWrapperPaths = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
 		}
-		panic(fmt.Errorf("message badges.BadgeCollection does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenCollection does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -835,91 +835,91 @@ func (x *fastReflection_BadgeCollection) Clear(fd protoreflect.FieldDescriptor) 
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_BadgeCollection) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenCollection) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.BadgeCollection.collectionId":
+	case "badges.TokenCollection.collectionId":
 		value := x.CollectionId
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeCollection.collectionMetadataTimeline":
+	case "badges.TokenCollection.collectionMetadataTimeline":
 		if len(x.CollectionMetadataTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_2_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_2_list{})
 		}
-		listValue := &_BadgeCollection_2_list{list: &x.CollectionMetadataTimeline}
+		listValue := &_TokenCollection_2_list{list: &x.CollectionMetadataTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.badgeMetadataTimeline":
-		if len(x.BadgeMetadataTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_3_list{})
+	case "badges.TokenCollection.tokenMetadataTimeline":
+		if len(x.TokenMetadataTimeline) == 0 {
+			return protoreflect.ValueOfList(&_TokenCollection_3_list{})
 		}
-		listValue := &_BadgeCollection_3_list{list: &x.BadgeMetadataTimeline}
+		listValue := &_TokenCollection_3_list{list: &x.TokenMetadataTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.balancesType":
+	case "badges.TokenCollection.balancesType":
 		value := x.BalancesType
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeCollection.offChainBalancesMetadataTimeline":
+	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
 		if len(x.OffChainBalancesMetadataTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_5_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_5_list{})
 		}
-		listValue := &_BadgeCollection_5_list{list: &x.OffChainBalancesMetadataTimeline}
+		listValue := &_TokenCollection_5_list{list: &x.OffChainBalancesMetadataTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.customDataTimeline":
+	case "badges.TokenCollection.customDataTimeline":
 		if len(x.CustomDataTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_7_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_7_list{})
 		}
-		listValue := &_BadgeCollection_7_list{list: &x.CustomDataTimeline}
+		listValue := &_TokenCollection_7_list{list: &x.CustomDataTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.managerTimeline":
+	case "badges.TokenCollection.managerTimeline":
 		if len(x.ManagerTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_8_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_8_list{})
 		}
-		listValue := &_BadgeCollection_8_list{list: &x.ManagerTimeline}
+		listValue := &_TokenCollection_8_list{list: &x.ManagerTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.collectionPermissions":
+	case "badges.TokenCollection.collectionPermissions":
 		value := x.CollectionPermissions
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.BadgeCollection.collectionApprovals":
+	case "badges.TokenCollection.collectionApprovals":
 		if len(x.CollectionApprovals) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_10_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_10_list{})
 		}
-		listValue := &_BadgeCollection_10_list{list: &x.CollectionApprovals}
+		listValue := &_TokenCollection_10_list{list: &x.CollectionApprovals}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.standardsTimeline":
+	case "badges.TokenCollection.standardsTimeline":
 		if len(x.StandardsTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_11_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_11_list{})
 		}
-		listValue := &_BadgeCollection_11_list{list: &x.StandardsTimeline}
+		listValue := &_TokenCollection_11_list{list: &x.StandardsTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.isArchivedTimeline":
+	case "badges.TokenCollection.isArchivedTimeline":
 		if len(x.IsArchivedTimeline) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_12_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_12_list{})
 		}
-		listValue := &_BadgeCollection_12_list{list: &x.IsArchivedTimeline}
+		listValue := &_TokenCollection_12_list{list: &x.IsArchivedTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.defaultBalances":
+	case "badges.TokenCollection.defaultBalances":
 		value := x.DefaultBalances
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.BadgeCollection.createdBy":
+	case "badges.TokenCollection.createdBy":
 		value := x.CreatedBy
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeCollection.validBadgeIds":
-		if len(x.ValidBadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_15_list{})
+	case "badges.TokenCollection.validTokenIds":
+		if len(x.ValidTokenIds) == 0 {
+			return protoreflect.ValueOfList(&_TokenCollection_15_list{})
 		}
-		listValue := &_BadgeCollection_15_list{list: &x.ValidBadgeIds}
+		listValue := &_TokenCollection_15_list{list: &x.ValidTokenIds}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.BadgeCollection.mintEscrowAddress":
+	case "badges.TokenCollection.mintEscrowAddress":
 		value := x.MintEscrowAddress
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		if len(x.CosmosCoinWrapperPaths) == 0 {
-			return protoreflect.ValueOfList(&_BadgeCollection_17_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_17_list{})
 		}
-		listValue := &_BadgeCollection_17_list{list: &x.CosmosCoinWrapperPaths}
+		listValue := &_TokenCollection_17_list{list: &x.CosmosCoinWrapperPaths}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
 		}
-		panic(fmt.Errorf("message badges.BadgeCollection does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.TokenCollection does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -933,65 +933,65 @@ func (x *fastReflection_BadgeCollection) Get(descriptor protoreflect.FieldDescri
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeCollection) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_TokenCollection) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.BadgeCollection.collectionId":
+	case "badges.TokenCollection.collectionId":
 		x.CollectionId = value.Interface().(string)
-	case "badges.BadgeCollection.collectionMetadataTimeline":
+	case "badges.TokenCollection.collectionMetadataTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_2_list)
+		clv := lv.(*_TokenCollection_2_list)
 		x.CollectionMetadataTimeline = *clv.list
-	case "badges.BadgeCollection.badgeMetadataTimeline":
+	case "badges.TokenCollection.tokenMetadataTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_3_list)
-		x.BadgeMetadataTimeline = *clv.list
-	case "badges.BadgeCollection.balancesType":
+		clv := lv.(*_TokenCollection_3_list)
+		x.TokenMetadataTimeline = *clv.list
+	case "badges.TokenCollection.balancesType":
 		x.BalancesType = value.Interface().(string)
-	case "badges.BadgeCollection.offChainBalancesMetadataTimeline":
+	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_5_list)
+		clv := lv.(*_TokenCollection_5_list)
 		x.OffChainBalancesMetadataTimeline = *clv.list
-	case "badges.BadgeCollection.customDataTimeline":
+	case "badges.TokenCollection.customDataTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_7_list)
+		clv := lv.(*_TokenCollection_7_list)
 		x.CustomDataTimeline = *clv.list
-	case "badges.BadgeCollection.managerTimeline":
+	case "badges.TokenCollection.managerTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_8_list)
+		clv := lv.(*_TokenCollection_8_list)
 		x.ManagerTimeline = *clv.list
-	case "badges.BadgeCollection.collectionPermissions":
+	case "badges.TokenCollection.collectionPermissions":
 		x.CollectionPermissions = value.Message().Interface().(*CollectionPermissions)
-	case "badges.BadgeCollection.collectionApprovals":
+	case "badges.TokenCollection.collectionApprovals":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_10_list)
+		clv := lv.(*_TokenCollection_10_list)
 		x.CollectionApprovals = *clv.list
-	case "badges.BadgeCollection.standardsTimeline":
+	case "badges.TokenCollection.standardsTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_11_list)
+		clv := lv.(*_TokenCollection_11_list)
 		x.StandardsTimeline = *clv.list
-	case "badges.BadgeCollection.isArchivedTimeline":
+	case "badges.TokenCollection.isArchivedTimeline":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_12_list)
+		clv := lv.(*_TokenCollection_12_list)
 		x.IsArchivedTimeline = *clv.list
-	case "badges.BadgeCollection.defaultBalances":
+	case "badges.TokenCollection.defaultBalances":
 		x.DefaultBalances = value.Message().Interface().(*UserBalanceStore)
-	case "badges.BadgeCollection.createdBy":
+	case "badges.TokenCollection.createdBy":
 		x.CreatedBy = value.Interface().(string)
-	case "badges.BadgeCollection.validBadgeIds":
+	case "badges.TokenCollection.validTokenIds":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_15_list)
-		x.ValidBadgeIds = *clv.list
-	case "badges.BadgeCollection.mintEscrowAddress":
+		clv := lv.(*_TokenCollection_15_list)
+		x.ValidTokenIds = *clv.list
+	case "badges.TokenCollection.mintEscrowAddress":
 		x.MintEscrowAddress = value.Interface().(string)
-	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		lv := value.List()
-		clv := lv.(*_BadgeCollection_17_list)
+		clv := lv.(*_TokenCollection_17_list)
 		x.CosmosCoinWrapperPaths = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
 		}
-		panic(fmt.Errorf("message badges.BadgeCollection does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenCollection does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1005,158 +1005,158 @@ func (x *fastReflection_BadgeCollection) Set(fd protoreflect.FieldDescriptor, va
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeCollection) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenCollection) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeCollection.collectionMetadataTimeline":
+	case "badges.TokenCollection.collectionMetadataTimeline":
 		if x.CollectionMetadataTimeline == nil {
 			x.CollectionMetadataTimeline = []*CollectionMetadataTimeline{}
 		}
-		value := &_BadgeCollection_2_list{list: &x.CollectionMetadataTimeline}
+		value := &_TokenCollection_2_list{list: &x.CollectionMetadataTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.badgeMetadataTimeline":
-		if x.BadgeMetadataTimeline == nil {
-			x.BadgeMetadataTimeline = []*BadgeMetadataTimeline{}
+	case "badges.TokenCollection.tokenMetadataTimeline":
+		if x.TokenMetadataTimeline == nil {
+			x.TokenMetadataTimeline = []*TokenMetadataTimeline{}
 		}
-		value := &_BadgeCollection_3_list{list: &x.BadgeMetadataTimeline}
+		value := &_TokenCollection_3_list{list: &x.TokenMetadataTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.offChainBalancesMetadataTimeline":
+	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
 		if x.OffChainBalancesMetadataTimeline == nil {
 			x.OffChainBalancesMetadataTimeline = []*OffChainBalancesMetadataTimeline{}
 		}
-		value := &_BadgeCollection_5_list{list: &x.OffChainBalancesMetadataTimeline}
+		value := &_TokenCollection_5_list{list: &x.OffChainBalancesMetadataTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.customDataTimeline":
+	case "badges.TokenCollection.customDataTimeline":
 		if x.CustomDataTimeline == nil {
 			x.CustomDataTimeline = []*CustomDataTimeline{}
 		}
-		value := &_BadgeCollection_7_list{list: &x.CustomDataTimeline}
+		value := &_TokenCollection_7_list{list: &x.CustomDataTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.managerTimeline":
+	case "badges.TokenCollection.managerTimeline":
 		if x.ManagerTimeline == nil {
 			x.ManagerTimeline = []*ManagerTimeline{}
 		}
-		value := &_BadgeCollection_8_list{list: &x.ManagerTimeline}
+		value := &_TokenCollection_8_list{list: &x.ManagerTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.collectionPermissions":
+	case "badges.TokenCollection.collectionPermissions":
 		if x.CollectionPermissions == nil {
 			x.CollectionPermissions = new(CollectionPermissions)
 		}
 		return protoreflect.ValueOfMessage(x.CollectionPermissions.ProtoReflect())
-	case "badges.BadgeCollection.collectionApprovals":
+	case "badges.TokenCollection.collectionApprovals":
 		if x.CollectionApprovals == nil {
 			x.CollectionApprovals = []*CollectionApproval{}
 		}
-		value := &_BadgeCollection_10_list{list: &x.CollectionApprovals}
+		value := &_TokenCollection_10_list{list: &x.CollectionApprovals}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.standardsTimeline":
+	case "badges.TokenCollection.standardsTimeline":
 		if x.StandardsTimeline == nil {
 			x.StandardsTimeline = []*StandardsTimeline{}
 		}
-		value := &_BadgeCollection_11_list{list: &x.StandardsTimeline}
+		value := &_TokenCollection_11_list{list: &x.StandardsTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.isArchivedTimeline":
+	case "badges.TokenCollection.isArchivedTimeline":
 		if x.IsArchivedTimeline == nil {
 			x.IsArchivedTimeline = []*IsArchivedTimeline{}
 		}
-		value := &_BadgeCollection_12_list{list: &x.IsArchivedTimeline}
+		value := &_TokenCollection_12_list{list: &x.IsArchivedTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.defaultBalances":
+	case "badges.TokenCollection.defaultBalances":
 		if x.DefaultBalances == nil {
 			x.DefaultBalances = new(UserBalanceStore)
 		}
 		return protoreflect.ValueOfMessage(x.DefaultBalances.ProtoReflect())
-	case "badges.BadgeCollection.validBadgeIds":
-		if x.ValidBadgeIds == nil {
-			x.ValidBadgeIds = []*UintRange{}
+	case "badges.TokenCollection.validTokenIds":
+		if x.ValidTokenIds == nil {
+			x.ValidTokenIds = []*UintRange{}
 		}
-		value := &_BadgeCollection_15_list{list: &x.ValidBadgeIds}
+		value := &_TokenCollection_15_list{list: &x.ValidTokenIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		if x.CosmosCoinWrapperPaths == nil {
 			x.CosmosCoinWrapperPaths = []*CosmosCoinWrapperPath{}
 		}
-		value := &_BadgeCollection_17_list{list: &x.CosmosCoinWrapperPaths}
+		value := &_TokenCollection_17_list{list: &x.CosmosCoinWrapperPaths}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeCollection.collectionId":
-		panic(fmt.Errorf("field collectionId of message badges.BadgeCollection is not mutable"))
-	case "badges.BadgeCollection.balancesType":
-		panic(fmt.Errorf("field balancesType of message badges.BadgeCollection is not mutable"))
-	case "badges.BadgeCollection.createdBy":
-		panic(fmt.Errorf("field createdBy of message badges.BadgeCollection is not mutable"))
-	case "badges.BadgeCollection.mintEscrowAddress":
-		panic(fmt.Errorf("field mintEscrowAddress of message badges.BadgeCollection is not mutable"))
+	case "badges.TokenCollection.collectionId":
+		panic(fmt.Errorf("field collectionId of message badges.TokenCollection is not mutable"))
+	case "badges.TokenCollection.balancesType":
+		panic(fmt.Errorf("field balancesType of message badges.TokenCollection is not mutable"))
+	case "badges.TokenCollection.createdBy":
+		panic(fmt.Errorf("field createdBy of message badges.TokenCollection is not mutable"))
+	case "badges.TokenCollection.mintEscrowAddress":
+		panic(fmt.Errorf("field mintEscrowAddress of message badges.TokenCollection is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
 		}
-		panic(fmt.Errorf("message badges.BadgeCollection does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenCollection does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_BadgeCollection) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenCollection) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeCollection.collectionId":
+	case "badges.TokenCollection.collectionId":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeCollection.collectionMetadataTimeline":
+	case "badges.TokenCollection.collectionMetadataTimeline":
 		list := []*CollectionMetadataTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_2_list{list: &list})
-	case "badges.BadgeCollection.badgeMetadataTimeline":
-		list := []*BadgeMetadataTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_3_list{list: &list})
-	case "badges.BadgeCollection.balancesType":
+		return protoreflect.ValueOfList(&_TokenCollection_2_list{list: &list})
+	case "badges.TokenCollection.tokenMetadataTimeline":
+		list := []*TokenMetadataTimeline{}
+		return protoreflect.ValueOfList(&_TokenCollection_3_list{list: &list})
+	case "badges.TokenCollection.balancesType":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeCollection.offChainBalancesMetadataTimeline":
+	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
 		list := []*OffChainBalancesMetadataTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_5_list{list: &list})
-	case "badges.BadgeCollection.customDataTimeline":
+		return protoreflect.ValueOfList(&_TokenCollection_5_list{list: &list})
+	case "badges.TokenCollection.customDataTimeline":
 		list := []*CustomDataTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_7_list{list: &list})
-	case "badges.BadgeCollection.managerTimeline":
+		return protoreflect.ValueOfList(&_TokenCollection_7_list{list: &list})
+	case "badges.TokenCollection.managerTimeline":
 		list := []*ManagerTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_8_list{list: &list})
-	case "badges.BadgeCollection.collectionPermissions":
+		return protoreflect.ValueOfList(&_TokenCollection_8_list{list: &list})
+	case "badges.TokenCollection.collectionPermissions":
 		m := new(CollectionPermissions)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.BadgeCollection.collectionApprovals":
+	case "badges.TokenCollection.collectionApprovals":
 		list := []*CollectionApproval{}
-		return protoreflect.ValueOfList(&_BadgeCollection_10_list{list: &list})
-	case "badges.BadgeCollection.standardsTimeline":
+		return protoreflect.ValueOfList(&_TokenCollection_10_list{list: &list})
+	case "badges.TokenCollection.standardsTimeline":
 		list := []*StandardsTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_11_list{list: &list})
-	case "badges.BadgeCollection.isArchivedTimeline":
+		return protoreflect.ValueOfList(&_TokenCollection_11_list{list: &list})
+	case "badges.TokenCollection.isArchivedTimeline":
 		list := []*IsArchivedTimeline{}
-		return protoreflect.ValueOfList(&_BadgeCollection_12_list{list: &list})
-	case "badges.BadgeCollection.defaultBalances":
+		return protoreflect.ValueOfList(&_TokenCollection_12_list{list: &list})
+	case "badges.TokenCollection.defaultBalances":
 		m := new(UserBalanceStore)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.BadgeCollection.createdBy":
+	case "badges.TokenCollection.createdBy":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeCollection.validBadgeIds":
+	case "badges.TokenCollection.validTokenIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeCollection_15_list{list: &list})
-	case "badges.BadgeCollection.mintEscrowAddress":
+		return protoreflect.ValueOfList(&_TokenCollection_15_list{list: &list})
+	case "badges.TokenCollection.mintEscrowAddress":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeCollection.cosmosCoinWrapperPaths":
+	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		list := []*CosmosCoinWrapperPath{}
-		return protoreflect.ValueOfList(&_BadgeCollection_17_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_17_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeCollection"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
 		}
-		panic(fmt.Errorf("message badges.BadgeCollection does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenCollection does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_BadgeCollection) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_TokenCollection) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.BadgeCollection", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.TokenCollection", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1164,7 +1164,7 @@ func (x *fastReflection_BadgeCollection) WhichOneof(d protoreflect.OneofDescript
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_BadgeCollection) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_TokenCollection) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -1175,7 +1175,7 @@ func (x *fastReflection_BadgeCollection) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeCollection) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_TokenCollection) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -1187,7 +1187,7 @@ func (x *fastReflection_BadgeCollection) SetUnknown(fields protoreflect.RawField
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_BadgeCollection) IsValid() bool {
+func (x *fastReflection_TokenCollection) IsValid() bool {
 	return x != nil
 }
 
@@ -1197,9 +1197,9 @@ func (x *fastReflection_BadgeCollection) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*BadgeCollection)
+		x := input.Message.Interface().(*TokenCollection)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1221,8 +1221,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeMetadataTimeline) > 0 {
-			for _, e := range x.BadgeMetadataTimeline {
+		if len(x.TokenMetadataTimeline) > 0 {
+			for _, e := range x.TokenMetadataTimeline {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -1279,8 +1279,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.ValidBadgeIds) > 0 {
-			for _, e := range x.ValidBadgeIds {
+		if len(x.ValidTokenIds) > 0 {
+			for _, e := range x.ValidTokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -1305,7 +1305,7 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeCollection)
+		x := input.Message.Interface().(*TokenCollection)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1351,9 +1351,9 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 			i--
 			dAtA[i] = 0x82
 		}
-		if len(x.ValidBadgeIds) > 0 {
-			for iNdEx := len(x.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.ValidBadgeIds[iNdEx])
+		if len(x.ValidTokenIds) > 0 {
+			for iNdEx := len(x.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.ValidTokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1505,9 +1505,9 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 			i--
 			dAtA[i] = 0x22
 		}
-		if len(x.BadgeMetadataTimeline) > 0 {
-			for iNdEx := len(x.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeMetadataTimeline[iNdEx])
+		if len(x.TokenMetadataTimeline) > 0 {
+			for iNdEx := len(x.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenMetadataTimeline[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1555,7 +1555,7 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeCollection)
+		x := input.Message.Interface().(*TokenCollection)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1587,10 +1587,10 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeCollection: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenCollection: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeCollection: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenCollection: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -1661,7 +1661,7 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenMetadataTimeline", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -1688,8 +1688,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeMetadataTimeline = append(x.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeMetadataTimeline[len(x.BadgeMetadataTimeline)-1]); err != nil {
+				x.TokenMetadataTimeline = append(x.TokenMetadataTimeline, &TokenMetadataTimeline{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenMetadataTimeline[len(x.TokenMetadataTimeline)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -2035,7 +2035,7 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 15:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -2062,8 +2062,8 @@ func (x *fastReflection_BadgeCollection) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.ValidBadgeIds = append(x.ValidBadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.ValidBadgeIds[len(x.ValidBadgeIds)-1]); err != nil {
+				x.ValidTokenIds = append(x.ValidTokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.ValidTokenIds[len(x.ValidTokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -2326,7 +2326,7 @@ var (
 	fd_CosmosCoinWrapperPath_address        protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_denom          protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_ownershipTimes protoreflect.FieldDescriptor
-	fd_CosmosCoinWrapperPath_badgeIds       protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_tokenIds       protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_symbol         protoreflect.FieldDescriptor
 	fd_CosmosCoinWrapperPath_denomUnits     protoreflect.FieldDescriptor
 )
@@ -2337,7 +2337,7 @@ func init() {
 	fd_CosmosCoinWrapperPath_address = md_CosmosCoinWrapperPath.Fields().ByName("address")
 	fd_CosmosCoinWrapperPath_denom = md_CosmosCoinWrapperPath.Fields().ByName("denom")
 	fd_CosmosCoinWrapperPath_ownershipTimes = md_CosmosCoinWrapperPath.Fields().ByName("ownershipTimes")
-	fd_CosmosCoinWrapperPath_badgeIds = md_CosmosCoinWrapperPath.Fields().ByName("badgeIds")
+	fd_CosmosCoinWrapperPath_tokenIds = md_CosmosCoinWrapperPath.Fields().ByName("tokenIds")
 	fd_CosmosCoinWrapperPath_symbol = md_CosmosCoinWrapperPath.Fields().ByName("symbol")
 	fd_CosmosCoinWrapperPath_denomUnits = md_CosmosCoinWrapperPath.Fields().ByName("denomUnits")
 }
@@ -2425,9 +2425,9 @@ func (x *fastReflection_CosmosCoinWrapperPath) Range(f func(protoreflect.FieldDe
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds})
-		if !f(fd_CosmosCoinWrapperPath_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &x.TokenIds})
+		if !f(fd_CosmosCoinWrapperPath_tokenIds, value) {
 			return
 		}
 	}
@@ -2464,8 +2464,8 @@ func (x *fastReflection_CosmosCoinWrapperPath) Has(fd protoreflect.FieldDescript
 		return x.Denom != ""
 	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
-	case "badges.CosmosCoinWrapperPath.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.CosmosCoinWrapperPath.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.CosmosCoinWrapperPath.symbol":
 		return x.Symbol != ""
 	case "badges.CosmosCoinWrapperPath.denomUnits":
@@ -2492,8 +2492,8 @@ func (x *fastReflection_CosmosCoinWrapperPath) Clear(fd protoreflect.FieldDescri
 		x.Denom = ""
 	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		x.OwnershipTimes = nil
-	case "badges.CosmosCoinWrapperPath.badgeIds":
-		x.BadgeIds = nil
+	case "badges.CosmosCoinWrapperPath.tokenIds":
+		x.TokenIds = nil
 	case "badges.CosmosCoinWrapperPath.symbol":
 		x.Symbol = ""
 	case "badges.CosmosCoinWrapperPath.denomUnits":
@@ -2526,11 +2526,11 @@ func (x *fastReflection_CosmosCoinWrapperPath) Get(descriptor protoreflect.Field
 		}
 		listValue := &_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.CosmosCoinWrapperPath.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.CosmosCoinWrapperPath.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{})
 		}
-		listValue := &_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds}
+		listValue := &_CosmosCoinWrapperPath_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.CosmosCoinWrapperPath.symbol":
 		value := x.Symbol
@@ -2569,10 +2569,10 @@ func (x *fastReflection_CosmosCoinWrapperPath) Set(fd protoreflect.FieldDescript
 		lv := value.List()
 		clv := lv.(*_CosmosCoinWrapperPath_3_list)
 		x.OwnershipTimes = *clv.list
-	case "badges.CosmosCoinWrapperPath.badgeIds":
+	case "badges.CosmosCoinWrapperPath.tokenIds":
 		lv := value.List()
 		clv := lv.(*_CosmosCoinWrapperPath_4_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.CosmosCoinWrapperPath.symbol":
 		x.Symbol = value.Interface().(string)
 	case "badges.CosmosCoinWrapperPath.denomUnits":
@@ -2605,11 +2605,11 @@ func (x *fastReflection_CosmosCoinWrapperPath) Mutable(fd protoreflect.FieldDesc
 		}
 		value := &_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.CosmosCoinWrapperPath.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.CosmosCoinWrapperPath.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_CosmosCoinWrapperPath_4_list{list: &x.BadgeIds}
+		value := &_CosmosCoinWrapperPath_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		if x.DenomUnits == nil {
@@ -2643,7 +2643,7 @@ func (x *fastReflection_CosmosCoinWrapperPath) NewField(fd protoreflect.FieldDes
 	case "badges.CosmosCoinWrapperPath.ownershipTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{list: &list})
-	case "badges.CosmosCoinWrapperPath.badgeIds":
+	case "badges.CosmosCoinWrapperPath.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &list})
 	case "badges.CosmosCoinWrapperPath.symbol":
@@ -2734,8 +2734,8 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -2802,9 +2802,9 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 			i--
 			dAtA[i] = 0x2a
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2997,7 +2997,7 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -3024,8 +3024,8 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -3681,7 +3681,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// A BadgeCollection is the top-level object for a collection of tokens.
+// A TokenCollection is the top-level object for a collection of tokens.
 // It defines everything about the collection, such as the manager, metadata, etc.
 //
 // All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. the first collection has ID 1).
@@ -3696,7 +3696,7 @@ const (
 // Collections may have different balance types: standard vs. off-chain - indexed vs. inherited.vs off-chain - non-indexed vs non-public.
 //
 // See documentation for more details.
-type BadgeCollection struct {
+type TokenCollection struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -3706,7 +3706,7 @@ type BadgeCollection struct {
 	// The metadata for the collection itself, which can vary over time.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// The metadata for each token in the collection, also subject to changes over time.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,3,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
 	// The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
 	BalancesType string `protobuf:"bytes,4,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	// Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
@@ -3732,15 +3732,15 @@ type BadgeCollection struct {
 	// The user or entity who created the collection.
 	CreatedBy string `protobuf:"bytes,14,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
 	// The valid token IDs for this collection.
-	ValidBadgeIds []*UintRange `protobuf:"bytes,15,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,15,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	// The generated address of the collection. Also used to escrow Mint balances.
 	MintEscrowAddress string `protobuf:"bytes,16,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
 	// The IBC wrapper (sdk.coin) paths for the collection.
 	CosmosCoinWrapperPaths []*CosmosCoinWrapperPath `protobuf:"bytes,17,rep,name=cosmosCoinWrapperPaths,proto3" json:"cosmosCoinWrapperPaths,omitempty"`
 }
 
-func (x *BadgeCollection) Reset() {
-	*x = BadgeCollection{}
+func (x *TokenCollection) Reset() {
+	*x = TokenCollection{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_collections_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3748,123 +3748,123 @@ func (x *BadgeCollection) Reset() {
 	}
 }
 
-func (x *BadgeCollection) String() string {
+func (x *TokenCollection) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BadgeCollection) ProtoMessage() {}
+func (*TokenCollection) ProtoMessage() {}
 
-// Deprecated: Use BadgeCollection.ProtoReflect.Descriptor instead.
-func (*BadgeCollection) Descriptor() ([]byte, []int) {
+// Deprecated: Use TokenCollection.ProtoReflect.Descriptor instead.
+func (*TokenCollection) Descriptor() ([]byte, []int) {
 	return file_badges_collections_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *BadgeCollection) GetCollectionId() string {
+func (x *TokenCollection) GetCollectionId() string {
 	if x != nil {
 		return x.CollectionId
 	}
 	return ""
 }
 
-func (x *BadgeCollection) GetCollectionMetadataTimeline() []*CollectionMetadataTimeline {
+func (x *TokenCollection) GetCollectionMetadataTimeline() []*CollectionMetadataTimeline {
 	if x != nil {
 		return x.CollectionMetadataTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+func (x *TokenCollection) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if x != nil {
-		return x.BadgeMetadataTimeline
+		return x.TokenMetadataTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetBalancesType() string {
+func (x *TokenCollection) GetBalancesType() string {
 	if x != nil {
 		return x.BalancesType
 	}
 	return ""
 }
 
-func (x *BadgeCollection) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
+func (x *TokenCollection) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
 	if x != nil {
 		return x.OffChainBalancesMetadataTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetCustomDataTimeline() []*CustomDataTimeline {
+func (x *TokenCollection) GetCustomDataTimeline() []*CustomDataTimeline {
 	if x != nil {
 		return x.CustomDataTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetManagerTimeline() []*ManagerTimeline {
+func (x *TokenCollection) GetManagerTimeline() []*ManagerTimeline {
 	if x != nil {
 		return x.ManagerTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetCollectionPermissions() *CollectionPermissions {
+func (x *TokenCollection) GetCollectionPermissions() *CollectionPermissions {
 	if x != nil {
 		return x.CollectionPermissions
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetCollectionApprovals() []*CollectionApproval {
+func (x *TokenCollection) GetCollectionApprovals() []*CollectionApproval {
 	if x != nil {
 		return x.CollectionApprovals
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetStandardsTimeline() []*StandardsTimeline {
+func (x *TokenCollection) GetStandardsTimeline() []*StandardsTimeline {
 	if x != nil {
 		return x.StandardsTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetIsArchivedTimeline() []*IsArchivedTimeline {
+func (x *TokenCollection) GetIsArchivedTimeline() []*IsArchivedTimeline {
 	if x != nil {
 		return x.IsArchivedTimeline
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetDefaultBalances() *UserBalanceStore {
+func (x *TokenCollection) GetDefaultBalances() *UserBalanceStore {
 	if x != nil {
 		return x.DefaultBalances
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetCreatedBy() string {
+func (x *TokenCollection) GetCreatedBy() string {
 	if x != nil {
 		return x.CreatedBy
 	}
 	return ""
 }
 
-func (x *BadgeCollection) GetValidBadgeIds() []*UintRange {
+func (x *TokenCollection) GetValidTokenIds() []*UintRange {
 	if x != nil {
-		return x.ValidBadgeIds
+		return x.ValidTokenIds
 	}
 	return nil
 }
 
-func (x *BadgeCollection) GetMintEscrowAddress() string {
+func (x *TokenCollection) GetMintEscrowAddress() string {
 	if x != nil {
 		return x.MintEscrowAddress
 	}
 	return ""
 }
 
-func (x *BadgeCollection) GetCosmosCoinWrapperPaths() []*CosmosCoinWrapperPath {
+func (x *TokenCollection) GetCosmosCoinWrapperPaths() []*CosmosCoinWrapperPath {
 	if x != nil {
 		return x.CosmosCoinWrapperPaths
 	}
@@ -3879,7 +3879,7 @@ type CosmosCoinWrapperPath struct {
 	Address        string       `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	Denom          string       `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
 	OwnershipTimes []*UintRange `protobuf:"bytes,3,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	BadgeIds       []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds       []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	Symbol         string       `protobuf:"bytes,5,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	DenomUnits     []*DenomUnit `protobuf:"bytes,6,rep,name=denomUnits,proto3" json:"denomUnits,omitempty"`
 }
@@ -3925,9 +3925,9 @@ func (x *CosmosCoinWrapperPath) GetOwnershipTimes() []*UintRange {
 	return nil
 }
 
-func (x *CosmosCoinWrapperPath) GetBadgeIds() []*UintRange {
+func (x *CosmosCoinWrapperPath) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -4132,11 +4132,11 @@ func file_badges_collections_proto_rawDescGZIP() []byte {
 
 var file_badges_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_badges_collections_proto_goTypes = []interface{}{
-	(*BadgeCollection)(nil),                  // 0: badges.BadgeCollection
+	(*TokenCollection)(nil),                  // 0: badges.TokenCollection
 	(*CosmosCoinWrapperPath)(nil),            // 1: badges.CosmosCoinWrapperPath
 	(*DenomUnit)(nil),                        // 2: badges.DenomUnit
 	(*CollectionMetadataTimeline)(nil),       // 3: badges.CollectionMetadataTimeline
-	(*BadgeMetadataTimeline)(nil),            // 4: badges.BadgeMetadataTimeline
+	(*TokenMetadataTimeline)(nil),            // 4: badges.TokenMetadataTimeline
 	(*OffChainBalancesMetadataTimeline)(nil), // 5: badges.OffChainBalancesMetadataTimeline
 	(*CustomDataTimeline)(nil),               // 6: badges.CustomDataTimeline
 	(*ManagerTimeline)(nil),                  // 7: badges.ManagerTimeline
@@ -4148,20 +4148,20 @@ var file_badges_collections_proto_goTypes = []interface{}{
 	(*UintRange)(nil),                        // 13: badges.UintRange
 }
 var file_badges_collections_proto_depIdxs = []int32{
-	3,  // 0: badges.BadgeCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
-	4,  // 1: badges.BadgeCollection.badgeMetadataTimeline:type_name -> badges.BadgeMetadataTimeline
-	5,  // 2: badges.BadgeCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
-	6,  // 3: badges.BadgeCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
-	7,  // 4: badges.BadgeCollection.managerTimeline:type_name -> badges.ManagerTimeline
-	8,  // 5: badges.BadgeCollection.collectionPermissions:type_name -> badges.CollectionPermissions
-	9,  // 6: badges.BadgeCollection.collectionApprovals:type_name -> badges.CollectionApproval
-	10, // 7: badges.BadgeCollection.standardsTimeline:type_name -> badges.StandardsTimeline
-	11, // 8: badges.BadgeCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
-	12, // 9: badges.BadgeCollection.defaultBalances:type_name -> badges.UserBalanceStore
-	13, // 10: badges.BadgeCollection.validBadgeIds:type_name -> badges.UintRange
-	1,  // 11: badges.BadgeCollection.cosmosCoinWrapperPaths:type_name -> badges.CosmosCoinWrapperPath
+	3,  // 0: badges.TokenCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
+	4,  // 1: badges.TokenCollection.tokenMetadataTimeline:type_name -> badges.TokenMetadataTimeline
+	5,  // 2: badges.TokenCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
+	6,  // 3: badges.TokenCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
+	7,  // 4: badges.TokenCollection.managerTimeline:type_name -> badges.ManagerTimeline
+	8,  // 5: badges.TokenCollection.collectionPermissions:type_name -> badges.CollectionPermissions
+	9,  // 6: badges.TokenCollection.collectionApprovals:type_name -> badges.CollectionApproval
+	10, // 7: badges.TokenCollection.standardsTimeline:type_name -> badges.StandardsTimeline
+	11, // 8: badges.TokenCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
+	12, // 9: badges.TokenCollection.defaultBalances:type_name -> badges.UserBalanceStore
+	13, // 10: badges.TokenCollection.validTokenIds:type_name -> badges.UintRange
+	1,  // 11: badges.TokenCollection.cosmosCoinWrapperPaths:type_name -> badges.CosmosCoinWrapperPath
 	13, // 12: badges.CosmosCoinWrapperPath.ownershipTimes:type_name -> badges.UintRange
-	13, // 13: badges.CosmosCoinWrapperPath.badgeIds:type_name -> badges.UintRange
+	13, // 13: badges.CosmosCoinWrapperPath.tokenIds:type_name -> badges.UintRange
 	2,  // 14: badges.CosmosCoinWrapperPath.denomUnits:type_name -> badges.DenomUnit
 	15, // [15:15] is the sub-list for method output_type
 	15, // [15:15] is the sub-list for method input_type
@@ -4182,7 +4182,7 @@ func file_badges_collections_proto_init() {
 	file_badges_timelines_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_badges_collections_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BadgeCollection); i {
+			switch v := v.(*TokenCollection); i {
 			case 0:
 				return &v.state
 			case 1:

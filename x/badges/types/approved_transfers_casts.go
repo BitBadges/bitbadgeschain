@@ -25,7 +25,7 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 		FromListId:        fromAddress,
 		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:     transfer.TransferTimes,
-		BadgeIds:          transfer.BadgeIds,
+		TokenIds:          transfer.TokenIds,
 		OwnershipTimes:    transfer.OwnershipTimes,
 		ApprovalCriteria:  approvalCriteria,
 		ApprovalId:        transfer.ApprovalId,
@@ -43,7 +43,7 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 		ToListId:          transfer.ToListId,
 		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:     transfer.TransferTimes,
-		BadgeIds:          transfer.BadgeIds,
+		TokenIds:          transfer.TokenIds,
 		OwnershipTimes:    transfer.OwnershipTimes,
 		ApprovalCriteria:  approvalCriteria,
 		ApprovalId:        transfer.ApprovalId,
@@ -62,7 +62,7 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 		FromListId:        transfer.FromListId,
 		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:     transfer.TransferTimes,
-		BadgeIds:          transfer.BadgeIds,
+		TokenIds:          transfer.TokenIds,
 		OwnershipTimes:    transfer.OwnershipTimes,
 		ApprovalCriteria:  approvalCriteria,
 		ApprovalId:        transfer.ApprovalId,
@@ -80,7 +80,7 @@ func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) 
 		FromListId:        transfer.FromListId,
 		InitiatedByListId: transfer.InitiatedByListId,
 		TransferTimes:     transfer.TransferTimes,
-		BadgeIds:          transfer.BadgeIds,
+		TokenIds:          transfer.TokenIds,
 		OwnershipTimes:    transfer.OwnershipTimes,
 		ApprovalCriteria:  approvalCriteria,
 		ApprovalId:        transfer.ApprovalId,
@@ -104,7 +104,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 		CoinTransfers:                      approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:                approvalCriteria.AutoDeletionOptions,
-		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
+		MustOwnTokens:                      approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:             approvalCriteria.DynamicStoreChallenges,
 	}
 }
@@ -123,7 +123,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 		CoinTransfers:                    approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:              approvalCriteria.AutoDeletionOptions,
-		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
+		MustOwnTokens:                    approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:           approvalCriteria.DynamicStoreChallenges,
 	}
 }
@@ -138,7 +138,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		MerkleChallenges:                   approvalCriteria.MerkleChallenges,
 		CoinTransfers:                      approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:                approvalCriteria.AutoDeletionOptions,
-		MustOwnBadges:                      approvalCriteria.MustOwnBadges,
+		MustOwnTokens:                      approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:             approvalCriteria.DynamicStoreChallenges,
 	}
 }
@@ -153,7 +153,7 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		MerkleChallenges:                 approvalCriteria.MerkleChallenges,
 		CoinTransfers:                    approvalCriteria.CoinTransfers,
 		AutoDeletionOptions:              approvalCriteria.AutoDeletionOptions,
-		MustOwnBadges:                    approvalCriteria.MustOwnBadges,
+		MustOwnTokens:                    approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:           approvalCriteria.DynamicStoreChallenges,
 	}
 }

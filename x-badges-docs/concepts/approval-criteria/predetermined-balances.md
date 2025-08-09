@@ -33,7 +33,7 @@ Define an array of specific balance sets manually. Each element corresponds to a
     "manualBalances": [
         {
             "amount": "1",
-            "badgeIds": [
+            "tokenIds": [
                 {
                     "start": "1",
                     "end": "1"
@@ -48,7 +48,7 @@ Define an array of specific balance sets manually. Each element corresponds to a
         },
         {
             "amount": "5",
-            "badgeIds": [
+            "tokenIds": [
                 {
                     "start": "2",
                     "end": "6"
@@ -77,7 +77,7 @@ Define starting balances and rules for subsequent transfers. Perfect for sequent
         "startBalances": [
             {
                 "amount": "1",
-                "badgeIds": [
+                "tokenIds": [
                     {
                         "start": "1",
                         "end": "1"
@@ -91,11 +91,11 @@ Define starting balances and rules for subsequent transfers. Perfect for sequent
                 ]
             }
         ],
-        "incrementBadgeIdsBy": "1",
+        "incrementTokenIdsBy": "1",
         "incrementOwnershipTimesBy": "0",
         "durationFromTimestamp": "0",
         "allowOverrideTimestamp": false,
-        "allowOverrideWithAnyValidBadge": false,
+        "allowOverrideWithAnyValidToken": false,
         "recurringOwnershipTimes": {
             "startTime": "0",
             "intervalLength": "0",
@@ -109,11 +109,11 @@ Define starting balances and rules for subsequent transfers. Perfect for sequent
 
 | Field                            | Description                                          | Example                                              |
 | -------------------------------- | ---------------------------------------------------- | ---------------------------------------------------- |
-| `incrementBadgeIdsBy`            | Amount to increment token IDs by after each transfer | `"1"` = next transfer gets token ID 2, then 3, etc.  |
+| `incrementTokenIdsBy`            | Amount to increment token IDs by after each transfer | `"1"` = next transfer gets token ID 2, then 3, etc.  |
 | `incrementOwnershipTimesBy`      | Amount to increment ownership times by               | `"86400000"` = add 1 day to ownership times          |
 | `durationFromTimestamp`          | Calculate ownership times from timestamp + duration  | `"2592000000"` = 30 days from transfer time          |
 | `allowOverrideTimestamp`         | Allow custom timestamp override in transfer          | `true` = users can specify custom start time         |
-| `allowOverrideWithAnyValidBadge` | Allow any valid token ID (one) override              | `true` = users can specify any single valid token ID |
+| `allowOverrideWithAnyValidToken` | Allow any valid token ID (one) override              | `true` = users can specify any single valid token ID |
 | `recurringOwnershipTimes`        | Define recurring time intervals                      | Monthly subscriptions, weekly rewards                |
 
 #### Duration From Timestamp
@@ -130,7 +130,7 @@ Dynamically calculate ownership times from a timestamp plus a set duration. This
 **Behavior**:
 
 -   **Default**: Uses transfer time as the base timestamp
--   **Override**: If `allowOverrideTimestamp` is true, users can specify a custom timestamp in `MsgTransferBadges` `precalculationOptions`
+-   **Override**: If `allowOverrideTimestamp` is true, users can specify a custom timestamp in `MsgTransferTokens` `precalculationOptions`
 -   **Calculation**: `ownershipTime = baseTimestamp + durationFromTimestamp`
 -   **Overwrite**: All ownership times in starting balances are replaced with [{ "start": baseTimestamp, "end": baseTimestamp + durationFromTimestamp }]
 
@@ -162,7 +162,7 @@ Predetermined balances can change rapidly between transaction broadcast and conf
 
 ### The Solution: Precalculation
 
-Use `precalculateBalancesFromApproval` in [MsgTransferBadges](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md) to dynamically calculate balances at execution time.
+Use `precalculateBalancesFromApproval` in [MsgTransferTokens](../../../bitbadges-blockchain/cosmos-sdk-msgs/x-badges/msgtransferbadges.md) to dynamically calculate balances at execution time.
 
 ```typescript
 {
@@ -254,7 +254,7 @@ export interface PredeterminedOrderCalculationMethod {
 
 ### Understanding Bounds
 
-Every approval defines bounds through its core fields (badgeIds, ownershipTimes, etc.). For example:
+Every approval defines bounds through its core fields (tokenIds, ownershipTimes, etc.). For example:
 
 -   **Token IDs**: 1-100
 -   **Ownership Times**: Mon-Fri only

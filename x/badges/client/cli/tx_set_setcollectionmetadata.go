@@ -16,8 +16,8 @@ var _ = strconv.Itoa(0)
 
 func CmdSetCollectionMetadata() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-setcollectionmetadata [tx-json]",
-		Short: "Broadcast message setSetCollectionMetadata",
+		Use:   "set-collection-metadata [tx-json]",
+		Short: "Broadcast message setCollectionMetadata",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

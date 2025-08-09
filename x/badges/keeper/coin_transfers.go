@@ -27,7 +27,7 @@ func (k Keeper) HandleCoinTransfers(
 	approvalLevel string,
 	simulate bool,
 	coinTransfersUsed *[]CoinTransfers,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	royalties *types.UserRoyalties,
 ) error {
 	if len(coinTransfers) == 0 {

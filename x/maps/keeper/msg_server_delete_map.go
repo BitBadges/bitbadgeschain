@@ -20,7 +20,7 @@ func (k msgServer) DeleteMap(goCtx context.Context, msg *types.MsgDeleteMap) (*t
 		return nil, sdkerrors.Wrap(ErrMapDoesNotExist, "Failed to get map from store")
 	}
 
-	collection := &badgetypes.BadgeCollection{}
+	collection := &badgetypes.TokenCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
 		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
 		if err != nil {

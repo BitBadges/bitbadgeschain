@@ -35,7 +35,7 @@ func GetRandomBalances(r *rand.Rand, length int) []*types.Balance {
 	for i := 0; i < r.Intn(length); i++ {
 		randomSubassets = append(randomSubassets, &types.Balance{
 			Amount:         sdkmath.NewUint(r.Uint64()),
-			BadgeIds:       GetTimelineTimes(r, 3),
+			TokenIds:       GetTimelineTimes(r, 3),
 			OwnershipTimes: GetTimelineTimes(r, 3),
 		})
 	}
@@ -130,21 +130,21 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
+		CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				BadgeIds:                  GetTimelineTimes(r, 3),
+				TokenIds:                  GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
+		CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TimelineTimes:             GetTimelineTimes(r, 3),
-				BadgeIds:                  GetTimelineTimes(r, 3),
+				TokenIds:                  GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{
@@ -154,7 +154,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 				TransferTimes:             GetTimelineTimes(r, 3),
 				OwnershipTimes:            GetTimelineTimes(r, 3),
-				BadgeIds:                  GetTimelineTimes(r, 3),
+				TokenIds:                  GetTimelineTimes(r, 3),
 				ToListId:                  GetRandomAddresses(r, 3, accs)[0],
 				FromListId:                GetRandomAddresses(r, 3, accs)[0],
 				InitiatedByListId:         GetRandomAddresses(r, 3, accs)[0],

@@ -45,7 +45,7 @@ func (msg *MsgCreateCollection) ValidateBasic() error {
 	// Validate invariants if present
 	if msg.Invariants != nil && msg.Invariants.NoCustomOwnershipTimes {
 		// Create a temporary collection to validate invariants
-		tempCollection := &BadgeCollection{
+		tempCollection := &TokenCollection{
 			Invariants: msg.Invariants,
 		}
 		if err := ValidateCollectionApprovalsWithInvariants(sdk.Context{}, msg.CollectionApprovals, false, tempCollection); err != nil {

@@ -79,7 +79,7 @@ Multiple denomination units allow for different display formats:
     "balances": [
         {
             "amount": "1",
-            "badgeIds": [{ "start": "1", "end": "1" }],
+            "tokenIds": [{ "start": "1", "end": "1" }],
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }]
         }
     ],
@@ -102,7 +102,7 @@ Multiple denomination units allow for different display formats:
     "balances": [
         {
             "amount": "1",
-            "badgeIds": [{ "start": "1", "end": "100" }],
+            "tokenIds": [{ "start": "1", "end": "100" }],
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }]
         }
     ],

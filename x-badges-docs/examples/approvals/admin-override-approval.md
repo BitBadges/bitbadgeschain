@@ -24,7 +24,7 @@ const approveSelfForcefully = (address: string) => {
         toListId: 'All',
         initiatedByListId: address,
         transferTimes: UintRangeArray.FullRanges(),
-        badgeIds: UintRangeArray.FullRanges(),
+        tokenIds: UintRangeArray.FullRanges(),
         ownershipTimes: UintRangeArray.FullRanges(),
         approvalId: id,
         version: 0n,

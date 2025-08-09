@@ -90,7 +90,7 @@ Trackers store amounts using the balance type structure. Above, we simplified it
     "amounts": [
         {
             "amount": 10n,
-            "badgeIds": [{ "start": 1n, "end": 1n }],
+            "tokenIds": [{ "start": 1n, "end": 1n }],
             "ownershipTimes": [{ "start": 1n, "end": 100000000000n }]
         }
     ]

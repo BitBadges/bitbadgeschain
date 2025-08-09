@@ -20,7 +20,7 @@ const mintApproval = {
     toListId: 'All', // To any address
     initiatedByListId: myAddress, // Only you can initiate
     transferTimes: UintRangeArray.FullRanges(),
-    badgeIds: UintRangeArray.FullRanges(), // All token IDs
+    tokenIds: UintRangeArray.FullRanges(), // All token IDs
     ownershipTimes: UintRangeArray.FullRanges(),
     approvalId: 'mint-approval',
     version: 0n,
@@ -57,7 +57,7 @@ const transfers = [
         toAddresses: [myAddress], // To your address
         balances: [
             {
-                badgeIds: [{ start: 1n, end: 100n }],
+                tokenIds: [{ start: 1n, end: 100n }],
                 ownershipTimes: UintRangeArray.FullRanges(),
                 amount: 100n,
             },
@@ -72,4 +72,4 @@ const transfers = [
 -   [Building Collection Approvals](./building-collection-approvals.md)
 -   [Admin Override Approval](./approvals/admin-override-approval.md)
 -   [Mint Escrow Address](../concepts/mint-escrow-address.md)
--   [MsgTransferBadges](../messages/msg-transfer-badges.md)
+-   [MsgTransferTokens](../messages/msg-transfer-badges.md)

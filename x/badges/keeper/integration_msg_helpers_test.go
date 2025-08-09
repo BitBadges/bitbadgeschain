@@ -12,10 +12,10 @@ import (
 
 /* Query helpers */
 
-func GetCollection(suite *TestSuite, ctx context.Context, id sdkmath.Uint) (*types.BadgeCollection, error) {
+func GetCollection(suite *TestSuite, ctx context.Context, id sdkmath.Uint) (*types.TokenCollection, error) {
 	res, err := suite.app.BadgesKeeper.GetCollection(ctx, &types.QueryGetCollectionRequest{CollectionId: sdkmath.Uint(id).String()})
 	if err != nil {
-		return &types.BadgeCollection{}, err
+		return &types.TokenCollection{}, err
 	}
 
 	return res.Collection, nil
@@ -105,13 +105,13 @@ func DeleteCollection(suite *TestSuite, ctx context.Context, msg *types.MsgDelet
 	return err
 }
 
-func TransferBadges(suite *TestSuite, ctx context.Context, msg *types.MsgTransferBadges) error {
+func TransferTokens(suite *TestSuite, ctx context.Context, msg *types.MsgTransferTokens) error {
 	err := msg.ValidateBasic()
 	if err != nil {
 		return err
 	}
 
-	_, err = suite.msgServer.TransferBadges(ctx, msg)
+	_, err = suite.msgServer.TransferTokens(ctx, msg)
 	return err
 }
 
@@ -212,11 +212,11 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
 		}
 
-		allBadgeIds := []*types.UintRange{}
+		allTokenIds := []*types.UintRange{}
 		for _, badge := range collectionToCreate.BadgesToCreate {
-			allBadgeIds = append(allBadgeIds, badge.BadgeIds...)
+			allTokenIds = append(allTokenIds, badge.TokenIds...)
 		}
-		allBadgeIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allBadgeIds)
+		allTokenIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allTokenIds)
 
 		//For legacy purposes, we will use badgesToCreate which mints them to the mint address
 		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUniversalUpdateCollection{
@@ -234,21 +234,21 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 				UserPermissions: nil,
 			},
 			CollectionMetadataTimeline:       collectionToCreate.CollectionMetadataTimeline,
-			BadgeMetadataTimeline:            collectionToCreate.BadgeMetadataTimeline,
+			TokenMetadataTimeline:            collectionToCreate.TokenMetadataTimeline,
 			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
 			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline:          collectionToCreate.CustomDataTimeline,
 			StandardsTimeline:           collectionToCreate.StandardsTimeline,
 			CosmosCoinWrapperPathsToAdd: collectionToCreate.CosmosCoinWrapperPathsToAdd,
-			ValidBadgeIds:               allBadgeIds,
+			ValidTokenIds:               allTokenIds,
 			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
 
 			// ManagerTimeline: collectionToCreate.ManagerTimeline,
-			UpdateValidBadgeIds:         true,
+			UpdateValidTokenIds:         true,
 			UpdateCollectionPermissions: true,
 			// UpdateManagerTimeline: true,
 			UpdateCollectionMetadataTimeline:       true,
-			UpdateBadgeMetadataTimeline:            true,
+			UpdateTokenMetadataTimeline:            true,
 			UpdateOffChainBalancesMetadataTimeline: true,
 
 			UpdateCustomDataTimeline:  true,
@@ -312,7 +312,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		}
 
 		if len(collectionToCreate.Transfers) > 0 {
-			err = TransferBadges(suite, ctx, &types.MsgTransferBadges{
+			err = TransferTokens(suite, ctx, &types.MsgTransferTokens{
 				Creator:      bob,
 				CollectionId: collectionRes.CollectionId,
 				Transfers:    collectionToCreate.Transfers,
@@ -335,21 +335,21 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 }
 
 func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.MsgMintAndDistributeBadges) error {
-	allBadgeIds := []*types.UintRange{}
+	allTokenIds := []*types.UintRange{}
 	for _, badge := range msg.BadgesToCreate {
-		allBadgeIds = append(allBadgeIds, badge.BadgeIds...)
+		allTokenIds = append(allTokenIds, badge.TokenIds...)
 	}
-	allBadgeIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allBadgeIds)
+	allTokenIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allTokenIds)
 
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
 		Creator:                                bob,
 		CollectionId:                           msg.CollectionId,
-		UpdateValidBadgeIds:                    true,
-		ValidBadgeIds:                          allBadgeIds,
+		UpdateValidTokenIds:                    true,
+		ValidTokenIds:                          allTokenIds,
 		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
 		UpdateCollectionMetadataTimeline:       true,
-		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
-		UpdateBadgeMetadataTimeline:            true,
+		TokenMetadataTimeline:                  msg.TokenMetadataTimeline,
+		UpdateTokenMetadataTimeline:            true,
 		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
 		CollectionApprovals:                    msg.CollectionApprovals,
@@ -368,7 +368,7 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 	}
 
 	if len(msg.Transfers) > 0 {
-		_, err = suite.msgServer.TransferBadges(ctx, &types.MsgTransferBadges{
+		_, err = suite.msgServer.TransferTokens(ctx, &types.MsgTransferTokens{
 			Creator:      bob,
 			CollectionId: msg.CollectionId,
 			Transfers:    newTransfers,
@@ -413,8 +413,8 @@ func UpdateMetadata(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateM
 		CollectionId:                           msg.CollectionId,
 		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
 		UpdateCollectionMetadataTimeline:       true,
-		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
-		UpdateBadgeMetadataTimeline:            true,
+		TokenMetadataTimeline:                  msg.TokenMetadataTimeline,
+		UpdateTokenMetadataTimeline:            true,
 		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
 		StandardsTimeline:                      msg.StandardsTimeline,
@@ -451,13 +451,13 @@ func UpdateUserPermissions(suite *TestSuite, ctx context.Context, msg *types.Msg
 
 // Helper functions for UniversalUpdateCollection subsets using native messages
 
-func SetValidBadgeIds(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, validBadgeIds []*types.UintRange) error {
-	msg := &types.MsgSetValidBadgeIds{
+func SetValidTokenIds(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, validTokenIds []*types.UintRange) error {
+	msg := &types.MsgSetValidTokenIds{
 		Creator:       creator,
 		CollectionId:  collectionId,
-		ValidBadgeIds: validBadgeIds,
+		ValidTokenIds: validTokenIds,
 	}
-	_, err := suite.msgServer.SetValidBadgeIds(ctx, msg)
+	_, err := suite.msgServer.SetValidTokenIds(ctx, msg)
 	return err
 }
 
@@ -481,13 +481,13 @@ func SetCollectionMetadata(suite *TestSuite, ctx context.Context, creator string
 	return err
 }
 
-func SetBadgeMetadata(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, badgeMetadataTimeline []*types.BadgeMetadataTimeline) error {
-	msg := &types.MsgSetBadgeMetadata{
+func SetTokenMetadata(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, tokenMetadataTimeline []*types.TokenMetadataTimeline) error {
+	msg := &types.MsgSetTokenMetadata{
 		Creator:               creator,
 		CollectionId:          collectionId,
-		BadgeMetadataTimeline: badgeMetadataTimeline,
+		TokenMetadataTimeline: tokenMetadataTimeline,
 	}
-	_, err := suite.msgServer.SetBadgeMetadata(ctx, msg)
+	_, err := suite.msgServer.SetTokenMetadata(ctx, msg)
 	return err
 }
 

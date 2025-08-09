@@ -11,7 +11,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
   This message defines the metadata for specific token IDs.
   The interpretation of this metadata should follow the collection standard.
 */
-message BadgeMetadata {
+message TokenMetadata {
   // The URI (Uniform Resource Identifier) associated with the token metadata.
   string uri = 1;
   
@@ -19,7 +19,7 @@ message BadgeMetadata {
   string customData = 2;
   
   // The token IDs to which this metadata applies.
-  repeated UintRange badgeIds = 3;
+  repeated UintRange tokenIds = 3;
 }
 
 /* 

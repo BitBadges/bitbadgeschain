@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
+func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferTokens) (*types.MsgTransferTokensResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := msg.CheckAndCleanMsg(ctx, true)
@@ -71,5 +71,5 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		),
 	)
 
-	return &types.MsgTransferBadgesResponse{}, nil
+	return &types.MsgTransferTokensResponse{}, nil
 }

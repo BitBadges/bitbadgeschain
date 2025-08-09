@@ -4,7 +4,7 @@ Updates an existing collection's properties.
 
 ## Update Flag Pattern
 
-This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateValidBadgeIds`, `updateCollectionPermissions`).
+This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateValidTokenIds`, `updateCollectionPermissions`).
 
 -   **If update flag is `true`**: The corresponding value field is processed and the collection is updated with the new value
 -   **If update flag is `false`**: The corresponding value field is completely ignored, regardless of what data is provided
@@ -23,16 +23,16 @@ Updates can only be performed by the **current manager** of the collection. All 
 message MsgUpdateCollection {
   string creator = 1; // Address updating collection (must be manager)
   string collectionId = 2; // ID of collection to update
-  bool updateValidBadgeIds = 3;
-  repeated UintRange validBadgeIds = 4;
+  bool updateValidTokenIds = 3;
+  repeated UintRange validTokenIds = 4;
   bool updateCollectionPermissions = 7;
   CollectionPermissions collectionPermissions = 8;
   bool updateManagerTimeline = 9;
   repeated ManagerTimeline managerTimeline = 10;
   bool updateCollectionMetadataTimeline = 11;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
-  bool updateBadgeMetadataTimeline = 13;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
+  bool updateTokenMetadataTimeline = 13;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 14;
   bool updateOffChainBalancesMetadataTimeline = 15;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
   bool updateCustomDataTimeline = 17;
@@ -66,8 +66,8 @@ bitbadgeschaind tx badges update-collection '[tx-json]' --from manager-key
 {
     "creator": "bb1abc123...",
     "collectionId": "1",
-    "updateValidBadgeIds": true,
-    "validBadgeIds": [{ "start": "1", "end": "200" }],
+    "updateValidTokenIds": true,
+    "validTokenIds": [{ "start": "1", "end": "200" }],
     "updateCollectionPermissions": false,
     "collectionPermissions": {
         "canDeleteCollection": [],
@@ -77,16 +77,16 @@ bitbadgeschaind tx badges update-collection '[tx-json]' --from manager-key
         "canUpdateCustomData": [],
         "canUpdateManager": [],
         "canUpdateCollectionMetadata": [],
-        "canUpdateValidBadgeIds": [],
-        "canUpdateBadgeMetadata": [],
+        "canUpdateValidTokenIds": [],
+        "canUpdateTokenMetadata": [],
         "canUpdateCollectionApprovals": []
     },
     "updateManagerTimeline": false,
     "managerTimeline": [],
     "updateCollectionMetadataTimeline": false,
     "collectionMetadataTimeline": [],
-    "updateBadgeMetadataTimeline": false,
-    "badgeMetadataTimeline": [],
+    "updateTokenMetadataTimeline": false,
+    "tokenMetadataTimeline": [],
     "updateOffChainBalancesMetadataTimeline": false,
     "offChainBalancesMetadataTimeline": [],
     "updateCustomDataTimeline": false,

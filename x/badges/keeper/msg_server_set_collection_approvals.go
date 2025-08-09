@@ -38,9 +38,9 @@ func (k msgServer) SetCollectionApprovals(goCtx context.Context, msg *types.MsgS
 			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
 			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds:            collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:            collection.CollectionPermissions.CanUpdateTokenMetadata,
 		},
 	}
 

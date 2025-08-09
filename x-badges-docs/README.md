@@ -10,7 +10,7 @@ const res = await BitBadgesApi.getBalanceByAddress(collectionId, address, {
 });
 console.log(res);
 
-const res = await BitBadgesApi.getBadgeMetadata(1, 5);
+const res = await BitBadgesApi.getTokenMetadata(1, 5);
 ```
 
 ## Table of Contents
@@ -34,7 +34,7 @@ const res = await BitBadgesApi.getBadgeMetadata(1, 5);
 
 ### Token Transfers
 
--   [MsgTransferBadges](./messages/msg-transfer-badges.md) - Transfer tokens between addresses
+-   [MsgTransferTokens](./messages/msg-transfer-badges.md) - Transfer tokens between addresses
 
 ### User Approvals
 

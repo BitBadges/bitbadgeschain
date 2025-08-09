@@ -4,28 +4,28 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgSetBadgeMetadata = "set_badge_metadata"
+const TypeMsgSetTokenMetadata = "set_badge_metadata"
 
-var _ sdk.Msg = &MsgSetBadgeMetadata{}
+var _ sdk.Msg = &MsgSetTokenMetadata{}
 
-func NewMsgSetBadgeMetadata(creator string, collectionId Uint, badgeMetadataTimeline []*BadgeMetadataTimeline, canUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission) *MsgSetBadgeMetadata {
-	return &MsgSetBadgeMetadata{
+func NewMsgSetTokenMetadata(creator string, collectionId Uint, tokenMetadataTimeline []*TokenMetadataTimeline, canUpdateTokenMetadata []*TimedUpdateWithTokenIdsPermission) *MsgSetTokenMetadata {
+	return &MsgSetTokenMetadata{
 		Creator:                creator,
 		CollectionId:           collectionId,
-		BadgeMetadataTimeline:  badgeMetadataTimeline,
-		CanUpdateBadgeMetadata: canUpdateBadgeMetadata,
+		TokenMetadataTimeline:  tokenMetadataTimeline,
+		CanUpdateTokenMetadata: canUpdateTokenMetadata,
 	}
 }
 
-func (msg *MsgSetBadgeMetadata) Route() string {
+func (msg *MsgSetTokenMetadata) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgSetBadgeMetadata) Type() string {
-	return TypeMsgSetBadgeMetadata
+func (msg *MsgSetTokenMetadata) Type() string {
+	return TypeMsgSetTokenMetadata
 }
 
-func (msg *MsgSetBadgeMetadata) GetSigners() []sdk.AccAddress {
+func (msg *MsgSetTokenMetadata) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -33,13 +33,13 @@ func (msg *MsgSetBadgeMetadata) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgSetBadgeMetadata) GetSignBytes() []byte {
+func (msg *MsgSetTokenMetadata) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	sorted := sdk.MustSortJSON(bz)
 	return sorted
 }
 
-func (msg *MsgSetBadgeMetadata) ValidateBasic() error {
+func (msg *MsgSetTokenMetadata) ValidateBasic() error {
 	uni, err := msg.ToUniversalUpdateCollection()
 	if err != nil {
 		return err
@@ -47,15 +47,15 @@ func (msg *MsgSetBadgeMetadata) ValidateBasic() error {
 	return uni.ValidateBasic()
 }
 
-func (msg *MsgSetBadgeMetadata) ToUniversalUpdateCollection() (*MsgUniversalUpdateCollection, error) {
+func (msg *MsgSetTokenMetadata) ToUniversalUpdateCollection() (*MsgUniversalUpdateCollection, error) {
 	ms := &MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateBadgeMetadataTimeline: true,
-		BadgeMetadataTimeline:       msg.BadgeMetadataTimeline,
+		UpdateTokenMetadataTimeline: true,
+		TokenMetadataTimeline:       msg.TokenMetadataTimeline,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
-			CanUpdateBadgeMetadata: msg.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata: msg.CanUpdateTokenMetadata,
 		},
 	}
 	err := ms.CheckAndCleanMsg(sdk.Context{}, true)

@@ -26,13 +26,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // CollectionPermissions defines the permissions for the collection (i.e., what the manager can and cannot do).
 //
-// There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithBadgeIdsPermission, BadgeIdsActionPermission, and CollectionApprovalPermission.
+// There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithTokenIdsPermission, TokenIdsActionPermission, and CollectionApprovalPermission.
 //
 // The permission type allows fine-grained access control for each action.
 // - ActionPermission: defines when the manager can perform an action.
 // - TimedUpdatePermission: defines when the manager can update a timeline-based field and what times of the timeline can be updated.
-// - TimedUpdateWithBadgeIdsPermission: defines when the manager can update a timeline-based field for specific tokens and what times of the timeline can be updated.
-// - BadgeIdsActionPermission: defines when the manager can perform an action for specific tokens
+// - TimedUpdateWithTokenIdsPermission: defines when the manager can update a timeline-based field for specific tokens and what times of the timeline can be updated.
+// - TokenIdsActionPermission: defines when the manager can perform an action for specific tokens
 // - CollectionApprovalPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs. locked.
 //
 // Note there are a few different times here which could get confusing:
@@ -63,9 +63,9 @@ type CollectionPermissions struct {
 	// Permissions related to updating the metadata of the collection.
 	CanUpdateCollectionMetadata []*TimedUpdatePermission `protobuf:"bytes,7,rep,name=canUpdateCollectionMetadata,proto3" json:"canUpdateCollectionMetadata,omitempty"`
 	// Permissions related to creating more tokens for the collection.
-	CanUpdateValidBadgeIds []*BadgeIdsActionPermission `protobuf:"bytes,8,rep,name=canUpdateValidBadgeIds,proto3" json:"canUpdateValidBadgeIds,omitempty"`
+	CanUpdateValidTokenIds []*TokenIdsActionPermission `protobuf:"bytes,8,rep,name=canUpdateValidTokenIds,proto3" json:"canUpdateValidTokenIds,omitempty"`
 	// Permissions related to updating token metadata for specific tokens.
-	CanUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission `protobuf:"bytes,9,rep,name=canUpdateBadgeMetadata,proto3" json:"canUpdateBadgeMetadata,omitempty"`
+	CanUpdateTokenMetadata []*TimedUpdateWithTokenIdsPermission `protobuf:"bytes,9,rep,name=canUpdateTokenMetadata,proto3" json:"canUpdateTokenMetadata,omitempty"`
 	// Permissions related to updating collection approvals.
 	CanUpdateCollectionApprovals []*CollectionApprovalPermission `protobuf:"bytes,10,rep,name=canUpdateCollectionApprovals,proto3" json:"canUpdateCollectionApprovals,omitempty"`
 }
@@ -152,16 +152,16 @@ func (m *CollectionPermissions) GetCanUpdateCollectionMetadata() []*TimedUpdateP
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateValidBadgeIds() []*BadgeIdsActionPermission {
+func (m *CollectionPermissions) GetCanUpdateValidTokenIds() []*TokenIdsActionPermission {
 	if m != nil {
-		return m.CanUpdateValidBadgeIds
+		return m.CanUpdateValidTokenIds
 	}
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateBadgeMetadata() []*TimedUpdateWithBadgeIdsPermission {
+func (m *CollectionPermissions) GetCanUpdateTokenMetadata() []*TimedUpdateWithTokenIdsPermission {
 	if m != nil {
-		return m.CanUpdateBadgeMetadata
+		return m.CanUpdateTokenMetadata
 	}
 	return nil
 }
@@ -264,7 +264,7 @@ func (m *UserPermissions) GetCanUpdateAutoApproveAllIncomingTransfers() []*Actio
 //
 // Each transfer is broken down to a (from, to, initiatedBy, transferTime, badgeId) tuple.
 // For a transfer to match, we need to match ALL of the fields in the combination.
-// These are determined by the fromListId, toListId, initiatedByListId, transferTimes, badgeIds fields.
+// These are determined by the fromListId, toListId, initiatedByListId, transferTimes, tokenIds fields.
 // AddressLists are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressLists).
 //
 // TimelineTimes: which timeline times of the collection's approvalsTimeline field can be updated or not?
@@ -286,7 +286,7 @@ type CollectionApprovalPermission struct {
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,5,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
@@ -361,9 +361,9 @@ func (m *CollectionApprovalPermission) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (m *CollectionApprovalPermission) GetBadgeIds() []*UintRange {
+func (m *CollectionApprovalPermission) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -405,7 +405,7 @@ type UserOutgoingApprovalPermission struct {
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
@@ -473,9 +473,9 @@ func (m *UserOutgoingApprovalPermission) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (m *UserOutgoingApprovalPermission) GetBadgeIds() []*UintRange {
+func (m *UserOutgoingApprovalPermission) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -519,7 +519,7 @@ type UserIncomingApprovalPermission struct {
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
@@ -587,9 +587,9 @@ func (m *UserIncomingApprovalPermission) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (m *UserIncomingApprovalPermission) GetBadgeIds() []*UintRange {
+func (m *UserIncomingApprovalPermission) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -622,32 +622,32 @@ func (m *UserIncomingApprovalPermission) GetPermanentlyForbiddenTimes() []*UintR
 	return nil
 }
 
-// BadgeIdsActionPermission defines the permissions for updating a timeline-based field for specific tokens and specific token ownership times.
+// TokenIdsActionPermission defines the permissions for updating a timeline-based field for specific tokens and specific token ownership times.
 // Currently, this is only used for creating new tokens.
 //
-// Ex: If you want to lock the ability to create new tokens for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-type BadgeIdsActionPermission struct {
+// Ex: If you want to lock the ability to create new tokens for tokenIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
+// you could set the combination (tokenIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
+type TokenIdsActionPermission struct {
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,1,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
 	// Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
 	PermanentlyForbiddenTimes []*UintRange `protobuf:"bytes,3,rep,name=permanentlyForbiddenTimes,proto3" json:"permanentlyForbiddenTimes,omitempty"`
 }
 
-func (m *BadgeIdsActionPermission) Reset()         { *m = BadgeIdsActionPermission{} }
-func (m *BadgeIdsActionPermission) String() string { return proto.CompactTextString(m) }
-func (*BadgeIdsActionPermission) ProtoMessage()    {}
-func (*BadgeIdsActionPermission) Descriptor() ([]byte, []int) {
+func (m *TokenIdsActionPermission) Reset()         { *m = TokenIdsActionPermission{} }
+func (m *TokenIdsActionPermission) String() string { return proto.CompactTextString(m) }
+func (*TokenIdsActionPermission) ProtoMessage()    {}
+func (*TokenIdsActionPermission) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1298419e4a97cfe6, []int{5}
 }
-func (m *BadgeIdsActionPermission) XXX_Unmarshal(b []byte) error {
+func (m *TokenIdsActionPermission) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BadgeIdsActionPermission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TokenIdsActionPermission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BadgeIdsActionPermission.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TokenIdsActionPermission.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -657,33 +657,33 @@ func (m *BadgeIdsActionPermission) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *BadgeIdsActionPermission) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BadgeIdsActionPermission.Merge(m, src)
+func (m *TokenIdsActionPermission) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TokenIdsActionPermission.Merge(m, src)
 }
-func (m *BadgeIdsActionPermission) XXX_Size() int {
+func (m *TokenIdsActionPermission) XXX_Size() int {
 	return m.Size()
 }
-func (m *BadgeIdsActionPermission) XXX_DiscardUnknown() {
-	xxx_messageInfo_BadgeIdsActionPermission.DiscardUnknown(m)
+func (m *TokenIdsActionPermission) XXX_DiscardUnknown() {
+	xxx_messageInfo_TokenIdsActionPermission.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BadgeIdsActionPermission proto.InternalMessageInfo
+var xxx_messageInfo_TokenIdsActionPermission proto.InternalMessageInfo
 
-func (m *BadgeIdsActionPermission) GetBadgeIds() []*UintRange {
+func (m *TokenIdsActionPermission) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
 
-func (m *BadgeIdsActionPermission) GetPermanentlyPermittedTimes() []*UintRange {
+func (m *TokenIdsActionPermission) GetPermanentlyPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermanentlyPermittedTimes
 	}
 	return nil
 }
 
-func (m *BadgeIdsActionPermission) GetPermanentlyForbiddenTimes() []*UintRange {
+func (m *TokenIdsActionPermission) GetPermanentlyForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.PermanentlyForbiddenTimes
 	}
@@ -814,13 +814,13 @@ func (m *TimedUpdatePermission) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific tokens.
+// TimedUpdateWithTokenIdsPermission defines the permissions for updating a timeline-based field for specific tokens.
 //
-// Ex: If you want to lock the ability to update the metadata for badgeIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (badgeIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-type TimedUpdateWithBadgeIdsPermission struct {
+// Ex: If you want to lock the ability to update the metadata for tokenIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
+// you could set the combination (tokenIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
+type TimedUpdateWithTokenIdsPermission struct {
 	// Specifies the token IDs involved in the transfer.
-	BadgeIds []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,1,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
 	// Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
@@ -829,18 +829,18 @@ type TimedUpdateWithBadgeIdsPermission struct {
 	TimelineTimes []*UintRange `protobuf:"bytes,4,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) Reset()         { *m = TimedUpdateWithBadgeIdsPermission{} }
-func (m *TimedUpdateWithBadgeIdsPermission) String() string { return proto.CompactTextString(m) }
-func (*TimedUpdateWithBadgeIdsPermission) ProtoMessage()    {}
-func (*TimedUpdateWithBadgeIdsPermission) Descriptor() ([]byte, []int) {
+func (m *TimedUpdateWithTokenIdsPermission) Reset()         { *m = TimedUpdateWithTokenIdsPermission{} }
+func (m *TimedUpdateWithTokenIdsPermission) String() string { return proto.CompactTextString(m) }
+func (*TimedUpdateWithTokenIdsPermission) ProtoMessage()    {}
+func (*TimedUpdateWithTokenIdsPermission) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1298419e4a97cfe6, []int{8}
 }
-func (m *TimedUpdateWithBadgeIdsPermission) XXX_Unmarshal(b []byte) error {
+func (m *TimedUpdateWithTokenIdsPermission) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *TimedUpdateWithBadgeIdsPermission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TimedUpdateWithTokenIdsPermission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_TimedUpdateWithBadgeIdsPermission.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TimedUpdateWithTokenIdsPermission.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -850,40 +850,40 @@ func (m *TimedUpdateWithBadgeIdsPermission) XXX_Marshal(b []byte, deterministic 
 		return b[:n], nil
 	}
 }
-func (m *TimedUpdateWithBadgeIdsPermission) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TimedUpdateWithBadgeIdsPermission.Merge(m, src)
+func (m *TimedUpdateWithTokenIdsPermission) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TimedUpdateWithTokenIdsPermission.Merge(m, src)
 }
-func (m *TimedUpdateWithBadgeIdsPermission) XXX_Size() int {
+func (m *TimedUpdateWithTokenIdsPermission) XXX_Size() int {
 	return m.Size()
 }
-func (m *TimedUpdateWithBadgeIdsPermission) XXX_DiscardUnknown() {
-	xxx_messageInfo_TimedUpdateWithBadgeIdsPermission.DiscardUnknown(m)
+func (m *TimedUpdateWithTokenIdsPermission) XXX_DiscardUnknown() {
+	xxx_messageInfo_TimedUpdateWithTokenIdsPermission.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_TimedUpdateWithBadgeIdsPermission proto.InternalMessageInfo
+var xxx_messageInfo_TimedUpdateWithTokenIdsPermission proto.InternalMessageInfo
 
-func (m *TimedUpdateWithBadgeIdsPermission) GetBadgeIds() []*UintRange {
+func (m *TimedUpdateWithTokenIdsPermission) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) GetPermanentlyPermittedTimes() []*UintRange {
+func (m *TimedUpdateWithTokenIdsPermission) GetPermanentlyPermittedTimes() []*UintRange {
 	if m != nil {
 		return m.PermanentlyPermittedTimes
 	}
 	return nil
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) GetPermanentlyForbiddenTimes() []*UintRange {
+func (m *TimedUpdateWithTokenIdsPermission) GetPermanentlyForbiddenTimes() []*UintRange {
 	if m != nil {
 		return m.PermanentlyForbiddenTimes
 	}
 	return nil
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) GetTimelineTimes() []*UintRange {
+func (m *TimedUpdateWithTokenIdsPermission) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -896,71 +896,70 @@ func init() {
 	proto.RegisterType((*CollectionApprovalPermission)(nil), "badges.CollectionApprovalPermission")
 	proto.RegisterType((*UserOutgoingApprovalPermission)(nil), "badges.UserOutgoingApprovalPermission")
 	proto.RegisterType((*UserIncomingApprovalPermission)(nil), "badges.UserIncomingApprovalPermission")
-	proto.RegisterType((*BadgeIdsActionPermission)(nil), "badges.BadgeIdsActionPermission")
+	proto.RegisterType((*TokenIdsActionPermission)(nil), "badges.TokenIdsActionPermission")
 	proto.RegisterType((*ActionPermission)(nil), "badges.ActionPermission")
 	proto.RegisterType((*TimedUpdatePermission)(nil), "badges.TimedUpdatePermission")
-	proto.RegisterType((*TimedUpdateWithBadgeIdsPermission)(nil), "badges.TimedUpdateWithBadgeIdsPermission")
+	proto.RegisterType((*TimedUpdateWithTokenIdsPermission)(nil), "badges.TimedUpdateWithTokenIdsPermission")
 }
 
 func init() { proto.RegisterFile("badges/permissions.proto", fileDescriptor_1298419e4a97cfe6) }
 
 var fileDescriptor_1298419e4a97cfe6 = []byte{
-	// 867 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0xcb, 0x6e, 0xdb, 0x46,
-	0x14, 0x35, 0xf5, 0xb2, 0x34, 0x46, 0x5b, 0x7b, 0x6a, 0x17, 0xb4, 0xea, 0x12, 0xb6, 0x50, 0x14,
-	0x2e, 0xd0, 0x4a, 0x80, 0xbb, 0x28, 0xba, 0x94, 0x6c, 0x14, 0x50, 0x61, 0xc3, 0x8d, 0x6c, 0x27,
-	0x41, 0x36, 0xc6, 0x90, 0x33, 0xa2, 0x06, 0xa1, 0x66, 0x04, 0xce, 0xc8, 0x89, 0xfe, 0x20, 0xcb,
-	0xac, 0xf2, 0x17, 0xd9, 0xe5, 0x23, 0xb2, 0x8b, 0x81, 0x6c, 0xb2, 0x0c, 0xec, 0x65, 0xe0, 0x4d,
-	0xbe, 0x20, 0xe0, 0x53, 0x94, 0x48, 0x4a, 0x8c, 0xe2, 0x85, 0x11, 0x64, 0x47, 0xdd, 0x7b, 0xcf,
-	0x39, 0xf7, 0x31, 0x77, 0x44, 0x02, 0x55, 0x47, 0xd8, 0x24, 0xa2, 0x31, 0x20, 0x76, 0x9f, 0x0a,
-	0x41, 0x39, 0x13, 0xf5, 0x81, 0xcd, 0x25, 0x87, 0x25, 0xcf, 0x53, 0xdd, 0x34, 0x39, 0x37, 0x2d,
-	0xd2, 0x70, 0xad, 0xfa, 0xb0, 0xdb, 0x40, 0x6c, 0xe4, 0x85, 0x54, 0x37, 0x7c, 0xb0, 0x8e, 0x2c,
-	0xc4, 0x0c, 0xe2, 0x23, 0xab, 0x55, 0xdf, 0x8c, 0x30, 0xb6, 0x89, 0x10, 0xe7, 0x16, 0x15, 0x32,
-	0xf0, 0xad, 0x9b, 0xdc, 0xe4, 0xee, 0x63, 0xc3, 0x79, 0xf2, 0xac, 0xb5, 0x17, 0xcb, 0x60, 0x63,
-	0x9f, 0x5b, 0x16, 0x31, 0x24, 0xe5, 0xec, 0xff, 0x71, 0x2e, 0xf0, 0x3f, 0xf0, 0xa3, 0x81, 0xd8,
-	0x01, 0xb1, 0x88, 0x24, 0xe3, 0x08, 0x55, 0xd9, 0xce, 0xef, 0xae, 0xec, 0xa9, 0x75, 0x4f, 0xa9,
-	0xde, 0x9c, 0xc2, 0x75, 0x92, 0x40, 0xf0, 0x1e, 0x58, 0x37, 0x10, 0x6b, 0xda, 0x46, 0x8f, 0x5e,
-	0x44, 0xc9, 0x72, 0x2e, 0xd9, 0x2f, 0x01, 0xd9, 0x29, 0xed, 0x13, 0x7c, 0x36, 0xc0, 0x48, 0x92,
-	0x08, 0x63, 0x22, 0x14, 0x3e, 0x06, 0x3b, 0x06, 0x62, 0x5e, 0xf0, 0x71, 0xb7, 0xbb, 0xdf, 0x43,
-	0x94, 0xb5, 0xfc, 0x6e, 0x1c, 0x11, 0x89, 0x30, 0x92, 0x48, 0xcd, 0x67, 0xe1, 0x9f, 0xcf, 0x03,
-	0x8f, 0x00, 0x0c, 0x83, 0x4e, 0x24, 0x62, 0x18, 0xd9, 0x58, 0xa8, 0x85, 0x2c, 0xec, 0x09, 0x40,
-	0x78, 0xec, 0xb6, 0xd6, 0xb3, 0xee, 0x0f, 0x85, 0xe4, 0xfd, 0x03, 0x27, 0xdb, 0x62, 0x16, 0xbe,
-	0x24, 0x24, 0x6c, 0x83, 0xd5, 0xd0, 0x7c, 0x84, 0x18, 0x32, 0x89, 0xad, 0x96, 0xb2, 0xb0, 0xc5,
-	0x60, 0xf0, 0x1c, 0xfc, 0x3c, 0x56, 0x08, 0xdb, 0x1d, 0x76, 0x74, 0x39, 0x0b, 0xeb, 0x2c, 0x06,
-	0xf8, 0x10, 0xfc, 0x14, 0xba, 0xef, 0x23, 0x8b, 0xe2, 0x96, 0x43, 0xd5, 0xc6, 0x42, 0x2d, 0xbb,
-	0xdc, 0xdb, 0x01, 0x77, 0x60, 0x8f, 0x1d, 0xb1, 0x14, 0x3c, 0x44, 0x11, 0x66, 0xd7, 0x18, 0x66,
-	0x5d, 0x71, 0x99, 0x7f, 0x4f, 0xc8, 0xfa, 0x01, 0x95, 0xbd, 0x80, 0x20, 0x51, 0x62, 0x82, 0x08,
-	0xf6, 0xc0, 0x56, 0x42, 0x6d, 0xcd, 0xc1, 0xc0, 0xe6, 0x17, 0xc8, 0x12, 0x2a, 0x70, 0x85, 0x7e,
-	0x0d, 0x84, 0xe2, 0x21, 0x11, 0x8d, 0x99, 0x4c, 0xb5, 0x9b, 0x02, 0xf8, 0xe1, 0x4c, 0x10, 0x3b,
-	0xba, 0x92, 0x5d, 0x50, 0x1d, 0x9f, 0xd5, 0xa1, 0x34, 0x39, 0x65, 0xe6, 0x58, 0xdb, 0xdb, 0xcc,
-	0xdf, 0x02, 0x6d, 0x07, 0x3c, 0x1d, 0x14, 0x51, 0x9f, 0xc1, 0x34, 0xa1, 0xd3, 0x66, 0x06, 0xef,
-	0x4f, 0xe8, 0xe4, 0xe2, 0x3a, 0xd3, 0x41, 0x89, 0x3a, 0x31, 0x26, 0xf8, 0x4c, 0x01, 0x7b, 0xa1,
-	0xbb, 0x39, 0x94, 0xdc, 0x73, 0x91, 0x13, 0x62, 0x75, 0xdb, 0x8c, 0x4a, 0x8a, 0x24, 0xc1, 0x41,
-	0x7a, 0xa7, 0x36, 0x62, 0xa2, 0x4b, 0x6c, 0xe1, 0x6f, 0x75, 0xfa, 0x15, 0xb4, 0x00, 0x67, 0xb6,
-	0x54, 0x82, 0x0a, 0xc6, 0xa9, 0x14, 0xbe, 0x38, 0x95, 0x18, 0x27, 0x94, 0x60, 0x37, 0x09, 0xd5,
-	0xb4, 0xac, 0xb8, 0x7e, 0x71, 0x8e, 0x7e, 0x66, 0xa6, 0xda, 0x4d, 0x1e, 0x6c, 0xcd, 0x3a, 0xae,
-	0x50, 0x03, 0xa0, 0x6b, 0xf3, 0xfe, 0x21, 0x15, 0xb2, 0x8d, 0x55, 0x65, 0x5b, 0xd9, 0xad, 0x74,
-	0x22, 0x16, 0x58, 0x05, 0x65, 0xc9, 0x7d, 0x6f, 0xce, 0xf5, 0x86, 0xbf, 0xe1, 0x1f, 0x60, 0x8d,
-	0x06, 0x05, 0xb7, 0x46, 0x7e, 0x50, 0xde, 0x0d, 0x8a, 0x3b, 0xe0, 0xdf, 0xe0, 0x3b, 0xe9, 0xe7,
-	0xe5, 0x6c, 0x6a, 0xd0, 0xe5, 0xb5, 0xf0, 0xc4, 0x51, 0x26, 0x3b, 0x88, 0x99, 0xa4, 0x33, 0x19,
-	0x07, 0xff, 0x04, 0x65, 0x3d, 0xb8, 0x4c, 0x8a, 0x69, 0x98, 0x30, 0x04, 0xfe, 0x03, 0xbe, 0xe7,
-	0x4f, 0x18, 0xb1, 0x45, 0x8f, 0x0e, 0x3c, 0xa1, 0x52, 0x1a, 0x68, 0x2a, 0xd0, 0x69, 0x06, 0xf2,
-	0x5b, 0xd4, 0xc6, 0x6a, 0xc5, 0x6b, 0xc6, 0xd8, 0x02, 0x8f, 0xc1, 0xa6, 0xf3, 0xbf, 0x8e, 0x18,
-	0x61, 0xd2, 0x1a, 0xb9, 0x5d, 0x94, 0x92, 0x60, 0x4f, 0x05, 0xa4, 0xa9, 0xa4, 0x63, 0xa6, 0x08,
-	0xff, 0xe5, 0xb6, 0x4e, 0x31, 0x26, 0xcc, 0x23, 0x5c, 0xc9, 0x42, 0x38, 0x89, 0xa9, 0xbd, 0xc9,
-	0x03, 0x6d, 0xf6, 0x15, 0x31, 0x31, 0x51, 0x25, 0xcb, 0x44, 0x73, 0x99, 0x27, 0x9a, 0x5f, 0x60,
-	0xa2, 0x85, 0x45, 0x26, 0x5a, 0x5c, 0x6c, 0xa2, 0xe5, 0xcf, 0x9b, 0x68, 0xe5, 0xb6, 0x27, 0x0a,
-	0x16, 0x98, 0xe8, 0x5b, 0x7f, 0xa2, 0xe9, 0x97, 0xf1, 0xdc, 0x1d, 0xfe, 0x36, 0xd5, 0x3b, 0x37,
-	0xd5, 0x0f, 0x0a, 0x50, 0xd3, 0xde, 0x84, 0x26, 0x1a, 0xa9, 0xcc, 0x6f, 0xe4, 0xcc, 0x6a, 0x73,
-	0xb7, 0x5d, 0x6d, 0x7e, 0x81, 0x6a, 0x5f, 0x29, 0x60, 0x35, 0x56, 0xe5, 0xcc, 0xb4, 0x95, 0xdb,
-	0x4e, 0x3b, 0xb7, 0x40, 0xda, 0x1f, 0x15, 0xb0, 0x91, 0xf8, 0x2a, 0x7c, 0xf7, 0x73, 0x77, 0xb7,
-	0x98, 0xf6, 0x89, 0x45, 0x19, 0x99, 0xbb, 0xc5, 0xd1, 0xb8, 0xda, 0xcb, 0x1c, 0xd8, 0x99, 0xfb,
-	0x26, 0xfd, 0xd5, 0x1d, 0xd1, 0x78, 0xbf, 0x0a, 0xd9, 0xfa, 0xd5, 0x3a, 0x7c, 0x7d, 0xa5, 0x29,
-	0x97, 0x57, 0x9a, 0xf2, 0xfe, 0x4a, 0x53, 0x9e, 0x5f, 0x6b, 0x4b, 0x97, 0xd7, 0xda, 0xd2, 0xbb,
-	0x6b, 0x6d, 0xe9, 0xd1, 0x9e, 0x49, 0x65, 0x6f, 0xa8, 0xd7, 0x0d, 0xde, 0x6f, 0xe8, 0x54, 0x06,
-	0xdf, 0xf6, 0xc1, 0x93, 0xe1, 0x7c, 0x93, 0x36, 0x9e, 0x36, 0x7c, 0xbb, 0x1c, 0x0d, 0x88, 0xd0,
-	0x4b, 0xee, 0xf7, 0xfb, 0x5f, 0x9f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x99, 0xa9, 0xd5, 0xe1, 0x47,
-	0x10, 0x00, 0x00,
+	// 864 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0xcd, 0x6e, 0xd3, 0x4a,
+	0x14, 0xae, 0xf3, 0xd7, 0x66, 0xaa, 0x7b, 0x6f, 0x3b, 0xb7, 0x45, 0x6e, 0x28, 0x56, 0x1b, 0x21,
+	0x54, 0x24, 0x48, 0xa4, 0xb2, 0x40, 0x2c, 0xd3, 0x56, 0x48, 0x41, 0xad, 0x0a, 0x69, 0x0b, 0x88,
+	0x4d, 0x35, 0xf1, 0x4c, 0x9c, 0x51, 0x9d, 0x99, 0xc8, 0x33, 0x29, 0xe4, 0x0d, 0x58, 0xb2, 0xe2,
+	0x2d, 0xd8, 0xf1, 0x10, 0xec, 0xa8, 0xc4, 0x86, 0x25, 0x6a, 0x97, 0xa8, 0x1b, 0x9e, 0x00, 0xf9,
+	0x37, 0x4e, 0x6c, 0x27, 0x26, 0x74, 0x51, 0x21, 0x76, 0xce, 0x39, 0xe7, 0xfb, 0x99, 0x73, 0x66,
+	0x26, 0x36, 0x50, 0x9b, 0x08, 0x1b, 0x44, 0x54, 0xbb, 0xc4, 0xea, 0x50, 0x21, 0x28, 0x67, 0xa2,
+	0xd2, 0xb5, 0xb8, 0xe4, 0xb0, 0xe0, 0x66, 0x4a, 0x2b, 0x06, 0xe7, 0x86, 0x49, 0xaa, 0x4e, 0xb4,
+	0xd9, 0x6b, 0x55, 0x11, 0xeb, 0xbb, 0x25, 0xa5, 0x65, 0x0f, 0xdc, 0x44, 0x26, 0x62, 0x3a, 0xf1,
+	0x90, 0xa5, 0x92, 0x17, 0x46, 0x18, 0x5b, 0x44, 0x88, 0x63, 0x93, 0x0a, 0xe9, 0xe7, 0x96, 0x0c,
+	0x6e, 0x70, 0xe7, 0xb1, 0x6a, 0x3f, 0xb9, 0xd1, 0xf2, 0xfb, 0x59, 0xb0, 0xbc, 0xcd, 0x4d, 0x93,
+	0xe8, 0x92, 0x72, 0xf6, 0x74, 0xe0, 0x05, 0x3e, 0x01, 0xff, 0xeb, 0x88, 0xed, 0x10, 0x93, 0x48,
+	0x32, 0xa8, 0x50, 0x95, 0xb5, 0xec, 0xc6, 0xfc, 0xa6, 0x5a, 0x71, 0x95, 0x2a, 0xb5, 0x11, 0x5c,
+	0x23, 0x0e, 0x04, 0x9f, 0x81, 0x25, 0x1d, 0xb1, 0x9a, 0xa5, 0xb7, 0xe9, 0x69, 0x98, 0x2c, 0xe3,
+	0x90, 0xdd, 0xf2, 0xc9, 0x0e, 0x69, 0x87, 0xe0, 0xa3, 0x2e, 0x46, 0x92, 0x84, 0x18, 0x63, 0xa1,
+	0xf0, 0x04, 0xac, 0xeb, 0x88, 0xb9, 0xc5, 0xfb, 0xad, 0xd6, 0x76, 0x1b, 0x51, 0xb6, 0xe5, 0x75,
+	0x63, 0x8f, 0x48, 0x84, 0x91, 0x44, 0x6a, 0x36, 0x0d, 0xff, 0x64, 0x1e, 0xb8, 0x07, 0x60, 0x50,
+	0x74, 0x20, 0x11, 0xc3, 0xc8, 0xc2, 0x42, 0xcd, 0xa5, 0x61, 0x8f, 0x01, 0xc2, 0x7d, 0xa7, 0xb5,
+	0x6e, 0x74, 0xbb, 0x27, 0x24, 0xef, 0xec, 0xd8, 0x6e, 0xf3, 0x69, 0xf8, 0xe2, 0x90, 0xb0, 0x0e,
+	0x16, 0x82, 0xf0, 0x1e, 0x62, 0xc8, 0x20, 0x96, 0x5a, 0x48, 0xc3, 0x16, 0x81, 0xc1, 0x63, 0x70,
+	0x73, 0xa0, 0x10, 0xb4, 0x3b, 0xe8, 0xe8, 0x6c, 0x1a, 0xd6, 0x71, 0x0c, 0xf0, 0x25, 0xb8, 0x11,
+	0xa4, 0x9f, 0x23, 0x93, 0xe2, 0x43, 0x7e, 0x42, 0x58, 0x1d, 0x0b, 0x75, 0xce, 0xe1, 0x5e, 0x0b,
+	0xb8, 0xbd, 0x78, 0x64, 0x8b, 0x25, 0xe0, 0x21, 0x0a, 0x31, 0x3b, 0xc1, 0xc0, 0x75, 0xd1, 0x61,
+	0xbe, 0x1b, 0xe3, 0xfa, 0x05, 0x95, 0x6d, 0x9f, 0x20, 0x56, 0x62, 0x88, 0x08, 0xb6, 0xc1, 0x6a,
+	0xcc, 0xda, 0x6a, 0xdd, 0xae, 0xc5, 0x4f, 0x91, 0x29, 0x54, 0xe0, 0x08, 0xdd, 0xf6, 0x85, 0xa2,
+	0x25, 0x21, 0x8d, 0xb1, 0x4c, 0xe5, 0xcb, 0x1c, 0xf8, 0xef, 0x48, 0x10, 0x2b, 0x7c, 0x24, 0x5b,
+	0xa0, 0x34, 0xd8, 0xab, 0x3d, 0x69, 0x70, 0xca, 0x8c, 0x81, 0xb6, 0x7b, 0x32, 0xef, 0xf8, 0xda,
+	0x36, 0x78, 0xb4, 0x28, 0xa4, 0x3e, 0x86, 0x69, 0x48, 0xa7, 0xce, 0x74, 0xde, 0x19, 0xd2, 0xc9,
+	0x44, 0x75, 0x46, 0x8b, 0x62, 0x75, 0x22, 0x4c, 0xf0, 0xad, 0x02, 0x36, 0x83, 0x74, 0xad, 0x27,
+	0xb9, 0x9b, 0x22, 0x07, 0xc4, 0x6c, 0xd5, 0x19, 0x95, 0x14, 0x49, 0x82, 0x7d, 0x7b, 0x87, 0x16,
+	0x62, 0xa2, 0x45, 0x2c, 0xe1, 0x9d, 0xea, 0xe4, 0x2b, 0x68, 0x0a, 0xce, 0x74, 0x56, 0xfc, 0x15,
+	0x0c, 0xac, 0xe4, 0x7e, 0xdb, 0x4a, 0x84, 0x13, 0x4a, 0xb0, 0x11, 0x87, 0xaa, 0x99, 0x66, 0x54,
+	0x3f, 0x3f, 0x41, 0x3f, 0x35, 0x53, 0xf9, 0x32, 0x0b, 0x56, 0xc7, 0x6d, 0x57, 0xa8, 0x01, 0xd0,
+	0xb2, 0x78, 0x67, 0x97, 0x0a, 0x59, 0xc7, 0xaa, 0xb2, 0xa6, 0x6c, 0x14, 0x1b, 0xa1, 0x08, 0x2c,
+	0x81, 0x39, 0xc9, 0xbd, 0x6c, 0xc6, 0xc9, 0x06, 0xbf, 0xe1, 0x3d, 0xb0, 0x48, 0xfd, 0x05, 0x6f,
+	0xf5, 0xbd, 0xa2, 0xac, 0x53, 0x14, 0x4d, 0xc0, 0x87, 0xe0, 0x1f, 0xe9, 0xf9, 0xb2, 0x4f, 0xaa,
+	0xdf, 0xe5, 0xc5, 0x60, 0xc7, 0x51, 0x26, 0x1b, 0x88, 0x19, 0xa4, 0x31, 0x5c, 0x07, 0xef, 0xdb,
+	0x16, 0xbc, 0xcb, 0x24, 0x9f, 0x84, 0x09, 0x4a, 0xe0, 0x23, 0xf0, 0x2f, 0x7f, 0xcd, 0x88, 0x25,
+	0xda, 0xb4, 0xeb, 0x0a, 0x15, 0x92, 0x40, 0x23, 0x85, 0x76, 0x33, 0x90, 0xd7, 0xa2, 0x3a, 0x56,
+	0x8b, 0x6e, 0x33, 0x06, 0x11, 0xb8, 0x0f, 0x56, 0xec, 0xff, 0x75, 0xc4, 0x08, 0x93, 0x66, 0xdf,
+	0xe9, 0xa2, 0x94, 0x04, 0xbb, 0x2a, 0x20, 0x49, 0x25, 0x19, 0x33, 0x42, 0xf8, 0x98, 0x5b, 0x4d,
+	0x8a, 0x31, 0x61, 0x2e, 0xe1, 0x7c, 0x1a, 0xc2, 0x61, 0x4c, 0xf9, 0x73, 0x16, 0x68, 0xe3, 0xaf,
+	0x88, 0xa1, 0x89, 0x2a, 0x69, 0x26, 0x9a, 0x49, 0x3d, 0xd1, 0xec, 0x14, 0x13, 0xcd, 0x4d, 0x33,
+	0xd1, 0xfc, 0x74, 0x13, 0x9d, 0xfb, 0xb5, 0x89, 0x16, 0xaf, 0x7a, 0xa2, 0x60, 0x8a, 0x89, 0x7e,
+	0xf1, 0x26, 0x9a, 0x7c, 0x19, 0x4f, 0x3c, 0xc3, 0x7f, 0xa7, 0x7a, 0xed, 0xa6, 0xfa, 0x5d, 0x01,
+	0x6a, 0xd2, 0x9b, 0xd0, 0x50, 0x23, 0x95, 0xc9, 0x8d, 0x1c, 0xbb, 0xda, 0xcc, 0x55, 0xaf, 0x36,
+	0x3b, 0xc5, 0x6a, 0x3f, 0x2a, 0x60, 0x21, 0xb2, 0xca, 0xb1, 0xb6, 0x95, 0xab, 0xb6, 0x9d, 0x99,
+	0xc2, 0xf6, 0x0f, 0x05, 0x2c, 0xc7, 0xbe, 0x0a, 0x5f, 0x7f, 0xef, 0xce, 0x29, 0xa6, 0x1d, 0x62,
+	0x52, 0x46, 0x26, 0x9e, 0xe2, 0x70, 0x5d, 0xf9, 0x43, 0x06, 0xac, 0x4f, 0x7c, 0x93, 0xfe, 0xe3,
+	0xb6, 0x68, 0xb4, 0x5f, 0xb9, 0x74, 0xfd, 0xda, 0xda, 0xfd, 0x74, 0xae, 0x29, 0x67, 0xe7, 0x9a,
+	0xf2, 0xed, 0x5c, 0x53, 0xde, 0x5d, 0x68, 0x33, 0x67, 0x17, 0xda, 0xcc, 0xd7, 0x0b, 0x6d, 0xe6,
+	0xd5, 0xa6, 0x41, 0x65, 0xbb, 0xd7, 0xac, 0xe8, 0xbc, 0x53, 0x6d, 0x52, 0xe9, 0x7f, 0xdb, 0xfb,
+	0x4f, 0xba, 0xfd, 0x4d, 0x5a, 0x7d, 0x53, 0xf5, 0xe2, 0xb2, 0xdf, 0x25, 0xa2, 0x59, 0x70, 0xbe,
+	0xdf, 0x1f, 0xfc, 0x0c, 0x00, 0x00, 0xff, 0xff, 0x39, 0x5f, 0xba, 0x23, 0x47, 0x10, 0x00, 0x00,
 }
 
 func (m *CollectionPermissions) Marshal() (dAtA []byte, err error) {
@@ -997,10 +996,10 @@ func (m *CollectionPermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.CanUpdateBadgeMetadata) > 0 {
-		for iNdEx := len(m.CanUpdateBadgeMetadata) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CanUpdateTokenMetadata) > 0 {
+		for iNdEx := len(m.CanUpdateTokenMetadata) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CanUpdateBadgeMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CanUpdateTokenMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1011,10 +1010,10 @@ func (m *CollectionPermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x4a
 		}
 	}
-	if len(m.CanUpdateValidBadgeIds) > 0 {
-		for iNdEx := len(m.CanUpdateValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CanUpdateValidTokenIds) > 0 {
+		for iNdEx := len(m.CanUpdateValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CanUpdateValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CanUpdateValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1288,10 +1287,10 @@ func (m *CollectionApprovalPermission) MarshalToSizedBuffer(dAtA []byte) (int, e
 			dAtA[i] = 0x32
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1409,10 +1408,10 @@ func (m *UserOutgoingApprovalPermission) MarshalToSizedBuffer(dAtA []byte) (int,
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1523,10 +1522,10 @@ func (m *UserIncomingApprovalPermission) MarshalToSizedBuffer(dAtA []byte) (int,
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1568,7 +1567,7 @@ func (m *UserIncomingApprovalPermission) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *BadgeIdsActionPermission) Marshal() (dAtA []byte, err error) {
+func (m *TokenIdsActionPermission) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1578,12 +1577,12 @@ func (m *BadgeIdsActionPermission) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BadgeIdsActionPermission) MarshalTo(dAtA []byte) (int, error) {
+func (m *TokenIdsActionPermission) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BadgeIdsActionPermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TokenIdsActionPermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1616,10 +1615,10 @@ func (m *BadgeIdsActionPermission) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1749,7 +1748,7 @@ func (m *TimedUpdatePermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) Marshal() (dAtA []byte, err error) {
+func (m *TimedUpdateWithTokenIdsPermission) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1759,12 +1758,12 @@ func (m *TimedUpdateWithBadgeIdsPermission) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) MarshalTo(dAtA []byte) (int, error) {
+func (m *TimedUpdateWithTokenIdsPermission) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TimedUpdateWithTokenIdsPermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1811,10 +1810,10 @@ func (m *TimedUpdateWithBadgeIdsPermission) MarshalToSizedBuffer(dAtA []byte) (i
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1887,14 +1886,14 @@ func (m *CollectionPermissions) Size() (n int) {
 			n += 1 + l + sovPermissions(uint64(l))
 		}
 	}
-	if len(m.CanUpdateValidBadgeIds) > 0 {
-		for _, e := range m.CanUpdateValidBadgeIds {
+	if len(m.CanUpdateValidTokenIds) > 0 {
+		for _, e := range m.CanUpdateValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
 	}
-	if len(m.CanUpdateBadgeMetadata) > 0 {
-		for _, e := range m.CanUpdateBadgeMetadata {
+	if len(m.CanUpdateTokenMetadata) > 0 {
+		for _, e := range m.CanUpdateTokenMetadata {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -1971,8 +1970,8 @@ func (m *CollectionApprovalPermission) Size() (n int) {
 			n += 1 + l + sovPermissions(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -2022,8 +2021,8 @@ func (m *UserOutgoingApprovalPermission) Size() (n int) {
 			n += 1 + l + sovPermissions(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -2073,8 +2072,8 @@ func (m *UserIncomingApprovalPermission) Size() (n int) {
 			n += 1 + l + sovPermissions(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -2104,14 +2103,14 @@ func (m *UserIncomingApprovalPermission) Size() (n int) {
 	return n
 }
 
-func (m *BadgeIdsActionPermission) Size() (n int) {
+func (m *TokenIdsActionPermission) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -2179,14 +2178,14 @@ func (m *TimedUpdatePermission) Size() (n int) {
 	return n
 }
 
-func (m *TimedUpdateWithBadgeIdsPermission) Size() (n int) {
+func (m *TimedUpdateWithTokenIdsPermission) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -2487,7 +2486,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2514,14 +2513,14 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateValidBadgeIds = append(m.CanUpdateValidBadgeIds, &BadgeIdsActionPermission{})
-			if err := m.CanUpdateValidBadgeIds[len(m.CanUpdateValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CanUpdateValidTokenIds = append(m.CanUpdateValidTokenIds, &TokenIdsActionPermission{})
+			if err := m.CanUpdateValidTokenIds[len(m.CanUpdateValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateBadgeMetadata", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateTokenMetadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2548,8 +2547,8 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateBadgeMetadata = append(m.CanUpdateBadgeMetadata, &TimedUpdateWithBadgeIdsPermission{})
-			if err := m.CanUpdateBadgeMetadata[len(m.CanUpdateBadgeMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CanUpdateTokenMetadata = append(m.CanUpdateTokenMetadata, &TimedUpdateWithTokenIdsPermission{})
+			if err := m.CanUpdateTokenMetadata[len(m.CanUpdateTokenMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2989,7 +2988,7 @@ func (m *CollectionApprovalPermission) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3016,8 +3015,8 @@ func (m *CollectionApprovalPermission) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3305,7 +3304,7 @@ func (m *UserOutgoingApprovalPermission) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3332,8 +3331,8 @@ func (m *UserOutgoingApprovalPermission) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3621,7 +3620,7 @@ func (m *UserIncomingApprovalPermission) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3648,8 +3647,8 @@ func (m *UserIncomingApprovalPermission) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3808,7 +3807,7 @@ func (m *UserIncomingApprovalPermission) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *BadgeIdsActionPermission) Unmarshal(dAtA []byte) error {
+func (m *TokenIdsActionPermission) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3831,15 +3830,15 @@ func (m *BadgeIdsActionPermission) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BadgeIdsActionPermission: wiretype end group for non-group")
+			return fmt.Errorf("proto: TokenIdsActionPermission: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BadgeIdsActionPermission: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TokenIdsActionPermission: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3866,8 +3865,8 @@ func (m *BadgeIdsActionPermission) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4230,7 +4229,7 @@ func (m *TimedUpdatePermission) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *TimedUpdateWithBadgeIdsPermission) Unmarshal(dAtA []byte) error {
+func (m *TimedUpdateWithTokenIdsPermission) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4253,15 +4252,15 @@ func (m *TimedUpdateWithBadgeIdsPermission) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: TimedUpdateWithBadgeIdsPermission: wiretype end group for non-group")
+			return fmt.Errorf("proto: TimedUpdateWithTokenIdsPermission: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TimedUpdateWithBadgeIdsPermission: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TimedUpdateWithTokenIdsPermission: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4288,8 +4287,8 @@ func (m *TimedUpdateWithBadgeIdsPermission) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

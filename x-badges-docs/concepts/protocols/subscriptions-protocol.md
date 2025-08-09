@@ -55,11 +55,11 @@ Must use `incrementedBalances` with specific configuration:
             "startBalances": [
                 {
                     "amount": "1",
-                    "badgeIds": [{ "start": "1", "end": "1" }],
+                    "tokenIds": [{ "start": "1", "end": "1" }],
                     "ownershipTimes": [{ "start": "0", "end": "0" }]
                 }
             ],
-            "incrementBadgeIdsBy": "0",
+            "incrementTokenIdsBy": "0",
             "incrementOwnershipTimesBy": "0",
             "durationFromTimestamp": "2592000000", // 30 days in milliseconds
             "allowOverrideTimestamp": true,
@@ -85,7 +85,7 @@ Must use `incrementedBalances` with specific configuration:
 ##### Restrictions
 
 -   **No Merkle Challenges**: Cannot include merkle challenges
--   **No Token Requirements**: Cannot include mustOwnBadges requirements
+-   **No Token Requirements**: Cannot include mustOwnTokens requirements
 -   **No Address Restrictions**: Cannot require from/to equals initiated by
 -   **No Override Approvals**: Cannot override incoming approvals
 
@@ -129,10 +129,10 @@ Users manage their subscriptions through incoming approvals that complement the 
             "startBalances": [
                 {
                     "amount": "1",
-                    "badgeIds": [{ "start": "1", "end": "1" }]
+                    "tokenIds": [{ "start": "1", "end": "1" }]
                 }
             ],
-            "incrementBadgeIdsBy": "0",
+            "incrementTokenIdsBy": "0",
             "incrementOwnershipTimesBy": "0",
             "durationFromTimestamp": "0",
             "allowOverrideTimestamp": false,
@@ -185,14 +185,14 @@ function doesCollectionFollowSubscriptionProtocol(collection) {
     if (subscriptionApprovals.length < 1) return false;
 
     // Validate single token ID requirement
-    if (collection.validBadgeIds.length !== 1) return false;
+    if (collection.validTokenIds.length !== 1) return false;
 
     // Ensure approval token IDs match collection token IDs
-    const allApprovalBadgeIds = subscriptionApprovals
-        .map((approval) => approval.badgeIds)
+    const allApprovalTokenIds = subscriptionApprovals
+        .map((approval) => approval.tokenIds)
         .flat();
 
-    return badgeIdsMatch(collection.validBadgeIds, allApprovalBadgeIds);
+    return tokenIdsMatch(collection.validTokenIds, allApprovalTokenIds);
 }
 ```
 
@@ -229,7 +229,7 @@ function isSubscriptionFaucetApproval(approval) {
         approval.approvalCriteria.predeterminedBalances?.incrementedBalances;
     if (!incrementedBalances) return false;
 
-    return validateIncrementedBalances(incrementedBalances, approval.badgeIds);
+    return validateIncrementedBalances(incrementedBalances, approval.tokenIds);
 }
 ```
 
@@ -243,7 +243,7 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
     if (userApproval.fromListId !== 'Mint') return false;
 
     // Token IDs must match subscription
-    if (!badgeIdsMatch(userApproval.badgeIds, subscriptionApproval.badgeIds)) {
+    if (!tokenIdsMatch(userApproval.tokenIds, subscriptionApproval.tokenIds)) {
         return false;
     }
 
@@ -275,7 +275,7 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
 
 ```json
 {
-    "validBadgeIds": [{ "start": "1", "end": "1" }],
+    "validTokenIds": [{ "start": "1", "end": "1" }],
     "standardsTimeline": [
         {
             "timelineTimes": [{ "start": "1", "end": "18446744073709551615" }],
@@ -288,7 +288,7 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
             "toListId": "All",
             "initiatedByListId": "All",
             "transferTimes": [{ "start": "1", "end": "18446744073709551615" }],
-            "badgeIds": [{ "start": "1", "end": "1" }],
+            "tokenIds": [{ "start": "1", "end": "1" }],
             "approvalCriteria": {
                 "coinTransfers": [
                     {
@@ -302,7 +302,7 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
                         "startBalances": [
                             {
                                 "amount": "1",
-                                "badgeIds": [{ "start": "1", "end": "1" }]
+                                "tokenIds": [{ "start": "1", "end": "1" }]
                             }
                         ],
                         "durationFromTimestamp": "2592000000",
@@ -320,7 +320,7 @@ function isUserRecurringApproval(userApproval, subscriptionApproval) {
 ```json
 {
     "fromListId": "Mint",
-    "badgeIds": [{ "start": "1", "end": "1" }],
+    "tokenIds": [{ "start": "1", "end": "1" }],
     "approvalCriteria": {
         "coinTransfers": [
             {

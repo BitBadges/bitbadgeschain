@@ -37,9 +37,9 @@ func (k msgServer) SetIsArchived(goCtx context.Context, msg *types.MsgSetIsArchi
 			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
 			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds:            collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:            collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}

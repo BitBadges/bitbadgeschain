@@ -8,26 +8,26 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// CheckMustOwnBadges checks if the initiatedBy address owns the required tokens
-func (k Keeper) CheckMustOwnBadges(
+// CheckMustOwnTokens checks if the initiatedBy address owns the required tokens
+func (k Keeper) CheckMustOwnTokens(
 	ctx sdk.Context,
-	mustOwnBadges []*types.MustOwnBadges,
+	mustOwnTokens []*types.MustOwnTokens,
 	initiatedBy string,
 	fromAddress string,
 	toAddress string,
 ) error {
-	failedMustOwnBadges := false
-	for _, mustOwnBadge := range mustOwnBadges {
-		collection, found := k.GetCollectionFromStore(ctx, mustOwnBadge.CollectionId)
+	failedMustOwnTokens := false
+	for _, mustOwnToken := range mustOwnTokens {
+		collection, found := k.GetCollectionFromStore(ctx, mustOwnToken.CollectionId)
 		if !found {
-			failedMustOwnBadges = true
+			failedMustOwnTokens = true
 			break
 		}
 
 		// Determine which party to check ownership for
 		partyToCheck := initiatedBy // default to initiator
-		if mustOwnBadge.OwnershipCheckParty != "" {
-			switch mustOwnBadge.OwnershipCheckParty {
+		if mustOwnToken.OwnershipCheckParty != "" {
+			switch mustOwnToken.OwnershipCheckParty {
 			case "initiator":
 				partyToCheck = initiatedBy
 			case "sender":
@@ -43,39 +43,39 @@ func (k Keeper) CheckMustOwnBadges(
 		partyBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, partyToCheck)
 		balances := partyBalances.Balances
 
-		if mustOwnBadge.OverrideWithCurrentTime {
+		if mustOwnToken.OverrideWithCurrentTime {
 			currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-			mustOwnBadge.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
+			mustOwnToken.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
 		}
 
-		fetchedBalances, err := types.GetBalancesForIds(ctx, mustOwnBadge.BadgeIds, mustOwnBadge.OwnershipTimes, balances)
+		fetchedBalances, err := types.GetBalancesForIds(ctx, mustOwnToken.TokenIds, mustOwnToken.OwnershipTimes, balances)
 		if err != nil {
-			failedMustOwnBadges = true
+			failedMustOwnTokens = true
 			break
 		}
 
 		satisfiesRequirementsForOne := false
 		for _, fetchedBalance := range fetchedBalances {
 			//check if amount is within range
-			minAmount := mustOwnBadge.AmountRange.Start
-			maxAmount := mustOwnBadge.AmountRange.End
+			minAmount := mustOwnToken.AmountRange.Start
+			maxAmount := mustOwnToken.AmountRange.End
 
 			if fetchedBalance.Amount.LT(minAmount) || fetchedBalance.Amount.GT(maxAmount) {
-				failedMustOwnBadges = true
+				failedMustOwnTokens = true
 			} else {
 				satisfiesRequirementsForOne = true
 			}
 		}
 
-		if mustOwnBadge.MustSatisfyForAllAssets && failedMustOwnBadges {
+		if mustOwnToken.MustSatisfyForAllAssets && failedMustOwnTokens {
 			break
-		} else if !mustOwnBadge.MustSatisfyForAllAssets && satisfiesRequirementsForOne {
-			failedMustOwnBadges = false
+		} else if !mustOwnToken.MustSatisfyForAllAssets && satisfiesRequirementsForOne {
+			failedMustOwnTokens = false
 			break
 		}
 	}
 
-	if failedMustOwnBadges {
+	if failedMustOwnTokens {
 		return sdkerrors.Wrapf(ErrInadequateApprovals, "failed token ownership requirements")
 	}
 

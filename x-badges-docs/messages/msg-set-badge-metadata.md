@@ -1,7 +1,7 @@
 **Disclaimer:**  
 This message is a streamlined alternative to [MsgUpdateCollection](./msg-update-collection.md). If you need to update many fields at once, we recommend using MsgUpdateCollection instead.
 
-# MsgSetBadgeMetadata
+# MsgSetTokenMetadata
 
 Sets the token metadata timeline and update permissions for a collection. This is a convenience message that focuses specifically on token metadata management.
 
@@ -19,9 +19,9 @@ Updates can only be performed by the **current manager** of the collection. The 
 ## Proto Definition
 
 ```protobuf
-message MsgSetBadgeMetadata {
+message MsgSetTokenMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/SetBadgeMetadata";
+  option (amino.name) = "badges/SetTokenMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -30,13 +30,13 @@ message MsgSetBadgeMetadata {
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 3;
 
   // Permission to update token metadata timeline
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 4;
+  repeated TimedUpdateWithTokenIdsPermission canUpdateTokenMetadata = 4;
 }
 
-message MsgSetBadgeMetadataResponse {
+message MsgSetTokenMetadataResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
@@ -55,21 +55,21 @@ bitbadgeschaind tx badges set-badge-metadata '[tx-json]' --from manager-key
 {
     "creator": "bb1abc123...",
     "collectionId": "1",
-    "badgeMetadataTimeline": [
+    "tokenMetadataTimeline": [
         {
-            "badgeMetadata": [
+            "tokenMetadata": [
                 {
                     "uri": "https://example.com/badge1.json",
                     "customData": "{\"description\": \"First token\"}",
-                    "badgeIds": [{ "start": "1", "end": "10" }]
+                    "tokenIds": [{ "start": "1", "end": "10" }]
                 }
             ],
             "timelineTimes": [{ "start": "1000", "end": "2000" }]
         }
     ],
-    "canUpdateBadgeMetadata": [
+    "canUpdateTokenMetadata": [
         {
-            "badgeIds": [{ "start": "1", "end": "10" }],
+            "tokenIds": [{ "start": "1", "end": "10" }],
             "timelineTimes": [{ "start": "1000", "end": "2000" }],
             "permanentlyPermittedTimes": [{ "start": "1000", "end": "2000" }],
             "permanentlyForbiddenTimes": []

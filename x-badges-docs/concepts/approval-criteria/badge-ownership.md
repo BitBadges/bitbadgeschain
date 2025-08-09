@@ -16,11 +16,11 @@ Token ownership requirements enable gating mechanisms where users must possess s
 ## Interface
 
 ```typescript
-interface MustOwnBadges<T extends NumberType> {
+interface MustOwnTokens<T extends NumberType> {
     collectionId: T;
     amountRange: UintRange<T>; // Min/max amount expected
     ownershipTimes: UintRange<T>[];
-    badgeIds: UintRange<T>[];
+    tokenIds: UintRange<T>[];
 
     overrideWithCurrentTime: boolean; // Use current block time. Overrides ownershipTimes with [{ start: currentTime, end: currentTime }]
     mustSatisfyForAllAssets: boolean; // All vs one requirement
@@ -49,7 +49,7 @@ interface MustOwnBadges<T extends NumberType> {
 -   **Description**: Time ranges when the user must have owned the tokens (UNIX milliseconds)
 -   **Example**: `[{ start: "1691931600000", end: "1723554000000" }]` for Aug 13, 2023 - Aug 13, 2024
 
-### badgeIds
+### tokenIds
 
 -   **Type**: `UintRange<T>[]`
 -   **Description**: Specific token IDs that must be owned
@@ -86,12 +86,12 @@ Require users to own specific tokens to access premium features or exclusive tra
 
 ```json
 {
-    "mustOwnBadges": [
+    "mustOwnTokens": [
         {
             "collectionId": "1",
             "amountRange": { "start": "1", "end": "1" },
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
-            "badgeIds": [{ "start": "1", "end": "1" }],
+            "tokenIds": [{ "start": "1", "end": "1" }],
             "overrideWithCurrentTime": false,
             "mustSatisfyForAllAssets": true,
             "ownershipCheckParty": "initiator"
@@ -106,11 +106,11 @@ Require users to own specific tokens to access premium features or exclusive tra
 
 ```json
 {
-    "mustOwnBadges": [
+    "mustOwnTokens": [
         {
             "collectionId": "1",
             "amountRange": { "start": "1", "end": "1" },
-            "badgeIds": [{ "start": "1", "end": "1" }],
+            "tokenIds": [{ "start": "1", "end": "1" }],
             "ownershipCheckParty": "initiator"
         }
     ]
@@ -121,11 +121,11 @@ Require users to own specific tokens to access premium features or exclusive tra
 
 ```json
 {
-    "mustOwnBadges": [
+    "mustOwnTokens": [
         {
             "collectionId": "1",
             "amountRange": { "start": "1", "end": "1" },
-            "badgeIds": [{ "start": "1", "end": "1" }],
+            "tokenIds": [{ "start": "1", "end": "1" }],
             "ownershipCheckParty": "sender"
         }
     ]
@@ -136,11 +136,11 @@ Require users to own specific tokens to access premium features or exclusive tra
 
 ```json
 {
-    "mustOwnBadges": [
+    "mustOwnTokens": [
         {
             "collectionId": "1",
             "amountRange": { "start": "1", "end": "1" },
-            "badgeIds": [{ "start": "1", "end": "1" }],
+            "tokenIds": [{ "start": "1", "end": "1" }],
             "ownershipCheckParty": "recipient"
         }
     ]

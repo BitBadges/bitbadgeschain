@@ -252,7 +252,7 @@ Common message types that need schema updates:
 -   `badges/CreateCollection`
 -   `badges/UpdateCollection`
 -   `badges/UniversalUpdateCollection`
--   `badges/TransferBadges`
+-   `badges/TransferTokens`
 -   `badges/UpdateUserApprovals`
 -   `badges/CreateAddressLists`
 -   `maps/CreateMap`

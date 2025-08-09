@@ -26,8 +26,8 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
 				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
-				UpdateBadgeMetadataTimeline:      true,
-				BadgeMetadataTimeline:            GetValidBadgeMetadataTimeline(),
+				UpdateTokenMetadataTimeline:      true,
+				TokenMetadataTimeline:            GetValidTokenMetadataTimeline(),
 				UpdateCollectionPermissions:      true,
 				CollectionPermissions:            &types.CollectionPermissions{},
 			},
@@ -40,9 +40,9 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
 				UpdateCollectionPermissions:      true,
-				UpdateBadgeMetadataTimeline:      true,
+				UpdateTokenMetadataTimeline:      true,
 				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
-				BadgeMetadataTimeline:            GetValidBadgeMetadataTimeline(),
+				TokenMetadataTimeline:            GetValidTokenMetadataTimeline(),
 				CollectionPermissions:            &types.CollectionPermissions{},
 			},
 		}, {
@@ -53,7 +53,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
 				UpdateCollectionPermissions:      true,
-				UpdateBadgeMetadataTimeline:      true,
+				UpdateTokenMetadataTimeline:      true,
 				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
 					{
 						CollectionMetadata: &types.CollectionMetadata{
@@ -67,7 +67,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 						},
 					},
 				},
-				BadgeMetadataTimeline: GetValidBadgeMetadataTimeline(),
+				TokenMetadataTimeline: GetValidTokenMetadataTimeline(),
 				CollectionPermissions: &types.CollectionPermissions{},
 			},
 
@@ -82,13 +82,13 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
 				UpdateCollectionMetadataTimeline: true,
 				UpdateCollectionPermissions:      true,
-				UpdateBadgeMetadataTimeline:      true,
-				BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+				UpdateTokenMetadataTimeline:      true,
+				TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 					{
-						BadgeMetadata: []*types.BadgeMetadata{
+						TokenMetadata: []*types.TokenMetadata{
 							{
 								Uri: "asdfasdfas",
-								BadgeIds: []*types.UintRange{
+								TokenIds: []*types.UintRange{
 									{
 										Start: sdkmath.NewUint(1),
 										End:   sdkmath.NewUint(math.MaxUint64),
@@ -116,9 +116,9 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		// 		BalancesType:               "Standard",
 		// 		UpdateCollectionMetadataTimeline: true,
 		// 		UpdateCollectionPermissions: true,
-		// 		UpdateBadgeMetadataTimeline: true,
+		// 		UpdateTokenMetadataTimeline: true,
 		// 		CollectionMetadataTimeline: GetValidCollectionMetadataTimeline(),
-		// 		BadgeMetadataTimeline:      GetValidBadgeMetadataTimeline(),
+		// 		TokenMetadataTimeline:      GetValidTokenMetadataTimeline(),
 		// 	},
 		// 	err: types.ErrPermissionsIsNil,
 		// },

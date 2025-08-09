@@ -16,7 +16,7 @@ import (
 var _ protoreflect.List = (*_GenesisState_3_list)(nil)
 
 type _GenesisState_3_list struct {
-	list *[]*BadgeCollection
+	list *[]*TokenCollection
 }
 
 func (x *_GenesisState_3_list) Len() int {
@@ -32,18 +32,18 @@ func (x *_GenesisState_3_list) Get(i int) protoreflect.Value {
 
 func (x *_GenesisState_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeCollection)
+	concreteValue := valueUnwrapped.Interface().(*TokenCollection)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_GenesisState_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*BadgeCollection)
+	concreteValue := valueUnwrapped.Interface().(*TokenCollection)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_GenesisState_3_list) AppendMutable() protoreflect.Value {
-	v := new(BadgeCollection)
+	v := new(TokenCollection)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -56,7 +56,7 @@ func (x *_GenesisState_3_list) Truncate(n int) {
 }
 
 func (x *_GenesisState_3_list) NewElement() protoreflect.Value {
-	v := new(BadgeCollection)
+	v := new(TokenCollection)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -932,7 +932,7 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 		return protoreflect.ValueOfMessage(x.Params.ProtoReflect())
 	case "badges.GenesisState.collections":
 		if x.Collections == nil {
-			x.Collections = []*BadgeCollection{}
+			x.Collections = []*TokenCollection{}
 		}
 		value := &_GenesisState_3_list{list: &x.Collections}
 		return protoreflect.ValueOfList(value)
@@ -1013,7 +1013,7 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 	case "badges.GenesisState.port_id":
 		return protoreflect.ValueOfString("")
 	case "badges.GenesisState.collections":
-		list := []*BadgeCollection{}
+		list := []*TokenCollection{}
 		return protoreflect.ValueOfList(&_GenesisState_3_list{list: &list})
 	case "badges.GenesisState.nextCollectionId":
 		return protoreflect.ValueOfString("")
@@ -1506,7 +1506,7 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Collections = append(x.Collections, &BadgeCollection{})
+				x.Collections = append(x.Collections, &TokenCollection{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Collections[len(x.Collections)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
@@ -1893,7 +1893,7 @@ type GenesisState struct {
 
 	Params                           *Params             `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
 	PortId                           string              `protobuf:"bytes,2,opt,name=port_id,json=portId,proto3" json:"port_id,omitempty"`
-	Collections                      []*BadgeCollection  `protobuf:"bytes,3,rep,name=collections,proto3" json:"collections,omitempty"`
+	Collections                      []*TokenCollection  `protobuf:"bytes,3,rep,name=collections,proto3" json:"collections,omitempty"`
 	NextCollectionId                 string              `protobuf:"bytes,4,opt,name=nextCollectionId,proto3" json:"nextCollectionId,omitempty"`
 	Balances                         []*UserBalanceStore `protobuf:"bytes,5,rep,name=balances,proto3" json:"balances,omitempty"`
 	BalanceStoreKeys                 []string            `protobuf:"bytes,6,rep,name=balanceStoreKeys,proto3" json:"balanceStoreKeys,omitempty"`
@@ -1940,7 +1940,7 @@ func (x *GenesisState) GetPortId() string {
 	return ""
 }
 
-func (x *GenesisState) GetCollections() []*BadgeCollection {
+func (x *GenesisState) GetCollections() []*TokenCollection {
 	if x != nil {
 		return x.Collections
 	}
@@ -2104,14 +2104,14 @@ var file_badges_genesis_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_badges_genesis_proto_goTypes = []interface{}{
 	(*GenesisState)(nil),     // 0: badges.GenesisState
 	(*Params)(nil),           // 1: badges.Params
-	(*BadgeCollection)(nil),  // 2: badges.BadgeCollection
+	(*TokenCollection)(nil),  // 2: badges.TokenCollection
 	(*UserBalanceStore)(nil), // 3: badges.UserBalanceStore
 	(*AddressList)(nil),      // 4: badges.AddressList
 	(*ApprovalTracker)(nil),  // 5: badges.ApprovalTracker
 }
 var file_badges_genesis_proto_depIdxs = []int32{
 	1, // 0: badges.GenesisState.params:type_name -> badges.Params
-	2, // 1: badges.GenesisState.collections:type_name -> badges.BadgeCollection
+	2, // 1: badges.GenesisState.collections:type_name -> badges.TokenCollection
 	3, // 2: badges.GenesisState.balances:type_name -> badges.UserBalanceStore
 	4, // 3: badges.GenesisState.addressLists:type_name -> badges.AddressList
 	5, // 4: badges.GenesisState.approvalTrackers:type_name -> badges.ApprovalTracker

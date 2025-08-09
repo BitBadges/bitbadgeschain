@@ -32,13 +32,13 @@ func getETHSignatureChallengeSchema() string {
 	}`
 }
 
-// getMustOwnBadgesSchema returns the schema for must own tokens criteria
-func getMustOwnBadgesSchema() string {
+// getMustOwnTokensSchema returns the schema for must own tokens criteria
+func getMustOwnTokensSchema() string {
 	return `{
 		"collectionId": "",
 		"amountRange": ` + getUintRangeSchema() + `,
 		"ownershipTimes": [` + getUintRangeSchema() + `],
-		"badgeIds": [` + getUintRangeSchema() + `],
+		"tokenIds": [` + getUintRangeSchema() + `],
 		"overrideWithCurrentTime": false,
 		"mustSatisfyForAllAssets": false,
 		"ownershipCheckParty": ""
@@ -65,7 +65,7 @@ func getBalanceSchema() string {
 	return `{
 		"amount": "",
 		"ownershipTimes": [` + getUintRangeSchema() + `],
-		"badgeIds": [` + getUintRangeSchema() + `]
+		"tokenIds": [` + getUintRangeSchema() + `]
 	}`
 }
 
@@ -83,8 +83,8 @@ func getPredeterminedBalancesSchema() string {
 			"startBalances": [
 				` + getBalanceSchema() + `
 			],
-			"incrementBadgeIdsBy": "",
-			"allowOverrideWithAnyValidBadge": false,
+			"incrementTokenIdsBy": "",
+			"allowOverrideWithAnyValidToken": false,
 			"durationFromTimestamp": "",
 			"incrementOwnershipTimesBy": "",
 			"allowOverrideTimestamp": true,
@@ -153,8 +153,8 @@ func getDynamicStoreChallengeSchema() string {
 // getBaseApprovalCriteriaSchema returns the base approval criteria schema without collection-specific fields
 func getBaseApprovalCriteriaSchema() string {
 	return `{
-		"mustOwnBadges": [
-			` + getMustOwnBadgesSchema() + `
+		"mustOwnTokens": [
+			` + getMustOwnTokensSchema() + `
 		],
 		"merkleChallenges": [
 			` + getMerkleChallengeSchema() + `
@@ -178,8 +178,8 @@ func getBaseApprovalCriteriaSchema() string {
 // getCollectionApprovalCriteriaSchema returns the schema for collection approval criteria
 func getCollectionApprovalCriteriaSchema() string {
 	return `{
-		"mustOwnBadges": [
-			` + getMustOwnBadgesSchema() + `
+		"mustOwnTokens": [
+			` + getMustOwnTokensSchema() + `
 		],
 		"merkleChallenges": [
 			` + getMerkleChallengeSchema() + `
@@ -213,8 +213,8 @@ func getCollectionApprovalCriteriaSchema() string {
 // getOutgoingApprovalCriteriaSchema returns the schema for outgoing approval criteria
 func getOutgoingApprovalCriteriaSchema() string {
 	return `{
-		"mustOwnBadges": [
-			` + getMustOwnBadgesSchema() + `
+		"mustOwnTokens": [
+			` + getMustOwnTokensSchema() + `
 		],
 		"merkleChallenges": [
 			` + getMerkleChallengeSchema() + `
@@ -240,8 +240,8 @@ func getOutgoingApprovalCriteriaSchema() string {
 // getIncomingApprovalCriteriaSchema returns the schema for incoming approval criteria
 func getIncomingApprovalCriteriaSchema() string {
 	return `{
-		"mustOwnBadges": [
-			` + getMustOwnBadgesSchema() + `
+		"mustOwnTokens": [
+			` + getMustOwnTokensSchema() + `
 		],
 		"merkleChallenges": [
 			` + getMerkleChallengeSchema() + `
@@ -276,7 +276,7 @@ func getCollectionApprovalSchema() string {
 		"toListId": "",
 		"initiatedByListId": "",
 		"transferTimes": [` + getUintRangeSchema() + `],
-		"badgeIds": [` + getUintRangeSchema() + `],
+		"tokenIds": [` + getUintRangeSchema() + `],
 		"ownershipTimes": [` + getUintRangeSchema() + `],
 		"uri": "",
 		"customData": "",
@@ -292,7 +292,7 @@ func getIncomingApprovalSchema() string {
 		"fromListId": "",
 		"initiatedByListId": "",
 		"transferTimes": [` + getUintRangeSchema() + `],
-		"badgeIds": [` + getUintRangeSchema() + `],
+		"tokenIds": [` + getUintRangeSchema() + `],
 		"ownershipTimes": [` + getUintRangeSchema() + `],
 		"uri": "",
 		"customData": "",
@@ -308,7 +308,7 @@ func getOutgoingApprovalSchema() string {
 		"toListId": "",
 		"initiatedByListId": "",
 		"transferTimes": [` + getUintRangeSchema() + `],
-		"badgeIds": [` + getUintRangeSchema() + `],
+		"tokenIds": [` + getUintRangeSchema() + `],
 		"ownershipTimes": [` + getUintRangeSchema() + `],
 		"uri": "",
 		"customData": "",
@@ -328,17 +328,17 @@ func getCollectionPermissionsSchema() string {
 		"canUpdateCustomData": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateManager": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateCollectionMetadata": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateValidBadgeIds": [{"badgeIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateBadgeMetadata": [{"badgeIds": [` + getUintRangeSchema() + `], "timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "badgeIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
+		"canUpdateValidTokenIds": [{"tokenIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateTokenMetadata": [{"tokenIds": [` + getUintRangeSchema() + `], "timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
 	}`
 }
 
 // getUserPermissionsSchema returns the schema for user permissions
 func getUserPermissionsSchema() string {
 	return `{
-		"canUpdateOutgoingApprovals": [{"toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "badgeIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateIncomingApprovals": [{"fromListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "badgeIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateOutgoingApprovals": [{"toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateIncomingApprovals": [{"fromListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateAutoApproveSelfInitiatedIncomingTransfers": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateAutoApproveAllIncomingTransfers": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
@@ -545,7 +545,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/TransferBadges",
+		"type": "badges/TransferTokens",
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -594,7 +594,7 @@ func GetSchemas() []string {
 					"onlyCheckPrioritizedOutgoingApprovals": false,
 					"precalculationOptions": {
 						"overrideTimestamp": "0",
-						"badgeIdsOverride": [`+getUintRangeSchema()+`]
+						"tokenIdsOverride": [`+getUintRangeSchema()+`]
 					},
 					"affiliateAddress": "",
 					"numAttempts": "0"
@@ -624,8 +624,8 @@ func GetSchemas() []string {
 				"autoApproveSelfInitiatedOutgoingTransfers": true,
 				"autoApproveAllIncomingTransfers": true
 			},
-			"updateValidBadgeIds": false,
-			"validBadgeIds": [`+getUintRangeSchema()+`],
+			"updateValidTokenIds": false,
+			"validTokenIds": [`+getUintRangeSchema()+`],
 			"updateCollectionPermissions": false,
 			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
 			"updateManagerTimeline": false,
@@ -645,14 +645,14 @@ func GetSchemas() []string {
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"updateBadgeMetadataTimeline": false,
-			"badgeMetadataTimeline": [
+			"updateTokenMetadataTimeline": false,
+			"tokenMetadataTimeline": [
 				{
-					"badgeMetadata": [
+					"tokenMetadata": [
 						{
 							"uri": "",
 							"customData": "",
-							"badgeIds": [`+getUintRangeSchema()+`]
+							"tokenIds": [`+getUintRangeSchema()+`]
 						}
 					],
 					"timelineTimes": [`+getUintRangeSchema()+`]
@@ -765,7 +765,7 @@ func GetSchemas() []string {
 				"autoApproveSelfInitiatedOutgoingTransfers": true,
 				"autoApproveAllIncomingTransfers": true
 			},
-			"validBadgeIds": [`+getUintRangeSchema()+`],
+			"validTokenIds": [`+getUintRangeSchema()+`],
 			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
 			"managerTimeline": [
 				{
@@ -782,13 +782,13 @@ func GetSchemas() []string {
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"badgeMetadataTimeline": [
+			"tokenMetadataTimeline": [
 				{
-					"badgeMetadata": [
+					"tokenMetadata": [
 						{
 							"uri": "",
 							"customData": "",
-							"badgeIds": [`+getUintRangeSchema()+`]
+							"tokenIds": [`+getUintRangeSchema()+`]
 						}
 					],
 					"timelineTimes": [`+getUintRangeSchema()+`]
@@ -857,8 +857,8 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"updateValidBadgeIds": false,
-			"validBadgeIds": [`+getUintRangeSchema()+`],
+			"updateValidTokenIds": false,
+			"validTokenIds": [`+getUintRangeSchema()+`],
 			"updateCollectionPermissions": false,
 			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
 			"updateManagerTimeline": false,
@@ -878,14 +878,14 @@ func GetSchemas() []string {
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"updateBadgeMetadataTimeline": false,
-			"badgeMetadataTimeline": [
+			"updateTokenMetadataTimeline": false,
+			"tokenMetadataTimeline": [
 				{
-					"badgeMetadata": [
+					"tokenMetadata": [
 						{
 							"uri": "",
 							"customData": "",
-							"badgeIds": [`+getUintRangeSchema()+`]
+							"tokenIds": [`+getUintRangeSchema()+`]
 						}
 					],
 					"timelineTimes": [`+getUintRangeSchema()+`]
@@ -1067,12 +1067,12 @@ func GetSchemas() []string {
 
 	// UniversalUpdateCollection helper message types
 	schemas = append(schemas, `{
-		"type": "badges/SetValidBadgeIds",
+		"type": "badges/SetValidTokenIds",
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"validBadgeIds": [`+getUintRangeSchema()+`],
-			"canUpdateValidBadgeIds": [{"badgeIds": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"validTokenIds": [`+getUintRangeSchema()+`],
+			"canUpdateValidTokenIds": [{"tokenIds": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1110,13 +1110,13 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetBadgeMetadata",
+		"type": "badges/SetTokenMetadata",
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"badgeMetadataTimeline": [
+			"tokenMetadataTimeline": [
 				{
-					"badgeMetadata": [
+					"tokenMetadata": [
 						{
 							"uri": "",
 							"customData": ""
@@ -1125,7 +1125,7 @@ func GetSchemas() []string {
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"canUpdateBadgeMetadata": [{"badgeIds": [`+getUintRangeSchema()+`], "timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"canUpdateTokenMetadata": [{"tokenIds": [`+getUintRangeSchema()+`], "timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1167,7 +1167,7 @@ func GetSchemas() []string {
 			"collectionApprovals": [
 				`+getCollectionApprovalSchema()+`
 			],
-			"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [`+getUintRangeSchema()+`], "badgeIds": [`+getUintRangeSchema()+`], "ownershipTimes": [`+getUintRangeSchema()+`], "approvalId": "", "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [`+getUintRangeSchema()+`], "tokenIds": [`+getUintRangeSchema()+`], "ownershipTimes": [`+getUintRangeSchema()+`], "approvalId": "", "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 

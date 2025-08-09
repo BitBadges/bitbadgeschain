@@ -38,7 +38,7 @@ message MsgNewCollection {
   // See collections.proto for more details about these MsgNewBadge fields. Defines the token details. Leave unneeded fields empty.
   string creator = 1; 
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 3;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 4;
   repeated CustomDataTimeline customDataTimeline = 5;
   string balancesType = 6 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -75,7 +75,7 @@ message MsgMintAndDistributeBadges {
 
   repeated Transfer transfers = 4;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 6; 
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 7;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 8;
   repeated CollectionApproval collectionApprovals = 9;
 
@@ -100,7 +100,7 @@ message MsgUpdateMetadata {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 3; 
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 4;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 4;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
   repeated CustomDataTimeline customDataTimeline = 6;
   repeated ContractAddressTimeline contractAddressTimeline = 7;

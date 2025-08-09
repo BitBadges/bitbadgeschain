@@ -31,7 +31,7 @@ Listings allow owners to sell their tokens for coins.
 -   Exactly one coin transfer with one coin denomination
 -   Coin recipient must be the token owner (`to` equals `fromListId`)
 -   No address overrides (`overrideFromWithApproverAddress` and `overrideToWithInitiator` must be false)
--   Specific token IDs (no `allowOverrideWithAnyValidBadge`)
+-   Specific token IDs (no `allowOverrideWithAnyValidToken`)
 -   Full ownership times
 -   No Merkle challenges or prerequisite tokens
 -   `overallMaxNumTransfers` > 0
@@ -47,7 +47,7 @@ Bids allow users to offer coins to purchase tokens from others.
 -   Exactly one coin transfer with one coin denomination
 -   Coins come from bidder (`overrideFromWithApproverAddress` must be true)
 -   Coins go to token owner (`overrideToWithInitiator` must be true)
--   Specific token IDs (no `allowOverrideWithAnyValidBadge` unless collection bid)
+-   Specific token IDs (no `allowOverrideWithAnyValidToken` unless collection bid)
 -   Full ownership times
 -   No Merkle challenges or prerequisite tokens
 -   `overallMaxNumTransfers` > 0
@@ -58,7 +58,7 @@ Collection bids allow users to bid on any token within a collection.
 
 **Additional Requirements:**
 
--   Must have `allowOverrideWithAnyValidBadge` set to true
+-   Must have `allowOverrideWithAnyValidToken` set to true
 -   All other bid requirements apply
 
 ## Validation Functions
@@ -149,20 +149,20 @@ export const isBidOrListingApproval = (
 
     // Collection bids can accept any valid ID
     if (options?.isCollectionBid) {
-        if (!incrementedBalances.allowOverrideWithAnyValidBadge) {
+        if (!incrementedBalances.allowOverrideWithAnyValidToken) {
             return false;
         }
     } else {
-        const allBadgeIds = UintRangeArray.From(
-            incrementedBalances.startBalances[0].badgeIds
+        const allTokenIds = UintRangeArray.From(
+            incrementedBalances.startBalances[0].tokenIds
         )
             .sortAndMerge()
             .convert(BigInt);
-        if (allBadgeIds.length !== 1 || allBadgeIds.size() !== 1n) {
+        if (allTokenIds.length !== 1 || allTokenIds.size() !== 1n) {
             return false;
         }
 
-        if (incrementedBalances.allowOverrideWithAnyValidBadge) {
+        if (incrementedBalances.allowOverrideWithAnyValidToken) {
             return false;
         }
     }
@@ -185,7 +185,7 @@ export const isBidOrListingApproval = (
         return false;
     }
 
-    if (incrementedBalances.incrementBadgeIdsBy !== 0n) {
+    if (incrementedBalances.incrementTokenIdsBy !== 0n) {
         return false;
     }
 
@@ -229,7 +229,7 @@ export const isBidOrListingApproval = (
         return false;
     }
 
-    if (approvalCriteria.mustOwnBadges?.length) {
+    if (approvalCriteria.mustOwnTokens?.length) {
         return false;
     }
 

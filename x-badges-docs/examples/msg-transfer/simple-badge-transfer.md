@@ -35,7 +35,7 @@ This transfer creates token ID 1 from collection 20 and sends it to the creator 
                                 "end": "18446744073709551615"
                             }
                         ],
-                        "badgeIds": [
+                        "tokenIds": [
                             {
                                 "start": "1",
                                 "end": "1"
@@ -85,7 +85,7 @@ This transfer creates token ID 1 from collection 20 and sends it to the creator 
 
 -   `"amount": "1"` - Transfer 1 token
 -   `"ownershipTimes"` - Full ownership time range (1 to max uint64)
--   `"badgeIds"` - Specific token ID range (1 to 1)
+-   `"tokenIds"` - Specific token ID range (1 to 1)
 
 ### Approval Configuration
 

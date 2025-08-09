@@ -2041,7 +2041,7 @@ var (
 	fd_UserOutgoingApproval_toListId          protoreflect.FieldDescriptor
 	fd_UserOutgoingApproval_initiatedByListId protoreflect.FieldDescriptor
 	fd_UserOutgoingApproval_transferTimes     protoreflect.FieldDescriptor
-	fd_UserOutgoingApproval_badgeIds          protoreflect.FieldDescriptor
+	fd_UserOutgoingApproval_tokenIds          protoreflect.FieldDescriptor
 	fd_UserOutgoingApproval_ownershipTimes    protoreflect.FieldDescriptor
 	fd_UserOutgoingApproval_uri               protoreflect.FieldDescriptor
 	fd_UserOutgoingApproval_customData        protoreflect.FieldDescriptor
@@ -2056,7 +2056,7 @@ func init() {
 	fd_UserOutgoingApproval_toListId = md_UserOutgoingApproval.Fields().ByName("toListId")
 	fd_UserOutgoingApproval_initiatedByListId = md_UserOutgoingApproval.Fields().ByName("initiatedByListId")
 	fd_UserOutgoingApproval_transferTimes = md_UserOutgoingApproval.Fields().ByName("transferTimes")
-	fd_UserOutgoingApproval_badgeIds = md_UserOutgoingApproval.Fields().ByName("badgeIds")
+	fd_UserOutgoingApproval_tokenIds = md_UserOutgoingApproval.Fields().ByName("tokenIds")
 	fd_UserOutgoingApproval_ownershipTimes = md_UserOutgoingApproval.Fields().ByName("ownershipTimes")
 	fd_UserOutgoingApproval_uri = md_UserOutgoingApproval.Fields().ByName("uri")
 	fd_UserOutgoingApproval_customData = md_UserOutgoingApproval.Fields().ByName("customData")
@@ -2148,9 +2148,9 @@ func (x *fastReflection_UserOutgoingApproval) Range(f func(protoreflect.FieldDes
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_UserOutgoingApproval_4_list{list: &x.BadgeIds})
-		if !f(fd_UserOutgoingApproval_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_UserOutgoingApproval_4_list{list: &x.TokenIds})
+		if !f(fd_UserOutgoingApproval_tokenIds, value) {
 			return
 		}
 	}
@@ -2211,8 +2211,8 @@ func (x *fastReflection_UserOutgoingApproval) Has(fd protoreflect.FieldDescripto
 		return x.InitiatedByListId != ""
 	case "badges.UserOutgoingApproval.transferTimes":
 		return len(x.TransferTimes) != 0
-	case "badges.UserOutgoingApproval.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.UserOutgoingApproval.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.UserOutgoingApproval.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
 	case "badges.UserOutgoingApproval.uri":
@@ -2247,8 +2247,8 @@ func (x *fastReflection_UserOutgoingApproval) Clear(fd protoreflect.FieldDescrip
 		x.InitiatedByListId = ""
 	case "badges.UserOutgoingApproval.transferTimes":
 		x.TransferTimes = nil
-	case "badges.UserOutgoingApproval.badgeIds":
-		x.BadgeIds = nil
+	case "badges.UserOutgoingApproval.tokenIds":
+		x.TokenIds = nil
 	case "badges.UserOutgoingApproval.ownershipTimes":
 		x.OwnershipTimes = nil
 	case "badges.UserOutgoingApproval.uri":
@@ -2289,11 +2289,11 @@ func (x *fastReflection_UserOutgoingApproval) Get(descriptor protoreflect.FieldD
 		}
 		listValue := &_UserOutgoingApproval_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.UserOutgoingApproval.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.UserOutgoingApproval.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_UserOutgoingApproval_4_list{})
 		}
-		listValue := &_UserOutgoingApproval_4_list{list: &x.BadgeIds}
+		listValue := &_UserOutgoingApproval_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.UserOutgoingApproval.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
@@ -2344,10 +2344,10 @@ func (x *fastReflection_UserOutgoingApproval) Set(fd protoreflect.FieldDescripto
 		lv := value.List()
 		clv := lv.(*_UserOutgoingApproval_3_list)
 		x.TransferTimes = *clv.list
-	case "badges.UserOutgoingApproval.badgeIds":
+	case "badges.UserOutgoingApproval.tokenIds":
 		lv := value.List()
 		clv := lv.(*_UserOutgoingApproval_4_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.UserOutgoingApproval.ownershipTimes":
 		lv := value.List()
 		clv := lv.(*_UserOutgoingApproval_5_list)
@@ -2388,11 +2388,11 @@ func (x *fastReflection_UserOutgoingApproval) Mutable(fd protoreflect.FieldDescr
 		}
 		value := &_UserOutgoingApproval_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.UserOutgoingApproval.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.UserOutgoingApproval.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_UserOutgoingApproval_4_list{list: &x.BadgeIds}
+		value := &_UserOutgoingApproval_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.UserOutgoingApproval.ownershipTimes":
 		if x.OwnershipTimes == nil {
@@ -2437,7 +2437,7 @@ func (x *fastReflection_UserOutgoingApproval) NewField(fd protoreflect.FieldDesc
 	case "badges.UserOutgoingApproval.transferTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserOutgoingApproval_3_list{list: &list})
-	case "badges.UserOutgoingApproval.badgeIds":
+	case "badges.UserOutgoingApproval.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserOutgoingApproval_4_list{list: &list})
 	case "badges.UserOutgoingApproval.ownershipTimes":
@@ -2537,8 +2537,8 @@ func (x *fastReflection_UserOutgoingApproval) ProtoMethods() *protoiface.Methods
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -2656,9 +2656,9 @@ func (x *fastReflection_UserOutgoingApproval) ProtoMethods() *protoiface.Methods
 				dAtA[i] = 0x2a
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2851,7 +2851,7 @@ func (x *fastReflection_UserOutgoingApproval) ProtoMethods() *protoiface.Methods
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -2878,8 +2878,8 @@ func (x *fastReflection_UserOutgoingApproval) ProtoMethods() *protoiface.Methods
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -3274,7 +3274,7 @@ var (
 	fd_UserIncomingApproval_fromListId        protoreflect.FieldDescriptor
 	fd_UserIncomingApproval_initiatedByListId protoreflect.FieldDescriptor
 	fd_UserIncomingApproval_transferTimes     protoreflect.FieldDescriptor
-	fd_UserIncomingApproval_badgeIds          protoreflect.FieldDescriptor
+	fd_UserIncomingApproval_tokenIds          protoreflect.FieldDescriptor
 	fd_UserIncomingApproval_ownershipTimes    protoreflect.FieldDescriptor
 	fd_UserIncomingApproval_uri               protoreflect.FieldDescriptor
 	fd_UserIncomingApproval_customData        protoreflect.FieldDescriptor
@@ -3289,7 +3289,7 @@ func init() {
 	fd_UserIncomingApproval_fromListId = md_UserIncomingApproval.Fields().ByName("fromListId")
 	fd_UserIncomingApproval_initiatedByListId = md_UserIncomingApproval.Fields().ByName("initiatedByListId")
 	fd_UserIncomingApproval_transferTimes = md_UserIncomingApproval.Fields().ByName("transferTimes")
-	fd_UserIncomingApproval_badgeIds = md_UserIncomingApproval.Fields().ByName("badgeIds")
+	fd_UserIncomingApproval_tokenIds = md_UserIncomingApproval.Fields().ByName("tokenIds")
 	fd_UserIncomingApproval_ownershipTimes = md_UserIncomingApproval.Fields().ByName("ownershipTimes")
 	fd_UserIncomingApproval_uri = md_UserIncomingApproval.Fields().ByName("uri")
 	fd_UserIncomingApproval_customData = md_UserIncomingApproval.Fields().ByName("customData")
@@ -3381,9 +3381,9 @@ func (x *fastReflection_UserIncomingApproval) Range(f func(protoreflect.FieldDes
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_UserIncomingApproval_4_list{list: &x.BadgeIds})
-		if !f(fd_UserIncomingApproval_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_UserIncomingApproval_4_list{list: &x.TokenIds})
+		if !f(fd_UserIncomingApproval_tokenIds, value) {
 			return
 		}
 	}
@@ -3444,8 +3444,8 @@ func (x *fastReflection_UserIncomingApproval) Has(fd protoreflect.FieldDescripto
 		return x.InitiatedByListId != ""
 	case "badges.UserIncomingApproval.transferTimes":
 		return len(x.TransferTimes) != 0
-	case "badges.UserIncomingApproval.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.UserIncomingApproval.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.UserIncomingApproval.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
 	case "badges.UserIncomingApproval.uri":
@@ -3480,8 +3480,8 @@ func (x *fastReflection_UserIncomingApproval) Clear(fd protoreflect.FieldDescrip
 		x.InitiatedByListId = ""
 	case "badges.UserIncomingApproval.transferTimes":
 		x.TransferTimes = nil
-	case "badges.UserIncomingApproval.badgeIds":
-		x.BadgeIds = nil
+	case "badges.UserIncomingApproval.tokenIds":
+		x.TokenIds = nil
 	case "badges.UserIncomingApproval.ownershipTimes":
 		x.OwnershipTimes = nil
 	case "badges.UserIncomingApproval.uri":
@@ -3522,11 +3522,11 @@ func (x *fastReflection_UserIncomingApproval) Get(descriptor protoreflect.FieldD
 		}
 		listValue := &_UserIncomingApproval_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.UserIncomingApproval.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.UserIncomingApproval.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_UserIncomingApproval_4_list{})
 		}
-		listValue := &_UserIncomingApproval_4_list{list: &x.BadgeIds}
+		listValue := &_UserIncomingApproval_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.UserIncomingApproval.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
@@ -3577,10 +3577,10 @@ func (x *fastReflection_UserIncomingApproval) Set(fd protoreflect.FieldDescripto
 		lv := value.List()
 		clv := lv.(*_UserIncomingApproval_3_list)
 		x.TransferTimes = *clv.list
-	case "badges.UserIncomingApproval.badgeIds":
+	case "badges.UserIncomingApproval.tokenIds":
 		lv := value.List()
 		clv := lv.(*_UserIncomingApproval_4_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.UserIncomingApproval.ownershipTimes":
 		lv := value.List()
 		clv := lv.(*_UserIncomingApproval_5_list)
@@ -3621,11 +3621,11 @@ func (x *fastReflection_UserIncomingApproval) Mutable(fd protoreflect.FieldDescr
 		}
 		value := &_UserIncomingApproval_3_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.UserIncomingApproval.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.UserIncomingApproval.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_UserIncomingApproval_4_list{list: &x.BadgeIds}
+		value := &_UserIncomingApproval_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.UserIncomingApproval.ownershipTimes":
 		if x.OwnershipTimes == nil {
@@ -3670,7 +3670,7 @@ func (x *fastReflection_UserIncomingApproval) NewField(fd protoreflect.FieldDesc
 	case "badges.UserIncomingApproval.transferTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserIncomingApproval_3_list{list: &list})
-	case "badges.UserIncomingApproval.badgeIds":
+	case "badges.UserIncomingApproval.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_UserIncomingApproval_4_list{list: &list})
 	case "badges.UserIncomingApproval.ownershipTimes":
@@ -3770,8 +3770,8 @@ func (x *fastReflection_UserIncomingApproval) ProtoMethods() *protoiface.Methods
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -3889,9 +3889,9 @@ func (x *fastReflection_UserIncomingApproval) ProtoMethods() *protoiface.Methods
 				dAtA[i] = 0x2a
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4084,7 +4084,7 @@ func (x *fastReflection_UserIncomingApproval) ProtoMethods() *protoiface.Methods
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -4111,8 +4111,8 @@ func (x *fastReflection_UserIncomingApproval) ProtoMethods() *protoiface.Methods
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -5445,24 +5445,24 @@ func (x *_IncrementedBalances_1_list) IsValid() bool {
 var (
 	md_IncrementedBalances                                protoreflect.MessageDescriptor
 	fd_IncrementedBalances_startBalances                  protoreflect.FieldDescriptor
-	fd_IncrementedBalances_incrementBadgeIdsBy            protoreflect.FieldDescriptor
+	fd_IncrementedBalances_incrementTokenIdsBy            protoreflect.FieldDescriptor
 	fd_IncrementedBalances_incrementOwnershipTimesBy      protoreflect.FieldDescriptor
 	fd_IncrementedBalances_durationFromTimestamp          protoreflect.FieldDescriptor
 	fd_IncrementedBalances_allowOverrideTimestamp         protoreflect.FieldDescriptor
 	fd_IncrementedBalances_recurringOwnershipTimes        protoreflect.FieldDescriptor
-	fd_IncrementedBalances_allowOverrideWithAnyValidBadge protoreflect.FieldDescriptor
+	fd_IncrementedBalances_allowOverrideWithAnyValidToken protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_transfers_proto_init()
 	md_IncrementedBalances = File_badges_transfers_proto.Messages().ByName("IncrementedBalances")
 	fd_IncrementedBalances_startBalances = md_IncrementedBalances.Fields().ByName("startBalances")
-	fd_IncrementedBalances_incrementBadgeIdsBy = md_IncrementedBalances.Fields().ByName("incrementBadgeIdsBy")
+	fd_IncrementedBalances_incrementTokenIdsBy = md_IncrementedBalances.Fields().ByName("incrementTokenIdsBy")
 	fd_IncrementedBalances_incrementOwnershipTimesBy = md_IncrementedBalances.Fields().ByName("incrementOwnershipTimesBy")
 	fd_IncrementedBalances_durationFromTimestamp = md_IncrementedBalances.Fields().ByName("durationFromTimestamp")
 	fd_IncrementedBalances_allowOverrideTimestamp = md_IncrementedBalances.Fields().ByName("allowOverrideTimestamp")
 	fd_IncrementedBalances_recurringOwnershipTimes = md_IncrementedBalances.Fields().ByName("recurringOwnershipTimes")
-	fd_IncrementedBalances_allowOverrideWithAnyValidBadge = md_IncrementedBalances.Fields().ByName("allowOverrideWithAnyValidBadge")
+	fd_IncrementedBalances_allowOverrideWithAnyValidToken = md_IncrementedBalances.Fields().ByName("allowOverrideWithAnyValidToken")
 }
 
 var _ protoreflect.Message = (*fastReflection_IncrementedBalances)(nil)
@@ -5536,9 +5536,9 @@ func (x *fastReflection_IncrementedBalances) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
-	if x.IncrementBadgeIdsBy != "" {
-		value := protoreflect.ValueOfString(x.IncrementBadgeIdsBy)
-		if !f(fd_IncrementedBalances_incrementBadgeIdsBy, value) {
+	if x.IncrementTokenIdsBy != "" {
+		value := protoreflect.ValueOfString(x.IncrementTokenIdsBy)
+		if !f(fd_IncrementedBalances_incrementTokenIdsBy, value) {
 			return
 		}
 	}
@@ -5566,9 +5566,9 @@ func (x *fastReflection_IncrementedBalances) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
-	if x.AllowOverrideWithAnyValidBadge != false {
-		value := protoreflect.ValueOfBool(x.AllowOverrideWithAnyValidBadge)
-		if !f(fd_IncrementedBalances_allowOverrideWithAnyValidBadge, value) {
+	if x.AllowOverrideWithAnyValidToken != false {
+		value := protoreflect.ValueOfBool(x.AllowOverrideWithAnyValidToken)
+		if !f(fd_IncrementedBalances_allowOverrideWithAnyValidToken, value) {
 			return
 		}
 	}
@@ -5589,8 +5589,8 @@ func (x *fastReflection_IncrementedBalances) Has(fd protoreflect.FieldDescriptor
 	switch fd.FullName() {
 	case "badges.IncrementedBalances.startBalances":
 		return len(x.StartBalances) != 0
-	case "badges.IncrementedBalances.incrementBadgeIdsBy":
-		return x.IncrementBadgeIdsBy != ""
+	case "badges.IncrementedBalances.incrementTokenIdsBy":
+		return x.IncrementTokenIdsBy != ""
 	case "badges.IncrementedBalances.incrementOwnershipTimesBy":
 		return x.IncrementOwnershipTimesBy != ""
 	case "badges.IncrementedBalances.durationFromTimestamp":
@@ -5599,8 +5599,8 @@ func (x *fastReflection_IncrementedBalances) Has(fd protoreflect.FieldDescriptor
 		return x.AllowOverrideTimestamp != false
 	case "badges.IncrementedBalances.recurringOwnershipTimes":
 		return x.RecurringOwnershipTimes != nil
-	case "badges.IncrementedBalances.allowOverrideWithAnyValidBadge":
-		return x.AllowOverrideWithAnyValidBadge != false
+	case "badges.IncrementedBalances.allowOverrideWithAnyValidToken":
+		return x.AllowOverrideWithAnyValidToken != false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncrementedBalances"))
@@ -5619,8 +5619,8 @@ func (x *fastReflection_IncrementedBalances) Clear(fd protoreflect.FieldDescript
 	switch fd.FullName() {
 	case "badges.IncrementedBalances.startBalances":
 		x.StartBalances = nil
-	case "badges.IncrementedBalances.incrementBadgeIdsBy":
-		x.IncrementBadgeIdsBy = ""
+	case "badges.IncrementedBalances.incrementTokenIdsBy":
+		x.IncrementTokenIdsBy = ""
 	case "badges.IncrementedBalances.incrementOwnershipTimesBy":
 		x.IncrementOwnershipTimesBy = ""
 	case "badges.IncrementedBalances.durationFromTimestamp":
@@ -5629,8 +5629,8 @@ func (x *fastReflection_IncrementedBalances) Clear(fd protoreflect.FieldDescript
 		x.AllowOverrideTimestamp = false
 	case "badges.IncrementedBalances.recurringOwnershipTimes":
 		x.RecurringOwnershipTimes = nil
-	case "badges.IncrementedBalances.allowOverrideWithAnyValidBadge":
-		x.AllowOverrideWithAnyValidBadge = false
+	case "badges.IncrementedBalances.allowOverrideWithAnyValidToken":
+		x.AllowOverrideWithAnyValidToken = false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncrementedBalances"))
@@ -5653,8 +5653,8 @@ func (x *fastReflection_IncrementedBalances) Get(descriptor protoreflect.FieldDe
 		}
 		listValue := &_IncrementedBalances_1_list{list: &x.StartBalances}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.IncrementedBalances.incrementBadgeIdsBy":
-		value := x.IncrementBadgeIdsBy
+	case "badges.IncrementedBalances.incrementTokenIdsBy":
+		value := x.IncrementTokenIdsBy
 		return protoreflect.ValueOfString(value)
 	case "badges.IncrementedBalances.incrementOwnershipTimesBy":
 		value := x.IncrementOwnershipTimesBy
@@ -5668,8 +5668,8 @@ func (x *fastReflection_IncrementedBalances) Get(descriptor protoreflect.FieldDe
 	case "badges.IncrementedBalances.recurringOwnershipTimes":
 		value := x.RecurringOwnershipTimes
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.IncrementedBalances.allowOverrideWithAnyValidBadge":
-		value := x.AllowOverrideWithAnyValidBadge
+	case "badges.IncrementedBalances.allowOverrideWithAnyValidToken":
+		value := x.AllowOverrideWithAnyValidToken
 		return protoreflect.ValueOfBool(value)
 	default:
 		if descriptor.IsExtension() {
@@ -5695,8 +5695,8 @@ func (x *fastReflection_IncrementedBalances) Set(fd protoreflect.FieldDescriptor
 		lv := value.List()
 		clv := lv.(*_IncrementedBalances_1_list)
 		x.StartBalances = *clv.list
-	case "badges.IncrementedBalances.incrementBadgeIdsBy":
-		x.IncrementBadgeIdsBy = value.Interface().(string)
+	case "badges.IncrementedBalances.incrementTokenIdsBy":
+		x.IncrementTokenIdsBy = value.Interface().(string)
 	case "badges.IncrementedBalances.incrementOwnershipTimesBy":
 		x.IncrementOwnershipTimesBy = value.Interface().(string)
 	case "badges.IncrementedBalances.durationFromTimestamp":
@@ -5705,8 +5705,8 @@ func (x *fastReflection_IncrementedBalances) Set(fd protoreflect.FieldDescriptor
 		x.AllowOverrideTimestamp = value.Bool()
 	case "badges.IncrementedBalances.recurringOwnershipTimes":
 		x.RecurringOwnershipTimes = value.Message().Interface().(*RecurringOwnershipTimes)
-	case "badges.IncrementedBalances.allowOverrideWithAnyValidBadge":
-		x.AllowOverrideWithAnyValidBadge = value.Bool()
+	case "badges.IncrementedBalances.allowOverrideWithAnyValidToken":
+		x.AllowOverrideWithAnyValidToken = value.Bool()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncrementedBalances"))
@@ -5738,16 +5738,16 @@ func (x *fastReflection_IncrementedBalances) Mutable(fd protoreflect.FieldDescri
 			x.RecurringOwnershipTimes = new(RecurringOwnershipTimes)
 		}
 		return protoreflect.ValueOfMessage(x.RecurringOwnershipTimes.ProtoReflect())
-	case "badges.IncrementedBalances.incrementBadgeIdsBy":
-		panic(fmt.Errorf("field incrementBadgeIdsBy of message badges.IncrementedBalances is not mutable"))
+	case "badges.IncrementedBalances.incrementTokenIdsBy":
+		panic(fmt.Errorf("field incrementTokenIdsBy of message badges.IncrementedBalances is not mutable"))
 	case "badges.IncrementedBalances.incrementOwnershipTimesBy":
 		panic(fmt.Errorf("field incrementOwnershipTimesBy of message badges.IncrementedBalances is not mutable"))
 	case "badges.IncrementedBalances.durationFromTimestamp":
 		panic(fmt.Errorf("field durationFromTimestamp of message badges.IncrementedBalances is not mutable"))
 	case "badges.IncrementedBalances.allowOverrideTimestamp":
 		panic(fmt.Errorf("field allowOverrideTimestamp of message badges.IncrementedBalances is not mutable"))
-	case "badges.IncrementedBalances.allowOverrideWithAnyValidBadge":
-		panic(fmt.Errorf("field allowOverrideWithAnyValidBadge of message badges.IncrementedBalances is not mutable"))
+	case "badges.IncrementedBalances.allowOverrideWithAnyValidToken":
+		panic(fmt.Errorf("field allowOverrideWithAnyValidToken of message badges.IncrementedBalances is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncrementedBalances"))
@@ -5764,7 +5764,7 @@ func (x *fastReflection_IncrementedBalances) NewField(fd protoreflect.FieldDescr
 	case "badges.IncrementedBalances.startBalances":
 		list := []*Balance{}
 		return protoreflect.ValueOfList(&_IncrementedBalances_1_list{list: &list})
-	case "badges.IncrementedBalances.incrementBadgeIdsBy":
+	case "badges.IncrementedBalances.incrementTokenIdsBy":
 		return protoreflect.ValueOfString("")
 	case "badges.IncrementedBalances.incrementOwnershipTimesBy":
 		return protoreflect.ValueOfString("")
@@ -5775,7 +5775,7 @@ func (x *fastReflection_IncrementedBalances) NewField(fd protoreflect.FieldDescr
 	case "badges.IncrementedBalances.recurringOwnershipTimes":
 		m := new(RecurringOwnershipTimes)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.IncrementedBalances.allowOverrideWithAnyValidBadge":
+	case "badges.IncrementedBalances.allowOverrideWithAnyValidToken":
 		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
@@ -5852,7 +5852,7 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		l = len(x.IncrementBadgeIdsBy)
+		l = len(x.IncrementTokenIdsBy)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
@@ -5871,7 +5871,7 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 			l = options.Size(x.RecurringOwnershipTimes)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.AllowOverrideWithAnyValidBadge {
+		if x.AllowOverrideWithAnyValidToken {
 			n += 2
 		}
 		if x.unknownFields != nil {
@@ -5903,9 +5903,9 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.AllowOverrideWithAnyValidBadge {
+		if x.AllowOverrideWithAnyValidToken {
 			i--
-			if x.AllowOverrideWithAnyValidBadge {
+			if x.AllowOverrideWithAnyValidToken {
 				dAtA[i] = 1
 			} else {
 				dAtA[i] = 0
@@ -5951,10 +5951,10 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 			i--
 			dAtA[i] = 0x1a
 		}
-		if len(x.IncrementBadgeIdsBy) > 0 {
-			i -= len(x.IncrementBadgeIdsBy)
-			copy(dAtA[i:], x.IncrementBadgeIdsBy)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.IncrementBadgeIdsBy)))
+		if len(x.IncrementTokenIdsBy) > 0 {
+			i -= len(x.IncrementTokenIdsBy)
+			copy(dAtA[i:], x.IncrementTokenIdsBy)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.IncrementTokenIdsBy)))
 			i--
 			dAtA[i] = 0x12
 		}
@@ -6059,7 +6059,7 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IncrementBadgeIdsBy", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IncrementTokenIdsBy", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -6087,7 +6087,7 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.IncrementBadgeIdsBy = string(dAtA[iNdEx:postIndex])
+				x.IncrementTokenIdsBy = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
@@ -6211,7 +6211,7 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 				iNdEx = postIndex
 			case 7:
 				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowOverrideWithAnyValidBadge", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowOverrideWithAnyValidToken", wireType)
 				}
 				var v int
 				for shift := uint(0); ; shift += 7 {
@@ -6228,7 +6228,7 @@ func (x *fastReflection_IncrementedBalances) ProtoMethods() *protoiface.Methods 
 						break
 					}
 				}
-				x.AllowOverrideWithAnyValidBadge = bool(v != 0)
+				x.AllowOverrideWithAnyValidToken = bool(v != 0)
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -11352,138 +11352,138 @@ func (x *fastReflection_CoinTransfer) ProtoMethods() *protoiface.Methods {
 	}
 }
 
-var _ protoreflect.List = (*_MustOwnBadges_3_list)(nil)
+var _ protoreflect.List = (*_MustOwnTokens_3_list)(nil)
 
-type _MustOwnBadges_3_list struct {
+type _MustOwnTokens_3_list struct {
 	list *[]*UintRange
 }
 
-func (x *_MustOwnBadges_3_list) Len() int {
+func (x *_MustOwnTokens_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_MustOwnBadges_3_list) Get(i int) protoreflect.Value {
+func (x *_MustOwnTokens_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_MustOwnBadges_3_list) Set(i int, value protoreflect.Value) {
+func (x *_MustOwnTokens_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_MustOwnBadges_3_list) Append(value protoreflect.Value) {
+func (x *_MustOwnTokens_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_MustOwnBadges_3_list) AppendMutable() protoreflect.Value {
+func (x *_MustOwnTokens_3_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_MustOwnBadges_3_list) Truncate(n int) {
+func (x *_MustOwnTokens_3_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_MustOwnBadges_3_list) NewElement() protoreflect.Value {
+func (x *_MustOwnTokens_3_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_MustOwnBadges_3_list) IsValid() bool {
+func (x *_MustOwnTokens_3_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_MustOwnBadges_4_list)(nil)
+var _ protoreflect.List = (*_MustOwnTokens_4_list)(nil)
 
-type _MustOwnBadges_4_list struct {
+type _MustOwnTokens_4_list struct {
 	list *[]*UintRange
 }
 
-func (x *_MustOwnBadges_4_list) Len() int {
+func (x *_MustOwnTokens_4_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_MustOwnBadges_4_list) Get(i int) protoreflect.Value {
+func (x *_MustOwnTokens_4_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_MustOwnBadges_4_list) Set(i int, value protoreflect.Value) {
+func (x *_MustOwnTokens_4_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_MustOwnBadges_4_list) Append(value protoreflect.Value) {
+func (x *_MustOwnTokens_4_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_MustOwnBadges_4_list) AppendMutable() protoreflect.Value {
+func (x *_MustOwnTokens_4_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_MustOwnBadges_4_list) Truncate(n int) {
+func (x *_MustOwnTokens_4_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_MustOwnBadges_4_list) NewElement() protoreflect.Value {
+func (x *_MustOwnTokens_4_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_MustOwnBadges_4_list) IsValid() bool {
+func (x *_MustOwnTokens_4_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_MustOwnBadges                         protoreflect.MessageDescriptor
-	fd_MustOwnBadges_collectionId            protoreflect.FieldDescriptor
-	fd_MustOwnBadges_amountRange             protoreflect.FieldDescriptor
-	fd_MustOwnBadges_ownershipTimes          protoreflect.FieldDescriptor
-	fd_MustOwnBadges_badgeIds                protoreflect.FieldDescriptor
-	fd_MustOwnBadges_overrideWithCurrentTime protoreflect.FieldDescriptor
-	fd_MustOwnBadges_mustSatisfyForAllAssets protoreflect.FieldDescriptor
+	md_MustOwnTokens                         protoreflect.MessageDescriptor
+	fd_MustOwnTokens_collectionId            protoreflect.FieldDescriptor
+	fd_MustOwnTokens_amountRange             protoreflect.FieldDescriptor
+	fd_MustOwnTokens_ownershipTimes          protoreflect.FieldDescriptor
+	fd_MustOwnTokens_tokenIds                protoreflect.FieldDescriptor
+	fd_MustOwnTokens_overrideWithCurrentTime protoreflect.FieldDescriptor
+	fd_MustOwnTokens_mustSatisfyForAllAssets protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_transfers_proto_init()
-	md_MustOwnBadges = File_badges_transfers_proto.Messages().ByName("MustOwnBadges")
-	fd_MustOwnBadges_collectionId = md_MustOwnBadges.Fields().ByName("collectionId")
-	fd_MustOwnBadges_amountRange = md_MustOwnBadges.Fields().ByName("amountRange")
-	fd_MustOwnBadges_ownershipTimes = md_MustOwnBadges.Fields().ByName("ownershipTimes")
-	fd_MustOwnBadges_badgeIds = md_MustOwnBadges.Fields().ByName("badgeIds")
-	fd_MustOwnBadges_overrideWithCurrentTime = md_MustOwnBadges.Fields().ByName("overrideWithCurrentTime")
-	fd_MustOwnBadges_mustSatisfyForAllAssets = md_MustOwnBadges.Fields().ByName("mustSatisfyForAllAssets")
+	md_MustOwnTokens = File_badges_transfers_proto.Messages().ByName("MustOwnTokens")
+	fd_MustOwnTokens_collectionId = md_MustOwnTokens.Fields().ByName("collectionId")
+	fd_MustOwnTokens_amountRange = md_MustOwnTokens.Fields().ByName("amountRange")
+	fd_MustOwnTokens_ownershipTimes = md_MustOwnTokens.Fields().ByName("ownershipTimes")
+	fd_MustOwnTokens_tokenIds = md_MustOwnTokens.Fields().ByName("tokenIds")
+	fd_MustOwnTokens_overrideWithCurrentTime = md_MustOwnTokens.Fields().ByName("overrideWithCurrentTime")
+	fd_MustOwnTokens_mustSatisfyForAllAssets = md_MustOwnTokens.Fields().ByName("mustSatisfyForAllAssets")
 }
 
-var _ protoreflect.Message = (*fastReflection_MustOwnBadges)(nil)
+var _ protoreflect.Message = (*fastReflection_MustOwnTokens)(nil)
 
-type fastReflection_MustOwnBadges MustOwnBadges
+type fastReflection_MustOwnTokens MustOwnTokens
 
-func (x *MustOwnBadges) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MustOwnBadges)(x)
+func (x *MustOwnTokens) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MustOwnTokens)(x)
 }
 
-func (x *MustOwnBadges) slowProtoReflect() protoreflect.Message {
+func (x *MustOwnTokens) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_transfers_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -11495,43 +11495,43 @@ func (x *MustOwnBadges) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MustOwnBadges_messageType fastReflection_MustOwnBadges_messageType
-var _ protoreflect.MessageType = fastReflection_MustOwnBadges_messageType{}
+var _fastReflection_MustOwnTokens_messageType fastReflection_MustOwnTokens_messageType
+var _ protoreflect.MessageType = fastReflection_MustOwnTokens_messageType{}
 
-type fastReflection_MustOwnBadges_messageType struct{}
+type fastReflection_MustOwnTokens_messageType struct{}
 
-func (x fastReflection_MustOwnBadges_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MustOwnBadges)(nil)
+func (x fastReflection_MustOwnTokens_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MustOwnTokens)(nil)
 }
-func (x fastReflection_MustOwnBadges_messageType) New() protoreflect.Message {
-	return new(fastReflection_MustOwnBadges)
+func (x fastReflection_MustOwnTokens_messageType) New() protoreflect.Message {
+	return new(fastReflection_MustOwnTokens)
 }
-func (x fastReflection_MustOwnBadges_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MustOwnBadges
+func (x fastReflection_MustOwnTokens_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MustOwnTokens
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MustOwnBadges) Descriptor() protoreflect.MessageDescriptor {
-	return md_MustOwnBadges
+func (x *fastReflection_MustOwnTokens) Descriptor() protoreflect.MessageDescriptor {
+	return md_MustOwnTokens
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MustOwnBadges) Type() protoreflect.MessageType {
-	return _fastReflection_MustOwnBadges_messageType
+func (x *fastReflection_MustOwnTokens) Type() protoreflect.MessageType {
+	return _fastReflection_MustOwnTokens_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MustOwnBadges) New() protoreflect.Message {
-	return new(fastReflection_MustOwnBadges)
+func (x *fastReflection_MustOwnTokens) New() protoreflect.Message {
+	return new(fastReflection_MustOwnTokens)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MustOwnBadges) Interface() protoreflect.ProtoMessage {
-	return (*MustOwnBadges)(x)
+func (x *fastReflection_MustOwnTokens) Interface() protoreflect.ProtoMessage {
+	return (*MustOwnTokens)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -11539,40 +11539,40 @@ func (x *fastReflection_MustOwnBadges) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MustOwnBadges) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MustOwnTokens) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.CollectionId != "" {
 		value := protoreflect.ValueOfString(x.CollectionId)
-		if !f(fd_MustOwnBadges_collectionId, value) {
+		if !f(fd_MustOwnTokens_collectionId, value) {
 			return
 		}
 	}
 	if x.AmountRange != nil {
 		value := protoreflect.ValueOfMessage(x.AmountRange.ProtoReflect())
-		if !f(fd_MustOwnBadges_amountRange, value) {
+		if !f(fd_MustOwnTokens_amountRange, value) {
 			return
 		}
 	}
 	if len(x.OwnershipTimes) != 0 {
-		value := protoreflect.ValueOfList(&_MustOwnBadges_3_list{list: &x.OwnershipTimes})
-		if !f(fd_MustOwnBadges_ownershipTimes, value) {
+		value := protoreflect.ValueOfList(&_MustOwnTokens_3_list{list: &x.OwnershipTimes})
+		if !f(fd_MustOwnTokens_ownershipTimes, value) {
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_MustOwnBadges_4_list{list: &x.BadgeIds})
-		if !f(fd_MustOwnBadges_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_MustOwnTokens_4_list{list: &x.TokenIds})
+		if !f(fd_MustOwnTokens_tokenIds, value) {
 			return
 		}
 	}
 	if x.OverrideWithCurrentTime != false {
 		value := protoreflect.ValueOfBool(x.OverrideWithCurrentTime)
-		if !f(fd_MustOwnBadges_overrideWithCurrentTime, value) {
+		if !f(fd_MustOwnTokens_overrideWithCurrentTime, value) {
 			return
 		}
 	}
 	if x.MustSatisfyForAllAssets != false {
 		value := protoreflect.ValueOfBool(x.MustSatisfyForAllAssets)
-		if !f(fd_MustOwnBadges_mustSatisfyForAllAssets, value) {
+		if !f(fd_MustOwnTokens_mustSatisfyForAllAssets, value) {
 			return
 		}
 	}
@@ -11589,25 +11589,25 @@ func (x *fastReflection_MustOwnBadges) Range(f func(protoreflect.FieldDescriptor
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MustOwnBadges) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MustOwnTokens) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.MustOwnBadges.collectionId":
+	case "badges.MustOwnTokens.collectionId":
 		return x.CollectionId != ""
-	case "badges.MustOwnBadges.amountRange":
+	case "badges.MustOwnTokens.amountRange":
 		return x.AmountRange != nil
-	case "badges.MustOwnBadges.ownershipTimes":
+	case "badges.MustOwnTokens.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
-	case "badges.MustOwnBadges.badgeIds":
-		return len(x.BadgeIds) != 0
-	case "badges.MustOwnBadges.overrideWithCurrentTime":
+	case "badges.MustOwnTokens.tokenIds":
+		return len(x.TokenIds) != 0
+	case "badges.MustOwnTokens.overrideWithCurrentTime":
 		return x.OverrideWithCurrentTime != false
-	case "badges.MustOwnBadges.mustSatisfyForAllAssets":
+	case "badges.MustOwnTokens.mustSatisfyForAllAssets":
 		return x.MustSatisfyForAllAssets != false
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnBadges"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnTokens"))
 		}
-		panic(fmt.Errorf("message badges.MustOwnBadges does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.MustOwnTokens does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11617,25 +11617,25 @@ func (x *fastReflection_MustOwnBadges) Has(fd protoreflect.FieldDescriptor) bool
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MustOwnBadges) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MustOwnTokens) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.MustOwnBadges.collectionId":
+	case "badges.MustOwnTokens.collectionId":
 		x.CollectionId = ""
-	case "badges.MustOwnBadges.amountRange":
+	case "badges.MustOwnTokens.amountRange":
 		x.AmountRange = nil
-	case "badges.MustOwnBadges.ownershipTimes":
+	case "badges.MustOwnTokens.ownershipTimes":
 		x.OwnershipTimes = nil
-	case "badges.MustOwnBadges.badgeIds":
-		x.BadgeIds = nil
-	case "badges.MustOwnBadges.overrideWithCurrentTime":
+	case "badges.MustOwnTokens.tokenIds":
+		x.TokenIds = nil
+	case "badges.MustOwnTokens.overrideWithCurrentTime":
 		x.OverrideWithCurrentTime = false
-	case "badges.MustOwnBadges.mustSatisfyForAllAssets":
+	case "badges.MustOwnTokens.mustSatisfyForAllAssets":
 		x.MustSatisfyForAllAssets = false
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnBadges"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnTokens"))
 		}
-		panic(fmt.Errorf("message badges.MustOwnBadges does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.MustOwnTokens does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11645,37 +11645,37 @@ func (x *fastReflection_MustOwnBadges) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MustOwnBadges) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MustOwnTokens) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.MustOwnBadges.collectionId":
+	case "badges.MustOwnTokens.collectionId":
 		value := x.CollectionId
 		return protoreflect.ValueOfString(value)
-	case "badges.MustOwnBadges.amountRange":
+	case "badges.MustOwnTokens.amountRange":
 		value := x.AmountRange
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.MustOwnBadges.ownershipTimes":
+	case "badges.MustOwnTokens.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
-			return protoreflect.ValueOfList(&_MustOwnBadges_3_list{})
+			return protoreflect.ValueOfList(&_MustOwnTokens_3_list{})
 		}
-		listValue := &_MustOwnBadges_3_list{list: &x.OwnershipTimes}
+		listValue := &_MustOwnTokens_3_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.MustOwnBadges.badgeIds":
-		if len(x.BadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_MustOwnBadges_4_list{})
+	case "badges.MustOwnTokens.tokenIds":
+		if len(x.TokenIds) == 0 {
+			return protoreflect.ValueOfList(&_MustOwnTokens_4_list{})
 		}
-		listValue := &_MustOwnBadges_4_list{list: &x.BadgeIds}
+		listValue := &_MustOwnTokens_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.MustOwnBadges.overrideWithCurrentTime":
+	case "badges.MustOwnTokens.overrideWithCurrentTime":
 		value := x.OverrideWithCurrentTime
 		return protoreflect.ValueOfBool(value)
-	case "badges.MustOwnBadges.mustSatisfyForAllAssets":
+	case "badges.MustOwnTokens.mustSatisfyForAllAssets":
 		value := x.MustSatisfyForAllAssets
 		return protoreflect.ValueOfBool(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnBadges"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnTokens"))
 		}
-		panic(fmt.Errorf("message badges.MustOwnBadges does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.MustOwnTokens does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -11689,29 +11689,29 @@ func (x *fastReflection_MustOwnBadges) Get(descriptor protoreflect.FieldDescript
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MustOwnBadges) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MustOwnTokens) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.MustOwnBadges.collectionId":
+	case "badges.MustOwnTokens.collectionId":
 		x.CollectionId = value.Interface().(string)
-	case "badges.MustOwnBadges.amountRange":
+	case "badges.MustOwnTokens.amountRange":
 		x.AmountRange = value.Message().Interface().(*UintRange)
-	case "badges.MustOwnBadges.ownershipTimes":
+	case "badges.MustOwnTokens.ownershipTimes":
 		lv := value.List()
-		clv := lv.(*_MustOwnBadges_3_list)
+		clv := lv.(*_MustOwnTokens_3_list)
 		x.OwnershipTimes = *clv.list
-	case "badges.MustOwnBadges.badgeIds":
+	case "badges.MustOwnTokens.tokenIds":
 		lv := value.List()
-		clv := lv.(*_MustOwnBadges_4_list)
-		x.BadgeIds = *clv.list
-	case "badges.MustOwnBadges.overrideWithCurrentTime":
+		clv := lv.(*_MustOwnTokens_4_list)
+		x.TokenIds = *clv.list
+	case "badges.MustOwnTokens.overrideWithCurrentTime":
 		x.OverrideWithCurrentTime = value.Bool()
-	case "badges.MustOwnBadges.mustSatisfyForAllAssets":
+	case "badges.MustOwnTokens.mustSatisfyForAllAssets":
 		x.MustSatisfyForAllAssets = value.Bool()
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnBadges"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnTokens"))
 		}
-		panic(fmt.Errorf("message badges.MustOwnBadges does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.MustOwnTokens does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11725,74 +11725,74 @@ func (x *fastReflection_MustOwnBadges) Set(fd protoreflect.FieldDescriptor, valu
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MustOwnBadges) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MustOwnTokens) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.MustOwnBadges.amountRange":
+	case "badges.MustOwnTokens.amountRange":
 		if x.AmountRange == nil {
 			x.AmountRange = new(UintRange)
 		}
 		return protoreflect.ValueOfMessage(x.AmountRange.ProtoReflect())
-	case "badges.MustOwnBadges.ownershipTimes":
+	case "badges.MustOwnTokens.ownershipTimes":
 		if x.OwnershipTimes == nil {
 			x.OwnershipTimes = []*UintRange{}
 		}
-		value := &_MustOwnBadges_3_list{list: &x.OwnershipTimes}
+		value := &_MustOwnTokens_3_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.MustOwnBadges.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.MustOwnTokens.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_MustOwnBadges_4_list{list: &x.BadgeIds}
+		value := &_MustOwnTokens_4_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.MustOwnBadges.collectionId":
-		panic(fmt.Errorf("field collectionId of message badges.MustOwnBadges is not mutable"))
-	case "badges.MustOwnBadges.overrideWithCurrentTime":
-		panic(fmt.Errorf("field overrideWithCurrentTime of message badges.MustOwnBadges is not mutable"))
-	case "badges.MustOwnBadges.mustSatisfyForAllAssets":
-		panic(fmt.Errorf("field mustSatisfyForAllAssets of message badges.MustOwnBadges is not mutable"))
+	case "badges.MustOwnTokens.collectionId":
+		panic(fmt.Errorf("field collectionId of message badges.MustOwnTokens is not mutable"))
+	case "badges.MustOwnTokens.overrideWithCurrentTime":
+		panic(fmt.Errorf("field overrideWithCurrentTime of message badges.MustOwnTokens is not mutable"))
+	case "badges.MustOwnTokens.mustSatisfyForAllAssets":
+		panic(fmt.Errorf("field mustSatisfyForAllAssets of message badges.MustOwnTokens is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnBadges"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnTokens"))
 		}
-		panic(fmt.Errorf("message badges.MustOwnBadges does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.MustOwnTokens does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MustOwnBadges) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MustOwnTokens) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.MustOwnBadges.collectionId":
+	case "badges.MustOwnTokens.collectionId":
 		return protoreflect.ValueOfString("")
-	case "badges.MustOwnBadges.amountRange":
+	case "badges.MustOwnTokens.amountRange":
 		m := new(UintRange)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.MustOwnBadges.ownershipTimes":
+	case "badges.MustOwnTokens.ownershipTimes":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_MustOwnBadges_3_list{list: &list})
-	case "badges.MustOwnBadges.badgeIds":
+		return protoreflect.ValueOfList(&_MustOwnTokens_3_list{list: &list})
+	case "badges.MustOwnTokens.tokenIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_MustOwnBadges_4_list{list: &list})
-	case "badges.MustOwnBadges.overrideWithCurrentTime":
+		return protoreflect.ValueOfList(&_MustOwnTokens_4_list{list: &list})
+	case "badges.MustOwnTokens.overrideWithCurrentTime":
 		return protoreflect.ValueOfBool(false)
-	case "badges.MustOwnBadges.mustSatisfyForAllAssets":
+	case "badges.MustOwnTokens.mustSatisfyForAllAssets":
 		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnBadges"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.MustOwnTokens"))
 		}
-		panic(fmt.Errorf("message badges.MustOwnBadges does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.MustOwnTokens does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MustOwnBadges) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MustOwnTokens) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.MustOwnBadges", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.MustOwnTokens", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -11800,7 +11800,7 @@ func (x *fastReflection_MustOwnBadges) WhichOneof(d protoreflect.OneofDescriptor
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MustOwnBadges) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MustOwnTokens) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -11811,7 +11811,7 @@ func (x *fastReflection_MustOwnBadges) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MustOwnBadges) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MustOwnTokens) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -11823,7 +11823,7 @@ func (x *fastReflection_MustOwnBadges) SetUnknown(fields protoreflect.RawFields)
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MustOwnBadges) IsValid() bool {
+func (x *fastReflection_MustOwnTokens) IsValid() bool {
 	return x != nil
 }
 
@@ -11833,9 +11833,9 @@ func (x *fastReflection_MustOwnBadges) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MustOwnTokens) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MustOwnBadges)
+		x := input.Message.Interface().(*MustOwnTokens)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11861,8 +11861,8 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -11883,7 +11883,7 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MustOwnBadges)
+		x := input.Message.Interface().(*MustOwnTokens)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11922,9 +11922,9 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 			i--
 			dAtA[i] = 0x28
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11986,7 +11986,7 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MustOwnBadges)
+		x := input.Message.Interface().(*MustOwnTokens)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -12018,10 +12018,10 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MustOwnBadges: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MustOwnTokens: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MustOwnBadges: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MustOwnTokens: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -12128,7 +12128,7 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -12155,8 +12155,8 @@ func (x *fastReflection_MustOwnBadges) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -12340,7 +12340,7 @@ func (x *_ApprovalCriteria_5_list) IsValid() bool {
 var _ protoreflect.List = (*_ApprovalCriteria_14_list)(nil)
 
 type _ApprovalCriteria_14_list struct {
-	list *[]*MustOwnBadges
+	list *[]*MustOwnTokens
 }
 
 func (x *_ApprovalCriteria_14_list) Len() int {
@@ -12356,18 +12356,18 @@ func (x *_ApprovalCriteria_14_list) Get(i int) protoreflect.Value {
 
 func (x *_ApprovalCriteria_14_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*MustOwnBadges)
+	concreteValue := valueUnwrapped.Interface().(*MustOwnTokens)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_ApprovalCriteria_14_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*MustOwnBadges)
+	concreteValue := valueUnwrapped.Interface().(*MustOwnTokens)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_ApprovalCriteria_14_list) AppendMutable() protoreflect.Value {
-	v := new(MustOwnBadges)
+	v := new(MustOwnTokens)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -12380,7 +12380,7 @@ func (x *_ApprovalCriteria_14_list) Truncate(n int) {
 }
 
 func (x *_ApprovalCriteria_14_list) NewElement() protoreflect.Value {
-	v := new(MustOwnBadges)
+	v := new(MustOwnTokens)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -12403,7 +12403,7 @@ var (
 	fd_ApprovalCriteria_overridesToIncomingApprovals       protoreflect.FieldDescriptor
 	fd_ApprovalCriteria_autoDeletionOptions                protoreflect.FieldDescriptor
 	fd_ApprovalCriteria_userRoyalties                      protoreflect.FieldDescriptor
-	fd_ApprovalCriteria_mustOwnBadges                      protoreflect.FieldDescriptor
+	fd_ApprovalCriteria_mustOwnTokens                      protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -12422,7 +12422,7 @@ func init() {
 	fd_ApprovalCriteria_overridesToIncomingApprovals = md_ApprovalCriteria.Fields().ByName("overridesToIncomingApprovals")
 	fd_ApprovalCriteria_autoDeletionOptions = md_ApprovalCriteria.Fields().ByName("autoDeletionOptions")
 	fd_ApprovalCriteria_userRoyalties = md_ApprovalCriteria.Fields().ByName("userRoyalties")
-	fd_ApprovalCriteria_mustOwnBadges = md_ApprovalCriteria.Fields().ByName("mustOwnBadges")
+	fd_ApprovalCriteria_mustOwnTokens = md_ApprovalCriteria.Fields().ByName("mustOwnTokens")
 }
 
 var _ protoreflect.Message = (*fastReflection_ApprovalCriteria)(nil)
@@ -12568,9 +12568,9 @@ func (x *fastReflection_ApprovalCriteria) Range(f func(protoreflect.FieldDescrip
 			return
 		}
 	}
-	if len(x.MustOwnBadges) != 0 {
-		value := protoreflect.ValueOfList(&_ApprovalCriteria_14_list{list: &x.MustOwnBadges})
-		if !f(fd_ApprovalCriteria_mustOwnBadges, value) {
+	if len(x.MustOwnTokens) != 0 {
+		value := protoreflect.ValueOfList(&_ApprovalCriteria_14_list{list: &x.MustOwnTokens})
+		if !f(fd_ApprovalCriteria_mustOwnTokens, value) {
 			return
 		}
 	}
@@ -12615,8 +12615,8 @@ func (x *fastReflection_ApprovalCriteria) Has(fd protoreflect.FieldDescriptor) b
 		return x.AutoDeletionOptions != nil
 	case "badges.ApprovalCriteria.userRoyalties":
 		return x.UserRoyalties != nil
-	case "badges.ApprovalCriteria.mustOwnBadges":
-		return len(x.MustOwnBadges) != 0
+	case "badges.ApprovalCriteria.mustOwnTokens":
+		return len(x.MustOwnTokens) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.ApprovalCriteria"))
@@ -12659,8 +12659,8 @@ func (x *fastReflection_ApprovalCriteria) Clear(fd protoreflect.FieldDescriptor)
 		x.AutoDeletionOptions = nil
 	case "badges.ApprovalCriteria.userRoyalties":
 		x.UserRoyalties = nil
-	case "badges.ApprovalCriteria.mustOwnBadges":
-		x.MustOwnBadges = nil
+	case "badges.ApprovalCriteria.mustOwnTokens":
+		x.MustOwnTokens = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.ApprovalCriteria"))
@@ -12722,11 +12722,11 @@ func (x *fastReflection_ApprovalCriteria) Get(descriptor protoreflect.FieldDescr
 	case "badges.ApprovalCriteria.userRoyalties":
 		value := x.UserRoyalties
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.ApprovalCriteria.mustOwnBadges":
-		if len(x.MustOwnBadges) == 0 {
+	case "badges.ApprovalCriteria.mustOwnTokens":
+		if len(x.MustOwnTokens) == 0 {
 			return protoreflect.ValueOfList(&_ApprovalCriteria_14_list{})
 		}
-		listValue := &_ApprovalCriteria_14_list{list: &x.MustOwnBadges}
+		listValue := &_ApprovalCriteria_14_list{list: &x.MustOwnTokens}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -12778,10 +12778,10 @@ func (x *fastReflection_ApprovalCriteria) Set(fd protoreflect.FieldDescriptor, v
 		x.AutoDeletionOptions = value.Message().Interface().(*AutoDeletionOptions)
 	case "badges.ApprovalCriteria.userRoyalties":
 		x.UserRoyalties = value.Message().Interface().(*UserRoyalties)
-	case "badges.ApprovalCriteria.mustOwnBadges":
+	case "badges.ApprovalCriteria.mustOwnTokens":
 		lv := value.List()
 		clv := lv.(*_ApprovalCriteria_14_list)
-		x.MustOwnBadges = *clv.list
+		x.MustOwnTokens = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.ApprovalCriteria"))
@@ -12839,11 +12839,11 @@ func (x *fastReflection_ApprovalCriteria) Mutable(fd protoreflect.FieldDescripto
 			x.UserRoyalties = new(UserRoyalties)
 		}
 		return protoreflect.ValueOfMessage(x.UserRoyalties.ProtoReflect())
-	case "badges.ApprovalCriteria.mustOwnBadges":
-		if x.MustOwnBadges == nil {
-			x.MustOwnBadges = []*MustOwnBadges{}
+	case "badges.ApprovalCriteria.mustOwnTokens":
+		if x.MustOwnTokens == nil {
+			x.MustOwnTokens = []*MustOwnTokens{}
 		}
-		value := &_ApprovalCriteria_14_list{list: &x.MustOwnBadges}
+		value := &_ApprovalCriteria_14_list{list: &x.MustOwnTokens}
 		return protoreflect.ValueOfList(value)
 	case "badges.ApprovalCriteria.requireToEqualsInitiatedBy":
 		panic(fmt.Errorf("field requireToEqualsInitiatedBy of message badges.ApprovalCriteria is not mutable"))
@@ -12903,8 +12903,8 @@ func (x *fastReflection_ApprovalCriteria) NewField(fd protoreflect.FieldDescript
 	case "badges.ApprovalCriteria.userRoyalties":
 		m := new(UserRoyalties)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.ApprovalCriteria.mustOwnBadges":
-		list := []*MustOwnBadges{}
+	case "badges.ApprovalCriteria.mustOwnTokens":
+		list := []*MustOwnTokens{}
 		return protoreflect.ValueOfList(&_ApprovalCriteria_14_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -13025,8 +13025,8 @@ func (x *fastReflection_ApprovalCriteria) ProtoMethods() *protoiface.Methods {
 			l = options.Size(x.UserRoyalties)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.MustOwnBadges) > 0 {
-			for _, e := range x.MustOwnBadges {
+		if len(x.MustOwnTokens) > 0 {
+			for _, e := range x.MustOwnTokens {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -13060,9 +13060,9 @@ func (x *fastReflection_ApprovalCriteria) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.MustOwnBadges) > 0 {
-			for iNdEx := len(x.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.MustOwnBadges[iNdEx])
+		if len(x.MustOwnTokens) > 0 {
+			for iNdEx := len(x.MustOwnTokens) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.MustOwnTokens[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -13657,7 +13657,7 @@ func (x *fastReflection_ApprovalCriteria) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 14:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MustOwnTokens", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -13684,8 +13684,8 @@ func (x *fastReflection_ApprovalCriteria) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.MustOwnBadges = append(x.MustOwnBadges, &MustOwnBadges{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MustOwnBadges[len(x.MustOwnBadges)-1]); err != nil {
+				x.MustOwnTokens = append(x.MustOwnTokens, &MustOwnTokens{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MustOwnTokens[len(x.MustOwnTokens)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -14313,7 +14313,7 @@ func (x *_OutgoingApprovalCriteria_5_list) IsValid() bool {
 var _ protoreflect.List = (*_OutgoingApprovalCriteria_9_list)(nil)
 
 type _OutgoingApprovalCriteria_9_list struct {
-	list *[]*MustOwnBadges
+	list *[]*MustOwnTokens
 }
 
 func (x *_OutgoingApprovalCriteria_9_list) Len() int {
@@ -14329,18 +14329,18 @@ func (x *_OutgoingApprovalCriteria_9_list) Get(i int) protoreflect.Value {
 
 func (x *_OutgoingApprovalCriteria_9_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*MustOwnBadges)
+	concreteValue := valueUnwrapped.Interface().(*MustOwnTokens)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_OutgoingApprovalCriteria_9_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*MustOwnBadges)
+	concreteValue := valueUnwrapped.Interface().(*MustOwnTokens)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_OutgoingApprovalCriteria_9_list) AppendMutable() protoreflect.Value {
-	v := new(MustOwnBadges)
+	v := new(MustOwnTokens)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -14353,7 +14353,7 @@ func (x *_OutgoingApprovalCriteria_9_list) Truncate(n int) {
 }
 
 func (x *_OutgoingApprovalCriteria_9_list) NewElement() protoreflect.Value {
-	v := new(MustOwnBadges)
+	v := new(MustOwnTokens)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -14371,7 +14371,7 @@ var (
 	fd_OutgoingApprovalCriteria_requireToEqualsInitiatedBy       protoreflect.FieldDescriptor
 	fd_OutgoingApprovalCriteria_requireToDoesNotEqualInitiatedBy protoreflect.FieldDescriptor
 	fd_OutgoingApprovalCriteria_autoDeletionOptions              protoreflect.FieldDescriptor
-	fd_OutgoingApprovalCriteria_mustOwnBadges                    protoreflect.FieldDescriptor
+	fd_OutgoingApprovalCriteria_mustOwnTokens                    protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -14385,7 +14385,7 @@ func init() {
 	fd_OutgoingApprovalCriteria_requireToEqualsInitiatedBy = md_OutgoingApprovalCriteria.Fields().ByName("requireToEqualsInitiatedBy")
 	fd_OutgoingApprovalCriteria_requireToDoesNotEqualInitiatedBy = md_OutgoingApprovalCriteria.Fields().ByName("requireToDoesNotEqualInitiatedBy")
 	fd_OutgoingApprovalCriteria_autoDeletionOptions = md_OutgoingApprovalCriteria.Fields().ByName("autoDeletionOptions")
-	fd_OutgoingApprovalCriteria_mustOwnBadges = md_OutgoingApprovalCriteria.Fields().ByName("mustOwnBadges")
+	fd_OutgoingApprovalCriteria_mustOwnTokens = md_OutgoingApprovalCriteria.Fields().ByName("mustOwnTokens")
 }
 
 var _ protoreflect.Message = (*fastReflection_OutgoingApprovalCriteria)(nil)
@@ -14501,9 +14501,9 @@ func (x *fastReflection_OutgoingApprovalCriteria) Range(f func(protoreflect.Fiel
 			return
 		}
 	}
-	if len(x.MustOwnBadges) != 0 {
-		value := protoreflect.ValueOfList(&_OutgoingApprovalCriteria_9_list{list: &x.MustOwnBadges})
-		if !f(fd_OutgoingApprovalCriteria_mustOwnBadges, value) {
+	if len(x.MustOwnTokens) != 0 {
+		value := protoreflect.ValueOfList(&_OutgoingApprovalCriteria_9_list{list: &x.MustOwnTokens})
+		if !f(fd_OutgoingApprovalCriteria_mustOwnTokens, value) {
 			return
 		}
 	}
@@ -14538,8 +14538,8 @@ func (x *fastReflection_OutgoingApprovalCriteria) Has(fd protoreflect.FieldDescr
 		return x.RequireToDoesNotEqualInitiatedBy != false
 	case "badges.OutgoingApprovalCriteria.autoDeletionOptions":
 		return x.AutoDeletionOptions != nil
-	case "badges.OutgoingApprovalCriteria.mustOwnBadges":
-		return len(x.MustOwnBadges) != 0
+	case "badges.OutgoingApprovalCriteria.mustOwnTokens":
+		return len(x.MustOwnTokens) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OutgoingApprovalCriteria"))
@@ -14572,8 +14572,8 @@ func (x *fastReflection_OutgoingApprovalCriteria) Clear(fd protoreflect.FieldDes
 		x.RequireToDoesNotEqualInitiatedBy = false
 	case "badges.OutgoingApprovalCriteria.autoDeletionOptions":
 		x.AutoDeletionOptions = nil
-	case "badges.OutgoingApprovalCriteria.mustOwnBadges":
-		x.MustOwnBadges = nil
+	case "badges.OutgoingApprovalCriteria.mustOwnTokens":
+		x.MustOwnTokens = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OutgoingApprovalCriteria"))
@@ -14620,11 +14620,11 @@ func (x *fastReflection_OutgoingApprovalCriteria) Get(descriptor protoreflect.Fi
 	case "badges.OutgoingApprovalCriteria.autoDeletionOptions":
 		value := x.AutoDeletionOptions
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.OutgoingApprovalCriteria.mustOwnBadges":
-		if len(x.MustOwnBadges) == 0 {
+	case "badges.OutgoingApprovalCriteria.mustOwnTokens":
+		if len(x.MustOwnTokens) == 0 {
 			return protoreflect.ValueOfList(&_OutgoingApprovalCriteria_9_list{})
 		}
-		listValue := &_OutgoingApprovalCriteria_9_list{list: &x.MustOwnBadges}
+		listValue := &_OutgoingApprovalCriteria_9_list{list: &x.MustOwnTokens}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -14666,10 +14666,10 @@ func (x *fastReflection_OutgoingApprovalCriteria) Set(fd protoreflect.FieldDescr
 		x.RequireToDoesNotEqualInitiatedBy = value.Bool()
 	case "badges.OutgoingApprovalCriteria.autoDeletionOptions":
 		x.AutoDeletionOptions = value.Message().Interface().(*AutoDeletionOptions)
-	case "badges.OutgoingApprovalCriteria.mustOwnBadges":
+	case "badges.OutgoingApprovalCriteria.mustOwnTokens":
 		lv := value.List()
 		clv := lv.(*_OutgoingApprovalCriteria_9_list)
-		x.MustOwnBadges = *clv.list
+		x.MustOwnTokens = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OutgoingApprovalCriteria"))
@@ -14722,11 +14722,11 @@ func (x *fastReflection_OutgoingApprovalCriteria) Mutable(fd protoreflect.FieldD
 			x.AutoDeletionOptions = new(AutoDeletionOptions)
 		}
 		return protoreflect.ValueOfMessage(x.AutoDeletionOptions.ProtoReflect())
-	case "badges.OutgoingApprovalCriteria.mustOwnBadges":
-		if x.MustOwnBadges == nil {
-			x.MustOwnBadges = []*MustOwnBadges{}
+	case "badges.OutgoingApprovalCriteria.mustOwnTokens":
+		if x.MustOwnTokens == nil {
+			x.MustOwnTokens = []*MustOwnTokens{}
 		}
-		value := &_OutgoingApprovalCriteria_9_list{list: &x.MustOwnBadges}
+		value := &_OutgoingApprovalCriteria_9_list{list: &x.MustOwnTokens}
 		return protoreflect.ValueOfList(value)
 	case "badges.OutgoingApprovalCriteria.requireToEqualsInitiatedBy":
 		panic(fmt.Errorf("field requireToEqualsInitiatedBy of message badges.OutgoingApprovalCriteria is not mutable"))
@@ -14767,8 +14767,8 @@ func (x *fastReflection_OutgoingApprovalCriteria) NewField(fd protoreflect.Field
 	case "badges.OutgoingApprovalCriteria.autoDeletionOptions":
 		m := new(AutoDeletionOptions)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.OutgoingApprovalCriteria.mustOwnBadges":
-		list := []*MustOwnBadges{}
+	case "badges.OutgoingApprovalCriteria.mustOwnTokens":
+		list := []*MustOwnTokens{}
 		return protoreflect.ValueOfList(&_OutgoingApprovalCriteria_9_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -14873,8 +14873,8 @@ func (x *fastReflection_OutgoingApprovalCriteria) ProtoMethods() *protoiface.Met
 			l = options.Size(x.AutoDeletionOptions)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.MustOwnBadges) > 0 {
-			for _, e := range x.MustOwnBadges {
+		if len(x.MustOwnTokens) > 0 {
+			for _, e := range x.MustOwnTokens {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -14908,9 +14908,9 @@ func (x *fastReflection_OutgoingApprovalCriteria) ProtoMethods() *protoiface.Met
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.MustOwnBadges) > 0 {
-			for iNdEx := len(x.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.MustOwnBadges[iNdEx])
+		if len(x.MustOwnTokens) > 0 {
+			for iNdEx := len(x.MustOwnTokens) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.MustOwnTokens[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -15335,7 +15335,7 @@ func (x *fastReflection_OutgoingApprovalCriteria) ProtoMethods() *protoiface.Met
 				iNdEx = postIndex
 			case 9:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MustOwnTokens", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -15362,8 +15362,8 @@ func (x *fastReflection_OutgoingApprovalCriteria) ProtoMethods() *protoiface.Met
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.MustOwnBadges = append(x.MustOwnBadges, &MustOwnBadges{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MustOwnBadges[len(x.MustOwnBadges)-1]); err != nil {
+				x.MustOwnTokens = append(x.MustOwnTokens, &MustOwnTokens{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MustOwnTokens[len(x.MustOwnTokens)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -15507,7 +15507,7 @@ func (x *_IncomingApprovalCriteria_5_list) IsValid() bool {
 var _ protoreflect.List = (*_IncomingApprovalCriteria_9_list)(nil)
 
 type _IncomingApprovalCriteria_9_list struct {
-	list *[]*MustOwnBadges
+	list *[]*MustOwnTokens
 }
 
 func (x *_IncomingApprovalCriteria_9_list) Len() int {
@@ -15523,18 +15523,18 @@ func (x *_IncomingApprovalCriteria_9_list) Get(i int) protoreflect.Value {
 
 func (x *_IncomingApprovalCriteria_9_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*MustOwnBadges)
+	concreteValue := valueUnwrapped.Interface().(*MustOwnTokens)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_IncomingApprovalCriteria_9_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*MustOwnBadges)
+	concreteValue := valueUnwrapped.Interface().(*MustOwnTokens)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_IncomingApprovalCriteria_9_list) AppendMutable() protoreflect.Value {
-	v := new(MustOwnBadges)
+	v := new(MustOwnTokens)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -15547,7 +15547,7 @@ func (x *_IncomingApprovalCriteria_9_list) Truncate(n int) {
 }
 
 func (x *_IncomingApprovalCriteria_9_list) NewElement() protoreflect.Value {
-	v := new(MustOwnBadges)
+	v := new(MustOwnTokens)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -15565,7 +15565,7 @@ var (
 	fd_IncomingApprovalCriteria_requireFromEqualsInitiatedBy       protoreflect.FieldDescriptor
 	fd_IncomingApprovalCriteria_requireFromDoesNotEqualInitiatedBy protoreflect.FieldDescriptor
 	fd_IncomingApprovalCriteria_autoDeletionOptions                protoreflect.FieldDescriptor
-	fd_IncomingApprovalCriteria_mustOwnBadges                      protoreflect.FieldDescriptor
+	fd_IncomingApprovalCriteria_mustOwnTokens                      protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -15579,7 +15579,7 @@ func init() {
 	fd_IncomingApprovalCriteria_requireFromEqualsInitiatedBy = md_IncomingApprovalCriteria.Fields().ByName("requireFromEqualsInitiatedBy")
 	fd_IncomingApprovalCriteria_requireFromDoesNotEqualInitiatedBy = md_IncomingApprovalCriteria.Fields().ByName("requireFromDoesNotEqualInitiatedBy")
 	fd_IncomingApprovalCriteria_autoDeletionOptions = md_IncomingApprovalCriteria.Fields().ByName("autoDeletionOptions")
-	fd_IncomingApprovalCriteria_mustOwnBadges = md_IncomingApprovalCriteria.Fields().ByName("mustOwnBadges")
+	fd_IncomingApprovalCriteria_mustOwnTokens = md_IncomingApprovalCriteria.Fields().ByName("mustOwnTokens")
 }
 
 var _ protoreflect.Message = (*fastReflection_IncomingApprovalCriteria)(nil)
@@ -15695,9 +15695,9 @@ func (x *fastReflection_IncomingApprovalCriteria) Range(f func(protoreflect.Fiel
 			return
 		}
 	}
-	if len(x.MustOwnBadges) != 0 {
-		value := protoreflect.ValueOfList(&_IncomingApprovalCriteria_9_list{list: &x.MustOwnBadges})
-		if !f(fd_IncomingApprovalCriteria_mustOwnBadges, value) {
+	if len(x.MustOwnTokens) != 0 {
+		value := protoreflect.ValueOfList(&_IncomingApprovalCriteria_9_list{list: &x.MustOwnTokens})
+		if !f(fd_IncomingApprovalCriteria_mustOwnTokens, value) {
 			return
 		}
 	}
@@ -15732,8 +15732,8 @@ func (x *fastReflection_IncomingApprovalCriteria) Has(fd protoreflect.FieldDescr
 		return x.RequireFromDoesNotEqualInitiatedBy != false
 	case "badges.IncomingApprovalCriteria.autoDeletionOptions":
 		return x.AutoDeletionOptions != nil
-	case "badges.IncomingApprovalCriteria.mustOwnBadges":
-		return len(x.MustOwnBadges) != 0
+	case "badges.IncomingApprovalCriteria.mustOwnTokens":
+		return len(x.MustOwnTokens) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncomingApprovalCriteria"))
@@ -15766,8 +15766,8 @@ func (x *fastReflection_IncomingApprovalCriteria) Clear(fd protoreflect.FieldDes
 		x.RequireFromDoesNotEqualInitiatedBy = false
 	case "badges.IncomingApprovalCriteria.autoDeletionOptions":
 		x.AutoDeletionOptions = nil
-	case "badges.IncomingApprovalCriteria.mustOwnBadges":
-		x.MustOwnBadges = nil
+	case "badges.IncomingApprovalCriteria.mustOwnTokens":
+		x.MustOwnTokens = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncomingApprovalCriteria"))
@@ -15814,11 +15814,11 @@ func (x *fastReflection_IncomingApprovalCriteria) Get(descriptor protoreflect.Fi
 	case "badges.IncomingApprovalCriteria.autoDeletionOptions":
 		value := x.AutoDeletionOptions
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.IncomingApprovalCriteria.mustOwnBadges":
-		if len(x.MustOwnBadges) == 0 {
+	case "badges.IncomingApprovalCriteria.mustOwnTokens":
+		if len(x.MustOwnTokens) == 0 {
 			return protoreflect.ValueOfList(&_IncomingApprovalCriteria_9_list{})
 		}
-		listValue := &_IncomingApprovalCriteria_9_list{list: &x.MustOwnBadges}
+		listValue := &_IncomingApprovalCriteria_9_list{list: &x.MustOwnTokens}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -15860,10 +15860,10 @@ func (x *fastReflection_IncomingApprovalCriteria) Set(fd protoreflect.FieldDescr
 		x.RequireFromDoesNotEqualInitiatedBy = value.Bool()
 	case "badges.IncomingApprovalCriteria.autoDeletionOptions":
 		x.AutoDeletionOptions = value.Message().Interface().(*AutoDeletionOptions)
-	case "badges.IncomingApprovalCriteria.mustOwnBadges":
+	case "badges.IncomingApprovalCriteria.mustOwnTokens":
 		lv := value.List()
 		clv := lv.(*_IncomingApprovalCriteria_9_list)
-		x.MustOwnBadges = *clv.list
+		x.MustOwnTokens = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.IncomingApprovalCriteria"))
@@ -15916,11 +15916,11 @@ func (x *fastReflection_IncomingApprovalCriteria) Mutable(fd protoreflect.FieldD
 			x.AutoDeletionOptions = new(AutoDeletionOptions)
 		}
 		return protoreflect.ValueOfMessage(x.AutoDeletionOptions.ProtoReflect())
-	case "badges.IncomingApprovalCriteria.mustOwnBadges":
-		if x.MustOwnBadges == nil {
-			x.MustOwnBadges = []*MustOwnBadges{}
+	case "badges.IncomingApprovalCriteria.mustOwnTokens":
+		if x.MustOwnTokens == nil {
+			x.MustOwnTokens = []*MustOwnTokens{}
 		}
-		value := &_IncomingApprovalCriteria_9_list{list: &x.MustOwnBadges}
+		value := &_IncomingApprovalCriteria_9_list{list: &x.MustOwnTokens}
 		return protoreflect.ValueOfList(value)
 	case "badges.IncomingApprovalCriteria.requireFromEqualsInitiatedBy":
 		panic(fmt.Errorf("field requireFromEqualsInitiatedBy of message badges.IncomingApprovalCriteria is not mutable"))
@@ -15961,8 +15961,8 @@ func (x *fastReflection_IncomingApprovalCriteria) NewField(fd protoreflect.Field
 	case "badges.IncomingApprovalCriteria.autoDeletionOptions":
 		m := new(AutoDeletionOptions)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.IncomingApprovalCriteria.mustOwnBadges":
-		list := []*MustOwnBadges{}
+	case "badges.IncomingApprovalCriteria.mustOwnTokens":
+		list := []*MustOwnTokens{}
 		return protoreflect.ValueOfList(&_IncomingApprovalCriteria_9_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -16067,8 +16067,8 @@ func (x *fastReflection_IncomingApprovalCriteria) ProtoMethods() *protoiface.Met
 			l = options.Size(x.AutoDeletionOptions)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.MustOwnBadges) > 0 {
-			for _, e := range x.MustOwnBadges {
+		if len(x.MustOwnTokens) > 0 {
+			for _, e := range x.MustOwnTokens {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -16102,9 +16102,9 @@ func (x *fastReflection_IncomingApprovalCriteria) ProtoMethods() *protoiface.Met
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.MustOwnBadges) > 0 {
-			for iNdEx := len(x.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.MustOwnBadges[iNdEx])
+		if len(x.MustOwnTokens) > 0 {
+			for iNdEx := len(x.MustOwnTokens) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.MustOwnTokens[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -16529,7 +16529,7 @@ func (x *fastReflection_IncomingApprovalCriteria) ProtoMethods() *protoiface.Met
 				iNdEx = postIndex
 			case 9:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MustOwnTokens", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -16556,8 +16556,8 @@ func (x *fastReflection_IncomingApprovalCriteria) ProtoMethods() *protoiface.Met
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.MustOwnBadges = append(x.MustOwnBadges, &MustOwnBadges{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MustOwnBadges[len(x.MustOwnBadges)-1]); err != nil {
+				x.MustOwnTokens = append(x.MustOwnTokens, &MustOwnTokens{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.MustOwnTokens[len(x.MustOwnTokens)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -16755,7 +16755,7 @@ var (
 	fd_CollectionApproval_toListId          protoreflect.FieldDescriptor
 	fd_CollectionApproval_initiatedByListId protoreflect.FieldDescriptor
 	fd_CollectionApproval_transferTimes     protoreflect.FieldDescriptor
-	fd_CollectionApproval_badgeIds          protoreflect.FieldDescriptor
+	fd_CollectionApproval_tokenIds          protoreflect.FieldDescriptor
 	fd_CollectionApproval_ownershipTimes    protoreflect.FieldDescriptor
 	fd_CollectionApproval_uri               protoreflect.FieldDescriptor
 	fd_CollectionApproval_customData        protoreflect.FieldDescriptor
@@ -16771,7 +16771,7 @@ func init() {
 	fd_CollectionApproval_toListId = md_CollectionApproval.Fields().ByName("toListId")
 	fd_CollectionApproval_initiatedByListId = md_CollectionApproval.Fields().ByName("initiatedByListId")
 	fd_CollectionApproval_transferTimes = md_CollectionApproval.Fields().ByName("transferTimes")
-	fd_CollectionApproval_badgeIds = md_CollectionApproval.Fields().ByName("badgeIds")
+	fd_CollectionApproval_tokenIds = md_CollectionApproval.Fields().ByName("tokenIds")
 	fd_CollectionApproval_ownershipTimes = md_CollectionApproval.Fields().ByName("ownershipTimes")
 	fd_CollectionApproval_uri = md_CollectionApproval.Fields().ByName("uri")
 	fd_CollectionApproval_customData = md_CollectionApproval.Fields().ByName("customData")
@@ -16869,9 +16869,9 @@ func (x *fastReflection_CollectionApproval) Range(f func(protoreflect.FieldDescr
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_CollectionApproval_5_list{list: &x.BadgeIds})
-		if !f(fd_CollectionApproval_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_CollectionApproval_5_list{list: &x.TokenIds})
+		if !f(fd_CollectionApproval_tokenIds, value) {
 			return
 		}
 	}
@@ -16934,8 +16934,8 @@ func (x *fastReflection_CollectionApproval) Has(fd protoreflect.FieldDescriptor)
 		return x.InitiatedByListId != ""
 	case "badges.CollectionApproval.transferTimes":
 		return len(x.TransferTimes) != 0
-	case "badges.CollectionApproval.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.CollectionApproval.tokenIds":
+		return len(x.TokenIds) != 0
 	case "badges.CollectionApproval.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
 	case "badges.CollectionApproval.uri":
@@ -16972,8 +16972,8 @@ func (x *fastReflection_CollectionApproval) Clear(fd protoreflect.FieldDescripto
 		x.InitiatedByListId = ""
 	case "badges.CollectionApproval.transferTimes":
 		x.TransferTimes = nil
-	case "badges.CollectionApproval.badgeIds":
-		x.BadgeIds = nil
+	case "badges.CollectionApproval.tokenIds":
+		x.TokenIds = nil
 	case "badges.CollectionApproval.ownershipTimes":
 		x.OwnershipTimes = nil
 	case "badges.CollectionApproval.uri":
@@ -17017,11 +17017,11 @@ func (x *fastReflection_CollectionApproval) Get(descriptor protoreflect.FieldDes
 		}
 		listValue := &_CollectionApproval_4_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.CollectionApproval.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.CollectionApproval.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_CollectionApproval_5_list{})
 		}
-		listValue := &_CollectionApproval_5_list{list: &x.BadgeIds}
+		listValue := &_CollectionApproval_5_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.CollectionApproval.ownershipTimes":
 		if len(x.OwnershipTimes) == 0 {
@@ -17074,10 +17074,10 @@ func (x *fastReflection_CollectionApproval) Set(fd protoreflect.FieldDescriptor,
 		lv := value.List()
 		clv := lv.(*_CollectionApproval_4_list)
 		x.TransferTimes = *clv.list
-	case "badges.CollectionApproval.badgeIds":
+	case "badges.CollectionApproval.tokenIds":
 		lv := value.List()
 		clv := lv.(*_CollectionApproval_5_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	case "badges.CollectionApproval.ownershipTimes":
 		lv := value.List()
 		clv := lv.(*_CollectionApproval_6_list)
@@ -17118,11 +17118,11 @@ func (x *fastReflection_CollectionApproval) Mutable(fd protoreflect.FieldDescrip
 		}
 		value := &_CollectionApproval_4_list{list: &x.TransferTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.CollectionApproval.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.CollectionApproval.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_CollectionApproval_5_list{list: &x.BadgeIds}
+		value := &_CollectionApproval_5_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.CollectionApproval.ownershipTimes":
 		if x.OwnershipTimes == nil {
@@ -17171,7 +17171,7 @@ func (x *fastReflection_CollectionApproval) NewField(fd protoreflect.FieldDescri
 	case "badges.CollectionApproval.transferTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CollectionApproval_4_list{list: &list})
-	case "badges.CollectionApproval.badgeIds":
+	case "badges.CollectionApproval.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_CollectionApproval_5_list{list: &list})
 	case "badges.CollectionApproval.ownershipTimes":
@@ -17275,8 +17275,8 @@ func (x *fastReflection_CollectionApproval) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -17394,9 +17394,9 @@ func (x *fastReflection_CollectionApproval) ProtoMethods() *protoiface.Methods {
 				dAtA[i] = 0x32
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -17628,7 +17628,7 @@ func (x *fastReflection_CollectionApproval) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 5:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -17655,8 +17655,8 @@ func (x *fastReflection_CollectionApproval) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -20029,14 +20029,14 @@ func (x *_PrecalculationOptions_2_list) IsValid() bool {
 var (
 	md_PrecalculationOptions                   protoreflect.MessageDescriptor
 	fd_PrecalculationOptions_overrideTimestamp protoreflect.FieldDescriptor
-	fd_PrecalculationOptions_badgeIdsOverride  protoreflect.FieldDescriptor
+	fd_PrecalculationOptions_tokenIdsOverride  protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_transfers_proto_init()
 	md_PrecalculationOptions = File_badges_transfers_proto.Messages().ByName("PrecalculationOptions")
 	fd_PrecalculationOptions_overrideTimestamp = md_PrecalculationOptions.Fields().ByName("overrideTimestamp")
-	fd_PrecalculationOptions_badgeIdsOverride = md_PrecalculationOptions.Fields().ByName("badgeIdsOverride")
+	fd_PrecalculationOptions_tokenIdsOverride = md_PrecalculationOptions.Fields().ByName("tokenIdsOverride")
 }
 
 var _ protoreflect.Message = (*fastReflection_PrecalculationOptions)(nil)
@@ -20110,9 +20110,9 @@ func (x *fastReflection_PrecalculationOptions) Range(f func(protoreflect.FieldDe
 			return
 		}
 	}
-	if len(x.BadgeIdsOverride) != 0 {
-		value := protoreflect.ValueOfList(&_PrecalculationOptions_2_list{list: &x.BadgeIdsOverride})
-		if !f(fd_PrecalculationOptions_badgeIdsOverride, value) {
+	if len(x.TokenIdsOverride) != 0 {
+		value := protoreflect.ValueOfList(&_PrecalculationOptions_2_list{list: &x.TokenIdsOverride})
+		if !f(fd_PrecalculationOptions_tokenIdsOverride, value) {
 			return
 		}
 	}
@@ -20133,8 +20133,8 @@ func (x *fastReflection_PrecalculationOptions) Has(fd protoreflect.FieldDescript
 	switch fd.FullName() {
 	case "badges.PrecalculationOptions.overrideTimestamp":
 		return x.OverrideTimestamp != ""
-	case "badges.PrecalculationOptions.badgeIdsOverride":
-		return len(x.BadgeIdsOverride) != 0
+	case "badges.PrecalculationOptions.tokenIdsOverride":
+		return len(x.TokenIdsOverride) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.PrecalculationOptions"))
@@ -20153,8 +20153,8 @@ func (x *fastReflection_PrecalculationOptions) Clear(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	case "badges.PrecalculationOptions.overrideTimestamp":
 		x.OverrideTimestamp = ""
-	case "badges.PrecalculationOptions.badgeIdsOverride":
-		x.BadgeIdsOverride = nil
+	case "badges.PrecalculationOptions.tokenIdsOverride":
+		x.TokenIdsOverride = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.PrecalculationOptions"))
@@ -20174,11 +20174,11 @@ func (x *fastReflection_PrecalculationOptions) Get(descriptor protoreflect.Field
 	case "badges.PrecalculationOptions.overrideTimestamp":
 		value := x.OverrideTimestamp
 		return protoreflect.ValueOfString(value)
-	case "badges.PrecalculationOptions.badgeIdsOverride":
-		if len(x.BadgeIdsOverride) == 0 {
+	case "badges.PrecalculationOptions.tokenIdsOverride":
+		if len(x.TokenIdsOverride) == 0 {
 			return protoreflect.ValueOfList(&_PrecalculationOptions_2_list{})
 		}
-		listValue := &_PrecalculationOptions_2_list{list: &x.BadgeIdsOverride}
+		listValue := &_PrecalculationOptions_2_list{list: &x.TokenIdsOverride}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -20202,10 +20202,10 @@ func (x *fastReflection_PrecalculationOptions) Set(fd protoreflect.FieldDescript
 	switch fd.FullName() {
 	case "badges.PrecalculationOptions.overrideTimestamp":
 		x.OverrideTimestamp = value.Interface().(string)
-	case "badges.PrecalculationOptions.badgeIdsOverride":
+	case "badges.PrecalculationOptions.tokenIdsOverride":
 		lv := value.List()
 		clv := lv.(*_PrecalculationOptions_2_list)
-		x.BadgeIdsOverride = *clv.list
+		x.TokenIdsOverride = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.PrecalculationOptions"))
@@ -20226,11 +20226,11 @@ func (x *fastReflection_PrecalculationOptions) Set(fd protoreflect.FieldDescript
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_PrecalculationOptions) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.PrecalculationOptions.badgeIdsOverride":
-		if x.BadgeIdsOverride == nil {
-			x.BadgeIdsOverride = []*UintRange{}
+	case "badges.PrecalculationOptions.tokenIdsOverride":
+		if x.TokenIdsOverride == nil {
+			x.TokenIdsOverride = []*UintRange{}
 		}
-		value := &_PrecalculationOptions_2_list{list: &x.BadgeIdsOverride}
+		value := &_PrecalculationOptions_2_list{list: &x.TokenIdsOverride}
 		return protoreflect.ValueOfList(value)
 	case "badges.PrecalculationOptions.overrideTimestamp":
 		panic(fmt.Errorf("field overrideTimestamp of message badges.PrecalculationOptions is not mutable"))
@@ -20249,7 +20249,7 @@ func (x *fastReflection_PrecalculationOptions) NewField(fd protoreflect.FieldDes
 	switch fd.FullName() {
 	case "badges.PrecalculationOptions.overrideTimestamp":
 		return protoreflect.ValueOfString("")
-	case "badges.PrecalculationOptions.badgeIdsOverride":
+	case "badges.PrecalculationOptions.tokenIdsOverride":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_PrecalculationOptions_2_list{list: &list})
 	default:
@@ -20325,8 +20325,8 @@ func (x *fastReflection_PrecalculationOptions) ProtoMethods() *protoiface.Method
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.BadgeIdsOverride) > 0 {
-			for _, e := range x.BadgeIdsOverride {
+		if len(x.TokenIdsOverride) > 0 {
+			for _, e := range x.TokenIdsOverride {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -20360,9 +20360,9 @@ func (x *fastReflection_PrecalculationOptions) ProtoMethods() *protoiface.Method
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.BadgeIdsOverride) > 0 {
-			for iNdEx := len(x.BadgeIdsOverride) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIdsOverride[iNdEx])
+		if len(x.TokenIdsOverride) > 0 {
+			for iNdEx := len(x.TokenIdsOverride) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIdsOverride[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -20466,7 +20466,7 @@ func (x *fastReflection_PrecalculationOptions) ProtoMethods() *protoiface.Method
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsOverride", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIdsOverride", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -20493,8 +20493,8 @@ func (x *fastReflection_PrecalculationOptions) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIdsOverride = append(x.BadgeIdsOverride, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIdsOverride[len(x.BadgeIdsOverride)-1]); err != nil {
+				x.TokenIdsOverride = append(x.TokenIdsOverride, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIdsOverride[len(x.TokenIdsOverride)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -21876,7 +21876,7 @@ type UserOutgoingApproval struct {
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// The allowed range of token IDs for approval.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The URI associated with this approval, optionally providing metadata about the approval.
@@ -21932,9 +21932,9 @@ func (x *UserOutgoingApproval) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (x *UserOutgoingApproval) GetBadgeIds() []*UintRange {
+func (x *UserOutgoingApproval) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -21994,7 +21994,7 @@ type UserIncomingApproval struct {
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// The allowed range of token IDs for approval.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The URI associated with this approval, optionally providing metadata about the approval.
@@ -22050,9 +22050,9 @@ func (x *UserIncomingApproval) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (x *UserIncomingApproval) GetBadgeIds() []*UintRange {
+func (x *UserIncomingApproval) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -22198,7 +22198,7 @@ type IncrementedBalances struct {
 
 	StartBalances []*Balance `protobuf:"bytes,1,rep,name=startBalances,proto3" json:"startBalances,omitempty"`
 	// The amount by which to increment token IDs.
-	IncrementBadgeIdsBy string `protobuf:"bytes,2,opt,name=incrementBadgeIdsBy,proto3" json:"incrementBadgeIdsBy,omitempty"`
+	IncrementTokenIdsBy string `protobuf:"bytes,2,opt,name=incrementTokenIdsBy,proto3" json:"incrementTokenIdsBy,omitempty"`
 	// The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
 	IncrementOwnershipTimesBy string `protobuf:"bytes,3,opt,name=incrementOwnershipTimesBy,proto3" json:"incrementOwnershipTimesBy,omitempty"`
 	// The amount of unix milliseconds to approve starting from now. Incompatible with incrementOwnershipTimesBy.
@@ -22208,7 +22208,7 @@ type IncrementedBalances struct {
 	// Recurring ownership times.
 	RecurringOwnershipTimes *RecurringOwnershipTimes `protobuf:"bytes,6,opt,name=recurringOwnershipTimes,proto3" json:"recurringOwnershipTimes,omitempty"`
 	// Allow override of any valid ID
-	AllowOverrideWithAnyValidBadge bool `protobuf:"varint,7,opt,name=allowOverrideWithAnyValidBadge,proto3" json:"allowOverrideWithAnyValidBadge,omitempty"`
+	AllowOverrideWithAnyValidToken bool `protobuf:"varint,7,opt,name=allowOverrideWithAnyValidToken,proto3" json:"allowOverrideWithAnyValidToken,omitempty"`
 }
 
 func (x *IncrementedBalances) Reset() {
@@ -22238,9 +22238,9 @@ func (x *IncrementedBalances) GetStartBalances() []*Balance {
 	return nil
 }
 
-func (x *IncrementedBalances) GetIncrementBadgeIdsBy() string {
+func (x *IncrementedBalances) GetIncrementTokenIdsBy() string {
 	if x != nil {
-		return x.IncrementBadgeIdsBy
+		return x.IncrementTokenIdsBy
 	}
 	return ""
 }
@@ -22273,9 +22273,9 @@ func (x *IncrementedBalances) GetRecurringOwnershipTimes() *RecurringOwnershipTi
 	return nil
 }
 
-func (x *IncrementedBalances) GetAllowOverrideWithAnyValidBadge() bool {
+func (x *IncrementedBalances) GetAllowOverrideWithAnyValidToken() bool {
 	if x != nil {
-		return x.AllowOverrideWithAnyValidBadge
+		return x.AllowOverrideWithAnyValidToken
 	}
 	return false
 }
@@ -22802,16 +22802,16 @@ func (x *CoinTransfer) GetOverrideToWithInitiator() bool {
 	return false
 }
 
-// MustOwnBadges represents a condition where a user must own specific tokens
+// MustOwnTokens represents a condition where a user must own specific tokens
 // to be approved to transfer.
 //
 // - collectionId: The ID of the collection for the tokens that must be owned
 // - amountRange: The range of amounts the user must own (min to max)
 // - ownershipTimes: The time ranges during which the user must own the tokens.
-// - badgeIds: The token IDs the user must own.
+// - tokenIds: The token IDs the user must own.
 // - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
 // - mustSatisfyForAllAssets: If true, the user must own all specified tokens; otherwise, owning any one for >= 1 millisecond is sufficient.
-type MustOwnBadges struct {
+type MustOwnTokens struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -22823,15 +22823,15 @@ type MustOwnBadges struct {
 	// The time ranges during which the user must own the tokens.
 	OwnershipTimes []*UintRange `protobuf:"bytes,3,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The token IDs the user must own.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// If true, override ownershipTimes with the current time.
 	OverrideWithCurrentTime bool `protobuf:"varint,5,opt,name=overrideWithCurrentTime,proto3" json:"overrideWithCurrentTime,omitempty"`
 	// If true, the user must meet ownership requirements for all specified tokens; else, must meet requirements for any single token.
 	MustSatisfyForAllAssets bool `protobuf:"varint,6,opt,name=mustSatisfyForAllAssets,proto3" json:"mustSatisfyForAllAssets,omitempty"`
 }
 
-func (x *MustOwnBadges) Reset() {
-	*x = MustOwnBadges{}
+func (x *MustOwnTokens) Reset() {
+	*x = MustOwnTokens{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_transfers_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -22839,53 +22839,53 @@ func (x *MustOwnBadges) Reset() {
 	}
 }
 
-func (x *MustOwnBadges) String() string {
+func (x *MustOwnTokens) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MustOwnBadges) ProtoMessage() {}
+func (*MustOwnTokens) ProtoMessage() {}
 
-// Deprecated: Use MustOwnBadges.ProtoReflect.Descriptor instead.
-func (*MustOwnBadges) Descriptor() ([]byte, []int) {
+// Deprecated: Use MustOwnTokens.ProtoReflect.Descriptor instead.
+func (*MustOwnTokens) Descriptor() ([]byte, []int) {
 	return file_badges_transfers_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *MustOwnBadges) GetCollectionId() string {
+func (x *MustOwnTokens) GetCollectionId() string {
 	if x != nil {
 		return x.CollectionId
 	}
 	return ""
 }
 
-func (x *MustOwnBadges) GetAmountRange() *UintRange {
+func (x *MustOwnTokens) GetAmountRange() *UintRange {
 	if x != nil {
 		return x.AmountRange
 	}
 	return nil
 }
 
-func (x *MustOwnBadges) GetOwnershipTimes() []*UintRange {
+func (x *MustOwnTokens) GetOwnershipTimes() []*UintRange {
 	if x != nil {
 		return x.OwnershipTimes
 	}
 	return nil
 }
 
-func (x *MustOwnBadges) GetBadgeIds() []*UintRange {
+func (x *MustOwnTokens) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
 
-func (x *MustOwnBadges) GetOverrideWithCurrentTime() bool {
+func (x *MustOwnTokens) GetOverrideWithCurrentTime() bool {
 	if x != nil {
 		return x.OverrideWithCurrentTime
 	}
 	return false
 }
 
-func (x *MustOwnBadges) GetMustSatisfyForAllAssets() bool {
+func (x *MustOwnTokens) GetMustSatisfyForAllAssets() bool {
 	if x != nil {
 		return x.MustSatisfyForAllAssets
 	}
@@ -22925,7 +22925,7 @@ type ApprovalCriteria struct {
 	// User level royalties to apply to the transfer.
 	UserRoyalties *UserRoyalties `protobuf:"bytes,13,opt,name=userRoyalties,proto3" json:"userRoyalties,omitempty"`
 	// Must own tokens for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,14,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,14,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
 }
 
 func (x *ApprovalCriteria) Reset() {
@@ -23039,9 +23039,9 @@ func (x *ApprovalCriteria) GetUserRoyalties() *UserRoyalties {
 	return nil
 }
 
-func (x *ApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
+func (x *ApprovalCriteria) GetMustOwnTokens() []*MustOwnTokens {
 	if x != nil {
-		return x.MustOwnBadges
+		return x.MustOwnTokens
 	}
 	return nil
 }
@@ -23115,7 +23115,7 @@ type OutgoingApprovalCriteria struct {
 	// Auto-deletion options.
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
 	// Must own tokens for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,9,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
 }
 
 func (x *OutgoingApprovalCriteria) Reset() {
@@ -23194,9 +23194,9 @@ func (x *OutgoingApprovalCriteria) GetAutoDeletionOptions() *AutoDeletionOptions
 	return nil
 }
 
-func (x *OutgoingApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
+func (x *OutgoingApprovalCriteria) GetMustOwnTokens() []*MustOwnTokens {
 	if x != nil {
-		return x.MustOwnBadges
+		return x.MustOwnTokens
 	}
 	return nil
 }
@@ -23224,7 +23224,7 @@ type IncomingApprovalCriteria struct {
 	// Auto-deletion options.
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
 	// Must own tokens for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,9,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
 }
 
 func (x *IncomingApprovalCriteria) Reset() {
@@ -23303,9 +23303,9 @@ func (x *IncomingApprovalCriteria) GetAutoDeletionOptions() *AutoDeletionOptions
 	return nil
 }
 
-func (x *IncomingApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
+func (x *IncomingApprovalCriteria) GetMustOwnTokens() []*MustOwnTokens {
 	if x != nil {
-		return x.MustOwnBadges
+		return x.MustOwnTokens
 	}
 	return nil
 }
@@ -23325,7 +23325,7 @@ type CollectionApproval struct {
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// The allowed range of token IDs for approval.
-	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,5,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The URI associated with this approval, optionally providing metadata about the approval.
@@ -23388,9 +23388,9 @@ func (x *CollectionApproval) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (x *CollectionApproval) GetBadgeIds() []*UintRange {
+func (x *CollectionApproval) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -23663,7 +23663,7 @@ type PrecalculationOptions struct {
 	// The timestamp to override with when calculating the balances.
 	OverrideTimestamp string `protobuf:"bytes,1,opt,name=overrideTimestamp,proto3" json:"overrideTimestamp,omitempty"`
 	// The tokenIdsOverride to use for the transfer.
-	BadgeIdsOverride []*UintRange `protobuf:"bytes,2,rep,name=badgeIdsOverride,proto3" json:"badgeIdsOverride,omitempty"`
+	TokenIdsOverride []*UintRange `protobuf:"bytes,2,rep,name=tokenIdsOverride,proto3" json:"tokenIdsOverride,omitempty"`
 }
 
 func (x *PrecalculationOptions) Reset() {
@@ -23693,9 +23693,9 @@ func (x *PrecalculationOptions) GetOverrideTimestamp() string {
 	return ""
 }
 
-func (x *PrecalculationOptions) GetBadgeIdsOverride() []*UintRange {
+func (x *PrecalculationOptions) GetTokenIdsOverride() []*UintRange {
 	if x != nil {
-		return x.BadgeIdsOverride
+		return x.TokenIdsOverride
 	}
 	return nil
 }
@@ -24442,7 +24442,7 @@ var file_badges_transfers_proto_goTypes = []interface{}{
 	(*MaxNumTransfers)(nil),                     // 12: badges.MaxNumTransfers
 	(*ApprovalTracker)(nil),                     // 13: badges.ApprovalTracker
 	(*CoinTransfer)(nil),                        // 14: badges.CoinTransfer
-	(*MustOwnBadges)(nil),                       // 15: badges.MustOwnBadges
+	(*MustOwnTokens)(nil),                       // 15: badges.MustOwnTokens
 	(*ApprovalCriteria)(nil),                    // 16: badges.ApprovalCriteria
 	(*UserRoyalties)(nil),                       // 17: badges.UserRoyalties
 	(*OutgoingApprovalCriteria)(nil),            // 18: badges.OutgoingApprovalCriteria
@@ -24464,11 +24464,11 @@ var file_badges_transfers_proto_depIdxs = []int32{
 	3,  // 2: badges.UserBalanceStore.incomingApprovals:type_name -> badges.UserIncomingApproval
 	27, // 3: badges.UserBalanceStore.userPermissions:type_name -> badges.UserPermissions
 	28, // 4: badges.UserOutgoingApproval.transferTimes:type_name -> badges.UintRange
-	28, // 5: badges.UserOutgoingApproval.badgeIds:type_name -> badges.UintRange
+	28, // 5: badges.UserOutgoingApproval.tokenIds:type_name -> badges.UintRange
 	28, // 6: badges.UserOutgoingApproval.ownershipTimes:type_name -> badges.UintRange
 	18, // 7: badges.UserOutgoingApproval.approvalCriteria:type_name -> badges.OutgoingApprovalCriteria
 	28, // 8: badges.UserIncomingApproval.transferTimes:type_name -> badges.UintRange
-	28, // 9: badges.UserIncomingApproval.badgeIds:type_name -> badges.UintRange
+	28, // 9: badges.UserIncomingApproval.tokenIds:type_name -> badges.UintRange
 	28, // 10: badges.UserIncomingApproval.ownershipTimes:type_name -> badges.UintRange
 	19, // 11: badges.UserIncomingApproval.approvalCriteria:type_name -> badges.IncomingApprovalCriteria
 	26, // 12: badges.ManualBalances.balances:type_name -> badges.Balance
@@ -24481,9 +24481,9 @@ var file_badges_transfers_proto_depIdxs = []int32{
 	11, // 19: badges.MaxNumTransfers.resetTimeIntervals:type_name -> badges.ResetTimeIntervals
 	26, // 20: badges.ApprovalTracker.amounts:type_name -> badges.Balance
 	29, // 21: badges.CoinTransfer.coins:type_name -> cosmos.base.v1beta1.Coin
-	28, // 22: badges.MustOwnBadges.amountRange:type_name -> badges.UintRange
-	28, // 23: badges.MustOwnBadges.ownershipTimes:type_name -> badges.UintRange
-	28, // 24: badges.MustOwnBadges.badgeIds:type_name -> badges.UintRange
+	28, // 22: badges.MustOwnTokens.amountRange:type_name -> badges.UintRange
+	28, // 23: badges.MustOwnTokens.ownershipTimes:type_name -> badges.UintRange
+	28, // 24: badges.MustOwnTokens.tokenIds:type_name -> badges.UintRange
 	1,  // 25: badges.ApprovalCriteria.merkleChallenges:type_name -> badges.MerkleChallenge
 	8,  // 26: badges.ApprovalCriteria.predeterminedBalances:type_name -> badges.PredeterminedBalances
 	10, // 27: badges.ApprovalCriteria.approvalAmounts:type_name -> badges.ApprovalAmounts
@@ -24491,23 +24491,23 @@ var file_badges_transfers_proto_depIdxs = []int32{
 	14, // 29: badges.ApprovalCriteria.coinTransfers:type_name -> badges.CoinTransfer
 	9,  // 30: badges.ApprovalCriteria.autoDeletionOptions:type_name -> badges.AutoDeletionOptions
 	17, // 31: badges.ApprovalCriteria.userRoyalties:type_name -> badges.UserRoyalties
-	15, // 32: badges.ApprovalCriteria.mustOwnBadges:type_name -> badges.MustOwnBadges
+	15, // 32: badges.ApprovalCriteria.mustOwnTokens:type_name -> badges.MustOwnTokens
 	1,  // 33: badges.OutgoingApprovalCriteria.merkleChallenges:type_name -> badges.MerkleChallenge
 	8,  // 34: badges.OutgoingApprovalCriteria.predeterminedBalances:type_name -> badges.PredeterminedBalances
 	10, // 35: badges.OutgoingApprovalCriteria.approvalAmounts:type_name -> badges.ApprovalAmounts
 	12, // 36: badges.OutgoingApprovalCriteria.maxNumTransfers:type_name -> badges.MaxNumTransfers
 	14, // 37: badges.OutgoingApprovalCriteria.coinTransfers:type_name -> badges.CoinTransfer
 	9,  // 38: badges.OutgoingApprovalCriteria.autoDeletionOptions:type_name -> badges.AutoDeletionOptions
-	15, // 39: badges.OutgoingApprovalCriteria.mustOwnBadges:type_name -> badges.MustOwnBadges
+	15, // 39: badges.OutgoingApprovalCriteria.mustOwnTokens:type_name -> badges.MustOwnTokens
 	1,  // 40: badges.IncomingApprovalCriteria.merkleChallenges:type_name -> badges.MerkleChallenge
 	8,  // 41: badges.IncomingApprovalCriteria.predeterminedBalances:type_name -> badges.PredeterminedBalances
 	10, // 42: badges.IncomingApprovalCriteria.approvalAmounts:type_name -> badges.ApprovalAmounts
 	12, // 43: badges.IncomingApprovalCriteria.maxNumTransfers:type_name -> badges.MaxNumTransfers
 	14, // 44: badges.IncomingApprovalCriteria.coinTransfers:type_name -> badges.CoinTransfer
 	9,  // 45: badges.IncomingApprovalCriteria.autoDeletionOptions:type_name -> badges.AutoDeletionOptions
-	15, // 46: badges.IncomingApprovalCriteria.mustOwnBadges:type_name -> badges.MustOwnBadges
+	15, // 46: badges.IncomingApprovalCriteria.mustOwnTokens:type_name -> badges.MustOwnTokens
 	28, // 47: badges.CollectionApproval.transferTimes:type_name -> badges.UintRange
-	28, // 48: badges.CollectionApproval.badgeIds:type_name -> badges.UintRange
+	28, // 48: badges.CollectionApproval.tokenIds:type_name -> badges.UintRange
 	28, // 49: badges.CollectionApproval.ownershipTimes:type_name -> badges.UintRange
 	16, // 50: badges.CollectionApproval.approvalCriteria:type_name -> badges.ApprovalCriteria
 	26, // 51: badges.Transfer.balances:type_name -> badges.Balance
@@ -24515,7 +24515,7 @@ var file_badges_transfers_proto_depIdxs = []int32{
 	25, // 53: badges.Transfer.merkleProofs:type_name -> badges.MerkleProof
 	21, // 54: badges.Transfer.prioritizedApprovals:type_name -> badges.ApprovalIdentifierDetails
 	23, // 55: badges.Transfer.precalculationOptions:type_name -> badges.PrecalculationOptions
-	28, // 56: badges.PrecalculationOptions.badgeIdsOverride:type_name -> badges.UintRange
+	28, // 56: badges.PrecalculationOptions.tokenIdsOverride:type_name -> badges.UintRange
 	24, // 57: badges.MerkleProof.aunts:type_name -> badges.MerklePathItem
 	58, // [58:58] is the sub-list for method output_type
 	58, // [58:58] is the sub-list for method input_type
@@ -24714,7 +24714,7 @@ func file_badges_transfers_proto_init() {
 			}
 		}
 		file_badges_transfers_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MustOwnBadges); i {
+			switch v := v.(*MustOwnTokens); i {
 			case 0:
 				return &v.state
 			case 1:

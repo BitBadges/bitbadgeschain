@@ -22,7 +22,7 @@ const userIncomingApproval = {
     toListId: 'All', // Can specify recipients
     initiatedByListId: 'All',
     transferTimes: [{ start: '1', end: '18446744073709551615' }],
-    badgeIds: [{ start: '1', end: '100' }],
+    tokenIds: [{ start: '1', end: '100' }],
     ownershipTimes: [{ start: '1', end: '18446744073709551615' }],
     approvalId: 'user-incoming-approval',
 
@@ -45,7 +45,7 @@ const userOutgoingApproval = {
     toListId: 'user-address', // Locked to approver's address
     initiatedByListId: 'All',
     transferTimes: [{ start: '1', end: '18446744073709551615' }],
-    badgeIds: [{ start: '1', end: '100' }],
+    tokenIds: [{ start: '1', end: '100' }],
     ownershipTimes: [{ start: '1', end: '18446744073709551615' }],
     approvalId: 'user-outgoing-approval',
 

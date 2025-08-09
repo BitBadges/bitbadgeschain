@@ -4,7 +4,7 @@ This example demonstrates how to permanently lock approvals for specific token I
 
 ## Overview
 
-By targeting specific `badgeIds`, you can freeze approvals for those tokens permanently while allowing updates to approvals for other token IDs.
+By targeting specific `tokenIds`, you can freeze approvals for those tokens permanently while allowing updates to approvals for other token IDs.
 
 ## Lock Token IDs 1-100
 
@@ -24,8 +24,8 @@ const collectionPermissions = {
     canUpdateCustomData: [],
     canUpdateManager: [],
     canUpdateCollectionMetadata: [],
-    canUpdateValidBadgeIds: [],
-    canUpdateBadgeMetadata: [],
+    canUpdateValidTokenIds: [],
+    canUpdateTokenMetadata: [],
     canUpdateCollectionApprovals: [
         {
             // Which approvals does this permission apply to? Approvals must match ALL criteria.
@@ -33,7 +33,7 @@ const collectionPermissions = {
             toListId: 'All',
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: [
+            tokenIds: [
                 {
                     start: '1',
                     end: '100', // Only targets tokens 1-100
@@ -61,8 +61,8 @@ const collectionPermissions = {
     canUpdateCustomData: [],
     canUpdateManager: [],
     canUpdateCollectionMetadata: [],
-    canUpdateValidBadgeIds: [],
-    canUpdateBadgeMetadata: [],
+    canUpdateValidTokenIds: [],
+    canUpdateTokenMetadata: [],
     canUpdateCollectionApprovals: [
         {
             // Which approvals does this permission apply to? Approvals must match ALL criteria.
@@ -70,7 +70,7 @@ const collectionPermissions = {
             toListId: 'All',
             initiatedByListId: 'All',
             transferTimes: FullTimeRanges,
-            badgeIds: [
+            tokenIds: [
                 {
                     start: '101',
                     end: '18446744073709551615', // All tokens except 1-100
@@ -95,11 +95,11 @@ const createCollection = {
     collectionPermissions,
     collectionApprovals: [
         {
-            badgeIds: [{ start: '1', end: '50' }],
+            tokenIds: [{ start: '1', end: '50' }],
             // ... this approval will be locked if it overlaps with permission criteria
         },
         {
-            badgeIds: [{ start: '150', end: '200' }],
+            tokenIds: [{ start: '150', end: '200' }],
             // ... this approval's updateability depends on configuration
         },
     ],

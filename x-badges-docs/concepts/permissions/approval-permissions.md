@@ -6,7 +6,7 @@ Approval permissions control when transfer approvals can be updated, allowing yo
 
 ```
 For each approval update request:
-    Check if approval criteria match (from, to, initiatedBy, transferTimes, badgeIds, ownershipTimes, approvalId)
+    Check if approval criteria match (from, to, initiatedBy, transferTimes, tokenIds, ownershipTimes, approvalId)
         → If no match: ALLOW (neutral state)
         → If match: Check if current time is in permanentlyPermittedTimes
             → If yes: ALLOW
@@ -39,7 +39,7 @@ interface ApprovalPermission {
     toListId: string;
     initiatedByListId: string;
     transferTimes: UintRange[];
-    badgeIds: UintRange[];
+    tokenIds: UintRange[];
     ownershipTimes: UintRange[];
     approvalId: string;
 
@@ -65,7 +65,7 @@ interface ApprovalPermission {
 
 ### Approval Tuple
 
-An approval tuple consists of: `(from, to, initiatedBy, badgeIds, transferTimes, ownershipTimes, approvalId)`
+An approval tuple consists of: `(from, to, initiatedBy, tokenIds, transferTimes, ownershipTimes, approvalId)`
 
 ### Brute Force Pattern
 
@@ -76,7 +76,7 @@ To lock specific criteria, specify the target and set all other criteria to maxi
     "fromListId": "All",
     "toListId": "All",
     "initiatedByListId": "All",
-    "badgeIds": [{ "start": "1", "end": "10" }],
+    "tokenIds": [{ "start": "1", "end": "10" }],
     "transferTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "approvalId": "All",
@@ -98,7 +98,7 @@ To lock specific criteria, specify the target and set all other criteria to maxi
             "fromListId": "All",
             "toListId": "All",
             "initiatedByListId": "All",
-            "badgeIds": [{ "start": "1", "end": "100" }],
+            "tokenIds": [{ "start": "1", "end": "100" }],
             "transferTimes": [{ "start": "1", "end": "18446744073709551615" }],
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
             "approvalId": "All",
@@ -120,7 +120,7 @@ To lock specific criteria, specify the target and set all other criteria to maxi
             "fromListId": "All",
             "toListId": "All",
             "initiatedByListId": "All",
-            "badgeIds": [{ "start": "1", "end": "18446744073709551615" }],
+            "tokenIds": [{ "start": "1", "end": "18446744073709551615" }],
             "transferTimes": [{ "start": "1", "end": "18446744073709551615" }],
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
             "approvalId": "specific-approval-id",
@@ -150,7 +150,7 @@ Lock a token range AND all overlapping approvals:
 ```json
 // Lock token range
 {
-    "badgeIds": [{ "start": "1", "end": "10" }],
+    "tokenIds": [{ "start": "1", "end": "10" }],
     "approvalId": "All"
 }
 
@@ -169,7 +169,7 @@ Lock all approvals for a collection:
     "fromListId": "All",
     "toListId": "All",
     "initiatedByListId": "All",
-    "badgeIds": [{ "start": "1", "end": "18446744073709551615" }],
+    "tokenIds": [{ "start": "1", "end": "18446744073709551615" }],
     "transferTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
     "approvalId": "All",

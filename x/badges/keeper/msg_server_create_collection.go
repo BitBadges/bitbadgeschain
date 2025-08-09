@@ -22,15 +22,15 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		DefaultBalances: msg.DefaultBalances,
 
 		//Applicable to creations and updates
-		ValidBadgeIds:                          msg.ValidBadgeIds,
+		ValidTokenIds:                          msg.ValidTokenIds,
 		UpdateCollectionPermissions:            true,
 		CollectionPermissions:                  msg.CollectionPermissions,
 		UpdateManagerTimeline:                  true,
 		ManagerTimeline:                        msg.ManagerTimeline,
 		UpdateCollectionMetadataTimeline:       true,
 		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
-		UpdateBadgeMetadataTimeline:            true,
-		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
+		UpdateTokenMetadataTimeline:            true,
+		TokenMetadataTimeline:                  msg.TokenMetadataTimeline,
 		UpdateOffChainBalancesMetadataTimeline: true,
 		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
 		UpdateCustomDataTimeline:               true,

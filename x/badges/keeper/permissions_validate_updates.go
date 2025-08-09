@@ -15,21 +15,21 @@ import (
 
 //HACK: For resuable code, we cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
 
-func (k Keeper) ValidateBadgeIdsActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.BadgeIdsActionPermission, newPermissions []*types.BadgeIdsActionPermission) error {
-	if err := types.ValidateBadgeIdsActionPermission(oldPermissions, true); err != nil {
+func (k Keeper) ValidateTokenIdsActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.TokenIdsActionPermission, newPermissions []*types.TokenIdsActionPermission) error {
+	if err := types.ValidateTokenIdsActionPermission(oldPermissions, true); err != nil {
 		return err
 	}
 
-	if err := types.ValidateBadgeIdsActionPermission(newPermissions, true); err != nil {
+	if err := types.ValidateTokenIdsActionPermission(newPermissions, true); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastBadgeIdsActionPermissionToUniversalPermission(oldPermissions)
+	castedOldPermissions, err := k.CastTokenIdsActionPermissionToUniversalPermission(oldPermissions)
 	if err != nil {
 		return err
 	}
 
-	castedNewPermissions, err := k.CastBadgeIdsActionPermissionToUniversalPermission(newPermissions)
+	castedNewPermissions, err := k.CastTokenIdsActionPermissionToUniversalPermission(newPermissions)
 	if err != nil {
 		return err
 	}
@@ -69,21 +69,21 @@ func (k Keeper) ValidateTimedUpdatePermissionUpdate(ctx sdk.Context, oldPermissi
 	return nil
 }
 
-func (k Keeper) ValidateTimedUpdateWithBadgeIdsPermissionUpdate(ctx sdk.Context, oldPermissions []*types.TimedUpdateWithBadgeIdsPermission, newPermissions []*types.TimedUpdateWithBadgeIdsPermission) error {
-	if err := types.ValidateTimedUpdateWithBadgeIdsPermission(oldPermissions, true); err != nil {
+func (k Keeper) ValidateTimedUpdateWithTokenIdsPermissionUpdate(ctx sdk.Context, oldPermissions []*types.TimedUpdateWithTokenIdsPermission, newPermissions []*types.TimedUpdateWithTokenIdsPermission) error {
+	if err := types.ValidateTimedUpdateWithTokenIdsPermission(oldPermissions, true); err != nil {
 		return err
 	}
 
-	if err := types.ValidateTimedUpdateWithBadgeIdsPermission(newPermissions, true); err != nil {
+	if err := types.ValidateTimedUpdateWithTokenIdsPermission(newPermissions, true); err != nil {
 		return err
 	}
 
-	castedOldPermissions, err := k.CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(oldPermissions)
+	castedOldPermissions, err := k.CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(oldPermissions)
 	if err != nil {
 		return err
 	}
 
-	castedNewPermissions, err := k.CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(newPermissions)
+	castedNewPermissions, err := k.CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(newPermissions)
 	if err != nil {
 		return err
 	}
@@ -274,11 +274,11 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if err := k.ValidateBadgeIdsActionPermissionUpdate(ctx, oldPermissions.CanUpdateValidBadgeIds, newPermissions.CanUpdateValidBadgeIds); err != nil {
+	if err := k.ValidateTokenIdsActionPermissionUpdate(ctx, oldPermissions.CanUpdateValidTokenIds, newPermissions.CanUpdateValidTokenIds); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(ctx, oldPermissions.CanUpdateBadgeMetadata, newPermissions.CanUpdateBadgeMetadata); err != nil {
+	if err := k.ValidateTimedUpdateWithTokenIdsPermissionUpdate(ctx, oldPermissions.CanUpdateTokenMetadata, newPermissions.CanUpdateTokenMetadata); err != nil {
 		return err
 	}
 

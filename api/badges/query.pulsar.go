@@ -1383,7 +1383,7 @@ func (x *fastReflection_QueryGetCollectionResponse) Get(descriptor protoreflect.
 func (x *fastReflection_QueryGetCollectionResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "badges.QueryGetCollectionResponse.collection":
-		x.Collection = value.Message().Interface().(*BadgeCollection)
+		x.Collection = value.Message().Interface().(*TokenCollection)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.QueryGetCollectionResponse"))
@@ -1406,7 +1406,7 @@ func (x *fastReflection_QueryGetCollectionResponse) Mutable(fd protoreflect.Fiel
 	switch fd.FullName() {
 	case "badges.QueryGetCollectionResponse.collection":
 		if x.Collection == nil {
-			x.Collection = new(BadgeCollection)
+			x.Collection = new(TokenCollection)
 		}
 		return protoreflect.ValueOfMessage(x.Collection.ProtoReflect())
 	default:
@@ -1423,7 +1423,7 @@ func (x *fastReflection_QueryGetCollectionResponse) Mutable(fd protoreflect.Fiel
 func (x *fastReflection_QueryGetCollectionResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "badges.QueryGetCollectionResponse.collection":
-		m := new(BadgeCollection)
+		m := new(TokenCollection)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -1620,7 +1620,7 @@ func (x *fastReflection_QueryGetCollectionResponse) ProtoMethods() *protoiface.M
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Collection == nil {
-					x.Collection = &BadgeCollection{}
+					x.Collection = &TokenCollection{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Collection); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -5951,7 +5951,7 @@ type QueryGetCollectionResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Collection *BadgeCollection `protobuf:"bytes,1,opt,name=collection,proto3" json:"collection,omitempty"`
+	Collection *TokenCollection `protobuf:"bytes,1,opt,name=collection,proto3" json:"collection,omitempty"`
 }
 
 func (x *QueryGetCollectionResponse) Reset() {
@@ -5974,7 +5974,7 @@ func (*QueryGetCollectionResponse) Descriptor() ([]byte, []int) {
 	return file_badges_query_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *QueryGetCollectionResponse) GetCollection() *BadgeCollection {
+func (x *QueryGetCollectionResponse) GetCollection() *TokenCollection {
 	if x != nil {
 		return x.Collection
 	}
@@ -6561,14 +6561,14 @@ var file_badges_query_proto_goTypes = []interface{}{
 	(*QueryGetChallengeTrackerRequest)(nil),  // 10: badges.QueryGetChallengeTrackerRequest
 	(*QueryGetChallengeTrackerResponse)(nil), // 11: badges.QueryGetChallengeTrackerResponse
 	(*Params)(nil),                           // 12: badges.Params
-	(*BadgeCollection)(nil),                  // 13: badges.BadgeCollection
+	(*TokenCollection)(nil),                  // 13: badges.TokenCollection
 	(*UserBalanceStore)(nil),                 // 14: badges.UserBalanceStore
 	(*AddressList)(nil),                      // 15: badges.AddressList
 	(*ApprovalTracker)(nil),                  // 16: badges.ApprovalTracker
 }
 var file_badges_query_proto_depIdxs = []int32{
 	12, // 0: badges.QueryParamsResponse.params:type_name -> badges.Params
-	13, // 1: badges.QueryGetCollectionResponse.collection:type_name -> badges.BadgeCollection
+	13, // 1: badges.QueryGetCollectionResponse.collection:type_name -> badges.TokenCollection
 	14, // 2: badges.QueryGetBalanceResponse.balance:type_name -> badges.UserBalanceStore
 	15, // 3: badges.QueryGetAddressListResponse.list:type_name -> badges.AddressList
 	16, // 4: badges.QueryGetApprovalTrackerResponse.tracker:type_name -> badges.ApprovalTracker

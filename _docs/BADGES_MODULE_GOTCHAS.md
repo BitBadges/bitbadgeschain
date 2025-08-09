@@ -158,7 +158,7 @@ defaultBalances := UserBalanceStore{
     Balances: []Balance{
         {
             Amount: []UintRange{{Start: NewUint(1), End: MaxUint}},
-            BadgeIds: []UintRange{{Start: NewUint(1), End: NewUint(1000)}},
+            TokenIds: []UintRange{{Start: NewUint(1), End: NewUint(1000)}},
             OwnershipTimes: []UintRange{{Start: NewUint(1), End: MaxUint}},
         },
     },
@@ -173,7 +173,7 @@ defaultBalances := UserBalanceStore{
     Balances: []Balance{
         {
             Amount: []UintRange{{Start: NewUint(0), End: NewUint(0)}},
-            BadgeIds: []UintRange{{Start: NewUint(1), End: NewUint(1000)}},
+            TokenIds: []UintRange{{Start: NewUint(1), End: NewUint(1000)}},
             OwnershipTimes: []UintRange{{Start: NewUint(1), End: MaxUint}},
         },
     },
@@ -278,7 +278,7 @@ permission := ActionPermission{
 
 ```go
 // ❌ This could be expensive for large ranges
-badgeIds := []UintRange{{Start: NewUint(1), End: NewUint(1000000)}}
+tokenIds := []UintRange{{Start: NewUint(1), End: NewUint(1000000)}}
 // Processing 1M token IDs individually would be prohibitively expensive
 ```
 
@@ -377,7 +377,7 @@ ignite chain serve --skip-proto
 
 ```go
 // ❌ Incomplete test collection - will fail validation
-collection := &types.BadgeCollection{
+collection := &types.TokenCollection{
     CollectionId: NewUint(1),
     // Missing required fields like manager timeline, permissions, etc.
 }
@@ -395,8 +395,8 @@ func TestTransfer(t *testing.T) {
     k, ctx := setupKeeper(t)
     
     // Missing: Create collection, set up approvals, mint initial balances
-    msg := &types.MsgTransferBadges{...}
-    _, err := k.TransferBadges(ctx, msg) // Will fail - collection doesn't exist
+    msg := &types.MsgTransferTokens{...}
+    _, err := k.TransferTokens(ctx, msg) // Will fail - collection doesn't exist
 }
 ```
 

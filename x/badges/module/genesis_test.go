@@ -9,7 +9,7 @@ func TestGenesis(t *testing.T) {
 	// 	Params:           types.DefaultParams(),
 	// 	PortId:           types.PortID,
 	// 	NextCollectionId: sdkmath.NewUint(1),
-	// 	Collections:      []*types.BadgeCollection{},
+	// 	Collections:      []*types.TokenCollection{},
 	// 	Balances:         []*types.UserBalanceStore{},
 	// 	BalanceStoreKeys: []string{},
 	// 	// Claims:           []*types.Claim{},

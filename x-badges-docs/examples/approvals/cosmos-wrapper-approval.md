@@ -11,12 +11,12 @@ Full example: [Cosmos Coin Wrapper Example](../cosmos-coin-wrapper-example.md)
 ```typescript
 export const wrapperApproval = ({
     specialAddress,
-    badgeIds,
+    tokenIds,
     ownershipTimes,
     approvalId,
 }: {
     specialAddress: string;
-    badgeIds: iUintRange<bigint>[];
+    tokenIds: iUintRange<bigint>[];
     ownershipTimes: iUintRange<bigint>[];
     approvalId: string;
 }): RequiredApprovalProps => {
@@ -30,7 +30,7 @@ export const wrapperApproval = ({
         initiatedByListId: 'All',
         initiatedByList: AddressList.AllAddresses(),
         transferTimes: UintRangeArray.FullRanges(),
-        badgeIds: badgeIds,
+        tokenIds: tokenIds,
         ownershipTimes: ownershipTimes,
         approvalId: id,
         approvalCriteria: {

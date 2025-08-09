@@ -9,7 +9,7 @@ A universal message that can be used to either create a new collection or update
 
 ## Update Flag Pattern
 
-This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateValidBadgeIds`, `updateCollectionPermissions`).
+This message uses an update flag + value pattern for selective updates. Each updatable field has a corresponding boolean flag (e.g., `updateValidTokenIds`, `updateCollectionPermissions`).
 
 -   **If update flag is `true`**: The corresponding value field is processed and the collection is updated with the new value
 -   **If update flag is `false`**: The corresponding value field is completely ignored, regardless of what data is provided
@@ -31,15 +31,15 @@ message MsgUniversalUpdateCollection {
   UserBalanceStore defaultBalances = 4;
 
   // Updateable fields (used for both creation and updates)
-  repeated UintRange validBadgeIds = 5;
+  repeated UintRange validTokenIds = 5;
   bool updateCollectionPermissions = 6;
   CollectionPermissions collectionPermissions = 7;
   bool updateManagerTimeline = 8;
   repeated ManagerTimeline managerTimeline = 9;
   bool updateCollectionMetadataTimeline = 10;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 11;
-  bool updateBadgeMetadataTimeline = 12;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 13;
+  bool updateTokenMetadataTimeline = 12;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 13;
   bool updateOffChainBalancesMetadataTimeline = 14;
   repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 15;
   bool updateCustomDataTimeline = 16;
@@ -93,7 +93,7 @@ bitbadgeschaind tx badges universal-update-collection '[tx-json]' --from creator
             "canUpdateAutoApproveAllIncomingTransfers": []
         }
     },
-    "validBadgeIds": [{ "start": "1", "end": "100" }],
+    "validTokenIds": [{ "start": "1", "end": "100" }],
     "updateCollectionPermissions": true,
     "collectionPermissions": {
         "canDeleteCollection": [],
@@ -103,16 +103,16 @@ bitbadgeschaind tx badges universal-update-collection '[tx-json]' --from creator
         "canUpdateCustomData": [],
         "canUpdateManager": [],
         "canUpdateCollectionMetadata": [],
-        "canUpdateValidBadgeIds": [],
-        "canUpdateBadgeMetadata": [],
+        "canUpdateValidTokenIds": [],
+        "canUpdateTokenMetadata": [],
         "canUpdateCollectionApprovals": []
     },
     "updateManagerTimeline": true,
     "managerTimeline": [],
     "updateCollectionMetadataTimeline": true,
     "collectionMetadataTimeline": [],
-    "updateBadgeMetadataTimeline": true,
-    "badgeMetadataTimeline": [],
+    "updateTokenMetadataTimeline": true,
+    "tokenMetadataTimeline": [],
     "updateOffChainBalancesMetadataTimeline": true,
     "offChainBalancesMetadataTimeline": [],
     "updateCustomDataTimeline": true,
@@ -137,16 +137,16 @@ bitbadgeschaind tx badges universal-update-collection '[tx-json]' --from creator
 {
     "creator": "bb1abc123...",
     "collectionId": "1",
-    "updateValidBadgeIds": true,
-    "validBadgeIds": [{ "start": "1", "end": "200" }],
+    "updateValidTokenIds": true,
+    "validTokenIds": [{ "start": "1", "end": "200" }],
     "updateCollectionPermissions": false,
     "collectionPermissions": {},
     "updateManagerTimeline": false,
     "managerTimeline": [],
     "updateCollectionMetadataTimeline": false,
     "collectionMetadataTimeline": [],
-    "updateBadgeMetadataTimeline": false,
-    "badgeMetadataTimeline": [],
+    "updateTokenMetadataTimeline": false,
+    "tokenMetadataTimeline": [],
     "updateOffChainBalancesMetadataTimeline": false,
     "offChainBalancesMetadataTimeline": [],
     "updateCustomDataTimeline": false,

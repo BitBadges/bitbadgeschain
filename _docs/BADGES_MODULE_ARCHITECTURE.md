@@ -83,7 +83,7 @@ type CollectionManager struct {
     // Static properties
     CollectionId           Uint
     BalanceType           BalanceType
-    ValidBadgeIds         []UintRange
+    ValidTokenIds         []UintRange
 }
 ```
 
