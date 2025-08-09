@@ -15,7 +15,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 )
 
-// The following methods are used for the badge store and everything associated with badges.
+// The following methods are used for the badge store and everything associated with tokens.
 // All preconditions and checks must be handled before these functions are called.
 // This file handles storing collections, balances, approvals, used challenges, next collection ID, etc.
 
@@ -65,7 +65,7 @@ func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uin
 	return &collection, true
 }
 
-// GetCollectionsFromStore defines a method for returning all badges information by key.
+// GetCollectionsFromStore defines a method for returning all tokens information by key.
 func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.BadgeCollection) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -249,7 +249,7 @@ func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdkmath.Uint) {
 // Increments the next collection ID by 1.
 func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
 	nextID := k.GetNextCollectionId(ctx)
-	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
+	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 tokens which isn't totally feasible
 }
 
 /****************************************NEXT LIST ID****************************************/
@@ -272,7 +272,7 @@ func (k Keeper) SetNextAddressListCounter(ctx sdk.Context, nextID sdkmath.Uint) 
 // Increments the next collection ID by 1.
 func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
 	nextID := k.GetNextAddressListCounter(ctx)
-	k.SetNextAddressListCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 badges which isn't totally feasible
+	k.SetNextAddressListCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 tokens which isn't totally feasible
 }
 
 /********************************************************************************/

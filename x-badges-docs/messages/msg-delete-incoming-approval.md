@@ -1,6 +1,6 @@
 # MsgDeleteIncomingApproval
 
-A helper message to delete a single incoming approval for badge transfers. This is a developer-friendly wrapper around `MsgUpdateUserApprovals` that simplifies deleting individual incoming approvals. For more information, we refer to the [MsgUpdateUserApprovals](./msg-update-user-approvals.md) documentation.
+A helper message to delete a single incoming approval for token transfers. This is a developer-friendly wrapper around `MsgUpdateUserApprovals` that simplifies deleting individual incoming approvals. For more information, we refer to the [MsgUpdateUserApprovals](./msg-update-user-approvals.md) documentation.
 
 ## Overview
 

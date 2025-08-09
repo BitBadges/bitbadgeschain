@@ -1,12 +1,12 @@
-# Badge ID Action Permissions
+# Token ID Action Permissions
 
-Badge ID action permissions control which badge-specific actions can be performed based on badge IDs.
+Token ID action permissions control which token-specific actions can be performed based on token IDs.
 
 ## High-Level Logic
 
 ```
-For each badge action request:
-    Check if badge ID matches any badgeIds criteria
+For each token action request:
+    Check if token ID matches any badgeIds criteria
         → If no match: ALLOW (neutral state)
         → If match: Check if current time is in permanentlyPermittedTimes
             → If yes: ALLOW
@@ -15,14 +15,14 @@ For each badge action request:
                 → If no: ALLOW (neutral state)
 ```
 
-**English**: "For these times, these badge IDs can be updated" or "For these times, these badge IDs are locked"
+**English**: "For these times, these token IDs can be updated" or "For these times, these token IDs are locked"
 
 ## Overview
 
 ```
-Badge Action
+Token Action
     ↓
-Badge ID Match
+Token ID Match
     ↓
 Time Permission Check
     ↓
@@ -43,11 +43,11 @@ interface BadgeIdsActionPermission {
 
 | Action                   | Description            | Use Case      |
 | ------------------------ | ---------------------- | ------------- |
-| `canUpdateValidBadgeIds` | Update valid badge IDs | Configuration |
+| `canUpdateValidBadgeIds` | Update valid token IDs | Configuration |
 
 ## Examples
 
-### Lock All Badge ID Updates
+### Lock All Token ID Updates
 
 ```json
 {
@@ -63,7 +63,7 @@ interface BadgeIdsActionPermission {
 }
 ```
 
-### Lock Specific Badge Range
+### Lock Specific ID Range
 
 ```json
 {
@@ -79,7 +79,7 @@ interface BadgeIdsActionPermission {
 }
 ```
 
-### Allow Future Badge IDs Only
+### Allow Future Token IDs Only
 
 ```json
 {

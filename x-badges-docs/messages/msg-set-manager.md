@@ -3,7 +3,7 @@ This message is a streamlined alternative to [MsgUpdateCollection](./msg-update-
 
 # MsgSetManager
 
-Sets the manager timeline and update permissions for a badge collection. This is a convenience message that focuses specifically on manager management.
+Sets the manager timeline and update permissions for a collection. This is a convenience message that focuses specifically on manager management.
 
 ## Overview
 
@@ -37,7 +37,7 @@ message MsgSetManager {
 }
 
 message MsgSetManagerResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 ```

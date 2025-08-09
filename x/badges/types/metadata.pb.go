@@ -24,14 +24,14 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// This message defines the metadata for specific badge IDs.
+// This message defines the metadata for specific token IDs.
 // The interpretation of this metadata should follow the collection standard.
 type BadgeMetadata struct {
-	// The URI (Uniform Resource Identifier) associated with the badge metadata.
+	// The URI (Uniform Resource Identifier) associated with the token metadata.
 	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
-	// Custom data or additional information related to the badge metadata.
+	// Custom data or additional information related to the token metadata.
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
-	// The badge IDs to which this metadata applies.
+	// The token IDs to which this metadata applies.
 	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 }
 

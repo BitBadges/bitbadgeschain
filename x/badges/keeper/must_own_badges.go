@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// CheckMustOwnBadges checks if the specified party owns the required badges
+// CheckMustOwnBadges checks if the initiatedBy address owns the required tokens
 func (k Keeper) CheckMustOwnBadges(
 	ctx sdk.Context,
 	mustOwnBadges []*types.MustOwnBadges,
@@ -16,7 +16,6 @@ func (k Keeper) CheckMustOwnBadges(
 	fromAddress string,
 	toAddress string,
 ) error {
-	//Assert that the specified party owns the required badges
 	failedMustOwnBadges := false
 	for _, mustOwnBadge := range mustOwnBadges {
 		collection, found := k.GetCollectionFromStore(ctx, mustOwnBadge.CollectionId)
@@ -77,7 +76,7 @@ func (k Keeper) CheckMustOwnBadges(
 	}
 
 	if failedMustOwnBadges {
-		return sdkerrors.Wrapf(ErrInadequateApprovals, "failed badge ownership requirements")
+		return sdkerrors.Wrapf(ErrInadequateApprovals, "failed token ownership requirements")
 	}
 
 	return nil

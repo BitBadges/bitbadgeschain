@@ -131,7 +131,7 @@ message UserOutgoingApproval {
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 3;
 
-  // The allowed range of badge IDs for approval.
+  // The allowed range of token IDs for approval.
   repeated UintRange badgeIds = 4;
 
   // The allowed range of ownership times for approval.
@@ -164,7 +164,7 @@ message UserIncomingApproval {
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 3;
 
-  // The allowed range of badge IDs for approval.
+  // The allowed range of token IDs for approval.
   repeated UintRange badgeIds = 4;
 
   // The allowed range of ownership times for approval.
@@ -232,7 +232,7 @@ message UserIncomingApproval {
 // Ex: If overallApprovals maxNumTransfers = 20 and trackerID = "abc", then the first 20 transfers that map to trackerID = "abc" will be approved. The 21st transfer will be disallowed.
 //
 // IMPORTANT: Be very careful when updating an approved transfer but keeping the same tracker ID. 
-// For example, if you change the corresponding badge IDs and the old badge IDs overlap, then the overlapping badge IDs will already have existing tallies.
+// For example, if you change the corresponding token IDs and the old token IDs overlap, then the overlapping token IDs will already have existing tallies.
 //    
 // Another common area of confusion is what is actually being tallied. The tally is based on the approved transfer rules that are set.
 // For example, if you don't have per address rules set and you update the approved transfer rules to include per address rules, 
@@ -240,7 +240,7 @@ message UserIncomingApproval {
 //
 // Lastly, we have overridesFromOutgoingApprovals and overridesToIncomingApprovals.
 // If these are set to true, we ignore the from / to user's approved outgoing / incoming transfers, respectively.
-// This is useful, for example, for forcefully revoking badges.
+// This is useful, for example, for forcefully revoking tokens.
 // If these are set to false, the transfer must also be approved by the from /to user's approved outgoing / incoming transfers, respectively.
 
 
@@ -262,7 +262,7 @@ message RecurringOwnershipTimes {
 // IncrementedBalances represents balances that are incremented by specific amounts, according to the order calculation method.
 message IncrementedBalances {
   repeated Balance startBalances = 1;
-  // The amount by which to increment badge IDs.
+  // The amount by which to increment token IDs.
   string incrementBadgeIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
   string incrementOwnershipTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -272,7 +272,7 @@ message IncrementedBalances {
   bool allowOverrideTimestamp = 5;
   // Recurring ownership times.
   RecurringOwnershipTimes recurringOwnershipTimes = 6;
-  // Allow override of any valid badge
+  // Allow override of any valid ID
   bool allowOverrideWithAnyValidBadge = 7;
 }
 
@@ -316,7 +316,7 @@ message AutoDeletionOptions {
 
 // ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
 // If any of these are nil or "0", we assume unlimited approvals.
-// If they are set to a value, then the running tally of the amounts transferred for the specified badge IDs and ownership times 
+// If they are set to a value, then the running tally of the amounts transferred for the specified token IDs and ownership times 
 // must not exceed the corresponding value.
 message ApprovalAmounts {
   // Overall approval amount.
@@ -344,7 +344,7 @@ message ResetTimeIntervals {
 
 // MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
 // If any of these are nil or "0", we assume unlimited approvals.
-// If they are set to a value, then the running tally of the number of transfers for the specified badge IDs and ownership times
+// If they are set to a value, then the running tally of the number of transfers for the specified token IDs and ownership times
 // must not exceed the corresponding value.
 message MaxNumTransfers {
   // Overall maximum number of transfers.
@@ -387,33 +387,33 @@ message CoinTransfer {
 }
 
 /* 
-  MustOwnBadges represents a condition where a user must own specific badges
+  MustOwnBadges represents a condition where a user must own specific tokens
   to be approved to transfer.
 
-  - collectionId: The ID of the badge collection for the badges that must be owned
-  - amountRange: The range of badge amounts the user must own (min to max)
-  - ownershipTimes: The time ranges during which the user must own the badges.
-  - badgeIds: The badge IDs the user must own.
+  - collectionId: The ID of the collection for the tokens that must be owned
+  - amountRange: The range of amounts the user must own (min to max)
+  - ownershipTimes: The time ranges during which the user must own the tokens.
+  - badgeIds: The token IDs the user must own.
   - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
-  - mustSatisfyForAllAssets: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
+  - mustSatisfyForAllAssets: If true, the user must own all specified tokens; otherwise, owning any one for >= 1 millisecond is sufficient.
 */
 message MustOwnBadges {
-  // The ID of the badge collection.
+  // The ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  // The range of badge amounts the user must own (min to max).
+  // The range of amounts the user must own (min to max).
   UintRange amountRange = 2;
 
-  // The time ranges during which the user must own the badges.
+  // The time ranges during which the user must own the tokens.
   repeated UintRange ownershipTimes = 3;
 
-  // The badge IDs the user must own.
+  // The token IDs the user must own.
   repeated UintRange badgeIds = 4;
 
   // If true, override ownershipTimes with the current time.
   bool overrideWithCurrentTime = 5;
 
-  // If true, the user must meet ownership requirements for all specified badges; else, must meet requirements for any single badge.
+  // If true, the user must meet ownership requirements for all specified tokens; else, must meet requirements for any single token.
   bool mustSatisfyForAllAssets = 6;
 
   // The party to check ownership for. Options are "initiator", "sender", or "recipient". Defaults to "initiator" if empty.
@@ -459,7 +459,7 @@ message ApprovalCriteria {
   // User level royalties to apply to the transfer.
   UserRoyalties userRoyalties = 13;
 
-  // Must own badges for approval.
+  // Must own tokens for approval.
   repeated MustOwnBadges mustOwnBadges = 14;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
@@ -496,7 +496,7 @@ message OutgoingApprovalCriteria {
   // Auto-deletion options.
   AutoDeletionOptions autoDeletionOptions = 8;
 
-  // Must own badges for approval.
+  // Must own tokens for approval.
   repeated MustOwnBadges mustOwnBadges = 9;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
@@ -525,7 +525,7 @@ message IncomingApprovalCriteria {
   // Auto-deletion options.
   AutoDeletionOptions autoDeletionOptions = 8;
 
-  // Must own badges for approval.
+  // Must own tokens for approval.
   repeated MustOwnBadges mustOwnBadges = 9;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
@@ -544,7 +544,7 @@ message CollectionApproval {
   string initiatedByListId = 3;
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 4;
-  // The allowed range of badge IDs for approval.
+  // The allowed range of token IDs for approval.
   repeated UintRange badgeIds = 5;
   // The allowed range of ownership times for approval.
   repeated UintRange ownershipTimes = 6;
@@ -574,7 +574,7 @@ message ApprovalIdentifierDetails {
 }
 
 
-// Transfer defines the details of a transfer of badges.
+// Transfer defines the details of a transfer of tokens.
 message Transfer {
   // The address of the sender of the transfer.
   string from = 1;
@@ -618,7 +618,7 @@ message Transfer {
 message PrecalculationOptions {
   // The timestamp to override with when calculating the balances.
   string overrideTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // The badgeIdsOverride to use for the transfer.
+  // The IDs to override for the transfer. Only applicable if using this option in precalculation.
   repeated UintRange badgeIdsOverride = 2;
 }
 

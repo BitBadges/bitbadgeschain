@@ -1,12 +1,12 @@
-# Locking Valid Badge IDs
+# Locking Valid Token IDs
 
-This example demonstrates how to control updates to the `validBadgeIds` field, either locking it permanently or allowing controlled expansion. The `validBadgeIds` field is used to control which badge IDs are considered valid for the collection.
+This example demonstrates how to control updates to the `validBadgeIds` field, either locking it permanently or allowing controlled expansion. The `validBadgeIds` field is used to control which token IDs are considered valid for the collection.
 
 ## Overview
 
-The `canUpdateValidBadgeIds` permission controls whether the valid badge ID ranges can be modified.
+The `canUpdateValidBadgeIds` permission controls whether the valid token ID ranges can be modified.
 
-## Lock Valid Badge IDs Forever
+## Lock Valid Token IDs Forever
 
 ```typescript
 const FullTimeRanges = [
@@ -26,8 +26,8 @@ const collectionPermissions = {
     canUpdateCollectionMetadata: [],
     canUpdateValidBadgeIds: [
         {
-            // Which badge IDs does this permission apply to?
-            badgeIds: FullTimeRanges, // All badge IDs
+            // Which token IDs does this permission apply to?
+            badgeIds: FullTimeRanges, // All token IDs
 
             // What is status of this permission at any given time?
             permanentlyPermittedTimes: [],
@@ -39,7 +39,7 @@ const collectionPermissions = {
 };
 ```
 
-## Lock Badge IDs 1-100, Allow Future Expansion
+## Lock Token IDs 1-100, Allow Future Expansion
 
 ```typescript
 const collectionPermissions = {
@@ -52,19 +52,19 @@ const collectionPermissions = {
     canUpdateCollectionMetadata: [],
     canUpdateValidBadgeIds: [
         {
-            // Which badge IDs does this permission apply to?
+            // Which token IDs does this permission apply to?
             badgeIds: [
                 {
                     start: '1',
-                    end: '100', // Only applies to badges 1-100
+                    end: '100', // Only applies to tokens 1-100
                 },
             ],
 
             // What is status of this permission at any given time?
             permanentlyPermittedTimes: [],
-            permanentlyForbiddenTimes: FullTimeRanges, // Badge IDs 1-100 locked forever
+            permanentlyForbiddenTimes: FullTimeRanges, // Token IDs 1-100 locked forever
         },
-        // Badge IDs 101+ remain soft-enabled (can be updated by manager)
+        // Token IDs 101+ remain soft-enabled (can be updated by manager)
     ],
     canUpdateBadgeMetadata: [],
     canUpdateCollectionApprovals: [],
@@ -88,18 +88,18 @@ const createCollection = {
 
 ## Important Notes
 
-### ⚠️ Badge ID Targeting
+### ⚠️ Token ID Targeting
 
--   Permissions only apply to the specified badge ID ranges
+-   Permissions only apply to the specified token ID ranges
 -   Unspecified ranges remain soft-enabled for manager updates
--   Cannot reduce valid badge IDs once locked (only expansion possible for unlocked ranges)
+-   Cannot reduce valid token IDs once locked (only expansion possible for unlocked ranges)
 
 ## Related Examples
 
--   [Locking Specific Badge IDs](./locking-specific-badge-ids.md) - Lock approval updates for badge ranges
+-   [Locking Specific Token IDs](./locking-specific-badge-ids.md) - Lock approval updates for token ranges
 -   [Freezing Mint Transferability](./freezing-mint-transferability.md) - Lock mint approvals
 
 ## Related Concepts
 
--   [Valid Badge IDs](../../concepts/valid-badge-ids.md) - Badge ID range concept
--   [Badge IDs Action Permission](../../concepts/permissions/balances-action-permission.md) - Badge-specific permission controls
+-   [Valid Token IDs](../../concepts/valid-badge-ids.md) - Token ID range concept
+-   [Token IDs Action Permission](../../concepts/permissions/balances-action-permission.md) - Token-specific permission controls

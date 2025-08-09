@@ -1,6 +1,6 @@
 # Cosmos Wrapper Approval
 
-This example demonstrates how to create an approval that allows badges to be sent to a Cosmos coin wrapper address, enabling conversion to native Cosmos SDK coins.
+This example demonstrates how to create an approval that allows tokens to be sent to a Cosmos coin wrapper address, enabling conversion to native Cosmos SDK coins.
 
 You pretty much: 1) figure out your address and 2) figure out a path that users can send to this address without needing the address to control its approvals. Oftentimes, you may not even need to forcefully override the incoming approvals because you default allow all incoming transfers which also applies to the wrapper address automatically.
 

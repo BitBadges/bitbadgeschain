@@ -62,7 +62,7 @@ message ValueStore {
 message MapUpdateCriteria {
   //All ID slots are only updatable by manager
   bool managerOnly = 1;
-  //ID slots are only updatable by badge ID owner of this collection (>1 balance at current time)
+  //ID slots are only updatable by token ID owner of this collection (>1 balance at current time)
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   //Keys are address based and can only be updated by that respective address
   bool creatorOnly = 3;

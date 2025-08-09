@@ -9674,15 +9674,15 @@ const (
 // The permission type allows fine-grained access control for each action.
 // - ActionPermission: defines when the manager can perform an action.
 // - TimedUpdatePermission: defines when the manager can update a timeline-based field and what times of the timeline can be updated.
-// - TimedUpdateWithBadgeIdsPermission: defines when the manager can update a timeline-based field for specific badges and what times of the timeline can be updated.
-// - BadgeIdsActionPermission: defines when the manager can perform an action for specific badges
+// - TimedUpdateWithBadgeIdsPermission: defines when the manager can update a timeline-based field for specific tokens and what times of the timeline can be updated.
+// - BadgeIdsActionPermission: defines when the manager can perform an action for specific tokens
 // - CollectionApprovalPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs. locked.
 //
 // Note there are a few different times here which could get confusing:
 // - timelineTimes: the times when a timeline-based field is a specific value
 // - permanentlyPermitted/ForbiddenTimes - the times that a permission can be performed
 // - transferTimes - the times that a transfer occurs
-// - ownershipTimes - the times when a badge is owned by a user
+// - ownershipTimes - the times when a token is owned by a user
 //
 // The permitted/permanentlyForbiddenTimes are used to determine when a permission can be executed.
 // Once a time is set to be permitted or forbidden, it is PERMANENT and cannot be changed.
@@ -9709,9 +9709,9 @@ type CollectionPermissions struct {
 	CanUpdateManager []*TimedUpdatePermission `protobuf:"bytes,6,rep,name=canUpdateManager,proto3" json:"canUpdateManager,omitempty"`
 	// Permissions related to updating the metadata of the collection.
 	CanUpdateCollectionMetadata []*TimedUpdatePermission `protobuf:"bytes,7,rep,name=canUpdateCollectionMetadata,proto3" json:"canUpdateCollectionMetadata,omitempty"`
-	// Permissions related to creating more badges for the collection.
+	// Permissions related to creating more tokens for the collection.
 	CanUpdateValidBadgeIds []*BadgeIdsActionPermission `protobuf:"bytes,8,rep,name=canUpdateValidBadgeIds,proto3" json:"canUpdateValidBadgeIds,omitempty"`
-	// Permissions related to updating badge metadata for specific badges.
+	// Permissions related to updating token metadata for specific tokens.
 	CanUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission `protobuf:"bytes,9,rep,name=canUpdateBadgeMetadata,proto3" json:"canUpdateBadgeMetadata,omitempty"`
 	// Permissions related to updating collection approvals.
 	CanUpdateCollectionApprovals []*CollectionApprovalPermission `protobuf:"bytes,10,rep,name=canUpdateCollectionApprovals,proto3" json:"canUpdateCollectionApprovals,omitempty"`
@@ -9899,7 +9899,7 @@ func (x *UserPermissions) GetCanUpdateAutoApproveAllIncomingTransfers() []*Actio
 // We would check to find the FIRST CollectionApprovalPermission that matches this combination.
 // If we find a match, we would check the permitted/forbidden times to see if we can execute this permission (default is ALLOWED).
 //
-// Ex: So if you wanted to freeze the transferability to enforce that badge ID 1 will always be transferable, you could set
+// Ex: So if you wanted to freeze the transferability to enforce that token ID 1 will always be transferable, you could set
 // the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
 type CollectionApprovalPermission struct {
 	state         protoimpl.MessageState
@@ -9914,9 +9914,9 @@ type CollectionApprovalPermission struct {
 	InitiatedByListId string `protobuf:"bytes,3,opt,name=initiatedByListId,proto3" json:"initiatedByListId,omitempty"`
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	// Specifies the badge IDs involved in the transfer.
+	// Specifies the token IDs involved in the transfer.
 	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	// Specifies the ownership times for the badges in the transfer.
+	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
 	// If you use "All", this approval will match to all approvalIds.
@@ -10024,9 +10024,9 @@ type UserOutgoingApprovalPermission struct {
 	InitiatedByListId string `protobuf:"bytes,2,opt,name=initiatedByListId,proto3" json:"initiatedByListId,omitempty"`
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	// Specifies the badge IDs involved in the transfer.
+	// Specifies the token IDs involved in the transfer.
 	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	// Specifies the ownership times for the badges in the transfer.
+	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
 	// If you use "All", this approval will match to all approvalIds.
@@ -10129,9 +10129,9 @@ type UserIncomingApprovalPermission struct {
 	InitiatedByListId string `protobuf:"bytes,2,opt,name=initiatedByListId,proto3" json:"initiatedByListId,omitempty"`
 	// Specifies the times when the transfer can occur.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	// Specifies the badge IDs involved in the transfer.
+	// Specifies the token IDs involved in the transfer.
 	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
-	// Specifies the ownership times for the badges in the transfer.
+	// Specifies the ownership times for the tokens in the transfer.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// Identifier for the approvalId. You can use "All" or "!approvalId" for shorthand.
 	// If you use "All", this approval will match to all approvalIds.
@@ -10220,17 +10220,17 @@ func (x *UserIncomingApprovalPermission) GetPermanentlyForbiddenTimes() []*UintR
 	return nil
 }
 
-// BadgeIdsActionPermission defines the permissions for updating a timeline-based field for specific badges and specific badge ownership times.
-// Currently, this is only used for creating new badges.
+// BadgeIdsActionPermission defines the permissions for updating a timeline-based field for specific tokens and specific token ownership times.
+// Currently, this is only used for creating new tokens.
 //
-// Ex: If you want to lock the ability to create new badges for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
+// Ex: If you want to lock the ability to create new tokens for badgeIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
 // you could set the combination (badgeIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 type BadgeIdsActionPermission struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specifies the badge IDs involved in the transfer.
+	// Specifies the token IDs involved in the transfer.
 	BadgeIds []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
@@ -10385,7 +10385,7 @@ func (x *TimedUpdatePermission) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific badges.
+// TimedUpdateWithBadgeIdsPermission defines the permissions for updating a timeline-based field for specific tokens.
 //
 // Ex: If you want to lock the ability to update the metadata for badgeIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
 // you could set the combination (badgeIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
@@ -10394,7 +10394,7 @@ type TimedUpdateWithBadgeIdsPermission struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specifies the badge IDs involved in the transfer.
+	// Specifies the token IDs involved in the transfer.
 	BadgeIds []*UintRange `protobuf:"bytes,1,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
 	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`

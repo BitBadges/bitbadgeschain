@@ -21875,7 +21875,7 @@ type UserOutgoingApproval struct {
 	InitiatedByListId string `protobuf:"bytes,2,opt,name=initiatedByListId,proto3" json:"initiatedByListId,omitempty"`
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	// The allowed range of badge IDs for approval.
+	// The allowed range of token IDs for approval.
 	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
@@ -21993,7 +21993,7 @@ type UserIncomingApproval struct {
 	InitiatedByListId string `protobuf:"bytes,2,opt,name=initiatedByListId,proto3" json:"initiatedByListId,omitempty"`
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	// The allowed range of badge IDs for approval.
+	// The allowed range of token IDs for approval.
 	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
@@ -22197,7 +22197,7 @@ type IncrementedBalances struct {
 	unknownFields protoimpl.UnknownFields
 
 	StartBalances []*Balance `protobuf:"bytes,1,rep,name=startBalances,proto3" json:"startBalances,omitempty"`
-	// The amount by which to increment badge IDs.
+	// The amount by which to increment token IDs.
 	IncrementBadgeIdsBy string `protobuf:"bytes,2,opt,name=incrementBadgeIdsBy,proto3" json:"incrementBadgeIdsBy,omitempty"`
 	// The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
 	IncrementOwnershipTimesBy string `protobuf:"bytes,3,opt,name=incrementOwnershipTimesBy,proto3" json:"incrementOwnershipTimesBy,omitempty"`
@@ -22207,7 +22207,7 @@ type IncrementedBalances struct {
 	AllowOverrideTimestamp bool `protobuf:"varint,5,opt,name=allowOverrideTimestamp,proto3" json:"allowOverrideTimestamp,omitempty"`
 	// Recurring ownership times.
 	RecurringOwnershipTimes *RecurringOwnershipTimes `protobuf:"bytes,6,opt,name=recurringOwnershipTimes,proto3" json:"recurringOwnershipTimes,omitempty"`
-	// Allow override of any valid badge
+	// Allow override of any valid ID
 	AllowOverrideWithAnyValidBadge bool `protobuf:"varint,7,opt,name=allowOverrideWithAnyValidBadge,proto3" json:"allowOverrideWithAnyValidBadge,omitempty"`
 }
 
@@ -22465,7 +22465,7 @@ func (x *AutoDeletionOptions) GetAfterOverallMaxNumTransfers() bool {
 
 // ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
 // If any of these are nil or "0", we assume unlimited approvals.
-// If they are set to a value, then the running tally of the amounts transferred for the specified badge IDs and ownership times
+// If they are set to a value, then the running tally of the amounts transferred for the specified token IDs and ownership times
 // must not exceed the corresponding value.
 type ApprovalAmounts struct {
 	state         protoimpl.MessageState
@@ -22597,7 +22597,7 @@ func (x *ResetTimeIntervals) GetIntervalLength() string {
 
 // MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
 // If any of these are nil or "0", we assume unlimited approvals.
-// If they are set to a value, then the running tally of the number of transfers for the specified badge IDs and ownership times
+// If they are set to a value, then the running tally of the number of transfers for the specified token IDs and ownership times
 // must not exceed the corresponding value.
 type MaxNumTransfers struct {
 	state         protoimpl.MessageState
@@ -22802,31 +22802,31 @@ func (x *CoinTransfer) GetOverrideToWithInitiator() bool {
 	return false
 }
 
-// MustOwnBadges represents a condition where a user must own specific badges
+// MustOwnBadges represents a condition where a user must own specific tokens
 // to be approved to transfer.
 //
-// - collectionId: The ID of the badge collection for the badges that must be owned
-// - amountRange: The range of badge amounts the user must own (min to max)
-// - ownershipTimes: The time ranges during which the user must own the badges.
-// - badgeIds: The badge IDs the user must own.
+// - collectionId: The ID of the collection for the tokens that must be owned
+// - amountRange: The range of amounts the user must own (min to max)
+// - ownershipTimes: The time ranges during which the user must own the tokens.
+// - badgeIds: The token IDs the user must own.
 // - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
-// - mustSatisfyForAllAssets: If true, the user must own all specified badges; otherwise, owning any one for >= 1 millisecond is sufficient.
+// - mustSatisfyForAllAssets: If true, the user must own all specified tokens; otherwise, owning any one for >= 1 millisecond is sufficient.
 type MustOwnBadges struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The ID of the badge collection.
+	// The ID of the collection.
 	CollectionId string `protobuf:"bytes,1,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
-	// The range of badge amounts the user must own (min to max).
+	// The range of amounts the user must own (min to max).
 	AmountRange *UintRange `protobuf:"bytes,2,opt,name=amountRange,proto3" json:"amountRange,omitempty"`
-	// The time ranges during which the user must own the badges.
+	// The time ranges during which the user must own the tokens.
 	OwnershipTimes []*UintRange `protobuf:"bytes,3,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	// The badge IDs the user must own.
+	// The token IDs the user must own.
 	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	// If true, override ownershipTimes with the current time.
 	OverrideWithCurrentTime bool `protobuf:"varint,5,opt,name=overrideWithCurrentTime,proto3" json:"overrideWithCurrentTime,omitempty"`
-	// If true, the user must meet ownership requirements for all specified badges; else, must meet requirements for any single badge.
+	// If true, the user must meet ownership requirements for all specified tokens; else, must meet requirements for any single token.
 	MustSatisfyForAllAssets bool `protobuf:"varint,6,opt,name=mustSatisfyForAllAssets,proto3" json:"mustSatisfyForAllAssets,omitempty"`
 }
 
@@ -22924,7 +22924,7 @@ type ApprovalCriteria struct {
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,12,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
 	// User level royalties to apply to the transfer.
 	UserRoyalties *UserRoyalties `protobuf:"bytes,13,opt,name=userRoyalties,proto3" json:"userRoyalties,omitempty"`
-	// Must own badges for approval.
+	// Must own tokens for approval.
 	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,14,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
 }
 
@@ -23114,7 +23114,7 @@ type OutgoingApprovalCriteria struct {
 	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
 	// Auto-deletion options.
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// Must own badges for approval.
+	// Must own tokens for approval.
 	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,9,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
 }
 
@@ -23223,7 +23223,7 @@ type IncomingApprovalCriteria struct {
 	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
 	// Auto-deletion options.
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// Must own badges for approval.
+	// Must own tokens for approval.
 	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,9,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
 }
 
@@ -23324,7 +23324,7 @@ type CollectionApproval struct {
 	InitiatedByListId string `protobuf:"bytes,3,opt,name=initiatedByListId,proto3" json:"initiatedByListId,omitempty"`
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
-	// The allowed range of badge IDs for approval.
+	// The allowed range of token IDs for approval.
 	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
@@ -23501,7 +23501,7 @@ func (x *ApprovalIdentifierDetails) GetVersion() string {
 	return ""
 }
 
-// Transfer defines the details of a transfer of badges.
+// Transfer defines the details of a transfer of tokens.
 type Transfer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -23662,7 +23662,7 @@ type PrecalculationOptions struct {
 
 	// The timestamp to override with when calculating the balances.
 	OverrideTimestamp string `protobuf:"bytes,1,opt,name=overrideTimestamp,proto3" json:"overrideTimestamp,omitempty"`
-	// The badgeIdsOverride to use for the transfer.
+	// The tokenIdsOverride to use for the transfer.
 	BadgeIdsOverride []*UintRange `protobuf:"bytes,2,rep,name=badgeIdsOverride,proto3" json:"badgeIdsOverride,omitempty"`
 }
 

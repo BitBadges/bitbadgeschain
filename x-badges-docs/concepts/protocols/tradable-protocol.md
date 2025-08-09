@@ -1,14 +1,14 @@
 # Tradable Protocol
 
-The Tradable Protocol enables orderbook-style trading of badges through standardized bid and listing approvals. This protocol supports both fungible and non-fungible badge types with coin-based transactions.
+The Tradable Protocol enables orderbook-style trading of tokens through standardized bid and listing approvals. This protocol supports both fungible and non-fungible token types with coin-based transactions.
 
 ## Protocol Overview
 
 The Tradable Protocol creates a decentralized marketplace where users can:
 
--   **List badges for sale** at specific prices
--   **Place bids** to buy badges from other users
--   **Support both NFT and fungible badges** with flexible trading rules
+-   **List tokens for sale** at specific prices
+-   **Place bids** to buy tokens from other users
+-   **Support both NFT and fungible tokens** with flexible trading rules
 -   **Execute trades** through standardized approval mechanisms
 
 ## Protocol Requirements
@@ -16,45 +16,45 @@ The Tradable Protocol creates a decentralized marketplace where users can:
 ### Collection Standards
 
 -   Must include "Tradable" in the `standardsTimeline` for the current time period. Note this often also goes well with "NFT" standard if your collection is NFTs.
--   Compatible with all badge types (fungible and non-fungible)
--   No restrictions on badge ID ranges or quantities
+-   Compatible with all token types (fungible and non-fungible)
+-   No restrictions on token ID ranges or quantities
 
 ### Approval Types
 
 #### 1. Listing Approvals (Outgoing)
 
-Listings allow badge owners to sell their badges for coins.
+Listings allow owners to sell their tokens for coins.
 
 **Requirements:**
 
 -   Single transfer time range
 -   Exactly one coin transfer with one coin denomination
--   Coin recipient must be the badge owner (`to` equals `fromListId`)
+-   Coin recipient must be the token owner (`to` equals `fromListId`)
 -   No address overrides (`overrideFromWithApproverAddress` and `overrideToWithInitiator` must be false)
--   Specific badge IDs (no `allowOverrideWithAnyValidBadge`)
+-   Specific token IDs (no `allowOverrideWithAnyValidBadge`)
 -   Full ownership times
--   No Merkle challenges or prerequisite badges
+-   No Merkle challenges or prerequisite tokens
 -   `overallMaxNumTransfers` > 0
 -   Typically, you want the denomination to match the collection's preferred denomination.
 
 #### 2. Bid Approvals (Incoming)
 
-Bids allow users to offer coins to purchase badges from others.
+Bids allow users to offer coins to purchase tokens from others.
 
 **Requirements:**
 
 -   Single transfer time range
 -   Exactly one coin transfer with one coin denomination
 -   Coins come from bidder (`overrideFromWithApproverAddress` must be true)
--   Coins go to badge owner (`overrideToWithInitiator` must be true)
--   Specific badge IDs (no `allowOverrideWithAnyValidBadge` unless collection bid)
+-   Coins go to token owner (`overrideToWithInitiator` must be true)
+-   Specific token IDs (no `allowOverrideWithAnyValidBadge` unless collection bid)
 -   Full ownership times
--   No Merkle challenges or prerequisite badges
+-   No Merkle challenges or prerequisite tokens
 -   `overallMaxNumTransfers` > 0
 
 #### 3. Collection Bids (Special Case)
 
-Collection bids allow users to bid on any badge within a collection.
+Collection bids allow users to bid on any token within a collection.
 
 **Additional Requirements:**
 
@@ -147,7 +147,7 @@ export const isBidOrListingApproval = (
         return false;
     }
 
-    // Collection bids can accept any valid badge
+    // Collection bids can accept any valid ID
     if (options?.isCollectionBid) {
         if (!incrementedBalances.allowOverrideWithAnyValidBadge) {
             return false;

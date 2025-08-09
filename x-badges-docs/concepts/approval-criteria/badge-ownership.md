@@ -1,18 +1,17 @@
-# Badge Ownership
+# Token Ownership
 
-Require specific badge holdings from the specified party as a prerequisite for transfer approval. This approval criteria checks on-chain badge balances to ensure the specified party owns required badges before allowing transfers.
+Require specific token holdings from the initiator as a prerequisite for transfer approval. This approval criteria checks on-chain balances to ensure users own required tokens before allowing transfers.
 
 ## Overview
 
-Badge ownership requirements enable gating mechanisms where users must possess specific badges to access certain transfers. This creates dependency relationships between collections and enables sophisticated access control systems.
+Token ownership requirements enable gating mechanisms where users must possess specific tokens to access certain transfers. This creates dependency relationships between collections and enables sophisticated access control systems.
 
 **Key Benefits**:
 
--   **Access Control**: Gate transfers based on badge ownership
--   **Collection Dependencies**: Create relationships between different badge collections
+-   **Access Control**: Gate transfers based on token ownership
+-   **Collection Dependencies**: Create relationships between different collections
 -   **On-Chain Verification**: Automatic balance checking without external data
--   **Flexible Requirements**: Support for amount ranges, time-based ownership, and multiple badge types
--   **Party-Specific Checks**: Check ownership for initiator, sender, or recipient
+-   **Flexible Requirements**: Support for amount ranges, time-based ownership, and multiple token types
 
 ## Interface
 
@@ -24,7 +23,7 @@ interface MustOwnBadges<T extends NumberType> {
     badgeIds: UintRange<T>[];
 
     overrideWithCurrentTime: boolean; // Use current block time. Overrides ownershipTimes with [{ start: currentTime, end: currentTime }]
-    mustSatisfyForAllAssets: boolean; // All vs one badge requirement
+    mustSatisfyForAllAssets: boolean; // All vs one requirement
     ownershipCheckParty: string; // Which party to check ownership for: "initiator", "sender", "recipient" (default: "initiator" if empty)
 }
 ```
@@ -34,27 +33,27 @@ interface MustOwnBadges<T extends NumberType> {
 ### collectionId
 
 -   **Type**: `T` (NumberType)
--   **Description**: The ID of the collection containing the required badges
+-   **Description**: The ID of the collection containing the required tokens
 -   **Example**: `"1"` for collection ID 1
 
 ### amountRange
 
 -   **Type**: `UintRange<T>`
--   **Description**: Minimum and maximum amount of badges the user must own
+-   **Description**: Minimum and maximum amount of tokens the user must own
 -   **Format**: `{ start: "minAmount", end: "maxAmount" }`
--   **Example**: `{ start: "1", end: "10" }` requires 1-10 badges (amounts)
+-   **Example**: `{ start: "1", end: "10" }` requires 1-10 tokens (amounts)
 
 ### ownershipTimes
 
 -   **Type**: `UintRange<T>[]`
--   **Description**: Time ranges when the user must have owned the badges (UNIX milliseconds)
+-   **Description**: Time ranges when the user must have owned the tokens (UNIX milliseconds)
 -   **Example**: `[{ start: "1691931600000", end: "1723554000000" }]` for Aug 13, 2023 - Aug 13, 2024
 
 ### badgeIds
 
 -   **Type**: `UintRange<T>[]`
--   **Description**: Specific badge IDs that must be owned
--   **Example**: `[{ start: "1", end: "100" }]` for badge IDs 1-100
+-   **Description**: Specific token IDs that must be owned
+-   **Example**: `[{ start: "1", end: "100" }]` for token IDs 1-100
 
 ### overrideWithCurrentTime
 
@@ -66,9 +65,9 @@ interface MustOwnBadges<T extends NumberType> {
 ### mustSatisfyForAllAssets
 
 -   **Type**: `boolean`
--   **Description**: Controls whether all specified badge requirements must be met or just one
--   **True**: User must own ALL specified badge combinations
--   **False**: User must own AT LEAST ONE of the specified badge combinations
+-   **Description**: Controls whether all specified token requirements must be met or just one
+-   **True**: User must own ALL specified token combinations
+-   **False**: User must own AT LEAST ONE of the specified token combinations
 
 ### ownershipCheckParty
 
@@ -83,7 +82,7 @@ interface MustOwnBadges<T extends NumberType> {
 
 ## Example
 
-Require users to own specific badges to access premium features or exclusive transfers.
+Require users to own specific tokens to access premium features or exclusive transfers.
 
 ```json
 {

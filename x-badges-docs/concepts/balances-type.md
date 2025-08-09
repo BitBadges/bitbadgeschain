@@ -1,6 +1,6 @@
 # Balances Type
 
-The balances type determines how badge ownership and transfers are managed within a collection. This is permanent upon genesis and cannot be changed.
+The balances type determines how token ownership and transfers are managed within a collection. This is permanent upon genesis and cannot be changed.
 
 > **Important**: Always use `"Standard"` for new collections. Other balance types are supported behind the scenes for legacy purposes only, but "Standard" should always be used for on-chain balances.
 
@@ -42,9 +42,9 @@ The collection approvals are managed by the manager and can optionally override 
 
 The "Mint" address has special properties:
 
--   **Unlimited balances** - Can mint any amount of badges
--   **Send-only** - Can only send badges, not receive them
--   **Circulating supply control** - All circulating badges originate from Mint transfers. Thus, the circulating supply is controlled by the collection approvals from the Mint address.
+-   **Unlimited balances** - Can mint any amount of tokens
+-   **Send-only** - Can only send tokens, not receive them
+-   **Circulating supply control** - All circulating tokens originate from Mint transfers. Thus, the circulating supply is controlled by the collection approvals from the Mint address.
 -   **Non-Controllable** - The Mint address cannot set its own approvals, so all approvals must be set by the collection manager and forcefully override the Mint address's approvals.
 
 ### Circulating Supply Management

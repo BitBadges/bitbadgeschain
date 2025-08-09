@@ -1,6 +1,6 @@
 # Timeline Permissions
 
-Timeline permissions control when timeline-based fields can be updated, such as collection metadata and badge metadata.
+Timeline permissions control when timeline-based fields can be updated, such as collection metadata and token metadata.
 
 ## High-Level Logic
 
@@ -17,11 +17,11 @@ For each timeline update request:
                 → If no: ALLOW (neutral state)
 ```
 
-### Badge-Specific Timeline Permissions
+### Token-Specific Timeline Permissions
 
 ```
-For each badge timeline update request:
-    Check if timeline time AND badge ID match criteria
+For each token timeline update request:
+    Check if timeline time AND token ID match criteria
         → If no match: ALLOW (neutral state)
         → If match: Check if current time is in permanentlyPermittedTimes
             → If yes: ALLOW
@@ -33,7 +33,7 @@ For each badge timeline update request:
 **English**:
 
 -   **Basic**: "For these permission execution times, the (timelineTime -> timelineValue) pairs can be updated"
--   **Badge-Specific**: "For these permission execution times, the (badgeId, timelineTime -> timelineValue) pairs can be updated"
+-   **Token-Specific**: "For these permission execution times, the (badgeId, timelineTime -> timelineValue) pairs can be updated"
 
 ## Timeline vs Execution Times
 
@@ -77,9 +77,9 @@ interface TimedUpdatePermission {
 -   `canUpdateManager`
 -   `canUpdateCollectionMetadata`
 
-### Badge-Specific Timeline Permissions
+### Token-Specific Timeline Permissions
 
-Control badge metadata timeline updates:
+Control token metadata timeline updates:
 
 ```typescript
 interface TimedUpdateWithBadgeIdsPermission {
@@ -128,7 +128,7 @@ interface TimedUpdateWithBadgeIdsPermission {
 }
 ```
 
-### Lock Badge Metadata for Existing Badges
+### Lock Token Metadata for Existing Tokens
 
 ```json
 {

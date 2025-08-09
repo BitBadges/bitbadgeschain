@@ -74,7 +74,7 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			err: types.ErrInvalidURI,
 		},
 		{
-			name: "invalid Badge URI",
+			name: "invalid Token URI",
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:                          sample.AccAddress(),
 				CollectionId:                     sdkmath.NewUint(0),

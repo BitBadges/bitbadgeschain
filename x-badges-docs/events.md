@@ -68,7 +68,7 @@ Attributes:
   - msg: string (JSON-encoded message)
 ```
 
-### Badge Transfers
+### Token Transfers
 
 #### TransferBadges
 

@@ -17,7 +17,7 @@ When adding new fields to proto definitions, you need to follow a systematic app
 
 Proto definitions are located in the `./proto` directory, organized by module:
 
--   `./proto/badges/` - Badge-related definitions
+-   `./proto/badges/` - Token-related definitions
 -   `./proto/maps/` - Map-related definitions
 -   `./proto/anchor/` - Anchor-related definitions
 -   `./proto/ethereum/` - Ethereum-specific definitions
@@ -26,7 +26,7 @@ Proto definitions are located in the `./proto` directory, organized by module:
 
 ### Key Files to Modify
 
-For badge-related changes, the main files are:
+For token-related changes, the main files are:
 
 -   `./proto/badges/tx.proto` - Transaction messages
 -   `./proto/badges/query.proto` - Query messages
@@ -76,7 +76,7 @@ message ExampleMessage {
 For number types that need to be handled as Uint in Go:
 
 ```protobuf
-// Use this pattern for collection IDs, badge IDs, and other numeric identifiers
+// Use this pattern for collection IDs, token IDs, and other numeric identifiers
 string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 string badgeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 ```

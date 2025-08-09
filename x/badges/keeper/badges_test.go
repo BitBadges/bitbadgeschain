@@ -43,10 +43,10 @@ func (suite *TestSuite) TestCreateBadges() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	// collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	// suite.Require().Nil(err, "Error getting badge: %s")
+	// suite.Require().Nil(err, "Error getting token: %s")
 	balance := &types.UserBalanceStore{}
 
 	// totalSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
@@ -87,7 +87,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge")
+	suite.Require().Nil(err, "Error transferring token")
 
 	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -182,7 +182,7 @@ func (suite *TestSuite) TestCreateBadges() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error creating badges: %s")
+	suite.Require().Error(err, "Error creating tokens: %s")
 }
 
 func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
@@ -219,7 +219,7 @@ func (suite *TestSuite) TestCreateBadgesIdGreaterThanMax() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 }
 
 func (suite *TestSuite) TestDuplicateBadgeIDs() {
@@ -332,7 +332,7 @@ func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	balance := &types.UserBalanceStore{}
 	// totalSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
@@ -372,7 +372,7 @@ func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge")
+	suite.Require().Nil(err, "Error transferring token")
 
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -395,7 +395,7 @@ func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge")
+	suite.Require().Error(err, "Error transferring token")
 }
 
 func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
@@ -411,10 +411,10 @@ func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err, "Error getting badge: %s")
+	suite.Require().Nil(err, "Error getting token: %s")
 	AssertUintRangesEqual(suite, collection.ValidBadgeIds, GetOneUintRange())
 
 	//Set permission
@@ -437,7 +437,7 @@ func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
-	//Update valid badge IDs
+	//Update valid token IDs
 	err = UpdateCollection(suite, wctx, &types.MsgUniversalUpdateCollection{
 		Creator:             bob,
 		CollectionId:        sdkmath.NewUint(1),
@@ -447,10 +447,10 @@ func (suite *TestSuite) TestValidUpdateBadgeIdsWithPermission() {
 	suite.Require().Nil(err, "Error updating collection permissions")
 
 	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err, "Error getting badge: %s")
+	suite.Require().Nil(err, "Error getting token: %s")
 	AssertUintRangesEqual(suite, collection.ValidBadgeIds, []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}})
 
-	//Update valid badge IDs - invalid > 2
+	//Update valid token IDs - invalid > 2
 	err = UpdateCollection(suite, wctx, &types.MsgUniversalUpdateCollection{
 		Creator:             bob,
 		CollectionId:        sdkmath.NewUint(1),

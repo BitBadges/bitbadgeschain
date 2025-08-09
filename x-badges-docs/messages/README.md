@@ -6,25 +6,25 @@ This directory contains detailed documentation for all message types supported b
 
 ### Collection Management
 
--   [MsgCreateCollection](./msg-create-collection.md) - Create new badge collection
+-   [MsgCreateCollection](./msg-create-collection.md) - Create new collection
 -   [MsgUpdateCollection](./msg-update-collection.md) - Update existing collection properties
 -   [MsgUniversalUpdateCollection](./msg-universal-update-collection.md) - Universal create/update interface with invariants support
 -   [MsgDeleteCollection](./msg-delete-collection.md) - Archive/delete collection
 
 ### Helper Collection Update Messages
 
--   [MsgSetValidBadgeIds](./msg-set-valid-badge-ids.md) - Update valid badge IDs and permissions
+-   [MsgSetValidBadgeIds](./msg-set-valid-badge-ids.md) - Update valid token IDs and permissions
 -   [MsgSetManager](./msg-set-manager.md) - Update manager timeline and permissions
 -   [MsgSetCollectionMetadata](./msg-set-collection-metadata.md) - Update collection metadata timeline and permissions
--   [MsgSetBadgeMetadata](./msg-set-badge-metadata.md) - Update badge metadata timeline and permissions
+-   [MsgSetBadgeMetadata](./msg-set-badge-metadata.md) - Update token metadata timeline and permissions
 -   [MsgSetCustomData](./msg-set-custom-data.md) - Update custom data timeline and permissions
 -   [MsgSetStandards](./msg-set-standards.md) - Update standards timeline and permissions
 -   [MsgSetCollectionApprovals](./msg-set-collection-approvals.md) - Update collection approvals and permissions
 -   [MsgSetIsArchived](./msg-set-is-archived.md) - Update isArchived timeline and permissions
 
-### Badge Transfers
+### Token Transfers
 
--   [MsgTransferBadges](./msg-transfer-badges.md) - Transfer badges between addresses with approval validation
+-   [MsgTransferBadges](./msg-transfer-badges.md) - Transfer tokens between addresses with approval validation
 
 ### User Approval Management
 

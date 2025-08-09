@@ -1,13 +1,13 @@
 # MsgTransferBadges
 
-Executes badge transfers between addresses.
+Executes token transfers between addresses.
 
 ## Proto Definition
 
 ```protobuf
 message MsgTransferBadges {
   string creator = 1; // Address initiating the transfer
-  string collectionId = 2; // Collection containing badges to transfer
+  string collectionId = 2; // Collection containing tokens to transfer
   repeated Transfer transfers = 3; // Transfer operations (must pass approvals)
 }
 
@@ -55,7 +55,7 @@ message Transfer {
 message PrecalculationOptions {
   // The timestamp to override with when calculating the balances.
   string overrideTimestamp = 1;
-  // The badgeIdsOverride to use for the transfer.
+  // The IDs to override with when calculating the balances.
   repeated UintRange badgeIdsOverride = 2;
 }
 ```
@@ -141,7 +141,7 @@ PRE. CALCULATE BALANCES (if needed)
   └── If precalculateBalancesFromApproval is specified, we will use the predeterminedBalances from the specified approval to pre-calculate the balances at execution time.
 
 1. BALANCE CHECK
-   └── Verify sender has sufficient badge balances for the transfer including ownership times
+   └── Verify sender has sufficient balances for the transfer including ownership times
    └── FAIL if insufficient balances
 
 2. COLLECTION APPROVAL CHECK
@@ -166,7 +166,7 @@ PRE. CALCULATE BALANCES (if needed)
    └── FAIL if any recipient lacks valid incoming approval
 
 5. EXECUTE TRANSFER
-   └── Update badge balances
+   └── Update balances
    └── Execute any approved side effects
    └── Emit transfer events
    └── SUCCESS
@@ -185,7 +185,7 @@ This allows collection managers to enable transfers that would otherwise be bloc
 
 Transfers fail at the first validation step that doesn't pass:
 
-1. **Insufficient Balances** - Sender doesn't own the badges
+1. **Insufficient Balances** - Sender doesn't own the tokens
 2. **No Collection Approval** - No valid collection-level approval found
 3. **Blocked by Sender** - Sender's outgoing approvals reject the transfer
 4. **Blocked by Recipient** - Recipient's incoming approvals reject the transfer
@@ -194,8 +194,8 @@ Transfers fail at the first validation step that doesn't pass:
 
 ETH Signature Proofs are required when transfers use [ETH Signature Challenges](../concepts/approval-criteria/eth-signature-challenges.md). Each proof contains:
 
-- **`nonce`**: The unique identifier that was signed
-- **`signature`**: The Ethereum signature of the message `nonce + "-" + creatorAddress`
+-   **`nonce`**: The unique identifier that was signed
+-   **`signature`**: The Ethereum signature of the message `nonce + "-" + creatorAddress`
 
 **Important**: Each signature can only be used once per challenge tracker. The system tracks used signatures to prevent replay attacks.
 
@@ -244,7 +244,7 @@ bitbadgeschaind tx badges transfer-badges '[tx-json]' --from sender-key
                 "approverAddress": "",
                 "version": "0"
             },
-            // Additional options dependent on what is allowed (e.g. allow timestamp override, badge ID override, etc.)
+            // Additional options dependent on what is allowed (e.g. allow timestamp override, token ID override, etc.)
             "precalculationOptions": {
                 "overrideTimestamp": "0",
                 "badgeIdsOverride": []

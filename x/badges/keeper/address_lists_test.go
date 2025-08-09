@@ -11,7 +11,7 @@ func (suite *TestSuite) TestReservedIds() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	toCheck := []string{"Mint", "!dadsf", "1asdsdfa:1234", "All", "AllWithoutMint", "!(Mint)", "AllWithoutMint:" + alice, "None", alice, bob, charlie} //"122:323",
 	for _, check := range toCheck {
@@ -101,7 +101,7 @@ func (suite *TestSuite) TestStoreAddressLists() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	list, err := GetAddressList(suite, suite.ctx, "test1asdasfda")
 	suite.Require().Nil(err, "Error getting address list: %s", "test1asdasfda")
@@ -121,13 +121,13 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 	}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating badge: %s")
+	suite.Require().Nil(err, "Error creating token: %s")
 
 	err = CreateAddressLists(suite, wctx, &types.MsgCreateAddressLists{
 		Creator:      alice,
 		AddressLists: collectionsToCreate[0].AddressLists,
 	})
-	suite.Require().Error(err, "Error creating badge: %s")
+	suite.Require().Error(err, "Error creating token: %s")
 }
 
 // func (suite *TestSuite) TestAddressListsManagerOf() {
@@ -135,7 +135,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
@@ -193,7 +193,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
@@ -258,7 +258,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
@@ -323,7 +323,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",
@@ -388,7 +388,7 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 
 // 	collectionsToCreate := GetCollectionsToCreate()
 // 	err := CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
 // 		ListId: "test",

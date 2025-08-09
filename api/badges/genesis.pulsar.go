@@ -1885,7 +1885,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// GenesisState defines the badges module's genesis state.
+// GenesisState defines the tokens module's genesis state.
 type GenesisState struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

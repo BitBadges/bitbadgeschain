@@ -1,4 +1,4 @@
-# Quest Badge Collection Example
+# Quest Token Collection Example
 
 This example demonstrates creating a quest collection.
 
@@ -251,13 +251,13 @@ This example demonstrates creating a quest collection.
 
 ## Key Features
 
-### Quest Badge Collection
+### Quest Token Collection
 
-This example creates a quest badge collection with the following characteristics:
+This example creates a quest collection with the following characteristics:
 
--   **Single Badge**: Only badge ID 1 is valid (`validBadgeIds: [{"start": "1", "end": "1"}]`)
+-   **Single Token**: Only token ID 1 is valid (`validBadgeIds: [{"start": "1", "end": "1"}]`)
 -   **Quest Standard**: Uses the "Quests" standard for quest-related functionality
--   **Merkle Proof Verification**: Requires users to provide valid Merkle proofs (BitBadges claims) to claim badges
+-   **Merkle Proof Verification**: Requires users to provide valid Merkle proofs (BitBadges claims) to claim tokens
 -   **Coin Rewards**: Transfers 5000000000 ubadge coins to successful claimants and properly handles the Mint escrow coins
 
 ### Approval System
@@ -285,7 +285,7 @@ This example creates a quest badge collection with the following characteristics
 ### Metadata
 
 -   **Collection URI**: `ipfs://QmRbRYYyphz73apphqP3QQmkeZxbtMWmAxasGfhcw1RApD`
--   **Badge URI**: Same as collection URI for all badges
+-   **Token URI**: Same as collection URI for all tokens
 -   **Approval URI**: `ipfs://QmPUAjAPMDQMJZV8mpnaYbhBu2BUS4u449c7KsRNZip9uf`
 -   **Challenge URI**: `ipfs://QmRsSK3Fw63bcJPuiYutNfBK3TYdnB8X5QG8W6ksVMuNcH`
 

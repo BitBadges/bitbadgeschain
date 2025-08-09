@@ -1,17 +1,17 @@
-# Mint All Badges to Self - Tutorial
+# Mint All Tokens to Self - Tutorial
 
-This tutorial walks through the process of creating a collection and minting all badges to yourself in a single transaction. This is useful for creating collections where you want to control the initial distribution.
+This tutorial walks through the process of creating a collection and minting all tokens to yourself in a single transaction. This is useful for creating collections where you want to control the initial distribution.
 
 ## Overview
 
 This is a two-step process that can be executed as a single multi-message transaction:
 
-1. **Create Collection** with a mint approval that allows you to mint badges
-2. **Execute Transfer** using that approval to mint badges to yourself
+1. **Create Collection** with a mint approval that allows you to mint tokens
+2. **Execute Transfer** using that approval to mint tokens to yourself
 
 ## Step 1: Create Mint Approval
 
-First, create an approval that allows you to mint badges from the "Mint" address:
+First, create an approval that allows you to mint tokens from the "Mint" address:
 
 ```typescript
 // Step 1: Set up your mint approval
@@ -20,7 +20,7 @@ const mintApproval = {
     toListId: 'All', // To any address
     initiatedByListId: myAddress, // Only you can initiate
     transferTimes: UintRangeArray.FullRanges(),
-    badgeIds: UintRangeArray.FullRanges(), // All badge IDs
+    badgeIds: UintRangeArray.FullRanges(), // All token IDs
     ownershipTimes: UintRangeArray.FullRanges(),
     approvalId: 'mint-approval',
     version: 0n,
@@ -47,10 +47,10 @@ const collection = {
 
 ## Step 2: Execute Mint Transfer
 
-After creating the collection, use the mint approval to transfer badges to yourself:
+After creating the collection, use the mint approval to transfer tokens to yourself:
 
 ```typescript
-// Step 2: Mint badges to yourself using the approval
+// Step 2: Mint tokens to yourself using the approval
 const transfers = [
     {
         from: 'Mint', // From mint address

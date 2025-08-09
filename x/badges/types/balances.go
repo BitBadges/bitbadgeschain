@@ -515,24 +515,24 @@ func IncrementBalances(
 			}
 		}
 
-		//Handle badge IDs override
+		//Handle token IDs override
 		if allowOverrideBadgeIdsWithAnyValidBadgeId {
-			//Verify that the badge IDs are valid
+			//Verify that the token IDs are valid
 
 			//1. Check size == 1
 			if len(overrideBadgeIds) != 1 {
-				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid badge IDs override (length != 1)")
+				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid token IDs override (length != 1)")
 			}
 
-			//2. Check that the badge IDs are the same
+			//2. Check that the token IDs are the same
 			if !overrideBadgeIds[0].Start.Equal(overrideBadgeIds[0].End) {
-				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid badge IDs override (start != end)")
+				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid token IDs override (start != end)")
 			}
 
-			//3. Check that the badge IDs are specified as valid in the collection
+			//3. Check that the token IDs are specified as valid in the collection
 			isValid, err := SearchUintRangesForUint(overrideBadgeIds[0].Start, collection.ValidBadgeIds)
 			if err != nil || !isValid {
-				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid badge IDs override (not valid ID in collection)")
+				return balances, sdkerrors.Wrapf(ErrInvalidBadgeIds, "invalid token IDs override (not valid ID in collection)")
 			}
 
 			startBalance.BadgeIds = overrideBadgeIds

@@ -1,6 +1,6 @@
 # GetBalance
 
-Retrieves badge balances for a specific address in a collection.
+Retrieves balances for a specific address in a collection.
 
 ## Proto Definition
 

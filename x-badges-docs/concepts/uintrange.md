@@ -1,6 +1,6 @@
 # UintRanges
 
-The `UintRange` is the fundamental data structure used throughout the badges module to represent inclusive ranges of unsigned integers efficiently. This type enables powerful range-based operations and is primarily used for badge IDs, time ranges, and amounts.
+The `UintRange` is the fundamental data structure used throughout the badges module to represent inclusive ranges of unsigned integers efficiently. This type enables powerful range-based operations and is primarily used for token IDs, time ranges, and amounts.
 
 ## Proto Definition
 
@@ -15,10 +15,10 @@ message UintRange {
 
 UintRanges are used to represent:
 
--   **Badge ID ranges**: `[1-100]` represents badge IDs 1 through 100 (inclusive)
+-   **Token ID ranges**: `[1-100]` represents token IDs 1 through 100 (inclusive)
 -   **Time ranges**: `[1640995200000-1672531200000]` represents a year in UNIX milliseconds
 -   **Amount ranges**: `[1-5]` represents quantities from 1 to 5
--   **Ownership time ranges**: When badges are valid for ownership
+-   **Ownership time ranges**: When tokens are valid for ownership
 
 ## Restrictions & Valid Values
 
@@ -54,7 +54,7 @@ To represent a complete range covering all possible values:
 To represent a single value, use the same value for start and end:
 
 ```protobuf
-// Single badge ID 5
+// Single token ID 5
 {
   start: "5",
   end: "5"
@@ -67,10 +67,10 @@ Inverting a range results in all values from 1 to 18446744073709551615 that are 
 
 ## Examples
 
-### Badge ID Examples
+### Token ID Examples
 
 ```typescript
-// Badge IDs 1-10 (inclusive)
+// Token IDs 1-10 (inclusive)
 const badgeRange: UintRange[] = [{ start: '1', end: '10' }];
 
 // Multiple non-overlapping ranges
@@ -83,13 +83,13 @@ const multipleBadges: UintRange[] = [
 ### Go Code Examples
 
 ```go
-// Badge IDs 1-10
+// Token IDs 1-10
 badgeIdRange := UintRange{Start: NewUint(1), End: NewUint(10)}
 
 // Unlimited amount
 unlimitedAmount := UintRange{Start: NewUint(1), End: MaxUint}
 
-// Single badge ID
+// Single token ID
 singleBadge := UintRange{Start: NewUint(5), End: NewUint(5)}
 ```
 

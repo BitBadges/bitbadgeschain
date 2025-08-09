@@ -33,7 +33,7 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
-	// Queries a badge collection by ID.
+	// Queries a collection by ID.
 	GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error)
 	// Queries an address list by ID.
 	GetAddressList(ctx context.Context, in *QueryGetAddressListRequest, opts ...grpc.CallOption) (*QueryGetAddressListResponse, error)
@@ -41,7 +41,7 @@ type QueryClient interface {
 	GetApprovalTracker(ctx context.Context, in *QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalTrackerResponse, error)
 	// Queries the number of times a given leaf has been used for a given merkle challenge.
 	GetChallengeTracker(ctx context.Context, in *QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*QueryGetChallengeTrackerResponse, error)
-	// Queries an addresses balance for a badge collection, specified by its ID.
+	// Queries an addresses balance for a collection, specified by its ID.
 	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
 }
 
@@ -113,7 +113,7 @@ func (c *queryClient) GetBalance(ctx context.Context, in *QueryGetBalanceRequest
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
-	// Queries a badge collection by ID.
+	// Queries a collection by ID.
 	GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error)
 	// Queries an address list by ID.
 	GetAddressList(context.Context, *QueryGetAddressListRequest) (*QueryGetAddressListResponse, error)
@@ -121,7 +121,7 @@ type QueryServer interface {
 	GetApprovalTracker(context.Context, *QueryGetApprovalTrackerRequest) (*QueryGetApprovalTrackerResponse, error)
 	// Queries the number of times a given leaf has been used for a given merkle challenge.
 	GetChallengeTracker(context.Context, *QueryGetChallengeTrackerRequest) (*QueryGetChallengeTrackerResponse, error)
-	// Queries an addresses balance for a badge collection, specified by its ID.
+	// Queries an addresses balance for a collection, specified by its ID.
 	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }

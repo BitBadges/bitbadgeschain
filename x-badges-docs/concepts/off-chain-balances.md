@@ -4,7 +4,7 @@
 
 ## Overview
 
-Off-chain balances were a legacy feature that allowed badge collections to store balance information and handle transferability outside of the blockchain. This approach has been deprecated in favor of off-chain only claims, address lists, and other off-chain features.
+Off-chain balances were a legacy feature that allowed collections to store balance information and handle transferability outside of the blockchain. This approach has been deprecated in favor of off-chain only claims, address lists, and other off-chain features.
 
 ## Deprecated Balance Types
 

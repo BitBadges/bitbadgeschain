@@ -100,7 +100,7 @@ Trackers store amounts using the balance type structure. Above, we simplified it
 **What Gets Incremented**:
 
 -   **Amount**: The total quantity transferred
--   **Badge IDs**: Specific badge IDs that were transferred
+-   **Token IDs**: Specific token IDs that were transferred
 -   **Ownership Times**: The ownership time ranges that were transferred
 
 ### Unlimited Trackers (No Increment)
@@ -112,7 +112,7 @@ Since "to" and "from" trackers are set to "0" (unlimited), no tracking occurs fo
 -   **As-Needed**: Only increment trackers when necessary (unlimited = no tracking)
 -   **Separate Counts**: Each tracker type maintains independent tallies
 -   **Address Scoped**: Per-address trackers create unique counters per address
--   **Balance Tracking**: Increments for specific badge IDs and ownership times transferred
+-   **Balance Tracking**: Increments for specific token IDs and ownership times transferred
 
 ## Resets and ID Changes
 

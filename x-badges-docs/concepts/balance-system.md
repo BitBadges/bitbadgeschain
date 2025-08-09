@@ -1,6 +1,6 @@
 # Balance System
 
-The Balance system in BitBadges is designed to represent ownership of badges across different IDs and time ranges. Ownership times are a new concept to BitBadges allowing you to set that someone owns a badge during a specific time but not other times.
+The Balance system in BitBadges is designed to represent ownership of tokens across different IDs and time ranges. Ownership times are a new concept to BitBadges allowing you to set that someone owns a token during a specific time but not other times.
 
 ## Balance Interface
 
@@ -12,13 +12,13 @@ export interface Balance<T extends NumberType> {
 }
 ```
 
--   `amount`: The quantity of badges owned
--   `badgeIds`: An array of ID ranges representing the badges owned
--   `ownershipTimes`: An array of time ranges during which the badges are owned
+-   `amount`: The quantity of tokens owned
+-   `badgeIds`: An array of ID ranges representing the tokens owned
+-   `ownershipTimes`: An array of time ranges during which the tokens are owned
 
 ## Interpreting Balances
 
-When interpreting balances, it's crucial to understand that multiple ranges of badge IDs and ownership times within a single Balance structure represent all possible combinations.
+When interpreting balances, it's crucial to understand that multiple ranges of token IDs and ownership times within a single Balance structure represent all possible combinations.
 
 ### Interpretation Algorithm
 
@@ -81,7 +81,7 @@ When subtracting balances, you may need to represent the result as multiple Bala
 
 ## Handling Duplicates
 
-When duplicate badge IDs are specified in balances, they are combined and their amounts are added. For example:
+When duplicate token IDs are specified in balances, they are combined and their amounts are added. For example:
 
 ```json
 {

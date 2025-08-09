@@ -19,7 +19,7 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	//Assert that initiatedBy owns the required badges
+	//Assert that initiatedBy owns the required tokens
 	balances := &types.UserBalanceStore{}
 	collectionId := sdkmath.NewUintFromString(req.CollectionId)
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)

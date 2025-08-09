@@ -68,7 +68,7 @@ func (suite *TestSuite) TestMustOwnBadges() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets() {
@@ -134,7 +134,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets2() {
@@ -210,7 +210,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustSatisfyForAllAssets2() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
@@ -284,7 +284,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
@@ -349,7 +349,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnOne2() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
@@ -413,7 +413,7 @@ func (suite *TestSuite) TestMustOwnBadgesDoesntOwnBadges() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
@@ -478,7 +478,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
@@ -498,7 +498,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnZero() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badge: %s")
+	suite.Require().Nil(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
@@ -564,7 +564,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      alice,
@@ -583,7 +583,7 @@ func (suite *TestSuite) TestMustOwnBadgesMustOwnGreaterThan() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badge: %s")
+	suite.Require().Error(err, "Error transferring token: %s")
 }
 
 func (suite *TestSuite) TestMustOwnBadgesOwnershipCheckParty() {

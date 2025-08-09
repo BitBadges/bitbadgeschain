@@ -10589,7 +10589,7 @@ type MapUpdateCriteria struct {
 
 	// All ID slots are only updatable by manager
 	ManagerOnly bool `protobuf:"varint,1,opt,name=managerOnly,proto3" json:"managerOnly,omitempty"`
-	// ID slots are only updatable by badge ID owner of this collection (>1 balance at current time)
+	// ID slots are only updatable by token ID owner of this collection (>1 balance at current time)
 	CollectionId string `protobuf:"bytes,2,opt,name=collectionId,proto3" json:"collectionId,omitempty"`
 	// Keys are address based and can only be updated by that respective address
 	CreatorOnly bool `protobuf:"varint,3,opt,name=creatorOnly,proto3" json:"creatorOnly,omitempty"`

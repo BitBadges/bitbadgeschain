@@ -24,7 +24,7 @@ func (k Keeper) SetMapInStore(ctx sdk.Context, protocol *types.Map) error {
 	return nil
 }
 
-// Gets a badge from the store according to the mapId.
+// Gets a map from the store according to the mapId.
 func (k Keeper) GetMapFromStore(ctx sdk.Context, mapId string) (*types.Map, bool) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -38,7 +38,7 @@ func (k Keeper) GetMapFromStore(ctx sdk.Context, mapId string) (*types.Map, bool
 	return &protocol, true
 }
 
-// GetMapsFromStore defines a method for returning all badges information by key.
+// GetMapsFromStore defines a method for returning all maps information by key.
 func (k Keeper) GetMapsFromStore(ctx sdk.Context) (protocols []*types.Map) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -59,7 +59,7 @@ func (k Keeper) StoreHasMapID(ctx sdk.Context, mapId string) bool {
 	return store.Has(mapStoreKey(mapId))
 }
 
-// DeleteMapFromStore deletes a badge from the store.
+// DeleteMapFromStore deletes a map from the store.
 func (k Keeper) DeleteMapFromStore(ctx sdk.Context, mapId string) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -85,7 +85,7 @@ func (k Keeper) SetMapValueInStore(ctx sdk.Context, mapId string, key string, va
 	return nil
 }
 
-// Gets a badge from the store according to the mapId.
+// Gets a map value from the store according to the mapId.
 func (k Keeper) GetMapValueFromStore(ctx sdk.Context, mapId string, value string) types.ValueStore {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -100,7 +100,7 @@ func (k Keeper) GetMapValueFromStore(ctx sdk.Context, mapId string, value string
 	return valueStore
 }
 
-// DeleteMapFromStore deletes a badge from the store.
+// DeleteMapFromStore deletes a map value from the store.
 func (k Keeper) DeleteMapValueFromStore(ctx sdk.Context, mapId string, value string) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})

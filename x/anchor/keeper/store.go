@@ -25,7 +25,7 @@ func (k Keeper) GetNextAnchorId(ctx sdk.Context) (sdkmath.Uint, error) {
 	return nextID, nil
 }
 
-// * ****************************** BADGES ****************************** **/
+// * ****************************** ANCHORS ****************************** **/
 // Set anchor location by ID
 func (k Keeper) SetAnchorLocation(ctx sdk.Context, idx sdkmath.Uint, value string, creator string) error {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))

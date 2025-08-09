@@ -1,6 +1,6 @@
 # MsgCreateCollection
 
-Creates a new badge collection.
+Creates a new collection.
 
 The collectionId will be assigned at execution time and is obtainable in the transaction response. Subsequent updates to the collection will be through MsgUpdateCollection.
 
@@ -19,7 +19,7 @@ message MsgCreateCollection {
   string creator = 1; // Address creating the collection
   string balancesType = 2; // "Standard", "Off-Chain - Indexed", etc.
   UserBalanceStore defaultBalances = 4;
-  repeated UintRange validBadgeIds = 5; // Badge ID ranges to include
+  repeated UintRange validBadgeIds = 5; // Token ID ranges to include
   CollectionPermissions collectionPermissions = 6;
   repeated ManagerTimeline managerTimeline = 7;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;

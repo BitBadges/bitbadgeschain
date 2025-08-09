@@ -23,7 +23,7 @@ service Query {
       option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/params";
   }
 
-  // Queries a badge collection by ID.
+  // Queries a collection by ID.
 	rpc GetCollection(QueryGetCollectionRequest) returns (QueryGetCollectionResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_collection/{collectionId}";
 	}
@@ -48,7 +48,7 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_eth_signature_tracker/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{challengeTrackerId}/{signature}";
   }
 
-  // Queries an addresses balance for a badge collection, specified by its ID.
+  // Queries an addresses balance for a collection, specified by its ID.
 	rpc GetBalance(QueryGetBalanceRequest) returns (QueryGetBalanceResponse) {
 		option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_balance/{collectionId}/{address}";
 	}

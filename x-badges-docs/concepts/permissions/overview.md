@@ -62,8 +62,8 @@ There are **five types** of permissions, each with different criteria:
 
 -   **[Action Permissions](action-permissions.md)** - Simple time-based permissions (no criteria)
 -   **[Timeline Permissions](timeline-permissions.md)** - Control timeline updates (timelineTimes)
--   **[Timeline with Badge IDs](timeline-permissions.md)** - Control badge-specific timeline updates (timelineTimes + badgeIds)
--   **[Badge ID Action Permissions](badge-id-permissions.md)** - Control badge-specific actions (badgeIds)
+-   **[Timeline with Token IDs](timeline-permissions.md)** - Control token-specific timeline updates (timelineTimes + badgeIds)
+-   **[Token ID Action Permissions](badge-id-permissions.md)** - Control token-specific actions (badgeIds)
 -   **[Approval Permissions](approval-permissions.md)** - Control approval updates (transfer criteria + approvalId)
 
 ### Correct Categorization
@@ -86,11 +86,11 @@ Based on the proto definitions:
 -   `canUpdateManager`
 -   `canUpdateCollectionMetadata`
 
-**Timeline with Badge IDs** (timelineTimes + badgeIds + time control):
+**Timeline with Token IDs** (timelineTimes + badgeIds + time control):
 
 -   `canUpdateBadgeMetadata`
 
-**Badge ID Action Permissions** (badgeIds + time control):
+**Token ID Action Permissions** (badgeIds + time control):
 
 -   `canUpdateValidBadgeIds`
 
@@ -119,9 +119,9 @@ When can the collection be deleted?
 }
 ```
 
-### Freeze Badge Metadata
+### Freeze Token Metadata
 
-When can the badge metadata be updated? And which (badge IDs, timeline time) pairs does it apply to?
+When can the token metadata be updated? And which (token IDs, timeline time) pairs does it apply to?
 
 ```json
 {
@@ -176,7 +176,7 @@ Permissions are evaluated as a linear array where each element has criteria and 
 
 All criteria in a permission element must match for it to be applied. Partial matches are ignored.
 
-### Example: Badge Metadata Permissions
+### Example: Token Metadata Permissions
 
 ```json
 "canUpdateBadgeMetadata": [
@@ -191,13 +191,13 @@ All criteria in a permission element must match for it to be applied. Partial ma
 
 **This permission only covers:**
 
--   Timeline times 1-10 AND badge IDs 1-10
+-   Timeline times 1-10 AND token IDs 1-10
 
 **It does NOT cover:**
 
--   Timeline time 1 with badge ID 11
--   Timeline time 11 with badge ID 1
--   Timeline time 11 with badge ID 11
+-   Timeline time 1 with token ID 11
+-   Timeline time 11 with token ID 1
+-   Timeline time 11 with token ID 11
 
 These combinations are **unhandled** and **allowed by default** since they do not match the permission criteria.
 
@@ -205,7 +205,7 @@ These combinations are **unhandled** and **allowed by default** since they do no
 
 To lock specific criteria, you must specify the target and set all other criteria to maximum ranges.
 
-### Example: Lock Badge IDs 1-10
+### Example: Lock Token IDs 1-10
 
 ```json
 {

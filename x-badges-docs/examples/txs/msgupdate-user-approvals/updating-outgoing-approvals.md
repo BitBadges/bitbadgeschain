@@ -1,6 +1,6 @@
 # Updating Outgoing Approvals
 
-This example demonstrates how to update user outgoing approvals to control what badges a user can send and to whom.
+This example demonstrates how to update user outgoing approvals to control what tokens a user can send and to whom.
 
 ## Transaction Structure
 

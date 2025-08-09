@@ -526,7 +526,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges: %s")
+	suite.Require().Nil(err, "Error transferring tokens: %s")
 
 	bal, err := GetUserBalance(suite, suite.ctx, sdkmath.NewUint(1), alice)
 	suite.Require().Nil(err, "Error getting user balance: %s")
@@ -625,7 +625,7 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges: %s")
+	suite.Require().Nil(err, "Error transferring tokens: %s")
 }
 
 // Adjust these values to test more or less

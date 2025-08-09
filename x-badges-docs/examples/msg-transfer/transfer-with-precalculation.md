@@ -1,15 +1,15 @@
 # Transfer with Precalculation
 
-This example demonstrates a badge transfer that uses precalculation from approval criteria instead of manually specifying balances.
+This example demonstrates a token transfer that uses precalculation from approval criteria instead of manually specifying balances.
 
 ## Overview
 
-This transfer creates badges from collection 20 and sends them to the creator address. Instead of manually specifying the balance amounts, it uses precalculation from the approval criteria to determine what badges to transfer.
+This transfer creates tokens from collection 20 and sends them to the creator address. Instead of manually specifying the balance amounts, it uses precalculation from the approval criteria to determine what tokens to transfer.
 
 ## Transfer Details
 
 -   **Collection ID**: 20
--   **From**: Mint (new badge creation)
+-   **From**: Mint (new token creation)
 -   **To**: Creator address
 -   **Approval**: Collection-level approval with precalculation
 -   **Precalculation**: Enabled with specific approval ID
@@ -76,7 +76,7 @@ This transfer creates badges from collection 20 and sends them to the creator ad
 ### Precalculation Options
 
 -   `"overrideTimestamp": "0"` - Use current timestamp for calculations
--   `"badgeIdsOverride": []` - No badge ID overrides, use approval criteria
+-   `"badgeIdsOverride": []` - No token ID overrides, use approval criteria
 
 ### Non-Auto-Scan Behavior
 
@@ -92,10 +92,10 @@ This example demonstrates "prioritized non-auto-scan" behavior where:
 
 This example is useful when:
 
--   You want to transfer badges based on approval criteria rather than manual specification
+-   You want to transfer tokens based on approval criteria rather than manual specification
 -   You need precise control over which approval is used
 -   You want to avoid automatic approval scanning
--   The approval criteria dynamically determine badge amounts and IDs
+-   The approval criteria dynamically determine amounts and IDs
 
 ## Differences from Simple Transfer
 

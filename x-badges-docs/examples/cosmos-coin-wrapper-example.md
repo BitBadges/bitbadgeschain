@@ -1,6 +1,6 @@
 # Cosmos Coin Wrapper Tutorial
 
-This tutorial walks you through setting up cosmos coin wrappers to bridge BitBadges with the broader Cosmos ecosystem. Cosmos coin wrappers automatically convert badges to fungible Cosmos coins and vice versa.
+This tutorial walks you through setting up cosmos coin wrappers to bridge BitBadges with the broader Cosmos ecosystem. Cosmos coin wrappers automatically convert tokens to fungible Cosmos coins and vice versa.
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ const cosmosCoinWrapperPaths = [ ... ];
 
 ## Step 2: Generate Your Special Address
 
-When you create a collection with cosmos coin wrapper paths, the system automatically generates a special address for each wrapper. This address acts as the bridge between badges and cosmos coins. This will also be available on the BitBadges site if you want to go that route.
+When you create a collection with cosmos coin wrapper paths, the system automatically generates a special address for each wrapper. This address acts as the bridge between tokens and cosmos coins. This will also be available on the BitBadges site if you want to go that route.
 
 ```typescript
 import { generateAliasAddressForDenom } from 'bitbadgesjs-sdk';
@@ -54,4 +54,4 @@ const collection = {
 
 -   [Cosmos Wrapper Paths](../concepts/cosmos-wrapper-paths.md)
 -   [Approval System](../concepts/approval-criteria/approval-system.md)
--   [Badge Collections](../concepts/badge-collections.md)
+-   [Token Collections](../concepts/badge-collections.md)

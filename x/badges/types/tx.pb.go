@@ -453,9 +453,9 @@ type MsgUniversalUpdateCollection struct {
 	BalancesType string `protobuf:"bytes,3,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	//The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
-	// Indicates if the valid badge IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+	// Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateValidBadgeIds bool `protobuf:"varint,5,opt,name=updateValidBadgeIds,proto3" json:"updateValidBadgeIds,omitempty"`
-	// New badge IDs to add to this collection
+	// New token IDs to add to this collection
 	ValidBadgeIds []*UintRange `protobuf:"bytes,6,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
 	// Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateCollectionPermissions bool `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
@@ -469,9 +469,9 @@ type MsgUniversalUpdateCollection struct {
 	UpdateCollectionMetadataTimeline bool `protobuf:"varint,11,opt,name=updateCollectionMetadataTimeline,proto3" json:"updateCollectionMetadataTimeline,omitempty"`
 	// New collection metadata timeline to set.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,12,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	// Indicates if the badge metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+	// Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateBadgeMetadataTimeline bool `protobuf:"varint,13,opt,name=updateBadgeMetadataTimeline,proto3" json:"updateBadgeMetadataTimeline,omitempty"`
-	// New badge metadata timeline to set.
+	// New token metadata timeline to set.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,14,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
 	// Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateOffChainBalancesMetadataTimeline bool `protobuf:"varint,15,opt,name=updateOffChainBalancesMetadataTimeline,proto3" json:"updateOffChainBalancesMetadataTimeline,omitempty"`
@@ -719,7 +719,7 @@ func (m *MsgUniversalUpdateCollection) GetInvariants() *CollectionInvariants {
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
 type MsgUniversalUpdateCollectionResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -762,9 +762,9 @@ type MsgUpdateCollection struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection (0 for new collection).
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	// Indicates if the valid badge IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+	// Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateValidBadgeIds bool `protobuf:"varint,3,opt,name=updateValidBadgeIds,proto3" json:"updateValidBadgeIds,omitempty"`
-	// New badge IDs to add to this collection
+	// New token IDs to add to this collection
 	ValidBadgeIds []*UintRange `protobuf:"bytes,4,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
 	// Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateCollectionPermissions bool `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
@@ -778,9 +778,9 @@ type MsgUpdateCollection struct {
 	UpdateCollectionMetadataTimeline bool `protobuf:"varint,11,opt,name=updateCollectionMetadataTimeline,proto3" json:"updateCollectionMetadataTimeline,omitempty"`
 	// New collection metadata timeline to set.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,12,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	// Indicates if the badge metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+	// Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateBadgeMetadataTimeline bool `protobuf:"varint,13,opt,name=updateBadgeMetadataTimeline,proto3" json:"updateBadgeMetadataTimeline,omitempty"`
-	// New badge metadata timeline to set.
+	// New token metadata timeline to set.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,14,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
 	// Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateOffChainBalancesMetadataTimeline bool `protobuf:"varint,15,opt,name=updateOffChainBalancesMetadataTimeline,proto3" json:"updateOffChainBalancesMetadataTimeline,omitempty"`
@@ -1014,7 +1014,7 @@ func (m *MsgUpdateCollection) GetInvariants() *CollectionInvariants {
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
 type MsgUpdateCollectionResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -1059,7 +1059,7 @@ type MsgCreateCollection struct {
 	BalancesType string `protobuf:"bytes,2,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	//The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
-	// New badge IDs to add to this collection
+	// New token IDs to add to this collection
 	ValidBadgeIds []*UintRange `protobuf:"bytes,5,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
 	// Collection permissions.
 	CollectionPermissions *CollectionPermissions `protobuf:"bytes,6,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
@@ -1067,7 +1067,7 @@ type MsgCreateCollection struct {
 	ManagerTimeline []*ManagerTimeline `protobuf:"bytes,7,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
 	// Collection metadata timeline entries.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,8,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	// Badge metadata timeline entries.
+	// Token metadata timeline entries.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,9,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
 	// Off-chain balances metadata timeline entries.
 	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,10,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
@@ -1234,7 +1234,7 @@ func (m *MsgCreateCollection) GetInvariants() *CollectionInvariants {
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.
 type MsgCreateCollectionResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -1363,7 +1363,7 @@ func (m *MsgCreateAddressListsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateAddressListsResponse proto.InternalMessageInfo
 
-// MsgTransferBadges is used to transfer badges.
+// MsgTransferBadges is used to transfer tokens.
 type MsgTransferBadges struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -2796,9 +2796,9 @@ type MsgSetValidBadgeIds struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	// New badge IDs to add to this collection
+	// New token IDs to add to this collection
 	ValidBadgeIds []*UintRange `protobuf:"bytes,3,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
-	// Permission to update valid badge IDs
+	// Permission to update valid token IDs
 	CanUpdateValidBadgeIds []*BadgeIdsActionPermission `protobuf:"bytes,4,rep,name=canUpdateValidBadgeIds,proto3" json:"canUpdateValidBadgeIds,omitempty"`
 }
 
@@ -2858,7 +2858,7 @@ func (m *MsgSetValidBadgeIds) GetCanUpdateValidBadgeIds() []*BadgeIdsActionPermi
 
 // MsgSetValidBadgeIdsResponse is the response to MsgSetValidBadgeIds.
 type MsgSetValidBadgeIdsResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -2963,7 +2963,7 @@ func (m *MsgSetManager) GetCanUpdateManager() []*TimedUpdatePermission {
 
 // MsgSetManagerResponse is the response to MsgSetManager.
 type MsgSetManagerResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -3068,7 +3068,7 @@ func (m *MsgSetCollectionMetadata) GetCanUpdateCollectionMetadata() []*TimedUpda
 
 // MsgSetCollectionMetadataResponse is the response to MsgSetCollectionMetadata.
 type MsgSetCollectionMetadataResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -3105,15 +3105,15 @@ func (m *MsgSetCollectionMetadataResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetCollectionMetadataResponse proto.InternalMessageInfo
 
-// MsgSetBadgeMetadata sets the badge metadata timeline and canUpdateBadgeMetadata permission
+// MsgSetBadgeMetadata sets the token metadata timeline and canUpdateBadgeMetadata permission
 type MsgSetBadgeMetadata struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	// New badge metadata timeline to set.
+	// New token metadata timeline to set.
 	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	// Permission to update badge metadata timeline
+	// Permission to update token metadata timeline
 	CanUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission `protobuf:"bytes,4,rep,name=canUpdateBadgeMetadata,proto3" json:"canUpdateBadgeMetadata,omitempty"`
 }
 
@@ -3173,7 +3173,7 @@ func (m *MsgSetBadgeMetadata) GetCanUpdateBadgeMetadata() []*TimedUpdateWithBadg
 
 // MsgSetBadgeMetadataResponse is the response to MsgSetBadgeMetadata.
 type MsgSetBadgeMetadataResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -3278,7 +3278,7 @@ func (m *MsgSetCustomData) GetCanUpdateCustomData() []*TimedUpdatePermission {
 
 // MsgSetCustomDataResponse is the response to MsgSetCustomData.
 type MsgSetCustomDataResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -3383,7 +3383,7 @@ func (m *MsgSetStandards) GetCanUpdateStandards() []*TimedUpdatePermission {
 
 // MsgSetStandardsResponse is the response to MsgSetStandards.
 type MsgSetStandardsResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -3488,7 +3488,7 @@ func (m *MsgSetCollectionApprovals) GetCanUpdateCollectionApprovals() []*Collect
 
 // MsgSetCollectionApprovalsResponse is the response to MsgSetCollectionApprovals.
 type MsgSetCollectionApprovalsResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
@@ -3593,7 +3593,7 @@ func (m *MsgSetIsArchived) GetCanArchiveCollection() []*TimedUpdatePermission {
 
 // MsgSetIsArchivedResponse is the response to MsgSetIsArchived.
 type MsgSetIsArchivedResponse struct {
-	// ID of the badge collection.
+	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 

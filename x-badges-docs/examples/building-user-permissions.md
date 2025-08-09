@@ -73,7 +73,7 @@ For permission patterns, see:
 
 -   [Freezing Mint Transferability](./permissions/freezing-mint-transferability.md) - Collection permission example
 -   [Locking Specific Approval ID](./permissions/locking-specific-approval-id.md) - Approval ID targeting
--   [Locking Specific Badge IDs](./permissions/locking-specific-badge-ids.md) - Badge ID targeting
+-   [Locking Specific Token IDs](./permissions/locking-specific-badge-ids.md) - Token ID targeting
 -   [Building Collection Permissions](./building-collection-permissions.md) - Collection-level patterns
 
 For user approval configuration, see:

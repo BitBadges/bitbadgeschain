@@ -40,7 +40,7 @@ package keeper_test
 // 	}
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
 // 		{
@@ -94,7 +94,7 @@ package keeper_test
 // 	}
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com/test2222", []*types.BadgeMetadata{
 // 		{
@@ -145,7 +145,7 @@ package keeper_test
 // 	}
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = UpdateURIs(suite, wctx, alice, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
 // 		{
@@ -196,7 +196,7 @@ package keeper_test
 // 	}
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().Nil(err, "Error updating uris")
@@ -234,7 +234,7 @@ package keeper_test
 // 	}
 
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
-// 	suite.Require().Nil(err, "Error creating badge: %s")
+// 	suite.Require().Nil(err, "Error creating token: %s")
 
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())

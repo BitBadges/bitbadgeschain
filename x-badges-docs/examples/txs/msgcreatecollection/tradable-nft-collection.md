@@ -316,7 +316,7 @@ This example demonstrates creating a tradable collection that supports orderbook
 This collection follows the [Tradable Protocol](../../../concepts/protocols/tradable-protocol.md) requirements:
 
 -   ✅ Includes "Tradable" in standards timeline
--   ✅ Compatible with both fungible and non-fungible badges
+-   ✅ Compatible with both fungible and non-fungible tokens
 -   ✅ Supports orderbook-style trading
 -   ✅ No restrictions on bid/listing creation
 -   ✅ Enables decentralized marketplace functionality

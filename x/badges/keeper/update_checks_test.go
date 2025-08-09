@@ -976,7 +976,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 }
 
 func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
@@ -1037,7 +1037,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -1057,7 +1057,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badges")
+	suite.Require().Error(err, "Error transferring tokens")
 }
 
 func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() {
@@ -1123,7 +1123,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 }
 
 func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwoTransfers() {
@@ -1184,7 +1184,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
 		Creator:      bob,
@@ -1204,7 +1204,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badges")
+	suite.Require().Error(err, "Error transferring tokens")
 }
 
 func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredeterminedBalances() {
@@ -1282,7 +1282,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 
 	//Not exactly the predetermined balances, but the same number of transfers
 	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
@@ -1303,7 +1303,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 			},
 		},
 	})
-	suite.Require().Error(err, "Error transferring badges")
+	suite.Require().Error(err, "Error transferring tokens")
 }
 
 func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransferBalances() {
@@ -1387,7 +1387,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 }
 
 func (suite *TestSuite) TestGetMaxPossible() {
@@ -1477,7 +1477,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring badges")
+	suite.Require().Nil(err, "Error transferring tokens")
 }
 
 //TODO: Equality checks

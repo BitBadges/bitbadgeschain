@@ -1,6 +1,6 @@
-# Badge Collections
+# Collections
 
-A badge collection is the primary entity that defines a group of related badges with shared properties and rules. We refer you to other pages for more details on the different concepts that make up a collection.
+A collection is the primary entity that defines a group of related tokens with shared properties and rules. We refer you to other pages for more details on the different concepts that make up a collection.
 
 Note: This is what is stored on-chain in storage for a collection. You may typically interact with similar concepts but moreso in Messages and Queries format.
 
@@ -14,7 +14,7 @@ message BadgeCollection {
   // The metadata for the collection itself, which can vary over time.
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
 
-  // The metadata for each badge in the collection, also subject to changes over time.
+  // The metadata for each token in the collection, also subject to changes over time.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
 
   // The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
@@ -48,13 +48,13 @@ message BadgeCollection {
   // The default store of a balance for a user, upon genesis.
   UserBalanceStore defaultBalances = 13;
 
-  // The user or entity who created the badge collection.
+  // The user or entity who created the collection.
   string createdBy = 14;
 
-  // The valid badge IDs for this collection.
+  // The valid token IDs for this collection.
   repeated UintRange validBadgeIds = 15;
 
-  // The generated address of the badge collection. Also used to escrow Mint balances.
+  // The generated address of the collection. Also used to escrow Mint balances.
   string mintEscrowAddress = 16;
 
   // The IBC wrapper (sdk.coin) paths for the collection.

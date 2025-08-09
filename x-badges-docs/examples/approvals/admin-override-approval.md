@@ -1,12 +1,12 @@
 # Admin Override Approval
 
-This example demonstrates how to create an approval that allows a specific address to forcefully transfer badges, overriding all user-level approvals. This provides complete administrative control for emergency situations or management purposes.
+This example demonstrates how to create an approval that allows a specific address to forcefully transfer tokens, overriding all user-level approvals. This provides complete administrative control for emergency situations or management purposes.
 
 ## Overview
 
 An admin override approval grants a specific address the power to:
 
--   Transfer badges from any address to any address
+-   Transfer tokens from any address to any address
 -   Override user-level incoming and outgoing approvals
 -   Bypass normal approval restrictions
 -   Maintain complete administrative control

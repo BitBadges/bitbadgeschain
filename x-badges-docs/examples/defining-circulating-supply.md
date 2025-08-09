@@ -72,7 +72,7 @@ const collectionPermissions = {
 
 **Result**: Manager can always modify mint approvals and adjust supply
 
-## Lock Specific Badge IDs
+## Lock Specific Token IDs
 
 ```typescript
 const collectionPermissions = {
@@ -98,7 +98,7 @@ const collectionPermissions = {
 };
 ```
 
-**Result**: The Mint approvals for badges 1-100 are locked and final. The manager can still create new Mint approvals for other badge IDs or post-mint approvals for those badges.
+**Result**: The Mint approvals for tokens 1-100 are locked and final. The manager can still create new Mint approvals for other token IDs or post-mint approvals for those tokens.
 
 ## Related Examples
 

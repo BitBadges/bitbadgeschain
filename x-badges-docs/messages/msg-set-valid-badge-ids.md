@@ -3,18 +3,18 @@ This message is a streamlined alternative to [MsgUpdateCollection](./msg-update-
 
 # MsgSetValidBadgeIds
 
-Sets the valid badge IDs and update permissions for a badge collection. This is a convenience message that focuses specifically on badge ID management.
+Sets the valid token IDs and update permissions for a collection. This is a convenience message that focuses specifically on token ID management.
 
 ## Overview
 
 This message allows you to:
 
--   Set which badge IDs are valid for the collection
--   Configure permissions to update the valid badge IDs in the future
+-   Set which token IDs are valid for the collection
+-   Configure permissions to update the valid token IDs in the future
 
 ## Authorization & Permissions
 
-Updates can only be performed by the **current manager** of the collection. The manager must have permission to update valid badge IDs according to the collection's current permission settings.
+Updates can only be performed by the **current manager** of the collection. The manager must have permission to update valid token IDs according to the collection's current permission settings.
 
 ## Proto Definition
 
@@ -29,15 +29,15 @@ message MsgSetValidBadgeIds {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  // New badge IDs to add to this collection
+  // New token IDs to add to this collection
   repeated UintRange validBadgeIds = 3;
 
-  // Permission to update valid badge IDs
+  // Permission to update valid token IDs
   repeated BadgeIdsActionPermission canUpdateValidBadgeIds = 4;
 }
 
 message MsgSetValidBadgeIdsResponse {
-  // ID of the badge collection.
+  // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 ```

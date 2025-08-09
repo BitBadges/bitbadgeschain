@@ -38,7 +38,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 ) ([]*UserApprovalsToCheck, error) {
 	fromAddress := transfer.From
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
-	remainingBalances := types.DeepCopyBalances(transfer.Balances) //Keep a running tally of all the badges we still have to handle
+	remainingBalances := types.DeepCopyBalances(transfer.Balances) //Keep a running tally of all the tokens we still have to handle
 	approvals, err := SortViaPrioritizedApprovals(_approvals, transfer, approvalLevel, approverAddress)
 	if err != nil {
 		return []*UserApprovalsToCheck{}, err
@@ -92,7 +92,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			continue
 		}
 
-		transferStr := "attempting to transfer badge ID " + approval.BadgeIds[0].Start.String()
+		transferStr := "attempting to transfer ID " + approval.BadgeIds[0].Start.String()
 
 		//If there are no restrictions or criteria, it is a full match and we can deduct all the overlapping (badgeIds, ownershipTimes) from the remaining balances
 		if approval.ApprovalCriteria == nil {
@@ -424,7 +424,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
-		transferStr := "attempting to transfer badge ID " + remainingBalances[0].BadgeIds[0].Start.String()
+		transferStr := "attempting to transfer ID " + remainingBalances[0].BadgeIds[0].Start.String()
 		potentialErrorsStr := ""
 		if len(potentialErrors) > 0 {
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
@@ -547,7 +547,7 @@ func (k Keeper) GetMaxPossible(
 		return nil, err
 	}
 
-	// Calculate current tally for specific badge IDs and times
+	// Calculate current tally for specific IDs and times
 	currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(
 		ctx,
 		approval.BadgeIds,

@@ -181,7 +181,7 @@ func (m *CollectionApprovalTimeline) GetTimelineTimes() []*UintRange {
 }
 
 type MsgNewCollection struct {
-	// See collections.proto for more details about these MsgNewBadge fields. Defines the badge details. Leave unneeded fields empty.
+	// See collections.proto for more details about these MsgNewBadge fields. Defines the token details. Leave unneeded fields empty.
 	Creator                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionMetadataTimeline       []*CollectionMetadataTimeline       `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	BadgeMetadataTimeline            []*BadgeMetadataTimeline            `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
@@ -191,7 +191,7 @@ type MsgNewCollection struct {
 	CollectionApprovals              []*CollectionApproval               `protobuf:"bytes,8,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	Permissions                      *CollectionPermissions              `protobuf:"bytes,9,opt,name=permissions,proto3" json:"permissions,omitempty"`
 	StandardsTimeline                []*StandardsTimeline                `protobuf:"bytes,10,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
-	//Badge supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
+	//Token supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
 	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
 	BadgesToCreate                 []*Balance                 `protobuf:"bytes,11,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
 	Transfers                      []*Transfer                `protobuf:"bytes,12,rep,name=transfers,proto3" json:"transfers,omitempty"`
@@ -394,7 +394,7 @@ func (m *MsgNewCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgNewCollectionResponse proto.InternalMessageInfo
 
-// This handles both minting more of existing badges and creating new badges.
+// This handles both minting more of existing badges and creating new tokens.
 type MsgMintAndDistributeBadges struct {
 	Creator                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId                     Uint                                `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`

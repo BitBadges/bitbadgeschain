@@ -21,7 +21,7 @@ func CastUintRanges(ranges []*UintRange) []*badgetypes.UintRange {
 func GetCurrentManagerForMap(ctx sdk.Context, currMap *Map, collection *badgetypes.BadgeCollection) string {
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
 		if collection == nil {
-			panic("Badge collection must be provided if map is inheriting manager timeline from a collection")
+			panic("Token collection must be provided if map is inheriting manager timeline from a collection")
 		}
 
 		return badgetypes.GetCurrentManager(ctx, collection)
