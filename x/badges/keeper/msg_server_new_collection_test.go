@@ -26,7 +26,7 @@ func (suite *TestSuite) TestNewCollection() {
 	AssertUintsEqual(suite, sdkmath.NewUint(2), nextId)
 
 	// Verify token details are correct
-	// AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextBadgeId)
+	// AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextTokenId)
 }
 
 func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {

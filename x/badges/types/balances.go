@@ -69,10 +69,10 @@ func DeepCopyBalances(balances []*Balance) []*Balance {
 		balanceToAdd := &Balance{
 			Amount: approval.Amount,
 		}
-		for _, badgeId := range approval.TokenIds {
+		for _, tokenId := range approval.TokenIds {
 			balanceToAdd.TokenIds = append(balanceToAdd.TokenIds, &UintRange{
-				Start: badgeId.Start,
-				End:   badgeId.End,
+				Start: tokenId.Start,
+				End:   tokenId.End,
 			})
 		}
 
@@ -135,7 +135,7 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 		for _, currRange := range balanceObj.TokenIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId:        currRange,
+					TokenId:        currRange,
 					OwnershipTime:  currTime,
 					ArbitraryValue: balanceObj.Amount,
 				})
@@ -147,7 +147,7 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	for _, rangeToFetch := range idRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
-				BadgeId:       rangeToFetch,
+				TokenId:       rangeToFetch,
 				OwnershipTime: timeToFetch,
 			},
 			)
@@ -162,7 +162,7 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         amount,
-			TokenIds:       []*UintRange{overlap.BadgeId},
+			TokenIds:       []*UintRange{overlap.TokenId},
 			OwnershipTimes: []*UintRange{overlap.OwnershipTime},
 		})
 	}
@@ -171,7 +171,7 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	for _, detail := range inNewButNotOld {
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         sdkmath.NewUint(0),
-			TokenIds:       []*UintRange{detail.BadgeId},
+			TokenIds:       []*UintRange{detail.TokenId},
 			OwnershipTimes: []*UintRange{detail.OwnershipTime},
 		})
 	}
@@ -312,7 +312,7 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, currRange := range balanceObj.TokenIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
-					BadgeId:       currRange,
+					TokenId:       currRange,
 					OwnershipTime: currTime,
 				})
 			}
@@ -322,7 +322,7 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, rangeToDelete := range rangesToDelete {
 			for _, timeToDelete := range timesToDelete {
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{
-					BadgeId:       rangeToDelete,
+					TokenId:       rangeToDelete,
 					OwnershipTime: timeToDelete,
 				})
 			}
@@ -332,7 +332,7 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		for _, remainingBalance := range inOldButNotNew {
 			newBalances = append(newBalances, &Balance{
 				Amount:         balanceObj.Amount,
-				TokenIds:       []*UintRange{remainingBalance.BadgeId},
+				TokenIds:       []*UintRange{remainingBalance.TokenId},
 				OwnershipTimes: []*UintRange{remainingBalance.OwnershipTime},
 			})
 		}
@@ -537,9 +537,9 @@ func IncrementBalances(
 
 			startBalance.TokenIds = overrideTokenIds
 		} else {
-			for _, badgeId := range startBalance.TokenIds {
-				badgeId.Start = badgeId.Start.Add(numIncrements.Mul(incrementTokenIdsBy))
-				badgeId.End = badgeId.End.Add(numIncrements.Mul(incrementTokenIdsBy))
+			for _, tokenId := range startBalance.TokenIds {
+				tokenId.Start = tokenId.Start.Add(numIncrements.Mul(incrementTokenIdsBy))
+				tokenId.End = tokenId.End.Add(numIncrements.Mul(incrementTokenIdsBy))
 			}
 		}
 	}

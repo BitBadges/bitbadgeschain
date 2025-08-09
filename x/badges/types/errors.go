@@ -60,7 +60,7 @@ var (
 	ErrAmountTrackerIdIsNil                        = sdkerrors.Register(ModuleName, 1547, "approval id is nil")
 	ErrChallengeTrackerIdIsNil                     = sdkerrors.Register(ModuleName, 1548, "challenge tracker id is nil")
 	ErrIdsContainsInvalidChars                     = sdkerrors.Register(ModuleName, 1549, "ids contains invalid chars")
-	ErrInvalidBadgeId                              = sdkerrors.Register(ModuleName, 1550, "invalid token id")
+	ErrInvalidTokenId                              = sdkerrors.Register(ModuleName, 1550, "invalid token id")
 	ErrMismatchedVersions                          = sdkerrors.Register(ModuleName, 1551, "versions are mismatched")
 	ErrOutsideChargePeriod                         = sdkerrors.Register(ModuleName, 1552, "outside charge period")
 	ErrOverrideTimestampNotAllowed                 = sdkerrors.Register(ModuleName, 1553, "override timestamp not allowed")

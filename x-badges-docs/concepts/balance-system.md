@@ -24,9 +24,9 @@ When interpreting balances, it's crucial to understand that multiple ranges of t
 
 ```javascript
 for (balance of balances) {
-    for (badgeIdRange of balance.tokenIds) {
+    for (tokenIdRange of balance.tokenIds) {
         for (ownershipTimeRange of balance.ownershipTimes) {
-            // User owns x(balance.amount) of (badgeIdRange) for the times (ownershipTimeRange)
+            // User owns x(balance.amount) of (tokenIdRange) for the times (ownershipTimeRange)
         }
     }
 }

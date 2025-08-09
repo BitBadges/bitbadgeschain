@@ -35,9 +35,9 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.TokenCollection,
 
 	//Check if we are allowed to create these tokens
 	detailsToCheck := []*types.UniversalPermissionDetails{}
-	for _, badgeIdRange := range newValidTokenIds {
+	for _, tokenIdRange := range newValidTokenIds {
 		detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-			BadgeId: badgeIdRange,
+			TokenId: tokenIdRange,
 		})
 	}
 

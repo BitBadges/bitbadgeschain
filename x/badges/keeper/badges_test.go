@@ -152,7 +152,7 @@ func (suite *TestSuite) TestCreateBadges() {
 	// }, false)
 	// suite.Require().Nil(err, "Error subtracting balances: %s")
 
-	// AssertUintsEqual(suite, collection.NextBadgeId, sdkmath.NewUint(uint64(math.MaxUint64)).Add(sdkmath.NewUint(1)))
+	// AssertUintsEqual(suite, collection.NextTokenId, sdkmath.NewUint(uint64(math.MaxUint64)).Add(sdkmath.NewUint(1)))
 
 	// unmintedSupplys, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Mint")
 	// suite.Require().Nil(err, "Error getting user balance: %s")

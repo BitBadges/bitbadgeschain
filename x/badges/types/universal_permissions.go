@@ -42,7 +42,7 @@ type UniversalPermission struct {
 }
 
 type UniversalPermissionDetails struct {
-	BadgeId         *UintRange
+	TokenId         *UintRange
 	TimelineTime    *UintRange
 	TransferTime    *UintRange
 	OwnershipTime   *UintRange
@@ -126,7 +126,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 		return remaining, []*UniversalPermissionDetails{}
 	}
 
-	badgesAfterRemoval, removedBadges := RemoveUintRangeFromUintRange(toRemove.BadgeId, base.BadgeId)
+	badgesAfterRemoval, removedBadges := RemoveUintRangeFromUintRange(toRemove.TokenId, base.TokenId)
 	if len(removedBadges) == 0 {
 		remaining = append(remaining, base)
 		return remaining, []*UniversalPermissionDetails{}
@@ -184,7 +184,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	for _, timelineTimeAfterRemoval := range timelineTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    timelineTimeAfterRemoval,
-			BadgeId:         base.BadgeId,
+			TokenId:         base.TokenId,
 			TransferTime:    base.TransferTime,
 			OwnershipTime:   base.OwnershipTime,
 			ToList:          base.ToList,
@@ -198,7 +198,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	for _, badgeAfterRemoval := range badgesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:         badgeAfterRemoval,
+			TokenId:         badgeAfterRemoval,
 			TransferTime:    base.TransferTime,
 			OwnershipTime:   base.OwnershipTime,
 			ToList:          base.ToList,
@@ -212,7 +212,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	for _, transferTimeAfterRemoval := range transferTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:    transferTimeAfterRemoval,
 			OwnershipTime:   base.OwnershipTime,
 			ToList:          base.ToList,
@@ -226,7 +226,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	for _, ownershipTimeAfterRemoval := range ownershipTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   ownershipTimeAfterRemoval,
 			ToList:          base.ToList,
@@ -240,7 +240,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	if !IsAddressListEmpty(toListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          toListAfterRemoval,
@@ -254,7 +254,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	if !IsAddressListEmpty(fromListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          removedToList,
@@ -268,7 +268,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	if !IsAddressListEmpty(initiatedByListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			BadgeId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedBadges[0],        //We know there is only one because there can only be one interesection between two ranges
 			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          removedToList,
@@ -282,7 +282,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	if !IsAddressListEmpty(approvalIdListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
 			TimelineTime:    removedTimelineTimes[0],
-			BadgeId:         removedBadges[0],
+			TokenId:         removedBadges[0],
 			TransferTime:    removedTransferTimes[0],
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          removedToList,
@@ -301,7 +301,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 				for _, removedOwnershipTime := range removedOwnershipTimes {
 					removedDetails = append(removedDetails, &UniversalPermissionDetails{
 						TimelineTime:    removedTimelineTime,
-						BadgeId:         removedBadge,
+						TokenId:         removedBadge,
 						TransferTime:    removedTransferTime,
 						OwnershipTime:   removedOwnershipTime,
 						ToList:          removedToList,
@@ -337,13 +337,13 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 
 		approvalIdList := GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
 
-		for _, badgeId := range tokenIds {
+		for _, tokenId := range tokenIds {
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
 					for _, ownershipTime := range ownershipTimes {
 						brokenDown := []*UniversalPermissionDetails{
 							{
-								BadgeId:         badgeId,
+								TokenId:         tokenId,
 								TimelineTime:    timelineTime,
 								TransferTime:    transferTime,
 								OwnershipTime:   ownershipTime,
@@ -358,7 +358,7 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 						for _, remaining := range inBrokenDownButNottoRemove {
 							toRemove = append(toRemove, &UniversalPermissionDetails{
 								TimelineTime:    remaining.TimelineTime,
-								BadgeId:         remaining.BadgeId,
+								TokenId:         remaining.TokenId,
 								TransferTime:    remaining.TransferTime,
 								OwnershipTime:   remaining.OwnershipTime,
 								ToList:          remaining.ToList,

@@ -30,8 +30,8 @@ import (
 //		 If the value was not updated, then for timeA-timeB, we do not need to check the permissions.
 //		 If it was updated, we need to check the permissions for timeA-timeB.
 //		-Lastly, if it was updated, in addition to just simply checking timeA-timeB, we may also have to be more specific with what that we need to check.
-//		 Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com],
-//				 we only need to check badgeIDs 1 to 2 from timeA-timeB
+//		 Ex: If we go from [tokenIDs 1 to 10 -> www.example.com] to [tokenIDs 1 to 2 -> www.example2.com, tokenIDs 3 to 10 -> www.example.com],
+//				 we only need to check tokenIDs 1 to 2 from timeA-timeB
 //		 We eventually end with a (timeA-timeB, tokenIds, transferTimes, toList, fromList, initiatedByList) tuples array[] that we need to check, adding dummy values where needed.
 //		 This step and the third step is field-specific, so that is why we do it via a generic custom function (GetUpdatedStringCombinations, GetUpdatedBoolCombinations, etc...)
 //-2) For all the values that are considered "updated", we check if we are allowed to update them, according to the permissions.
@@ -75,7 +75,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		initiatedByList := types.GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 		approvalIdList := types.GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
 
-		for _, badgeId := range tokenIds {
+		for _, tokenId := range tokenIds {
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
 					for _, ownershipTime := range ownershipTimes {
@@ -87,7 +87,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 
 						brokenDown := []*types.UniversalPermissionDetails{
 							{
-								BadgeId:         badgeId,
+								TokenId:         tokenId,
 								TimelineTime:    timelineTime,
 								TransferTime:    transferTime,
 								OwnershipTime:   ownershipTime,
@@ -114,7 +114,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 							newArbValue := mergedApprovalCriteria
 							handled = append(handled, &types.UniversalPermissionDetails{
 								TimelineTime:    overlap.Overlap.TimelineTime,
-								BadgeId:         overlap.Overlap.BadgeId,
+								TokenId:         overlap.Overlap.TokenId,
 								TransferTime:    overlap.Overlap.TransferTime,
 								OwnershipTime:   overlap.Overlap.OwnershipTime,
 								ToList:          overlap.Overlap.ToList,
@@ -141,7 +141,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 	returnArr := []*types.UniversalPermissionDetails{}
 	for _, handledItem := range handled {
 		idxToInsert := 0
-		for idxToInsert < len(returnArr) && handledItem.BadgeId.Start.GT(returnArr[idxToInsert].BadgeId.Start) {
+		for idxToInsert < len(returnArr) && handledItem.TokenId.Start.GT(returnArr[idxToInsert].TokenId.Start) {
 			idxToInsert++
 		}
 

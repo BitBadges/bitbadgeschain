@@ -1262,7 +1262,7 @@ func (x *UintRange) GetEnd() string {
 //
 // Example: User A owns x10 of token IDs 1-10 from 1/1/2020 to 1/1/2021.
 //
-// If times or badgeIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
+// If times or tokenIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
 type Balance struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

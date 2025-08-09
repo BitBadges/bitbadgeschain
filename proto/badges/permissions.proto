@@ -95,7 +95,7 @@ message UserPermissions {
 /* 
   CollectionApprovalPermission defines what collection approved transfers can be updated vs. are locked.
 
-  Each transfer is broken down to a (from, to, initiatedBy, transferTime, badgeId) tuple.
+  Each transfer is broken down to a (from, to, initiatedBy, transferTime, tokenId) tuple.
   For a transfer to match, we need to match ALL of the fields in the combination. 
   These are determined by the fromListId, toListId, initiatedByListId, transferTimes, tokenIds fields.
   AddressLists are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressLists). 

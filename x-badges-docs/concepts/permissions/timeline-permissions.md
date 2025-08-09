@@ -33,7 +33,7 @@ For each token timeline update request:
 **English**:
 
 -   **Basic**: "For these permission execution times, the (timelineTime -> timelineValue) pairs can be updated"
--   **Token-Specific**: "For these permission execution times, the (badgeId, timelineTime -> timelineValue) pairs can be updated"
+-   **Token-Specific**: "For these permission execution times, the (tokenId, timelineTime -> timelineValue) pairs can be updated"
 
 ## Timeline vs Execution Times
 

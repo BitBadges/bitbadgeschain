@@ -84,38 +84,38 @@ func DoRangesOverlap(ids []*UintRange) bool {
 }
 
 // Validates ranges are valid. If end.IsZero(), we assume end == start.
-func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, errorOnEmpty bool) error {
-	if len(badgeUintRanges) == 0 {
+func ValidateRangesAreValid(tokenUintRanges []*UintRange, allowAllUints bool, errorOnEmpty bool) error {
+	if len(tokenUintRanges) == 0 {
 		if errorOnEmpty {
 			return sdkerrors.Wrapf(ErrInvalidUintRangeSpecified, "these id ranges can not be empty (length == 0)")
 		}
 	}
 
-	for _, badgeUintRange := range badgeUintRanges {
-		if badgeUintRange == nil {
+	for _, tokenUintRange := range tokenUintRanges {
+		if tokenUintRange == nil {
 			return ErrRangesIsNil
 		}
 
-		if badgeUintRange.Start.IsNil() || badgeUintRange.End.IsNil() {
+		if tokenUintRange.Start.IsNil() || tokenUintRange.End.IsNil() {
 			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is nil")
 		}
 
-		if badgeUintRange.Start.GT(badgeUintRange.End) {
+		if tokenUintRange.Start.GT(tokenUintRange.End) {
 			return ErrStartGreaterThanEnd
 		}
 
 		if !allowAllUints {
-			if badgeUintRange.Start.IsZero() || badgeUintRange.End.IsZero() {
+			if tokenUintRange.Start.IsZero() || tokenUintRange.End.IsZero() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is zero")
 			}
 
-			if badgeUintRange.Start.GT(sdkmath.NewUint(math.MaxUint64)) || badgeUintRange.End.GT(sdkmath.NewUint(math.MaxUint64)) {
+			if tokenUintRange.Start.GT(sdkmath.NewUint(math.MaxUint64)) || tokenUintRange.End.GT(sdkmath.NewUint(math.MaxUint64)) {
 				return ErrUintGreaterThanMax
 			}
 		}
 	}
 
-	overlap := DoRangesOverlap(badgeUintRanges)
+	overlap := DoRangesOverlap(tokenUintRanges)
 	if overlap {
 		return ErrRangesOverlap
 	}
@@ -592,16 +592,16 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment ownership times by, approval duration from now, or recurring ownership times can be set")
 						}
 
-						badgeIdOverrideCount := 0
+						tokenIdOverrideCount := 0
 						if !sequentialTransfer.IncrementTokenIdsBy.IsNil() && !sequentialTransfer.IncrementTokenIdsBy.IsZero() {
-							badgeIdOverrideCount++
+							tokenIdOverrideCount++
 						}
 
 						if sequentialTransfer.AllowOverrideWithAnyValidToken {
-							badgeIdOverrideCount++
+							tokenIdOverrideCount++
 						}
 
-						if badgeIdOverrideCount > 1 {
+						if tokenIdOverrideCount > 1 {
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment token ids by, or allow override with any valid ID can be set")
 						}
 

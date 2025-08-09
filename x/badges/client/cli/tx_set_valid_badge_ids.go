@@ -16,7 +16,7 @@ var _ = strconv.Itoa(0)
 
 func CmdSetValidTokenIds() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-valid-badge-ids [tx-json]",
+		Use:   "set-valid-token-ids [tx-json]",
 		Short: "Broadcast message setValidTokenIds",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

@@ -82,7 +82,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	if !currMap.UpdateCriteria.CollectionId.IsNil() && currMap.UpdateCriteria.CollectionId.GT(sdkmath.NewUint(0)) {
-		badgeId := sdkmath.NewUintFromString(key)
+		tokenId := sdkmath.NewUintFromString(key)
 		balancesRes, err := k.badgesKeeper.GetBalance(ctx, &badgetypes.QueryGetBalanceRequest{
 			CollectionId: currMap.UpdateCriteria.CollectionId.String(),
 			Address:      msg.Creator,
@@ -93,7 +93,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 		bals, err := badgetypes.GetBalancesForIds(ctx, []*badgetypes.UintRange{
-			{Start: badgeId, End: badgeId},
+			{Start: tokenId, End: tokenId},
 		}, []*badgetypes.UintRange{
 			{Start: currTime, End: currTime},
 		}, balancesRes.Balance.Balances)

@@ -78,7 +78,7 @@ For number types that need to be handled as Uint in Go:
 ```protobuf
 // Use this pattern for collection IDs, token IDs, and other numeric identifiers
 string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-string badgeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+string tokenId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 ```
 
 This pattern:

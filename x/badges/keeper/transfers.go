@@ -454,13 +454,13 @@ func (k Keeper) HandleTransfer(
 		// Little hacky but we find the amount for a specific time and ID
 		// Then we will check if it is evenly divisible by the number of transfer balances
 
-		firstBadgeId := transferBalances[0].TokenIds[0].Start
+		firstTokenId := transferBalances[0].TokenIds[0].Start
 		firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
 		firstAmount := transferBalances[0].Amount
 
 		multiplier := sdkmath.NewUint(0)
 		for _, balance := range conversionBalances {
-			foundBadgeId, err := types.SearchUintRangesForUint(firstBadgeId, balance.TokenIds)
+			foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.TokenIds)
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 			}
@@ -468,7 +468,7 @@ func (k Keeper) HandleTransfer(
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 			}
-			if foundBadgeId && foundOwnershipTime {
+			if foundTokenId && foundOwnershipTime {
 				multiplier = firstAmount.Quo(balance.Amount)
 				break
 			}

@@ -29,8 +29,8 @@ func IsAddressListEmpty(list *AddressList) bool {
 }
 
 func AddDefaultsIfNil(permission *UniversalPermissionDetails) *UniversalPermissionDetails {
-	if permission.BadgeId == nil {
-		permission.BadgeId = createDummyUintRange()
+	if permission.TokenId == nil {
+		permission.TokenId = createDummyUintRange()
 	}
 	if permission.TimelineTime == nil {
 		permission.TimelineTime = createDummyUintRange()
@@ -90,14 +90,14 @@ func GetPermissionString(permission *UniversalPermissionDetails) string {
 
 	// Helper to add field if it's at max value
 	addIfMax := func(name, value string) {
-		if permission.BadgeId.Start.Equal(sdkmath.NewUint(math.MaxUint64)) ||
-			permission.BadgeId.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
+		if permission.TokenId.Start.Equal(sdkmath.NewUint(math.MaxUint64)) ||
+			permission.TokenId.End.Equal(sdkmath.NewUint(math.MaxUint64)) {
 			parts = append(parts, fmt.Sprintf("%s: %s", name, value))
 		}
 	}
 
 	// Add each field
-	addIfMax("badgeId", permission.BadgeId.Start.String())
+	addIfMax("tokenId", permission.TokenId.Start.String())
 	addIfMax("timelineTime", permission.TimelineTime.Start.String())
 	addIfMax("transferTime", permission.TransferTime.Start.String())
 	addIfMax("ownershipTime", permission.OwnershipTime.Start.String())

@@ -46,7 +46,7 @@ message MsgSetValidTokenIdsResponse {
 
 ```bash
 # CLI command
-bitbadgeschaind tx badges set-valid-badge-ids '[tx-json]' --from manager-key
+bitbadgeschaind tx badges set-valid-token-ids '[tx-json]' --from manager-key
 ```
 
 ### JSON Example

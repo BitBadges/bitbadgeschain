@@ -84,7 +84,7 @@ const multipleBadges: UintRange[] = [
 
 ```go
 // Token IDs 1-10
-badgeIdRange := UintRange{Start: NewUint(1), End: NewUint(10)}
+tokenIdRange := UintRange{Start: NewUint(1), End: NewUint(10)}
 
 // Unlimited amount
 unlimitedAmount := UintRange{Start: NewUint(1), End: MaxUint}

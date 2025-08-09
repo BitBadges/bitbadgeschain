@@ -19,7 +19,7 @@ func CmdGetBalance() *cobra.Command {
 		Short: "Query getBalance",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			reqBadgeId := args[0]
+			reqTokenId := args[0]
 			if err != nil {
 				return err
 			}
@@ -38,7 +38,7 @@ func CmdGetBalance() *cobra.Command {
 
 			params := &types.QueryGetBalanceRequest{
 
-				CollectionId: reqBadgeId,
+				CollectionId: reqTokenId,
 				Address:      reqAddress,
 			}
 

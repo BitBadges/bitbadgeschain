@@ -214,7 +214,7 @@ If you specify `collectionId` as `"0"`, it will automatically lookup the latest 
 
 ```bash
 # CLI command
-bitbadgeschaind tx badges transfer-badges '[tx-json]' --from sender-key
+bitbadgeschaind tx badges transfer-tokens '[tx-json]' --from sender-key
 ```
 
 ### JSON Example

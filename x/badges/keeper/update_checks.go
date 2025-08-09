@@ -11,9 +11,9 @@ import (
 // Precondition: Assumes that all passed-in matches have .ArbitraryValue set
 //
 // This is a generic function that is used to get the "updated" field combinations
-// Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com]
+// Ex: If we go from [tokenIDs 1 to 10 -> www.example.com] to [tokenIDs 1 to 2 -> www.example2.com, tokenIDs 3 to 10 -> www.example.com]
 //
-// # This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they changed and are the ones we need to check
+// # This will return a UniversalPermissionDetails with tokenIDs 1 to 2 because they changed and are the ones we need to check
 //
 // Note that updates are field-specific, so the comparison logic is handled via a custom passed-in function - compareAndGetUpdateCombosToCheck
 func GetUpdateCombinationsToCheck(
@@ -72,7 +72,7 @@ func GetUpdateCombinationsToCheck(
 func addTimelineTimeToDetails(details *types.UniversalPermissionDetails, timelineTime *types.UintRange) *types.UniversalPermissionDetails {
 	return &types.UniversalPermissionDetails{
 		TimelineTime:    timelineTime,
-		BadgeId:         details.BadgeId,
+		TokenId:         details.TokenId,
 		TransferTime:    details.TransferTime,
 		OwnershipTime:   details.OwnershipTime,
 		ToList:          details.ToList,

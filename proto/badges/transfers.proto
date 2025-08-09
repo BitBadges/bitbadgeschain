@@ -191,7 +191,7 @@ message UserIncomingApproval {
 
 
 // CollectionApproval defines the rules for the approval of a transfer.
-// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, badgeId) tuple.
+// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, tokenId) tuple.
 // We check the approvals for first match of this tuple, using the approvals. Subsequent matches are ignored.
 //
 // If the first match is disallowed, the transfer is disallowed.
@@ -207,7 +207,7 @@ message UserIncomingApproval {
 
 
 // CollectionApproval defines the rules for the approval of a transfer.
-// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, badgeId) tuple.
+// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, tokenId) tuple.
 // We check the approvals for first match of this tuple, using the approvals. Subsequent matches are ignored.
 //
 // If the first match is disallowed, the transfer is disallowed.

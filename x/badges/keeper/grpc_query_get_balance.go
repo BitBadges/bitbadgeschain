@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Queries a balance for the given address and badgeId and returns its contents.
 func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequest) (*types.QueryGetBalanceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
