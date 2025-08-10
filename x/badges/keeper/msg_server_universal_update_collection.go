@@ -210,27 +210,28 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
 		pathsToAdd := make([]*types.CosmosCoinWrapperPath, len(msg.CosmosCoinWrapperPathsToAdd))
 		for i, path := range msg.CosmosCoinWrapperPathsToAdd {
+
 			var accountAddr sdk.AccAddress
-			for {
-				fullPath := path.Denom
-				fullPathBytes := []byte(fullPath)
 
-				ac, err := authtypes.NewModuleCredential(types.ModuleName, WrapperPathGenerationPrefix, fullPathBytes)
-				if err != nil {
-					return nil, err
-				}
-				//generate the address from the credential
-				accountAddr = sdk.AccAddress(ac.Address())
+			// For paths with {id} placeholder, we keep the {id} in the address generation
+			// so we have one address for any ID dynamically
+			fullPath := path.Denom
+			fullPathBytes := []byte(fullPath)
 
-				break
+			ac, err := authtypes.NewModuleCredential(types.ModuleName, WrapperPathGenerationPrefix, fullPathBytes)
+			if err != nil {
+				return nil, err
 			}
+			//generate the address from the credential
+			accountAddr = sdk.AccAddress(ac.Address())
 
 			pathsToAdd[i] = &types.CosmosCoinWrapperPath{
-				Address:    accountAddr.String(),
-				Denom:      path.Denom,
-				Balances:   path.Balances,
-				Symbol:     path.Symbol,
-				DenomUnits: path.DenomUnits,
+				Address:                        accountAddr.String(),
+				Denom:                          path.Denom,
+				Balances:                       path.Balances,
+				Symbol:                         path.Symbol,
+				DenomUnits:                     path.DenomUnits,
+				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
 			}
 		}
 

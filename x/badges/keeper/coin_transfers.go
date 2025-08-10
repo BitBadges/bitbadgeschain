@@ -29,6 +29,7 @@ func (k Keeper) HandleCoinTransfers(
 	coinTransfersUsed *[]CoinTransfers,
 	collection *types.TokenCollection,
 	royalties *types.UserRoyalties,
+	userLevelRestrictions *types.UserLevelRestrictions,
 ) error {
 	if len(coinTransfers) == 0 {
 		return nil
@@ -52,6 +53,21 @@ func (k Keeper) HandleCoinTransfers(
 		for _, coinTransfer := range coinTransfers {
 			if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
 				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
+			}
+		}
+	}
+
+	// Additional user-level denom validation if userLevelRestrictions is provided
+	if userLevelRestrictions != nil && !userLevelRestrictions.AllowAllDenoms {
+		// If AllowAllDenoms is false, validate that all coin transfers use allowed denoms
+		if len(userLevelRestrictions.AllowedDenoms) == 0 {
+			// Empty array with !allowAllDenoms means no denoms are allowed
+			return sdkerrors.Wrapf(ErrInvalidDenom, "no denoms are allowed by user-level payment restrictions")
+		}
+
+		for _, coinTransfer := range coinTransfers {
+			if !slices.Contains(userLevelRestrictions.AllowedDenoms, coinTransfer.Coins[0].Denom) {
+				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed by user-level payment restrictions", coinTransfer.Coins[0].Denom)
 			}
 		}
 	}

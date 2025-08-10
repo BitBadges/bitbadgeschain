@@ -247,6 +247,9 @@ func MigrateCosmosCoinWrapperPath(cosmosCoinWrapperPath *oldtypes.CosmosCoinWrap
 
 	newCosmosCoinWrapperPath.Balances = MigrateBalancesType(cosmosCoinWrapperPath.Balances)
 
+	// Set allowOverrideWithAnyValidToken to false for existing paths during migration
+	newCosmosCoinWrapperPath.AllowOverrideWithAnyValidToken = false
+
 	return &newCosmosCoinWrapperPath
 }
 
@@ -289,6 +292,11 @@ func MigrateApprovalCriteria(approvalCriteria *oldtypes.ApprovalCriteria) *newty
 	var newApprovalCriteria newtypes.ApprovalCriteria
 	if err := json.Unmarshal(jsonBytes, &newApprovalCriteria); err != nil {
 		return nil
+	}
+
+	newApprovalCriteria.UserLevelRestrictions = &newtypes.UserLevelRestrictions{
+		AllowAllDenoms: true,
+		AllowedDenoms:  []string{},
 	}
 
 	newApprovalCriteria.MustOwnTokens = MigrateMustOwnTokens(approvalCriteria.MustOwnBadges)

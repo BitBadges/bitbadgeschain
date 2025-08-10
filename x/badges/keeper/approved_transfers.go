@@ -15,10 +15,11 @@ import (
 
 // The UserApprovalsToCheck struct is used to keep track of which incoming / outgoing approvals for which addresses we need to check.
 type UserApprovalsToCheck struct {
-	Address       string
-	Balances      []*types.Balance
-	Outgoing      bool
-	UserRoyalties *types.UserRoyalties
+	Address               string
+	Balances              []*types.Balance
+	Outgoing              bool
+	UserRoyalties         *types.UserRoyalties
+	UserLevelRestrictions *types.UserLevelRestrictions
 }
 
 // All in one approval deduction function. We also return the user approvals to check (only used when collection approvals)
@@ -65,6 +66,14 @@ func (k Keeper) DeductAndGetUserApprovals(
 			userRoyalties = approval.ApprovalCriteria.UserRoyalties
 		}
 
+		userLevelRestrictions := &types.UserLevelRestrictions{
+			AllowAllDenoms: true,
+			AllowedDenoms:  []string{},
+		}
+		if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.UserLevelRestrictions != nil {
+			userLevelRestrictions = approval.ApprovalCriteria.UserLevelRestrictions
+		}
+
 		isPrioritizedApproval := false
 		for _, prioritizedApproval := range transfer.PrioritizedApprovals {
 			if prioritizedApproval.ApprovalId == approval.ApprovalId && prioritizedApproval.ApprovalLevel == approvalLevel && prioritizedApproval.ApproverAddress == approverAddress {
@@ -108,17 +117,19 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
 			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-				Address:       fromAddress,
-				Balances:      allBalancesForIdsAndTimes,
-				Outgoing:      true,
-				UserRoyalties: userRoyalties,
+				Address:               fromAddress,
+				Balances:              allBalancesForIdsAndTimes,
+				Outgoing:              true,
+				UserRoyalties:         userRoyalties,
+				UserLevelRestrictions: userLevelRestrictions,
 			})
 
 			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-				Address:       toAddress,
-				Balances:      allBalancesForIdsAndTimes,
-				Outgoing:      false,
-				UserRoyalties: userRoyalties,
+				Address:               toAddress,
+				Balances:              allBalancesForIdsAndTimes,
+				Outgoing:              false,
+				UserRoyalties:         userRoyalties,
+				UserLevelRestrictions: userLevelRestrictions,
 			})
 
 			*approvalsUsed = append(*approvalsUsed, ApprovalsUsed{
@@ -210,7 +221,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 		skipApproval:
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
-			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, true, coinTransfersUsed, collection, royalties) //simulate = true
+			err := k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, true, coinTransfersUsed, collection, royalties, userLevelRestrictions) //simulate = true
 			if err != nil {
 				if isPrioritizedApproval {
 					potentialErrors = append(potentialErrors, fmt.Sprintf("coin transfer error: %s", err))
@@ -349,7 +360,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, false, coinTransfersUsed, collection, royalties) //simulate = false
+			err = k.HandleCoinTransfers(ctx, approvalCriteria.CoinTransfers, initiatedBy, approverAddress, approvalLevel, false, coinTransfersUsed, collection, royalties, userLevelRestrictions) //simulate = false
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
 			}
@@ -396,19 +407,21 @@ func (k Keeper) DeductAndGetUserApprovals(
 			//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
 			if !approvalCriteria.OverridesFromOutgoingApprovals {
 				userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-					Address:       fromAddress,
-					Balances:      transferBalancesToCheck,
-					Outgoing:      true,
-					UserRoyalties: userRoyalties,
+					Address:               fromAddress,
+					Balances:              transferBalancesToCheck,
+					Outgoing:              true,
+					UserRoyalties:         userRoyalties,
+					UserLevelRestrictions: userLevelRestrictions,
 				})
 			}
 
 			if !approvalCriteria.OverridesToIncomingApprovals {
 				userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-					Address:       toAddress,
-					Balances:      transferBalancesToCheck,
-					Outgoing:      false,
-					UserRoyalties: userRoyalties,
+					Address:               toAddress,
+					Balances:              transferBalancesToCheck,
+					Outgoing:              false,
+					UserRoyalties:         userRoyalties,
+					UserLevelRestrictions: userLevelRestrictions,
 				})
 			}
 
