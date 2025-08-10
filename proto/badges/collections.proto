@@ -92,6 +92,8 @@ message CosmosCoinWrapperPath {
   repeated Balance balances = 3;
   string symbol = 4;
   repeated DenomUnit denomUnits = 5;
+  // If true, allows overriding with any valid badge ID for conversion to IBC denomination
+  bool allowOverrideWithAnyValidToken = 6;
 }
 
 message DenomUnit {

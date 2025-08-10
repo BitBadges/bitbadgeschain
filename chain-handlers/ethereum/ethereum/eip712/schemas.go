@@ -201,6 +201,10 @@ func getCollectionApprovalCriteriaSchema() string {
 			"payoutAddress": ""
 		},
 		"overridesToIncomingApprovals": false,
+		"userLevelPayments": {
+			"allowAllDenoms": false,
+			"allowedDenoms": []
+		},
 		"dynamicStoreChallenges": [
 			` + getDynamicStoreChallengeSchema() + `
 		],
@@ -712,7 +716,8 @@ func GetSchemas() []string {
 							"symbol": "",
 							"isDefaultDisplay": false
 						}
-					]
+					],
+					"allowOverrideWithAnyValidToken": false
 				}
 			],
 			"invariants": {
@@ -843,7 +848,8 @@ func GetSchemas() []string {
 							"symbol": "",
 							"isDefaultDisplay": false
 						}
-					]
+					],
+					"allowOverrideWithAnyValidToken": false
 				}
 			],
 			"invariants": {
@@ -945,7 +951,8 @@ func GetSchemas() []string {
 							"symbol": "",
 							"isDefaultDisplay": false
 						}
-					]
+					],
+					"allowOverrideWithAnyValidToken": false
 				}
 			],
 			"invariants": {

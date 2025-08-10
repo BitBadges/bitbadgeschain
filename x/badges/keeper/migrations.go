@@ -246,6 +246,9 @@ func MigrateCosmosCoinWrapperPath(cosmosCoinWrapperPath *oldtypes.CosmosCoinWrap
 	}
 
 	newCosmosCoinWrapperPath.Balances = MigrateBalancesType(cosmosCoinWrapperPath.Balances)
+	
+	// Set allowOverrideWithAnyValidToken to false for existing paths during migration
+	newCosmosCoinWrapperPath.AllowOverrideWithAnyValidToken = false
 
 	return &newCosmosCoinWrapperPath
 }

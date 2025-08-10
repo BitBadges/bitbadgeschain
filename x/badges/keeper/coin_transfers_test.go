@@ -81,6 +81,39 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000+10)) //10% of 100 ubadge
 }
 
+func (suite *TestSuite) TestUserLevelPayments() {
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserLevelPayments = &types.UserLevelPayments{
+		AllowAllDenoms: false,
+		AllowedDenoms:  []string{"ubadge", "uatom"},
+	}
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating tokens")
+
+	// Test that the collection was created with the correct userLevelPayments
+	collection, found := suite.app.BadgesKeeper.GetCollectionFromStore(suite.ctx, sdkmath.NewUint(1))
+	suite.Require().True(found, "collection should exist")
+	suite.Require().NotNil(collection.CollectionApprovals[1].ApprovalCriteria.UserLevelPayments, "userLevelPayments should not be nil")
+	suite.Require().False(collection.CollectionApprovals[1].ApprovalCriteria.UserLevelPayments.AllowAllDenoms, "allowAllDenoms should be false")
+	suite.Require().Equal([]string{"ubadge", "uatom"}, collection.CollectionApprovals[1].ApprovalCriteria.UserLevelPayments.AllowedDenoms, "allowedDenoms should match")
+
+	// Test with allowAllDenoms = true
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserLevelPayments = &types.UserLevelPayments{
+		AllowAllDenoms: true,
+		AllowedDenoms:  []string{},
+	}
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating tokens with allowAllDenoms = true")
+
+	collection, found = suite.app.BadgesKeeper.GetCollectionFromStore(suite.ctx, sdkmath.NewUint(2))
+	suite.Require().True(found, "collection should exist")
+	suite.Require().NotNil(collection.CollectionApprovals[1].ApprovalCriteria.UserLevelPayments, "userLevelPayments should not be nil")
+	suite.Require().True(collection.CollectionApprovals[1].ApprovalCriteria.UserLevelPayments.AllowAllDenoms, "allowAllDenoms should be true")
+	suite.Require().Empty(collection.CollectionApprovals[1].ApprovalCriteria.UserLevelPayments.AllowedDenoms, "allowedDenoms should be empty when allowAllDenoms is true")
+}
+
 func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 

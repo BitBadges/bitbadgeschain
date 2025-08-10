@@ -451,6 +451,14 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					approvalCriteria.UserRoyalties.Percentage = sdkmath.NewUint(0)
 				}
 
+				if approvalCriteria.UserLevelPayments == nil {
+					approvalCriteria.UserLevelPayments = &UserLevelPayments{}
+				}
+
+				if approvalCriteria.UserLevelPayments.AllowAllDenoms {
+					approvalCriteria.UserLevelPayments.AllowedDenoms = []string{}
+				}
+
 				if approvalCriteria.MaxNumTransfers == nil {
 					approvalCriteria.MaxNumTransfers = &MaxNumTransfers{}
 				}
