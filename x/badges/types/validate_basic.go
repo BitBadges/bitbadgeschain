@@ -226,15 +226,26 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
-	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
-		return false
-	}
-
+	// 
 	if approvalCriteria.MaxNumTransfers != nil && !MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
 		return false
 	}
 
 	if approvalCriteria.ApprovalAmounts != nil && !ApprovalAmountsIsBasicallyNil(approvalCriteria.ApprovalAmounts) {
+		return false
+	}
+
+	// Note: These might be fine since they are "standalone" and actually meant to change but they do have write side effects
+	//       So we add them here. Merkle challenges can also change the balances but thats only if using predetermined which it catches.
+	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
+		return false
+	}
+
+	if approvalCriteria.DynamicStoreChallenges != nil && len(approvalCriteria.DynamicStoreChallenges) > 0 {
+		return false
+	}
+
+	if approvalCriteria.EthSignatureChallenges != nil && len(approvalCriteria.EthSignatureChallenges) > 0 {
 		return false
 	}
 
