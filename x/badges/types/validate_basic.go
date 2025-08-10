@@ -226,7 +226,7 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
-	// 
+	//
 	if approvalCriteria.MaxNumTransfers != nil && !MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
 		return false
 	}
@@ -236,7 +236,7 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 	}
 
 	// Note: These might be fine since they are "standalone" and actually meant to change but they do have write side effects
-	//       So we add them here. Merkle challenges can also change the balances but thats only if using predetermined which it catches.
+	//       So we add them here. Merkle challenges can also change the balances with order calc method but thats only if using predetermined which it catches.
 	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
 		return false
 	}
