@@ -106,6 +106,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		AutoDeletionOptions:                approvalCriteria.AutoDeletionOptions,
 		MustOwnTokens:                      approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:             approvalCriteria.DynamicStoreChallenges,
+		EthSignatureChallenges:             approvalCriteria.EthSignatureChallenges,
 	}
 }
 
@@ -125,6 +126,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		AutoDeletionOptions:              approvalCriteria.AutoDeletionOptions,
 		MustOwnTokens:                    approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:           approvalCriteria.DynamicStoreChallenges,
+		EthSignatureChallenges:           approvalCriteria.EthSignatureChallenges,
 	}
 }
 
@@ -140,6 +142,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		AutoDeletionOptions:                approvalCriteria.AutoDeletionOptions,
 		MustOwnTokens:                      approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:             approvalCriteria.DynamicStoreChallenges,
+		EthSignatureChallenges:             approvalCriteria.EthSignatureChallenges,
 	}
 }
 
@@ -155,5 +158,6 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		AutoDeletionOptions:              approvalCriteria.AutoDeletionOptions,
 		MustOwnTokens:                    approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:           approvalCriteria.DynamicStoreChallenges,
+		EthSignatureChallenges:           approvalCriteria.EthSignatureChallenges,
 	}
 }

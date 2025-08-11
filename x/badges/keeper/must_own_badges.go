@@ -40,6 +40,11 @@ func (k Keeper) CheckMustOwnTokens(
 			}
 		}
 
+		// Special handling for "Mint" address - use the collection's mintEscrowAddress instead
+		if partyToCheck == "Mint" {
+			partyToCheck = collection.MintEscrowAddress
+		}
+
 		partyBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, partyToCheck)
 		balances := partyBalances.Balances
 

@@ -150,31 +150,6 @@ func getDynamicStoreChallengeSchema() string {
 	return `{ "storeId": "" }`
 }
 
-// getBaseApprovalCriteriaSchema returns the base approval criteria schema without collection-specific fields
-func getBaseApprovalCriteriaSchema() string {
-	return `{
-		"mustOwnTokens": [
-			` + getMustOwnTokensSchema() + `
-		],
-		"merkleChallenges": [
-			` + getMerkleChallengeSchema() + `
-		],
-		"coinTransfers": [
-			` + getCoinTransferSchema() + `
-		],
-		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
-		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
-		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
-		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
-		"dynamicStoreChallenges": [
-			` + getDynamicStoreChallengeSchema() + `
-		],
-		"ethSignatureChallenges": [
-			` + getETHSignatureChallengeSchema() + `
-		]
-	}`
-}
-
 // getCollectionApprovalCriteriaSchema returns the schema for collection approval criteria
 func getCollectionApprovalCriteriaSchema() string {
 	return `{
