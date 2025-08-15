@@ -23,6 +23,7 @@ accounts:
       coins:
           - 99999999999999996ubadge
           - 99000000000000000ustake
+          - 1000000000000000badges:49:chaosnet
       address: bb1kx9532ujful8vgg2dht6k544ax4k9qzsp0sany
     - name: charlie
       coins:
@@ -33,6 +34,7 @@ accounts:
           - 99999999999999996ubadge
           - 1000000000000000ustake
           - 100000000ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349
+          - 1000000000000000badges:49:chaosnet
 client:
     typescript:
         path: ts-client
