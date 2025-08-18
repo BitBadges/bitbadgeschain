@@ -1,0 +1,34 @@
+syntax = "proto3";
+package badges.v12;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v12";
+
+/*
+  A DynamicStore is a flexible storage object that can store arbitrary data.
+  It is identified by a unique ID assigned by the blockchain, which is a uint64 that increments.
+  Dynamic stores are created by users and can only be updated or deleted by their creator.
+  They provide a way to store custom data on-chain with proper access control.
+*/
+message DynamicStore {
+  // The unique identifier for this dynamic store. This is assigned by the blockchain.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The address of the creator of this dynamic store.
+  string createdBy = 2;
+  // The default value for uninitialized addresses (number of uses).
+  string defaultValue = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+/*
+  A DynamicStoreValue stores a usage count for a specific address in a dynamic store.
+  This allows the creator to set usage counts per address that can be decremented on use.
+*/
+message DynamicStoreValue {
+  // The unique identifier for this dynamic store.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The address for which this value is stored.
+  string address = 2;
+  // The usage count (number of times this address can use the approval).
+  string value = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+} 

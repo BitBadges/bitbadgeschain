@@ -162,8 +162,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			err = k.CheckMustOwnBadges(ctx, approvalCriteria.MustOwnBadges, initiatedBy)
+			err = k.CheckMustOwnTokens(ctx, approvalCriteria.MustOwnBadges, initiatedBy, fromAddress, toAddress)
 			if err != nil {
+				if isPrioritizedApproval {
+					potentialErrors = append(potentialErrors, fmt.Sprintf("ownership check failed: %s", err))
+				}
 				continue
 			}
 
@@ -428,7 +431,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 		if len(potentialErrors) > 0 {
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
 		} else {
-			potentialErrorsStr = " - auto-scan failed (no prioritized approvals found): "
+			potentialErrorsStr = " - auto-scan failed: "
 		}
 		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s%s", transferStr, potentialErrorsStr)
 	}

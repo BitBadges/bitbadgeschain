@@ -16,14 +16,15 @@ Token ownership requirements enable gating mechanisms where users must possess s
 ## Interface
 
 ```typescript
-interface MustOwnBadges<T extends NumberType> {
+interface MustOwnTokens<T extends NumberType> {
     collectionId: T;
     amountRange: UintRange<T>; // Min/max amount expected
     ownershipTimes: UintRange<T>[];
-    badgeIds: UintRange<T>[];
+    tokenIds: UintRange<T>[];
 
     overrideWithCurrentTime: boolean; // Use current block time. Overrides ownershipTimes with [{ start: currentTime, end: currentTime }]
-    mustSatisfyForAllAssets: boolean; // All vs one token requirement
+    mustSatisfyForAllAssets: boolean; // All vs one requirement
+    ownershipCheckParty: string; // Which party to check ownership for: "initiator", "sender", "recipient" (default: "initiator" if empty)
 }
 ```
 
@@ -68,6 +69,17 @@ interface MustOwnBadges<T extends NumberType> {
 -   **True**: User must own ALL specified token combinations
 -   **False**: User must own AT LEAST ONE of the specified token combinations
 
+### ownershipCheckParty
+
+-   **Type**: `string`
+-   **Description**: Specifies which party of the transfer to check ownership for
+-   **Options**:
+    -   `"initiator"` (default): Check ownership for the address that initiated the transfer
+    -   `"sender"`: Check ownership for the address sending the badges
+    -   `"recipient"`: Check ownership for the address receiving the badges
+-   **Default**: `"initiator"` (if empty or not specified)
+-   **Example**: `"sender"` to require the sender to own specific badges before allowing the transfer
+
 ## Example
 
 Require users to own specific tokens to access premium features or exclusive transfers.
@@ -81,7 +93,55 @@ Require users to own specific tokens to access premium features or exclusive tra
             "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }],
             "badgeIds": [{ "start": "1", "end": "1" }],
             "overrideWithCurrentTime": false,
-            "mustSatisfyForAllAssets": true
+            "mustSatisfyForAllAssets": true,
+            "ownershipCheckParty": "initiator"
+        }
+    ]
+}
+```
+
+### Party-Specific Examples
+
+#### Check Initiator Ownership (Default)
+
+```json
+{
+    "mustOwnBadges": [
+        {
+            "collectionId": "1",
+            "amountRange": { "start": "1", "end": "1" },
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipCheckParty": "initiator"
+        }
+    ]
+}
+```
+
+#### Check Sender Ownership
+
+```json
+{
+    "mustOwnBadges": [
+        {
+            "collectionId": "1",
+            "amountRange": { "start": "1", "end": "1" },
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipCheckParty": "sender"
+        }
+    ]
+}
+```
+
+#### Check Recipient Ownership
+
+```json
+{
+    "mustOwnBadges": [
+        {
+            "collectionId": "1",
+            "amountRange": { "start": "1", "end": "1" },
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipCheckParty": "recipient"
         }
     ]
 }

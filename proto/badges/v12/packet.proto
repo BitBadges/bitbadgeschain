@@ -1,0 +1,13 @@
+syntax = "proto3";
+package badges.v12;
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v12";
+
+message BadgesPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}

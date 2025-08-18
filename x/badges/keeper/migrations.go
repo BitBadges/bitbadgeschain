@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
-	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v11"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v12"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
@@ -21,13 +20,12 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 
-	currParams := k.GetParams(ctx)
-	currParams.AffiliatePercentage = sdkmath.NewUint(5000)
+	// currParams := k.GetParams(ctx)
 
-	err := k.SetParams(ctx, currParams)
-	if err != nil {
-		return err
-	}
+	// err := k.SetParams(ctx, currParams)
+	// if err != nil {
+	// 	return err
+	// }
 
 	if err := MigrateCollections(ctx, store, k); err != nil {
 		return err
@@ -53,58 +51,49 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
-	// for _, approval := range incomingApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+	for _, approval := range incomingApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
 
-	// 	if approval.ApprovalCriteria.AutoDeletionOptions == nil {
-	// 		continue
-	// 	}
-
-	// 	approval.ApprovalCriteria.AutoDeletionOptions = &newtypes.AutoDeletionOptions{
-	// 		AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
-	// 		AfterOverallMaxNumTransfers: false,
-	// 	}
-	// }
+		for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
+			if mustOwnBadge.OwnershipCheckParty == "" {
+				mustOwnBadge.OwnershipCheckParty = "initiator"
+			}
+		}
+	}
 
 	return incomingApprovals
 }
 
 func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval) []*newtypes.UserOutgoingApproval {
-	// for _, approval := range outgoingApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+	for _, approval := range outgoingApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
 
-	// 	if approval.ApprovalCriteria.AutoDeletionOptions == nil {
-	// 		continue
-	// 	}
-
-	// 	approval.ApprovalCriteria.AutoDeletionOptions = &newtypes.AutoDeletionOptions{
-	// 		AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
-	// 		AfterOverallMaxNumTransfers: false,
-	// 	}
-	// }
+		for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
+			if mustOwnBadge.OwnershipCheckParty == "" {
+				mustOwnBadge.OwnershipCheckParty = "initiator"
+			}
+		}
+	}
 
 	return outgoingApprovals
 }
 
 func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*newtypes.CollectionApproval {
-	// for _, approval := range collectionApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+	for _, approval := range collectionApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
 
-	// 	if approval.ApprovalCriteria.AutoDeletionOptions == nil {
-	// 		continue
-	// 	}
-
-	// 	approval.ApprovalCriteria.AutoDeletionOptions = &newtypes.AutoDeletionOptions{
-	// 		AfterOneUse:                 approval.ApprovalCriteria.AutoDeletionOptions.AfterOneUse,
-	// 		AfterOverallMaxNumTransfers: false,
-	// 	}
-	// }
+		for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
+			if mustOwnBadge.OwnershipCheckParty == "" {
+				mustOwnBadge.OwnershipCheckParty = "initiator"
+			}
+		}
+	}
 
 	return collectionApprovals
 }
@@ -145,13 +134,9 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			return err
 		}
 
-		// newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
-		// newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
-		// newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
-
-		newCollection.Invariants = &newtypes.CollectionInvariants{
-			NoCustomOwnershipTimes: false,
-		}
+		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
+		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
+		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
 
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {
@@ -182,8 +167,8 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 			return err
 		}
 
-		// oldBalance.IncomingApprovals = MigrateIncomingApprovals(oldBalance.IncomingApprovals)
-		// oldBalance.OutgoingApprovals = MigrateOutgoingApprovals(oldBalance.OutgoingApprovals)
+		oldBalance.IncomingApprovals = MigrateIncomingApprovals(oldBalance.IncomingApprovals)
+		oldBalance.OutgoingApprovals = MigrateOutgoingApprovals(oldBalance.OutgoingApprovals)
 
 		store.Set(iterator.Key(), k.cdc.MustMarshal(&oldBalance))
 	}
@@ -237,10 +222,6 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 			return err
 		}
 
-		wctx := sdk.UnwrapSDKContext(ctx)
-		nowUnixMilli := wctx.BlockTime().UnixMilli()
-		oldApprovalTracker.LastUpdatedAt = sdkmath.NewUint(uint64(nowUnixMilli))
-
 		store.Set(iterator.Key(), k.cdc.MustMarshal(&oldApprovalTracker))
 	}
 
@@ -267,13 +248,6 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 			return err
 		}
 
-		// Convert boolean defaultValue to uint
-		if oldDynamicStore.DefaultValue {
-			newDynamicStore.DefaultValue = sdkmath.NewUint(1)
-		} else {
-			newDynamicStore.DefaultValue = sdkmath.NewUint(0)
-		}
-
 		// Save the updated dynamic store
 		if err := k.SetDynamicStoreInStore(sdk.UnwrapSDKContext(ctx), newDynamicStore); err != nil {
 			return err
@@ -297,13 +271,6 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		var newDynamicStoreValue newtypes.DynamicStoreValue
 		if err := json.Unmarshal(jsonBytes, &newDynamicStoreValue); err != nil {
 			return err
-		}
-
-		// Convert boolean value to uint
-		if oldDynamicStoreValue.Value {
-			newDynamicStoreValue.Value = sdkmath.NewUint(1)
-		} else {
-			newDynamicStoreValue.Value = sdkmath.NewUint(0)
 		}
 
 		// Save the updated dynamic store value
