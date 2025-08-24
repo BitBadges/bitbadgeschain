@@ -328,10 +328,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					if coinToTransfer.Denom == "" {
 						return sdkerrors.Wrapf(ErrInvalidRequest, "coin denom is uninitialized")
 					}
-
-					if coinToTransfer.Amount.GT(sdkmath.NewInt(100000000000)) {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "coin amount is too large - the max amount is 100000000000ubadge")
-					}
 				}
 			}
 

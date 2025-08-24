@@ -3,14 +3,14 @@ package app
 import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	v12 "github.com/bitbadges/bitbadgeschain/app/upgrades/v12"
+	v13 "github.com/bitbadges/bitbadgeschain/app/upgrades/v13"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v12.UpgradeName,
-		v12.CreateUpgradeHandler(
+		v13.UpgradeName,
+		v13.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
 			app.BadgesKeeper,
@@ -32,7 +32,7 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v12.UpgradeName:
+	case v13.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{},
 		}
