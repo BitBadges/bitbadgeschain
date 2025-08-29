@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"cosmossdk.io/log"
@@ -43,6 +44,7 @@ func initRootCmd(
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
 	rootCmd.AddCommand(
+		versionCommand(),
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
 		queryCommand(),
@@ -53,6 +55,18 @@ func initRootCmd(
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+}
+
+// versionCommand returns a Cobra command for displaying version information
+func versionCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print the application binary version information",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("%s\n", app.Version)
+		},
+	}
+	return cmd
 }
 
 // genesisCommand builds genesis-related `bitbadgeschaind genesis` command. Users may provide application specific commands as a parameter

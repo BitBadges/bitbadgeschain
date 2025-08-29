@@ -101,6 +101,11 @@ const (
 	Name                 = "bitbadgeschain"
 )
 
+// Version information - this will be set by ldflags during build
+var (
+	Version = "dev"
+)
+
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
