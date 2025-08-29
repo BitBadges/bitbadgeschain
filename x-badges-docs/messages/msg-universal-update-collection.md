@@ -126,7 +126,8 @@ bitbadgeschaind tx badges universal-update-collection '[tx-json]' --from creator
     "mintEscrowCoinsToTransfer": [],
     "cosmosCoinWrapperPathsToAdd": [],
     "invariants": {
-        "noCustomOwnershipTimes": false
+        "noCustomOwnershipTimes": false,
+        "maxSupplyPerId": "0"
     }
 }
 ```
@@ -184,7 +185,8 @@ When creating a new collection (collectionId = "0"), you can set collection inva
 ```json
 {
     "invariants": {
-        "noCustomOwnershipTimes": true
+        "noCustomOwnershipTimes": true,
+        "maxSupplyPerId": "0"
     }
 }
 ```

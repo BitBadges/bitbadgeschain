@@ -105,4 +105,8 @@ message CollectionInvariants {
   // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
   // This prevents time-based restrictions on token ownership.
   bool noCustomOwnershipTimes = 1;
+  
+  // Maximum supply per token ID. If set, no balance can exceed this amount.
+  // This prevents any single token ID from having more than the specified supply.
+  string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

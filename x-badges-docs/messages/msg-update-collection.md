@@ -100,7 +100,8 @@ bitbadgeschaind tx badges update-collection '[tx-json]' --from manager-key
     "mintEscrowCoinsToTransfer": [],
     "cosmosCoinWrapperPathsToAdd": [],
     "invariants": {
-        "noCustomOwnershipTimes": false
+        "noCustomOwnershipTimes": false,
+        "maxSupplyPerId": "0"
     }
 }
 ```

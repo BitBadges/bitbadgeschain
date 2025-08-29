@@ -89,6 +89,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 		for i := sdkmath.NewUint(0); i.LT(numAttempts); i = i.Add(sdkmath.NewUint(1)) {
 			fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+			totalMinted := []*types.Balance{}
 
 			for _, to := range transfer.ToAddresses {
 				approvalsUsed := []ApprovalsUsed{}
@@ -165,6 +166,14 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 							sdk.NewAttribute("transfer", amountsStr),
 						),
 					)
+				}
+
+				if transfer.From == "Mint" {
+					copiedBalances := types.DeepCopyBalances(transfer.Balances)
+					totalMinted, err = types.AddBalances(ctx, totalMinted, copiedBalances)
+					if err != nil {
+						return err
+					}
 				}
 
 				fromUserBalance, toUserBalance, err = k.HandleTransfer(
@@ -308,6 +317,17 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 			if transfer.From != "Mint" {
 				if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
+					return err
+				}
+			} else {
+				// Get current Total
+				totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, "Total")
+				totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
+				if err != nil {
+					return err
+				}
+
+				if err := k.SetBalanceForAddress(ctx, collection, "Total", totalBalances); err != nil {
 					return err
 				}
 			}

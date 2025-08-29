@@ -716,7 +716,8 @@ func GetSchemas() []string {
 				}
 			],
 			"invariants": {
-				"noCustomOwnershipTimes": false
+				"noCustomOwnershipTimes": false,
+				"maxSupplyPerId": ""
 			}
 		}
 	}`)
@@ -847,7 +848,8 @@ func GetSchemas() []string {
 				}
 			],
 			"invariants": {
-				"noCustomOwnershipTimes": false
+				"noCustomOwnershipTimes": false,
+				"maxSupplyPerId": ""
 			}
 		}
 	}`)
@@ -949,7 +951,8 @@ func GetSchemas() []string {
 				}
 			],
 			"invariants": {
-				"noCustomOwnershipTimes": false
+				"noCustomOwnershipTimes": false,
+				"maxSupplyPerId": ""
 			}
 		}
 	}`)

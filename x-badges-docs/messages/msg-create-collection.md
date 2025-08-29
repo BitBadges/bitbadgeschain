@@ -93,7 +93,8 @@ For complete transaction examples, see [MsgCreateCollection Examples](../example
     "mintEscrowCoinsToTransfer": [],
     "cosmosCoinWrapperPathsToAdd": [],
     "invariants": {
-        "noCustomOwnershipTimes": false
+        "noCustomOwnershipTimes": false,
+        "maxSupplyPerId": "0"
     }
 }
 ```

@@ -108,25 +108,41 @@ func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey strin
 	}
 
 	// Check invariants if enabled
-	if collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
-		// Validate incoming approvals
-		for _, incomingApproval := range userBalance.IncomingApprovals {
-			if err := types.ValidateNoCustomOwnershipTimesInvariant(incomingApproval.OwnershipTimes, true); err != nil {
-				return sdkerrors.Wrap(err, "incoming approval ownership times validation failed")
+	if collection.Invariants != nil {
+		// Check noCustomOwnershipTimes invariant
+		if collection.Invariants.NoCustomOwnershipTimes {
+			// Validate incoming approvals
+			for _, incomingApproval := range userBalance.IncomingApprovals {
+				if err := types.ValidateNoCustomOwnershipTimesInvariant(incomingApproval.OwnershipTimes, true); err != nil {
+					return sdkerrors.Wrap(err, "incoming approval ownership times validation failed")
+				}
+			}
+
+			// Validate outgoing approvals
+			for _, outgoingApproval := range userBalance.OutgoingApprovals {
+				if err := types.ValidateNoCustomOwnershipTimesInvariant(outgoingApproval.OwnershipTimes, true); err != nil {
+					return sdkerrors.Wrap(err, "outgoing approval ownership times validation failed")
+				}
+			}
+
+			// Validate balances ownership times
+			for _, balance := range userBalance.Balances {
+				if err := types.ValidateNoCustomOwnershipTimesInvariant(balance.OwnershipTimes, true); err != nil {
+					return sdkerrors.Wrap(err, "balance ownership times validation failed")
+				}
 			}
 		}
 
-		// Validate outgoing approvals
-		for _, outgoingApproval := range userBalance.OutgoingApprovals {
-			if err := types.ValidateNoCustomOwnershipTimesInvariant(outgoingApproval.OwnershipTimes, true); err != nil {
-				return sdkerrors.Wrap(err, "outgoing approval ownership times validation failed")
-			}
-		}
-
-		// Validate balances ownership times
-		for _, balance := range userBalance.Balances {
-			if err := types.ValidateNoCustomOwnershipTimesInvariant(balance.OwnershipTimes, true); err != nil {
-				return sdkerrors.Wrap(err, "balance ownership times validation failed")
+		// Check maxSupplyPerId invariant if we're setting "Total" address balances
+		if !collection.Invariants.MaxSupplyPerId.IsNil() && !collection.Invariants.MaxSupplyPerId.IsZero() {
+			balanceKeyDetails := GetDetailsFromBalanceKey(balanceKey)
+			if balanceKeyDetails.address == "Total" {
+				// Validate that no balance amount exceeds maxSupplyPerId
+				for _, balance := range userBalance.Balances {
+					if balance.Amount.GT(collection.Invariants.MaxSupplyPerId) {
+						return sdkerrors.Wrapf(types.ErrInvalidRequest, "maxSupplyPerId invariant violation: balance amount %s exceeds maximum supply per ID %s", balance.Amount.String(), collection.Invariants.MaxSupplyPerId.String())
+					}
+				}
 			}
 		}
 	}
@@ -139,6 +155,7 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, UserBalance, nil); err != nil {
 		return err
 	}
+
 	//HACK: We always store a non-nil permissions object to avoid the case where everything is nil -> marshaled len = 0 -> default balances get populated again
 	if UserBalance.UserPermissions == nil {
 		UserBalance.UserPermissions = &types.UserPermissions{
