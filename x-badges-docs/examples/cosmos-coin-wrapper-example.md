@@ -27,6 +27,10 @@ const wrapperAddress = generateAliasAddressForDenom(denom);
 console.log('Wrapper Address:', wrapperAddress);
 ```
 
+### Dynamic Address Generation for {id} Placeholders
+
+The {id} is actually kept for the hash preimage, so we always have one address per wrapper path regardless of the badge ID.
+
 ## Step 3: Set Up Approvals for Wrapping/Unwrapping
 
 The transfers still operate under the approval / transferability system. We will use the following examples from our examples section, but you can customize as you see fit. Note the need to override the wrapper address's approvals where necessary because the wrapper address is uncontrollable.

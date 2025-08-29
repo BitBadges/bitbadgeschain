@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -469,18 +470,81 @@ func (k Keeper) HandleTransfer(
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
 		}
 
+		// Handle {id} placeholder replacement and overrideWithAnyValidToken logic
+		ibcDenom := denomInfo.Denom
+		firstTokenId := transferBalances[0].BadgeIds[0].Start
+
+		// Check if the denom contains the {id} placeholder
+		if strings.Contains(denomInfo.Denom, "{id}") {
+			//Throw if balances len != 1
+			if len(transferBalances) != 1 {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
+			}
+
+			//Throw if BadgeIds len != 1
+			if len(transferBalances[0].BadgeIds) != 1 {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
+			}
+
+			//Throw if BadgeIds[0].Start != BadgeIds[0].End
+			if !transferBalances[0].BadgeIds[0].Start.Equal(transferBalances[0].BadgeIds[0].End) {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
+			}
+
+			// For {id} placeholder, we need to replace it with the actual badge ID
+			// Since we're in a transfer context, we can use the first token ID from the transfer
+
+			ibcDenom = strings.ReplaceAll(denomInfo.Denom, "{id}", firstTokenId.String())
+		}
+
 		conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
+
+		// If allowOverrideWithAnyValidToken is true, allow any valid badge ID
+		if denomInfo.AllowOverrideWithAnyValidToken {
+			// Validate that the token ID being transferred is within the valid range
+			isValidToken := false
+			for _, balance := range transferBalances {
+				for _, tokenRange := range balance.BadgeIds {
+					for _, validRange := range collection.ValidBadgeIds {
+						if tokenRange.Start.GTE(validRange.Start) && tokenRange.End.LTE(validRange.End) {
+							isValidToken = true
+							break
+						}
+					}
+					if isValidToken {
+						break
+					}
+				}
+
+				if isValidToken {
+					break
+				}
+			}
+
+			if !isValidToken {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "token ID not in valid range for overrideWithAnyValidToken")
+			}
+
+			// Perform the override
+			for _, balance := range conversionBalances {
+				balance.BadgeIds = []*types.UintRange{
+					{
+						Start: firstTokenId,
+						End:   firstTokenId,
+					},
+				}
+			}
+		}
 
 		// Little hacky but we find the amount for a specific time and ID
 		// Then we will check if it is evenly divisible by the number of transfer balances
 
-		firstBadgeId := transferBalances[0].BadgeIds[0].Start
 		firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
 		firstAmount := transferBalances[0].Amount
 
 		multiplier := sdkmath.NewUint(0)
 		for _, balance := range conversionBalances {
-			foundBadgeId, err := types.SearchUintRangesForUint(firstBadgeId, balance.BadgeIds)
+			foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.BadgeIds)
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 			}
@@ -488,7 +552,7 @@ func (k Keeper) HandleTransfer(
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 			}
-			if foundBadgeId && foundOwnershipTime {
+			if foundTokenId && foundOwnershipTime {
 				multiplier = firstAmount.Quo(balance.Amount)
 				break
 			}
@@ -513,7 +577,8 @@ func (k Keeper) HandleTransfer(
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
 		}
 
-		ibcDenom := "badges:" + collection.CollectionId.String() + ":" + denomInfo.Denom
+		// Construct the full IBC denomination
+		ibcDenom = "badges:" + collection.CollectionId.String() + ":" + ibcDenom
 		bankKeeper := k.bankKeeper
 		amountInt := multiplier.BigInt()
 		if isSendingToSpecialAddress {

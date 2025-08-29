@@ -226,11 +226,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			}
 
 			pathsToAdd[i] = &types.CosmosCoinWrapperPath{
-				Address:    accountAddr.String(),
-				Denom:      path.Denom,
-				Balances:   path.Balances,
-				Symbol:     path.Symbol,
-				DenomUnits: path.DenomUnits,
+				Address:                        accountAddr.String(),
+				Denom:                          path.Denom,
+				Balances:                       path.Balances,
+				Symbol:                         path.Symbol,
+				DenomUnits:                     path.DenomUnits,
+				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
 			}
 		}
 

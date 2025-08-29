@@ -24,6 +24,7 @@ message CosmosCoinWrapperPathAddObject {
   repeated Balance balances = 2;
   string symbol = 3;
   repeated DenomUnit denomUnits = 4;
+  bool allowOverrideWithAnyValidToken = 5;
 }
 
 message DenomUnit {
@@ -38,6 +39,7 @@ message DenomUnit {
 ### Denom
 
 -   **Base denomination** - The fundamental unit name for the wrapped coin. For the full Cosmos denomination, it will be "badges:collectionId:denom"
+-   **{id} placeholder support** - You can use `{id}` in the denom to dynamically replace it with the actual badge ID during transfers if allowOverrideWithAnyValidToken is true
 
 ### Symbol
 
@@ -68,6 +70,75 @@ Multiple denomination units allow for different display formats:
 -   **Only one default** - Only one unit can be marked as default display. If none are marked as default, the base level with 0 decimals is shown by default.
 -   **User experience** - Determines what users see first
 
+### Allow Override With Any Valid Token
+
+-   **Dynamic badge ID handling** - When `true`, allows the wrapper to accept any SINGLE valid badge ID from the collection's `validBadgeIds` range
+-   **Override conversion balances** - Temporarily overrides the `balances` field's badge ID ranges with the actual token ID being transferred
+-   **Validation required** - The transferred token ID must be within the collection's valid badge ID range
+-   **Use case** - Useful when you want a single wrapper path to handle multiple badge IDs dynamically
+
+#### Example with {id} Placeholder
+
+```json
+{
+    "denom": "utoken{id}",
+    "symbol": "TOKEN:{id}",
+    "balances": [
+        {
+            "amount": "1",
+            "badgeIds": [{ "start": "1", "end": "1" }],
+            "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }]
+        }
+    ],
+    "denomUnits": [
+        {
+            "decimals": "6",
+            "symbol": "TOKEN",
+            "isDefaultDisplay": true
+        }
+    ],
+    "allowOverrideWithAnyValidToken": true
+}
+```
+
+When transferring badge ID 5, the final denomination becomes `utoken5`.
+
+### Allow Override With Any Valid Token
+
+This feature provides flexibility in handling different badge IDs within a single wrapper path.
+
+#### How It Works
+
+1. **Validation Check** - Verifies the transferred token ID is within the collection's `validBadgeIds` range
+2. **Dynamic Override** - Temporarily replaces the wrapper's badge ID ranges with the actual token ID being transferred
+3. **Conversion** - Uses the overridden badge ID for the conversion calculation
+
+#### Example with Override Enabled
+
+```json
+{
+    "denom": "utoken",
+    "symbol": "TOKEN",
+    "balances": [
+        {
+            "amount": "1",
+            "badgeIds": [{ "start": "1", "end": "1" }], // These technically don't matter since we can override the badge IDs during conversion
+            "ownershipTimes": [{ "start": "1", "end": "18446744073709551615" }]
+        }
+    ],
+    "denomUnits": [
+        {
+            "decimals": "6",
+            "symbol": "TOKEN",
+            "isDefaultDisplay": true
+        }
+    ],
+    "allowOverrideWithAnyValidToken": true
+}
+```
+
+This wrapper can now handle any badge ID from 1-100 (assuming the collection's `validBadgeIds` includes that range), dynamically overriding the badge ID during conversion.
+
 ## Usage Examples
 
 ### Basic Wrapper Path
@@ -89,7 +160,8 @@ Multiple denomination units allow for different display formats:
             "symbol": "TOKEN1",
             "isDefaultDisplay": true
         }
-    ]
+    ],
+    "allowOverrideWithAnyValidToken": false
 }
 ```
 
@@ -117,7 +189,8 @@ Multiple denomination units allow for different display formats:
             "symbol": "TOKEN",
             "isDefaultDisplay": true
         }
-    ]
+    ],
+    "allowOverrideWithAnyValidToken": false
 }
 ```
 
@@ -162,15 +235,17 @@ With BitBadges' existing relayer infrastructure and IBC-compatible wrapped denom
 ### Token to Coin (Wrapping)
 
 1. User transfers tokens to the wrapper address
-2. System burns the tokens from user's balance
-3. System mints equivalent native coins
-4. Coins are credited to the user's account
+2. System processes the denom (replaces {id} if present, validates override if enabled)
+3. System burns the tokens from user's balance
+4. System mints equivalent native coins
+5. Coins are credited to the user's account
 
 ### Coin to Token (Unwrapping)
 
 1. User transfers coins to the wrapper address
-2. System burns the native coins
-3. System mints equivalent tokens
-4. Tokens are credited to the user's balance
+2. System processes the denom (replaces {id} if present, validates override if enabled)
+3. System burns the native coins
+4. System mints equivalent tokens
+5. Tokens are credited to the user's balance
 
 Cosmos Wrapper Paths provide seamless interoperability between BitBadges and the broader Cosmos ecosystem while maintaining the unique properties of both token and coin systems.

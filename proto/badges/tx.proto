@@ -115,6 +115,7 @@ message CosmosCoinWrapperPathAddObject {
   repeated Balance balances = 2;
   string symbol = 3;
   repeated DenomUnit denomUnits = 4;
+  bool allowOverrideWithAnyValidToken = 5;
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
