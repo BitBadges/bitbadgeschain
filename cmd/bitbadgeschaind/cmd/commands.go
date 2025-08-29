@@ -59,13 +59,29 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 
 // versionCommand returns a Cobra command for displaying version information
 func versionCommand() *cobra.Command {
+	var long bool
+
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print the application binary version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("%s\n", app.Version)
+			if long {
+				// Display detailed version information
+				fmt.Printf("name: %s\n", app.Name)
+				fmt.Printf("server_name: %sd\n", app.Name)
+				fmt.Printf("version: %s\n", app.Version)
+				fmt.Printf("commit: %s\n", app.Commit)
+				fmt.Printf("build_tags: %s\n", app.BuildTags)
+				fmt.Printf("go: %s\n", app.GoVersion)
+				fmt.Printf("cosmos_sdk_version: %s\n", app.CosmosSDKVersion)
+			} else {
+				// Display simple version
+				fmt.Printf("%s\n", app.Version)
+			}
 		},
 	}
+
+	cmd.Flags().BoolVar(&long, "long", false, "Print long version information")
 	return cmd
 }
 

@@ -2,7 +2,11 @@
 VERSION ?= $(error VERSION is required. Usage: make build-linux/amd64 VERSION=v13)
 
 # Common ldflags for version information
-LDFLAGS := -X github.com/bitbadges/bitbadgeschain/app.Version=$(VERSION)
+LDFLAGS := -X github.com/bitbadges/bitbadgeschain/app.Version=$(VERSION) \
+	-X github.com/bitbadges/bitbadgeschain/app.Commit=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown") \
+	-X github.com/bitbadges/bitbadgeschain/app.BuildTags=$(shell go list -f '{{.BuildTags}}' ./... 2>/dev/null | head -1 | tr ' ' ',' | sed 's/,$$//' || echo "") \
+	-X github.com/bitbadges/bitbadgeschain/app.GoVersion=$(shell go version 2>/dev/null | sed 's/^go version //' | cut -d' ' -f1 || echo "unknown") \
+	-X github.com/bitbadges/bitbadgeschain/app.CosmosSDKVersion=v0.50.13
 
 build-linux/amd64:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go

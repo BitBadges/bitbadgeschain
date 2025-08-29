@@ -103,7 +103,11 @@ const (
 
 // Version information - this will be set by ldflags during build
 var (
-	Version = "dev"
+	Version          = "dev"
+	Commit           = ""
+	BuildTags        = ""
+	GoVersion        = ""
+	CosmosSDKVersion = "v0.50.13"
 )
 
 var (
