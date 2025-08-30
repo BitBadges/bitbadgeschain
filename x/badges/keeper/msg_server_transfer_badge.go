@@ -6,10 +6,39 @@ import (
 	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldTransferBadgesToNewType(oldMsg *oldtypes.MsgTransferBadges) (*types.MsgTransferBadges, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgTransferBadges
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) TransferBadgesV13(goCtx context.Context, msg *oldtypes.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
+	newMsg, err := CastOldTransferBadgesToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.TransferBadges(goCtx, newMsg)
+}
+
+func (k msgServer) TransferBadgesV14(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
+	return k.TransferBadges(goCtx, msg)
+}
 
 func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

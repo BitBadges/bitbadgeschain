@@ -1,5 +1,10 @@
 package eip712
 
+const (
+	CurrentVersion = "V14"
+	OldVersion     = "V13"
+)
+
 /*
 	These are used as fully populated examples to generate EIP712 types.
 	This is because the EIP712 type generation code expects all values to be populated an  non-optional.
@@ -520,7 +525,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/CreateAddressLists",
+		"type": "badges/CreateAddressLists"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"addressLists": [
@@ -537,7 +542,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/DeleteCollection",
+		"type": "badges/DeleteCollection"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": ""
@@ -545,7 +550,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/TransferBadges",
+		"type": "badges/TransferBadges"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -604,7 +609,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/UniversalUpdateCollection",
+		"type": "badges/UniversalUpdateCollection"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -724,7 +729,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/UpdateUserApprovals",
+		"type": "badges/UpdateUserApprovals"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -748,7 +753,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/CreateCollection",
+		"type": "badges/CreateCollection"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"balancesType": "",
@@ -857,7 +862,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/UpdateCollection",
+		"type": "badges/UpdateCollection"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -961,7 +966,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/CreateDynamicStore",
+		"type": "badges/CreateDynamicStore"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"defaultValue": ""
@@ -969,7 +974,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/UpdateDynamicStore",
+		"type": "badges/UpdateDynamicStore"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"storeId": "",
@@ -978,7 +983,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/DeleteDynamicStore",
+		"type": "badges/DeleteDynamicStore"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"storeId": ""
@@ -986,7 +991,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetDynamicStoreValue",
+		"type": "badges/SetDynamicStoreValue"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"storeId": "",
@@ -996,7 +1001,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/IncrementStoreValue",
+		"type": "badges/IncrementStoreValue"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"storeId": "",
@@ -1006,7 +1011,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/DecrementStoreValue",
+		"type": "badges/DecrementStoreValue"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"storeId": "",
@@ -1017,7 +1022,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetIncomingApproval",
+		"type": "badges/SetIncomingApproval"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1026,7 +1031,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/DeleteIncomingApproval",
+		"type": "badges/DeleteIncomingApproval"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1035,7 +1040,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetOutgoingApproval",
+		"type": "badges/SetOutgoingApproval"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1044,7 +1049,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/DeleteOutgoingApproval",
+		"type": "badges/DeleteOutgoingApproval"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1053,7 +1058,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/PurgeApprovals",
+		"type": "badges/PurgeApprovals"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1073,7 +1078,7 @@ func GetSchemas() []string {
 
 	// UniversalUpdateCollection helper message types
 	schemas = append(schemas, `{
-		"type": "badges/SetValidBadgeIds",
+		"type": "badges/SetValidBadgeIds"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1083,7 +1088,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetManager",
+		"type": "badges/SetManager"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1098,7 +1103,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetCollectionMetadata",
+		"type": "badges/SetCollectionMetadata"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1116,7 +1121,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetBadgeMetadata",
+		"type": "badges/SetBadgeMetadata"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1136,7 +1141,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetCustomData",
+		"type": "badges/SetCustomData"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1151,7 +1156,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetStandards",
+		"type": "badges/SetStandards"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1166,7 +1171,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetCollectionApprovals",
+		"type": "badges/SetCollectionApprovals"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",
@@ -1178,7 +1183,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "badges/SetIsArchived",
+		"type": "badges/SetIsArchived"`+CurrentVersion+`,
 		"value": {
 			"creator": "",
 			"collectionId": "",

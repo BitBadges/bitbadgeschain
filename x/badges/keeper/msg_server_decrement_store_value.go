@@ -2,12 +2,42 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldDecrementStoreValueToNewType(oldMsg *oldtypes.MsgDecrementStoreValue) (*types.MsgDecrementStoreValue, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgDecrementStoreValue
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) DecrementStoreValueV13(goCtx context.Context, msg *oldtypes.MsgDecrementStoreValue) (*types.MsgDecrementStoreValueResponse, error) {
+	newMsg, err := CastOldDecrementStoreValueToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.DecrementStoreValue(goCtx, newMsg)
+}
+
+func (k msgServer) DecrementStoreValueV14(goCtx context.Context, msg *types.MsgDecrementStoreValue) (*types.MsgDecrementStoreValueResponse, error) {
+	return k.DecrementStoreValue(goCtx, msg)
+}
 
 func (k msgServer) DecrementStoreValue(goCtx context.Context, msg *types.MsgDecrementStoreValue) (*types.MsgDecrementStoreValueResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

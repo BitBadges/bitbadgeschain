@@ -7,9 +7,38 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldDeleteOutgoingApprovalToNewType(oldMsg *oldtypes.MsgDeleteOutgoingApproval) (*types.MsgDeleteOutgoingApproval, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgDeleteOutgoingApproval
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) DeleteOutgoingApprovalV13(goCtx context.Context, msg *oldtypes.MsgDeleteOutgoingApproval) (*types.MsgDeleteOutgoingApprovalResponse, error) {
+	newMsg, err := CastOldDeleteOutgoingApprovalToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.DeleteOutgoingApproval(goCtx, newMsg)
+}
+
+func (k msgServer) DeleteOutgoingApprovalV14(goCtx context.Context, msg *types.MsgDeleteOutgoingApproval) (*types.MsgDeleteOutgoingApprovalResponse, error) {
+	return k.DeleteOutgoingApproval(goCtx, msg)
+}
 
 func (k msgServer) DeleteOutgoingApproval(goCtx context.Context, msg *types.MsgDeleteOutgoingApproval) (*types.MsgDeleteOutgoingApprovalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

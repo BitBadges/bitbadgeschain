@@ -2,11 +2,41 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldDeleteDynamicStoreToNewType(oldMsg *oldtypes.MsgDeleteDynamicStore) (*types.MsgDeleteDynamicStore, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgDeleteDynamicStore
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) DeleteDynamicStoreV13(goCtx context.Context, msg *oldtypes.MsgDeleteDynamicStore) (*types.MsgDeleteDynamicStoreResponse, error) {
+	newMsg, err := CastOldDeleteDynamicStoreToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.DeleteDynamicStore(goCtx, newMsg)
+}
+
+func (k msgServer) DeleteDynamicStoreV14(goCtx context.Context, msg *types.MsgDeleteDynamicStore) (*types.MsgDeleteDynamicStoreResponse, error) {
+	return k.DeleteDynamicStore(goCtx, msg)
+}
 
 func (k msgServer) DeleteDynamicStore(goCtx context.Context, msg *types.MsgDeleteDynamicStore) (*types.MsgDeleteDynamicStoreResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

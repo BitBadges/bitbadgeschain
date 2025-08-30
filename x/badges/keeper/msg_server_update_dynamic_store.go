@@ -2,11 +2,41 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	sdkerrors "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldUpdateDynamicStoreToNewType(oldMsg *oldtypes.MsgUpdateDynamicStore) (*types.MsgUpdateDynamicStore, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgUpdateDynamicStore
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) UpdateDynamicStoreV13(goCtx context.Context, msg *oldtypes.MsgUpdateDynamicStore) (*types.MsgUpdateDynamicStoreResponse, error) {
+	newMsg, err := CastOldUpdateDynamicStoreToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.UpdateDynamicStore(goCtx, newMsg)
+}
+
+func (k msgServer) UpdateDynamicStoreV14(goCtx context.Context, msg *types.MsgUpdateDynamicStore) (*types.MsgUpdateDynamicStoreResponse, error) {
+	return k.UpdateDynamicStore(goCtx, msg)
+}
 
 func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdateDynamicStore) (*types.MsgUpdateDynamicStoreResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

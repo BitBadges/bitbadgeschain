@@ -7,9 +7,38 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldUpdateUserApprovalsToNewType(oldMsg *oldtypes.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovals, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgUpdateUserApprovals
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) UpdateUserApprovalsV13(goCtx context.Context, msg *oldtypes.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
+	newMsg, err := CastOldUpdateUserApprovalsToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.UpdateUserApprovals(goCtx, newMsg)
+}
+
+func (k msgServer) UpdateUserApprovalsV14(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
+	return k.UpdateUserApprovals(goCtx, msg)
+}
 
 // Helper function to create and execute an UpdateUserApprovals message
 func (k msgServer) executeUpdateUserApprovals(ctx sdk.Context, creator string, collectionId sdkmath.Uint, updateMsg *types.MsgUpdateUserApprovals) error {

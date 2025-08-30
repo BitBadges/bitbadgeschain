@@ -7,9 +7,38 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldPurgeApprovalsToNewType(oldMsg *oldtypes.MsgPurgeApprovals) (*types.MsgPurgeApprovals, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgPurgeApprovals
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) PurgeApprovalsV13(goCtx context.Context, msg *oldtypes.MsgPurgeApprovals) (*types.MsgPurgeApprovalsResponse, error) {
+	newMsg, err := CastOldPurgeApprovalsToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.PurgeApprovals(goCtx, newMsg)
+}
+
+func (k msgServer) PurgeApprovalsV14(goCtx context.Context, msg *types.MsgPurgeApprovals) (*types.MsgPurgeApprovalsResponse, error) {
+	return k.PurgeApprovals(goCtx, msg)
+}
 
 // PurgeApprovals handles the purging of specific user-level approvals (incoming/outgoing)
 func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeApprovals) (*types.MsgPurgeApprovalsResponse, error) {

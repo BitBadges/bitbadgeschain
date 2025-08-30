@@ -9,12 +9,41 @@ import (
 	"slices"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
+
+func CastOldUniversalUpdateCollectionToNewType(oldMsg *oldtypes.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollection, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgUniversalUpdateCollection
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) UniversalUpdateCollectionV13(goCtx context.Context, msg *oldtypes.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
+	newMsg, err := CastOldUniversalUpdateCollectionToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.UniversalUpdateCollection(goCtx, newMsg)
+}
+
+func (k msgServer) UniversalUpdateCollectionV14(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
+	return k.UniversalUpdateCollection(goCtx, msg)
+}
 
 // Legacy function that is all-inclusive (creates and updates)
 func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {

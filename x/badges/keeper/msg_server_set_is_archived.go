@@ -5,8 +5,37 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldSetIsArchivedToNewType(oldMsg *oldtypes.MsgSetIsArchived) (*types.MsgSetIsArchived, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgSetIsArchived
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) SetIsArchivedV13(goCtx context.Context, msg *oldtypes.MsgSetIsArchived) (*types.MsgSetIsArchivedResponse, error) {
+	newMsg, err := CastOldSetIsArchivedToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.SetIsArchived(goCtx, newMsg)
+}
+
+func (k msgServer) SetIsArchivedV14(goCtx context.Context, msg *types.MsgSetIsArchived) (*types.MsgSetIsArchivedResponse, error) {
+	return k.SetIsArchived(goCtx, msg)
+}
 
 func (k msgServer) SetIsArchived(goCtx context.Context, msg *types.MsgSetIsArchived) (*types.MsgSetIsArchivedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

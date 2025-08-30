@@ -5,8 +5,37 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldSetCollectionApprovalsToNewType(oldMsg *oldtypes.MsgSetCollectionApprovals) (*types.MsgSetCollectionApprovals, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgSetCollectionApprovals
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) SetCollectionApprovalsV13(goCtx context.Context, msg *oldtypes.MsgSetCollectionApprovals) (*types.MsgSetCollectionApprovalsResponse, error) {
+	newMsg, err := CastOldSetCollectionApprovalsToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.SetCollectionApprovals(goCtx, newMsg)
+}
+
+func (k msgServer) SetCollectionApprovalsV14(goCtx context.Context, msg *types.MsgSetCollectionApprovals) (*types.MsgSetCollectionApprovalsResponse, error) {
+	return k.SetCollectionApprovals(goCtx, msg)
+}
 
 func (k msgServer) SetCollectionApprovals(goCtx context.Context, msg *types.MsgSetCollectionApprovals) (*types.MsgSetCollectionApprovalsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

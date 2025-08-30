@@ -5,8 +5,37 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldSetCollectionMetadataToNewType(oldMsg *oldtypes.MsgSetCollectionMetadata) (*types.MsgSetCollectionMetadata, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgSetCollectionMetadata
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) SetCollectionMetadataV13(goCtx context.Context, msg *oldtypes.MsgSetCollectionMetadata) (*types.MsgSetCollectionMetadataResponse, error) {
+	newMsg, err := CastOldSetCollectionMetadataToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.SetCollectionMetadata(goCtx, newMsg)
+}
+
+func (k msgServer) SetCollectionMetadataV14(goCtx context.Context, msg *types.MsgSetCollectionMetadata) (*types.MsgSetCollectionMetadataResponse, error) {
+	return k.SetCollectionMetadata(goCtx, msg)
+}
 
 func (k msgServer) SetCollectionMetadata(goCtx context.Context, msg *types.MsgSetCollectionMetadata) (*types.MsgSetCollectionMetadataResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

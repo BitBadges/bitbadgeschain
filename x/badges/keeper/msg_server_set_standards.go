@@ -5,8 +5,37 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldSetStandardsToNewType(oldMsg *oldtypes.MsgSetStandards) (*types.MsgSetStandards, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgSetStandards
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) SetStandardsV13(goCtx context.Context, msg *oldtypes.MsgSetStandards) (*types.MsgSetStandardsResponse, error) {
+	newMsg, err := CastOldSetStandardsToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.SetStandards(goCtx, newMsg)
+}
+
+func (k msgServer) SetStandardsV14(goCtx context.Context, msg *types.MsgSetStandards) (*types.MsgSetStandardsResponse, error) {
+	return k.SetStandards(goCtx, msg)
+}
 
 func (k msgServer) SetStandards(goCtx context.Context, msg *types.MsgSetStandards) (*types.MsgSetStandardsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

@@ -5,10 +5,39 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldCreateCollectionToNewType(oldMsg *oldtypes.MsgCreateCollection) (*types.MsgCreateCollection, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newCollection types.MsgCreateCollection
+	if err := json.Unmarshal(jsonBytes, &newCollection); err != nil {
+		return nil, err
+	}
+
+	return &newCollection, nil
+}
+
+func (k msgServer) CreateCollectionV13(goCtx context.Context, msg *oldtypes.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
+	newMsg, err := CastOldCreateCollectionToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.CreateCollection(goCtx, newMsg)
+}
+
+func (k msgServer) CreateCollectionV14(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
+	return k.CreateCollection(goCtx, msg)
+}
 
 func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

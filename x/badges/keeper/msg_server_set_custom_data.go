@@ -5,8 +5,37 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldSetCustomDataToNewType(oldMsg *oldtypes.MsgSetCustomData) (*types.MsgSetCustomData, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgSetCustomData
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) SetCustomDataV13(goCtx context.Context, msg *oldtypes.MsgSetCustomData) (*types.MsgSetCustomDataResponse, error) {
+	newMsg, err := CastOldSetCustomDataToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.SetCustomData(goCtx, newMsg)
+}
+
+func (k msgServer) SetCustomDataV14(goCtx context.Context, msg *types.MsgSetCustomData) (*types.MsgSetCustomDataResponse, error) {
+	return k.SetCustomData(goCtx, msg)
+}
 
 func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomData) (*types.MsgSetCustomDataResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

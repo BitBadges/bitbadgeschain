@@ -5,8 +5,37 @@ import (
 	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldSetValidBadgeIdsToNewType(oldMsg *oldtypes.MsgSetValidBadgeIds) (*types.MsgSetValidBadgeIds, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgSetValidBadgeIds
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) SetValidBadgeIdsV13(goCtx context.Context, msg *oldtypes.MsgSetValidBadgeIds) (*types.MsgSetValidBadgeIdsResponse, error) {
+	newMsg, err := CastOldSetValidBadgeIdsToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.SetValidBadgeIds(goCtx, newMsg)
+}
+
+func (k msgServer) SetValidBadgeIdsV14(goCtx context.Context, msg *types.MsgSetValidBadgeIds) (*types.MsgSetValidBadgeIdsResponse, error) {
+	return k.SetValidBadgeIds(goCtx, msg)
+}
 
 func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetValidBadgeIds) (*types.MsgSetValidBadgeIdsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

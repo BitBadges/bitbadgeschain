@@ -6,8 +6,38 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldTypeToNewType(oldMsg *oldtypes.MsgCreateAddressLists) (*types.MsgCreateAddressLists, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newCollection types.MsgCreateAddressLists
+	if err := json.Unmarshal(jsonBytes, &newCollection); err != nil {
+		return nil, err
+	}
+
+	return &newCollection, nil
+}
+
+func (k msgServer) CreateAddressListsV13(goCtx context.Context, msg *oldtypes.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
+	newMsg, err := CastOldTypeToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.CreateAddressLists(goCtx, newMsg)
+}
+
+func (k msgServer) CreateAddressListsV14(goCtx context.Context, msg *types.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
+	return k.CreateAddressLists(goCtx, msg)
+}
 
 func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

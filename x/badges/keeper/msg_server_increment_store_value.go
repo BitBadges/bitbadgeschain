@@ -2,12 +2,42 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func CastOldIncrementStoreValueToNewType(oldMsg *oldtypes.MsgIncrementStoreValue) (*types.MsgIncrementStoreValue, error) {
+	// Convert to JSON
+	jsonBytes, err := json.Marshal(oldMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal into new type
+	var newMsg types.MsgIncrementStoreValue
+	if err := json.Unmarshal(jsonBytes, &newMsg); err != nil {
+		return nil, err
+	}
+
+	return &newMsg, nil
+}
+
+func (k msgServer) IncrementStoreValueV13(goCtx context.Context, msg *oldtypes.MsgIncrementStoreValue) (*types.MsgIncrementStoreValueResponse, error) {
+	newMsg, err := CastOldIncrementStoreValueToNewType(msg)
+	if err != nil {
+		return nil, err
+	}
+	return k.IncrementStoreValue(goCtx, newMsg)
+}
+
+func (k msgServer) IncrementStoreValueV14(goCtx context.Context, msg *types.MsgIncrementStoreValue) (*types.MsgIncrementStoreValueResponse, error) {
+	return k.IncrementStoreValue(goCtx, msg)
+}
 
 func (k msgServer) IncrementStoreValue(goCtx context.Context, msg *types.MsgIncrementStoreValue) (*types.MsgIncrementStoreValueResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
