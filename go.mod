@@ -52,6 +52,7 @@ require (
 	github.com/cosmos/ibc-go/modules/apps/callbacks v0.2.1-0.20231113120333-342c00b0f8bd
 	github.com/ethereum/go-ethereum v1.14.7
 	github.com/gogo/protobuf v1.3.2
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.4
 	github.com/golangci/golangci-lint v1.52.0
 	github.com/spf13/cast v1.7.1
@@ -64,6 +65,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
 	google.golang.org/grpc v1.72.2
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -137,6 +139,7 @@ require (
 	github.com/chavacava/garif v0.0.0-20230227094218-b8c73b2037b8 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/cockroachdb/apd/v2 v2.0.2 // indirect
+	github.com/cockroachdb/datadriven v1.0.3-0.20230801171734-e384cf455877 // indirect
 	github.com/cockroachdb/errors v1.11.3 // indirect
 	github.com/cockroachdb/fifo v0.0.0-20240606204812-0bbfbd93a7ce // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
@@ -195,7 +198,7 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.1 // indirect
 	github.com/go-critic/go-critic v0.7.0 // indirect
-	github.com/go-kit/kit v0.12.0 // indirect
+	github.com/go-kit/kit v0.13.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
@@ -217,7 +220,6 @@ require (
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/golang/glog v1.2.4 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v0.0.5-0.20220116011046-fa5810519dcb // indirect
 	github.com/golangci/check v0.0.0-20180506172741-cfe4005ccda2 // indirect
 	github.com/golangci/dupl v0.0.0-20180902072040-3e9179ac440a // indirect
@@ -257,6 +259,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-plugin v1.5.2 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
@@ -433,7 +436,6 @@ require (
 	google.golang.org/genproto v0.0.0-20240701130421-f6361c86f094 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.1 // indirect
 	honnef.co/go/tools v0.4.3 // indirect
@@ -441,7 +443,7 @@ require (
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
 	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
 	mvdan.cc/unparam v0.0.0-20221223090309-7455f1af531d // indirect
-	nhooyr.io/websocket v1.8.6 // indirect
+	nhooyr.io/websocket v1.8.7 // indirect
 	pgregory.net/rapid v1.1.0 // indirect
 	pluginrpc.com/pluginrpc v0.5.0 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
