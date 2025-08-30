@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 
+	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v12"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v13"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
@@ -19,13 +20,6 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 	// Get all collections
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-
-	// currParams := k.GetParams(ctx)
-
-	// err := k.SetParams(ctx, currParams)
-	// if err != nil {
-	// 	return err
-	// }
 
 	if err := MigrateCollections(ctx, store, k); err != nil {
 		return err
@@ -51,49 +45,49 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
-	for _, approval := range incomingApprovals {
-		if approval.ApprovalCriteria == nil {
-			continue
-		}
+	// for _, approval := range incomingApprovals {
+	// 	if approval.ApprovalCriteria == nil {
+	// 		continue
+	// 	}
 
-		for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
-			if mustOwnBadge.OwnershipCheckParty == "" {
-				mustOwnBadge.OwnershipCheckParty = "initiator"
-			}
-		}
-	}
+	// 	for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
+	// 		if mustOwnBadge.OwnershipCheckParty == "" {
+	// 			mustOwnBadge.OwnershipCheckParty = "initiator"
+	// 		}
+	// 	}
+	// }
 
 	return incomingApprovals
 }
 
 func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval) []*newtypes.UserOutgoingApproval {
-	for _, approval := range outgoingApprovals {
-		if approval.ApprovalCriteria == nil {
-			continue
-		}
+	// for _, approval := range outgoingApprovals {
+	// 	if approval.ApprovalCriteria == nil {
+	// 		continue
+	// 	}
 
-		for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
-			if mustOwnBadge.OwnershipCheckParty == "" {
-				mustOwnBadge.OwnershipCheckParty = "initiator"
-			}
-		}
-	}
+	// 	for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
+	// 		if mustOwnBadge.OwnershipCheckParty == "" {
+	// 			mustOwnBadge.OwnershipCheckParty = "initiator"
+	// 		}
+	// 	}
+	// }
 
 	return outgoingApprovals
 }
 
 func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*newtypes.CollectionApproval {
-	for _, approval := range collectionApprovals {
-		if approval.ApprovalCriteria == nil {
-			continue
-		}
+	// for _, approval := range collectionApprovals {
+	// 	if approval.ApprovalCriteria == nil {
+	// 		continue
+	// 	}
 
-		for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
-			if mustOwnBadge.OwnershipCheckParty == "" {
-				mustOwnBadge.OwnershipCheckParty = "initiator"
-			}
-		}
-	}
+	// 	for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
+	// 		if mustOwnBadge.OwnershipCheckParty == "" {
+	// 			mustOwnBadge.OwnershipCheckParty = "initiator"
+	// 		}
+	// 	}
+	// }
 
 	return collectionApprovals
 }
@@ -137,6 +131,11 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
+
+		for _, wrapperPath := range newCollection.CosmosCoinWrapperPaths {
+			wrapperPath.AllowOverrideWithAnyValidToken = false
+		}
+		newCollection.Invariants.MaxSupplyPerId = sdkmath.NewUint(0)
 
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {

@@ -1,0 +1,36 @@
+syntax = "proto3";
+package badges.v13;
+
+import "gogoproto/gogo.proto";
+import "badges/v13/params.proto";
+import "badges/v13/collections.proto";
+import "badges/v13/balances.proto";
+import "badges/v13/transfers.proto";
+import "badges/v13/address_lists.proto";
+import "badges/v13/dynamic_stores.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v13";
+
+// GenesisState defines the badges module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  string port_id = 2;
+  repeated BadgeCollection collections = 3;
+  string nextCollectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated UserBalanceStore balances = 5;
+  repeated string balanceStoreKeys = 6;
+  repeated string challengeTrackers = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string challengeTrackerStoreKeys = 8;
+  repeated AddressList addressLists = 9;
+  repeated ApprovalTracker approvalTrackers = 10;
+  repeated string approvalTrackerStoreKeys = 11;
+  repeated string approvalTrackerVersions = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string approvalTrackerVersionsStoreKeys = 13;
+  repeated DynamicStore dynamicStores = 14;
+  string nextDynamicStoreId = 15 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated DynamicStoreValue dynamicStoreValues = 16;
+  repeated string ethSignatureTrackers = 17 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string ethSignatureTrackerStoreKeys = 18;
+  // this line is used by starport scaffolding # genesis/proto/state
+}
