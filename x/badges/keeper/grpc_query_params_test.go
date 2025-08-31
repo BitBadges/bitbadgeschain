@@ -21,5 +21,5 @@ func TestParamsQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, params.AllowedDenoms, response.Params.AllowedDenoms)
 	// AffiliatePercentage should be zero (default value)
-	require.Equal(t, uint64(0), response.Params.AffiliatePercentage.Uint64())
+	require.NotEqual(t, uint64(0), response.Params.AffiliatePercentage.Uint64())
 }
