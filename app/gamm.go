@@ -34,6 +34,7 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.DistrKeeper,
+		app.BadgesKeeper,
 	)
 	app.GammKeeper = gk
 

@@ -33,15 +33,6 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		return nil, ErrCollectionNotExists
 	}
 
-	isArchived := types.GetIsArchived(ctx, collection)
-	if isArchived {
-		return nil, ErrCollectionIsArchived
-	}
-
-	if !IsStandardBalances(collection) {
-		return nil, ErrWrongBalancesType
-	}
-
 	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
 		return nil, err
 	}

@@ -75,6 +75,15 @@ type CoinTransfers struct {
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
 	err := *new(error)
 
+	isArchived := types.GetIsArchived(ctx, collection)
+	if isArchived {
+		return ErrCollectionIsArchived
+	}
+
+	if !IsStandardBalances(collection) {
+		return ErrWrongBalancesType
+	}
+
 	// Validate transfers with invariants
 	for _, transfer := range transfers {
 		if err := types.ValidateTransferWithInvariants(ctx, transfer, true, collection); err != nil {

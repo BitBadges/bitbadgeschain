@@ -9,7 +9,7 @@ import (
 )
 
 func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, joiner sdk.AccAddress, numShares osmomath.Int, joinCoins sdk.Coins) error {
-	err := k.bankKeeper.SendCoins(ctx, joiner, pool.GetAddress(), joinCoins)
+	err := k.SendCoinsWithWrapping(ctx, joiner, pool.GetAddress(), joinCoins)
 	if err != nil {
 		return err
 	}
@@ -30,7 +30,7 @@ func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.
 }
 
 func (k Keeper) applyExitPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, exiter sdk.AccAddress, numShares osmomath.Int, exitCoins sdk.Coins) error {
-	err := k.bankKeeper.SendCoins(ctx, pool.GetAddress(), exiter, exitCoins)
+	err := k.SendCoinsWitUhwrapping(ctx, pool.GetAddress(), exiter, exitCoins)
 	if err != nil {
 		return err
 	}

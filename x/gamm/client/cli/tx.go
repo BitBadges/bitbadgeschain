@@ -14,7 +14,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmocli"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
-	gammmigration "github.com/bitbadges/bitbadgeschain/x/gamm/types/migration"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -400,42 +399,6 @@ func ParseCoinsNoSort(coinsStr string) (sdk.Coins, error) {
 		decCoins[i] = coin
 	}
 	return sdk.NormalizeCoins(decCoins), nil
-}
-
-func parseMigrationRecords(cmd *cobra.Command) ([]gammmigration.BalancerToConcentratedPoolLink, error) {
-	assetsStr, err := cmd.Flags().GetString(FlagMigrationRecords)
-	if err != nil {
-		return nil, err
-	}
-
-	assets := strings.Split(assetsStr, ",")
-
-	if len(assets)%2 != 0 {
-		return nil, errors.New("migration records should be a list of balancer pool id and concentrated pool id pairs")
-	}
-
-	replaceMigrations := []gammmigration.BalancerToConcentratedPoolLink{}
-	i := 0
-	for i < len(assets) {
-		balancerPoolId, err := strconv.Atoi(assets[i])
-		if err != nil {
-			return nil, err
-		}
-		clPoolId, err := strconv.Atoi(assets[i+1])
-		if err != nil {
-			return nil, err
-		}
-
-		replaceMigrations = append(replaceMigrations, gammmigration.BalancerToConcentratedPoolLink{
-			BalancerPoolId: uint64(balancerPoolId),
-			ClPoolId:       uint64(clPoolId),
-		})
-
-		// increase counter by the next 2
-		i = i + 2
-	}
-
-	return replaceMigrations, nil
 }
 
 func parsePoolRecordsWithCFMMLink(cmd *cobra.Command) ([]types.PoolRecordWithCFMMLink, error) {
