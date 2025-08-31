@@ -9,9 +9,4 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/gamm/types";
 
 // Params holds parameters for the incentives module
 message Params {
-  repeated cosmos.base.v1beta1.Coin pool_creation_fee = 1 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-    (gogoproto.moretags) = "yaml:\"pool_creation_fee\"",
-    (gogoproto.nullable) = false
-  ];
 }

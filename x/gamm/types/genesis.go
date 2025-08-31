@@ -1,17 +1,15 @@
 package types
 
 import (
-	gammmigration "github.com/bitbadges/bitbadgeschain/x/gamm/types/migration"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 // DefaultGenesis creates a default GenesisState object.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Pools:            []*codectypes.Any{},
-		NextPoolNumber:   1,
-		Params:           DefaultParams(),
-		MigrationRecords: &gammmigration.MigrationRecords{},
+		Pools:          []*codectypes.Any{},
+		NextPoolNumber: 1,
+		Params:         DefaultParams(),
 	}
 }
 

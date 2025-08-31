@@ -10,7 +10,6 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 import "cosmos_proto/cosmos.proto";
-import "gamm/v1beta1/migration/shared.proto";
 import "gamm/v1beta1/params.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/gamm/types";

@@ -1,10 +1,8 @@
 package cli
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,17 +13,12 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmocli"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
-	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	gammmigration "github.com/bitbadges/bitbadgeschain/x/gamm/types/migration"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 func NewTxCmd() *cobra.Command {
@@ -40,7 +33,6 @@ func NewTxCmd() *cobra.Command {
 	osmocli.AddTxCmd(txCmd, NewExitSwapShareAmountIn)
 	txCmd.AddCommand(
 		NewCreatePoolCmd().BuildCommandCustomFn(),
-		NewStableSwapAdjustScalingFactorsCmd(),
 	)
 	return txCmd
 }
@@ -168,211 +160,6 @@ func NewExitSwapShareAmountIn() (*osmocli.TxCliDesc, *types.MsgExitSwapShareAmou
 	}, &types.MsgExitSwapShareAmountIn{}
 }
 
-// TODO: Change these flags to args. Required flags don't make that much sense.
-func NewStableSwapAdjustScalingFactorsCmd() *cobra.Command {
-	cmd := osmocli.TxCliDesc{
-		Use:              "adjust-scaling-factors --pool-id=[pool-id]  --scaling-factors=[scaling-factors]",
-		Short:            "adjust scaling factors",
-		Example:          "osmosisd adjust-scaling-factors --pool-id=1 --scaling-factors=\"100, 100\"",
-		NumArgs:          0,
-		ParseAndBuildMsg: NewStableSwapAdjustScalingFactorsMsg,
-	}.BuildCommandCustomFn()
-
-	cmd.Flags().AddFlagSet(FlagSetAdjustScalingFactors())
-	_ = cmd.MarkFlagRequired(FlagPoolId)
-	_ = cmd.MarkFlagRequired(FlagScalingFactors)
-	return cmd
-}
-
-// NewCmdSubmitReplaceMigrationRecordsProposal implements a command handler for replace migration records proposal
-func NewCmdSubmitReplaceMigrationRecordsProposal() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "replace-migration-records-proposal [flags]",
-		Args:  cobra.ExactArgs(0),
-		Short: "Submit a replace migration record proposal",
-		Long: strings.TrimSpace(`Submit a replace migration record proposal.
-
-Passing in poolIds separated by commas would be parsed automatically to pairs of migration record.
-Ex) 2,4,1,5 -> [(Balancer 2, CL 4), (Balancer 1, CL 5)]
-
-
-		`),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, proposalTitle, summary, deposit, isExpedited, authority, err := osmocli.GetProposalInfo(cmd)
-			if err != nil {
-				return err
-			}
-
-			content, err := parseReplaceMigrationRecordsArgsToContent(cmd)
-			if err != nil {
-				return err
-			}
-
-			contentMsg, err := v1.NewLegacyContent(content, authority.String())
-			if err != nil {
-				return err
-			}
-
-			msg := v1.NewMsgExecLegacyContent(contentMsg.Content, authority.String())
-
-			proposalMsg, err := v1.NewMsgSubmitProposal([]sdk.Msg{msg}, deposit, clientCtx.GetFromAddress().String(), "", proposalTitle, summary, isExpedited)
-			if err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposalMsg)
-		},
-	}
-	osmocli.AddCommonProposalFlags(cmd)
-	cmd.Flags().String(FlagMigrationRecords, "", "The migration records array")
-
-	return cmd
-}
-
-// NewCmdSubmitUpdateMigrationRecordsProposal implements a command handler for update migration records proposal
-func NewCmdSubmitUpdateMigrationRecordsProposal() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update-migration-records-proposal [flags]",
-		Args:  cobra.ExactArgs(0),
-		Short: "Submit a update migration record proposal",
-		Long: strings.TrimSpace(`Submit a update migration record proposal.
-
-Passing in poolIds separated by commas would be parsed automatically to pairs of migration record.
-Ex) 2,4,1,5 -> [(Balancer 2, CL 4), (Balancer 1, CL 5)]
-
-		`),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, proposalTitle, summary, deposit, isExpedited, authority, err := osmocli.GetProposalInfo(cmd)
-			if err != nil {
-				return err
-			}
-
-			content, err := parseUpdateMigrationRecordsArgsToContent(cmd)
-			if err != nil {
-				return err
-			}
-
-			contentMsg, err := v1.NewLegacyContent(content, authority.String())
-			if err != nil {
-				return err
-			}
-
-			msg := v1.NewMsgExecLegacyContent(contentMsg.Content, authority.String())
-
-			proposalMsg, err := v1.NewMsgSubmitProposal([]sdk.Msg{msg}, deposit, clientCtx.GetFromAddress().String(), "", proposalTitle, summary, isExpedited)
-			if err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposalMsg)
-		},
-	}
-	osmocli.AddCommonProposalFlags(cmd)
-	cmd.Flags().String(FlagMigrationRecords, "", "The migration records array")
-
-	return cmd
-}
-
-// NewCmdSubmitUpdateMigrationRecordsProposal implements a command handler for update migration records proposal
-func NewCmdSubmitCreateCLPoolAndLinkToCFMMProposal() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "create-cl-pool-and-cfmm-link [flags]",
-		Args:  cobra.ExactArgs(0),
-		Short: "Submit a create clpool and link to cfmm proposal",
-		Long:  strings.TrimSpace(`submit a proposal to create CL pool and link to Balancer pool.`),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, proposalTitle, summary, deposit, isExpedited, authority, err := osmocli.GetProposalInfo(cmd)
-			if err != nil {
-				return err
-			}
-
-			content, err := parseCreateConcentratedLiquidityPoolArgsToContent(cmd)
-			if err != nil {
-				return err
-			}
-
-			contentMsg, err := v1.NewLegacyContent(content, authority.String())
-			if err != nil {
-				return err
-			}
-
-			msg := v1.NewMsgExecLegacyContent(contentMsg.Content, authority.String())
-
-			proposalMsg, err := v1.NewMsgSubmitProposal([]sdk.Msg{msg}, deposit, clientCtx.GetFromAddress().String(), "", proposalTitle, summary, isExpedited)
-			if err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposalMsg)
-		},
-	}
-	osmocli.AddCommonProposalFlags(cmd)
-	cmd.Flags().String(FlagPoolRecords, "", "The pool records array")
-
-	return cmd
-}
-
-// NewCmdSubmitSetScalingFactorControllerProposal implements a command handler for the set scaling factor controller proposal
-func NewCmdSubmitSetScalingFactorControllerProposal() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "set-scaling-factor-controller-proposal [flags]",
-		Args:  cobra.ExactArgs(0),
-		Short: "Submit a set scaling factor controller proposal",
-		Long: strings.TrimSpace(`Submit a set scaling factor controller proposal.
-
-Sample proposal file:
-{
-	"title": "Set Scaling Factor Controller Proposal",
-	"description": "Change scaling factor controller address from osmoXXX to osmoYYY"
-	"pool-id": 1,
-	"controller-address": "osmoYYY"
-}
->>> osmosisd tx gov submit-proposal set-scaling-factor-controller-proposal \
-        --proposal proposal.json \
-		--deposit 1600000000uosmo \
-
-Sample proposal with flags
->>> osmosisd tx gov submit-proposal set-scaling-factor-controller-proposal \
-        --title "Set Scaling Factor Controller Proposal" \
-		--summary "Change scaling factor controller address from osmoXXX to osmoYYY"
-		--deposit 1600000000uosmo
-		--pool-id 1
-		--controller-address osmoYYY
-		`),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, proposalTitle, summary, deposit, isExpedited, authority, err := osmocli.GetProposalInfo(cmd)
-			if err != nil {
-				return err
-			}
-
-			content, err := parseSetScalingFactorControllerArgsToContent(cmd)
-			if err != nil {
-				return err
-			}
-
-			contentMsg, err := v1.NewLegacyContent(content, authority.String())
-			if err != nil {
-				return err
-			}
-
-			msg := v1.NewMsgExecLegacyContent(contentMsg.Content, authority.String())
-
-			proposalMsg, err := v1.NewMsgSubmitProposal([]sdk.Msg{msg}, deposit, clientCtx.GetFromAddress().String(), "", proposalTitle, summary, isExpedited)
-			if err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposalMsg)
-		},
-	}
-	osmocli.AddCommonProposalFlags(cmd)
-	cmd.Flags().Uint64(FlagPoolId, 0, "stableswap pool-id")
-	cmd.Flags().String(FlagScalingFactorControllerAddress, "", "target scaling factor controller address")
-	cmd.Flags().String(govcli.FlagProposal, "", "proposal file path") //nolint:staticcheck
-
-	return cmd
-}
-
 func BuildCreatePoolCmd(clientCtx client.Context, args []string, fs *flag.FlagSet) (sdk.Msg, error) {
 	poolType, err := fs.GetString(FlagPoolType)
 	if err != nil {
@@ -383,11 +170,6 @@ func BuildCreatePoolCmd(clientCtx client.Context, args []string, fs *flag.FlagSe
 	var msg sdk.Msg
 	if poolType == "balancer" || poolType == "uniswap" {
 		msg, err = NewBuildCreateBalancerPoolMsg(clientCtx, fs)
-		if err != nil {
-			return nil, err
-		}
-	} else if poolType == "stableswap" {
-		msg, err = NewBuildCreateStableswapPoolMsg(clientCtx, fs)
 		if err != nil {
 			return nil, err
 		}
@@ -491,54 +273,6 @@ func NewBuildCreateBalancerPoolMsg(clientCtx client.Context, fs *flag.FlagSet) (
 	}
 
 	return msg, nil
-}
-
-// Apologies to whoever has to touch this next, this code is horrendous
-func NewBuildCreateStableswapPoolMsg(clientCtx client.Context, fs *flag.FlagSet) (sdk.Msg, error) {
-	flags, err := parseCreateStableswapPoolFlags(fs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse pool: %w", err)
-	}
-
-	deposit, err := ParseCoinsNoSort(flags.InitialDeposit)
-	if err != nil {
-		return nil, err
-	}
-
-	spreadFactor, err := osmomath.NewDecFromStr(flags.SwapFee)
-	if err != nil {
-		return nil, err
-	}
-
-	poolParams := &stableswap.PoolParams{
-		SwapFee: spreadFactor,
-		ExitFee: osmomath.NewDec(0),
-	}
-
-	scalingFactors := []uint64{}
-	trimmedSfString := strings.Trim(flags.ScalingFactors, "[] {}")
-	if len(trimmedSfString) > 0 {
-		ints := strings.Split(trimmedSfString, ",")
-		for _, i := range ints {
-			u, err := strconv.ParseUint(i, 10, 64)
-			if err != nil {
-				return nil, err
-			}
-			scalingFactors = append(scalingFactors, u)
-		}
-		if len(scalingFactors) != len(deposit) {
-			return nil, fmt.Errorf("number of scaling factors doesn't match number of assets")
-		}
-	}
-
-	return &stableswap.MsgCreateStableswapPool{
-		Sender:                  clientCtx.GetFromAddress().String(),
-		PoolParams:              poolParams,
-		InitialPoolLiquidity:    deposit,
-		ScalingFactors:          scalingFactors,
-		ScalingFactorController: flags.ScalingFactorController,
-		FuturePoolGovernor:      flags.FutureGovernor,
-	}, nil
 }
 
 func maxAmountsInParser(fs *flag.FlagSet) (sdk.Coins, error) {
@@ -652,37 +386,6 @@ func NewBuildSwapExactAmountOutMsg(clientCtx client.Context, args []string, fs *
 	}, nil
 }
 
-func NewStableSwapAdjustScalingFactorsMsg(clientCtx client.Context, _args []string, fs *flag.FlagSet) (sdk.Msg, error) {
-	poolID, err := fs.GetUint64(FlagPoolId)
-	if err != nil {
-		return nil, err
-	}
-
-	scalingFactorsStr, err := fs.GetString(FlagScalingFactors)
-	if err != nil {
-		return nil, err
-	}
-
-	scalingFactorsStrSlice := strings.Split(scalingFactorsStr, ",")
-
-	scalingFactors := make([]uint64, len(scalingFactorsStrSlice))
-	for i, scalingFactorStr := range scalingFactorsStrSlice {
-		scalingFactor, err := strconv.ParseUint(scalingFactorStr, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		scalingFactors[i] = scalingFactor
-	}
-
-	msg := &stableswap.MsgStableSwapAdjustScalingFactors{
-		Sender:         clientCtx.GetFromAddress().String(),
-		PoolID:         poolID,
-		ScalingFactors: scalingFactors,
-	}
-
-	return msg, nil
-}
-
 // ParseCoinsNoSort parses coins from coinsStr but does not sort them.
 // Returns error if parsing fails.
 func ParseCoinsNoSort(coinsStr string) (sdk.Coins, error) {
@@ -733,79 +436,6 @@ func parseMigrationRecords(cmd *cobra.Command) ([]gammmigration.BalancerToConcen
 	}
 
 	return replaceMigrations, nil
-}
-
-func parseReplaceMigrationRecordsArgsToContent(cmd *cobra.Command) (govtypesv1beta1.Content, error) {
-	title, err := cmd.Flags().GetString(govcli.FlagTitle)
-	if err != nil {
-		return nil, err
-	}
-
-	description, err := cmd.Flags().GetString(govcli.FlagSummary)
-	if err != nil {
-		return nil, err
-	}
-
-	replaceMigrations, err := parseMigrationRecords(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	content := &types.ReplaceMigrationRecordsProposal{
-		Title:       title,
-		Description: description,
-		Records:     replaceMigrations,
-	}
-	return content, nil
-}
-
-func parseUpdateMigrationRecordsArgsToContent(cmd *cobra.Command) (govtypesv1beta1.Content, error) {
-	title, err := cmd.Flags().GetString(govcli.FlagTitle)
-	if err != nil {
-		return nil, err
-	}
-
-	description, err := cmd.Flags().GetString(govcli.FlagSummary)
-	if err != nil {
-		return nil, err
-	}
-
-	replaceMigrations, err := parseMigrationRecords(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	content := &types.UpdateMigrationRecordsProposal{
-		Title:       title,
-		Description: description,
-		Records:     replaceMigrations,
-	}
-	return content, nil
-}
-
-func parseCreateConcentratedLiquidityPoolArgsToContent(cmd *cobra.Command) (govtypesv1beta1.Content, error) {
-	title, err := cmd.Flags().GetString(govcli.FlagTitle)
-	if err != nil {
-		return nil, err
-	}
-
-	description, err := cmd.Flags().GetString(govcli.FlagSummary)
-	if err != nil {
-		return nil, err
-	}
-
-	poolRecordsWithCFMMLink, err := parsePoolRecordsWithCFMMLink(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	content := &types.CreateConcentratedLiquidityPoolsAndLinktoCFMMProposal{
-		Title:                   title,
-		Description:             description,
-		PoolRecordsWithCfmmLink: poolRecordsWithCFMMLink,
-	}
-
-	return content, nil
 }
 
 func parsePoolRecordsWithCFMMLink(cmd *cobra.Command) ([]types.PoolRecordWithCFMMLink, error) {
@@ -862,53 +492,4 @@ func parsePoolRecordsWithCFMMLink(cmd *cobra.Command) ([]types.PoolRecordWithCFM
 	}
 
 	return finalPoolRecords, nil
-}
-
-func parseSetScalingFactorControllerArgsToContent(cmd *cobra.Command) (govtypesv1beta1.Content, error) {
-	proposalFile, err := cmd.Flags().GetString(govcli.FlagProposal) //nolint:staticcheck
-	if err != nil {
-		return nil, err
-	}
-
-	if proposalFile != "" {
-		contents, err := os.ReadFile(proposalFile)
-		if err != nil {
-			return nil, err
-		}
-
-		var proposal types.SetScalingFactorControllerProposal
-		if err := json.Unmarshal(contents, &proposal); err != nil {
-			return nil, err
-		}
-		return &proposal, nil
-	}
-
-	title, err := cmd.Flags().GetString(govcli.FlagTitle)
-	if err != nil {
-		return nil, err
-	}
-
-	description, err := cmd.Flags().GetString(govcli.FlagSummary)
-	if err != nil {
-		return nil, err
-	}
-
-	poolId, err := cmd.Flags().GetUint64(FlagPoolId)
-	if err != nil {
-		return nil, err
-	}
-
-	controllerAddress, err := cmd.Flags().GetString(FlagScalingFactorControllerAddress)
-	if err != nil {
-		return nil, err
-	}
-
-	content := &types.SetScalingFactorControllerProposal{
-		Title:             title,
-		Description:       description,
-		PoolId:            poolId,
-		ControllerAddress: controllerAddress,
-	}
-
-	return content, nil
 }

@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
-	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
@@ -27,40 +26,15 @@ func NewBalancerMsgServerImpl(keeper *Keeper) balancer.MsgServer {
 	}
 }
 
-func NewStableswapMsgServerImpl(keeper *Keeper) stableswap.MsgServer {
-	return &msgServer{
-		keeper: keeper,
-	}
-}
-
 var (
-	_ types.MsgServer      = msgServer{}
-	_ balancer.MsgServer   = msgServer{}
-	_ stableswap.MsgServer = msgServer{}
+	_ types.MsgServer    = msgServer{}
+	_ balancer.MsgServer = msgServer{}
 )
 
 // CreateBalancerPool is a create balancer pool message.
 func (server msgServer) CreateBalancerPool(goCtx context.Context, msg *balancer.MsgCreateBalancerPool) (*balancer.MsgCreateBalancerPoolResponse, error) {
 	poolId, err := server.CreatePool(goCtx, msg)
 	return &balancer.MsgCreateBalancerPoolResponse{PoolID: poolId}, err
-}
-
-func (server msgServer) CreateStableswapPool(goCtx context.Context, msg *stableswap.MsgCreateStableswapPool) (*stableswap.MsgCreateStableswapPoolResponse, error) {
-	poolId, err := server.CreatePool(goCtx, msg)
-	if err != nil {
-		return nil, err
-	}
-	return &stableswap.MsgCreateStableswapPoolResponse{PoolID: poolId}, nil
-}
-
-func (server msgServer) StableSwapAdjustScalingFactors(goCtx context.Context, msg *stableswap.MsgStableSwapAdjustScalingFactors) (*stableswap.MsgStableSwapAdjustScalingFactorsResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	if err := server.keeper.setStableSwapScalingFactors(ctx, msg.PoolID, msg.ScalingFactors, msg.Sender); err != nil {
-		return nil, err
-	}
-
-	return &stableswap.MsgStableSwapAdjustScalingFactorsResponse{}, nil
 }
 
 // CreatePool attempts to create a pool returning the newly created pool ID or an error upon failure.
