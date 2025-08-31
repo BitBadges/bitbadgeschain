@@ -2,10 +2,10 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/address"
 	proto "github.com/cosmos/gogoproto/proto"
 
 	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/osmoutils"
 )
 
 var MaxPoolId uint64 = 99_999_999_999
@@ -39,13 +39,7 @@ type PoolI interface {
 	AsSerializablePool() PoolI
 }
 
-// NewModuleAddressWithPrefix returns a new module address with the given prefix and identifier.
-func NewModuleAddressWithPrefix(moduleName, prefix string, identifier []byte) sdk.AccAddress {
-	key := append([]byte(prefix), identifier...)
-	return address.Module(moduleName, key)
-}
-
 // NewPoolAddress returns an address for a pool from a given id.
 func NewPoolAddress(poolId uint64) sdk.AccAddress {
-	return NewModuleAddressWithPrefix(ModuleName, "pool", sdk.Uint64ToBigEndian(poolId))
+	return osmoutils.NewModuleAddressWithPrefix(ModuleName, "pool", sdk.Uint64ToBigEndian(poolId))
 }

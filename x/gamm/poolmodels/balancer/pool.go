@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/osmomath"
-	"github.com/bitbadges/bitbadgeschain/x/gamm/pool-models/internal/cfmm_common"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/internal/cfmm_common"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )

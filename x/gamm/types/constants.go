@@ -1,7 +1,7 @@
 package types
 
 import (
-	osmomath "github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/osmomath"
 )
 
 const (
