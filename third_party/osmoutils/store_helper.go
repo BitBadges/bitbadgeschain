@@ -11,7 +11,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 
 	"cosmossdk.io/store"
 	"github.com/cosmos/gogoproto/proto"

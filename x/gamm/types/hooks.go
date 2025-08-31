@@ -3,7 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 )
 
 type GammHooks interface {

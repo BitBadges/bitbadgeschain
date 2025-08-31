@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
-	"github.com/bitbadges/bitbadgeschain/osmoutils/osmocli"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmocli"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"

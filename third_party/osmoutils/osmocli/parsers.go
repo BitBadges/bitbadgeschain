@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
-	"github.com/bitbadges/bitbadgeschain/osmoutils"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 )
 
 var DefaultGovAuthority = sdk.AccAddress(address.Module("gov"))

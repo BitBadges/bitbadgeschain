@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/gogoproto/proto"
 
-	"github.com/bitbadges/bitbadgeschain/osmoutils"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 )
 
 type Descriptor interface {

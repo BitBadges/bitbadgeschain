@@ -15,7 +15,7 @@ import (
 	flag "github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
 
-	"github.com/bitbadges/bitbadgeschain/osmoutils/osmocli"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmocli"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )

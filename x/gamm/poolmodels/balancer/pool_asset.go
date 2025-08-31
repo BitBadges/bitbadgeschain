@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 
 	errorsmod "cosmossdk.io/errors"

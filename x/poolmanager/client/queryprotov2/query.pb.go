@@ -6,7 +6,11 @@ package queryprotov2
 import (
 	context "context"
 	fmt "fmt"
-	github_com_bitbadges_bitbadgeschain_osmomath "github.com/bitbadges/bitbadgeschain/osmomath"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+
+	github_com_bitbadges_bitbadgeschain_osmomath "github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	_ "github.com/cosmos/cosmos-proto"
 	_ "github.com/cosmos/cosmos-sdk/codec/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
@@ -17,9 +21,6 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
-	io "io"
-	math "math"
-	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -99,7 +100,7 @@ func (m *SpotPriceRequest) GetQuoteAssetDenom() string {
 // query.
 type SpotPriceResponse struct {
 	// String of the BigDec. Ex) 10.203uatom
-	SpotPrice github_com_bitbadges_bitbadgeschain_osmomath.BigDec `protobuf:"bytes,1,opt,name=spot_price,json=spotPrice,proto3,customtype=github.com/bitbadges/bitbadgeschain/osmomath.BigDec" json:"spot_price" yaml:"spot_price"`
+	SpotPrice github_com_bitbadges_bitbadgeschain_osmomath.BigDec `protobuf:"bytes,1,opt,name=spot_price,json=spotPrice,proto3,customtype=github.com/bitbadges/bitbadgeschain/third_party/osmomath.BigDec" json:"spot_price" yaml:"spot_price"`
 }
 
 func (m *SpotPriceResponse) Reset()         { *m = SpotPriceResponse{} }

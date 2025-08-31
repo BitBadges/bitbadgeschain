@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 

@@ -10,8 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
-	"github.com/bitbadges/bitbadgeschain/osmoutils"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"

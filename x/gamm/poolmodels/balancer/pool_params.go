@@ -3,7 +3,7 @@ package balancer
 import (
 	"errors"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 

@@ -15,7 +15,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/v2types"

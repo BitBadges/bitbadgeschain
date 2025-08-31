@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	proto "github.com/cosmos/gogoproto/proto"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
-	"github.com/bitbadges/bitbadgeschain/osmoutils"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 )
 
 var MaxPoolId uint64 = 99_999_999_999

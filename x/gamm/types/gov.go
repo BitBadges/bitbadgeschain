@@ -8,7 +8,7 @@ import (
 
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	gammmigration "github.com/bitbadges/bitbadgeschain/x/gamm/types/migration"
 )
 

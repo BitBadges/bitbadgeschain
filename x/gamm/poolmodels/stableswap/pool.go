@@ -9,7 +9,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/bitbadges/bitbadgeschain/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/internal/cfmm_common"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
