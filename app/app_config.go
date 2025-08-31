@@ -196,7 +196,7 @@ var (
 		{Account: packetforwardtypes.ModuleName},
 		{Account: wasmtypes.ModuleName},
 		{Account: wasmxmoduletypes.ModuleName},
-		{Account: gammtypes.ModuleName},
+		{Account: gammtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 

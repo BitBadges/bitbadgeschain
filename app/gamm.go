@@ -23,10 +23,8 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// register the key tables for legacy param subspaces
-	keyTable := gammtypes.ParamKeyTable()
-	keyTable.RegisterParamSet(&gammtypes.Params{})
-	app.ParamsKeeper.Subspace(gammtypes.ModuleName).WithKeyTable(keyTable)
+	// register thee gamm params
+	app.ParamsKeeper.Subspace(gammtypes.ModuleName).WithKeyTable(gammtypes.ParamKeyTable())
 
 	// add capability keeper and ScopeToModule for ibc module
 	gk := gammkeeper.NewKeeper(
