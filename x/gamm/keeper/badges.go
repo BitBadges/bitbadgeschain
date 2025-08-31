@@ -7,6 +7,7 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -96,20 +97,23 @@ func (k Keeper) WrapBadgesToSDKDenom(ctx sdk.Context, poolAddress string, recipi
 		return err
 	}
 
-	// TODO: Make this a MsgTransferBadges or handle pre / post checks manually
+	// Create and execute MsgTransferBadges to ensure proper event handling and validation
+	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
-	err = k.badgesKeeper.HandleTransfers(ctx, collection, []*badgestypes.Transfer{
-		{
-			From:        poolAddress,
-			ToAddresses: []string{recipientAddress},
-			Balances:    balancesToTransfer,
+	msg := &badgestypes.MsgTransferBadges{
+		Creator:      poolAddress,
+		CollectionId: collection.CollectionId,
+		Transfers: []*badgestypes.Transfer{
+			{
+				From:        poolAddress,
+				ToAddresses: []string{recipientAddress},
+				Balances:    balancesToTransfer,
+			},
 		},
-	}, poolAddress)
-	if err != nil {
-		return err
 	}
 
-	return nil
+	_, err = badgesMsgServer.TransferBadges(ctx, msg)
+	return err
 }
 
 func (k Keeper) UnwrapSDKDenomToBadges(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
@@ -123,19 +127,23 @@ func (k Keeper) UnwrapSDKDenomToBadges(ctx sdk.Context, poolAddress string, reci
 		return err
 	}
 
-	// TODO: Make this a MsgTransferBadges or handle pre / post checks manually
-	err = k.badgesKeeper.HandleTransfers(ctx, collection, []*badgestypes.Transfer{
-		{
-			From:        recipientAddress,
-			ToAddresses: []string{poolAddress},
-			Balances:    balancesToTransfer,
+	// Create and execute MsgTransferBadges to ensure proper event handling and validation
+	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
+
+	msg := &badgestypes.MsgTransferBadges{
+		Creator:      recipientAddress,
+		CollectionId: collection.CollectionId,
+		Transfers: []*badgestypes.Transfer{
+			{
+				From:        recipientAddress,
+				ToAddresses: []string{poolAddress},
+				Balances:    balancesToTransfer,
+			},
 		},
-	}, recipientAddress)
-	if err != nil {
-		return err
 	}
 
-	return nil
+	_, err = badgesMsgServer.TransferBadges(ctx, msg)
+	return err
 }
 
 func (k Keeper) SendCoinsWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
@@ -158,8 +166,8 @@ func (k Keeper) SendCoinsWithWrapping(ctx sdk.Context, from sdk.AccAddress, to s
 	return nil
 }
 
-func (k Keeper) SendCoinsWitUhwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// if denom is a badges denom, wrap it
+func (k Keeper) SendCoinsWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
 		if CheckStartsWithBadges(coin.Denom) {
 			err := k.UnwrapSDKDenomToBadges(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))

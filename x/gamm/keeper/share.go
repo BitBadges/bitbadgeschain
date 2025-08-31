@@ -30,7 +30,7 @@ func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.
 }
 
 func (k Keeper) applyExitPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, exiter sdk.AccAddress, numShares osmomath.Int, exitCoins sdk.Coins) error {
-	err := k.SendCoinsWitUhwrapping(ctx, pool.GetAddress(), exiter, exitCoins)
+	err := k.SendCoinsWithUnwrapping(ctx, pool.GetAddress(), exiter, exitCoins)
 	if err != nil {
 		return err
 	}

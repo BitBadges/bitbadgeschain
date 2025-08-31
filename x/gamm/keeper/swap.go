@@ -201,7 +201,7 @@ func (k Keeper) updatePoolForSwap(
 		return err
 	}
 
-	err = k.SendCoinsWitUhwrapping(ctx, pool.GetAddress(), sender, sdk.Coins{
+	err = k.SendCoinsWithUnwrapping(ctx, pool.GetAddress(), sender, sdk.Coins{
 		tokenOut,
 	})
 	if err != nil {
