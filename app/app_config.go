@@ -6,6 +6,7 @@ import (
 	anchormodulev1 "github.com/bitbadges/bitbadgeschain/api/anchor/module"
 	_ "github.com/bitbadges/bitbadgeschain/x/anchor/module" // import for side-effects
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
+	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
@@ -115,6 +116,7 @@ var (
 		packetforwardtypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
+		gammtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -145,6 +147,7 @@ var (
 		packetforwardtypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
+		gammtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -169,6 +172,7 @@ var (
 		packetforwardtypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
+		gammtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -192,6 +196,7 @@ var (
 		{Account: packetforwardtypes.ModuleName},
 		{Account: wasmtypes.ModuleName},
 		{Account: wasmxmoduletypes.ModuleName},
+		{Account: gammtypes.ModuleName},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 

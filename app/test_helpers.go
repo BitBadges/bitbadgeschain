@@ -81,7 +81,7 @@ func Setup(
 
 	db := dbm.NewMemDB()
 	app, err := New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
-	// map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), simapp.EmptyAppOptions{})
+
 	if err != nil {
 		panic(err)
 	}

@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/app/params"
-
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,15 +20,6 @@ var (
 	protoCodec codec.ProtoCodecMarshaler
 	aminoCodec *codec.LegacyAmino
 )
-
-// SetEncodingConfig set the encoding config to the singleton codecs (Amino and Protobuf).
-// The process of unmarshaling SignDoc bytes into a SignDoc object requires having a codec
-// populated with all relevant message types. As a result, we must call this method on app
-// initialization with the app's encoding config.
-func SetEncodingConfig(cfg params.EncodingConfig) {
-	aminoCodec = cfg.Amino
-	protoCodec = codec.NewProtoCodec(cfg.InterfaceRegistry)
-}
 
 // GetEIP712BytesForMsg returns the EIP-712 object bytes for the given SignDoc bytes by decoding the bytes into
 // an EIP-712 object, then converting via WrapTxToTypedData. See https://eips.ethereum.org/EIPS/eip-712 for more.

@@ -91,6 +91,8 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 
+	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/bitbadges/bitbadgeschain/docs"
@@ -170,6 +172,8 @@ type App struct {
 	MapsKeeper   mapsmodulekeeper.Keeper
 	WasmKeeper   wasmkeeper.Keeper
 	WasmxKeeper  wasmxmodulekeeper.Keeper
+
+	GammKeeper gammkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -301,6 +305,10 @@ func New(
 	// register legacy modules
 
 	if err := app.registerIBCModules(appOpts); err != nil {
+		return nil, err
+	}
+
+	if err := app.registerGammModules(appOpts); err != nil {
 		return nil, err
 	}
 
