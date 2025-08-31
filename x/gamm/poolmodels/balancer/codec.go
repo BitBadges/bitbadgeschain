@@ -1,7 +1,6 @@
 package balancer
 
 import (
-	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -14,20 +13,15 @@ import (
 // RegisterLegacyAminoCodec registers the necessary x/gamm interfaces and concrete types
 // on the provided LegacyAmino codec. These types are used for Amino JSON serialization.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&Pool{}, "osmosis/gamm/BalancerPool", nil)
-	cdc.RegisterConcrete(&MsgCreateBalancerPool{}, "osmosis/gamm/create-balancer-pool", nil)
-	cdc.RegisterConcrete(&PoolParams{}, "osmosis/gamm/BalancerPoolParams", nil)
+	cdc.RegisterConcrete(&Pool{}, "gamm/BalancerPool", nil)
+	cdc.RegisterConcrete(&MsgCreateBalancerPool{}, "gamm/create-balancer-pool", nil)
+	cdc.RegisterConcrete(&PoolParams{}, "gamm/BalancerPoolParams", nil)
 }
 
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterInterface(
-		"osmosis.poolmanager.v1beta1.PoolI",
+		"poolmanager.v1beta1.PoolI",
 		(*poolmanagertypes.PoolI)(nil),
-		&Pool{},
-	)
-	registry.RegisterInterface(
-		"osmosis.gamm.v1beta1.PoolI", // N.B.: the old proto-path is preserved for backwards-compatibility.
-		(*types.CFMMPoolI)(nil),
 		&Pool{},
 	)
 	registry.RegisterImplementations(
