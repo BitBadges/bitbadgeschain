@@ -1192,5 +1192,141 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	// GAMM transaction schemas
+	schemas = append(schemas, `{
+		"type": "gamm/JoinPool",
+		"value": {
+			"sender": "",
+			"poolId": "0",
+			"shareOutAmount": "",
+			"tokenInMaxs": [
+				{
+					"amount": "",
+					"denom": ""
+				}
+			]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/ExitPool",
+		"value": {
+			"sender": "",
+			"poolId": "0",
+			"shareInAmount": "",
+			"tokenOutMins": [
+				{
+					"amount": "",
+					"denom": ""
+				}
+			]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/SwapExactAmountIn",
+		"value": {
+			"sender": "",
+			"routes": [
+				{
+					"poolId": "0",
+					"tokenOutDenom": ""
+				}
+			],
+			"tokenIn": {
+				"amount": "",
+				"denom": ""
+			},
+			"tokenOutMinAmount": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/SwapExactAmountOut",
+		"value": {
+			"sender": "",
+			"routes": [
+				{
+					"poolId": "0",
+					"tokenInDenom": ""
+				}
+			],
+			"tokenInMaxAmount": "",
+			"tokenOut": {
+				"amount": "",
+				"denom": ""
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/JoinSwapExternAmountIn",
+		"value": {
+			"sender": "",
+			"poolId": "0",
+			"tokenIn": {
+				"amount": "",
+				"denom": ""
+			},
+			"shareOutMinAmount": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/JoinSwapShareAmountOut",
+		"value": {
+			"sender": "",
+			"poolId": "0",
+			"tokenInDenom": "",
+			"shareOutAmount": "",
+			"tokenInMaxAmount": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/ExitSwapShareAmountIn",
+		"value": {
+			"sender": "",
+			"poolId": "0",
+			"tokenOutDenom": "",
+			"shareInAmount": "",
+			"tokenOutMinAmount": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/ExitSwapExternAmountOut",
+		"value": {
+			"sender": "",
+			"poolId": "0",
+			"tokenOut": {
+				"amount": "",
+				"denom": ""
+			},
+			"shareInMaxAmount": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "gamm/CreateBalancerPool",
+		"value": {
+			"sender": "",
+			"poolParams": {
+				"swapFee": "",
+				"exitFee": ""
+			},
+			"poolAssets": [
+				{
+					"token": {
+						"amount": "",
+						"denom": ""
+					},
+					"weight": ""
+				}
+			],
+			"futurePoolGovernor": ""
+		}
+	}`)
+
 	return schemas
 }
