@@ -24,8 +24,6 @@ service Msg {
       returns (MsgSetDenomPairTakerFeeResponse);
   rpc SetTakerFeeShareAgreementForDenom(MsgSetTakerFeeShareAgreementForDenom)
       returns (MsgSetTakerFeeShareAgreementForDenomResponse);
-  rpc SetRegisteredAlloyedPool(MsgSetRegisteredAlloyedPool)
-      returns (MsgSetRegisteredAlloyedPoolResponse);
 }
 
 // ===================== MsgSwapExactAmountIn
@@ -153,7 +151,7 @@ message MsgSetDenomPairTakerFeeResponse { bool success = 1; }
 // ===================== MsgSetTakerFeeShareAgreementForDenom
 message MsgSetTakerFeeShareAgreementForDenom {
   option (amino.name) =
-      "osmosis/poolmanager/set-taker-fee-share-agreement-for-denom";
+      "poolmanager/set-taker-fee-share-agreement-for-denom";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];

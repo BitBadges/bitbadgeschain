@@ -60,6 +60,7 @@ service Query {
     option (google.api.http).get =
         "/osmosis/gamm/v1beta1/pools/{pool_id}/join_swap_exact_in";
   }
+  
   rpc CalcExitPoolCoinsFromShares(QueryCalcExitPoolCoinsFromSharesRequest)
       returns (QueryCalcExitPoolCoinsFromSharesResponse) {
     option (google.api.http).get =

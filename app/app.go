@@ -83,6 +83,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/app/ante"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
@@ -173,7 +174,8 @@ type App struct {
 	WasmKeeper   wasmkeeper.Keeper
 	WasmxKeeper  wasmxmodulekeeper.Keeper
 
-	GammKeeper gammkeeper.Keeper
+	GammKeeper        gammkeeper.Keeper
+	PoolManagerKeeper poolmanager.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager

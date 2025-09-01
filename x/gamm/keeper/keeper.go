@@ -29,7 +29,6 @@ type Keeper struct {
 	cdc      codec.BinaryCodec
 
 	paramSpace paramtypes.Subspace
-	hooks      types.GammHooks
 
 	// keepers
 	accountKeeper       types.AccountKeeper
@@ -64,17 +63,6 @@ func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace p
 		communityPoolKeeper: communityPoolKeeper,
 		badgesKeeper:        badgesKeeper,
 	}
-}
-
-// Set the gamm hooks.
-func (k *Keeper) SetHooks(gh types.GammHooks) *Keeper {
-	if k.hooks != nil {
-		panic("cannot set gamm hooks twice")
-	}
-
-	k.hooks = gh
-
-	return k
 }
 
 func (k *Keeper) SetPoolManager(poolManager types.PoolManager) {

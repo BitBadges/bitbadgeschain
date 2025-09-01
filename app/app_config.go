@@ -7,6 +7,7 @@ import (
 	_ "github.com/bitbadges/bitbadgeschain/x/anchor/module" // import for side-effects
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
@@ -117,6 +118,7 @@ var (
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
+		poolmanagertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -148,6 +150,7 @@ var (
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
+		poolmanagertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -173,6 +176,7 @@ var (
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
+		poolmanagertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -197,6 +201,7 @@ var (
 		{Account: wasmtypes.ModuleName},
 		{Account: wasmxmoduletypes.ModuleName},
 		{Account: gammtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: poolmanagertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 

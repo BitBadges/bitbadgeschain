@@ -3,6 +3,7 @@ package balancer
 import (
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 
+	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,6 +23,11 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterInterface(
 		"poolmanager.v1beta1.PoolI",
 		(*poolmanagertypes.PoolI)(nil),
+		&Pool{},
+	)
+	registry.RegisterInterface(
+		"gamm.v1beta1.PoolI", // N.B.: the old proto-path is preserved for backwards-compatibility.
+		(*types.CFMMPoolI)(nil),
 		&Pool{},
 	)
 	registry.RegisterImplementations(

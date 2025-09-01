@@ -9,7 +9,9 @@ import (
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 func CheckStartsWithBadges(denom string) bool {
@@ -48,9 +50,14 @@ func ParseDenomPath(denom string) (string, error) {
 }
 
 func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string) (*badgestypes.CosmosCoinWrapperPath, error) {
+	baseDenom, err := ParseDenomPath(denom)
+	if err != nil {
+		return nil, err
+	}
+
 	cosmosPaths := collection.CosmosCoinWrapperPaths
 	for _, path := range cosmosPaths {
-		if path.Denom == denom {
+		if path.Denom == baseDenom {
 			return path, nil
 		}
 	}
@@ -86,7 +93,7 @@ func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badges
 	return collection, nil
 }
 
-func (k Keeper) WrapBadgesToSDKDenom(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -116,7 +123,7 @@ func (k Keeper) WrapBadgesToSDKDenom(ctx sdk.Context, poolAddress string, recipi
 	return err
 }
 
-func (k Keeper) UnwrapSDKDenomToBadges(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -146,40 +153,95 @@ func (k Keeper) UnwrapSDKDenomToBadges(ctx sdk.Context, poolAddress string, reci
 	return err
 }
 
-func (k Keeper) SendCoinsWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+// IMPORTANT: Should ONLY be called when to address is a pool address
+func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, wrap it
 	for _, coin := range coins {
 		if CheckStartsWithBadges(coin.Denom) {
-			err := k.WrapBadgesToSDKDenom(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			err := k.SendNativeBadgesToPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
-		}
 
-		// otherwise, send the coins normally
-		err := k.bankKeeper.SendCoins(ctx, from, to, coins)
-		if err != nil {
-			return err
+			//Mint corresponding coins for compatibillity
+			err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
+
+			// Send to the pool address
+			err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, to, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
+		} else {
+			// otherwise, send the coins normally
+			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
 }
 
-func (k Keeper) SendCoinsWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+// IMPORTANT: Should ONLY be called when from address is a pool address
+func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
 		if CheckStartsWithBadges(coin.Denom) {
-			err := k.UnwrapSDKDenomToBadges(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			err := k.SendNativeBadgesFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			if err != nil {
+				return err
+			}
+
+			// Send coins to module from pool
+			err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, from, types.ModuleName, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
+
+			//Burn corresponding coins from the pool for compatibillity
+			err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
+		} else {
+
+			// otherwise, send the coins normally
+			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
 				return err
 			}
 		}
+	}
 
-		// otherwise, send the coins normally
-		err := k.bankKeeper.SendCoins(ctx, from, to, coins)
-		if err != nil {
-			return err
+	return nil
+}
+
+// Used for taker fees
+func (k Keeper) SendCoinsToPoolWithWrappingFromAccountToModule(ctx sdk.Context, from sdk.AccAddress, to string, coins sdk.Coins) error {
+	for _, coin := range coins {
+		moduleAddress := authtypes.NewModuleAddress(to).String()
+
+		if CheckStartsWithBadges(coin.Denom) {
+			err := k.SendNativeBadgesToPool(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			if err != nil {
+				return err
+			}
+
+			//Mint corresponding coins to the pool for compatibillity
+			err = k.bankKeeper.MintCoins(ctx, to, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
+
+		} else {
+			err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, from, to, sdk.NewCoins(coin))
+			if err != nil {
+				return err
+			}
 		}
 	}
 

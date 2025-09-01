@@ -194,14 +194,14 @@ func (k Keeper) updatePoolForSwap(
 		return err
 	}
 
-	err = k.SendCoinsWithWrapping(ctx, sender, pool.GetAddress(), sdk.Coins{
+	err = k.SendCoinsToPoolWithWrapping(ctx, sender, pool.GetAddress(), sdk.Coins{
 		tokenIn,
 	})
 	if err != nil {
 		return err
 	}
 
-	err = k.SendCoinsWithUnwrapping(ctx, pool.GetAddress(), sender, sdk.Coins{
+	err = k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), sender, sdk.Coins{
 		tokenOut,
 	})
 	if err != nil {
@@ -212,7 +212,6 @@ func (k Keeper) updatePoolForSwap(
 	// since poolmanager has many swap wrapper APIs that we would need to consider.
 	// Search for references to this function to see where else it is used.
 	// Each new pool module will have to emit this event separately
-	k.hooks.AfterCFMMSwap(ctx, sender, pool.GetId(), tokensIn, tokensOut)
 	k.RecordTotalLiquidityIncrease(ctx, tokensIn)
 	k.RecordTotalLiquidityDecrease(ctx, tokensOut)
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
@@ -219,56 +218,9 @@ func NewBuildCreateBalancerPoolMsg(clientCtx client.Context, fs *flag.FlagSet) (
 	}
 
 	msg := &balancer.MsgCreateBalancerPool{
-		Sender:             clientCtx.GetFromAddress().String(),
-		PoolParams:         poolParams,
-		PoolAssets:         poolAssets,
-		FuturePoolGovernor: pool.FutureGovernor,
-	}
-
-	if (pool.SmoothWeightChangeParams != smoothWeightChangeParamsInputs{}) {
-		duration, err := time.ParseDuration(pool.SmoothWeightChangeParams.Duration)
-		if err != nil {
-			return nil, fmt.Errorf("could not parse duration: %w", err)
-		}
-
-		targetPoolAssetCoins, err := sdk.ParseDecCoins(pool.SmoothWeightChangeParams.TargetPoolWeights)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(targetPoolAssetCoins) != len(poolAssetCoins) {
-			return nil, errors.New("initial pool weights and target pool weights should have same length")
-		}
-
-		var targetPoolAssets []balancer.PoolAsset
-		for i := 0; i < len(targetPoolAssetCoins); i++ {
-			if targetPoolAssetCoins[i].Denom != poolAssetCoins[i].Denom {
-				return nil, errors.New("initial pool weights and target pool weights should have same denom order")
-			}
-
-			targetPoolAssets = append(targetPoolAssets, balancer.PoolAsset{
-				Weight: targetPoolAssetCoins[i].Amount.RoundInt(),
-				Token:  deposit[i],
-				// TODO: This doesn't make sense. Should only use denom, not an sdk.Coin
-			})
-		}
-
-		smoothWeightParams := balancer.SmoothWeightChangeParams{
-			Duration:           duration,
-			InitialPoolWeights: poolAssets,
-			TargetPoolWeights:  targetPoolAssets,
-		}
-
-		if pool.SmoothWeightChangeParams.StartTime != "" {
-			startTime, err := time.Parse(time.RFC3339, pool.SmoothWeightChangeParams.StartTime)
-			if err != nil {
-				return nil, fmt.Errorf("could not parse time: %w", err)
-			}
-
-			smoothWeightParams.StartTime = startTime
-		}
-
-		msg.PoolParams.SmoothWeightChangeParams = &smoothWeightParams
+		Sender:     clientCtx.GetFromAddress().String(),
+		PoolParams: poolParams,
+		PoolAssets: poolAssets,
 	}
 
 	return msg, nil

@@ -1323,8 +1323,7 @@ func GetSchemas() []string {
 					},
 					"weight": ""
 				}
-			],
-			"futurePoolGovernor": ""
+			]
 		}
 	}`)
 

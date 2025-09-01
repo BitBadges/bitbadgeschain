@@ -22,13 +22,11 @@ func NewMsgCreateBalancerPool(
 	sender sdk.AccAddress,
 	poolParams PoolParams,
 	poolAssets []PoolAsset,
-	futurePoolGovernor string,
 ) MsgCreateBalancerPool {
 	return MsgCreateBalancerPool{
-		Sender:             sender.String(),
-		PoolParams:         &poolParams,
-		PoolAssets:         poolAssets,
-		FuturePoolGovernor: futurePoolGovernor,
+		Sender:     sender.String(),
+		PoolParams: &poolParams,
+		PoolAssets: poolAssets,
 	}
 }
 
@@ -47,11 +45,6 @@ func (msg MsgCreateBalancerPool) ValidateBasic() error {
 
 	err = msg.PoolParams.Validate(msg.PoolAssets)
 	if err != nil {
-		return err
-	}
-
-	// validation for future owner
-	if err = types.ValidateFutureGovernor(msg.FuturePoolGovernor); err != nil {
 		return err
 	}
 
@@ -93,7 +86,7 @@ func (msg MsgCreateBalancerPool) InitialLiquidity() sdk.Coins {
 }
 
 func (msg MsgCreateBalancerPool) CreatePool(ctx sdk.Context, poolID uint64) (poolmanagertypes.PoolI, error) {
-	poolI, err := NewBalancerPool(poolID, *msg.PoolParams, msg.PoolAssets, msg.FuturePoolGovernor, ctx.BlockTime())
+	poolI, err := NewBalancerPool(poolID, *msg.PoolParams, msg.PoolAssets, ctx.BlockTime())
 	return &poolI, err
 }
 

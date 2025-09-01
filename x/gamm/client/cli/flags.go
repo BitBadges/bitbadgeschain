@@ -16,7 +16,6 @@ const (
 	PoolFileExitFee        = "exit-fee"
 	PoolFileFutureGovernor = "future-governor"
 
-	PoolFileSmoothWeightChangeParams = "lbp-params"
 	PoolFileStartTime                = "start-time"
 	PoolFileDuration                 = "duration"
 	PoolFileTargetPoolWeights        = "target-pool-weights"
@@ -53,7 +52,6 @@ type createBalancerPoolInputs struct {
 	SwapFee                  string                         `json:"swap-fee"`
 	ExitFee                  string                         `json:"exit-fee"`
 	FutureGovernor           string                         `json:"future-governor"`
-	SmoothWeightChangeParams smoothWeightChangeParamsInputs `json:"lbp-params"`
 }
 
 type createStableswapPoolInputs struct {
@@ -63,12 +61,6 @@ type createStableswapPoolInputs struct {
 	FutureGovernor          string `json:"future-governor"`
 	ScalingFactorController string `json:"scaling-factor-controller"`
 	ScalingFactors          string `json:"scaling-factors"`
-}
-
-type smoothWeightChangeParamsInputs struct {
-	StartTime         string `json:"start-time"`
-	Duration          string `json:"duration"`
-	TargetPoolWeights string `json:"target-pool-weights"`
 }
 
 func FlagSetMultihopSwapRoutes() *flag.FlagSet {

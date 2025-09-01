@@ -12,6 +12,9 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/gamm"
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
+	poolmanagermodule "github.com/bitbadges/bitbadgeschain/x/poolmanager/module"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -19,15 +22,16 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 	// set up non depinject support modules store keys
 	if err := app.RegisterStores(
 		storetypes.NewKVStoreKey(gammtypes.StoreKey),
+		storetypes.NewKVStoreKey(poolmanagertypes.StoreKey),
 	); err != nil {
 		return err
 	}
 
 	// register thee gamm params
+	app.ParamsKeeper.Subspace(poolmanagertypes.ModuleName).WithKeyTable(poolmanagertypes.ParamKeyTable())
 	app.ParamsKeeper.Subspace(gammtypes.ModuleName).WithKeyTable(gammtypes.ParamKeyTable())
 
-	// add capability keeper and ScopeToModule for ibc module
-	gk := gammkeeper.NewKeeper(
+	app.GammKeeper = gammkeeper.NewKeeper(
 		app.appCodec,
 		app.GetKey(gammtypes.StoreKey),
 		app.GetSubspace(gammtypes.ModuleName),
@@ -36,11 +40,23 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 		app.DistrKeeper,
 		app.BadgesKeeper,
 	)
-	app.GammKeeper = gk
+
+	app.PoolManagerKeeper = *poolmanager.NewKeeper(
+		app.GetKey(poolmanagertypes.StoreKey),
+		app.GetSubspace(poolmanagertypes.ModuleName),
+		app.GammKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.DistrKeeper,
+		app.StakingKeeper,
+	)
+
+	app.GammKeeper.SetPoolManager(&app.PoolManagerKeeper)
 
 	// register IBC modules
 	if err := app.RegisterModules(
-		gamm.NewAppModule(app.appCodec, gk, app.AccountKeeper, app.BankKeeper),
+		gamm.NewAppModule(app.appCodec, app.GammKeeper, app.AccountKeeper, app.BankKeeper),
+		poolmanagermodule.NewAppModule(app.PoolManagerKeeper, app.GammKeeper),
 	); err != nil {
 		return err
 	}
@@ -53,7 +69,8 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 // This needs to be removed after IBC supports App Wiring.
 func RegisterGamm(registry cdctypes.InterfaceRegistry) map[string]appmodule.AppModule {
 	modules := map[string]appmodule.AppModule{
-		gammtypes.ModuleName: gamm.AppModule{},
+		gammtypes.ModuleName:        gamm.AppModule{},
+		poolmanagertypes.ModuleName: poolmanagermodule.AppModule{},
 	}
 
 	for name, m := range modules {
