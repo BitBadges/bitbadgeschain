@@ -7,6 +7,8 @@ import (
 	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	gammKeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
+	gammTypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	mapsKeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 	mapsTypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
@@ -17,7 +19,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Keeper, mk mapsKeeper.Keeper) wasmKeeper.CustomQuerier {
+func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Keeper, mk mapsKeeper.Keeper, gk gammKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 		isBadgeModuleQuery := false
 		var custom badgeCustomQuery
@@ -40,12 +42,21 @@ func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Ke
 			isMapsModuleQuery = true
 		}
 
+		isGammModuleQuery := false
+		var gammCustom gammCustomQuery
+		err = json.Unmarshal(request, &gammCustom)
+		if err == nil {
+			isGammModuleQuery = true
+		}
+
 		if isBadgeModuleQuery {
 			return PerformCustomBadgeQuery(bk)(ctx, request)
 		} else if isAnchorModuleQuery {
 			return PerformCustomAnchorQuery(ak)(ctx, request)
 		} else if isMapsModuleQuery {
 			return PerformCustomMapsQuery(mk)(ctx, request)
+		} else if isGammModuleQuery {
+			return PerformCustomGammQuery(gk)(ctx, request)
 		}
 
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
@@ -150,12 +161,93 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 	}
 }
 
+func PerformCustomGammQuery(gk gammKeeper.Keeper) wasmKeeper.CustomQuerier {
+	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
+		var custom gammCustomQuery
+		err := json.Unmarshal(request, &custom)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, err.Error())
+		}
+
+		// Create a querier to handle the gRPC-style queries
+		querier := gammKeeper.NewQuerier(gk)
+
+		// Convert sdk.Context to context.Context for gRPC methods
+		grpcCtx := sdk.WrapSDKContext(ctx)
+
+		switch {
+		case custom.QueryPool != nil:
+			res, err := querier.Pool(grpcCtx, custom.QueryPool)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryPoolResponse{Pool: res.Pool})
+		case custom.QueryPools != nil:
+			res, err := querier.Pools(grpcCtx, custom.QueryPools)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryPoolsResponse{Pools: res.Pools, Pagination: res.Pagination})
+		case custom.QueryPoolType != nil:
+			res, err := querier.PoolType(grpcCtx, custom.QueryPoolType)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryPoolTypeResponse{PoolType: res.PoolType})
+		case custom.QueryPoolsWithFilter != nil:
+			res, err := querier.PoolsWithFilter(grpcCtx, custom.QueryPoolsWithFilter)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryPoolsWithFilterResponse{Pools: res.Pools, Pagination: res.Pagination})
+		case custom.QueryNumPools != nil:
+			res, err := querier.NumPools(grpcCtx, custom.QueryNumPools)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryNumPoolsResponse{NumPools: res.NumPools})
+		case custom.QueryTotalLiquidity != nil:
+			res, err := querier.TotalLiquidity(grpcCtx, custom.QueryTotalLiquidity)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryTotalLiquidityResponse{Liquidity: res.Liquidity})
+		case custom.QueryTotalPoolLiquidity != nil:
+			res, err := querier.TotalPoolLiquidity(grpcCtx, custom.QueryTotalPoolLiquidity)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryTotalPoolLiquidityResponse{Liquidity: res.Liquidity})
+		case custom.QuerySpotPrice != nil:
+			res, err := querier.SpotPrice(grpcCtx, custom.QuerySpotPrice)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QuerySpotPriceResponse{SpotPrice: res.SpotPrice})
+		case custom.QueryPoolParams != nil:
+			res, err := querier.PoolParams(grpcCtx, custom.QueryPoolParams)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryPoolParamsResponse{Params: res.Params})
+		case custom.QueryTotalShares != nil:
+			res, err := querier.TotalShares(grpcCtx, custom.QueryTotalShares)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(gammTypes.QueryTotalSharesResponse{TotalShares: res.TotalShares})
+		}
+
+		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
+	}
+}
+
 type badgeCustomQuery struct {
-	QueryCollection          *badgeTypes.QueryGetCollectionRequest       `json:"queryCollection,omitempty"`
-	QueryBalance             *badgeTypes.QueryGetBalanceRequest          `json:"queryBalance,omitempty"`
-	QueryAddressList         *badgeTypes.QueryGetAddressListRequest      `json:"queryAddressList,omitempty"`
-	QueryApprovalTracker     *badgeTypes.QueryGetApprovalTrackerRequest  `json:"queryApprovalTracker,omitempty"`
-	QueryGetChallengeTracker *badgeTypes.QueryGetChallengeTrackerRequest `json:"queryGetChallengeTracker,omitempty"`
+	QueryCollection             *badgeTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
+	QueryBalance                *badgeTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
+	QueryAddressList            *badgeTypes.QueryGetAddressListRequest         `json:"queryAddressList,omitempty"`
+	QueryApprovalTracker        *badgeTypes.QueryGetApprovalTrackerRequest     `json:"queryApprovalTracker,omitempty"`
+	QueryGetChallengeTracker    *badgeTypes.QueryGetChallengeTrackerRequest    `json:"queryGetChallengeTracker,omitempty"`
 	QueryGetETHSignatureTracker *badgeTypes.QueryGetETHSignatureTrackerRequest `json:"queryGetETHSignatureTracker,omitempty"`
 }
 
@@ -166,4 +258,17 @@ type anchorCustomQuery struct {
 type mapsCustomQuery struct {
 	QueryMap      *mapsTypes.QueryGetMapRequest      `json:"queryMap,omitempty"`
 	QueryMapValue *mapsTypes.QueryGetMapValueRequest `json:"queryMapList,omitempty"`
+}
+
+type gammCustomQuery struct {
+	QueryPool               *gammTypes.QueryPoolRequest               `json:"queryPool,omitempty"`
+	QueryPools              *gammTypes.QueryPoolsRequest              `json:"queryPools,omitempty"`
+	QueryPoolType           *gammTypes.QueryPoolTypeRequest           `json:"queryPoolType,omitempty"`
+	QueryPoolsWithFilter    *gammTypes.QueryPoolsWithFilterRequest    `json:"queryPoolsWithFilter,omitempty"`
+	QueryNumPools           *gammTypes.QueryNumPoolsRequest           `json:"queryNumPools,omitempty"`
+	QueryTotalLiquidity     *gammTypes.QueryTotalLiquidityRequest     `json:"queryTotalLiquidity,omitempty"`
+	QueryTotalPoolLiquidity *gammTypes.QueryTotalPoolLiquidityRequest `json:"queryTotalPoolLiquidity,omitempty"`
+	QuerySpotPrice          *gammTypes.QuerySpotPriceRequest          `json:"querySpotPrice,omitempty"`
+	QueryPoolParams         *gammTypes.QueryPoolParamsRequest         `json:"queryPoolParams,omitempty"`
+	QueryTotalShares        *gammTypes.QueryTotalSharesRequest        `json:"queryTotalShares,omitempty"`
 }

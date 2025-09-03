@@ -35,3 +35,8 @@ message MsgCreateBalancerPool {
 message MsgCreateBalancerPoolResponse {
   uint64 pool_id = 1 [ (gogoproto.customname) = "PoolID" ];
 }
+
+// Used for WASM bindings and JSON parsing
+message BalancerCustomMsgType {
+  MsgCreateBalancerPool createBalancerPoolMsg = 1;
+}

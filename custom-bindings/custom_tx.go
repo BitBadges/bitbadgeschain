@@ -12,6 +12,8 @@ import (
 
 	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	balancertypes "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
+	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	mapstypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
@@ -44,6 +46,20 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 		err = jsonpb.Unmarshal(reader, &mapsCustomMsg)
 		if err == nil {
 			isMapsModuleMsg = true
+		}
+
+		isGammModuleMsg := false
+		var gammCustomMsg gammtypes.GammCustomMsgType
+		err = jsonpb.Unmarshal(reader, &gammCustomMsg)
+		if err == nil {
+			isGammModuleMsg = true
+		}
+
+		isBalancerModuleMsg := false
+		var balancerCustomMsg balancertypes.BalancerCustomMsgType
+		err = jsonpb.Unmarshal(reader, &balancerCustomMsg)
+		if err == nil {
+			isBalancerModuleMsg = true
 		}
 
 		if isBadgeModuleMsg {
@@ -170,6 +186,53 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case mapsCustomMsg.SetValueMsg != nil:
 				mapsCustomMsg.SetValueMsg.Creator = sender.String()
 				return []sdk.Msg{mapsCustomMsg.SetValueMsg}, nil
+			}
+		} else if isGammModuleMsg {
+			reader = bytes.NewReader(jsonData)
+			var gammCustomMsg gammtypes.GammCustomMsgType
+			err = jsonpb.Unmarshal(reader, &gammCustomMsg)
+			if err != nil {
+				return nil, sdkerrors.Wrap(err, err.Error())
+			}
+
+			switch {
+			case gammCustomMsg.JoinPoolMsg != nil:
+				gammCustomMsg.JoinPoolMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.JoinPoolMsg}, nil
+			case gammCustomMsg.ExitPoolMsg != nil:
+				gammCustomMsg.ExitPoolMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.ExitPoolMsg}, nil
+			case gammCustomMsg.SwapExactAmountInMsg != nil:
+				gammCustomMsg.SwapExactAmountInMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.SwapExactAmountInMsg}, nil
+			case gammCustomMsg.SwapExactAmountOutMsg != nil:
+				gammCustomMsg.SwapExactAmountOutMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.SwapExactAmountOutMsg}, nil
+			case gammCustomMsg.JoinSwapExternAmountInMsg != nil:
+				gammCustomMsg.JoinSwapExternAmountInMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.JoinSwapExternAmountInMsg}, nil
+			case gammCustomMsg.JoinSwapShareAmountOutMsg != nil:
+				gammCustomMsg.JoinSwapShareAmountOutMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.JoinSwapShareAmountOutMsg}, nil
+			case gammCustomMsg.ExitSwapShareAmountInMsg != nil:
+				gammCustomMsg.ExitSwapShareAmountInMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.ExitSwapShareAmountInMsg}, nil
+			case gammCustomMsg.ExitSwapExternAmountOutMsg != nil:
+				gammCustomMsg.ExitSwapExternAmountOutMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.ExitSwapExternAmountOutMsg}, nil
+			}
+		} else if isBalancerModuleMsg {
+			reader = bytes.NewReader(jsonData)
+			var balancerCustomMsg balancertypes.BalancerCustomMsgType
+			err = jsonpb.Unmarshal(reader, &balancerCustomMsg)
+			if err != nil {
+				return nil, sdkerrors.Wrap(err, err.Error())
+			}
+
+			switch {
+			case balancerCustomMsg.CreateBalancerPoolMsg != nil:
+				balancerCustomMsg.CreateBalancerPoolMsg.Sender = sender.String()
+				return []sdk.Msg{balancerCustomMsg.CreateBalancerPoolMsg}, nil
 			}
 		}
 

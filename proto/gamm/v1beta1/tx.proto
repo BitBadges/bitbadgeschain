@@ -269,3 +269,15 @@ message MsgExitSwapExternAmountOutResponse {
     (gogoproto.nullable) = false
   ];
 }
+
+// Used for WASM bindings and JSON parsing
+message GammCustomMsgType {
+  MsgJoinPool joinPoolMsg = 1;
+  MsgExitPool exitPoolMsg = 2;
+  MsgSwapExactAmountIn swapExactAmountInMsg = 3;
+  MsgSwapExactAmountOut swapExactAmountOutMsg = 4;
+  MsgJoinSwapExternAmountIn joinSwapExternAmountInMsg = 5;
+  MsgJoinSwapShareAmountOut joinSwapShareAmountOutMsg = 6;
+  MsgExitSwapShareAmountIn exitSwapShareAmountInMsg = 7;
+  MsgExitSwapExternAmountOut exitSwapExternAmountOutMsg = 8;
+}

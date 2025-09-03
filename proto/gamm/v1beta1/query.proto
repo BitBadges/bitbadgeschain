@@ -343,3 +343,17 @@ message QueryTotalLiquidityResponse {
     (gogoproto.nullable) = false
   ];
 }
+
+// Used for WASM bindings and JSON parsing
+message GammCustomQueryType {
+  QueryPoolRequest queryPool = 1;
+  QueryPoolsRequest queryPools = 2;
+  QueryPoolTypeRequest queryPoolType = 3;
+  QueryPoolsWithFilterRequest queryPoolsWithFilter = 4;
+  QueryNumPoolsRequest queryNumPools = 5;
+  QueryTotalLiquidityRequest queryTotalLiquidity = 6;
+  QueryTotalPoolLiquidityRequest queryTotalPoolLiquidity = 7;
+  QuerySpotPriceRequest querySpotPrice = 8;
+  QueryPoolParamsRequest queryPoolParams = 9;
+  QueryTotalSharesRequest queryTotalShares = 10;
+}
