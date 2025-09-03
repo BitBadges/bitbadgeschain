@@ -134,6 +134,7 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 
 		for _, wrapperPath := range newCollection.CosmosCoinWrapperPaths {
 			wrapperPath.AllowOverrideWithAnyValidToken = false
+			wrapperPath.AllowCosmosWrapping = true
 		}
 		newCollection.Invariants.MaxSupplyPerId = sdkmath.NewUint(0)
 

@@ -58,6 +58,9 @@ func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string)
 	cosmosPaths := collection.CosmosCoinWrapperPaths
 	for _, path := range cosmosPaths {
 		if path.Denom == baseDenom {
+			if path.AllowOverrideWithAnyValidToken {
+				return nil, fmt.Errorf("path allows override with any valid token is set: %s", denom)
+			}
 			return path, nil
 		}
 	}
@@ -87,13 +90,13 @@ func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badges
 
 	collection, found := k.badgesKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
 	if !found {
-		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidCollectionID, "collection %s not found", collectionId)
+		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidCollectionID, "collection %s not found", sdkmath.NewUint(collectionId).String())
 	}
 
 	return collection, nil
 }
 
-func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -108,12 +111,12 @@ func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, poolAddress string, reci
 	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
 	msg := &badgestypes.MsgTransferBadges{
-		Creator:      poolAddress,
+		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
 		Transfers: []*badgestypes.Transfer{
 			{
-				From:        poolAddress,
-				ToAddresses: []string{recipientAddress},
+				From:        recipientAddress,
+				ToAddresses: []string{poolAddress},
 				Balances:    balancesToTransfer,
 			},
 		},
@@ -138,12 +141,12 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
 	msg := &badgestypes.MsgTransferBadges{
-		Creator:      recipientAddress,
+		Creator:      poolAddress,
 		CollectionId: collection.CollectionId,
 		Transfers: []*badgestypes.Transfer{
 			{
-				From:        recipientAddress,
-				ToAddresses: []string{poolAddress},
+				From:        poolAddress,
+				ToAddresses: []string{recipientAddress},
 				Balances:    balancesToTransfer,
 			},
 		},

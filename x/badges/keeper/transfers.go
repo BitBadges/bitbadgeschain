@@ -479,6 +479,11 @@ func (k Keeper) HandleTransfer(
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
 		}
 
+		// Check if cosmos wrapping is allowed for this path
+		if !denomInfo.AllowCosmosWrapping {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "cosmos wrapping is not allowed for this wrapper path")
+		}
+
 		// Handle {id} placeholder replacement and overrideWithAnyValidToken logic
 		ibcDenom := denomInfo.Denom
 		firstTokenId := transferBalances[0].BadgeIds[0].Start

@@ -21,6 +21,7 @@ func (suite *TestSuite) TestWrapBadges() {
 					BadgeIds:       GetOneUintRange(),
 				},
 			},
+			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -140,6 +141,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 					BadgeIds:       GetOneUintRange(),
 				},
 			},
+			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -244,6 +246,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 					BadgeIds:       GetOneUintRange(),
 				},
 			},
+			AllowCosmosWrapping: true,
 		},
 	}
 

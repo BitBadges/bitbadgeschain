@@ -92,6 +92,7 @@ message CosmosCoinWrapperPath {
   repeated Balance balances = 3;
   string symbol = 4;
   repeated DenomUnit denomUnits = 5;
+  bool allowCosmosWrapping = 6;
 }
 
 message DenomUnit {

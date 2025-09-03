@@ -713,7 +713,8 @@ func GetSchemas() []string {
 							"isDefaultDisplay": false
 						}
 					],
-					"allowOverrideWithAnyValidToken": false
+					"allowOverrideWithAnyValidToken": false,
+					"allowCosmosWrapping": false
 				}
 			],
 			"invariants": {
@@ -846,7 +847,8 @@ func GetSchemas() []string {
 							"isDefaultDisplay": false
 						}
 					],
-					"allowOverrideWithAnyValidToken": false
+					"allowOverrideWithAnyValidToken": false,
+					"allowCosmosWrapping": false
 				}
 			],
 			"invariants": {
@@ -950,7 +952,8 @@ func GetSchemas() []string {
 							"isDefaultDisplay": false
 						}
 					],
-					"allowOverrideWithAnyValidToken": false
+					"allowOverrideWithAnyValidToken": false,
+					"allowCosmosWrapping": false
 				}
 			],
 			"invariants": {

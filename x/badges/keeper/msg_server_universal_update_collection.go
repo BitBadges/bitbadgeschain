@@ -232,6 +232,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				Symbol:                         path.Symbol,
 				DenomUnits:                     path.DenomUnits,
 				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
+				AllowCosmosWrapping:            path.AllowCosmosWrapping,
 			}
 		}
 

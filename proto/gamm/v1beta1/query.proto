@@ -167,9 +167,9 @@ message QueryCalcJoinPoolSharesRequest {
     (gogoproto.nullable) = false
   ];
 }
+
 message QueryCalcJoinPoolSharesResponse {
   string share_out_amount = 1 [
-
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"share_out_amount\"",
     (gogoproto.nullable) = false

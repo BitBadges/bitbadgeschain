@@ -93,6 +93,7 @@ message CosmosCoinWrapperPath {
   string symbol = 4;
   repeated DenomUnit denomUnits = 5;
   bool allowOverrideWithAnyValidToken = 6;
+  bool allowCosmosWrapping = 7;
 }
 
 message DenomUnit {
