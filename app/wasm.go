@@ -61,7 +61,7 @@ func (app *App) registerWasmModules(appOpts servertypes.AppOptions) (store.KVSto
 	}
 
 	customEncoderOptions := GetCustomMsgEncodersOptions()
-	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.AnchorKeeper, app.MapsKeeper)
+	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.AnchorKeeper, app.MapsKeeper, app.GammKeeper)
 	wasmOpts := append(customEncoderOptions, customQueryOptions...)
 	availableCapabilities := wasmkeeper.BuiltInCapabilities()
 	availableCapabilities = append(availableCapabilities, "bitbadges")
