@@ -485,6 +485,10 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
 }
 
+func (app *App) InterfaceRegistry() codectypes.InterfaceRegistry {
+	return app.interfaceRegistry
+}
+
 // GetMaccPerms returns a copy of the module account permissions
 //
 // NOTE: This is solely to be used for testing purposes.

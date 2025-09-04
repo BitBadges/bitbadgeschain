@@ -52,6 +52,7 @@ require (
 	github.com/cosmos/ibc-go/modules/apps/callbacks v0.2.1-0.20231113120333-342c00b0f8bd
 	github.com/ethereum/go-ethereum v1.14.7
 	github.com/gogo/protobuf v1.3.2
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.4
 	github.com/golangci/golangci-lint v1.52.0
 	github.com/spf13/cast v1.7.1
@@ -220,7 +221,6 @@ require (
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/golang/glog v1.2.4 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v0.0.5-0.20220116011046-fa5810519dcb // indirect
 	github.com/golangci/check v0.0.0-20180506172741-cfe4005ccda2 // indirect
 	github.com/golangci/dupl v0.0.0-20180902072040-3e9179ac440a // indirect
