@@ -61,22 +61,24 @@ func (k Keeper) CreatePool(ctx sdk.Context, msg types.CreatePoolMsg) (uint64, er
 // The creator of the pool must be the poolmanager module account. Returns error if not. Otherwise, functions the same as
 // the regular createPoolZeroLiquidityNoCreationFee.
 func (k Keeper) CreateConcentratedPoolAsPoolManager(ctx sdk.Context, msg types.CreatePoolMsg) (types.PoolI, error) {
-	// Validate that creator is the poolmanager module account as a sanity check.
-	creator := msg.PoolCreator()
-	poolmanagerModuleAccInterface := k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
-	if !poolmanagerModuleAccInterface.GetAddress().Equals(creator) {
-		return nil, types.InvalidPoolCreatorError{CreatorAddresss: creator.String()}
-	}
+	panic("not implemented")
 
-	// Disallow this for any pool type other than concentrated liquidity pool.
-	// This can be further relaxed in the future.
-	// The reason for this constraint is having balancer and stableswap pools mint gamm shares during InitializePool()
-	// Module accounts cannot receive shares, so we cannot use this function for the above pool types without refactor.
-	if msg.GetPoolType() != types.Concentrated {
-		return nil, types.InvalidPoolTypeError{PoolType: msg.GetPoolType()}
-	}
+	// // Validate that creator is the poolmanager module account as a sanity check.
+	// creator := msg.PoolCreator()
+	// poolmanagerModuleAccInterface := k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
+	// if !poolmanagerModuleAccInterface.GetAddress().Equals(creator) {
+	// 	return nil, types.InvalidPoolCreatorError{CreatorAddresss: creator.String()}
+	// }
 
-	return k.createPoolZeroLiquidityNoCreationFee(ctx, msg)
+	// // Disallow this for any pool type other than concentrated liquidity pool.
+	// // This can be further relaxed in the future.
+	// // The reason for this constraint is having balancer and stableswap pools mint gamm shares during InitializePool()
+	// // Module accounts cannot receive shares, so we cannot use this function for the above pool types without refactor.
+	// if msg.GetPoolType() != types.Concentrated {
+	// 	return nil, types.InvalidPoolTypeError{PoolType: msg.GetPoolType()}
+	// }
+
+	// return k.createPoolZeroLiquidityNoCreationFee(ctx, msg)
 }
 
 // createPoolZeroLiquidityNoCreationFee is an internal helper to create a pool from message with zero initial liquidity

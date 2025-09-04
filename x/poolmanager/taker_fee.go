@@ -13,7 +13,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
-	txfeestypes "github.com/bitbadges/bitbadgeschain/x/txfees/types"
 )
 
 var zero = osmomath.ZeroInt()
@@ -128,35 +127,38 @@ func (k Keeper) GetAllTradingPairTakerFees(ctx sdk.Context) ([]types.DenomPairTa
 // If the sender is in the taker fee reduced whitelisted, it returns the tokenIn without extracting the taker fee.
 // In the future, we might charge a lower taker fee as opposed to no fee at all.
 // TODO: Gas optimize this function, its expensive in both gas and CPU.
+// NOTE: Taker fees are disabled in this fork - always return tokenIn without charging any fee
 func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom string, sender sdk.AccAddress, exactIn bool) (sdk.Coin, sdk.Coin, error) {
-	takerFeeModuleAccountName := txfeestypes.TakerFeeCollectorName
+	// Taker fees are disabled in this fork - return tokenIn without charging any fee
+	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
+	// takerFeeModuleAccountName := txfeestypes.TakerFeeCollectorName
 
-	reducedFeeWhitelist := []string{}
-	k.paramSpace.Get(ctx, types.KeyReducedTakerFeeByWhitelist, &reducedFeeWhitelist)
+	// reducedFeeWhitelist := []string{}
+	// k.paramSpace.Get(ctx, types.KeyReducedTakerFeeByWhitelist, &reducedFeeWhitelist)
 
-	// Determine if eligible to bypass taker fee.
-	if osmoutils.Contains(reducedFeeWhitelist, sender.String()) {
-		return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
-	}
+	// // Determine if eligible to bypass taker fee.
+	// if osmoutils.Contains(reducedFeeWhitelist, sender.String()) {
+	// 	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
+	// }
 
-	takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
-	if err != nil {
-		return sdk.Coin{}, sdk.Coin{}, err
-	}
+	// takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
+	// if err != nil {
+	// 	return sdk.Coin{}, sdk.Coin{}, err
+	// }
 
-	var tokenInAfterTakerFee sdk.Coin
-	var takerFeeCoin sdk.Coin
-	if exactIn {
-		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactIn(tokenIn, takerFee)
-	} else {
-		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
-	}
+	// var tokenInAfterTakerFee sdk.Coin
+	// var takerFeeCoin sdk.Coin
+	// if exactIn {
+	// 	tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactIn(tokenIn, takerFee)
+	// } else {
+	// 	tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
+	// }
 
-	err = k.gammKeeper.SendCoinsToPoolWithWrappingFromAccountToModule(ctx, sender, takerFeeModuleAccountName, sdk.NewCoins(takerFeeCoin))
-	if err != nil {
-		return sdk.Coin{}, sdk.Coin{}, err
-	}
-	return tokenInAfterTakerFee, takerFeeCoin, nil
+	// err = k.gammKeeper.SendCoinsToPoolWithWrappingFromAccountToModule(ctx, sender, takerFeeModuleAccountName, sdk.NewCoins(takerFeeCoin))
+	// if err != nil {
+	// 	return sdk.Coin{}, sdk.Coin{}, err
+	// }
+	// return tokenInAfterTakerFee, takerFeeCoin, nil
 }
 
 // Returns remaining amount in to swap, and takerFeeCoins.

@@ -49,10 +49,6 @@ func (k Keeper) CreateMultihopExpectedSwapOuts(
 	return k.createMultihopExpectedSwapOuts(ctx, route, tokenOut)
 }
 
-// func (k Keeper) TrackVolume(ctx sdk.Context, poolId uint64, volumeGenerated sdk.Coin) {
-// 	k.trackVolume(ctx, poolId, volumeGenerated)
-// }
-
 func (k Keeper) ChargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom string, sender sdk.AccAddress, exactIn bool) (sdk.Coin, sdk.Coin, error) {
 	return k.chargeTakerFee(ctx, tokenIn, tokenOutDenom, sender, exactIn)
 }

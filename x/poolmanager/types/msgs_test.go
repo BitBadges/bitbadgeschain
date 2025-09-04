@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/app/apptesting"
-	appParams "github.com/bitbadges/bitbadgeschain/app/params"
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/module"
@@ -18,7 +17,7 @@ import (
 var (
 	pk1         = ed25519.GenPrivKey().PubKey()
 	addr1       = sdk.AccAddress(pk1.Address()).String()
-	invalidAddr = "invalid"
+	invalidAddr = ""
 
 	validSwapRoutePoolThreeAmountIn = types.SwapAmountInRoute{
 		PoolId:        3,
@@ -171,11 +170,6 @@ func TestMsgSwapExactAmountIn(t *testing.T) {
 }
 
 func TestMsgSwapExactAmountOut(t *testing.T) {
-	appParams.SetAddressPrefixes()
-	pk1 := ed25519.GenPrivKey().PubKey()
-	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := "invalid"
-
 	properMsg := types.MsgSwapExactAmountOut{
 		Sender: addr1,
 		Routes: []types.SwapAmountOutRoute{{

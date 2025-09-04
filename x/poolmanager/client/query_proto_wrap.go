@@ -9,9 +9,9 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
-	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/client/queryprotov2"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // This file should evolve to being code gen'd, off of `proto/poolmanager/v1beta/query.yml`
@@ -396,10 +396,10 @@ func (q Querier) EstimateTradeBasedOnPriceImpact(
 		return q.K.EstimateTradeBasedOnPriceImpactStableSwapPool(
 			ctx, req, spotPrice, adjustedMaxPriceImpact, swapModule, poolI,
 		)
-	case types.Concentrated:
-		return q.K.EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
-			ctx, req, spotPrice, adjustedMaxPriceImpact, swapModule, poolI,
-		)
+	// case types.Concentrated:
+	// 	return q.K.EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
+	// 		ctx, req, spotPrice, adjustedMaxPriceImpact, swapModule, poolI,
+	// 	)
 	default:
 		return nil, status.Error(codes.Internal, "pool type not supported")
 	}

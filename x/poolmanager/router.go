@@ -15,6 +15,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 var (
@@ -202,6 +203,9 @@ func (k Keeper) SwapExactAmountIn(
 		return osmomath.Int{}, sdk.Coin{}, err
 	}
 
+	// Track volume for volume-splitting incentives
+	k.trackVolume(ctx, pool.GetId(), tokenIn)
+
 	return tokenOutAmount, takerFeeCharged, nil
 }
 
@@ -233,6 +237,9 @@ func (k Keeper) SwapExactAmountInNoTakerFee(
 	if err != nil {
 		return osmomath.Int{}, err
 	}
+
+	// Track volume for volume-splitting incentives
+	k.trackVolume(ctx, pool.GetId(), tokenIn)
 
 	return tokenOutAmount, nil
 }
@@ -394,6 +401,9 @@ func (k Keeper) RouteExactAmountOut(ctx sdk.Context,
 		if err != nil {
 			return osmomath.Int{}, err
 		}
+
+		// Track volume for volume-splitting incentives
+		k.trackVolume(ctx, pool.GetId(), sdk.NewCoin(routeStep.TokenInDenom, tokenIn.Amount))
 
 		// Sets the final amount of tokens that need to be input into the first pool. Even though this is the final return value for the
 		// whole method and will not change after the first iteration, we still iterate through the rest of the pools to execute their respective
@@ -684,8 +694,72 @@ func (k Keeper) TotalLiquidity(ctx sdk.Context) (sdk.Coins, error) {
 	if err != nil {
 		return nil, err
 	}
+	// totalConcentratedLiquidity, err := k.concentratedKeeper.GetTotalLiquidity(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// totalCosmwasmLiquidity, err := k.cosmwasmpoolKeeper.GetTotalLiquidity(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	totalLiquidity := totalGammLiquidity
+	// .Add(totalConcentratedLiquidity...).Add(totalCosmwasmLiquidity...)
 	return totalLiquidity, nil
+}
+
+// nolint: unused
+// trackVolume converts the input token into OSMO units and adds it to the global tracked volume for the given pool ID.
+// Fails quietly if an OSMO paired pool cannot be found, although this should only happen in rare scenarios where OSMO is
+// removed as a base denom from the protorev module (which this function relies on).
+//
+// CONTRACT: `volumeGenerated` corresponds to one of the denoms in the pool
+// CONTRACT: pool with `poolId` exists
+func (k Keeper) trackVolume(ctx sdk.Context, poolId uint64, volumeGenerated sdk.Coin) {
+	return // TODO: implement
+
+	// // If the denom is already denominated in uosmo, we can just use it directly
+	// OSMO, err := k.stakingKeeper.BondDenom(ctx)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// if volumeGenerated.Denom == OSMO {
+	// 	k.addVolume(ctx, poolId, volumeGenerated)
+	// 	return
+	// }
+
+	// // Get the most liquid OSMO-paired pool with `volumeGenerated`'s denom using `GetPoolForDenomPair`
+	// osmoPairedPoolId, err := k.protorevKeeper.GetPoolForDenomPair(ctx, OSMO, volumeGenerated.Denom)
+
+	// // If no pool is found, fail quietly.
+	// //
+	// // This is a rare scenario that should only happen if OSMO-paired pools are all removed from the protorev module.
+	// // Since this removal scenario is all-or-nothing, this is functionally equiavalent to freezing the tracked volume amounts
+	// // where they were prior to the disabling, which seems an appropriate response.
+	// //
+	// // This branch would also get triggered in the case where there is a token that has no OSMO-paired pool on the entire chain.
+	// // We simply do not track volume in these cases. Importantly, volume splitting gauge logic should prevent a gauge from being
+	// // created for such a pool that includes such a token, although it is okay to no-op in these cases regardless.
+	// if err != nil {
+	// 	return
+	// }
+
+	// // Since we want to ultimately multiply the volume by this spot price, we want to quote OSMO in terms of the input token.
+	// // This is so that once we multiply the volume by the spot price, we get the volume in units of OSMO.
+	// osmoPerInputToken, err := k.RouteCalculateSpotPrice(ctx, osmoPairedPoolId, OSMO, volumeGenerated.Denom)
+
+	// // We expect that if a pool is found, there should always be an available spot price as well.
+	// // That being said, if there is an error finding the spot price, we fail quietly and leave tracked volume unchanged.
+	// // This is because we do not want to escalate an issue with finding spot price to locking all swaps involving the given asset.
+	// if err != nil {
+	// 	return
+	// }
+
+	// // Multiply `volumeGenerated.Amount.ToDec()` by this spot price.
+	// // While rounding does not particularly matter here, we round down to ensure that we do not overcount volume.
+	// volumeInOsmo := osmomath.BigDecFromSDKInt(volumeGenerated.Amount).Mul(osmoPerInputToken).Dec().TruncateInt()
+
+	// // Add this new volume to the global tracked volume for the pool ID
+	// k.addVolume(ctx, poolId, sdk.NewCoin(OSMO, volumeInOsmo))
 }
 
 // addVolume adds the given volume to the global tracked volume for the given pool ID.
@@ -744,15 +818,15 @@ func (k Keeper) GetOsmoVolumeForPool(ctx sdk.Context, poolId uint64) osmomath.In
 // smallest units.
 func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 	ctx sdk.Context,
-	req types.EstimateTradeBasedOnPriceImpactRequest,
+	req queryproto.EstimateTradeBasedOnPriceImpactRequest,
 	spotPrice, adjustedMaxPriceImpact osmomath.Dec,
 	swapModule types.PoolModuleI,
 	poolI types.PoolI,
-) (*types.EstimateTradeBasedOnPriceImpactResponse, error) {
+) (*queryproto.EstimateTradeBasedOnPriceImpactResponse, error) {
 	tokenOut, err := swapModule.CalcOutAmtGivenIn(ctx, poolI, req.FromCoin, req.ToCoinDenom, types.ZeroDec)
 	if err != nil {
 		if errors.Is(err, gammtypes.ErrInvalidMathApprox) {
-			return &types.EstimateTradeBasedOnPriceImpactResponse{
+			return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 				InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 				OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 			}, nil
@@ -760,7 +834,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	if tokenOut.IsZero() {
-		return &types.EstimateTradeBasedOnPriceImpactResponse{
+		return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 			InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 			OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 		}, nil
@@ -775,7 +849,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 		)
 		if err != nil {
 			if errors.Is(err, gammtypes.ErrInvalidMathApprox) {
-				return &types.EstimateTradeBasedOnPriceImpactResponse{
+				return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 					InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 					OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 				}, nil
@@ -783,7 +857,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		return &types.EstimateTradeBasedOnPriceImpactResponse{
+		return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 			InputCoin:  req.FromCoin,
 			OutputCoin: tokenOut,
 		}, nil
@@ -818,7 +892,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 		)
 		if err != nil {
 			if errors.Is(err, gammtypes.ErrInvalidMathApprox) {
-				return &types.EstimateTradeBasedOnPriceImpactResponse{
+				return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 					InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 					OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 				}, nil
@@ -826,7 +900,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 		if tokenOut.IsZero() {
-			return &types.EstimateTradeBasedOnPriceImpactResponse{
+			return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 				InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 				OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 			}, nil
@@ -843,7 +917,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 	// highAmount is 0 it means the loop has iterated to the end without finding a viable trade that respects
 	// the price impact.
 	if highAmount.IsZero() {
-		return &types.EstimateTradeBasedOnPriceImpactResponse{
+		return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 			InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 			OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 		}, nil
@@ -856,7 +930,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.EstimateTradeBasedOnPriceImpactResponse{
+	return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 		InputCoin:  currFromCoin,
 		OutputCoin: tokenOut,
 	}, nil
@@ -868,11 +942,11 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactBalancerPool(
 // and keep attempting lower input amounts while if it's a normal error we should return an empty trade.
 func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 	ctx sdk.Context,
-	req types.EstimateTradeBasedOnPriceImpactRequest,
+	req queryproto.EstimateTradeBasedOnPriceImpactRequest,
 	spotPrice, adjustedMaxPriceImpact osmomath.Dec,
 	swapModule types.PoolModuleI,
 	poolI types.PoolI,
-) (*types.EstimateTradeBasedOnPriceImpactResponse, error) {
+) (*queryproto.EstimateTradeBasedOnPriceImpactResponse, error) {
 	var tokenOut sdk.Coin
 	var err error
 	err = osmoutils.ApplyFuncIfNoError(ctx, func(ctx sdk.Context) error {
@@ -885,7 +959,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 	// we want to continue to iterate to find attempt to find a smaller value. StableSwap panics on amounts that
 	// are too large due to the maths involved, while Balancer pool types do not.
 	if err != nil && !strings.Contains(err.Error(), "panic") {
-		return &types.EstimateTradeBasedOnPriceImpactResponse{
+		return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 			InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 			OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 		}, nil
@@ -901,7 +975,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 				return nil, status.Error(codes.Internal, err.Error())
 			}
 
-			return &types.EstimateTradeBasedOnPriceImpactResponse{
+			return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 				InputCoin:  req.FromCoin,
 				OutputCoin: tokenOut,
 			}, nil
@@ -941,7 +1015,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 		// This occurs for the StableSwap pool type due to the maths involved, this does not occur for Balancer
 		// pool types.
 		if err != nil && !strings.Contains(err.Error(), "panic") {
-			return &types.EstimateTradeBasedOnPriceImpactResponse{
+			return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 				InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 				OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 			}, nil
@@ -962,7 +1036,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 	// highAmount is 0 it means the loop has iterated to the end without finding a viable trade that respects
 	// the price impact.
 	if highAmount.IsZero() {
-		return &types.EstimateTradeBasedOnPriceImpactResponse{
+		return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 			InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 			OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 		}, nil
@@ -975,7 +1049,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.EstimateTradeBasedOnPriceImpactResponse{
+	return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 		InputCoin:  currFromCoin,
 		OutputCoin: tokenOut,
 	}, nil
@@ -988,18 +1062,18 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactStableSwapPool(
 // by halving the input.
 func (k Keeper) EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
 	ctx sdk.Context,
-	req types.EstimateTradeBasedOnPriceImpactRequest,
+	req queryproto.EstimateTradeBasedOnPriceImpactRequest,
 	spotPrice, adjustedMaxPriceImpact osmomath.Dec,
 	swapModule types.PoolModuleI,
 	poolI types.PoolI,
-) (*types.EstimateTradeBasedOnPriceImpactResponse, error) {
+) (*queryproto.EstimateTradeBasedOnPriceImpactResponse, error) {
 	tokenOut, err := swapModule.CalcOutAmtGivenIn(ctx, poolI, req.FromCoin, req.ToCoinDenom, types.ZeroDec)
 	// If there was no error we attempt to validate if the output is below the adjustedMaxPriceImpact.
 	if err == nil {
 		// If the tokenOut was returned to be zero it means the amount being traded is too small. We ignore the
 		// error output here as it could mean that the input is too large.
 		if tokenOut.IsZero() {
-			return &types.EstimateTradeBasedOnPriceImpactResponse{
+			return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 				InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 				OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 			}, nil
@@ -1014,7 +1088,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
 				return nil, status.Error(codes.Internal, err.Error())
 			}
 
-			return &types.EstimateTradeBasedOnPriceImpactResponse{
+			return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 				InputCoin:  req.FromCoin,
 				OutputCoin: tokenOut,
 			}, nil
@@ -1050,7 +1124,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
 			// If the tokenOut was returned to be zero it means the amount being traded is too small. We ignore the
 			// error output here as it could mean that the input is too large.
 			if tokenOut.IsZero() {
-				return &types.EstimateTradeBasedOnPriceImpactResponse{
+				return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 					InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 					OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 				}, nil
@@ -1070,7 +1144,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
 	// highAmount is 0 it means the loop has iterated to the end without finding a viable trade that respects
 	// the price impact.
 	if highAmount.IsZero() {
-		return &types.EstimateTradeBasedOnPriceImpactResponse{
+		return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 			InputCoin:  sdk.NewCoin(req.FromCoin.Denom, osmomath.ZeroInt()),
 			OutputCoin: sdk.NewCoin(req.ToCoinDenom, osmomath.ZeroInt()),
 		}, nil
@@ -1083,7 +1157,7 @@ func (k Keeper) EstimateTradeBasedOnPriceImpactConcentratedLiquidity(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.EstimateTradeBasedOnPriceImpactResponse{
+	return &queryproto.EstimateTradeBasedOnPriceImpactResponse{
 		InputCoin:  currFromCoin,
 		OutputCoin: tokenOut,
 	}, nil
