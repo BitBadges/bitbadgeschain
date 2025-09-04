@@ -19,7 +19,7 @@ func TestMsgCreateBalancerPool_ValidateBasic(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := ""
 
 	createMsg := func(after func(msg balancer.MsgCreateBalancerPool) balancer.MsgCreateBalancerPool) balancer.MsgCreateBalancerPool {
 		testPoolAsset := []balancer.PoolAsset{
@@ -74,7 +74,7 @@ func TestMsgCreateBalancerPool_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg balancer.MsgCreateBalancerPool) balancer.MsgCreateBalancerPool {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,

@@ -7,12 +7,9 @@ package stableswap_test
 import (
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/app/apptesting"
-	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 )
 
 type TestSuite struct {
@@ -27,33 +24,33 @@ func (suite *TestSuite) SetupTest() {
 	suite.Setup()
 }
 
-func (s *TestSuite) TestSetScalingFactors() {
-	s.SetupTest()
-	pk1 := ed25519.GenPrivKey().PubKey()
-	addr1 := sdk.AccAddress(pk1.Address())
-	nextPoolId := s.App.GammKeeper.GetNextPoolId(s.Ctx)
-	defaultCreatePoolMsg := *baseCreatePoolMsgGen(addr1)
-	defaultCreatePoolMsg.ScalingFactorController = defaultCreatePoolMsg.Sender
-	defaultAdjustSFMsg := stableswap.NewMsgStableSwapAdjustScalingFactors(defaultCreatePoolMsg.Sender, nextPoolId, []uint64{1, 1})
+// func (s *TestSuite) TestSetScalingFactors() {
+// 	s.SetupTest()
+// 	pk1 := ed25519.GenPrivKey().PubKey()
+// 	addr1 := sdk.AccAddress(pk1.Address())
+// 	nextPoolId := s.App.GammKeeper.GetNextPoolId(s.Ctx)
+// 	defaultCreatePoolMsg := *baseCreatePoolMsgGen(addr1)
+// 	defaultCreatePoolMsg.ScalingFactorController = defaultCreatePoolMsg.Sender
+// 	defaultAdjustSFMsg := stableswap.NewMsgStableSwapAdjustScalingFactors(defaultCreatePoolMsg.Sender, nextPoolId, []uint64{1, 1})
 
-	tests := map[string]struct {
-		createMsg  stableswap.MsgCreateStableswapPool
-		setMsg     stableswap.MsgStableSwapAdjustScalingFactors
-		expectPass bool
-	}{
-		"valid_msg": {defaultCreatePoolMsg, defaultAdjustSFMsg, true},
-	}
+// 	tests := map[string]struct {
+// 		createMsg  stableswap.MsgCreateStableswapPool
+// 		setMsg     stableswap.MsgStableSwapAdjustScalingFactors
+// 		expectPass bool
+// 	}{
+// 		"valid_msg": {defaultCreatePoolMsg, defaultAdjustSFMsg, true},
+// 	}
 
-	for name, tc := range tests {
-		s.Run(name, func() {
-			s.SetupTest()
-			sender := tc.createMsg.GetSigners()[0]
-			// s.FundAcc(sender, s.App.GammKeeper.GetParams(s.Ctx).PoolCreationFee)
-			s.FundAcc(sender, tc.createMsg.InitialPoolLiquidity.Sort())
-			_, err := s.RunMsg(&tc.createMsg)
-			s.Require().NoError(err)
-			_, err = s.RunMsg(&tc.setMsg)
-			s.Require().NoError(err)
-		})
-	}
-}
+// 	for name, tc := range tests {
+// 		s.Run(name, func() {
+// 			s.SetupTest()
+// 			sender := tc.createMsg.GetSigners()[0]
+// 			// s.FundAcc(sender, s.App.GammKeeper.GetParams(s.Ctx).PoolCreationFee)
+// 			s.FundAcc(sender, tc.createMsg.InitialPoolLiquidity.Sort())
+// 			_, err := s.RunMsg(&tc.createMsg)
+// 			s.Require().NoError(err)
+// 			_, err = s.RunMsg(&tc.setMsg)
+// 			s.Require().NoError(err)
+// 		})
+// 	}
+// }

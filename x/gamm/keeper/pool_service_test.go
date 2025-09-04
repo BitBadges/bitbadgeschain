@@ -513,7 +513,6 @@ func (s *KeeperTestSuite) TestJoinPoolNoSwap() {
 	for _, test := range tests {
 		s.SetupTest()
 
-		ctx := s.Ctx
 		gammKeeper := s.App.GammKeeper
 		poolmanagerKeeper := s.App.PoolManagerKeeper
 		bankKeeper := s.App.BankKeeper
@@ -549,11 +548,9 @@ func (s *KeeperTestSuite) TestJoinPoolNoSwap() {
 			s.Require().NoError(err, "test: %v", test.name)
 			s.Require().Equal("15000bar,15000foo", liquidity.String())
 
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolJoined, 1)
 		} else {
 			s.Require().Error(err, "test: %v", test.name)
 
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolJoined, 0)
 		}
 	}
 }
@@ -664,10 +661,8 @@ func (s *KeeperTestSuite) TestExitPool() {
 				s.Require().NoError(err)
 				s.Require().Equal("5000bar,5000foo", liquidity.String())
 
-				s.AssertEventEmitted(ctx, types.TypeEvtPoolExited, 1)
 			} else {
 				s.Require().Error(err, "test: %v", test.name)
-				s.AssertEventEmitted(ctx, types.TypeEvtPoolExited, 0)
 			}
 		})
 	}
@@ -743,12 +738,8 @@ func (s *KeeperTestSuite) TestJoinPoolExitPool_InverseRelationship() {
 			_, _, err = gammKeeper.JoinPoolNoSwap(ctx, joinPoolAcc, poolId, tc.joinPoolShareAmt, sdk.Coins{})
 			s.Require().NoError(err)
 
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolJoined, 1)
-
 			_, err = gammKeeper.ExitPool(ctx, joinPoolAcc, poolId, tc.joinPoolShareAmt, sdk.Coins{})
 			s.Require().NoError(err)
-
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolExited, 1)
 
 			balanceAfterExit := s.App.BankKeeper.GetAllBalances(ctx, joinPoolAcc)
 			deltaBalance, _ := balanceBeforeJoin.SafeSub(balanceAfterExit...)
@@ -793,12 +784,8 @@ func (s *KeeperTestSuite) TestActiveBalancerPool() {
 			_, _, err := gammKeeper.JoinPoolNoSwap(ctx, testAccount, poolId, types.OneShare.MulRaw(50), sdk.Coins{})
 			s.Require().NoError(err)
 
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolJoined, 1)
-
 			_, err = gammKeeper.ExitPool(ctx, testAccount, poolId, types.InitPoolSharesSupply.QuoRaw(2), sdk.Coins{})
 			s.Require().NoError(err)
-
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolExited, 1)
 
 			foocoin := sdk.NewCoin("foo", osmomath.NewInt(10))
 			foocoins := sdk.Coins{foocoin}

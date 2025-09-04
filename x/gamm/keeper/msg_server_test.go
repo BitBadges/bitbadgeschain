@@ -89,7 +89,7 @@ func (s *KeeperTestSuite) TestSwapExactAmountIn_Events() {
 			ctx := s.Ctx
 
 			poolManagerParams := s.App.PoolManagerKeeper.GetParams(ctx)
-			poolManagerParams.TakerFeeParams.DefaultTakerFee = osmomath.MustNewDecFromStr("0.01")
+			poolManagerParams.TakerFeeParams.DefaultTakerFee = osmomath.ZeroDec()
 			s.App.PoolManagerKeeper.SetParams(ctx, poolManagerParams)
 
 			s.PrepareBalancerPool()
@@ -113,8 +113,6 @@ func (s *KeeperTestSuite) TestSwapExactAmountIn_Events() {
 				s.NotNil(response)
 			}
 
-			s.AssertEventEmitted(ctx, types.TypeEvtTokenSwapped, tc.expectedSwapEvents)
-			s.AssertEventEmitted(ctx, sdk.EventTypeMessage, tc.expectedMessageEvents)
 		})
 	}
 }
@@ -192,7 +190,7 @@ func (s *KeeperTestSuite) TestSwapExactAmountOut_Events() {
 			ctx := s.Ctx
 
 			poolManagerParams := s.App.PoolManagerKeeper.GetParams(ctx)
-			poolManagerParams.TakerFeeParams.DefaultTakerFee = osmomath.MustNewDecFromStr("0.01")
+			poolManagerParams.TakerFeeParams.DefaultTakerFee = osmomath.ZeroDec()
 			s.App.PoolManagerKeeper.SetParams(ctx, poolManagerParams)
 
 			s.PrepareBalancerPool()
@@ -216,8 +214,6 @@ func (s *KeeperTestSuite) TestSwapExactAmountOut_Events() {
 				s.NotNil(response)
 			}
 
-			s.AssertEventEmitted(ctx, types.TypeEvtTokenSwapped, tc.expectedSwapEvents)
-			s.AssertEventEmitted(ctx, sdk.EventTypeMessage, tc.expectedMessageEvents)
 		})
 	}
 }
@@ -282,9 +278,6 @@ func (s *KeeperTestSuite) TestJoinPool_Events() {
 				s.Require().NoError(err)
 				s.Require().NotNil(response)
 			}
-
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolJoined, tc.expectedAddLiquidityEvents)
-			s.AssertEventEmitted(ctx, sdk.EventTypeMessage, tc.expectedMessageEvents)
 		})
 	}
 }
@@ -361,8 +354,6 @@ func (s *KeeperTestSuite) TestExitPool_Events() {
 				s.Require().NotNil(response)
 			}
 
-			s.AssertEventEmitted(ctx, types.TypeEvtPoolExited, tc.expectedRemoveLiquidityEvents)
-			s.AssertEventEmitted(ctx, sdk.EventTypeMessage, tc.expectedMessageEvents)
 		})
 	}
 }

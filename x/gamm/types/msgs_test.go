@@ -21,7 +21,7 @@ func TestMsgSwapExactAmountIn(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgSwapExactAmountIn) gammtypes.MsgSwapExactAmountIn) gammtypes.MsgSwapExactAmountIn {
 		properMsg := gammtypes.MsgSwapExactAmountIn{
@@ -67,7 +67,7 @@ func TestMsgSwapExactAmountIn(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgSwapExactAmountIn) gammtypes.MsgSwapExactAmountIn {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -151,7 +151,7 @@ func TestMsgSwapExactAmountOut(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgSwapExactAmountOut) gammtypes.MsgSwapExactAmountOut) gammtypes.MsgSwapExactAmountOut {
 		properMsg := gammtypes.MsgSwapExactAmountOut{
@@ -197,7 +197,7 @@ func TestMsgSwapExactAmountOut(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgSwapExactAmountOut) gammtypes.MsgSwapExactAmountOut {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -281,7 +281,7 @@ func TestMsgJoinPool(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgJoinPool) gammtypes.MsgJoinPool) gammtypes.MsgJoinPool {
 		properMsg := gammtypes.MsgJoinPool{
@@ -321,7 +321,7 @@ func TestMsgJoinPool(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgJoinPool) gammtypes.MsgJoinPool {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -381,7 +381,7 @@ func TestMsgExitPool(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgExitPool) gammtypes.MsgExitPool) gammtypes.MsgExitPool {
 		properMsg := gammtypes.MsgExitPool{
@@ -420,7 +420,7 @@ func TestMsgExitPool(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgExitPool) gammtypes.MsgExitPool {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -480,7 +480,7 @@ func TestMsgJoinSwapExternAmountIn(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgJoinSwapExternAmountIn) gammtypes.MsgJoinSwapExternAmountIn) gammtypes.MsgJoinSwapExternAmountIn {
 		properMsg := gammtypes.MsgJoinSwapExternAmountIn{
@@ -519,7 +519,7 @@ func TestMsgJoinSwapExternAmountIn(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgJoinSwapExternAmountIn) gammtypes.MsgJoinSwapExternAmountIn {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -579,7 +579,7 @@ func TestMsgJoinSwapShareAmountOut(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgJoinSwapShareAmountOut) gammtypes.MsgJoinSwapShareAmountOut) gammtypes.MsgJoinSwapShareAmountOut {
 		properMsg := gammtypes.MsgJoinSwapShareAmountOut{
@@ -619,7 +619,7 @@ func TestMsgJoinSwapShareAmountOut(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgJoinSwapShareAmountOut) gammtypes.MsgJoinSwapShareAmountOut {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -679,7 +679,7 @@ func TestMsgExitSwapExternAmountOut(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgExitSwapExternAmountOut) gammtypes.MsgExitSwapExternAmountOut) gammtypes.MsgExitSwapExternAmountOut {
 		properMsg := gammtypes.MsgExitSwapExternAmountOut{
@@ -718,7 +718,7 @@ func TestMsgExitSwapExternAmountOut(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgExitSwapExternAmountOut) gammtypes.MsgExitSwapExternAmountOut {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -778,7 +778,7 @@ func TestMsgExitSwapShareAmountIn(t *testing.T) {
 	appParams.SetAddressPrefixes()
 	pk1 := ed25519.GenPrivKey().PubKey()
 	addr1 := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid")
+	invalidAddr := "invalid"
 
 	createMsg := func(after func(msg gammtypes.MsgExitSwapShareAmountIn) gammtypes.MsgExitSwapShareAmountIn) gammtypes.MsgExitSwapShareAmountIn {
 		properMsg := gammtypes.MsgExitSwapShareAmountIn{
@@ -818,7 +818,7 @@ func TestMsgExitSwapShareAmountIn(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(func(msg gammtypes.MsgExitSwapShareAmountIn) gammtypes.MsgExitSwapShareAmountIn {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,

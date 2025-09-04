@@ -168,7 +168,7 @@ func (s *KeeperTestHelper) Reset() {
 }
 
 func (s *KeeperTestHelper) setupGeneral() {
-	s.setupGeneralCustomChainId("osmosis-1")
+	s.setupGeneralCustomChainId("bitbadges-1")
 }
 
 func (s *KeeperTestHelper) setupGeneralCustomChainId(chainId string) {

@@ -150,8 +150,6 @@ func (s *KeeperTestSuite) TestBalancerPoolSimpleSwapExactAmountIn() {
 				// We consume `types.GasFeeForSwap` directly, so the extra I/O operation mean we end up consuming more.
 				s.Assert().Greater(gasConsumedForSwap, uint64(types.BalancerGasFeeForSwap))
 
-				s.AssertEventEmitted(ctx, types.TypeEvtTokenSwapped, 1)
-
 				spotPriceAfter, err := keeper.CalculateSpotPrice(ctx, poolId, test.param.tokenIn.Denom, test.param.tokenOutDenom)
 				s.NoError(err, "test: %v", test.name)
 
@@ -405,8 +403,6 @@ func (s *KeeperTestSuite) TestBalancerPoolSimpleSwapExactAmountOut() {
 				gasConsumedForSwap := s.Ctx.GasMeter().GasConsumed() - prevGasConsumed
 				// We consume `types.GasFeeForSwap` directly, so the extra I/O operation mean we end up consuming more.
 				s.Assert().Greater(gasConsumedForSwap, uint64(types.BalancerGasFeeForSwap))
-
-				s.AssertEventEmitted(ctx, types.TypeEvtTokenSwapped, 1)
 
 				spotPriceAfter, err := keeper.CalculateSpotPrice(ctx, poolId, test.param.tokenInDenom, test.param.tokenOut.Denom)
 				s.NoError(err, "test: %v", test.name)

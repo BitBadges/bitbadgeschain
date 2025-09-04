@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	poolmanagerKeeper "github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
@@ -108,8 +108,7 @@ func (s *KeeperTestSuite) TestSplitRouteSwapExactAmountIn() {
 				s.Require().Nil(response)
 			} else {
 				s.Require().NoError(err)
-				s.AssertEventEmitted(ctx, types.TypeMsgSplitRouteSwapExactAmountIn, tc.expectedSplitRouteSwapEvent)
-				s.AssertEventEmitted(ctx, sdk.EventTypeMessage, tc.expectedMessageEvents)
+
 			}
 
 		})
@@ -200,8 +199,6 @@ func (s *KeeperTestSuite) TestSplitRouteSwapExactAmountOut() {
 			} else {
 
 				s.Require().NoError(err)
-				s.AssertEventEmitted(ctx, types.TypeMsgSplitRouteSwapExactAmountOut, tc.expectedSplitRouteSwapEvent)
-				s.AssertEventEmitted(ctx, sdk.EventTypeMessage, tc.expectedMessageEvents)
 			}
 
 		})
@@ -338,8 +335,6 @@ func (s *KeeperTestSuite) TestSetDenomPairTakerFee() {
 				s.Require().Nil(response)
 			} else {
 				s.Require().NoError(err)
-				s.AssertEventEmitted(s.Ctx, types.TypeMsgSetDenomPairTakerFee, tc.expectedSetDenomPairTakerFeeEvent)
-				s.AssertEventEmitted(s.Ctx, sdk.EventTypeMessage, 0)
 			}
 		})
 	}

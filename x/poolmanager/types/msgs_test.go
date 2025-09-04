@@ -7,10 +7,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/app/apptesting"
 	appParams "github.com/bitbadges/bitbadgeschain/app/params"
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/module"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
@@ -18,7 +18,7 @@ import (
 var (
 	pk1         = ed25519.GenPrivKey().PubKey()
 	addr1       = sdk.AccAddress(pk1.Address()).String()
-	invalidAddr = sdk.AccAddress("invalid")
+	invalidAddr = "invalid"
 
 	validSwapRoutePoolThreeAmountIn = types.SwapAmountInRoute{
 		PoolId:        3,
@@ -86,7 +86,7 @@ func TestMsgSwapExactAmountIn(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(properMsg, func(msg types.MsgSwapExactAmountIn) types.MsgSwapExactAmountIn {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
@@ -172,6 +172,9 @@ func TestMsgSwapExactAmountIn(t *testing.T) {
 
 func TestMsgSwapExactAmountOut(t *testing.T) {
 	appParams.SetAddressPrefixes()
+	pk1 := ed25519.GenPrivKey().PubKey()
+	addr1 := sdk.AccAddress(pk1.Address()).String()
+	invalidAddr := "invalid"
 
 	properMsg := types.MsgSwapExactAmountOut{
 		Sender: addr1,
@@ -213,7 +216,7 @@ func TestMsgSwapExactAmountOut(t *testing.T) {
 		{
 			name: "invalid sender",
 			msg: createMsg(properMsg, func(msg types.MsgSwapExactAmountOut) types.MsgSwapExactAmountOut {
-				msg.Sender = invalidAddr.String()
+				msg.Sender = invalidAddr
 				return msg
 			}),
 			expectPass: false,
