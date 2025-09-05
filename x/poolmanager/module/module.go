@@ -15,7 +15,7 @@ import (
 
 	"cosmossdk.io/core/appmodule"
 
-	"github.com/bitbadges/bitbadgeschain/simulation/simtypes"
+	"github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	pmclient "github.com/bitbadges/bitbadgeschain/x/poolmanager/client"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/client/cli"

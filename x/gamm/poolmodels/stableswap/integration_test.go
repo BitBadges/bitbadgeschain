@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/bitbadges/bitbadgeschain/app/apptesting"
+	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 )
 
 type TestSuite struct {

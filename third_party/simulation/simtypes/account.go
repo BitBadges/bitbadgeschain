@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/simulation"
 
-	sdkrand "github.com/bitbadges/bitbadgeschain/simulation/simtypes/random"
+	sdkrand "github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes/random"
 )
 
 func (sim *SimCtx) RandomSimAccount() simulation.Account {

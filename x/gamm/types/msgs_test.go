@@ -12,7 +12,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 
-	"github.com/bitbadges/bitbadgeschain/app/apptesting"
+	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 

@@ -18,12 +18,6 @@ type AppModuleSimulationGenesis interface {
 	SimulatorGenesisState(*module.SimulationState, *SimCtx)
 }
 
-type AppModuleSimulationPropertyCheck interface {
-	module.AppModule
-
-	PropertyChecks() []PropertyCheck
-}
-
 type ModuleGenesisGenerator interface {
 	GenerateGenesisStates(simState *module.SimulationState, sim *SimCtx)
 }

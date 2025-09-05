@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
-	sdkrand "github.com/bitbadges/bitbadgeschain/simulation/simtypes/random"
+	sdkrand "github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes/random"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 

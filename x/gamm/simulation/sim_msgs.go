@@ -8,8 +8,8 @@ import (
 
 	legacysimulationtype "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/bitbadges/bitbadgeschain/simulation/simtypes"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	balancertypes "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"

@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/bitbadges/bitbadgeschain/app/apptesting"
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
+	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmoassert"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"

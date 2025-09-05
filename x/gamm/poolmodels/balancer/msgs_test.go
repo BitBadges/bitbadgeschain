@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bitbadges/bitbadgeschain/app/apptesting"
+	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	balancer "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"

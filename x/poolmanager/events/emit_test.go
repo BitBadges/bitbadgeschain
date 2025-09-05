@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
-	"github.com/bitbadges/bitbadgeschain/app/apptesting"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/events"
 )

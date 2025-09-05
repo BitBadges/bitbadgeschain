@@ -8,9 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
 
-	"github.com/bitbadges/bitbadgeschain/app/apptesting"
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	"github.com/bitbadges/bitbadgeschain/testutil/mocks"
+	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmoassert"
 	gamm "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"

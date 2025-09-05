@@ -1,7 +1,7 @@
 package gammsimulation
 
 import (
-	"github.com/bitbadges/bitbadgeschain/simulation/simtypes"
+	"github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 )
 

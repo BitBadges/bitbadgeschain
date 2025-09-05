@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmoassert"
-	appparams "github.com/bitbadges/bitbadgeschain/app/params"
-	sdkrand "github.com/bitbadges/bitbadgeschain/simulation/simtypes/random"
+	sdkrand "github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes/random"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/internal/cfmm_common"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/internal/test_helpers"
 	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"

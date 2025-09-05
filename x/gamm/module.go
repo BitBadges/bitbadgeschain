@@ -24,7 +24,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/bitbadges/bitbadgeschain/simulation/simtypes"
+	"github.com/bitbadges/bitbadgeschain/third_party/simulation/simtypes"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/client/cli"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
