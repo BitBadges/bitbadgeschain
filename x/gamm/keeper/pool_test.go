@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
 
-	"github.com/bitbadges/bitbadgeschain/testutil/mocks"
+	"github.com/bitbadges/bitbadgeschain/third_party/mocks"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
