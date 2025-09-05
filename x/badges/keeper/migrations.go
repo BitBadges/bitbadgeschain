@@ -136,7 +136,9 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			wrapperPath.AllowOverrideWithAnyValidToken = false
 			wrapperPath.AllowCosmosWrapping = true
 		}
-		newCollection.Invariants.MaxSupplyPerId = sdkmath.NewUint(0)
+		if newCollection.Invariants != nil {
+			newCollection.Invariants.MaxSupplyPerId = sdkmath.NewUint(0)
+		}
 
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {

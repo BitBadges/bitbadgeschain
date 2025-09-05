@@ -4,6 +4,8 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v14 "github.com/bitbadges/bitbadgeschain/app/upgrades/v14"
+	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -34,7 +36,10 @@ func (app *App) RegisterUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v14.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{},
+			Added: []string{
+				gammtypes.StoreKey,
+				poolmanagertypes.StoreKey,
+			},
 		}
 	}
 
