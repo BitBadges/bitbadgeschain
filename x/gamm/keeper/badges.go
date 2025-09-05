@@ -12,6 +12,7 @@ import (
 	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 func CheckStartsWithBadges(denom string) bool {
@@ -224,9 +225,9 @@ func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAdd
 }
 
 // Used for taker fees
-func (k Keeper) SendCoinsToPoolWithWrappingFromAccountToModule(ctx sdk.Context, from sdk.AccAddress, to string, coins sdk.Coins) error {
+func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, coins sdk.Coins) error {
 	for _, coin := range coins {
-		moduleAddress := authtypes.NewModuleAddress(to).String()
+		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
 		if CheckStartsWithBadges(coin.Denom) {
 			err := k.SendNativeBadgesToPool(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
@@ -234,14 +235,8 @@ func (k Keeper) SendCoinsToPoolWithWrappingFromAccountToModule(ctx sdk.Context, 
 				return err
 			}
 
-			//Mint corresponding coins to the pool for compatibillity
-			err = k.bankKeeper.MintCoins(ctx, to, sdk.NewCoins(coin))
-			if err != nil {
-				return err
-			}
-
 		} else {
-			err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, from, to, sdk.NewCoins(coin))
+			err := k.communityPoolKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
 			if err != nil {
 				return err
 			}

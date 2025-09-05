@@ -129,9 +129,6 @@ func (k Keeper) GetAllTradingPairTakerFees(ctx sdk.Context) ([]types.DenomPairTa
 // TODO: Gas optimize this function, its expensive in both gas and CPU.
 // NOTE: Taker fees are disabled in this fork - always return tokenIn without charging any fee
 func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom string, sender sdk.AccAddress, exactIn bool) (sdk.Coin, sdk.Coin, error) {
-	// Taker fees are disabled in this fork - return tokenIn without charging any fee
-	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
-	// takerFeeModuleAccountName := txfeestypes.TakerFeeCollectorName
 
 	// reducedFeeWhitelist := []string{}
 	// k.paramSpace.Get(ctx, types.KeyReducedTakerFeeByWhitelist, &reducedFeeWhitelist)
@@ -141,24 +138,24 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 	// 	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
 	// }
 
-	// takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
-	// if err != nil {
-	// 	return sdk.Coin{}, sdk.Coin{}, err
-	// }
+	takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
+	if err != nil {
+		return sdk.Coin{}, sdk.Coin{}, err
+	}
 
-	// var tokenInAfterTakerFee sdk.Coin
-	// var takerFeeCoin sdk.Coin
-	// if exactIn {
-	// 	tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactIn(tokenIn, takerFee)
-	// } else {
-	// 	tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
-	// }
+	var tokenInAfterTakerFee sdk.Coin
+	var takerFeeCoin sdk.Coin
+	if exactIn {
+		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactIn(tokenIn, takerFee)
+	} else {
+		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
+	}
 
-	// err = k.gammKeeper.SendCoinsToPoolWithWrappingFromAccountToModule(ctx, sender, takerFeeModuleAccountName, sdk.NewCoins(takerFeeCoin))
-	// if err != nil {
-	// 	return sdk.Coin{}, sdk.Coin{}, err
-	// }
-	// return tokenInAfterTakerFee, takerFeeCoin, nil
+	err = k.gammKeeper.FundCommunityPoolWithWrapping(ctx, sender, sdk.NewCoins(takerFeeCoin))
+	if err != nil {
+		return sdk.Coin{}, sdk.Coin{}, err
+	}
+	return tokenInAfterTakerFee, takerFeeCoin, nil
 }
 
 // Returns remaining amount in to swap, and takerFeeCoins.
