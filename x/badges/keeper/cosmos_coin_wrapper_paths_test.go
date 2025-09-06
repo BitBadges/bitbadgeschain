@@ -413,7 +413,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom: "coin1",
+			Denom: "coin-one",
 			Balances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
@@ -421,11 +421,11 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 					BadgeIds:       GetOneUintRange(),
 				},
 			},
-			Symbol:              "COIN1",
+			Symbol:              "COIN-ONE",
 			AllowCosmosWrapping: true,
 		},
 		{
-			Denom: "coin2",
+			Denom: "coin-two",
 			Balances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
@@ -433,7 +433,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 					BadgeIds:       GetOneUintRange(),
 				},
 			},
-			Symbol:              "COIN2",
+			Symbol:              "COIN-TWO",
 			AllowCosmosWrapping: true,
 		},
 	}

@@ -268,8 +268,14 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	}
 
 	for _, path := range msg.CosmosCoinWrapperPathsToAdd {
-		if path.Denom == "" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "denom cannot be empty")
+		// Validate denom format
+		if err := ValidateCosmosWrapperPathDenom(path.Denom); err != nil {
+			return err
+		}
+
+		// Validate symbol format
+		if err := ValidateCosmosWrapperPathSymbol(path.Symbol); err != nil {
+			return err
 		}
 
 		// Validate balances
@@ -282,6 +288,11 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		defaultDisplayCount := 0
 		decimalsSet := make(map[string]bool)
 		for _, denomUnit := range path.DenomUnits {
+			// Validate denom unit symbol format
+			if err := ValidateCosmosWrapperPathSymbol(denomUnit.Symbol); err != nil {
+				return err
+			}
+
 			if denomUnit.IsDefaultDisplay {
 				defaultDisplayCount++
 			}

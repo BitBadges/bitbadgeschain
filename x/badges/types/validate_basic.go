@@ -15,6 +15,10 @@ var (
 	// URI must be a valid URI. Method <= 10 characters long. Path <= 90 characters long.
 	reUriString = `\w+:(\/?\/?)[^\s]+`
 	reUri       = regexp.MustCompile(fmt.Sprintf(`^%s$`, reUriString))
+
+	// Cosmos wrapper path denom/symbol validation: only a-zA-Z, _, {, }, and -
+	reCosmosWrapperPathString = `^[a-zA-Z_{}-]+$`
+	reCosmosWrapperPath       = regexp.MustCompile(reCosmosWrapperPathString)
 )
 
 func duplicateInStringArray(arr []string) bool {
@@ -38,6 +42,34 @@ func ValidateURI(uri string) error {
 	regexMatch := reUri.MatchString(uri)
 	if !regexMatch {
 		return sdkerrors.Wrapf(ErrInvalidURI, "invalid uri: %s", uri)
+	}
+
+	return nil
+}
+
+// ValidateCosmosWrapperPathDenom validates that a cosmos wrapper path denom contains only allowed characters: a-zA-Z, _, {, }, and -
+func ValidateCosmosWrapperPathDenom(denom string) error {
+	if denom == "" {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom cannot be empty")
+	}
+
+	regexMatch := reCosmosWrapperPath.MatchString(denom)
+	if !regexMatch {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains invalid characters. Only a-zA-Z, _, {, }, and - are allowed: %s", denom)
+	}
+
+	return nil
+}
+
+// ValidateCosmosWrapperPathSymbol validates that a cosmos wrapper path symbol contains only allowed characters: a-zA-Z, _, {, }, and -
+func ValidateCosmosWrapperPathSymbol(symbol string) error {
+	if symbol == "" {
+		return nil // Symbol can be empty
+	}
+
+	regexMatch := reCosmosWrapperPath.MatchString(symbol)
+	if !regexMatch {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "symbol contains invalid characters. Only a-zA-Z, _, {, }, and - are allowed: %s", symbol)
 	}
 
 	return nil
