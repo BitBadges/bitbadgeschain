@@ -1,5 +1,5 @@
 # Version must be provided as a CLI argument
-VERSION ?= $(error VERSION is required. Usage: make build-linux/amd64 VERSION=v13)
+VERSION := v14
 
 # Common ldflags for version information
 LDFLAGS := -X github.com/bitbadges/bitbadgeschain/app.Version=$(VERSION) \
