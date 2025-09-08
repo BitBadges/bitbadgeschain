@@ -104,15 +104,6 @@ const (
 	Name                 = "bitbadgeschain"
 )
 
-// Version information - this will be set by ldflags during build
-var (
-	Version          = "dev"
-	Commit           = ""
-	BuildTags        = ""
-	GoVersion        = ""
-	CosmosSDKVersion = "v0.50.13"
-)
-
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
