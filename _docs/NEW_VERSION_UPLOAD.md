@@ -37,14 +37,14 @@ Create a `RELEASE_NOTES.md` file in the `release-info/v9` directory using the ex
 
 **IMPORTANT: Use find-and-replace to update all version references:**
 
--   Replace all instances of `v8` with `v9` (or the current version)
+-   Replace all instances of `v9` with the current version
 -   Replace all instances of `[INSERT_BLOCK_HEIGHT]` with the actual mainnet block height
 -   Replace all instances of `[INSERT_DATE_TIME]` with the actual mainnet date/time
 -   Replace all instances of `[INSERT_SUMMARY]` with the actual summary
 -   Replace all instances of `[INSERT_CHANGE_1]`, `[INSERT_CHANGE_2]`, etc. with actual changes
 
 ```markdown
-[v8](https://github.com/BitBadges/bitbadgeschain/releases/tag/v8) [Latest](https://github.com/BitBadges/bitbadgeschain/releases/latest)
+[v9](https://github.com/BitBadges/bitbadgeschain/releases/tag/v9) [Latest](https://github.com/BitBadges/bitbadgeschain/releases/latest)
 
 🔧 BitBadges Chain Upgrade — v9
 📦 [[Release v9](https://github.com/BitBadges/bitbadgeschain/releases/tag/v9)](https://github.com/BitBadges/bitbadgeschain/releases/tag/v9) • 🆕 [[Latest Release](https://github.com/BitBadges/bitbadgeschain/releases/latest)](https://github.com/BitBadges/bitbadgeschain/releases/latest)
@@ -109,13 +109,13 @@ Create a `mainnet-proposal.json` file in the `release-info/v9` directory:
             "plan": {
                 "name": "v9",
                 "height": "[INSERT_BLOCK_HEIGHT]",
-                "info": "Upgrade to v9",
+                "info": "{\"binaries\":{\"linux/amd64\":\"https://github.com/BitBadges/bitbadgeschain/releases/download/v9/bitbadgeschain-linux-amd64\",\"linux/arm64\":\"https://github.com/BitBadges/bitbadgeschain/releases/download/v9/bitbadgeschain-linux-arm64\"}}",
                 "upgraded_client_state": null
             }
         }
     ],
     "expedited": true,
-    "deposit": "1000000000000ustake",
+    "deposit": "1000000000000ubadge",
     "title": "Upgrade to v9",
     "summary": "This proposal upgrades the chain to version v9."
 }
@@ -139,13 +139,13 @@ Create a `testnet-proposal.json` file in the `release-info/v9` directory:
             "plan": {
                 "name": "v9",
                 "height": "[INSERT_TESTNET_BLOCK_HEIGHT]",
-                "info": "Upgrade to v9",
+                "info": "{\"binaries\":{\"linux/amd64\":\"https://github.com/BitBadges/bitbadgeschain/releases/download/v9/bitbadgeschain-linux-amd64\",\"linux/arm64\":\"https://github.com/BitBadges/bitbadgeschain/releases/download/v9/bitbadgeschain-linux-arm64\"}}",
                 "upgraded_client_state": null
             }
         }
     ],
     "expedited": true,
-    "deposit": "1000000000000ustake",
+    "deposit": "1000000000000ubadge",
     "title": "Upgrade to v9",
     "summary": "This proposal upgrades the chain to version v9."
 }
