@@ -714,7 +714,25 @@ func GetSchemas() []string {
 						}
 					],
 					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"allowCosmosWrapping": false,
+					"denomSuffixDetails": {
+						"withAddress": false
+					}
+				}
+			],
+			"ibcUnwrapPathsToAdd": [
+				{
+					"channelId": "",
+					"portId": "",
+					"sourceCollectionId": "",
+					"denom": "",
+					"allowOverrideWithAnyValidToken": false,
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"denomSuffixDetails": {
+						"withAddress": false
+					}
 				}
 			],
 			"invariants": {
@@ -848,7 +866,25 @@ func GetSchemas() []string {
 						}
 					],
 					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"allowCosmosWrapping": false,
+					"denomSuffixDetails": {
+						"withAddress": false
+					}
+				}
+			],
+			"ibcUnwrapPathsToAdd": [
+				{
+					"channelId": "",
+					"portId": "",
+					"sourceCollectionId": "",
+					"denom": "",
+					"allowOverrideWithAnyValidToken": false,
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"denomSuffixDetails": {
+						"withAddress": false
+					}
 				}
 			],
 			"invariants": {
@@ -953,7 +989,25 @@ func GetSchemas() []string {
 						}
 					],
 					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"allowCosmosWrapping": false,
+					"denomSuffixDetails": {
+						"withAddress": false
+					}
+				}
+			],
+			"ibcUnwrapPathsToAdd": [
+				{
+					"channelId": "",
+					"portId": "",
+					"sourceCollectionId": "",
+					"denom": "",
+					"allowOverrideWithAnyValidToken": false,
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"denomSuffixDetails": {
+						"withAddress": false
+					}
 				}
 			],
 			"invariants": {
@@ -1192,6 +1246,19 @@ func GetSchemas() []string {
 				}
 			],
 			"canArchiveCollection": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/UnwrapIBCDenom",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"amount": {
+				"denom": "",
+				"amount": ""
+			},
+			"overrideTokenId": ""
 		}
 	}`)
 

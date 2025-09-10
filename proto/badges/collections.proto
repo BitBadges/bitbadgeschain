@@ -81,6 +81,9 @@ message BadgeCollection {
   // The IBC wrapper (sdk.coin) paths for the collection.
   repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
 
+  // The IBC unwrap paths for the collection.
+  repeated IBCUnwrapPath ibcUnwrapPaths = 19;
+
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
   CollectionInvariants invariants = 18;
@@ -94,6 +97,23 @@ message CosmosCoinWrapperPath {
   repeated DenomUnit denomUnits = 5;
   bool allowOverrideWithAnyValidToken = 6;
   bool allowCosmosWrapping = 7;
+  DenomSuffixDetails denomSuffixDetails = 8;
+}
+
+message IBCUnwrapPath {
+  string channelId = 1;
+  string portId = 2;
+  string sourceCollectionId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string denom = 4;
+  bool allowOverrideWithAnyValidToken = 5;
+  repeated Balance balances = 6;
+  DenomSuffixDetails denomSuffixDetails = 7;
+}
+
+message DenomSuffixDetails {
+  bool withAddress = 1;
+  string destinationCollectionId = 2;
+  string destinationChainId = 3;
 }
 
 message DenomUnit {

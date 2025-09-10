@@ -530,3 +530,13 @@ func SetIsArchived(suite *TestSuite, ctx context.Context, creator string, collec
 	_, err := suite.msgServer.SetIsArchived(ctx, msg)
 	return err
 }
+
+func UnwrapIBCDenom(suite *TestSuite, ctx context.Context, msg *types.MsgUnwrapIBCDenom) error {
+	err := msg.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	_, err = suite.msgServer.UnwrapIBCDenom(ctx, msg)
+	return err
+}

@@ -45,6 +45,7 @@ service Msg {
   rpc SetDynamicStoreValue  (MsgSetDynamicStoreValue) returns (MsgSetDynamicStoreValueResponse);
   rpc IncrementStoreValue   (MsgIncrementStoreValue) returns (MsgIncrementStoreValueResponse);
   rpc DecrementStoreValue   (MsgDecrementStoreValue) returns (MsgDecrementStoreValueResponse);
+  rpc UnwrapIBCDenom        (MsgUnwrapIBCDenom) returns (MsgUnwrapIBCDenomResponse);
   
   // Helper message types for UniversalUpdateCollection subsets
   rpc SetValidBadgeIds(MsgSetValidBadgeIds) returns (MsgSetValidBadgeIdsResponse);
@@ -87,6 +88,7 @@ message BadgeCustomMsgType {
   MsgSetStandards setStandardsMsg = 24;
   MsgSetCollectionApprovals setCollectionApprovalsMsg = 25;
   MsgSetIsArchived setIsArchivedMsg = 26;
+  MsgUnwrapIBCDenom unwrapIBCDenomMsg = 27;
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -117,6 +119,17 @@ message CosmosCoinWrapperPathAddObject {
   repeated DenomUnit denomUnits = 4;
   bool allowOverrideWithAnyValidToken = 5;
   bool allowCosmosWrapping = 6;
+  DenomSuffixDetails denomSuffixDetails = 7;
+}
+
+message IBCUnwrapPathAddObject {
+  string channelId = 1;
+  string portId = 2;
+  string sourceCollectionId = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string denom = 4;
+  bool allowOverrideWithAnyValidToken = 5;
+  repeated Balance balances = 6;
+  DenomSuffixDetails denomSuffixDetails = 7;
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
@@ -203,6 +216,9 @@ message MsgUniversalUpdateCollection {
 
   // IBC wrapper paths to add.
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 28;
+
+  // IBC unwrap paths to add.
+  repeated IBCUnwrapPathAddObject ibcUnwrapPathsToAdd = 30;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
@@ -292,6 +308,9 @@ message MsgUpdateCollection {
   // IBC wrapper paths to add.
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 30;
 
+  // IBC unwrap paths to add.
+  repeated IBCUnwrapPathAddObject ibcUnwrapPathsToAdd = 32;
+
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
   CollectionInvariants invariants = 31;
@@ -352,6 +371,9 @@ message MsgCreateCollection {
 
   // IBC wrapper paths to add.
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 17;
+
+  // IBC unwrap paths to add.
+  repeated IBCUnwrapPathAddObject ibcUnwrapPathsToAdd = 19;
 
   // Collection-level invariants that cannot be broken.
   CollectionInvariants invariants = 18;
@@ -872,3 +894,25 @@ message MsgSetIsArchivedResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
+
+// MsgUnwrapIBCDenom is used to unwrap IBC tokens back to badges.
+message MsgUnwrapIBCDenom {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/UnwrapIBCDenom";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The IBC token to unwrap (expected to be ibc/SHA256 format).
+  cosmos.base.v1beta1.Coin amount = 3;
+  
+  // Override token ID to replace {id} placeholders in path denom.
+  // Used when AllowOverrideWithAnyValidToken is true.
+  string overrideTokenId = 4;
+}
+
+// MsgUnwrapIBCDenomResponse is the response to MsgUnwrapIBCDenom.
+message MsgUnwrapIBCDenomResponse {}

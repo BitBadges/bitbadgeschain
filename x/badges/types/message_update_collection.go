@@ -314,5 +314,33 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		}
 	}
 
+	for _, path := range msg.IbcUnwrapPathsToAdd {
+		// Validate channel ID format
+		if path.ChannelId == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "channel ID cannot be empty")
+		}
+
+		// Validate port ID format
+		if path.PortId == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "port ID cannot be empty")
+		}
+
+		// Validate source collection ID
+		if path.SourceCollectionId.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "source collection ID cannot be zero")
+		}
+
+		// Validate denom format
+		if err := ValidateCosmosWrapperPathDenom(path.Denom); err != nil {
+			return err
+		}
+
+		// Validate balances
+		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

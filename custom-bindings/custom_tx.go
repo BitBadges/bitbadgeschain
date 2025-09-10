@@ -149,6 +149,9 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.SetIsArchivedMsg != nil:
 				badgeCustomMsg.SetIsArchivedMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetIsArchivedMsg}, nil
+			case badgeCustomMsg.UnwrapIBCDenomMsg != nil:
+				badgeCustomMsg.UnwrapIBCDenomMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.UnwrapIBCDenomMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}

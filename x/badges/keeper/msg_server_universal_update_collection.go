@@ -210,6 +210,24 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
 		pathsToAdd := make([]*types.CosmosCoinWrapperPath, len(msg.CosmosCoinWrapperPathsToAdd))
 		for i, path := range msg.CosmosCoinWrapperPathsToAdd {
+			// Validate destination collection ID and chain ID if specified
+			if path.DenomSuffixDetails != nil {
+				// Validate destination collection ID
+				if path.DenomSuffixDetails.DestinationCollectionId != "" {
+					if path.DenomSuffixDetails.DestinationCollectionId != collection.CollectionId.String() {
+						return nil, fmt.Errorf("destination collection ID must match current collection ID: expected %s, got %s", collection.CollectionId.String(), path.DenomSuffixDetails.DestinationCollectionId)
+					}
+				}
+
+				// Validate destination chain ID
+				if path.DenomSuffixDetails.DestinationChainId != "" {
+					currentChainId := ctx.ChainID()
+					if path.DenomSuffixDetails.DestinationChainId != currentChainId {
+						return nil, fmt.Errorf("destination chain ID must match current chain ID: expected %s, got %s", currentChainId, path.DenomSuffixDetails.DestinationChainId)
+					}
+				}
+			}
+
 			var accountAddr sdk.AccAddress
 			for {
 				fullPath := path.Denom
@@ -233,19 +251,64 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				DenomUnits:                     path.DenomUnits,
 				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
 				AllowCosmosWrapping:            path.AllowCosmosWrapping,
+				DenomSuffixDetails:             path.DenomSuffixDetails,
 			}
 		}
 
 		collection.CosmosCoinWrapperPaths = append(collection.CosmosCoinWrapperPaths, pathsToAdd...)
 	}
 
-	// Ensure no duplicate denom paths
+	if len(msg.IbcUnwrapPathsToAdd) > 0 {
+		pathsToAdd := make([]*types.IBCUnwrapPath, len(msg.IbcUnwrapPathsToAdd))
+		for i, path := range msg.IbcUnwrapPathsToAdd {
+			// Validate destination collection ID and chain ID if specified
+			if path.DenomSuffixDetails != nil {
+				// Validate destination collection ID
+				if path.DenomSuffixDetails.DestinationCollectionId != "" {
+					if path.DenomSuffixDetails.DestinationCollectionId != collection.CollectionId.String() {
+						return nil, fmt.Errorf("destination collection ID must match current collection ID: expected %s, got %s", collection.CollectionId.String(), path.DenomSuffixDetails.DestinationCollectionId)
+					}
+				}
+
+				// Validate destination chain ID
+				if path.DenomSuffixDetails.DestinationChainId != "" {
+					currentChainId := ctx.ChainID()
+					if path.DenomSuffixDetails.DestinationChainId != currentChainId {
+						return nil, fmt.Errorf("destination chain ID must match current chain ID: expected %s, got %s", currentChainId, path.DenomSuffixDetails.DestinationChainId)
+					}
+				}
+			}
+
+			pathsToAdd[i] = &types.IBCUnwrapPath{
+				ChannelId:                      path.ChannelId,
+				PortId:                         path.PortId,
+				SourceCollectionId:             path.SourceCollectionId,
+				Denom:                          path.Denom,
+				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
+				Balances:                       path.Balances,
+				DenomSuffixDetails:             path.DenomSuffixDetails,
+			}
+		}
+
+		collection.IbcUnwrapPaths = append(collection.IbcUnwrapPaths, pathsToAdd...)
+	}
+
+	// Ensure no duplicate denom paths for cosmos coin wrapper paths
 	denomPaths := make(map[string]bool)
 	for _, path := range collection.CosmosCoinWrapperPaths {
 		if _, ok := denomPaths[path.Denom]; ok {
 			return nil, fmt.Errorf("duplicate ibc wrapper path denom: %s", path.Denom)
 		}
 		denomPaths[path.Denom] = true
+	}
+
+	// Ensure no duplicate denom paths for IBC unwrap paths
+	ibcDenomPaths := make(map[string]bool)
+	for _, path := range collection.IbcUnwrapPaths {
+		if _, ok := ibcDenomPaths[path.Denom]; ok {
+			return nil, fmt.Errorf("duplicate ibc unwrap path denom: %s", path.Denom)
+		}
+		ibcDenomPaths[path.Denom] = true
 	}
 
 	// Ensure no duplicate symbols (including base symbol and denom unit symbols)
