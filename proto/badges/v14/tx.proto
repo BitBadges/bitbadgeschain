@@ -1,24 +1,24 @@
 syntax = "proto3";
-package badges.v13;
+package badges.v14;
 
 import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-import "badges/v13/params.proto";
+import "badges/v14/params.proto";
 
-import "badges/v13/transfers.proto";
-import "badges/v13/balances.proto";
-import "badges/v13/permissions.proto";
-import "badges/v13/metadata.proto";
-import "badges/v13/collections.proto";
-import "badges/v13/address_lists.proto";
-import "badges/v13/timelines.proto";
-import "badges/v13/dynamic_stores.proto";
+import "badges/v14/transfers.proto";
+import "badges/v14/balances.proto";
+import "badges/v14/permissions.proto";
+import "badges/v14/metadata.proto";
+import "badges/v14/collections.proto";
+import "badges/v14/address_lists.proto";
+import "badges/v14/timelines.proto";
+import "badges/v14/dynamic_stores.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v13";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
 
 // Msg defines the Msg service.
 service Msg {
@@ -92,7 +92,7 @@ message BadgeCustomMsgType {
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
   option (cosmos.msg.v1.signer) = "authority";
-  option (amino.name) = "badges/v13/MsgUpdateParams";
+  option (amino.name) = "badges/v14/MsgUpdateParams";
 
   // authority is the address that controls the module (defaults to x/gov unless overwritten).
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
@@ -115,6 +115,8 @@ message CosmosCoinWrapperPathAddObject {
   repeated Balance balances = 2;
   string symbol = 3;
   repeated DenomUnit denomUnits = 4;
+  bool allowOverrideWithAnyValidToken = 5;
+  bool allowCosmosWrapping = 6;
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
@@ -122,7 +124,7 @@ message CosmosCoinWrapperPathAddObject {
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 message MsgUniversalUpdateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/UniversalUpdateCollection";
+  option (amino.name) = "badges/v14/UniversalUpdateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -216,7 +218,7 @@ message MsgUniversalUpdateCollectionResponse {
 // MsgUpdateCollection is used to update a collection.
 message MsgUpdateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/UpdateCollection";
+  option (amino.name) = "badges/v14/UpdateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -304,7 +306,7 @@ message MsgUpdateCollectionResponse {
 // MsgCreateCollection is used to create a new collection.
 message MsgCreateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/CreateCollection";
+  option (amino.name) = "badges/v14/CreateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -364,7 +366,7 @@ message MsgCreateCollectionResponse {
 // MsgCreateAddressLists is used to create address lists.
 message MsgCreateAddressLists {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/CreateAddressLists";
+  option (amino.name) = "badges/v14/CreateAddressLists";
 
   // Address of the creator.
   string creator = 1;
@@ -379,7 +381,7 @@ message MsgCreateAddressListsResponse {}
 // MsgTransferBadges is used to transfer tokens.
 message MsgTransferBadges {
   option (cosmos.msg.v1.signer) = "creator";
-    option (amino.name) = "badges/v13/TransferBadges";
+    option (amino.name) = "badges/v14/TransferBadges";
 
   // Address of the creator.
   string creator = 1;
@@ -397,7 +399,7 @@ message MsgTransferBadgesResponse {}
 // MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/DeleteCollection";
+  option (amino.name) = "badges/v14/DeleteCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -412,7 +414,7 @@ message MsgDeleteCollectionResponse {}
 // MsgUpdateUserApprovals is used to update user approvals.
 message MsgUpdateUserApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/UpdateUserApprovals";
+  option (amino.name) = "badges/v14/UpdateUserApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -463,7 +465,7 @@ message MsgUpdateUserApprovalsResponse {}
 // MsgSetIncomingApproval is a helper message to set a single incoming approval.
 message MsgSetIncomingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetIncomingApproval";
+  option (amino.name) = "badges/v14/SetIncomingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -481,7 +483,7 @@ message MsgSetIncomingApprovalResponse {}
 // MsgDeleteIncomingApproval is a helper message to delete a single incoming approval.
 message MsgDeleteIncomingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/DeleteIncomingApproval";
+  option (amino.name) = "badges/v14/DeleteIncomingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -499,7 +501,7 @@ message MsgDeleteIncomingApprovalResponse {}
 // MsgSetOutgoingApproval is a helper message to set a single outgoing approval.
 message MsgSetOutgoingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetOutgoingApproval";
+  option (amino.name) = "badges/v14/SetOutgoingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -517,7 +519,7 @@ message MsgSetOutgoingApprovalResponse {}
 // MsgDeleteOutgoingApproval is a helper message to delete a single outgoing approval.
 message MsgDeleteOutgoingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/DeleteOutgoingApproval";
+  option (amino.name) = "badges/v14/DeleteOutgoingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -535,7 +537,7 @@ message MsgDeleteOutgoingApprovalResponse {}
 // MsgPurgeApprovals is a helper message to purge expired approvals.
 message MsgPurgeApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/PurgeApprovals";
+  option (amino.name) = "badges/v14/PurgeApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -565,7 +567,7 @@ message MsgPurgeApprovalsResponse {
 // MsgCreateDynamicStore is used to create a new dynamic store.
 message MsgCreateDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/CreateDynamicStore";
+  option (amino.name) = "badges/v14/CreateDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -582,7 +584,7 @@ message MsgCreateDynamicStoreResponse {
 // MsgUpdateDynamicStore is used to update an existing dynamic store.
 message MsgUpdateDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/UpdateDynamicStore";
+  option (amino.name) = "badges/v14/UpdateDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -598,7 +600,7 @@ message MsgUpdateDynamicStoreResponse {}
 // MsgDeleteDynamicStore is used to delete a dynamic store.
 message MsgDeleteDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/DeleteDynamicStore";
+  option (amino.name) = "badges/v14/DeleteDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -613,7 +615,7 @@ message MsgDeleteDynamicStoreResponse {}
 // MsgSetDynamicStoreValue is used to set a usage count for a specific address in a dynamic store.
 message MsgSetDynamicStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetDynamicStoreValue";
+  option (amino.name) = "badges/v14/SetDynamicStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -634,7 +636,7 @@ message MsgSetDynamicStoreValueResponse {}
 // MsgIncrementStoreValue is used to increment a usage count for a specific address in a dynamic store.
 message MsgIncrementStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/IncrementStoreValue";
+  option (amino.name) = "badges/v14/IncrementStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -655,7 +657,7 @@ message MsgIncrementStoreValueResponse {}
 // MsgDecrementStoreValue is used to decrement a usage count for a specific address in a dynamic store.
 message MsgDecrementStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/DecrementStoreValue";
+  option (amino.name) = "badges/v14/DecrementStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -682,7 +684,7 @@ message MsgDecrementStoreValueResponse {}
 // MsgSetValidBadgeIds sets the validBadgeIds and canUpdateValidBadgeIds permission
 message MsgSetValidBadgeIds {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetValidBadgeIds";
+  option (amino.name) = "badges/v14/SetValidBadgeIds";
 
   // Address of the creator.
   string creator = 1;
@@ -706,7 +708,7 @@ message MsgSetValidBadgeIdsResponse {
 // MsgSetManager sets the manager timeline and canUpdateManager permission
 message MsgSetManager {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetManager";
+  option (amino.name) = "badges/v14/SetManager";
 
   // Address of the creator.
   string creator = 1;
@@ -730,7 +732,7 @@ message MsgSetManagerResponse {
 // MsgSetCollectionMetadata sets the collection metadata timeline and canUpdateCollectionMetadata permission
 message MsgSetCollectionMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetCollectionMetadata";
+  option (amino.name) = "badges/v14/SetCollectionMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -754,7 +756,7 @@ message MsgSetCollectionMetadataResponse {
 // MsgSetBadgeMetadata sets the token metadata timeline and canUpdateBadgeMetadata permission
 message MsgSetBadgeMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetBadgeMetadata";
+  option (amino.name) = "badges/v14/SetBadgeMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -778,7 +780,7 @@ message MsgSetBadgeMetadataResponse {
 // MsgSetCustomData sets the custom data timeline and canUpdateCustomData permission
 message MsgSetCustomData {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetCustomData";
+  option (amino.name) = "badges/v14/SetCustomData";
 
   // Address of the creator.
   string creator = 1;
@@ -802,7 +804,7 @@ message MsgSetCustomDataResponse {
 // MsgSetStandards sets the standards timeline and canUpdateStandards permission
 message MsgSetStandards {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetStandards";
+  option (amino.name) = "badges/v14/SetStandards";
 
   // Address of the creator.
   string creator = 1;
@@ -826,7 +828,7 @@ message MsgSetStandardsResponse {
 // MsgSetCollectionApprovals sets the collection approvals and canUpdateCollectionApprovals permission
 message MsgSetCollectionApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetCollectionApprovals";
+  option (amino.name) = "badges/v14/SetCollectionApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -850,7 +852,7 @@ message MsgSetCollectionApprovalsResponse {
 // MsgSetIsArchived sets the isArchived timeline and canArchiveCollection permission
 message MsgSetIsArchived {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v13/SetIsArchived";
+  option (amino.name) = "badges/v14/SetIsArchived";
 
   // Address of the creator.
   string creator = 1;

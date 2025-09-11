@@ -1,9 +1,9 @@
 syntax = "proto3";
-package badges.v13;
+package badges.v14;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v13";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
 
 /*
   A DynamicStore is a flexible storage object that can store arbitrary data.
