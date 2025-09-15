@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v13;
+package badges.v14;
 
 import "google/protobuf/any.proto";
-import "badges/v13/transfers.proto";
-import "badges/v13/balances.proto";
-import "badges/v13/permissions.proto";
-import "badges/v13/metadata.proto";
-import "badges/v13/timelines.proto";
+import "badges/v14/transfers.proto";
+import "badges/v14/balances.proto";
+import "badges/v14/permissions.proto";
+import "badges/v14/metadata.proto";
+import "badges/v14/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v13";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
 
 /* 
   A BadgeCollection is the top-level object for a collection of tokens. 
@@ -92,6 +92,8 @@ message CosmosCoinWrapperPath {
   repeated Balance balances = 3;
   string symbol = 4;
   repeated DenomUnit denomUnits = 5;
+  bool allowOverrideWithAnyValidToken = 6;
+  bool allowCosmosWrapping = 7;
 }
 
 message DenomUnit {
@@ -105,4 +107,8 @@ message CollectionInvariants {
   // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
   // This prevents time-based restrictions on token ownership.
   bool noCustomOwnershipTimes = 1;
+  
+  // Maximum supply per token ID. If set, no balance can exceed this amount.
+  // This prevents any single token ID from having more than the specified supply.
+  string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
