@@ -258,7 +258,15 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
+	// Theoretically, we might be able to remove this but two things:
+	// 1. It could potentially change which IDs are received (but that only makes sense if predetermined balances is true)
+	// 2. We need to pass stuff to MsgTransferBadges so this doesn't really make sense for auto-scanning
 	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
+		return false
+	}
+
+	//I guess ETH signatures also fall under same category
+	if approvalCriteria.EthSignatureChallenges != nil && len(approvalCriteria.EthSignatureChallenges) > 0 {
 		return false
 	}
 

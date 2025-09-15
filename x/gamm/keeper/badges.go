@@ -19,6 +19,33 @@ func CheckStartsWithBadges(denom string) bool {
 	return strings.HasPrefix(denom, "badges:")
 }
 
+func (k Keeper) CheckIsBadgesWrappedDenom(ctx sdk.Context, denom string) bool {
+	if !CheckStartsWithBadges(denom) {
+		return false
+	}
+
+	collection, err := k.ParseCollectionFromDenom(ctx, denom)
+	if err != nil {
+		return false
+	}
+
+	path, err := GetCorrespondingPath(collection, denom)
+	if err != nil {
+		return false
+	}
+
+	// This is a little bit of an edge case
+	// It is possible to have a badges: denom that is not the auto-converted denom
+	// If this flag is true, we assume that they have to be wrapped first
+	//
+	// Ex: chaosnet denomination (badges:49:chaosnet)
+	if path.AllowCosmosWrapping {
+		return false
+	}
+
+	return true
+}
+
 func GetPartsFromDenom(denom string) ([]string, error) {
 	if !CheckStartsWithBadges(denom) {
 		return nil, fmt.Errorf("invalid denom: %s", denom)
@@ -161,7 +188,7 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, wrap it
 	for _, coin := range coins {
-		if CheckStartsWithBadges(coin.Denom) {
+		if k.CheckIsBadgesWrappedDenom(ctx, coin.Denom) {
 			err := k.SendNativeBadgesToPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
@@ -194,7 +221,7 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress
 func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
-		if CheckStartsWithBadges(coin.Denom) {
+		if k.CheckIsBadgesWrappedDenom(ctx, coin.Denom) {
 			err := k.SendNativeBadgesFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
@@ -229,7 +256,7 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 	for _, coin := range coins {
 		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
-		if CheckStartsWithBadges(coin.Denom) {
+		if k.CheckIsBadgesWrappedDenom(ctx, coin.Denom) {
 			err := k.SendNativeBadgesToPool(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
