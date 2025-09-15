@@ -232,7 +232,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	require.NoError(t, err, "error minting and distributing badges to alice")
 
 	response3, err := suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:3:nowrap",
+		Denom:   "badgeslp:3:nowrap",
 		Address: alice,
 	})
 	require.NoError(t, err)

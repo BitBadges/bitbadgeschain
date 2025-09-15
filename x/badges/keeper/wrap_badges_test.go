@@ -91,7 +91,7 @@ func (suite *TestSuite) TestWrapBadges() {
 
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting user address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + collection.CosmosCoinWrapperPaths[0].Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, collection.CosmosCoinWrapperPaths[0])
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
@@ -316,7 +316,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting user address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + collection.CosmosCoinWrapperPaths[0].Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, collection.CosmosCoinWrapperPaths[0])
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())

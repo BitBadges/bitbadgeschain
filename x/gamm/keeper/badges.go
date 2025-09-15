@@ -16,7 +16,7 @@ import (
 )
 
 func CheckStartsWithBadges(denom string) bool {
-	return strings.HasPrefix(denom, "badges:")
+	return strings.HasPrefix(denom, "badges:") || strings.HasPrefix(denom, "badgeslp:")
 }
 
 func (k Keeper) CheckIsBadgesWrappedDenom(ctx sdk.Context, denom string) bool {

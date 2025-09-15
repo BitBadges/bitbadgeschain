@@ -595,8 +595,14 @@ func (k Keeper) HandleTransfer(
 			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
 		}
 
+		// I think this technically doesn't matter because we throw if not cosmos wrappable
+		badgePrefix := "badges:"
+		if !denomInfo.AllowCosmosWrapping {
+			badgePrefix = "badgeslp:"
+		}
+
 		// Construct the full IBC denomination
-		ibcDenom = "badges:" + collection.CollectionId.String() + ":" + ibcDenom
+		ibcDenom = badgePrefix + collection.CollectionId.String() + ":" + ibcDenom
 
 		bankKeeper := k.bankKeeper
 		amountInt := multiplier.BigInt()

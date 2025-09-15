@@ -8,6 +8,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// generateBadgeDenom generates the correct badge denom based on AllowCosmosWrapping setting
+func generateBadgeDenom(collectionId sdkmath.Uint, wrapperPath *types.CosmosCoinWrapperPath) string {
+	prefix := "badges:"
+	if !wrapperPath.AllowCosmosWrapping {
+		prefix = "badgeslp:"
+	}
+	return prefix + collectionId.String() + ":" + wrapperPath.Denom
+}
+
 // TestCosmosCoinWrapperPathsBasic tests the basic functionality of cosmos coin wrapper paths
 // by creating a collection with wrapper paths and transferring badges to the special alias address
 func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
@@ -97,7 +106,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 	// Verify the cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
@@ -168,7 +177,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 	// Get the wrapped coin amount
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
 
@@ -268,7 +277,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 	suite.Require().Nil(err, "Error getting bob's address")
 	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Error getting alice's address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	err = suite.app.BankKeeper.SendCoins(suite.ctx, bobAccAddr, aliceAccAddr, sdk.Coins{sdk.NewCoin(fullDenom, sdkmath.NewInt(1))})
 	suite.Require().Nil(err, "Error transferring wrapped coin to alice")
@@ -484,7 +493,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 	// Verify first denom was created
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom1 := "badges:" + collection.CollectionId.String() + ":" + wrapperPath1.Denom
+	fullDenom1 := generateBadgeDenom(collection.CollectionId, wrapperPath1)
 	bobBalanceDenom1 := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom1)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom1.Amount, "Bob should have 1 of first wrapped coin")
 
@@ -579,7 +588,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 	// Verify no cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	suite.Require().Equal(sdkmath.NewInt(0), bobBalanceDenom.Amount, "No cosmos coin should be minted when wrapping is disabled")
 }
@@ -654,7 +663,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 	// Verify cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	fullDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom.Amount, "Cosmos coin should be minted when override is enabled")
 }
@@ -729,7 +738,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 	// Verify cosmos coin was minted with the replaced denom
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	// The denom should be replaced: "badge_1_coin"
+	// The denom should be replaced: "badge_1_coin" (with {id} replaced by 1)
 	replacedDenom := "badges:" + collection.CollectionId.String() + ":badge_1_coin"
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, replacedDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom.Amount, "Cosmos coin should be minted with replaced denom")
@@ -990,7 +999,7 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test denom parsing and validation
 	suite.testDenomParsingAndValidation(badgesDenom, collection)
@@ -1148,7 +1157,7 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test community pool funding with badges
 	suite.testCommunityPoolFundingWithBadges(bob, badgesDenom)
@@ -1199,7 +1208,7 @@ func (suite *TestSuite) TestGammKeeperPoolWithWrapping() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test pool operations
 	suite.testPoolOperations(bob, badgesDenom, wrapperPath.Address)
@@ -1236,7 +1245,7 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test denom parsing functions
 	// Test CheckStartsWithBadges
@@ -1296,7 +1305,7 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test case: GetCorrespondingPath with AllowOverrideWithAnyValidToken should work with {id} placeholder
 	// Since the denom "errortest" doesn't contain numeric characters, it should not match any path
@@ -1355,7 +1364,7 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test simple integration functionality
 	suite.testSimpleIntegration(bob, badgesDenom, wrapperPath.Address)
@@ -1416,7 +1425,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	poolAcc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, poolAccAddr)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, poolAcc)
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test ParseCollectionFromDenom
 	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(suite.ctx, badgesDenom)
@@ -1493,7 +1502,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test comprehensive pool operations
 	suite.testComprehensivePoolOperations(bob, badgesDenom, wrapperPath.Address)
@@ -1544,7 +1553,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test denom parsing and validation
 	suite.testDenomParsingAndValidation(badgesDenom, collection)
@@ -1757,7 +1766,7 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test ALL gamm keeper functions
 	suite.testAllGammKeeperFunctions(bob, badgesDenom, wrapperPath.Address)
@@ -1896,7 +1905,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := generateBadgeDenom(collection.CollectionId, wrapperPath)
 
 	// Test all pool operations using the working approach
 	suite.testComprehensivePoolOperations(bob, badgesDenom, wrapperPath.Address)

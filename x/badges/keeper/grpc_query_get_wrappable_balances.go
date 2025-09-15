@@ -23,13 +23,13 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Parse collection ID from denom (format: badges:COLL_ID:*)
-	if !strings.HasPrefix(req.Denom, "badges:") {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "denom must start with 'badges:'")
+	if !strings.HasPrefix(req.Denom, "badges:") && !strings.HasPrefix(req.Denom, "badgeslp:") {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "denom must start with 'badges:' or 'badgeslp:'")
 	}
 
 	parts := strings.Split(req.Denom, ":")
 	if len(parts) < 3 {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "invalid denom format, expected 'badges:COLL_ID:*'")
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "invalid denom format, expected '*:COLL_ID:*'")
 	}
 
 	collectionIdStr := parts[1]

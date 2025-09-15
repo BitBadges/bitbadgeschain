@@ -55,7 +55,7 @@ message MsgCreateBalancerPoolResponse {
         },
         {
             "token": {
-                "denom": "badges:21:utoken",
+                "denom": "badgeslp:21:utoken",
                 "amount": "5000000"
             },
             "weight": "50"

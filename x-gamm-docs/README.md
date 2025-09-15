@@ -28,7 +28,7 @@ The main difference is in the badge token handling system. With every attempted 
 
 Here's how the badge token conversion works:
 
-**Badge Token**: `badges:21:utoken`
+**Badge Token**: `badgeslp:21:utoken`
 
 -   Collection ID: `21`
 -   Base Denom: `utoken`
@@ -37,15 +37,15 @@ Here's how the badge token conversion works:
 **Conversion Process**:
 
 ```
-1 badges:21:utoken = [{ amount: 1n, badgeIds: [{ start: 1n, end: 1n }], ownershipTimes: UintRangeArray.FullRanges() }]
+1 badgeslp:21:utoken = [{ amount: 1n, badgeIds: [{ start: 1n, end: 1n }], ownershipTimes: UintRangeArray.FullRanges() }]
 
-2 badges:21:utoken = [{ amount: 2n, badgeIds: [{ start: 1n, end: 1n }], ownershipTimes: UintRangeArray.FullRanges() }]
+2 badgeslp:21:utoken = [{ amount: 2n, badgeIds: [{ start: 1n, end: 1n }], ownershipTimes: UintRangeArray.FullRanges() }]
 ```
 
 **Visual Flow**:
 
 ```
-User wants to add 5 badges:21:utoken to a pool in liquidity
+User wants to add 5 badgeslp:21:utoken to a pool in liquidity
     ↓
 System reads cosmosCoinWrapperPaths for collection 21
     ↓
@@ -53,9 +53,9 @@ Finds path with denom "utoken" and balances array (using the wrapper path's bala
     ↓
 Transfers the x/badges balances to the pool address with conversions applied
     ↓
-Pool receives the x/badges balances and mints the corresponding badges:21:utoken balances which are native x/bank denominations
+Pool receives the x/badges balances and mints the corresponding badgeslp:21:utoken balances which are native x/bank denominations
     ↓
-The user now has the equivalent of badges:21:utoken balances in the pool (all else in x/gamm is kept the same as standard in Osmosis)
+The user now has the equivalent of badgeslp:21:utoken balances in the pool (all else in x/gamm is kept the same as standard in Osmosis)
 ```
 
 For the reverse, when a pool wants to send tokens to the user, it will burn the native x/bank denominations and transfer the x/badges balances back to the user address.
