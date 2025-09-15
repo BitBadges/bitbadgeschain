@@ -63,6 +63,11 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_dynamic_store_value/{storeId}/{address}";
 	}
 
+  // Queries the maximum wrappable amount for a given denom and user address.
+  rpc GetWrappableBalances(QueryGetWrappableBalancesRequest) returns (QueryGetWrappableBalancesResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_wrappable_balances/{denom}/{address}";
+	}
+
   // this line is used by starport scaffolding # 2
 }
 
@@ -155,6 +160,15 @@ message QueryGetETHSignatureTrackerRequest {
 
 message QueryGetETHSignatureTrackerResponse {
   string numUsed = 1;
+}
+
+message QueryGetWrappableBalancesRequest {
+  string denom = 1;
+  string address = 2;
+}
+
+message QueryGetWrappableBalancesResponse {
+  string maxWrappableAmount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // this line is used by starport scaffolding # 3

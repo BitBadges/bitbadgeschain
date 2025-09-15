@@ -96,6 +96,9 @@ func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string)
 		if path.AllowOverrideWithAnyValidToken {
 			// 1. Replace the {id} placeholder with the actual denom
 			// 2. Convert all balance.badgeIds to the actual badge ID
+			if numericStr == "" {
+				continue
+			}
 
 			idFromDenom := sdkmath.NewUintFromString(numericStr)
 			path.Denom = strings.ReplaceAll(path.Denom, "{id}", idFromDenom.String())

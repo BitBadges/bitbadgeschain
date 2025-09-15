@@ -1298,10 +1298,11 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 
 	badgesDenom := "badges:" + collection.CollectionId.String() + ":" + wrapperPath.Denom
 
-	// Test error case: GetCorrespondingPath with AllowOverrideWithAnyValidToken
+	// Test case: GetCorrespondingPath with AllowOverrideWithAnyValidToken should work with {id} placeholder
+	// Since the denom "errortest" doesn't contain numeric characters, it should not match any path
 	_, err = gammkeeper.GetCorrespondingPath(collection, badgesDenom)
-	suite.Require().Error(err, "Should error when AllowOverrideWithAnyValidToken is true")
-	suite.Require().Contains(err.Error(), "path allows override with any valid token is set", "Error should mention override flag")
+	suite.Require().Error(err, "Should error when no matching path is found")
+	suite.Require().Contains(err.Error(), "path not found for denom", "Error should mention path not found")
 
 	// Test error case: invalid denom format
 	_, err = gammkeeper.ParseDenomCollectionId("invalid-denom")
