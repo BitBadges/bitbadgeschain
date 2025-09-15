@@ -14,6 +14,8 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.ModuleManager,
 			app.Configurator(),
 			app.BadgesKeeper,
+			app.MintKeeper,
+			app.SlashingKeeper,
 		),
 	)
 
