@@ -51,7 +51,7 @@ func CreateUpgradeHandler(
 	slashingKeeper slashingkeeper.Keeper,
 ) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		err := CustomUpgradeHandlerLogic(ctx, badgesKeeper, mintKeeper, slashingKeeper, stakingKeeper, ibcKeeper)
+		err := CustomUpgradeHandlerLogic(ctx, badgesKeeper, mintKeeper, slashingKeeper)
 		if err != nil {
 			return nil, err
 		}
