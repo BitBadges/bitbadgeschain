@@ -490,6 +490,10 @@ func (k Keeper) HandleTransfer(
 
 		// Check if the denom contains the {id} placeholder
 		if strings.Contains(denomInfo.Denom, "{id}") {
+			if !denomInfo.AllowOverrideWithAnyValidToken {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "allowOverrideWithAnyValidToken is not true for this wrapper path")
+			}
+
 			//Throw if balances len != 1
 			if len(transferBalances) != 1 {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
@@ -593,6 +597,7 @@ func (k Keeper) HandleTransfer(
 
 		// Construct the full IBC denomination
 		ibcDenom = "badges:" + collection.CollectionId.String() + ":" + ibcDenom
+
 		bankKeeper := k.bankKeeper
 		amountInt := multiplier.BigInt()
 		if isSendingToSpecialAddress {

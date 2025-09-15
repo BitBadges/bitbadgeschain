@@ -83,12 +83,31 @@ func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string)
 		return nil, err
 	}
 
+	// This is okay because we don't allow numeric chars in denoms
+	numericStr := ""
+	for _, char := range baseDenom {
+		if char >= '0' && char <= '9' {
+			numericStr += string(char)
+		}
+	}
+
 	cosmosPaths := collection.CosmosCoinWrapperPaths
 	for _, path := range cosmosPaths {
-		if path.Denom == baseDenom {
-			if path.AllowOverrideWithAnyValidToken {
-				return nil, fmt.Errorf("path allows override with any valid token is set: %s", denom)
+		if path.AllowOverrideWithAnyValidToken {
+			// 1. Replace the {id} placeholder with the actual denom
+			// 2. Convert all balance.badgeIds to the actual badge ID
+
+			idFromDenom := sdkmath.NewUintFromString(numericStr)
+			path.Denom = strings.ReplaceAll(path.Denom, "{id}", idFromDenom.String())
+			path.Balances = badgestypes.DeepCopyBalances(path.Balances)
+			for _, balance := range path.Balances {
+				balance.BadgeIds = []*badgestypes.UintRange{
+					{Start: idFromDenom, End: idFromDenom},
+				}
 			}
+		}
+
+		if path.Denom == baseDenom {
 			return path, nil
 		}
 	}
