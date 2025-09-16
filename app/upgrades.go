@@ -16,6 +16,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.BadgesKeeper,
 			app.MintKeeper,
 			app.SlashingKeeper,
+			app.GammKeeper,
 		),
 	)
 

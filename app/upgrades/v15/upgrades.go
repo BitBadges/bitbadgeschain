@@ -5,6 +5,7 @@ import (
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -16,9 +17,13 @@ const (
 )
 
 // This is in a separate function so we can test it locally with a snapshot
-func CustomUpgradeHandlerLogic(ctx context.Context, badgesKeeper keeper.Keeper, mintKeeper mintkeeper.Keeper, slashingKeeper slashingkeeper.Keeper) error {
+func CustomUpgradeHandlerLogic(ctx context.Context, badgesKeeper keeper.Keeper, mintKeeper mintkeeper.Keeper, slashingKeeper slashingkeeper.Keeper, gammKeeper gammkeeper.Keeper) error {
 	// Run migrations
 	if err := badgesKeeper.MigrateBadgesKeeper(sdk.UnwrapSDKContext(ctx)); err != nil {
+		return err
+	}
+
+	if err := gammKeeper.MigrateAllPoolsV15(sdk.UnwrapSDKContext(ctx)); err != nil {
 		return err
 	}
 
@@ -49,9 +54,10 @@ func CreateUpgradeHandler(
 	badgesKeeper keeper.Keeper,
 	mintKeeper mintkeeper.Keeper,
 	slashingKeeper slashingkeeper.Keeper,
+	gammKeeper gammkeeper.Keeper,
 ) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		err := CustomUpgradeHandlerLogic(ctx, badgesKeeper, mintKeeper, slashingKeeper)
+		err := CustomUpgradeHandlerLogic(ctx, badgesKeeper, mintKeeper, slashingKeeper, gammKeeper)
 		if err != nil {
 			return nil, err
 		}

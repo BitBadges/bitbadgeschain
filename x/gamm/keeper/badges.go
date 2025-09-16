@@ -9,6 +9,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -283,7 +284,6 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 			if err != nil {
 				return err
 			}
-
 		} else {
 			err := k.communityPoolKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
 			if err != nil {
@@ -293,4 +293,110 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 	}
 
 	return nil
+}
+
+func (k Keeper) MigrateAllPoolsV15(ctx sdk.Context) error {
+	allPools, err := k.GetPoolsAndPoke(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, pool := range allPools {
+		liquidity := pool.GetTotalPoolLiquidity(ctx)
+		for _, denom := range liquidity.Denoms() {
+			if strings.HasPrefix(denom, "badges:") {
+				collection, err := k.ParseCollectionFromDenom(ctx, denom)
+				if err != nil {
+					return err
+				}
+
+				path, err := GetCorrespondingPath(collection, denom)
+				if err != nil {
+					return err
+				}
+
+				if !path.AllowCosmosWrapping {
+					// We need to migrate to badgeslp: denom
+					newDenom := "badgeslp:" + collection.CollectionId.String() + ":" + path.Denom
+
+					// Get the current amount of the old denom in the pool
+					oldCoin := liquidity.AmountOf(denom)
+					if oldCoin.IsZero() {
+						continue // Skip if no liquidity for this denom
+					}
+
+					// Create the new coin with the same amount
+					newCoin := sdk.NewCoin(newDenom, oldCoin)
+
+					// Update pool based on pool type
+					switch poolType := pool.(type) {
+					case *balancer.Pool:
+						// For balancer pools, update the PoolAssets array
+						err := k.migrateBalancerPoolDenom(ctx, poolType, denom, newDenom, oldCoin)
+						if err != nil {
+							return err
+						}
+					default:
+						return fmt.Errorf("unsupported pool type for migration: %T", pool)
+					}
+
+					// Handle bank keeper escrowed amounts
+					poolAddress := pool.GetAddress()
+
+					// Send the old denom tokens from pool to module (to burn them)
+					err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, poolAddress, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, oldCoin)))
+					if err != nil {
+						return err
+					}
+
+					// Burn the old denom tokens
+					err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, oldCoin)))
+					if err != nil {
+						return err
+					}
+
+					// Mint the new denom tokens
+					err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(newCoin))
+					if err != nil {
+						return err
+					}
+
+					// Send the new denom tokens to the pool
+					err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, poolAddress, sdk.NewCoins(newCoin))
+					if err != nil {
+						return err
+					}
+
+					// Update total liquidity tracking
+					k.RecordTotalLiquidityDecrease(ctx, sdk.NewCoins(sdk.NewCoin(denom, oldCoin)))
+					k.RecordTotalLiquidityIncrease(ctx, sdk.NewCoins(newCoin))
+
+					// Save the updated pool
+					err = k.setPool(ctx, pool)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// migrateBalancerPoolDenom migrates a denom in a balancer pool from oldDenom to newDenom
+func (k Keeper) migrateBalancerPoolDenom(ctx sdk.Context, pool *balancer.Pool, oldDenom, newDenom string, amount sdkmath.Int) error {
+	// Find the pool asset with the old denom
+	poolAssets := pool.GetAllPoolAssets()
+	for i, asset := range poolAssets {
+		if asset.Token.Denom == oldDenom {
+			// Update the denom while keeping the same amount and weight
+			poolAssets[i].Token = sdk.NewCoin(newDenom, amount)
+			// Update the pool's PoolAssets array
+			pool.PoolAssets = poolAssets
+			return nil
+		}
+	}
+
+	return fmt.Errorf("denom %s not found in balancer pool %d", oldDenom, pool.GetId())
 }
