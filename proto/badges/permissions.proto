@@ -133,13 +133,13 @@ message CollectionApprovalPermission {
   // If you use "All", this approval will match to all approvalIds.
   // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
   // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
-  string approvalId = 9;
+  string approvalId = 7;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 10;
+  repeated UintRange permanentlyPermittedTimes = 8;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 11;
+  repeated UintRange permanentlyForbiddenTimes = 9;
 }
 
 
@@ -166,14 +166,14 @@ message UserOutgoingApprovalPermission {
   // If you use "All", this approval will match to all approvalIds.
   // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
   // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
-  string approvalId = 8;
+  string approvalId = 6;
 
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 9;
+  repeated UintRange permanentlyPermittedTimes = 7;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 10;
+  repeated UintRange permanentlyForbiddenTimes = 8;
 }
 
 /* 
@@ -201,13 +201,13 @@ message UserIncomingApprovalPermission {
   // If you use "All", this approval will match to all approvalIds.
   // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
   // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
-  string approvalId = 8;
+  string approvalId = 6;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 9;
+  repeated UintRange permanentlyPermittedTimes = 7;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 10;
+  repeated UintRange permanentlyForbiddenTimes = 8;
 }
 
 /* 

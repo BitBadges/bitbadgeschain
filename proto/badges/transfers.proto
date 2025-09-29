@@ -138,19 +138,19 @@ message UserOutgoingApproval {
   repeated UintRange ownershipTimes = 5;
 
   // The URI associated with this approval, optionally providing metadata about the approval.
-  string uri = 8;
+  string uri = 6;
 
   // Arbitrary custom data associated with this approval.
-  string customData = 9;
+  string customData = 7;
 
   // The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
-  string approvalId = 10;
+  string approvalId = 8;
 
   // The criteria that must be met for this approval to be considered.
-  OutgoingApprovalCriteria approvalCriteria = 11;
+  OutgoingApprovalCriteria approvalCriteria = 9;
 
   // Version of the approval. Maintained internally.
-  string version = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string version = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
@@ -171,20 +171,19 @@ message UserIncomingApproval {
   repeated UintRange ownershipTimes = 5;
 
   // The URI associated with this approval, optionally providing metadata about the approval.
-  string uri = 8;
+  string uri = 6;
 
   // Arbitrary custom data associated with this approval.
-  string customData = 9;
+  string customData = 7;
 
   // The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
-  string approvalId = 10;
+  string approvalId = 8;
 
   // The criteria that must be met for this approval to be considered.
-  IncomingApprovalCriteria approvalCriteria = 11;
-  
+  IncomingApprovalCriteria approvalCriteria = 9;
 
   // Version of the approval. Maintained internally.
-  string version = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string version = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 
@@ -548,17 +547,21 @@ message CollectionApproval {
   repeated UintRange badgeIds = 5;
   // The allowed range of ownership times for approval.
   repeated UintRange ownershipTimes = 6;
+  
   // The URI associated with this approval, optionally providing metadata about the approval.
-  string uri = 9;
+  string uri = 7;
+  
   // Arbitrary custom data associated with this approval.
-  string customData = 10;
+  string customData = 8;
+  
   // The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
-  string approvalId = 11;
+  string approvalId = 9;
+  
   // The criteria that must be met for this approval to be considered.
-  ApprovalCriteria approvalCriteria = 12;
+  ApprovalCriteria approvalCriteria = 10;
 
   // Version of the approval. Maintained internally.
-  string version = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string version = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // ApprovalIdentifierDetails defines the details to identify a specific approval.

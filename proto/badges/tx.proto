@@ -133,72 +133,72 @@ message MsgUniversalUpdateCollection {
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   //The default balances for the user
-  UserBalanceStore defaultBalances = 4;
+  UserBalanceStore defaultBalances = 3;
 
   // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateValidBadgeIds = 5;
+  bool updateValidBadgeIds = 4;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 6; 
+  repeated UintRange validBadgeIds = 5; 
 
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionPermissions = 7;
+  bool updateCollectionPermissions = 6;
   
   // New collection permissions to set.
-  CollectionPermissions collectionPermissions = 8;
+  CollectionPermissions collectionPermissions = 7;
   
   // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateManagerTimeline = 9;
+  bool updateManagerTimeline = 8;
   
   // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 10;
+  repeated ManagerTimeline managerTimeline = 9;
   
   // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionMetadataTimeline = 11;
+  bool updateCollectionMetadataTimeline = 10;
   
   // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 11;
   
   // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateBadgeMetadataTimeline = 13;
+  bool updateBadgeMetadataTimeline = 12;
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 13;
   
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCustomDataTimeline = 17;
+  bool updateCustomDataTimeline = 14;
   
   // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 18;
+  repeated CustomDataTimeline customDataTimeline = 15;
   
   // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionApprovals = 21;
+  bool updateCollectionApprovals = 16;
   
   // New collection approvals to set.
-  repeated CollectionApproval collectionApprovals = 22;
+  repeated CollectionApproval collectionApprovals = 17;
   
   // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateStandardsTimeline = 23;
+  bool updateStandardsTimeline = 18;
   
   // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 24;
+  repeated StandardsTimeline standardsTimeline = 19;
   
   // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 25;
+  bool updateIsArchivedTimeline = 20;
   
   // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 26;
+  repeated IsArchivedTimeline isArchivedTimeline = 21;
 
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 27;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 22;
 
   // IBC wrapper paths to add.
-  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 28;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 23;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
-  CollectionInvariants invariants = 29;
+  CollectionInvariants invariants = 24;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -225,63 +225,63 @@ message MsgUpdateCollection {
   repeated UintRange validBadgeIds = 4;
   
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionPermissions = 7;
+  bool updateCollectionPermissions = 5;
   
   // New collection permissions to set.
-  CollectionPermissions collectionPermissions = 8;
+  CollectionPermissions collectionPermissions = 6;
   
   // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateManagerTimeline = 9;
+  bool updateManagerTimeline = 7;
   
   // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 10;
+  repeated ManagerTimeline managerTimeline = 8;
   
   // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionMetadataTimeline = 11;
+  bool updateCollectionMetadataTimeline = 9;
   
   // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 10;
   
   // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateBadgeMetadataTimeline = 13;
+  bool updateBadgeMetadataTimeline = 11;
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 12;
   
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCustomDataTimeline = 17;
+  bool updateCustomDataTimeline = 13;
   
   // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 18;
+  repeated CustomDataTimeline customDataTimeline = 14;
   
   // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionApprovals = 21;
+  bool updateCollectionApprovals = 15;
   
   // New collection approvals to set.
-  repeated CollectionApproval collectionApprovals = 22;
+  repeated CollectionApproval collectionApprovals = 16;
   
   // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateStandardsTimeline = 23;
+  bool updateStandardsTimeline = 17;
   
   // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 24;
+  repeated StandardsTimeline standardsTimeline = 18;
   
   // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 27;
+  bool updateIsArchivedTimeline = 19;
   
   // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 28;
+  repeated IsArchivedTimeline isArchivedTimeline = 20;
 
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 29;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 21;
 
   // IBC wrapper paths to add.
-  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 30;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 22;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
-  CollectionInvariants invariants = 31;
+  CollectionInvariants invariants = 23;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
@@ -299,43 +299,43 @@ message MsgCreateCollection {
   string creator = 1;
   
   //The default balances for the user
-  UserBalanceStore defaultBalances = 4;
+  UserBalanceStore defaultBalances = 2;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 5; 
+  repeated UintRange validBadgeIds = 3; 
   
   // Collection permissions.
-  CollectionPermissions collectionPermissions = 6;
+  CollectionPermissions collectionPermissions = 4;
   
   // Manager timeline entries.
-  repeated ManagerTimeline managerTimeline = 7;
+  repeated ManagerTimeline managerTimeline = 5;
   
   // Collection metadata timeline entries.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 6;
   
   // Token metadata timeline entries.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
   
   // Custom data timeline entries.
-  repeated CustomDataTimeline customDataTimeline = 11;
+  repeated CustomDataTimeline customDataTimeline = 8;
   
   // Collection approvals.
-  repeated CollectionApproval collectionApprovals = 12;
+  repeated CollectionApproval collectionApprovals = 9;
   
   // Standards timeline entries.
-  repeated StandardsTimeline standardsTimeline = 13;
+  repeated StandardsTimeline standardsTimeline = 10;
   
   // isArchived timeline entries.
-  repeated IsArchivedTimeline isArchivedTimeline = 14;
+  repeated IsArchivedTimeline isArchivedTimeline = 11;
 
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 16;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 12;
 
   // IBC wrapper paths to add.
-  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 17;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 13;
 
   // Collection-level invariants that cannot be broken.
-  CollectionInvariants invariants = 18;
+  CollectionInvariants invariants = 14;
 }
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.

@@ -106,13 +106,13 @@ message QueryGetAddressListResponse {
 }
 
 message QueryGetApprovalTrackerRequest {
-  string collectionId = 5 ;
+  string amountTrackerId = 1; 
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string approverAddress = 3; //if approvalLevel is "collection", leave blank
-  string approvalId = 7;
-  string amountTrackerId = 1; 
   string trackerType = 4;; //"overall", "to", "from", "initiatedBy"
+  string collectionId = 5 ;
   string approvedAddress = 6; //if trackerType is "overall", leave blank
+  string approvalId = 7;
 }
 
 message QueryGetApprovalTrackerResponse {
@@ -123,9 +123,9 @@ message QueryGetChallengeTrackerRequest {
   string collectionId = 1 ;
   string approvalLevel = 2; //"collection" or "incoming" or "outgoing"
   string approverAddress = 3; //if approvalLevel is "collection", leave blank
-  string approvalId = 6;
   string challengeTrackerId = 4;
   string leafIndex = 5 ; 
+  string approvalId = 6;
 }
 
 message QueryGetChallengeTrackerResponse {
