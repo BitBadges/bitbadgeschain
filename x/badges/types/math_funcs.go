@@ -5,14 +5,7 @@ import (
 )
 
 // Safe adds two sdkmath.Uints
-func SafeAdd(left sdkmath.Uint, right sdkmath.Uint) (sdkmath.Uint, error) {
-	defer func() (sdkmath.Uint, error) {
-		if r := recover(); r != nil {
-			return sdkmath.NewUint(0), ErrOverflow
-		}
-		return left.Add(right), nil
-	}()
-
+func SafeAdd(left sdkmath.Uint, right sdkmath.Uint) (result sdkmath.Uint, err error) {
 	return left.Add(right), nil
 }
 

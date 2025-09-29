@@ -302,13 +302,13 @@ func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId s
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
-			panic("Failed to parse num used")
+			return sdkmath.NewUint(0), sdkerrors.Wrapf(err, "failed to parse num used")
 		}
 
 		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(curr.Incr().String()))
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(incrementedNum.String()))
 	return incrementedNum, nil
 }
 
@@ -320,7 +320,7 @@ func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkma
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
-			panic("Failed to parse num used")
+			return sdkmath.NewUint(0), sdkerrors.Wrapf(err, "failed to parse num used")
 		}
 
 		curr = sdkmath.NewUint(currUint)
@@ -336,7 +336,8 @@ func (k Keeper) GetChallengeTrackersFromStore(ctx sdk.Context) (numUsed []sdkmat
 	for ; iterator.Valid(); iterator.Next() {
 		curr, err := strconv.ParseUint(string((iterator.Value())), 10, 64)
 		if err != nil {
-			panic("Failed to parse num used")
+			// Log error but continue processing - this is a data corruption issue
+			continue
 		}
 		numUsed = append(numUsed, sdkmath.NewUint(curr))
 		ids = append(ids, string(iterator.Key()[1:]))
@@ -481,7 +482,8 @@ func (k Keeper) IncrementApprovalVersion(ctx sdk.Context, collectionId sdkmath.U
 	} else {
 		versionUint, err := strconv.ParseUint(string(version), 10, 64)
 		if err != nil {
-			panic("Failed to parse version")
+			// Return 0 on parse error - this indicates data corruption
+			return sdkmath.NewUint(0)
 		}
 
 		versionUint++
@@ -506,7 +508,8 @@ func (k Keeper) GetApprovalTrackerVersionsFromStore(ctx sdk.Context) (versions [
 	for ; iterator.Valid(); iterator.Next() {
 		version, err := strconv.ParseUint(string(iterator.Value()), 10, 64)
 		if err != nil {
-			panic("Failed to parse version")
+			// Log error but continue processing - this is a data corruption issue
+			continue
 		}
 		versions = append(versions, sdkmath.NewUint(version))
 		ids = append(ids, string(iterator.Key()[1:]))
@@ -529,7 +532,8 @@ func (k Keeper) GetApprovalTrackerVersionFromStore(ctx sdk.Context, key string) 
 	}
 	versionUint, err := strconv.ParseUint(string(version), 10, 64)
 	if err != nil {
-		panic("Failed to parse version")
+		// Return false on parse error - this indicates data corruption
+		return sdkmath.NewUint(0), false
 	}
 	return sdkmath.NewUint(versionUint), true
 }

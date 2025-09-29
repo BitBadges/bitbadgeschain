@@ -20,7 +20,7 @@ func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
 }
 
 func ValidateApprovalTimeline(ctx sdk.Context, timeline []*CollectionApprovalTimeline, canChangeValues bool) error {
-	err := *new(error)
+	var err error
 	for _, timelineVal := range timeline {
 		err = ValidateCollectionApprovals(ctx, timelineVal.CollectionApprovals, canChangeValues)
 		if err != nil {

@@ -568,7 +568,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						}
 
 						if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
-							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
+							return sdkerrors.Wrapf(ErrUintUnititialized, "increment ownership times by is uninitialized")
 						}
 
 						if sequentialTransfer.DurationFromTimestamp.IsNil() {
@@ -602,7 +602,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 							// grace period cannot be longer than the interval length
 							if sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.GT(sequentialTransfer.RecurringOwnershipTimes.IntervalLength) {
-								return sdkerrors.Wrapf(ErrInvalidRequest, "grace period length cannot be longer than or equal tothe interval length")
+								return sdkerrors.Wrapf(ErrInvalidRequest, "grace period length cannot be longer than or equal to the interval length")
 							}
 						}
 

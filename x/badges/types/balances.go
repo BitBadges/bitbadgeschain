@@ -28,7 +28,7 @@ func DoBalancesExceedThreshold(ctx sdk.Context, balances []*Balance, thresholdBa
 }
 
 func AddBalancesAndAssertDoesntExceedThreshold(ctx sdk.Context, currTally []*Balance, toAdd []*Balance, threshold []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 	//If we transferAsMuchAsPossible, we need to increment the currTally by all that we can
 	//We then need to return the updated toAdd
 
@@ -98,7 +98,7 @@ func HandleDuplicateBadgeIds(ctx sdk.Context, balances []*Balance, canChangeValu
 	}
 
 	newBalances := []*Balance{}
-	err := *new(error)
+	var err error
 	newBalances, err = AddBalances(ctx, balances, newBalances)
 	if err != nil {
 		return []*Balance{}, err
@@ -111,7 +111,7 @@ func HandleDuplicateBadgeIds(ctx sdk.Context, balances []*Balance, canChangeValu
 func UpdateBalance(ctx sdk.Context, newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortUintRangesAndMerge(ranges)
-	err := *new(error)
+	var err error
 	balances, err = DeleteBalances(ctx, newBalance.BadgeIds, newBalance.OwnershipTimes, balances)
 	if err != nil {
 		return balances, err
@@ -208,7 +208,7 @@ func GetOverlappingBalances(ctx sdk.Context, transferBalancesToCheck []*Balance,
 }
 
 func AddBalances(ctx sdk.Context, balancesToAdd []*Balance, balances []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 	for _, balance := range balancesToAdd {
 		balances, err = AddBalance(ctx, balances, balance)
 		if err != nil {
@@ -247,7 +247,7 @@ func AddBalance(ctx sdk.Context, existingBalances []*Balance, balanceToAdd *Bala
 }
 
 func SubtractBalances(ctx sdk.Context, balancesToSubtract []*Balance, balances []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 
 	for _, balance := range balancesToSubtract {
 		balances, err = SubtractBalance(ctx, balances, balance, false)
@@ -260,7 +260,7 @@ func SubtractBalances(ctx sdk.Context, balancesToSubtract []*Balance, balances [
 }
 
 func SubtractBalancesWithZeroForUnderflows(ctx sdk.Context, balancesToSubtract []*Balance, balances []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 
 	for _, balance := range balancesToSubtract {
 		balances, err = SubtractBalance(ctx, balances, balance, true)
@@ -356,7 +356,7 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 
 	balances = append(balances, newBalancesWithoutZeroes...)
 
-	err := *new(error)
+	var err error
 
 	//Little clean up to start. We sort and if we have adjacent (note not intersecting), we  merge them
 	for _, balance := range balances {
