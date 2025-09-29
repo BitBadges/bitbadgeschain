@@ -14,7 +14,7 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 	id := addressList.ListId
 
 	//if starts with !
-	if id[0] == '!' {
+	if len(id) > 0 && id[0] == '!' {
 		return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id cannot start with !")
 	}
 
@@ -35,7 +35,9 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 		return err
 	}
 
-	k.IncrementNextAddressListCounter(ctx)
+	if err := k.IncrementNextAddressListCounter(ctx); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -44,10 +46,10 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 
 	// Handle special reserved IDs
 	switch {
-	case addressListId == "Mint":
+	case addressListId == types.MintAddress:
 		return &types.AddressList{
-			ListId:     "Mint",
-			Addresses:  []string{"Mint"},
+			ListId:     types.MintAddress,
+			Addresses:  []string{types.MintAddress},
 			Whitelist:  true,
 			Uri:        "",
 			CustomData: "",
@@ -110,7 +112,7 @@ func (k Keeper) GetTrackerListById(ctx sdk.Context, trackerListId string) (*type
 	inverted := false
 	originalId := trackerListId
 
-	if trackerListId[0] == '!' {
+	if len(trackerListId) > 0 && trackerListId[0] == '!' {
 		inverted = true
 		trackerListId = trackerListId[1:]
 	}
@@ -135,7 +137,7 @@ func (k Keeper) GetAddressListById(ctx sdk.Context, addressListId string) (*type
 	originalId := addressListId
 
 	// Handle inversion patterns
-	if addressListId[0] == '!' && len(addressListId) > 1 && addressListId[len(addressListId)-1] != ')' {
+	if len(addressListId) > 0 && addressListId[0] == '!' && len(addressListId) > 1 && addressListId[len(addressListId)-1] != ')' {
 		inverted = true
 		addressListId = addressListId[1:]
 	} else if strings.HasPrefix(addressListId, "!(") && strings.HasSuffix(addressListId, ")") {

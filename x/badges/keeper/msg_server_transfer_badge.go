@@ -11,6 +11,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	// DefaultCollectionId represents the default collection ID used for multi-msg transactions
+	DefaultCollectionId = 0
+)
+
 func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -23,8 +28,12 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 		We support specifying collectionId === 0 for multi-msg transactions where you do not know the collection ID yet upon creation
 	*/
 	collectionId := msg.CollectionId
-	if collectionId.Equal(sdkmath.NewUint(0)) {
+	if collectionId.Equal(sdkmath.NewUint(DefaultCollectionId)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)
+		// Check for potential underflow before subtracting
+		if nextCollectionId.IsZero() {
+			return nil, fmt.Errorf("no collections available: next collection ID is zero")
+		}
 		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
 	}
 

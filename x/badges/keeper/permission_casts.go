@@ -3,6 +3,7 @@ package keeper
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -87,7 +88,10 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 
 func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*types.ActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
-	for _, actionPermission := range actionPermission {
+	for i, actionPermission := range actionPermission {
+		if actionPermission == nil {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "action permission at index %d is nil", i)
+		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 

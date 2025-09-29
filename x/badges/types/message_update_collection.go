@@ -90,18 +90,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		}
 	}
 
-	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
-		return err
-	}
-
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
-		return err
-	}
-
-	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
-		return err
-	}
-
 	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
 		return err
 	}
@@ -164,18 +152,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	}
 
 	if err := ValidateUserPermissions(msg.DefaultBalances.UserPermissions, canChangeValues); err != nil {
-		return err
-	}
-
-	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
-		return err
-	}
-
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
-		return err
-	}
-
-	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
 		return err
 	}
 

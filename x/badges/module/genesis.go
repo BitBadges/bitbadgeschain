@@ -115,7 +115,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(address, balanceIds[i]))
 	}
 
-	genesis.ChallengeTrackers, genesis.ChallengeTrackerStoreKeys = k.GetChallengeTrackersFromStore(ctx)
+	challengeTrackers, challengeTrackerStoreKeys := k.GetChallengeTrackersFromStore(ctx)
+	genesis.ChallengeTrackers = challengeTrackers
+	genesis.ChallengeTrackerStoreKeys = challengeTrackerStoreKeys
 	genesis.AddressLists = k.GetAddressListsFromStore(ctx)
 	genesis.ApprovalTrackers, genesis.ApprovalTrackerStoreKeys = k.GetApprovalTrackersFromStore(ctx)
 	genesis.ApprovalTrackerVersions, genesis.ApprovalTrackerVersionsStoreKeys = k.GetApprovalTrackerVersionsFromStore(ctx)

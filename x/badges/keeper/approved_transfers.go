@@ -728,7 +728,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		approvedAmount.GT(sdkmath.NewUint(0)) ||
 		isCustomChallengeOrderCalculation(approvalCriteria.PredeterminedBalances, trackerType)
 
-	err := *new(error)
+	var err error
 	if needToFetchApprovalTrackerDetails {
 		amountsTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
@@ -1051,7 +1051,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					predeterminedBalances = types.DeepCopyBalances(approvalCriteria.PredeterminedBalances.ManualBalances[numIncrements.Uint64()].Balances)
 				}
 			} else if approvalCriteria.PredeterminedBalances.IncrementedBalances != nil {
-				err := *new(error)
+				var err error
 				predeterminedBalances, err = types.IncrementBalances(
 					ctx,
 					approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances,

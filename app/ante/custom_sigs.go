@@ -294,7 +294,7 @@ func VerifySignature(
 
 		recoveredFeePayerAcc := sdk.AccAddress(pubKey.Address().Bytes())
 		if !recoveredFeePayerAcc.Equals(feePayer) {
-			return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to match fee payer in extension to the expected signer %s", recoveredFeePayerAcc)
+			return sdkerrors.Wrapf(types.ErrInvalidSignerGeneral, "failed to match fee payer in extension to the expected signer %s", recoveredFeePayerAcc)
 		}
 
 		adaptableTx := tx.(authsigning.V2AdaptableTx)
@@ -389,7 +389,7 @@ func VerifySignature(
 				hashedMsgSigValid := ed25519.Verify(pubKey.Bytes(), []byte(jsonHashHexStr), feePayerSig)
 				humanReadableMsgSigValid := ed25519.Verify(pubKey.Bytes(), []byte(humanReadableStr), feePayerSig)
 				if !standardMsgSigValid && !hashedMsgSigValid && !humanReadableMsgSigValid {
-					return sdkerrors.Wrapf(types.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature %s %s", recoveredFeePayerAcc, jsonStr, jsonHashHexStr)
+					return sdkerrors.Wrapf(types.ErrInvalidSignerGeneral, "failed to verify delegated fee payer %s signature %s %s", recoveredFeePayerAcc, jsonStr, jsonHashHexStr)
 				}
 
 			} else if chain == "Bitcoin" {
@@ -428,7 +428,7 @@ func VerifySignature(
 				}
 
 				if !standardSigIsValid && !humanReadableSigIsValid {
-					return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify signer signature of Bitcoin signature")
+					return sdkerrors.Wrap(types.ErrInvalidSignerGeneral, "unable to verify signer signature of Bitcoin signature")
 				}
 			}
 
@@ -436,7 +436,7 @@ func VerifySignature(
 		} else {
 
 			if len(feePayerSig) != ethcrypto.SignatureLength {
-				return sdkerrors.Wrap(types.ErrorInvalidSigner, "signature length doesn't match typical [R||S||V] signature 65 bytes")
+				return sdkerrors.Wrap(types.ErrInvalidSignerGeneral, "signature length doesn't match typical [R||S||V] signature 65 bytes")
 			}
 
 			byteStr := []byte(jsonStr)
@@ -480,12 +480,12 @@ func VerifySignature(
 			}
 
 			if CheckFeePayerPubKey(pubKey, sigHash, feePayerSig) != nil {
-				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify Ethereum signature")
+				return sdkerrors.Wrap(types.ErrInvalidSignerGeneral, "unable to verify Ethereum signature")
 			}
 
 			standardMsgSigValid := secp256k1.VerifySignature(pubKey.Bytes(), sigHash, feePayerSig[:len(feePayerSig)-1])
 			if !standardMsgSigValid {
-				return sdkerrors.Wrap(types.ErrorInvalidSigner, "unable to verify Ethereum signature")
+				return sdkerrors.Wrap(types.ErrInvalidSignerGeneral, "unable to verify Ethereum signature")
 			}
 		}
 

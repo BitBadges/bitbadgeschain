@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -158,7 +159,12 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	//For all overlaps, we simply return the amount
 	for _, overlapObject := range overlaps {
 		overlap := overlapObject.Overlap
-		amount := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
+
+		// Safe type assertion with error handling
+		amount, ok := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
+		if !ok {
+			return nil, fmt.Errorf("invalid ArbitraryValue type: expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
+		}
 
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         amount,
@@ -232,7 +238,7 @@ func AddBalance(ctx sdk.Context, existingBalances []*Balance, balanceToAdd *Bala
 	}
 
 	for _, balance := range currBalances {
-		balance.Amount, err = SafeAdd(balance.Amount, balanceToAdd.Amount)
+		balance.Amount, err = SafeAddWithOverflowCheck(balance.Amount, balanceToAdd.Amount)
 		if err != nil {
 			return existingBalances, err
 		}
@@ -362,12 +368,12 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 	for _, balance := range balances {
 		balance.OwnershipTimes, err = SortUintRangesAndMerge(balance.OwnershipTimes, false)
 		if err != nil {
-			return balances, nil
+			return nil, err
 		}
 
 		balance.BadgeIds, err = SortUintRangesAndMerge(balance.BadgeIds, false)
 		if err != nil {
-			return balances, nil
+			return nil, err
 		}
 	}
 
