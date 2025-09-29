@@ -131,9 +131,6 @@ message MsgUniversalUpdateCollection {
   
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
-  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
-  string balancesType = 3;
 
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
@@ -168,11 +165,6 @@ message MsgUniversalUpdateCollection {
   // New token metadata timeline to set.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
   
-  // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateOffChainBalancesMetadataTimeline = 15;
-  
-  // New off-chain balances metadata timeline to set.
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCustomDataTimeline = 17;
@@ -256,11 +248,6 @@ message MsgUpdateCollection {
   // New token metadata timeline to set.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
   
-  // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateOffChainBalancesMetadataTimeline = 15;
-  
-  // New off-chain balances metadata timeline to set.
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCustomDataTimeline = 17;
@@ -311,9 +298,6 @@ message MsgCreateCollection {
   // Address of the creator.
   string creator = 1;
   
-  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
-  string balancesType = 2;
-  
   //The default balances for the user
   UserBalanceStore defaultBalances = 4;
 
@@ -331,9 +315,6 @@ message MsgCreateCollection {
   
   // Token metadata timeline entries.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
-  
-  // Off-chain balances metadata timeline entries.
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 10;
   
   // Custom data timeline entries.
   repeated CustomDataTimeline customDataTimeline = 11;

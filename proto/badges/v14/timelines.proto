@@ -28,15 +28,6 @@ message BadgeMetadataTimeline {
   repeated UintRange timelineTimes = 2;
 }
 
-// OffChainBalancesMetadataTimeline defines the metadata for off-chain balances at different timeline times.
-message OffChainBalancesMetadataTimeline {
-  // The off-chain balances metadata for a specific timeline element.
-  OffChainBalancesMetadata offChainBalancesMetadata = 1;
-
-  // The timeline times when the off-chain balances metadata is valid. Can not overlap with other timeline elements in same array.
-  repeated UintRange timelineTimes = 2;
-}
-
 // CustomDataTimeline defines custom data at different timeline times.
 message CustomDataTimeline {
   // The custom data for a specific timeline element.

@@ -21,18 +21,17 @@ func SimulateMsgUniversalUpdateCollection(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUniversalUpdateCollection{
-			Creator:                                simAccount.Address.String(),
-			UpdateCollectionPermissions:            r.Int63n(2) == 0,
-			UpdateIsArchivedTimeline:               r.Int63n(2) == 0,
-			UpdateManagerTimeline:                  r.Int63n(2) == 0,
-			UpdateCollectionMetadataTimeline:       r.Int63n(2) == 0,
-			UpdateBadgeMetadataTimeline:            r.Int63n(2) == 0,
-			UpdateOffChainBalancesMetadataTimeline: r.Int63n(2) == 0,
-			UpdateCustomDataTimeline:               r.Int63n(2) == 0,
-			UpdateCollectionApprovals:              r.Int63n(2) == 0,
-			UpdateStandardsTimeline:                r.Int63n(2) == 0,
-			UpdateValidBadgeIds:                    r.Int63n(2) == 0,
-			
+			Creator:                          simAccount.Address.String(),
+			UpdateCollectionPermissions:      r.Int63n(2) == 0,
+			UpdateIsArchivedTimeline:         r.Int63n(2) == 0,
+			UpdateManagerTimeline:            r.Int63n(2) == 0,
+			UpdateCollectionMetadataTimeline: r.Int63n(2) == 0,
+			UpdateBadgeMetadataTimeline:      r.Int63n(2) == 0,
+			UpdateCustomDataTimeline:         r.Int63n(2) == 0,
+			UpdateCollectionApprovals:        r.Int63n(2) == 0,
+			UpdateStandardsTimeline:          r.Int63n(2) == 0,
+			UpdateValidBadgeIds:              r.Int63n(2) == 0,
+
 			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
 			IsArchivedTimeline: []*types.IsArchivedTimeline{
 				{

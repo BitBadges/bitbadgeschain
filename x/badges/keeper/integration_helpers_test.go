@@ -79,8 +79,7 @@ func GetTwoUintRanges() []*types.UintRange {
 func GetCollectionsToCreate() []*types.MsgNewCollection {
 	collectionsToCreate := []*types.MsgNewCollection{
 		{
-			Creator:      bob,
-			BalancesType: sdkmath.NewUint(1),
+			Creator: bob,
 			CollectionApprovals: []*types.CollectionApproval{
 				{
 					ToListId:          "AllWithoutMint",

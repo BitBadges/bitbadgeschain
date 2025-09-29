@@ -3,7 +3,6 @@ package keeper
 import (
 	"math"
 
-	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	proto "github.com/gogo/protobuf/proto"
 
@@ -154,10 +153,6 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 }
 
 func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
-	if !IsStandardBalances(collection) && newApprovals != nil && len(newApprovals) > 0 {
-		return nil, sdkerrors.Wrapf(ErrWrongBalancesType, "collection %s does not have standard balances", collection.CollectionId)
-	}
-
 	x := [][]*types.UintRange{}
 	x = append(x, []*types.UintRange{
 		//Dummmy range since collection approvals dont use timeline times
@@ -385,20 +380,6 @@ func GetUpdatedCollectionMetadataCombinations(ctx sdk.Context, oldValue interfac
 	return x, nil
 }
 
-func GetUpdatedOffChainBalancesMetadataCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-	castedCollectionMetadata := &types.CollectionMetadata{
-		Uri:        oldValue.(*types.OffChainBalancesMetadata).Uri,
-		CustomData: oldValue.(*types.OffChainBalancesMetadata).CustomData,
-	}
-
-	castedNewCollectionMetadata := &types.CollectionMetadata{
-		Uri:        newValue.(*types.OffChainBalancesMetadata).Uri,
-		CustomData: newValue.(*types.OffChainBalancesMetadata).CustomData,
-	}
-
-	return GetUpdatedCollectionMetadataCombinations(ctx, castedCollectionMetadata, castedNewCollectionMetadata)
-}
-
 func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionMetadata []*types.CollectionMetadataTimeline, newCollectionMetadata []*types.CollectionMetadataTimeline, canUpdateCollectionMetadata []*types.TimedUpdatePermission) error {
 	oldTimes, oldValues := types.GetCollectionMetadataTimesAndValues(oldCollectionMetadata)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
@@ -412,33 +393,6 @@ func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionM
 	}
 
 	err = k.CheckIfTimedUpdatePermissionPermits(ctx, detailsToCheck, canUpdateCollectionMetadata, "update collection metadata")
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (k Keeper) ValidateOffChainBalancesMetadataUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, newOffChainBalancesMetadata []*types.OffChainBalancesMetadataTimeline, canUpdateOffChainBalancesMetadata []*types.TimedUpdatePermission) error {
-	if !IsOffChainBalances(collection) && !IsNonIndexedBalances(collection) {
-		if len(oldOffChainBalancesMetadata) > 0 || len(newOffChainBalancesMetadata) > 0 {
-			return sdkerrors.Wrapf(ErrWrongBalancesType, "off chain balances are being set but collection %s does not have off chain balances", collection.CollectionId)
-		}
-		return nil
-	}
-
-	oldTimes, oldValues := types.GetOffChainBalancesMetadataTimesAndValues(oldOffChainBalancesMetadata)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
-
-	newTimes, newValues := types.GetOffChainBalancesMetadataTimesAndValues(newOffChainBalancesMetadata)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, &types.OffChainBalancesMetadata{}, GetUpdatedOffChainBalancesMetadataCombinations)
-	if err != nil {
-		return err
-	}
-
-	err = k.CheckIfTimedUpdatePermissionPermits(ctx, detailsToCheck, canUpdateOffChainBalancesMetadata, "update off chain balances metadata")
 	if err != nil {
 		return err
 	}

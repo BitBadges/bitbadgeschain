@@ -10,12 +10,6 @@ import (
 
 // Create tokens and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newValidBadgeIds []*types.UintRange) (*types.BadgeCollection, error) {
-	//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
-	if !IsStandardBalances(collection) {
-		if len(collection.CollectionApprovals) > 0 {
-			return &types.BadgeCollection{}, ErrWrongBalancesType
-		}
-	}
 
 	err := *new(error)
 	allBadgeIds := []*types.UintRange{}

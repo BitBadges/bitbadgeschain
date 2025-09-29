@@ -46,10 +46,6 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, ErrCollectionIsArchived
 	}
 
-	if !IsStandardBalances(collection) {
-		return nil, ErrWrongBalancesType
-	}
-
 	userBalance, appliedDefault := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}

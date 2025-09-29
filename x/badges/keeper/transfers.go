@@ -80,10 +80,6 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 		return ErrCollectionIsArchived
 	}
 
-	if !IsStandardBalances(collection) {
-		return ErrWrongBalancesType
-	}
-
 	// Validate transfers with invariants
 	for _, transfer := range transfers {
 		if err := types.ValidateTransferWithInvariants(ctx, transfer, true, collection); err != nil {

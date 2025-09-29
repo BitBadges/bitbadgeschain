@@ -37,23 +37,6 @@ func ValidateApprovalTimeline(ctx sdk.Context, timeline []*CollectionApprovalTim
 	return nil
 }
 
-func ValidateOffChainBalancesMetadataTimeline(timeline []*OffChainBalancesMetadataTimeline) error {
-	for _, timelineVal := range timeline {
-		err := ValidateURI(timelineVal.OffChainBalancesMetadata.Uri)
-		if err != nil {
-			return err
-		}
-	}
-
-	times, _ := GetOffChainBalancesMetadataTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func ValidateBadgeMetadataTimeline(timeline []*BadgeMetadataTimeline, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
 		err := ValidateBadgeMetadata(timelineVal.BadgeMetadata, canChangeValues)

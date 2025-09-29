@@ -38,11 +38,6 @@ message BadgeCollection {
   // The metadata for each token in the collection, also subject to changes over time.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   
-  // The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
-  string balancesType = 4;
-  
-  // Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
 
   // An arbitrary field that can store any data, subject to changes over time.
   repeated CustomDataTimeline customDataTimeline = 7;

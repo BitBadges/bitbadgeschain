@@ -71,16 +71,6 @@ func GetUserIncomingApprovalTimesAndValues(approvals []*UserIncomingApprovalTime
 	return times, values
 }
 
-func GetOffChainBalancesMetadataTimesAndValues(inheritedBalancesMetadata []*OffChainBalancesMetadataTimeline) ([][]*UintRange, []interface{}) {
-	times := [][]*UintRange{}
-	values := []interface{}{}
-	for _, timelineVal := range inheritedBalancesMetadata {
-		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.OffChainBalancesMetadata)
-	}
-	return times, values
-}
-
 func GetCollectionMetadataTimesAndValues(timeline []*CollectionMetadataTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}

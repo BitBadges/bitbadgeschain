@@ -550,7 +550,6 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 				},
 			},
 		},
-		BalancesType: "Standard",
 	})
 
 	err := CreateMap(suite, wctx, createMsg)
@@ -629,7 +628,6 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 				},
 			},
 		},
-		BalancesType: "Standard",
 	})
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{

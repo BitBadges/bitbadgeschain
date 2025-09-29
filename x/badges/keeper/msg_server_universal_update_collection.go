@@ -53,7 +53,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection = &types.BadgeCollection{
 			CollectionId:          nextCollectionId,
 			CollectionPermissions: &types.CollectionPermissions{},
-			BalancesType:          msg.BalancesType,
 			DefaultBalances:       msg.DefaultBalances,
 			CreatedBy:             msg.Creator,
 			ManagerTimeline: []*types.ManagerTimeline{
@@ -137,13 +136,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			return nil, err
 		}
 		collection.CollectionMetadataTimeline = msg.CollectionMetadataTimeline
-	}
-
-	if msg.UpdateOffChainBalancesMetadataTimeline {
-		if err := k.ValidateOffChainBalancesMetadataUpdate(ctx, collection, collection.OffChainBalancesMetadataTimeline, msg.OffChainBalancesMetadataTimeline, collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
-			return nil, err
-		}
-		collection.OffChainBalancesMetadataTimeline = msg.OffChainBalancesMetadataTimeline
 	}
 
 	if msg.UpdateBadgeMetadataTimeline {

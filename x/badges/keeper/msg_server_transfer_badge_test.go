@@ -206,9 +206,8 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 		},
 		CollectionApprovals: collection.CollectionApprovals,
 		// InheritedBalancesTimeline: 				 collection.InheritedBalancesTimeline,
-		CollectionMetadataTimeline:       collection.CollectionMetadataTimeline,
-		BadgeMetadataTimeline:            collection.BadgeMetadataTimeline,
-		OffChainBalancesMetadataTimeline: collection.OffChainBalancesMetadataTimeline,
+		CollectionMetadataTimeline: collection.CollectionMetadataTimeline,
+		BadgeMetadataTimeline:      collection.BadgeMetadataTimeline,
 	})
 	suite.Require().Nil(err, "Error transferring token")
 

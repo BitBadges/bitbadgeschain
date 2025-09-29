@@ -23,7 +23,6 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:                          "invalid_address",
 				CollectionId:                     sdkmath.NewUint(0),
-				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
 				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
 				UpdateBadgeMetadataTimeline:      true,
@@ -37,7 +36,6 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:                          sample.AccAddress(),
 				CollectionId:                     sdkmath.NewUint(0),
-				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
 				UpdateCollectionPermissions:      true,
 				UpdateBadgeMetadataTimeline:      true,
@@ -50,7 +48,6 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:                          sample.AccAddress(),
 				CollectionId:                     sdkmath.NewUint(0),
-				BalancesType:                     "Standard",
 				UpdateCollectionMetadataTimeline: true,
 				UpdateCollectionPermissions:      true,
 				UpdateBadgeMetadataTimeline:      true,
@@ -78,7 +75,6 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:                          sample.AccAddress(),
 				CollectionId:                     sdkmath.NewUint(0),
-				BalancesType:                     "Standard",
 				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
 				UpdateCollectionMetadataTimeline: true,
 				UpdateCollectionPermissions:      true,
