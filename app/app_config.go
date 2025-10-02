@@ -182,6 +182,7 @@ var (
 
 	preBlockers = []string{
 		upgradetypes.ModuleName,
+		authtypes.ModuleName, // NEW - required for v0.53.x
 		// this line is used by starport scaffolding # stargate/app/preBlockers
 	}
 
