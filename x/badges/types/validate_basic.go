@@ -287,6 +287,8 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
+	// Note: Dynamic stores, mustOwnTokens, etc are fine since they are read-only during MsgTransferBadges
+
 	return true
 }
 

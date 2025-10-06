@@ -508,7 +508,7 @@ func (k Keeper) GetMaxPossible(
 }
 
 // handlePredeterminedBalances checks if the transfer matches predetermined balance requirements
-func (k Keeper) handlePredeterminedBalances(
+func handlePredeterminedBalances(
 	ctx sdk.Context,
 	predeterminedBalances *types.PredeterminedBalances,
 	originalTransferBalances []*types.Balance,
@@ -573,38 +573,6 @@ func (k Keeper) handlePredeterminedBalances(
 	}
 
 	return calculatedBalances, nil
-}
-
-// emitApprovalEvent emits an event for approval tracking
-func emitApprovalEvent(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	approverAddress string,
-	approvalId string,
-	amountsTrackerId string,
-	approvalLevel string,
-	trackerType string,
-	address string,
-	amountsStr string,
-	numTransfersStr string,
-	lastUpdatedAt sdkmath.Uint,
-) {
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			"approval"+fmt.Sprint(collectionId)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalId)+fmt.Sprint(amountsTrackerId)+fmt.Sprint(approvalLevel)+fmt.Sprint(trackerType)+fmt.Sprint(address),
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-			sdk.NewAttribute("approvalId", fmt.Sprint(approvalId)),
-			sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-			sdk.NewAttribute("amountTrackerId", fmt.Sprint(amountsTrackerId)),
-			sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
-			sdk.NewAttribute("trackerType", fmt.Sprint(trackerType)),
-			sdk.NewAttribute("approvedAddress", fmt.Sprint(address)),
-			sdk.NewAttribute("amounts", amountsStr),
-			sdk.NewAttribute("numTransfers", numTransfersStr),
-			sdk.NewAttribute("lastUpdatedAt", fmt.Sprint(lastUpdatedAt)),
-		),
-	)
 }
 
 // IncrementApprovalsAndAssertWithinThreshold handles approval tracking and threshold checks
@@ -690,7 +658,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	}
 
 	// Handle predetermined balances check
-	_, err = k.handlePredeterminedBalances(
+	_, err = handlePredeterminedBalances(
 		ctx,
 		approvalCriteria.PredeterminedBalances,
 		originalTransferBalances,
@@ -782,7 +750,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 
 		isSameId := amountsTrackerId == maxNumTransfersTrackerId
 		if isSameId {
-			emitApprovalEvent(
+			EmitApprovalEvent(
 				ctx,
 				collection.CollectionId,
 				approverAddress,
@@ -812,7 +780,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				return err
 			}
 		} else {
-			emitApprovalEvent(
+			EmitApprovalEvent(
 				ctx,
 				collection.CollectionId,
 				approverAddress,
@@ -826,7 +794,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				maxNumTransfersTrackerDetails.LastUpdatedAt,
 			)
 
-			emitApprovalEvent(
+			EmitApprovalEvent(
 				ctx,
 				collection.CollectionId,
 				approverAddress,
@@ -995,4 +963,36 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	}
 
 	return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "no predetermined transfers found for approval id: %s", precalculationId)
+}
+
+// SimulateGetMaxPossible is a wrapper around GetMaxPossible for simulation
+func (k Keeper) SimulateGetMaxPossible(
+	ctx sdk.Context,
+	collection *types.BadgeCollection,
+	approval *types.CollectionApproval,
+	transfer *types.Transfer,
+	originalTransferBalances []*types.Balance,
+	approvedAmount sdkmath.Uint,
+	challengeNumIncrements sdkmath.Uint,
+	transferMetadata TransferMetadata,
+	trackerType string,
+	address string,
+) ([]*types.Balance, error) {
+	return k.GetMaxPossible(ctx, collection, approval, transfer, originalTransferBalances, approvedAmount, challengeNumIncrements, transferMetadata, trackerType, address, true)
+}
+
+// ExecuteGetMaxPossible is a wrapper around GetMaxPossible for execution
+func (k Keeper) ExecuteGetMaxPossible(
+	ctx sdk.Context,
+	collection *types.BadgeCollection,
+	approval *types.CollectionApproval,
+	transfer *types.Transfer,
+	originalTransferBalances []*types.Balance,
+	approvedAmount sdkmath.Uint,
+	challengeNumIncrements sdkmath.Uint,
+	transferMetadata TransferMetadata,
+	trackerType string,
+	address string,
+) ([]*types.Balance, error) {
+	return k.GetMaxPossible(ctx, collection, approval, transfer, originalTransferBalances, approvedAmount, challengeNumIncrements, transferMetadata, trackerType, address, false)
 }

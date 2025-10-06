@@ -414,3 +414,35 @@ func EmitUsedApprovalDetailsEvent(ctx sdk.Context, collectionId sdkmath.Uint, fr
 
 	return nil
 }
+
+// EmitApprovalEvent emits an event for approval tracking
+func EmitApprovalEvent(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	approverAddress string,
+	approvalId string,
+	amountsTrackerId string,
+	approvalLevel string,
+	trackerType string,
+	address string,
+	amountsStr string,
+	numTransfersStr string,
+	lastUpdatedAt sdkmath.Uint,
+) {
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			"approval"+fmt.Sprint(collectionId)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalId)+fmt.Sprint(amountsTrackerId)+fmt.Sprint(approvalLevel)+fmt.Sprint(trackerType)+fmt.Sprint(address),
+			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+			sdk.NewAttribute("approvalId", fmt.Sprint(approvalId)),
+			sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+			sdk.NewAttribute("amountTrackerId", fmt.Sprint(amountsTrackerId)),
+			sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
+			sdk.NewAttribute("trackerType", fmt.Sprint(trackerType)),
+			sdk.NewAttribute("approvedAddress", fmt.Sprint(address)),
+			sdk.NewAttribute("amounts", amountsStr),
+			sdk.NewAttribute("numTransfers", numTransfersStr),
+			sdk.NewAttribute("lastUpdatedAt", fmt.Sprint(lastUpdatedAt)),
+		),
+	)
+}

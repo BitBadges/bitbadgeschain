@@ -216,19 +216,10 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 				oldVal := oldArbVal
 				newVal := newArbVal
 
-				//TODO: Eventually we should make this more flexible instead of simply stringifying
-				//For example, does it really matter what order they are in if approved? What about simply changing details that have no impact like customdata?
-				//Or, if we have two empty approval details (no restrictions) and update to just one. That really does not matter.
-
 				//Go one by one comparing old to new as flat array (if 2d array is empty we still treat it as an empty element
 				if len(oldVal) != len(newVal) {
 					different = true
 				} else {
-
-					//Decided against allowing flexible order here because if we use a linear match approahc, chanigng order might cause unexpected behavior
-					//Even though, the user can choose which approval to select, it is still better to be consistent. Can change in the future though.
-					//The only thing is I am not too sure how deterministic the GetFirstMatchOnlyWithApprovalCriteria function is.
-					//TODO: Determine best path forward
 					for i := 0; i < len(oldVal); i++ {
 						oldApprovalCriteria := oldVal[i].ApprovalCriteria
 						newApprovalCriteria := newVal[i].ApprovalCriteria

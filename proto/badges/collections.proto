@@ -60,7 +60,7 @@ message BadgeCollection {
   // When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
   repeated IsArchivedTimeline isArchivedTimeline = 9;
 
-  // The default store of a balance for a user, upon genesis.
+  // The default store of a balance / approvals for a user, upon genesis.
   UserBalanceStore defaultBalances = 10;
 
   // The user or entity who created the collection.
