@@ -881,13 +881,13 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	collection *types.BadgeCollection,
 	approvals []*types.CollectionApproval,
 	transfer *types.Transfer,
-	precalcDetails *types.ApprovalIdentifierDetails,
 	transferMetadata TransferMetadata,
-	precalculationOptions *types.PrecalculationOptions,
 ) ([]*types.Balance, error) {
 	to := transferMetadata.To
 	initiatedBy := transferMetadata.InitiatedBy
 	approvalId := ""
+	precalcDetails := transfer.PrecalculateBalancesFromApproval
+	precalculationOptions := transfer.PrecalculationOptions
 	approverAddress := precalcDetails.ApproverAddress
 	approvalLevel := precalcDetails.ApprovalLevel
 	precalculationId := precalcDetails.ApprovalId

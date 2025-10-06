@@ -80,8 +80,8 @@ func ValidateCosmosWrapperPathSymbol(symbol string) error {
 	return nil
 }
 
-func ValidateAddress(address string, allowAliases bool) error {
-	if allowAliases && (address == "Mint") {
+func ValidateAddress(address string, alowMint bool) error {
+	if alowMint && (address == "Mint") {
 		return nil
 	}
 

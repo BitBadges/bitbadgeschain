@@ -3,7 +3,6 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -11,30 +10,7 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
-
-const (
-	// ProtocolFeeNumerator represents the numerator for protocol fee calculation (0.5% = 5/1000)
-	ProtocolFeeNumerator = 5
-	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.5% = 5/1000)
-	ProtocolFeeDenominator = 1000
-	// AffiliatePercentageDenominator represents the denominator for affiliate percentage calculation (0-10000)
-	AffiliatePercentageDenominator = 10000
-)
-
-func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *types.UserBalanceStore {
-	return &types.UserBalanceStore{
-		Balances:          collection.DefaultBalances.Balances,
-		OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
-		IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
-		AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
-		AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
-		AutoApproveAllIncomingTransfers:           collection.DefaultBalances.AutoApproveAllIncomingTransfers,
-		UserPermissions:                           collection.DefaultBalances.UserPermissions,
-	}
-}
 
 type TransferMetadata struct {
 	To              string
@@ -42,36 +18,6 @@ type TransferMetadata struct {
 	InitiatedBy     string
 	ApproverAddress string
 	ApprovalLevel   string
-}
-
-func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) (*types.UserBalanceStore, bool) {
-	//Mint has unlimited balances
-	if types.IsSpecialAddress(userAddress) {
-		return &types.UserBalanceStore{}, false
-	}
-
-	//We get current balances or fallback to default balances
-	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
-	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
-	appliedDefault := false
-	if !found {
-		balance = GetDefaultBalanceStoreForCollection(collection)
-		appliedDefault = true
-		// We need to set the version to "0" for all incoming and outgoing approvals
-		for _, approval := range balance.IncomingApprovals {
-			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
-		}
-		for _, approval := range balance.OutgoingApprovals {
-			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
-		}
-	}
-
-	return balance, appliedDefault
-}
-
-func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.BadgeCollection, userAddress string, balance *types.UserBalanceStore) error {
-	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
-	return k.SetUserBalanceInStore(ctx, balanceKey, balance)
 }
 
 type ApprovalsUsed struct {
@@ -121,6 +67,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 		if numAttempts.GT(sdkmath.NewUint(10000)) {
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "numAttempts cannot exceed 10000, got %s", numAttempts.String())
 		}
+
 		numAttemptsUint64 := numAttempts.Uint64()
 		for i := uint64(0); i < numAttemptsUint64; i++ {
 			fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
@@ -179,9 +126,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 						collection,
 						approvals,
 						transfer,
-						transfer.PrecalculateBalancesFromApproval,
 						transferMetadata,
-						transfer.PrecalculationOptions,
 					)
 					if err != nil {
 						return err
@@ -229,124 +174,16 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					return err
 				}
 
-				// Calculate protocol fees for all denoms (0.5% of each denom transferred)
-				protocolFees := sdk.NewCoins()
-				denomAmounts := make(map[string]sdkmath.Uint)
-
-				for _, coinTransfer := range coinTransfers {
-					amount := sdkmath.NewUintFromString(coinTransfer.Amount)
-					//initialize it if it doesn't exist
-					if _, ok := denomAmounts[coinTransfer.Denom]; !ok {
-						denomAmounts[coinTransfer.Denom] = sdkmath.NewUint(0)
-					}
-
-					denomAmounts[coinTransfer.Denom] = denomAmounts[coinTransfer.Denom].Add(amount)
-				}
-
-				for denom, totalAmount := range denomAmounts {
-					// 0.5% of the total amount for this denom
-					// Safety check to prevent division by zero
-					if ProtocolFeeDenominator == 0 {
-						return sdkerrors.Wrapf(types.ErrInvalidRequest, "protocol fee denominator cannot be zero")
-					}
-					protocolFee := totalAmount.Mul(sdkmath.NewUint(ProtocolFeeNumerator)).Quo(sdkmath.NewUint(ProtocolFeeDenominator))
-
-					// For other denoms, just use 0.5%
-					if !protocolFee.IsZero() {
-						protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromUint64(protocolFee.Uint64())))
-					}
-				}
-
-				affiliatePercentage := k.GetParams(ctx).AffiliatePercentage // 0 to AffiliatePercentageDenominator
-
-				fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
+				// Calculate and distribute protocol fees
+				protocolFeeTransfers, err := k.CalculateAndDistributeProtocolFees(ctx, coinTransfers, initiatedBy, transfer.AffiliateAddress)
 				if err != nil {
 					return err
 				}
 
-				if !protocolFees.IsZero() {
-					// If no affiliate address is specified, send all fees to community pool
-					if transfer.AffiliateAddress == "" {
-						err = k.distributionKeeper.FundCommunityPool(ctx, protocolFees, fromAddressAcc)
-						if err != nil {
-							return sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", protocolFees)
-						}
+				// Add protocol fee transfers to the main coinTransfers slice
+				coinTransfers = append(coinTransfers, protocolFeeTransfers...)
 
-						// Add all protocol fees to coinTransfers for community pool
-						for _, protocolFee := range protocolFees {
-							coinTransfers = append(coinTransfers, CoinTransfers{
-								From:          initiatedBy,
-								To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
-								Amount:        protocolFee.Amount.String(),
-								Denom:         protocolFee.Denom,
-								IsProtocolFee: true,
-							})
-						}
-					} else {
-						// Split protocol fees between community pool and affiliate
-						affiliateFees := sdk.NewCoins()
-						communityPoolFees := sdk.NewCoins()
-
-						for _, protocolFee := range protocolFees {
-							// Calculate affiliate portion (affiliatePercentage is 0-AffiliatePercentageDenominator, so divide by AffiliatePercentageDenominator)
-							affiliateAmount := protocolFee.Amount.Mul(sdkmath.NewIntFromUint64(affiliatePercentage.Uint64())).Quo(sdkmath.NewInt(AffiliatePercentageDenominator))
-							communityPoolAmount := protocolFee.Amount.Sub(affiliateAmount)
-
-							if affiliateAmount.GT(sdkmath.ZeroInt()) {
-								affiliateFees = affiliateFees.Add(sdk.NewCoin(protocolFee.Denom, affiliateAmount))
-							}
-							if communityPoolAmount.GT(sdkmath.ZeroInt()) {
-								communityPoolFees = communityPoolFees.Add(sdk.NewCoin(protocolFee.Denom, communityPoolAmount))
-							}
-						}
-
-						// Send affiliate fees to affiliate address
-						if !affiliateFees.IsZero() {
-							affiliateAddressAcc, err := sdk.AccAddressFromBech32(transfer.AffiliateAddress)
-							if err != nil {
-								return err
-							}
-
-							err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, affiliateAddressAcc, affiliateFees)
-							if err != nil {
-								return sdkerrors.Wrapf(err, "error sending affiliate fees: %s", affiliateFees)
-							}
-						}
-
-						// Send remaining fees to community pool
-						if !communityPoolFees.IsZero() {
-							err = k.distributionKeeper.FundCommunityPool(ctx, communityPoolFees, fromAddressAcc)
-							if err != nil {
-								return sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", communityPoolFees)
-							}
-						}
-
-						// Add protocol fee transfers to coinTransfers for each denom
-						// Add affiliate fee transfers
-						for _, affiliateFee := range affiliateFees {
-							coinTransfers = append(coinTransfers, CoinTransfers{
-								From:          initiatedBy,
-								To:            transfer.AffiliateAddress,
-								Amount:        affiliateFee.Amount.String(),
-								Denom:         affiliateFee.Denom,
-								IsProtocolFee: true,
-							})
-						}
-
-						// Add community pool fee transfers
-						for _, communityPoolFee := range communityPoolFees {
-							coinTransfers = append(coinTransfers, CoinTransfers{
-								From:          initiatedBy,
-								To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
-								Amount:        communityPoolFee.Amount.String(),
-								Denom:         communityPoolFee.Denom,
-								IsProtocolFee: true,
-							})
-						}
-					}
-				}
-
-				err = emitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
+				err = EmitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
 				if err != nil {
 					return err
 				}
@@ -357,7 +194,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					return err
 				}
 			} else {
-				// Get current Total
+				// Get current Total and increment it
 				totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
 				totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
 				if err != nil {
@@ -370,46 +207,6 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			}
 		}
 	}
-
-	return nil
-}
-
-func emitUsedApprovalDetailsEvent(ctx sdk.Context, collectionId sdkmath.Uint, from string, to string, initiatedBy string, coinTransfers []CoinTransfers, approvalsUsed []ApprovalsUsed, balances []*types.Balance) (err error) {
-	marshalToString := func(v interface{}) (string, error) {
-		data, err := json.Marshal(v)
-		if err != nil {
-			return "", err
-		}
-		return string(data), nil
-	}
-
-	coinTransfersStr, err := marshalToString(coinTransfers)
-	if err != nil {
-		return err
-	}
-
-	approvalsUsedStr, err := marshalToString(approvalsUsed)
-	if err != nil {
-		return err
-	}
-
-	balancesStr, err := marshalToString(balances)
-	if err != nil {
-		return err
-	}
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("usedApprovalDetails",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-			sdk.NewAttribute("from", from),
-			sdk.NewAttribute("to", to),
-			sdk.NewAttribute("initiatedBy", initiatedBy),
-			sdk.NewAttribute("coinTransfers", coinTransfersStr),
-			sdk.NewAttribute("approvalsUsed", approvalsUsedStr),
-			sdk.NewAttribute("balances", balancesStr),
-		),
-	)
 
 	return nil
 }
@@ -428,8 +225,11 @@ func (k Keeper) HandleTransfer(
 	initiatedBy string,
 	eventTracking *EventTracking,
 ) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
-	var err error
+	if to == from {
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "cannot send to self")
+	}
 
+	var err error
 	transferMetadata := TransferMetadata{
 		From:            from,
 		To:              to,
@@ -495,409 +295,16 @@ func (k Keeper) HandleTransfer(
 		}
 	}
 
-	// Get denomination information
-	denomInfo := &types.CosmosCoinWrapperPath{}
-	isSendingToSpecialAddress := false
-	isSendingFromSpecialAddress := false
-	for _, path := range collection.CosmosCoinWrapperPaths {
-		if path.Address == to {
-			isSendingToSpecialAddress = true
-			denomInfo = path
-		}
-		if path.Address == from {
-			isSendingFromSpecialAddress = true
-			denomInfo = path
-		}
+	// Handle special address wrapping/unwrapping to x/bank denominations
+	err = k.HandleSpecialAddressWrapping(ctx, collection, transferBalances, from, to)
+	if err != nil {
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
-	if to == from {
-		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "cannot send to self")
-	}
-
-	if isSendingFromSpecialAddress || isSendingToSpecialAddress {
-		if denomInfo.Denom == "" {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
-		}
-
-		// Check if cosmos wrapping is allowed for this path
-		if !denomInfo.AllowCosmosWrapping {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "cosmos wrapping is not allowed for this wrapper path")
-		}
-
-		// Handle {id} placeholder replacement and overrideWithAnyValidToken logic
-		ibcDenom := denomInfo.Denom
-		if len(transferBalances) == 0 || len(transferBalances[0].BadgeIds) == 0 {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one badge ID")
-		}
-		firstTokenId := transferBalances[0].BadgeIds[0].Start
-
-		// Check if the denom contains the {id} placeholder
-		if strings.Contains(denomInfo.Denom, "{id}") {
-			if !denomInfo.AllowOverrideWithAnyValidToken {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "allowOverrideWithAnyValidToken is not true for this wrapper path")
-			}
-
-			//Throw if balances len != 1
-			if len(transferBalances) != 1 {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
-			}
-
-			//Throw if BadgeIds len != 1
-			if len(transferBalances[0].BadgeIds) != 1 {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
-			}
-
-			//Throw if BadgeIds[0].Start != BadgeIds[0].End
-			if !transferBalances[0].BadgeIds[0].Start.Equal(transferBalances[0].BadgeIds[0].End) {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
-			}
-
-			// For {id} placeholder, we need to replace it with the actual badge ID
-			// Since we're in a transfer context, we can use the first token ID from the transfer
-
-			ibcDenom = strings.ReplaceAll(denomInfo.Denom, "{id}", firstTokenId.String())
-		}
-
-		conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
-
-		// If allowOverrideWithAnyValidToken is true, allow any valid badge ID
-		if denomInfo.AllowOverrideWithAnyValidToken {
-			// Validate that the token ID being transferred is within the valid range
-			isValidToken := false
-			for _, balance := range transferBalances {
-				for _, tokenRange := range balance.BadgeIds {
-					for _, validRange := range collection.ValidBadgeIds {
-						if tokenRange.Start.GTE(validRange.Start) && tokenRange.End.LTE(validRange.End) {
-							isValidToken = true
-							break
-						}
-					}
-					if isValidToken {
-						break
-					}
-				}
-
-				if isValidToken {
-					break
-				}
-			}
-
-			if !isValidToken {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "token ID not in valid range for overrideWithAnyValidToken")
-			}
-
-			// Perform the override
-			for _, balance := range conversionBalances {
-				balance.BadgeIds = []*types.UintRange{
-					{
-						Start: firstTokenId,
-						End:   firstTokenId,
-					},
-				}
-			}
-		}
-
-		// Little hacky but we find the amount for a specific time and ID
-		// Then we will check if it is evenly divisible by the number of transfer balances
-
-		if len(transferBalances[0].OwnershipTimes) == 0 {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one ownership time")
-		}
-		firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
-		firstAmount := transferBalances[0].Amount
-
-		multiplier := sdkmath.NewUint(0)
-		for _, balance := range conversionBalances {
-			foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.BadgeIds)
-			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-			}
-			foundOwnershipTime, err := types.SearchUintRangesForUint(firstOwnershipTime, balance.OwnershipTimes)
-			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-			}
-			if foundTokenId && foundOwnershipTime {
-				multiplier = firstAmount.Quo(balance.Amount)
-				break
-			}
-		}
-
-		if multiplier.IsZero() {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
-		}
-
-		conversionBalancesMultiplied := types.DeepCopyBalances(conversionBalances)
-		for _, balance := range conversionBalancesMultiplied {
-			balance.Amount = balance.Amount.Mul(multiplier)
-		}
-
-		transferBalancesCopy := types.DeepCopyBalances(transferBalances)
-		remainingBalances, err := types.SubtractBalances(ctx, transferBalancesCopy, conversionBalancesMultiplied)
-		if err != nil {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "conversion is not evenly divisible")
-		}
-
-		if len(remainingBalances) > 0 {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
-		}
-
-		// I think this technically doesn't matter because we throw if not cosmos wrappable
-		badgePrefix := "badges:"
-		if !denomInfo.AllowCosmosWrapping {
-			badgePrefix = "badgeslp:"
-		}
-
-		// Construct the full IBC denomination
-		ibcDenom = badgePrefix + collection.CollectionId.String() + ":" + ibcDenom
-
-		bankKeeper := k.bankKeeper
-		amountInt := multiplier.BigInt()
-		if isSendingToSpecialAddress {
-			if types.IsMintAddress(from) {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "the Mint address cannot perform wrap / unwrap actions")
-			}
-
-			userAddressAcc := sdk.MustAccAddressFromBech32(from)
-
-			err = bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
-			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-			}
-
-			err = bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
-			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-			}
-		}
-
-		if isSendingFromSpecialAddress {
-			userAddressAcc := sdk.MustAccAddressFromBech32(to)
-
-			err = bankKeeper.SendCoinsFromAccountToModule(ctx, userAddressAcc, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
-			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-			}
-
-			err = bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
-			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-			}
-		}
-	}
-
-	IsDeleteAfterOneUse := func(autoDeletionOptions *types.AutoDeletionOptions) bool {
-		if autoDeletionOptions == nil {
-			return false
-		}
-
-		if autoDeletionOptions.AfterOneUse {
-			return true
-		}
-
-		return false
-	}
-
-	IsDeleteAfterOverallMaxNumTransfersForCollection := func(autoDeletionOptions *types.AutoDeletionOptions, approvalCriteria *types.ApprovalCriteria, approvalUsed ApprovalsUsed) bool {
-		if autoDeletionOptions == nil || !autoDeletionOptions.AfterOverallMaxNumTransfers {
-			return false
-		}
-
-		// Check if overall max number of transfers threshold is set
-		if approvalCriteria == nil || approvalCriteria.MaxNumTransfers == nil || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero() {
-			return false
-		}
-
-		// Get the tracker to check current number of transfers
-		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
-		if maxNumTransfersTrackerId == "" {
-			return false
-		}
-
-		// Get the current tracker details
-		trackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
-			ctx,
-			collection.CollectionId,
-			approvalUsed.ApproverAddress,
-			approvalUsed.ApprovalId,
-			maxNumTransfersTrackerId,
-			approvalUsed.ApprovalLevel,
-			"overall",
-			"",
-			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
-			true,
-		)
-		if err != nil {
-			return false
-		}
-
-		// Check if the current number of transfers has reached or exceeded the threshold
-		return trackerDetails.NumTransfers.GTE(approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers)
-	}
-
-	IsDeleteAfterOverallMaxNumTransfersForOutgoing := func(autoDeletionOptions *types.AutoDeletionOptions, approvalCriteria *types.OutgoingApprovalCriteria, approvalUsed ApprovalsUsed) bool {
-		if autoDeletionOptions == nil || !autoDeletionOptions.AfterOverallMaxNumTransfers {
-			return false
-		}
-
-		// Check if overall max number of transfers threshold is set
-		if approvalCriteria == nil || approvalCriteria.MaxNumTransfers == nil || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero() {
-			return false
-		}
-
-		// Get the tracker to check current number of transfers
-		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
-		if maxNumTransfersTrackerId == "" {
-			return false
-		}
-
-		// Get the current tracker details
-		trackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
-			ctx,
-			collection.CollectionId,
-			approvalUsed.ApproverAddress,
-			approvalUsed.ApprovalId,
-			maxNumTransfersTrackerId,
-			approvalUsed.ApprovalLevel,
-			"overall",
-			"",
-			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
-			true,
-		)
-		if err != nil {
-			return false
-		}
-
-		// Check if the current number of transfers has reached or exceeded the threshold
-		return trackerDetails.NumTransfers.GTE(approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers)
-	}
-
-	IsDeleteAfterOverallMaxNumTransfersForIncoming := func(autoDeletionOptions *types.AutoDeletionOptions, approvalCriteria *types.IncomingApprovalCriteria, approvalUsed ApprovalsUsed) bool {
-		if autoDeletionOptions == nil || !autoDeletionOptions.AfterOverallMaxNumTransfers {
-			return false
-		}
-
-		// Check if overall max number of transfers threshold is set
-		if approvalCriteria == nil || approvalCriteria.MaxNumTransfers == nil || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() || approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero() {
-			return false
-		}
-
-		// Get the tracker to check current number of transfers
-		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
-		if maxNumTransfersTrackerId == "" {
-			return false
-		}
-
-		// Get the current tracker details
-		trackerDetails, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
-			ctx,
-			collection.CollectionId,
-			approvalUsed.ApproverAddress,
-			approvalUsed.ApprovalId,
-			maxNumTransfersTrackerId,
-			approvalUsed.ApprovalLevel,
-			"overall",
-			"",
-			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
-			true,
-		)
-		if err != nil {
-			return false
-		}
-
-		// Check if the current number of transfers has reached or exceeded the threshold
-		return trackerDetails.NumTransfers.GTE(approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers)
-	}
-
-	// Per-transfer, we handle auto-deletions if applicable
-	for _, approvalUsed := range *eventTracking.ApprovalsUsed {
-		if approvalUsed.ApprovalLevel == "incoming" {
-			newIncomingApprovals := []*types.UserIncomingApproval{}
-			for _, incomingApproval := range toUserBalance.IncomingApprovals {
-				if incomingApproval.ApprovalId != approvalUsed.ApprovalId {
-					newIncomingApprovals = append(newIncomingApprovals, incomingApproval)
-				} else {
-					shouldDelete := false
-
-					// Check if should delete after one use (doesn't depend on ApprovalCriteria)
-					if incomingApproval.ApprovalCriteria != nil && incomingApproval.ApprovalCriteria.AutoDeletionOptions != nil {
-						shouldDelete = IsDeleteAfterOneUse(incomingApproval.ApprovalCriteria.AutoDeletionOptions)
-					}
-
-					// Check if should delete after overall max transfers (depends on ApprovalCriteria)
-					if !shouldDelete && incomingApproval.ApprovalCriteria != nil {
-						shouldDelete = IsDeleteAfterOverallMaxNumTransfersForIncoming(incomingApproval.ApprovalCriteria.AutoDeletionOptions, incomingApproval.ApprovalCriteria, approvalUsed)
-					}
-
-					if !shouldDelete {
-						newIncomingApprovals = append(newIncomingApprovals, incomingApproval)
-					} else {
-						// Delete the approval
-					}
-				}
-			}
-			toUserBalance.IncomingApprovals = newIncomingApprovals
-		} else if approvalUsed.ApprovalLevel == "outgoing" {
-			newOutgoingApprovals := []*types.UserOutgoingApproval{}
-			for _, outgoingApproval := range fromUserBalance.OutgoingApprovals {
-				if outgoingApproval.ApprovalId != approvalUsed.ApprovalId {
-					newOutgoingApprovals = append(newOutgoingApprovals, outgoingApproval)
-				} else {
-					shouldDelete := false
-
-					// Check if should delete after one use (doesn't depend on ApprovalCriteria)
-					if outgoingApproval.ApprovalCriteria != nil && outgoingApproval.ApprovalCriteria.AutoDeletionOptions != nil {
-						shouldDelete = IsDeleteAfterOneUse(outgoingApproval.ApprovalCriteria.AutoDeletionOptions)
-					}
-
-					// Check if should delete after overall max transfers (depends on ApprovalCriteria)
-					if !shouldDelete && outgoingApproval.ApprovalCriteria != nil {
-						shouldDelete = IsDeleteAfterOverallMaxNumTransfersForOutgoing(outgoingApproval.ApprovalCriteria.AutoDeletionOptions, outgoingApproval.ApprovalCriteria, approvalUsed)
-					}
-
-					if !shouldDelete {
-						newOutgoingApprovals = append(newOutgoingApprovals, outgoingApproval)
-					} else {
-						// Delete the approval
-					}
-				}
-			}
-			fromUserBalance.OutgoingApprovals = newOutgoingApprovals
-		} else if approvalUsed.ApprovalLevel == "collection" {
-			newCollectionApprovals := []*types.CollectionApproval{}
-			edited := false
-			for _, collectionApproval := range collection.CollectionApprovals {
-				if collectionApproval.ApprovalId != approvalUsed.ApprovalId {
-					newCollectionApprovals = append(newCollectionApprovals, collectionApproval)
-				} else {
-					shouldDelete := false
-
-					// Check if should delete after one use (doesn't depend on ApprovalCriteria)
-					if collectionApproval.ApprovalCriteria != nil && collectionApproval.ApprovalCriteria.AutoDeletionOptions != nil {
-						shouldDelete = IsDeleteAfterOneUse(collectionApproval.ApprovalCriteria.AutoDeletionOptions)
-					}
-
-					// Check if should delete after overall max transfers (depends on ApprovalCriteria)
-					if !shouldDelete && collectionApproval.ApprovalCriteria != nil {
-						shouldDelete = IsDeleteAfterOverallMaxNumTransfersForCollection(collectionApproval.ApprovalCriteria.AutoDeletionOptions, collectionApproval.ApprovalCriteria, approvalUsed)
-					}
-
-					if !shouldDelete {
-						newCollectionApprovals = append(newCollectionApprovals, collectionApproval)
-					} else {
-						// Delete the approval
-						edited = true
-					}
-				}
-			}
-
-			collection.CollectionApprovals = newCollectionApprovals
-			if edited {
-				err = k.SetCollectionInStore(ctx, collection)
-				if err != nil {
-					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
-				}
-			}
-		}
+	// Handle auto-deletions for approvals if necessary
+	fromUserBalance, toUserBalance, err = k.HandleAutoDeletions(ctx, collection, fromUserBalance, toUserBalance, *eventTracking.ApprovalsUsed)
+	if err != nil {
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
 	return fromUserBalance, toUserBalance, nil
