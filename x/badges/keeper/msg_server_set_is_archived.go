@@ -51,16 +51,16 @@ func (k msgServer) SetIsArchived(goCtx context.Context, msg *types.MsgSetIsArchi
 	}
 
 	msgBytes, err := json.Marshal(msg)
-	if err == nil {
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-				sdk.NewAttribute("msg_type", "set_is_archived"),
-				sdk.NewAttribute("msg", string(msgBytes)),
-			),
-		)
+	if err != nil {
+		return nil, err
 	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_is_archived"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+	)
 
 	return &types.MsgSetIsArchivedResponse{
 		CollectionId: response.CollectionId,

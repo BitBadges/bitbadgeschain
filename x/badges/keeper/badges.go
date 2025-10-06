@@ -19,6 +19,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		return &types.BadgeCollection{}, err
 	}
 
+	// Ensure the badge ids are sequential starting from 1
 	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
 		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Ids must be sequential starting from 1")
 	}

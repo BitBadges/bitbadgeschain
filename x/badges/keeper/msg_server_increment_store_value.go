@@ -51,16 +51,14 @@ func (k msgServer) IncrementStoreValue(goCtx context.Context, msg *types.MsgIncr
 	}
 
 	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "increment_store_value"),
-			sdk.NewAttribute("store_id", msg.StoreId.String()),
-			sdk.NewAttribute("address", msg.Address),
-			sdk.NewAttribute("amount", msg.Amount.String()),
-			sdk.NewAttribute("new_value", newValue.String()),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "increment_store_value"),
+		sdk.NewAttribute("store_id", msg.StoreId.String()),
+		sdk.NewAttribute("address", msg.Address),
+		sdk.NewAttribute("amount", msg.Amount.String()),
+		sdk.NewAttribute("new_value", newValue.String()),
 	)
 
 	return &types.MsgIncrementStoreValueResponse{}, nil

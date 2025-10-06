@@ -19,11 +19,12 @@ func (k Keeper) HandleMerkleChallenges(
 	collectionId sdkmath.Uint,
 	transfer *types.Transfer,
 	approval *types.CollectionApproval,
-	creatorAddress string,
-	approverAddress string,
-	approvalLevel string,
+	transferMetadata TransferMetadata,
 	simulation bool,
 ) (sdkmath.Uint, error) {
+	creatorAddress := transferMetadata.InitiatedBy
+	approverAddress := transferMetadata.ApproverAddress
+	approvalLevel := transferMetadata.ApprovalLevel
 	numIncrements := sdkmath.NewUint(0)
 	challenges := approval.ApprovalCriteria.MerkleChallenges
 	merkleProofs := transfer.MerkleProofs
@@ -193,11 +194,12 @@ func (k Keeper) HandleETHSignatureChallenges(
 	collectionId sdkmath.Uint,
 	transfer *types.Transfer,
 	approval *types.CollectionApproval,
-	creatorAddress string,
-	approverAddress string,
-	approvalLevel string,
+	transferMetadata TransferMetadata,
 	simulation bool,
 ) error {
+	creatorAddress := transferMetadata.InitiatedBy
+	approverAddress := transferMetadata.ApproverAddress
+	approvalLevel := transferMetadata.ApprovalLevel
 	challenges := approval.ApprovalCriteria.EthSignatureChallenges
 	ethSignatureProofs := transfer.EthSignatureProofs
 
@@ -319,4 +321,48 @@ func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 	}
 
 	return leafIndex
+}
+
+// SimulateMerkleChallenges is a wrapper around HandleMerkleChallenges for simulation
+func (k Keeper) SimulateMerkleChallenges(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	transfer *types.Transfer,
+	approval *types.CollectionApproval,
+	transferMetadata TransferMetadata,
+) (sdkmath.Uint, error) {
+	return k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
+}
+
+// ExecuteMerkleChallenges is a wrapper around HandleMerkleChallenges for execution
+func (k Keeper) ExecuteMerkleChallenges(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	transfer *types.Transfer,
+	approval *types.CollectionApproval,
+	transferMetadata TransferMetadata,
+) (sdkmath.Uint, error) {
+	return k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
+}
+
+// SimulateETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for simulation
+func (k Keeper) SimulateETHSignatureChallenges(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	transfer *types.Transfer,
+	approval *types.CollectionApproval,
+	transferMetadata TransferMetadata,
+) error {
+	return k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
+}
+
+// ExecuteETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for execution
+func (k Keeper) ExecuteETHSignatureChallenges(
+	ctx sdk.Context,
+	collectionId sdkmath.Uint,
+	transfer *types.Transfer,
+	approval *types.CollectionApproval,
+	transferMetadata TransferMetadata,
+) error {
+	return k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
 }

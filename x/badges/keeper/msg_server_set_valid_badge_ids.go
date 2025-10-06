@@ -51,16 +51,16 @@ func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetVali
 	}
 
 	msgBytes, err := json.Marshal(msg)
-	if err == nil {
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-				sdk.NewAttribute("msg_type", "set_valid_badge_ids"),
-				sdk.NewAttribute("msg", string(msgBytes)),
-			),
-		)
+	if err != nil {
+		return nil, err
 	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_valid_badge_ids"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+	)
 
 	return &types.MsgSetValidBadgeIdsResponse{
 		CollectionId: response.CollectionId,

@@ -40,11 +40,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			return nil, err
 		}
 
-		// From cosmos SDK x/group moduleAdd commentMore actions
+		// From cosmos SDK x/group module
 		// Generate account address of collection
 		var accountAddr sdk.AccAddress
-		// loop here in the rare case where a ADR-028-derived address creates a
-		// collision with an existing address.
 		for {
 			derivationKey := make([]byte, DerivationKeyLength)
 			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
@@ -64,6 +62,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			CollectionPermissions: &types.CollectionPermissions{},
 			DefaultBalances:       msg.DefaultBalances,
 			CreatedBy:             msg.Creator,
+			// Default manager is the creator if not updating manager timeline
 			ManagerTimeline: []*types.ManagerTimeline{
 				{
 					Manager: msg.Creator,
@@ -107,10 +106,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.IsArchivedTimeline = msg.IsArchivedTimeline
 	}
 	stillArchived := types.GetIsArchived(ctx, collection)
-
 	if previouslyArchived && stillArchived {
 		return nil, ErrCollectionIsArchived
 	}
+
+
 
 	if msg.UpdateCollectionApprovals {
 		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
@@ -187,7 +187,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		if err != nil {
 			return nil, err
 		}
-
 		collection.CollectionPermissions = msg.CollectionPermissions
 	}
 
@@ -305,24 +304,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "universal_update_collection"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "universal_update_collection"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "universal_update_collection"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
 	)
 
 	return &types.MsgUniversalUpdateCollectionResponse{

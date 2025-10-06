@@ -1,0 +1,86 @@
+package keeper
+
+import (
+	"fmt"
+
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+// DynamicStoreChallengeResult represents the result of checking dynamic store challenges
+type DynamicStoreChallengeResult struct {
+	Success bool
+	Error   string
+}
+
+// CheckDynamicStoreChallenges validates and processes dynamic store challenges for an approval
+// It checks if the initiator has sufficient remaining uses for each challenge and decrements the usage count
+func (k Keeper) CheckDynamicStoreChallenges(
+	ctx sdk.Context,
+	challenges []*types.DynamicStoreChallenge,
+	initiatedBy string,
+	isPrioritizedApproval bool,
+	addPotentialError func(bool, string),
+) DynamicStoreChallengeResult {
+	for _, challenge := range challenges {
+		storeId := challenge.StoreId
+
+		// Get the current value for the initiator
+		dynamicStoreValue, found := k.GetDynamicStoreValueFromStore(ctx, storeId, initiatedBy)
+		
+		var val sdkmath.Uint
+		if found {
+			val = dynamicStoreValue.Value
+		} else {
+			// If no specific value found, get the default value from the store
+			dynamicStore, foundStore := k.GetDynamicStoreFromStore(ctx, storeId)
+			if !foundStore {
+				errorMsg := fmt.Sprintf("dynamic store not found for storeId %s", storeId.String())
+				addPotentialError(isPrioritizedApproval, errorMsg)
+				return DynamicStoreChallengeResult{
+					Success: false,
+					Error:   errorMsg,
+				}
+			}
+			val = dynamicStore.DefaultValue
+		}
+
+		// Check if the initiator has remaining uses
+		if val.Equal(sdkmath.NewUint(0)) {
+			errorMsg := fmt.Sprintf("initiator has no remaining uses for dynamic store challenge storeId %s", storeId.String())
+			addPotentialError(isPrioritizedApproval, errorMsg)
+			return DynamicStoreChallengeResult{
+				Success: false,
+				Error:   errorMsg,
+			}
+		}
+
+		// Decrement the usage count
+		newValue := val.SubUint64(1)
+		if found {
+			// Update existing value
+			if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+				return DynamicStoreChallengeResult{
+					Success: false,
+					Error:   sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String()).Error(),
+				}
+			}
+		} else {
+			// Create new value with decremented default
+			if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+				return DynamicStoreChallengeResult{
+					Success: false,
+					Error:   sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String()).Error(),
+				}
+			}
+		}
+	}
+
+	return DynamicStoreChallengeResult{
+		Success: true,
+		Error:   "",
+	}
+}

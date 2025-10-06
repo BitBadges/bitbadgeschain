@@ -36,13 +36,11 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 	}
 
 	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "update_dynamic_store"),
-			sdk.NewAttribute("store_id", msg.StoreId.String()),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "update_dynamic_store"),
+		sdk.NewAttribute("store_id", msg.StoreId.String()),
 	)
 
 	return &types.MsgUpdateDynamicStoreResponse{}, nil

@@ -93,24 +93,12 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "purge_approvals"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "purge_approvals"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "purge_approvals"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
 	return &types.MsgPurgeApprovalsResponse{NumPurged: numPurged}, nil

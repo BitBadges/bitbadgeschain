@@ -36,6 +36,14 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 	}
 }
 
+type TransferMetadata struct {
+	To              string
+	From            string
+	InitiatedBy     string
+	ApproverAddress string
+	ApprovalLevel   string
+}
+
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) (*types.UserBalanceStore, bool) {
 	//Mint has unlimited balances
 	if types.IsSpecialAddress(userAddress) {
@@ -81,6 +89,12 @@ type CoinTransfers struct {
 	IsProtocolFee bool
 }
 
+// EventTracking combines approvalsUsed and coinTransfersUsed for cleaner function signatures
+type EventTracking struct {
+	ApprovalsUsed *[]ApprovalsUsed
+	CoinTransfers *[]CoinTransfers
+}
+
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
 	var err error
 
@@ -115,11 +129,22 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			for _, to := range transfer.ToAddresses {
 				approvalsUsed := []ApprovalsUsed{}
 				coinTransfers := []CoinTransfers{}
+				eventTracking := &EventTracking{
+					ApprovalsUsed: &approvalsUsed,
+					CoinTransfers: &coinTransfers,
+				}
 
 				toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
 
 				if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
 					//Here, we precalculate balances from a specified approval
+					transferMetadata := TransferMetadata{
+						From:            transfer.From,
+						To:              to,
+						InitiatedBy:     initiatedBy,
+						ApproverAddress: "",
+						ApprovalLevel:   "collection",
+					}
 					approvals := collection.CollectionApprovals
 					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "collection" {
 						if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
@@ -155,8 +180,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 						approvals,
 						transfer,
 						transfer.PrecalculateBalancesFromApproval,
-						to,
-						initiatedBy,
+						transferMetadata,
 						transfer.PrecalculationOptions,
 					)
 					if err != nil {
@@ -170,22 +194,11 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					}
 					amountsStr := string(amountsJsonData)
 
-					ctx.EventManager().EmitEvent(
-						sdk.NewEvent(sdk.EventTypeMessage,
-							sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-							sdk.NewAttribute("creator", initiatedBy),
-							sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-							sdk.NewAttribute("transfer", amountsStr),
-						),
-					)
-
-					ctx.EventManager().EmitEvent(
-						sdk.NewEvent("indexer",
-							sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-							sdk.NewAttribute("creator", initiatedBy),
-							sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-							sdk.NewAttribute("transfer", amountsStr),
-						),
+					EmitMessageAndIndexerEvents(ctx,
+						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+						sdk.NewAttribute("creator", initiatedBy),
+						sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
+						sdk.NewAttribute("transfer", amountsStr),
 					)
 				}
 
@@ -206,8 +219,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					transfer.From,
 					to,
 					initiatedBy,
-					&approvalsUsed,
-					&coinTransfers,
+					eventTracking,
 				)
 				if err != nil {
 					return err
@@ -414,13 +426,20 @@ func (k Keeper) HandleTransfer(
 	from string,
 	to string,
 	initiatedBy string,
-	approvalsUsed *[]ApprovalsUsed,
-	coinTransfers *[]CoinTransfers,
+	eventTracking *EventTracking,
 ) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
 	var err error
 
+	transferMetadata := TransferMetadata{
+		From:            from,
+		To:              to,
+		InitiatedBy:     initiatedBy,
+		ApproverAddress: "",
+		ApprovalLevel:   "collection",
+	}
+
 	transferBalances := types.DeepCopyBalances(transfer.Balances)
-	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, to, initiatedBy, approvalsUsed, coinTransfers)
+	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, transferMetadata, eventTracking)
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals not satisfied")
 	}
@@ -442,12 +461,18 @@ func (k Keeper) HandleTransfer(
 			}
 
 			if userApproval.Outgoing {
-				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalances, newTransfer, from, to, initiatedBy, fromUserBalance, approvalsUsed, coinTransfers, userApproval.UserRoyalties)
+				transferMetadata.ApproverAddress = from
+				transferMetadata.ApprovalLevel = "outgoing"
+
+				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalances, newTransfer, transferMetadata, fromUserBalance, eventTracking, userApproval.UserRoyalties)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
 				}
 			} else {
-				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalances, newTransfer, to, initiatedBy, toUserBalance, approvalsUsed, coinTransfers, userApproval.UserRoyalties)
+				transferMetadata.ApproverAddress = to
+				transferMetadata.ApprovalLevel = "incoming"
+
+				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalances, newTransfer, transferMetadata, toUserBalance, eventTracking, userApproval.UserRoyalties)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
 				}
@@ -784,7 +809,7 @@ func (k Keeper) HandleTransfer(
 	}
 
 	// Per-transfer, we handle auto-deletions if applicable
-	for _, approvalUsed := range *approvalsUsed {
+	for _, approvalUsed := range *eventTracking.ApprovalsUsed {
 		if approvalUsed.ApprovalLevel == "incoming" {
 			newIncomingApprovals := []*types.UserIncomingApproval{}
 			for _, incomingApproval := range toUserBalance.IncomingApprovals {

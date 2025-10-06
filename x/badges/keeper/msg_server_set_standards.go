@@ -51,16 +51,16 @@ func (k msgServer) SetStandards(goCtx context.Context, msg *types.MsgSetStandard
 	}
 
 	msgBytes, err := json.Marshal(msg)
-	if err == nil {
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-				sdk.NewAttribute("msg_type", "set_standards"),
-				sdk.NewAttribute("msg", string(msgBytes)),
-			),
-		)
+	if err != nil {
+		return nil, err
 	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_standards"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+	)
 
 	return &types.MsgSetStandardsResponse{
 		CollectionId: response.CollectionId,

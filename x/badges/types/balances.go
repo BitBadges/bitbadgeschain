@@ -437,18 +437,21 @@ func jsonEqual(a, b interface{}) bool {
 
 func IncrementBalances(
 	ctx sdk.Context,
-	startBalances []*Balance,
+	incrementedBalances *IncrementedBalances,
 	numIncrements sdkmath.Uint,
-	incrementOwnershipTimesBy sdkmath.Uint,
-	incrementBadgeIdsBy sdkmath.Uint,
-	durationFromTimestamp sdkmath.Uint,
-	recurringOwnershipTimes *RecurringOwnershipTimes,
-	overrideTimestamp sdkmath.Uint,
-	allowOverrideTimestamp bool,
-	overrideBadgeIds []*UintRange,
-	allowOverrideBadgeIdsWithAnyValidBadgeId bool,
+	precalculationOptions *PrecalculationOptions,
 	collection *BadgeCollection,
 ) ([]*Balance, error) {
+	startBalances := incrementedBalances.StartBalances
+	incrementOwnershipTimesBy := incrementedBalances.IncrementOwnershipTimesBy
+	incrementBadgeIdsBy := incrementedBalances.IncrementBadgeIdsBy
+	durationFromTimestamp := incrementedBalances.DurationFromTimestamp
+	recurringOwnershipTimes := incrementedBalances.RecurringOwnershipTimes
+	allowOverrideTimestamp := incrementedBalances.AllowOverrideTimestamp
+	allowOverrideBadgeIdsWithAnyValidBadgeId := incrementedBalances.AllowOverrideWithAnyValidBadge
+
+	overrideTimestamp := precalculationOptions.OverrideTimestamp
+	overrideBadgeIds := precalculationOptions.BadgeIdsOverride
 	balances := DeepCopyBalances(startBalances)
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 

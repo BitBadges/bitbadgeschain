@@ -82,24 +82,12 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "set_incoming_approval"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "set_incoming_approval"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_incoming_approval"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
 	return &types.MsgSetIncomingApprovalResponse{}, nil

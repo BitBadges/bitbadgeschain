@@ -38,15 +38,13 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 	}
 
 	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "set_dynamic_store_value"),
-			sdk.NewAttribute("store_id", msg.StoreId.String()),
-			sdk.NewAttribute("address", msg.Address),
-			sdk.NewAttribute("value", msg.Value.String()),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_dynamic_store_value"),
+		sdk.NewAttribute("store_id", msg.StoreId.String()),
+		sdk.NewAttribute("address", msg.Address),
+		sdk.NewAttribute("value", msg.Value.String()),
 	)
 
 	return &types.MsgSetDynamicStoreValueResponse{}, nil

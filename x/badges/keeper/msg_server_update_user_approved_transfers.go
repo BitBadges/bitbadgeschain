@@ -171,24 +171,12 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "update_user_approvals"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "update_user_approvals"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "update_user_approvals"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
 	return &types.MsgUpdateUserApprovalsResponse{}, nil

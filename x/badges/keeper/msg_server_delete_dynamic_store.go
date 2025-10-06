@@ -31,13 +31,11 @@ func (k msgServer) DeleteDynamicStore(goCtx context.Context, msg *types.MsgDelet
 	k.DeleteDynamicStoreFromStore(ctx, msg.StoreId)
 
 	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "delete_dynamic_store"),
-			sdk.NewAttribute("store_id", msg.StoreId.String()),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "delete_dynamic_store"),
+		sdk.NewAttribute("store_id", msg.StoreId.String()),
 	)
 
 	return &types.MsgDeleteDynamicStoreResponse{}, nil

@@ -14,14 +14,12 @@ func (k Keeper) DeductUserOutgoingApprovals(
 	collection *types.BadgeCollection,
 	originalTransferBalances []*types.Balance,
 	transfer *types.Transfer,
-	from string,
-	to string,
-	requester string,
+	transferMetadata TransferMetadata,
 	userBalance *types.UserBalanceStore,
-	approvalsUsed *[]ApprovalsUsed,
-	coinTransfers *[]CoinTransfers,
+	eventTracking *EventTracking,
 	royalties *types.UserRoyalties,
 ) error {
+	from := transferMetadata.From
 	currApprovals := userBalance.OutgoingApprovals
 	if userBalance.AutoApproveSelfInitiatedOutgoingTransfers {
 		currApprovals = AppendSelfInitiatedOutgoingApproval(currApprovals, from)
@@ -29,18 +27,16 @@ func (k Keeper) DeductUserOutgoingApprovals(
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedApprovals := types.CastOutgoingTransfersToCollectionTransfers(currApprovals, from)
+
+	// We do not care about the return value here because it is user-level
 	_, err := k.DeductAndGetUserApprovals(
 		ctx,
 		collection,
 		originalTransferBalances,
 		transfer,
 		castedApprovals,
-		to,
-		requester,
-		"outgoing",
-		from,
-		approvalsUsed,
-		coinTransfers,
+		transferMetadata,
+		eventTracking,
 		royalties,
 	)
 	return err
@@ -52,17 +48,16 @@ func (k Keeper) DeductUserIncomingApprovals(
 	collection *types.BadgeCollection,
 	originalTransferBalances []*types.Balance,
 	transfer *types.Transfer,
-	to string,
-	initiatedBy string,
+	transferMetadata TransferMetadata,
 	userBalance *types.UserBalanceStore,
-	approvalsUsed *[]ApprovalsUsed,
-	coinTransfers *[]CoinTransfers,
+	eventTracking *EventTracking,
 	royalties *types.UserRoyalties,
 ) error {
 	if userBalance.AutoApproveAllIncomingTransfers {
 		return nil
 	}
 
+	to := transferMetadata.To
 	currApprovals := userBalance.IncomingApprovals
 	if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
 		currApprovals = AppendSelfInitiatedIncomingApproval(currApprovals, to)
@@ -70,18 +65,16 @@ func (k Keeper) DeductUserIncomingApprovals(
 
 	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedApprovals := types.CastIncomingTransfersToCollectionTransfers(currApprovals, to)
+
+	// We do not care about the return value here because it is user-level
 	_, err := k.DeductAndGetUserApprovals(
 		ctx,
 		collection,
 		originalTransferBalances,
 		transfer,
 		castedApprovals,
-		to,
-		initiatedBy,
-		"incoming",
-		to,
-		approvalsUsed,
-		coinTransfers,
+		transferMetadata,
+		eventTracking,
 		royalties,
 	)
 	return err
@@ -92,27 +85,22 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 	ctx sdk.Context,
 	collection *types.BadgeCollection,
 	transfer *types.Transfer,
-	toAddress string,
-	initiatedBy string,
-	approvalsUsed *[]ApprovalsUsed,
-	coinTransfers *[]CoinTransfers,
+	transferMetadata TransferMetadata,
+	eventTracking *EventTracking,
 ) ([]*UserApprovalsToCheck, error) {
 	blankRoyalties := &types.UserRoyalties{
 		Percentage:    sdkmath.NewUint(0),
 		PayoutAddress: "",
 	}
+
 	return k.DeductAndGetUserApprovals(
 		ctx,
 		collection,
 		transfer.Balances,
 		transfer,
 		collection.CollectionApprovals,
-		toAddress,
-		initiatedBy,
-		"collection",
-		"",
-		approvalsUsed,
-		coinTransfers,
+		transferMetadata,
+		eventTracking,
 		blankRoyalties,
 	)
 }
@@ -131,7 +119,12 @@ func onlyCheckPrioritizedApprovals(transfer *types.Transfer, approvalLevel strin
 	return onlyCheckPrioritized
 }
 
-func SortViaPrioritizedApprovals(_approvals []*types.CollectionApproval, transfer *types.Transfer, approvalLevel string, approverAddress string) ([]*types.CollectionApproval, error) {
+func SortViaPrioritizedApprovals(
+	_approvals []*types.CollectionApproval,
+	transfer *types.Transfer,
+	approvalLevel string,
+	approverAddress string,
+) ([]*types.CollectionApproval, error) {
 	prioritizedApprovals := transfer.PrioritizedApprovals
 	onlyCheckPrioritized := onlyCheckPrioritizedApprovals(transfer, approvalLevel)
 
