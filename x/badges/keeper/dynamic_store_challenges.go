@@ -24,13 +24,14 @@ func (k Keeper) CheckDynamicStoreChallenges(
 	initiatedBy string,
 	isPrioritizedApproval bool,
 	addPotentialError func(bool, string),
+	simulation bool,
 ) DynamicStoreChallengeResult {
 	for _, challenge := range challenges {
 		storeId := challenge.StoreId
 
 		// Get the current value for the initiator
 		dynamicStoreValue, found := k.GetDynamicStoreValueFromStore(ctx, storeId, initiatedBy)
-		
+
 		var val sdkmath.Uint
 		if found {
 			val = dynamicStoreValue.Value
@@ -58,22 +59,24 @@ func (k Keeper) CheckDynamicStoreChallenges(
 			}
 		}
 
-		// Decrement the usage count
-		newValue := val.SubUint64(1)
-		if found {
-			// Update existing value
-			if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-				return DynamicStoreChallengeResult{
-					Success: false,
-					Error:   sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String()).Error(),
+		// Decrement the usage count only if not simulating
+		if !simulation {
+			newValue := val.SubUint64(1)
+			if found {
+				// Update existing value
+				if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+					return DynamicStoreChallengeResult{
+						Success: false,
+						Error:   sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String()).Error(),
+					}
 				}
-			}
-		} else {
-			// Create new value with decremented default
-			if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-				return DynamicStoreChallengeResult{
-					Success: false,
-					Error:   sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String()).Error(),
+			} else {
+				// Create new value with decremented default
+				if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+					return DynamicStoreChallengeResult{
+						Success: false,
+						Error:   sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String()).Error(),
+					}
 				}
 			}
 		}
@@ -83,4 +86,26 @@ func (k Keeper) CheckDynamicStoreChallenges(
 		Success: true,
 		Error:   "",
 	}
+}
+
+// SimulateDynamicStoreChallenges is a wrapper around CheckDynamicStoreChallenges for simulation
+func (k Keeper) SimulateDynamicStoreChallenges(
+	ctx sdk.Context,
+	challenges []*types.DynamicStoreChallenge,
+	initiatedBy string,
+	isPrioritizedApproval bool,
+	addPotentialError func(bool, string),
+) DynamicStoreChallengeResult {
+	return k.CheckDynamicStoreChallenges(ctx, challenges, initiatedBy, isPrioritizedApproval, addPotentialError, true)
+}
+
+// ExecuteDynamicStoreChallenges is a wrapper around CheckDynamicStoreChallenges for execution
+func (k Keeper) ExecuteDynamicStoreChallenges(
+	ctx sdk.Context,
+	challenges []*types.DynamicStoreChallenge,
+	initiatedBy string,
+	isPrioritizedApproval bool,
+	addPotentialError func(bool, string),
+) DynamicStoreChallengeResult {
+	return k.CheckDynamicStoreChallenges(ctx, challenges, initiatedBy, isPrioritizedApproval, addPotentialError, false)
 }

@@ -283,11 +283,15 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
+	if approvalCriteria.DynamicStoreChallenges != nil && len(approvalCriteria.DynamicStoreChallenges) > 0 {
+		return false
+	}
+
 	if approvalCriteria.ApprovalAmounts != nil && !ApprovalAmountsIsBasicallyNil(approvalCriteria.ApprovalAmounts) {
 		return false
 	}
 
-	// Note: Dynamic stores, mustOwnTokens, etc are fine since they are read-only during MsgTransferBadges
+	// Note: mustOwnTokens, etc are fine since they are read-only during MsgTransferBadges
 
 	return true
 }

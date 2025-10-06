@@ -165,10 +165,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			// Dynamic store challenges check - all challenges must pass
-			// Note even though this involves state, it is read-only (updates are handled in other Msgs)
-			// Thus, there is no need to simulate
-			challengeResult := k.CheckDynamicStoreChallenges(
+			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
+			// Dynamic store challenges check - simulate first
+			challengeResult := k.SimulateDynamicStoreChallenges(
 				ctx,
 				approvalCriteria.DynamicStoreChallenges,
 				initiatedBy,
@@ -176,15 +175,10 @@ func (k Keeper) DeductAndGetUserApprovals(
 				addPotentialError,
 			)
 			if !challengeResult.Success {
-				if challengeResult.Error != "" && !isPrioritizedApproval {
-					return []*UserApprovalsToCheck{}, sdkerrors.New("dynamic_store_challenge_error", 1, challengeResult.Error)
-				}
-				goto skipApproval
+				addPotentialError(isPrioritizedApproval, fmt.Sprintf("dynamic store challenge error: %s", challengeResult.Error))
+				continue
 			}
 
-		skipApproval:
-
-			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
 			err := k.SimulateCoinTransfers(ctx, approvalCriteria.CoinTransfers, transferMetadata, collection, royalties)
 			if err != nil {
 				addPotentialError(isPrioritizedApproval, fmt.Sprintf("coin transfer error: %s", err))
@@ -306,6 +300,18 @@ func (k Keeper) DeductAndGetUserApprovals(
 			err = k.ExecuteCoinTransfers(ctx, approvalCriteria.CoinTransfers, transferMetadata, eventTracking.CoinTransfers, collection, royalties)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error handling coin transfers")
+			}
+
+			// Execute dynamic store challenges
+			challengeResult = k.ExecuteDynamicStoreChallenges(
+				ctx,
+				approvalCriteria.DynamicStoreChallenges,
+				initiatedBy,
+				isPrioritizedApproval,
+				addPotentialError,
+			)
+			if !challengeResult.Success {
+				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(sdkerrors.New("dynamic_store_challenge_error", 1, challengeResult.Error), "%s", transferStr)
 			}
 
 			//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
