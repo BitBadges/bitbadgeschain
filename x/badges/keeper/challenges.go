@@ -14,6 +14,11 @@ import (
 	ethcommon "github.com/ethereum/go-ethereum/common"
 )
 
+const (
+	// MaxMerkleProofLength represents the maximum allowed Merkle proof length to prevent DoS attacks
+	MaxMerkleProofLength = 10
+)
+
 func (k Keeper) HandleMerkleChallenges(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
@@ -47,6 +52,11 @@ func (k Keeper) HandleMerkleChallenges(
 	for _, challenge := range challenges {
 		if challenge == nil || challenge.Root == "" {
 			return numIncrements, sdkerrors.Wrapf(types.ErrChallengeTrackerIdIsNil, "challenge is nil or has empty root")
+		}
+
+		// Early validation of proof length to prevent DoS attacks
+		if challenge.ExpectedProofLength.GT(sdkmath.NewUint(MaxMerkleProofLength)) {
+			return numIncrements, sdkerrors.Wrapf(types.ErrInvalidRequest, "expected proof length %s exceeds maximum allowed %d", challenge.ExpectedProofLength.String(), MaxMerkleProofLength)
 		}
 
 		challengeId := challenge.ChallengeTrackerId
@@ -108,14 +118,7 @@ func (k Keeper) HandleMerkleChallenges(
 				leafIndex := GetLeafIndex(proof.Aunts)
 				leftmostLeafIndex := sdkmath.NewUint(1)
 
-				// Add bounds checking to prevent excessive computation
-				maxProofLength := sdkmath.NewUint(10) // Reasonable upper bound
-				proofLength := challenge.ExpectedProofLength
-				if proofLength.GT(maxProofLength) {
-					return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "expected proof length %s exceeds maximum allowed %s", proofLength.String(), maxProofLength.String())
-				}
-
-				for i := sdkmath.NewUint(0); i.LT(proofLength); i = i.Add(sdkmath.NewUint(1)) {
+				for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
 					leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
 				}
 

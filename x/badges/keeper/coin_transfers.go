@@ -10,6 +10,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	RoyaltyDivisor = 10000
+)
+
 // formatDenomForDisplay formats a denom for display in error messages
 // Shows "BADGE" for "ubadge" and prints others as-is
 func formatDenomForDisplay(denom string) string {
@@ -162,7 +166,13 @@ func (k Keeper) ExecuteCoinTransfers(
 		for _, coin := range coinsToTransfer {
 			// Calculate royalty amount
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(10000)) // Assuming royalty percentage is in basis points (e.g., 250 = 2.5%)
+
+			// Validate royalty divisor to prevent division by zero
+			if RoyaltyDivisor == 0 {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "royalty divisor cannot be zero")
+			}
+
+			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
 
 			// Convert royalty amount to Int for coin operations
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
