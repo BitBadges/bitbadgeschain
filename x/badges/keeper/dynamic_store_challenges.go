@@ -10,14 +10,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// DynamicStoreChallengeResult represents the result of checking dynamic store challenges
-type DynamicStoreChallengeResult struct {
-	Success bool
-	Error   string
-}
-
 // CheckDynamicStoreChallenges validates and processes dynamic store challenges for an approval
 // It checks if the initiator has sufficient remaining uses for each challenge and decrements the usage count
+// Returns error if validation fails, nil on success
 func (k Keeper) CheckDynamicStoreChallenges(
 	ctx sdk.Context,
 	challenges []*types.DynamicStoreChallenge,
@@ -25,7 +20,7 @@ func (k Keeper) CheckDynamicStoreChallenges(
 	isPrioritizedApproval bool,
 	addPotentialError func(bool, string),
 	simulation bool,
-) DynamicStoreChallengeResult {
+) error {
 	for _, challenge := range challenges {
 		storeId := challenge.StoreId
 
@@ -41,10 +36,7 @@ func (k Keeper) CheckDynamicStoreChallenges(
 			if !foundStore {
 				errorMsg := fmt.Sprintf("dynamic store not found for storeId %s", storeId.String())
 				addPotentialError(isPrioritizedApproval, errorMsg)
-				return DynamicStoreChallengeResult{
-					Success: false,
-					Error:   errorMsg,
-				}
+				return sdkerrors.New("dynamic_store_not_found", 1, errorMsg)
 			}
 			val = dynamicStore.DefaultValue
 		}
@@ -53,10 +45,7 @@ func (k Keeper) CheckDynamicStoreChallenges(
 		if val.Equal(sdkmath.NewUint(0)) {
 			errorMsg := fmt.Sprintf("initiator has no remaining uses for dynamic store challenge storeId %s", storeId.String())
 			addPotentialError(isPrioritizedApproval, errorMsg)
-			return DynamicStoreChallengeResult{
-				Success: false,
-				Error:   errorMsg,
-			}
+			return sdkerrors.New("no_remaining_uses", 1, errorMsg)
 		}
 
 		// Decrement the usage count only if not simulating
@@ -65,27 +54,18 @@ func (k Keeper) CheckDynamicStoreChallenges(
 			if found {
 				// Update existing value
 				if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-					return DynamicStoreChallengeResult{
-						Success: false,
-						Error:   sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String()).Error(),
-					}
+					return sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String())
 				}
 			} else {
 				// Create new value with decremented default
 				if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-					return DynamicStoreChallengeResult{
-						Success: false,
-						Error:   sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String()).Error(),
-					}
+					return sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String())
 				}
 			}
 		}
 	}
 
-	return DynamicStoreChallengeResult{
-		Success: true,
-		Error:   "",
-	}
+	return nil
 }
 
 // SimulateDynamicStoreChallenges is a wrapper around CheckDynamicStoreChallenges for simulation
@@ -95,7 +75,7 @@ func (k Keeper) SimulateDynamicStoreChallenges(
 	initiatedBy string,
 	isPrioritizedApproval bool,
 	addPotentialError func(bool, string),
-) DynamicStoreChallengeResult {
+) error {
 	return k.CheckDynamicStoreChallenges(ctx, challenges, initiatedBy, isPrioritizedApproval, addPotentialError, true)
 }
 
@@ -106,6 +86,6 @@ func (k Keeper) ExecuteDynamicStoreChallenges(
 	initiatedBy string,
 	isPrioritizedApproval bool,
 	addPotentialError func(bool, string),
-) DynamicStoreChallengeResult {
+) error {
 	return k.CheckDynamicStoreChallenges(ctx, challenges, initiatedBy, isPrioritizedApproval, addPotentialError, false)
 }

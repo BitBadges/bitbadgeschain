@@ -167,19 +167,19 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
 			// Dynamic store challenges check - simulate first
-			challengeResult := k.SimulateDynamicStoreChallenges(
+			err = k.SimulateDynamicStoreChallenges(
 				ctx,
 				approvalCriteria.DynamicStoreChallenges,
 				initiatedBy,
 				isPrioritizedApproval,
 				addPotentialError,
 			)
-			if !challengeResult.Success {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("dynamic store challenge error: %s", challengeResult.Error))
+			if err != nil {
+				addPotentialError(isPrioritizedApproval, fmt.Sprintf("dynamic store challenge error: %s", err))
 				continue
 			}
 
-			err := k.SimulateCoinTransfers(ctx, approvalCriteria.CoinTransfers, transferMetadata, collection, royalties)
+			err = k.SimulateCoinTransfers(ctx, approvalCriteria.CoinTransfers, transferMetadata, collection, royalties)
 			if err != nil {
 				addPotentialError(isPrioritizedApproval, fmt.Sprintf("coin transfer error: %s", err))
 				continue
@@ -253,7 +253,6 @@ func (k Keeper) DeductAndGetUserApprovals(
 					transferMetadata,
 					trackerType,
 					approvedAddresses[i],
-					true,
 				)
 				if err != nil {
 					addPotentialError(isPrioritizedApproval, fmt.Sprintf("get max possible error: %s", err))
@@ -303,15 +302,15 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// Execute dynamic store challenges
-			challengeResult = k.ExecuteDynamicStoreChallenges(
+			err = k.ExecuteDynamicStoreChallenges(
 				ctx,
 				approvalCriteria.DynamicStoreChallenges,
 				initiatedBy,
 				isPrioritizedApproval,
 				addPotentialError,
 			)
-			if !challengeResult.Success {
-				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(sdkerrors.New("dynamic_store_challenge_error", 1, challengeResult.Error), "%s", transferStr)
+			if err != nil {
+				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "%s", transferStr)
 			}
 
 			//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
@@ -455,7 +454,6 @@ func (k Keeper) GetMaxPossible(
 	transferMetadata TransferMetadata,
 	trackerType string,
 	address string,
-	simulate bool,
 ) ([]*types.Balance, error) {
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
@@ -969,36 +967,4 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	}
 
 	return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "no predetermined transfers found for approval id: %s", precalculationId)
-}
-
-// SimulateGetMaxPossible is a wrapper around GetMaxPossible for simulation
-func (k Keeper) SimulateGetMaxPossible(
-	ctx sdk.Context,
-	collection *types.BadgeCollection,
-	approval *types.CollectionApproval,
-	transfer *types.Transfer,
-	originalTransferBalances []*types.Balance,
-	approvedAmount sdkmath.Uint,
-	challengeNumIncrements sdkmath.Uint,
-	transferMetadata TransferMetadata,
-	trackerType string,
-	address string,
-) ([]*types.Balance, error) {
-	return k.GetMaxPossible(ctx, collection, approval, transfer, originalTransferBalances, approvedAmount, challengeNumIncrements, transferMetadata, trackerType, address, true)
-}
-
-// ExecuteGetMaxPossible is a wrapper around GetMaxPossible for execution
-func (k Keeper) ExecuteGetMaxPossible(
-	ctx sdk.Context,
-	collection *types.BadgeCollection,
-	approval *types.CollectionApproval,
-	transfer *types.Transfer,
-	originalTransferBalances []*types.Balance,
-	approvedAmount sdkmath.Uint,
-	challengeNumIncrements sdkmath.Uint,
-	transferMetadata TransferMetadata,
-	trackerType string,
-	address string,
-) ([]*types.Balance, error) {
-	return k.GetMaxPossible(ctx, collection, approval, transfer, originalTransferBalances, approvedAmount, challengeNumIncrements, transferMetadata, trackerType, address, false)
 }
