@@ -90,14 +90,6 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{
-			{
-
-				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
-				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
-			},
-		},
 		CanUpdateStandards: []*types.TimedUpdatePermission{
 			{
 

@@ -146,15 +146,14 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:              []*types.TimedUpdatePermission{},
-				CanUpdateOffChainBalancesMetadata: []*types.TimedUpdatePermission{},
-				CanUpdateStandards:                []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:               []*types.TimedUpdatePermission{},
-				CanDeleteCollection:               []*types.ActionPermission{},
-				CanUpdateManager:                  []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:       []*types.TimedUpdatePermission{},
-				CanUpdateBadgeMetadata:            []*types.TimedUpdateWithBadgeIdsPermission{},
-				CanUpdateCollectionApprovals:      []*types.CollectionApprovalPermission{},
+				CanArchiveCollection:         []*types.TimedUpdatePermission{},
+				CanUpdateStandards:           []*types.TimedUpdatePermission{},
+				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanDeleteCollection:          []*types.ActionPermission{},
+				CanUpdateManager:             []*types.TimedUpdatePermission{},
+				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
+				CanUpdateBadgeMetadata:       []*types.TimedUpdateWithBadgeIdsPermission{},
+				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
 					{
 						PermanentlyPermittedTimes: GetFullUintRanges(),

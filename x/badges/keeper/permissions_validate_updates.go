@@ -266,10 +266,6 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateOffChainBalancesMetadata, newPermissions.CanUpdateOffChainBalancesMetadata); err != nil {
-		return err
-	}
-
 	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
 		return err
 	}

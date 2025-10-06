@@ -32,15 +32,14 @@ func (k msgServer) SetIsArchived(goCtx context.Context, msg *types.MsgSetIsArchi
 		CollectionPermissions: &types.CollectionPermissions{
 			CanArchiveCollection: msg.CanArchiveCollection,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:               collection.CollectionPermissions.CanDeleteCollection,
-			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
-			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
-			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
-			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
+			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}
 

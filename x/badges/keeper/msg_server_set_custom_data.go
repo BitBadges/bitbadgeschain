@@ -32,15 +32,14 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCustomData: msg.CanUpdateCustomData,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:               collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:              collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
-			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
-			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
-			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}
 

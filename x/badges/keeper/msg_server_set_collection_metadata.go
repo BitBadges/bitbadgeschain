@@ -32,15 +32,14 @@ func (k msgServer) SetCollectionMetadata(goCtx context.Context, msg *types.MsgSe
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCollectionMetadata: msg.CanUpdateCollectionMetadata,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:               collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:              collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
-			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
-			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}
 

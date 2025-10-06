@@ -32,15 +32,14 @@ func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetVali
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateValidBadgeIds: msg.CanUpdateValidBadgeIds,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:               collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:              collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
-			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
-			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}
 
