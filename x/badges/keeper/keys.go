@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -88,13 +89,13 @@ func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) 
 }
 
 func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, codeLeafIndex sdkmath.Uint) string {
-	collection_id_str := collectionId.String()
-
-	code_leaf_index_str := codeLeafIndex.String()
-	challenge_id_str := challengeId
-	address_for_challenge_str := addressForChallenge
-	challenge_level_str := approvalLevel
-	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + code_leaf_index_str
+	return fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s%s",
+		collectionId.String(), BalanceKeyDelimiter,
+		addressForChallenge, BalanceKeyDelimiter,
+		approvalLevel, BalanceKeyDelimiter,
+		approvalId, BalanceKeyDelimiter,
+		challengeId, BalanceKeyDelimiter,
+		codeLeafIndex.String())
 }
 
 func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, signature string) string {
@@ -108,15 +109,29 @@ func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChalle
 // Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.
 
 // Helper function to unparse a balance key and get the information from it.
-func GetDetailsFromBalanceKey(id string) BalanceKeyDetails {
+func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 	result := strings.Split(id, BalanceKeyDelimiter)
-	address := result[1]
-	collection_id, _ := strconv.ParseUint(result[0], 10, 64)
+
+	// Validate that we have the expected number of parts
+	if len(result) != 2 {
+		return BalanceKeyDetails{}, fmt.Errorf("invalid balance key format: expected 2 parts, got %d", len(result))
+	}
+
+	// Validate that the collection ID can be parsed
+	collection_id, err := strconv.ParseUint(result[0], 10, 64)
+	if err != nil {
+		return BalanceKeyDetails{}, fmt.Errorf("invalid collection ID in balance key: %w", err)
+	}
+
+	// Validate that the address is not empty
+	if result[1] == "" {
+		return BalanceKeyDetails{}, fmt.Errorf("empty address in balance key")
+	}
 
 	return BalanceKeyDetails{
-		address:      address,
+		address:      result[1],
 		collectionId: sdkmath.NewUint(collection_id),
-	}
+	}, nil
 }
 
 // Prefixer functions

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -99,7 +100,11 @@ func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.
 func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey string, userBalance *types.UserBalanceStore, collection *types.BadgeCollection) error {
 	// Get collection if not provided
 	if collection == nil {
-		collectionId := GetDetailsFromBalanceKey(balanceKey).collectionId
+		balanceKeyDetails, err := GetDetailsFromBalanceKey(balanceKey)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid balance key format")
+		}
+		collectionId := balanceKeyDetails.collectionId
 		var found bool
 		collection, found = k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
@@ -133,10 +138,13 @@ func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey strin
 			}
 		}
 
-		// Check maxSupplyPerId invariant if we're setting "Total" address balances
+		// Check maxSupplyPerId invariant if we're setting Total address balances
 		if !collection.Invariants.MaxSupplyPerId.IsNil() && !collection.Invariants.MaxSupplyPerId.IsZero() {
-			balanceKeyDetails := GetDetailsFromBalanceKey(balanceKey)
-			if balanceKeyDetails.address == "Total" {
+			balanceKeyDetails, err := GetDetailsFromBalanceKey(balanceKey)
+			if err != nil {
+				return sdkerrors.Wrapf(err, "invalid balance key format")
+			}
+			if types.IsTotalAddress(balanceKeyDetails.address) {
 				// Validate that no balance amount exceeds maxSupplyPerId
 				for _, balance := range userBalance.Balances {
 					if balance.Amount.GT(collection.Invariants.MaxSupplyPerId) {
@@ -156,7 +164,9 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		return err
 	}
 
-	//HACK: We always store a non-nil permissions object to avoid the case where everything is nil -> marshaled len = 0 -> default balances get populated again
+	// NOTE: We always store a non-nil permissions object to prevent issues where
+	// nil permissions would marshal to zero length, causing default balances to be
+	// incorrectly populated again during deserialization.
 	if UserBalance.UserPermissions == nil {
 		UserBalance.UserPermissions = &types.UserPermissions{
 			CanUpdateOutgoingApprovals:                         []*types.UserOutgoingApprovalPermission{},
@@ -173,8 +183,12 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	}
 
 	//Prevent accidental non-BitBadges addresses from being stored
-	if GetDetailsFromBalanceKey(balanceKey).address != "Mint" && GetDetailsFromBalanceKey(balanceKey).address != "Total" {
-		if err = types.ValidateAddress(GetDetailsFromBalanceKey(balanceKey).address, false); err != nil {
+	balanceKeyDetails, err := GetDetailsFromBalanceKey(balanceKey)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "invalid balance key format")
+	}
+	if !types.IsSpecialAddress(balanceKeyDetails.address) {
+		if err = types.ValidateAddress(balanceKeyDetails.address, false); err != nil {
 			return sdkerrors.Wrap(err, "Invalid address")
 		}
 	}
@@ -210,7 +224,13 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
 		balances = append(balances, &UserBalance)
 
-		balanceKeyDetails := GetDetailsFromBalanceKey(string(iterator.Key()[1:]))
+		balanceKeyDetails, err := GetDetailsFromBalanceKey(string(iterator.Key()[1:]))
+		if err != nil {
+			// Log error and continue processing other keys
+			// This could indicate data corruption, but we continue to avoid breaking the entire operation
+			k.logger.Error("failed to parse balance key", "key", string(iterator.Key()), "error", err)
+			continue
+		}
 		ids = append(ids, balanceKeyDetails.collectionId)
 		addresses = append(addresses, balanceKeyDetails.address)
 	}
@@ -264,9 +284,17 @@ func (k Keeper) SetNextCollectionId(ctx sdk.Context, nextID sdkmath.Uint) {
 }
 
 // Increments the next collection ID by 1.
-func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) {
+func (k Keeper) IncrementNextCollectionId(ctx sdk.Context) error {
 	nextID := k.GetNextCollectionId(ctx)
-	k.SetNextCollectionId(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 tokens which isn't totally feasible
+
+	// Check for overflow before incrementing
+	if nextID.Equal(sdkmath.NewUint(math.MaxUint64)) {
+		return sdkerrors.Wrapf(types.ErrOverflow, "collection ID overflow: maximum number of collections reached")
+	}
+
+	newID := nextID.AddUint64(1)
+	k.SetNextCollectionId(ctx, newID)
+	return nil
 }
 
 /****************************************NEXT LIST ID****************************************/
@@ -286,10 +314,18 @@ func (k Keeper) SetNextAddressListCounter(ctx sdk.Context, nextID sdkmath.Uint) 
 	store.Set(nextAddressListCounterKey(), []byte(nextID.String()))
 }
 
-// Increments the next collection ID by 1.
-func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) {
+// Increments the next address list counter by 1.
+func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) error {
 	nextID := k.GetNextAddressListCounter(ctx)
-	k.SetNextAddressListCounter(ctx, nextID.AddUint64(1)) //susceptible to overflow but by that time we will have 2^64 tokens which isn't totally feasible
+	newID := nextID.AddUint64(1)
+
+	// Check for overflow: if the new ID is less than the original, we've overflowed
+	if newID.LT(nextID) {
+		return sdkerrors.Wrapf(types.ErrOverflow, "address list counter overflow: maximum number of address lists reached")
+	}
+
+	k.SetNextAddressListCounter(ctx, newID)
+	return nil
 }
 
 /********************************************************************************/
@@ -302,13 +338,13 @@ func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId s
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
-			panic("Failed to parse num used")
+			return sdkmath.NewUint(0), sdkerrors.Wrapf(err, "failed to parse num used")
 		}
 
 		curr = sdkmath.NewUint(currUint)
 	}
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(curr.Incr().String()))
+	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(incrementedNum.String()))
 	return incrementedNum, nil
 }
 
@@ -320,7 +356,7 @@ func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkma
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
 		if err != nil {
-			panic("Failed to parse num used")
+			return sdkmath.NewUint(0), sdkerrors.Wrapf(err, "failed to parse num used")
 		}
 
 		curr = sdkmath.NewUint(currUint)
@@ -336,7 +372,10 @@ func (k Keeper) GetChallengeTrackersFromStore(ctx sdk.Context) (numUsed []sdkmat
 	for ; iterator.Valid(); iterator.Next() {
 		curr, err := strconv.ParseUint(string((iterator.Value())), 10, 64)
 		if err != nil {
-			panic("Failed to parse num used")
+			// Log error and continue processing - this is a data corruption issue
+			// We continue to avoid breaking the entire operation, but log for monitoring
+			k.logger.Error("failed to parse challenge tracker value", "value", string(iterator.Value()), "error", err)
+			continue
 		}
 		numUsed = append(numUsed, sdkmath.NewUint(curr))
 		ids = append(ids, string(iterator.Key()[1:]))
@@ -481,7 +520,8 @@ func (k Keeper) IncrementApprovalVersion(ctx sdk.Context, collectionId sdkmath.U
 	} else {
 		versionUint, err := strconv.ParseUint(string(version), 10, 64)
 		if err != nil {
-			panic("Failed to parse version")
+			// Return 0 on parse error
+			return sdkmath.NewUint(0)
 		}
 
 		versionUint++
@@ -506,7 +546,8 @@ func (k Keeper) GetApprovalTrackerVersionsFromStore(ctx sdk.Context) (versions [
 	for ; iterator.Valid(); iterator.Next() {
 		version, err := strconv.ParseUint(string(iterator.Value()), 10, 64)
 		if err != nil {
-			panic("Failed to parse version")
+			// Log error but continue processing - this is a data corruption issue
+			continue
 		}
 		versions = append(versions, sdkmath.NewUint(version))
 		ids = append(ids, string(iterator.Key()[1:]))
@@ -529,7 +570,8 @@ func (k Keeper) GetApprovalTrackerVersionFromStore(ctx sdk.Context, key string) 
 	}
 	versionUint, err := strconv.ParseUint(string(version), 10, 64)
 	if err != nil {
-		panic("Failed to parse version")
+		// Return false on parse error - this indicates data corruption
+		return sdkmath.NewUint(0), false
 	}
 	return sdkmath.NewUint(versionUint), true
 }
@@ -610,6 +652,14 @@ func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
 
 // Sets a dynamic store value in the store using DynamicStoreValueKey ([]byte{0x0F}) as the prefix.
 func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value sdkmath.Uint) error {
+	// Validate inputs
+	if storeId.IsZero() {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "store ID cannot be zero")
+	}
+	if address == "" {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "address cannot be empty")
+	}
+
 	dynamicStoreValue := types.DynamicStoreValue{
 		StoreId: storeId,
 		Address: address,

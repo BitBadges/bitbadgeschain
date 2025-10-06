@@ -4,16 +4,19 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-// Safe adds two sdkmath.Uints
-func SafeAdd(left sdkmath.Uint, right sdkmath.Uint) (sdkmath.Uint, error) {
-	defer func() (sdkmath.Uint, error) {
-		if r := recover(); r != nil {
-			return sdkmath.NewUint(0), ErrOverflow
-		}
-		return left.Add(right), nil
-	}()
+// Add adds two sdkmath.Uints. Note: This function does not check for overflow.
+// Use SafeAddWithOverflowCheck if overflow protection is needed.
+func Add(left sdkmath.Uint, right sdkmath.Uint) sdkmath.Uint {
+	return left.Add(right)
+}
 
-	return left.Add(right), nil
+// SafeAddWithOverflowCheck adds two sdkmath.Uints and returns an error if the result overflows.
+func SafeAddWithOverflowCheck(left sdkmath.Uint, right sdkmath.Uint) (sdkmath.Uint, error) {
+	result := left.Add(right) // SDK uints already handle overflows
+	if result.LT(left) && result.LT(right) {
+		return sdkmath.NewUint(0), ErrOverflow
+	}
+	return result, nil
 }
 
 // Safe subtracts two sdkmath.Uints and returns an error if the result underflows sdkmath.Uint.

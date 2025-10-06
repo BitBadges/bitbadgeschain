@@ -131,6 +131,10 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 }
 
 func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriteria *ApprovalCriteria) *IncomingApprovalCriteria {
+	if approvalCriteria == nil {
+		return nil
+	}
+
 	return &IncomingApprovalCriteria{
 		ApprovalAmounts:                    approvalCriteria.ApprovalAmounts,
 		MaxNumTransfers:                    approvalCriteria.MaxNumTransfers,
@@ -147,6 +151,10 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 }
 
 func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriteria *ApprovalCriteria) *OutgoingApprovalCriteria {
+	if approvalCriteria == nil {
+		return nil
+	}
+
 	return &OutgoingApprovalCriteria{
 		ApprovalAmounts:                  approvalCriteria.ApprovalAmounts,
 		MaxNumTransfers:                  approvalCriteria.MaxNumTransfers,

@@ -10,15 +10,15 @@ import (
 )
 
 func (suite *TestSuite) TestSafeAdd() {
-	result, err := types.SafeAdd(sdkmath.NewUint(0), sdkmath.NewUint(1))
+	result, err := types.SafeAddWithOverflowCheck(sdkmath.NewUint(0), sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error adding: %s")
 	AssertUintsEqual(suite, result, sdkmath.NewUint(1))
 
-	result, err = types.SafeAdd(sdkmath.NewUint(math.MaxUint64), sdkmath.NewUint(0))
+	result, err = types.SafeAddWithOverflowCheck(sdkmath.NewUint(math.MaxUint64), sdkmath.NewUint(0))
 	suite.Require().Nil(err, "Error adding: %s")
 	AssertUintsEqual(suite, result, sdkmath.NewUint(math.MaxUint64))
 
-	_, err = types.SafeAdd(sdkmath.NewUint(math.MaxUint), sdkmath.NewUint(1))
+	_, err = types.SafeAddWithOverflowCheck(sdkmath.NewUint(math.MaxUint), sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error adding: %s")
 	// AssertBalancesEqualEsuite, rror(err, types.ErrOverflow.Error()) With Cosmos SDK Uint now, this error is not returned
 }

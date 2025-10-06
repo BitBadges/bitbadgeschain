@@ -49,7 +49,7 @@ func (msg *MsgSetOutgoingApproval) CheckAndCleanMsg(ctx sdk.Context, canChangeVa
 	}
 
 	// Validate collection ID
-	if msg.CollectionId.IsZero() {
+	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidCollectionID, "collection ID cannot be zero")
 	}
 

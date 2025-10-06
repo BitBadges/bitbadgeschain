@@ -50,6 +50,9 @@ func (k Keeper) HandleCoinTransfers(
 	allowedDenoms := k.GetAllowedDenoms(ctx)
 	if len(allowedDenoms) > 0 {
 		for _, coinTransfer := range coinTransfers {
+			if len(coinTransfer.Coins) == 0 {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
+			}
 			if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
 				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
 			}

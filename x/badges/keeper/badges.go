@@ -11,7 +11,7 @@ import (
 // Create tokens and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newValidBadgeIds []*types.UintRange) (*types.BadgeCollection, error) {
 
-	err := *new(error)
+	var err error
 	allBadgeIds := []*types.UintRange{}
 	allBadgeIds = append(allBadgeIds, newValidBadgeIds...)
 	allBadgeIds, err = types.SortUintRangesAndMerge(allBadgeIds, true)

@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -28,7 +29,7 @@ func DoBalancesExceedThreshold(ctx sdk.Context, balances []*Balance, thresholdBa
 }
 
 func AddBalancesAndAssertDoesntExceedThreshold(ctx sdk.Context, currTally []*Balance, toAdd []*Balance, threshold []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 	//If we transferAsMuchAsPossible, we need to increment the currTally by all that we can
 	//We then need to return the updated toAdd
 
@@ -98,7 +99,7 @@ func HandleDuplicateBadgeIds(ctx sdk.Context, balances []*Balance, canChangeValu
 	}
 
 	newBalances := []*Balance{}
-	err := *new(error)
+	var err error
 	newBalances, err = AddBalances(ctx, balances, newBalances)
 	if err != nil {
 		return []*Balance{}, err
@@ -111,7 +112,7 @@ func HandleDuplicateBadgeIds(ctx sdk.Context, balances []*Balance, canChangeValu
 func UpdateBalance(ctx sdk.Context, newBalance *Balance, balances []*Balance) ([]*Balance, error) {
 	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortUintRangesAndMerge(ranges)
-	err := *new(error)
+	var err error
 	balances, err = DeleteBalances(ctx, newBalance.BadgeIds, newBalance.OwnershipTimes, balances)
 	if err != nil {
 		return balances, err
@@ -158,7 +159,12 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	//For all overlaps, we simply return the amount
 	for _, overlapObject := range overlaps {
 		overlap := overlapObject.Overlap
-		amount := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
+
+		// Safe type assertion with error handling
+		amount, ok := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
+		if !ok {
+			return nil, fmt.Errorf("invalid ArbitraryValue type: expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
+		}
 
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         amount,
@@ -208,7 +214,7 @@ func GetOverlappingBalances(ctx sdk.Context, transferBalancesToCheck []*Balance,
 }
 
 func AddBalances(ctx sdk.Context, balancesToAdd []*Balance, balances []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 	for _, balance := range balancesToAdd {
 		balances, err = AddBalance(ctx, balances, balance)
 		if err != nil {
@@ -232,7 +238,7 @@ func AddBalance(ctx sdk.Context, existingBalances []*Balance, balanceToAdd *Bala
 	}
 
 	for _, balance := range currBalances {
-		balance.Amount, err = SafeAdd(balance.Amount, balanceToAdd.Amount)
+		balance.Amount, err = SafeAddWithOverflowCheck(balance.Amount, balanceToAdd.Amount)
 		if err != nil {
 			return existingBalances, err
 		}
@@ -247,7 +253,7 @@ func AddBalance(ctx sdk.Context, existingBalances []*Balance, balanceToAdd *Bala
 }
 
 func SubtractBalances(ctx sdk.Context, balancesToSubtract []*Balance, balances []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 
 	for _, balance := range balancesToSubtract {
 		balances, err = SubtractBalance(ctx, balances, balance, false)
@@ -260,7 +266,7 @@ func SubtractBalances(ctx sdk.Context, balancesToSubtract []*Balance, balances [
 }
 
 func SubtractBalancesWithZeroForUnderflows(ctx sdk.Context, balancesToSubtract []*Balance, balances []*Balance) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 
 	for _, balance := range balancesToSubtract {
 		balances, err = SubtractBalance(ctx, balances, balance, true)
@@ -356,18 +362,18 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 
 	balances = append(balances, newBalancesWithoutZeroes...)
 
-	err := *new(error)
+	var err error
 
 	//Little clean up to start. We sort and if we have adjacent (note not intersecting), we  merge them
 	for _, balance := range balances {
 		balance.OwnershipTimes, err = SortUintRangesAndMerge(balance.OwnershipTimes, false)
 		if err != nil {
-			return balances, nil
+			return nil, err
 		}
 
 		balance.BadgeIds, err = SortUintRangesAndMerge(balance.BadgeIds, false)
 		if err != nil {
-			return balances, nil
+			return nil, err
 		}
 	}
 

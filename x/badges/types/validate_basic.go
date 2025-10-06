@@ -11,6 +11,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	// MaxUint64Value represents the maximum value for uint64
+	MaxUint64Value = math.MaxUint64
+)
+
 var (
 	// URI must be a valid URI. Method <= 10 characters long. Path <= 90 characters long.
 	reUriString = `\w+:(\/?\/?)[^\s]+`
@@ -88,15 +93,21 @@ func ValidateAddress(address string, allowAliases bool) error {
 }
 
 func DoRangesOverlap(ids []*UintRange) bool {
+	// Create a copy to avoid modifying the input slice
+	idsCopy := make([]*UintRange, len(ids))
+	for i, id := range ids {
+		idsCopy[i] = id
+	}
+
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
-	var n = len(ids)
+	var n = len(idsCopy)
 	for i := 1; i < n; i++ {
 		j := i
 		for j > 0 {
-			if ids[j-1].Start.GT(ids[j].Start) {
-				ids[j-1], ids[j] = ids[j], ids[j-1]
-			} else if ids[j-1].Start.Equal(ids[j].Start) && ids[j-1].End.GT(ids[j].End) {
-				ids[j-1], ids[j] = ids[j], ids[j-1]
+			if idsCopy[j-1].Start.GT(idsCopy[j].Start) {
+				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
+			} else if idsCopy[j-1].Start.Equal(idsCopy[j].Start) && idsCopy[j-1].End.GT(idsCopy[j].End) {
+				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
 			}
 			j = j - 1
 		}
@@ -104,8 +115,8 @@ func DoRangesOverlap(ids []*UintRange) bool {
 
 	//Check if any overlap
 	for i := 1; i < n; i++ {
-		prevInsertedRange := ids[i-1]
-		currRange := ids[i]
+		prevInsertedRange := idsCopy[i-1]
+		currRange := idsCopy[i]
 
 		if currRange.Start.LTE(prevInsertedRange.End) {
 			return true
@@ -141,7 +152,7 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, er
 				return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is zero")
 			}
 
-			if badgeUintRange.Start.GT(sdkmath.NewUint(math.MaxUint64)) || badgeUintRange.End.GT(sdkmath.NewUint(math.MaxUint64)) {
+			if badgeUintRange.Start.GT(sdkmath.NewUint(MaxUint64Value)) || badgeUintRange.End.GT(sdkmath.NewUint(MaxUint64Value)) {
 				return ErrUintGreaterThanMax
 			}
 		}
@@ -199,6 +210,10 @@ func ValidateAddressList(addressList *AddressList) error {
 	}
 
 	for _, address := range addressList.Addresses {
+		// Check for empty addresses
+		if address == "" {
+			return sdkerrors.Wrapf(ErrInvalidAddress, "address list cannot contain empty addresses")
+		}
 		if err := ValidateAddress(address, false); err != nil {
 			return err
 		}
@@ -284,24 +299,24 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool) error {
 	for i := 0; i < len(collectionApprovals); i++ {
 		if collectionApprovals[i].ApprovalId == "" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized at index %d", i)
 		}
 
 		if collectionApprovals[i].ApprovalId == "All" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be All")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be All at index %d", i)
 		}
 
 		reservedApprovalIds := []string{"default-outgoing", "default-incoming", "self-initiated-outgoing", "self-initiated-incoming", "all-incoming-transfers"}
 
 		for _, reservedApprovalId := range reservedApprovalIds {
 			if collectionApprovals[i].ApprovalId == reservedApprovalId {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be %s", reservedApprovalId)
+				return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be %s at index %d", reservedApprovalId, i)
 			}
 		}
 
 		for j := i + 1; j < len(collectionApprovals); j++ {
 			if collectionApprovals[i].ApprovalId == collectionApprovals[j].ApprovalId {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate approval ids")
+				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate approval ids at indices %d and %d: %s", i, j, collectionApprovals[i].ApprovalId)
 			}
 		}
 	}
@@ -555,7 +570,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
 					}
 
-					err := *new(error)
+					var err error
 					if manualBalancesIsBasicallyNil && !sequentialTransferIsBasicallyNil {
 						sequentialTransfer := approvalCriteria.PredeterminedBalances.IncrementedBalances
 						sequentialTransfer.StartBalances, err = ValidateBalances(ctx, sequentialTransfer.StartBalances, canChangeValues)
@@ -568,7 +583,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						}
 
 						if sequentialTransfer.IncrementOwnershipTimesBy.IsNil() {
-							return sdkerrors.Wrapf(ErrUintUnititialized, "max num transfers is uninitialized")
+							return sdkerrors.Wrapf(ErrUintUnititialized, "increment ownership times by is uninitialized")
 						}
 
 						if sequentialTransfer.DurationFromTimestamp.IsNil() {
@@ -602,7 +617,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 							// grace period cannot be longer than the interval length
 							if sequentialTransfer.RecurringOwnershipTimes.ChargePeriodLength.GT(sequentialTransfer.RecurringOwnershipTimes.IntervalLength) {
-								return sdkerrors.Wrapf(ErrInvalidRequest, "grace period length cannot be longer than or equal tothe interval length")
+								return sdkerrors.Wrapf(ErrInvalidRequest, "grace period length cannot be longer than or equal to the interval length")
 							}
 						}
 
@@ -759,7 +774,7 @@ func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTr
 }
 
 func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool) ([]*Balance, error) {
-	err := *new(error)
+	var err error
 	for _, balance := range balances {
 		if balance == nil {
 			return balances, sdkerrors.Wrapf(ErrInvalidLengthBalances, "balances is nil")
@@ -808,7 +823,7 @@ func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChan
 }
 
 func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool) error {
-	err := *new(error)
+	var err error
 
 	transfer.Balances, err = ValidateBalances(ctx, transfer.Balances, canChangeValues)
 	if err != nil {
@@ -888,7 +903,7 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 }
 
 func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool) error {
-	err := *new(error)
+	var err error
 
 	handledBadgeIds := []*UintRange{}
 	if len(badgeMetadata) > 0 {
@@ -925,7 +940,7 @@ func IsFullOwnershipTimesRange(ownershipTimes []*UintRange) bool {
 	}
 
 	range_ := ownershipTimes[0]
-	return range_.Start.Equal(sdkmath.NewUint(1)) && range_.End.Equal(sdkmath.NewUint(math.MaxUint64))
+	return range_.Start.Equal(sdkmath.NewUint(1)) && range_.End.Equal(sdkmath.NewUint(MaxUint64Value))
 }
 
 // ValidateNoCustomOwnershipTimesInvariant validates that all ownership times are full ranges when the invariant is enabled

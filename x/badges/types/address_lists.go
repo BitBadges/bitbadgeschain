@@ -4,17 +4,15 @@ func getDuplicatesAndNonDuplicates(list1 []string, list2 []string) ([]string, []
 	duplicates := []string{}
 	inListOneButNotTwo := []string{}
 
-	for _, address := range list1 {
-		//Check if address is in list2
-		found := false
-		for _, address2 := range list2 {
-			if address == address2 {
-				found = true
-				break
-			}
-		}
+	// Create a map for O(1) lookup instead of O(n) nested loop
+	list2Map := make(map[string]bool, len(list2))
+	for _, address := range list2 {
+		list2Map[address] = true
+	}
 
-		if found {
+	for _, address := range list1 {
+		// Check if address is in list2 using map lookup
+		if list2Map[address] {
 			duplicates = append(duplicates, address)
 		} else {
 			inListOneButNotTwo = append(inListOneButNotTwo, address)
@@ -45,39 +43,56 @@ func RemoveAddressListFromAddressList(listToRemove *AddressList, addressList *Ad
 	removed := &AddressList{}
 	remaining := &AddressList{}
 
-	if listToRemove.Whitelist && addressList.Whitelist {
-		//Case 1
-		removed.Whitelist = true
-		removed.Addresses = duplicates
-
-		remaining.Whitelist = true
-		remaining.Addresses = inListButNotToRemove
-	} else if !listToRemove.Whitelist && addressList.Whitelist {
-		//Case 2
-		removed.Whitelist = true
-		removed.Addresses = inListButNotToRemove
-
-		remaining.Whitelist = true
-		remaining.Addresses = duplicates
-	} else if listToRemove.Whitelist && !addressList.Whitelist {
-		//Case 3
-		removed.Whitelist = true
-		removed.Addresses = inToRemoveButNotList
-
-		remaining.Whitelist = false
-		remaining.Addresses = append(remaining.Addresses, inListButNotToRemove...)
-		remaining.Addresses = append(remaining.Addresses, inToRemoveButNotList...)
-		remaining.Addresses = append(remaining.Addresses, duplicates...)
-	} else if !listToRemove.Whitelist && !addressList.Whitelist {
-		//Case 4
-		removed.Whitelist = false
-		removed.Addresses = append(removed.Addresses, inListButNotToRemove...)
-		removed.Addresses = append(removed.Addresses, inToRemoveButNotList...)
-		removed.Addresses = append(removed.Addresses, duplicates...)
-
-		remaining.Whitelist = true
-		remaining.Addresses = inToRemoveButNotList
+	switch {
+	case listToRemove.Whitelist && addressList.Whitelist:
+		handleCase1(removed, remaining, duplicates, inListButNotToRemove)
+	case !listToRemove.Whitelist && addressList.Whitelist:
+		handleCase2(removed, remaining, duplicates, inListButNotToRemove)
+	case listToRemove.Whitelist && !addressList.Whitelist:
+		handleCase3(removed, remaining, duplicates, inToRemoveButNotList, inListButNotToRemove)
+	case !listToRemove.Whitelist && !addressList.Whitelist:
+		handleCase4(removed, remaining, duplicates, inToRemoveButNotList, inListButNotToRemove)
 	}
 
 	return remaining, removed
+}
+
+// Case 1: (true, true) - Remove ABC from BCD
+func handleCase1(removed, remaining *AddressList, duplicates, inListButNotToRemove []string) {
+	removed.Whitelist = true
+	removed.Addresses = duplicates
+
+	remaining.Whitelist = true
+	remaining.Addresses = inListButNotToRemove
+}
+
+// Case 2: (false, true) - Remove All but ABC from BCD
+func handleCase2(removed, remaining *AddressList, duplicates, inListButNotToRemove []string) {
+	removed.Whitelist = true
+	removed.Addresses = inListButNotToRemove
+
+	remaining.Whitelist = true
+	remaining.Addresses = duplicates
+}
+
+// Case 3: (true, false) - Remove ABC from All but BCD
+func handleCase3(removed, remaining *AddressList, duplicates, inToRemoveButNotList, inListButNotToRemove []string) {
+	removed.Whitelist = true
+	removed.Addresses = inToRemoveButNotList
+
+	remaining.Whitelist = false
+	remaining.Addresses = append(remaining.Addresses, inListButNotToRemove...)
+	remaining.Addresses = append(remaining.Addresses, inToRemoveButNotList...)
+	remaining.Addresses = append(remaining.Addresses, duplicates...)
+}
+
+// Case 4: (false, false) - Remove All but ABC from All but BCD
+func handleCase4(removed, remaining *AddressList, duplicates, inToRemoveButNotList, inListButNotToRemove []string) {
+	removed.Whitelist = false
+	removed.Addresses = append(removed.Addresses, inListButNotToRemove...)
+	removed.Addresses = append(removed.Addresses, inToRemoveButNotList...)
+	removed.Addresses = append(removed.Addresses, duplicates...)
+
+	remaining.Whitelist = true
+	remaining.Addresses = inToRemoveButNotList
 }

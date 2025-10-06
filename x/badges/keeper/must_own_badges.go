@@ -34,7 +34,7 @@ func (k Keeper) CheckMustOwnTokens(
 			partyToCheck = fromAddress
 		case "recipient":
 			partyToCheck = toAddress
-		case "Mint":
+		case types.MintAddress:
 			partyToCheck = collection.MintEscrowAddress
 		case "":
 			partyToCheck = initiatedBy

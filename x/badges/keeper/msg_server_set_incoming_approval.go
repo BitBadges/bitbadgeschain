@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -22,6 +23,10 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 	collectionId := msg.CollectionId
 	if collectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)
+		// Prevent underflow by checking if nextCollectionId is greater than 0
+		if nextCollectionId.IsZero() {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "cannot calculate collection ID: next collection ID is zero")
+		}
 		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
 	}
 

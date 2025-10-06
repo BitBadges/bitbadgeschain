@@ -15,6 +15,15 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
+const (
+	// ProtocolFeeNumerator represents the numerator for protocol fee calculation (0.5% = 5/1000)
+	ProtocolFeeNumerator = 5
+	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.5% = 5/1000)
+	ProtocolFeeDenominator = 1000
+	// AffiliatePercentageDenominator represents the denominator for affiliate percentage calculation (0-10000)
+	AffiliatePercentageDenominator = 10000
+)
+
 func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *types.UserBalanceStore {
 	return &types.UserBalanceStore{
 		Balances:          collection.DefaultBalances.Balances,
@@ -29,7 +38,7 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) (*types.UserBalanceStore, bool) {
 	//Mint has unlimited balances
-	if userAddress == "Total" || userAddress == "Mint" {
+	if types.IsSpecialAddress(userAddress) {
 		return &types.UserBalanceStore{}, false
 	}
 
@@ -73,7 +82,7 @@ type CoinTransfers struct {
 }
 
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
-	err := *new(error)
+	var err error
 
 	isArchived := types.GetIsArchived(ctx, collection)
 	if isArchived {
@@ -93,7 +102,13 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 			numAttempts = transfer.NumAttempts
 		}
 
-		for i := sdkmath.NewUint(0); i.LT(numAttempts); i = i.Add(sdkmath.NewUint(1)) {
+		// Convert to uint64 for more efficient loop iteration
+		// Add bounds checking to prevent potential issues with very large values
+		if numAttempts.GT(sdkmath.NewUint(10000)) {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "numAttempts cannot exceed 10000, got %s", numAttempts.String())
+		}
+		numAttemptsUint64 := numAttempts.Uint64()
+		for i := uint64(0); i < numAttemptsUint64; i++ {
 			fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
 			totalMinted := []*types.Balance{}
 
@@ -174,7 +189,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					)
 				}
 
-				if transfer.From == "Mint" {
+				if types.IsMintAddress(transfer.From) {
 					copiedBalances := types.DeepCopyBalances(transfer.Balances)
 					totalMinted, err = types.AddBalances(ctx, totalMinted, copiedBalances)
 					if err != nil {
@@ -218,7 +233,11 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 				for denom, totalAmount := range denomAmounts {
 					// 0.5% of the total amount for this denom
-					protocolFee := totalAmount.Mul(sdkmath.NewUint(5)).Quo(sdkmath.NewUint(1000))
+					// Safety check to prevent division by zero
+					if ProtocolFeeDenominator == 0 {
+						return sdkerrors.Wrapf(types.ErrInvalidRequest, "protocol fee denominator cannot be zero")
+					}
+					protocolFee := totalAmount.Mul(sdkmath.NewUint(ProtocolFeeNumerator)).Quo(sdkmath.NewUint(ProtocolFeeDenominator))
 
 					// For other denoms, just use 0.5%
 					if !protocolFee.IsZero() {
@@ -226,7 +245,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 					}
 				}
 
-				affiliatePercentage := k.GetParams(ctx).AffiliatePercentage // 0 to 10000
+				affiliatePercentage := k.GetParams(ctx).AffiliatePercentage // 0 to AffiliatePercentageDenominator
 
 				fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
 				if err != nil {
@@ -257,8 +276,8 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 						communityPoolFees := sdk.NewCoins()
 
 						for _, protocolFee := range protocolFees {
-							// Calculate affiliate portion (affiliatePercentage is 0-10000, so divide by 10000)
-							affiliateAmount := protocolFee.Amount.Mul(sdkmath.NewIntFromUint64(affiliatePercentage.Uint64())).Quo(sdkmath.NewInt(10000))
+							// Calculate affiliate portion (affiliatePercentage is 0-AffiliatePercentageDenominator, so divide by AffiliatePercentageDenominator)
+							affiliateAmount := protocolFee.Amount.Mul(sdkmath.NewIntFromUint64(affiliatePercentage.Uint64())).Quo(sdkmath.NewInt(AffiliatePercentageDenominator))
 							communityPoolAmount := protocolFee.Amount.Sub(affiliateAmount)
 
 							if affiliateAmount.GT(sdkmath.ZeroInt()) {
@@ -321,19 +340,19 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 				}
 			}
 
-			if transfer.From != "Mint" {
+			if !types.IsMintAddress(transfer.From) {
 				if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
 					return err
 				}
 			} else {
 				// Get current Total
-				totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, "Total")
+				totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
 				totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
 				if err != nil {
 					return err
 				}
 
-				if err := k.SetBalanceForAddress(ctx, collection, "Total", totalBalances); err != nil {
+				if err := k.SetBalanceForAddress(ctx, collection, types.TotalAddress, totalBalances); err != nil {
 					return err
 				}
 			}
@@ -398,7 +417,7 @@ func (k Keeper) HandleTransfer(
 	approvalsUsed *[]ApprovalsUsed,
 	coinTransfers *[]CoinTransfers,
 ) (*types.UserBalanceStore, *types.UserBalanceStore, error) {
-	err := *new(error)
+	var err error
 
 	transferBalances := types.DeepCopyBalances(transfer.Balances)
 	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, to, initiatedBy, approvalsUsed, coinTransfers)
@@ -438,7 +457,7 @@ func (k Keeper) HandleTransfer(
 
 	for _, balance := range transferBalances {
 		//Mint has unlimited balances
-		if from != "Mint" {
+		if !types.IsMintAddress(from) {
 			fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
@@ -482,6 +501,9 @@ func (k Keeper) HandleTransfer(
 
 		// Handle {id} placeholder replacement and overrideWithAnyValidToken logic
 		ibcDenom := denomInfo.Denom
+		if len(transferBalances) == 0 || len(transferBalances[0].BadgeIds) == 0 {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one badge ID")
+		}
 		firstTokenId := transferBalances[0].BadgeIds[0].Start
 
 		// Check if the denom contains the {id} placeholder
@@ -553,6 +575,9 @@ func (k Keeper) HandleTransfer(
 		// Little hacky but we find the amount for a specific time and ID
 		// Then we will check if it is evenly divisible by the number of transfer balances
 
+		if len(transferBalances[0].OwnershipTimes) == 0 {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one ownership time")
+		}
 		firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
 		firstAmount := transferBalances[0].Amount
 
@@ -603,7 +628,7 @@ func (k Keeper) HandleTransfer(
 		bankKeeper := k.bankKeeper
 		amountInt := multiplier.BigInt()
 		if isSendingToSpecialAddress {
-			if from == "Mint" {
+			if types.IsMintAddress(from) {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(ErrNotImplemented, "the Mint address cannot perform wrap / unwrap actions")
 			}
 

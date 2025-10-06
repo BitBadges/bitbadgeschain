@@ -52,21 +52,21 @@ func (k Keeper) HandleMerkleChallenges(
 		root := challenge.Root
 		hasValidSolution := false
 
-		errStr := ""
+		baseErrorStr := ""
 		if challenge.UseCreatorAddressAsLeaf {
-			errStr = "does not satisfy whitelist"
+			baseErrorStr = "does not satisfy whitelist"
 		} else {
-			errStr = "invalid code / password"
+			baseErrorStr = "invalid code / password"
 		}
 
 		// We check that 1 of N proofs is valid
-		additionalDetailsErrorStr := ""
+		detailedErrorStr := ""
 		for _, proof := range merkleProofs {
-			additionalDetailsErrorStr = ""
+			detailedErrorStr = ""
 			if root != "" {
 				// Must be proper length to avoid preimage attacks
 				if len(proof.Aunts) != int(challenge.ExpectedProofLength.Uint64()) {
-					additionalDetailsErrorStr = "invalid proof length"
+					detailedErrorStr = "invalid proof length"
 					continue
 				}
 
@@ -75,7 +75,7 @@ func (k Keeper) HandleMerkleChallenges(
 				}
 
 				if proof.Leaf == "" {
-					additionalDetailsErrorStr = "empty leaf"
+					detailedErrorStr = "empty leaf"
 					continue
 				}
 
@@ -84,7 +84,7 @@ func (k Keeper) HandleMerkleChallenges(
 
 					leafSignerEthAddress := challenge.LeafSigner
 					if leafSignerEthAddress == "" {
-						additionalDetailsErrorStr = "empty leaf signer"
+						detailedErrorStr = "empty leaf signer"
 						continue
 					}
 
@@ -98,7 +98,7 @@ func (k Keeper) HandleMerkleChallenges(
 					)
 
 					if !isValid || err != nil {
-						additionalDetailsErrorStr = "invalid leaf signature"
+						detailedErrorStr = "invalid leaf signature"
 						continue
 					}
 				}
@@ -106,7 +106,15 @@ func (k Keeper) HandleMerkleChallenges(
 				//Get leftmost leaf index for layer === challenge.ExpectedProofLength
 				leafIndex := GetLeafIndex(proof.Aunts)
 				leftmostLeafIndex := sdkmath.NewUint(1)
-				for i := sdkmath.NewUint(0); i.LT(challenge.ExpectedProofLength); i = i.Add(sdkmath.NewUint(1)) {
+
+				// Add bounds checking to prevent excessive computation
+				maxIterations := sdkmath.NewUint(1000) // Reasonable upper bound
+				iterations := challenge.ExpectedProofLength
+				if iterations.GT(maxIterations) {
+					return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "expected proof length %s exceeds maximum allowed %s", iterations.String(), maxIterations.String())
+				}
+
+				for i := sdkmath.NewUint(0); i.LT(iterations); i = i.Add(sdkmath.NewUint(1)) {
 					leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
 				}
 
@@ -124,7 +132,7 @@ func (k Keeper) HandleMerkleChallenges(
 
 				err := CheckMerklePath(proof.Leaf, root, proof.Aunts)
 				if err != nil {
-					additionalDetailsErrorStr = ""
+					detailedErrorStr = ""
 					continue
 				}
 
@@ -132,14 +140,14 @@ func (k Keeper) HandleMerkleChallenges(
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
 					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 					if err != nil {
-						additionalDetailsErrorStr = "error getting num processed"
+						detailedErrorStr = "error getting num processed"
 						continue
 					}
 					numUsed = numUsed.Add(sdkmath.NewUint(1))
 
 					maxUses := challenge.MaxUsesPerLeaf
 					if numUsed.GT(maxUses) {
-						additionalDetailsErrorStr = "exceeded max number of uses"
+						detailedErrorStr = "exceeded max number of uses"
 						continue
 					}
 
@@ -173,7 +181,7 @@ func (k Keeper) HandleMerkleChallenges(
 		}
 
 		if !hasValidSolution {
-			return numIncrements, sdkerrors.Wrapf(ErrNoValidSolutionForChallenge, "%s - %s", errStr, additionalDetailsErrorStr)
+			return numIncrements, sdkerrors.Wrapf(ErrNoValidSolutionForChallenge, "%s - %s", baseErrorStr, detailedErrorStr)
 		}
 	}
 

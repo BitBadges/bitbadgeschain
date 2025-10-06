@@ -205,8 +205,8 @@ type ModuleInputs struct {
 	Config       *modulev1.Module
 	Logger       log.Logger
 
-	AccountKeeper types.AccountKeeper
-	BankKeeper    types.BankKeeper
+	AccountKeeper      types.AccountKeeper
+	BankKeeper         types.BankKeeper
 	DistributionKeeper types.DistributionKeeper
 
 	IBCKeeperFn        func() *ibckeeper.Keeper                   `optional:"true"`

@@ -9,7 +9,9 @@ import (
 	encodingcodec "github.com/bitbadges/bitbadgeschain/encoding/codec"
 )
 
-//HACK: Even though the miscellaneous encoding/codec stuff is not used in the module, we register it here w/ the tokens stuff (just needs to be registered once)
+// NOTE: The miscellaneous encoding/codec registration is included here to ensure
+// all necessary codec types are registered once for the badges module.
+// This is required for proper serialization/deserialization across the module.
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgTransferBadges{}, "badges/TransferBadges", nil)

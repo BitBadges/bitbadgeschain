@@ -33,7 +33,8 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) (bool, er
 	low := 0
 	high := len(ranges) - 1
 	for low <= high {
-		median := int(uint(low+high) >> 1)
+		// Use safer median calculation to prevent potential overflow
+		median := low + (high-low)/2
 		currRange := ranges[median]
 
 		if currRange.Start.LTE(id) && currRange.End.GTE(id) {

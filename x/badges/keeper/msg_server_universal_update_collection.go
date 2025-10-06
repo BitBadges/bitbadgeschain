@@ -16,6 +16,13 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+const (
+	// DerivationKeyLength represents the length of the derivation key for account generation
+	DerivationKeyLength = 8
+	// MaxUint64Value represents the maximum value for uint64
+	MaxUint64Value = math.MaxUint64
+)
+
 // Legacy function that is all-inclusive (creates and updates)
 func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -26,10 +33,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	collection := &types.BadgeCollection{}
-	if msg.CollectionId.Equal(sdkmath.NewUint(0)) {
+	if msg.CollectionId.Equal(sdkmath.NewUint(NewCollectionId)) {
 		//Creation case
 		nextCollectionId := k.GetNextCollectionId(ctx)
-		k.IncrementNextCollectionId(ctx)
+		if err := k.IncrementNextCollectionId(ctx); err != nil {
+			return nil, err
+		}
 
 		// From cosmos SDK x/group moduleAdd commentMore actions
 		// Generate account address of collection
@@ -37,7 +46,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		// loop here in the rare case where a ADR-028-derived address creates a
 		// collision with an existing address.
 		for {
-			derivationKey := make([]byte, 8)
+			derivationKey := make([]byte, DerivationKeyLength)
 			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
 
 			ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
@@ -61,7 +70,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 					TimelineTimes: []*types.UintRange{
 						{
 							Start: sdkmath.NewUint(1),
-							End:   sdkmath.NewUint(math.MaxUint64),
+							End:   sdkmath.NewUint(MaxUint64Value),
 						},
 					},
 				},

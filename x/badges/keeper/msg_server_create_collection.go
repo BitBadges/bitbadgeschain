@@ -10,12 +10,22 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	// NewCollectionId represents the ID used to indicate a new collection creation
+	NewCollectionId = 0
+)
+
 func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Validate the message before processing
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:      msg.Creator,
-		CollectionId: sdkmath.NewUint(0), //We use 0 to indicate a new collection
+		CollectionId: sdkmath.NewUint(NewCollectionId), //We use 0 to indicate a new collection
 
 		//Exclusive to collection creations
 		DefaultBalances: msg.DefaultBalances,
