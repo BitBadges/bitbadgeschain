@@ -1,13 +1,13 @@
 syntax = "proto3";
-package badges.v14;
+package badges.v15;
 
 import "gogoproto/gogo.proto";
-import "badges/v14/permissions.proto";
-import "badges/v14/address_lists.proto";
-import "badges/v14/balances.proto";
+import "badges/v15/permissions.proto";
+import "badges/v15/address_lists.proto";
+import "badges/v15/balances.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v15";
 
 /*
   UserBalanceStore is the store for the user balances for a collection.
@@ -138,19 +138,19 @@ message UserOutgoingApproval {
   repeated UintRange ownershipTimes = 5;
 
   // The URI associated with this approval, optionally providing metadata about the approval.
-  string uri = 6;
+  string uri = 8;
 
   // Arbitrary custom data associated with this approval.
-  string customData = 7;
+  string customData = 9;
 
   // The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
-  string approvalId = 8;
+  string approvalId = 10;
 
   // The criteria that must be met for this approval to be considered.
-  OutgoingApprovalCriteria approvalCriteria = 9;
+  OutgoingApprovalCriteria approvalCriteria = 11;
 
   // Version of the approval. Maintained internally.
-  string version = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string version = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // UserIncomingApproval defines the rules for the approval of an incoming transfer to a user.
@@ -171,20 +171,20 @@ message UserIncomingApproval {
   repeated UintRange ownershipTimes = 5;
 
   // The URI associated with this approval, optionally providing metadata about the approval.
-  string uri = 6;
+  string uri = 8;
 
   // Arbitrary custom data associated with this approval.
-  string customData = 7;
+  string customData = 9;
 
   // The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
-  string approvalId = 8;
+  string approvalId = 10;
 
   // The criteria that must be met for this approval to be considered.
-  IncomingApprovalCriteria approvalCriteria = 9;
+  IncomingApprovalCriteria approvalCriteria = 11;
   
 
   // Version of the approval. Maintained internally.
-  string version = 10 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string version = 12 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 
@@ -548,21 +548,17 @@ message CollectionApproval {
   repeated UintRange badgeIds = 5;
   // The allowed range of ownership times for approval.
   repeated UintRange ownershipTimes = 6;
-  
   // The URI associated with this approval, optionally providing metadata about the approval.
-  string uri = 7;
-  
+  string uri = 9;
   // Arbitrary custom data associated with this approval.
-  string customData = 8;
-  
+  string customData = 10;
   // The ID of this approval. Must be unique per level (i.e. collection, outgoing, incoming).
-  string approvalId = 9;
-  
+  string approvalId = 11;
   // The criteria that must be met for this approval to be considered.
-  ApprovalCriteria approvalCriteria = 10;
+  ApprovalCriteria approvalCriteria = 12;
 
   // Version of the approval. Maintained internally.
-  string version = 11 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string version = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // ApprovalIdentifierDetails defines the details to identify a specific approval.

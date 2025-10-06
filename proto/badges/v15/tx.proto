@@ -1,24 +1,24 @@
 syntax = "proto3";
-package badges.v14;
+package badges.v15;
 
 import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-import "badges/v14/params.proto";
+import "badges/v15/params.proto";
 
-import "badges/v14/transfers.proto";
-import "badges/v14/balances.proto";
-import "badges/v14/permissions.proto";
-import "badges/v14/metadata.proto";
-import "badges/v14/collections.proto";
-import "badges/v14/address_lists.proto";
-import "badges/v14/timelines.proto";
-import "badges/v14/dynamic_stores.proto";
+import "badges/v15/transfers.proto";
+import "badges/v15/balances.proto";
+import "badges/v15/permissions.proto";
+import "badges/v15/metadata.proto";
+import "badges/v15/collections.proto";
+import "badges/v15/address_lists.proto";
+import "badges/v15/timelines.proto";
+import "badges/v15/dynamic_stores.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v15";
 
 // Msg defines the Msg service.
 service Msg {
@@ -92,7 +92,7 @@ message BadgeCustomMsgType {
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
   option (cosmos.msg.v1.signer) = "authority";
-  option (amino.name) = "badges/v14/MsgUpdateParams";
+  option (amino.name) = "badges/v15/MsgUpdateParams";
 
   // authority is the address that controls the module (defaults to x/gov unless overwritten).
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
@@ -124,81 +124,89 @@ message CosmosCoinWrapperPathAddObject {
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 message MsgUniversalUpdateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/UniversalUpdateCollection";
+  option (amino.name) = "badges/v15/UniversalUpdateCollection";
 
   // Address of the creator.
   string creator = 1;
   
   // ID of the collection (0 for new collection).
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
+  string balancesType = 3;
 
   //The default balances for the user
-  UserBalanceStore defaultBalances = 3;
+  UserBalanceStore defaultBalances = 4;
 
   // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateValidBadgeIds = 4;
+  bool updateValidBadgeIds = 5;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 5; 
+  repeated UintRange validBadgeIds = 6; 
 
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionPermissions = 6;
+  bool updateCollectionPermissions = 7;
   
   // New collection permissions to set.
-  CollectionPermissions collectionPermissions = 7;
+  CollectionPermissions collectionPermissions = 8;
   
   // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateManagerTimeline = 8;
+  bool updateManagerTimeline = 9;
   
   // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 9;
+  repeated ManagerTimeline managerTimeline = 10;
   
   // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionMetadataTimeline = 10;
+  bool updateCollectionMetadataTimeline = 11;
   
   // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 11;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
   
   // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateBadgeMetadataTimeline = 12;
+  bool updateBadgeMetadataTimeline = 13;
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 13;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
   
+  // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateOffChainBalancesMetadataTimeline = 15;
+  
+  // New off-chain balances metadata timeline to set.
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCustomDataTimeline = 14;
+  bool updateCustomDataTimeline = 17;
   
   // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 15;
+  repeated CustomDataTimeline customDataTimeline = 18;
   
   // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionApprovals = 16;
+  bool updateCollectionApprovals = 21;
   
   // New collection approvals to set.
-  repeated CollectionApproval collectionApprovals = 17;
+  repeated CollectionApproval collectionApprovals = 22;
   
   // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateStandardsTimeline = 18;
+  bool updateStandardsTimeline = 23;
   
   // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 19;
+  repeated StandardsTimeline standardsTimeline = 24;
   
   // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 20;
+  bool updateIsArchivedTimeline = 25;
   
   // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 21;
+  repeated IsArchivedTimeline isArchivedTimeline = 26;
 
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 22;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 27;
 
   // IBC wrapper paths to add.
-  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 23;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 28;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
-  CollectionInvariants invariants = 24;
+  CollectionInvariants invariants = 29;
 }
 
 // MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
@@ -210,7 +218,7 @@ message MsgUniversalUpdateCollectionResponse {
 // MsgUpdateCollection is used to update a collection.
 message MsgUpdateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/UpdateCollection";
+  option (amino.name) = "badges/v15/UpdateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -225,63 +233,68 @@ message MsgUpdateCollection {
   repeated UintRange validBadgeIds = 4;
   
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionPermissions = 5;
+  bool updateCollectionPermissions = 7;
   
   // New collection permissions to set.
-  CollectionPermissions collectionPermissions = 6;
+  CollectionPermissions collectionPermissions = 8;
   
   // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateManagerTimeline = 7;
+  bool updateManagerTimeline = 9;
   
   // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 8;
+  repeated ManagerTimeline managerTimeline = 10;
   
   // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionMetadataTimeline = 9;
+  bool updateCollectionMetadataTimeline = 11;
   
   // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 10;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 12;
   
   // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateBadgeMetadataTimeline = 11;
+  bool updateBadgeMetadataTimeline = 13;
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 12;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 14;
   
+  // Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateOffChainBalancesMetadataTimeline = 15;
+  
+  // New off-chain balances metadata timeline to set.
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 16;
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCustomDataTimeline = 13;
+  bool updateCustomDataTimeline = 17;
   
   // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 14;
+  repeated CustomDataTimeline customDataTimeline = 18;
   
   // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionApprovals = 15;
+  bool updateCollectionApprovals = 21;
   
   // New collection approvals to set.
-  repeated CollectionApproval collectionApprovals = 16;
+  repeated CollectionApproval collectionApprovals = 22;
   
   // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateStandardsTimeline = 17;
+  bool updateStandardsTimeline = 23;
   
   // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 18;
+  repeated StandardsTimeline standardsTimeline = 24;
   
   // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 19;
+  bool updateIsArchivedTimeline = 27;
   
   // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 20;
+  repeated IsArchivedTimeline isArchivedTimeline = 28;
 
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 21;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 29;
 
   // IBC wrapper paths to add.
-  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 22;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 30;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
-  CollectionInvariants invariants = 23;
+  CollectionInvariants invariants = 31;
 }
 
 // MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
@@ -293,49 +306,55 @@ message MsgUpdateCollectionResponse {
 // MsgCreateCollection is used to create a new collection.
 message MsgCreateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/CreateCollection";
+  option (amino.name) = "badges/v15/CreateCollection";
 
   // Address of the creator.
   string creator = 1;
   
+  // Type of balances "Standard" or "Off-Chain - Indexed" or "Off-Chain - Non-Indexed" or "Non-Public".
+  string balancesType = 2;
+  
   //The default balances for the user
-  UserBalanceStore defaultBalances = 2;
+  UserBalanceStore defaultBalances = 4;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 3; 
+  repeated UintRange validBadgeIds = 5; 
   
   // Collection permissions.
-  CollectionPermissions collectionPermissions = 4;
+  CollectionPermissions collectionPermissions = 6;
   
   // Manager timeline entries.
-  repeated ManagerTimeline managerTimeline = 5;
+  repeated ManagerTimeline managerTimeline = 7;
   
   // Collection metadata timeline entries.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 6;
+  repeated CollectionMetadataTimeline collectionMetadataTimeline = 8;
   
   // Token metadata timeline entries.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
+  repeated BadgeMetadataTimeline badgeMetadataTimeline = 9;
+  
+  // Off-chain balances metadata timeline entries.
+  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 10;
   
   // Custom data timeline entries.
-  repeated CustomDataTimeline customDataTimeline = 8;
+  repeated CustomDataTimeline customDataTimeline = 11;
   
   // Collection approvals.
-  repeated CollectionApproval collectionApprovals = 9;
+  repeated CollectionApproval collectionApprovals = 12;
   
   // Standards timeline entries.
-  repeated StandardsTimeline standardsTimeline = 10;
+  repeated StandardsTimeline standardsTimeline = 13;
   
   // isArchived timeline entries.
-  repeated IsArchivedTimeline isArchivedTimeline = 11;
+  repeated IsArchivedTimeline isArchivedTimeline = 14;
 
   // Coins to be transferred to the mint escrow address.
-  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 12;
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 16;
 
   // IBC wrapper paths to add.
-  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 13;
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 17;
 
   // Collection-level invariants that cannot be broken.
-  CollectionInvariants invariants = 14;
+  CollectionInvariants invariants = 18;
 }
 
 // MsgCreateCollectionResponse is the response to MsgCreateCollection.
@@ -347,7 +366,7 @@ message MsgCreateCollectionResponse {
 // MsgCreateAddressLists is used to create address lists.
 message MsgCreateAddressLists {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/CreateAddressLists";
+  option (amino.name) = "badges/v15/CreateAddressLists";
 
   // Address of the creator.
   string creator = 1;
@@ -362,7 +381,7 @@ message MsgCreateAddressListsResponse {}
 // MsgTransferBadges is used to transfer tokens.
 message MsgTransferBadges {
   option (cosmos.msg.v1.signer) = "creator";
-    option (amino.name) = "badges/v14/TransferBadges";
+    option (amino.name) = "badges/v15/TransferBadges";
 
   // Address of the creator.
   string creator = 1;
@@ -380,7 +399,7 @@ message MsgTransferBadgesResponse {}
 // MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/DeleteCollection";
+  option (amino.name) = "badges/v15/DeleteCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -395,7 +414,7 @@ message MsgDeleteCollectionResponse {}
 // MsgUpdateUserApprovals is used to update user approvals.
 message MsgUpdateUserApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/UpdateUserApprovals";
+  option (amino.name) = "badges/v15/UpdateUserApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -446,7 +465,7 @@ message MsgUpdateUserApprovalsResponse {}
 // MsgSetIncomingApproval is a helper message to set a single incoming approval.
 message MsgSetIncomingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetIncomingApproval";
+  option (amino.name) = "badges/v15/SetIncomingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -464,7 +483,7 @@ message MsgSetIncomingApprovalResponse {}
 // MsgDeleteIncomingApproval is a helper message to delete a single incoming approval.
 message MsgDeleteIncomingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/DeleteIncomingApproval";
+  option (amino.name) = "badges/v15/DeleteIncomingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -482,7 +501,7 @@ message MsgDeleteIncomingApprovalResponse {}
 // MsgSetOutgoingApproval is a helper message to set a single outgoing approval.
 message MsgSetOutgoingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetOutgoingApproval";
+  option (amino.name) = "badges/v15/SetOutgoingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -500,7 +519,7 @@ message MsgSetOutgoingApprovalResponse {}
 // MsgDeleteOutgoingApproval is a helper message to delete a single outgoing approval.
 message MsgDeleteOutgoingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/DeleteOutgoingApproval";
+  option (amino.name) = "badges/v15/DeleteOutgoingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -518,7 +537,7 @@ message MsgDeleteOutgoingApprovalResponse {}
 // MsgPurgeApprovals is a helper message to purge expired approvals.
 message MsgPurgeApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/PurgeApprovals";
+  option (amino.name) = "badges/v15/PurgeApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -548,7 +567,7 @@ message MsgPurgeApprovalsResponse {
 // MsgCreateDynamicStore is used to create a new dynamic store.
 message MsgCreateDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/CreateDynamicStore";
+  option (amino.name) = "badges/v15/CreateDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -565,7 +584,7 @@ message MsgCreateDynamicStoreResponse {
 // MsgUpdateDynamicStore is used to update an existing dynamic store.
 message MsgUpdateDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/UpdateDynamicStore";
+  option (amino.name) = "badges/v15/UpdateDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -581,7 +600,7 @@ message MsgUpdateDynamicStoreResponse {}
 // MsgDeleteDynamicStore is used to delete a dynamic store.
 message MsgDeleteDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/DeleteDynamicStore";
+  option (amino.name) = "badges/v15/DeleteDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -596,7 +615,7 @@ message MsgDeleteDynamicStoreResponse {}
 // MsgSetDynamicStoreValue is used to set a usage count for a specific address in a dynamic store.
 message MsgSetDynamicStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetDynamicStoreValue";
+  option (amino.name) = "badges/v15/SetDynamicStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -617,7 +636,7 @@ message MsgSetDynamicStoreValueResponse {}
 // MsgIncrementStoreValue is used to increment a usage count for a specific address in a dynamic store.
 message MsgIncrementStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/IncrementStoreValue";
+  option (amino.name) = "badges/v15/IncrementStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -638,7 +657,7 @@ message MsgIncrementStoreValueResponse {}
 // MsgDecrementStoreValue is used to decrement a usage count for a specific address in a dynamic store.
 message MsgDecrementStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/DecrementStoreValue";
+  option (amino.name) = "badges/v15/DecrementStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -665,7 +684,7 @@ message MsgDecrementStoreValueResponse {}
 // MsgSetValidBadgeIds sets the validBadgeIds and canUpdateValidBadgeIds permission
 message MsgSetValidBadgeIds {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetValidBadgeIds";
+  option (amino.name) = "badges/v15/SetValidBadgeIds";
 
   // Address of the creator.
   string creator = 1;
@@ -689,7 +708,7 @@ message MsgSetValidBadgeIdsResponse {
 // MsgSetManager sets the manager timeline and canUpdateManager permission
 message MsgSetManager {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetManager";
+  option (amino.name) = "badges/v15/SetManager";
 
   // Address of the creator.
   string creator = 1;
@@ -713,7 +732,7 @@ message MsgSetManagerResponse {
 // MsgSetCollectionMetadata sets the collection metadata timeline and canUpdateCollectionMetadata permission
 message MsgSetCollectionMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetCollectionMetadata";
+  option (amino.name) = "badges/v15/SetCollectionMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -737,7 +756,7 @@ message MsgSetCollectionMetadataResponse {
 // MsgSetBadgeMetadata sets the token metadata timeline and canUpdateBadgeMetadata permission
 message MsgSetBadgeMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetBadgeMetadata";
+  option (amino.name) = "badges/v15/SetBadgeMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -761,7 +780,7 @@ message MsgSetBadgeMetadataResponse {
 // MsgSetCustomData sets the custom data timeline and canUpdateCustomData permission
 message MsgSetCustomData {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetCustomData";
+  option (amino.name) = "badges/v15/SetCustomData";
 
   // Address of the creator.
   string creator = 1;
@@ -785,7 +804,7 @@ message MsgSetCustomDataResponse {
 // MsgSetStandards sets the standards timeline and canUpdateStandards permission
 message MsgSetStandards {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetStandards";
+  option (amino.name) = "badges/v15/SetStandards";
 
   // Address of the creator.
   string creator = 1;
@@ -809,7 +828,7 @@ message MsgSetStandardsResponse {
 // MsgSetCollectionApprovals sets the collection approvals and canUpdateCollectionApprovals permission
 message MsgSetCollectionApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetCollectionApprovals";
+  option (amino.name) = "badges/v15/SetCollectionApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -833,7 +852,7 @@ message MsgSetCollectionApprovalsResponse {
 // MsgSetIsArchived sets the isArchived timeline and canArchiveCollection permission
 message MsgSetIsArchived {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v14/SetIsArchived";
+  option (amino.name) = "badges/v15/SetIsArchived";
 
   // Address of the creator.
   string creator = 1;

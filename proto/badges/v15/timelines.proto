@@ -1,14 +1,14 @@
 syntax = "proto3";
-package badges.v14;
+package badges.v15;
 
 import "google/protobuf/any.proto";
-import "badges/v14/transfers.proto";
-import "badges/v14/balances.proto";
-import "badges/v14/permissions.proto";
-import "badges/v14/metadata.proto";
+import "badges/v15/transfers.proto";
+import "badges/v15/balances.proto";
+import "badges/v15/permissions.proto";
+import "badges/v15/metadata.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v15";
 
 // CollectionMetadataTimeline defines the metadata for a collection at different timeline times.
 message CollectionMetadataTimeline {
@@ -25,6 +25,15 @@ message BadgeMetadataTimeline {
   repeated BadgeMetadata badgeMetadata = 1;
 
   // The timeline times when the token metadata is valid. Can not overlap with other timeline elements in same array.
+  repeated UintRange timelineTimes = 2;
+}
+
+// OffChainBalancesMetadataTimeline defines the metadata for off-chain balances at different timeline times.
+message OffChainBalancesMetadataTimeline {
+  // The off-chain balances metadata for a specific timeline element.
+  OffChainBalancesMetadata offChainBalancesMetadata = 1;
+
+  // The timeline times when the off-chain balances metadata is valid. Can not overlap with other timeline elements in same array.
   repeated UintRange timelineTimes = 2;
 }
 

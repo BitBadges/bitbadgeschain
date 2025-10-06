@@ -1,12 +1,12 @@
 syntax = "proto3";
-package badges.v14;
+package badges.v15;
 
 import "google/protobuf/any.proto";
-import "badges/v14/balances.proto";
-import "badges/v14/address_lists.proto";
+import "badges/v15/balances.proto";
+import "badges/v15/address_lists.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v14";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v15";
 
 
 /* 
@@ -41,26 +41,29 @@ message CollectionPermissions {
   // Permissions related to archiving the collection.
   repeated TimedUpdatePermission canArchiveCollection = 2;
 
+  // Permissions related to updating off-chain balances metadata.
+  repeated TimedUpdatePermission canUpdateOffChainBalancesMetadata = 3;
+
   // Permissions related to updating standards for the collection.
-  repeated TimedUpdatePermission canUpdateStandards = 3;
+  repeated TimedUpdatePermission canUpdateStandards = 4;
 
   // Permissions related to updating custom data for the collection.
-  repeated TimedUpdatePermission canUpdateCustomData = 4;
+  repeated TimedUpdatePermission canUpdateCustomData = 5;
 
   // Permissions related to updating the collection's manager.
-  repeated TimedUpdatePermission canUpdateManager = 5;
+  repeated TimedUpdatePermission canUpdateManager = 6;
 
   // Permissions related to updating the metadata of the collection.
-  repeated TimedUpdatePermission canUpdateCollectionMetadata = 6;
+  repeated TimedUpdatePermission canUpdateCollectionMetadata = 7;
 
   // Permissions related to creating more tokens for the collection.
-  repeated BadgeIdsActionPermission canUpdateValidBadgeIds = 7;
+  repeated BadgeIdsActionPermission canUpdateValidBadgeIds = 8;
 
   // Permissions related to updating token metadata for specific tokens.
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 8;
+  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 9;
 
   // Permissions related to updating collection approvals.
-  repeated CollectionApprovalPermission canUpdateCollectionApprovals = 9;
+  repeated CollectionApprovalPermission canUpdateCollectionApprovals = 10;
 }
 
 /* 
@@ -130,13 +133,13 @@ message CollectionApprovalPermission {
   // If you use "All", this approval will match to all approvalIds.
   // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
   // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
-  string approvalId = 7;
+  string approvalId = 9;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 8;
+  repeated UintRange permanentlyPermittedTimes = 10;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 9;
+  repeated UintRange permanentlyForbiddenTimes = 11;
 }
 
 
@@ -163,14 +166,14 @@ message UserOutgoingApprovalPermission {
   // If you use "All", this approval will match to all approvalIds.
   // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
   // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
-  string approvalId = 6;
+  string approvalId = 8;
 
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 7;
+  repeated UintRange permanentlyPermittedTimes = 9;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 8;
+  repeated UintRange permanentlyForbiddenTimes = 10;
 }
 
 /* 
@@ -198,13 +201,13 @@ message UserIncomingApprovalPermission {
   // If you use "All", this approval will match to all approvalIds.
   // If you use "!approvalId", this approval will match to all approvalIds except for approvalId.
   // If you use "approvalId", this approval will match to only the specified approvalId and fail on all others.
-  string approvalId = 6;
+  string approvalId = 8;
 
   // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 7;
+  repeated UintRange permanentlyPermittedTimes = 9;
 
   // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 8;
+  repeated UintRange permanentlyForbiddenTimes = 10;
 }
 
 /* 

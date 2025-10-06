@@ -36,9 +36,7 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 	}
 
 	// Increment the next dynamic store ID
-	if err := k.IncrementNextDynamicStoreId(ctx); err != nil {
-		return nil, sdkerrors.Wrap(err, "Failed to increment next dynamic store ID")
-	}
+	k.IncrementNextDynamicStoreId(ctx)
 
 	// Emit event
 	EmitMessageAndIndexerEvents(ctx,

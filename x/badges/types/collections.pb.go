@@ -62,7 +62,7 @@ type BadgeCollection struct {
 	// Whether the collection is archived or not, subject to changes over time.
 	// When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
 	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,9,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
-	// The default store of a balance for a user, upon genesis.
+	// The default store of a balance / approvals for a user, upon genesis.
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,10,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
 	// The user or entity who created the collection.
 	CreatedBy string `protobuf:"bytes,11,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
