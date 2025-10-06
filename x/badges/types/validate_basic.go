@@ -46,7 +46,7 @@ func ValidateURI(uri string) error {
 
 	regexMatch := reUri.MatchString(uri)
 	if !regexMatch {
-		return sdkerrors.Wrapf(ErrInvalidURI, "invalid uri: %s", uri)
+		return sdkerrors.Wrapf(ErrInvalidURI, "invalid URI: %s", uri)
 	}
 
 	return nil
@@ -60,7 +60,7 @@ func ValidateCosmosWrapperPathDenom(denom string) error {
 
 	regexMatch := reCosmosWrapperPath.MatchString(denom)
 	if !regexMatch {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains invalid characters. Only a-zA-Z, _, {, }, and - are allowed: %s", denom)
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains invalid characters - only a-zA-Z, _, {, }, and - are allowed: %s", denom)
 	}
 
 	return nil
@@ -74,7 +74,7 @@ func ValidateCosmosWrapperPathSymbol(symbol string) error {
 
 	regexMatch := reCosmosWrapperPath.MatchString(symbol)
 	if !regexMatch {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "symbol contains invalid characters. Only a-zA-Z, _, {, }, and - are allowed: %s", symbol)
+		return sdkerrors.Wrapf(ErrInvalidRequest, "symbol contains invalid characters - only a-zA-Z, _, {, }, and - are allowed: %s", symbol)
 	}
 
 	return nil
@@ -87,7 +87,7 @@ func ValidateAddress(address string, alowMint bool) error {
 
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address (%s)", err)
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s", err)
 	}
 	return nil
 }
@@ -130,7 +130,7 @@ func DoRangesOverlap(ids []*UintRange) bool {
 func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, errorOnEmpty bool) error {
 	if len(badgeUintRanges) == 0 {
 		if errorOnEmpty {
-			return sdkerrors.Wrapf(ErrInvalidUintRangeSpecified, "these id ranges can not be empty (length == 0)")
+			return sdkerrors.Wrapf(ErrInvalidUintRangeSpecified, "ID ranges cannot be empty (length == 0)")
 		}
 	}
 
@@ -140,7 +140,7 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, er
 		}
 
 		if badgeUintRange.Start.IsNil() || badgeUintRange.End.IsNil() {
-			return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is nil")
+			return sdkerrors.Wrapf(ErrUintUnititialized, "ID range start and/or end is nil")
 		}
 
 		if badgeUintRange.Start.GT(badgeUintRange.End) {
@@ -149,7 +149,7 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, er
 
 		if !allowAllUints {
 			if badgeUintRange.Start.IsZero() || badgeUintRange.End.IsZero() {
-				return sdkerrors.Wrapf(ErrUintUnititialized, "id range start and/or end is zero")
+				return sdkerrors.Wrapf(ErrUintUnititialized, "ID range start and/or end is zero")
 			}
 
 			if badgeUintRange.Start.GT(sdkmath.NewUint(MaxUint64Value)) || badgeUintRange.End.GT(sdkmath.NewUint(MaxUint64Value)) {
@@ -170,7 +170,7 @@ func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, er
 func ValidateNoElementIsX(amounts []sdkmath.Uint, x sdkmath.Uint) error {
 	for _, amount := range amounts {
 		if amount.Equal(x) {
-			return sdkerrors.Wrapf(ErrElementCantEqualThis, "amount can not equal %s", x.String())
+			return sdkerrors.Wrapf(ErrElementCantEqualThis, "amount cannot equal %s", x.String())
 		}
 	}
 	return nil
@@ -180,7 +180,7 @@ func ValidateNoElementIsX(amounts []sdkmath.Uint, x sdkmath.Uint) error {
 func ValidateNoStringElementIsX(addresses []string, x string) error {
 	for _, amount := range addresses {
 		if amount == x {
-			return sdkerrors.Wrapf(ErrElementCantEqualThis, "address can not equal %s", x)
+			return sdkerrors.Wrapf(ErrElementCantEqualThis, "address cannot equal %s", x)
 		}
 	}
 	return nil
@@ -192,15 +192,15 @@ func ValidateAddressList(addressList *AddressList) error {
 		addressList.ListId == "Manager" ||
 		addressList.ListId == "AllWithoutMint" ||
 		addressList.ListId == "None" {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "list id is uninitialized")
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized")
 	}
 
 	if err := ValidateAddress(addressList.ListId, false); err == nil {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "list id can not be a valid address")
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot be a valid address")
 	}
 
 	if strings.Contains(addressList.ListId, ":") || strings.Contains(addressList.ListId, "!") {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "list id can not contain : or !")
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot contain : or !")
 	}
 
 	for _, address := range addressList.Addresses {

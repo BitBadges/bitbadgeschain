@@ -645,6 +645,12 @@ func (k Keeper) SetNextDynamicStoreId(ctx sdk.Context, nextID sdkmath.Uint) {
 
 func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
 	nextID := k.GetNextDynamicStoreId(ctx)
+
+	// Check for overflow before incrementing
+	if nextID.Equal(sdkmath.NewUint(math.MaxUint64)) {
+		panic("dynamic store ID overflow: cannot increment beyond MaxUint64")
+	}
+
 	k.SetNextDynamicStoreId(ctx, nextID.AddUint64(1))
 }
 
@@ -658,6 +664,9 @@ func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uin
 	}
 	if address == "" {
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "address cannot be empty")
+	}
+	if value.IsNil() {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "value cannot be nil")
 	}
 
 	dynamicStoreValue := types.DynamicStoreValue{

@@ -109,13 +109,13 @@ func (k Keeper) HandleMerkleChallenges(
 				leftmostLeafIndex := sdkmath.NewUint(1)
 
 				// Add bounds checking to prevent excessive computation
-				maxIterations := sdkmath.NewUint(1000) // Reasonable upper bound
-				iterations := challenge.ExpectedProofLength
-				if iterations.GT(maxIterations) {
-					return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "expected proof length %s exceeds maximum allowed %s", iterations.String(), maxIterations.String())
+				maxProofLength := sdkmath.NewUint(10) // Reasonable upper bound
+				proofLength := challenge.ExpectedProofLength
+				if proofLength.GT(maxProofLength) {
+					return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "expected proof length %s exceeds maximum allowed %s", proofLength.String(), maxProofLength.String())
 				}
 
-				for i := sdkmath.NewUint(0); i.LT(iterations); i = i.Add(sdkmath.NewUint(1)) {
+				for i := sdkmath.NewUint(0); i.LT(proofLength); i = i.Add(sdkmath.NewUint(1)) {
 					leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
 				}
 

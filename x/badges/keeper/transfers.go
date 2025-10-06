@@ -70,6 +70,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 
 		numAttemptsUint64 := numAttempts.Uint64()
 		for i := uint64(0); i < numAttemptsUint64; i++ {
+			if i > 0 {
+				ctx.GasMeter().ConsumeGas(1000, "HandleTransfers: Gas consumed for each attempt")
+			}
+
 			fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
 			totalMinted := []*types.Balance{}
 
