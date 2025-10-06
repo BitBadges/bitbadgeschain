@@ -23,11 +23,9 @@ func SimulateMsgCreateAddressLists(
 			Creator: simAccount.Address.String(),
 			AddressLists: []*types.AddressList{
 				{
-					Addresses:  []string{simAccount.Address.String()},
-					Uri:        "",
-					CustomData: "",
-					ListId:     simtypes.RandStringOfLength(r, 10),
-					CreatedBy:  simAccount.Address.String(),
+					Addresses: []string{simAccount.Address.String()},
+					ListId:    simtypes.RandStringOfLength(r, 10),
+					CreatedBy: simAccount.Address.String(),
 				},
 			},
 		}
