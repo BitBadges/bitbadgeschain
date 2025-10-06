@@ -203,6 +203,12 @@ func ValidateAddressList(addressList *AddressList) error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot contain : or !")
 	}
 
+	if addressList.Uri != "" {
+		if err := ValidateURI(addressList.Uri); err != nil {
+			return err
+		}
+	}
+
 	for _, address := range addressList.Addresses {
 		// Check for empty addresses
 		if address == "" {

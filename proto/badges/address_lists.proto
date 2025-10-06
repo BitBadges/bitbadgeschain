@@ -23,6 +23,12 @@ message AddressList {
   // Indicates whether the list includes the specified addresses (true) or excludes them (false).
   bool whitelist = 3;
   
+  // URI (Uniform Resource Identifier) associated with the address list to provide metadata, if applicable.
+  string uri = 4;
+  
+  // Custom arbitrary data or additional information related to the address list.
+  string customData = 5;
+  
   // The user or entity who created the address list.
-  string createdBy = 4;
+  string createdBy = 6;
 }

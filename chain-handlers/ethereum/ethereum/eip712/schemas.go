@@ -527,6 +527,8 @@ func GetSchemas() []string {
 					"listId": "",
 					"addresses": [],
 					"whitelist": false,
+					"uri": "",
+					"customData": "",
 					"createdBy": ""
 				}
 			]
