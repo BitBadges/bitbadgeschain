@@ -784,15 +784,6 @@ func GetSchemas() []string {
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
-			"offChainBalancesMetadataTimeline": [
-				{
-					"offChainBalancesMetadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
 			"customDataTimeline": [
 				{
 					"customData": "",

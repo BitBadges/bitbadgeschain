@@ -866,14 +866,9 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 	}
 
 	if canChangeValues {
-		if transfer.NumAttempts.IsNil() {
+		if transfer.NumAttempts.IsNil() || transfer.NumAttempts.IsZero() {
 			transfer.NumAttempts = sdkmath.NewUint(1)
 		}
-	}
-
-	// Validate the retry fields on the transfer
-	if !transfer.NumAttempts.IsNil() && transfer.NumAttempts.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "numAttempts cannot be zero")
 	}
 
 	if transfer.PrecalculateBalancesFromApproval != nil {

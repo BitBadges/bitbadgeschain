@@ -313,7 +313,6 @@ schema := `{
     "type": "badges/CreateCollection",
     "value": {
         "creator": "",
-        "balancesType": ""
         // Missing other fields - signatures will fail!
     }
 }`
