@@ -38,52 +38,46 @@ message BadgeCollection {
   // The metadata for each token in the collection, also subject to changes over time.
   repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
   
-  // The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
-  string balancesType = 4;
-  
-  // Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
-  repeated OffChainBalancesMetadataTimeline offChainBalancesMetadataTimeline = 5;
-
   // An arbitrary field that can store any data, subject to changes over time.
-  repeated CustomDataTimeline customDataTimeline = 7;
+  repeated CustomDataTimeline customDataTimeline = 4;
   
   // The address of the manager of this collection, subject to changes over time.
-  repeated ManagerTimeline managerTimeline = 8;
+  repeated ManagerTimeline managerTimeline = 5;
   
   // Permissions that define what the manager of the collection can do or not do.
-  CollectionPermissions collectionPermissions = 9;
+  CollectionPermissions collectionPermissions = 6;
   
   // Transferability of the collection for collections with standard balances, subject to changes over time.
   // Overrides user approvals for a transfer if specified.
   // Transfer must satisfy both user and collection-level approvals.
   // Only applicable to on-chain balances.
-  repeated CollectionApproval collectionApprovals = 10;
+  repeated CollectionApproval collectionApprovals = 7;
   
   // Standards that define how to interpret the fields of the collection, subject to changes over time.
-  repeated StandardsTimeline standardsTimeline = 11;
+  repeated StandardsTimeline standardsTimeline = 8;
 
   // Whether the collection is archived or not, subject to changes over time.
   // When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
-  repeated IsArchivedTimeline isArchivedTimeline = 12;
+  repeated IsArchivedTimeline isArchivedTimeline = 9;
 
-  // The default store of a balance for a user, upon genesis.
-  UserBalanceStore defaultBalances = 13;
+  // The default store of a balance / approvals for a user, upon genesis.
+  UserBalanceStore defaultBalances = 10;
 
   // The user or entity who created the collection.
-  string createdBy = 14;
+  string createdBy = 11;
 
   // The valid token IDs for this collection.
-  repeated UintRange validBadgeIds = 15;
+  repeated UintRange validBadgeIds = 12;
 
   //The generated address of the collection. Also used to escrow Mint balances.
-  string mintEscrowAddress = 16;
+  string mintEscrowAddress = 13;
 
   // The IBC wrapper (sdk.coin) paths for the collection.
-  repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 17;
+  repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 14;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
-  CollectionInvariants invariants = 18;
+  CollectionInvariants invariants = 15;
 }
 
 message CosmosCoinWrapperPath {

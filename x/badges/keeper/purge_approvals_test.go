@@ -29,7 +29,6 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeOwnExpiredApprovals() {
 	// Create a collection first
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        bob,
-		BalancesType:   sdkmath.NewUint(1),
 		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
 	}})
 
@@ -91,7 +90,6 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsNotAll
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        alice,
-		BalancesType:   sdkmath.NewUint(1),
 		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
 	}})
 
@@ -150,7 +148,6 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsAllowe
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        alice,
-		BalancesType:   sdkmath.NewUint(1),
 		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
 	}})
 
@@ -229,7 +226,6 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeCounterpartyApprovalsAllowed() {
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        bob,
-		BalancesType:   sdkmath.NewUint(1),
 		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
 	}})
 
@@ -288,7 +284,6 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeNonExpiredApprovals() {
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        bob,
-		BalancesType:   sdkmath.NewUint(1),
 		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
 	}})
 

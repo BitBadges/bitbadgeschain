@@ -37,10 +37,9 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 
 	collectionsToCreate := GetCollectionsToCreate()
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
-	collectionsToCreate[0].BalancesType = sdkmath.NewUint(2)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Error(err, "Error creating token: %s")
+	suite.Require().NoError(err, "Error creating collection with Standard balances")
 
 	//This is fine. Just comented out bc with new MsgUniversalUpdateCollection logic, we have to set UpdateCollectionApprovals to false
 	//which is not possible with the way the integration helpers are written
@@ -55,10 +54,9 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 
 	collectionsToCreate = GetCollectionsToCreate()
 	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
-	collectionsToCreate[0].BalancesType = sdkmath.NewUint(3)
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Error(err, "Error creating token: %s")
+	suite.Require().NoError(err, "Error creating collection with Standard balances")
 
 	// collectionsToCreate = GetCollectionsToCreate()
 	// collectionsToCreate[0].BadgesToCreate = []*types.Balance{}

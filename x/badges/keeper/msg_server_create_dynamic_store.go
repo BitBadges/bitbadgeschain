@@ -39,13 +39,11 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 	k.IncrementNextDynamicStoreId(ctx)
 
 	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "create_dynamic_store"),
-			sdk.NewAttribute("store_id", nextStoreId.String()),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "create_dynamic_store"),
+		sdk.NewAttribute("store_id", nextStoreId.String()),
 	)
 
 	return &types.MsgCreateDynamicStoreResponse{

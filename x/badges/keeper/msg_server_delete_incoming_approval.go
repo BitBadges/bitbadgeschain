@@ -76,24 +76,12 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "delete_incoming_approval"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "delete_incoming_approval"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "delete_incoming_approval"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
 	return &types.MsgDeleteIncomingApprovalResponse{}, nil

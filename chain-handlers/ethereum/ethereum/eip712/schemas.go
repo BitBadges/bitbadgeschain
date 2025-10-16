@@ -323,7 +323,6 @@ func getCollectionPermissionsSchema() string {
 	return `{
 		"canDeleteCollection": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canArchiveCollection": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateOffChainBalancesMetadata": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateStandards": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateCustomData": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateManager": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
@@ -608,7 +607,6 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"balancesType": "",
 			"defaultBalances": {
 				"balances": [
 					`+getBalanceSchema()+`
@@ -655,16 +653,6 @@ func GetSchemas() []string {
 							"badgeIds": [`+getUintRangeSchema()+`]
 						}
 					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateOffChainBalancesMetadataTimeline": false,
-			"offChainBalancesMetadataTimeline": [
-				{
-					"offChainBalancesMetadata": {
-						"uri": "",
-						"customData": ""
-					},
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
@@ -752,7 +740,6 @@ func GetSchemas() []string {
 		"type": "badges/CreateCollection",
 		"value": {
 			"creator": "",
-			"balancesType": "",
 			"defaultBalances": {
 										"balances": [
 					`+getBalanceSchema()+`
@@ -794,15 +781,6 @@ func GetSchemas() []string {
 							"badgeIds": [`+getUintRangeSchema()+`]
 						}
 					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"offChainBalancesMetadataTimeline": [
-				{
-					"offChainBalancesMetadata": {
-						"uri": "",
-						"customData": ""
-					},
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],
@@ -894,16 +872,6 @@ func GetSchemas() []string {
 							"badgeIds": [`+getUintRangeSchema()+`]
 						}
 					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateOffChainBalancesMetadataTimeline": false,
-			"offChainBalancesMetadataTimeline": [
-				{
-					"offChainBalancesMetadata": {
-						"uri": "",
-						"customData": ""
-					},
 					"timelineTimes": [`+getUintRangeSchema()+`]
 				}
 			],

@@ -182,27 +182,25 @@ func (m *CollectionApprovalTimeline) GetTimelineTimes() []*UintRange {
 
 type MsgNewCollection struct {
 	// See collections.proto for more details about these MsgNewBadge fields. Defines the token details. Leave unneeded fields empty.
-	Creator                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	CollectionMetadataTimeline       []*CollectionMetadataTimeline       `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	BadgeMetadataTimeline            []*BadgeMetadataTimeline            `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,4,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	CustomDataTimeline               []*CustomDataTimeline               `protobuf:"bytes,5,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
-	BalancesType                     Uint                                `protobuf:"bytes,6,opt,name=balancesType,proto3,customtype=Uint" json:"balancesType"`
-	CollectionApprovals              []*CollectionApproval               `protobuf:"bytes,8,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
-	Permissions                      *CollectionPermissions              `protobuf:"bytes,9,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	StandardsTimeline                []*StandardsTimeline                `protobuf:"bytes,10,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
+	Creator                    string                        `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
+	BadgeMetadataTimeline      []*BadgeMetadataTimeline      `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	CustomDataTimeline         []*CustomDataTimeline         `protobuf:"bytes,4,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
+	CollectionApprovals        []*CollectionApproval         `protobuf:"bytes,5,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	Permissions                *CollectionPermissions        `protobuf:"bytes,6,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	StandardsTimeline          []*StandardsTimeline          `protobuf:"bytes,7,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
 	//Token supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
 	//If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-	BadgesToCreate                 []*Balance                 `protobuf:"bytes,11,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
-	Transfers                      []*Transfer                `protobuf:"bytes,12,rep,name=transfers,proto3" json:"transfers,omitempty"`
-	ContractAddressTimeline        []*ContractAddressTimeline `protobuf:"bytes,13,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
-	AddressLists                   []*AddressList             `protobuf:"bytes,14,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
-	DefaultOutgoingApprovals       []*UserOutgoingApproval    `protobuf:"bytes,15,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"`
-	DefaultIncomingApprovals       []*UserIncomingApproval    `protobuf:"bytes,16,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"`
-	DefaultDisapproveSelfInitiated bool                       `protobuf:"varint,17,opt,name=defaultDisapproveSelfInitiated,proto3" json:"defaultDisapproveSelfInitiated,omitempty"`
+	BadgesToCreate                 []*Balance                 `protobuf:"bytes,8,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	Transfers                      []*Transfer                `protobuf:"bytes,9,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	ContractAddressTimeline        []*ContractAddressTimeline `protobuf:"bytes,10,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
+	AddressLists                   []*AddressList             `protobuf:"bytes,11,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
+	DefaultOutgoingApprovals       []*UserOutgoingApproval    `protobuf:"bytes,12,rep,name=defaultOutgoingApprovals,proto3" json:"defaultOutgoingApprovals,omitempty"`
+	DefaultIncomingApprovals       []*UserIncomingApproval    `protobuf:"bytes,13,rep,name=defaultIncomingApprovals,proto3" json:"defaultIncomingApprovals,omitempty"`
+	DefaultDisapproveSelfInitiated bool                       `protobuf:"varint,14,opt,name=defaultDisapproveSelfInitiated,proto3" json:"defaultDisapproveSelfInitiated,omitempty"`
 	//The default balances for the user
-	DefaultBalances             []*Balance                        `protobuf:"bytes,18,rep,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
-	CosmosCoinWrapperPathsToAdd []*CosmosCoinWrapperPathAddObject `protobuf:"bytes,19,rep,name=cosmosCoinWrapperPathsToAdd,proto3" json:"cosmosCoinWrapperPathsToAdd,omitempty"`
+	DefaultBalances             []*Balance                        `protobuf:"bytes,15,rep,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
+	CosmosCoinWrapperPathsToAdd []*CosmosCoinWrapperPathAddObject `protobuf:"bytes,16,rep,name=cosmosCoinWrapperPathsToAdd,proto3" json:"cosmosCoinWrapperPathsToAdd,omitempty"`
 }
 
 func (m *MsgNewCollection) Reset()         { *m = MsgNewCollection{} }
@@ -255,13 +253,6 @@ func (m *MsgNewCollection) GetCollectionMetadataTimeline() []*CollectionMetadata
 func (m *MsgNewCollection) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
 	if m != nil {
 		return m.BadgeMetadataTimeline
-	}
-	return nil
-}
-
-func (m *MsgNewCollection) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
-	if m != nil {
-		return m.OffChainBalancesMetadataTimeline
 	}
 	return nil
 }
@@ -396,15 +387,14 @@ var xxx_messageInfo_MsgNewCollectionResponse proto.InternalMessageInfo
 
 // This handles both minting more of existing badges and creating new tokens.
 type MsgMintAndDistributeBadges struct {
-	Creator                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	CollectionId                     Uint                                `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	BadgesToCreate                   []*Balance                          `protobuf:"bytes,3,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
-	Transfers                        []*Transfer                         `protobuf:"bytes,4,rep,name=transfers,proto3" json:"transfers,omitempty"`
-	CollectionMetadataTimeline       []*CollectionMetadataTimeline       `protobuf:"bytes,6,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	BadgeMetadataTimeline            []*BadgeMetadataTimeline            `protobuf:"bytes,7,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,8,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	CollectionApprovals              []*CollectionApproval               `protobuf:"bytes,9,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
-	AddressLists                     []*AddressList                      `protobuf:"bytes,10,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
+	Creator                    string                        `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId               Uint                          `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	BadgesToCreate             []*Balance                    `protobuf:"bytes,3,rep,name=badgesToCreate,proto3" json:"badgesToCreate,omitempty"`
+	Transfers                  []*Transfer                   `protobuf:"bytes,4,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,5,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
+	BadgeMetadataTimeline      []*BadgeMetadataTimeline      `protobuf:"bytes,6,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	CollectionApprovals        []*CollectionApproval         `protobuf:"bytes,7,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	AddressLists               []*AddressList                `protobuf:"bytes,8,rep,name=addressLists,proto3" json:"addressLists,omitempty"`
 }
 
 func (m *MsgMintAndDistributeBadges) Reset()         { *m = MsgMintAndDistributeBadges{} }
@@ -471,13 +461,6 @@ func (m *MsgMintAndDistributeBadges) GetCollectionMetadataTimeline() []*Collecti
 func (m *MsgMintAndDistributeBadges) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
 	if m != nil {
 		return m.BadgeMetadataTimeline
-	}
-	return nil
-}
-
-func (m *MsgMintAndDistributeBadges) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
-	if m != nil {
-		return m.OffChainBalancesMetadataTimeline
 	}
 	return nil
 }
@@ -635,14 +618,13 @@ var xxx_messageInfo_MsgUniversalUpdateCollectionApprovalsResponse proto.Internal
 
 // Update badge Uris with new URI object, if permitted.
 type MsgUpdateMetadata struct {
-	Creator                          string                              `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	CollectionId                     Uint                                `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
-	CollectionMetadataTimeline       []*CollectionMetadataTimeline       `protobuf:"bytes,3,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
-	BadgeMetadataTimeline            []*BadgeMetadataTimeline            `protobuf:"bytes,4,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
-	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,5,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
-	CustomDataTimeline               []*CustomDataTimeline               `protobuf:"bytes,6,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
-	ContractAddressTimeline          []*ContractAddressTimeline          `protobuf:"bytes,7,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
-	StandardsTimeline                []*StandardsTimeline                `protobuf:"bytes,8,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
+	Creator                    string                        `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	CollectionId               Uint                          `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
+	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,3,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
+	BadgeMetadataTimeline      []*BadgeMetadataTimeline      `protobuf:"bytes,4,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	CustomDataTimeline         []*CustomDataTimeline         `protobuf:"bytes,5,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
+	ContractAddressTimeline    []*ContractAddressTimeline    `protobuf:"bytes,6,rep,name=contractAddressTimeline,proto3" json:"contractAddressTimeline,omitempty"`
+	StandardsTimeline          []*StandardsTimeline          `protobuf:"bytes,7,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
 }
 
 func (m *MsgUpdateMetadata) Reset()         { *m = MsgUpdateMetadata{} }
@@ -695,13 +677,6 @@ func (m *MsgUpdateMetadata) GetCollectionMetadataTimeline() []*CollectionMetadat
 func (m *MsgUpdateMetadata) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
 	if m != nil {
 		return m.BadgeMetadataTimeline
-	}
-	return nil
-}
-
-func (m *MsgUpdateMetadata) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
-	if m != nil {
-		return m.OffChainBalancesMetadataTimeline
 	}
 	return nil
 }
@@ -1168,75 +1143,72 @@ func init() {
 func init() { proto.RegisterFile("badges/legacytx.proto", fileDescriptor_90968f2be9d0828d) }
 
 var fileDescriptor_90968f2be9d0828d = []byte{
-	// 1087 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcd, 0x6e, 0xdb, 0x46,
-	0x10, 0x36, 0x23, 0xf9, 0x6f, 0xed, 0xc4, 0xd6, 0x3a, 0x6d, 0x18, 0xc5, 0x95, 0x05, 0xa2, 0x3f,
-	0xbe, 0x54, 0x6a, 0xd3, 0x83, 0x91, 0x53, 0x21, 0xcb, 0x68, 0x21, 0xc3, 0xaa, 0x83, 0xb5, 0x8c,
-	0xfe, 0x5c, 0x8a, 0x15, 0xb9, 0xa2, 0xb6, 0xa0, 0xb8, 0x04, 0x77, 0xe5, 0xc6, 0x4f, 0xd0, 0x6b,
-	0x5f, 0xa1, 0xe8, 0xbd, 0xcf, 0x91, 0x5b, 0x73, 0x2c, 0x72, 0x08, 0x0a, 0xfb, 0x01, 0x7a, 0xef,
-	0xa1, 0x28, 0xb4, 0xe2, 0x92, 0x14, 0x49, 0xfd, 0x58, 0x91, 0x72, 0xa3, 0x76, 0xbf, 0xef, 0xdb,
-	0x99, 0xd9, 0x99, 0xe1, 0x88, 0xe0, 0xbd, 0x36, 0xb6, 0x6c, 0xc2, 0xab, 0x0e, 0xb1, 0xb1, 0x79,
-	0x2d, 0x5e, 0x54, 0x3c, 0x9f, 0x09, 0x06, 0xd7, 0x86, 0xcb, 0xc5, 0xf7, 0x83, 0x6d, 0xe1, 0x63,
-	0x97, 0x77, 0x88, 0xcf, 0x87, 0xfb, 0x45, 0x45, 0x6b, 0x63, 0x07, 0xbb, 0x26, 0x51, 0xcb, 0x7a,
-	0xb0, 0xec, 0x11, 0xbf, 0x47, 0x39, 0xa7, 0xcc, 0x4d, 0x12, 0x7a, 0x44, 0x60, 0x0b, 0x0b, 0x9c,
-	0x20, 0x98, 0xcc, 0x71, 0x88, 0x29, 0x62, 0x84, 0x87, 0x36, 0xb3, 0x99, 0x7c, 0xac, 0x0e, 0x9e,
-	0x82, 0xd5, 0x62, 0x80, 0xc7, 0x96, 0xe5, 0x13, 0xce, 0x7f, 0x74, 0x28, 0x17, 0x8a, 0x11, 0xda,
-	0x4a, 0x7b, 0xc4, 0xa1, 0x6e, 0x68, 0xd4, 0x8e, 0x5a, 0x0f, 0x9c, 0x33, 0x7e, 0xd7, 0xc0, 0xfe,
-	0x25, 0x27, 0xfe, 0x79, 0x5f, 0xd8, 0x8c, 0xba, 0x76, 0xcd, 0xf3, 0x7c, 0x76, 0x85, 0x9d, 0x56,
-	0x40, 0x84, 0xa7, 0xa0, 0xc0, 0x12, 0x7b, 0x5c, 0xd7, 0xca, 0xb9, 0xc3, 0xad, 0xa7, 0xfb, 0x95,
-	0xa1, 0x5a, 0x25, 0x4b, 0x00, 0xa5, 0x69, 0xf0, 0x08, 0xdc, 0x57, 0x06, 0x0d, 0xf4, 0xb9, 0x7e,
-	0x4f, 0xea, 0x14, 0x42, 0x1d, 0xea, 0x0a, 0x84, 0x5d, 0x9b, 0xa0, 0x51, 0x5c, 0x68, 0x65, 0xc3,
-	0x35, 0x59, 0x6f, 0x8c, 0x95, 0x34, 0xb1, 0x97, 0x69, 0x65, 0x52, 0x00, 0xa5, 0x69, 0x6f, 0x65,
-	0x65, 0xb1, 0x1e, 0x5e, 0x5e, 0xca, 0xc6, 0x33, 0xb0, 0x67, 0xa6, 0x76, 0x95, 0x95, 0x45, 0xa5,
-	0x9e, 0x16, 0x40, 0x59, 0xb4, 0xf9, 0xad, 0xfc, 0x13, 0x80, 0xdd, 0x26, 0xb7, 0xbf, 0x21, 0x3f,
-	0x47, 0x47, 0x41, 0x1d, 0xac, 0x9b, 0x3e, 0xc1, 0x82, 0xf9, 0xba, 0x56, 0xd6, 0x0e, 0x37, 0x91,
-	0xfa, 0x09, 0xdb, 0xa0, 0x18, 0x1d, 0xdf, 0x0c, 0x32, 0x56, 0xf9, 0x14, 0x1c, 0x6a, 0xa4, 0x8d,
-	0x4f, 0x22, 0xd1, 0x04, 0x15, 0x78, 0x11, 0x94, 0x5e, 0x4a, 0x3e, 0x27, 0xe5, 0x3f, 0x50, 0xf2,
-	0xc7, 0x59, 0x20, 0x94, 0xcd, 0x85, 0x02, 0x94, 0x59, 0xa7, 0x53, 0xef, 0x62, 0xea, 0x1e, 0x07,
-	0x95, 0x99, 0xd2, 0xcf, 0x4b, 0xfd, 0x43, 0xa5, 0x7f, 0x3e, 0x05, 0x8f, 0xa6, 0x2a, 0xc2, 0x53,
-	0x00, 0xcd, 0x3e, 0x17, 0xac, 0x77, 0x12, 0x3f, 0x67, 0x35, 0x71, 0xc7, 0x29, 0x04, 0xca, 0x60,
-	0xc1, 0xcf, 0xc0, 0xb6, 0xea, 0x29, 0xad, 0x6b, 0x8f, 0xe8, 0x6b, 0x83, 0x9b, 0x39, 0xde, 0x7e,
-	0xf9, 0xe6, 0x60, 0xe5, 0xf5, 0x9b, 0x83, 0xbc, 0xbc, 0xe1, 0x11, 0xc4, 0xb8, 0x14, 0xdb, 0x98,
-	0x2f, 0xc5, 0xbe, 0x04, 0x5b, 0xb1, 0xe6, 0xa5, 0x6f, 0x96, 0xb5, 0xf8, 0x65, 0x44, 0x2a, 0xcf,
-	0x23, 0x10, 0x8a, 0x33, 0xe0, 0xd7, 0xa0, 0xc0, 0x05, 0x76, 0x2d, 0xec, 0x5b, 0x3c, 0x8c, 0x05,
-	0x90, 0xc6, 0x3c, 0x56, 0x32, 0x17, 0x49, 0x00, 0x4a, 0x73, 0xe0, 0x11, 0x78, 0x30, 0x84, 0xb7,
-	0x58, 0x7d, 0x90, 0x97, 0x44, 0xdf, 0x92, 0x2a, 0x3b, 0x51, 0x66, 0xc8, 0x28, 0xa0, 0x04, 0x0c,
-	0x56, 0xc0, 0x66, 0xd8, 0xae, 0xf5, 0x6d, 0xc9, 0xd9, 0x55, 0x9c, 0x56, 0xb0, 0x81, 0x22, 0x08,
-	0xfc, 0x1e, 0x3c, 0x32, 0x99, 0x2b, 0x7c, 0x6c, 0x8a, 0xda, 0xb0, 0xad, 0x86, 0x76, 0xdf, 0x97,
-	0xec, 0x83, 0xc8, 0xfd, 0x4c, 0x18, 0x1a, 0xc7, 0x87, 0x47, 0x60, 0x3b, 0xe8, 0xd4, 0x67, 0x83,
-	0x46, 0xad, 0x3f, 0x90, 0x7a, 0x7b, 0x4a, 0xaf, 0x16, 0xed, 0xa1, 0x11, 0x20, 0xfc, 0x0e, 0xe8,
-	0x16, 0xe9, 0xe0, 0xbe, 0x23, 0xce, 0x53, 0x8d, 0x78, 0x67, 0x86, 0x46, 0x3c, 0x96, 0x1d, 0x53,
-	0x6e, 0xa4, 0x9a, 0xe7, 0xee, 0x0c, 0xcd, 0x73, 0x2c, 0x1b, 0x7e, 0x05, 0x4a, 0xc1, 0xde, 0x09,
-	0xe5, 0x58, 0x2e, 0x93, 0x0b, 0xe2, 0x74, 0x1a, 0x2e, 0x15, 0x14, 0x0b, 0x62, 0xe9, 0x85, 0xb2,
-	0x76, 0xb8, 0x81, 0xa6, 0xa0, 0xe0, 0x33, 0xb0, 0x13, 0x20, 0x54, 0xc5, 0xe9, 0x30, 0xfb, 0xe6,
-	0x93, 0x38, 0xd8, 0x05, 0x4f, 0x4c, 0xc6, 0x7b, 0x8c, 0xd7, 0x19, 0x75, 0xbf, 0xf5, 0xb1, 0xe7,
-	0x11, 0xff, 0x39, 0x16, 0x5d, 0xde, 0x62, 0x35, 0xcb, 0xd2, 0xf7, 0xa4, 0xcc, 0xc7, 0xd1, 0x75,
-	0x66, 0x40, 0x6b, 0x96, 0x75, 0xde, 0xfe, 0x89, 0x98, 0x02, 0x4d, 0x92, 0x32, 0xce, 0x80, 0x9e,
-	0x6c, 0xa8, 0x88, 0x70, 0x8f, 0xb9, 0x5c, 0xd6, 0x70, 0x54, 0x5a, 0x0d, 0x6b, 0xd8, 0x5d, 0x93,
-	0x35, 0x1c, 0x47, 0x18, 0xbf, 0xac, 0x82, 0x62, 0x93, 0xdb, 0x4d, 0xea, 0x8a, 0x9a, 0x6b, 0x9d,
-	0x50, 0x2e, 0x7c, 0xda, 0xee, 0x0b, 0x22, 0x9b, 0x1f, 0x9f, 0xd0, 0xa9, 0x93, 0x47, 0xdd, 0x9b,
-	0x76, 0x54, 0x46, 0x59, 0xe5, 0xe6, 0x28, 0xab, 0xfc, 0xf4, 0xb2, 0x9a, 0xfc, 0x12, 0x59, 0x5b,
-	0xee, 0x4b, 0x64, 0x7d, 0xc9, 0x2f, 0x91, 0x8d, 0x85, 0xbf, 0x44, 0xc6, 0xb4, 0xf1, 0xcd, 0x79,
-	0x27, 0x85, 0xd1, 0xc6, 0x03, 0x66, 0x6c, 0x3c, 0xc6, 0x87, 0xc0, 0x18, 0x9f, 0x88, 0x2a, 0xc3,
-	0x8d, 0x7f, 0x35, 0xf0, 0x51, 0x93, 0xdb, 0x97, 0x2e, 0xbd, 0x22, 0x3e, 0xc7, 0xce, 0xa5, 0x67,
-	0x61, 0x41, 0xea, 0x19, 0x86, 0x2c, 0x32, 0x75, 0xc7, 0x84, 0x28, 0xb7, 0x98, 0x10, 0xe5, 0x67,
-	0x0d, 0x51, 0x15, 0x7c, 0x3a, 0x93, 0xef, 0x61, 0xb4, 0xfe, 0xcb, 0x83, 0xc2, 0x80, 0x21, 0x81,
-	0xea, 0xe2, 0x17, 0x1a, 0x99, 0xc9, 0xb5, 0x96, 0x5b, 0x6e, 0xad, 0xe5, 0x97, 0x5c, 0x6b, 0xab,
-	0xef, 0x68, 0x60, 0x5b, 0x9b, 0x6b, 0x60, 0x9b, 0x30, 0x3d, 0xac, 0xbf, 0xe5, 0xf4, 0x90, 0x39,
-	0x4a, 0x6d, 0xdc, 0x7d, 0x94, 0x32, 0x9e, 0x80, 0xc7, 0xa9, 0xfc, 0x0b, 0xb3, 0xf3, 0x1f, 0x0d,
-	0x7c, 0x32, 0x29, 0x9f, 0x63, 0x93, 0xde, 0x42, 0x73, 0x36, 0x31, 0x69, 0xe6, 0xee, 0x3c, 0x69,
-	0xce, 0x5d, 0xc0, 0x9f, 0x83, 0xea, 0x8c, 0x0e, 0x87, 0x41, 0x7a, 0xad, 0xc9, 0xf7, 0xfd, 0x10,
-	0x3a, 0x98, 0x8b, 0x96, 0x15, 0x95, 0x67, 0x59, 0x51, 0x79, 0x14, 0x9f, 0xc8, 0x16, 0x1f, 0x0f,
-	0x03, 0x94, 0xc7, 0xf9, 0x16, 0x06, 0xe0, 0x37, 0x4d, 0xfe, 0x83, 0x0c, 0x72, 0x08, 0xbb, 0xd8,
-	0x26, 0xfe, 0x42, 0x1d, 0xaf, 0x81, 0x9d, 0xde, 0x50, 0x36, 0xd1, 0xb7, 0x42, 0xe7, 0x9b, 0xa3,
-	0xdb, 0x28, 0x89, 0x37, 0x8a, 0xb1, 0x3b, 0x0a, 0xc0, 0xa1, 0xfd, 0x7f, 0x68, 0xe0, 0x61, 0x93,
-	0xdb, 0x35, 0xdf, 0xec, 0xd2, 0x2b, 0x32, 0xd3, 0xbf, 0xe0, 0xbb, 0xfb, 0x70, 0x0a, 0x20, 0xe5,
-	0xc1, 0x11, 0x56, 0xc2, 0x8d, 0xb0, 0xaf, 0x34, 0x52, 0x08, 0x94, 0xc1, 0x32, 0x4a, 0x60, 0x3f,
-	0xcb, 0x5e, 0xe5, 0xd0, 0xf1, 0xd9, 0xcb, 0x9b, 0x92, 0xf6, 0xea, 0xa6, 0xa4, 0xfd, 0x7d, 0x53,
-	0xd2, 0x7e, 0xbd, 0x2d, 0xad, 0xbc, 0xba, 0x2d, 0xad, 0xfc, 0x75, 0x5b, 0x5a, 0xf9, 0xe1, 0xa9,
-	0x4d, 0x45, 0xb7, 0xdf, 0xae, 0x98, 0xac, 0x57, 0x6d, 0x53, 0xa1, 0xbe, 0x54, 0xa9, 0x27, 0x73,
-	0xd0, 0x1a, 0xab, 0x2f, 0xaa, 0xea, 0xab, 0xd0, 0xb5, 0x47, 0x78, 0x7b, 0x4d, 0x7e, 0x19, 0xfa,
-	0xe2, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc1, 0xaf, 0x23, 0x70, 0x0f, 0x13, 0x00, 0x00,
+	// 1034 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0x4d, 0x6f, 0xdb, 0x36,
+	0x18, 0x8e, 0x6a, 0xd7, 0x49, 0xde, 0xa4, 0x75, 0xc2, 0x76, 0xab, 0xea, 0x66, 0x8e, 0x21, 0xec,
+	0x23, 0x97, 0xd9, 0x5b, 0x77, 0x08, 0x7a, 0x1a, 0x9c, 0x04, 0x1b, 0x1c, 0xc4, 0x4b, 0xc1, 0x24,
+	0xd8, 0xc7, 0x65, 0xa0, 0x25, 0x46, 0xe6, 0x20, 0x93, 0x86, 0x48, 0x67, 0xed, 0x3f, 0xd8, 0x71,
+	0xfb, 0x09, 0xc3, 0x0e, 0xbb, 0xed, 0x77, 0xf4, 0xd8, 0xe3, 0xd0, 0x43, 0x31, 0x24, 0x3f, 0x60,
+	0xf7, 0x9d, 0x06, 0xcb, 0xa2, 0x64, 0xeb, 0xc3, 0x71, 0x1d, 0xe7, 0x26, 0x93, 0xcf, 0xf3, 0xf0,
+	0x7d, 0x5f, 0xbe, 0x7c, 0x44, 0x0b, 0xde, 0xeb, 0x10, 0xc7, 0xa5, 0xb2, 0xe1, 0x51, 0x97, 0xd8,
+	0x2f, 0xd5, 0x8b, 0x7a, 0xdf, 0x17, 0x4a, 0xa0, 0xd2, 0x68, 0xb8, 0xf2, 0x7e, 0x38, 0xad, 0x7c,
+	0xc2, 0xe5, 0x39, 0xf5, 0xe5, 0x68, 0xbe, 0xa2, 0x69, 0x1d, 0xe2, 0x11, 0x6e, 0x53, 0x3d, 0x6c,
+	0x86, 0xc3, 0x7d, 0xea, 0xf7, 0x98, 0x94, 0x4c, 0xf0, 0x24, 0xa1, 0x47, 0x15, 0x71, 0x88, 0x22,
+	0x09, 0x82, 0x2d, 0x3c, 0x8f, 0xda, 0x6a, 0x8c, 0xf0, 0xd0, 0x15, 0xae, 0x08, 0x1e, 0x1b, 0xc3,
+	0xa7, 0x70, 0xb4, 0x12, 0xe2, 0x89, 0xe3, 0xf8, 0x54, 0xca, 0x1f, 0x3d, 0x26, 0x95, 0x66, 0x44,
+	0xb1, 0xb2, 0x1e, 0xf5, 0x18, 0x8f, 0x82, 0x2a, 0xeb, 0xf1, 0x30, 0x39, 0xeb, 0x0f, 0x03, 0xb6,
+	0xce, 0x24, 0xf5, 0x8f, 0x07, 0xca, 0x15, 0x8c, 0xbb, 0xcd, 0x7e, 0xdf, 0x17, 0x17, 0xc4, 0x3b,
+	0x0d, 0x89, 0xe8, 0x10, 0x36, 0x45, 0x62, 0x4e, 0x9a, 0x46, 0xad, 0xb0, 0xb3, 0xf6, 0x74, 0xab,
+	0x3e, 0x52, 0xab, 0x67, 0x09, 0xe0, 0x34, 0x0d, 0xed, 0xc2, 0x3d, 0x1d, 0xd0, 0x50, 0x5f, 0x9a,
+	0x77, 0x02, 0x9d, 0xcd, 0x48, 0x87, 0x71, 0x85, 0x09, 0x77, 0x29, 0x9e, 0xc4, 0x45, 0x51, 0xb6,
+	0xb8, 0x2d, 0x7a, 0x39, 0x51, 0xb2, 0xc4, 0x5c, 0x66, 0x94, 0x49, 0x01, 0x9c, 0xa6, 0xdd, 0x28,
+	0xca, 0xca, 0x7e, 0xb4, 0x79, 0xa9, 0x18, 0x8f, 0xe0, 0x81, 0x9d, 0x9a, 0xd5, 0x51, 0x56, 0xb4,
+	0x7a, 0x5a, 0x00, 0x67, 0xd1, 0xe6, 0x8f, 0xf2, 0xcf, 0x55, 0xd8, 0x68, 0x4b, 0xf7, 0x1b, 0xfa,
+	0x73, 0xbc, 0x14, 0x32, 0x61, 0xd9, 0xf6, 0x29, 0x51, 0xc2, 0x37, 0x8d, 0x9a, 0xb1, 0xb3, 0x8a,
+	0xf5, 0x4f, 0xd4, 0x81, 0x4a, 0xbc, 0x7c, 0x3b, 0xec, 0x58, 0x9d, 0x53, 0xb8, 0xa8, 0x95, 0x0e,
+	0x3e, 0x89, 0xc4, 0x53, 0x54, 0xd0, 0x49, 0x78, 0xf4, 0x52, 0xf2, 0x85, 0x40, 0xfe, 0x03, 0x2d,
+	0xbf, 0x97, 0x05, 0xc2, 0xd9, 0x5c, 0x74, 0x08, 0xc8, 0x1e, 0x48, 0x25, 0x7a, 0x07, 0xe3, 0x8a,
+	0xc5, 0x44, 0xb5, 0x53, 0x08, 0x9c, 0xc1, 0xca, 0xdb, 0xba, 0xbb, 0xf3, 0x6d, 0xdd, 0x97, 0xb0,
+	0x36, 0x66, 0x0a, 0x66, 0xa9, 0x66, 0x8c, 0x27, 0x19, 0xab, 0x3c, 0x8f, 0x41, 0x78, 0x9c, 0x81,
+	0xbe, 0x86, 0x4d, 0xa9, 0x08, 0x77, 0x88, 0xef, 0xc8, 0x28, 0xb3, 0xe5, 0x20, 0x98, 0xc7, 0x5a,
+	0xe6, 0x24, 0x09, 0xc0, 0x69, 0x0e, 0xda, 0x85, 0xfb, 0x23, 0xf8, 0xa9, 0xd8, 0x1f, 0xee, 0x37,
+	0x35, 0x57, 0x02, 0x95, 0x72, 0x5c, 0xf1, 0xc0, 0xd3, 0x70, 0x02, 0x86, 0xea, 0xb0, 0x1a, 0xd9,
+	0xa0, 0xb9, 0x1a, 0x70, 0x36, 0x34, 0xe7, 0x34, 0x9c, 0xc0, 0x31, 0x04, 0x7d, 0x0f, 0x8f, 0x6c,
+	0xc1, 0x95, 0x4f, 0x6c, 0xd5, 0x1c, 0xd9, 0x55, 0x14, 0x37, 0x04, 0xec, 0xed, 0x38, 0xfd, 0x4c,
+	0x18, 0xce, 0xe3, 0xa3, 0x5d, 0x58, 0x0f, 0x1d, 0xf0, 0x68, 0x68, 0x80, 0xe6, 0x5a, 0xa0, 0xf7,
+	0x40, 0xeb, 0x35, 0xe3, 0x39, 0x3c, 0x01, 0x44, 0xdf, 0x81, 0xe9, 0xd0, 0x73, 0x32, 0xf0, 0xd4,
+	0x71, 0xca, 0xe0, 0xd6, 0x67, 0x30, 0xb8, 0x5c, 0xf6, 0x98, 0x72, 0x2b, 0x65, 0x4a, 0xf7, 0x66,
+	0x30, 0xa5, 0x5c, 0x36, 0xfa, 0x0a, 0xaa, 0xe1, 0xdc, 0x01, 0x93, 0x24, 0x18, 0xa6, 0x27, 0xd4,
+	0x3b, 0x6f, 0x71, 0xa6, 0x18, 0x51, 0xd4, 0x31, 0xef, 0xd7, 0x8c, 0x9d, 0x15, 0x7c, 0x0d, 0x0a,
+	0x3d, 0x83, 0x72, 0x88, 0x08, 0x77, 0x58, 0x9a, 0xe5, 0xec, 0x9d, 0x4f, 0xe2, 0x50, 0x17, 0x9e,
+	0xd8, 0x42, 0xf6, 0x84, 0xdc, 0x17, 0x8c, 0x7f, 0xeb, 0x93, 0x7e, 0x9f, 0xfa, 0xcf, 0x89, 0xea,
+	0xca, 0x53, 0xd1, 0x74, 0x1c, 0x73, 0x23, 0x90, 0xf9, 0x38, 0xde, 0xce, 0x0c, 0x68, 0xd3, 0x71,
+	0x8e, 0x3b, 0x3f, 0x51, 0x5b, 0xe1, 0x69, 0x52, 0xd6, 0x11, 0x98, 0x49, 0xa3, 0xc2, 0x54, 0xf6,
+	0x05, 0x97, 0x14, 0x7d, 0x06, 0xeb, 0xf1, 0xd1, 0x6a, 0x39, 0x23, 0xd7, 0xda, 0x5b, 0x7f, 0xf5,
+	0x76, 0x7b, 0xe9, 0xcd, 0xdb, 0xed, 0x62, 0xe0, 0x7e, 0x13, 0x08, 0xeb, 0xb7, 0x22, 0x54, 0xda,
+	0xd2, 0x6d, 0x33, 0xae, 0x9a, 0xdc, 0x39, 0x60, 0x52, 0xf9, 0xac, 0x33, 0x50, 0x34, 0x30, 0x15,
+	0x39, 0xc5, 0x01, 0x93, 0x4b, 0xdd, 0xb9, 0x6e, 0xa9, 0x8c, 0x63, 0x55, 0x98, 0xe3, 0x58, 0x15,
+	0xaf, 0x3f, 0x56, 0xd3, 0xcd, 0xf9, 0xee, 0xed, 0x9a, 0x73, 0xe9, 0x06, 0xe6, 0x9c, 0x63, 0xa8,
+	0xcb, 0xf3, 0xbe, 0x0b, 0x27, 0x2d, 0x60, 0x65, 0x46, 0x0b, 0xb0, 0x3e, 0x04, 0x2b, 0xbf, 0x25,
+	0x74, 0xaf, 0x59, 0xff, 0x19, 0xf0, 0x51, 0x5b, 0xba, 0x67, 0x9c, 0x5d, 0x50, 0x5f, 0x12, 0xef,
+	0xac, 0xef, 0x10, 0x45, 0xf7, 0x33, 0x02, 0x59, 0x64, 0x13, 0xe5, 0x94, 0xa8, 0xb0, 0x98, 0x12,
+	0x15, 0x67, 0x2d, 0x51, 0x03, 0x3e, 0x9d, 0x29, 0xf7, 0xa8, 0x5a, 0xbf, 0x14, 0x61, 0x73, 0xc8,
+	0x08, 0x80, 0x7a, 0xe3, 0x17, 0x5a, 0x99, 0xe9, 0x5d, 0x5f, 0xb8, 0xdd, 0xae, 0x2f, 0x2e, 0xfc,
+	0x4a, 0x72, 0x77, 0xae, 0x2b, 0xc9, 0x94, 0x37, 0x6a, 0xe9, 0x86, 0x6f, 0xd4, 0x45, 0x5d, 0x2f,
+	0xac, 0x27, 0xf0, 0x38, 0xd5, 0x09, 0x51, 0x9f, 0xfc, 0x6b, 0xc0, 0x27, 0xd3, 0x3a, 0x6b, 0xec,
+	0xf6, 0xb3, 0xd0, 0xee, 0x49, 0xdc, 0xbe, 0x0a, 0xef, 0x7c, 0xfb, 0x9a, 0xfb, 0x28, 0x7d, 0x0e,
+	0x8d, 0x19, 0x13, 0x8e, 0x8a, 0xf4, 0xc6, 0x08, 0xde, 0x81, 0x23, 0xe8, 0xf0, 0xae, 0x70, 0x5b,
+	0x55, 0x79, 0x96, 0x55, 0x95, 0x47, 0xe3, 0xb7, 0x94, 0xc5, 0xd7, 0xc3, 0x82, 0x5a, 0x5e, 0x6e,
+	0x51, 0x01, 0x7e, 0x37, 0x82, 0x7f, 0x2b, 0x61, 0x0f, 0x11, 0x4e, 0x5c, 0xea, 0x2f, 0x34, 0xf1,
+	0x26, 0x94, 0x7b, 0x23, 0xd9, 0x84, 0x83, 0x44, 0xc9, 0xb7, 0x27, 0xa7, 0x71, 0x12, 0x6f, 0x55,
+	0xc6, 0xf6, 0x28, 0x04, 0x47, 0xf1, 0xff, 0x65, 0xc0, 0xc3, 0xb6, 0x74, 0x9b, 0xbe, 0xdd, 0x65,
+	0x17, 0x74, 0xa6, 0x7f, 0x5c, 0xef, 0x9e, 0xc3, 0x21, 0x20, 0x26, 0xc3, 0x25, 0x9c, 0x44, 0x1a,
+	0x91, 0xaf, 0xb4, 0x52, 0x08, 0x9c, 0xc1, 0xb2, 0xaa, 0xb0, 0x95, 0x15, 0xaf, 0x4e, 0x68, 0xef,
+	0xe8, 0xd5, 0x65, 0xd5, 0x78, 0x7d, 0x59, 0x35, 0xfe, 0xb9, 0xac, 0x1a, 0xbf, 0x5e, 0x55, 0x97,
+	0x5e, 0x5f, 0x55, 0x97, 0xfe, 0xbe, 0xaa, 0x2e, 0xfd, 0xf0, 0xd4, 0x65, 0xaa, 0x3b, 0xe8, 0xd4,
+	0x6d, 0xd1, 0x6b, 0x74, 0x98, 0xd2, 0x5f, 0x45, 0xf4, 0x93, 0xdd, 0x25, 0x8c, 0x37, 0x5e, 0x34,
+	0xf4, 0x17, 0x88, 0x97, 0x7d, 0x2a, 0x3b, 0xa5, 0xe0, 0x2b, 0xc4, 0x17, 0xff, 0x07, 0x00, 0x00,
+	0xff, 0xff, 0x94, 0xd0, 0x2a, 0xc2, 0x7b, 0x11, 0x00, 0x00,
 }
 
 func (m *UserOutgoingApprovalTimeline) Marshal() (dAtA []byte, err error) {
@@ -1425,7 +1397,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i--
 			dAtA[i] = 0x1
 			i--
-			dAtA[i] = 0x9a
+			dAtA[i] = 0x82
 		}
 	}
 	if len(m.DefaultBalances) > 0 {
@@ -1439,9 +1411,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0x92
+			dAtA[i] = 0x7a
 		}
 	}
 	if m.DefaultDisapproveSelfInitiated {
@@ -1452,9 +1422,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x88
+		dAtA[i] = 0x70
 	}
 	if len(m.DefaultIncomingApprovals) > 0 {
 		for iNdEx := len(m.DefaultIncomingApprovals) - 1; iNdEx >= 0; iNdEx-- {
@@ -1467,9 +1435,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0x82
+			dAtA[i] = 0x6a
 		}
 	}
 	if len(m.DefaultOutgoingApprovals) > 0 {
@@ -1483,7 +1449,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x7a
+			dAtA[i] = 0x62
 		}
 	}
 	if len(m.AddressLists) > 0 {
@@ -1497,7 +1463,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x72
+			dAtA[i] = 0x5a
 		}
 	}
 	if len(m.ContractAddressTimeline) > 0 {
@@ -1511,7 +1477,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x6a
+			dAtA[i] = 0x52
 		}
 	}
 	if len(m.Transfers) > 0 {
@@ -1525,7 +1491,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x62
+			dAtA[i] = 0x4a
 		}
 	}
 	if len(m.BadgesToCreate) > 0 {
@@ -1539,7 +1505,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x5a
+			dAtA[i] = 0x42
 		}
 	}
 	if len(m.StandardsTimeline) > 0 {
@@ -1553,7 +1519,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x52
+			dAtA[i] = 0x3a
 		}
 	}
 	if m.Permissions != nil {
@@ -1566,7 +1532,7 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintLegacytx(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x4a
+		dAtA[i] = 0x32
 	}
 	if len(m.CollectionApprovals) > 0 {
 		for iNdEx := len(m.CollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
@@ -1579,37 +1545,13 @@ func (m *MsgNewCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x42
+			dAtA[i] = 0x2a
 		}
 	}
-	{
-		size := m.BalancesType.Size()
-		i -= size
-		if _, err := m.BalancesType.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLegacytx(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x32
 	if len(m.CustomDataTimeline) > 0 {
 		for iNdEx := len(m.CustomDataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.CustomDataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintLegacytx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x2a
-		}
-	}
-	if len(m.OffChainBalancesMetadataTimeline) > 0 {
-		for iNdEx := len(m.OffChainBalancesMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.OffChainBalancesMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1722,7 +1664,7 @@ func (m *MsgMintAndDistributeBadges) MarshalToSizedBuffer(dAtA []byte) (int, err
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x52
+			dAtA[i] = 0x42
 		}
 	}
 	if len(m.CollectionApprovals) > 0 {
@@ -1736,21 +1678,7 @@ func (m *MsgMintAndDistributeBadges) MarshalToSizedBuffer(dAtA []byte) (int, err
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x4a
-		}
-	}
-	if len(m.OffChainBalancesMetadataTimeline) > 0 {
-		for iNdEx := len(m.OffChainBalancesMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.OffChainBalancesMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintLegacytx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x42
+			dAtA[i] = 0x3a
 		}
 	}
 	if len(m.BadgeMetadataTimeline) > 0 {
@@ -1764,7 +1692,7 @@ func (m *MsgMintAndDistributeBadges) MarshalToSizedBuffer(dAtA []byte) (int, err
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x32
 		}
 	}
 	if len(m.CollectionMetadataTimeline) > 0 {
@@ -1778,7 +1706,7 @@ func (m *MsgMintAndDistributeBadges) MarshalToSizedBuffer(dAtA []byte) (int, err
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x2a
 		}
 	}
 	if len(m.Transfers) > 0 {
@@ -1974,7 +1902,7 @@ func (m *MsgUpdateMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x42
+			dAtA[i] = 0x3a
 		}
 	}
 	if len(m.ContractAddressTimeline) > 0 {
@@ -1988,27 +1916,13 @@ func (m *MsgUpdateMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintLegacytx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x32
 		}
 	}
 	if len(m.CustomDataTimeline) > 0 {
 		for iNdEx := len(m.CustomDataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.CustomDataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintLegacytx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x32
-		}
-	}
-	if len(m.OffChainBalancesMetadataTimeline) > 0 {
-		for iNdEx := len(m.OffChainBalancesMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.OffChainBalancesMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2518,20 +2432,12 @@ func (m *MsgNewCollection) Size() (n int) {
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
-	if len(m.OffChainBalancesMetadataTimeline) > 0 {
-		for _, e := range m.OffChainBalancesMetadataTimeline {
-			l = e.Size()
-			n += 1 + l + sovLegacytx(uint64(l))
-		}
-	}
 	if len(m.CustomDataTimeline) > 0 {
 		for _, e := range m.CustomDataTimeline {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
-	l = m.BalancesType.Size()
-	n += 1 + l + sovLegacytx(uint64(l))
 	if len(m.CollectionApprovals) > 0 {
 		for _, e := range m.CollectionApprovals {
 			l = e.Size()
@@ -2581,16 +2487,16 @@ func (m *MsgNewCollection) Size() (n int) {
 	if len(m.DefaultIncomingApprovals) > 0 {
 		for _, e := range m.DefaultIncomingApprovals {
 			l = e.Size()
-			n += 2 + l + sovLegacytx(uint64(l))
+			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
 	if m.DefaultDisapproveSelfInitiated {
-		n += 3
+		n += 2
 	}
 	if len(m.DefaultBalances) > 0 {
 		for _, e := range m.DefaultBalances {
 			l = e.Size()
-			n += 2 + l + sovLegacytx(uint64(l))
+			n += 1 + l + sovLegacytx(uint64(l))
 		}
 	}
 	if len(m.CosmosCoinWrapperPathsToAdd) > 0 {
@@ -2645,12 +2551,6 @@ func (m *MsgMintAndDistributeBadges) Size() (n int) {
 	}
 	if len(m.BadgeMetadataTimeline) > 0 {
 		for _, e := range m.BadgeMetadataTimeline {
-			l = e.Size()
-			n += 1 + l + sovLegacytx(uint64(l))
-		}
-	}
-	if len(m.OffChainBalancesMetadataTimeline) > 0 {
-		for _, e := range m.OffChainBalancesMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -2735,12 +2635,6 @@ func (m *MsgUpdateMetadata) Size() (n int) {
 	}
 	if len(m.BadgeMetadataTimeline) > 0 {
 		for _, e := range m.BadgeMetadataTimeline {
-			l = e.Size()
-			n += 1 + l + sovLegacytx(uint64(l))
-		}
-	}
-	if len(m.OffChainBalancesMetadataTimeline) > 0 {
-		for _, e := range m.OffChainBalancesMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovLegacytx(uint64(l))
 		}
@@ -3394,40 +3288,6 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OffChainBalancesMetadataTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLegacytx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OffChainBalancesMetadataTimeline = append(m.OffChainBalancesMetadataTimeline, &OffChainBalancesMetadataTimeline{})
-			if err := m.OffChainBalancesMetadataTimeline[len(m.OffChainBalancesMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomDataTimeline", wireType)
 			}
 			var msglen int
@@ -3460,41 +3320,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BalancesType", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLegacytx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.BalancesType.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
@@ -3528,7 +3354,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Permissions", wireType)
 			}
@@ -3564,7 +3390,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 10:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StandardsTimeline", wireType)
 			}
@@ -3598,7 +3424,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 11:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BadgesToCreate", wireType)
 			}
@@ -3632,7 +3458,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 12:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Transfers", wireType)
 			}
@@ -3666,7 +3492,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 13:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddressTimeline", wireType)
 			}
@@ -3700,7 +3526,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 14:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AddressLists", wireType)
 			}
@@ -3734,7 +3560,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 15:
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultOutgoingApprovals", wireType)
 			}
@@ -3768,7 +3594,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 16:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultIncomingApprovals", wireType)
 			}
@@ -3802,7 +3628,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 17:
+		case 14:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultDisapproveSelfInitiated", wireType)
 			}
@@ -3822,7 +3648,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.DefaultDisapproveSelfInitiated = bool(v != 0)
-		case 18:
+		case 15:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultBalances", wireType)
 			}
@@ -3856,7 +3682,7 @@ func (m *MsgNewCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 19:
+		case 16:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CosmosCoinWrapperPathsToAdd", wireType)
 			}
@@ -4158,7 +3984,7 @@ func (m *MsgMintAndDistributeBadges) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CollectionMetadataTimeline", wireType)
 			}
@@ -4192,7 +4018,7 @@ func (m *MsgMintAndDistributeBadges) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
 			}
@@ -4226,41 +4052,7 @@ func (m *MsgMintAndDistributeBadges) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OffChainBalancesMetadataTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLegacytx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OffChainBalancesMetadataTimeline = append(m.OffChainBalancesMetadataTimeline, &OffChainBalancesMetadataTimeline{})
-			if err := m.OffChainBalancesMetadataTimeline[len(m.OffChainBalancesMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 			}
@@ -4294,7 +4086,7 @@ func (m *MsgMintAndDistributeBadges) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 10:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AddressLists", wireType)
 			}
@@ -4798,40 +4590,6 @@ func (m *MsgUpdateMetadata) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OffChainBalancesMetadataTimeline", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLegacytx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthLegacytx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OffChainBalancesMetadataTimeline = append(m.OffChainBalancesMetadataTimeline, &OffChainBalancesMetadataTimeline{})
-			if err := m.OffChainBalancesMetadataTimeline[len(m.OffChainBalancesMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomDataTimeline", wireType)
 			}
 			var msglen int
@@ -4864,7 +4622,7 @@ func (m *MsgUpdateMetadata) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddressTimeline", wireType)
 			}
@@ -4898,7 +4656,7 @@ func (m *MsgUpdateMetadata) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 8:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StandardsTimeline", wireType)
 			}

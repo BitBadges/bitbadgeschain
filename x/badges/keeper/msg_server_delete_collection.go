@@ -41,23 +41,12 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 		return nil, err
 	}
 
-	//TODO: should we prune all balances and challenge stores here too?
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "delete_collection"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "delete_collection"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-		),
+	//TODO: should we purge all balances and challenge stores here too?
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "delete_collection"),
+		sdk.NewAttribute("msg", string(msgBytes)),
 	)
 	return &types.MsgDeleteCollectionResponse{}, nil
 }

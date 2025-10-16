@@ -158,12 +158,41 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(ctx, currPermissionDetails, toFetchPermissionDetails)
 	//For all overlaps, we simply return the amount
 	for _, overlapObject := range overlaps {
-		overlap := overlapObject.Overlap
+		// Validate overlap object structure
+		if overlapObject == nil {
+			return nil, fmt.Errorf("overlap object is nil")
+		}
 
-		// Safe type assertion with error handling
+		overlap := overlapObject.Overlap
+		if overlap == nil {
+			return nil, fmt.Errorf("overlap is nil in overlap object")
+		}
+
+		if overlap.BadgeId == nil {
+			return nil, fmt.Errorf("BadgeId is nil in overlap")
+		}
+
+		if overlap.OwnershipTime == nil {
+			return nil, fmt.Errorf("OwnershipTime is nil in overlap")
+		}
+
+		// Safe type assertion with comprehensive error handling
+		if overlapObject.FirstDetails == nil {
+			return nil, fmt.Errorf("FirstDetails is nil in overlap object")
+		}
+
+		if overlapObject.FirstDetails.ArbitraryValue == nil {
+			return nil, fmt.Errorf("ArbitraryValue is nil in FirstDetails")
+		}
+
 		amount, ok := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
 		if !ok {
 			return nil, fmt.Errorf("invalid ArbitraryValue type: expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
+		}
+
+		// Additional validation: check for nil or invalid amount
+		if amount.IsNil() {
+			return nil, fmt.Errorf("amount is nil in ArbitraryValue")
 		}
 
 		fetchedBalances = append(fetchedBalances, &Balance{
@@ -437,18 +466,21 @@ func jsonEqual(a, b interface{}) bool {
 
 func IncrementBalances(
 	ctx sdk.Context,
-	startBalances []*Balance,
+	incrementedBalances *IncrementedBalances,
 	numIncrements sdkmath.Uint,
-	incrementOwnershipTimesBy sdkmath.Uint,
-	incrementBadgeIdsBy sdkmath.Uint,
-	durationFromTimestamp sdkmath.Uint,
-	recurringOwnershipTimes *RecurringOwnershipTimes,
-	overrideTimestamp sdkmath.Uint,
-	allowOverrideTimestamp bool,
-	overrideBadgeIds []*UintRange,
-	allowOverrideBadgeIdsWithAnyValidBadgeId bool,
+	precalculationOptions *PrecalculationOptions,
 	collection *BadgeCollection,
 ) ([]*Balance, error) {
+	startBalances := incrementedBalances.StartBalances
+	incrementOwnershipTimesBy := incrementedBalances.IncrementOwnershipTimesBy
+	incrementBadgeIdsBy := incrementedBalances.IncrementBadgeIdsBy
+	durationFromTimestamp := incrementedBalances.DurationFromTimestamp
+	recurringOwnershipTimes := incrementedBalances.RecurringOwnershipTimes
+	allowOverrideTimestamp := incrementedBalances.AllowOverrideTimestamp
+	allowOverrideBadgeIdsWithAnyValidBadgeId := incrementedBalances.AllowOverrideWithAnyValidBadge
+
+	overrideTimestamp := precalculationOptions.OverrideTimestamp
+	overrideBadgeIds := precalculationOptions.BadgeIdsOverride
 	balances := DeepCopyBalances(startBalances)
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 

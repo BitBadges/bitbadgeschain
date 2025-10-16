@@ -51,8 +51,6 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 			ListId:     types.MintAddress,
 			Addresses:  []string{types.MintAddress},
 			Whitelist:  true,
-			Uri:        "",
-			CustomData: "",
 		}, true, nil
 
 	case strings.HasPrefix(addressListId, "AllWithout"):
@@ -66,8 +64,6 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 			ListId:     addressListId,
 			Addresses:  addresses,
 			Whitelist:  false,
-			Uri:        "",
-			CustomData: "",
 		}, true, nil
 
 	case addressListId == "All", addressListId == "AllWithMint":
@@ -75,8 +71,6 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 			ListId:     addressListId,
 			Addresses:  []string{},
 			Whitelist:  false,
-			Uri:        "",
-			CustomData: "",
 		}, true, nil
 
 	case addressListId == "None":
@@ -84,8 +78,6 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 			ListId:     addressListId,
 			Addresses:  []string{},
 			Whitelist:  true,
-			Uri:        "",
-			CustomData: "",
 		}, true, nil
 	}
 
@@ -103,8 +95,6 @@ func getReservedListById(addressListId string, allowAliases bool) (*types.Addres
 		ListId:     addressListId,
 		Addresses:  addresses,
 		Whitelist:  true,
-		Uri:        "",
-		CustomData: "",
 	}, true, nil
 }
 

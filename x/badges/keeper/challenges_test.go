@@ -39,10 +39,14 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 			},
 			PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
 		},
-		alice,
-		alice,
-		&[]keeper.ApprovalsUsed{},
-		&[]keeper.CoinTransfers{},
+		keeper.TransferMetadata{
+			To:              alice,
+			From:            bob,
+			InitiatedBy:     alice,
+			ApproverAddress: "",
+			ApprovalLevel:   "collection",
+		},
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 }
@@ -79,10 +83,14 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 				},
 			},
 		},
-		alice,
-		alice,
-		&[]keeper.ApprovalsUsed{},
-		&[]keeper.CoinTransfers{},
+		keeper.TransferMetadata{
+			To:              alice,
+			From:            bob,
+			InitiatedBy:     alice,
+			ApproverAddress: "",
+			ApprovalLevel:   "collection",
+		},
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 
 	suite.Require().Error(err, "Error getting user balance: %s")
@@ -108,10 +116,14 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 				},
 			},
 		},
-		alice,
-		alice,
-		&[]keeper.ApprovalsUsed{},
-		&[]keeper.CoinTransfers{},
+		keeper.TransferMetadata{
+			To:              alice,
+			From:            bob,
+			InitiatedBy:     alice,
+			ApproverAddress: "",
+			ApprovalLevel:   "collection",
+		},
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Error(err, "Error getting user balance: %s")
 }

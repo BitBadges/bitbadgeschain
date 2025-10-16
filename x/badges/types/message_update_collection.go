@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -64,10 +62,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	if err := ValidateOffChainBalancesMetadataTimeline(msg.OffChainBalancesMetadataTimeline); err != nil {
-		return err
-	}
-
 	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
@@ -88,6 +82,14 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		if err := ValidateCollectionApprovalsWithInvariants(ctx, msg.CollectionApprovals, canChangeValues, tempCollection); err != nil {
 			return err
 		}
+	}
+
+	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
+		return err
 	}
 
 	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
@@ -155,81 +157,20 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
+	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
+		return err
+	}
+
 	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
 		return err
 	}
 
 	if err := ValidateStandardsTimeline(msg.StandardsTimeline); err != nil {
 		return err
-	}
-
-	if msg.CollectionId.IsZero() {
-		if msg.BalancesType != "Standard" && msg.BalancesType != "Off-Chain - Indexed" && msg.BalancesType != "Off-Chain - Non-Indexed" && msg.BalancesType != "Non-Public" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "balances type must be Standard, Inherited, Off-Chain - Indexed, or Off-Chain - Non-Indexed")
-		}
-
-		if msg.BalancesType != "Standard" {
-			if len(msg.CollectionApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but claims and/or transfers are set")
-			}
-
-			if len(msg.DefaultBalances.IncomingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default approvals are set")
-			}
-
-			if len(msg.DefaultBalances.OutgoingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default approvals are set")
-			}
-
-			if len(msg.DefaultBalances.Balances) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default balances are set")
-			}
-
-			if len(msg.DefaultBalances.UserPermissions.CanUpdateIncomingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
-			}
-
-			if len(msg.DefaultBalances.UserPermissions.CanUpdateOutgoingApprovals) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
-			}
-
-			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
-			}
-
-			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
-			}
-
-			if len(msg.DefaultBalances.UserPermissions.CanUpdateAutoApproveAllIncomingTransfers) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balance type is off-chain or non-public but default user permissions are being set")
-			}
-		}
-
-		if msg.BalancesType == "Standard" || msg.BalancesType == "Non-Public" {
-			if len(msg.OffChainBalancesMetadataTimeline) > 0 {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "balances metadata denotes on-chain balances but off-chain balances are set")
-			}
-		}
-
-		if msg.BalancesType == "Off-Chain - Non-Indexed" {
-			for _, offChainUriObj := range msg.OffChainBalancesMetadataTimeline {
-				//must contain "{address}" in uri
-				if !strings.Contains(offChainUriObj.OffChainBalancesMetadata.Uri, "{address}") {
-					return sdkerrors.Wrapf(ErrInvalidRequest, "balances type is non-indexed but uri does not contain {address} in uri")
-				}
-			}
-		}
-	}
-
-	if len(msg.CollectionApprovals) > 0 {
-		if msg.OffChainBalancesMetadataTimeline != nil && len(msg.OffChainBalancesMetadataTimeline) > 0 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = off-chain")
-		}
-
-		if msg.BalancesType == "Inherited" {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "transfers and/or claims are set but collection has balances type = inherited")
-		}
 	}
 
 	for _, timelineVal := range msg.ManagerTimeline {

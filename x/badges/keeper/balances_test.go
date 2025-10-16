@@ -317,7 +317,6 @@ func (suite *TestSuite) TestDefaultBalances() {
 		CollectionId:    sdkmath.NewUint(0),
 		Creator:         alice,
 		ManagerTimeline: []*types.ManagerTimeline{},
-		BalancesType:    "Standard",
 		DefaultBalances: &types.UserBalanceStore{
 			Balances: []*types.Balance{
 				{
@@ -363,7 +362,6 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 		CollectionId:              sdkmath.NewUint(0),
 		Creator:                   alice,
 		ManagerTimeline:           []*types.ManagerTimeline{},
-		BalancesType:              "Standard",
 		UpdateCollectionApprovals: true,
 		CollectionApprovals: []*types.CollectionApproval{
 			GetBobApproval(),
@@ -597,7 +595,6 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 		CollectionId:              sdkmath.NewUint(0),
 		Creator:                   alice,
 		ManagerTimeline:           []*types.ManagerTimeline{},
-		BalancesType:              "Standard",
 		UpdateCollectionApprovals: true,
 		CollectionApprovals: []*types.CollectionApproval{
 			GetBobApproval(),

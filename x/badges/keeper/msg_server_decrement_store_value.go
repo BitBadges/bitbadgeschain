@@ -61,22 +61,20 @@ func (k msgServer) DecrementStoreValue(goCtx context.Context, msg *types.MsgDecr
 	}
 
 	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "decrement_store_value"),
-			sdk.NewAttribute("store_id", msg.StoreId.String()),
-			sdk.NewAttribute("address", msg.Address),
-			sdk.NewAttribute("amount", msg.Amount.String()),
-			sdk.NewAttribute("new_value", newValue.String()),
-			sdk.NewAttribute("set_to_zero_on_underflow", func() string {
-				if msg.SetToZeroOnUnderflow {
-					return "true"
-				}
-				return "false"
-			}()),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "decrement_store_value"),
+		sdk.NewAttribute("store_id", msg.StoreId.String()),
+		sdk.NewAttribute("address", msg.Address),
+		sdk.NewAttribute("amount", msg.Amount.String()),
+		sdk.NewAttribute("new_value", newValue.String()),
+		sdk.NewAttribute("set_to_zero_on_underflow", func() string {
+			if msg.SetToZeroOnUnderflow {
+				return "true"
+			}
+			return "false"
+		}()),
 	)
 
 	return &types.MsgDecrementStoreValueResponse{}, nil

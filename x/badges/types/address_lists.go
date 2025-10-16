@@ -37,6 +37,14 @@ func getDuplicatesAndNonDuplicates(list1 []string, list2 []string) ([]string, []
 //     Removed - everyone but combined list of toRemove.Addresses and addressList.Addresses (everyone but ABCD)
 //     Remaining - non-duplicates from toRemove.Addresses (A)
 func RemoveAddressListFromAddressList(listToRemove *AddressList, addressList *AddressList) (*AddressList, *AddressList) {
+	// Validate input parameters
+	if listToRemove == nil {
+		panic("listToRemove cannot be nil")
+	}
+	if addressList == nil {
+		panic("addressList cannot be nil")
+	}
+
 	duplicates, inToRemoveButNotList := getDuplicatesAndNonDuplicates(listToRemove.Addresses, addressList.Addresses)
 	_, inListButNotToRemove := getDuplicatesAndNonDuplicates(addressList.Addresses, listToRemove.Addresses)
 

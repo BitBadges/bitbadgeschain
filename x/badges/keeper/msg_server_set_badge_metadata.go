@@ -32,15 +32,14 @@ func (k msgServer) SetBadgeMetadata(goCtx context.Context, msg *types.MsgSetBadg
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateBadgeMetadata: msg.CanUpdateBadgeMetadata,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:               collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:              collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
-			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
-			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateCollectionApprovals:      collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}
 
@@ -51,16 +50,16 @@ func (k msgServer) SetBadgeMetadata(goCtx context.Context, msg *types.MsgSetBadg
 	}
 
 	msgBytes, err := json.Marshal(msg)
-	if err == nil {
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-				sdk.NewAttribute("msg_type", "set_badge_metadata"),
-				sdk.NewAttribute("msg", string(msgBytes)),
-			),
-		)
+	if err != nil {
+		return nil, err
 	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_badge_metadata"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+	)
 
 	return &types.MsgSetBadgeMetadataResponse{
 		CollectionId: response.CollectionId,

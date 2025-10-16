@@ -6,7 +6,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -199,18 +198,7 @@ func DecrementStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgDe
 
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []*types.MsgNewCollection) error {
 	for _, collectionToCreate := range collectionsToCreate {
-		balancesType := ""
-		if sdkmath.NewUint(1).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
-			balancesType = "Standard"
-		} else if sdkmath.NewUint(2).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
-			balancesType = "Off-Chain - Indexed"
-		} else if sdkmath.NewUint(3).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
-			balancesType = "Inherited"
-		} else if sdkmath.NewUint(4).Equal(sdkmath.NewUint(collectionToCreate.BalancesType.Uint64())) {
-			balancesType = "Off-Chain - Non-Indexed"
-		} else {
-			return sdkerrors.Wrapf(types.ErrInvalidCollectionID, "Balances type %s not supported", collectionToCreate.BalancesType)
-		}
+		// All collections now use Standard balances
 
 		allBadgeIds := []*types.UintRange{}
 		for _, badge := range collectionToCreate.BadgesToCreate {
@@ -222,7 +210,6 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUniversalUpdateCollection{
 			CollectionId:          sdkmath.NewUint(0),
 			Creator:               bob,
-			BalancesType:          balancesType,
 			CollectionPermissions: collectionToCreate.Permissions,
 			CollectionApprovals:   collectionToCreate.CollectionApprovals,
 			DefaultBalances: &types.UserBalanceStore{
@@ -233,9 +220,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 				AutoApproveSelfInitiatedIncomingTransfers: true,
 				UserPermissions: nil,
 			},
-			CollectionMetadataTimeline:       collectionToCreate.CollectionMetadataTimeline,
-			BadgeMetadataTimeline:            collectionToCreate.BadgeMetadataTimeline,
-			OffChainBalancesMetadataTimeline: collectionToCreate.OffChainBalancesMetadataTimeline,
+			CollectionMetadataTimeline: collectionToCreate.CollectionMetadataTimeline,
+			BadgeMetadataTimeline:      collectionToCreate.BadgeMetadataTimeline,
 			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
 			CustomDataTimeline:          collectionToCreate.CustomDataTimeline,
 			StandardsTimeline:           collectionToCreate.StandardsTimeline,
@@ -247,13 +233,11 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			UpdateValidBadgeIds:         true,
 			UpdateCollectionPermissions: true,
 			// UpdateManagerTimeline: true,
-			UpdateCollectionMetadataTimeline:       true,
-			UpdateBadgeMetadataTimeline:            true,
-			UpdateOffChainBalancesMetadataTimeline: true,
-
-			UpdateCustomDataTimeline:  true,
-			UpdateCollectionApprovals: true,
-			UpdateStandardsTimeline:   true,
+			UpdateCollectionMetadataTimeline: true,
+			UpdateBadgeMetadataTimeline:      true,
+			UpdateCustomDataTimeline:         true,
+			UpdateCollectionApprovals:        true,
+			UpdateStandardsTimeline:          true,
 			// UpdateIsArchivedTimeline: true,
 		})
 		if err != nil {
@@ -342,19 +326,17 @@ func MintAndDistributeBadges(suite *TestSuite, ctx context.Context, msg *types.M
 	allBadgeIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allBadgeIds)
 
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
-		Creator:                                bob,
-		CollectionId:                           msg.CollectionId,
-		UpdateValidBadgeIds:                    true,
-		ValidBadgeIds:                          allBadgeIds,
-		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
-		UpdateCollectionMetadataTimeline:       true,
-		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
-		UpdateBadgeMetadataTimeline:            true,
-		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
-		UpdateOffChainBalancesMetadataTimeline: true,
-		CollectionApprovals:                    msg.CollectionApprovals,
-		UpdateCollectionApprovals:              true,
-		DefaultBalances:                        &types.UserBalanceStore{},
+		Creator:                          bob,
+		CollectionId:                     msg.CollectionId,
+		UpdateValidBadgeIds:              true,
+		ValidBadgeIds:                    allBadgeIds,
+		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
+		UpdateCollectionMetadataTimeline: true,
+		BadgeMetadataTimeline:            msg.BadgeMetadataTimeline,
+		UpdateBadgeMetadataTimeline:      true,
+		CollectionApprovals:              msg.CollectionApprovals,
+		UpdateCollectionApprovals:        true,
+		DefaultBalances:                  &types.UserBalanceStore{},
 	})
 	if err != nil {
 		return err
@@ -409,18 +391,16 @@ func UpdateManager(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateMa
 
 func UpdateMetadata(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateMetadata) error {
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
-		Creator:                                bob,
-		CollectionId:                           msg.CollectionId,
-		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
-		UpdateCollectionMetadataTimeline:       true,
-		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
-		UpdateBadgeMetadataTimeline:            true,
-		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
-		UpdateOffChainBalancesMetadataTimeline: true,
-		StandardsTimeline:                      msg.StandardsTimeline,
-		UpdateStandardsTimeline:                true,
-		CustomDataTimeline:                     msg.CustomDataTimeline,
-		UpdateCustomDataTimeline:               true,
+		Creator:                          bob,
+		CollectionId:                     msg.CollectionId,
+		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
+		UpdateCollectionMetadataTimeline: true,
+		BadgeMetadataTimeline:            msg.BadgeMetadataTimeline,
+		UpdateBadgeMetadataTimeline:      true,
+		StandardsTimeline:                msg.StandardsTimeline,
+		UpdateStandardsTimeline:          true,
+		CustomDataTimeline:               msg.CustomDataTimeline,
+		UpdateCustomDataTimeline:         true,
 	})
 	if err != nil {
 		return err

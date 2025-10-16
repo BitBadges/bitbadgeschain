@@ -28,29 +28,26 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		CollectionId: sdkmath.NewUint(NewCollectionId), //We use 0 to indicate a new collection
 
 		//Exclusive to collection creations
-		BalancesType:    msg.BalancesType,
 		DefaultBalances: msg.DefaultBalances,
 
 		//Applicable to creations and updates
-		ValidBadgeIds:                          msg.ValidBadgeIds,
-		UpdateCollectionPermissions:            true,
-		CollectionPermissions:                  msg.CollectionPermissions,
-		UpdateManagerTimeline:                  true,
-		ManagerTimeline:                        msg.ManagerTimeline,
-		UpdateCollectionMetadataTimeline:       true,
-		CollectionMetadataTimeline:             msg.CollectionMetadataTimeline,
-		UpdateBadgeMetadataTimeline:            true,
-		BadgeMetadataTimeline:                  msg.BadgeMetadataTimeline,
-		UpdateOffChainBalancesMetadataTimeline: true,
-		OffChainBalancesMetadataTimeline:       msg.OffChainBalancesMetadataTimeline,
-		UpdateCustomDataTimeline:               true,
-		CustomDataTimeline:                     msg.CustomDataTimeline,
-		UpdateCollectionApprovals:              true,
-		CollectionApprovals:                    msg.CollectionApprovals,
-		UpdateStandardsTimeline:                true,
-		StandardsTimeline:                      msg.StandardsTimeline,
-		UpdateIsArchivedTimeline:               true,
-		IsArchivedTimeline:                     msg.IsArchivedTimeline,
+		ValidBadgeIds:                    msg.ValidBadgeIds,
+		UpdateCollectionPermissions:      true,
+		CollectionPermissions:            msg.CollectionPermissions,
+		UpdateManagerTimeline:            true,
+		ManagerTimeline:                  msg.ManagerTimeline,
+		UpdateCollectionMetadataTimeline: true,
+		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
+		UpdateBadgeMetadataTimeline:      true,
+		BadgeMetadataTimeline:            msg.BadgeMetadataTimeline,
+		UpdateCustomDataTimeline:         true,
+		CustomDataTimeline:               msg.CustomDataTimeline,
+		UpdateCollectionApprovals:        true,
+		CollectionApprovals:              msg.CollectionApprovals,
+		UpdateStandardsTimeline:          true,
+		StandardsTimeline:                msg.StandardsTimeline,
+		UpdateIsArchivedTimeline:         true,
+		IsArchivedTimeline:               msg.IsArchivedTimeline,
 
 		MintEscrowCoinsToTransfer:   msg.MintEscrowCoinsToTransfer,
 		CosmosCoinWrapperPathsToAdd: msg.CosmosCoinWrapperPathsToAdd,
@@ -67,22 +64,11 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "create_collection"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-		),
-	)
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("indexer",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-			sdk.NewAttribute("msg_type", "create_collection"),
-			sdk.NewAttribute("msg", string(msgBytes)),
-		),
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "create_collection"),
+		sdk.NewAttribute("msg", string(msgBytes)),
 	)
 
 	return &types.MsgCreateCollectionResponse{

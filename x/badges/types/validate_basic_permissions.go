@@ -324,10 +324,6 @@ func ValidatePermissions(permissions *CollectionPermissions, canChangeValues boo
 		return err
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanUpdateOffChainBalancesMetadata, canChangeValues); err != nil {
-		return err
-	}
-
 	if err := ValidateTimedUpdatePermission(permissions.CanArchiveCollection, canChangeValues); err != nil {
 		return err
 	}

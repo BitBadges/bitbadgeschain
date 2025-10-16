@@ -1,0 +1,19 @@
+syntax = "proto3";
+package badges.v15;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v15";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "github.com/bitbadges/bitbadgeschain/x/badges/Params";
+  option (gogoproto.equal) = true;
+
+  // allowed_denoms defines the list of denoms that are allowed to be used in coin_transfers
+  repeated string allowed_denoms = 1;
+
+  // affiliate_percentage defines the percentage of the transfer amount that goes to the affiliate
+  string affiliate_percentage = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}

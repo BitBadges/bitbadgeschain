@@ -10,12 +10,6 @@ import (
 
 // Create tokens and update the unminted / total supplys for the collection
 func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newValidBadgeIds []*types.UintRange) (*types.BadgeCollection, error) {
-	//For readability, we do not allow transfers to happen on-chain, if not defined in the collection
-	if !IsStandardBalances(collection) {
-		if len(collection.CollectionApprovals) > 0 {
-			return &types.BadgeCollection{}, ErrWrongBalancesType
-		}
-	}
 
 	var err error
 	allBadgeIds := []*types.UintRange{}
@@ -25,6 +19,7 @@ func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection,
 		return &types.BadgeCollection{}, err
 	}
 
+	// Ensure the badge ids are sequential starting from 1
 	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
 		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Ids must be sequential starting from 1")
 	}

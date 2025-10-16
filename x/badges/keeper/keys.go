@@ -118,14 +118,28 @@ func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 	}
 
 	// Validate that the collection ID can be parsed
+	if result[0] == "" {
+		return BalanceKeyDetails{}, fmt.Errorf("empty collection ID in balance key")
+	}
+
 	collection_id, err := strconv.ParseUint(result[0], 10, 64)
 	if err != nil {
-		return BalanceKeyDetails{}, fmt.Errorf("invalid collection ID in balance key: %w", err)
+		return BalanceKeyDetails{}, fmt.Errorf("invalid collection ID '%s' in balance key: %w", result[0], err)
+	}
+
+	// Validate collection ID is not zero (collection IDs start from 1)
+	if collection_id == 0 {
+		return BalanceKeyDetails{}, fmt.Errorf("collection ID cannot be zero")
 	}
 
 	// Validate that the address is not empty
 	if result[1] == "" {
 		return BalanceKeyDetails{}, fmt.Errorf("empty address in balance key")
+	}
+
+	// Additional validation: check for potential delimiter conflicts
+	if strings.Contains(result[0], BalanceKeyDelimiter) || strings.Contains(result[1], BalanceKeyDelimiter) {
+		return BalanceKeyDetails{}, fmt.Errorf("balance key components cannot contain delimiter '%s'", BalanceKeyDelimiter)
 	}
 
 	return BalanceKeyDetails{

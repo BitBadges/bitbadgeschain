@@ -32,15 +32,14 @@ func (k msgServer) SetCollectionApprovals(goCtx context.Context, msg *types.MsgS
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCollectionApprovals: msg.CanUpdateCollectionApprovals,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:               collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:              collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateOffChainBalancesMetadata: collection.CollectionPermissions.CanUpdateOffChainBalancesMetadata,
-			CanUpdateStandards:                collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:               collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                  collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:            collection.CollectionPermissions.CanUpdateValidBadgeIds,
-			CanUpdateCollectionMetadata:       collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:            collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanDeleteCollection:         collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:        collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:          collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:         collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:            collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidBadgeIds:      collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateCollectionMetadata: collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateBadgeMetadata:      collection.CollectionPermissions.CanUpdateBadgeMetadata,
 		},
 	}
 
@@ -51,16 +50,16 @@ func (k msgServer) SetCollectionApprovals(goCtx context.Context, msg *types.MsgS
 	}
 
 	msgBytes, err := json.Marshal(msg)
-	if err == nil {
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-				sdk.NewAttribute("msg_type", "set_collection_approvals"),
-				sdk.NewAttribute("msg", string(msgBytes)),
-			),
-		)
+	if err != nil {
+		return nil, err
 	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+		sdk.NewAttribute("msg_type", "set_collection_approvals"),
+		sdk.NewAttribute("msg", string(msgBytes)),
+	)
 
 	return &types.MsgSetCollectionApprovalsResponse{
 		CollectionId: response.CollectionId,
