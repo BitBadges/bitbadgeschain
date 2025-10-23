@@ -75,6 +75,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				},
 			},
 			MintEscrowAddress: accountAddr.String(),
+			Invariants:        msg.Invariants,
 		}
 	} else {
 		//Update case
@@ -109,8 +110,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if previouslyArchived && stillArchived {
 		return nil, ErrCollectionIsArchived
 	}
-
-
 
 	if msg.UpdateCollectionApprovals {
 		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {

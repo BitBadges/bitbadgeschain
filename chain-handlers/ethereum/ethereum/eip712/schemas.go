@@ -1298,5 +1298,148 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	// Cosmos SDK Group module schemas
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgCreateGroup",
+		"value": {
+			"admin": "",
+			"members": [{"address": "", "weight": "0", "metadata": ""}],
+			"metadata": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgUpdateGroupMembers",
+		"value": {
+			"admin": "",
+			"group_id": "0",
+			"member_updates": [{"address": "", "weight": "0", "metadata": ""}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgUpdateGroupAdmin",
+		"value": {
+			"admin": "",
+			"group_id": "0",
+			"new_admin": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgUpdateGroupMetadata",
+		"value": {
+			"admin": "",
+			"group_id": "0",
+			"metadata": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgCreateGroupPolicy",
+		"value": {
+			"admin": "",
+			"group_id": "0",
+			"metadata": "",
+			"decision_policy": {
+				"type": "/cosmos.group.v1.ThresholdDecisionPolicy",
+				"value": ""
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgUpdateGroupPolicyAdmin",
+		"value": {
+			"admin": "",
+			"group_policy_address": "",
+			"new_admin": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgCreateGroupWithPolicy",
+		"value": {
+			"admin": "",
+			"members": [{"address": "", "weight": "0", "metadata": ""}],
+			"group_metadata": "",
+			"group_policy_metadata": "",
+			"group_policy_as_admin": false,
+			"decision_policy": {
+				"type": "/cosmos.group.v1.ThresholdDecisionPolicy",
+				"value": ""
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgUpdateGroupDecisionPolicy",
+		"value": {
+			"admin": "",
+			"group_policy_address": "",
+			"decision_policy": {
+				"type": "/cosmos.group.v1.ThresholdDecisionPolicy",
+				"value": ""
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/MsgUpdateGroupPolicyMetadata",
+		"value": {
+			"admin": "",
+			"group_policy_address": "",
+			"metadata": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/group/MsgSubmitProposal",
+		"value": {
+			"group_policy_address": "",
+			"proposers": [],
+			"metadata": "",
+			"messages": [],
+			"exec": 0,
+			"title": "",
+			"summary": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/group/MsgWithdrawProposal",
+		"value": {
+			"proposal_id": "0",
+			"address": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/group/MsgVote",
+		"value": {
+			"proposal_id": "0",
+			"voter": "",
+			"option": 0,
+			"metadata": "",
+			"exec": 0
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/group/MsgExec",
+		"value": {
+			"proposal_id": "0",
+			"executor": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "cosmos-sdk/group/MsgLeaveGroup",
+		"value": {
+			"address": "",
+			"group_id": "0"
+		}
+	}`)
+
 	return schemas
 }
