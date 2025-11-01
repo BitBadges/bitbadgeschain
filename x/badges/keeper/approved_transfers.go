@@ -362,12 +362,12 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
-		transferStr := "attempting to transfer ID " + remainingBalances[0].BadgeIds[0].Start.String()
+		transferStr := fmt.Sprintf("attempting to transfer ID %s from %s to %s initiated by %s", remainingBalances[0].BadgeIds[0].Start.String(), fromAddress, toAddress, initiatedBy)
 		potentialErrorsStr := ""
 		if len(potentialErrors) > 0 {
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
 		} else {
-			potentialErrorsStr = " - auto-scan failed: "
+			potentialErrorsStr = " - auto-scan failed"
 		}
 		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s%s", transferStr, potentialErrorsStr)
 	}
