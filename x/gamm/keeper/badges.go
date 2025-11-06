@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -9,7 +10,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -161,6 +161,36 @@ func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, recipientAddress string,
 	// Create and execute MsgTransferBadges to ensure proper event handling and validation
 	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
+	currBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress)
+
+	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
+	alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
+	alreadyAutoApprovedSelfInitiatedIncomingTransfers := currBalances.AutoApproveSelfInitiatedIncomingTransfers
+
+	autoApprovedAll := alreadyAutoApprovedAllIncomingTransfers && alreadyAutoApprovedSelfInitiatedOutgoingTransfers && alreadyAutoApprovedSelfInitiatedIncomingTransfers
+
+	if !autoApprovedAll {
+		// We override all approvals to be default allowed
+		// Incoming - All, no matter what
+		// Outgoing - Self-initiated
+		//
+		// This should cover the transfer to this address (rare edge case where default opt-in only)
+		updateApprovalsMsg := &badgestypes.MsgUpdateUserApprovals{
+			Creator:                               poolAddress,
+			CollectionId:                          collection.CollectionId,
+			UpdateAutoApproveAllIncomingTransfers: true,
+			AutoApproveAllIncomingTransfers:       true,
+			UpdateAutoApproveSelfInitiatedOutgoingTransfers: true,
+			AutoApproveSelfInitiatedOutgoingTransfers:       true,
+			UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
+			AutoApproveSelfInitiatedIncomingTransfers:       true,
+		}
+		_, err = badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
+		if err != nil {
+			return err
+		}
+	}
+
 	msg := &badgestypes.MsgTransferBadges{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
@@ -191,20 +221,79 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 	// Create and execute MsgTransferBadges to ensure proper event handling and validation
 	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
+	// Just for sanity checks, we override all approvals to be default allowed
+	// Incoming - All, no matter what
+	// Outgoing - Self-initiated
+	updateApprovalsMsg := &badgestypes.MsgUpdateUserApprovals{
+		Creator:                               poolAddress,
+		CollectionId:                          collection.CollectionId,
+		UpdateAutoApproveAllIncomingTransfers: true,
+		AutoApproveAllIncomingTransfers:       true,
+		UpdateAutoApproveSelfInitiatedOutgoingTransfers: true,
+		AutoApproveSelfInitiatedOutgoingTransfers:       true,
+		UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
+		AutoApproveSelfInitiatedIncomingTransfers:       true,
+
+		//One-time outgoing approval for the pool to send badges to the recipient
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*badgestypes.UserOutgoingApproval{
+			{
+				ToListId:          recipientAddress,
+				InitiatedByListId: recipientAddress,
+				TransferTimes:     []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+				OwnershipTimes:    []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+				BadgeIds:          []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+				Version:           sdkmath.NewUint(0),
+				ApprovalId:        "one-time-outgoing",
+			},
+		},
+	}
+	_, err = badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
+	if err != nil {
+		return err
+	}
+
 	msg := &badgestypes.MsgTransferBadges{
-		Creator:      poolAddress,
+		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
 		Transfers: []*badgestypes.Transfer{
 			{
 				From:        poolAddress,
 				ToAddresses: []string{recipientAddress},
 				Balances:    balancesToTransfer,
+				PrioritizedApprovals: []*badgestypes.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "one-time-outgoing",
+						ApprovalLevel:   "outgoing",
+						ApproverAddress: poolAddress,
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+				OnlyCheckPrioritizedIncomingApprovals: true,
 			},
 		},
 	}
 
 	_, err = badgesMsgServer.TransferBadges(ctx, msg)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// We then make sure that the pool no longer has the one-time outgoing approval
+	// This is needed as opposed to auto-deletion because technically the approval might not
+	// be used if there is some forceful override (thus never deletes and we have a dangling approval)
+	updateApprovalsMsg2 := &badgestypes.MsgUpdateUserApprovals{
+		Creator:      poolAddress,
+		CollectionId: collection.CollectionId,
+
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals:       []*badgestypes.UserOutgoingApproval{},
+	}
+	_, err = badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg2)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // IMPORTANT: Should ONLY be called when to address is a pool address
@@ -293,110 +382,4 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 	}
 
 	return nil
-}
-
-func (k Keeper) MigrateAllPoolsV15(ctx sdk.Context) error {
-	allPools, err := k.GetPoolsAndPoke(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, pool := range allPools {
-		liquidity := pool.GetTotalPoolLiquidity(ctx)
-		for _, denom := range liquidity.Denoms() {
-			if strings.HasPrefix(denom, "badges:") {
-				collection, err := k.ParseCollectionFromDenom(ctx, denom)
-				if err != nil {
-					return err
-				}
-
-				path, err := GetCorrespondingPath(collection, denom)
-				if err != nil {
-					return err
-				}
-
-				if !path.AllowCosmosWrapping {
-					// We need to migrate to badgeslp: denom
-					newDenom := "badgeslp:" + collection.CollectionId.String() + ":" + path.Denom
-
-					// Get the current amount of the old denom in the pool
-					oldCoin := liquidity.AmountOf(denom)
-					if oldCoin.IsZero() {
-						continue // Skip if no liquidity for this denom
-					}
-
-					// Create the new coin with the same amount
-					newCoin := sdk.NewCoin(newDenom, oldCoin)
-
-					// Update pool based on pool type
-					switch poolType := pool.(type) {
-					case *balancer.Pool:
-						// For balancer pools, update the PoolAssets array
-						err := k.migrateBalancerPoolDenom(ctx, poolType, denom, newDenom, oldCoin)
-						if err != nil {
-							return err
-						}
-					default:
-						return fmt.Errorf("unsupported pool type for migration: %T", pool)
-					}
-
-					// Handle bank keeper escrowed amounts
-					poolAddress := pool.GetAddress()
-
-					// Send the old denom tokens from pool to module (to burn them)
-					err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, poolAddress, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, oldCoin)))
-					if err != nil {
-						return err
-					}
-
-					// Burn the old denom tokens
-					err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, oldCoin)))
-					if err != nil {
-						return err
-					}
-
-					// Mint the new denom tokens
-					err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(newCoin))
-					if err != nil {
-						return err
-					}
-
-					// Send the new denom tokens to the pool
-					err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, poolAddress, sdk.NewCoins(newCoin))
-					if err != nil {
-						return err
-					}
-
-					// Update total liquidity tracking
-					k.RecordTotalLiquidityDecrease(ctx, sdk.NewCoins(sdk.NewCoin(denom, oldCoin)))
-					k.RecordTotalLiquidityIncrease(ctx, sdk.NewCoins(newCoin))
-
-					// Save the updated pool
-					err = k.setPool(ctx, pool)
-					if err != nil {
-						return err
-					}
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-// migrateBalancerPoolDenom migrates a denom in a balancer pool from oldDenom to newDenom
-func (k Keeper) migrateBalancerPoolDenom(ctx sdk.Context, pool *balancer.Pool, oldDenom, newDenom string, amount sdkmath.Int) error {
-	// Find the pool asset with the old denom
-	poolAssets := pool.GetAllPoolAssets()
-	for i, asset := range poolAssets {
-		if asset.Token.Denom == oldDenom {
-			// Update the denom while keeping the same amount and weight
-			poolAssets[i].Token = sdk.NewCoin(newDenom, amount)
-			// Update the pool's PoolAssets array
-			pool.PoolAssets = poolAssets
-			return nil
-		}
-	}
-
-	return fmt.Errorf("denom %s not found in balancer pool %d", oldDenom, pool.GetId())
 }
