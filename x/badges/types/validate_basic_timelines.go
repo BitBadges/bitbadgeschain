@@ -3,18 +3,18 @@ package types
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
 func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
-	handledBadgeIds := []*UintRange{}
+	handledTokenIds := []*UintRange{}
 	for _, time := range times {
 		if len(time) == 0 {
 			return ErrNoTimelineTimeSpecified
 		}
 
-		err := AssertRangesDoNotOverlapAtAll(time, handledBadgeIds)
+		err := AssertRangesDoNotOverlapAtAll(time, handledTokenIds)
 		if err != nil {
 			return err
 		}
 
-		handledBadgeIds = append(handledBadgeIds, time...)
+		handledTokenIds = append(handledTokenIds, time...)
 	}
 	return nil
 }
@@ -37,15 +37,15 @@ func ValidateApprovalTimeline(ctx sdk.Context, timeline []*CollectionApprovalTim
 	return nil
 }
 
-func ValidateBadgeMetadataTimeline(timeline []*BadgeMetadataTimeline, canChangeValues bool) error {
+func ValidateTokenMetadataTimeline(timeline []*TokenMetadataTimeline, canChangeValues bool) error {
 	for _, timelineVal := range timeline {
-		err := ValidateBadgeMetadata(timelineVal.BadgeMetadata, canChangeValues)
+		err := ValidateTokenMetadata(timelineVal.TokenMetadata, canChangeValues)
 		if err != nil {
 			return err
 		}
 	}
 
-	times, _ := GetBadgeMetadataTimesAndValues(timeline)
+	times, _ := GetTokenMetadataTimesAndValues(timeline)
 	err := ValidateTimelineTimesDoNotOverlap(times)
 	if err != nil {
 		return err

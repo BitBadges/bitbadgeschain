@@ -20,7 +20,7 @@ func CheckStartsWithBadges(denom string) bool {
 	return strings.HasPrefix(denom, "badges:") || strings.HasPrefix(denom, "badgeslp:")
 }
 
-func (k Keeper) CheckIsBadgesWrappedDenom(ctx sdk.Context, denom string) bool {
+func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
 	if !CheckStartsWithBadges(denom) {
 		return false
 	}
@@ -78,7 +78,7 @@ func ParseDenomPath(denom string) (string, error) {
 	return parts[2], nil
 }
 
-func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string) (*badgestypes.CosmosCoinWrapperPath, error) {
+func GetCorrespondingPath(collection *badgestypes.TokenCollection, denom string) (*badgestypes.CosmosCoinWrapperPath, error) {
 	baseDenom, err := ParseDenomPath(denom)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string)
 	for _, path := range cosmosPaths {
 		if path.AllowOverrideWithAnyValidToken {
 			// 1. Replace the {id} placeholder with the actual denom
-			// 2. Convert all balance.badgeIds to the actual badge ID
+			// 2. Convert all balance.tokenIds to the actual token ID
 			if numericStr == "" {
 				continue
 			}
@@ -105,7 +105,7 @@ func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string)
 			path.Denom = strings.ReplaceAll(path.Denom, "{id}", idFromDenom.String())
 			path.Balances = badgestypes.DeepCopyBalances(path.Balances)
 			for _, balance := range path.Balances {
-				balance.BadgeIds = []*badgestypes.UintRange{
+				balance.TokenIds = []*badgestypes.UintRange{
 					{Start: idFromDenom, End: idFromDenom},
 				}
 			}
@@ -119,7 +119,7 @@ func GetCorrespondingPath(collection *badgestypes.BadgeCollection, denom string)
 	return nil, fmt.Errorf("path not found for denom: %s", denom)
 }
 
-func GetBalancesToTransfer(collection *badgestypes.BadgeCollection, denom string, amount sdkmath.Uint) ([]*badgestypes.Balance, error) {
+func GetBalancesToTransfer(collection *badgestypes.TokenCollection, denom string, amount sdkmath.Uint) ([]*badgestypes.Balance, error) {
 	path, err := GetCorrespondingPath(collection, denom)
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func GetBalancesToTransfer(collection *badgestypes.BadgeCollection, denom string
 	return balancesToTransfer, nil
 }
 
-func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.BadgeCollection, error) {
+func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error) {
 	collectionId, err := ParseDenomCollectionId(denom)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badges
 	return collection, nil
 }
 
-func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
+func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -158,7 +158,7 @@ func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, recipientAddress string,
 		return err
 	}
 
-	// Create and execute MsgTransferBadges to ensure proper event handling and validation
+	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
 	currBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress)
@@ -191,7 +191,7 @@ func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, recipientAddress string,
 		}
 	}
 
-	msg := &badgestypes.MsgTransferBadges{
+	msg := &badgestypes.MsgTransferTokens{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
 		Transfers: []*badgestypes.Transfer{
@@ -203,11 +203,11 @@ func (k Keeper) SendNativeBadgesToPool(ctx sdk.Context, recipientAddress string,
 		},
 	}
 
-	_, err = badgesMsgServer.TransferBadges(ctx, msg)
+	_, err = badgesMsgServer.TransferTokens(ctx, msg)
 	return err
 }
 
-func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -218,7 +218,7 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 		return err
 	}
 
-	// Create and execute MsgTransferBadges to ensure proper event handling and validation
+	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
 
 	// Just for sanity checks, we override all approvals to be default allowed
@@ -234,7 +234,7 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 		UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
 		AutoApproveSelfInitiatedIncomingTransfers:       true,
 
-		//One-time outgoing approval for the pool to send badges to the recipient
+		//One-time outgoing approval for the pool to send tokens to the recipient
 		UpdateOutgoingApprovals: true,
 		OutgoingApprovals: []*badgestypes.UserOutgoingApproval{
 			{
@@ -242,7 +242,7 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 				InitiatedByListId: recipientAddress,
 				TransferTimes:     []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 				OwnershipTimes:    []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-				BadgeIds:          []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+				TokenIds:          []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 				Version:           sdkmath.NewUint(0),
 				ApprovalId:        "one-time-outgoing",
 			},
@@ -253,7 +253,7 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 		return err
 	}
 
-	msg := &badgestypes.MsgTransferBadges{
+	msg := &badgestypes.MsgTransferTokens{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
 		Transfers: []*badgestypes.Transfer{
@@ -274,7 +274,7 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 		},
 	}
 
-	_, err = badgesMsgServer.TransferBadges(ctx, msg)
+	_, err = badgesMsgServer.TransferTokens(ctx, msg)
 	if err != nil {
 		return err
 	}
@@ -300,8 +300,8 @@ func (k Keeper) SendNativeBadgesFromPool(ctx sdk.Context, poolAddress string, re
 func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, wrap it
 	for _, coin := range coins {
-		if k.CheckIsBadgesWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeBadgesToPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+			err := k.SendNativeTokensToPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
@@ -333,8 +333,8 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress
 func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
-		if k.CheckIsBadgesWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeBadgesFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+			err := k.SendNativeTokensFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
@@ -368,8 +368,8 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 	for _, coin := range coins {
 		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
-		if k.CheckIsBadgesWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeBadgesToPool(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+			err := k.SendNativeTokensToPool(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}

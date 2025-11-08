@@ -78,7 +78,7 @@ For number types that need to be handled as Uint in Go:
 ```protobuf
 // Use this pattern for collection IDs, token IDs, and other numeric identifiers
 string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-string badgeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+string tokenId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 ```
 
 This pattern:
@@ -119,7 +119,7 @@ This command will:
 
 The generated code appears in:
 
--   `api/badges/` - Generated Go types for badges module
+-   `api/badges/` - Generated Go types for tokens module
 -   `api/maps/` - Generated Go types for maps module
 -   `api/anchor/` - Generated Go types for anchor module
 -   `x/badges/types/` - Additional type definitions
@@ -252,7 +252,7 @@ Common message types that need schema updates:
 -   `badges/CreateCollection`
 -   `badges/UpdateCollection`
 -   `badges/UniversalUpdateCollection`
--   `badges/TransferBadges`
+-   `badges/TransferTokens`
 -   `badges/UpdateUserApprovals`
 -   `badges/CreateAddressLists`
 -   `maps/CreateMap`

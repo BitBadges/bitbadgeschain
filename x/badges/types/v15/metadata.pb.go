@@ -26,27 +26,27 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // This message defines the metadata for specific token IDs.
 // The interpretation of this metadata should follow the collection standard.
-type BadgeMetadata struct {
+type TokenMetadata struct {
 	// The URI (Uniform Resource Identifier) associated with the token metadata.
 	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	// Custom data or additional information related to the token metadata.
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
 	// The token IDs to which this metadata applies.
-	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,3,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 }
 
-func (m *BadgeMetadata) Reset()         { *m = BadgeMetadata{} }
-func (m *BadgeMetadata) String() string { return proto.CompactTextString(m) }
-func (*BadgeMetadata) ProtoMessage()    {}
-func (*BadgeMetadata) Descriptor() ([]byte, []int) {
+func (m *TokenMetadata) Reset()         { *m = TokenMetadata{} }
+func (m *TokenMetadata) String() string { return proto.CompactTextString(m) }
+func (*TokenMetadata) ProtoMessage()    {}
+func (*TokenMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3afdc26c8d7dbb73, []int{0}
 }
-func (m *BadgeMetadata) XXX_Unmarshal(b []byte) error {
+func (m *TokenMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BadgeMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TokenMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BadgeMetadata.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TokenMetadata.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -56,35 +56,35 @@ func (m *BadgeMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (m *BadgeMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BadgeMetadata.Merge(m, src)
+func (m *TokenMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TokenMetadata.Merge(m, src)
 }
-func (m *BadgeMetadata) XXX_Size() int {
+func (m *TokenMetadata) XXX_Size() int {
 	return m.Size()
 }
-func (m *BadgeMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_BadgeMetadata.DiscardUnknown(m)
+func (m *TokenMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_TokenMetadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BadgeMetadata proto.InternalMessageInfo
+var xxx_messageInfo_TokenMetadata proto.InternalMessageInfo
 
-func (m *BadgeMetadata) GetUri() string {
+func (m *TokenMetadata) GetUri() string {
 	if m != nil {
 		return m.Uri
 	}
 	return ""
 }
 
-func (m *BadgeMetadata) GetCustomData() string {
+func (m *TokenMetadata) GetCustomData() string {
 	if m != nil {
 		return m.CustomData
 	}
 	return ""
 }
 
-func (m *BadgeMetadata) GetBadgeIds() []*UintRange {
+func (m *TokenMetadata) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -202,7 +202,7 @@ func (m *OffChainBalancesMetadata) GetCustomData() string {
 }
 
 func init() {
-	proto.RegisterType((*BadgeMetadata)(nil), "badges.v15.BadgeMetadata")
+	proto.RegisterType((*TokenMetadata)(nil), "badges.v15.TokenMetadata")
 	proto.RegisterType((*CollectionMetadata)(nil), "badges.v15.CollectionMetadata")
 	proto.RegisterType((*OffChainBalancesMetadata)(nil), "badges.v15.OffChainBalancesMetadata")
 }
@@ -231,7 +231,7 @@ var fileDescriptor_3afdc26c8d7dbb73 = []byte{
 	0xff, 0xff, 0x95, 0x49, 0x75, 0xf0, 0xd9, 0x01, 0x00, 0x00,
 }
 
-func (m *BadgeMetadata) Marshal() (dAtA []byte, err error) {
+func (m *TokenMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -241,20 +241,20 @@ func (m *BadgeMetadata) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BadgeMetadata) MarshalTo(dAtA []byte) (int, error) {
+func (m *TokenMetadata) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BadgeMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TokenMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -367,7 +367,7 @@ func encodeVarintMetadata(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *BadgeMetadata) Size() (n int) {
+func (m *TokenMetadata) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -381,8 +381,8 @@ func (m *BadgeMetadata) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovMetadata(uint64(l))
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovMetadata(uint64(l))
 		}
@@ -430,7 +430,7 @@ func sovMetadata(x uint64) (n int) {
 func sozMetadata(x uint64) (n int) {
 	return sovMetadata(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *BadgeMetadata) Unmarshal(dAtA []byte) error {
+func (m *TokenMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -453,10 +453,10 @@ func (m *BadgeMetadata) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BadgeMetadata: wiretype end group for non-group")
+			return fmt.Errorf("proto: TokenMetadata: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BadgeMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TokenMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -525,7 +525,7 @@ func (m *BadgeMetadata) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -552,8 +552,8 @@ func (m *BadgeMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

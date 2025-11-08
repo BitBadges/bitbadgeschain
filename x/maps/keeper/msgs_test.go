@@ -475,7 +475,7 @@ func (suite *TestSuite) TestCollectionIdReservedMaps() {
 }
 
 func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.BadgeCollection{
+	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*badgestypes.ManagerTimeline{
 			{
@@ -502,7 +502,7 @@ func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
 }
 
 func (suite *TestSuite) TestCollectionIdReservedMapsWithManagerNotManager() {
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.BadgeCollection{
+	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*badgestypes.ManagerTimeline{
 			{
@@ -537,7 +537,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 	createMsg.MapId = "1"
 	createMsg.Creator = alice
 
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.BadgeCollection{
+	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*badgestypes.ManagerTimeline{
 			{
@@ -558,7 +558,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 	suite.app.BadgesKeeper.SetUserBalanceInStore(suite.ctx, badgeskeeper.ConstructBalanceKey(alice, sdkmath.NewUint(1)), &badgestypes.UserBalanceStore{
 		Balances: []*badgestypes.Balance{
 			{
-				BadgeIds: []*badgestypes.UintRange{
+				TokenIds: []*badgestypes.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(1),
@@ -615,7 +615,7 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.BadgeCollection{
+	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		ManagerTimeline: []*badgestypes.ManagerTimeline{
 			{

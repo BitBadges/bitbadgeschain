@@ -84,9 +84,9 @@ func (suite *TestSuite) TestReservedIds() {
 	// list, err := suite.app.BadgesKeeper.GetAddressListById(suite.ctx, "1:1",)
 	// suite.Require().Nil(err, "Error getting address list: %s", "1:1")
 	// suite.Require().Equal(list.ListId, "1:1", "Error getting address list: %s", "1:1")
-	// AssertUintsEqual(suite, list.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].Start, sdkmath.NewUint(1))
-	// AssertUintsEqual(suite, list.Filters[0].Conditions[0].MustOwnBadges[0].BadgeIds[0].End, sdkmath.NewUint(1))
-	// AssertUintsEqual(suite, list.Filters[0].Conditions[0].MustOwnBadges[0].CollectionId, sdkmath.NewUint(1))
+	// AssertUintsEqual(suite, list.Filters[0].Conditions[0].MustOwnTokens[0].TokenIds[0].Start, sdkmath.NewUint(1))
+	// AssertUintsEqual(suite, list.Filters[0].Conditions[0].MustOwnTokens[0].TokenIds[0].End, sdkmath.NewUint(1))
+	// AssertUintsEqual(suite, list.Filters[0].Conditions[0].MustOwnTokens[0].CollectionId, sdkmath.NewUint(1))
 }
 
 func (suite *TestSuite) TestStoreAddressLists() {

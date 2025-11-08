@@ -16,7 +16,7 @@ const (
 	DefaultCollectionId = 0
 )
 
-func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferBadges) (*types.MsgTransferBadgesResponse, error) {
+func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferTokens) (*types.MsgTransferTokensResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := msg.CheckAndCleanMsg(ctx, true)
@@ -54,10 +54,10 @@ func (k msgServer) TransferBadges(goCtx context.Context, msg *types.MsgTransferB
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-		sdk.NewAttribute("msg_type", "transfer_badges"),
+		sdk.NewAttribute("msg_type", "transfer_tokens"),
 		sdk.NewAttribute("msg", string(msgBytes)),
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
-	return &types.MsgTransferBadgesResponse{}, nil
+	return &types.MsgTransferTokensResponse{}, nil
 }

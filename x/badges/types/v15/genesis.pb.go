@@ -23,11 +23,11 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the badges module's genesis state.
+// GenesisState defines the tokens module's genesis state.
 type GenesisState struct {
 	Params                           Params               `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 	PortId                           string               `protobuf:"bytes,2,opt,name=port_id,json=portId,proto3" json:"port_id,omitempty"`
-	Collections                      []*BadgeCollection   `protobuf:"bytes,3,rep,name=collections,proto3" json:"collections,omitempty"`
+	Collections                      []*TokenCollection   `protobuf:"bytes,3,rep,name=collections,proto3" json:"collections,omitempty"`
 	NextCollectionId                 Uint                 `protobuf:"bytes,4,opt,name=nextCollectionId,proto3,customtype=Uint" json:"nextCollectionId"`
 	Balances                         []*UserBalanceStore  `protobuf:"bytes,5,rep,name=balances,proto3" json:"balances,omitempty"`
 	BalanceStoreKeys                 []string             `protobuf:"bytes,6,rep,name=balanceStoreKeys,proto3" json:"balanceStoreKeys,omitempty"`
@@ -92,7 +92,7 @@ func (m *GenesisState) GetPortId() string {
 	return ""
 }
 
-func (m *GenesisState) GetCollections() []*BadgeCollection {
+func (m *GenesisState) GetCollections() []*TokenCollection {
 	if m != nil {
 		return m.Collections
 	}
@@ -697,7 +697,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Collections = append(m.Collections, &BadgeCollection{})
+			m.Collections = append(m.Collections, &TokenCollection{})
 			if err := m.Collections[len(m.Collections)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

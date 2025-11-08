@@ -340,7 +340,7 @@ func VerifySignature(
 		//message payload
 		typedData, err = eip712.NormalizeEIP712TypedData(typedData)
 		if err != nil {
-			return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data for badges module")
+			return sdkerrors.Wrap(err, "failed to normalize EIP712 typed data")
 		}
 
 		//We generate the Solana message payload using the code from generatin EIP712

@@ -36,9 +36,9 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
 			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds:       collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:       collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}

@@ -11,9 +11,9 @@ import (
 // Precondition: Assumes that all passed-in matches have .ArbitraryValue set
 //
 // This is a generic function that is used to get the "updated" field combinations
-// Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com]
+// Ex: If we go from [tokenIDs 1 to 10 -> www.example.com] to [tokenIDs 1 to 2 -> www.example2.com, tokenIDs 3 to 10 -> www.example.com]
 //
-// # This will return a UniversalPermissionDetails with badgeIDs 1 to 2 because they changed and are the ones we need to check
+// # This will return a UniversalPermissionDetails with tokenIDs 1 to 2 because they changed and are the ones we need to check
 //
 // Note that updates are field-specific, so the comparison logic is handled via a custom passed-in function - compareAndGetUpdateCombosToCheck
 func GetUpdateCombinationsToCheck(
@@ -72,7 +72,7 @@ func GetUpdateCombinationsToCheck(
 func addTimelineTimeToDetails(details *types.UniversalPermissionDetails, timelineTime *types.UintRange) *types.UniversalPermissionDetails {
 	return &types.UniversalPermissionDetails{
 		TimelineTime:    timelineTime,
-		BadgeId:         details.BadgeId,
+		TokenId:         details.TokenId,
 		TransferTime:    details.TransferTime,
 		OwnershipTime:   details.OwnershipTime,
 		ToList:          details.ToList,
@@ -102,8 +102,8 @@ func (k Keeper) CheckIfTimedUpdatePermissionPermits(ctx sdk.Context, detailsToCh
 	return CheckNotForbiddenForAllOverlaps(ctx, castedPermissions, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckIfBadgeIdsActionPermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.BadgeIdsActionPermission, permissionStr string) error {
-	castedPermissions, err := k.CastBadgeIdsActionPermissionToUniversalPermission(permissions)
+func (k Keeper) CheckIfTokenIdsActionPermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TokenIdsActionPermission, permissionStr string) error {
+	castedPermissions, err := k.CastTokenIdsActionPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
 	}
@@ -111,8 +111,8 @@ func (k Keeper) CheckIfBadgeIdsActionPermissionPermits(ctx sdk.Context, detailsT
 	return CheckNotForbiddenForAllOverlaps(ctx, castedPermissions, detailsToCheck, permissionStr)
 }
 
-func (k Keeper) CheckIfTimedUpdateWithBadgeIdsPermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdateWithBadgeIdsPermission, permissionStr string) error {
-	castedPermissions, err := k.CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(permissions)
+func (k Keeper) CheckIfTimedUpdateWithTokenIdsPermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdateWithTokenIdsPermission, permissionStr string) error {
+	castedPermissions, err := k.CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
 	}

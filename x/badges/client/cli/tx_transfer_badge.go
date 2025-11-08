@@ -15,7 +15,7 @@ import (
 var _ = strconv.Itoa(0)
 
 /*
-your-cli-command transfer-badges '{
+your-cli-command transfer-tokens '{
   "creator": "your-creator-address",
   "collectionId": "your-collection-id",
   "transfers": [
@@ -33,10 +33,10 @@ your-cli-command transfer-badges '{
 }'
 */
 
-func CmdTransferBadges() *cobra.Command {
+func CmdTransferTokens() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-badges [tx-json]",
-		Short: "Broadcast message transferBadges",
+		Use:   "transfer-tokens [tx-json]",
+		Short: "Broadcast message transferTokens",
 		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -46,7 +46,7 @@ func CmdTransferBadges() *cobra.Command {
 
 			txJSON := args[0]
 
-			var txData types.MsgTransferBadges
+			var txData types.MsgTransferTokens
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
 				return err
 			}

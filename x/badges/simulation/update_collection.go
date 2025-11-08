@@ -26,11 +26,11 @@ func SimulateMsgUniversalUpdateCollection(
 			UpdateIsArchivedTimeline:         r.Int63n(2) == 0,
 			UpdateManagerTimeline:            r.Int63n(2) == 0,
 			UpdateCollectionMetadataTimeline: r.Int63n(2) == 0,
-			UpdateBadgeMetadataTimeline:      r.Int63n(2) == 0,
+			UpdateTokenMetadataTimeline:      r.Int63n(2) == 0,
 			UpdateCustomDataTimeline:         r.Int63n(2) == 0,
 			UpdateCollectionApprovals:        r.Int63n(2) == 0,
 			UpdateStandardsTimeline:          r.Int63n(2) == 0,
-			UpdateValidBadgeIds:              r.Int63n(2) == 0,
+			UpdateValidTokenIds:              r.Int63n(2) == 0,
 
 			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
 			IsArchivedTimeline: []*types.IsArchivedTimeline{
@@ -39,7 +39,7 @@ func SimulateMsgUniversalUpdateCollection(
 					TimelineTimes: GetTimelineTimes(r, 3),
 				},
 			},
-			ValidBadgeIds: GetTimelineTimes(r, 3),
+			ValidTokenIds: GetTimelineTimes(r, 3),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
 					FromListId:        GetRandomAddresses(r, 1, accs)[0],
@@ -47,7 +47,7 @@ func SimulateMsgUniversalUpdateCollection(
 					InitiatedByListId: GetRandomAddresses(r, 1, accs)[0],
 					TransferTimes:     GetTimelineTimes(r, 100),
 					OwnershipTimes:    GetTimelineTimes(r, 100),
-					BadgeIds:          GetTimelineTimes(r, 3),
+					TokenIds:          GetTimelineTimes(r, 3),
 				},
 			},
 			ManagerTimeline: []*types.ManagerTimeline{

@@ -1,7 +1,7 @@
 package types
 
 import (
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // Validate permissions are validly formed. Disallows leading zeroes.
@@ -10,15 +10,15 @@ func ValidatePermissions(permissions *MapPermissions, canChangeValues bool) erro
 		return ErrPermissionsIsNil
 	}
 
-	if err := badgetypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateManager), canChangeValues); err != nil {
+	if err := tokentypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateManager), canChangeValues); err != nil {
 		return err
 	}
 
-	if err := badgetypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateMetadata), canChangeValues); err != nil {
+	if err := tokentypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateMetadata), canChangeValues); err != nil {
 		return err
 	}
 
-	if err := badgetypes.ValidateActionPermission(CastActionPermissions(permissions.CanDeleteMap), canChangeValues); err != nil {
+	if err := tokentypes.ValidateActionPermission(CastActionPermissions(permissions.CanDeleteMap), canChangeValues); err != nil {
 		return err
 	}
 

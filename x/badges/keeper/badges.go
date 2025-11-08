@@ -9,39 +9,39 @@ import (
 )
 
 // Create tokens and update the unminted / total supplys for the collection
-func (k Keeper) CreateBadges(ctx sdk.Context, collection *types.BadgeCollection, newValidBadgeIds []*types.UintRange) (*types.BadgeCollection, error) {
+func (k Keeper) CreateTokens(ctx sdk.Context, collection *types.TokenCollection, newValidTokenIds []*types.UintRange) (*types.TokenCollection, error) {
 
 	var err error
-	allBadgeIds := []*types.UintRange{}
-	allBadgeIds = append(allBadgeIds, newValidBadgeIds...)
-	allBadgeIds, err = types.SortUintRangesAndMerge(allBadgeIds, true)
+	allTokenIds := []*types.UintRange{}
+	allTokenIds = append(allTokenIds, newValidTokenIds...)
+	allTokenIds, err = types.SortUintRangesAndMerge(allTokenIds, true)
 	if err != nil {
-		return &types.BadgeCollection{}, err
+		return &types.TokenCollection{}, err
 	}
 
-	// Ensure the badge ids are sequential starting from 1
-	if len(allBadgeIds) > 1 || (len(allBadgeIds) == 1 && !allBadgeIds[0].Start.Equal(sdkmath.NewUint(1))) {
-		return &types.BadgeCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Ids must be sequential starting from 1")
+	// Ensure the token ids are sequential starting from 1
+	if len(allTokenIds) > 1 || (len(allTokenIds) == 1 && !allTokenIds[0].Start.Equal(sdkmath.NewUint(1))) {
+		return &types.TokenCollection{}, sdkerrors.Wrapf(types.ErrNotSupported, "Ids must be sequential starting from 1")
 	}
 
-	if len(newValidBadgeIds) == 0 {
+	if len(newValidTokenIds) == 0 {
 		return collection, nil
 	}
 
 	//Check if we are allowed to create these tokens
 	detailsToCheck := []*types.UniversalPermissionDetails{}
-	for _, badgeIdRange := range newValidBadgeIds {
+	for _, tokenIdRange := range newValidTokenIds {
 		detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-			BadgeId: badgeIdRange,
+			TokenId: tokenIdRange,
 		})
 	}
 
-	err = k.CheckIfBadgeIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidBadgeIds, "can create more tokens")
+	err = k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidTokenIds, "can create more tokens")
 	if err != nil {
-		return &types.BadgeCollection{}, err
+		return &types.TokenCollection{}, err
 	}
 
-	collection.ValidBadgeIds = allBadgeIds
+	collection.ValidTokenIds = allTokenIds
 
 	return collection, nil
 }

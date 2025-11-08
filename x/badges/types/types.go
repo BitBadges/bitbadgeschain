@@ -1,8 +1,8 @@
 package types
 
-// Special addresses used throughout the badges module
+// Special addresses used throughout the tokens module
 const (
-	// MintAddress represents the special address for minting new badges
+	// MintAddress represents the special address for minting new tokens
 	MintAddress = "Mint"
 
 	// TotalAddress represents the special address for tracking total supply

@@ -6,7 +6,7 @@ import (
 	anchorKeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	gammKeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	gammTypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	mapsKeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
@@ -109,7 +109,7 @@ func PerformCustomAnchorQuery(ak anchorKeeper.Keeper) wasmKeeper.CustomQuerier {
 	}
 }
 
-// WASM handler for contracts calling into the badges module
+// WASM handler for contracts calling into the tokens module
 func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 		var custom badgeCustomQuery
@@ -124,44 +124,44 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetCollectionResponse{Collection: res.Collection})
+			return json.Marshal(tokenTypes.QueryGetCollectionResponse{Collection: res.Collection})
 		case custom.QueryBalance != nil:
 			res, err := keeper.GetBalance(ctx, custom.QueryBalance)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetBalanceResponse{Balance: res.Balance})
+			return json.Marshal(tokenTypes.QueryGetBalanceResponse{Balance: res.Balance})
 
 		case custom.QueryAddressList != nil:
 			res, err := keeper.GetAddressList(ctx, custom.QueryAddressList)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetAddressListResponse{List: res.List})
+			return json.Marshal(tokenTypes.QueryGetAddressListResponse{List: res.List})
 		case custom.QueryApprovalTracker != nil:
 			res, err := keeper.GetApprovalTracker(ctx, custom.QueryApprovalTracker)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetApprovalTrackerResponse{Tracker: res.Tracker})
+			return json.Marshal(tokenTypes.QueryGetApprovalTrackerResponse{Tracker: res.Tracker})
 		case custom.QueryGetChallengeTracker != nil:
 			res, err := keeper.GetChallengeTracker(ctx, custom.QueryGetChallengeTracker)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetChallengeTrackerResponse{NumUsed: res.NumUsed})
+			return json.Marshal(tokenTypes.QueryGetChallengeTrackerResponse{NumUsed: res.NumUsed})
 		case custom.QueryGetETHSignatureTracker != nil:
 			res, err := keeper.GetETHSignatureTracker(ctx, custom.QueryGetETHSignatureTracker)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetETHSignatureTrackerResponse{NumUsed: res.NumUsed})
+			return json.Marshal(tokenTypes.QueryGetETHSignatureTrackerResponse{NumUsed: res.NumUsed})
 		case custom.QueryGetWrappableBalances != nil:
 			res, err := keeper.GetWrappableBalances(ctx, custom.QueryGetWrappableBalances)
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(badgeTypes.QueryGetWrappableBalancesResponse{MaxWrappableAmount: res.MaxWrappableAmount})
+			return json.Marshal(tokenTypes.QueryGetWrappableBalancesResponse{MaxWrappableAmount: res.MaxWrappableAmount})
 		}
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}
@@ -249,13 +249,13 @@ func PerformCustomGammQuery(gk gammKeeper.Keeper) wasmKeeper.CustomQuerier {
 }
 
 type badgeCustomQuery struct {
-	QueryCollection             *badgeTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
-	QueryBalance                *badgeTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
-	QueryAddressList            *badgeTypes.QueryGetAddressListRequest         `json:"queryAddressList,omitempty"`
-	QueryApprovalTracker        *badgeTypes.QueryGetApprovalTrackerRequest     `json:"queryApprovalTracker,omitempty"`
-	QueryGetChallengeTracker    *badgeTypes.QueryGetChallengeTrackerRequest    `json:"queryGetChallengeTracker,omitempty"`
-	QueryGetETHSignatureTracker *badgeTypes.QueryGetETHSignatureTrackerRequest `json:"queryGetETHSignatureTracker,omitempty"`
-	QueryGetWrappableBalances   *badgeTypes.QueryGetWrappableBalancesRequest   `json:"queryGetWrappableBalances,omitempty"`
+	QueryCollection             *tokenTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
+	QueryBalance                *tokenTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
+	QueryAddressList            *tokenTypes.QueryGetAddressListRequest         `json:"queryAddressList,omitempty"`
+	QueryApprovalTracker        *tokenTypes.QueryGetApprovalTrackerRequest     `json:"queryApprovalTracker,omitempty"`
+	QueryGetChallengeTracker    *tokenTypes.QueryGetChallengeTrackerRequest    `json:"queryGetChallengeTracker,omitempty"`
+	QueryGetETHSignatureTracker *tokenTypes.QueryGetETHSignatureTrackerRequest `json:"queryGetETHSignatureTracker,omitempty"`
+	QueryGetWrappableBalances   *tokenTypes.QueryGetWrappableBalancesRequest   `json:"queryGetWrappableBalances,omitempty"`
 }
 
 type anchorCustomQuery struct {

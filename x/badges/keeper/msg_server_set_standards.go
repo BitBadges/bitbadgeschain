@@ -36,9 +36,9 @@ func (k msgServer) SetStandards(goCtx context.Context, msg *types.MsgSetStandard
 			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
 			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
 			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds:       collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:       collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}

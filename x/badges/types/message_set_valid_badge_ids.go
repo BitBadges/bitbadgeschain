@@ -4,28 +4,28 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const TypeMsgSetValidBadgeIds = "set_valid_badge_ids"
+const TypeMsgSetValidTokenIds = "set_valid_token_ids"
 
-var _ sdk.Msg = &MsgSetValidBadgeIds{}
+var _ sdk.Msg = &MsgSetValidTokenIds{}
 
-func NewMsgSetValidBadgeIds(creator string, collectionId Uint, validBadgeIds []*UintRange, canUpdateValidBadgeIds []*BadgeIdsActionPermission) *MsgSetValidBadgeIds {
-	return &MsgSetValidBadgeIds{
+func NewMsgSetValidTokenIds(creator string, collectionId Uint, validTokenIds []*UintRange, canUpdateValidTokenIds []*TokenIdsActionPermission) *MsgSetValidTokenIds {
+	return &MsgSetValidTokenIds{
 		Creator:                creator,
 		CollectionId:           collectionId,
-		ValidBadgeIds:          validBadgeIds,
-		CanUpdateValidBadgeIds: canUpdateValidBadgeIds,
+		ValidTokenIds:          validTokenIds,
+		CanUpdateValidTokenIds: canUpdateValidTokenIds,
 	}
 }
 
-func (msg *MsgSetValidBadgeIds) Route() string {
+func (msg *MsgSetValidTokenIds) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgSetValidBadgeIds) Type() string {
-	return TypeMsgSetValidBadgeIds
+func (msg *MsgSetValidTokenIds) Type() string {
+	return TypeMsgSetValidTokenIds
 }
 
-func (msg *MsgSetValidBadgeIds) GetSigners() []sdk.AccAddress {
+func (msg *MsgSetValidTokenIds) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -33,13 +33,13 @@ func (msg *MsgSetValidBadgeIds) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgSetValidBadgeIds) GetSignBytes() []byte {
+func (msg *MsgSetValidTokenIds) GetSignBytes() []byte {
 	bz := AminoCdc.MustMarshalJSON(msg)
 	sorted := sdk.MustSortJSON(bz)
 	return sorted
 }
 
-func (msg *MsgSetValidBadgeIds) ValidateBasic() error {
+func (msg *MsgSetValidTokenIds) ValidateBasic() error {
 	uni, err := msg.ToUniversalUpdateCollection()
 	if err != nil {
 		return err
@@ -47,15 +47,15 @@ func (msg *MsgSetValidBadgeIds) ValidateBasic() error {
 	return uni.ValidateBasic()
 }
 
-func (msg *MsgSetValidBadgeIds) ToUniversalUpdateCollection() (*MsgUniversalUpdateCollection, error) {
+func (msg *MsgSetValidTokenIds) ToUniversalUpdateCollection() (*MsgUniversalUpdateCollection, error) {
 	ms := &MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateValidBadgeIds:         true,
-		ValidBadgeIds:               msg.ValidBadgeIds,
+		UpdateValidTokenIds:         true,
+		ValidTokenIds:               msg.ValidTokenIds,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
-			CanUpdateValidBadgeIds: msg.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds: msg.CanUpdateValidTokenIds,
 		},
 	}
 	err := ms.CheckAndCleanMsg(sdk.Context{}, true)

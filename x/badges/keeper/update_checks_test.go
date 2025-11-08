@@ -126,7 +126,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsInvalidTimes() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermits() {
+func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermits() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -138,12 +138,12 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermits() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
+			CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{
 				{
 
 					PermanentlyPermittedTimes: GetFullUintRanges(),
 					TimelineTimes:             GetFullUintRanges(),
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 				},
 			},
 		},
@@ -153,13 +153,13 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermits() {
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+		TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
-				BadgeMetadata: []*types.BadgeMetadata{
+				TokenMetadata: []*types.TokenMetadata{
 					{
 						Uri:      "https://example.com",
-						BadgeIds: GetFullUintRanges(),
+						TokenIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -168,7 +168,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermits() {
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsDefaultAllowed() {
+func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermitsDefaultAllowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -180,7 +180,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsDefau
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{},
+			CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
@@ -188,13 +188,13 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsDefau
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+		TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
-				BadgeMetadata: []*types.BadgeMetadata{
+				TokenMetadata: []*types.TokenMetadata{
 					{
 						Uri:      "https://example.com",
-						BadgeIds: GetFullUintRanges(),
+						TokenIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -203,7 +203,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsDefau
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsInvalidTimes() {
+func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermitsInvalidTimes() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -215,18 +215,18 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsInval
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateBadgeMetadata: []*types.TimedUpdateWithBadgeIdsPermission{
+			CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{
 				{
 
 					PermanentlyPermittedTimes: GetFullUintRanges(),
 					TimelineTimes:             GetOneUintRange(),
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 				},
 				{
 
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					TimelineTimes:             GetTwoUintRanges(),
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 				},
 			},
 		},
@@ -236,13 +236,13 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsInval
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+		TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 			{
 				TimelineTimes: GetFullUintRanges(),
-				BadgeMetadata: []*types.BadgeMetadata{
+				TokenMetadata: []*types.TokenMetadata{
 					{
 						Uri:      "https://example.com",
-						BadgeIds: GetFullUintRanges(),
+						TokenIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -253,13 +253,13 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithBadgeIdsPermissionPermitsInval
 	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgeMetadataTimeline: []*types.BadgeMetadataTimeline{
+		TokenMetadataTimeline: []*types.TokenMetadataTimeline{
 			{
 				TimelineTimes: GetOneUintRange(),
-				BadgeMetadata: []*types.BadgeMetadata{
+				TokenMetadata: []*types.TokenMetadata{
 					{
 						Uri:      "https://example.com",
-						BadgeIds: GetFullUintRanges(),
+						TokenIds: GetFullUintRanges(),
 					},
 				},
 			},
@@ -288,7 +288,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
 					ApprovalId:                "All",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 				},
@@ -305,7 +305,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -330,7 +330,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -340,7 +340,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testasdfas",
@@ -350,7 +350,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testasdfasdfasfd",
@@ -369,7 +369,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -379,7 +379,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testafdasdf",
@@ -389,7 +389,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testasdfasdf",
@@ -408,7 +408,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -418,7 +418,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testdfgh",
@@ -437,7 +437,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "something different",
@@ -447,7 +447,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testhdfgjhdf",
@@ -465,7 +465,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -483,7 +483,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 			FromListId:        bob,
 			ToListId:          "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "test2",
@@ -527,7 +527,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
 					ApprovalId:                "All",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 				},
@@ -545,7 +545,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "something that is not the same",
@@ -555,7 +555,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "tesfasdft",
@@ -574,7 +574,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -584,7 +584,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testadsfasdf",
@@ -611,7 +611,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -634,7 +634,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
 					ApprovalId:                "test",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 				},
@@ -652,7 +652,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "Mint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -663,7 +663,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testafdsasdf",
@@ -682,7 +682,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetOneUintRange(), //different
 				ApprovalId:        "test",
@@ -692,7 +692,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testasdfas",
@@ -711,7 +711,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -721,7 +721,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "tesadsft",
@@ -731,7 +731,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        "!" + alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testasdfasd",
@@ -762,7 +762,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
 					ApprovalId:                "approvalidtotest",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 				},
@@ -780,7 +780,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetOneUintRange(), //different
 				ApprovalId:        "approvalidtotest",
@@ -800,7 +800,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				FromListId:        alice,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "different id",
@@ -831,7 +831,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 					ToListId:                  alice,
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 					ApprovalId:                "All",
@@ -843,7 +843,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 					FromListId:                alice,
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 					ApprovalId:                "All",
@@ -862,7 +862,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 			{
 				ToListId:          alice,
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -878,7 +878,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 			{
 				FromListId:        alice,
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -896,7 +896,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 			{
 				ToListId:          bob,
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -912,7 +912,7 @@ func (suite *TestSuite) TestCheckUserApprovalUpdate() {
 			{
 				FromListId:        bob,
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -948,7 +948,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 					ToListId:                  "AllWithoutMint",
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
 					InitiatedByListId:         "AllWithoutMint",
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 					TransferTimes:             GetFullUintRanges(),
 					OwnershipTimes:            GetFullUintRanges(),
 					ApprovalId:                "All",
@@ -958,7 +958,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -968,7 +968,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentBaseCaseNoSplit() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -999,7 +999,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -1009,7 +1009,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				FromListId:        "!" + bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testgfag",
@@ -1019,7 +1019,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1029,7 +1029,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1039,7 +1039,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 	})
 	suite.Require().Nil(err, "Error transferring tokens")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1049,7 +1049,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1080,7 +1080,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -1090,7 +1090,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 				FromListId:        "!" + bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testagdf",
@@ -1100,7 +1100,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1110,12 +1110,12 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetTopHalfUintRanges(),
+						TokenIds:       GetTopHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1146,7 +1146,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -1156,7 +1156,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				FromListId:        "!" + bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testadfgsd",
@@ -1166,7 +1166,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1176,7 +1176,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1186,7 +1186,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 	})
 	suite.Require().Nil(err, "Error transferring tokens")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1196,7 +1196,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetTopHalfUintRanges(),
+						TokenIds:       GetTopHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1222,11 +1222,11 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 			StartBalances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetFullUintRanges(),
+					TokenIds:       GetFullUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 			DurationFromTimestamp:     sdkmath.NewUint(0),
 		},
@@ -1244,7 +1244,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetBottomHalfUintRanges(),
+				TokenIds:          GetBottomHalfUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -1254,7 +1254,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetTopHalfUintRanges(),
+				TokenIds:          GetTopHalfUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testsgdfs",
@@ -1264,7 +1264,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1274,7 +1274,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1285,7 +1285,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 	suite.Require().Nil(err, "Error transferring tokens")
 
 	//Not exactly the predetermined balances, but the same number of transfers
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1295,7 +1295,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(2),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1321,11 +1321,11 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 			StartBalances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetFullUintRanges(),
+					TokenIds:       GetFullUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
-			IncrementBadgeIdsBy:       sdkmath.NewUint(0),
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
 			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
 			DurationFromTimestamp:     sdkmath.NewUint(0),
 		},
@@ -1343,7 +1343,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetBottomHalfUintRanges(),
+				TokenIds:          GetBottomHalfUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -1353,7 +1353,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetTopHalfUintRanges(),
+				TokenIds:          GetTopHalfUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "testsdfgsdf",
@@ -1364,7 +1364,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
 	//Test that the number of balances does not matter as long as they are equivalent
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1374,12 +1374,12 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetTopHalfUintRanges(),
+						TokenIds:       GetTopHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetBottomHalfUintRanges(),
+						TokenIds:       GetBottomHalfUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -1401,14 +1401,14 @@ func (suite *TestSuite) TestGetMaxPossible() {
 			TransferTimes:     GetFullUintRanges(),
 			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalId:        "test",
-			BadgeIds:          GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
 		},
 	}
 
-	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+	collectionsToCreate[0].TokensToCreate = []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(20),
-			BadgeIds:       GetFullUintRanges(),
+			TokenIds:       GetFullUintRanges(),
 			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
@@ -1426,7 +1426,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "test",
@@ -1442,7 +1442,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 				FromListId:        bob,
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
-				BadgeIds:          GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				ApprovalId:        "tessdgfst",
@@ -1459,7 +1459,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
 	//Test that the number of balances does not matter as long as they are equivalent
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -1469,7 +1469,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(20),
-						BadgeIds:       GetFullUintRanges(),
+						TokenIds:       GetFullUintRanges(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},

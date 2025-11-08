@@ -603,7 +603,7 @@ var (
 	md_Balance                protoreflect.MessageDescriptor
 	fd_Balance_amount         protoreflect.FieldDescriptor
 	fd_Balance_ownershipTimes protoreflect.FieldDescriptor
-	fd_Balance_badgeIds       protoreflect.FieldDescriptor
+	fd_Balance_tokenIds       protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -611,7 +611,7 @@ func init() {
 	md_Balance = File_badges_balances_proto.Messages().ByName("Balance")
 	fd_Balance_amount = md_Balance.Fields().ByName("amount")
 	fd_Balance_ownershipTimes = md_Balance.Fields().ByName("ownershipTimes")
-	fd_Balance_badgeIds = md_Balance.Fields().ByName("badgeIds")
+	fd_Balance_tokenIds = md_Balance.Fields().ByName("tokenIds")
 }
 
 var _ protoreflect.Message = (*fastReflection_Balance)(nil)
@@ -691,9 +691,9 @@ func (x *fastReflection_Balance) Range(f func(protoreflect.FieldDescriptor, prot
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_Balance_3_list{list: &x.BadgeIds})
-		if !f(fd_Balance_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_Balance_3_list{list: &x.TokenIds})
+		if !f(fd_Balance_tokenIds, value) {
 			return
 		}
 	}
@@ -716,8 +716,8 @@ func (x *fastReflection_Balance) Has(fd protoreflect.FieldDescriptor) bool {
 		return x.Amount != ""
 	case "badges.Balance.ownershipTimes":
 		return len(x.OwnershipTimes) != 0
-	case "badges.Balance.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.Balance.tokenIds":
+		return len(x.TokenIds) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Balance"))
@@ -738,8 +738,8 @@ func (x *fastReflection_Balance) Clear(fd protoreflect.FieldDescriptor) {
 		x.Amount = ""
 	case "badges.Balance.ownershipTimes":
 		x.OwnershipTimes = nil
-	case "badges.Balance.badgeIds":
-		x.BadgeIds = nil
+	case "badges.Balance.tokenIds":
+		x.TokenIds = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Balance"))
@@ -765,11 +765,11 @@ func (x *fastReflection_Balance) Get(descriptor protoreflect.FieldDescriptor) pr
 		}
 		listValue := &_Balance_2_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.Balance.badgeIds":
-		if len(x.BadgeIds) == 0 {
+	case "badges.Balance.tokenIds":
+		if len(x.TokenIds) == 0 {
 			return protoreflect.ValueOfList(&_Balance_3_list{})
 		}
-		listValue := &_Balance_3_list{list: &x.BadgeIds}
+		listValue := &_Balance_3_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -797,10 +797,10 @@ func (x *fastReflection_Balance) Set(fd protoreflect.FieldDescriptor, value prot
 		lv := value.List()
 		clv := lv.(*_Balance_2_list)
 		x.OwnershipTimes = *clv.list
-	case "badges.Balance.badgeIds":
+	case "badges.Balance.tokenIds":
 		lv := value.List()
 		clv := lv.(*_Balance_3_list)
-		x.BadgeIds = *clv.list
+		x.TokenIds = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Balance"))
@@ -827,11 +827,11 @@ func (x *fastReflection_Balance) Mutable(fd protoreflect.FieldDescriptor) protor
 		}
 		value := &_Balance_2_list{list: &x.OwnershipTimes}
 		return protoreflect.ValueOfList(value)
-	case "badges.Balance.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.Balance.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_Balance_3_list{list: &x.BadgeIds}
+		value := &_Balance_3_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.Balance.amount":
 		panic(fmt.Errorf("field amount of message badges.Balance is not mutable"))
@@ -853,7 +853,7 @@ func (x *fastReflection_Balance) NewField(fd protoreflect.FieldDescriptor) proto
 	case "badges.Balance.ownershipTimes":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_Balance_2_list{list: &list})
-	case "badges.Balance.badgeIds":
+	case "badges.Balance.tokenIds":
 		list := []*UintRange{}
 		return protoreflect.ValueOfList(&_Balance_3_list{list: &list})
 	default:
@@ -935,8 +935,8 @@ func (x *fastReflection_Balance) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -970,9 +970,9 @@ func (x *fastReflection_Balance) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1126,7 +1126,7 @@ func (x *fastReflection_Balance) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -1153,8 +1153,8 @@ func (x *fastReflection_Balance) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -1258,11 +1258,11 @@ func (x *UintRange) GetEnd() string {
 }
 
 // Balance represents the balance of a token for a specific user.
-// The user amounts xAmount of a token for the badgeID specified for the time ranges specified.
+// The user amounts xAmount of a token for the tokenID specified for the time ranges specified.
 //
 // Example: User A owns x10 of token IDs 1-10 from 1/1/2020 to 1/1/2021.
 //
-// If times or badgeIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
+// If times or tokenIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
 type Balance struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1273,7 +1273,7 @@ type Balance struct {
 	// The time ranges during which the user owns the token.
 	OwnershipTimes []*UintRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The token IDs for which the user owns the token.
-	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,3,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 }
 
 func (x *Balance) Reset() {
@@ -1310,9 +1310,9 @@ func (x *Balance) GetOwnershipTimes() []*UintRange {
 	return nil
 }
 
-func (x *Balance) GetBadgeIds() []*UintRange {
+func (x *Balance) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -1368,7 +1368,7 @@ var file_badges_balances_proto_goTypes = []interface{}{
 }
 var file_badges_balances_proto_depIdxs = []int32{
 	0, // 0: badges.Balance.ownershipTimes:type_name -> badges.UintRange
-	0, // 1: badges.Balance.badgeIds:type_name -> badges.UintRange
+	0, // 1: badges.Balance.tokenIds:type_name -> badges.UintRange
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

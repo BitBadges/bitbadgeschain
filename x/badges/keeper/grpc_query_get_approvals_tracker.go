@@ -12,7 +12,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-// Queries a balance for the given address and badgeId and returns its contents.
+// Queries a balance for the given address and tokenId and returns its contents.
 func (k Keeper) GetApprovalTracker(goCtx context.Context, req *types.QueryGetApprovalTrackerRequest) (*types.QueryGetApprovalTrackerResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

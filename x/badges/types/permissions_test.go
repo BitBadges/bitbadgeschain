@@ -103,7 +103,7 @@ func GetFullUintRanges() []*types.UintRange {
 	}
 }
 
-func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
+func (suite *TestSuite) TestActionPermissionUpdateWithTokenIds() {
 	oldActionPermission := &types.CollectionApprovalPermission{
 		ApprovalId:        "All",
 		FromListId:        "All",
@@ -111,7 +111,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -139,7 +139,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -180,7 +180,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(122),
@@ -220,7 +220,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(80),
@@ -260,7 +260,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: types.InvertUintRanges([]*types.UintRange{
+		TokenIds: types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(80),
@@ -299,7 +299,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		ToListId:          "All",
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
-		BadgeIds: types.InvertUintRanges([]*types.UintRange{
+		TokenIds: types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -339,7 +339,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -387,7 +387,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -427,7 +427,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -467,7 +467,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 		InitiatedByListId: "All",
 		TransferTimes:     GetFullUintRanges(),
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -500,7 +500,7 @@ func (suite *TestSuite) TestActionPermissionUpdateWithBadgeIds() {
 	//copy newActionPermission to newActionPermission2
 	newActionPermission2 := &types.CollectionApprovalPermission{}
 	*newActionPermission2 = *newActionPermission
-	newActionPermission2.BadgeIds = types.InvertUintRanges(newActionPermission2.BadgeIds, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
+	newActionPermission2.TokenIds = types.InvertUintRanges(newActionPermission2.TokenIds, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64))
 	//Everything else from newActionPermission
 
 	err = keeper.ValidateCollectionApprovalPermissionsUpdate(sdk.Context{}, []*types.CollectionApprovalPermission{oldActionPermission}, []*types.CollectionApprovalPermission{newActionPermission, newActionPermission2})
@@ -794,8 +794,8 @@ func (suite *TestSuite) TestTimedUpdatePermission() {
 	require.NoError(suite.T(), err)
 }
 
-func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
-	oldActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
+func (suite *TestSuite) TestValidateTimedUpdatePermissionWithTokenIds() {
+	oldActionPermissions := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -804,7 +804,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -820,7 +820,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	newActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -829,7 +829,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -855,10 +855,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 	}
 
 	keeper, _ := keepertest.BadgesKeeper(suite.T())
-	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err := keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -867,7 +867,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(122),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(122),
@@ -892,10 +892,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -904,7 +904,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(80),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
@@ -929,10 +929,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
 				{
@@ -940,7 +940,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(80),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(80),
@@ -966,10 +966,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: types.InvertUintRanges([]*types.UintRange{
@@ -978,7 +978,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1003,10 +1003,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1019,7 +1019,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(300),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1048,10 +1048,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1060,7 +1060,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1085,10 +1085,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1097,7 +1097,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1122,10 +1122,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 			TimelineTimes: []*types.UintRange{
 				{
@@ -1133,7 +1133,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1163,7 +1163,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1188,17 +1188,17 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 
-	oldActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{{
+	oldActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{{
 		TimelineTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -1227,7 +1227,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 				End:   sdkmath.NewUint(100),
 			},
 		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -1251,7 +1251,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}}
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1264,7 +1264,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(60),
@@ -1303,7 +1303,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(60),
@@ -1332,10 +1332,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1348,7 +1348,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(60),
@@ -1387,7 +1387,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(60),
@@ -1416,10 +1416,10 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1428,7 +1428,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(61),
 					End:   sdkmath.NewUint(100),
@@ -1458,7 +1458,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(61),
 					End:   sdkmath.NewUint(100),
@@ -1483,7 +1483,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	newActionPermission2 := []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermission2 := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 			TimelineTimes: []*types.UintRange{
 				{
@@ -1491,7 +1491,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1522,7 +1522,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1548,17 +1548,17 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 	}
 
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 
-	oldActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{{
+	oldActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{{
 		TimelineTimes: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -1588,7 +1588,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 				End:   sdkmath.NewUint(100),
 			},
 		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -1612,7 +1612,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}}
 
-	newActionPermissions = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1621,7 +1621,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -1652,7 +1652,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(50),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -1677,7 +1677,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 		},
 	}
 
-	newActionPermission2 = []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermission2 = []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1686,7 +1686,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -1717,7 +1717,7 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -1743,13 +1743,13 @@ func (suite *TestSuite) TestValidateTimedUpdatePermissionWithBadgeIds() {
 	}
 
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err = keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err = keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.Error(suite.T(), err)
 
 }
 
-func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
-	oldActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
+func (suite *TestSuite) TestValidateTimedUpdateWithTokenIdsPermissionUpdate2() {
+	oldActionPermissions := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1758,7 +1758,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1788,7 +1788,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1812,7 +1812,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 			},
 		}}
 
-	newActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1821,7 +1821,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -1851,7 +1851,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 					End:   sdkmath.NewUint(50),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -1875,7 +1875,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 			}},
 	}
 
-	newActionPermission2 := []*types.TimedUpdateWithBadgeIdsPermission{{
+	newActionPermission2 := []*types.TimedUpdateWithTokenIdsPermission{{
 
 		TimelineTimes: []*types.UintRange{
 			{
@@ -1883,7 +1883,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 				End:   sdkmath.NewUint(100),
 			},
 		},
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(9),
@@ -1917,7 +1917,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 				End:   sdkmath.NewUint(100),
 			},
 		}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(9),
@@ -1948,12 +1948,12 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate2() {
 
 	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err := keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 }
 
-func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
-	oldActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
+func (suite *TestSuite) TestValidateTimedUpdateWithTokenIdsPermissionUpdate3() {
+	oldActionPermissions := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -1962,7 +1962,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -1992,7 +1992,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2017,7 +2017,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 		},
 	}
 
-	newActionPermissions := []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermissions := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -2026,7 +2026,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 					End:   sdkmath.NewUint(50),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -2056,7 +2056,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 					End:   sdkmath.NewUint(50),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -2081,7 +2081,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 		},
 	}
 
-	newActionPermission2 := []*types.TimedUpdateWithBadgeIdsPermission{
+	newActionPermission2 := []*types.TimedUpdateWithTokenIdsPermission{
 		{
 
 			TimelineTimes: []*types.UintRange{
@@ -2090,7 +2090,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 					End:   sdkmath.NewUint(100),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(9),
@@ -2123,7 +2123,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 					End:   sdkmath.NewUint(100),
 				},
 			}, sdkmath.NewUint(1), sdkmath.NewUint(math.MaxUint64)),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(9),
@@ -2154,7 +2154,7 @@ func (suite *TestSuite) TestValidateTimedUpdateWithBadgeIdsPermissionUpdate3() {
 
 	keeper, _ := keepertest.BadgesKeeper(suite.T())
 	newActionPermissions = append(newActionPermissions, newActionPermission2...)
-	err := keeper.ValidateTimedUpdateWithBadgeIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
+	err := keeper.ValidateTimedUpdateWithTokenIdsPermissionUpdate(sdk.Context{}, oldActionPermissions, newActionPermissions)
 	require.NoError(suite.T(), err)
 }
 
@@ -2162,7 +2162,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2202,7 +2202,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 		},
 	}, {
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2245,7 +2245,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 
 	newActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(10),
 				End:   sdkmath.NewUint(50),
@@ -2285,7 +2285,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 		}},
 		{
 
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -2328,7 +2328,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 	newActionPermission2 := []*types.CollectionApprovalPermission{
 		{
 
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(9),
@@ -2373,7 +2373,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 		},
 		{
 
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(9),
@@ -2426,7 +2426,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 	newActionPermissions = []*types.CollectionApprovalPermission{
 		{
 
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -2466,7 +2466,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 			},
 		},
 		{
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(10),
 					End:   sdkmath.NewUint(50),
@@ -2509,7 +2509,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 
 	newActionPermission2 = []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(9),
@@ -2554,7 +2554,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 	},
 		{
 
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(9),
@@ -2606,7 +2606,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate() {
 func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate2() {
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2647,7 +2647,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate2() {
 	},
 		{
 
-			BadgeIds: types.InvertUintRanges([]*types.UintRange{
+			TokenIds: types.InvertUintRanges([]*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2690,7 +2690,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate2() {
 
 	newActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2729,7 +2729,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate2() {
 			},
 		},
 	}, {
-		BadgeIds: types.InvertUintRanges([]*types.UintRange{
+		TokenIds: types.InvertUintRanges([]*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2800,7 +2800,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate3() {
 
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2840,7 +2840,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate3() {
 		},
 	}, {
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2883,7 +2883,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate3() {
 
 	newActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -2924,7 +2924,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate3() {
 	},
 		{
 
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -2994,7 +2994,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate4Invalid(
 
 	oldActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -3034,7 +3034,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate4Invalid(
 		},
 	},
 		{
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(100),
@@ -3077,7 +3077,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate4Invalid(
 
 	newActionPermissions := []*types.CollectionApprovalPermission{{
 
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),
@@ -3116,7 +3116,7 @@ func (suite *TestSuite) TestValidateCollectionApprovalPermissionsUpdate4Invalid(
 			},
 		},
 	}, {
-		BadgeIds: []*types.UintRange{
+		TokenIds: []*types.UintRange{
 			{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(100),

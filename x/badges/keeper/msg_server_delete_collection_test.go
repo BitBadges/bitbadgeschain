@@ -11,7 +11,7 @@ func (suite *TestSuite) TestDeleteCollection() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].TokensToCreate = []*types.Balance{}
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating token: %s")

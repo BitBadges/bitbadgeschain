@@ -27,13 +27,13 @@ func (suite *TestSuite) TestNewBadges() {
 	})
 	suite.Require().Nil(err, "Error updating collection approvals")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetOneUintRange(),
+				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
@@ -45,7 +45,7 @@ func (suite *TestSuite) TestNewBadges() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetOneUintRange(),
 					},
 				},
@@ -64,13 +64,13 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating token: %s")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetOneUintRange(),
+				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
@@ -81,7 +81,7 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetOneUintRange(),
 					},
 				},
@@ -99,13 +99,13 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating token: %s")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetOneUintRange(),
+				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 				Balances: []*types.Balance{
 					{
 						Amount: sdkmath.NewUint(1),
-						BadgeIds: []*types.UintRange{
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(2),
 								End:   sdkmath.NewUint(math.MaxUint64).Add(sdkmath.NewUint(1)),
@@ -143,23 +143,23 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
+			CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 				{
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 				},
 			},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetOneUintRange(),
+				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
@@ -170,7 +170,7 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetOneUintRange(),
 					},
 				},
@@ -192,66 +192,66 @@ func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
+			CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 				{
 					PermanentlyPermittedTimes: GetFullUintRanges(),
-					BadgeIds:                  GetOneUintRange(),
+					TokenIds:                  GetOneUintRange(),
 				},
 				{
 					PermanentlyForbiddenTimes: GetFullUintRanges(),
-					BadgeIds:                  GetFullUintRanges(),
+					TokenIds:                  GetFullUintRanges(),
 				},
 			},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetOneUintRange(),
+				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
 	})
 	suite.Require().Nil(err, "Error creating token: %s")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetTwoUintRanges(),
+				TokenIds:       GetTwoUintRanges(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
 		},
 	})
 	suite.Require().Error(err, "Error creating token: %s")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetFullUintRanges(),
+				TokenIds:       GetFullUintRanges(),
 				OwnershipTimes: GetOneUintRange(),
 			},
 		},
 	})
 	suite.Require().Error(err, "Error creating token: %s")
 
-	err = MintAndDistributeBadges(suite, wctx, &types.MsgMintAndDistributeBadges{
+	err = MintAndDistributeTokens(suite, wctx, &types.MsgMintAndDistributeTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
-		BadgesToCreate: []*types.Balance{
+		TokensToCreate: []*types.Balance{
 			{
 				Amount:         sdkmath.NewUint(1),
-				BadgeIds:       GetOneUintRange(),
+				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetOneUintRange(),
 			},
 		},

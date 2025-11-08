@@ -13,7 +13,7 @@ import (
 	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v16"
 )
 
-// MigrateBadgesKeeper migrates the badges keeper to set all approval versions to 0
+// MigrateBadgesKeeper migrates the tokens keeper to set all approval versions to 0
 func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 
 	// Get all collections
@@ -49,9 +49,9 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 	// 		continue
 	// 	}
 
-	// 	for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
-	// 		if mustOwnBadge.OwnershipCheckParty == "" {
-	// 			mustOwnBadge.OwnershipCheckParty = "initiator"
+	// 	for _, mustOwnToken := range approval.ApprovalCriteria.MustOwnTokens {
+	// 		if mustOwnToken.OwnershipCheckParty == "" {
+	// 			mustOwnToken.OwnershipCheckParty = "initiator"
 	// 		}
 	// 	}
 	// }
@@ -65,9 +65,9 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 	// 		continue
 	// 	}
 
-	// 	for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
-	// 		if mustOwnBadge.OwnershipCheckParty == "" {
-	// 			mustOwnBadge.OwnershipCheckParty = "initiator"
+	// 	for _, mustOwnToken := range approval.ApprovalCriteria.MustOwnTokens {
+	// 		if mustOwnToken.OwnershipCheckParty == "" {
+	// 			mustOwnToken.OwnershipCheckParty = "initiator"
 	// 		}
 	// 	}
 	// }
@@ -81,9 +81,9 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 	// 		continue
 	// 	}
 
-	// 	for _, mustOwnBadge := range approval.ApprovalCriteria.MustOwnBadges {
-	// 		if mustOwnBadge.OwnershipCheckParty == "" {
-	// 			mustOwnBadge.OwnershipCheckParty = "initiator"
+	// 	for _, mustOwnToken := range approval.ApprovalCriteria.MustOwnTokens {
+	// 		if mustOwnToken.OwnershipCheckParty == "" {
+	// 			mustOwnToken.OwnershipCheckParty = "initiator"
 	// 		}
 	// 	}
 	// }
@@ -112,7 +112,7 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var oldCollection oldtypes.BadgeCollection
+		var oldCollection oldtypes.TokenCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &oldCollection)
 
 		// Convert to JSON
@@ -122,7 +122,7 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		}
 
 		// Unmarshal into new type
-		var newCollection newtypes.BadgeCollection
+		var newCollection newtypes.TokenCollection
 		if err := json.Unmarshal(jsonBytes, &newCollection); err != nil {
 			return err
 		}

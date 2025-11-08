@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
+func TestMsgMintAndDistributeTokens_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
 		msg  types.MsgUniversalUpdateCollection
@@ -28,7 +28,7 @@ func TestMsgMintAndDistributeBadges_ValidateBasic(t *testing.T) {
 			msg: types.MsgUniversalUpdateCollection{
 				Creator:       sample.AccAddress(),
 				CollectionId:  sdkmath.NewUint(1),
-				ValidBadgeIds: []*types.UintRange{},
+				ValidTokenIds: []*types.UintRange{},
 			},
 		},
 	}

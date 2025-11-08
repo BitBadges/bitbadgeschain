@@ -41,7 +41,7 @@ type EventTracking struct {
 	CoinTransfers *[]CoinTransfers
 }
 
-func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollection, transfers []*types.Transfer, initiatedBy string) error {
+func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollection, transfers []*types.Transfer, initiatedBy string) error {
 	var err error
 
 	isArchived := types.GetIsArchived(ctx, collection)
@@ -220,7 +220,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.BadgeCollecti
 // Step 3: If all good, we can transfer the balances
 func (k Keeper) HandleTransfer(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	transfer *types.Transfer,
 	fromUserBalance *types.UserBalanceStore,
 	toUserBalance *types.UserBalanceStore,

@@ -24,7 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// A BadgeCollection is the top-level object for a collection of tokens.
+// A TokenCollection is the top-level object for a collection of tokens.
 // It defines everything about the collection, such as the manager, metadata, etc.
 //
 // All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. the first collection has ID 1).
@@ -39,13 +39,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // Collections may have different balance types: standard vs. off-chain - indexed vs. inherited.vs off-chain - non-indexed vs non-public.
 //
 // See documentation for more details.
-type BadgeCollection struct {
+type TokenCollection struct {
 	// The unique identifier for this collection. This is assigned by the blockchain. First collection has ID 1.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	// The metadata for the collection itself, which can vary over time.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// The metadata for each token in the collection, also subject to changes over time.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,3,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
 	// The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
 	BalancesType string `protobuf:"bytes,4,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
 	// Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
@@ -71,7 +71,7 @@ type BadgeCollection struct {
 	// The user or entity who created the collection.
 	CreatedBy string `protobuf:"bytes,14,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
 	// The valid token IDs for this collection.
-	ValidBadgeIds []*UintRange `protobuf:"bytes,15,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,15,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	//The generated address of the collection. Also used to escrow Mint balances.
 	MintEscrowAddress string `protobuf:"bytes,16,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
 	// The IBC wrapper (sdk.coin) paths for the collection.
@@ -81,18 +81,18 @@ type BadgeCollection struct {
 	Invariants *CollectionInvariants `protobuf:"bytes,18,opt,name=invariants,proto3" json:"invariants,omitempty"`
 }
 
-func (m *BadgeCollection) Reset()         { *m = BadgeCollection{} }
-func (m *BadgeCollection) String() string { return proto.CompactTextString(m) }
-func (*BadgeCollection) ProtoMessage()    {}
-func (*BadgeCollection) Descriptor() ([]byte, []int) {
+func (m *TokenCollection) Reset()         { *m = TokenCollection{} }
+func (m *TokenCollection) String() string { return proto.CompactTextString(m) }
+func (*TokenCollection) ProtoMessage()    {}
+func (*TokenCollection) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6b448a7e03a2c5a, []int{0}
 }
-func (m *BadgeCollection) XXX_Unmarshal(b []byte) error {
+func (m *TokenCollection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BadgeCollection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TokenCollection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BadgeCollection.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TokenCollection.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -102,124 +102,124 @@ func (m *BadgeCollection) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *BadgeCollection) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BadgeCollection.Merge(m, src)
+func (m *TokenCollection) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TokenCollection.Merge(m, src)
 }
-func (m *BadgeCollection) XXX_Size() int {
+func (m *TokenCollection) XXX_Size() int {
 	return m.Size()
 }
-func (m *BadgeCollection) XXX_DiscardUnknown() {
-	xxx_messageInfo_BadgeCollection.DiscardUnknown(m)
+func (m *TokenCollection) XXX_DiscardUnknown() {
+	xxx_messageInfo_TokenCollection.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BadgeCollection proto.InternalMessageInfo
+var xxx_messageInfo_TokenCollection proto.InternalMessageInfo
 
-func (m *BadgeCollection) GetCollectionMetadataTimeline() []*CollectionMetadataTimeline {
+func (m *TokenCollection) GetCollectionMetadataTimeline() []*CollectionMetadataTimeline {
 	if m != nil {
 		return m.CollectionMetadataTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+func (m *TokenCollection) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if m != nil {
-		return m.BadgeMetadataTimeline
+		return m.TokenMetadataTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetBalancesType() string {
+func (m *TokenCollection) GetBalancesType() string {
 	if m != nil {
 		return m.BalancesType
 	}
 	return ""
 }
 
-func (m *BadgeCollection) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
+func (m *TokenCollection) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
 	if m != nil {
 		return m.OffChainBalancesMetadataTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetCustomDataTimeline() []*CustomDataTimeline {
+func (m *TokenCollection) GetCustomDataTimeline() []*CustomDataTimeline {
 	if m != nil {
 		return m.CustomDataTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetManagerTimeline() []*ManagerTimeline {
+func (m *TokenCollection) GetManagerTimeline() []*ManagerTimeline {
 	if m != nil {
 		return m.ManagerTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetCollectionPermissions() *CollectionPermissions {
+func (m *TokenCollection) GetCollectionPermissions() *CollectionPermissions {
 	if m != nil {
 		return m.CollectionPermissions
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetCollectionApprovals() []*CollectionApproval {
+func (m *TokenCollection) GetCollectionApprovals() []*CollectionApproval {
 	if m != nil {
 		return m.CollectionApprovals
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetStandardsTimeline() []*StandardsTimeline {
+func (m *TokenCollection) GetStandardsTimeline() []*StandardsTimeline {
 	if m != nil {
 		return m.StandardsTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetIsArchivedTimeline() []*IsArchivedTimeline {
+func (m *TokenCollection) GetIsArchivedTimeline() []*IsArchivedTimeline {
 	if m != nil {
 		return m.IsArchivedTimeline
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetDefaultBalances() *UserBalanceStore {
+func (m *TokenCollection) GetDefaultBalances() *UserBalanceStore {
 	if m != nil {
 		return m.DefaultBalances
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetCreatedBy() string {
+func (m *TokenCollection) GetCreatedBy() string {
 	if m != nil {
 		return m.CreatedBy
 	}
 	return ""
 }
 
-func (m *BadgeCollection) GetValidBadgeIds() []*UintRange {
+func (m *TokenCollection) GetValidTokenIds() []*UintRange {
 	if m != nil {
-		return m.ValidBadgeIds
+		return m.ValidTokenIds
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetMintEscrowAddress() string {
+func (m *TokenCollection) GetMintEscrowAddress() string {
 	if m != nil {
 		return m.MintEscrowAddress
 	}
 	return ""
 }
 
-func (m *BadgeCollection) GetCosmosCoinWrapperPaths() []*CosmosCoinWrapperPath {
+func (m *TokenCollection) GetCosmosCoinWrapperPaths() []*CosmosCoinWrapperPath {
 	if m != nil {
 		return m.CosmosCoinWrapperPaths
 	}
 	return nil
 }
 
-func (m *BadgeCollection) GetInvariants() *CollectionInvariants {
+func (m *TokenCollection) GetInvariants() *CollectionInvariants {
 	if m != nil {
 		return m.Invariants
 	}
@@ -422,7 +422,7 @@ func (m *CollectionInvariants) GetNoCustomOwnershipTimes() bool {
 }
 
 func init() {
-	proto.RegisterType((*BadgeCollection)(nil), "badges.v15.BadgeCollection")
+	proto.RegisterType((*TokenCollection)(nil), "badges.v15.TokenCollection")
 	proto.RegisterType((*CosmosCoinWrapperPath)(nil), "badges.v15.CosmosCoinWrapperPath")
 	proto.RegisterType((*DenomUnit)(nil), "badges.v15.DenomUnit")
 	proto.RegisterType((*CollectionInvariants)(nil), "badges.v15.CollectionInvariants")
@@ -488,7 +488,7 @@ var fileDescriptor_d6b448a7e03a2c5a = []byte{
 	0xc8, 0xdf, 0xfd, 0x1f, 0x00, 0x00, 0xff, 0xff, 0x8c, 0xb1, 0xab, 0xb6, 0x79, 0x08, 0x00, 0x00,
 }
 
-func (m *BadgeCollection) Marshal() (dAtA []byte, err error) {
+func (m *TokenCollection) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -498,12 +498,12 @@ func (m *BadgeCollection) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BadgeCollection) MarshalTo(dAtA []byte) (int, error) {
+func (m *TokenCollection) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BadgeCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TokenCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -547,10 +547,10 @@ func (m *BadgeCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x82
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for iNdEx := len(m.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.ValidTokenIds) > 0 {
+		for iNdEx := len(m.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -683,10 +683,10 @@ func (m *BadgeCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for iNdEx := len(m.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for iNdEx := len(m.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -920,7 +920,7 @@ func encodeVarintCollections(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *BadgeCollection) Size() (n int) {
+func (m *TokenCollection) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -934,8 +934,8 @@ func (m *BadgeCollection) Size() (n int) {
 			n += 1 + l + sovCollections(uint64(l))
 		}
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for _, e := range m.BadgeMetadataTimeline {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for _, e := range m.TokenMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovCollections(uint64(l))
 		}
@@ -992,8 +992,8 @@ func (m *BadgeCollection) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovCollections(uint64(l))
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for _, e := range m.ValidBadgeIds {
+	if len(m.ValidTokenIds) > 0 {
+		for _, e := range m.ValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovCollections(uint64(l))
 		}
@@ -1092,7 +1092,7 @@ func sovCollections(x uint64) (n int) {
 func sozCollections(x uint64) (n int) {
 	return sovCollections(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
+func (m *TokenCollection) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1115,10 +1115,10 @@ func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BadgeCollection: wiretype end group for non-group")
+			return fmt.Errorf("proto: TokenCollection: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BadgeCollection: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TokenCollection: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1191,7 +1191,7 @@ func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenMetadataTimeline", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1218,8 +1218,8 @@ func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeMetadataTimeline = append(m.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
-			if err := m.BadgeMetadataTimeline[len(m.BadgeMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenMetadataTimeline = append(m.TokenMetadataTimeline, &TokenMetadataTimeline{})
+			if err := m.TokenMetadataTimeline[len(m.TokenMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1565,7 +1565,7 @@ func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 15:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1592,8 +1592,8 @@ func (m *BadgeCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ValidBadgeIds = append(m.ValidBadgeIds, &UintRange{})
-			if err := m.ValidBadgeIds[len(m.ValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ValidTokenIds = append(m.ValidTokenIds, &UintRange{})
+			if err := m.ValidTokenIds[len(m.ValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -9,7 +9,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*types.MsgCreateMapResponse, error) {
@@ -34,7 +34,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 	//Numeric map IDs are reserved for specific collections
 	collId, err := sdkmath.ParseUint(msg.MapId)
 	if err == nil {
-		currCollectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{
+		currCollectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{
 			CollectionId: collId.String(),
 		})
 		if err != nil {
@@ -42,7 +42,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 		}
 
 		//Check if user is manager of collection in x/badges
-		currManager := badgetypes.GetCurrentManager(ctx, currCollectionRes.Collection)
+		currManager := tokentypes.GetCurrentManager(ctx, currCollectionRes.Collection)
 		if currManager != msg.Creator {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Numeric map IDs are reserved for specific collections. To create a map for this collection, you must be the manager of the collection")
 		}

@@ -1,16 +1,16 @@
 package types
 
 import (
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CastUintRanges(ranges []*UintRange) []*badgetypes.UintRange {
-	castedRanges := make([]*badgetypes.UintRange, len(ranges))
+func CastUintRanges(ranges []*UintRange) []*tokentypes.UintRange {
+	castedRanges := make([]*tokentypes.UintRange, len(ranges))
 	for i, rangeVal := range ranges {
-		castedRanges[i] = &badgetypes.UintRange{
+		castedRanges[i] = &tokentypes.UintRange{
 			Start: rangeVal.Start,
 			End:   rangeVal.End,
 		}
@@ -18,18 +18,18 @@ func CastUintRanges(ranges []*UintRange) []*badgetypes.UintRange {
 	return castedRanges
 }
 
-func GetCurrentManagerForMap(ctx sdk.Context, currMap *Map, collection *badgetypes.BadgeCollection) string {
+func GetCurrentManagerForMap(ctx sdk.Context, currMap *Map, collection *tokentypes.TokenCollection) string {
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
 		if collection == nil {
 			panic("Token collection must be provided if map is inheriting manager timeline from a collection")
 		}
 
-		return badgetypes.GetCurrentManager(ctx, collection)
+		return tokentypes.GetCurrentManager(ctx, collection)
 	} else {
 		blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 		currManager := ""
 		for _, managerTimelineVal := range currMap.ManagerTimeline {
-			found, err := badgetypes.SearchUintRangesForUint(blockTime, CastUintRanges(managerTimelineVal.TimelineTimes))
+			found, err := tokentypes.SearchUintRangesForUint(blockTime, CastUintRanges(managerTimelineVal.TimelineTimes))
 			if found || err != nil {
 				currManager = managerTimelineVal.Manager
 				break
@@ -39,55 +39,55 @@ func GetCurrentManagerForMap(ctx sdk.Context, currMap *Map, collection *badgetyp
 	}
 }
 
-func CastActionPermission(perm *ActionPermission) *badgetypes.ActionPermission {
-	return &badgetypes.ActionPermission{
+func CastActionPermission(perm *ActionPermission) *tokentypes.ActionPermission {
+	return &tokentypes.ActionPermission{
 		PermanentlyPermittedTimes: CastUintRanges(perm.PermanentlyPermittedTimes),
 		PermanentlyForbiddenTimes: CastUintRanges(perm.PermanentlyForbiddenTimes),
 	}
 }
 
-func CastTimedUpdatePermission(perm *TimedUpdatePermission) *badgetypes.TimedUpdatePermission {
-	return &badgetypes.TimedUpdatePermission{
+func CastTimedUpdatePermission(perm *TimedUpdatePermission) *tokentypes.TimedUpdatePermission {
+	return &tokentypes.TimedUpdatePermission{
 		PermanentlyPermittedTimes: CastUintRanges(perm.PermanentlyPermittedTimes),
 		PermanentlyForbiddenTimes: CastUintRanges(perm.PermanentlyForbiddenTimes),
 		TimelineTimes:             CastUintRanges(perm.TimelineTimes),
 	}
 }
 
-func CastActionPermissions(perms []*ActionPermission) []*badgetypes.ActionPermission {
-	casted := make([]*badgetypes.ActionPermission, len(perms))
+func CastActionPermissions(perms []*ActionPermission) []*tokentypes.ActionPermission {
+	casted := make([]*tokentypes.ActionPermission, len(perms))
 	for i, perm := range perms {
 		casted[i] = CastActionPermission(perm)
 	}
 	return casted
 }
 
-func CastTimedUpdatePermissions(perms []*TimedUpdatePermission) []*badgetypes.TimedUpdatePermission {
-	casted := make([]*badgetypes.TimedUpdatePermission, len(perms))
+func CastTimedUpdatePermissions(perms []*TimedUpdatePermission) []*tokentypes.TimedUpdatePermission {
+	casted := make([]*tokentypes.TimedUpdatePermission, len(perms))
 	for i, perm := range perms {
 		casted[i] = CastTimedUpdatePermission(perm)
 	}
 	return casted
 }
 
-func CastManagerTimeline(timeline *ManagerTimeline) *badgetypes.ManagerTimeline {
-	return &badgetypes.ManagerTimeline{
+func CastManagerTimeline(timeline *ManagerTimeline) *tokentypes.ManagerTimeline {
+	return &tokentypes.ManagerTimeline{
 		Manager:       timeline.Manager,
 		TimelineTimes: CastUintRanges(timeline.TimelineTimes),
 	}
 }
 
-func CastManagerTimelineArray(timelines []*ManagerTimeline) []*badgetypes.ManagerTimeline {
-	casted := make([]*badgetypes.ManagerTimeline, len(timelines))
+func CastManagerTimelineArray(timelines []*ManagerTimeline) []*tokentypes.ManagerTimeline {
+	casted := make([]*tokentypes.ManagerTimeline, len(timelines))
 	for i, timeline := range timelines {
 		casted[i] = CastManagerTimeline(timeline)
 	}
 	return casted
 }
 
-func CastMetadataTimeline(timeline *MapMetadataTimeline) *badgetypes.CollectionMetadataTimeline {
-	return &badgetypes.CollectionMetadataTimeline{
-		CollectionMetadata: &badgetypes.CollectionMetadata{
+func CastMetadataTimeline(timeline *MapMetadataTimeline) *tokentypes.CollectionMetadataTimeline {
+	return &tokentypes.CollectionMetadataTimeline{
+		CollectionMetadata: &tokentypes.CollectionMetadata{
 			Uri:        timeline.Metadata.Uri,
 			CustomData: timeline.Metadata.CustomData,
 		},
@@ -95,8 +95,8 @@ func CastMetadataTimeline(timeline *MapMetadataTimeline) *badgetypes.CollectionM
 	}
 }
 
-func CastMetadataTimelineArray(timelines []*MapMetadataTimeline) []*badgetypes.CollectionMetadataTimeline {
-	casted := make([]*badgetypes.CollectionMetadataTimeline, len(timelines))
+func CastMetadataTimelineArray(timelines []*MapMetadataTimeline) []*tokentypes.CollectionMetadataTimeline {
+	casted := make([]*tokentypes.CollectionMetadataTimeline, len(timelines))
 	for i, timeline := range timelines {
 		casted[i] = CastMetadataTimeline(timeline)
 	}

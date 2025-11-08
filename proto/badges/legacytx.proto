@@ -17,7 +17,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 //Before switching to the universal Msgs, we had a separate Msg for each action.
 //This is the old Msg service definition. It is still used in some parts of the codebase for compatibility.
 
-//The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the badges module.
+//The types defined in these files are used to define the MsgServer types for all requests and responses for Msgs of the tokens module.
 message UserOutgoingApprovalTimeline {
   repeated UserOutgoingApproval outgoingApprovals = 1;
   repeated UintRange timelineTimes = 2;
@@ -38,7 +38,7 @@ message MsgNewCollection {
   // See collections.proto for more details about these MsgNewBadge fields. Defines the token details. Leave unneeded fields empty.
   string creator = 1; 
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 3;
   repeated CustomDataTimeline customDataTimeline = 4;
   repeated CollectionApproval collectionApprovals = 5;
   CollectionPermissions permissions = 6;
@@ -46,7 +46,7 @@ message MsgNewCollection {
 
   //Token supplys and amounts to create. For each idx, we create amounts[idx] badges each with a supply of supplys[idx].
   //If supply[idx] == 0, we assume default supply. amountsToCreate[idx] can't equal 0.
-  repeated Balance badgesToCreate = 8;
+  repeated Balance tokensToCreate = 8;
   repeated Transfer transfers = 9;
   repeated ContractAddressTimeline contractAddressTimeline = 10;
   repeated AddressList addressLists = 11;
@@ -66,20 +66,20 @@ message MsgNewCollectionResponse {
 }
 
 //This handles both minting more of existing badges and creating new tokens.
-message MsgMintAndDistributeBadges {
+message MsgMintAndDistributeTokens {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated Balance badgesToCreate = 3;
+  repeated Balance tokensToCreate = 3;
 
   repeated Transfer transfers = 4;
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 5; 
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 6;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 6;
   repeated CollectionApproval collectionApprovals = 7;
 
   repeated AddressList addressLists = 8;
 }
 
-message MsgMintAndDistributeBadgesResponse {}
+message MsgMintAndDistributeTokensResponse {}
 
 message MsgUniversalUpdateCollectionApprovals {
   string creator = 1;
@@ -97,7 +97,7 @@ message MsgUpdateMetadata {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 3; 
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 4;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 4;
   repeated CustomDataTimeline customDataTimeline = 5;
   repeated ContractAddressTimeline contractAddressTimeline = 6;
   repeated StandardsTimeline standardsTimeline = 7;

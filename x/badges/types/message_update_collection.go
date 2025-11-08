@@ -51,8 +51,8 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
 	}
 
-	if msg.ValidBadgeIds != nil {
-		err = ValidateRangesAreValid(msg.ValidBadgeIds, false, false)
+	if msg.ValidTokenIds != nil {
+		err = ValidateRangesAreValid(msg.ValidTokenIds, false, false)
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
+	if err := ValidateTokenMetadataTimeline(msg.TokenMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
 
@@ -76,7 +76,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 
 	// For new collections (CollectionId = 0), we need to create a temporary collection to validate invariants
 	if msg.CollectionId.IsZero() && msg.Invariants != nil && msg.Invariants.NoCustomOwnershipTimes {
-		tempCollection := &BadgeCollection{
+		tempCollection := &TokenCollection{
 			Invariants: msg.Invariants,
 		}
 		if err := ValidateCollectionApprovalsWithInvariants(ctx, msg.CollectionApprovals, canChangeValues, tempCollection); err != nil {
@@ -84,7 +84,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		}
 	}
 
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
+	if err := ValidateTokenMetadataTimeline(msg.TokenMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
 
@@ -157,7 +157,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	if err := ValidateBadgeMetadataTimeline(msg.BadgeMetadataTimeline, canChangeValues); err != nil {
+	if err := ValidateTokenMetadataTimeline(msg.TokenMetadataTimeline, canChangeValues); err != nil {
 		return err
 	}
 

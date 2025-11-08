@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestWrapBadges() {
+func (suite *TestSuite) TestWrapTokens() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -18,7 +18,7 @@ func (suite *TestSuite) TestWrapBadges() {
 				{
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
-					BadgeIds:       GetOneUintRange(),
+					TokenIds:       GetOneUintRange(),
 				},
 			},
 			AllowCosmosWrapping: true,
@@ -29,7 +29,7 @@ func (suite *TestSuite) TestWrapBadges() {
 		ApprovalId:        "asadsdas",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -49,7 +49,7 @@ func (suite *TestSuite) TestWrapBadges() {
 	suite.Require().Nil(err, "Error getting collection")
 	denomAddress := collection.CosmosCoinWrapperPaths[0].Address
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -59,7 +59,7 @@ func (suite *TestSuite) TestWrapBadges() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -75,12 +75,12 @@ func (suite *TestSuite) TestWrapBadges() {
 	diffInBalances, err := types.SubtractBalances(suite.ctx, bobBalanceAfter.Balances, bobBalanceBefore.Balances)
 	suite.Require().Nil(err, "Error subtracting balances")
 
-	// len 1, amount 1, badgeIds 1, full ownership times
+	// len 1, amount 1, tokenIds 1, full ownership times
 	suite.Require().Equal(1, len(diffInBalances), "Error burning tokens")
 	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].Amount, "Error burning tokens")
-	suite.Require().Equal(1, len(diffInBalances[0].BadgeIds), "Error burning tokens")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].Start, "Error burning tokens")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].End, "Error burning tokens")
+	suite.Require().Equal(1, len(diffInBalances[0].TokenIds), "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].TokenIds[0].Start, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].TokenIds[0].End, "Error burning tokens")
 	suite.Require().Equal(GetFullUintRanges(), diffInBalances[0].OwnershipTimes, "Error burning tokens")
 	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].OwnershipTimes[0].Start, "Error burning tokens")
 	suite.Require().Equal(sdkmath.NewUint(18446744073709551615), diffInBalances[0].OwnershipTimes[0].End, "Error burning tokens")
@@ -98,7 +98,7 @@ func (suite *TestSuite) TestWrapBadges() {
 	suite.Require().Equal(sdkmath.NewUint(1), bobAmount, "Error wrapping tokens")
 
 	// Unwrap the tokens
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -108,7 +108,7 @@ func (suite *TestSuite) TestWrapBadges() {
 				Balances: []*types.Balance{
 					{
 						Amount:         bobAmount,
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestWrapBadges() {
 	suite.Require().Equal(sdkmath.NewInt(0), bobBalanceDenomAfterUnwrap.Amount, "Error unwrapping tokens")
 }
 
-func (suite *TestSuite) TestWrapBadgesErrors() {
+func (suite *TestSuite) TestWrapTokensErrors() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -138,7 +138,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 				{
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
-					BadgeIds:       GetOneUintRange(),
+					TokenIds:       GetOneUintRange(),
 				},
 			},
 			AllowCosmosWrapping: true,
@@ -149,7 +149,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 		ApprovalId:        "asadsdas",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -172,13 +172,13 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 	balances := []*types.Balance{
 		{
 			Amount:         sdkmath.NewUint(1),
-			BadgeIds:       GetOneUintRange(),
+			TokenIds:       GetOneUintRange(),
 			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
 
 	// Test more than one balance
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -187,7 +187,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 				ToAddresses: []string{denomAddress},
 				Balances: append(balances, &types.Balance{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetOneUintRange(),
+					TokenIds:       GetOneUintRange(),
 					OwnershipTimes: GetFullUintRanges(),
 				}),
 			},
@@ -198,10 +198,10 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 	// Test wrong token IDs
 	newBalancesClone := make([]*types.Balance, len(balances))
 	copy(newBalancesClone, balances)
-	newBalancesClone[0].BadgeIds[0].Start = sdkmath.NewUint(2)
-	newBalancesClone[0].BadgeIds[0].End = sdkmath.NewUint(2)
+	newBalancesClone[0].TokenIds[0].Start = sdkmath.NewUint(2)
+	newBalancesClone[0].TokenIds[0].End = sdkmath.NewUint(2)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -218,7 +218,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 	newBalancesClone[0].OwnershipTimes[0].Start = sdkmath.NewUint(2)
 	newBalancesClone[0].OwnershipTimes[0].End = sdkmath.NewUint(2)
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -232,7 +232,7 @@ func (suite *TestSuite) TestWrapBadgesErrors() {
 	suite.Require().Error(err, "Error wrapping tokens")
 }
 
-func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
+func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -243,7 +243,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 				{
 					Amount:         sdkmath.NewUint(1),
 					OwnershipTimes: GetFullUintRanges(),
-					BadgeIds:       GetOneUintRange(),
+					TokenIds:       GetOneUintRange(),
 				},
 			},
 			AllowCosmosWrapping: true,
@@ -254,7 +254,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 		ApprovalId:        "asadsdas",
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
-		BadgeIds:          GetOneUintRange(),
+		TokenIds:          GetOneUintRange(),
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
@@ -274,7 +274,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	suite.Require().Nil(err, "Error getting collection")
 	denomAddress := collection.CosmosCoinWrapperPaths[0].Address
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -284,7 +284,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -300,12 +300,12 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	diffInBalances, err := types.SubtractBalances(suite.ctx, bobBalanceAfter.Balances, bobBalanceBefore.Balances)
 	suite.Require().Nil(err, "Error subtracting balances")
 
-	// len 1, amount 1, badgeIds 1, full ownership times
+	// len 1, amount 1, tokenIds 1, full ownership times
 	suite.Require().Equal(1, len(diffInBalances), "Error burning tokens")
 	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].Amount, "Error burning tokens")
-	suite.Require().Equal(1, len(diffInBalances[0].BadgeIds), "Error burning tokens")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].Start, "Error burning tokens")
-	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].BadgeIds[0].End, "Error burning tokens")
+	suite.Require().Equal(1, len(diffInBalances[0].TokenIds), "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].TokenIds[0].Start, "Error burning tokens")
+	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].TokenIds[0].End, "Error burning tokens")
 	suite.Require().Equal(GetFullUintRanges(), diffInBalances[0].OwnershipTimes, "Error burning tokens")
 	suite.Require().Equal(sdkmath.NewUint(1), diffInBalances[0].OwnershipTimes[0].Start, "Error burning tokens")
 	suite.Require().Equal(sdkmath.NewUint(18446744073709551615), diffInBalances[0].OwnershipTimes[0].End, "Error burning tokens")
@@ -329,7 +329,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	suite.Require().Nil(err, "Error sending coins")
 
 	// Unwrap the tokens - bob should fail
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -339,7 +339,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 				Balances: []*types.Balance{
 					{
 						Amount:         bobAmount,
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
@@ -349,7 +349,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 	suite.Require().Error(err, "Error unwrapping tokens")
 
 	// Unwrap the tokens - alice should succeed
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -359,7 +359,7 @@ func (suite *TestSuite) TestWrapBadgesInadequateBalanceOnTheUnwrap() {
 				Balances: []*types.Balance{
 					{
 						Amount:         bobAmount,
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},

@@ -155,7 +155,7 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 // HandleAutoDeletions processes auto-deletion logic for approvals after transfers
 func (k Keeper) HandleAutoDeletions(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	fromUserBalance *types.UserBalanceStore,
 	toUserBalance *types.UserBalanceStore,
 	approvalsUsed []ApprovalsUsed,

@@ -127,38 +127,38 @@ func DoRangesOverlap(ids []*UintRange) bool {
 }
 
 // Validates ranges are valid. If end.IsZero(), we assume end == start.
-func ValidateRangesAreValid(badgeUintRanges []*UintRange, allowAllUints bool, errorOnEmpty bool) error {
-	if len(badgeUintRanges) == 0 {
+func ValidateRangesAreValid(tokenUintRanges []*UintRange, allowAllUints bool, errorOnEmpty bool) error {
+	if len(tokenUintRanges) == 0 {
 		if errorOnEmpty {
 			return sdkerrors.Wrapf(ErrInvalidUintRangeSpecified, "ID ranges cannot be empty (length == 0)")
 		}
 	}
 
-	for _, badgeUintRange := range badgeUintRanges {
-		if badgeUintRange == nil {
+	for _, tokenUintRange := range tokenUintRanges {
+		if tokenUintRange == nil {
 			return ErrRangesIsNil
 		}
 
-		if badgeUintRange.Start.IsNil() || badgeUintRange.End.IsNil() {
+		if tokenUintRange.Start.IsNil() || tokenUintRange.End.IsNil() {
 			return sdkerrors.Wrapf(ErrUintUnititialized, "ID range start and/or end is nil")
 		}
 
-		if badgeUintRange.Start.GT(badgeUintRange.End) {
+		if tokenUintRange.Start.GT(tokenUintRange.End) {
 			return ErrStartGreaterThanEnd
 		}
 
 		if !allowAllUints {
-			if badgeUintRange.Start.IsZero() || badgeUintRange.End.IsZero() {
+			if tokenUintRange.Start.IsZero() || tokenUintRange.End.IsZero() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "ID range start and/or end is zero")
 			}
 
-			if badgeUintRange.Start.GT(sdkmath.NewUint(MaxUint64Value)) || badgeUintRange.End.GT(sdkmath.NewUint(MaxUint64Value)) {
+			if tokenUintRange.Start.GT(sdkmath.NewUint(MaxUint64Value)) || tokenUintRange.End.GT(sdkmath.NewUint(MaxUint64Value)) {
 				return ErrUintGreaterThanMax
 			}
 		}
 	}
 
-	overlap := DoRangesOverlap(badgeUintRanges)
+	overlap := DoRangesOverlap(tokenUintRanges)
 	if overlap {
 		return ErrRangesOverlap
 	}
@@ -275,7 +275,7 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 
 	// Theoretically, we might be able to remove this but two things:
 	// 1. It could potentially change which IDs are received (but that only makes sense if predetermined balances is true)
-	// 2. We need to pass stuff to MsgTransferBadges so this doesn't really make sense for auto-scanning
+	// 2. We need to pass stuff to MsgTransferTokens so this doesn't really make sense for auto-scanning
 	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
 		return false
 	}
@@ -297,7 +297,7 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
-	// Note: mustOwnTokens, etc are fine since they are read-only during MsgTransferBadges
+	// Note: mustOwnTokens, etc are fine since they are read-only during MsgTransferTokens
 
 	return true
 }
@@ -344,7 +344,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidAddress, "initiated by list id is uninitialized")
 		}
 
-		if err := ValidateRangesAreValid(collectionApproval.BadgeIds, false, false); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, false); err != nil {
 			return sdkerrors.Wrapf(err, "invalid token IDs")
 		}
 
@@ -405,20 +405,20 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 			if canChangeValues {
 
-				if approvalCriteria.MustOwnBadges == nil {
-					approvalCriteria.MustOwnBadges = []*MustOwnBadges{}
+				if approvalCriteria.MustOwnTokens == nil {
+					approvalCriteria.MustOwnTokens = []*MustOwnTokens{}
 				}
 
 				if approvalCriteria.DynamicStoreChallenges == nil {
 					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
 				}
 
-				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnBadges {
+				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnTokens {
 					if mustOwnTokenBalance == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnBadges balance is nil")
+						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnTokens balance is nil")
 					}
 
-					if err := ValidateRangesAreValid(mustOwnTokenBalance.BadgeIds, false, false); err != nil {
+					if err := ValidateRangesAreValid(mustOwnTokenBalance.TokenIds, false, false); err != nil {
 						return sdkerrors.Wrapf(err, "invalid token IDs")
 					}
 
@@ -584,7 +584,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 							return err
 						}
 
-						if sequentialTransfer.IncrementBadgeIdsBy.IsNil() {
+						if sequentialTransfer.IncrementTokenIdsBy.IsNil() {
 							return sdkerrors.Wrapf(ErrUintUnititialized, "increment ids by is uninitialized")
 						}
 
@@ -649,16 +649,16 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment ownership times by, approval duration from now, or recurring ownership times can be set")
 						}
 
-						badgeIdOverrideCount := 0
-						if !sequentialTransfer.IncrementBadgeIdsBy.IsNil() && !sequentialTransfer.IncrementBadgeIdsBy.IsZero() {
-							badgeIdOverrideCount++
+						tokenIdOverrideCount := 0
+						if !sequentialTransfer.IncrementTokenIdsBy.IsNil() && !sequentialTransfer.IncrementTokenIdsBy.IsZero() {
+							tokenIdOverrideCount++
 						}
 
-						if sequentialTransfer.AllowOverrideWithAnyValidBadge {
-							badgeIdOverrideCount++
+						if sequentialTransfer.AllowOverrideWithAnyValidToken {
+							tokenIdOverrideCount++
 						}
 
-						if badgeIdOverrideCount > 1 {
+						if tokenIdOverrideCount > 1 {
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment token ids by, or allow override with any valid ID can be set")
 						}
 
@@ -686,7 +686,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 }
 
 // ValidateCollectionApprovalsWithInvariants validates collection approvals and checks invariants
-func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool, collection *BadgeCollection) error {
+func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool, collection *TokenCollection) error {
 	// First validate the basic collection approvals
 	if err := ValidateCollectionApprovals(ctx, collectionApprovals, canChangeValues); err != nil {
 		return err
@@ -718,10 +718,10 @@ func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedO
 
 func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) bool {
 	return incrementedBalances == nil || ((incrementedBalances.StartBalances == nil || len(incrementedBalances.StartBalances) == 0) &&
-		(incrementedBalances.AllowOverrideWithAnyValidBadge == false) &&
+		(incrementedBalances.AllowOverrideWithAnyValidToken == false) &&
 		(incrementedBalances.AllowOverrideTimestamp == false) &&
-		(incrementedBalances.IncrementBadgeIdsBy.IsNil() ||
-			incrementedBalances.IncrementBadgeIdsBy.IsZero()) &&
+		(incrementedBalances.IncrementTokenIdsBy.IsNil() ||
+			incrementedBalances.IncrementTokenIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
 			incrementedBalances.IncrementOwnershipTimesBy.IsZero()) &&
 		(incrementedBalances.DurationFromTimestamp.IsNil() ||
@@ -790,7 +790,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 			return balances, sdkerrors.Wrapf(ErrAmountEqualsZero, "amount is uninitialized")
 		}
 
-		err = ValidateRangesAreValid(balance.BadgeIds, false, true)
+		err = ValidateRangesAreValid(balance.TokenIds, false, true)
 		if err != nil {
 			return balances, sdkerrors.Wrapf(err, "invalid balance token ids")
 		}
@@ -801,7 +801,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 		}
 	}
 
-	balances, err = HandleDuplicateBadgeIds(ctx, balances, canChangeValues)
+	balances, err = HandleDuplicateTokenIds(ctx, balances, canChangeValues)
 	if err != nil {
 		return balances, err
 	}
@@ -810,7 +810,7 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 }
 
 // ValidateTransferWithInvariants validates a transfer and checks invariants
-func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *BadgeCollection) error {
+func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *TokenCollection) error {
 	// First validate the basic transfer
 	if err := ValidateTransfer(ctx, transfer, canChangeValues); err != nil {
 		return err
@@ -895,7 +895,7 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 		if transfer.PrecalculationOptions == nil {
 			transfer.PrecalculationOptions = &PrecalculationOptions{
 				OverrideTimestamp: sdkmath.NewUint(0),
-				BadgeIdsOverride:  nil,
+				TokenIdsOverride:  nil,
 			}
 		}
 	}
@@ -903,30 +903,30 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 	return nil
 }
 
-func ValidateBadgeMetadata(badgeMetadata []*BadgeMetadata, canChangeValues bool) error {
+func ValidateTokenMetadata(tokenMetadata []*TokenMetadata, canChangeValues bool) error {
 	var err error
 
-	handledBadgeIds := []*UintRange{}
-	if len(badgeMetadata) > 0 {
-		for _, badgeMetadata := range badgeMetadata {
+	handledTokenIds := []*UintRange{}
+	if len(tokenMetadata) > 0 {
+		for _, tokenMetadata := range tokenMetadata {
 			//Validate well-formedness of the message entries
-			if err := ValidateURI(badgeMetadata.Uri); err != nil {
+			if err := ValidateURI(tokenMetadata.Uri); err != nil {
 				return err
 			}
 
-			err = ValidateRangesAreValid(badgeMetadata.BadgeIds, false, false)
+			err = ValidateRangesAreValid(tokenMetadata.TokenIds, false, false)
 			if err != nil {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid IDIds")
 			}
 
-			if err := AssertRangesDoNotOverlapAtAll(handledBadgeIds, badgeMetadata.BadgeIds); err != nil {
+			if err := AssertRangesDoNotOverlapAtAll(handledTokenIds, tokenMetadata.TokenIds); err != nil {
 				return sdkerrors.Wrapf(err, "token metadata has duplicate token ids")
 			}
 
-			handledBadgeIds = append(handledBadgeIds, SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)...)
+			handledTokenIds = append(handledTokenIds, SortUintRangesAndMergeAdjacentAndIntersecting(tokenMetadata.TokenIds)...)
 
 			if canChangeValues {
-				badgeMetadata.BadgeIds = SortUintRangesAndMergeAdjacentAndIntersecting(badgeMetadata.BadgeIds)
+				tokenMetadata.TokenIds = SortUintRangesAndMergeAdjacentAndIntersecting(tokenMetadata.TokenIds)
 			}
 		}
 	}

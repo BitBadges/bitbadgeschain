@@ -19,10 +19,10 @@ message CollectionMetadataTimeline {
   repeated UintRange timelineTimes = 2;
 }
 
-// BadgeMetadataTimeline defines the metadata for tokens at different timeline times.
-message BadgeMetadataTimeline {
+// TokenMetadataTimeline defines the metadata for tokens at different timeline times.
+message TokenMetadataTimeline {
   // The token metadata for a specific timeline element.
-  repeated BadgeMetadata badgeMetadata = 1;
+  repeated TokenMetadata tokenMetadata = 1;
 
   // The timeline times when the token metadata is valid. Can not overlap with other timeline elements in same array.
   repeated UintRange timelineTimes = 2;

@@ -87,7 +87,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					InitiatedByListId: "AllWithoutMint",
 					TransferTimes:     GetFullUintRanges(),
 					OwnershipTimes:    GetFullUintRanges(),
-					BadgeIds:          GetFullUintRanges(),
+					TokenIds:          GetFullUintRanges(),
 					ApprovalId:        "test",
 					ApprovalCriteria: &types.ApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
@@ -104,7 +104,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					InitiatedByListId: "AllWithoutMint",
 					TransferTimes:     GetFullUintRanges(),
 					OwnershipTimes:    GetFullUintRanges(),
-					BadgeIds:          GetFullUintRanges(),
+					TokenIds:          GetFullUintRanges(),
 
 					ApprovalId: "test",
 					ApprovalCriteria: &types.IncomingApprovalCriteria{
@@ -124,7 +124,7 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					InitiatedByListId: "AllWithoutMint",
 					TransferTimes:     GetFullUintRanges(),
 					OwnershipTimes:    GetFullUintRanges(),
-					BadgeIds:          GetFullUintRanges(),
+					TokenIds:          GetFullUintRanges(),
 
 					ApprovalId: "test",
 					ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -138,10 +138,10 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				},
 			},
 
-			BadgesToCreate: []*types.Balance{
+			TokensToCreate: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetFullUintRanges(),
+					TokenIds:       GetFullUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
@@ -152,9 +152,9 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				CanDeleteCollection:          []*types.ActionPermission{},
 				CanUpdateManager:             []*types.TimedUpdatePermission{},
 				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateBadgeMetadata:       []*types.TimedUpdateWithBadgeIdsPermission{},
+				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
-				CanUpdateValidBadgeIds: []*types.BadgeIdsActionPermission{
+				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
 						PermanentlyPermittedTimes: GetFullUintRanges(),
 					},
@@ -176,7 +176,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 		InitiatedByListId: "AllWithoutMint",
 
 		TransferTimes:  GetFullUintRanges(),
-		BadgeIds:       GetFullUintRanges(),
+		TokenIds:       GetFullUintRanges(),
 		OwnershipTimes: GetFullUintRanges(),
 		ApprovalId:     "mint-test",
 		ApprovalCriteria: &types.ApprovalCriteria{
@@ -200,7 +200,7 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 			Balances: []*types.Balance{
 				{
 					Amount:         sdkmath.NewUint(1),
-					BadgeIds:       GetFullUintRanges(),
+					TokenIds:       GetFullUintRanges(),
 					OwnershipTimes: GetFullUintRanges(),
 				},
 			},

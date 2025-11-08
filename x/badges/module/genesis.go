@@ -41,8 +41,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	for _, badge := range genState.Collections {
-		if err := k.SetCollectionInStore(ctx, badge); err != nil {
+	for _, collection := range genState.Collections {
+		if err := k.SetCollectionInStore(ctx, collection); err != nil {
 			panic(err)
 		}
 	}

@@ -10,11 +10,11 @@ import (
 )
 
 // NOTE: The miscellaneous encoding/codec registration is included here to ensure
-// all necessary codec types are registered once for the badges module.
+// all necessary codec types are registered once for the tokens module.
 // This is required for proper serialization/deserialization across the module.
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgTransferBadges{}, "badges/TransferBadges", nil)
+	cdc.RegisterConcrete(&MsgTransferTokens{}, "badges/TransferTokens", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "badges/DeleteCollection", nil)
 	cdc.RegisterConcrete(&MsgUpdateUserApprovals{}, "badges/UpdateUserApprovals", nil)
 	cdc.RegisterConcrete(&MsgUniversalUpdateCollection{}, "badges/UniversalUpdateCollection", nil)
@@ -30,10 +30,10 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetOutgoingApproval{}, "badges/SetOutgoingApproval", nil)
 	cdc.RegisterConcrete(&MsgDeleteOutgoingApproval{}, "badges/DeleteOutgoingApproval", nil)
 	cdc.RegisterConcrete(&MsgPurgeApprovals{}, "badges/PurgeApprovals", nil)
-	cdc.RegisterConcrete(&MsgSetValidBadgeIds{}, "badges/SetValidBadgeIds", nil)
+	cdc.RegisterConcrete(&MsgSetValidTokenIds{}, "badges/SetValidTokenIds", nil)
 	cdc.RegisterConcrete(&MsgSetManager{}, "badges/SetManager", nil)
 	cdc.RegisterConcrete(&MsgSetCollectionMetadata{}, "badges/SetCollectionMetadata", nil)
-	cdc.RegisterConcrete(&MsgSetBadgeMetadata{}, "badges/SetBadgeMetadata", nil)
+	cdc.RegisterConcrete(&MsgSetTokenMetadata{}, "badges/SetTokenMetadata", nil)
 	cdc.RegisterConcrete(&MsgSetCustomData{}, "badges/SetCustomData", nil)
 	cdc.RegisterConcrete(&MsgSetStandards{}, "badges/SetStandards", nil)
 	cdc.RegisterConcrete(&MsgSetCollectionApprovals{}, "badges/SetCollectionApprovals", nil)
@@ -45,7 +45,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgTransferBadges{},
+		&MsgTransferTokens{},
 		&MsgDeleteCollection{},
 		&MsgUpdateUserApprovals{},
 		&MsgUniversalUpdateCollection{},
@@ -61,10 +61,10 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSetOutgoingApproval{},
 		&MsgDeleteOutgoingApproval{},
 		&MsgPurgeApprovals{},
-		&MsgSetValidBadgeIds{},
+		&MsgSetValidTokenIds{},
 		&MsgSetManager{},
 		&MsgSetCollectionMetadata{},
-		&MsgSetBadgeMetadata{},
+		&MsgSetTokenMetadata{},
 		&MsgSetCustomData{},
 		&MsgSetStandards{},
 		&MsgSetCollectionApprovals{},

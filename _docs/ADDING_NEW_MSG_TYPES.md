@@ -1,10 +1,10 @@
 # Adding New Message Types to x/badges
 
-This guide documents the process for adding new message types to the badges module, including all necessary steps, gotchas, and commands.
+This guide documents the process for adding new message types to the tokens module, including all necessary steps, gotchas, and commands.
 
 ## Overview
 
-When adding new message types to the badges module, you need to follow a specific sequence of steps to ensure proper integration with the Cosmos SDK, WASM bindings, CLI, and testing infrastructure.
+When adding new message types to the tokens module, you need to follow a specific sequence of steps to ensure proper integration with the Cosmos SDK, WASM bindings, CLI, and testing infrastructure.
 
 ## Step-by-Step Process
 
@@ -225,7 +225,7 @@ go test ./x/badges/keeper/...
 
 ## Example Implementation
 
-See the implementation of existing message types like `MsgTransferBadges`, `MsgCreateCollection`, etc. for reference patterns.
+See the implementation of existing message types like `MsgTransferTokens`, `MsgCreateCollection`, etc. for reference patterns.
 
 ## Commands Reference
 

@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetValidBadgeIds) (*types.MsgSetValidBadgeIdsResponse, error) {
+func (k msgServer) SetValidTokenIds(goCtx context.Context, msg *types.MsgSetValidTokenIds) (*types.MsgSetValidTokenIdsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Validate the message
@@ -26,11 +26,11 @@ func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetVali
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateValidBadgeIds:         true,
-		ValidBadgeIds:               msg.ValidBadgeIds,
+		UpdateValidTokenIds:         true,
+		ValidTokenIds:               msg.ValidTokenIds,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
-			CanUpdateValidBadgeIds: msg.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds: msg.CanUpdateValidTokenIds,
 			// Copy existing permissions for other fields
 			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
 			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
@@ -38,7 +38,7 @@ func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetVali
 			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
 			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
 			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:       collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}
@@ -57,11 +57,11 @@ func (k msgServer) SetValidBadgeIds(goCtx context.Context, msg *types.MsgSetVali
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-		sdk.NewAttribute("msg_type", "set_valid_badge_ids"),
+		sdk.NewAttribute("msg_type", "set_valid_token_ids"),
 		sdk.NewAttribute("msg", string(msgBytes)),
 	)
 
-	return &types.MsgSetValidBadgeIdsResponse{
+	return &types.MsgSetValidTokenIdsResponse{
 		CollectionId: response.CollectionId,
 	}, nil
 }

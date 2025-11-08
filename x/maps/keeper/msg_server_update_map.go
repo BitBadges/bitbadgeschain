@@ -8,7 +8,7 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*types.MsgUpdateMapResponse, error) {
@@ -20,9 +20,9 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 		return nil, sdkerrors.Wrap(ErrMapDoesNotExist, "Failed to get map from store")
 	}
 
-	collection := &badgetypes.BadgeCollection{}
+	collection := &tokentypes.TokenCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}

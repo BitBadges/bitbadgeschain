@@ -79,26 +79,26 @@ func (m *CollectionMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// BadgeMetadataTimeline defines the metadata for tokens at different timeline times.
-type BadgeMetadataTimeline struct {
+// TokenMetadataTimeline defines the metadata for tokens at different timeline times.
+type TokenMetadataTimeline struct {
 	// The token metadata for a specific timeline element.
-	BadgeMetadata []*BadgeMetadata `protobuf:"bytes,1,rep,name=badgeMetadata,proto3" json:"badgeMetadata,omitempty"`
+	TokenMetadata []*TokenMetadata `protobuf:"bytes,1,rep,name=tokenMetadata,proto3" json:"tokenMetadata,omitempty"`
 	// The timeline times when the token metadata is valid. Can not overlap with other timeline elements in same array.
 	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
 }
 
-func (m *BadgeMetadataTimeline) Reset()         { *m = BadgeMetadataTimeline{} }
-func (m *BadgeMetadataTimeline) String() string { return proto.CompactTextString(m) }
-func (*BadgeMetadataTimeline) ProtoMessage()    {}
-func (*BadgeMetadataTimeline) Descriptor() ([]byte, []int) {
+func (m *TokenMetadataTimeline) Reset()         { *m = TokenMetadataTimeline{} }
+func (m *TokenMetadataTimeline) String() string { return proto.CompactTextString(m) }
+func (*TokenMetadataTimeline) ProtoMessage()    {}
+func (*TokenMetadataTimeline) Descriptor() ([]byte, []int) {
 	return fileDescriptor_a815060c836800c2, []int{1}
 }
-func (m *BadgeMetadataTimeline) XXX_Unmarshal(b []byte) error {
+func (m *TokenMetadataTimeline) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BadgeMetadataTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TokenMetadataTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BadgeMetadataTimeline.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TokenMetadataTimeline.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -108,26 +108,26 @@ func (m *BadgeMetadataTimeline) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *BadgeMetadataTimeline) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BadgeMetadataTimeline.Merge(m, src)
+func (m *TokenMetadataTimeline) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TokenMetadataTimeline.Merge(m, src)
 }
-func (m *BadgeMetadataTimeline) XXX_Size() int {
+func (m *TokenMetadataTimeline) XXX_Size() int {
 	return m.Size()
 }
-func (m *BadgeMetadataTimeline) XXX_DiscardUnknown() {
-	xxx_messageInfo_BadgeMetadataTimeline.DiscardUnknown(m)
+func (m *TokenMetadataTimeline) XXX_DiscardUnknown() {
+	xxx_messageInfo_TokenMetadataTimeline.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BadgeMetadataTimeline proto.InternalMessageInfo
+var xxx_messageInfo_TokenMetadataTimeline proto.InternalMessageInfo
 
-func (m *BadgeMetadataTimeline) GetBadgeMetadata() []*BadgeMetadata {
+func (m *TokenMetadataTimeline) GetTokenMetadata() []*TokenMetadata {
 	if m != nil {
-		return m.BadgeMetadata
+		return m.TokenMetadata
 	}
 	return nil
 }
 
-func (m *BadgeMetadataTimeline) GetTimelineTimes() []*UintRange {
+func (m *TokenMetadataTimeline) GetTimelineTimes() []*UintRange {
 	if m != nil {
 		return m.TimelineTimes
 	}
@@ -466,7 +466,7 @@ func (m *StandardsTimeline) GetTimelineTimes() []*UintRange {
 
 func init() {
 	proto.RegisterType((*CollectionMetadataTimeline)(nil), "badges.v15.CollectionMetadataTimeline")
-	proto.RegisterType((*BadgeMetadataTimeline)(nil), "badges.v15.BadgeMetadataTimeline")
+	proto.RegisterType((*TokenMetadataTimeline)(nil), "badges.v15.TokenMetadataTimeline")
 	proto.RegisterType((*OffChainBalancesMetadataTimeline)(nil), "badges.v15.OffChainBalancesMetadataTimeline")
 	proto.RegisterType((*CustomDataTimeline)(nil), "badges.v15.CustomDataTimeline")
 	proto.RegisterType((*ManagerTimeline)(nil), "badges.v15.ManagerTimeline")
@@ -560,7 +560,7 @@ func (m *CollectionMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *BadgeMetadataTimeline) Marshal() (dAtA []byte, err error) {
+func (m *TokenMetadataTimeline) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -570,12 +570,12 @@ func (m *BadgeMetadataTimeline) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BadgeMetadataTimeline) MarshalTo(dAtA []byte) (int, error) {
+func (m *TokenMetadataTimeline) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BadgeMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TokenMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -594,10 +594,10 @@ func (m *BadgeMetadataTimeline) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.BadgeMetadata) > 0 {
-		for iNdEx := len(m.BadgeMetadata) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenMetadata) > 0 {
+		for iNdEx := len(m.TokenMetadata) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -915,14 +915,14 @@ func (m *CollectionMetadataTimeline) Size() (n int) {
 	return n
 }
 
-func (m *BadgeMetadataTimeline) Size() (n int) {
+func (m *TokenMetadataTimeline) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.BadgeMetadata) > 0 {
-		for _, e := range m.BadgeMetadata {
+	if len(m.TokenMetadata) > 0 {
+		for _, e := range m.TokenMetadata {
 			l = e.Size()
 			n += 1 + l + sovTimelines(uint64(l))
 		}
@@ -1177,7 +1177,7 @@ func (m *CollectionMetadataTimeline) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *BadgeMetadataTimeline) Unmarshal(dAtA []byte) error {
+func (m *TokenMetadataTimeline) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1200,15 +1200,15 @@ func (m *BadgeMetadataTimeline) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BadgeMetadataTimeline: wiretype end group for non-group")
+			return fmt.Errorf("proto: TokenMetadataTimeline: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BadgeMetadataTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TokenMetadataTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadata", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenMetadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1235,8 +1235,8 @@ func (m *BadgeMetadataTimeline) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeMetadata = append(m.BadgeMetadata, &BadgeMetadata{})
-			if err := m.BadgeMetadata[len(m.BadgeMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenMetadata = append(m.TokenMetadata, &TokenMetadata{})
+			if err := m.TokenMetadata[len(m.TokenMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

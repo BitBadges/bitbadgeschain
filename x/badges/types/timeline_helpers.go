@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
+func GetCurrentManager(ctx sdk.Context, collection *TokenCollection) string {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	managerTimeline := collection.ManagerTimeline
 	for _, managerTimelineVal := range managerTimeline {
@@ -18,7 +18,7 @@ func GetCurrentManager(ctx sdk.Context, collection *BadgeCollection) string {
 	return ""
 }
 
-func GetIsArchived(ctx sdk.Context, collection *BadgeCollection) bool {
+func GetIsArchived(ctx sdk.Context, collection *TokenCollection) bool {
 	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 	isArchivedTimeline := collection.IsArchivedTimeline
 	for _, isArchivedTimelineVal := range isArchivedTimeline {
@@ -81,12 +81,12 @@ func GetCollectionMetadataTimesAndValues(timeline []*CollectionMetadataTimeline)
 	return times, values
 }
 
-func GetBadgeMetadataTimesAndValues(timeline []*BadgeMetadataTimeline) ([][]*UintRange, []interface{}) {
+func GetTokenMetadataTimesAndValues(timeline []*TokenMetadataTimeline) ([][]*UintRange, []interface{}) {
 	times := [][]*UintRange{}
 	values := []interface{}{}
 	for _, timelineVal := range timeline {
 		times = append(times, timelineVal.TimelineTimes)
-		values = append(values, timelineVal.BadgeMetadata)
+		values = append(values, timelineVal.TokenMetadata)
 	}
 	return times, values
 }

@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Queries a balance for the given address and badgeId and returns its contents.
+// Queries a balance for the given address and tokenId and returns its contents.
 func (k Keeper) MapValue(goCtx context.Context, req *types.QueryGetMapValueRequest) (*types.QueryGetMapValueResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

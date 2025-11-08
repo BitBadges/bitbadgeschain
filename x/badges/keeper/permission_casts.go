@@ -28,14 +28,14 @@ func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:        permission.BadgeIds,
+			TokenIds:        permission.TokenIds,
 			TransferTimes:   permission.TransferTimes,
 			OwnershipTimes:  permission.OwnershipTimes,
 			FromList:        fromList,
 			InitiatedByList: initiatedByList,
 			ApprovalIdList:  approvalTrackerList,
 
-			UsesBadgeIds:              true,
+			UsesTokenIds:              true,
 			UsesTransferTimes:         true,
 			UsesOwnershipTimes:        true,
 			UsesFromList:              true,
@@ -67,14 +67,14 @@ func (k Keeper) CastUserOutgoingApprovalPermissionToUniversalPermission(ctx sdk.
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-			BadgeIds:                  permission.BadgeIds,
+			TokenIds:                  permission.TokenIds,
 			TransferTimes:             permission.TransferTimes,
 			OwnershipTimes:            permission.OwnershipTimes,
 			ToList:                    toList,
 			InitiatedByList:           initiatedByList,
 			ApprovalIdList:            approvalTrackerList,
 			UsesApprovalId:            true,
-			UsesBadgeIds:              true,
+			UsesTokenIds:              true,
 			UsesTransferTimes:         true,
 			UsesOwnershipTimes:        true,
 			UsesToList:                true,
@@ -132,10 +132,10 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 			ToList:              toList,
 			FromList:            fromList,
 			InitiatedByList:     initiatedByList,
-			BadgeIds:            collectionUpdatePermission.BadgeIds,
+			TokenIds:            collectionUpdatePermission.TokenIds,
 			ApprovalIdList:      approvalTrackerList,
 			UsesApprovalId:      true,
-			UsesBadgeIds:        true,
+			UsesTokenIds:        true,
 			UsesTransferTimes:   true,
 			UsesOwnershipTimes:  true,
 			UsesToList:          true,
@@ -149,19 +149,19 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastTimedUpdateWithBadgeIdsPermissionToUniversalPermission(timedUpdateWithBadgeIdsPermission []*types.TimedUpdateWithBadgeIdsPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(timedUpdateWithTokenIdsPermission []*types.TimedUpdateWithTokenIdsPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
-	for _, timedUpdateWithBadgeIdsPermission := range timedUpdateWithBadgeIdsPermission {
+	for _, timedUpdateWithTokenIdsPermission := range timedUpdateWithTokenIdsPermission {
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			TimelineTimes:     timedUpdateWithBadgeIdsPermission.TimelineTimes,
-			BadgeIds:          timedUpdateWithBadgeIdsPermission.BadgeIds,
+			TimelineTimes:     timedUpdateWithTokenIdsPermission.TimelineTimes,
+			TokenIds:          timedUpdateWithTokenIdsPermission.TokenIds,
 			UsesTimelineTimes: true,
-			UsesBadgeIds:      true,
+			UsesTokenIds:      true,
 
-			PermanentlyPermittedTimes: timedUpdateWithBadgeIdsPermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes: timedUpdateWithBadgeIdsPermission.PermanentlyForbiddenTimes,
+			PermanentlyPermittedTimes: timedUpdateWithTokenIdsPermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: timedUpdateWithTokenIdsPermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil
@@ -183,16 +183,16 @@ func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermis
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastBadgeIdsActionPermissionToUniversalPermission(BadgeIdsActionPermission []*types.BadgeIdsActionPermission) ([]*types.UniversalPermission, error) {
+func (k Keeper) CastTokenIdsActionPermissionToUniversalPermission(TokenIdsActionPermission []*types.TokenIdsActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
-	for _, BadgeIdsActionPermission := range BadgeIdsActionPermission {
+	for _, TokenIdsActionPermission := range TokenIdsActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
 
-			BadgeIds:     BadgeIdsActionPermission.BadgeIds,
-			UsesBadgeIds: true,
+			TokenIds:     TokenIdsActionPermission.TokenIds,
+			UsesTokenIds: true,
 
-			PermanentlyPermittedTimes: BadgeIdsActionPermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes: BadgeIdsActionPermission.PermanentlyForbiddenTimes,
+			PermanentlyPermittedTimes: TokenIdsActionPermission.PermanentlyPermittedTimes,
+			PermanentlyForbiddenTimes: TokenIdsActionPermission.PermanentlyForbiddenTimes,
 		})
 	}
 	return castedPermissions, nil

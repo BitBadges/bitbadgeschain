@@ -9,7 +9,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgetypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*types.MsgSetValueResponse, error) {
@@ -52,7 +52,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		}
 
 		if currMap.ValueOptions.ExpectUri {
-			err := badgetypes.ValidateURI(value)
+			err := tokentypes.ValidateURI(value)
 			if err != nil {
 				return nil, sdkerrors.Wrap(ErrInvalidValue, "Value must be a valid URI")
 			}
@@ -64,9 +64,9 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		return nil, sdkerrors.Wrap(ErrValueAlreadySet, "Value cannot be the same as the current value")
 	}
 
-	collection := &badgetypes.BadgeCollection{}
+	collection := &tokentypes.TokenCollection{}
 	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &badgetypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
@@ -82,8 +82,8 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	if !currMap.UpdateCriteria.CollectionId.IsNil() && currMap.UpdateCriteria.CollectionId.GT(sdkmath.NewUint(0)) {
-		badgeId := sdkmath.NewUintFromString(key)
-		balancesRes, err := k.badgesKeeper.GetBalance(ctx, &badgetypes.QueryGetBalanceRequest{
+		tokenId := sdkmath.NewUintFromString(key)
+		balancesRes, err := k.badgesKeeper.GetBalance(ctx, &tokentypes.QueryGetBalanceRequest{
 			CollectionId: currMap.UpdateCriteria.CollectionId.String(),
 			Address:      msg.Creator,
 		})
@@ -92,9 +92,9 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 		}
 
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-		bals, err := badgetypes.GetBalancesForIds(ctx, []*badgetypes.UintRange{
-			{Start: badgeId, End: badgeId},
-		}, []*badgetypes.UintRange{
+		bals, err := tokentypes.GetBalancesForIds(ctx, []*tokentypes.UintRange{
+			{Start: tokenId, End: tokenId},
+		}, []*tokentypes.UintRange{
 			{Start: currTime, End: currTime},
 		}, balancesRes.Balance.Balances)
 		if err != nil {

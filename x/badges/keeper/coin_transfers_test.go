@@ -33,7 +33,7 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 				InitiatedByListId: alice,
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
-				BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 
 				ApprovalId: "test",
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -57,7 +57,7 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 	})
 	suite.Require().Nil(err, "error updating user approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -67,7 +67,7 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},
@@ -116,7 +116,7 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 				InitiatedByListId: alice,
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
-				BadgeIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 
 				ApprovalId: "test",
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -140,7 +140,7 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 	})
 	suite.Require().Nil(err, "error updating user approvals")
 
-	err = TransferBadges(suite, wctx, &types.MsgTransferBadges{
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
@@ -150,7 +150,7 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 				Balances: []*types.Balance{
 					{
 						OwnershipTimes: GetFullUintRanges(),
-						BadgeIds:       GetOneUintRange(),
+						TokenIds:       GetOneUintRange(),
 						Amount:         sdkmath.NewUint(1),
 					},
 				},

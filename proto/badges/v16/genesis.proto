@@ -12,11 +12,11 @@ import "badges/v16/dynamic_stores.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v16";
 
-// GenesisState defines the badges module's genesis state.
+// GenesisState defines the tokens module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
   string port_id = 2;
-  repeated BadgeCollection collections = 3;
+  repeated TokenCollection collections = 3;
   string nextCollectionId = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated UserBalanceStore balances = 5;
   repeated string balanceStoreKeys = 6;

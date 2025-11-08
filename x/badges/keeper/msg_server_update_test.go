@@ -20,10 +20,10 @@ package keeper_test
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Collection: types.MsgNewCollection{
-// 				BadgeMetadata: []*types.BadgeMetadata{
+// 				TokenMetadata: []*types.TokenMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
+// 						TokenIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -42,10 +42,10 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating token: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com", []*types.TokenMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}",
-// 			BadgeIds: []*types.UintRange{
+// 			TokenIds: []*types.UintRange{
 // 				{
 // 					Start: sdkmath.NewUint(1),
 // 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -56,7 +56,7 @@ package keeper_test
 // 	suite.Require().Nil(err, "Error updating uris")
 // 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	suite.Require().Equal("https://example.com", badge.CollectionMetadata)
-// 	// suite.Require().Equal("https://example.com/{id}", badge.BadgeMetadata)
+// 	// suite.Require().Equal("https://example.com/{id}", badge.TokenMetadata)
 
 // 	err = UpdateCollectionPermissions(suite, wctx, bob, sdkmath.NewUint(1), sdkmath.NewUint(60-32))
 // 	suite.Require().Nil(err, "Error updating permissions")
@@ -75,10 +75,10 @@ package keeper_test
 // 		{
 // 			Collection: types.MsgNewCollection{
 // 				CollectionMetadata: "https://example.com",
-// 				BadgeMetadata: []*types.BadgeMetadata{
+// 				TokenMetadata: []*types.TokenMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
+// 						TokenIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -96,10 +96,10 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating token: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com/test2222", []*types.BadgeMetadata{
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "https://example.com/test2222", []*types.TokenMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}/edited",
-// 			BadgeIds: []*types.UintRange{
+// 			TokenIds: []*types.UintRange{
 // 				{
 // 					Start: sdkmath.NewUint(1),
 // 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -126,10 +126,10 @@ package keeper_test
 // 		{
 // 			Collection: types.MsgNewCollection{
 // 				CollectionMetadata: "https://example.com",
-// 				BadgeMetadata: []*types.BadgeMetadata{
+// 				TokenMetadata: []*types.TokenMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
+// 						TokenIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -147,10 +147,10 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating token: %s")
 
-// 	err = UpdateURIs(suite, wctx, alice, sdkmath.NewUint(1), "https://example.com", []*types.BadgeMetadata{
+// 	err = UpdateURIs(suite, wctx, alice, sdkmath.NewUint(1), "https://example.com", []*types.TokenMetadata{
 // 		{
 // 			Uri: "https://example.com/{id}",
-// 			BadgeIds: []*types.UintRange{
+// 			TokenIds: []*types.UintRange{
 // 				{
 // 					Start: sdkmath.NewUint(1),
 // 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -176,10 +176,10 @@ package keeper_test
 // 	collectionsToCreate := []CollectionsToCreate{
 // 		{
 // 			Collection: types.MsgNewCollection{
-// 				BadgeMetadata: []*types.BadgeMetadata{
+// 				TokenMetadata: []*types.TokenMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
+// 						TokenIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -198,11 +198,11 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating token: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.TokenMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().Nil(err, "Error updating uris")
 // 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 // 	suite.Require().Equal("https://balance.com/{id}", badge.OffChainBalancesMetadata)
-// 	// suite.Require().Equal("https://example.com/{id}", badge.BadgeMetadata)
+// 	// suite.Require().Equal("https://example.com/{id}", badge.TokenMetadata)
 // }
 
 // func (suite *TestSuite) TestCantUpdateBalanceUris() {
@@ -215,10 +215,10 @@ package keeper_test
 // 		{
 // 			Collection: types.MsgNewCollection{
 // 				CollectionMetadata: "https://example.com",
-// 				BadgeMetadata: []*types.BadgeMetadata{
+// 				TokenMetadata: []*types.TokenMetadata{
 // 					{
 // 						Uri: "https://example.com/{id}",
-// 						BadgeIds: []*types.UintRange{
+// 						TokenIds: []*types.UintRange{
 // 							{
 // 								Start: sdkmath.NewUint(1),
 // 								End:   sdkmath.NewUint(math.MaxUint64),
@@ -236,6 +236,6 @@ package keeper_test
 // 	err = CreateCollections(suite, wctx, collectionsToCreate)
 // 	suite.Require().Nil(err, "Error creating token: %s")
 
-// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.BadgeMetadata{}, "https://balance.com/{id}")
+// 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.TokenMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().EqualError(err, keeper.ErrInvalidPermissions.Error())
 // }

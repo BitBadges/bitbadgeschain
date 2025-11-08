@@ -20,7 +20,7 @@ const (
 
 func TestRemoveOverlaps(t *testing.T) {
 	remaining, _ := types.UniversalRemoveOverlaps(sdk.Context{}, &types.UniversalPermissionDetails{
-		BadgeId: &types.UintRange{
+		TokenId: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
@@ -51,7 +51,7 @@ func TestRemoveOverlaps(t *testing.T) {
 		},
 		ApprovalIdList: &types.AddressList{},
 	}, &types.UniversalPermissionDetails{
-		BadgeId: &types.UintRange{
+		TokenId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
@@ -88,7 +88,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -120,7 +120,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -152,7 +152,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
@@ -184,7 +184,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
@@ -216,7 +216,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -249,7 +249,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -281,7 +281,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -314,7 +314,7 @@ func TestRemoveOverlaps(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -350,8 +350,8 @@ func TestRemoveOverlaps(t *testing.T) {
 
 	for idx, r := range expected {
 		x := remaining[idx]
-		require.Equal(t, r.BadgeId.End, x.BadgeId.End)
-		require.Equal(t, r.BadgeId.Start, x.BadgeId.Start)
+		require.Equal(t, r.TokenId.End, x.TokenId.End)
+		require.Equal(t, r.TokenId.Start, x.TokenId.Start)
 
 		require.Equal(t, r.TimelineTime.End, x.TimelineTime.End)
 		require.Equal(t, r.TimelineTime.Start, x.TimelineTime.Start)
@@ -381,7 +381,7 @@ func TestRemoveOverlaps(t *testing.T) {
 
 func TestRemoveAddresses(t *testing.T) {
 	remaining, _ := types.UniversalRemoveOverlaps(sdk.Context{}, &types.UniversalPermissionDetails{
-		BadgeId: &types.UintRange{
+		TokenId: &types.UintRange{
 			Start: sdkmath.NewUint(5),
 			End:   sdkmath.NewUint(5),
 		},
@@ -412,7 +412,7 @@ func TestRemoveAddresses(t *testing.T) {
 
 		ApprovalIdList: &types.AddressList{},
 	}, &types.UniversalPermissionDetails{
-		BadgeId: &types.UintRange{
+		TokenId: &types.UintRange{
 			Start: sdkmath.NewUint(1),
 			End:   sdkmath.NewUint(10),
 		},
@@ -449,7 +449,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -481,7 +481,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(10),
 			},
@@ -513,7 +513,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(4),
 			},
@@ -545,7 +545,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(6),
 				End:   sdkmath.NewUint(10),
 			},
@@ -577,7 +577,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -610,7 +610,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -642,7 +642,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -675,7 +675,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -708,7 +708,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -740,7 +740,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -772,7 +772,7 @@ func TestRemoveAddresses(t *testing.T) {
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
-			BadgeId: &types.UintRange{
+			TokenId: &types.UintRange{
 				Start: sdkmath.NewUint(5),
 				End:   sdkmath.NewUint(5),
 			},
@@ -810,8 +810,8 @@ func TestRemoveAddresses(t *testing.T) {
 		t.Log(idx)
 
 		x := remaining[idx]
-		require.Equal(t, r.BadgeId.End, x.BadgeId.End)
-		require.Equal(t, r.BadgeId.Start, x.BadgeId.Start)
+		require.Equal(t, r.TokenId.End, x.TokenId.End)
+		require.Equal(t, r.TokenId.Start, x.TokenId.Start)
 
 		require.Equal(t, r.TimelineTime.End, x.TimelineTime.End)
 		require.Equal(t, r.TimelineTime.Start, x.TimelineTime.Start)

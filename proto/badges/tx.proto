@@ -29,7 +29,7 @@ service Msg {
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc UniversalUpdateCollection      (MsgUniversalUpdateCollection) returns (MsgUniversalUpdateCollectionResponse);
   rpc CreateAddressLists (MsgCreateAddressLists) returns (MsgCreateAddressListsResponse);
-  rpc TransferBadges(MsgTransferBadges) returns (MsgTransferBadgesResponse);
+  rpc TransferTokens(MsgTransferTokens) returns (MsgTransferTokensResponse);
   rpc UpdateUserApprovals(MsgUpdateUserApprovals) returns (MsgUpdateUserApprovalsResponse);
   rpc SetIncomingApproval(MsgSetIncomingApproval) returns (MsgSetIncomingApprovalResponse);
   rpc DeleteIncomingApproval(MsgDeleteIncomingApproval) returns (MsgDeleteIncomingApprovalResponse);
@@ -47,10 +47,10 @@ service Msg {
   rpc DecrementStoreValue   (MsgDecrementStoreValue) returns (MsgDecrementStoreValueResponse);
   
   // Helper message types for UniversalUpdateCollection subsets
-  rpc SetValidBadgeIds(MsgSetValidBadgeIds) returns (MsgSetValidBadgeIdsResponse);
+  rpc SetValidTokenIds(MsgSetValidTokenIds) returns (MsgSetValidTokenIdsResponse);
   rpc SetManager(MsgSetManager) returns (MsgSetManagerResponse);
   rpc SetCollectionMetadata(MsgSetCollectionMetadata) returns (MsgSetCollectionMetadataResponse);
-  rpc SetBadgeMetadata(MsgSetBadgeMetadata) returns (MsgSetBadgeMetadataResponse);
+  rpc SetTokenMetadata(MsgSetTokenMetadata) returns (MsgSetTokenMetadataResponse);
   rpc SetCustomData(MsgSetCustomData) returns (MsgSetCustomDataResponse);
   rpc SetStandards(MsgSetStandards) returns (MsgSetStandardsResponse);
   rpc SetCollectionApprovals(MsgSetCollectionApprovals) returns (MsgSetCollectionApprovalsResponse);
@@ -62,7 +62,7 @@ message BadgeCustomMsgType {
   MsgCreateAddressLists createAddressListsMsg = 1;
   MsgUniversalUpdateCollection universalUpdateCollectionMsg = 2;
   MsgDeleteCollection deleteCollectionMsg = 3;
-  MsgTransferBadges transferBadgesMsg = 4;
+  MsgTransferTokens transferTokensMsg = 4;
   MsgUpdateUserApprovals updateUserApprovalsMsg = 5;
   MsgUpdateCollection updateCollectionMsg = 6;
   MsgCreateCollection createCollectionMsg = 7;
@@ -79,10 +79,10 @@ message BadgeCustomMsgType {
   MsgPurgeApprovals purgeApprovalsMsg = 18;
   
   // Helper message types for UniversalUpdateCollection subsets
-  MsgSetValidBadgeIds setValidBadgeIdsMsg = 19;
+  MsgSetValidTokenIds setValidTokenIdsMsg = 19;
   MsgSetManager setManagerMsg = 20;
   MsgSetCollectionMetadata setCollectionMetadataMsg = 21;
-  MsgSetBadgeMetadata setBadgeMetadataMsg = 22;
+  MsgSetTokenMetadata setTokenMetadataMsg = 22;
   MsgSetCustomData setCustomDataMsg = 23;
   MsgSetStandards setStandardsMsg = 24;
   MsgSetCollectionApprovals setCollectionApprovalsMsg = 25;
@@ -119,7 +119,7 @@ message CosmosCoinWrapperPathAddObject {
   bool allowCosmosWrapping = 6;
 }
 
-// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
+// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the tokens module.
 // It is a universal interface that can be used for both creating and updating collections.
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 message MsgUniversalUpdateCollection {
@@ -136,10 +136,10 @@ message MsgUniversalUpdateCollection {
   UserBalanceStore defaultBalances = 3;
 
   // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateValidBadgeIds = 4;
+  bool updateValidTokenIds = 4;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 5; 
+  repeated UintRange validTokenIds = 5; 
 
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionPermissions = 6;
@@ -160,10 +160,10 @@ message MsgUniversalUpdateCollection {
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 11;
   
   // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateBadgeMetadataTimeline = 12;
+  bool updateTokenMetadataTimeline = 12;
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 13;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 13;
   
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
@@ -219,10 +219,10 @@ message MsgUpdateCollection {
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
   // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateValidBadgeIds = 3;
+  bool updateValidTokenIds = 3;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 4;
+  repeated UintRange validTokenIds = 4;
   
   // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionPermissions = 5;
@@ -243,10 +243,10 @@ message MsgUpdateCollection {
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 10;
   
   // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateBadgeMetadataTimeline = 11;
+  bool updateTokenMetadataTimeline = 11;
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 12;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 12;
   
   
   // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
@@ -302,7 +302,7 @@ message MsgCreateCollection {
   UserBalanceStore defaultBalances = 2;
 
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 3; 
+  repeated UintRange validTokenIds = 3; 
   
   // Collection permissions.
   CollectionPermissions collectionPermissions = 4;
@@ -314,7 +314,7 @@ message MsgCreateCollection {
   repeated CollectionMetadataTimeline collectionMetadataTimeline = 6;
   
   // Token metadata timeline entries.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 7;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 7;
   
   // Custom data timeline entries.
   repeated CustomDataTimeline customDataTimeline = 8;
@@ -359,10 +359,10 @@ message MsgCreateAddressLists {
 // MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.
 message MsgCreateAddressListsResponse {}
 
-// MsgTransferBadges is used to transfer tokens.
-message MsgTransferBadges {
+// MsgTransferTokens is used to transfer tokens.
+message MsgTransferTokens {
   option (cosmos.msg.v1.signer) = "creator";
-    option (amino.name) = "badges/TransferBadges";
+    option (amino.name) = "badges/TransferTokens";
 
   // Address of the creator.
   string creator = 1;
@@ -374,8 +374,8 @@ message MsgTransferBadges {
   repeated Transfer transfers = 3;
 }
 
-// MsgTransferBadgesResponse is the response to MsgTransferBadges.
-message MsgTransferBadgesResponse {}
+// MsgTransferTokensResponse is the response to MsgTransferTokens.
+message MsgTransferTokensResponse {}
 
 // MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
@@ -662,10 +662,10 @@ message MsgDecrementStoreValueResponse {}
 // Helper message types for UniversalUpdateCollection subsets
 // These are convenience messages that set specific subsets of the UniversalUpdateCollection message
 
-// MsgSetValidBadgeIds sets the validBadgeIds and canUpdateValidBadgeIds permission
-message MsgSetValidBadgeIds {
+// MsgSetValidTokenIds sets the validTokenIds and canUpdateValidTokenIds permission
+message MsgSetValidTokenIds {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/SetValidBadgeIds";
+  option (amino.name) = "badges/SetValidTokenIds";
 
   // Address of the creator.
   string creator = 1;
@@ -674,14 +674,14 @@ message MsgSetValidBadgeIds {
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
   // New token IDs to add to this collection
-  repeated UintRange validBadgeIds = 3;
+  repeated UintRange validTokenIds = 3;
   
   // Permission to update valid token IDs
-  repeated BadgeIdsActionPermission canUpdateValidBadgeIds = 4;
+  repeated TokenIdsActionPermission canUpdateValidTokenIds = 4;
 }
 
-// MsgSetValidBadgeIdsResponse is the response to MsgSetValidBadgeIds.
-message MsgSetValidBadgeIdsResponse {
+// MsgSetValidTokenIdsResponse is the response to MsgSetValidTokenIds.
+message MsgSetValidTokenIdsResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
@@ -734,10 +734,10 @@ message MsgSetCollectionMetadataResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetBadgeMetadata sets the token metadata timeline and canUpdateBadgeMetadata permission
-message MsgSetBadgeMetadata {
+// MsgSetTokenMetadata sets the token metadata timeline and canUpdateTokenMetadata permission
+message MsgSetTokenMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/SetBadgeMetadata";
+  option (amino.name) = "badges/SetTokenMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -746,14 +746,14 @@ message MsgSetBadgeMetadata {
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
   // New token metadata timeline to set.
-  repeated BadgeMetadataTimeline badgeMetadataTimeline = 3;
+  repeated TokenMetadataTimeline tokenMetadataTimeline = 3;
   
   // Permission to update token metadata timeline
-  repeated TimedUpdateWithBadgeIdsPermission canUpdateBadgeMetadata = 4;
+  repeated TimedUpdateWithTokenIdsPermission canUpdateTokenMetadata = 4;
 }
 
-// MsgSetBadgeMetadataResponse is the response to MsgSetBadgeMetadata.
-message MsgSetBadgeMetadataResponse {
+// MsgSetTokenMetadataResponse is the response to MsgSetTokenMetadata.
+message MsgSetTokenMetadataResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

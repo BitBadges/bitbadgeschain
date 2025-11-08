@@ -29,7 +29,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeOwnExpiredApprovals() {
 	// Create a collection first
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        bob,
-		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
+		TokensToCreate: []*types.Balance{{TokenIds: GetFullUintRanges()}},
 	}})
 
 	now := uint64(time.Now().UnixMilli())
@@ -40,7 +40,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeOwnExpiredApprovals() {
 		ToListId:          alice,
 		InitiatedByListId: bob,
 		TransferTimes:     []*types.UintRange{{Start: startTime, End: expiredTime}},
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		ApprovalId:        "expired-approval",
 		ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -90,7 +90,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsNotAll
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        alice,
-		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
+		TokensToCreate: []*types.Balance{{TokenIds: GetFullUintRanges()}},
 	}})
 
 	now := uint64(time.Now().UnixMilli())
@@ -101,7 +101,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsNotAll
 		ToListId:          charlie,
 		InitiatedByListId: alice,
 		TransferTimes:     []*types.UintRange{{Start: startTime, End: expiredTime}},
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		ApprovalId:        "expired-approval",
 		ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -148,7 +148,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsAllowe
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        alice,
-		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
+		TokensToCreate: []*types.Balance{{TokenIds: GetFullUintRanges()}},
 	}})
 
 	now := uint64(time.Now().UnixMilli())
@@ -159,7 +159,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsAllowe
 		ToListId:          charlie,
 		InitiatedByListId: alice,
 		TransferTimes:     []*types.UintRange{{Start: startTime, End: expiredTime}},
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		ApprovalId:        "expired-approval",
 		ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -226,7 +226,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeCounterpartyApprovalsAllowed() {
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        bob,
-		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
+		TokensToCreate: []*types.Balance{{TokenIds: GetFullUintRanges()}},
 	}})
 
 	now := uint64(time.Now().UnixMilli())
@@ -237,7 +237,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeCounterpartyApprovalsAllowed() {
 		ToListId:          alice,
 		InitiatedByListId: "bobonly",
 		TransferTimes:     []*types.UintRange{{Start: startTime, End: expiredTime}},
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		ApprovalId:        "counterparty-approval",
 		ApprovalCriteria: &types.OutgoingApprovalCriteria{
@@ -284,7 +284,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeNonExpiredApprovals() {
 
 	CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
 		Creator:        bob,
-		BadgesToCreate: []*types.Balance{{BadgeIds: GetFullUintRanges()}},
+		TokensToCreate: []*types.Balance{{TokenIds: GetFullUintRanges()}},
 	}})
 
 	now := uint64(time.Now().UnixMilli())
@@ -295,7 +295,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeNonExpiredApprovals() {
 		ToListId:          alice,
 		InitiatedByListId: bob,
 		TransferTimes:     []*types.UintRange{{Start: startTime, End: futureTime}},
-		BadgeIds:          GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		ApprovalId:        "future-approval",
 		ApprovalCriteria: &types.OutgoingApprovalCriteria{

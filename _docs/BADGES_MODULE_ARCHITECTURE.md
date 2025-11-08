@@ -1,4 +1,4 @@
-# BitBadges Module Architecture Overview
+# Module Architecture Overview
 
 This document provides a high-level architectural overview of the BitBadges `x/badges` module, focusing on design patterns, data flow, and integration points.
 
@@ -83,7 +83,7 @@ type CollectionManager struct {
     // Static properties
     CollectionId           Uint
     BalanceType           BalanceType
-    ValidBadgeIds         []UintRange
+    ValidTokenIds         []UintRange
 }
 ```
 

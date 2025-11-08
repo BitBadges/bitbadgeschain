@@ -339,7 +339,7 @@ type UserOutgoingApproval struct {
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// The allowed range of token IDs for approval.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The URI associated with this approval, optionally providing metadata about the approval.
@@ -408,9 +408,9 @@ func (m *UserOutgoingApproval) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (m *UserOutgoingApproval) GetBadgeIds() []*UintRange {
+func (m *UserOutgoingApproval) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -459,7 +459,7 @@ type UserIncomingApproval struct {
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,3,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// The allowed range of token IDs for approval.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,5,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The URI associated with this approval, optionally providing metadata about the approval.
@@ -528,9 +528,9 @@ func (m *UserIncomingApproval) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (m *UserIncomingApproval) GetBadgeIds() []*UintRange {
+func (m *UserIncomingApproval) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -662,7 +662,7 @@ var xxx_messageInfo_RecurringOwnershipTimes proto.InternalMessageInfo
 type IncrementedBalances struct {
 	StartBalances []*Balance `protobuf:"bytes,1,rep,name=startBalances,proto3" json:"startBalances,omitempty"`
 	// The amount by which to increment token IDs.
-	IncrementBadgeIdsBy Uint `protobuf:"bytes,2,opt,name=incrementBadgeIdsBy,proto3,customtype=Uint" json:"incrementBadgeIdsBy"`
+	IncrementTokenIdsBy Uint `protobuf:"bytes,2,opt,name=incrementTokenIdsBy,proto3,customtype=Uint" json:"incrementTokenIdsBy"`
 	// The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
 	IncrementOwnershipTimesBy Uint `protobuf:"bytes,3,opt,name=incrementOwnershipTimesBy,proto3,customtype=Uint" json:"incrementOwnershipTimesBy"`
 	// The amount of unix milliseconds to approve starting from now. Incompatible with incrementOwnershipTimesBy.
@@ -672,7 +672,7 @@ type IncrementedBalances struct {
 	// Recurring ownership times.
 	RecurringOwnershipTimes *RecurringOwnershipTimes `protobuf:"bytes,6,opt,name=recurringOwnershipTimes,proto3" json:"recurringOwnershipTimes,omitempty"`
 	// Allow override of any valid ID
-	AllowOverrideWithAnyValidBadge bool `protobuf:"varint,7,opt,name=allowOverrideWithAnyValidBadge,proto3" json:"allowOverrideWithAnyValidBadge,omitempty"`
+	AllowOverrideWithAnyValidToken bool `protobuf:"varint,7,opt,name=allowOverrideWithAnyValidToken,proto3" json:"allowOverrideWithAnyValidToken,omitempty"`
 }
 
 func (m *IncrementedBalances) Reset()         { *m = IncrementedBalances{} }
@@ -729,9 +729,9 @@ func (m *IncrementedBalances) GetRecurringOwnershipTimes() *RecurringOwnershipTi
 	return nil
 }
 
-func (m *IncrementedBalances) GetAllowOverrideWithAnyValidBadge() bool {
+func (m *IncrementedBalances) GetAllowOverrideWithAnyValidToken() bool {
 	if m != nil {
-		return m.AllowOverrideWithAnyValidBadge
+		return m.AllowOverrideWithAnyValidToken
 	}
 	return false
 }
@@ -1264,16 +1264,16 @@ func (m *CoinTransfer) GetOverrideToWithInitiator() bool {
 	return false
 }
 
-// MustOwnBadges represents a condition where a user must own specific tokens
+// MustOwnTokens represents a condition where a user must own specific tokens
 // to be approved to transfer.
 //
 // - collectionId: The ID of the collection for the tokens that must be owned
 // - amountRange: The range of amounts the user must own (min to max)
 // - ownershipTimes: The time ranges during which the user must own the tokens.
-// - badgeIds: The token IDs the user must own.
+// - tokenIds: The token IDs the user must own.
 // - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
 // - mustSatisfyForAllAssets: If true, the user must own all specified tokens; otherwise, owning any one for >= 1 millisecond is sufficient.
-type MustOwnBadges struct {
+type MustOwnTokens struct {
 	// The ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	// The range of amounts the user must own (min to max).
@@ -1281,7 +1281,7 @@ type MustOwnBadges struct {
 	// The time ranges during which the user must own the tokens.
 	OwnershipTimes []*UintRange `protobuf:"bytes,3,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The token IDs the user must own.
-	BadgeIds []*UintRange `protobuf:"bytes,4,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// If true, override ownershipTimes with the current time.
 	OverrideWithCurrentTime bool `protobuf:"varint,5,opt,name=overrideWithCurrentTime,proto3" json:"overrideWithCurrentTime,omitempty"`
 	// If true, the user must meet ownership requirements for all specified tokens; else, must meet requirements for any single token.
@@ -1290,18 +1290,18 @@ type MustOwnBadges struct {
 	OwnershipCheckParty string `protobuf:"bytes,7,opt,name=ownershipCheckParty,proto3" json:"ownershipCheckParty,omitempty"`
 }
 
-func (m *MustOwnBadges) Reset()         { *m = MustOwnBadges{} }
-func (m *MustOwnBadges) String() string { return proto.CompactTextString(m) }
-func (*MustOwnBadges) ProtoMessage()    {}
-func (*MustOwnBadges) Descriptor() ([]byte, []int) {
+func (m *MustOwnTokens) Reset()         { *m = MustOwnTokens{} }
+func (m *MustOwnTokens) String() string { return proto.CompactTextString(m) }
+func (*MustOwnTokens) ProtoMessage()    {}
+func (*MustOwnTokens) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4dea523332cf3365, []int{16}
 }
-func (m *MustOwnBadges) XXX_Unmarshal(b []byte) error {
+func (m *MustOwnTokens) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MustOwnBadges) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MustOwnTokens) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MustOwnBadges.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MustOwnTokens.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1311,54 +1311,54 @@ func (m *MustOwnBadges) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (m *MustOwnBadges) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MustOwnBadges.Merge(m, src)
+func (m *MustOwnTokens) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MustOwnTokens.Merge(m, src)
 }
-func (m *MustOwnBadges) XXX_Size() int {
+func (m *MustOwnTokens) XXX_Size() int {
 	return m.Size()
 }
-func (m *MustOwnBadges) XXX_DiscardUnknown() {
-	xxx_messageInfo_MustOwnBadges.DiscardUnknown(m)
+func (m *MustOwnTokens) XXX_DiscardUnknown() {
+	xxx_messageInfo_MustOwnTokens.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MustOwnBadges proto.InternalMessageInfo
+var xxx_messageInfo_MustOwnTokens proto.InternalMessageInfo
 
-func (m *MustOwnBadges) GetAmountRange() *UintRange {
+func (m *MustOwnTokens) GetAmountRange() *UintRange {
 	if m != nil {
 		return m.AmountRange
 	}
 	return nil
 }
 
-func (m *MustOwnBadges) GetOwnershipTimes() []*UintRange {
+func (m *MustOwnTokens) GetOwnershipTimes() []*UintRange {
 	if m != nil {
 		return m.OwnershipTimes
 	}
 	return nil
 }
 
-func (m *MustOwnBadges) GetBadgeIds() []*UintRange {
+func (m *MustOwnTokens) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
 
-func (m *MustOwnBadges) GetOverrideWithCurrentTime() bool {
+func (m *MustOwnTokens) GetOverrideWithCurrentTime() bool {
 	if m != nil {
 		return m.OverrideWithCurrentTime
 	}
 	return false
 }
 
-func (m *MustOwnBadges) GetMustSatisfyForAllAssets() bool {
+func (m *MustOwnTokens) GetMustSatisfyForAllAssets() bool {
 	if m != nil {
 		return m.MustSatisfyForAllAssets
 	}
 	return false
 }
 
-func (m *MustOwnBadges) GetOwnershipCheckParty() string {
+func (m *MustOwnTokens) GetOwnershipCheckParty() string {
 	if m != nil {
 		return m.OwnershipCheckParty
 	}
@@ -1433,7 +1433,7 @@ type ApprovalCriteria struct {
 	// User level royalties to apply to the transfer.
 	UserRoyalties *UserRoyalties `protobuf:"bytes,13,opt,name=userRoyalties,proto3" json:"userRoyalties,omitempty"`
 	// Must own tokens for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,14,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,14,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
 	// Dynamic store challenges that the initiator must pass for approval.
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,15,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
 	// ETH signature challenges that the initiator must pass for approval.
@@ -1564,9 +1564,9 @@ func (m *ApprovalCriteria) GetUserRoyalties() *UserRoyalties {
 	return nil
 }
 
-func (m *ApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
+func (m *ApprovalCriteria) GetMustOwnTokens() []*MustOwnTokens {
 	if m != nil {
-		return m.MustOwnBadges
+		return m.MustOwnTokens
 	}
 	return nil
 }
@@ -1652,7 +1652,7 @@ type OutgoingApprovalCriteria struct {
 	// Auto-deletion options.
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
 	// Must own tokens for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,9,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
 	// Dynamic store challenges that the initiator must pass for approval.
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,10,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
 	// ETH signature challenges that the initiator must pass for approval.
@@ -1748,9 +1748,9 @@ func (m *OutgoingApprovalCriteria) GetAutoDeletionOptions() *AutoDeletionOptions
 	return nil
 }
 
-func (m *OutgoingApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
+func (m *OutgoingApprovalCriteria) GetMustOwnTokens() []*MustOwnTokens {
 	if m != nil {
-		return m.MustOwnBadges
+		return m.MustOwnTokens
 	}
 	return nil
 }
@@ -1788,7 +1788,7 @@ type IncomingApprovalCriteria struct {
 	// Auto-deletion options.
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
 	// Must own tokens for approval.
-	MustOwnBadges []*MustOwnBadges `protobuf:"bytes,9,rep,name=mustOwnBadges,proto3" json:"mustOwnBadges,omitempty"`
+	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
 	// Dynamic store challenges that the initiator must pass for approval.
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,10,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
 	// ETH signature challenges that the initiator must pass for approval.
@@ -1884,9 +1884,9 @@ func (m *IncomingApprovalCriteria) GetAutoDeletionOptions() *AutoDeletionOptions
 	return nil
 }
 
-func (m *IncomingApprovalCriteria) GetMustOwnBadges() []*MustOwnBadges {
+func (m *IncomingApprovalCriteria) GetMustOwnTokens() []*MustOwnTokens {
 	if m != nil {
-		return m.MustOwnBadges
+		return m.MustOwnTokens
 	}
 	return nil
 }
@@ -1916,7 +1916,7 @@ type CollectionApproval struct {
 	// The allowed range of transfer times for approval.
 	TransferTimes []*UintRange `protobuf:"bytes,4,rep,name=transferTimes,proto3" json:"transferTimes,omitempty"`
 	// The allowed range of token IDs for approval.
-	BadgeIds []*UintRange `protobuf:"bytes,5,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,5,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 	// The allowed range of ownership times for approval.
 	OwnershipTimes []*UintRange `protobuf:"bytes,6,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The URI associated with this approval, optionally providing metadata about the approval.
@@ -1992,9 +1992,9 @@ func (m *CollectionApproval) GetTransferTimes() []*UintRange {
 	return nil
 }
 
-func (m *CollectionApproval) GetBadgeIds() []*UintRange {
+func (m *CollectionApproval) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -2269,7 +2269,7 @@ type PrecalculationOptions struct {
 	// The timestamp to override with when calculating the balances.
 	OverrideTimestamp Uint `protobuf:"bytes,1,opt,name=overrideTimestamp,proto3,customtype=Uint" json:"overrideTimestamp"`
 	// The IDs to override for the transfer. Only applicable if using this option in precalculation.
-	BadgeIdsOverride []*UintRange `protobuf:"bytes,2,rep,name=badgeIdsOverride,proto3" json:"badgeIdsOverride,omitempty"`
+	TokenIdsOverride []*UintRange `protobuf:"bytes,2,rep,name=tokenIdsOverride,proto3" json:"tokenIdsOverride,omitempty"`
 }
 
 func (m *PrecalculationOptions) Reset()         { *m = PrecalculationOptions{} }
@@ -2305,9 +2305,9 @@ func (m *PrecalculationOptions) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PrecalculationOptions proto.InternalMessageInfo
 
-func (m *PrecalculationOptions) GetBadgeIdsOverride() []*UintRange {
+func (m *PrecalculationOptions) GetTokenIdsOverride() []*UintRange {
 	if m != nil {
-		return m.BadgeIdsOverride
+		return m.TokenIdsOverride
 	}
 	return nil
 }
@@ -2503,7 +2503,7 @@ func init() {
 	proto.RegisterType((*MaxNumTransfers)(nil), "badges.v15.MaxNumTransfers")
 	proto.RegisterType((*ApprovalTracker)(nil), "badges.v15.ApprovalTracker")
 	proto.RegisterType((*CoinTransfer)(nil), "badges.v15.CoinTransfer")
-	proto.RegisterType((*MustOwnBadges)(nil), "badges.v15.MustOwnBadges")
+	proto.RegisterType((*MustOwnTokens)(nil), "badges.v15.MustOwnTokens")
 	proto.RegisterType((*DynamicStoreChallenge)(nil), "badges.v15.DynamicStoreChallenge")
 	proto.RegisterType((*ApprovalCriteria)(nil), "badges.v15.ApprovalCriteria")
 	proto.RegisterType((*UserRoyalties)(nil), "badges.v15.UserRoyalties")
@@ -3008,10 +3008,10 @@ func (m *UserOutgoingApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3130,10 +3130,10 @@ func (m *UserIncomingApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -3285,9 +3285,9 @@ func (m *IncrementedBalances) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.AllowOverrideWithAnyValidBadge {
+	if m.AllowOverrideWithAnyValidToken {
 		i--
-		if m.AllowOverrideWithAnyValidBadge {
+		if m.AllowOverrideWithAnyValidToken {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -3338,9 +3338,9 @@ func (m *IncrementedBalances) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i--
 	dAtA[i] = 0x1a
 	{
-		size := m.IncrementBadgeIdsBy.Size()
+		size := m.IncrementTokenIdsBy.Size()
 		i -= size
-		if _, err := m.IncrementBadgeIdsBy.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.IncrementTokenIdsBy.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintTransfers(dAtA, i, uint64(size))
@@ -3896,7 +3896,7 @@ func (m *CoinTransfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MustOwnBadges) Marshal() (dAtA []byte, err error) {
+func (m *MustOwnTokens) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3906,12 +3906,12 @@ func (m *MustOwnBadges) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MustOwnBadges) MarshalTo(dAtA []byte) (int, error) {
+func (m *MustOwnTokens) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MustOwnBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MustOwnTokens) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3943,10 +3943,10 @@ func (m *MustOwnBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x28
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -4079,10 +4079,10 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x7a
 		}
 	}
-	if len(m.MustOwnBadges) > 0 {
-		for iNdEx := len(m.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.MustOwnTokens) > 0 {
+		for iNdEx := len(m.MustOwnTokens) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.MustOwnBadges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.MustOwnTokens[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -4332,10 +4332,10 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.MustOwnBadges) > 0 {
-		for iNdEx := len(m.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.MustOwnTokens) > 0 {
+		for iNdEx := len(m.MustOwnTokens) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.MustOwnBadges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.MustOwnTokens[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -4493,10 +4493,10 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.MustOwnBadges) > 0 {
-		for iNdEx := len(m.MustOwnBadges) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.MustOwnTokens) > 0 {
+		for iNdEx := len(m.MustOwnTokens) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.MustOwnBadges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.MustOwnTokens[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -4683,10 +4683,10 @@ func (m *CollectionApproval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x32
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -4982,10 +4982,10 @@ func (m *PrecalculationOptions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.BadgeIdsOverride) > 0 {
-		for iNdEx := len(m.BadgeIdsOverride) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIdsOverride) > 0 {
+		for iNdEx := len(m.TokenIdsOverride) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIdsOverride[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIdsOverride[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -5269,8 +5269,8 @@ func (m *UserOutgoingApproval) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -5322,8 +5322,8 @@ func (m *UserIncomingApproval) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -5397,7 +5397,7 @@ func (m *IncrementedBalances) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	l = m.IncrementBadgeIdsBy.Size()
+	l = m.IncrementTokenIdsBy.Size()
 	n += 1 + l + sovTransfers(uint64(l))
 	l = m.IncrementOwnershipTimesBy.Size()
 	n += 1 + l + sovTransfers(uint64(l))
@@ -5410,7 +5410,7 @@ func (m *IncrementedBalances) Size() (n int) {
 		l = m.RecurringOwnershipTimes.Size()
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if m.AllowOverrideWithAnyValidBadge {
+	if m.AllowOverrideWithAnyValidToken {
 		n += 2
 	}
 	return n
@@ -5595,7 +5595,7 @@ func (m *CoinTransfer) Size() (n int) {
 	return n
 }
 
-func (m *MustOwnBadges) Size() (n int) {
+func (m *MustOwnTokens) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -5613,8 +5613,8 @@ func (m *MustOwnBadges) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -5699,8 +5699,8 @@ func (m *ApprovalCriteria) Size() (n int) {
 		l = m.UserRoyalties.Size()
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if len(m.MustOwnBadges) > 0 {
-		for _, e := range m.MustOwnBadges {
+	if len(m.MustOwnTokens) > 0 {
+		for _, e := range m.MustOwnTokens {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -5775,8 +5775,8 @@ func (m *OutgoingApprovalCriteria) Size() (n int) {
 		l = m.AutoDeletionOptions.Size()
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if len(m.MustOwnBadges) > 0 {
-		for _, e := range m.MustOwnBadges {
+	if len(m.MustOwnTokens) > 0 {
+		for _, e := range m.MustOwnTokens {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -5836,8 +5836,8 @@ func (m *IncomingApprovalCriteria) Size() (n int) {
 		l = m.AutoDeletionOptions.Size()
 		n += 1 + l + sovTransfers(uint64(l))
 	}
-	if len(m.MustOwnBadges) > 0 {
-		for _, e := range m.MustOwnBadges {
+	if len(m.MustOwnTokens) > 0 {
+		for _, e := range m.MustOwnTokens {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -5881,8 +5881,8 @@ func (m *CollectionApproval) Size() (n int) {
 			n += 1 + l + sovTransfers(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -6015,8 +6015,8 @@ func (m *PrecalculationOptions) Size() (n int) {
 	_ = l
 	l = m.OverrideTimestamp.Size()
 	n += 1 + l + sovTransfers(uint64(l))
-	if len(m.BadgeIdsOverride) > 0 {
-		for _, e := range m.BadgeIdsOverride {
+	if len(m.TokenIdsOverride) > 0 {
+		for _, e := range m.TokenIdsOverride {
 			l = e.Size()
 			n += 1 + l + sovTransfers(uint64(l))
 		}
@@ -6939,7 +6939,7 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6966,8 +6966,8 @@ func (m *UserOutgoingApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -7321,7 +7321,7 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7348,8 +7348,8 @@ func (m *UserIncomingApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -7875,7 +7875,7 @@ func (m *IncrementedBalances) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IncrementBadgeIdsBy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field IncrementTokenIdsBy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -7903,7 +7903,7 @@ func (m *IncrementedBalances) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.IncrementBadgeIdsBy.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.IncrementTokenIdsBy.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -8033,7 +8033,7 @@ func (m *IncrementedBalances) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AllowOverrideWithAnyValidBadge", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AllowOverrideWithAnyValidToken", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -8050,7 +8050,7 @@ func (m *IncrementedBalances) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.AllowOverrideWithAnyValidBadge = bool(v != 0)
+			m.AllowOverrideWithAnyValidToken = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTransfers(dAtA[iNdEx:])
@@ -9474,7 +9474,7 @@ func (m *CoinTransfer) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MustOwnBadges) Unmarshal(dAtA []byte) error {
+func (m *MustOwnTokens) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -9497,10 +9497,10 @@ func (m *MustOwnBadges) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MustOwnBadges: wiretype end group for non-group")
+			return fmt.Errorf("proto: MustOwnTokens: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MustOwnBadges: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MustOwnTokens: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -9609,7 +9609,7 @@ func (m *MustOwnBadges) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9636,8 +9636,8 @@ func (m *MustOwnBadges) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -10217,7 +10217,7 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 14:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnTokens", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10244,8 +10244,8 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MustOwnBadges = append(m.MustOwnBadges, &MustOwnBadges{})
-			if err := m.MustOwnBadges[len(m.MustOwnBadges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.MustOwnTokens = append(m.MustOwnTokens, &MustOwnTokens{})
+			if err := m.MustOwnTokens[len(m.MustOwnTokens)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -10737,7 +10737,7 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnTokens", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10764,8 +10764,8 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MustOwnBadges = append(m.MustOwnBadges, &MustOwnBadges{})
-			if err := m.MustOwnBadges[len(m.MustOwnBadges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.MustOwnTokens = append(m.MustOwnTokens, &MustOwnTokens{})
+			if err := m.MustOwnTokens[len(m.MustOwnTokens)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11141,7 +11141,7 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnBadges", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MustOwnTokens", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -11168,8 +11168,8 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MustOwnBadges = append(m.MustOwnBadges, &MustOwnBadges{})
-			if err := m.MustOwnBadges[len(m.MustOwnBadges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.MustOwnTokens = append(m.MustOwnTokens, &MustOwnTokens{})
+			if err := m.MustOwnTokens[len(m.MustOwnTokens)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11423,7 +11423,7 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -11450,8 +11450,8 @@ func (m *CollectionApproval) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -12401,7 +12401,7 @@ func (m *PrecalculationOptions) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIdsOverride", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIdsOverride", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -12428,8 +12428,8 @@ func (m *PrecalculationOptions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIdsOverride = append(m.BadgeIdsOverride, &UintRange{})
-			if err := m.BadgeIdsOverride[len(m.BadgeIdsOverride)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIdsOverride = append(m.TokenIdsOverride, &UintRange{})
+			if err := m.TokenIdsOverride[len(m.TokenIdsOverride)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

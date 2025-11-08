@@ -14,13 +14,13 @@ import (
 )
 
 func (k Keeper) SetMapInStore(ctx sdk.Context, protocol *types.Map) error {
-	marshaled_badge, err := k.cdc.Marshal(protocol)
+	marshaled_token, err := k.cdc.Marshal(protocol)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.Map failed")
 	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-	store.Set(mapStoreKey(protocol.MapId), marshaled_badge)
+	store.Set(mapStoreKey(protocol.MapId), marshaled_token)
 	return nil
 }
 

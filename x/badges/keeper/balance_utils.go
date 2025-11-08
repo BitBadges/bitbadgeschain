@@ -7,7 +7,7 @@ import (
 )
 
 // GetDefaultBalanceStoreForCollection creates a default balance store from collection defaults
-func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *types.UserBalanceStore {
+func GetDefaultBalanceStoreForCollection(collection *types.TokenCollection) *types.UserBalanceStore {
 	return &types.UserBalanceStore{
 		Balances:          collection.DefaultBalances.Balances,
 		OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
@@ -20,7 +20,7 @@ func GetDefaultBalanceStoreForCollection(collection *types.BadgeCollection) *typ
 }
 
 // GetBalanceOrApplyDefault retrieves user balance or applies default balance store
-func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.BadgeCollection, userAddress string) (*types.UserBalanceStore, bool) {
+func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool) {
 	//Mint has unlimited balances
 	if types.IsSpecialAddress(userAddress) {
 		return &types.UserBalanceStore{}, false
@@ -47,7 +47,7 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Badg
 }
 
 // SetBalanceForAddress stores a user balance for a specific address
-func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.BadgeCollection, userAddress string, balance *types.UserBalanceStore) error {
+func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.TokenCollection, userAddress string, balance *types.UserBalanceStore) error {
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	return k.SetUserBalanceInStore(ctx, balanceKey, balance)
 }

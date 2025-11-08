@@ -13,7 +13,7 @@ import (
 // HandleSpecialAddressWrapping processes cosmos coin wrapping/unwrapping for special addresses
 func (k Keeper) HandleSpecialAddressWrapping(
 	ctx sdk.Context,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	transferBalances []*types.Balance,
 	from string,
 	to string,
@@ -51,11 +51,11 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	}
 
 	ibcDenom := denomInfo.Denom
-	if len(transferBalances) == 0 || len(transferBalances[0].BadgeIds) == 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one badge ID")
+	if len(transferBalances) == 0 || len(transferBalances[0].TokenIds) == 0 {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one token ID")
 	}
 
-	firstTokenId := transferBalances[0].BadgeIds[0].Start
+	firstTokenId := transferBalances[0].TokenIds[0].Start
 
 	// Check if the denom contains the {id} placeholder
 	if strings.Contains(denomInfo.Denom, "{id}") {
@@ -65,42 +65,42 @@ func (k Keeper) HandleSpecialAddressWrapping(
 
 		//Throw if balances len != 1
 		if len(transferBalances) != 1 {
-			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
+			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine token ID for {id} placeholder replacement")
 		}
 
-		//Throw if BadgeIds len != 1
-		if len(transferBalances[0].BadgeIds) != 1 {
-			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
+		//Throw if TokenIds len != 1
+		if len(transferBalances[0].TokenIds) != 1 {
+			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine token ID for {id} placeholder replacement")
 		}
 
-		//Throw if BadgeIds[0].Start != BadgeIds[0].End
-		if !transferBalances[0].BadgeIds[0].Start.Equal(transferBalances[0].BadgeIds[0].End) {
-			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine badge ID for {id} placeholder replacement")
+		//Throw if TokenIds[0].Start != TokenIds[0].End
+		if !transferBalances[0].TokenIds[0].Start.Equal(transferBalances[0].TokenIds[0].End) {
+			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine token ID for {id} placeholder replacement")
 		}
 
-		// For {id} placeholder, we need to replace it with the actual badge ID
+		// For {id} placeholder, we need to replace it with the actual token ID
 		// Since we're in a transfer context, we can use the first token ID from the transfer
 		ibcDenom = strings.ReplaceAll(denomInfo.Denom, "{id}", firstTokenId.String())
 	}
 
 	conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
 
-	// If allowOverrideWithAnyValidToken is true, allow any valid badge ID
+	// If allowOverrideWithAnyValidToken is true, allow any valid token ID
 	if denomInfo.AllowOverrideWithAnyValidToken {
-		maxBadgeIdForCollection := sdkmath.NewUint(1)
-		for _, validRange := range collection.ValidBadgeIds {
-			if validRange.End.GT(maxBadgeIdForCollection) {
-				maxBadgeIdForCollection = validRange.End
+		maxTokenIdForCollection := sdkmath.NewUint(1)
+		for _, validRange := range collection.ValidTokenIds {
+			if validRange.End.GT(maxTokenIdForCollection) {
+				maxTokenIdForCollection = validRange.End
 			}
 		}
 
-		if firstTokenId.GT(maxBadgeIdForCollection) || firstTokenId.LT(sdkmath.NewUint(1)) {
+		if firstTokenId.GT(maxTokenIdForCollection) || firstTokenId.LT(sdkmath.NewUint(1)) {
 			return sdkerrors.Wrapf(ErrInvalidConversion, "token ID not in valid range for overrideWithAnyValidToken")
 		}
 
 		// Perform the override
 		for _, balance := range conversionBalances {
-			balance.BadgeIds = []*types.UintRange{
+			balance.TokenIds = []*types.UintRange{
 				{
 					Start: firstTokenId,
 					End:   firstTokenId,
@@ -119,7 +119,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 
 	multiplier := sdkmath.NewUint(0)
 	for _, balance := range conversionBalances {
-		foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.BadgeIds)
+		foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.TokenIds)
 		if err != nil {
 			return err
 		}

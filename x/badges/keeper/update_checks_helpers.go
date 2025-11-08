@@ -29,12 +29,12 @@ import (
 //		 If the value was not updated, then for timeA-timeB, we do not need to check the permissions.
 //		 If it was updated, we need to check the permissions for timeA-timeB.
 //		-Lastly, if it was updated, in addition to just simply checking timeA-timeB, we may also have to be more specific with what that we need to check.
-//		 Ex: If we go from [badgeIDs 1 to 10 -> www.example.com] to [badgeIDs 1 to 2 -> www.example2.com, badgeIDs 3 to 10 -> www.example.com],
-//				 we only need to check badgeIDs 1 to 2 from timeA-timeB
-//		 We eventually end with a (timeA-timeB, badgeIds, transferTimes, toList, fromList, initiatedByList) tuples array[] that we need to check, adding dummy values where needed.
+//		 Ex: If we go from [tokenIDs 1 to 10 -> www.example.com] to [tokenIDs 1 to 2 -> www.example2.com, tokenIDs 3 to 10 -> www.example.com],
+//				 we only need to check tokenIDs 1 to 2 from timeA-timeB
+//		 We eventually end with a (timeA-timeB, tokenIds, transferTimes, toList, fromList, initiatedByList) tuples array[] that we need to check, adding dummy values where needed.
 //		 This step and the third step is field-specific, so that is why we do it via a generic custom function (GetUpdatedStringCombinations, GetUpdatedBoolCombinations, etc...)
 //-2) For all the values that are considered "updated", we check if we are allowed to update them, according to the permissions.
-//		This is done by fetching wherever the returned tuples from above overlaps any of the permission's (timelineTime, badgeIds, transferTimes, toList, fromList, initiatedByList) tuples, again adding dummy values where needed.
+//		This is done by fetching wherever the returned tuples from above overlaps any of the permission's (timelineTime, tokenIds, transferTimes, toList, fromList, initiatedByList) tuples, again adding dummy values where needed.
 //		For all overlaps, we then assert that the current block time is NOT forbidden (permitted or undefined both correspond to allowed)
 //		If all are not forbidden, it is a valid update.
 
@@ -62,7 +62,7 @@ type ApprovalCriteriaWithIsApproved struct {
 func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
 	handled := []*types.UniversalPermissionDetails{}
 	for _, permission := range permissions {
-		badgeIds := types.GetUintRangesWithOptions(permission.BadgeIds, permission.UsesBadgeIds)
+		tokenIds := types.GetUintRangesWithOptions(permission.TokenIds, permission.UsesTokenIds)
 		timelineTimes := types.GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
 		transferTimes := types.GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
 		ownershipTimes := types.GetUintRangesWithOptions(permission.OwnershipTimes, permission.UsesOwnershipTimes)
@@ -74,7 +74,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		initiatedByList := types.GetListWithOptions(permission.InitiatedByList, permission.UsesInitiatedByList)
 		approvalIdList := types.GetListWithOptions(permission.ApprovalIdList, permission.UsesApprovalId)
 
-		for _, badgeId := range badgeIds {
+		for _, tokenId := range tokenIds {
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
 					for _, ownershipTime := range ownershipTimes {
@@ -86,7 +86,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 
 						brokenDown := []*types.UniversalPermissionDetails{
 							{
-								BadgeId:         badgeId,
+								TokenId:         tokenId,
 								TimelineTime:    timelineTime,
 								TransferTime:    transferTime,
 								OwnershipTime:   ownershipTime,
@@ -113,7 +113,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 							newArbValue := mergedApprovalCriteria
 							handled = append(handled, &types.UniversalPermissionDetails{
 								TimelineTime:    overlap.Overlap.TimelineTime,
-								BadgeId:         overlap.Overlap.BadgeId,
+								TokenId:         overlap.Overlap.TokenId,
 								TransferTime:    overlap.Overlap.TransferTime,
 								OwnershipTime:   overlap.Overlap.OwnershipTime,
 								ToList:          overlap.Overlap.ToList,
@@ -140,7 +140,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 	returnArr := []*types.UniversalPermissionDetails{}
 	for _, handledItem := range handled {
 		idxToInsert := 0
-		for idxToInsert < len(returnArr) && handledItem.BadgeId.Start.GT(returnArr[idxToInsert].BadgeId.Start) {
+		for idxToInsert < len(returnArr) && handledItem.TokenId.Start.GT(returnArr[idxToInsert].TokenId.Start) {
 			idxToInsert++
 		}
 
@@ -152,7 +152,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 	return handled
 }
 
-func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
+func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
 	x := [][]*types.UintRange{}
 	x = append(x, []*types.UintRange{
 		//Dummmy range since collection approvals dont use timeline times
@@ -248,7 +248,7 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.BadgeCollec
 	return detailsToCheck, nil
 }
 
-func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval, CanUpdateCollectionApprovals []*types.CollectionApprovalPermission) error {
+func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval, CanUpdateCollectionApprovals []*types.CollectionApprovalPermission) error {
 	// Validate new approvals with invariants
 	if err := types.ValidateCollectionApprovalsWithInvariants(ctx, newApprovals, true, collection); err != nil {
 		return err
@@ -267,7 +267,7 @@ func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *t
 	return nil
 }
 
-func (k Keeper) ValidateUserOutgoingApprovalsUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.UserOutgoingApproval, newApprovals []*types.UserOutgoingApproval, CanUpdateCollectionApprovals []*types.UserOutgoingApprovalPermission, fromAddress string) error {
+func (k Keeper) ValidateUserOutgoingApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.UserOutgoingApproval, newApprovals []*types.UserOutgoingApproval, CanUpdateCollectionApprovals []*types.UserOutgoingApprovalPermission, fromAddress string) error {
 	old := types.CastOutgoingTransfersToCollectionTransfers(oldApprovals, fromAddress)
 	new := types.CastOutgoingTransfersToCollectionTransfers(newApprovals, fromAddress)
 
@@ -284,7 +284,7 @@ func (k Keeper) ValidateUserOutgoingApprovalsUpdate(ctx sdk.Context, collection 
 	return nil
 }
 
-func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection *types.BadgeCollection, oldApprovals []*types.UserIncomingApproval, newApprovals []*types.UserIncomingApproval, CanUpdateCollectionApprovals []*types.UserIncomingApprovalPermission, toAddress string) error {
+func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.UserIncomingApproval, newApprovals []*types.UserIncomingApproval, CanUpdateCollectionApprovals []*types.UserIncomingApprovalPermission, toAddress string) error {
 	old := types.CastIncomingTransfersToCollectionTransfers(oldApprovals, toAddress)
 	new := types.CastIncomingTransfersToCollectionTransfers(newApprovals, toAddress)
 
@@ -301,20 +301,20 @@ func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection 
 	return nil
 }
 
-func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []*types.BadgeMetadataTimeline, newBadgeMetadata []*types.BadgeMetadataTimeline, canUpdateBadgeMetadata []*types.TimedUpdateWithBadgeIdsPermission) error {
-	oldTimes, oldValues := types.GetBadgeMetadataTimesAndValues(oldBadgeMetadata)
+func (k Keeper) ValidateTokenMetadataUpdate(ctx sdk.Context, oldTokenMetadata []*types.TokenMetadataTimeline, newTokenMetadata []*types.TokenMetadataTimeline, canUpdateTokenMetadata []*types.TimedUpdateWithTokenIdsPermission) error {
+	oldTimes, oldValues := types.GetTokenMetadataTimesAndValues(oldTokenMetadata)
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
 
-	newTimes, newValues := types.GetBadgeMetadataTimesAndValues(newBadgeMetadata)
+	newTimes, newValues := types.GetTokenMetadataTimesAndValues(newTokenMetadata)
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
 
-	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.BadgeMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
+	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.TokenMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
 		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each token ID)
-		oldBadgeMetadata := oldValue.([]*types.BadgeMetadata)
-		firstMatchesForOld := types.GetFirstMatchOnly(ctx, k.CastBadgeMetadataToUniversalPermission(oldBadgeMetadata))
+		oldTokenMetadata := oldValue.([]*types.TokenMetadata)
+		firstMatchesForOld := types.GetFirstMatchOnly(ctx, k.CastTokenMetadataToUniversalPermission(oldTokenMetadata))
 
-		newBadgeMetadata := newValue.([]*types.BadgeMetadata)
-		firstMatchesForNew := types.GetFirstMatchOnly(ctx, k.CastBadgeMetadataToUniversalPermission(newBadgeMetadata))
+		newTokenMetadata := newValue.([]*types.TokenMetadata)
+		firstMatchesForNew := types.GetFirstMatchOnly(ctx, k.CastTokenMetadataToUniversalPermission(newTokenMetadata))
 
 		//For every token, we need to check if the new provided value is different in any way from the old value for each specific token ID
 		//The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
@@ -348,7 +348,7 @@ func (k Keeper) ValidateBadgeMetadataUpdate(ctx sdk.Context, oldBadgeMetadata []
 		return err
 	}
 
-	err = k.CheckIfTimedUpdateWithBadgeIdsPermissionPermits(ctx, detailsToCheck, canUpdateBadgeMetadata, "update token metadata")
+	err = k.CheckIfTimedUpdateWithTokenIdsPermissionPermits(ctx, detailsToCheck, canUpdateTokenMetadata, "update token metadata")
 	if err != nil {
 		return err
 	}

@@ -37,7 +37,7 @@ type BadgeCustomMsgType struct {
 	CreateAddressListsMsg        *MsgCreateAddressLists        `protobuf:"bytes,1,opt,name=createAddressListsMsg,proto3" json:"createAddressListsMsg,omitempty"`
 	UniversalUpdateCollectionMsg *MsgUniversalUpdateCollection `protobuf:"bytes,2,opt,name=universalUpdateCollectionMsg,proto3" json:"universalUpdateCollectionMsg,omitempty"`
 	DeleteCollectionMsg          *MsgDeleteCollection          `protobuf:"bytes,3,opt,name=deleteCollectionMsg,proto3" json:"deleteCollectionMsg,omitempty"`
-	TransferBadgesMsg            *MsgTransferBadges            `protobuf:"bytes,4,opt,name=transferBadgesMsg,proto3" json:"transferBadgesMsg,omitempty"`
+	TransferTokensMsg            *MsgTransferTokens            `protobuf:"bytes,4,opt,name=transferTokensMsg,proto3" json:"transferTokensMsg,omitempty"`
 	UpdateUserApprovalsMsg       *MsgUpdateUserApprovals       `protobuf:"bytes,5,opt,name=updateUserApprovalsMsg,proto3" json:"updateUserApprovalsMsg,omitempty"`
 	UpdateCollectionMsg          *MsgUpdateCollection          `protobuf:"bytes,6,opt,name=updateCollectionMsg,proto3" json:"updateCollectionMsg,omitempty"`
 	CreateCollectionMsg          *MsgCreateCollection          `protobuf:"bytes,7,opt,name=createCollectionMsg,proto3" json:"createCollectionMsg,omitempty"`
@@ -53,10 +53,10 @@ type BadgeCustomMsgType struct {
 	DeleteOutgoingApprovalMsg    *MsgDeleteOutgoingApproval    `protobuf:"bytes,17,opt,name=deleteOutgoingApprovalMsg,proto3" json:"deleteOutgoingApprovalMsg,omitempty"`
 	PurgeApprovalsMsg            *MsgPurgeApprovals            `protobuf:"bytes,18,opt,name=purgeApprovalsMsg,proto3" json:"purgeApprovalsMsg,omitempty"`
 	// Helper message types for UniversalUpdateCollection subsets
-	SetValidBadgeIdsMsg       *MsgSetValidBadgeIds       `protobuf:"bytes,19,opt,name=setValidBadgeIdsMsg,proto3" json:"setValidBadgeIdsMsg,omitempty"`
+	SetValidTokenIdsMsg       *MsgSetValidTokenIds       `protobuf:"bytes,19,opt,name=setValidTokenIdsMsg,proto3" json:"setValidTokenIdsMsg,omitempty"`
 	SetManagerMsg             *MsgSetManager             `protobuf:"bytes,20,opt,name=setManagerMsg,proto3" json:"setManagerMsg,omitempty"`
 	SetCollectionMetadataMsg  *MsgSetCollectionMetadata  `protobuf:"bytes,21,opt,name=setCollectionMetadataMsg,proto3" json:"setCollectionMetadataMsg,omitempty"`
-	SetBadgeMetadataMsg       *MsgSetBadgeMetadata       `protobuf:"bytes,22,opt,name=setBadgeMetadataMsg,proto3" json:"setBadgeMetadataMsg,omitempty"`
+	SetTokenMetadataMsg       *MsgSetTokenMetadata       `protobuf:"bytes,22,opt,name=setTokenMetadataMsg,proto3" json:"setTokenMetadataMsg,omitempty"`
 	SetCustomDataMsg          *MsgSetCustomData          `protobuf:"bytes,23,opt,name=setCustomDataMsg,proto3" json:"setCustomDataMsg,omitempty"`
 	SetStandardsMsg           *MsgSetStandards           `protobuf:"bytes,24,opt,name=setStandardsMsg,proto3" json:"setStandardsMsg,omitempty"`
 	SetCollectionApprovalsMsg *MsgSetCollectionApprovals `protobuf:"bytes,25,opt,name=setCollectionApprovalsMsg,proto3" json:"setCollectionApprovalsMsg,omitempty"`
@@ -117,9 +117,9 @@ func (m *BadgeCustomMsgType) GetDeleteCollectionMsg() *MsgDeleteCollection {
 	return nil
 }
 
-func (m *BadgeCustomMsgType) GetTransferBadgesMsg() *MsgTransferBadges {
+func (m *BadgeCustomMsgType) GetTransferTokensMsg() *MsgTransferTokens {
 	if m != nil {
-		return m.TransferBadgesMsg
+		return m.TransferTokensMsg
 	}
 	return nil
 }
@@ -222,9 +222,9 @@ func (m *BadgeCustomMsgType) GetPurgeApprovalsMsg() *MsgPurgeApprovals {
 	return nil
 }
 
-func (m *BadgeCustomMsgType) GetSetValidBadgeIdsMsg() *MsgSetValidBadgeIds {
+func (m *BadgeCustomMsgType) GetSetValidTokenIdsMsg() *MsgSetValidTokenIds {
 	if m != nil {
-		return m.SetValidBadgeIdsMsg
+		return m.SetValidTokenIdsMsg
 	}
 	return nil
 }
@@ -243,9 +243,9 @@ func (m *BadgeCustomMsgType) GetSetCollectionMetadataMsg() *MsgSetCollectionMeta
 	return nil
 }
 
-func (m *BadgeCustomMsgType) GetSetBadgeMetadataMsg() *MsgSetBadgeMetadata {
+func (m *BadgeCustomMsgType) GetSetTokenMetadataMsg() *MsgSetTokenMetadata {
 	if m != nil {
-		return m.SetBadgeMetadataMsg
+		return m.SetTokenMetadataMsg
 	}
 	return nil
 }
@@ -457,7 +457,7 @@ func (m *CosmosCoinWrapperPathAddObject) GetAllowCosmosWrapping() bool {
 	return false
 }
 
-// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the badges module.
+// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the tokens module.
 // It is a universal interface that can be used for both creating and updating collections.
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 type MsgUniversalUpdateCollection struct {
@@ -470,9 +470,9 @@ type MsgUniversalUpdateCollection struct {
 	//The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
 	// Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-	UpdateValidBadgeIds bool `protobuf:"varint,5,opt,name=updateValidBadgeIds,proto3" json:"updateValidBadgeIds,omitempty"`
+	UpdateValidTokenIds bool `protobuf:"varint,5,opt,name=updateValidTokenIds,proto3" json:"updateValidTokenIds,omitempty"`
 	// New token IDs to add to this collection
-	ValidBadgeIds []*UintRange `protobuf:"bytes,6,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,6,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	// Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateCollectionPermissions bool `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
 	// New collection permissions to set.
@@ -486,9 +486,9 @@ type MsgUniversalUpdateCollection struct {
 	// New collection metadata timeline to set.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,12,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-	UpdateBadgeMetadataTimeline bool `protobuf:"varint,13,opt,name=updateBadgeMetadataTimeline,proto3" json:"updateBadgeMetadataTimeline,omitempty"`
+	UpdateTokenMetadataTimeline bool `protobuf:"varint,13,opt,name=updateTokenMetadataTimeline,proto3" json:"updateTokenMetadataTimeline,omitempty"`
 	// New token metadata timeline to set.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,14,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,14,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
 	// Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateOffChainBalancesMetadataTimeline bool `protobuf:"varint,15,opt,name=updateOffChainBalancesMetadataTimeline,proto3" json:"updateOffChainBalancesMetadataTimeline,omitempty"`
 	// New off-chain balances metadata timeline to set.
@@ -572,16 +572,16 @@ func (m *MsgUniversalUpdateCollection) GetDefaultBalances() *UserBalanceStore {
 	return nil
 }
 
-func (m *MsgUniversalUpdateCollection) GetUpdateValidBadgeIds() bool {
+func (m *MsgUniversalUpdateCollection) GetUpdateValidTokenIds() bool {
 	if m != nil {
-		return m.UpdateValidBadgeIds
+		return m.UpdateValidTokenIds
 	}
 	return false
 }
 
-func (m *MsgUniversalUpdateCollection) GetValidBadgeIds() []*UintRange {
+func (m *MsgUniversalUpdateCollection) GetValidTokenIds() []*UintRange {
 	if m != nil {
-		return m.ValidBadgeIds
+		return m.ValidTokenIds
 	}
 	return nil
 }
@@ -628,16 +628,16 @@ func (m *MsgUniversalUpdateCollection) GetCollectionMetadataTimeline() []*Collec
 	return nil
 }
 
-func (m *MsgUniversalUpdateCollection) GetUpdateBadgeMetadataTimeline() bool {
+func (m *MsgUniversalUpdateCollection) GetUpdateTokenMetadataTimeline() bool {
 	if m != nil {
-		return m.UpdateBadgeMetadataTimeline
+		return m.UpdateTokenMetadataTimeline
 	}
 	return false
 }
 
-func (m *MsgUniversalUpdateCollection) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+func (m *MsgUniversalUpdateCollection) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if m != nil {
-		return m.BadgeMetadataTimeline
+		return m.TokenMetadataTimeline
 	}
 	return nil
 }
@@ -779,9 +779,9 @@ type MsgUpdateCollection struct {
 	// ID of the collection (0 for new collection).
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	// Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-	UpdateValidBadgeIds bool `protobuf:"varint,3,opt,name=updateValidBadgeIds,proto3" json:"updateValidBadgeIds,omitempty"`
+	UpdateValidTokenIds bool `protobuf:"varint,3,opt,name=updateValidTokenIds,proto3" json:"updateValidTokenIds,omitempty"`
 	// New token IDs to add to this collection
-	ValidBadgeIds []*UintRange `protobuf:"bytes,4,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,4,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	// Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateCollectionPermissions bool `protobuf:"varint,7,opt,name=updateCollectionPermissions,proto3" json:"updateCollectionPermissions,omitempty"`
 	// New collection permissions to set.
@@ -795,9 +795,9 @@ type MsgUpdateCollection struct {
 	// New collection metadata timeline to set.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,12,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-	UpdateBadgeMetadataTimeline bool `protobuf:"varint,13,opt,name=updateBadgeMetadataTimeline,proto3" json:"updateBadgeMetadataTimeline,omitempty"`
+	UpdateTokenMetadataTimeline bool `protobuf:"varint,13,opt,name=updateTokenMetadataTimeline,proto3" json:"updateTokenMetadataTimeline,omitempty"`
 	// New token metadata timeline to set.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,14,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,14,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
 	// Indicates if the off-chain balances metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
 	UpdateOffChainBalancesMetadataTimeline bool `protobuf:"varint,15,opt,name=updateOffChainBalancesMetadataTimeline,proto3" json:"updateOffChainBalancesMetadataTimeline,omitempty"`
 	// New off-chain balances metadata timeline to set.
@@ -867,16 +867,16 @@ func (m *MsgUpdateCollection) GetCreator() string {
 	return ""
 }
 
-func (m *MsgUpdateCollection) GetUpdateValidBadgeIds() bool {
+func (m *MsgUpdateCollection) GetUpdateValidTokenIds() bool {
 	if m != nil {
-		return m.UpdateValidBadgeIds
+		return m.UpdateValidTokenIds
 	}
 	return false
 }
 
-func (m *MsgUpdateCollection) GetValidBadgeIds() []*UintRange {
+func (m *MsgUpdateCollection) GetValidTokenIds() []*UintRange {
 	if m != nil {
-		return m.ValidBadgeIds
+		return m.ValidTokenIds
 	}
 	return nil
 }
@@ -923,16 +923,16 @@ func (m *MsgUpdateCollection) GetCollectionMetadataTimeline() []*CollectionMetad
 	return nil
 }
 
-func (m *MsgUpdateCollection) GetUpdateBadgeMetadataTimeline() bool {
+func (m *MsgUpdateCollection) GetUpdateTokenMetadataTimeline() bool {
 	if m != nil {
-		return m.UpdateBadgeMetadataTimeline
+		return m.UpdateTokenMetadataTimeline
 	}
 	return false
 }
 
-func (m *MsgUpdateCollection) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+func (m *MsgUpdateCollection) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if m != nil {
-		return m.BadgeMetadataTimeline
+		return m.TokenMetadataTimeline
 	}
 	return nil
 }
@@ -1076,7 +1076,7 @@ type MsgCreateCollection struct {
 	//The default balances for the user
 	DefaultBalances *UserBalanceStore `protobuf:"bytes,4,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
 	// New token IDs to add to this collection
-	ValidBadgeIds []*UintRange `protobuf:"bytes,5,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,5,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	// Collection permissions.
 	CollectionPermissions *CollectionPermissions `protobuf:"bytes,6,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
 	// Manager timeline entries.
@@ -1084,7 +1084,7 @@ type MsgCreateCollection struct {
 	// Collection metadata timeline entries.
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,8,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// Token metadata timeline entries.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,9,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,9,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
 	// Off-chain balances metadata timeline entries.
 	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,10,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
 	// Custom data timeline entries.
@@ -1157,9 +1157,9 @@ func (m *MsgCreateCollection) GetDefaultBalances() *UserBalanceStore {
 	return nil
 }
 
-func (m *MsgCreateCollection) GetValidBadgeIds() []*UintRange {
+func (m *MsgCreateCollection) GetValidTokenIds() []*UintRange {
 	if m != nil {
-		return m.ValidBadgeIds
+		return m.ValidTokenIds
 	}
 	return nil
 }
@@ -1185,9 +1185,9 @@ func (m *MsgCreateCollection) GetCollectionMetadataTimeline() []*CollectionMetad
 	return nil
 }
 
-func (m *MsgCreateCollection) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+func (m *MsgCreateCollection) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if m != nil {
-		return m.BadgeMetadataTimeline
+		return m.TokenMetadataTimeline
 	}
 	return nil
 }
@@ -1379,8 +1379,8 @@ func (m *MsgCreateAddressListsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateAddressListsResponse proto.InternalMessageInfo
 
-// MsgTransferBadges is used to transfer tokens.
-type MsgTransferBadges struct {
+// MsgTransferTokens is used to transfer tokens.
+type MsgTransferTokens struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection.
@@ -1389,18 +1389,18 @@ type MsgTransferBadges struct {
 	Transfers []*Transfer `protobuf:"bytes,3,rep,name=transfers,proto3" json:"transfers,omitempty"`
 }
 
-func (m *MsgTransferBadges) Reset()         { *m = MsgTransferBadges{} }
-func (m *MsgTransferBadges) String() string { return proto.CompactTextString(m) }
-func (*MsgTransferBadges) ProtoMessage()    {}
-func (*MsgTransferBadges) Descriptor() ([]byte, []int) {
+func (m *MsgTransferTokens) Reset()         { *m = MsgTransferTokens{} }
+func (m *MsgTransferTokens) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferTokens) ProtoMessage()    {}
+func (*MsgTransferTokens) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6429f25934a9638, []int{12}
 }
-func (m *MsgTransferBadges) XXX_Unmarshal(b []byte) error {
+func (m *MsgTransferTokens) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgTransferBadges) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgTransferTokens) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgTransferBadges.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgTransferTokens.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1410,48 +1410,48 @@ func (m *MsgTransferBadges) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *MsgTransferBadges) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgTransferBadges.Merge(m, src)
+func (m *MsgTransferTokens) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferTokens.Merge(m, src)
 }
-func (m *MsgTransferBadges) XXX_Size() int {
+func (m *MsgTransferTokens) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgTransferBadges) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgTransferBadges.DiscardUnknown(m)
+func (m *MsgTransferTokens) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferTokens.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgTransferBadges proto.InternalMessageInfo
+var xxx_messageInfo_MsgTransferTokens proto.InternalMessageInfo
 
-func (m *MsgTransferBadges) GetCreator() string {
+func (m *MsgTransferTokens) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgTransferBadges) GetTransfers() []*Transfer {
+func (m *MsgTransferTokens) GetTransfers() []*Transfer {
 	if m != nil {
 		return m.Transfers
 	}
 	return nil
 }
 
-// MsgTransferBadgesResponse is the response to MsgTransferBadges.
-type MsgTransferBadgesResponse struct {
+// MsgTransferTokensResponse is the response to MsgTransferTokens.
+type MsgTransferTokensResponse struct {
 }
 
-func (m *MsgTransferBadgesResponse) Reset()         { *m = MsgTransferBadgesResponse{} }
-func (m *MsgTransferBadgesResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgTransferBadgesResponse) ProtoMessage()    {}
-func (*MsgTransferBadgesResponse) Descriptor() ([]byte, []int) {
+func (m *MsgTransferTokensResponse) Reset()         { *m = MsgTransferTokensResponse{} }
+func (m *MsgTransferTokensResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferTokensResponse) ProtoMessage()    {}
+func (*MsgTransferTokensResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6429f25934a9638, []int{13}
 }
-func (m *MsgTransferBadgesResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgTransferTokensResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgTransferBadgesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgTransferTokensResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgTransferBadgesResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgTransferTokensResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1461,17 +1461,17 @@ func (m *MsgTransferBadgesResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *MsgTransferBadgesResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgTransferBadgesResponse.Merge(m, src)
+func (m *MsgTransferTokensResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferTokensResponse.Merge(m, src)
 }
-func (m *MsgTransferBadgesResponse) XXX_Size() int {
+func (m *MsgTransferTokensResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgTransferBadgesResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgTransferBadgesResponse.DiscardUnknown(m)
+func (m *MsgTransferTokensResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferTokensResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgTransferBadgesResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgTransferTokensResponse proto.InternalMessageInfo
 
 // MsgDeleteCollection is used to delete a collection.
 type MsgDeleteCollection struct {
@@ -2806,30 +2806,30 @@ func (m *MsgDecrementStoreValueResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDecrementStoreValueResponse proto.InternalMessageInfo
 
-// MsgSetValidBadgeIds sets the validBadgeIds and canUpdateValidBadgeIds permission
-type MsgSetValidBadgeIds struct {
+// MsgSetValidTokenIds sets the validTokenIds and canUpdateValidTokenIds permission
+type MsgSetValidTokenIds struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	// New token IDs to add to this collection
-	ValidBadgeIds []*UintRange `protobuf:"bytes,3,rep,name=validBadgeIds,proto3" json:"validBadgeIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,3,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	// Permission to update valid token IDs
-	CanUpdateValidBadgeIds []*BadgeIdsActionPermission `protobuf:"bytes,4,rep,name=canUpdateValidBadgeIds,proto3" json:"canUpdateValidBadgeIds,omitempty"`
+	CanUpdateValidTokenIds []*TokenIdsActionPermission `protobuf:"bytes,4,rep,name=canUpdateValidTokenIds,proto3" json:"canUpdateValidTokenIds,omitempty"`
 }
 
-func (m *MsgSetValidBadgeIds) Reset()         { *m = MsgSetValidBadgeIds{} }
-func (m *MsgSetValidBadgeIds) String() string { return proto.CompactTextString(m) }
-func (*MsgSetValidBadgeIds) ProtoMessage()    {}
-func (*MsgSetValidBadgeIds) Descriptor() ([]byte, []int) {
+func (m *MsgSetValidTokenIds) Reset()         { *m = MsgSetValidTokenIds{} }
+func (m *MsgSetValidTokenIds) String() string { return proto.CompactTextString(m) }
+func (*MsgSetValidTokenIds) ProtoMessage()    {}
+func (*MsgSetValidTokenIds) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6429f25934a9638, []int{40}
 }
-func (m *MsgSetValidBadgeIds) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetValidTokenIds) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgSetValidBadgeIds) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetValidTokenIds) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgSetValidBadgeIds.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetValidTokenIds.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2839,57 +2839,57 @@ func (m *MsgSetValidBadgeIds) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *MsgSetValidBadgeIds) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSetValidBadgeIds.Merge(m, src)
+func (m *MsgSetValidTokenIds) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetValidTokenIds.Merge(m, src)
 }
-func (m *MsgSetValidBadgeIds) XXX_Size() int {
+func (m *MsgSetValidTokenIds) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgSetValidBadgeIds) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSetValidBadgeIds.DiscardUnknown(m)
+func (m *MsgSetValidTokenIds) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetValidTokenIds.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgSetValidBadgeIds proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetValidTokenIds proto.InternalMessageInfo
 
-func (m *MsgSetValidBadgeIds) GetCreator() string {
+func (m *MsgSetValidTokenIds) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgSetValidBadgeIds) GetValidBadgeIds() []*UintRange {
+func (m *MsgSetValidTokenIds) GetValidTokenIds() []*UintRange {
 	if m != nil {
-		return m.ValidBadgeIds
+		return m.ValidTokenIds
 	}
 	return nil
 }
 
-func (m *MsgSetValidBadgeIds) GetCanUpdateValidBadgeIds() []*BadgeIdsActionPermission {
+func (m *MsgSetValidTokenIds) GetCanUpdateValidTokenIds() []*TokenIdsActionPermission {
 	if m != nil {
-		return m.CanUpdateValidBadgeIds
+		return m.CanUpdateValidTokenIds
 	}
 	return nil
 }
 
-// MsgSetValidBadgeIdsResponse is the response to MsgSetValidBadgeIds.
-type MsgSetValidBadgeIdsResponse struct {
+// MsgSetValidTokenIdsResponse is the response to MsgSetValidTokenIds.
+type MsgSetValidTokenIdsResponse struct {
 	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
-func (m *MsgSetValidBadgeIdsResponse) Reset()         { *m = MsgSetValidBadgeIdsResponse{} }
-func (m *MsgSetValidBadgeIdsResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgSetValidBadgeIdsResponse) ProtoMessage()    {}
-func (*MsgSetValidBadgeIdsResponse) Descriptor() ([]byte, []int) {
+func (m *MsgSetValidTokenIdsResponse) Reset()         { *m = MsgSetValidTokenIdsResponse{} }
+func (m *MsgSetValidTokenIdsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetValidTokenIdsResponse) ProtoMessage()    {}
+func (*MsgSetValidTokenIdsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6429f25934a9638, []int{41}
 }
-func (m *MsgSetValidBadgeIdsResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetValidTokenIdsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgSetValidBadgeIdsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetValidTokenIdsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgSetValidBadgeIdsResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetValidTokenIdsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2899,17 +2899,17 @@ func (m *MsgSetValidBadgeIdsResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *MsgSetValidBadgeIdsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSetValidBadgeIdsResponse.Merge(m, src)
+func (m *MsgSetValidTokenIdsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetValidTokenIdsResponse.Merge(m, src)
 }
-func (m *MsgSetValidBadgeIdsResponse) XXX_Size() int {
+func (m *MsgSetValidTokenIdsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgSetValidBadgeIdsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSetValidBadgeIdsResponse.DiscardUnknown(m)
+func (m *MsgSetValidTokenIdsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetValidTokenIdsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgSetValidBadgeIdsResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetValidTokenIdsResponse proto.InternalMessageInfo
 
 // MsgSetManager sets the manager timeline and canUpdateManager permission
 type MsgSetManager struct {
@@ -3121,30 +3121,30 @@ func (m *MsgSetCollectionMetadataResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetCollectionMetadataResponse proto.InternalMessageInfo
 
-// MsgSetBadgeMetadata sets the token metadata timeline and canUpdateBadgeMetadata permission
-type MsgSetBadgeMetadata struct {
+// MsgSetTokenMetadata sets the token metadata timeline and canUpdateTokenMetadata permission
+type MsgSetTokenMetadata struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 	// New token metadata timeline to set.
-	BadgeMetadataTimeline []*BadgeMetadataTimeline `protobuf:"bytes,3,rep,name=badgeMetadataTimeline,proto3" json:"badgeMetadataTimeline,omitempty"`
+	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,3,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
 	// Permission to update token metadata timeline
-	CanUpdateBadgeMetadata []*TimedUpdateWithBadgeIdsPermission `protobuf:"bytes,4,rep,name=canUpdateBadgeMetadata,proto3" json:"canUpdateBadgeMetadata,omitempty"`
+	CanUpdateTokenMetadata []*TimedUpdateWithTokenIdsPermission `protobuf:"bytes,4,rep,name=canUpdateTokenMetadata,proto3" json:"canUpdateTokenMetadata,omitempty"`
 }
 
-func (m *MsgSetBadgeMetadata) Reset()         { *m = MsgSetBadgeMetadata{} }
-func (m *MsgSetBadgeMetadata) String() string { return proto.CompactTextString(m) }
-func (*MsgSetBadgeMetadata) ProtoMessage()    {}
-func (*MsgSetBadgeMetadata) Descriptor() ([]byte, []int) {
+func (m *MsgSetTokenMetadata) Reset()         { *m = MsgSetTokenMetadata{} }
+func (m *MsgSetTokenMetadata) String() string { return proto.CompactTextString(m) }
+func (*MsgSetTokenMetadata) ProtoMessage()    {}
+func (*MsgSetTokenMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6429f25934a9638, []int{46}
 }
-func (m *MsgSetBadgeMetadata) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetTokenMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgSetBadgeMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetTokenMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgSetBadgeMetadata.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetTokenMetadata.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3154,57 +3154,57 @@ func (m *MsgSetBadgeMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *MsgSetBadgeMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSetBadgeMetadata.Merge(m, src)
+func (m *MsgSetTokenMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetTokenMetadata.Merge(m, src)
 }
-func (m *MsgSetBadgeMetadata) XXX_Size() int {
+func (m *MsgSetTokenMetadata) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgSetBadgeMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSetBadgeMetadata.DiscardUnknown(m)
+func (m *MsgSetTokenMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetTokenMetadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgSetBadgeMetadata proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetTokenMetadata proto.InternalMessageInfo
 
-func (m *MsgSetBadgeMetadata) GetCreator() string {
+func (m *MsgSetTokenMetadata) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgSetBadgeMetadata) GetBadgeMetadataTimeline() []*BadgeMetadataTimeline {
+func (m *MsgSetTokenMetadata) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if m != nil {
-		return m.BadgeMetadataTimeline
+		return m.TokenMetadataTimeline
 	}
 	return nil
 }
 
-func (m *MsgSetBadgeMetadata) GetCanUpdateBadgeMetadata() []*TimedUpdateWithBadgeIdsPermission {
+func (m *MsgSetTokenMetadata) GetCanUpdateTokenMetadata() []*TimedUpdateWithTokenIdsPermission {
 	if m != nil {
-		return m.CanUpdateBadgeMetadata
+		return m.CanUpdateTokenMetadata
 	}
 	return nil
 }
 
-// MsgSetBadgeMetadataResponse is the response to MsgSetBadgeMetadata.
-type MsgSetBadgeMetadataResponse struct {
+// MsgSetTokenMetadataResponse is the response to MsgSetTokenMetadata.
+type MsgSetTokenMetadataResponse struct {
 	// ID of the collection.
 	CollectionId Uint `protobuf:"bytes,1,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
 }
 
-func (m *MsgSetBadgeMetadataResponse) Reset()         { *m = MsgSetBadgeMetadataResponse{} }
-func (m *MsgSetBadgeMetadataResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgSetBadgeMetadataResponse) ProtoMessage()    {}
-func (*MsgSetBadgeMetadataResponse) Descriptor() ([]byte, []int) {
+func (m *MsgSetTokenMetadataResponse) Reset()         { *m = MsgSetTokenMetadataResponse{} }
+func (m *MsgSetTokenMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetTokenMetadataResponse) ProtoMessage()    {}
+func (*MsgSetTokenMetadataResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d6429f25934a9638, []int{47}
 }
-func (m *MsgSetBadgeMetadataResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgSetTokenMetadataResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgSetBadgeMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgSetTokenMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgSetBadgeMetadataResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgSetTokenMetadataResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3214,17 +3214,17 @@ func (m *MsgSetBadgeMetadataResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *MsgSetBadgeMetadataResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgSetBadgeMetadataResponse.Merge(m, src)
+func (m *MsgSetTokenMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetTokenMetadataResponse.Merge(m, src)
 }
-func (m *MsgSetBadgeMetadataResponse) XXX_Size() int {
+func (m *MsgSetTokenMetadataResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgSetBadgeMetadataResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgSetBadgeMetadataResponse.DiscardUnknown(m)
+func (m *MsgSetTokenMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetTokenMetadataResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgSetBadgeMetadataResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgSetTokenMetadataResponse proto.InternalMessageInfo
 
 // MsgSetCustomData sets the custom data timeline and canUpdateCustomData permission
 type MsgSetCustomData struct {
@@ -3659,8 +3659,8 @@ func init() {
 	proto.RegisterType((*MsgCreateCollectionResponse)(nil), "badges.v15.MsgCreateCollectionResponse")
 	proto.RegisterType((*MsgCreateAddressLists)(nil), "badges.v15.MsgCreateAddressLists")
 	proto.RegisterType((*MsgCreateAddressListsResponse)(nil), "badges.v15.MsgCreateAddressListsResponse")
-	proto.RegisterType((*MsgTransferBadges)(nil), "badges.v15.MsgTransferBadges")
-	proto.RegisterType((*MsgTransferBadgesResponse)(nil), "badges.v15.MsgTransferBadgesResponse")
+	proto.RegisterType((*MsgTransferTokens)(nil), "badges.v15.MsgTransferTokens")
+	proto.RegisterType((*MsgTransferTokensResponse)(nil), "badges.v15.MsgTransferTokensResponse")
 	proto.RegisterType((*MsgDeleteCollection)(nil), "badges.v15.MsgDeleteCollection")
 	proto.RegisterType((*MsgDeleteCollectionResponse)(nil), "badges.v15.MsgDeleteCollectionResponse")
 	proto.RegisterType((*MsgUpdateUserApprovals)(nil), "badges.v15.MsgUpdateUserApprovals")
@@ -3687,14 +3687,14 @@ func init() {
 	proto.RegisterType((*MsgIncrementStoreValueResponse)(nil), "badges.v15.MsgIncrementStoreValueResponse")
 	proto.RegisterType((*MsgDecrementStoreValue)(nil), "badges.v15.MsgDecrementStoreValue")
 	proto.RegisterType((*MsgDecrementStoreValueResponse)(nil), "badges.v15.MsgDecrementStoreValueResponse")
-	proto.RegisterType((*MsgSetValidBadgeIds)(nil), "badges.v15.MsgSetValidBadgeIds")
-	proto.RegisterType((*MsgSetValidBadgeIdsResponse)(nil), "badges.v15.MsgSetValidBadgeIdsResponse")
+	proto.RegisterType((*MsgSetValidTokenIds)(nil), "badges.v15.MsgSetValidTokenIds")
+	proto.RegisterType((*MsgSetValidTokenIdsResponse)(nil), "badges.v15.MsgSetValidTokenIdsResponse")
 	proto.RegisterType((*MsgSetManager)(nil), "badges.v15.MsgSetManager")
 	proto.RegisterType((*MsgSetManagerResponse)(nil), "badges.v15.MsgSetManagerResponse")
 	proto.RegisterType((*MsgSetCollectionMetadata)(nil), "badges.v15.MsgSetCollectionMetadata")
 	proto.RegisterType((*MsgSetCollectionMetadataResponse)(nil), "badges.v15.MsgSetCollectionMetadataResponse")
-	proto.RegisterType((*MsgSetBadgeMetadata)(nil), "badges.v15.MsgSetBadgeMetadata")
-	proto.RegisterType((*MsgSetBadgeMetadataResponse)(nil), "badges.v15.MsgSetBadgeMetadataResponse")
+	proto.RegisterType((*MsgSetTokenMetadata)(nil), "badges.v15.MsgSetTokenMetadata")
+	proto.RegisterType((*MsgSetTokenMetadataResponse)(nil), "badges.v15.MsgSetTokenMetadataResponse")
 	proto.RegisterType((*MsgSetCustomData)(nil), "badges.v15.MsgSetCustomData")
 	proto.RegisterType((*MsgSetCustomDataResponse)(nil), "badges.v15.MsgSetCustomDataResponse")
 	proto.RegisterType((*MsgSetStandards)(nil), "badges.v15.MsgSetStandards")
@@ -3937,7 +3937,7 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	UniversalUpdateCollection(ctx context.Context, in *MsgUniversalUpdateCollection, opts ...grpc.CallOption) (*MsgUniversalUpdateCollectionResponse, error)
 	CreateAddressLists(ctx context.Context, in *MsgCreateAddressLists, opts ...grpc.CallOption) (*MsgCreateAddressListsResponse, error)
-	TransferBadges(ctx context.Context, in *MsgTransferBadges, opts ...grpc.CallOption) (*MsgTransferBadgesResponse, error)
+	TransferTokens(ctx context.Context, in *MsgTransferTokens, opts ...grpc.CallOption) (*MsgTransferTokensResponse, error)
 	UpdateUserApprovals(ctx context.Context, in *MsgUpdateUserApprovals, opts ...grpc.CallOption) (*MsgUpdateUserApprovalsResponse, error)
 	SetIncomingApproval(ctx context.Context, in *MsgSetIncomingApproval, opts ...grpc.CallOption) (*MsgSetIncomingApprovalResponse, error)
 	DeleteIncomingApproval(ctx context.Context, in *MsgDeleteIncomingApproval, opts ...grpc.CallOption) (*MsgDeleteIncomingApprovalResponse, error)
@@ -3954,10 +3954,10 @@ type MsgClient interface {
 	IncrementStoreValue(ctx context.Context, in *MsgIncrementStoreValue, opts ...grpc.CallOption) (*MsgIncrementStoreValueResponse, error)
 	DecrementStoreValue(ctx context.Context, in *MsgDecrementStoreValue, opts ...grpc.CallOption) (*MsgDecrementStoreValueResponse, error)
 	// Helper message types for UniversalUpdateCollection subsets
-	SetValidBadgeIds(ctx context.Context, in *MsgSetValidBadgeIds, opts ...grpc.CallOption) (*MsgSetValidBadgeIdsResponse, error)
+	SetValidTokenIds(ctx context.Context, in *MsgSetValidTokenIds, opts ...grpc.CallOption) (*MsgSetValidTokenIdsResponse, error)
 	SetManager(ctx context.Context, in *MsgSetManager, opts ...grpc.CallOption) (*MsgSetManagerResponse, error)
 	SetCollectionMetadata(ctx context.Context, in *MsgSetCollectionMetadata, opts ...grpc.CallOption) (*MsgSetCollectionMetadataResponse, error)
-	SetBadgeMetadata(ctx context.Context, in *MsgSetBadgeMetadata, opts ...grpc.CallOption) (*MsgSetBadgeMetadataResponse, error)
+	SetTokenMetadata(ctx context.Context, in *MsgSetTokenMetadata, opts ...grpc.CallOption) (*MsgSetTokenMetadataResponse, error)
 	SetCustomData(ctx context.Context, in *MsgSetCustomData, opts ...grpc.CallOption) (*MsgSetCustomDataResponse, error)
 	SetStandards(ctx context.Context, in *MsgSetStandards, opts ...grpc.CallOption) (*MsgSetStandardsResponse, error)
 	SetCollectionApprovals(ctx context.Context, in *MsgSetCollectionApprovals, opts ...grpc.CallOption) (*MsgSetCollectionApprovalsResponse, error)
@@ -3999,9 +3999,9 @@ func (c *msgClient) CreateAddressLists(ctx context.Context, in *MsgCreateAddress
 	return out, nil
 }
 
-func (c *msgClient) TransferBadges(ctx context.Context, in *MsgTransferBadges, opts ...grpc.CallOption) (*MsgTransferBadgesResponse, error) {
-	out := new(MsgTransferBadgesResponse)
-	err := c.cc.Invoke(ctx, "/badges.v15.Msg/TransferBadges", in, out, opts...)
+func (c *msgClient) TransferTokens(ctx context.Context, in *MsgTransferTokens, opts ...grpc.CallOption) (*MsgTransferTokensResponse, error) {
+	out := new(MsgTransferTokensResponse)
+	err := c.cc.Invoke(ctx, "/badges.v15.Msg/TransferTokens", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4143,9 +4143,9 @@ func (c *msgClient) DecrementStoreValue(ctx context.Context, in *MsgDecrementSto
 	return out, nil
 }
 
-func (c *msgClient) SetValidBadgeIds(ctx context.Context, in *MsgSetValidBadgeIds, opts ...grpc.CallOption) (*MsgSetValidBadgeIdsResponse, error) {
-	out := new(MsgSetValidBadgeIdsResponse)
-	err := c.cc.Invoke(ctx, "/badges.v15.Msg/SetValidBadgeIds", in, out, opts...)
+func (c *msgClient) SetValidTokenIds(ctx context.Context, in *MsgSetValidTokenIds, opts ...grpc.CallOption) (*MsgSetValidTokenIdsResponse, error) {
+	out := new(MsgSetValidTokenIdsResponse)
+	err := c.cc.Invoke(ctx, "/badges.v15.Msg/SetValidTokenIds", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4170,9 +4170,9 @@ func (c *msgClient) SetCollectionMetadata(ctx context.Context, in *MsgSetCollect
 	return out, nil
 }
 
-func (c *msgClient) SetBadgeMetadata(ctx context.Context, in *MsgSetBadgeMetadata, opts ...grpc.CallOption) (*MsgSetBadgeMetadataResponse, error) {
-	out := new(MsgSetBadgeMetadataResponse)
-	err := c.cc.Invoke(ctx, "/badges.v15.Msg/SetBadgeMetadata", in, out, opts...)
+func (c *msgClient) SetTokenMetadata(ctx context.Context, in *MsgSetTokenMetadata, opts ...grpc.CallOption) (*MsgSetTokenMetadataResponse, error) {
+	out := new(MsgSetTokenMetadataResponse)
+	err := c.cc.Invoke(ctx, "/badges.v15.Msg/SetTokenMetadata", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4222,7 +4222,7 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	UniversalUpdateCollection(context.Context, *MsgUniversalUpdateCollection) (*MsgUniversalUpdateCollectionResponse, error)
 	CreateAddressLists(context.Context, *MsgCreateAddressLists) (*MsgCreateAddressListsResponse, error)
-	TransferBadges(context.Context, *MsgTransferBadges) (*MsgTransferBadgesResponse, error)
+	TransferTokens(context.Context, *MsgTransferTokens) (*MsgTransferTokensResponse, error)
 	UpdateUserApprovals(context.Context, *MsgUpdateUserApprovals) (*MsgUpdateUserApprovalsResponse, error)
 	SetIncomingApproval(context.Context, *MsgSetIncomingApproval) (*MsgSetIncomingApprovalResponse, error)
 	DeleteIncomingApproval(context.Context, *MsgDeleteIncomingApproval) (*MsgDeleteIncomingApprovalResponse, error)
@@ -4239,10 +4239,10 @@ type MsgServer interface {
 	IncrementStoreValue(context.Context, *MsgIncrementStoreValue) (*MsgIncrementStoreValueResponse, error)
 	DecrementStoreValue(context.Context, *MsgDecrementStoreValue) (*MsgDecrementStoreValueResponse, error)
 	// Helper message types for UniversalUpdateCollection subsets
-	SetValidBadgeIds(context.Context, *MsgSetValidBadgeIds) (*MsgSetValidBadgeIdsResponse, error)
+	SetValidTokenIds(context.Context, *MsgSetValidTokenIds) (*MsgSetValidTokenIdsResponse, error)
 	SetManager(context.Context, *MsgSetManager) (*MsgSetManagerResponse, error)
 	SetCollectionMetadata(context.Context, *MsgSetCollectionMetadata) (*MsgSetCollectionMetadataResponse, error)
-	SetBadgeMetadata(context.Context, *MsgSetBadgeMetadata) (*MsgSetBadgeMetadataResponse, error)
+	SetTokenMetadata(context.Context, *MsgSetTokenMetadata) (*MsgSetTokenMetadataResponse, error)
 	SetCustomData(context.Context, *MsgSetCustomData) (*MsgSetCustomDataResponse, error)
 	SetStandards(context.Context, *MsgSetStandards) (*MsgSetStandardsResponse, error)
 	SetCollectionApprovals(context.Context, *MsgSetCollectionApprovals) (*MsgSetCollectionApprovalsResponse, error)
@@ -4262,8 +4262,8 @@ func (*UnimplementedMsgServer) UniversalUpdateCollection(ctx context.Context, re
 func (*UnimplementedMsgServer) CreateAddressLists(ctx context.Context, req *MsgCreateAddressLists) (*MsgCreateAddressListsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAddressLists not implemented")
 }
-func (*UnimplementedMsgServer) TransferBadges(ctx context.Context, req *MsgTransferBadges) (*MsgTransferBadgesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TransferBadges not implemented")
+func (*UnimplementedMsgServer) TransferTokens(ctx context.Context, req *MsgTransferTokens) (*MsgTransferTokensResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferTokens not implemented")
 }
 func (*UnimplementedMsgServer) UpdateUserApprovals(ctx context.Context, req *MsgUpdateUserApprovals) (*MsgUpdateUserApprovalsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserApprovals not implemented")
@@ -4310,8 +4310,8 @@ func (*UnimplementedMsgServer) IncrementStoreValue(ctx context.Context, req *Msg
 func (*UnimplementedMsgServer) DecrementStoreValue(ctx context.Context, req *MsgDecrementStoreValue) (*MsgDecrementStoreValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DecrementStoreValue not implemented")
 }
-func (*UnimplementedMsgServer) SetValidBadgeIds(ctx context.Context, req *MsgSetValidBadgeIds) (*MsgSetValidBadgeIdsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetValidBadgeIds not implemented")
+func (*UnimplementedMsgServer) SetValidTokenIds(ctx context.Context, req *MsgSetValidTokenIds) (*MsgSetValidTokenIdsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetValidTokenIds not implemented")
 }
 func (*UnimplementedMsgServer) SetManager(ctx context.Context, req *MsgSetManager) (*MsgSetManagerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetManager not implemented")
@@ -4319,8 +4319,8 @@ func (*UnimplementedMsgServer) SetManager(ctx context.Context, req *MsgSetManage
 func (*UnimplementedMsgServer) SetCollectionMetadata(ctx context.Context, req *MsgSetCollectionMetadata) (*MsgSetCollectionMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetCollectionMetadata not implemented")
 }
-func (*UnimplementedMsgServer) SetBadgeMetadata(ctx context.Context, req *MsgSetBadgeMetadata) (*MsgSetBadgeMetadataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetBadgeMetadata not implemented")
+func (*UnimplementedMsgServer) SetTokenMetadata(ctx context.Context, req *MsgSetTokenMetadata) (*MsgSetTokenMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetTokenMetadata not implemented")
 }
 func (*UnimplementedMsgServer) SetCustomData(ctx context.Context, req *MsgSetCustomData) (*MsgSetCustomDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetCustomData not implemented")
@@ -4393,20 +4393,20 @@ func _Msg_CreateAddressLists_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_TransferBadges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgTransferBadges)
+func _Msg_TransferTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferTokens)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).TransferBadges(ctx, in)
+		return srv.(MsgServer).TransferTokens(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/badges.v15.Msg/TransferBadges",
+		FullMethod: "/badges.v15.Msg/TransferTokens",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).TransferBadges(ctx, req.(*MsgTransferBadges))
+		return srv.(MsgServer).TransferTokens(ctx, req.(*MsgTransferTokens))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -4681,20 +4681,20 @@ func _Msg_DecrementStoreValue_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_SetValidBadgeIds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgSetValidBadgeIds)
+func _Msg_SetValidTokenIds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetValidTokenIds)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).SetValidBadgeIds(ctx, in)
+		return srv.(MsgServer).SetValidTokenIds(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/badges.v15.Msg/SetValidBadgeIds",
+		FullMethod: "/badges.v15.Msg/SetValidTokenIds",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).SetValidBadgeIds(ctx, req.(*MsgSetValidBadgeIds))
+		return srv.(MsgServer).SetValidTokenIds(ctx, req.(*MsgSetValidTokenIds))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -4735,20 +4735,20 @@ func _Msg_SetCollectionMetadata_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_SetBadgeMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgSetBadgeMetadata)
+func _Msg_SetTokenMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetTokenMetadata)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).SetBadgeMetadata(ctx, in)
+		return srv.(MsgServer).SetTokenMetadata(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/badges.v15.Msg/SetBadgeMetadata",
+		FullMethod: "/badges.v15.Msg/SetTokenMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).SetBadgeMetadata(ctx, req.(*MsgSetBadgeMetadata))
+		return srv.(MsgServer).SetTokenMetadata(ctx, req.(*MsgSetTokenMetadata))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -4843,8 +4843,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreateAddressLists_Handler,
 		},
 		{
-			MethodName: "TransferBadges",
-			Handler:    _Msg_TransferBadges_Handler,
+			MethodName: "TransferTokens",
+			Handler:    _Msg_TransferTokens_Handler,
 		},
 		{
 			MethodName: "UpdateUserApprovals",
@@ -4907,8 +4907,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_DecrementStoreValue_Handler,
 		},
 		{
-			MethodName: "SetValidBadgeIds",
-			Handler:    _Msg_SetValidBadgeIds_Handler,
+			MethodName: "SetValidTokenIds",
+			Handler:    _Msg_SetValidTokenIds_Handler,
 		},
 		{
 			MethodName: "SetManager",
@@ -4919,8 +4919,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_SetCollectionMetadata_Handler,
 		},
 		{
-			MethodName: "SetBadgeMetadata",
-			Handler:    _Msg_SetBadgeMetadata_Handler,
+			MethodName: "SetTokenMetadata",
+			Handler:    _Msg_SetTokenMetadata_Handler,
 		},
 		{
 			MethodName: "SetCustomData",
@@ -5019,9 +5019,9 @@ func (m *BadgeCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xba
 	}
-	if m.SetBadgeMetadataMsg != nil {
+	if m.SetTokenMetadataMsg != nil {
 		{
-			size, err := m.SetBadgeMetadataMsg.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SetTokenMetadataMsg.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -5061,9 +5061,9 @@ func (m *BadgeCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xa2
 	}
-	if m.SetValidBadgeIdsMsg != nil {
+	if m.SetValidTokenIdsMsg != nil {
 		{
-			size, err := m.SetValidBadgeIdsMsg.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SetValidTokenIdsMsg.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -5249,9 +5249,9 @@ func (m *BadgeCustomMsgType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x2a
 	}
-	if m.TransferBadgesMsg != nil {
+	if m.TransferTokensMsg != nil {
 		{
-			size, err := m.TransferBadgesMsg.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.TransferTokensMsg.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -5652,10 +5652,10 @@ func (m *MsgUniversalUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, e
 		i--
 		dAtA[i] = 0x78
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for iNdEx := len(m.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for iNdEx := len(m.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -5666,9 +5666,9 @@ func (m *MsgUniversalUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, e
 			dAtA[i] = 0x72
 		}
 	}
-	if m.UpdateBadgeMetadataTimeline {
+	if m.UpdateTokenMetadataTimeline {
 		i--
-		if m.UpdateBadgeMetadataTimeline {
+		if m.UpdateTokenMetadataTimeline {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -5746,10 +5746,10 @@ func (m *MsgUniversalUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, e
 		i--
 		dAtA[i] = 0x38
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for iNdEx := len(m.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.ValidTokenIds) > 0 {
+		for iNdEx := len(m.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -5760,9 +5760,9 @@ func (m *MsgUniversalUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, e
 			dAtA[i] = 0x32
 		}
 	}
-	if m.UpdateValidBadgeIds {
+	if m.UpdateValidTokenIds {
 		i--
-		if m.UpdateValidBadgeIds {
+		if m.UpdateValidTokenIds {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -6046,10 +6046,10 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x78
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for iNdEx := len(m.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for iNdEx := len(m.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -6060,9 +6060,9 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x72
 		}
 	}
-	if m.UpdateBadgeMetadataTimeline {
+	if m.UpdateTokenMetadataTimeline {
 		i--
-		if m.UpdateBadgeMetadataTimeline {
+		if m.UpdateTokenMetadataTimeline {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -6140,10 +6140,10 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x38
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for iNdEx := len(m.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.ValidTokenIds) > 0 {
+		for iNdEx := len(m.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -6154,9 +6154,9 @@ func (m *MsgUpdateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x22
 		}
 	}
-	if m.UpdateValidBadgeIds {
+	if m.UpdateValidTokenIds {
 		i--
-		if m.UpdateValidBadgeIds {
+		if m.UpdateValidTokenIds {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -6353,10 +6353,10 @@ func (m *MsgCreateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x52
 		}
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for iNdEx := len(m.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for iNdEx := len(m.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -6407,10 +6407,10 @@ func (m *MsgCreateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x32
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for iNdEx := len(m.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.ValidTokenIds) > 0 {
+		for iNdEx := len(m.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -6550,7 +6550,7 @@ func (m *MsgCreateAddressListsResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgTransferBadges) Marshal() (dAtA []byte, err error) {
+func (m *MsgTransferTokens) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -6560,12 +6560,12 @@ func (m *MsgTransferBadges) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgTransferBadges) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgTransferTokens) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgTransferBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgTransferTokens) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -6604,7 +6604,7 @@ func (m *MsgTransferBadges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgTransferBadgesResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgTransferTokensResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -6614,12 +6614,12 @@ func (m *MsgTransferBadgesResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgTransferBadgesResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgTransferTokensResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgTransferBadgesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgTransferTokensResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -7746,7 +7746,7 @@ func (m *MsgDecrementStoreValueResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSetValidBadgeIds) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetValidTokenIds) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7756,20 +7756,20 @@ func (m *MsgSetValidBadgeIds) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgSetValidBadgeIds) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetValidTokenIds) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgSetValidBadgeIds) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetValidTokenIds) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.CanUpdateValidBadgeIds) > 0 {
-		for iNdEx := len(m.CanUpdateValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CanUpdateValidTokenIds) > 0 {
+		for iNdEx := len(m.CanUpdateValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CanUpdateValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CanUpdateValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -7780,10 +7780,10 @@ func (m *MsgSetValidBadgeIds) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x22
 		}
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for iNdEx := len(m.ValidBadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.ValidTokenIds) > 0 {
+		for iNdEx := len(m.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.ValidBadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.ValidTokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -7814,7 +7814,7 @@ func (m *MsgSetValidBadgeIds) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSetValidBadgeIdsResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetValidTokenIdsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7824,12 +7824,12 @@ func (m *MsgSetValidBadgeIdsResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgSetValidBadgeIdsResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetValidTokenIdsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgSetValidBadgeIdsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetValidTokenIdsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8049,7 +8049,7 @@ func (m *MsgSetCollectionMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSetBadgeMetadata) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetTokenMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8059,20 +8059,20 @@ func (m *MsgSetBadgeMetadata) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgSetBadgeMetadata) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetTokenMetadata) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgSetBadgeMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetTokenMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.CanUpdateBadgeMetadata) > 0 {
-		for iNdEx := len(m.CanUpdateBadgeMetadata) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.CanUpdateTokenMetadata) > 0 {
+		for iNdEx := len(m.CanUpdateTokenMetadata) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CanUpdateBadgeMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.CanUpdateTokenMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -8083,10 +8083,10 @@ func (m *MsgSetBadgeMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x22
 		}
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for iNdEx := len(m.BadgeMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for iNdEx := len(m.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenMetadataTimeline[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -8117,7 +8117,7 @@ func (m *MsgSetBadgeMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgSetBadgeMetadataResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgSetTokenMetadataResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8127,12 +8127,12 @@ func (m *MsgSetBadgeMetadataResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgSetBadgeMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgSetTokenMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgSetBadgeMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgSetTokenMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8583,8 +8583,8 @@ func (m *BadgeCustomMsgType) Size() (n int) {
 		l = m.DeleteCollectionMsg.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.TransferBadgesMsg != nil {
-		l = m.TransferBadgesMsg.Size()
+	if m.TransferTokensMsg != nil {
+		l = m.TransferTokensMsg.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.UpdateUserApprovalsMsg != nil {
@@ -8643,8 +8643,8 @@ func (m *BadgeCustomMsgType) Size() (n int) {
 		l = m.PurgeApprovalsMsg.Size()
 		n += 2 + l + sovTx(uint64(l))
 	}
-	if m.SetValidBadgeIdsMsg != nil {
-		l = m.SetValidBadgeIdsMsg.Size()
+	if m.SetValidTokenIdsMsg != nil {
+		l = m.SetValidTokenIdsMsg.Size()
 		n += 2 + l + sovTx(uint64(l))
 	}
 	if m.SetManagerMsg != nil {
@@ -8655,8 +8655,8 @@ func (m *BadgeCustomMsgType) Size() (n int) {
 		l = m.SetCollectionMetadataMsg.Size()
 		n += 2 + l + sovTx(uint64(l))
 	}
-	if m.SetBadgeMetadataMsg != nil {
-		l = m.SetBadgeMetadataMsg.Size()
+	if m.SetTokenMetadataMsg != nil {
+		l = m.SetTokenMetadataMsg.Size()
 		n += 2 + l + sovTx(uint64(l))
 	}
 	if m.SetCustomDataMsg != nil {
@@ -8757,11 +8757,11 @@ func (m *MsgUniversalUpdateCollection) Size() (n int) {
 		l = m.DefaultBalances.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.UpdateValidBadgeIds {
+	if m.UpdateValidTokenIds {
 		n += 2
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for _, e := range m.ValidBadgeIds {
+	if len(m.ValidTokenIds) > 0 {
+		for _, e := range m.ValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -8791,11 +8791,11 @@ func (m *MsgUniversalUpdateCollection) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if m.UpdateBadgeMetadataTimeline {
+	if m.UpdateTokenMetadataTimeline {
 		n += 2
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for _, e := range m.BadgeMetadataTimeline {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for _, e := range m.TokenMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -8887,11 +8887,11 @@ func (m *MsgUpdateCollection) Size() (n int) {
 	}
 	l = m.CollectionId.Size()
 	n += 1 + l + sovTx(uint64(l))
-	if m.UpdateValidBadgeIds {
+	if m.UpdateValidTokenIds {
 		n += 2
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for _, e := range m.ValidBadgeIds {
+	if len(m.ValidTokenIds) > 0 {
+		for _, e := range m.ValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -8921,11 +8921,11 @@ func (m *MsgUpdateCollection) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if m.UpdateBadgeMetadataTimeline {
+	if m.UpdateTokenMetadataTimeline {
 		n += 2
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for _, e := range m.BadgeMetadataTimeline {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for _, e := range m.TokenMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -9023,8 +9023,8 @@ func (m *MsgCreateCollection) Size() (n int) {
 		l = m.DefaultBalances.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.ValidBadgeIds) > 0 {
-		for _, e := range m.ValidBadgeIds {
+	if len(m.ValidTokenIds) > 0 {
+		for _, e := range m.ValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -9045,8 +9045,8 @@ func (m *MsgCreateCollection) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for _, e := range m.BadgeMetadataTimeline {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for _, e := range m.TokenMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -9139,7 +9139,7 @@ func (m *MsgCreateAddressListsResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgTransferBadges) Size() (n int) {
+func (m *MsgTransferTokens) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -9160,7 +9160,7 @@ func (m *MsgTransferBadges) Size() (n int) {
 	return n
 }
 
-func (m *MsgTransferBadgesResponse) Size() (n int) {
+func (m *MsgTransferTokensResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -9583,7 +9583,7 @@ func (m *MsgDecrementStoreValueResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgSetValidBadgeIds) Size() (n int) {
+func (m *MsgSetValidTokenIds) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -9595,14 +9595,14 @@ func (m *MsgSetValidBadgeIds) Size() (n int) {
 	}
 	l = m.CollectionId.Size()
 	n += 1 + l + sovTx(uint64(l))
-	if len(m.ValidBadgeIds) > 0 {
-		for _, e := range m.ValidBadgeIds {
+	if len(m.ValidTokenIds) > 0 {
+		for _, e := range m.ValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.CanUpdateValidBadgeIds) > 0 {
-		for _, e := range m.CanUpdateValidBadgeIds {
+	if len(m.CanUpdateValidTokenIds) > 0 {
+		for _, e := range m.CanUpdateValidTokenIds {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -9610,7 +9610,7 @@ func (m *MsgSetValidBadgeIds) Size() (n int) {
 	return n
 }
 
-func (m *MsgSetValidBadgeIdsResponse) Size() (n int) {
+func (m *MsgSetValidTokenIdsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -9697,7 +9697,7 @@ func (m *MsgSetCollectionMetadataResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgSetBadgeMetadata) Size() (n int) {
+func (m *MsgSetTokenMetadata) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -9709,14 +9709,14 @@ func (m *MsgSetBadgeMetadata) Size() (n int) {
 	}
 	l = m.CollectionId.Size()
 	n += 1 + l + sovTx(uint64(l))
-	if len(m.BadgeMetadataTimeline) > 0 {
-		for _, e := range m.BadgeMetadataTimeline {
+	if len(m.TokenMetadataTimeline) > 0 {
+		for _, e := range m.TokenMetadataTimeline {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.CanUpdateBadgeMetadata) > 0 {
-		for _, e := range m.CanUpdateBadgeMetadata {
+	if len(m.CanUpdateTokenMetadata) > 0 {
+		for _, e := range m.CanUpdateTokenMetadata {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -9724,7 +9724,7 @@ func (m *MsgSetBadgeMetadata) Size() (n int) {
 	return n
 }
 
-func (m *MsgSetBadgeMetadataResponse) Size() (n int) {
+func (m *MsgSetTokenMetadataResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -10032,7 +10032,7 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TransferBadgesMsg", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TransferTokensMsg", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10059,10 +10059,10 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.TransferBadgesMsg == nil {
-				m.TransferBadgesMsg = &MsgTransferBadges{}
+			if m.TransferTokensMsg == nil {
+				m.TransferTokensMsg = &MsgTransferTokens{}
 			}
-			if err := m.TransferBadgesMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.TransferTokensMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -10572,7 +10572,7 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 19:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SetValidBadgeIdsMsg", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SetValidTokenIdsMsg", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10599,10 +10599,10 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.SetValidBadgeIdsMsg == nil {
-				m.SetValidBadgeIdsMsg = &MsgSetValidBadgeIds{}
+			if m.SetValidTokenIdsMsg == nil {
+				m.SetValidTokenIdsMsg = &MsgSetValidTokenIds{}
 			}
-			if err := m.SetValidBadgeIdsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.SetValidTokenIdsMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -10680,7 +10680,7 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 22:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SetBadgeMetadataMsg", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SetTokenMetadataMsg", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10707,10 +10707,10 @@ func (m *BadgeCustomMsgType) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.SetBadgeMetadataMsg == nil {
-				m.SetBadgeMetadataMsg = &MsgSetBadgeMetadata{}
+			if m.SetTokenMetadataMsg == nil {
+				m.SetTokenMetadataMsg = &MsgSetTokenMetadata{}
 			}
-			if err := m.SetBadgeMetadataMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.SetTokenMetadataMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11431,7 +11431,7 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateValidTokenIds", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -11448,10 +11448,10 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateValidBadgeIds = bool(v != 0)
+			m.UpdateValidTokenIds = bool(v != 0)
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -11478,8 +11478,8 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ValidBadgeIds = append(m.ValidBadgeIds, &UintRange{})
-			if err := m.ValidBadgeIds[len(m.ValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ValidTokenIds = append(m.ValidTokenIds, &UintRange{})
+			if err := m.ValidTokenIds[len(m.ValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11649,7 +11649,7 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 13:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateBadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateTokenMetadataTimeline", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -11666,10 +11666,10 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateBadgeMetadataTimeline = bool(v != 0)
+			m.UpdateTokenMetadataTimeline = bool(v != 0)
 		case 14:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenMetadataTimeline", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -11696,8 +11696,8 @@ func (m *MsgUniversalUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeMetadataTimeline = append(m.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
-			if err := m.BadgeMetadataTimeline[len(m.BadgeMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenMetadataTimeline = append(m.TokenMetadataTimeline, &TokenMetadataTimeline{})
+			if err := m.TokenMetadataTimeline[len(m.TokenMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -12277,7 +12277,7 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateValidTokenIds", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -12294,10 +12294,10 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateValidBadgeIds = bool(v != 0)
+			m.UpdateValidTokenIds = bool(v != 0)
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -12324,8 +12324,8 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ValidBadgeIds = append(m.ValidBadgeIds, &UintRange{})
-			if err := m.ValidBadgeIds[len(m.ValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ValidTokenIds = append(m.ValidTokenIds, &UintRange{})
+			if err := m.ValidTokenIds[len(m.ValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -12495,7 +12495,7 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 13:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateBadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateTokenMetadataTimeline", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -12512,10 +12512,10 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.UpdateBadgeMetadataTimeline = bool(v != 0)
+			m.UpdateTokenMetadataTimeline = bool(v != 0)
 		case 14:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenMetadataTimeline", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -12542,8 +12542,8 @@ func (m *MsgUpdateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeMetadataTimeline = append(m.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
-			if err := m.BadgeMetadataTimeline[len(m.BadgeMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenMetadataTimeline = append(m.TokenMetadataTimeline, &TokenMetadataTimeline{})
+			if err := m.TokenMetadataTimeline[len(m.TokenMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -13157,7 +13157,7 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -13184,8 +13184,8 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ValidBadgeIds = append(m.ValidBadgeIds, &UintRange{})
-			if err := m.ValidBadgeIds[len(m.ValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ValidTokenIds = append(m.ValidTokenIds, &UintRange{})
+			if err := m.ValidTokenIds[len(m.ValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -13295,7 +13295,7 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenMetadataTimeline", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -13322,8 +13322,8 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeMetadataTimeline = append(m.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
-			if err := m.BadgeMetadataTimeline[len(m.BadgeMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenMetadataTimeline = append(m.TokenMetadataTimeline, &TokenMetadataTimeline{})
+			if err := m.TokenMetadataTimeline[len(m.TokenMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -13872,7 +13872,7 @@ func (m *MsgCreateAddressListsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgTransferBadges) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferTokens) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -13895,10 +13895,10 @@ func (m *MsgTransferBadges) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgTransferBadges: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferTokens: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgTransferBadges: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferTokens: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -14022,7 +14022,7 @@ func (m *MsgTransferBadges) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgTransferBadgesResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferTokensResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -14045,10 +14045,10 @@ func (m *MsgTransferBadgesResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgTransferBadgesResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferTokensResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgTransferBadgesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferTokensResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -17076,7 +17076,7 @@ func (m *MsgDecrementStoreValueResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
+func (m *MsgSetValidTokenIds) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17099,10 +17099,10 @@ func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSetValidBadgeIds: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetValidTokenIds: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSetValidBadgeIds: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetValidTokenIds: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17173,7 +17173,7 @@ func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -17200,14 +17200,14 @@ func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ValidBadgeIds = append(m.ValidBadgeIds, &UintRange{})
-			if err := m.ValidBadgeIds[len(m.ValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.ValidTokenIds = append(m.ValidTokenIds, &UintRange{})
+			if err := m.ValidTokenIds[len(m.ValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidBadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateValidTokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -17234,8 +17234,8 @@ func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateValidBadgeIds = append(m.CanUpdateValidBadgeIds, &BadgeIdsActionPermission{})
-			if err := m.CanUpdateValidBadgeIds[len(m.CanUpdateValidBadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CanUpdateValidTokenIds = append(m.CanUpdateValidTokenIds, &TokenIdsActionPermission{})
+			if err := m.CanUpdateValidTokenIds[len(m.CanUpdateValidTokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -17260,7 +17260,7 @@ func (m *MsgSetValidBadgeIds) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgSetValidBadgeIdsResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgSetValidTokenIdsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17283,10 +17283,10 @@ func (m *MsgSetValidBadgeIdsResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSetValidBadgeIdsResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetValidTokenIdsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSetValidBadgeIdsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetValidTokenIdsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17880,7 +17880,7 @@ func (m *MsgSetCollectionMetadataResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
+func (m *MsgSetTokenMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17903,10 +17903,10 @@ func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSetBadgeMetadata: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetTokenMetadata: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSetBadgeMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetTokenMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17977,7 +17977,7 @@ func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeMetadataTimeline", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenMetadataTimeline", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -18004,14 +18004,14 @@ func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeMetadataTimeline = append(m.BadgeMetadataTimeline, &BadgeMetadataTimeline{})
-			if err := m.BadgeMetadataTimeline[len(m.BadgeMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenMetadataTimeline = append(m.TokenMetadataTimeline, &TokenMetadataTimeline{})
+			if err := m.TokenMetadataTimeline[len(m.TokenMetadataTimeline)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateBadgeMetadata", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateTokenMetadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -18038,8 +18038,8 @@ func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateBadgeMetadata = append(m.CanUpdateBadgeMetadata, &TimedUpdateWithBadgeIdsPermission{})
-			if err := m.CanUpdateBadgeMetadata[len(m.CanUpdateBadgeMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.CanUpdateTokenMetadata = append(m.CanUpdateTokenMetadata, &TimedUpdateWithTokenIdsPermission{})
+			if err := m.CanUpdateTokenMetadata[len(m.CanUpdateTokenMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -18064,7 +18064,7 @@ func (m *MsgSetBadgeMetadata) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgSetBadgeMetadataResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgSetTokenMetadataResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18087,10 +18087,10 @@ func (m *MsgSetBadgeMetadataResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgSetBadgeMetadataResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgSetTokenMetadataResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgSetBadgeMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgSetTokenMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

@@ -30,7 +30,7 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdTransferBadges())
+	cmd.AddCommand(CmdTransferTokens())
 	cmd.AddCommand(CmdDeleteCollection())
 	cmd.AddCommand(CmdUpdateUserOutgoingApprovals())
 	cmd.AddCommand(CmdUpdateCollection())
@@ -48,10 +48,10 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdSetOutgoingApproval())
 	cmd.AddCommand(CmdDeleteOutgoingApproval())
 	cmd.AddCommand(CmdPurgeApprovals())
-	cmd.AddCommand(CmdSetValidBadgeIds())
+	cmd.AddCommand(CmdSetValidTokenIds())
 	cmd.AddCommand(CmdSetManager())
 	cmd.AddCommand(CmdSetCollectionMetadata())
-	cmd.AddCommand(CmdSetBadgeMetadata())
+	cmd.AddCommand(CmdSetTokenMetadata())
 	cmd.AddCommand(CmdSetCustomData())
 	cmd.AddCommand(CmdSetStandards())
 	cmd.AddCommand(CmdSetCollectionApprovals())

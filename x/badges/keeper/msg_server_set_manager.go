@@ -36,9 +36,9 @@ func (k msgServer) SetManager(goCtx context.Context, msg *types.MsgSetManager) (
 			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
 			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateValidBadgeIds:       collection.CollectionPermissions.CanUpdateValidBadgeIds,
+			CanUpdateValidTokenIds:       collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateBadgeMetadata:       collection.CollectionPermissions.CanUpdateBadgeMetadata,
+			CanUpdateTokenMetadata:       collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
 		},
 	}

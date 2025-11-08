@@ -27,7 +27,7 @@ func (k Keeper) SimulateCoinTransfers(
 	ctx sdk.Context,
 	coinTransfers []*types.CoinTransfer,
 	transferMetadata TransferMetadata,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	royalties *types.UserRoyalties,
 ) error {
 	initiatedBy := transferMetadata.InitiatedBy
@@ -109,7 +109,7 @@ func (k Keeper) ExecuteCoinTransfers(
 	coinTransfers []*types.CoinTransfer,
 	transferMetadata TransferMetadata,
 	coinTransfersUsed *[]CoinTransfers,
-	collection *types.BadgeCollection,
+	collection *types.TokenCollection,
 	royalties *types.UserRoyalties,
 ) error {
 	initiatedBy := transferMetadata.InitiatedBy

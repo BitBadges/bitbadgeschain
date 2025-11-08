@@ -70,18 +70,18 @@ func (m *UintRange) XXX_DiscardUnknown() {
 var xxx_messageInfo_UintRange proto.InternalMessageInfo
 
 // Balance represents the balance of a token for a specific user.
-// The user amounts xAmount of a token for the badgeID specified for the time ranges specified.
+// The user amounts xAmount of a token for the tokenID specified for the time ranges specified.
 //
 // Example: User A owns x10 of token IDs 1-10 from 1/1/2020 to 1/1/2021.
 //
-// If times or badgeIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
+// If times or tokenIDs have len > 1, then the user owns all token IDs specified for all time ranges specified.
 type Balance struct {
 	// The amount of the token owned by the user.
 	Amount Uint `protobuf:"bytes,1,opt,name=amount,proto3,customtype=Uint" json:"amount"`
 	// The time ranges during which the user owns the token.
 	OwnershipTimes []*UintRange `protobuf:"bytes,2,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
 	// The token IDs for which the user owns the token.
-	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,3,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 }
 
 func (m *Balance) Reset()         { *m = Balance{} }
@@ -124,9 +124,9 @@ func (m *Balance) GetOwnershipTimes() []*UintRange {
 	return nil
 }
 
-func (m *Balance) GetBadgeIds() []*UintRange {
+func (m *Balance) GetTokenIds() []*UintRange {
 	if m != nil {
-		return m.BadgeIds
+		return m.TokenIds
 	}
 	return nil
 }
@@ -223,10 +223,10 @@ func (m *Balance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.BadgeIds) > 0 {
-		for iNdEx := len(m.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TokenIds) > 0 {
+		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.BadgeIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -302,8 +302,8 @@ func (m *Balance) Size() (n int) {
 			n += 1 + l + sovBalances(uint64(l))
 		}
 	}
-	if len(m.BadgeIds) > 0 {
-		for _, e := range m.BadgeIds {
+	if len(m.TokenIds) > 0 {
+		for _, e := range m.TokenIds {
 			l = e.Size()
 			n += 1 + l + sovBalances(uint64(l))
 		}
@@ -534,7 +534,7 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -561,8 +561,8 @@ func (m *Balance) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BadgeIds = append(m.BadgeIds, &UintRange{})
-			if err := m.BadgeIds[len(m.BadgeIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TokenIds = append(m.TokenIds, &UintRange{})
+			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

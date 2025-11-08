@@ -25,7 +25,7 @@ func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingAppr
 					End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(math.MaxUint64),
@@ -57,7 +57,7 @@ func AppendSelfInitiatedOutgoingApproval(currApprovals []*types.UserOutgoingAppr
 					End:   sdkmath.NewUint(uint64(math.MaxUint64)),
 				},
 			},
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				{
 					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(math.MaxUint64),

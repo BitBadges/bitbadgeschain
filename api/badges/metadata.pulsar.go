@@ -14,81 +14,81 @@ import (
 	sync "sync"
 )
 
-var _ protoreflect.List = (*_BadgeMetadata_3_list)(nil)
+var _ protoreflect.List = (*_TokenMetadata_3_list)(nil)
 
-type _BadgeMetadata_3_list struct {
+type _TokenMetadata_3_list struct {
 	list *[]*UintRange
 }
 
-func (x *_BadgeMetadata_3_list) Len() int {
+func (x *_TokenMetadata_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_BadgeMetadata_3_list) Get(i int) protoreflect.Value {
+func (x *_TokenMetadata_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_BadgeMetadata_3_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenMetadata_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_BadgeMetadata_3_list) Append(value protoreflect.Value) {
+func (x *_TokenMetadata_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_BadgeMetadata_3_list) AppendMutable() protoreflect.Value {
+func (x *_TokenMetadata_3_list) AppendMutable() protoreflect.Value {
 	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeMetadata_3_list) Truncate(n int) {
+func (x *_TokenMetadata_3_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_BadgeMetadata_3_list) NewElement() protoreflect.Value {
+func (x *_TokenMetadata_3_list) NewElement() protoreflect.Value {
 	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_BadgeMetadata_3_list) IsValid() bool {
+func (x *_TokenMetadata_3_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_BadgeMetadata            protoreflect.MessageDescriptor
-	fd_BadgeMetadata_uri        protoreflect.FieldDescriptor
-	fd_BadgeMetadata_customData protoreflect.FieldDescriptor
-	fd_BadgeMetadata_badgeIds   protoreflect.FieldDescriptor
+	md_TokenMetadata            protoreflect.MessageDescriptor
+	fd_TokenMetadata_uri        protoreflect.FieldDescriptor
+	fd_TokenMetadata_customData protoreflect.FieldDescriptor
+	fd_TokenMetadata_tokenIds   protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_metadata_proto_init()
-	md_BadgeMetadata = File_badges_metadata_proto.Messages().ByName("BadgeMetadata")
-	fd_BadgeMetadata_uri = md_BadgeMetadata.Fields().ByName("uri")
-	fd_BadgeMetadata_customData = md_BadgeMetadata.Fields().ByName("customData")
-	fd_BadgeMetadata_badgeIds = md_BadgeMetadata.Fields().ByName("badgeIds")
+	md_TokenMetadata = File_badges_metadata_proto.Messages().ByName("TokenMetadata")
+	fd_TokenMetadata_uri = md_TokenMetadata.Fields().ByName("uri")
+	fd_TokenMetadata_customData = md_TokenMetadata.Fields().ByName("customData")
+	fd_TokenMetadata_tokenIds = md_TokenMetadata.Fields().ByName("tokenIds")
 }
 
-var _ protoreflect.Message = (*fastReflection_BadgeMetadata)(nil)
+var _ protoreflect.Message = (*fastReflection_TokenMetadata)(nil)
 
-type fastReflection_BadgeMetadata BadgeMetadata
+type fastReflection_TokenMetadata TokenMetadata
 
-func (x *BadgeMetadata) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_BadgeMetadata)(x)
+func (x *TokenMetadata) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TokenMetadata)(x)
 }
 
-func (x *BadgeMetadata) slowProtoReflect() protoreflect.Message {
+func (x *TokenMetadata) slowProtoReflect() protoreflect.Message {
 	mi := &file_badges_metadata_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,43 +100,43 @@ func (x *BadgeMetadata) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_BadgeMetadata_messageType fastReflection_BadgeMetadata_messageType
-var _ protoreflect.MessageType = fastReflection_BadgeMetadata_messageType{}
+var _fastReflection_TokenMetadata_messageType fastReflection_TokenMetadata_messageType
+var _ protoreflect.MessageType = fastReflection_TokenMetadata_messageType{}
 
-type fastReflection_BadgeMetadata_messageType struct{}
+type fastReflection_TokenMetadata_messageType struct{}
 
-func (x fastReflection_BadgeMetadata_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_BadgeMetadata)(nil)
+func (x fastReflection_TokenMetadata_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TokenMetadata)(nil)
 }
-func (x fastReflection_BadgeMetadata_messageType) New() protoreflect.Message {
-	return new(fastReflection_BadgeMetadata)
+func (x fastReflection_TokenMetadata_messageType) New() protoreflect.Message {
+	return new(fastReflection_TokenMetadata)
 }
-func (x fastReflection_BadgeMetadata_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeMetadata
+func (x fastReflection_TokenMetadata_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenMetadata
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_BadgeMetadata) Descriptor() protoreflect.MessageDescriptor {
-	return md_BadgeMetadata
+func (x *fastReflection_TokenMetadata) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenMetadata
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_BadgeMetadata) Type() protoreflect.MessageType {
-	return _fastReflection_BadgeMetadata_messageType
+func (x *fastReflection_TokenMetadata) Type() protoreflect.MessageType {
+	return _fastReflection_TokenMetadata_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_BadgeMetadata) New() protoreflect.Message {
-	return new(fastReflection_BadgeMetadata)
+func (x *fastReflection_TokenMetadata) New() protoreflect.Message {
+	return new(fastReflection_TokenMetadata)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_BadgeMetadata) Interface() protoreflect.ProtoMessage {
-	return (*BadgeMetadata)(x)
+func (x *fastReflection_TokenMetadata) Interface() protoreflect.ProtoMessage {
+	return (*TokenMetadata)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -144,22 +144,22 @@ func (x *fastReflection_BadgeMetadata) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_BadgeMetadata) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_TokenMetadata) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Uri != "" {
 		value := protoreflect.ValueOfString(x.Uri)
-		if !f(fd_BadgeMetadata_uri, value) {
+		if !f(fd_TokenMetadata_uri, value) {
 			return
 		}
 	}
 	if x.CustomData != "" {
 		value := protoreflect.ValueOfString(x.CustomData)
-		if !f(fd_BadgeMetadata_customData, value) {
+		if !f(fd_TokenMetadata_customData, value) {
 			return
 		}
 	}
-	if len(x.BadgeIds) != 0 {
-		value := protoreflect.ValueOfList(&_BadgeMetadata_3_list{list: &x.BadgeIds})
-		if !f(fd_BadgeMetadata_badgeIds, value) {
+	if len(x.TokenIds) != 0 {
+		value := protoreflect.ValueOfList(&_TokenMetadata_3_list{list: &x.TokenIds})
+		if !f(fd_TokenMetadata_tokenIds, value) {
 			return
 		}
 	}
@@ -176,19 +176,19 @@ func (x *fastReflection_BadgeMetadata) Range(f func(protoreflect.FieldDescriptor
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_BadgeMetadata) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_TokenMetadata) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "badges.BadgeMetadata.uri":
+	case "badges.TokenMetadata.uri":
 		return x.Uri != ""
-	case "badges.BadgeMetadata.customData":
+	case "badges.TokenMetadata.customData":
 		return x.CustomData != ""
-	case "badges.BadgeMetadata.badgeIds":
-		return len(x.BadgeIds) != 0
+	case "badges.TokenMetadata.tokenIds":
+		return len(x.TokenIds) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadata"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadata"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadata does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadata does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -198,19 +198,19 @@ func (x *fastReflection_BadgeMetadata) Has(fd protoreflect.FieldDescriptor) bool
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadata) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_TokenMetadata) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "badges.BadgeMetadata.uri":
+	case "badges.TokenMetadata.uri":
 		x.Uri = ""
-	case "badges.BadgeMetadata.customData":
+	case "badges.TokenMetadata.customData":
 		x.CustomData = ""
-	case "badges.BadgeMetadata.badgeIds":
-		x.BadgeIds = nil
+	case "badges.TokenMetadata.tokenIds":
+		x.TokenIds = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadata"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadata"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadata does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadata does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -220,25 +220,25 @@ func (x *fastReflection_BadgeMetadata) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_BadgeMetadata) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenMetadata) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "badges.BadgeMetadata.uri":
+	case "badges.TokenMetadata.uri":
 		value := x.Uri
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeMetadata.customData":
+	case "badges.TokenMetadata.customData":
 		value := x.CustomData
 		return protoreflect.ValueOfString(value)
-	case "badges.BadgeMetadata.badgeIds":
-		if len(x.BadgeIds) == 0 {
-			return protoreflect.ValueOfList(&_BadgeMetadata_3_list{})
+	case "badges.TokenMetadata.tokenIds":
+		if len(x.TokenIds) == 0 {
+			return protoreflect.ValueOfList(&_TokenMetadata_3_list{})
 		}
-		listValue := &_BadgeMetadata_3_list{list: &x.BadgeIds}
+		listValue := &_TokenMetadata_3_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadata"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadata"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadata does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadata does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -252,21 +252,21 @@ func (x *fastReflection_BadgeMetadata) Get(descriptor protoreflect.FieldDescript
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadata) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_TokenMetadata) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "badges.BadgeMetadata.uri":
+	case "badges.TokenMetadata.uri":
 		x.Uri = value.Interface().(string)
-	case "badges.BadgeMetadata.customData":
+	case "badges.TokenMetadata.customData":
 		x.CustomData = value.Interface().(string)
-	case "badges.BadgeMetadata.badgeIds":
+	case "badges.TokenMetadata.tokenIds":
 		lv := value.List()
-		clv := lv.(*_BadgeMetadata_3_list)
-		x.BadgeIds = *clv.list
+		clv := lv.(*_TokenMetadata_3_list)
+		x.TokenIds = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadata"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadata"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadata does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadata does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -280,53 +280,53 @@ func (x *fastReflection_BadgeMetadata) Set(fd protoreflect.FieldDescriptor, valu
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadata) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenMetadata) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeMetadata.badgeIds":
-		if x.BadgeIds == nil {
-			x.BadgeIds = []*UintRange{}
+	case "badges.TokenMetadata.tokenIds":
+		if x.TokenIds == nil {
+			x.TokenIds = []*UintRange{}
 		}
-		value := &_BadgeMetadata_3_list{list: &x.BadgeIds}
+		value := &_TokenMetadata_3_list{list: &x.TokenIds}
 		return protoreflect.ValueOfList(value)
-	case "badges.BadgeMetadata.uri":
-		panic(fmt.Errorf("field uri of message badges.BadgeMetadata is not mutable"))
-	case "badges.BadgeMetadata.customData":
-		panic(fmt.Errorf("field customData of message badges.BadgeMetadata is not mutable"))
+	case "badges.TokenMetadata.uri":
+		panic(fmt.Errorf("field uri of message badges.TokenMetadata is not mutable"))
+	case "badges.TokenMetadata.customData":
+		panic(fmt.Errorf("field customData of message badges.TokenMetadata is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadata"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadata"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadata does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadata does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_BadgeMetadata) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_TokenMetadata) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.BadgeMetadata.uri":
+	case "badges.TokenMetadata.uri":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeMetadata.customData":
+	case "badges.TokenMetadata.customData":
 		return protoreflect.ValueOfString("")
-	case "badges.BadgeMetadata.badgeIds":
+	case "badges.TokenMetadata.tokenIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_BadgeMetadata_3_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenMetadata_3_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.BadgeMetadata"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenMetadata"))
 		}
-		panic(fmt.Errorf("message badges.BadgeMetadata does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message badges.TokenMetadata does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_BadgeMetadata) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_TokenMetadata) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.BadgeMetadata", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in badges.TokenMetadata", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -334,7 +334,7 @@ func (x *fastReflection_BadgeMetadata) WhichOneof(d protoreflect.OneofDescriptor
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_BadgeMetadata) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_TokenMetadata) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -345,7 +345,7 @@ func (x *fastReflection_BadgeMetadata) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_BadgeMetadata) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_TokenMetadata) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -357,7 +357,7 @@ func (x *fastReflection_BadgeMetadata) SetUnknown(fields protoreflect.RawFields)
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_BadgeMetadata) IsValid() bool {
+func (x *fastReflection_TokenMetadata) IsValid() bool {
 	return x != nil
 }
 
@@ -367,9 +367,9 @@ func (x *fastReflection_BadgeMetadata) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_TokenMetadata) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*BadgeMetadata)
+		x := input.Message.Interface().(*TokenMetadata)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -389,8 +389,8 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.BadgeIds) > 0 {
-			for _, e := range x.BadgeIds {
+		if len(x.TokenIds) > 0 {
+			for _, e := range x.TokenIds {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -405,7 +405,7 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeMetadata)
+		x := input.Message.Interface().(*TokenMetadata)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -424,9 +424,9 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.BadgeIds) > 0 {
-			for iNdEx := len(x.BadgeIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.BadgeIds[iNdEx])
+		if len(x.TokenIds) > 0 {
+			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.TokenIds[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -465,7 +465,7 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*BadgeMetadata)
+		x := input.Message.Interface().(*TokenMetadata)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -497,10 +497,10 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeMetadata: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenMetadata: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: BadgeMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -569,7 +569,7 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BadgeIds", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -596,8 +596,8 @@ func (x *fastReflection_BadgeMetadata) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BadgeIds = append(x.BadgeIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.BadgeIds[len(x.BadgeIds)-1]); err != nil {
+				x.TokenIds = append(x.TokenIds, &UintRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -1619,7 +1619,7 @@ const (
 
 // This message defines the metadata for specific token IDs.
 // The interpretation of this metadata should follow the collection standard.
-type BadgeMetadata struct {
+type TokenMetadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1629,11 +1629,11 @@ type BadgeMetadata struct {
 	// Custom data or additional information related to the token metadata.
 	CustomData string `protobuf:"bytes,2,opt,name=customData,proto3" json:"customData,omitempty"`
 	// The token IDs to which this metadata applies.
-	BadgeIds []*UintRange `protobuf:"bytes,3,rep,name=badgeIds,proto3" json:"badgeIds,omitempty"`
+	TokenIds []*UintRange `protobuf:"bytes,3,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
 }
 
-func (x *BadgeMetadata) Reset() {
-	*x = BadgeMetadata{}
+func (x *TokenMetadata) Reset() {
+	*x = TokenMetadata{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_badges_metadata_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1641,34 +1641,34 @@ func (x *BadgeMetadata) Reset() {
 	}
 }
 
-func (x *BadgeMetadata) String() string {
+func (x *TokenMetadata) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BadgeMetadata) ProtoMessage() {}
+func (*TokenMetadata) ProtoMessage() {}
 
-// Deprecated: Use BadgeMetadata.ProtoReflect.Descriptor instead.
-func (*BadgeMetadata) Descriptor() ([]byte, []int) {
+// Deprecated: Use TokenMetadata.ProtoReflect.Descriptor instead.
+func (*TokenMetadata) Descriptor() ([]byte, []int) {
 	return file_badges_metadata_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *BadgeMetadata) GetUri() string {
+func (x *TokenMetadata) GetUri() string {
 	if x != nil {
 		return x.Uri
 	}
 	return ""
 }
 
-func (x *BadgeMetadata) GetCustomData() string {
+func (x *TokenMetadata) GetCustomData() string {
 	if x != nil {
 		return x.CustomData
 	}
 	return ""
 }
 
-func (x *BadgeMetadata) GetBadgeIds() []*UintRange {
+func (x *TokenMetadata) GetTokenIds() []*UintRange {
 	if x != nil {
-		return x.BadgeIds
+		return x.TokenIds
 	}
 	return nil
 }
@@ -1817,13 +1817,13 @@ func file_badges_metadata_proto_rawDescGZIP() []byte {
 
 var file_badges_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_badges_metadata_proto_goTypes = []interface{}{
-	(*BadgeMetadata)(nil),            // 0: badges.BadgeMetadata
+	(*TokenMetadata)(nil),            // 0: badges.TokenMetadata
 	(*CollectionMetadata)(nil),       // 1: badges.CollectionMetadata
 	(*OffChainBalancesMetadata)(nil), // 2: badges.OffChainBalancesMetadata
 	(*UintRange)(nil),                // 3: badges.UintRange
 }
 var file_badges_metadata_proto_depIdxs = []int32{
-	3, // 0: badges.BadgeMetadata.badgeIds:type_name -> badges.UintRange
+	3, // 0: badges.TokenMetadata.tokenIds:type_name -> badges.UintRange
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -1839,7 +1839,7 @@ func file_badges_metadata_proto_init() {
 	file_badges_balances_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_badges_metadata_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BadgeMetadata); i {
+			switch v := v.(*TokenMetadata); i {
 			case 0:
 				return &v.state
 			case 1:

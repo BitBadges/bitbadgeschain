@@ -63,7 +63,7 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 }
 
 // getCorrespondingWrapperPath finds the wrapper path that matches the given denom
-func (k Keeper) getCorrespondingWrapperPath(collection *types.BadgeCollection, denom string) (*types.CosmosCoinWrapperPath, error) {
+func (k Keeper) getCorrespondingWrapperPath(collection *types.TokenCollection, denom string) (*types.CosmosCoinWrapperPath, error) {
 	parts := strings.Split(denom, ":")
 	if len(parts) != 3 {
 		return nil, fmt.Errorf("invalid denom format")
@@ -106,16 +106,16 @@ func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*typ
 		return sdkmath.NewUint(0), nil
 	}
 
-	// Get all badge IDs and ownership times from wrapper path balances
-	var allBadgeIds []*types.UintRange
+	// Get all token IDs and ownership times from wrapper path balances
+	var allTokenIds []*types.UintRange
 	var allOwnershipTimes []*types.UintRange
 
 	for _, wrapperBalance := range wrapperPathBalances {
-		allBadgeIds = append(allBadgeIds, wrapperBalance.BadgeIds...)
+		allTokenIds = append(allTokenIds, wrapperBalance.TokenIds...)
 		allOwnershipTimes = append(allOwnershipTimes, wrapperBalance.OwnershipTimes...)
 	}
 
-	allBadgeIds, err := types.SortUintRangesAndMerge(allBadgeIds, true)
+	allTokenIds, err := types.SortUintRangesAndMerge(allTokenIds, true)
 	if err != nil {
 		return sdkmath.NewUint(0), err
 	}
@@ -125,8 +125,8 @@ func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*typ
 		return sdkmath.NewUint(0), err
 	}
 
-	// Get user balances for the wrapper path badge IDs and ownership times
-	balancesForIds, err := types.GetBalancesForIds(ctx, allBadgeIds, allOwnershipTimes, userBalances)
+	// Get user balances for the wrapper path token IDs and ownership times
+	balancesForIds, err := types.GetBalancesForIds(ctx, allTokenIds, allOwnershipTimes, userBalances)
 	if err != nil {
 		return sdkmath.NewUint(0), err
 	}
@@ -166,7 +166,7 @@ func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*typ
 		for _, wrapperBalance := range wrapperPathBalances {
 			conversionBalance := &types.Balance{
 				Amount:         wrapperBalance.Amount.Mul(amount),
-				BadgeIds:       wrapperBalance.BadgeIds,
+				TokenIds:       wrapperBalance.TokenIds,
 				OwnershipTimes: wrapperBalance.OwnershipTimes,
 			}
 			conversionBalances = append(conversionBalances, conversionBalance)

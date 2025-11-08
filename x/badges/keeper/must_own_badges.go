@@ -11,7 +11,7 @@ import (
 // CheckMustOwnTokens checks if the initiatedBy address owns the required tokens
 func (k Keeper) CheckMustOwnTokens(
 	ctx sdk.Context,
-	mustOwnTokens []*types.MustOwnBadges,
+	mustOwnTokens []*types.MustOwnTokens,
 	initiatedBy string,
 	fromAddress string,
 	toAddress string,
@@ -51,7 +51,7 @@ func (k Keeper) CheckMustOwnTokens(
 			mustOwnToken.OwnershipTimes = []*types.UintRange{{Start: currTime, End: currTime}}
 		}
 
-		fetchedBalances, err := types.GetBalancesForIds(ctx, mustOwnToken.BadgeIds, mustOwnToken.OwnershipTimes, balances)
+		fetchedBalances, err := types.GetBalancesForIds(ctx, mustOwnToken.TokenIds, mustOwnToken.OwnershipTimes, balances)
 		if err != nil {
 			failedMustOwnTokens = true
 			break

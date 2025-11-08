@@ -15,7 +15,7 @@ func (suite *TestSuite) TestNewCollection() {
 	suite.Require().Nil(err, "Address %s failed to parse")
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].TokensToCreate = []*types.Balance{}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating token: %s")
@@ -26,7 +26,7 @@ func (suite *TestSuite) TestNewCollection() {
 	AssertUintsEqual(suite, sdkmath.NewUint(2), nextId)
 
 	// Verify token details are correct
-	// AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextBadgeId)
+	// AssertUintsEqual(suite, sdkmath.NewUint(1), collection.NextTokenId)
 }
 
 func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
@@ -36,7 +36,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	suite.Require().Nil(err, "Address %s failed to parse")
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].TokensToCreate = []*types.Balance{}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err, "Error creating collection with Standard balances")
@@ -45,7 +45,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	//which is not possible with the way the integration helpers are written
 
 	// collectionsToCreate = GetCollectionsToCreate()
-	// collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
+	// collectionsToCreate[0].TokensToCreate = []*types.Balance{}
 	// collectionsToCreate[0].BalancesType = sdkmath.NewUint(2)
 	// collectionsToCreate[0].CollectionApprovalsTimeline = nil
 
@@ -53,13 +53,13 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	// suite.Require().Nil(err, "Error creating token: %s")
 
 	collectionsToCreate = GetCollectionsToCreate()
-	collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
+	collectionsToCreate[0].TokensToCreate = []*types.Balance{}
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err, "Error creating collection with Standard balances")
 
 	// collectionsToCreate = GetCollectionsToCreate()
-	// collectionsToCreate[0].BadgesToCreate = []*types.Balance{}
+	// collectionsToCreate[0].TokensToCreate = []*types.Balance{}
 	// collectionsToCreate[0].BalancesType = sdkmath.NewUint(3)
 	// collectionsToCreate[0].CollectionApprovalsTimeline = nil
 
@@ -67,7 +67,7 @@ func (suite *TestSuite) TestNewCollectionDifferentBalancesTypes() {
 	// suite.Require().Nil(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
+func (suite *TestSuite) TestNewCollectionDuplicateTokenIds() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	_, err := sdk.AccAddressFromBech32(alice)
@@ -81,7 +81,7 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 			Balances: []*types.Balance{
 				{
 					Amount: sdkmath.NewUint(1),
-					BadgeIds: []*types.UintRange{
+					TokenIds: []*types.UintRange{
 						GetOneUintRange()[0],
 						GetOneUintRange()[0],
 					},
@@ -95,18 +95,18 @@ func (suite *TestSuite) TestNewCollectionDuplicateBadgeIds() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewCollectionNonSequentialBadgeIds() {
+func (suite *TestSuite) TestNewCollectionNonSequentialTokenIds() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	_, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Address %s failed to parse")
 
 	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].BadgesToCreate = []*types.Balance{
+	collectionsToCreate[0].TokensToCreate = []*types.Balance{
 
 		{
 			Amount: sdkmath.NewUint(1),
-			BadgeIds: []*types.UintRange{
+			TokenIds: []*types.UintRange{
 				GetOneUintRange()[0],
 				GetOneUintRange()[0],
 				{Start: sdkmath.NewUint(3), End: sdkmath.NewUint(3)},

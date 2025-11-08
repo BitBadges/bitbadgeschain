@@ -11,7 +11,7 @@ import (
 	"github.com/gogo/protobuf/jsonpb"
 
 	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
-	badgeTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	balancertypes "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	mapstypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
@@ -28,7 +28,7 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 		reader := bytes.NewReader(jsonData)
 
 		isBadgeModuleMsg := false
-		var badgeCustomMsg badgeTypes.BadgeCustomMsgType
+		var badgeCustomMsg tokenTypes.BadgeCustomMsgType
 		err = jsonpb.Unmarshal(reader, &badgeCustomMsg)
 		if err == nil {
 			isBadgeModuleMsg = true
@@ -64,7 +64,7 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 
 		if isBadgeModuleMsg {
 			reader = bytes.NewReader(jsonData)
-			var badgeCustomMsg badgeTypes.BadgeCustomMsgType
+			var badgeCustomMsg tokenTypes.BadgeCustomMsgType
 			err = jsonpb.Unmarshal(reader, &badgeCustomMsg)
 			if err != nil {
 				return nil, sdkerrors.Wrap(err, err.Error())
@@ -86,9 +86,9 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.DeleteCollectionMsg != nil:
 				badgeCustomMsg.DeleteCollectionMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.DeleteCollectionMsg}, nil
-			case badgeCustomMsg.TransferBadgesMsg != nil:
-				badgeCustomMsg.TransferBadgesMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.TransferBadgesMsg}, nil
+			case badgeCustomMsg.TransferTokensMsg != nil:
+				badgeCustomMsg.TransferTokensMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.TransferTokensMsg}, nil
 			case badgeCustomMsg.UpdateUserApprovalsMsg != nil:
 				badgeCustomMsg.UpdateUserApprovalsMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.UpdateUserApprovalsMsg}, nil
@@ -125,18 +125,18 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.PurgeApprovalsMsg != nil:
 				badgeCustomMsg.PurgeApprovalsMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.PurgeApprovalsMsg}, nil
-			case badgeCustomMsg.SetValidBadgeIdsMsg != nil:
-				badgeCustomMsg.SetValidBadgeIdsMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.SetValidBadgeIdsMsg}, nil
+			case badgeCustomMsg.SetValidTokenIdsMsg != nil:
+				badgeCustomMsg.SetValidTokenIdsMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetValidTokenIdsMsg}, nil
 			case badgeCustomMsg.SetManagerMsg != nil:
 				badgeCustomMsg.SetManagerMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetManagerMsg}, nil
 			case badgeCustomMsg.SetCollectionMetadataMsg != nil:
 				badgeCustomMsg.SetCollectionMetadataMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetCollectionMetadataMsg}, nil
-			case badgeCustomMsg.SetBadgeMetadataMsg != nil:
-				badgeCustomMsg.SetBadgeMetadataMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.SetBadgeMetadataMsg}, nil
+			case badgeCustomMsg.SetTokenMetadataMsg != nil:
+				badgeCustomMsg.SetTokenMetadataMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.SetTokenMetadataMsg}, nil
 			case badgeCustomMsg.SetCustomDataMsg != nil:
 				badgeCustomMsg.SetCustomDataMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetCustomDataMsg}, nil

@@ -6,7 +6,7 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 )
 
-// x/badges module sentinel errors
+// module sentinel errors
 var (
 	ErrInvalidSigner                               = sdkerrors.Register(ModuleName, 1100, "expected gov account as only signer for proposal message")
 	ErrSample                                      = sdkerrors.Register(ModuleName, 1101, "sample error")
@@ -27,7 +27,7 @@ var (
 	ErrUintUnititialized                           = sdkerrors.Register(ModuleName, 1514, "uint is uninitialized (nil)")
 	ErrPrimaryChallengeMustBeOneUsePerLeaf         = sdkerrors.Register(ModuleName, 1515, "if you are using leaf index for predetermined balances, it must be max one use per leaf")
 	ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree = sdkerrors.Register(ModuleName, 1516, "must use max one use per leaf with non-whitelist tree")
-	ErrCanOnlyUseLeafIndexForBadgeIdsOnce          = sdkerrors.Register(ModuleName, 1517, "can only use leaf index for token ids once")
+	ErrCanOnlyUseLeafIndexForTokenIdsOnce          = sdkerrors.Register(ModuleName, 1517, "can only use leaf index for token ids once")
 	ErrRangeDoesNotOverlap                         = sdkerrors.Register(ModuleName, 1518, "range does not overlap with existing ranges")
 	ErrAmountRestrictionsIsNil                     = sdkerrors.Register(ModuleName, 1519, "amount restrictions is nil")
 	ErrPermissionsValueIsNil                       = sdkerrors.Register(ModuleName, 1520, "permissions is defined but default values is nil")
@@ -60,10 +60,10 @@ var (
 	ErrAmountTrackerIdIsNil                        = sdkerrors.Register(ModuleName, 1547, "approval id is nil")
 	ErrChallengeTrackerIdIsNil                     = sdkerrors.Register(ModuleName, 1548, "challenge tracker id is nil")
 	ErrIdsContainsInvalidChars                     = sdkerrors.Register(ModuleName, 1549, "ids contains invalid chars")
-	ErrInvalidBadgeId                              = sdkerrors.Register(ModuleName, 1550, "invalid token id")
+	ErrInvalidTokenId                              = sdkerrors.Register(ModuleName, 1550, "invalid token id")
 	ErrMismatchedVersions                          = sdkerrors.Register(ModuleName, 1551, "versions are mismatched")
 	ErrOutsideChargePeriod                         = sdkerrors.Register(ModuleName, 1552, "outside charge period")
 	ErrOverrideTimestampNotAllowed                 = sdkerrors.Register(ModuleName, 1553, "override timestamp not allowed")
-	ErrInvalidBadgeIds                             = sdkerrors.Register(ModuleName, 1554, "invalid token ids")
+	ErrInvalidTokenIds                             = sdkerrors.Register(ModuleName, 1554, "invalid token ids")
 	ErrInvalidDynamicStoreID                       = sdkerrors.Register(ModuleName, 1600, "invalid dynamic store ID")
 )
