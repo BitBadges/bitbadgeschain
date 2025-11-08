@@ -132,7 +132,7 @@ message UserOutgoingApproval {
   repeated UintRange transferTimes = 3;
 
   // The allowed range of token IDs for approval.
-  repeated UintRange tokenIds = 4;
+  repeated UintRange badgeIds = 4;
 
   // The allowed range of ownership times for approval.
   repeated UintRange ownershipTimes = 5;
@@ -165,7 +165,7 @@ message UserIncomingApproval {
   repeated UintRange transferTimes = 3;
 
   // The allowed range of token IDs for approval.
-  repeated UintRange tokenIds = 4;
+  repeated UintRange badgeIds = 4;
 
   // The allowed range of ownership times for approval.
   repeated UintRange ownershipTimes = 5;
@@ -190,7 +190,7 @@ message UserIncomingApproval {
 
 
 // CollectionApproval defines the rules for the approval of a transfer.
-// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, tokenId) tuple.
+// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, badgeId) tuple.
 // We check the approvals for first match of this tuple, using the approvals. Subsequent matches are ignored.
 //
 // If the first match is disallowed, the transfer is disallowed.
@@ -206,7 +206,7 @@ message UserIncomingApproval {
 
 
 // CollectionApproval defines the rules for the approval of a transfer.
-// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, tokenId) tuple.
+// Each transfer can be broken down into a (from, to, initiatedBy, transferTime, badgeId) tuple.
 // We check the approvals for first match of this tuple, using the approvals. Subsequent matches are ignored.
 //
 // If the first match is disallowed, the transfer is disallowed.
@@ -262,7 +262,7 @@ message RecurringOwnershipTimes {
 message IncrementedBalances {
   repeated Balance startBalances = 1;
   // The amount by which to increment token IDs.
-  string incrementTokenIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string incrementBadgeIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
   string incrementOwnershipTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The amount of unix milliseconds to approve starting from now. Incompatible with incrementOwnershipTimesBy.
@@ -272,7 +272,7 @@ message IncrementedBalances {
   // Recurring ownership times.
   RecurringOwnershipTimes recurringOwnershipTimes = 6;
   // Allow override of any valid ID
-  bool allowOverrideWithAnyValidToken = 7;
+  bool allowOverrideWithAnyValidBadge = 7;
 }
 
 // PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
@@ -386,17 +386,17 @@ message CoinTransfer {
 }
 
 /* 
-  MustOwnTokens represents a condition where a user must own specific tokens
+  MustOwnBadges represents a condition where a user must own specific tokens
   to be approved to transfer.
 
   - collectionId: The ID of the collection for the tokens that must be owned
   - amountRange: The range of amounts the user must own (min to max)
   - ownershipTimes: The time ranges during which the user must own the tokens.
-  - tokenIds: The token IDs the user must own.
+  - badgeIds: The token IDs the user must own.
   - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
   - mustSatisfyForAllAssets: If true, the user must own all specified tokens; otherwise, owning any one for >= 1 millisecond is sufficient.
 */
-message MustOwnTokens {
+message MustOwnBadges {
   // The ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
@@ -407,7 +407,7 @@ message MustOwnTokens {
   repeated UintRange ownershipTimes = 3;
 
   // The token IDs the user must own.
-  repeated UintRange tokenIds = 4;
+  repeated UintRange badgeIds = 4;
 
   // If true, override ownershipTimes with the current time.
   bool overrideWithCurrentTime = 5;
@@ -459,7 +459,7 @@ message ApprovalCriteria {
   UserRoyalties userRoyalties = 13;
 
   // Must own tokens for approval.
-  repeated MustOwnTokens mustOwnTokens = 14;
+  repeated MustOwnBadges mustOwnBadges = 14;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
   // ETH signature challenges that the initiator must pass for approval.
@@ -496,7 +496,7 @@ message OutgoingApprovalCriteria {
   AutoDeletionOptions autoDeletionOptions = 8;
 
   // Must own tokens for approval.
-  repeated MustOwnTokens mustOwnTokens = 9;
+  repeated MustOwnBadges mustOwnBadges = 9;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
   // ETH signature challenges that the initiator must pass for approval.
@@ -525,7 +525,7 @@ message IncomingApprovalCriteria {
   AutoDeletionOptions autoDeletionOptions = 8;
 
   // Must own tokens for approval.
-  repeated MustOwnTokens mustOwnTokens = 9;
+  repeated MustOwnBadges mustOwnBadges = 9;
   // Dynamic store challenges that the initiator must pass for approval.
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
   // ETH signature challenges that the initiator must pass for approval.
@@ -544,7 +544,7 @@ message CollectionApproval {
   // The allowed range of transfer times for approval.
   repeated UintRange transferTimes = 4;
   // The allowed range of token IDs for approval.
-  repeated UintRange tokenIds = 5;
+  repeated UintRange badgeIds = 5;
   // The allowed range of ownership times for approval.
   repeated UintRange ownershipTimes = 6;
   
@@ -622,7 +622,7 @@ message PrecalculationOptions {
   // The timestamp to override with when calculating the balances.
   string overrideTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The IDs to override for the transfer. Only applicable if using this option in precalculation.
-  repeated UintRange tokenIdsOverride = 2;
+  repeated UintRange badgeIdsOverride = 2;
 }
 
 // MerklePathItem represents an item in a Merkle path.

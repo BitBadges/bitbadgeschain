@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"cosmossdk.io/store/prefix"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	storetypes "cosmossdk.io/store/types"
@@ -17,28 +15,29 @@ import (
 func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 
 	// Get all collections
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
 
-	if err := MigrateCollections(ctx, store, k); err != nil {
-		return err
-	}
+	// storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	// store := prefix.NewStore(storeAdapter, []byte{})
 
-	if err := MigrateBalances(ctx, store, k); err != nil {
-		return err
-	}
+	// if err := MigrateCollections(ctx, store, k); err != nil {
+	// 	return err
+	// }
 
-	if err := MigrateAddressLists(ctx, store, k); err != nil {
-		return err
-	}
+	// if err := MigrateBalances(ctx, store, k); err != nil {
+	// 	return err
+	// }
 
-	if err := MigrateApprovalTrackers(ctx, store, k); err != nil {
-		return err
-	}
+	// if err := MigrateAddressLists(ctx, store, k); err != nil {
+	// 	return err
+	// }
 
-	if err := MigrateDynamicStores(ctx, store, k); err != nil {
-		return err
-	}
+	// if err := MigrateApprovalTrackers(ctx, store, k); err != nil {
+	// 	return err
+	// }
+
+	// if err := MigrateDynamicStores(ctx, store, k); err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -112,7 +111,7 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var oldCollection oldtypes.TokenCollection
+		var oldCollection oldtypes.BadgeCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &oldCollection)
 
 		// Convert to JSON
