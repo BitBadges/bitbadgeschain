@@ -8,7 +8,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v16"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v17"
 )
 
 // MigrateBadgesKeeper migrates the tokens keeper to set all approval versions to 0
