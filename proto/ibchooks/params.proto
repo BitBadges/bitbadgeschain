@@ -1,0 +1,14 @@
+syntax = "proto3";
+package ibchooks;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/Params";
+  option (gogoproto.equal) = true;
+}
+

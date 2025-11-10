@@ -4,40 +4,40 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v17"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v18"
 )
 
 // MigrateBadgesKeeper migrates the tokens keeper to set all approval versions to 0
 func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 
-	// Get all collections
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
 
-	// storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	// store := prefix.NewStore(storeAdapter, []byte{})
+	if err := MigrateCollections(ctx, store, k); err != nil {
+		return err
+	}
 
-	// if err := MigrateCollections(ctx, store, k); err != nil {
-	// 	return err
-	// }
+	if err := MigrateBalances(ctx, store, k); err != nil {
+		return err
+	}
 
-	// if err := MigrateBalances(ctx, store, k); err != nil {
-	// 	return err
-	// }
+	if err := MigrateAddressLists(ctx, store, k); err != nil {
+		return err
+	}
 
-	// if err := MigrateAddressLists(ctx, store, k); err != nil {
-	// 	return err
-	// }
+	if err := MigrateApprovalTrackers(ctx, store, k); err != nil {
+		return err
+	}
 
-	// if err := MigrateApprovalTrackers(ctx, store, k); err != nil {
-	// 	return err
-	// }
-
-	// if err := MigrateDynamicStores(ctx, store, k); err != nil {
-	// 	return err
-	// }
+	if err := MigrateDynamicStores(ctx, store, k); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -111,7 +111,7 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var oldCollection oldtypes.BadgeCollection
+		var oldCollection oldtypes.TokenCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &oldCollection)
 
 		// Convert to JSON

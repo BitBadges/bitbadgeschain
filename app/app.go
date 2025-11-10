@@ -94,6 +94,8 @@ import (
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 
+	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/bitbadges/bitbadgeschain/docs"
@@ -151,6 +153,9 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 	PacketForwardKeeper *packetforwardkeeper.Keeper
+
+	// IBC Hooks
+	HooksICS4Wrapper ibchooks.ICS4Middleware
 
 	// Scoped IBC
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper

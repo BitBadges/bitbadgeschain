@@ -30,6 +30,8 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
@@ -56,6 +58,11 @@ import (
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 	ibccallbacks "github.com/cosmos/ibc-go/modules/apps/callbacks"
+
+	customhooks "github.com/bitbadges/bitbadgeschain/x/custom-hooks"
+	customhookskeeper "github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
+	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
+	ibchookstypes "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -69,6 +76,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		storetypes.NewKVStoreKey(icahosttypes.StoreKey),
 		storetypes.NewKVStoreKey(icacontrollertypes.StoreKey),
 		storetypes.NewKVStoreKey(packetforwardtypes.StoreKey),
+		storetypes.NewKVStoreKey(ibchookstypes.StoreKey),
 		storetypes.NewMemoryStoreKey(capabilitytypes.MemStoreKey),
 		storetypes.NewTransientStoreKey(paramstypes.TStoreKey),
 	); err != nil {
@@ -82,6 +90,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	app.ParamsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
 	app.ParamsKeeper.Subspace(icacontrollertypes.SubModuleName).WithKeyTable(icacontrollertypes.ParamKeyTable())
 	app.ParamsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
+	app.ParamsKeeper.Subspace(ibchookstypes.ModuleName).WithKeyTable(ibchookstypes.ParamKeyTable())
 
 	// add capability keeper and ScopeToModule for ibc module
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(
@@ -225,6 +234,31 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
 	transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
 	transferICS4Wrapper := transferStack.(porttypes.ICS4Wrapper)
+
+	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
+	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	customHooksKeeper := customhookskeeper.NewKeeper(
+		app.Logger(),
+		app.PoolManagerKeeper,
+		app.BankKeeper,
+		transferICS4Wrapper,
+		app.IBCKeeper.ChannelKeeper,
+		scopedIBCTransferKeeper,
+	)
+
+	// Setup Custom Hooks (standalone)
+	customHooks := customhooks.NewCustomHooks(customHooksKeeper, bech32Prefix)
+
+	// Setup ICS4 Wrapper for hooks (with custom hooks only)
+	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
+		app.IBCKeeper.ChannelKeeper,
+		customHooks,
+	)
+
+	// Add IBC Hooks middleware to transfer stack
+	hooksTransferModule := ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
+	transferStack = hooksTransferModule
+
 	transferStack = packetforward.NewIBCMiddleware(
 		transferStack,
 		app.PacketForwardKeeper,
