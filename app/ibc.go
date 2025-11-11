@@ -183,8 +183,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	)
 	app.GovKeeper.SetLegacyRouter(govRouter)
 
-	// Create IBC modules with ibcfee middleware
-	transferIBCModule := ibcfee.NewIBCMiddleware(ibctransfer.NewIBCModule(app.TransferKeeper), app.IBCFeeKeeper)
 	// integration point for custom authentication modules
 	var noAuthzModule porttypes.IBCModule
 	icaControllerIBCModule := ibcfee.NewIBCMiddleware(
@@ -194,9 +192,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	icaHostIBCModule := ibcfee.NewIBCMiddleware(icahost.NewIBCModule(app.ICAHostKeeper), app.IBCFeeKeeper)
 
-	// Create static IBC router, add transfer route, then set and seal it
+	// Create static IBC router (transfer route will be added after building full stack with hooks)
 	ibcRouter := porttypes.NewRouter().
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerIBCModule).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 
@@ -237,9 +234,10 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
 	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	// Pass pointer to GammKeeper to avoid copying the keeper (which contains storeKey)
 	customHooksKeeper := customhookskeeper.NewKeeper(
 		app.Logger(),
-		app.PoolManagerKeeper,
+		&app.GammKeeper,
 		app.BankKeeper,
 		transferICS4Wrapper,
 		app.IBCKeeper.ChannelKeeper,
@@ -250,22 +248,29 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	customHooks := customhooks.NewCustomHooks(customHooksKeeper, bech32Prefix)
 
 	// Setup ICS4 Wrapper for hooks (with custom hooks only)
+	// Use IBCFeeKeeper as the ICS4Wrapper since it implements the interface
+	// The channel field is only used for SendPacket operations, not OnRecvPacket hooks
 	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
-		app.IBCKeeper.ChannelKeeper,
+		app.IBCFeeKeeper,
 		customHooks,
 	)
 
-	// Add IBC Hooks middleware to transfer stack
-	hooksTransferModule := ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
-	transferStack = hooksTransferModule
-
+	// Add packetforward middleware first (before hooks)
 	transferStack = packetforward.NewIBCMiddleware(
 		transferStack,
 		app.PacketForwardKeeper,
 		0, // retries on timeout
 		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
 	)
+
+	// Add IBC Hooks middleware last (outermost) to have full control over acknowledgements
+	// This ensures error acknowledgements from hooks are properly returned
+	hooksTransferModule := ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
+	transferStack = hooksTransferModule
 	app.TransferKeeper.WithICS4Wrapper(transferICS4Wrapper)
+
+	// Add the transfer stack (with hooks) to the router
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)
 
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
 	// channel.RecvPacket -> fee.OnRecvPacket -> icaHost.OnRecvPacket

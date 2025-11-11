@@ -49,6 +49,12 @@ type NativeAsset struct {
 // PostSwapAction contains actions to execute after swap
 type PostSwapAction struct {
 	IBCTransfer *IBCTransferInfo `json:"ibc_transfer,omitempty"`
+	Transfer    *TransferInfo    `json:"transfer,omitempty"`
+}
+
+// TransferInfo contains local transfer information
+type TransferInfo struct {
+	ToAddress string `json:"to_address"`
 }
 
 // IBCTransferInfo contains IBC transfer information

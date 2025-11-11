@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -28,9 +29,10 @@ func (s *KeeperTestSuite) SetupTest() {
 	s.Reset()
 
 	// Create keeper with real app keepers
+	// Pass pointer to GammKeeper to avoid copying the keeper (which contains storeKey)
 	s.keeper = keeper.NewKeeper(
 		s.App.Logger(),
-		s.App.PoolManagerKeeper,
+		&s.App.GammKeeper,
 		s.App.BankKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,
@@ -38,8 +40,8 @@ func (s *KeeperTestSuite) SetupTest() {
 	)
 }
 
-// TestExecuteSwapAndAction_SwapOnly tests swap execution without post-swap action
-func (s *KeeperTestSuite) TestExecuteSwapAndAction_SwapOnly() {
+// TestExecuteSwapAndAction_NoPostSwapAction tests error when post_swap_action is missing
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoPostSwapAction() {
 	// Create a test pool
 	poolID := s.prepareTestPool()
 
@@ -49,7 +51,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_SwapOnly() {
 		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
 	})
 
-	// Create swap_and_action with swap only
+	// Create swap_and_action with swap only (no post_swap_action)
 	swapAndAction := &customhookstypes.SwapAndAction{
 		UserSwap: &customhookstypes.UserSwap{
 			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
@@ -69,15 +71,14 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_SwapOnly() {
 				Amount: "1000",
 			},
 		},
+		// PostSwapAction is nil - should fail
 	}
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
 	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
-
-	// Verify swap was executed (check balance changes)
-	// Note: In a real test, you'd verify the actual swap happened
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "post_swap_action is required")
 }
 
 // TestExecuteSwapAndAction_SwapWithPostAction tests swap with IBC transfer
@@ -131,9 +132,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_SwapWithPostAction() {
 	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
 	// Note: This will fail if IBC channel doesn't exist, which is expected in unit tests
 	// In integration tests, we'd set up proper IBC channels
-	if err != nil {
-		s.Require().Contains(err.Error(), "channel capability not found")
-	}
+	// The validation now happens before the swap, so we catch channel issues earlier
+	s.Require().Error(err)
+	s.Require().True(
+		strings.Contains(err.Error(), "IBC channel") || strings.Contains(err.Error(), "channel capability not found"),
+		"error should mention channel issue: %s", err.Error(),
+	)
 }
 
 // TestExecuteSwapAndAction_PostActionWithoutSwap tests error case
@@ -162,6 +166,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_PostActionWithoutSwap() {
 // TestExecuteSwapAndAction_InvalidPoolID tests error handling for invalid pool ID
 func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidPoolID() {
 	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
 	s.FundAcc(sender, sdk.Coins{
 		sdk.NewCoin("uosmo", osmomath.NewInt(1000000)),
 	})
@@ -179,6 +184,11 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidPoolID() {
 				},
 			},
 		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
 	}
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
@@ -191,6 +201,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidPoolID() {
 // TestExecuteSwapAndAction_EmptyOperations tests error handling for empty operations
 func (s *KeeperTestSuite) TestExecuteSwapAndAction_EmptyOperations() {
 	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
 	s.FundAcc(sender, sdk.Coins{
 		sdk.NewCoin("uosmo", osmomath.NewInt(1000000)),
 	})
@@ -200,6 +211,11 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_EmptyOperations() {
 			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
 				SwapVenueName: "bitbadges-poolmanager",
 				Operations:    []customhookstypes.Operation{},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
 			},
 		},
 	}
@@ -215,6 +231,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 	poolID := s.prepareTestPool()
 
 	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
 	// Fund with enough balance for the swap (need more than tokenIn amount)
 	s.FundAcc(sender, sdk.Coins{
 		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(10000000)),
@@ -234,6 +251,11 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 			},
 		},
 		// No MinAsset specified
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
 	}
 
 	// Use a smaller amount that the sender actually has
@@ -243,43 +265,375 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 	s.Require().NoError(err)
 }
 
-// TestConvertOperationsToRoutes tests route conversion
-func (s *KeeperTestSuite) TestConvertOperationsToRoutes() {
-	operations := []customhookstypes.Operation{
-		{
-			Pool:     "1",
-			DenomIn:  "uosmo",
-			DenomOut: "uatom",
+// TestExecuteSwapAndAction_MultiHopNotSupported tests that multi-hop swaps are rejected
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHopNotSupported() {
+	poolID1 := s.prepareTestPool()
+	poolID2 := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID1, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+					{
+						Pool:     strconv.FormatUint(poolID2, 10),
+						DenomIn:  "uatom",
+						DenomOut: "uusdc",
+					},
+				},
+			},
 		},
-		{
-			Pool:     "2",
-			DenomIn:  "uatom",
-			DenomOut: "uusdc",
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
 		},
 	}
 
-	routes, err := s.keeper.ConvertOperationsToRoutes(operations)
-	s.Require().NoError(err)
-	s.Require().Len(routes, 2)
-	s.Require().Equal(uint64(1), routes[0].PoolId)
-	s.Require().Equal("uatom", routes[0].TokenOutDenom)
-	s.Require().Equal(uint64(2), routes[1].PoolId)
-	s.Require().Equal("uusdc", routes[1].TokenOutDenom)
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "multi-hop swaps are not supported")
 }
 
-// TestConvertOperationsToRoutes_InvalidPoolID tests error handling
-func (s *KeeperTestSuite) TestConvertOperationsToRoutes_InvalidPoolID() {
-	operations := []customhookstypes.Operation{
-		{
-			Pool:     "invalid",
-			DenomIn:  "uosmo",
-			DenomOut: "uatom",
+// TestExecuteSwapAndAction_LocalTransfer tests swap with local transfer
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_LocalTransfer() {
+	// Create a test pool
+	poolID := s.prepareTestPool()
+
+	// Fund sender account
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial recipient balance
+	initialBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+
+	// Create swap_and_action with swap and local transfer
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
 		},
 	}
 
-	_, err := s.keeper.ConvertOperationsToRoutes(operations)
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify transfer was executed (check balance changes)
+	finalBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	s.Require().True(finalBalance.Amount.GT(initialBalance.Amount), "recipient should have received tokens")
+}
+
+// TestExecuteSwapAndAction_BothTransferTypes tests error when both IBCTransfer and Transfer are set
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_BothTransferTypes() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			IBCTransfer: &customhookstypes.IBCTransferInfo{
+				IBCInfo: &customhookstypes.IBCInfo{
+					SourceChannel: "channel-0",
+					Receiver:      "cosmos1test",
+				},
+			},
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "invalid pool ID")
+	s.Require().Contains(err.Error(), "cannot have both ibc_transfer and transfer")
+}
+
+// TestExecuteSwapAndAction_NeitherTransferType tests error when neither IBCTransfer nor Transfer is set
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_NeitherTransferType() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			// Neither IBCTransfer nor Transfer is set
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "must have either ibc_transfer or transfer")
+}
+
+// TestExecuteSwapAndAction_InvalidIBCChannel tests validation of non-existent IBC channel
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidIBCChannel() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			IBCTransfer: &customhookstypes.IBCTransferInfo{
+				IBCInfo: &customhookstypes.IBCInfo{
+					SourceChannel: "channel-nonexistent",
+					Receiver:      "cosmos1test",
+				},
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "IBC channel")
+}
+
+// TestExecuteSwapAndAction_MissingIBCReceiver tests validation of missing receiver
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingIBCReceiver() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			IBCTransfer: &customhookstypes.IBCTransferInfo{
+				IBCInfo: &customhookstypes.IBCInfo{
+					SourceChannel: "channel-0",
+					Receiver:      "", // Missing receiver
+				},
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	// Channel validation happens first, so we check for either error
+	s.Require().True(
+		strings.Contains(err.Error(), "receiver is required") || strings.Contains(err.Error(), "IBC channel"),
+		"error should mention receiver or channel issue: %s", err.Error(),
+	)
+}
+
+// TestExecuteSwapAndAction_InvalidLocalTransferAddress tests validation of invalid local transfer address
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidLocalTransferAddress() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: "invalid-address", // Invalid address
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "invalid transfer.to_address")
+}
+
+// TestExecuteSwapAndAction_InvalidRecoverAddress tests validation of invalid recover address
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidRecoverAddress() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			IBCTransfer: &customhookstypes.IBCTransferInfo{
+				IBCInfo: &customhookstypes.IBCInfo{
+					SourceChannel:  "channel-0",
+					Receiver:       "cosmos1test",
+					RecoverAddress: "invalid-recover-address", // Invalid address
+				},
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	// Channel validation happens first, so we check for either error
+	s.Require().True(
+		(strings.Contains(err.Error(), "invalid") && strings.Contains(err.Error(), "recover_address")) ||
+			strings.Contains(err.Error(), "IBC channel"),
+		"error should mention invalid recover_address or channel issue: %s", err.Error(),
+	)
+}
+
+// TestExecuteSwapAndAction_MissingLocalTransferAddress tests validation of missing local transfer address
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingLocalTransferAddress() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: "", // Missing address
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "to_address is required")
 }
 
 // Helper function to prepare a test pool

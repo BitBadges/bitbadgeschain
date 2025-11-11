@@ -174,7 +174,16 @@ func (im IBCMiddleware) OnRecvPacket(
 	relayer sdk.AccAddress,
 ) ibcexported.Acknowledgement {
 	if hook, ok := im.ICS4Middleware.Hooks.(OnRecvPacketOverrideHooks); ok {
-		return hook.OnRecvPacketOverride(im, ctx, packet, relayer)
+		ack := hook.OnRecvPacketOverride(im, ctx, packet, relayer)
+		// Log acknowledgement type for debugging - this helps identify if error acks are being returned
+		if !ack.Success() {
+			ctx.Logger().Error("ibc-hooks: override hook returned error acknowledgement",
+				"packet_sequence", packet.GetSequence(),
+				"packet_source_port", packet.GetSourcePort(),
+				"packet_source_channel", packet.GetSourceChannel(),
+				"ack_success", ack.Success())
+		}
+		return ack
 	}
 
 	if hook, ok := im.ICS4Middleware.Hooks.(OnRecvPacketBeforeHooks); ok {
