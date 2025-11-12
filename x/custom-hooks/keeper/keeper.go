@@ -112,9 +112,6 @@ func (k Keeper) ExecuteHook(ctx sdk.Context, sender sdk.AccAddress, hookData *ty
 
 // ExecuteSwapAndAction executes a SwapAndAction hook
 func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swapAndAction *types.SwapAndAction, tokenIn sdk.Coin) error {
-	k.Logger(ctx).Info("custom-hooks: ExecuteSwapAndAction called",
-		"sender", sender.String(),
-		"token_in", tokenIn.String())
 
 	if swapAndAction == nil {
 		return nil
@@ -170,11 +167,6 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			return fmt.Errorf("denom_in does not match token_in: %s != %s", operation.DenomIn, tokenIn.Denom)
 		}
 
-		k.Logger(ctx).Info("custom-hooks: executing swap",
-			"pool_id", poolId,
-			"denom_in", operation.DenomIn,
-			"denom_out", operation.DenomOut)
-
 		// Get the pool
 		pool, err := k.gammKeeper.GetCFMMPool(ctx, poolId)
 		if err != nil {
@@ -195,14 +187,6 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 
 		// Get spread factor from pool
 		spreadFactor := pool.GetSpreadFactor(ctx)
-
-		k.Logger(ctx).Info("custom-hooks: executing swap",
-			"pool_id", poolId,
-			"denom_in", operation.DenomIn,
-			"denom_out", operation.DenomOut,
-			"token_in", tokenIn.String(),
-			"token_out_min_amount", tokenOutMinAmount.String(),
-			"spread_factor", spreadFactor.String())
 
 		// Execute swap using Gamm keeper directly
 		tokenOut, err = k.gammKeeper.SwapExactAmountIn(
@@ -389,11 +373,6 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 	if err := k.SendCoinsFromIntermediateAddress(ctx, sender, toAddr, sdk.Coins{token}); err != nil {
 		return fmt.Errorf("failed to send coins: %w", err)
 	}
-
-	k.Logger(ctx).Info("custom-hooks: local transfer executed",
-		"from", sender.String(),
-		"to", transfer.ToAddress,
-		"amount", token.String())
 
 	return nil
 }
