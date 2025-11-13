@@ -79,6 +79,7 @@ import (
 	_ "github.com/cosmos/ibc-go/v8/modules/apps/29-fee" // import for side-effects
 	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
+	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
 	"github.com/bitbadges/bitbadgeschain/app/ante"
@@ -155,7 +156,8 @@ type App struct {
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 
 	// IBC Hooks
-	HooksICS4Wrapper ibchooks.ICS4Middleware
+	HooksICS4Wrapper    ibchooks.ICS4Middleware
+	TransferICS4Wrapper porttypes.ICS4Wrapper
 
 	// Scoped IBC
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -308,6 +310,17 @@ func New(
 
 	if err := app.registerGammModules(appOpts); err != nil {
 		return nil, err
+	}
+
+	// Set IBC keepers on GammKeeper for IBC transfer functionality
+	// This must be done after both registerIBCModules and registerGammModules
+	// because we need the IBC keepers from registerIBCModules and GammKeeper from registerGammModules
+	if app.TransferICS4Wrapper != nil {
+		app.GammKeeper.SetIBCKeepers(
+			app.TransferICS4Wrapper,
+			app.IBCKeeper.ChannelKeeper,
+			app.ScopedIBCTransferKeeper,
+		)
 	}
 
 	storeService, err := app.registerWasmModules(appOpts)

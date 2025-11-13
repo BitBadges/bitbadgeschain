@@ -230,7 +230,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
 	transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
-	transferICS4Wrapper := transferStack.(porttypes.ICS4Wrapper)
+	app.TransferICS4Wrapper = transferStack.(porttypes.ICS4Wrapper)
+	transferICS4Wrapper := app.TransferICS4Wrapper
 
 	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
 	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()

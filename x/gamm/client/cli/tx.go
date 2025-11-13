@@ -29,6 +29,7 @@ func NewTxCmd() *cobra.Command {
 	osmocli.AddTxCmd(txCmd, NewJoinSwapShareAmountOut)
 	osmocli.AddTxCmd(txCmd, NewExitSwapExternAmountOut)
 	osmocli.AddTxCmd(txCmd, NewExitSwapShareAmountIn)
+	osmocli.AddTxCmd(txCmd, NewSwapExactAmountInWithIBCTransferCmd)
 	txCmd.AddCommand(
 		NewCreatePoolCmd().BuildCommandCustomFn(),
 	)
@@ -156,6 +157,17 @@ func NewExitSwapShareAmountIn() (*osmocli.TxCliDesc, *types.MsgExitSwapShareAmou
 		CustomFlagOverrides: poolIdFlagOverride,
 		Flags:               osmocli.FlagDesc{RequiredFlags: []*flag.FlagSet{FlagSetJustPoolId()}},
 	}, &types.MsgExitSwapShareAmountIn{}
+}
+
+func NewSwapExactAmountInWithIBCTransferCmd() (*osmocli.TxCliDesc, *types.MsgSwapExactAmountInWithIBCTransfer) {
+	return &osmocli.TxCliDesc{
+		Use:   "swap-exact-amount-in-with-ibc-transfer",
+		Short: "swap exact amount in and initiate IBC transfer",
+		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
+			"Routes": osmocli.FlagOnlyParser(swapAmountInRoutes),
+		},
+		Flags: osmocli.FlagDesc{RequiredFlags: []*flag.FlagSet{FlagSetMultihopSwapRoutes()}},
+	}, &types.MsgSwapExactAmountInWithIBCTransfer{}
 }
 
 func BuildCreatePoolCmd(clientCtx client.Context, args []string, fs *flag.FlagSet) (sdk.Msg, error) {

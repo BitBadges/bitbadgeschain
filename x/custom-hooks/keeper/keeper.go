@@ -208,6 +208,11 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 
 	// Execute post-swap action (IBC transfer or local transfer)
 	if swapAndAction.PostSwapAction.IBCTransfer != nil {
+		// Check if attempting to IBC transfer a wrapped denomination
+		if k.gammKeeper.CheckIsWrappedDenom(ctx, tokenIn.Denom) {
+			return fmt.Errorf("cannot IBC transfer BitBadges denominations: %s", tokenIn.Denom)
+		}
+
 		// Use timeout_timestamp if provided, otherwise use default
 		var timeoutTimestamp uint64
 		if swapAndAction.TimeoutTimestamp != nil {

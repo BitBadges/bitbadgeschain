@@ -28,8 +28,8 @@ accounts:
     - name: charlie
       coins:
           - 1ubadge
-    - name: sol
-      address: bb18el5ug46umcws58m445ql5scgg2n3tzagfecvl
+    - name: keplr
+      address: bb1w63npeee74ewuudzf8cgvy6at4jn4mjr0a9r5p
       coins:
           - 99999999999999996ubadge
           - 1000000000000000ustake

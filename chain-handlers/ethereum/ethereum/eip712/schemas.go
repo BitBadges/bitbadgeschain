@@ -1213,6 +1213,30 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
+		"type": "gamm/SwapExactAmountInWithIBCTransfer",
+		"value": {
+			"sender": "",
+			"routes": [
+				{
+					"poolId": "0",
+					"tokenOutDenom": ""
+				}
+			],
+			"tokenIn": {
+				"amount": "",
+				"denom": ""
+			},
+			"tokenOutMinAmount": "",
+			"ibcTransferInfo": {
+				"sourceChannel": "",
+				"receiver": "",
+				"memo": "",
+				"timeoutTimestamp": "0"
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
 		"type": "gamm/SwapExactAmountOut",
 		"value": {
 			"sender": "",

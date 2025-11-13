@@ -26,6 +26,8 @@ service Msg {
       returns (MsgExitSwapExternAmountOutResponse);
   rpc ExitSwapShareAmountIn(MsgExitSwapShareAmountIn)
       returns (MsgExitSwapShareAmountInResponse);
+  rpc SwapExactAmountInWithIBCTransfer(MsgSwapExactAmountInWithIBCTransfer)
+      returns (MsgSwapExactAmountInWithIBCTransferResponse);
 }
 
 // ===================== MsgJoinPool
@@ -109,6 +111,47 @@ message MsgSwapExactAmountIn {
 }
 
 message MsgSwapExactAmountInResponse {
+  string token_out_amount = 1 [
+
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ===================== IBC Transfer Info
+message IBCTransferInfo {
+  string source_channel = 1 [ (gogoproto.moretags) = "yaml:\"source_channel\"" ];
+  string receiver = 2 [ (gogoproto.moretags) = "yaml:\"receiver\"" ];
+  string memo = 3 [ (gogoproto.moretags) = "yaml:\"memo\"" ];
+  uint64 timeout_timestamp = 4 [ (gogoproto.moretags) = "yaml:\"timeout_timestamp\"" ];
+}
+
+// ===================== MsgSwapExactAmountInWithIBCTransfer
+message MsgSwapExactAmountInWithIBCTransfer {
+  option (amino.name) = "gamm/swap-exact-amount-in-with-ibc-transfer";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  repeated poolmanager.v1beta1.SwapAmountInRoute routes = 2
+      [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin token_in = 3 [
+    (gogoproto.moretags) = "yaml:\"token_in\"",
+    (gogoproto.nullable) = false
+  ];
+  string token_out_min_amount = 4 [
+
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_min_amount\"",
+    (gogoproto.nullable) = false
+  ];
+  IBCTransferInfo ibc_transfer_info = 5 [
+    (gogoproto.moretags) = "yaml:\"ibc_transfer_info\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgSwapExactAmountInWithIBCTransferResponse {
   string token_out_amount = 1 [
 
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
@@ -280,4 +323,5 @@ message GammCustomMsgType {
   MsgJoinSwapShareAmountOut joinSwapShareAmountOutMsg = 6;
   MsgExitSwapShareAmountIn exitSwapShareAmountInMsg = 7;
   MsgExitSwapExternAmountOut exitSwapExternAmountOutMsg = 8;
+  MsgSwapExactAmountInWithIBCTransfer swapExactAmountInWithIBCTransferMsg = 9;
 }

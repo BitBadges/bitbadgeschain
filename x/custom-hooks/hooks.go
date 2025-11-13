@@ -78,6 +78,10 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	sender := data.GetSender()
 	channel := packet.GetDestChannel()
 
+	//log sender and channel
+	h.keeper.Logger(ctx).Info("custom-hooks: sender", "sender", sender)
+	h.keeper.Logger(ctx).Info("custom-hooks: channel", "channel", channel)
+
 	// Derive intermediate sender address
 	senderBech32, err := ibchookstypes.DeriveIntermediateSender(channel, sender, h.bech32PrefixAccAddr)
 	if err != nil {

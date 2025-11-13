@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -116,6 +117,40 @@ func (server msgServer) SwapExactAmountIn(goCtx context.Context, msg *types.MsgS
 	// Swap event is handled elsewhere
 
 	return &types.MsgSwapExactAmountInResponse{TokenOutAmount: tokenOutAmount}, nil
+}
+
+func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, msg *types.MsgSwapExactAmountInWithIBCTransfer) (*types.MsgSwapExactAmountInWithIBCTransferResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	// Perform the swap first
+	tokenOutAmount, err := server.keeper.poolManager.RouteExactAmountIn(ctx, sender, msg.Routes, msg.TokenIn, msg.TokenOutMinAmount)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the token out denom from the last route
+	if len(msg.Routes) == 0 {
+		return nil, fmt.Errorf("routes cannot be empty")
+	}
+	lastRoute := msg.Routes[len(msg.Routes)-1]
+	tokenOutDenom := lastRoute.TokenOutDenom
+
+	// Create the token out coin
+	tokenOut := sdk.NewCoin(tokenOutDenom, tokenOutAmount)
+
+	// Execute IBC transfer using the custom hooks keeper pattern
+	// Since there's no intermediate sender, we use msg.Sender directly
+	if err := server.keeper.ExecuteIBCTransfer(ctx, sender, &msg.IbcTransferInfo, tokenOut); err != nil {
+		return nil, err
+	}
+
+
+	return &types.MsgSwapExactAmountInWithIBCTransferResponse{TokenOutAmount: tokenOutAmount}, nil
 }
 
 func (server msgServer) SwapExactAmountOut(goCtx context.Context, msg *types.MsgSwapExactAmountOut) (*types.MsgSwapExactAmountOutResponse, error) {

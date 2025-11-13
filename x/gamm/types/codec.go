@@ -20,6 +20,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgJoinSwapShareAmountOut{}, "gamm/join-swap-share-amount-out", nil)
 	cdc.RegisterConcrete(&MsgExitSwapExternAmountOut{}, "gamm/exit-swap-extern-amount-out", nil)
 	cdc.RegisterConcrete(&MsgExitSwapShareAmountIn{}, "gamm/exit-swap-share-amount-in", nil)
+	cdc.RegisterConcrete(&MsgSwapExactAmountInWithIBCTransfer{}, "gamm/swap-exact-amount-in-with-ibc-transfer", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -33,6 +34,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgJoinSwapShareAmountOut{},
 		&MsgExitSwapExternAmountOut{},
 		&MsgExitSwapShareAmountIn{},
+		&MsgSwapExactAmountInWithIBCTransfer{},
 	)
 
 	registry.RegisterImplementations(

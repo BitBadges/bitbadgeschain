@@ -220,6 +220,9 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case gammCustomMsg.ExitSwapExternAmountOutMsg != nil:
 				gammCustomMsg.ExitSwapExternAmountOutMsg.Sender = sender.String()
 				return []sdk.Msg{gammCustomMsg.ExitSwapExternAmountOutMsg}, nil
+			case gammCustomMsg.SwapExactAmountInWithIBCTransferMsg != nil:
+				gammCustomMsg.SwapExactAmountInWithIBCTransferMsg.Sender = sender.String()
+				return []sdk.Msg{gammCustomMsg.SwapExactAmountInWithIBCTransferMsg}, nil
 			}
 		} else if isBalancerModuleMsg {
 			reader = bytes.NewReader(jsonData)
