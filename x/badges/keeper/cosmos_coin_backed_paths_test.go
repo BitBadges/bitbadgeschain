@@ -731,11 +731,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 	// Verify bob has 5 tokens before backing
 	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting bob's balance before backing")
-	totalBobAmountBefore := sdkmath.NewUint(0)
-	for _, balance := range bobBalanceBefore.Balances {
-		totalBobAmountBefore = totalBobAmountBefore.Add(balance.Amount)
-	}
-	suite.Require().Equal(sdkmath.NewUint(5), totalBobAmountBefore, "Bob should have 5 tokens before backing")
+	fetchedBobBalancesBefore, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetFullUintRanges(), bobBalanceBefore.Balances)
+	suite.Require().Nil(err, "Error fetching bob balances for IDs before backing")
+	suite.Require().Equal(sdkmath.NewUint(5), fetchedBobBalancesBefore[0].Amount, "Bob should have 5 tokens before backing")
 
 	// Back 5 tokens (should require 1 IBC coin)
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -770,18 +768,14 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 	// Verify backed path address has the 5 tokens
 	backedPathBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), backedPath.Address)
 	suite.Require().Nil(err, "Error getting backed path balance")
-	totalBackedPathAmount := sdkmath.NewUint(0)
-	for _, balance := range backedPathBalance.Balances {
-		totalBackedPathAmount = totalBackedPathAmount.Add(balance.Amount)
-	}
-	suite.Require().Equal(sdkmath.NewUint(5), totalBackedPathAmount, "Backed path should have 5 tokens")
+	fetchedBackedPathBalances, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetFullUintRanges(), backedPathBalance.Balances)
+	suite.Require().Nil(err, "Error fetching backed path balances for IDs")
+	suite.Require().Equal(sdkmath.NewUint(5), fetchedBackedPathBalances[0].Amount, "Backed path should have 5 tokens")
 
 	// Verify bob has 0 tokens
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
 	suite.Require().Nil(err, "Error getting bob's balance")
-	totalBobAmount := sdkmath.NewUint(0)
-	for _, balance := range bobBalance.Balances {
-		totalBobAmount = totalBobAmount.Add(balance.Amount)
-	}
-	suite.Require().Equal(sdkmath.NewUint(0), totalBobAmount, "Bob should have 0 tokens after backing")
+	fetchedBobBalances, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetFullUintRanges(), bobBalance.Balances)
+	suite.Require().Nil(err, "Error fetching bob balances for IDs")
+	suite.Require().Equal(sdkmath.NewUint(0), fetchedBobBalances[0].Amount, "Bob should have 0 tokens after backing")
 }
