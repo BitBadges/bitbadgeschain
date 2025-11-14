@@ -68,6 +68,16 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_wrappable_balances/{denom}/{address}";
 	}
 
+  // Queries if an address is a reserved protocol address.
+  rpc IsAddressReservedProtocol(QueryIsAddressReservedProtocolRequest) returns (QueryIsAddressReservedProtocolResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/is_address_reserved_protocol/{address}";
+	}
+
+  // Queries all reserved protocol addresses.
+  rpc GetAllReservedProtocolAddresses(QueryGetAllReservedProtocolAddressesRequest) returns (QueryGetAllReservedProtocolAddressesResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_all_reserved_protocol_addresses";
+	}
+
   // this line is used by starport scaffolding # 2
 }
 
@@ -169,6 +179,20 @@ message QueryGetWrappableBalancesRequest {
 
 message QueryGetWrappableBalancesResponse {
   string maxWrappableAmount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message QueryIsAddressReservedProtocolRequest {
+  string address = 1;
+}
+
+message QueryIsAddressReservedProtocolResponse {
+  bool isReservedProtocol = 1;
+}
+
+message QueryGetAllReservedProtocolAddressesRequest {}
+
+message QueryGetAllReservedProtocolAddressesResponse {
+  repeated string addresses = 1;
 }
 
 // this line is used by starport scaffolding # 3

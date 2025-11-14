@@ -10,7 +10,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	types "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -305,18 +304,6 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress
 			if err != nil {
 				return err
 			}
-
-			//Mint corresponding coins for compatibillity
-			err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(coin))
-			if err != nil {
-				return err
-			}
-
-			// Send to the pool address
-			err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, to, sdk.NewCoins(coin))
-			if err != nil {
-				return err
-			}
 		} else {
 			// otherwise, send the coins normally
 			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
@@ -339,19 +326,7 @@ func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAdd
 				return err
 			}
 
-			// Send coins to module from pool
-			err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, from, types.ModuleName, sdk.NewCoins(coin))
-			if err != nil {
-				return err
-			}
-
-			//Burn corresponding coins from the pool for compatibillity
-			err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(coin))
-			if err != nil {
-				return err
-			}
 		} else {
-
 			// otherwise, send the coins normally
 			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {

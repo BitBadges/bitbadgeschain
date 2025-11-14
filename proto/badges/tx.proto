@@ -55,6 +55,7 @@ service Msg {
   rpc SetStandards(MsgSetStandards) returns (MsgSetStandardsResponse);
   rpc SetCollectionApprovals(MsgSetCollectionApprovals) returns (MsgSetCollectionApprovalsResponse);
   rpc SetIsArchived(MsgSetIsArchived) returns (MsgSetIsArchivedResponse);
+  rpc SetReservedProtocolAddress(MsgSetReservedProtocolAddress) returns (MsgSetReservedProtocolAddressResponse);
 }
 
 //Used for WASM bindings and JSON parsing
@@ -87,6 +88,7 @@ message BadgeCustomMsgType {
   MsgSetStandards setStandardsMsg = 24;
   MsgSetCollectionApprovals setCollectionApprovalsMsg = 25;
   MsgSetIsArchived setIsArchivedMsg = 26;
+  MsgSetReservedProtocolAddress setReservedProtocolAddressMsg = 27;
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -853,3 +855,21 @@ message MsgSetIsArchivedResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
+
+// MsgSetReservedProtocolAddress sets or unsets a reserved protocol address (governance-only).
+message MsgSetReservedProtocolAddress {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "badges/SetReservedProtocolAddress";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // Address to set or unset as reserved protocol address.
+  string address = 2;
+
+  // Whether the address should be a reserved protocol address (true) or not (false).
+  bool isReservedProtocol = 3;
+}
+
+// MsgSetReservedProtocolAddressResponse is the response to MsgSetReservedProtocolAddress.
+message MsgSetReservedProtocolAddressResponse {}

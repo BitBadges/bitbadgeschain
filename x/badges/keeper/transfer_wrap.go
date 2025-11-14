@@ -191,3 +191,13 @@ func (k Keeper) HandleSpecialAddressWrapping(
 
 	return nil
 }
+
+// IsSpecialAddress checks if an address is a cosmos coin wrapper path address
+func (k Keeper) IsSpecialAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
+	for _, path := range collection.CosmosCoinWrapperPaths {
+		if path.Address == address {
+			return true
+		}
+	}
+	return false
+}

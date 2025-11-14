@@ -801,3 +801,41 @@ func (k Keeper) IncrementETHSignatureTrackerInStore(ctx sdk.Context, key string)
 
 	return newNumUsed, nil
 }
+
+/****************************************RESERVED PROTOCOL ADDRESSES****************************************/
+
+// SetReservedProtocolAddressInStore sets a reserved protocol address in the store.
+func (k Keeper) SetReservedProtocolAddressInStore(ctx sdk.Context, address string, isReservedProtocol bool) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+
+	if isReservedProtocol {
+		store.Set(reservedProtocolAddressStoreKey(address), []byte{1})
+	} else {
+		store.Delete(reservedProtocolAddressStoreKey(address))
+	}
+	return nil
+}
+
+// IsAddressReservedProtocolInStore checks if an address is a reserved protocol address.
+func (k Keeper) IsAddressReservedProtocolInStore(ctx sdk.Context, address string) bool {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	value := store.Get(reservedProtocolAddressStoreKey(address))
+	return len(value) > 0 && value[0] == 1
+}
+
+// GetAllReservedProtocolAddressesFromStore gets all reserved protocol addresses from the store.
+func (k Keeper) GetAllReservedProtocolAddressesFromStore(ctx sdk.Context) []string {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, ReservedProtocolAddressKey)
+	defer iterator.Close()
+
+	var addresses []string
+	for ; iterator.Valid(); iterator.Next() {
+		address := string(iterator.Key()[len(ReservedProtocolAddressKey):])
+		addresses = append(addresses, address)
+	}
+	return addresses
+}

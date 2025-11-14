@@ -11,20 +11,21 @@ import (
 )
 
 var (
-	CollectionKey           = []byte{0x01}
-	UserBalanceKey          = []byte{0x02}
-	NextCollectionIdKey     = []byte{0x03}
-	UsedClaimChallengeKey   = []byte{0x04}
-	AddressListKey          = []byte{0x06}
-	ApprovalTrackerKey      = []byte{0x07}
-	AccountGenerationPrefix = []byte{0x08}
-	AddressGenerationPrefix = []byte{0x09}
-	NextAddressListIdKey    = []byte{0x0A}
-	ApprovalVersionKey      = []byte{0x0B}
-	DynamicStoreKey         = []byte{0x0D}
-	NextDynamicStoreIdKey   = []byte{0x0E}
-	DynamicStoreValueKey    = []byte{0x0F}
-	ETHSignatureTrackerKey  = []byte{0x10}
+	CollectionKey              = []byte{0x01}
+	UserBalanceKey             = []byte{0x02}
+	NextCollectionIdKey        = []byte{0x03}
+	UsedClaimChallengeKey      = []byte{0x04}
+	AddressListKey             = []byte{0x06}
+	ApprovalTrackerKey         = []byte{0x07}
+	AccountGenerationPrefix    = []byte{0x08}
+	AddressGenerationPrefix    = []byte{0x09}
+	NextAddressListIdKey       = []byte{0x0A}
+	ApprovalVersionKey         = []byte{0x0B}
+	DynamicStoreKey            = []byte{0x0D}
+	NextDynamicStoreIdKey      = []byte{0x0E}
+	DynamicStoreValueKey       = []byte{0x0F}
+	ETHSignatureTrackerKey     = []byte{0x10}
+	ReservedProtocolAddressKey = []byte{0x11}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 
@@ -226,5 +227,12 @@ func ethSignatureTrackerStoreKey(ethSignatureTrackerKey string) []byte {
 	key := make([]byte, len(ETHSignatureTrackerKey)+len(ethSignatureTrackerKey))
 	copy(key, ETHSignatureTrackerKey)
 	copy(key[len(ETHSignatureTrackerKey):], []byte(ethSignatureTrackerKey))
+	return key
+}
+
+func reservedProtocolAddressStoreKey(address string) []byte {
+	key := make([]byte, len(ReservedProtocolAddressKey)+len(address))
+	copy(key, ReservedProtocolAddressKey)
+	copy(key[len(ReservedProtocolAddressKey):], []byte(address))
 	return key
 }

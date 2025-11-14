@@ -49,10 +49,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -141,10 +138,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -239,10 +233,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -340,10 +331,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -455,10 +443,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -548,10 +533,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -624,10 +606,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -699,10 +678,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -778,10 +754,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -893,10 +866,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -986,10 +956,7 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1144,10 +1111,7 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1195,10 +1159,7 @@ func (suite *TestSuite) TestGammKeeperPoolWithWrapping() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1351,10 +1312,7 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1402,10 +1360,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1489,10 +1444,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1540,10 +1492,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1753,10 +1702,7 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -1892,10 +1838,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)

@@ -165,6 +165,19 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
+			// Check if from address is a reserved protocol address when overridesFromOutgoingApprovals is true
+			// Bypass this check if the address is actually initiating it
+			//
+			// This is an important check to prevent abuse of systems built on top of our standard
+			// Ex: For liquidity pools, we don't want to allow forceful revocations from manager or any addresses
+			//     because this would mess up the entire escrow system and could cause infinite liquidity glitches
+			if approvalCriteria.OverridesFromOutgoingApprovals && fromAddress != initiatedBy {
+				if k.IsAddressReservedProtocolInStore(ctx, fromAddress) {
+					addPotentialError(isPrioritizedApproval, fmt.Sprintf("forceful transfers that bypass user approvals from reserved protocol addresses are globally disallowed (please use an approval that checks user-level approvals): %s", fromAddress))
+					continue
+				}
+			}
+
 			/**** SECTION 1: NO STORAGE WRITES (just simulate everything and continue if it doesn't pass) ****/
 			// Dynamic store challenges check - simulate first
 			err = k.SimulateDynamicStoreChallenges(

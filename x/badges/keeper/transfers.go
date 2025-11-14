@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -234,6 +235,41 @@ func (k Keeper) HandleTransfer(
 	}
 
 	var err error
+
+	// Check if sending from a special address (cosmos coin wrapper path) and set up one-time approval
+	isSendingFromSpecialAddress := k.IsSpecialAddress(ctx, collection, from)
+	if isSendingFromSpecialAddress {
+		// Set up one-time outgoing approval for the special address to send tokens to the recipient
+		// Similar to gamm pools
+		currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, from)
+
+		// Add one-time outgoing approval
+		oneTimeApproval := &types.UserOutgoingApproval{
+			ToListId:          to,
+			InitiatedByListId: initiatedBy,
+			TransferTimes:     []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+			OwnershipTimes:    []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+			TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+			Version:           sdkmath.NewUint(0),
+			ApprovalId:        "one-time-outgoing",
+		}
+
+		// Set version for the approval
+		oneTimeApproval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", from, oneTimeApproval.ApprovalId)
+
+		// Add to outgoing approvals
+		currBalances.OutgoingApprovals = []*types.UserOutgoingApproval{oneTimeApproval}
+
+		// Save the balance
+		err = k.SetBalanceForAddress(ctx, collection, from, currBalances)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "failed to set one-time approval for special address")
+		}
+
+		// Update fromUserBalance to include the new approval
+		fromUserBalance = currBalances
+	}
+
 	transferMetadata := TransferMetadata{
 		From:            from,
 		To:              to,
@@ -309,6 +345,20 @@ func (k Keeper) HandleTransfer(
 	fromUserBalance, toUserBalance, err = k.HandleAutoDeletions(ctx, collection, fromUserBalance, toUserBalance, *eventTracking.ApprovalsUsed)
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+	}
+
+	// Clean up one-time approval if sending from special address
+	if isSendingFromSpecialAddress {
+		// Remove the one-time outgoing approval
+		// This is needed as opposed to auto-deletion because technically the approval might not
+		// be used if there is some forceful override (thus never deletes and we have a dangling approval)
+		fromUserBalance.OutgoingApprovals = []*types.UserOutgoingApproval{}
+
+		// Save the updated balance
+		err = k.SetBalanceForAddress(ctx, collection, from, fromUserBalance)
+		if err != nil {
+			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "failed to clean up one-time approval for special address")
+		}
 	}
 
 	return fromUserBalance, toUserBalance, nil

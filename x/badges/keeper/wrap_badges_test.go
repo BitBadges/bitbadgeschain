@@ -33,10 +33,7 @@ func (suite *TestSuite) TestWrapTokens() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")
@@ -153,10 +150,7 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")
@@ -258,10 +252,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			OverridesToIncomingApprovals:   true,
-			OverridesFromOutgoingApprovals: true,
-		},
+		ApprovalCriteria:  &types.ApprovalCriteria{},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")

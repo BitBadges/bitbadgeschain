@@ -34,6 +34,8 @@ func GetQueryCmd() *cobra.Command {
 	cmd.AddCommand(CmdGetDynamicStore())
 	cmd.AddCommand(CmdGetDynamicStoreValue())
 	cmd.AddCommand(CmdGetWrappableBalances())
+	cmd.AddCommand(CmdIsAddressReservedProtocol())
+	cmd.AddCommand(CmdGetAllReservedProtocolAddresses())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

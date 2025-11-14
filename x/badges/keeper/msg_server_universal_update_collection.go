@@ -233,6 +233,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
 				AllowCosmosWrapping:            path.AllowCosmosWrapping,
 			}
+
+			// Auto-set the cosmoscoinwrapper path address as a reserved protocol address
+			err = k.SetReservedProtocolAddressInStore(ctx, accountAddr.String(), true)
+			if err != nil {
+				return nil, fmt.Errorf("failed to set cosmoscoinwrapper path address as reserved protocol: %w", err)
+			}
 		}
 
 		collection.CosmosCoinWrapperPaths = append(collection.CosmosCoinWrapperPaths, pathsToAdd...)
@@ -296,6 +302,33 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
+	}
+
+	// Set auto-approve flags for cosmoscoinwrapper path addresses (must be after SetCollectionInStore)
+	// This needs to happen after the collection is stored because GetBalanceOrApplyDefault requires the collection to exist
+	for _, path := range collection.CosmosCoinWrapperPaths {
+		wrapperPathAddress := path.Address
+		currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, wrapperPathAddress)
+
+		alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
+		alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
+		alreadyAutoApprovedSelfInitiatedIncomingTransfers := currBalances.AutoApproveSelfInitiatedIncomingTransfers
+
+		autoApprovedAll := alreadyAutoApprovedAllIncomingTransfers && alreadyAutoApprovedSelfInitiatedOutgoingTransfers && alreadyAutoApprovedSelfInitiatedIncomingTransfers
+
+		if !autoApprovedAll {
+			// We override all approvals to be default allowed
+			// Incoming - All, no matter what
+			// Outgoing - Self-initiated
+			// Incoming - Self-initiated
+			currBalances.AutoApproveAllIncomingTransfers = true
+			currBalances.AutoApproveSelfInitiatedOutgoingTransfers = true
+			currBalances.AutoApproveSelfInitiatedIncomingTransfers = true
+			err = k.SetBalanceForAddress(ctx, collection, wrapperPathAddress, currBalances)
+			if err != nil {
+				return nil, fmt.Errorf("failed to set auto-approve flags for cosmoscoinwrapper path address: %w", err)
+			}
+		}
 	}
 
 	msgBytes, err := json.Marshal(msg)
