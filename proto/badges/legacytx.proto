@@ -58,6 +58,7 @@ message MsgNewCollection {
    //The default balances for the user
   repeated Balance defaultBalances = 15;
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 16;
+  repeated CosmosCoinBackedPathAddObject cosmosCoinBackedPathsToAdd = 17;
 }
 
 message MsgNewCollectionResponse {
