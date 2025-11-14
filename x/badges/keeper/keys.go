@@ -28,6 +28,7 @@ var (
 	ReservedProtocolAddressKey = []byte{0x11}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
+	BackedPathGenerationPrefix  = []byte{0x12}
 
 	Delimiter   = []byte{0xDD}
 	Placeholder = []byte{0xFF}

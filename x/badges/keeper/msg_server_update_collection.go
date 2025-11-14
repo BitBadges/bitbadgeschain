@@ -35,6 +35,7 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		IsArchivedTimeline:               msg.IsArchivedTimeline,
 		MintEscrowCoinsToTransfer:        msg.MintEscrowCoinsToTransfer,
 		CosmosCoinWrapperPathsToAdd:      msg.CosmosCoinWrapperPathsToAdd,
+		CosmosCoinBackedPathsToAdd:       msg.CosmosCoinBackedPathsToAdd,
 		Invariants:                       msg.Invariants,
 	}
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)

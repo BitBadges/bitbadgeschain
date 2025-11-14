@@ -75,6 +75,9 @@ message TokenCollection {
   // The IBC wrapper (sdk.coin) paths for the collection.
   repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 14;
 
+  // The IBC backed (sdk.coin) paths for the collection.
+  repeated CosmosCoinBackedPath cosmosCoinBackedPaths = 16;
+
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
   CollectionInvariants invariants = 15;
@@ -88,6 +91,12 @@ message CosmosCoinWrapperPath {
   repeated DenomUnit denomUnits = 5;
   bool allowOverrideWithAnyValidToken = 6;
   bool allowCosmosWrapping = 7;
+}
+
+message CosmosCoinBackedPath {
+  string address = 1;
+  string ibcDenom = 2;
+  repeated Balance balances = 3;
 }
 
 message DenomUnit {

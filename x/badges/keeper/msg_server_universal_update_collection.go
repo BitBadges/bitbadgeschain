@@ -23,6 +23,51 @@ const (
 	MaxUint64Value = math.MaxUint64
 )
 
+// generatePathAddress generates an address from a path string using the given prefix
+func generatePathAddress(pathString string, prefix []byte) (sdk.AccAddress, error) {
+	fullPathBytes := []byte(pathString)
+	ac, err := authtypes.NewModuleCredential(types.ModuleName, prefix, fullPathBytes)
+	if err != nil {
+		return nil, err
+	}
+	return sdk.AccAddress(ac.Address()), nil
+}
+
+// setReservedProtocolAddressForPath sets a path address as a reserved protocol address
+func (k msgServer) setReservedProtocolAddressForPath(ctx sdk.Context, address string, pathType string) error {
+	err := k.SetReservedProtocolAddressInStore(ctx, address, true)
+	if err != nil {
+		return fmt.Errorf("failed to set %s path address as reserved protocol: %w", pathType, err)
+	}
+	return nil
+}
+
+// setAutoApproveFlagsForPathAddress sets auto-approve flags for a path address
+func (k msgServer) setAutoApproveFlagsForPathAddress(ctx sdk.Context, collection *types.TokenCollection, pathAddress string, pathType string) error {
+	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, pathAddress)
+
+	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
+	alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
+	alreadyAutoApprovedSelfInitiatedIncomingTransfers := currBalances.AutoApproveSelfInitiatedIncomingTransfers
+
+	autoApprovedAll := alreadyAutoApprovedAllIncomingTransfers && alreadyAutoApprovedSelfInitiatedOutgoingTransfers && alreadyAutoApprovedSelfInitiatedIncomingTransfers
+
+	if !autoApprovedAll {
+		// We override all approvals to be default allowed
+		// Incoming - All, no matter what
+		// Outgoing - Self-initiated
+		// Incoming - Self-initiated
+		currBalances.AutoApproveAllIncomingTransfers = true
+		currBalances.AutoApproveSelfInitiatedOutgoingTransfers = true
+		currBalances.AutoApproveSelfInitiatedIncomingTransfers = true
+		err := k.SetBalanceForAddress(ctx, collection, pathAddress, currBalances)
+		if err != nil {
+			return fmt.Errorf("failed to set auto-approve flags for %s path address: %w", pathType, err)
+		}
+	}
+	return nil
+}
+
 // Legacy function that is all-inclusive (creates and updates)
 func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.MsgUniversalUpdateCollection) (*types.MsgUniversalUpdateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -209,19 +254,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
 		pathsToAdd := make([]*types.CosmosCoinWrapperPath, len(msg.CosmosCoinWrapperPathsToAdd))
 		for i, path := range msg.CosmosCoinWrapperPathsToAdd {
-			var accountAddr sdk.AccAddress
-			for {
-				fullPath := path.Denom
-				fullPathBytes := []byte(fullPath)
-
-				ac, err := authtypes.NewModuleCredential(types.ModuleName, WrapperPathGenerationPrefix, fullPathBytes)
-				if err != nil {
-					return nil, err
-				}
-				//generate the address from the credential
-				accountAddr = sdk.AccAddress(ac.Address())
-
-				break
+			accountAddr, err := generatePathAddress(path.Denom, WrapperPathGenerationPrefix)
+			if err != nil {
+				return nil, err
 			}
 
 			pathsToAdd[i] = &types.CosmosCoinWrapperPath{
@@ -235,22 +270,53 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			}
 
 			// Auto-set the cosmoscoinwrapper path address as a reserved protocol address
-			err = k.SetReservedProtocolAddressInStore(ctx, accountAddr.String(), true)
-			if err != nil {
-				return nil, fmt.Errorf("failed to set cosmoscoinwrapper path address as reserved protocol: %w", err)
+			if err := k.setReservedProtocolAddressForPath(ctx, accountAddr.String(), "cosmoscoinwrapper"); err != nil {
+				return nil, err
 			}
 		}
 
 		collection.CosmosCoinWrapperPaths = append(collection.CosmosCoinWrapperPaths, pathsToAdd...)
 	}
 
-	// Ensure no duplicate denom paths
+	if len(msg.CosmosCoinBackedPathsToAdd) > 0 {
+		pathsToAdd := make([]*types.CosmosCoinBackedPath, len(msg.CosmosCoinBackedPathsToAdd))
+		for i, path := range msg.CosmosCoinBackedPathsToAdd {
+			accountAddr, err := generatePathAddress(path.IbcDenom, BackedPathGenerationPrefix)
+			if err != nil {
+				return nil, err
+			}
+
+			pathsToAdd[i] = &types.CosmosCoinBackedPath{
+				Address:  accountAddr.String(),
+				IbcDenom: path.IbcDenom,
+				Balances: path.Balances,
+			}
+
+			// Auto-set the cosmoscoinbacked path address as a reserved protocol address
+			if err := k.setReservedProtocolAddressForPath(ctx, accountAddr.String(), "cosmoscoinbacked"); err != nil {
+				return nil, err
+			}
+		}
+
+		collection.CosmosCoinBackedPaths = append(collection.CosmosCoinBackedPaths, pathsToAdd...)
+	}
+
+	// Ensure no duplicate denom paths for wrapper paths
 	denomPaths := make(map[string]bool)
 	for _, path := range collection.CosmosCoinWrapperPaths {
 		if _, ok := denomPaths[path.Denom]; ok {
 			return nil, fmt.Errorf("duplicate ibc wrapper path denom: %s", path.Denom)
 		}
 		denomPaths[path.Denom] = true
+	}
+
+	// Ensure no duplicate ibc denom paths for backed paths
+	ibcDenomPaths := make(map[string]bool)
+	for _, path := range collection.CosmosCoinBackedPaths {
+		if _, ok := ibcDenomPaths[path.IbcDenom]; ok {
+			return nil, fmt.Errorf("duplicate ibc backed path denom: %s", path.IbcDenom)
+		}
+		ibcDenomPaths[path.IbcDenom] = true
 	}
 
 	// Ensure no duplicate symbols (including base symbol and denom unit symbols)
@@ -304,30 +370,17 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-	// Set auto-approve flags for cosmoscoinwrapper path addresses (must be after SetCollectionInStore)
+	// Set auto-approve flags for path addresses (must be after SetCollectionInStore)
 	// This needs to happen after the collection is stored because GetBalanceOrApplyDefault requires the collection to exist
 	for _, path := range collection.CosmosCoinWrapperPaths {
-		wrapperPathAddress := path.Address
-		currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, wrapperPathAddress)
+		if err := k.setAutoApproveFlagsForPathAddress(ctx, collection, path.Address, "cosmoscoinwrapper"); err != nil {
+			return nil, err
+		}
+	}
 
-		alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
-		alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
-		alreadyAutoApprovedSelfInitiatedIncomingTransfers := currBalances.AutoApproveSelfInitiatedIncomingTransfers
-
-		autoApprovedAll := alreadyAutoApprovedAllIncomingTransfers && alreadyAutoApprovedSelfInitiatedOutgoingTransfers && alreadyAutoApprovedSelfInitiatedIncomingTransfers
-
-		if !autoApprovedAll {
-			// We override all approvals to be default allowed
-			// Incoming - All, no matter what
-			// Outgoing - Self-initiated
-			// Incoming - Self-initiated
-			currBalances.AutoApproveAllIncomingTransfers = true
-			currBalances.AutoApproveSelfInitiatedOutgoingTransfers = true
-			currBalances.AutoApproveSelfInitiatedIncomingTransfers = true
-			err = k.SetBalanceForAddress(ctx, collection, wrapperPathAddress, currBalances)
-			if err != nil {
-				return nil, fmt.Errorf("failed to set auto-approve flags for cosmoscoinwrapper path address: %w", err)
-			}
+	for _, path := range collection.CosmosCoinBackedPaths {
+		if err := k.setAutoApproveFlagsForPathAddress(ctx, collection, path.Address, "cosmoscoinbacked"); err != nil {
+			return nil, err
 		}
 	}
 

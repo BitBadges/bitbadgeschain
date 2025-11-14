@@ -41,21 +41,10 @@ func (k Keeper) HandleSpecialAddressWrapping(
 		return sdkerrors.Wrapf(ErrNotImplemented, "cannot send to and from special addresses at the same time")
 	}
 
-
-	// Lets check if the user is the initiator of the transfer here
-	//
-	// Treat this like a contract call where initiator must match the mint / burn sender / recipient
-	// Technically we could probably allow this via approvals, and it is not terrible in the worst case since 
-	// the denoms will be burned / minted by the approver address anyways. So, it is not like they are being transferred
-	// out. However, this is probably not the expected functionality and could be abused.
-	if isSendingToSpecialAddress && initiatedBy != from {
-		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the sender when sending to special addresses")
+	// Validate initiator
+	if err := validateSpecialAddressTransfer(isSendingToSpecialAddress, isSendingFromSpecialAddress, from, to, initiatedBy); err != nil {
+		return err
 	}
-
-	if isSendingFromSpecialAddress && initiatedBy != to {
-		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the recipient when sending from special addresses")
-	}
-
 
 	if denomInfo.Denom == "" {
 		return sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
@@ -126,47 +115,10 @@ func (k Keeper) HandleSpecialAddressWrapping(
 		}
 	}
 
-	// Little hacky but we find the amount for a specific time and ID
-	// Then we will check if it is evenly divisible by the number of transfer balances
-	if len(transferBalances[0].OwnershipTimes) == 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one ownership time")
-	}
-	firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
-	firstAmount := transferBalances[0].Amount
-
-	multiplier := sdkmath.NewUint(0)
-	for _, balance := range conversionBalances {
-		foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.TokenIds)
-		if err != nil {
-			return err
-		}
-		foundOwnershipTime, err := types.SearchUintRangesForUint(firstOwnershipTime, balance.OwnershipTimes)
-		if err != nil {
-			return err
-		}
-		if foundTokenId && foundOwnershipTime {
-			multiplier = firstAmount.Quo(balance.Amount)
-			break
-		}
-	}
-
-	if multiplier.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
-	}
-
-	conversionBalancesMultiplied := types.DeepCopyBalances(conversionBalances)
-	for _, balance := range conversionBalancesMultiplied {
-		balance.Amount = balance.Amount.Mul(multiplier)
-	}
-
-	transferBalancesCopy := types.DeepCopyBalances(transferBalances)
-	remainingBalances, err := types.SubtractBalances(ctx, transferBalancesCopy, conversionBalancesMultiplied)
+	// Calculate conversion multiplier
+	multiplier, err := k.calculateConversionMultiplier(ctx, collection, transferBalances, conversionBalances)
 	if err != nil {
-		return sdkerrors.Wrapf(err, "conversion is not evenly divisible")
-	}
-
-	if len(remainingBalances) > 0 {
-		return sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
+		return err
 	}
 
 	// Construct the full IBC denomination
@@ -209,9 +161,172 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	return nil
 }
 
-// IsSpecialAddress checks if an address is a cosmos coin wrapper path address
+// calculateConversionMultiplier calculates the multiplier for converting transfer balances to coin amounts
+// This is shared between wrapper and backed path handlers
+func (k Keeper) calculateConversionMultiplier(
+	ctx sdk.Context,
+	collection *types.TokenCollection,
+	transferBalances []*types.Balance,
+	conversionBalances []*types.Balance,
+) (sdkmath.Uint, error) {
+	if len(transferBalances) == 0 || len(transferBalances[0].TokenIds) == 0 {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one token ID")
+	}
+
+	firstTokenId := transferBalances[0].TokenIds[0].Start
+
+	if len(transferBalances[0].OwnershipTimes) == 0 {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "transfer balances must contain at least one ownership time")
+	}
+	firstOwnershipTime := transferBalances[0].OwnershipTimes[0].Start
+	firstAmount := transferBalances[0].Amount
+
+	multiplier := sdkmath.NewUint(0)
+	for _, balance := range conversionBalances {
+		foundTokenId, err := types.SearchUintRangesForUint(firstTokenId, balance.TokenIds)
+		if err != nil {
+			return sdkmath.NewUint(0), err
+		}
+		foundOwnershipTime, err := types.SearchUintRangesForUint(firstOwnershipTime, balance.OwnershipTimes)
+		if err != nil {
+			return sdkmath.NewUint(0), err
+		}
+		if foundTokenId && foundOwnershipTime {
+			multiplier = firstAmount.Quo(balance.Amount)
+			break
+		}
+	}
+
+	if multiplier.IsZero() {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
+	}
+
+	conversionBalancesMultiplied := types.DeepCopyBalances(conversionBalances)
+	for _, balance := range conversionBalancesMultiplied {
+		balance.Amount = balance.Amount.Mul(multiplier)
+	}
+
+	transferBalancesCopy := types.DeepCopyBalances(transferBalances)
+	remainingBalances, err := types.SubtractBalances(ctx, transferBalancesCopy, conversionBalancesMultiplied)
+	if err != nil {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(err, "conversion is not evenly divisible")
+	}
+
+	if len(remainingBalances) > 0 {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(ErrInvalidConversion, "conversion is not evenly divisible")
+	}
+
+	return multiplier, nil
+}
+
+// validateSpecialAddressTransfer validates that the initiator matches the expected address
+// This is shared between wrapper and backed path handlers
+func validateSpecialAddressTransfer(
+	isSendingToSpecialAddress bool,
+	isSendingFromSpecialAddress bool,
+	from string,
+	to string,
+	initiatedBy string,
+) error {
+	if isSendingToSpecialAddress && initiatedBy != from {
+		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the sender when sending to special addresses")
+	}
+
+	if isSendingFromSpecialAddress && initiatedBy != to {
+		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the recipient when sending from special addresses")
+	}
+
+	return nil
+}
+
+// HandleSpecialAddressBacking processes cosmos coin backing/unbacking for special addresses
+// This uses bankKeeper.SendCoins instead of minting/burning coins
+func (k Keeper) HandleSpecialAddressBacking(
+	ctx sdk.Context,
+	collection *types.TokenCollection,
+	transferBalances []*types.Balance,
+	from string,
+	to string,
+	initiatedBy string,
+) error {
+	// Get denomination information
+	denomInfo := &types.CosmosCoinBackedPath{}
+	isSendingToSpecialAddress := false
+	isSendingFromSpecialAddress := false
+
+	for _, path := range collection.CosmosCoinBackedPaths {
+		if path.Address == to {
+			isSendingToSpecialAddress = true
+			denomInfo = path
+		}
+		if path.Address == from {
+			isSendingFromSpecialAddress = true
+			denomInfo = path
+		}
+	}
+
+	if !isSendingFromSpecialAddress && !isSendingToSpecialAddress {
+		return nil // No special backing needed
+	} else if isSendingToSpecialAddress && isSendingFromSpecialAddress {
+		return sdkerrors.Wrapf(ErrNotImplemented, "cannot send to and from special addresses at the same time")
+	}
+
+	// Validate initiator
+	if err := validateSpecialAddressTransfer(isSendingToSpecialAddress, isSendingFromSpecialAddress, from, to, initiatedBy); err != nil {
+		return err
+	}
+
+	if denomInfo.IbcDenom == "" {
+		return sdkerrors.Wrapf(ErrNotImplemented, "no ibc denom info found for %s", denomInfo.Address)
+	}
+
+	ibcDenom := denomInfo.IbcDenom
+	conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
+
+	// Calculate conversion multiplier
+	multiplier, err := k.calculateConversionMultiplier(ctx, collection, transferBalances, conversionBalances)
+	if err != nil {
+		return err
+	}
+
+	bankKeeper := k.bankKeeper
+	amountInt := multiplier.BigInt()
+
+	if isSendingToSpecialAddress {
+		if types.IsMintAddress(from) {
+			return sdkerrors.Wrapf(ErrNotImplemented, "the Mint address cannot perform backing actions")
+		}
+
+		userAddressAcc := sdk.MustAccAddressFromBech32(from)
+		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
+
+		// Send coins from user to special address
+		err = bankKeeper.SendCoins(ctx, userAddressAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+		if err != nil {
+			return err
+		}
+	} else if isSendingFromSpecialAddress {
+		userAddressAcc := sdk.MustAccAddressFromBech32(to)
+		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
+
+		// Send coins from special address to user
+		err = bankKeeper.SendCoins(ctx, specialAddressAcc, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// IsSpecialAddress checks if an address is a cosmos coin wrapper path address or backed path address
 func (k Keeper) IsSpecialAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
 	for _, path := range collection.CosmosCoinWrapperPaths {
+		if path.Address == address {
+			return true
+		}
+	}
+	for _, path := range collection.CosmosCoinBackedPaths {
 		if path.Address == address {
 			return true
 		}

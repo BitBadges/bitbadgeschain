@@ -341,6 +341,12 @@ func (k Keeper) HandleTransfer(
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}
 
+	// Handle special address backing/unbacking to x/bank denominations
+	err = k.HandleSpecialAddressBacking(ctx, collection, transferBalances, from, to, initiatedBy)
+	if err != nil {
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+	}
+
 	// Handle auto-deletions for approvals if necessary
 	fromUserBalance, toUserBalance, err = k.HandleAutoDeletions(ctx, collection, fromUserBalance, toUserBalance, *eventTracking.ApprovalsUsed)
 	if err != nil {

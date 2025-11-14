@@ -231,5 +231,18 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		}
 	}
 
+	for _, path := range msg.CosmosCoinBackedPathsToAdd {
+		// Validate ibc denom is not empty
+		if path.IbcDenom == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "ibc denom cannot be empty")
+		}
+
+		// Validate balances
+		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

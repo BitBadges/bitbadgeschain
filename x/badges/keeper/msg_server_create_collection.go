@@ -51,6 +51,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 
 		MintEscrowCoinsToTransfer:   msg.MintEscrowCoinsToTransfer,
 		CosmosCoinWrapperPathsToAdd: msg.CosmosCoinWrapperPathsToAdd,
+		CosmosCoinBackedPathsToAdd:  msg.CosmosCoinBackedPathsToAdd,
 		Invariants:                  msg.Invariants,
 	}
 

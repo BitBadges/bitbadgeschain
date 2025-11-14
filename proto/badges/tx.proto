@@ -121,6 +121,11 @@ message CosmosCoinWrapperPathAddObject {
   bool allowCosmosWrapping = 6;
 }
 
+message CosmosCoinBackedPathAddObject {
+  string ibcDenom = 1;
+  repeated Balance balances = 2;
+}
+
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the tokens module.
 // It is a universal interface that can be used for both creating and updating collections.
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
@@ -197,6 +202,9 @@ message MsgUniversalUpdateCollection {
 
   // IBC wrapper paths to add.
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 23;
+
+  // IBC backed paths to add.
+  repeated CosmosCoinBackedPathAddObject cosmosCoinBackedPathsToAdd = 25;
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
@@ -281,6 +289,9 @@ message MsgUpdateCollection {
   // IBC wrapper paths to add.
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 22;
 
+  // IBC backed paths to add.
+  repeated CosmosCoinBackedPathAddObject cosmosCoinBackedPathsToAdd = 24;
+
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
   CollectionInvariants invariants = 23;
@@ -335,6 +346,9 @@ message MsgCreateCollection {
 
   // IBC wrapper paths to add.
   repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 13;
+
+  // IBC backed paths to add.
+  repeated CosmosCoinBackedPathAddObject cosmosCoinBackedPathsToAdd = 15;
 
   // Collection-level invariants that cannot be broken.
   CollectionInvariants invariants = 14;
