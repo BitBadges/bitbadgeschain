@@ -322,16 +322,19 @@ func (k Keeper) HandleTransfer(
 
 	for _, balance := range transferBalances {
 		//Mint has unlimited balances
-		if !types.IsMintAddress(from) {
+		//Backed addresses (wrapper and backed paths) have unlimited balances
+		if !types.IsMintAddress(from) && !k.IsSpecialBackedAddress(ctx, collection, from) {
 			fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
 			if err != nil {
 				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
 			}
 		}
 
-		toUserBalance.Balances, err = types.AddBalance(ctx, toUserBalance.Balances, balance)
-		if err != nil {
-			return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+		if !k.IsSpecialBackedAddress(ctx, collection, to) {
+			toUserBalance.Balances, err = types.AddBalance(ctx, toUserBalance.Balances, balance)
+			if err != nil {
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
+			}
 		}
 	}
 

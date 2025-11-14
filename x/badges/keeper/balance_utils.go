@@ -26,6 +26,16 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 		return &types.UserBalanceStore{}, false
 	}
 
+	if k.IsSpecialBackedAddress(ctx, collection, userAddress) {
+		//Special backed addresses also have unlimited balances
+		return &types.UserBalanceStore{
+			Balances:                        []*types.Balance{},
+			AutoApproveAllIncomingTransfers: true,
+			AutoApproveSelfInitiatedIncomingTransfers: true,
+			AutoApproveSelfInitiatedOutgoingTransfers: true,
+		}, false
+	}
+
 	//We get current balances or fallback to default balances
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
 	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)

@@ -24,6 +24,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1), // Default: 1 IBC coin per conversion unit
 		},
 	}
 
@@ -116,6 +117,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -213,6 +215,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -323,6 +326,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsErrors() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -421,6 +425,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 		{
 			IbcDenom: "ibc/coin-two",
@@ -431,6 +436,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -523,6 +529,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsInadequateBalance() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -581,6 +588,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackInadequateBalance() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -698,6 +706,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
+			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -778,4 +787,119 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 	fetchedBobBalances, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetFullUintRanges(), bobBalance.Balances)
 	suite.Require().Nil(err, "Error fetching bob balances for IDs")
 	suite.Require().Equal(sdkmath.NewUint(0), fetchedBobBalances[0].Amount, "Bob should have 0 tokens after backing")
+}
+
+// TestCosmosCoinBackedPathsIbcAmount tests the ibcAmount field functionality
+func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection with cosmos coin backed paths with ibcAmount = 10
+	// This means: 1 token = 10 IBC coins (instead of the default 1:1)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].CosmosCoinBackedPathsToAdd = []*types.CosmosCoinBackedPathAddObject{
+		{
+			IbcDenom: "ibc/ibcamount-test",
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					OwnershipTimes: GetFullUintRanges(),
+					TokenIds:       GetOneUintRange(),
+				},
+			},
+			IbcAmount: sdkmath.NewUint(10), // 10 IBC coins per conversion unit
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "ibcamount-test",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria:  &types.ApprovalCriteria{},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection")
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	backedPath := collection.CosmosCoinBackedPaths[0]
+	suite.Require().Equal(sdkmath.NewUint(10), backedPath.IbcAmount, "IbcAmount should be 10")
+
+	// Fund bob with 10 IBC coins (since ibcAmount = 10, we need 10 coins for 1 token)
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err, "Error getting bob's address")
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(10))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(10))})
+
+	// Back 1 token (should require 10 IBC coins due to ibcAmount = 10)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{backedPath.Address},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error backing token with ibcAmount")
+
+	// Verify bob has 0 IBC coins (all 10 were sent)
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.IbcDenom)
+	suite.Require().Equal(sdkmath.NewInt(0), bobIbcBalance.Amount, "Bob should have 0 IBC coins after backing")
+
+	// Verify backed path address has 10 IBC coins
+	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
+	suite.Require().Nil(err, "Error getting backed path address")
+	backedPathIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, backedPathAccAddr, backedPath.IbcDenom)
+	suite.Require().Equal(sdkmath.NewInt(10), backedPathIbcBalance.Amount, "Backed path should have 10 IBC coins")
+
+	// Verify bob has 0 tokens
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's balance")
+	fetchedBobBalances, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetFullUintRanges(), bobBalance.Balances)
+	suite.Require().Nil(err, "Error fetching bob balances for IDs")
+	suite.Require().Equal(sdkmath.NewUint(0), fetchedBobBalances[0].Amount, "Bob should have 0 tokens after backing")
+
+	// Now unback - should send 10 IBC coins back to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        backedPath.Address,
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error unbacking token")
+
+	// Verify bob received 10 IBC coins back
+	bobIbcBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.IbcDenom)
+	suite.Require().Equal(sdkmath.NewInt(10), bobIbcBalanceAfter.Amount, "Bob should have 10 IBC coins after unback")
+
+	// Verify bob has 1 token back
+	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's balance after unback")
+	fetchedBobBalancesAfter, err := types.GetBalancesForIds(suite.ctx, GetOneUintRange(), GetFullUintRanges(), bobBalanceAfter.Balances)
+	suite.Require().Nil(err, "Error fetching bob balances for IDs after unback")
+	suite.Require().Equal(sdkmath.NewUint(1), fetchedBobBalancesAfter[0].Amount, "Bob should have 1 token after unback")
 }

@@ -124,6 +124,7 @@ message CosmosCoinWrapperPathAddObject {
 message CosmosCoinBackedPathAddObject {
   string ibcDenom = 1;
   repeated Balance balances = 2;
+  string ibcAmount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the tokens module.

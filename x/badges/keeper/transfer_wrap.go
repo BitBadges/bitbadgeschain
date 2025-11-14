@@ -289,8 +289,14 @@ func (k Keeper) HandleSpecialAddressBacking(
 		return err
 	}
 
+	// ibcAmount is validated in ValidateBasic to be non-zero
+	ibcAmount := denomInfo.IbcAmount
+
+	// Calculate total IBC coin amount: multiplier * ibcAmount
+	totalIbcAmount := multiplier.Mul(ibcAmount)
+
 	bankKeeper := k.bankKeeper
-	amountInt := multiplier.BigInt()
+	amountInt := totalIbcAmount.BigInt()
 
 	if isSendingToSpecialAddress {
 		if types.IsMintAddress(from) {
@@ -300,17 +306,18 @@ func (k Keeper) HandleSpecialAddressBacking(
 		userAddressAcc := sdk.MustAccAddressFromBech32(from)
 		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
 
-		// Send coins from user to special address
-		err = bankKeeper.SendCoins(ctx, userAddressAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+		// Send coins from special address to user
+		err = bankKeeper.SendCoins(ctx, specialAddressAcc, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
 		}
+
 	} else if isSendingFromSpecialAddress {
 		userAddressAcc := sdk.MustAccAddressFromBech32(to)
 		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
 
-		// Send coins from special address to user
-		err = bankKeeper.SendCoins(ctx, specialAddressAcc, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+		// Send coins from user to special address
+		err = bankKeeper.SendCoins(ctx, userAddressAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
 		}
@@ -326,6 +333,16 @@ func (k Keeper) IsSpecialAddress(ctx sdk.Context, collection *types.TokenCollect
 			return true
 		}
 	}
+	for _, path := range collection.CosmosCoinBackedPaths {
+		if path.Address == address {
+			return true
+		}
+	}
+	return false
+}
+
+// IsSpecialAddress checks if an address is a cosmos coin wrapper path address or backed path address
+func (k Keeper) IsSpecialBackedAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
 	for _, path := range collection.CosmosCoinBackedPaths {
 		if path.Address == address {
 			return true

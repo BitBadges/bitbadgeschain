@@ -237,6 +237,11 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return sdkerrors.Wrapf(ErrInvalidRequest, "ibc denom cannot be empty")
 		}
 
+		// Validate ibcAmount is set and non-zero
+		if path.IbcAmount.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "ibcAmount cannot be zero")
+		}
+
 		// Validate balances
 		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
 		if err != nil {

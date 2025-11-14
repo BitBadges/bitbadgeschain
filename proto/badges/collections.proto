@@ -97,6 +97,7 @@ message CosmosCoinBackedPath {
   string address = 1;
   string ibcDenom = 2;
   repeated Balance balances = 3;
+  string ibcAmount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message DenomUnit {

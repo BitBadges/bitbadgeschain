@@ -705,6 +705,15 @@ func GetSchemas() []string {
 					"allowCosmosWrapping": false
 				}
 			],
+			"cosmosCoinBackedPathsToAdd": [
+				{
+					"ibcDenom": "",
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"ibcAmount": ""
+				}
+			],
 			"invariants": {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": ""
@@ -829,6 +838,15 @@ func GetSchemas() []string {
 					"allowCosmosWrapping": false
 				}
 			],
+			"cosmosCoinBackedPathsToAdd": [
+				{
+					"ibcDenom": "",
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"ibcAmount": ""
+				}
+			],
 			"invariants": {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": ""
@@ -922,6 +940,15 @@ func GetSchemas() []string {
 					],
 					"allowOverrideWithAnyValidToken": false,
 					"allowCosmosWrapping": false
+				}
+			],
+			"cosmosCoinBackedPathsToAdd": [
+				{
+					"ibcDenom": "",
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"ibcAmount": ""
 				}
 			],
 			"invariants": {

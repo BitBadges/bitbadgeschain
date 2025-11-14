@@ -286,10 +286,14 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				return nil, err
 			}
 
+			// ibcAmount is validated in ValidateBasic to be non-zero
+			ibcAmount := path.IbcAmount
+
 			pathsToAdd[i] = &types.CosmosCoinBackedPath{
-				Address:  accountAddr.String(),
-				IbcDenom: path.IbcDenom,
-				Balances: path.Balances,
+				Address:   accountAddr.String(),
+				IbcDenom:  path.IbcDenom,
+				Balances:  path.Balances,
+				IbcAmount: ibcAmount,
 			}
 
 			// Auto-set the cosmoscoinbacked path address as a reserved protocol address
