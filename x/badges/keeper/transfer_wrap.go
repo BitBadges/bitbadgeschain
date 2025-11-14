@@ -43,8 +43,11 @@ func (k Keeper) HandleSpecialAddressWrapping(
 
 
 	// Lets check if the user is the initiator of the transfer here
-	// Theoeretically, it might be fine to allow such transfers via approvals, but when dealing with minting / burning
-	// IBC denoms we should be extra careful and require the initiator to be the same as the recipient of the IBC denom
+	//
+	// Treat this like a contract call where initiator must match the mint / burn sender / recipient
+	// Technically we could probably allow this via approvals, and it is not terrible in the worst case since 
+	// the denoms will be burned / minted by the approver address anyways. So, it is not like they are being transferred
+	// out. However, this is probably not the expected functionality and could be abused.
 	if isSendingToSpecialAddress && initiatedBy != from {
 		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the sender when sending to special addresses")
 	}
