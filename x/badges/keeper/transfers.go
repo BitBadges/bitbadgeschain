@@ -336,7 +336,7 @@ func (k Keeper) HandleTransfer(
 	}
 
 	// Handle special address wrapping/unwrapping to x/bank denominations
-	err = k.HandleSpecialAddressWrapping(ctx, collection, transferBalances, from, to)
+	err = k.HandleSpecialAddressWrapping(ctx, collection, transferBalances, from, to, initiatedBy)
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 	}

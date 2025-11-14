@@ -17,6 +17,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	transferBalances []*types.Balance,
 	from string,
 	to string,
+	initiatedBy string,
 ) error {
 	// Get denomination information
 	denomInfo := &types.CosmosCoinWrapperPath{}
@@ -39,6 +40,19 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	} else if isSendingToSpecialAddress && isSendingFromSpecialAddress {
 		return sdkerrors.Wrapf(ErrNotImplemented, "cannot send to and from special addresses at the same time")
 	}
+
+
+	// Lets check if the user is the initiator of the transfer here
+	// Theoeretically, it might be fine to allow such transfers via approvals, but when dealing with minting / burning
+	// IBC denoms we should be extra careful and require the initiator to be the same as the recipient of the IBC denom
+	if isSendingToSpecialAddress && initiatedBy != from {
+		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the sender when sending to special addresses")
+	}
+
+	if isSendingFromSpecialAddress && initiatedBy != to {
+		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the recipient when sending from special addresses")
+	}
+
 
 	if denomInfo.Denom == "" {
 		return sdkerrors.Wrapf(ErrNotImplemented, "no denom info found for %s", denomInfo.Address)
