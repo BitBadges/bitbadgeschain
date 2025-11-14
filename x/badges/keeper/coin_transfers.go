@@ -37,6 +37,11 @@ func (k Keeper) SimulateCoinTransfers(
 		return nil
 	}
 
+	allowedDenoms := k.GetAllowedDenoms(ctx)
+	if len(allowedDenoms) == 0 {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "allowed denoms is empty")
+	}
+
 	royaltyPercentage := royalties.Percentage
 	royaltyPayoutAddress := royalties.PayoutAddress
 	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
@@ -50,15 +55,12 @@ func (k Keeper) SimulateCoinTransfers(
 		}
 	}
 
-	allowedDenoms := k.GetAllowedDenoms(ctx)
-	if len(allowedDenoms) > 0 {
-		for _, coinTransfer := range coinTransfers {
-			if len(coinTransfer.Coins) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
-			}
-			if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
-				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
-			}
+	for _, coinTransfer := range coinTransfers {
+		if len(coinTransfer.Coins) == 0 {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
+		}
+		if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
+			return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
 		}
 	}
 
@@ -133,14 +135,16 @@ func (k Keeper) ExecuteCoinTransfers(
 	}
 
 	allowedDenoms := k.GetAllowedDenoms(ctx)
-	if len(allowedDenoms) > 0 {
-		for _, coinTransfer := range coinTransfers {
-			if len(coinTransfer.Coins) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
-			}
-			if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
-				return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
-			}
+	if len(allowedDenoms) == 0 {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "allowed denoms is empty")
+	}
+
+	for _, coinTransfer := range coinTransfers {
+		if len(coinTransfer.Coins) == 0 {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
+		}
+		if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
+			return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
 		}
 	}
 
