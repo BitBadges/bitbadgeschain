@@ -2,11 +2,15 @@ package poolmanager_test
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	stableswap "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -381,4 +385,168 @@ func (s *KeeperTestSuite) TestValidateCreatedPool() {
 			s.Require().NoError(err)
 		})
 	}
+}
+
+// TestCreatePoolWithBadgesDisablePoolCreationInvariant tests that pool creation fails when
+// a badges collection has disablePoolCreation set to true.
+func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant() {
+	s.Setup()
+
+	ctx := s.Ctx
+	badgesKeeper := s.App.BadgesKeeper
+	poolmanagerKeeper := s.App.PoolManagerKeeper
+	gammKeeper := s.App.GammKeeper
+
+	// Create a badges collection with allowPoolCreation set to false
+	creator := s.TestAccs[0]
+	creatorStr := creator.String()
+
+	// Create collection with wrapper path and allowPoolCreation = false
+	createCollectionMsg := &badgestypes.MsgCreateCollection{
+		Creator: creatorStr,
+		ValidTokenIds: []*badgestypes.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
+		CollectionPermissions: &badgestypes.CollectionPermissions{},
+		ManagerTimeline: []*badgestypes.ManagerTimeline{
+			{
+				TimelineTimes: []*badgestypes.UintRange{
+					{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+				},
+				Manager: creatorStr,
+			},
+		},
+		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
+			{
+				Denom: "testbadge",
+				Balances: []*badgestypes.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+						TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					},
+				},
+				Symbol:              "TEST",
+				DenomUnits:          []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
+				AllowCosmosWrapping: true,
+			},
+		},
+		Invariants: &badgestypes.InvariantsAddObject{
+			DisablePoolCreation: true, // Set to true to block pool creation
+		},
+	}
+
+	// Create the collection
+	badgesMsgServer := badgeskeeper.NewMsgServerImpl(badgesKeeper)
+	createCollectionResp, err := badgesMsgServer.CreateCollection(ctx, createCollectionMsg)
+	s.Require().NoError(err)
+	collectionId := createCollectionResp.CollectionId
+
+	// Get the collection to find the wrapper denom
+	collection, found := badgesKeeper.GetCollectionFromStore(ctx, collectionId)
+	s.Require().True(found)
+	s.Require().NotNil(collection.Invariants)
+	s.Require().True(collection.Invariants.DisablePoolCreation, "disablePoolCreation should be true")
+
+	// Get the wrapper denom
+	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	badgesDenom := "badges:" + collectionId.String() + ":" + wrapperPath.Denom
+
+	// Try to create a pool with the badges asset that has allowPoolCreation = false
+	// This should fail
+	poolMsg := balancer.NewMsgCreateBalancerPool(
+		creator,
+		balancer.NewPoolParams(osmomath.ZeroDec(), osmomath.ZeroDec()),
+		[]balancer.PoolAsset{
+			{
+				Token:  sdk.NewCoin(badgesDenom, defaultInitPoolAmount),
+				Weight: osmomath.NewInt(1),
+			},
+			{
+				Token:  sdk.NewCoin(FOO, defaultInitPoolAmount),
+				Weight: osmomath.NewInt(1),
+			},
+		},
+	)
+
+	// Fund the creator
+	s.FundAcc(creator, sdk.NewCoins(
+		sdk.NewCoin(FOO, defaultInitPoolAmount.Mul(osmomath.NewInt(2))),
+	))
+
+	// Try to create the pool - this should fail
+	_, err = poolmanagerKeeper.CreatePool(ctx, poolMsg)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "disablePoolCreation invariant is set to true")
+
+	// Now test that pool creation validation passes when disablePoolCreation is false
+	// Create another collection with disablePoolCreation = false
+	createCollectionMsg2 := &badgestypes.MsgCreateCollection{
+		Creator: creatorStr,
+		ValidTokenIds: []*badgestypes.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
+		CollectionPermissions: &badgestypes.CollectionPermissions{},
+		ManagerTimeline: []*badgestypes.ManagerTimeline{
+			{
+				TimelineTimes: []*badgestypes.UintRange{
+					{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+				},
+				Manager: creatorStr,
+			},
+		},
+		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
+			{
+				Denom: "testbadgeallowed",
+				Balances: []*badgestypes.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+						TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					},
+				},
+				Symbol:              "TESTALLOWED",
+				DenomUnits:          []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
+				AllowCosmosWrapping: true,
+			},
+		},
+		Invariants: &badgestypes.InvariantsAddObject{
+			DisablePoolCreation: false, // Set to false to allow pool creation
+		},
+	}
+
+	createCollectionResp2, err := badgesMsgServer.CreateCollection(ctx, createCollectionMsg2)
+	s.Require().NoError(err)
+	collectionId2 := createCollectionResp2.CollectionId
+
+	collection2, found := badgesKeeper.GetCollectionFromStore(ctx, collectionId2)
+	s.Require().True(found)
+	s.Require().NotNil(collection2.Invariants)
+	s.Require().False(collection2.Invariants.DisablePoolCreation, "disablePoolCreation should be false")
+
+	wrapperPath2 := collection2.CosmosCoinWrapperPaths[0]
+	badgesDenom2 := "badges:" + collectionId2.String() + ":" + wrapperPath2.Denom
+
+	// Try to create a pool with the badges asset that has disablePoolCreation = false
+	// The validation should pass (disablePoolCreation is false)
+	poolMsg2 := balancer.NewMsgCreateBalancerPool(
+		creator,
+		balancer.NewPoolParams(osmomath.ZeroDec(), osmomath.ZeroDec()),
+		[]balancer.PoolAsset{
+			{
+				Token:  sdk.NewCoin(badgesDenom2, defaultInitPoolAmount),
+				Weight: osmomath.NewInt(1),
+			},
+			{
+				Token:  sdk.NewCoin(FOO, defaultInitPoolAmount),
+				Weight: osmomath.NewInt(1),
+			},
+		},
+	)
+
+	// The validation should pass (disablePoolCreation is false)
+	// Note: The actual pool creation might still fail due to insufficient badges tokens,
+	// but the disablePoolCreation check should pass
+	err = gammKeeper.ValidatePoolCreationAllowed(ctx, poolMsg2.InitialLiquidity())
+	s.Require().NoError(err, "Pool creation should be allowed when disablePoolCreation is false")
 }

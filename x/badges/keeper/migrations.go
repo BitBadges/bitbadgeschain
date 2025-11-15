@@ -136,6 +136,8 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			newCollection.Invariants.CosmosCoinBackedPath = nil
 			// Set noForcefulPostMintTransfers to false (default for bool)
 			newCollection.Invariants.NoForcefulPostMintTransfers = false
+			// Set disablePoolCreation to false (default for bool - allows pool creation by default)
+			newCollection.Invariants.DisablePoolCreation = false
 		}
 
 		// Save the updated collection

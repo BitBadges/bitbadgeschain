@@ -120,4 +120,8 @@ message CollectionInvariants {
   // This prevents forceful transfers that bypass user-level approvals.
   // This only applies to transfers where the from address does not equal "Mint".
   bool noForcefulPostMintTransfers = 4;
+  
+  // If true, disallows pool creation with this collection's assets.
+  // When true, any attempt to create a pool with badges assets from this collection will fail.
+  bool disablePoolCreation = 5;
 }

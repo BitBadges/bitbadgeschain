@@ -425,3 +425,35 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 
 	return nil
 }
+
+// ValidatePoolCreationAllowed checks if pool creation is allowed for all badges assets in the given coins.
+// Returns an error if any badges asset has disablePoolCreation set to true.
+func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) error {
+	for _, coin := range coins {
+		// Check if this is a badges denom
+		if !CheckStartsWithBadges(coin.Denom) {
+			continue
+		}
+
+		// Parse collection from denom
+		collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
+		if err != nil {
+			// If we can't parse the collection, skip it (might be a malformed denom)
+			continue
+		}
+
+		// Check if the collection disables pool creation
+		// If invariants is nil or disablePoolCreation is not explicitly set to true, allow it (default behavior)
+		// Only fail if disablePoolCreation is explicitly set to true
+		if collection.Invariants != nil && collection.Invariants.DisablePoolCreation {
+			return sdkerrors.Wrapf(
+				badgestypes.ErrInvalidRequest,
+				"pool creation is not allowed for collection %s (denom: %s). The collection's disablePoolCreation invariant is set to true",
+				collection.CollectionId.String(),
+				coin.Denom,
+			)
+		}
+	}
+
+	return nil
+}

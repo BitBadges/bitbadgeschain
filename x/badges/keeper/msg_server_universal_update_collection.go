@@ -179,6 +179,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				NoCustomOwnershipTimes:      msg.Invariants.NoCustomOwnershipTimes,
 				MaxSupplyPerId:              msg.Invariants.MaxSupplyPerId,
 				NoForcefulPostMintTransfers: msg.Invariants.NoForcefulPostMintTransfers,
+				DisablePoolCreation:         msg.Invariants.DisablePoolCreation,
 			}
 
 			// Handle cosmos coin backed path - generate address
@@ -384,6 +385,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.Invariants.NoCustomOwnershipTimes = msg.Invariants.NoCustomOwnershipTimes
 		collection.Invariants.MaxSupplyPerId = msg.Invariants.MaxSupplyPerId
 		collection.Invariants.NoForcefulPostMintTransfers = msg.Invariants.NoForcefulPostMintTransfers
+		collection.Invariants.DisablePoolCreation = msg.Invariants.DisablePoolCreation
 
 		// Handle cosmos coin backed path - generate address
 		if msg.Invariants.CosmosCoinBackedPath != nil {
