@@ -1,0 +1,58 @@
+syntax = "proto3";
+package ibcratelimit;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types";
+
+// ChannelFlow tracks the net flow (inflow - outflow) for a channel
+message ChannelFlow {
+  option (amino.name) = "ibcratelimit/ChannelFlow";
+  option (gogoproto.equal) = true;
+
+  // net_flow is the net amount transferred (inflow - outflow) in the current window
+  // Positive values mean more inflow than outflow
+  // Negative values mean more outflow than inflow
+  string net_flow = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ChannelFlowWindow tracks the time window for rate limiting
+message ChannelFlowWindow {
+  option (amino.name) = "ibcratelimit/ChannelFlowWindow";
+  option (gogoproto.equal) = true;
+
+  // window_start is the block height when the current window started
+  int64 window_start = 1;
+  
+  // window_duration is the duration of the window in blocks
+  int64 window_duration = 2;
+}
+
+// UniqueSenders tracks unique sender addresses for a channel
+message UniqueSenders {
+  option (amino.name) = "ibcratelimit/UniqueSenders";
+  option (gogoproto.equal) = true;
+
+  // senders is a list of unique sender addresses
+  repeated string senders = 1;
+}
+
+// AddressTransferData tracks transfer data for a specific address
+message AddressTransferData {
+  option (amino.name) = "ibcratelimit/AddressTransferData";
+  option (gogoproto.equal) = true;
+
+  // transfer_count is the number of transfers made by this address
+  int64 transfer_count = 1;
+  // total_amount is the total amount transferred by this address
+  string total_amount = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+

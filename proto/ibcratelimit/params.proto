@@ -1,0 +1,136 @@
+syntax = "proto3";
+package ibcratelimit;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types";
+
+// TimeframeType defines the type of timeframe
+enum TimeframeType {
+  TIMEFRAME_TYPE_UNSPECIFIED = 0;
+  TIMEFRAME_TYPE_BLOCK = 1;  // Duration in blocks
+  TIMEFRAME_TYPE_HOUR = 2;  // Duration in hours (converted to blocks using block time)
+  TIMEFRAME_TYPE_DAY = 3;    // Duration in days (converted to blocks using block time)
+}
+
+// TimeframeLimit defines a limit for a specific timeframe
+message TimeframeLimit {
+  option (amino.name) = "ibcratelimit/TimeframeLimit";
+  option (gogoproto.equal) = true;
+
+  // max_amount is the maximum absolute amount of supply change allowed in this timeframe
+  // Value is represented as an integer (e.g., "1000000" = 1,000,000 tokens)
+  // If set to 0, this limit is disabled
+  string max_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // timeframe_type defines the type of timeframe (block, hour, day)
+  TimeframeType timeframe_type = 2;
+
+  // timeframe_duration is the duration of the timeframe
+  // For BLOCK: number of blocks
+  // For HOUR: number of hours (will be converted to blocks using block time)
+  // For DAY: number of days (will be converted to blocks using block time)
+  int64 timeframe_duration = 3;
+}
+
+// UniqueSenderLimit defines limits on unique senders per channel
+message UniqueSenderLimit {
+  option (amino.name) = "ibcratelimit/UniqueSenderLimit";
+  option (gogoproto.equal) = true;
+
+  // max_unique_senders is the maximum number of unique senders allowed in the timeframe
+  // If set to 0, this limit is disabled
+  int64 max_unique_senders = 1;
+
+  // timeframe_type defines the type of timeframe (block, hour, day)
+  TimeframeType timeframe_type = 2;
+
+  // timeframe_duration is the duration of the timeframe
+  int64 timeframe_duration = 3;
+}
+
+// AddressLimit defines limits per address
+message AddressLimit {
+  option (amino.name) = "ibcratelimit/AddressLimit";
+  option (gogoproto.equal) = true;
+
+  // max_transfers is the maximum number of transfers allowed per address in the timeframe
+  // If set to 0, transfer count limit is disabled
+  int64 max_transfers = 1;
+
+  // max_amount is the maximum total amount allowed per address in the timeframe
+  // Value is represented as an integer (e.g., "1000000" = 1,000,000 tokens)
+  // If set to 0, amount limit is disabled
+  string max_amount = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // timeframe_type defines the type of timeframe (block, hour, day)
+  TimeframeType timeframe_type = 3;
+
+  // timeframe_duration is the duration of the timeframe
+  int64 timeframe_duration = 4;
+}
+
+// RateLimitConfig defines a rate limit configuration for a specific channel and denom
+message RateLimitConfig {
+  option (amino.name) = "ibcratelimit/RateLimitConfig";
+  option (gogoproto.equal) = true;
+
+  // channel_id is the IBC channel ID this rate limit applies to
+  // If empty, applies to all channels
+  string channel_id = 1;
+
+  // denom is the denomination this rate limit applies to
+  // Must be specified (empty denoms are not allowed)
+  string denom = 2;
+
+  // DEPRECATED: Use supply_shift_limits instead
+  // max_supply_shift is the maximum absolute amount of supply change allowed per window
+  string max_supply_shift = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // DEPRECATED: Use supply_shift_limits instead
+  // window_duration is the duration of the rate limit window in blocks
+  int64 window_duration = 4;
+
+  // supply_shift_limits defines multiple timeframe limits for supply shift
+  // All limits are checked, and the transfer is rejected if any limit would be exceeded
+  repeated TimeframeLimit supply_shift_limits = 5 [
+    (gogoproto.nullable) = false
+  ];
+
+  // unique_sender_limits defines limits on unique senders per channel
+  // All limits are checked, and the transfer is rejected if any limit would be exceeded
+  repeated UniqueSenderLimit unique_sender_limits = 6 [
+    (gogoproto.nullable) = false
+  ];
+
+  // address_limits defines per-address transfer limits
+  // All limits are checked, and the transfer is rejected if any limit would be exceeded
+  repeated AddressLimit address_limits = 7 [
+    (gogoproto.nullable) = false
+  ];
+}
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/Params";
+  option (gogoproto.equal) = true;
+
+  // rate_limits is an array of rate limit configurations
+  // Each configuration can specify channel_id, denom, max_supply_shift, and window_duration
+  // Configurations are checked in order, and the first matching config is used
+  // If no config matches, the transfer is allowed (no rate limit)
+  repeated RateLimitConfig rate_limits = 1 [
+    (gogoproto.nullable) = false
+  ];
+}
+

@@ -78,6 +78,8 @@ import (
 	_ "github.com/bitbadges/bitbadgeschain/x/wasmx/module" // import for side-effects
 	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
+	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
@@ -107,6 +109,7 @@ var (
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibcratelimittypes.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -147,6 +150,7 @@ var (
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibcratelimittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
@@ -174,6 +178,7 @@ var (
 		capabilitytypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		ibcratelimittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,

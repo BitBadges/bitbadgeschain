@@ -1,0 +1,14 @@
+syntax = "proto3";
+package ibcratelimit;
+
+import "gogoproto/gogo.proto";
+import "ibcratelimit/params.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types";
+
+// GenesisState defines the ibcratelimit module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+

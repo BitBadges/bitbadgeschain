@@ -5,6 +5,7 @@ import (
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v19 "github.com/bitbadges/bitbadgeschain/app/upgrades/v19"
 	ibchookstypes "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/types"
+	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 	managersplittermoduletypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 )
 
@@ -39,6 +40,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			Added: []string{
 				ibchookstypes.StoreKey,
 				managersplittermoduletypes.StoreKey,
+				ibcratelimittypes.StoreKey,
 			},
 		}
 	}

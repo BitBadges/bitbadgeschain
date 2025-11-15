@@ -97,6 +97,7 @@ import (
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
+	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -159,6 +160,9 @@ type App struct {
 	// IBC Hooks
 	HooksICS4Wrapper    ibchooks.ICS4Middleware
 	TransferICS4Wrapper porttypes.ICS4Wrapper
+
+	// IBC Rate Limit
+	IBCRateLimitKeeper ibcratelimitkeeper.Keeper
 
 	// Scoped IBC
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper

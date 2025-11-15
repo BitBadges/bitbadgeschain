@@ -63,7 +63,55 @@ import (
 	customhookskeeper "github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	ibchookstypes "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/types"
+	ibcratelimithooks "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/hooks"
+	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
+	ibcratelimitmodule "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/module"
+	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 )
+
+// CombinedIBCHooks combines rate limit and custom hooks
+type CombinedIBCHooks struct {
+	RateLimitOverrideHooks *ibcratelimithooks.RateLimitOverrideHooks
+	CustomHooks            *customhooks.CustomHooks
+}
+
+// Implement hook interfaces by delegating to the appropriate hook
+var _ ibchooks.OnRecvPacketOverrideHooks = &CombinedIBCHooks{}
+var _ ibchooks.SendPacketOverrideHooks = &CombinedIBCHooks{}
+
+func (h *CombinedIBCHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+	// Rate limit hooks take precedence - check first
+	if h.RateLimitOverrideHooks != nil {
+		// Create a wrapper IBCMiddleware that chains custom hooks after rate limit
+		// The rate limit hooks will call im.App.OnRecvPacket, so we wrap that to include custom hooks
+		wrappedApp := &customHooksWrapper{
+			app:         im.App,
+			customHooks: h.CustomHooks,
+		}
+		// Create a new IBCMiddleware with the wrapped app
+		wrappedIM := ibchooks.NewIBCMiddleware(wrappedApp, im.ICS4Middleware)
+		return h.RateLimitOverrideHooks.OnRecvPacketOverride(wrappedIM, ctx, packet, relayer)
+	}
+
+	// If no rate limit hooks, use custom hooks if available
+	if h.CustomHooks != nil {
+		return h.CustomHooks.OnRecvPacketOverride(im, ctx, packet, relayer)
+	}
+
+	// Fallback to default behavior
+	return im.App.OnRecvPacket(ctx, packet, relayer)
+}
+
+func (h *CombinedIBCHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk.Context, chanCap *capabilitytypes.Capability, sourcePort string, sourceChannel string, timeoutHeight ibcclienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
+	// Rate limit hooks take precedence - check first
+	if h.RateLimitOverrideHooks != nil {
+		return h.RateLimitOverrideHooks.SendPacketOverride(i, ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+	}
+
+	// Fallback to default behavior
+	return i.SendPacket(ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+}
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
 func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
@@ -77,6 +125,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		storetypes.NewKVStoreKey(icacontrollertypes.StoreKey),
 		storetypes.NewKVStoreKey(packetforwardtypes.StoreKey),
 		storetypes.NewKVStoreKey(ibchookstypes.StoreKey),
+		storetypes.NewKVStoreKey(ibcratelimittypes.StoreKey),
 		storetypes.NewMemoryStoreKey(capabilitytypes.MemStoreKey),
 		storetypes.NewTransientStoreKey(paramstypes.TStoreKey),
 	); err != nil {
@@ -248,12 +297,34 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// Setup Custom Hooks (standalone)
 	customHooks := customhooks.NewCustomHooks(customHooksKeeper, bech32Prefix)
 
-	// Setup ICS4 Wrapper for hooks (with custom hooks only)
+	// Setup IBC Rate Limit Keeper
+	// Authority defaults to gov module account
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	app.IBCRateLimitKeeper = ibcratelimitkeeper.NewKeeper(
+		app.appCodec,
+		app.GetKey(ibcratelimittypes.StoreKey),
+		app.BankKeeper,
+		authority,
+	)
+
+	// IBC rate limit module will be registered via RegisterModules below
+
+	// Setup IBC Rate Limit Hooks
+	rateLimitOverrideHooks := ibcratelimithooks.NewRateLimitOverrideHooks(app.IBCRateLimitKeeper)
+
+	// Combine hooks: rate limit override hooks take precedence, then custom hooks
+	// The rate limit hooks need to be checked first to reject packets before processing
+	combinedHooks := &CombinedIBCHooks{
+		RateLimitOverrideHooks: rateLimitOverrideHooks,
+		CustomHooks:            customHooks,
+	}
+
+	// Setup ICS4 Wrapper for hooks (with rate limit + custom hooks)
 	// Use IBCFeeKeeper as the ICS4Wrapper since it implements the interface
 	// The channel field is only used for SendPacket operations, not OnRecvPacket hooks
 	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
 		app.IBCFeeKeeper,
-		customHooks,
+		combinedHooks,
 	)
 
 	// Add packetforward middleware first (before hooks)
@@ -296,6 +367,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		ibctm.NewAppModule(),
 		solomachine.NewAppModule(),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
+		ibcratelimitmodule.NewAppModule(app.appCodec, app.IBCRateLimitKeeper),
 	); err != nil {
 		return err
 	}
@@ -316,6 +388,7 @@ func RegisterIBC(registry cdctypes.InterfaceRegistry) map[string]appmodule.AppMo
 		ibctm.ModuleName:              ibctm.AppModule{},
 		solomachine.ModuleName:        solomachine.AppModule{},
 		packetforwardtypes.ModuleName: packetforward.AppModule{},
+		ibcratelimittypes.ModuleName:  ibcratelimitmodule.AppModule{},
 	}
 
 	for name, m := range modules {
