@@ -87,6 +87,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
@@ -166,11 +167,12 @@ type App struct {
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedKeepers             map[string]capabilitykeeper.ScopedKeeper
 
-	AnchorKeeper anchormodulekeeper.Keeper
-	BadgesKeeper badgesmodulekeeper.Keeper
-	MapsKeeper   mapsmodulekeeper.Keeper
-	WasmKeeper   wasmkeeper.Keeper
-	WasmxKeeper  wasmxmodulekeeper.Keeper
+	AnchorKeeper          anchormodulekeeper.Keeper
+	BadgesKeeper          badgesmodulekeeper.Keeper
+	MapsKeeper            mapsmodulekeeper.Keeper
+	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
+	WasmKeeper            wasmkeeper.Keeper
+	WasmxKeeper           wasmxmodulekeeper.Keeper
 
 	GammKeeper        gammkeeper.Keeper
 	PoolManagerKeeper poolmanager.Keeper
@@ -289,6 +291,7 @@ func New(
 		&app.AnchorKeeper,
 		&app.BadgesKeeper,
 		&app.MapsKeeper,
+		&app.ManagerSplitterKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)

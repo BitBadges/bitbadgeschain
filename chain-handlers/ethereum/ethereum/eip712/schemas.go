@@ -1163,6 +1163,94 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	// ManagerSplitter transaction schemas
+	schemas = append(schemas, `{
+		"type": "managersplitter/CreateManagerSplitter",
+		"value": {
+			"admin": "",
+			"permissions": {
+				"canDeleteCollection": {"approvedAddresses": []},
+				"canArchiveCollection": {"approvedAddresses": []},
+				"canUpdateStandards": {"approvedAddresses": []},
+				"canUpdateCustomData": {"approvedAddresses": []},
+				"canUpdateManager": {"approvedAddresses": []},
+				"canUpdateCollectionMetadata": {"approvedAddresses": []},
+				"canUpdateValidTokenIds": {"approvedAddresses": []},
+				"canUpdateTokenMetadata": {"approvedAddresses": []},
+				"canUpdateCollectionApprovals": {"approvedAddresses": []}
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "managersplitter/UpdateManagerSplitter",
+		"value": {
+			"admin": "",
+			"address": "",
+			"permissions": {
+				"canDeleteCollection": {"approvedAddresses": []},
+				"canArchiveCollection": {"approvedAddresses": []},
+				"canUpdateStandards": {"approvedAddresses": []},
+				"canUpdateCustomData": {"approvedAddresses": []},
+				"canUpdateManager": {"approvedAddresses": []},
+				"canUpdateCollectionMetadata": {"approvedAddresses": []},
+				"canUpdateValidTokenIds": {"approvedAddresses": []},
+				"canUpdateTokenMetadata": {"approvedAddresses": []},
+				"canUpdateCollectionApprovals": {"approvedAddresses": []}
+			}
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "managersplitter/DeleteManagerSplitter",
+		"value": {
+			"admin": "",
+			"address": ""
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "managersplitter/ExecuteUniversalUpdateCollection",
+		"value": {
+			"executor": "",
+			"managerSplitterAddress": "",
+			"universalUpdateCollectionMsg": {
+				"creator": "",
+				"collectionId": "",
+				"defaultBalances": {
+					"balances": [`+getBalanceSchema()+`],
+					"incomingApprovals": [`+getIncomingApprovalSchema()+`],
+					"outgoingApprovals": [`+getOutgoingApprovalSchema()+`],
+					"userPermissions": `+getUserPermissionsSchema()+`,
+					"autoApproveSelfInitiatedIncomingTransfers": false,
+					"autoApproveSelfInitiatedOutgoingTransfers": false,
+					"autoApproveAllIncomingTransfers": false
+				},
+				"updateValidTokenIds": false,
+				"validTokenIds": [`+getUintRangeSchema()+`],
+				"updateCollectionPermissions": false,
+				"collectionPermissions": `+getCollectionPermissionsSchema()+`,
+				"updateManagerTimeline": false,
+				"managerTimeline": [{"manager": "", "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateCollectionMetadataTimeline": false,
+				"collectionMetadataTimeline": [{"collectionMetadata": {"uri": "", "customData": ""}, "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateTokenMetadataTimeline": false,
+				"tokenMetadataTimeline": [{"tokenMetadata": [{"uri": "", "customData": "", "tokenIds": [`+getUintRangeSchema()+`]}], "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateCustomDataTimeline": false,
+				"customDataTimeline": [{"customData": "", "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateCollectionApprovals": false,
+				"collectionApprovals": [`+getCollectionApprovalSchema()+`],
+				"updateStandardsTimeline": false,
+				"standardsTimeline": [{"standards": [], "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateIsArchivedTimeline": false,
+				"isArchivedTimeline": [{"isArchived": false, "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"mintEscrowCoinsToTransfer": [{"amount": "", "denom": ""}],
+				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false, "allowCosmosWrapping": false}],
+				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": ""}
+			}
+		}
+	}`)
+
 	// GAMM transaction schemas
 	schemas = append(schemas, `{
 		"type": "gamm/JoinPool",
