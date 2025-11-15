@@ -1,0 +1,41 @@
+{
+    "messages": [
+        {
+            "@type": "/cosmos.gov.v1.MsgUpdateParams",
+            "authority": "bb10d07y265gmmuvt4z0w9aw880jnsr700jelmk2z",
+            "params": {
+                "min_deposit": [
+                    {
+                        "denom": "ubadge",
+                        "amount": "10000000000"
+                    }
+                ],
+                "max_deposit_period": "168h0m0s",
+                "voting_period": "86400s",
+                "quorum": "0.334000000000000000",
+                "threshold": "0.500000000000000000",
+                "veto_threshold": "0.334000000000000000",
+                "min_initial_deposit_ratio": "0.000000000000000000",
+                "proposal_cancel_ratio": "0.500000000000000000",
+                "proposal_cancel_dest": "",
+                "expedited_voting_period": "600s",
+                "expedited_threshold": "0.667000000000000000",
+                "expedited_min_deposit": [
+                    {
+                        "denom": "ubadge",
+                        "amount": "50000000"
+                    }
+                ],
+                "burn_vote_quorum": false,
+                "burn_proposal_deposit_prevote": false,
+                "burn_vote_veto": true,
+                "min_deposit_ratio": "0.010000000000000000"
+            }
+        }
+    ],
+    "expedited": false,
+    "deposit": "1000000000000ubadge",
+    "title": "Reduce Governance Voting Periods",
+    "summary": "This proposal reduces the governance voting period to 1 day (24 hours) and expedited voting period to 10 minutes to enable faster decision-making."
+}
+

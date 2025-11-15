@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	UpgradeName = "v19"
+	UpgradeName = "v19.1"
 )
 
 // This is in a separate function so we can test it locally with a snapshot
