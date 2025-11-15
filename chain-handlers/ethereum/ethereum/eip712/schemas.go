@@ -150,6 +150,16 @@ func getDynamicStoreChallengeSchema() string {
 	return `{ "storeId": "" }`
 }
 
+// getAddressChecksSchema returns the schema for address checks
+func getAddressChecksSchema() string {
+	return `{
+		"mustBeWasmContract": false,
+		"mustNotBeWasmContract": false,
+		"mustBeLiquidityPool": false,
+		"mustNotBeLiquidityPool": false
+	}`
+}
+
 // getBaseApprovalCriteriaSchema returns the base approval criteria schema without collection-specific fields
 func getBaseApprovalCriteriaSchema() string {
 	return `{
@@ -206,7 +216,10 @@ func getCollectionApprovalCriteriaSchema() string {
 		],
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
-		]
+		],
+		"senderChecks": ` + getAddressChecksSchema() + `,
+		"recipientChecks": ` + getAddressChecksSchema() + `,
+		"initiatorChecks": ` + getAddressChecksSchema() + `
 	}`
 }
 
@@ -233,7 +246,9 @@ func getOutgoingApprovalCriteriaSchema() string {
 		],
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
-		]
+		],
+		"recipientChecks": ` + getAddressChecksSchema() + `,
+		"initiatorChecks": ` + getAddressChecksSchema() + `
 	}`
 }
 
@@ -260,7 +275,9 @@ func getIncomingApprovalCriteriaSchema() string {
 		],
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
-		]
+		],
+		"senderChecks": ` + getAddressChecksSchema() + `,
+		"initiatorChecks": ` + getAddressChecksSchema() + `
 	}`
 }
 
@@ -715,7 +732,8 @@ func GetSchemas() []string {
 					],
 					"ibcAmount": ""
 				},
-				"noForcefulPostMintTransfers": false
+				"noForcefulPostMintTransfers": false,
+				"disablePoolCreation": false
 			}
 		}
 	}`)
@@ -847,7 +865,8 @@ func GetSchemas() []string {
 					],
 					"ibcAmount": ""
 				},
-				"noForcefulPostMintTransfers": false
+				"noForcefulPostMintTransfers": false,
+				"disablePoolCreation": false
 			}
 		}
 	}`)
@@ -950,7 +969,8 @@ func GetSchemas() []string {
 					],
 					"ibcAmount": ""
 				},
-				"noForcefulPostMintTransfers": false
+				"noForcefulPostMintTransfers": false,
+				"disablePoolCreation": false
 			}
 		}
 	}`)
@@ -1270,7 +1290,7 @@ func GetSchemas() []string {
 				"isArchivedTimeline": [{"isArchived": false, "timelineTimes": [`+getUintRangeSchema()+`]}],
 				"mintEscrowCoinsToTransfer": [{"amount": "", "denom": ""}],
 				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false, "allowCosmosWrapping": false}],
-				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": ""}
+				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": "", "disablePoolCreation": false}
 			}
 		}
 	}`)

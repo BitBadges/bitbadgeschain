@@ -26,6 +26,7 @@ var (
 	DynamicStoreValueKey       = []byte{0x0F}
 	ETHSignatureTrackerKey     = []byte{0x10}
 	ReservedProtocolAddressKey = []byte{0x11}
+	PoolAddressCacheKey        = []byte{0x13}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 	BackedPathGenerationPrefix  = []byte{0x12}
@@ -235,5 +236,12 @@ func reservedProtocolAddressStoreKey(address string) []byte {
 	key := make([]byte, len(ReservedProtocolAddressKey)+len(address))
 	copy(key, ReservedProtocolAddressKey)
 	copy(key[len(ReservedProtocolAddressKey):], []byte(address))
+	return key
+}
+
+func poolAddressCacheStoreKey(address string) []byte {
+	key := make([]byte, len(PoolAddressCacheKey)+len(address))
+	copy(key, PoolAddressCacheKey)
+	copy(key[len(PoolAddressCacheKey):], []byte(address))
 	return key
 }

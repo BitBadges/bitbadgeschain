@@ -107,6 +107,9 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		MustOwnTokens:                      approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:             approvalCriteria.DynamicStoreChallenges,
 		EthSignatureChallenges:             approvalCriteria.EthSignatureChallenges,
+		SenderChecks:                       approvalCriteria.SenderChecks,
+		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
+		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
 
@@ -127,6 +130,9 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		MustOwnTokens:                    approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:           approvalCriteria.DynamicStoreChallenges,
 		EthSignatureChallenges:           approvalCriteria.EthSignatureChallenges,
+		RecipientChecks:                  approvalCriteria.RecipientChecks,
+		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
+		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }
 
@@ -147,6 +153,9 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		MustOwnTokens:                      approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:             approvalCriteria.DynamicStoreChallenges,
 		EthSignatureChallenges:             approvalCriteria.EthSignatureChallenges,
+		SenderChecks:                       approvalCriteria.SenderChecks,
+		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
+		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
 
@@ -167,5 +176,8 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		MustOwnTokens:                    approvalCriteria.MustOwnTokens,
 		DynamicStoreChallenges:           approvalCriteria.DynamicStoreChallenges,
 		EthSignatureChallenges:           approvalCriteria.EthSignatureChallenges,
+		RecipientChecks:                  approvalCriteria.RecipientChecks,
+		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
+		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }

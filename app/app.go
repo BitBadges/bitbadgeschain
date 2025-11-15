@@ -331,6 +331,10 @@ func New(
 		return nil, err
 	}
 
+	// Wire up keepers for address checks
+	app.BadgesKeeper.SetWasmViewKeeper(&app.WasmKeeper)
+	app.BadgesKeeper.SetGammKeeper(&app.GammKeeper)
+
 	// register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		return nil, err

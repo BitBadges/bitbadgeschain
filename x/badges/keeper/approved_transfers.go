@@ -165,6 +165,31 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
+			// Check address checks for sender, recipient, and initiator
+			if approvalCriteria.SenderChecks != nil {
+				err = k.CheckAddressChecks(ctx, approvalCriteria.SenderChecks, fromAddress)
+				if err != nil {
+					addPotentialError(isPrioritizedApproval, fmt.Sprintf("sender address check failed: %s", err))
+					continue
+				}
+			}
+
+			if approvalCriteria.RecipientChecks != nil {
+				err = k.CheckAddressChecks(ctx, approvalCriteria.RecipientChecks, toAddress)
+				if err != nil {
+					addPotentialError(isPrioritizedApproval, fmt.Sprintf("recipient address check failed: %s", err))
+					continue
+				}
+			}
+
+			if approvalCriteria.InitiatorChecks != nil {
+				err = k.CheckAddressChecks(ctx, approvalCriteria.InitiatorChecks, initiatedBy)
+				if err != nil {
+					addPotentialError(isPrioritizedApproval, fmt.Sprintf("initiator address check failed: %s", err))
+					continue
+				}
+			}
+
 			// Check noForcefulPostMintTransfers invariant - disallow any approval with overridesFrom or overridesTo
 			// This only applies when fromAddress does not equal "Mint"
 			if collection.Invariants != nil && collection.Invariants.NoForcefulPostMintTransfers {

@@ -425,6 +425,18 @@ message DynamicStoreChallenge {
   string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
+// AddressChecks defines checks for address types (WASM contract, liquidity pool, etc.)
+message AddressChecks {
+  // Require the address to be a WASM contract.
+  bool mustBeWasmContract = 1;
+  // Require the address to not be a WASM contract.
+  bool mustNotBeWasmContract = 2;
+  // Require the address to be a liquidity pool.
+  bool mustBeLiquidityPool = 3;
+  // Require the address to not be a liquidity pool.
+  bool mustNotBeLiquidityPool = 4;
+}
+
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
   // Merkle challenge that must be satisfied for approval.
@@ -464,6 +476,10 @@ message ApprovalCriteria {
   repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
   // ETH signature challenges that the initiator must pass for approval.
   repeated ETHSignatureChallenge ethSignatureChallenges = 16;
+  // Address checks for sender, recipient, and initiator.
+  AddressChecks senderChecks = 17;
+  AddressChecks recipientChecks = 18;
+  AddressChecks initiatorChecks = 19;
 }
 
 // UserRoyalties defines the royalties for a user.
@@ -501,6 +517,9 @@ message OutgoingApprovalCriteria {
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
   // ETH signature challenges that the initiator must pass for approval.
   repeated ETHSignatureChallenge ethSignatureChallenges = 11;
+  // Address checks for recipient and initiator (no sender checks for outgoing approvals).
+  AddressChecks recipientChecks = 12;
+  AddressChecks initiatorChecks = 13;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -530,6 +549,9 @@ message IncomingApprovalCriteria {
   repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
   // ETH signature challenges that the initiator must pass for approval.
   repeated ETHSignatureChallenge ethSignatureChallenges = 11;
+  // Address checks for sender and initiator (no recipient checks for incoming approvals).
+  AddressChecks senderChecks = 12;
+  AddressChecks initiatorChecks = 13;
 }
 
 

@@ -30,9 +30,13 @@ type (
 		// should be the x/gov module account.
 		authority string
 
-		bankKeeper    types.BankKeeper
-		accountKeeper types.AccountKeeper
+		bankKeeper         types.BankKeeper
+		accountKeeper      types.AccountKeeper
 		distributionKeeper types.DistributionKeeper
+
+		// Optional keepers for address checks
+		wasmViewKeeper types.WasmViewKeeper
+		gammKeeper     types.GammKeeper
 
 		ibcKeeperFn        func() *ibckeeper.Keeper
 		capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper
@@ -65,6 +69,16 @@ func NewKeeper(
 		ibcKeeperFn:        ibcKeeperFn,
 		capabilityScopedFn: capabilityScopedFn,
 	}
+}
+
+// SetWasmViewKeeper sets the WASM view keeper (optional)
+func (k *Keeper) SetWasmViewKeeper(wasmViewKeeper types.WasmViewKeeper) {
+	k.wasmViewKeeper = wasmViewKeeper
+}
+
+// SetGammKeeper sets the gamm keeper (optional)
+func (k *Keeper) SetGammKeeper(gammKeeper types.GammKeeper) {
+	k.gammKeeper = gammKeeper
 }
 
 // GetAuthority returns the module's authority.

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/binary"
 	"math"
 	"strconv"
 
@@ -835,6 +836,37 @@ func (k Keeper) IsAddressReservedProtocolInStore(ctx sdk.Context, address string
 	store := prefix.NewStore(storeAdapter, []byte{})
 	value := store.Get(reservedProtocolAddressStoreKey(address))
 	return len(value) > 0 && value[0] == 1
+}
+
+/****************************************POOL ADDRESS CACHE****************************************/
+
+// SetPoolAddressInCache stores a mapping of pool address to pool ID in the cache
+func (k Keeper) SetPoolAddressInCache(ctx sdk.Context, address string, poolId uint64) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	// Use big endian encoding for consistency with Cosmos SDK
+	key := make([]byte, 8)
+	binary.BigEndian.PutUint64(key, poolId)
+	store.Set(poolAddressCacheStoreKey(address), key)
+}
+
+// GetPoolIdFromAddressCache retrieves the pool ID for a given address from the cache
+func (k Keeper) GetPoolIdFromAddressCache(ctx sdk.Context, address string) (uint64, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	value := store.Get(poolAddressCacheStoreKey(address))
+	if len(value) == 0 || len(value) != 8 {
+		return 0, false
+	}
+	// Decode big endian
+	return binary.BigEndian.Uint64(value), true
+}
+
+// RemovePoolAddressFromCache removes a pool address from the cache
+func (k Keeper) RemovePoolAddressFromCache(ctx sdk.Context, address string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Delete(poolAddressCacheStoreKey(address))
 }
 
 // GetAllReservedProtocolAddressesFromStore gets all reserved protocol addresses from the store.

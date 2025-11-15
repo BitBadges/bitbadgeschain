@@ -43,49 +43,61 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
-	// for _, approval := range incomingApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+	for _, approval := range incomingApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
 
-	// 	for _, mustOwnToken := range approval.ApprovalCriteria.MustOwnTokens {
-	// 		if mustOwnToken.OwnershipCheckParty == "" {
-	// 			mustOwnToken.OwnershipCheckParty = "initiator"
-	// 		}
-	// 	}
-	// }
+		// Ensure address checks are properly initialized (nil is fine, but ensure they're not uninitialized)
+		// Address checks will be nil for old data, which is the correct default
+		if approval.ApprovalCriteria.SenderChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+		if approval.ApprovalCriteria.InitiatorChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+	}
 
 	return incomingApprovals
 }
 
 func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval) []*newtypes.UserOutgoingApproval {
-	// for _, approval := range outgoingApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+	for _, approval := range outgoingApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
 
-	// 	for _, mustOwnToken := range approval.ApprovalCriteria.MustOwnTokens {
-	// 		if mustOwnToken.OwnershipCheckParty == "" {
-	// 			mustOwnToken.OwnershipCheckParty = "initiator"
-	// 		}
-	// 	}
-	// }
+		// Ensure address checks are properly initialized (nil is fine, but ensure they're not uninitialized)
+		// Address checks will be nil for old data, which is the correct default
+		if approval.ApprovalCriteria.RecipientChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+		if approval.ApprovalCriteria.InitiatorChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+	}
 
 	return outgoingApprovals
 }
 
 func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*newtypes.CollectionApproval {
-	// for _, approval := range collectionApprovals {
-	// 	if approval.ApprovalCriteria == nil {
-	// 		continue
-	// 	}
+	for _, approval := range collectionApprovals {
+		if approval.ApprovalCriteria == nil {
+			continue
+		}
 
-	// 	for _, mustOwnToken := range approval.ApprovalCriteria.MustOwnTokens {
-	// 		if mustOwnToken.OwnershipCheckParty == "" {
-	// 			mustOwnToken.OwnershipCheckParty = "initiator"
-	// 		}
-	// 	}
-	// }
+		// Ensure address checks are properly initialized (nil is fine, but ensure they're not uninitialized)
+		// Address checks will be nil for old data, which is the correct default
+		if approval.ApprovalCriteria.SenderChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+		if approval.ApprovalCriteria.RecipientChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+		if approval.ApprovalCriteria.InitiatorChecks == nil {
+			// Keep as nil - this is the default for new fields
+		}
+	}
 
 	return collectionApprovals
 }

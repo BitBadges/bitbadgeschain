@@ -37,17 +37,17 @@ func (k Keeper) CreatePool(ctx sdk.Context, msg types.CreatePoolMsg) (uint64, er
 		return 0, types.InvalidPoolTypeError{PoolType: poolType}
 	}
 
-	// Validate that pool creation is allowed for all badges assets in the initial liquidity
-	initialPoolLiquidity := msg.InitialLiquidity()
-	if err := k.gammKeeper.ValidatePoolCreationAllowed(ctx, initialPoolLiquidity); err != nil {
-		return 0, err
-	}
-
 	// createPoolZeroLiquidityNoCreationFee contains shared pool creation logic between this function (CreatePool) and
 	// CreateConcentratedPoolAsPoolManager. Despite the name, within this (CreatePool) function, we do charge a creation
 	// fee and send initial liquidity to the pool's address. createPoolZeroLiquidityNoCreationFee is strictly used to reduce code duplication.
 	pool, err := k.createPoolZeroLiquidityNoCreationFee(ctx, msg)
 	if err != nil {
+		return 0, err
+	}
+
+	// Validate that pool creation is allowed for all badges assets in the initial liquidity
+	initialPoolLiquidity := msg.InitialLiquidity()
+	if err := k.gammKeeper.ValidatePoolCreationAllowed(ctx, initialPoolLiquidity); err != nil {
 		return 0, err
 	}
 
