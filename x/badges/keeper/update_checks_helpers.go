@@ -3,6 +3,7 @@ package keeper
 import (
 	"math"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	proto "github.com/gogo/protobuf/proto"
 
@@ -248,9 +249,63 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 	return detailsToCheck, nil
 }
 
+// ValidateCollectionApprovalsWithInvariants validates collection approvals with invariants using keeper context
+// This allows proper checking of address lists (e.g., whether FromListId includes "Mint")
+func (k Keeper) ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*types.CollectionApproval, canChangeValues bool, collection *types.TokenCollection) error {
+	// First validate the basic collection approvals
+	if err := types.ValidateCollectionApprovals(ctx, collectionApprovals, canChangeValues); err != nil {
+		return err
+	}
+
+	// Check invariants if collection is provided
+	if collection != nil && collection.Invariants != nil {
+		if collection.Invariants.NoCustomOwnershipTimes {
+			for _, collectionApproval := range collectionApprovals {
+				if err := types.ValidateNoCustomOwnershipTimesInvariant(collectionApproval.OwnershipTimes, true); err != nil {
+					return err
+				}
+			}
+		}
+
+		// Check noForcefulPostMintTransfers invariant
+		// This only applies to approvals where FromListId is not only "Mint"
+		if collection.Invariants.NoForcefulPostMintTransfers {
+			for _, collectionApproval := range collectionApprovals {
+				if collectionApproval.ApprovalCriteria != nil {
+					// Get the address list object and check if it's only Mint
+					fromList, err := k.GetAddressListById(ctx, collectionApproval.FromListId)
+					if err == nil && isOnlyMint(fromList) {
+						// FromListId is only Mint, so skip the check (allow forceful transfers from Mint)
+						continue
+					}
+
+					// FromListId is not only Mint, so disallow forceful transfers
+					if collectionApproval.ApprovalCriteria.OverridesFromOutgoingApprovals {
+						return sdkerrors.Wrapf(types.ErrInvalidRequest, "collection approval %s has overridesFromOutgoingApprovals set to true, which is disallowed when noForcefulPostMintTransfers invariant is enabled (unless FromListId is only Mint)", collectionApproval.ApprovalId)
+					}
+					if collectionApproval.ApprovalCriteria.OverridesToIncomingApprovals {
+						return sdkerrors.Wrapf(types.ErrInvalidRequest, "collection approval %s has overridesToIncomingApprovals set to true, which is disallowed when noForcefulPostMintTransfers invariant is enabled (unless FromListId is only Mint)", collectionApproval.ApprovalId)
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// isOnlyMint checks if an address list contains only Mint
+// It must be: whitelist = true, len(addresses) == 1, and addresses[0] == "Mint"
+func isOnlyMint(addressList *types.AddressList) bool {
+	return addressList != nil &&
+		addressList.Whitelist &&
+		len(addressList.Addresses) == 1 &&
+		addressList.Addresses[0] == types.MintAddress
+}
+
 func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval, CanUpdateCollectionApprovals []*types.CollectionApprovalPermission) error {
-	// Validate new approvals with invariants
-	if err := types.ValidateCollectionApprovalsWithInvariants(ctx, newApprovals, true, collection); err != nil {
+	// Validate new approvals with invariants (with keeper context for proper address list checking)
+	if err := k.ValidateCollectionApprovalsWithInvariants(ctx, newApprovals, true, collection); err != nil {
 		return err
 	}
 

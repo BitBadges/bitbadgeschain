@@ -693,12 +693,15 @@ func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprov
 	}
 
 	// Check invariants if collection is provided
-	if collection != nil && collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
-		for _, collectionApproval := range collectionApprovals {
-			if err := ValidateNoCustomOwnershipTimesInvariant(collectionApproval.OwnershipTimes, true); err != nil {
-				return err
+	if collection != nil && collection.Invariants != nil {
+		if collection.Invariants.NoCustomOwnershipTimes {
+			for _, collectionApproval := range collectionApprovals {
+				if err := ValidateNoCustomOwnershipTimesInvariant(collectionApproval.OwnershipTimes, true); err != nil {
+					return err
+				}
 			}
 		}
+
 	}
 
 	return nil

@@ -26,9 +26,9 @@ import (
 
 // validateCollectionBeforeStore validates a collection before storing it
 func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types.TokenCollection) error {
-	// Validate collection approvals with invariants
-	if collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
-		if err := types.ValidateCollectionApprovalsWithInvariants(ctx, collection.CollectionApprovals, false, collection); err != nil {
+	// Validate collection approvals with invariants (using keeper method for proper address list checking)
+	if collection.Invariants != nil {
+		if err := k.ValidateCollectionApprovalsWithInvariants(ctx, collection.CollectionApprovals, false, collection); err != nil {
 			return sdkerrors.Wrap(err, "collection approval validation failed")
 		}
 	}

@@ -165,6 +165,22 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
+			// Check noForcefulPostMintTransfers invariant - disallow any approval with overridesFrom or overridesTo
+			// This only applies when fromAddress does not equal "Mint"
+			if collection.Invariants != nil && collection.Invariants.NoForcefulPostMintTransfers {
+				if fromAddress != types.MintAddress {
+					// Only check if fromAddress is not "Mint"
+					if approvalCriteria.OverridesFromOutgoingApprovals {
+						addPotentialError(isPrioritizedApproval, fmt.Sprintf("forceful transfers that bypass user outgoing approvals are disallowed when noForcefulPostMintTransfers invariant is enabled (unless from address is Mint)"))
+						continue
+					}
+					if approvalCriteria.OverridesToIncomingApprovals {
+						addPotentialError(isPrioritizedApproval, fmt.Sprintf("forceful transfers that bypass user incoming approvals are disallowed when noForcefulPostMintTransfers invariant is enabled (unless from address is Mint)"))
+						continue
+					}
+				}
+			}
+
 			// Check if from address is a reserved protocol address when overridesFromOutgoingApprovals is true
 			// Bypass this check if the address is actually initiating it
 			//

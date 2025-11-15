@@ -176,8 +176,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		// Convert InvariantsAddObject to CollectionInvariants if present
 		if msg.Invariants != nil {
 			collection.Invariants = &types.CollectionInvariants{
-				NoCustomOwnershipTimes: msg.Invariants.NoCustomOwnershipTimes,
-				MaxSupplyPerId:         msg.Invariants.MaxSupplyPerId,
+				NoCustomOwnershipTimes:      msg.Invariants.NoCustomOwnershipTimes,
+				MaxSupplyPerId:              msg.Invariants.MaxSupplyPerId,
+				NoForcefulPostMintTransfers: msg.Invariants.NoForcefulPostMintTransfers,
 			}
 
 			// Handle cosmos coin backed path - generate address
@@ -238,7 +239,21 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if msg.UpdateCollectionApprovals {
-		if err := k.ValidateCollectionApprovalsUpdate(ctx, collection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
+		// Create a temporary collection with invariants from the message for validation
+		// This ensures invariants are checked even if they haven't been set on the collection yet
+		tempCollection := *collection
+		if msg.Invariants != nil {
+			if tempCollection.Invariants == nil {
+				tempCollection.Invariants = &types.CollectionInvariants{}
+			}
+			tempCollection.Invariants.NoCustomOwnershipTimes = msg.Invariants.NoCustomOwnershipTimes
+			tempCollection.Invariants.MaxSupplyPerId = msg.Invariants.MaxSupplyPerId
+			tempCollection.Invariants.NoForcefulPostMintTransfers = msg.Invariants.NoForcefulPostMintTransfers
+			// Note: CosmosCoinBackedPath requires address generation, so we skip it here
+			// It will be validated separately in validateCollectionBeforeStore
+		}
+
+		if err := k.ValidateCollectionApprovalsUpdate(ctx, &tempCollection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
 			return nil, err
 		}
 
@@ -368,6 +383,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		// Set basic invariant fields
 		collection.Invariants.NoCustomOwnershipTimes = msg.Invariants.NoCustomOwnershipTimes
 		collection.Invariants.MaxSupplyPerId = msg.Invariants.MaxSupplyPerId
+		collection.Invariants.NoForcefulPostMintTransfers = msg.Invariants.NoForcefulPostMintTransfers
 
 		// Handle cosmos coin backed path - generate address
 		if msg.Invariants.CosmosCoinBackedPath != nil {

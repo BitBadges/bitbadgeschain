@@ -115,4 +115,9 @@ message CollectionInvariants {
   
   // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
   CosmosCoinBackedPath cosmosCoinBackedPath = 3;
+  
+  // If true, disallows any collection approvals that have overridesFromOutgoingApprovals or overridesToIncomingApprovals set to true.
+  // This prevents forceful transfers that bypass user-level approvals.
+  // This only applies to transfers where the from address does not equal "Mint".
+  bool noForcefulPostMintTransfers = 4;
 }

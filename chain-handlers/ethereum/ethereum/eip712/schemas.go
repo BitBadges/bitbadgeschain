@@ -714,7 +714,8 @@ func GetSchemas() []string {
 						`+getBalanceSchema()+`
 					],
 					"ibcAmount": ""
-				}
+				},
+				"noForcefulPostMintTransfers": false
 			}
 		}
 	}`)
@@ -845,7 +846,8 @@ func GetSchemas() []string {
 						`+getBalanceSchema()+`
 					],
 					"ibcAmount": ""
-				}
+				},
+				"noForcefulPostMintTransfers": false
 			}
 		}
 	}`)
@@ -947,7 +949,8 @@ func GetSchemas() []string {
 						`+getBalanceSchema()+`
 					],
 					"ibcAmount": ""
-				}
+				},
+				"noForcefulPostMintTransfers": false
 			}
 		}
 	}`)
