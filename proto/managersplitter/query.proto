@@ -1,0 +1,57 @@
+syntax = "proto3";
+package managersplitter;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "managersplitter/params.proto";
+import "managersplitter/tx.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/managersplitter/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/managersplitter/params";
+  }
+  // ManagerSplitter queries a manager splitter by address.
+  rpc ManagerSplitter(QueryGetManagerSplitterRequest) returns (QueryGetManagerSplitterResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/managersplitter/{address}";
+  }
+  // AllManagerSplitters queries all manager splitters.
+  rpc AllManagerSplitters(QueryAllManagerSplittersRequest) returns (QueryAllManagerSplittersResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/managersplitter";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryGetManagerSplitterRequest is request type for the Query/ManagerSplitter RPC method.
+message QueryGetManagerSplitterRequest {
+  string address = 1;
+}
+
+// QueryGetManagerSplitterResponse is response type for the Query/ManagerSplitter RPC method.
+message QueryGetManagerSplitterResponse {
+  ManagerSplitter managerSplitter = 1;
+}
+
+// QueryAllManagerSplittersRequest is request type for the Query/AllManagerSplitters RPC method.
+message QueryAllManagerSplittersRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllManagerSplittersResponse is response type for the Query/AllManagerSplitters RPC method.
+message QueryAllManagerSplittersResponse {
+  repeated ManagerSplitter managerSplitters = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+

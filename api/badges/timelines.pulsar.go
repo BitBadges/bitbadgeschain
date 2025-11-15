@@ -1219,579 +1219,6 @@ func (x *fastReflection_TokenMetadataTimeline) ProtoMethods() *protoiface.Method
 	}
 }
 
-var _ protoreflect.List = (*_OffChainBalancesMetadataTimeline_2_list)(nil)
-
-type _OffChainBalancesMetadataTimeline_2_list struct {
-	list *[]*UintRange
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) Len() int {
-	if x.list == nil {
-		return 0
-	}
-	return len(*x.list)
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
-	(*x.list)[i] = concreteValue
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
-	*x.list = append(*x.list, concreteValue)
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) AppendMutable() protoreflect.Value {
-	v := new(UintRange)
-	*x.list = append(*x.list, v)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) Truncate(n int) {
-	for i := n; i < len(*x.list); i++ {
-		(*x.list)[i] = nil
-	}
-	*x.list = (*x.list)[:n]
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) NewElement() protoreflect.Value {
-	v := new(UintRange)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_OffChainBalancesMetadataTimeline_2_list) IsValid() bool {
-	return x.list != nil
-}
-
-var (
-	md_OffChainBalancesMetadataTimeline                          protoreflect.MessageDescriptor
-	fd_OffChainBalancesMetadataTimeline_offChainBalancesMetadata protoreflect.FieldDescriptor
-	fd_OffChainBalancesMetadataTimeline_timelineTimes            protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_badges_timelines_proto_init()
-	md_OffChainBalancesMetadataTimeline = File_badges_timelines_proto.Messages().ByName("OffChainBalancesMetadataTimeline")
-	fd_OffChainBalancesMetadataTimeline_offChainBalancesMetadata = md_OffChainBalancesMetadataTimeline.Fields().ByName("offChainBalancesMetadata")
-	fd_OffChainBalancesMetadataTimeline_timelineTimes = md_OffChainBalancesMetadataTimeline.Fields().ByName("timelineTimes")
-}
-
-var _ protoreflect.Message = (*fastReflection_OffChainBalancesMetadataTimeline)(nil)
-
-type fastReflection_OffChainBalancesMetadataTimeline OffChainBalancesMetadataTimeline
-
-func (x *OffChainBalancesMetadataTimeline) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_OffChainBalancesMetadataTimeline)(x)
-}
-
-func (x *OffChainBalancesMetadataTimeline) slowProtoReflect() protoreflect.Message {
-	mi := &file_badges_timelines_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_OffChainBalancesMetadataTimeline_messageType fastReflection_OffChainBalancesMetadataTimeline_messageType
-var _ protoreflect.MessageType = fastReflection_OffChainBalancesMetadataTimeline_messageType{}
-
-type fastReflection_OffChainBalancesMetadataTimeline_messageType struct{}
-
-func (x fastReflection_OffChainBalancesMetadataTimeline_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_OffChainBalancesMetadataTimeline)(nil)
-}
-func (x fastReflection_OffChainBalancesMetadataTimeline_messageType) New() protoreflect.Message {
-	return new(fastReflection_OffChainBalancesMetadataTimeline)
-}
-func (x fastReflection_OffChainBalancesMetadataTimeline_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_OffChainBalancesMetadataTimeline
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Descriptor() protoreflect.MessageDescriptor {
-	return md_OffChainBalancesMetadataTimeline
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Type() protoreflect.MessageType {
-	return _fastReflection_OffChainBalancesMetadataTimeline_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) New() protoreflect.Message {
-	return new(fastReflection_OffChainBalancesMetadataTimeline)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Interface() protoreflect.ProtoMessage {
-	return (*OffChainBalancesMetadataTimeline)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.OffChainBalancesMetadata != nil {
-		value := protoreflect.ValueOfMessage(x.OffChainBalancesMetadata.ProtoReflect())
-		if !f(fd_OffChainBalancesMetadataTimeline_offChainBalancesMetadata, value) {
-			return
-		}
-	}
-	if len(x.TimelineTimes) != 0 {
-		value := protoreflect.ValueOfList(&_OffChainBalancesMetadataTimeline_2_list{list: &x.TimelineTimes})
-		if !f(fd_OffChainBalancesMetadataTimeline_timelineTimes, value) {
-			return
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata":
-		return x.OffChainBalancesMetadata != nil
-	case "badges.OffChainBalancesMetadataTimeline.timelineTimes":
-		return len(x.TimelineTimes) != 0
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OffChainBalancesMetadataTimeline"))
-		}
-		panic(fmt.Errorf("message badges.OffChainBalancesMetadataTimeline does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata":
-		x.OffChainBalancesMetadata = nil
-	case "badges.OffChainBalancesMetadataTimeline.timelineTimes":
-		x.TimelineTimes = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OffChainBalancesMetadataTimeline"))
-		}
-		panic(fmt.Errorf("message badges.OffChainBalancesMetadataTimeline does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata":
-		value := x.OffChainBalancesMetadata
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "badges.OffChainBalancesMetadataTimeline.timelineTimes":
-		if len(x.TimelineTimes) == 0 {
-			return protoreflect.ValueOfList(&_OffChainBalancesMetadataTimeline_2_list{})
-		}
-		listValue := &_OffChainBalancesMetadataTimeline_2_list{list: &x.TimelineTimes}
-		return protoreflect.ValueOfList(listValue)
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OffChainBalancesMetadataTimeline"))
-		}
-		panic(fmt.Errorf("message badges.OffChainBalancesMetadataTimeline does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata":
-		x.OffChainBalancesMetadata = value.Message().Interface().(*OffChainBalancesMetadata)
-	case "badges.OffChainBalancesMetadataTimeline.timelineTimes":
-		lv := value.List()
-		clv := lv.(*_OffChainBalancesMetadataTimeline_2_list)
-		x.TimelineTimes = *clv.list
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OffChainBalancesMetadataTimeline"))
-		}
-		panic(fmt.Errorf("message badges.OffChainBalancesMetadataTimeline does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata":
-		if x.OffChainBalancesMetadata == nil {
-			x.OffChainBalancesMetadata = new(OffChainBalancesMetadata)
-		}
-		return protoreflect.ValueOfMessage(x.OffChainBalancesMetadata.ProtoReflect())
-	case "badges.OffChainBalancesMetadataTimeline.timelineTimes":
-		if x.TimelineTimes == nil {
-			x.TimelineTimes = []*UintRange{}
-		}
-		value := &_OffChainBalancesMetadataTimeline_2_list{list: &x.TimelineTimes}
-		return protoreflect.ValueOfList(value)
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OffChainBalancesMetadataTimeline"))
-		}
-		panic(fmt.Errorf("message badges.OffChainBalancesMetadataTimeline does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata":
-		m := new(OffChainBalancesMetadata)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "badges.OffChainBalancesMetadataTimeline.timelineTimes":
-		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_OffChainBalancesMetadataTimeline_2_list{list: &list})
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.OffChainBalancesMetadataTimeline"))
-		}
-		panic(fmt.Errorf("message badges.OffChainBalancesMetadataTimeline does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in badges.OffChainBalancesMetadataTimeline", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_OffChainBalancesMetadataTimeline) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*OffChainBalancesMetadataTimeline)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		if x.OffChainBalancesMetadata != nil {
-			l = options.Size(x.OffChainBalancesMetadata)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if len(x.TimelineTimes) > 0 {
-			for _, e := range x.TimelineTimes {
-				l = options.Size(e)
-				n += 1 + l + runtime.Sov(uint64(l))
-			}
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*OffChainBalancesMetadataTimeline)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.TimelineTimes) > 0 {
-			for iNdEx := len(x.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.TimelineTimes[iNdEx])
-				if err != nil {
-					return protoiface.MarshalOutput{
-						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-						Buf:               input.Buf,
-					}, err
-				}
-				i -= len(encoded)
-				copy(dAtA[i:], encoded)
-				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-				i--
-				dAtA[i] = 0x12
-			}
-		}
-		if x.OffChainBalancesMetadata != nil {
-			encoded, err := options.Marshal(x.OffChainBalancesMetadata)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0xa
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*OffChainBalancesMetadataTimeline)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: OffChainBalancesMetadataTimeline: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: OffChainBalancesMetadataTimeline: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 1:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OffChainBalancesMetadata", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.OffChainBalancesMetadata == nil {
-					x.OffChainBalancesMetadata = &OffChainBalancesMetadata{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.OffChainBalancesMetadata); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.TimelineTimes = append(x.TimelineTimes, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TimelineTimes[len(x.TimelineTimes)-1]); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
-
 var _ protoreflect.List = (*_CustomDataTimeline_2_list)(nil)
 
 type _CustomDataTimeline_2_list struct {
@@ -1865,7 +1292,7 @@ func (x *CustomDataTimeline) ProtoReflect() protoreflect.Message {
 }
 
 func (x *CustomDataTimeline) slowProtoReflect() protoreflect.Message {
-	mi := &file_badges_timelines_proto_msgTypes[3]
+	mi := &file_badges_timelines_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2423,7 +1850,7 @@ func (x *ManagerTimeline) ProtoReflect() protoreflect.Message {
 }
 
 func (x *ManagerTimeline) slowProtoReflect() protoreflect.Message {
-	mi := &file_badges_timelines_proto_msgTypes[4]
+	mi := &file_badges_timelines_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2981,7 +2408,7 @@ func (x *IsArchivedTimeline) ProtoReflect() protoreflect.Message {
 }
 
 func (x *IsArchivedTimeline) slowProtoReflect() protoreflect.Message {
-	mi := &file_badges_timelines_proto_msgTypes[5]
+	mi := &file_badges_timelines_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3529,7 +2956,7 @@ func (x *ContractAddressTimeline) ProtoReflect() protoreflect.Message {
 }
 
 func (x *ContractAddressTimeline) slowProtoReflect() protoreflect.Message {
-	mi := &file_badges_timelines_proto_msgTypes[6]
+	mi := &file_badges_timelines_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4133,7 +3560,7 @@ func (x *StandardsTimeline) ProtoReflect() protoreflect.Message {
 }
 
 func (x *StandardsTimeline) slowProtoReflect() protoreflect.Message {
-	mi := &file_badges_timelines_proto_msgTypes[7]
+	mi := &file_badges_timelines_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4737,52 +4164,6 @@ func (x *TokenMetadataTimeline) GetTimelineTimes() []*UintRange {
 	return nil
 }
 
-// OffChainBalancesMetadataTimeline defines the metadata for off-chain balances at different timeline times.
-type OffChainBalancesMetadataTimeline struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// The off-chain balances metadata for a specific timeline element.
-	OffChainBalancesMetadata *OffChainBalancesMetadata `protobuf:"bytes,1,opt,name=offChainBalancesMetadata,proto3" json:"offChainBalancesMetadata,omitempty"`
-	// The timeline times when the off-chain balances metadata is valid. Can not overlap with other timeline elements in same array.
-	TimelineTimes []*UintRange `protobuf:"bytes,2,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-}
-
-func (x *OffChainBalancesMetadataTimeline) Reset() {
-	*x = OffChainBalancesMetadataTimeline{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_badges_timelines_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *OffChainBalancesMetadataTimeline) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OffChainBalancesMetadataTimeline) ProtoMessage() {}
-
-// Deprecated: Use OffChainBalancesMetadataTimeline.ProtoReflect.Descriptor instead.
-func (*OffChainBalancesMetadataTimeline) Descriptor() ([]byte, []int) {
-	return file_badges_timelines_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *OffChainBalancesMetadataTimeline) GetOffChainBalancesMetadata() *OffChainBalancesMetadata {
-	if x != nil {
-		return x.OffChainBalancesMetadata
-	}
-	return nil
-}
-
-func (x *OffChainBalancesMetadataTimeline) GetTimelineTimes() []*UintRange {
-	if x != nil {
-		return x.TimelineTimes
-	}
-	return nil
-}
-
 // CustomDataTimeline defines custom data at different timeline times.
 type CustomDataTimeline struct {
 	state         protoimpl.MessageState
@@ -4798,7 +4179,7 @@ type CustomDataTimeline struct {
 func (x *CustomDataTimeline) Reset() {
 	*x = CustomDataTimeline{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_badges_timelines_proto_msgTypes[3]
+		mi := &file_badges_timelines_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4812,7 +4193,7 @@ func (*CustomDataTimeline) ProtoMessage() {}
 
 // Deprecated: Use CustomDataTimeline.ProtoReflect.Descriptor instead.
 func (*CustomDataTimeline) Descriptor() ([]byte, []int) {
-	return file_badges_timelines_proto_rawDescGZIP(), []int{3}
+	return file_badges_timelines_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CustomDataTimeline) GetCustomData() string {
@@ -4844,7 +4225,7 @@ type ManagerTimeline struct {
 func (x *ManagerTimeline) Reset() {
 	*x = ManagerTimeline{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_badges_timelines_proto_msgTypes[4]
+		mi := &file_badges_timelines_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4858,7 +4239,7 @@ func (*ManagerTimeline) ProtoMessage() {}
 
 // Deprecated: Use ManagerTimeline.ProtoReflect.Descriptor instead.
 func (*ManagerTimeline) Descriptor() ([]byte, []int) {
-	return file_badges_timelines_proto_rawDescGZIP(), []int{4}
+	return file_badges_timelines_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ManagerTimeline) GetManager() string {
@@ -4890,7 +4271,7 @@ type IsArchivedTimeline struct {
 func (x *IsArchivedTimeline) Reset() {
 	*x = IsArchivedTimeline{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_badges_timelines_proto_msgTypes[5]
+		mi := &file_badges_timelines_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4904,7 +4285,7 @@ func (*IsArchivedTimeline) ProtoMessage() {}
 
 // Deprecated: Use IsArchivedTimeline.ProtoReflect.Descriptor instead.
 func (*IsArchivedTimeline) Descriptor() ([]byte, []int) {
-	return file_badges_timelines_proto_rawDescGZIP(), []int{5}
+	return file_badges_timelines_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *IsArchivedTimeline) GetIsArchived() bool {
@@ -4936,7 +4317,7 @@ type ContractAddressTimeline struct {
 func (x *ContractAddressTimeline) Reset() {
 	*x = ContractAddressTimeline{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_badges_timelines_proto_msgTypes[6]
+		mi := &file_badges_timelines_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4950,7 +4331,7 @@ func (*ContractAddressTimeline) ProtoMessage() {}
 
 // Deprecated: Use ContractAddressTimeline.ProtoReflect.Descriptor instead.
 func (*ContractAddressTimeline) Descriptor() ([]byte, []int) {
-	return file_badges_timelines_proto_rawDescGZIP(), []int{6}
+	return file_badges_timelines_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ContractAddressTimeline) GetContractAddress() string {
@@ -4982,7 +4363,7 @@ type StandardsTimeline struct {
 func (x *StandardsTimeline) Reset() {
 	*x = StandardsTimeline{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_badges_timelines_proto_msgTypes[7]
+		mi := &file_badges_timelines_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4996,7 +4377,7 @@ func (*StandardsTimeline) ProtoMessage() {}
 
 // Deprecated: Use StandardsTimeline.ProtoReflect.Descriptor instead.
 func (*StandardsTimeline) Descriptor() ([]byte, []int) {
-	return file_badges_timelines_proto_rawDescGZIP(), []int{7}
+	return file_badges_timelines_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *StandardsTimeline) GetStandards() []string {
@@ -5037,70 +4418,58 @@ var file_badges_timelines_proto_rawDesc = []byte{
 	0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20,
 	0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e,
 	0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x8d, 0x01, 0x0a, 0x15, 0x42, 0x61, 0x64, 0x67, 0x65, 0x4d,
+	0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x8d, 0x01, 0x0a, 0x15, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x4d,
 	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12,
-	0x3b, 0x0a, 0x0d, 0x62, 0x61, 0x64, 0x67, 0x65, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0x3b, 0x0a, 0x0d, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e,
-	0x42, 0x61, 0x64, 0x67, 0x65, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x0d, 0x62,
-	0x61, 0x64, 0x67, 0x65, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x37, 0x0a, 0x0d,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x0d, 0x74,
+	0x6f, 0x6b, 0x65, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x37, 0x0a, 0x0d,
 	0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20,
 	0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e,
 	0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0xb9, 0x01, 0x0a, 0x20, 0x4f, 0x66, 0x66, 0x43, 0x68, 0x61,
-	0x69, 0x6e, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x5c, 0x0a, 0x18, 0x6f, 0x66,
-	0x66, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x4d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x62,
-	0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x4f, 0x66, 0x66, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x42, 0x61,
-	0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x18,
-	0x6f, 0x66, 0x66, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73,
-	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69, 0x6d, 0x65,
-	0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32,
-	0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e,
-	0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65,
-	0x73, 0x22, 0x6d, 0x0a, 0x12, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x54,
-	0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x75, 0x73, 0x74, 0x6f,
-	0x6d, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x75, 0x73,
-	0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11,
-	0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67,
-	0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73,
-	0x22, 0x64, 0x0a, 0x0f, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x54, 0x69, 0x6d, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x12, 0x37, 0x0a,
-	0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02,
-	0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69,
-	0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e,
-	0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x6d, 0x0a, 0x12, 0x49, 0x73, 0x41, 0x72, 0x63, 0x68,
-	0x69, 0x76, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x1e, 0x0a, 0x0a,
-	0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
-	0x52, 0x0a, 0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x12, 0x37, 0x0a, 0x0d,
-	0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20,
-	0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e,
-	0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x7c, 0x0a, 0x17, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63,
-	0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x12, 0x28, 0x0a, 0x0f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x41, 0x64, 0x64, 0x72,
-	0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6e, 0x74, 0x72,
-	0x61, 0x63, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69,
+	0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x6d, 0x0a, 0x12, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44,
+	0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x63,
+	0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x12, 0x37, 0x0a, 0x0d, 0x74,
+	0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74,
+	0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x22, 0x64, 0x0a, 0x0f, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x54,
+	0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x61, 0x6e, 0x61, 0x67,
+	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65,
+	0x72, 0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d,
+	0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65,
+	0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x6d, 0x0a, 0x12, 0x49, 0x73,
+	0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65,
+	0x12, 0x1e, 0x0a, 0x0a, 0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64,
+	0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65,
+	0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73,
+	0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65,
+	0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x7c, 0x0a, 0x17, 0x43, 0x6f, 0x6e,
+	0x74, 0x72, 0x61, 0x63, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x54, 0x69, 0x6d, 0x65,
+	0x6c, 0x69, 0x6e, 0x65, 0x12, 0x28, 0x0a, 0x0f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74,
+	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63,
+	0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x37,
+	0x0a, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18,
+	0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55,
+	0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69,
+	0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x22, 0x6a, 0x0a, 0x11, 0x53, 0x74, 0x61, 0x6e, 0x64,
+	0x61, 0x72, 0x64, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x1c, 0x0a, 0x09,
+	0x73, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x09, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69,
 	0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28,
 	0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52,
 	0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69,
-	0x6d, 0x65, 0x73, 0x22, 0x6a, 0x0a, 0x11, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73,
-	0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x74, 0x61, 0x6e,
-	0x64, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x73, 0x74, 0x61,
-	0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x12, 0x37, 0x0a, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69,
-	0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65,
-	0x52, 0x0d, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x42,
-	0x6f, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x0e, 0x54,
-	0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a,
-	0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58,
-	0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6d, 0x65, 0x73, 0x42, 0x6f, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65,
+	0x73, 0x42, 0x0e, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68,
+	0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02,
+	0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06,
+	0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c,
+	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -5115,38 +4484,34 @@ func file_badges_timelines_proto_rawDescGZIP() []byte {
 	return file_badges_timelines_proto_rawDescData
 }
 
-var file_badges_timelines_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_badges_timelines_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_badges_timelines_proto_goTypes = []interface{}{
-	(*CollectionMetadataTimeline)(nil),       // 0: badges.CollectionMetadataTimeline
-	(*TokenMetadataTimeline)(nil),            // 1: badges.TokenMetadataTimeline
-	(*OffChainBalancesMetadataTimeline)(nil), // 2: badges.OffChainBalancesMetadataTimeline
-	(*CustomDataTimeline)(nil),               // 3: badges.CustomDataTimeline
-	(*ManagerTimeline)(nil),                  // 4: badges.ManagerTimeline
-	(*IsArchivedTimeline)(nil),               // 5: badges.IsArchivedTimeline
-	(*ContractAddressTimeline)(nil),          // 6: badges.ContractAddressTimeline
-	(*StandardsTimeline)(nil),                // 7: badges.StandardsTimeline
-	(*CollectionMetadata)(nil),               // 8: badges.CollectionMetadata
-	(*UintRange)(nil),                        // 9: badges.UintRange
-	(*TokenMetadata)(nil),                    // 10: badges.TokenMetadata
-	(*OffChainBalancesMetadata)(nil),         // 11: badges.OffChainBalancesMetadata
+	(*CollectionMetadataTimeline)(nil), // 0: badges.CollectionMetadataTimeline
+	(*TokenMetadataTimeline)(nil),      // 1: badges.TokenMetadataTimeline
+	(*CustomDataTimeline)(nil),         // 2: badges.CustomDataTimeline
+	(*ManagerTimeline)(nil),            // 3: badges.ManagerTimeline
+	(*IsArchivedTimeline)(nil),         // 4: badges.IsArchivedTimeline
+	(*ContractAddressTimeline)(nil),    // 5: badges.ContractAddressTimeline
+	(*StandardsTimeline)(nil),          // 6: badges.StandardsTimeline
+	(*CollectionMetadata)(nil),         // 7: badges.CollectionMetadata
+	(*UintRange)(nil),                  // 8: badges.UintRange
+	(*TokenMetadata)(nil),              // 9: badges.TokenMetadata
 }
 var file_badges_timelines_proto_depIdxs = []int32{
-	8,  // 0: badges.CollectionMetadataTimeline.collectionMetadata:type_name -> badges.CollectionMetadata
-	9,  // 1: badges.CollectionMetadataTimeline.timelineTimes:type_name -> badges.UintRange
-	10, // 2: badges.TokenMetadataTimeline.tokenMetadata:type_name -> badges.TokenMetadata
-	9,  // 3: badges.TokenMetadataTimeline.timelineTimes:type_name -> badges.UintRange
-	11, // 4: badges.OffChainBalancesMetadataTimeline.offChainBalancesMetadata:type_name -> badges.OffChainBalancesMetadata
-	9,  // 5: badges.OffChainBalancesMetadataTimeline.timelineTimes:type_name -> badges.UintRange
-	9,  // 6: badges.CustomDataTimeline.timelineTimes:type_name -> badges.UintRange
-	9,  // 7: badges.ManagerTimeline.timelineTimes:type_name -> badges.UintRange
-	9,  // 8: badges.IsArchivedTimeline.timelineTimes:type_name -> badges.UintRange
-	9,  // 9: badges.ContractAddressTimeline.timelineTimes:type_name -> badges.UintRange
-	9,  // 10: badges.StandardsTimeline.timelineTimes:type_name -> badges.UintRange
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	7, // 0: badges.CollectionMetadataTimeline.collectionMetadata:type_name -> badges.CollectionMetadata
+	8, // 1: badges.CollectionMetadataTimeline.timelineTimes:type_name -> badges.UintRange
+	9, // 2: badges.TokenMetadataTimeline.tokenMetadata:type_name -> badges.TokenMetadata
+	8, // 3: badges.TokenMetadataTimeline.timelineTimes:type_name -> badges.UintRange
+	8, // 4: badges.CustomDataTimeline.timelineTimes:type_name -> badges.UintRange
+	8, // 5: badges.ManagerTimeline.timelineTimes:type_name -> badges.UintRange
+	8, // 6: badges.IsArchivedTimeline.timelineTimes:type_name -> badges.UintRange
+	8, // 7: badges.ContractAddressTimeline.timelineTimes:type_name -> badges.UintRange
+	8, // 8: badges.StandardsTimeline.timelineTimes:type_name -> badges.UintRange
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_badges_timelines_proto_init() }
@@ -5184,18 +4549,6 @@ func file_badges_timelines_proto_init() {
 			}
 		}
 		file_badges_timelines_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*OffChainBalancesMetadataTimeline); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_badges_timelines_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CustomDataTimeline); i {
 			case 0:
 				return &v.state
@@ -5207,7 +4560,7 @@ func file_badges_timelines_proto_init() {
 				return nil
 			}
 		}
-		file_badges_timelines_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_badges_timelines_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ManagerTimeline); i {
 			case 0:
 				return &v.state
@@ -5219,7 +4572,7 @@ func file_badges_timelines_proto_init() {
 				return nil
 			}
 		}
-		file_badges_timelines_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_badges_timelines_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*IsArchivedTimeline); i {
 			case 0:
 				return &v.state
@@ -5231,7 +4584,7 @@ func file_badges_timelines_proto_init() {
 				return nil
 			}
 		}
-		file_badges_timelines_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_badges_timelines_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ContractAddressTimeline); i {
 			case 0:
 				return &v.state
@@ -5243,7 +4596,7 @@ func file_badges_timelines_proto_init() {
 				return nil
 			}
 		}
-		file_badges_timelines_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_badges_timelines_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StandardsTimeline); i {
 			case 0:
 				return &v.state
@@ -5262,7 +4615,7 @@ func file_badges_timelines_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_badges_timelines_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

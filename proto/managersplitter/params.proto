@@ -1,0 +1,14 @@
+syntax = "proto3";
+package managersplitter;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/managersplitter/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "github.com/bitbadges/bitbadgeschain/x/managersplitter/Params";
+  option (gogoproto.equal) = true;
+}
+
