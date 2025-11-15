@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	// DefaultBlockTimeSeconds is the default block time in seconds (6 seconds for Cosmos chains)
-	DefaultBlockTimeSeconds int64 = 6
+	// DefaultBlockTimeSeconds is the default block time in seconds (3 seconds for BitBadges chain)
+	DefaultBlockTimeSeconds int64 = 3
 )
 
 // GetChannelFlowWithTimeframe gets the current flow state for a channel, denom, and timeframe
@@ -57,6 +57,11 @@ func (k Keeper) SetChannelFlowWindowWithTimeframe(ctx sdk.Context, channelID, de
 }
 
 // ResetChannelFlowWindowWithTimeframe resets the flow window for a channel, denom, and timeframe if it has expired
+// This uses a FIXED WINDOW approach (not sliding):
+//   - Window starts at a fixed block height (WindowStart)
+//   - Window expires after a fixed number of blocks (WindowDuration)
+//   - Window resets only when currentHeight >= WindowStart + WindowDuration
+//   - This prevents gaming: windows cannot be extended and always expire properly
 func (k Keeper) ResetChannelFlowWindowWithTimeframe(ctx sdk.Context, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64) {
 	blockTimeSeconds := DefaultBlockTimeSeconds
 	windowDurationBlocks := types.TimeframeDurationInBlocks(timeframeType, timeframeDuration, blockTimeSeconds)
@@ -64,14 +69,15 @@ func (k Keeper) ResetChannelFlowWindowWithTimeframe(ctx sdk.Context, channelID, 
 	currentHeight := ctx.BlockHeight()
 	window, found := k.GetChannelFlowWindowWithTimeframe(ctx, channelID, denom, timeframeType, timeframeDuration)
 
-	// If no window exists or window has expired, create/reset it
+	// Fixed window expiration check: window expires when currentHeight >= WindowStart + WindowDuration
+	// This ensures windows always expire and cannot be extended or gamed
 	if !found || currentHeight >= window.WindowStart+windowDurationBlocks {
 		newWindow := types.ChannelFlowWindow{
-			WindowStart:    currentHeight,
+			WindowStart:    currentHeight, // Always set to current block height (never future)
 			WindowDuration: windowDurationBlocks,
 		}
 		k.SetChannelFlowWindowWithTimeframe(ctx, channelID, denom, timeframeType, timeframeDuration, newWindow)
-		// Reset flow to zero
+		// Reset flow to zero when window expires
 		k.SetChannelFlowWithTimeframe(ctx, channelID, denom, timeframeType, timeframeDuration, types.ChannelFlow{NetFlow: sdkmath.ZeroInt()})
 	}
 }
@@ -137,6 +143,7 @@ func (k Keeper) SetUniqueSendersWindow(ctx sdk.Context, channelID string, timefr
 }
 
 // ResetUniqueSendersWindow resets the unique senders window if it has expired
+// Uses fixed window approach (see ResetChannelFlowWindowWithTimeframe for details)
 func (k Keeper) ResetUniqueSendersWindow(ctx sdk.Context, channelID string, timeframeType types.TimeframeType, timeframeDuration int64) {
 	blockTimeSeconds := DefaultBlockTimeSeconds
 	windowDurationBlocks := types.TimeframeDurationInBlocks(timeframeType, timeframeDuration, blockTimeSeconds)
@@ -144,14 +151,14 @@ func (k Keeper) ResetUniqueSendersWindow(ctx sdk.Context, channelID string, time
 	currentHeight := ctx.BlockHeight()
 	window, found := k.GetUniqueSendersWindow(ctx, channelID, timeframeType, timeframeDuration)
 
-	// If no window exists or window has expired, create/reset it
+	// Fixed window expiration check: window expires when currentHeight >= WindowStart + WindowDuration
 	if !found || currentHeight >= window.WindowStart+windowDurationBlocks {
 		newWindow := types.ChannelFlowWindow{
-			WindowStart:    currentHeight,
+			WindowStart:    currentHeight, // Always set to current block height (never future)
 			WindowDuration: windowDurationBlocks,
 		}
 		k.SetUniqueSendersWindow(ctx, channelID, timeframeType, timeframeDuration, newWindow)
-		// Reset unique senders
+		// Reset unique senders when window expires
 		k.SetUniqueSenders(ctx, channelID, timeframeType, timeframeDuration, types.UniqueSenders{Senders: []string{}})
 	}
 }
@@ -204,6 +211,7 @@ func (k Keeper) SetAddressTransferWindow(ctx sdk.Context, address, channelID, de
 }
 
 // ResetAddressTransferWindow resets the address transfer window if it has expired
+// Uses fixed window approach (see ResetChannelFlowWindowWithTimeframe for details)
 func (k Keeper) ResetAddressTransferWindow(ctx sdk.Context, address, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64) {
 	blockTimeSeconds := DefaultBlockTimeSeconds
 	windowDurationBlocks := types.TimeframeDurationInBlocks(timeframeType, timeframeDuration, blockTimeSeconds)
@@ -211,14 +219,14 @@ func (k Keeper) ResetAddressTransferWindow(ctx sdk.Context, address, channelID, 
 	currentHeight := ctx.BlockHeight()
 	window, found := k.GetAddressTransferWindow(ctx, address, channelID, denom, timeframeType, timeframeDuration)
 
-	// If no window exists or window has expired, create/reset it
+	// Fixed window expiration check: window expires when currentHeight >= WindowStart + WindowDuration
 	if !found || currentHeight >= window.WindowStart+windowDurationBlocks {
 		newWindow := types.ChannelFlowWindow{
-			WindowStart:    currentHeight,
+			WindowStart:    currentHeight, // Always set to current block height (never future)
 			WindowDuration: windowDurationBlocks,
 		}
 		k.SetAddressTransferWindow(ctx, address, channelID, denom, timeframeType, timeframeDuration, newWindow)
-		// Reset transfer data
+		// Reset transfer data when window expires
 		k.SetAddressTransferData(ctx, address, channelID, denom, timeframeType, timeframeDuration, types.AddressTransferData{
 			TransferCount: 0,
 			TotalAmount:   sdkmath.ZeroInt(),

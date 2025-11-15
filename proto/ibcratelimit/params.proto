@@ -90,17 +90,6 @@ message RateLimitConfig {
   // Must be specified (empty denoms are not allowed)
   string denom = 2;
 
-  // DEPRECATED: Use supply_shift_limits instead
-  // max_supply_shift is the maximum absolute amount of supply change allowed per window
-  string max_supply_shift = 3 [
-    (gogoproto.customtype) = "cosmossdk.io/math.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // DEPRECATED: Use supply_shift_limits instead
-  // window_duration is the duration of the rate limit window in blocks
-  int64 window_duration = 4;
-
   // supply_shift_limits defines multiple timeframe limits for supply shift
   // All limits are checked, and the transfer is rejected if any limit would be exceeded
   repeated TimeframeLimit supply_shift_limits = 5 [
@@ -126,7 +115,7 @@ message Params {
   option (gogoproto.equal) = true;
 
   // rate_limits is an array of rate limit configurations
-  // Each configuration can specify channel_id, denom, max_supply_shift, and window_duration
+  // Each configuration can specify channel_id, denom, and various limit types (supply_shift_limits, unique_sender_limits, address_limits)
   // Configurations are checked in order, and the first matching config is used
   // If no config matches, the transfer is allowed (no rate limit)
   repeated RateLimitConfig rate_limits = 1 [

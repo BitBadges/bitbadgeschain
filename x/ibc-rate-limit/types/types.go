@@ -40,12 +40,6 @@ func (c RateLimitConfig) Validate() error {
 		return fmt.Errorf("denom must be specified (empty denoms are not allowed)")
 	}
 
-	// Validate deprecated fields (for backward compatibility)
-	// Only validate if MaxSupplyShift is set (not zero)
-	if c.MaxSupplyShift.IsPositive() && c.WindowDuration < 0 {
-		return fmt.Errorf("window_duration cannot be negative: %d", c.WindowDuration)
-	}
-
 	// Validate supply shift limits
 	for i, limit := range c.SupplyShiftLimits {
 		if err := limit.Validate(); err != nil {

@@ -121,40 +121,33 @@ func (k Keeper) SetChannelFlowWindow(ctx sdk.Context, channelID, denom string, w
 	store.Set(key, bz)
 }
 
-// ResetChannelFlowWindow resets the flow window for a channel and denom if it has expired
+// ResetChannelFlowWindow resets the flow window for a channel and denom if it has expired (legacy function)
+// Uses fixed window approach: window expires when currentHeight >= WindowStart + WindowDuration
+// DEPRECATED: This function is kept for backward compatibility. Use ResetChannelFlowWindowWithTimeframe instead.
 func (k Keeper) ResetChannelFlowWindow(ctx sdk.Context, channelID, denom string, windowDuration int64) {
 	currentHeight := ctx.BlockHeight()
 	window, found := k.GetChannelFlowWindow(ctx, channelID, denom)
 
-	// If no window exists or window has expired, create/reset it
+	// Fixed window expiration check: window expires when currentHeight >= WindowStart + WindowDuration
 	if !found || currentHeight >= window.WindowStart+window.WindowDuration {
 		newWindow := types.ChannelFlowWindow{
-			WindowStart:    currentHeight,
+			WindowStart:    currentHeight, // Always set to current block height (never future)
 			WindowDuration: windowDuration,
 		}
 		k.SetChannelFlowWindow(ctx, channelID, denom, newWindow)
-		// Reset flow to zero
+		// Reset flow to zero when window expires
 		k.SetChannelFlow(ctx, channelID, denom, types.ChannelFlow{NetFlow: sdkmath.ZeroInt()})
 	}
 }
 
-// UpdateChannelFlow updates the net flow for a channel and denom
+// UpdateChannelFlow updates the net flow for a channel and denom (legacy function)
+// This function is kept for backward compatibility but should not be used with new configs
 // positive amount = inflow, negative amount = outflow
+// DEPRECATED: This function uses legacy window tracking. Use timeframe-based tracking instead.
 func (k Keeper) UpdateChannelFlow(ctx sdk.Context, channelID, denom string, amount sdkmath.Int) {
-	params := k.GetParams(ctx)
-	config := params.FindMatchingConfig(channelID, denom)
-
-	// If no config, don't track flow (no rate limit)
-	if config == nil {
-		return
-	}
-
-	// Reset window if needed
-	k.ResetChannelFlowWindow(ctx, channelID, denom, config.WindowDuration)
-
-	flow, _ := k.GetChannelFlow(ctx, channelID, denom)
-	flow.NetFlow = flow.NetFlow.Add(amount)
-	k.SetChannelFlow(ctx, channelID, denom, flow)
+	// This function is deprecated and should not be used
+	// It's kept for backward compatibility with old test code
+	// New code should use timeframe-based tracking via updateTrackingAfterTransfer
 }
 
 // CheckRateLimit checks if a transfer would exceed the rate limit
@@ -169,23 +162,6 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 	// If no config matches, allow the transfer (no rate limit)
 	if config == nil {
 		return nil
-	}
-
-	// Check backward compatibility: if old fields are set, use them
-	if !config.MaxSupplyShift.IsZero() && config.WindowDuration > 0 {
-		// Use deprecated single timeframe limit
-		k.ResetChannelFlowWindow(ctx, channelID, denom, config.WindowDuration)
-		flow, _ := k.GetChannelFlow(ctx, channelID, denom)
-		newFlow := flow.NetFlow
-		if isInflow {
-			newFlow = newFlow.Add(amount)
-		} else {
-			newFlow = newFlow.Sub(amount)
-		}
-		absNewFlow := newFlow.Abs()
-		if absNewFlow.GT(config.MaxSupplyShift) {
-			return types.ErrRateLimitExceeded
-		}
 	}
 
 	// Check multiple timeframe supply shift limits

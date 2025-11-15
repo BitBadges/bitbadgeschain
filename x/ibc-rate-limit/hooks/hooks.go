@@ -217,11 +217,6 @@ func (h *RateLimitOverrideHooks) updateTrackingAfterTransfer(ctx sdk.Context, ch
 		return // No config, no tracking
 	}
 
-	// Update backward compatibility tracking
-	if !config.MaxSupplyShift.IsZero() && config.WindowDuration > 0 {
-		h.keeper.UpdateChannelFlow(ctx, channelID, denom, amount)
-	}
-
 	// Update multiple timeframe supply shift limits
 	for _, limit := range config.SupplyShiftLimits {
 		if limit.MaxAmount.IsZero() {

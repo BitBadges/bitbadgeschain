@@ -79,13 +79,18 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	// Set default params for testing
 	defaultParams := ratelimittypes.DefaultParams()
-	// Add a test config: channel-0, uatom, max shift 300000, window 1000 blocks
+	// Add a test config: channel-0, uatom, max shift 300000 per 1000 blocks
 	defaultParams.RateLimits = []ratelimittypes.RateLimitConfig{
 		{
-			ChannelId:      "channel-0",
-			Denom:          "uatom",
-			MaxSupplyShift: sdkmath.NewInt(300000), // 300,000 tokens max shift
-			WindowDuration: 1000,                   // 1000 blocks
+			ChannelId: "channel-0",
+			Denom:     "uatom",
+			SupplyShiftLimits: []ratelimittypes.TimeframeLimit{
+				{
+					MaxAmount:         sdkmath.NewInt(300000), // 300,000 tokens max shift
+					TimeframeType:     ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK,
+					TimeframeDuration: 1000, // 1000 blocks
+				},
+			},
 		},
 	}
 	suite.keeper.SetParams(ctx, defaultParams)
@@ -194,22 +199,18 @@ func (suite *KeeperTestSuite) TestResetChannelFlowWindow() {
 }
 
 func (suite *KeeperTestSuite) TestUpdateChannelFlow() {
+	// This test is kept for backward compatibility but UpdateChannelFlow is deprecated
+	// The function now does nothing as it's been replaced by timeframe-based tracking
 	channelID := "channel-0"
 	denom := "uatom"
 
-	// Set up supply
-	suite.bankKeeper.MintCoins(suite.ctx, "mint", sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewInt(1000000))))
-
-	// Update flow with inflow
+	// UpdateChannelFlow is deprecated and no longer updates flow
+	// This test verifies it doesn't crash
 	suite.keeper.UpdateChannelFlow(suite.ctx, channelID, denom, sdkmath.NewInt(100))
 
-	flow, _ := suite.keeper.GetChannelFlow(suite.ctx, channelID, denom)
-	suite.Require().Equal(sdkmath.NewInt(100), flow.NetFlow)
-
-	// Update flow with more inflow
-	suite.keeper.UpdateChannelFlow(suite.ctx, channelID, denom, sdkmath.NewInt(50))
-	flow, _ = suite.keeper.GetChannelFlow(suite.ctx, channelID, denom)
-	suite.Require().Equal(sdkmath.NewInt(150), flow.NetFlow)
+	// Flow should not exist since UpdateChannelFlow is deprecated
+	_, found := suite.keeper.GetChannelFlow(suite.ctx, channelID, denom)
+	suite.Require().False(found)
 }
 
 func (suite *KeeperTestSuite) TestCheckRateLimit_WithinLimit() {
@@ -237,9 +238,16 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_NetFlow() {
 	channelID := "channel-0"
 	denom := "uatom"
 
-	// Config has max shift of 300,000 tokens
-	// Add some existing inflow
-	suite.keeper.UpdateChannelFlow(suite.ctx, channelID, denom, sdkmath.NewInt(200000))
+	// Config has max shift of 300,000 tokens per 1000 blocks
+	// Manually set existing flow and window for testing
+	currentHeight := suite.ctx.BlockHeight()
+	window := ratelimittypes.ChannelFlowWindow{
+		WindowStart:    currentHeight,
+		WindowDuration: 1000, // 1000 blocks
+	}
+	suite.keeper.SetChannelFlowWindowWithTimeframe(suite.ctx, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000, window)
+	flow := ratelimittypes.ChannelFlow{NetFlow: sdkmath.NewInt(200000)}
+	suite.keeper.SetChannelFlowWithTimeframe(suite.ctx, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000, flow)
 
 	// Try to add more inflow that would exceed limit
 	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), true, "")
@@ -254,9 +262,16 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_Outflow() {
 	channelID := "channel-0"
 	denom := "uatom"
 
-	// Config has max shift of 300,000 tokens
-	// Add some existing outflow (negative flow)
-	suite.keeper.UpdateChannelFlow(suite.ctx, channelID, denom, sdkmath.NewInt(-200000))
+	// Config has max shift of 300,000 tokens per 1000 blocks
+	// Manually set existing outflow (negative flow) and window for testing
+	currentHeight := suite.ctx.BlockHeight()
+	window := ratelimittypes.ChannelFlowWindow{
+		WindowStart:    currentHeight,
+		WindowDuration: 1000, // 1000 blocks
+	}
+	suite.keeper.SetChannelFlowWindowWithTimeframe(suite.ctx, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000, window)
+	flow := ratelimittypes.ChannelFlow{NetFlow: sdkmath.NewInt(-200000)}
+	suite.keeper.SetChannelFlowWithTimeframe(suite.ctx, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000, flow)
 
 	// Try to add more outflow
 	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), false, "")
@@ -293,9 +308,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_MultipleTimeframes() {
 	params := ratelimittypes.DefaultParams()
 	params.RateLimits = []ratelimittypes.RateLimitConfig{
 		{
-			ChannelId:      channelID,
-			Denom:          denom,
-			MaxSupplyShift: sdkmath.ZeroInt(), // Initialize to zero
+			ChannelId: channelID,
+			Denom:     denom,
 			SupplyShiftLimits: []ratelimittypes.TimeframeLimit{
 				{
 					MaxAmount:         sdkmath.NewInt(100000), // 100k per block
@@ -336,9 +350,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_UniqueSenders() {
 	params := ratelimittypes.DefaultParams()
 	params.RateLimits = []ratelimittypes.RateLimitConfig{
 		{
-			ChannelId:      channelID,
-			Denom:          denom,
-			MaxSupplyShift: sdkmath.ZeroInt(), // Initialize to zero
+			ChannelId: channelID,
+			Denom:     denom,
 			UniqueSenderLimits: []ratelimittypes.UniqueSenderLimit{
 				{
 					MaxUniqueSenders:  3, // Max 3 unique senders per block
@@ -388,9 +401,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressLimits() {
 	params := ratelimittypes.DefaultParams()
 	params.RateLimits = []ratelimittypes.RateLimitConfig{
 		{
-			ChannelId:      channelID,
-			Denom:          denom,
-			MaxSupplyShift: sdkmath.ZeroInt(), // Initialize to zero
+			ChannelId: channelID,
+			Denom:     denom,
 			AddressLimits: []ratelimittypes.AddressLimit{
 				{
 					MaxTransfers:      5,                     // Max 5 transfers per block
@@ -431,9 +443,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressAmountLimit() {
 	params := ratelimittypes.DefaultParams()
 	params.RateLimits = []ratelimittypes.RateLimitConfig{
 		{
-			ChannelId:      channelID,
-			Denom:          denom,
-			MaxSupplyShift: sdkmath.ZeroInt(), // Initialize to zero
+			ChannelId: channelID,
+			Denom:     denom,
 			AddressLimits: []ratelimittypes.AddressLimit{
 				{
 					MaxTransfers:      0,                     // No transfer count limit
@@ -469,19 +480,20 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressAmountLimit() {
 
 // TestTimeframeDurationInBlocks tests timeframe conversion
 func (suite *KeeperTestSuite) TestTimeframeDurationInBlocks() {
-	blockTimeSeconds := int64(6)
+	// Test with default block time (3 seconds for BitBadges chain)
+	blockTimeSeconds := int64(3)
 
 	// Test block timeframe (should return as-is)
 	blocks := ratelimittypes.TimeframeDurationInBlocks(ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 100, blockTimeSeconds)
 	suite.Require().Equal(int64(100), blocks)
 
-	// Test hour timeframe (1 hour = 3600 seconds = 600 blocks at 6s/block)
+	// Test hour timeframe (1 hour = 3600 seconds = 1200 blocks at 3s/block)
 	blocks = ratelimittypes.TimeframeDurationInBlocks(ratelimittypes.TimeframeType_TIMEFRAME_TYPE_HOUR, 1, blockTimeSeconds)
-	suite.Require().Equal(int64(600), blocks)
+	suite.Require().Equal(int64(1200), blocks)
 
-	// Test day timeframe (1 day = 86400 seconds = 14400 blocks at 6s/block)
+	// Test day timeframe (1 day = 86400 seconds = 28800 blocks at 3s/block)
 	blocks = ratelimittypes.TimeframeDurationInBlocks(ratelimittypes.TimeframeType_TIMEFRAME_TYPE_DAY, 1, blockTimeSeconds)
-	suite.Require().Equal(int64(14400), blocks)
+	suite.Require().Equal(int64(28800), blocks)
 }
 
 // TestValidateParams_EmptyDenom tests that empty denoms are rejected
@@ -489,10 +501,15 @@ func (suite *KeeperTestSuite) TestValidateParams_EmptyDenom() {
 	params := ratelimittypes.DefaultParams()
 	params.RateLimits = []ratelimittypes.RateLimitConfig{
 		{
-			ChannelId:      "channel-0",
-			Denom:          "", // Empty denom should be rejected
-			MaxSupplyShift: sdkmath.NewInt(300000),
-			WindowDuration: 1000,
+			ChannelId: "channel-0",
+			Denom:     "", // Empty denom should be rejected
+			SupplyShiftLimits: []ratelimittypes.TimeframeLimit{
+				{
+					MaxAmount:         sdkmath.NewInt(300000),
+					TimeframeType:     ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK,
+					TimeframeDuration: 1000,
+				},
+			},
 		},
 	}
 
