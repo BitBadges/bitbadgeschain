@@ -14,6 +14,7 @@ import (
 	tokenTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	balancertypes "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	managersplittertypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 	mapstypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 )
 
@@ -60,6 +61,13 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 		err = jsonpb.Unmarshal(reader, &balancerCustomMsg)
 		if err == nil {
 			isBalancerModuleMsg = true
+		}
+
+		isManagersplitterModuleMsg := false
+		var managersplitterCustomMsg managersplittertypes.ManagersplitterCustomMsgType
+		err = jsonpb.Unmarshal(reader, &managersplitterCustomMsg)
+		if err == nil {
+			isManagersplitterModuleMsg = true
 		}
 
 		if isBadgeModuleMsg {
@@ -236,6 +244,28 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case balancerCustomMsg.CreateBalancerPoolMsg != nil:
 				balancerCustomMsg.CreateBalancerPoolMsg.Sender = sender.String()
 				return []sdk.Msg{balancerCustomMsg.CreateBalancerPoolMsg}, nil
+			}
+		} else if isManagersplitterModuleMsg {
+			reader = bytes.NewReader(jsonData)
+			var managersplitterCustomMsg managersplittertypes.ManagersplitterCustomMsgType
+			err = jsonpb.Unmarshal(reader, &managersplitterCustomMsg)
+			if err != nil {
+				return nil, sdkerrors.Wrap(err, err.Error())
+			}
+
+			switch {
+			case managersplitterCustomMsg.CreateManagerSplitterMsg != nil:
+				managersplitterCustomMsg.CreateManagerSplitterMsg.Admin = sender.String()
+				return []sdk.Msg{managersplitterCustomMsg.CreateManagerSplitterMsg}, nil
+			case managersplitterCustomMsg.UpdateManagerSplitterMsg != nil:
+				managersplitterCustomMsg.UpdateManagerSplitterMsg.Admin = sender.String()
+				return []sdk.Msg{managersplitterCustomMsg.UpdateManagerSplitterMsg}, nil
+			case managersplitterCustomMsg.DeleteManagerSplitterMsg != nil:
+				managersplitterCustomMsg.DeleteManagerSplitterMsg.Admin = sender.String()
+				return []sdk.Msg{managersplitterCustomMsg.DeleteManagerSplitterMsg}, nil
+			case managersplitterCustomMsg.ExecuteUniversalUpdateCollectionMsg != nil:
+				managersplitterCustomMsg.ExecuteUniversalUpdateCollectionMsg.Executor = sender.String()
+				return []sdk.Msg{managersplitterCustomMsg.ExecuteUniversalUpdateCollectionMsg}, nil
 			}
 		}
 

@@ -130,3 +130,11 @@ message MsgExecuteUniversalUpdateCollectionResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
+// Used for WASM bindings and JSON parsing
+message ManagersplitterCustomMsgType {
+  MsgCreateManagerSplitter createManagerSplitterMsg = 1;
+  MsgUpdateManagerSplitter updateManagerSplitterMsg = 2;
+  MsgDeleteManagerSplitter deleteManagerSplitterMsg = 3;
+  MsgExecuteUniversalUpdateCollection executeUniversalUpdateCollectionMsg = 4;
+}
+

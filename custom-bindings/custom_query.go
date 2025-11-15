@@ -9,6 +9,8 @@ import (
 	tokenTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	gammKeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	gammTypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	managersplitterKeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
+	managersplitterTypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 	mapsKeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 	mapsTypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
@@ -19,7 +21,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Keeper, mk mapsKeeper.Keeper, gk gammKeeper.Keeper) wasmKeeper.CustomQuerier {
+func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Keeper, mk mapsKeeper.Keeper, gk gammKeeper.Keeper, msk managersplitterKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 		isBadgeModuleQuery := false
 		var custom badgeCustomQuery
@@ -49,6 +51,13 @@ func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Ke
 			isGammModuleQuery = true
 		}
 
+		isManagersplitterModuleQuery := false
+		var managersplitterCustom managersplitterCustomQuery
+		err = json.Unmarshal(request, &managersplitterCustom)
+		if err == nil {
+			isManagersplitterModuleQuery = true
+		}
+
 		if isBadgeModuleQuery {
 			return PerformCustomBadgeQuery(bk)(ctx, request)
 		} else if isAnchorModuleQuery {
@@ -57,6 +66,8 @@ func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Ke
 			return PerformCustomMapsQuery(mk)(ctx, request)
 		} else if isGammModuleQuery {
 			return PerformCustomGammQuery(gk)(ctx, request)
+		} else if isManagersplitterModuleQuery {
+			return PerformCustomManagersplitterQuery(msk)(ctx, request)
 		}
 
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
@@ -248,6 +259,42 @@ func PerformCustomGammQuery(gk gammKeeper.Keeper) wasmKeeper.CustomQuerier {
 	}
 }
 
+func PerformCustomManagersplitterQuery(msk managersplitterKeeper.Keeper) wasmKeeper.CustomQuerier {
+	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
+		var custom managersplitterCustomQuery
+		err := json.Unmarshal(request, &custom)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, err.Error())
+		}
+
+		// Create a querier to handle the gRPC-style queries
+		grpcCtx := sdk.WrapSDKContext(ctx)
+
+		switch {
+		case custom.QueryManagerSplitter != nil:
+			res, err := msk.ManagerSplitter(grpcCtx, custom.QueryManagerSplitter)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(managersplitterTypes.QueryGetManagerSplitterResponse{ManagerSplitter: res.ManagerSplitter})
+		case custom.QueryAllManagerSplitters != nil:
+			res, err := msk.AllManagerSplitters(grpcCtx, custom.QueryAllManagerSplitters)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(managersplitterTypes.QueryAllManagerSplittersResponse{ManagerSplitters: res.ManagerSplitters, Pagination: res.Pagination})
+		case custom.QueryParams != nil:
+			res, err := msk.Params(grpcCtx, custom.QueryParams)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(managersplitterTypes.QueryParamsResponse{Params: res.Params})
+		}
+
+		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
+	}
+}
+
 type badgeCustomQuery struct {
 	QueryCollection             *tokenTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
 	QueryBalance                *tokenTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
@@ -278,4 +325,10 @@ type gammCustomQuery struct {
 	QuerySpotPrice          *gammTypes.QuerySpotPriceRequest          `json:"querySpotPrice,omitempty"`
 	QueryPoolParams         *gammTypes.QueryPoolParamsRequest         `json:"queryPoolParams,omitempty"`
 	QueryTotalShares        *gammTypes.QueryTotalSharesRequest        `json:"queryTotalShares,omitempty"`
+}
+
+type managersplitterCustomQuery struct {
+	QueryManagerSplitter     *managersplitterTypes.QueryGetManagerSplitterRequest  `json:"queryManagerSplitter,omitempty"`
+	QueryAllManagerSplitters *managersplitterTypes.QueryAllManagerSplittersRequest `json:"queryAllManagerSplitters,omitempty"`
+	QueryParams              *managersplitterTypes.QueryParamsRequest              `json:"queryParams,omitempty"`
 }
