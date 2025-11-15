@@ -1,0 +1,45 @@
+syntax = "proto3";
+package managersplitter;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/managersplitter/types";
+
+// PermissionCriteria defines the criteria for executing a permission.
+// Currently supports approved addresses (whitelist).
+message PermissionCriteria {
+  // List of approved addresses that can execute this permission.
+  repeated string approvedAddresses = 1;
+}
+
+// ManagerSplitterPermissions mirrors the CollectionPermissions structure
+// but maps each permission to criteria for execution.
+message ManagerSplitterPermissions {
+  // Permissions related to deleting the collection.
+  PermissionCriteria canDeleteCollection = 1;
+
+  // Permissions related to archiving the collection.
+  PermissionCriteria canArchiveCollection = 2;
+
+  // Permissions related to updating standards for the collection.
+  PermissionCriteria canUpdateStandards = 3;
+
+  // Permissions related to updating custom data for the collection.
+  PermissionCriteria canUpdateCustomData = 4;
+
+  // Permissions related to updating the collection's manager.
+  PermissionCriteria canUpdateManager = 5;
+
+  // Permissions related to updating the metadata of the collection.
+  PermissionCriteria canUpdateCollectionMetadata = 6;
+
+  // Permissions related to creating more tokens for the collection.
+  PermissionCriteria canUpdateValidTokenIds = 7;
+
+  // Permissions related to updating token metadata for specific tokens.
+  PermissionCriteria canUpdateTokenMetadata = 8;
+
+  // Permissions related to updating collection approvals.
+  PermissionCriteria canUpdateCollectionApprovals = 9;
+}
+

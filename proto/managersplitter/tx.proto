@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package managersplitter;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "managersplitter/permissions.proto";
+import "managersplitter/params.proto";
+import "badges/tx.proto";
+import "badges/permissions.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/managersplitter/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  rpc CreateManagerSplitter(MsgCreateManagerSplitter) returns (MsgCreateManagerSplitterResponse);
+  rpc UpdateManagerSplitter(MsgUpdateManagerSplitter) returns (MsgUpdateManagerSplitterResponse);
+  rpc DeleteManagerSplitter(MsgDeleteManagerSplitter) returns (MsgDeleteManagerSplitterResponse);
+  rpc ExecuteUniversalUpdateCollection(MsgExecuteUniversalUpdateCollection) returns (MsgExecuteUniversalUpdateCollectionResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "managersplitter/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+// ManagerSplitter defines the manager splitter entity.
+message ManagerSplitter {
+  // The module address of this manager splitter (derived from module name + ID).
+  string address = 1;
+
+  // Permanent and static admin address. Has full control and can always execute all permissions.
+  string admin = 2;
+
+  // Permissions mapping each CollectionPermission field to execution criteria.
+  ManagerSplitterPermissions permissions = 3;
+}
+
+// MsgCreateManagerSplitter creates a new manager splitter entity.
+message MsgCreateManagerSplitter {
+  option (cosmos.msg.v1.signer) = "admin";
+  option (amino.name) = "managersplitter/CreateManagerSplitter";
+
+  // Admin address creating the entity.
+  string admin = 1;
+
+  // Permissions mapping each CollectionPermission field to execution criteria.
+  ManagerSplitterPermissions permissions = 2;
+}
+
+// MsgCreateManagerSplitterResponse is the response to MsgCreateManagerSplitter.
+message MsgCreateManagerSplitterResponse {
+  // The address of the created manager splitter.
+  string address = 1;
+}
+
+// MsgUpdateManagerSplitter updates an existing manager splitter entity.
+message MsgUpdateManagerSplitter {
+  option (cosmos.msg.v1.signer) = "admin";
+  option (amino.name) = "managersplitter/UpdateManagerSplitter";
+
+  // Admin address updating the entity.
+  string admin = 1;
+
+  // Address of the manager splitter to update.
+  string address = 2;
+
+  // New permissions to set.
+  ManagerSplitterPermissions permissions = 3;
+}
+
+// MsgUpdateManagerSplitterResponse is the response to MsgUpdateManagerSplitter.
+message MsgUpdateManagerSplitterResponse {}
+
+// MsgDeleteManagerSplitter deletes a manager splitter entity.
+message MsgDeleteManagerSplitter {
+  option (cosmos.msg.v1.signer) = "admin";
+  option (amino.name) = "managersplitter/DeleteManagerSplitter";
+
+  // Admin address deleting the entity.
+  string admin = 1;
+
+  // Address of the manager splitter to delete.
+  string address = 2;
+}
+
+// MsgDeleteManagerSplitterResponse is the response to MsgDeleteManagerSplitter.
+message MsgDeleteManagerSplitterResponse {}
+
+// MsgExecuteUniversalUpdateCollection executes a UniversalUpdateCollection message
+// through the manager splitter, checking permissions before execution.
+message MsgExecuteUniversalUpdateCollection {
+  option (cosmos.msg.v1.signer) = "executor";
+  option (amino.name) = "managersplitter/ExecuteUniversalUpdateCollection";
+
+  // Address executing the message (must be approved or admin).
+  string executor = 1;
+
+  // Address of the manager splitter to execute through.
+  string managerSplitterAddress = 2;
+
+  // The UniversalUpdateCollection message to execute.
+  badges.MsgUniversalUpdateCollection universalUpdateCollectionMsg = 3;
+}
+
+// MsgExecuteUniversalUpdateCollectionResponse is the response to MsgExecuteUniversalUpdateCollection.
+message MsgExecuteUniversalUpdateCollectionResponse {
+  // ID of the collection that was updated.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+

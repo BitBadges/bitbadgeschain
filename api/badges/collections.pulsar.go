@@ -116,10 +116,61 @@ func (x *_TokenCollection_3_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_TokenCollection_4_list)(nil)
+
+type _TokenCollection_4_list struct {
+	list *[]*CustomDataTimeline
+}
+
+func (x *_TokenCollection_4_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_TokenCollection_4_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_TokenCollection_4_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*CustomDataTimeline)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_TokenCollection_4_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*CustomDataTimeline)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_TokenCollection_4_list) AppendMutable() protoreflect.Value {
+	v := new(CustomDataTimeline)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_TokenCollection_4_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_TokenCollection_4_list) NewElement() protoreflect.Value {
+	v := new(CustomDataTimeline)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_TokenCollection_4_list) IsValid() bool {
+	return x.list != nil
+}
+
 var _ protoreflect.List = (*_TokenCollection_5_list)(nil)
 
 type _TokenCollection_5_list struct {
-	list *[]*OffChainBalancesMetadataTimeline
+	list *[]*ManagerTimeline
 }
 
 func (x *_TokenCollection_5_list) Len() int {
@@ -135,18 +186,18 @@ func (x *_TokenCollection_5_list) Get(i int) protoreflect.Value {
 
 func (x *_TokenCollection_5_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*OffChainBalancesMetadataTimeline)
+	concreteValue := valueUnwrapped.Interface().(*ManagerTimeline)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_TokenCollection_5_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*OffChainBalancesMetadataTimeline)
+	concreteValue := valueUnwrapped.Interface().(*ManagerTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_TokenCollection_5_list) AppendMutable() protoreflect.Value {
-	v := new(OffChainBalancesMetadataTimeline)
+	v := new(ManagerTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -159,7 +210,7 @@ func (x *_TokenCollection_5_list) Truncate(n int) {
 }
 
 func (x *_TokenCollection_5_list) NewElement() protoreflect.Value {
-	v := new(OffChainBalancesMetadataTimeline)
+	v := new(ManagerTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -170,7 +221,7 @@ func (x *_TokenCollection_5_list) IsValid() bool {
 var _ protoreflect.List = (*_TokenCollection_7_list)(nil)
 
 type _TokenCollection_7_list struct {
-	list *[]*CustomDataTimeline
+	list *[]*CollectionApproval
 }
 
 func (x *_TokenCollection_7_list) Len() int {
@@ -186,18 +237,18 @@ func (x *_TokenCollection_7_list) Get(i int) protoreflect.Value {
 
 func (x *_TokenCollection_7_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*CustomDataTimeline)
+	concreteValue := valueUnwrapped.Interface().(*CollectionApproval)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_TokenCollection_7_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*CustomDataTimeline)
+	concreteValue := valueUnwrapped.Interface().(*CollectionApproval)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_TokenCollection_7_list) AppendMutable() protoreflect.Value {
-	v := new(CustomDataTimeline)
+	v := new(CollectionApproval)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -210,7 +261,7 @@ func (x *_TokenCollection_7_list) Truncate(n int) {
 }
 
 func (x *_TokenCollection_7_list) NewElement() protoreflect.Value {
-	v := new(CustomDataTimeline)
+	v := new(CollectionApproval)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -221,7 +272,7 @@ func (x *_TokenCollection_7_list) IsValid() bool {
 var _ protoreflect.List = (*_TokenCollection_8_list)(nil)
 
 type _TokenCollection_8_list struct {
-	list *[]*ManagerTimeline
+	list *[]*StandardsTimeline
 }
 
 func (x *_TokenCollection_8_list) Len() int {
@@ -237,18 +288,18 @@ func (x *_TokenCollection_8_list) Get(i int) protoreflect.Value {
 
 func (x *_TokenCollection_8_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*ManagerTimeline)
+	concreteValue := valueUnwrapped.Interface().(*StandardsTimeline)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_TokenCollection_8_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*ManagerTimeline)
+	concreteValue := valueUnwrapped.Interface().(*StandardsTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_TokenCollection_8_list) AppendMutable() protoreflect.Value {
-	v := new(ManagerTimeline)
+	v := new(StandardsTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -261,7 +312,7 @@ func (x *_TokenCollection_8_list) Truncate(n int) {
 }
 
 func (x *_TokenCollection_8_list) NewElement() protoreflect.Value {
-	v := new(ManagerTimeline)
+	v := new(StandardsTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -269,112 +320,61 @@ func (x *_TokenCollection_8_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_TokenCollection_10_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_9_list)(nil)
 
-type _TokenCollection_10_list struct {
-	list *[]*CollectionApproval
+type _TokenCollection_9_list struct {
+	list *[]*IsArchivedTimeline
 }
 
-func (x *_TokenCollection_10_list) Len() int {
+func (x *_TokenCollection_9_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_TokenCollection_10_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_9_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_TokenCollection_10_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_9_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*CollectionApproval)
+	concreteValue := valueUnwrapped.Interface().(*IsArchivedTimeline)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_TokenCollection_10_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_9_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*CollectionApproval)
+	concreteValue := valueUnwrapped.Interface().(*IsArchivedTimeline)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_TokenCollection_10_list) AppendMutable() protoreflect.Value {
-	v := new(CollectionApproval)
+func (x *_TokenCollection_9_list) AppendMutable() protoreflect.Value {
+	v := new(IsArchivedTimeline)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TokenCollection_10_list) Truncate(n int) {
+func (x *_TokenCollection_9_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_TokenCollection_10_list) NewElement() protoreflect.Value {
-	v := new(CollectionApproval)
+func (x *_TokenCollection_9_list) NewElement() protoreflect.Value {
+	v := new(IsArchivedTimeline)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TokenCollection_10_list) IsValid() bool {
-	return x.list != nil
-}
-
-var _ protoreflect.List = (*_TokenCollection_11_list)(nil)
-
-type _TokenCollection_11_list struct {
-	list *[]*StandardsTimeline
-}
-
-func (x *_TokenCollection_11_list) Len() int {
-	if x.list == nil {
-		return 0
-	}
-	return len(*x.list)
-}
-
-func (x *_TokenCollection_11_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
-}
-
-func (x *_TokenCollection_11_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*StandardsTimeline)
-	(*x.list)[i] = concreteValue
-}
-
-func (x *_TokenCollection_11_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*StandardsTimeline)
-	*x.list = append(*x.list, concreteValue)
-}
-
-func (x *_TokenCollection_11_list) AppendMutable() protoreflect.Value {
-	v := new(StandardsTimeline)
-	*x.list = append(*x.list, v)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_TokenCollection_11_list) Truncate(n int) {
-	for i := n; i < len(*x.list); i++ {
-		(*x.list)[i] = nil
-	}
-	*x.list = (*x.list)[:n]
-}
-
-func (x *_TokenCollection_11_list) NewElement() protoreflect.Value {
-	v := new(StandardsTimeline)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_TokenCollection_11_list) IsValid() bool {
+func (x *_TokenCollection_9_list) IsValid() bool {
 	return x.list != nil
 }
 
 var _ protoreflect.List = (*_TokenCollection_12_list)(nil)
 
 type _TokenCollection_12_list struct {
-	list *[]*IsArchivedTimeline
+	list *[]*UintRange
 }
 
 func (x *_TokenCollection_12_list) Len() int {
@@ -390,18 +390,18 @@ func (x *_TokenCollection_12_list) Get(i int) protoreflect.Value {
 
 func (x *_TokenCollection_12_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*IsArchivedTimeline)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_TokenCollection_12_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*IsArchivedTimeline)
+	concreteValue := valueUnwrapped.Interface().(*UintRange)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_TokenCollection_12_list) AppendMutable() protoreflect.Value {
-	v := new(IsArchivedTimeline)
+	v := new(UintRange)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -414,7 +414,7 @@ func (x *_TokenCollection_12_list) Truncate(n int) {
 }
 
 func (x *_TokenCollection_12_list) NewElement() protoreflect.Value {
-	v := new(IsArchivedTimeline)
+	v := new(UintRange)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -422,126 +422,74 @@ func (x *_TokenCollection_12_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_TokenCollection_15_list)(nil)
+var _ protoreflect.List = (*_TokenCollection_14_list)(nil)
 
-type _TokenCollection_15_list struct {
-	list *[]*UintRange
-}
-
-func (x *_TokenCollection_15_list) Len() int {
-	if x.list == nil {
-		return 0
-	}
-	return len(*x.list)
-}
-
-func (x *_TokenCollection_15_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
-}
-
-func (x *_TokenCollection_15_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
-	(*x.list)[i] = concreteValue
-}
-
-func (x *_TokenCollection_15_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
-	*x.list = append(*x.list, concreteValue)
-}
-
-func (x *_TokenCollection_15_list) AppendMutable() protoreflect.Value {
-	v := new(UintRange)
-	*x.list = append(*x.list, v)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_TokenCollection_15_list) Truncate(n int) {
-	for i := n; i < len(*x.list); i++ {
-		(*x.list)[i] = nil
-	}
-	*x.list = (*x.list)[:n]
-}
-
-func (x *_TokenCollection_15_list) NewElement() protoreflect.Value {
-	v := new(UintRange)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_TokenCollection_15_list) IsValid() bool {
-	return x.list != nil
-}
-
-var _ protoreflect.List = (*_TokenCollection_17_list)(nil)
-
-type _TokenCollection_17_list struct {
+type _TokenCollection_14_list struct {
 	list *[]*CosmosCoinWrapperPath
 }
 
-func (x *_TokenCollection_17_list) Len() int {
+func (x *_TokenCollection_14_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_TokenCollection_17_list) Get(i int) protoreflect.Value {
+func (x *_TokenCollection_14_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_TokenCollection_17_list) Set(i int, value protoreflect.Value) {
+func (x *_TokenCollection_14_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CosmosCoinWrapperPath)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_TokenCollection_17_list) Append(value protoreflect.Value) {
+func (x *_TokenCollection_14_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*CosmosCoinWrapperPath)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_TokenCollection_17_list) AppendMutable() protoreflect.Value {
+func (x *_TokenCollection_14_list) AppendMutable() protoreflect.Value {
 	v := new(CosmosCoinWrapperPath)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TokenCollection_17_list) Truncate(n int) {
+func (x *_TokenCollection_14_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_TokenCollection_17_list) NewElement() protoreflect.Value {
+func (x *_TokenCollection_14_list) NewElement() protoreflect.Value {
 	v := new(CosmosCoinWrapperPath)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_TokenCollection_17_list) IsValid() bool {
+func (x *_TokenCollection_14_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_TokenCollection                                  protoreflect.MessageDescriptor
-	fd_TokenCollection_collectionId                     protoreflect.FieldDescriptor
-	fd_TokenCollection_collectionMetadataTimeline       protoreflect.FieldDescriptor
-	fd_TokenCollection_tokenMetadataTimeline            protoreflect.FieldDescriptor
-	fd_TokenCollection_balancesType                     protoreflect.FieldDescriptor
-	fd_TokenCollection_offChainBalancesMetadataTimeline protoreflect.FieldDescriptor
-	fd_TokenCollection_customDataTimeline               protoreflect.FieldDescriptor
-	fd_TokenCollection_managerTimeline                  protoreflect.FieldDescriptor
-	fd_TokenCollection_collectionPermissions            protoreflect.FieldDescriptor
-	fd_TokenCollection_collectionApprovals              protoreflect.FieldDescriptor
-	fd_TokenCollection_standardsTimeline                protoreflect.FieldDescriptor
-	fd_TokenCollection_isArchivedTimeline               protoreflect.FieldDescriptor
-	fd_TokenCollection_defaultBalances                  protoreflect.FieldDescriptor
-	fd_TokenCollection_createdBy                        protoreflect.FieldDescriptor
-	fd_TokenCollection_validTokenIds                    protoreflect.FieldDescriptor
-	fd_TokenCollection_mintEscrowAddress                protoreflect.FieldDescriptor
-	fd_TokenCollection_cosmosCoinWrapperPaths           protoreflect.FieldDescriptor
+	md_TokenCollection                            protoreflect.MessageDescriptor
+	fd_TokenCollection_collectionId               protoreflect.FieldDescriptor
+	fd_TokenCollection_collectionMetadataTimeline protoreflect.FieldDescriptor
+	fd_TokenCollection_tokenMetadataTimeline      protoreflect.FieldDescriptor
+	fd_TokenCollection_customDataTimeline         protoreflect.FieldDescriptor
+	fd_TokenCollection_managerTimeline            protoreflect.FieldDescriptor
+	fd_TokenCollection_collectionPermissions      protoreflect.FieldDescriptor
+	fd_TokenCollection_collectionApprovals        protoreflect.FieldDescriptor
+	fd_TokenCollection_standardsTimeline          protoreflect.FieldDescriptor
+	fd_TokenCollection_isArchivedTimeline         protoreflect.FieldDescriptor
+	fd_TokenCollection_defaultBalances            protoreflect.FieldDescriptor
+	fd_TokenCollection_createdBy                  protoreflect.FieldDescriptor
+	fd_TokenCollection_validTokenIds              protoreflect.FieldDescriptor
+	fd_TokenCollection_mintEscrowAddress          protoreflect.FieldDescriptor
+	fd_TokenCollection_cosmosCoinWrapperPaths     protoreflect.FieldDescriptor
+	fd_TokenCollection_invariants                 protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -550,8 +498,6 @@ func init() {
 	fd_TokenCollection_collectionId = md_TokenCollection.Fields().ByName("collectionId")
 	fd_TokenCollection_collectionMetadataTimeline = md_TokenCollection.Fields().ByName("collectionMetadataTimeline")
 	fd_TokenCollection_tokenMetadataTimeline = md_TokenCollection.Fields().ByName("tokenMetadataTimeline")
-	fd_TokenCollection_balancesType = md_TokenCollection.Fields().ByName("balancesType")
-	fd_TokenCollection_offChainBalancesMetadataTimeline = md_TokenCollection.Fields().ByName("offChainBalancesMetadataTimeline")
 	fd_TokenCollection_customDataTimeline = md_TokenCollection.Fields().ByName("customDataTimeline")
 	fd_TokenCollection_managerTimeline = md_TokenCollection.Fields().ByName("managerTimeline")
 	fd_TokenCollection_collectionPermissions = md_TokenCollection.Fields().ByName("collectionPermissions")
@@ -563,6 +509,7 @@ func init() {
 	fd_TokenCollection_validTokenIds = md_TokenCollection.Fields().ByName("validTokenIds")
 	fd_TokenCollection_mintEscrowAddress = md_TokenCollection.Fields().ByName("mintEscrowAddress")
 	fd_TokenCollection_cosmosCoinWrapperPaths = md_TokenCollection.Fields().ByName("cosmosCoinWrapperPaths")
+	fd_TokenCollection_invariants = md_TokenCollection.Fields().ByName("invariants")
 }
 
 var _ protoreflect.Message = (*fastReflection_TokenCollection)(nil)
@@ -648,26 +595,14 @@ func (x *fastReflection_TokenCollection) Range(f func(protoreflect.FieldDescript
 			return
 		}
 	}
-	if x.BalancesType != "" {
-		value := protoreflect.ValueOfString(x.BalancesType)
-		if !f(fd_TokenCollection_balancesType, value) {
-			return
-		}
-	}
-	if len(x.OffChainBalancesMetadataTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_5_list{list: &x.OffChainBalancesMetadataTimeline})
-		if !f(fd_TokenCollection_offChainBalancesMetadataTimeline, value) {
-			return
-		}
-	}
 	if len(x.CustomDataTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_7_list{list: &x.CustomDataTimeline})
+		value := protoreflect.ValueOfList(&_TokenCollection_4_list{list: &x.CustomDataTimeline})
 		if !f(fd_TokenCollection_customDataTimeline, value) {
 			return
 		}
 	}
 	if len(x.ManagerTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_8_list{list: &x.ManagerTimeline})
+		value := protoreflect.ValueOfList(&_TokenCollection_5_list{list: &x.ManagerTimeline})
 		if !f(fd_TokenCollection_managerTimeline, value) {
 			return
 		}
@@ -679,19 +614,19 @@ func (x *fastReflection_TokenCollection) Range(f func(protoreflect.FieldDescript
 		}
 	}
 	if len(x.CollectionApprovals) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_10_list{list: &x.CollectionApprovals})
+		value := protoreflect.ValueOfList(&_TokenCollection_7_list{list: &x.CollectionApprovals})
 		if !f(fd_TokenCollection_collectionApprovals, value) {
 			return
 		}
 	}
 	if len(x.StandardsTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_11_list{list: &x.StandardsTimeline})
+		value := protoreflect.ValueOfList(&_TokenCollection_8_list{list: &x.StandardsTimeline})
 		if !f(fd_TokenCollection_standardsTimeline, value) {
 			return
 		}
 	}
 	if len(x.IsArchivedTimeline) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_12_list{list: &x.IsArchivedTimeline})
+		value := protoreflect.ValueOfList(&_TokenCollection_9_list{list: &x.IsArchivedTimeline})
 		if !f(fd_TokenCollection_isArchivedTimeline, value) {
 			return
 		}
@@ -709,7 +644,7 @@ func (x *fastReflection_TokenCollection) Range(f func(protoreflect.FieldDescript
 		}
 	}
 	if len(x.ValidTokenIds) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_15_list{list: &x.ValidTokenIds})
+		value := protoreflect.ValueOfList(&_TokenCollection_12_list{list: &x.ValidTokenIds})
 		if !f(fd_TokenCollection_validTokenIds, value) {
 			return
 		}
@@ -721,8 +656,14 @@ func (x *fastReflection_TokenCollection) Range(f func(protoreflect.FieldDescript
 		}
 	}
 	if len(x.CosmosCoinWrapperPaths) != 0 {
-		value := protoreflect.ValueOfList(&_TokenCollection_17_list{list: &x.CosmosCoinWrapperPaths})
+		value := protoreflect.ValueOfList(&_TokenCollection_14_list{list: &x.CosmosCoinWrapperPaths})
 		if !f(fd_TokenCollection_cosmosCoinWrapperPaths, value) {
+			return
+		}
+	}
+	if x.Invariants != nil {
+		value := protoreflect.ValueOfMessage(x.Invariants.ProtoReflect())
+		if !f(fd_TokenCollection_invariants, value) {
 			return
 		}
 	}
@@ -747,10 +688,6 @@ func (x *fastReflection_TokenCollection) Has(fd protoreflect.FieldDescriptor) bo
 		return len(x.CollectionMetadataTimeline) != 0
 	case "badges.TokenCollection.tokenMetadataTimeline":
 		return len(x.TokenMetadataTimeline) != 0
-	case "badges.TokenCollection.balancesType":
-		return x.BalancesType != ""
-	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
-		return len(x.OffChainBalancesMetadataTimeline) != 0
 	case "badges.TokenCollection.customDataTimeline":
 		return len(x.CustomDataTimeline) != 0
 	case "badges.TokenCollection.managerTimeline":
@@ -773,6 +710,8 @@ func (x *fastReflection_TokenCollection) Has(fd protoreflect.FieldDescriptor) bo
 		return x.MintEscrowAddress != ""
 	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		return len(x.CosmosCoinWrapperPaths) != 0
+	case "badges.TokenCollection.invariants":
+		return x.Invariants != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
@@ -795,10 +734,6 @@ func (x *fastReflection_TokenCollection) Clear(fd protoreflect.FieldDescriptor) 
 		x.CollectionMetadataTimeline = nil
 	case "badges.TokenCollection.tokenMetadataTimeline":
 		x.TokenMetadataTimeline = nil
-	case "badges.TokenCollection.balancesType":
-		x.BalancesType = ""
-	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
-		x.OffChainBalancesMetadataTimeline = nil
 	case "badges.TokenCollection.customDataTimeline":
 		x.CustomDataTimeline = nil
 	case "badges.TokenCollection.managerTimeline":
@@ -821,6 +756,8 @@ func (x *fastReflection_TokenCollection) Clear(fd protoreflect.FieldDescriptor) 
 		x.MintEscrowAddress = ""
 	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		x.CosmosCoinWrapperPaths = nil
+	case "badges.TokenCollection.invariants":
+		x.Invariants = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
@@ -852,47 +789,38 @@ func (x *fastReflection_TokenCollection) Get(descriptor protoreflect.FieldDescri
 		}
 		listValue := &_TokenCollection_3_list{list: &x.TokenMetadataTimeline}
 		return protoreflect.ValueOfList(listValue)
-	case "badges.TokenCollection.balancesType":
-		value := x.BalancesType
-		return protoreflect.ValueOfString(value)
-	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
-		if len(x.OffChainBalancesMetadataTimeline) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_5_list{})
-		}
-		listValue := &_TokenCollection_5_list{list: &x.OffChainBalancesMetadataTimeline}
-		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.customDataTimeline":
 		if len(x.CustomDataTimeline) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_7_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_4_list{})
 		}
-		listValue := &_TokenCollection_7_list{list: &x.CustomDataTimeline}
+		listValue := &_TokenCollection_4_list{list: &x.CustomDataTimeline}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.managerTimeline":
 		if len(x.ManagerTimeline) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_8_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_5_list{})
 		}
-		listValue := &_TokenCollection_8_list{list: &x.ManagerTimeline}
+		listValue := &_TokenCollection_5_list{list: &x.ManagerTimeline}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.collectionPermissions":
 		value := x.CollectionPermissions
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "badges.TokenCollection.collectionApprovals":
 		if len(x.CollectionApprovals) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_10_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_7_list{})
 		}
-		listValue := &_TokenCollection_10_list{list: &x.CollectionApprovals}
+		listValue := &_TokenCollection_7_list{list: &x.CollectionApprovals}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.standardsTimeline":
 		if len(x.StandardsTimeline) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_11_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_8_list{})
 		}
-		listValue := &_TokenCollection_11_list{list: &x.StandardsTimeline}
+		listValue := &_TokenCollection_8_list{list: &x.StandardsTimeline}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.isArchivedTimeline":
 		if len(x.IsArchivedTimeline) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_12_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_9_list{})
 		}
-		listValue := &_TokenCollection_12_list{list: &x.IsArchivedTimeline}
+		listValue := &_TokenCollection_9_list{list: &x.IsArchivedTimeline}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.defaultBalances":
 		value := x.DefaultBalances
@@ -902,19 +830,22 @@ func (x *fastReflection_TokenCollection) Get(descriptor protoreflect.FieldDescri
 		return protoreflect.ValueOfString(value)
 	case "badges.TokenCollection.validTokenIds":
 		if len(x.ValidTokenIds) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_15_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_12_list{})
 		}
-		listValue := &_TokenCollection_15_list{list: &x.ValidTokenIds}
+		listValue := &_TokenCollection_12_list{list: &x.ValidTokenIds}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.TokenCollection.mintEscrowAddress":
 		value := x.MintEscrowAddress
 		return protoreflect.ValueOfString(value)
 	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		if len(x.CosmosCoinWrapperPaths) == 0 {
-			return protoreflect.ValueOfList(&_TokenCollection_17_list{})
+			return protoreflect.ValueOfList(&_TokenCollection_14_list{})
 		}
-		listValue := &_TokenCollection_17_list{list: &x.CosmosCoinWrapperPaths}
+		listValue := &_TokenCollection_14_list{list: &x.CosmosCoinWrapperPaths}
 		return protoreflect.ValueOfList(listValue)
+	case "badges.TokenCollection.invariants":
+		value := x.Invariants
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
@@ -945,33 +876,27 @@ func (x *fastReflection_TokenCollection) Set(fd protoreflect.FieldDescriptor, va
 		lv := value.List()
 		clv := lv.(*_TokenCollection_3_list)
 		x.TokenMetadataTimeline = *clv.list
-	case "badges.TokenCollection.balancesType":
-		x.BalancesType = value.Interface().(string)
-	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
-		lv := value.List()
-		clv := lv.(*_TokenCollection_5_list)
-		x.OffChainBalancesMetadataTimeline = *clv.list
 	case "badges.TokenCollection.customDataTimeline":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_7_list)
+		clv := lv.(*_TokenCollection_4_list)
 		x.CustomDataTimeline = *clv.list
 	case "badges.TokenCollection.managerTimeline":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_8_list)
+		clv := lv.(*_TokenCollection_5_list)
 		x.ManagerTimeline = *clv.list
 	case "badges.TokenCollection.collectionPermissions":
 		x.CollectionPermissions = value.Message().Interface().(*CollectionPermissions)
 	case "badges.TokenCollection.collectionApprovals":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_10_list)
+		clv := lv.(*_TokenCollection_7_list)
 		x.CollectionApprovals = *clv.list
 	case "badges.TokenCollection.standardsTimeline":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_11_list)
+		clv := lv.(*_TokenCollection_8_list)
 		x.StandardsTimeline = *clv.list
 	case "badges.TokenCollection.isArchivedTimeline":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_12_list)
+		clv := lv.(*_TokenCollection_9_list)
 		x.IsArchivedTimeline = *clv.list
 	case "badges.TokenCollection.defaultBalances":
 		x.DefaultBalances = value.Message().Interface().(*UserBalanceStore)
@@ -979,14 +904,16 @@ func (x *fastReflection_TokenCollection) Set(fd protoreflect.FieldDescriptor, va
 		x.CreatedBy = value.Interface().(string)
 	case "badges.TokenCollection.validTokenIds":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_15_list)
+		clv := lv.(*_TokenCollection_12_list)
 		x.ValidTokenIds = *clv.list
 	case "badges.TokenCollection.mintEscrowAddress":
 		x.MintEscrowAddress = value.Interface().(string)
 	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		lv := value.List()
-		clv := lv.(*_TokenCollection_17_list)
+		clv := lv.(*_TokenCollection_14_list)
 		x.CosmosCoinWrapperPaths = *clv.list
+	case "badges.TokenCollection.invariants":
+		x.Invariants = value.Message().Interface().(*CollectionInvariants)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
@@ -1019,23 +946,17 @@ func (x *fastReflection_TokenCollection) Mutable(fd protoreflect.FieldDescriptor
 		}
 		value := &_TokenCollection_3_list{list: &x.TokenMetadataTimeline}
 		return protoreflect.ValueOfList(value)
-	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
-		if x.OffChainBalancesMetadataTimeline == nil {
-			x.OffChainBalancesMetadataTimeline = []*OffChainBalancesMetadataTimeline{}
-		}
-		value := &_TokenCollection_5_list{list: &x.OffChainBalancesMetadataTimeline}
-		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.customDataTimeline":
 		if x.CustomDataTimeline == nil {
 			x.CustomDataTimeline = []*CustomDataTimeline{}
 		}
-		value := &_TokenCollection_7_list{list: &x.CustomDataTimeline}
+		value := &_TokenCollection_4_list{list: &x.CustomDataTimeline}
 		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.managerTimeline":
 		if x.ManagerTimeline == nil {
 			x.ManagerTimeline = []*ManagerTimeline{}
 		}
-		value := &_TokenCollection_8_list{list: &x.ManagerTimeline}
+		value := &_TokenCollection_5_list{list: &x.ManagerTimeline}
 		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.collectionPermissions":
 		if x.CollectionPermissions == nil {
@@ -1046,19 +967,19 @@ func (x *fastReflection_TokenCollection) Mutable(fd protoreflect.FieldDescriptor
 		if x.CollectionApprovals == nil {
 			x.CollectionApprovals = []*CollectionApproval{}
 		}
-		value := &_TokenCollection_10_list{list: &x.CollectionApprovals}
+		value := &_TokenCollection_7_list{list: &x.CollectionApprovals}
 		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.standardsTimeline":
 		if x.StandardsTimeline == nil {
 			x.StandardsTimeline = []*StandardsTimeline{}
 		}
-		value := &_TokenCollection_11_list{list: &x.StandardsTimeline}
+		value := &_TokenCollection_8_list{list: &x.StandardsTimeline}
 		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.isArchivedTimeline":
 		if x.IsArchivedTimeline == nil {
 			x.IsArchivedTimeline = []*IsArchivedTimeline{}
 		}
-		value := &_TokenCollection_12_list{list: &x.IsArchivedTimeline}
+		value := &_TokenCollection_9_list{list: &x.IsArchivedTimeline}
 		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.defaultBalances":
 		if x.DefaultBalances == nil {
@@ -1069,18 +990,21 @@ func (x *fastReflection_TokenCollection) Mutable(fd protoreflect.FieldDescriptor
 		if x.ValidTokenIds == nil {
 			x.ValidTokenIds = []*UintRange{}
 		}
-		value := &_TokenCollection_15_list{list: &x.ValidTokenIds}
+		value := &_TokenCollection_12_list{list: &x.ValidTokenIds}
 		return protoreflect.ValueOfList(value)
 	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		if x.CosmosCoinWrapperPaths == nil {
 			x.CosmosCoinWrapperPaths = []*CosmosCoinWrapperPath{}
 		}
-		value := &_TokenCollection_17_list{list: &x.CosmosCoinWrapperPaths}
+		value := &_TokenCollection_14_list{list: &x.CosmosCoinWrapperPaths}
 		return protoreflect.ValueOfList(value)
+	case "badges.TokenCollection.invariants":
+		if x.Invariants == nil {
+			x.Invariants = new(CollectionInvariants)
+		}
+		return protoreflect.ValueOfMessage(x.Invariants.ProtoReflect())
 	case "badges.TokenCollection.collectionId":
 		panic(fmt.Errorf("field collectionId of message badges.TokenCollection is not mutable"))
-	case "badges.TokenCollection.balancesType":
-		panic(fmt.Errorf("field balancesType of message badges.TokenCollection is not mutable"))
 	case "badges.TokenCollection.createdBy":
 		panic(fmt.Errorf("field createdBy of message badges.TokenCollection is not mutable"))
 	case "badges.TokenCollection.mintEscrowAddress":
@@ -1106,29 +1030,24 @@ func (x *fastReflection_TokenCollection) NewField(fd protoreflect.FieldDescripto
 	case "badges.TokenCollection.tokenMetadataTimeline":
 		list := []*TokenMetadataTimeline{}
 		return protoreflect.ValueOfList(&_TokenCollection_3_list{list: &list})
-	case "badges.TokenCollection.balancesType":
-		return protoreflect.ValueOfString("")
-	case "badges.TokenCollection.offChainBalancesMetadataTimeline":
-		list := []*OffChainBalancesMetadataTimeline{}
-		return protoreflect.ValueOfList(&_TokenCollection_5_list{list: &list})
 	case "badges.TokenCollection.customDataTimeline":
 		list := []*CustomDataTimeline{}
-		return protoreflect.ValueOfList(&_TokenCollection_7_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_4_list{list: &list})
 	case "badges.TokenCollection.managerTimeline":
 		list := []*ManagerTimeline{}
-		return protoreflect.ValueOfList(&_TokenCollection_8_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_5_list{list: &list})
 	case "badges.TokenCollection.collectionPermissions":
 		m := new(CollectionPermissions)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "badges.TokenCollection.collectionApprovals":
 		list := []*CollectionApproval{}
-		return protoreflect.ValueOfList(&_TokenCollection_10_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_7_list{list: &list})
 	case "badges.TokenCollection.standardsTimeline":
 		list := []*StandardsTimeline{}
-		return protoreflect.ValueOfList(&_TokenCollection_11_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_8_list{list: &list})
 	case "badges.TokenCollection.isArchivedTimeline":
 		list := []*IsArchivedTimeline{}
-		return protoreflect.ValueOfList(&_TokenCollection_12_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_9_list{list: &list})
 	case "badges.TokenCollection.defaultBalances":
 		m := new(UserBalanceStore)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
@@ -1136,12 +1055,15 @@ func (x *fastReflection_TokenCollection) NewField(fd protoreflect.FieldDescripto
 		return protoreflect.ValueOfString("")
 	case "badges.TokenCollection.validTokenIds":
 		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_TokenCollection_15_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_12_list{list: &list})
 	case "badges.TokenCollection.mintEscrowAddress":
 		return protoreflect.ValueOfString("")
 	case "badges.TokenCollection.cosmosCoinWrapperPaths":
 		list := []*CosmosCoinWrapperPath{}
-		return protoreflect.ValueOfList(&_TokenCollection_17_list{list: &list})
+		return protoreflect.ValueOfList(&_TokenCollection_14_list{list: &list})
+	case "badges.TokenCollection.invariants":
+		m := new(CollectionInvariants)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.TokenCollection"))
@@ -1227,16 +1149,6 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		l = len(x.BalancesType)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if len(x.OffChainBalancesMetadataTimeline) > 0 {
-			for _, e := range x.OffChainBalancesMetadataTimeline {
-				l = options.Size(e)
-				n += 1 + l + runtime.Sov(uint64(l))
-			}
-		}
 		if len(x.CustomDataTimeline) > 0 {
 			for _, e := range x.CustomDataTimeline {
 				l = options.Size(e)
@@ -1287,13 +1199,17 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 		}
 		l = len(x.MintEscrowAddress)
 		if l > 0 {
-			n += 2 + l + runtime.Sov(uint64(l))
+			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if len(x.CosmosCoinWrapperPaths) > 0 {
 			for _, e := range x.CosmosCoinWrapperPaths {
 				l = options.Size(e)
-				n += 2 + l + runtime.Sov(uint64(l))
+				n += 1 + l + runtime.Sov(uint64(l))
 			}
+		}
+		if x.Invariants != nil {
+			l = options.Size(x.Invariants)
+			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -1324,6 +1240,20 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
+		if x.Invariants != nil {
+			encoded, err := options.Marshal(x.Invariants)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x7a
+		}
 		if len(x.CosmosCoinWrapperPaths) > 0 {
 			for iNdEx := len(x.CosmosCoinWrapperPaths) - 1; iNdEx >= 0; iNdEx-- {
 				encoded, err := options.Marshal(x.CosmosCoinWrapperPaths[iNdEx])
@@ -1337,9 +1267,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x1
-				i--
-				dAtA[i] = 0x8a
+				dAtA[i] = 0x72
 			}
 		}
 		if len(x.MintEscrowAddress) > 0 {
@@ -1347,9 +1275,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 			copy(dAtA[i:], x.MintEscrowAddress)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.MintEscrowAddress)))
 			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0x82
+			dAtA[i] = 0x6a
 		}
 		if len(x.ValidTokenIds) > 0 {
 			for iNdEx := len(x.ValidTokenIds) - 1; iNdEx >= 0; iNdEx-- {
@@ -1364,7 +1290,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x7a
+				dAtA[i] = 0x62
 			}
 		}
 		if len(x.CreatedBy) > 0 {
@@ -1372,7 +1298,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 			copy(dAtA[i:], x.CreatedBy)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.CreatedBy)))
 			i--
-			dAtA[i] = 0x72
+			dAtA[i] = 0x5a
 		}
 		if x.DefaultBalances != nil {
 			encoded, err := options.Marshal(x.DefaultBalances)
@@ -1386,7 +1312,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x6a
+			dAtA[i] = 0x52
 		}
 		if len(x.IsArchivedTimeline) > 0 {
 			for iNdEx := len(x.IsArchivedTimeline) - 1; iNdEx >= 0; iNdEx-- {
@@ -1401,7 +1327,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x62
+				dAtA[i] = 0x4a
 			}
 		}
 		if len(x.StandardsTimeline) > 0 {
@@ -1417,7 +1343,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x5a
+				dAtA[i] = 0x42
 			}
 		}
 		if len(x.CollectionApprovals) > 0 {
@@ -1433,7 +1359,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x52
+				dAtA[i] = 0x3a
 			}
 		}
 		if x.CollectionPermissions != nil {
@@ -1448,7 +1374,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x4a
+			dAtA[i] = 0x32
 		}
 		if len(x.ManagerTimeline) > 0 {
 			for iNdEx := len(x.ManagerTimeline) - 1; iNdEx >= 0; iNdEx-- {
@@ -1463,7 +1389,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x42
+				dAtA[i] = 0x2a
 			}
 		}
 		if len(x.CustomDataTimeline) > 0 {
@@ -1479,31 +1405,8 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x3a
+				dAtA[i] = 0x22
 			}
-		}
-		if len(x.OffChainBalancesMetadataTimeline) > 0 {
-			for iNdEx := len(x.OffChainBalancesMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.OffChainBalancesMetadataTimeline[iNdEx])
-				if err != nil {
-					return protoiface.MarshalOutput{
-						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-						Buf:               input.Buf,
-					}, err
-				}
-				i -= len(encoded)
-				copy(dAtA[i:], encoded)
-				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-				i--
-				dAtA[i] = 0x2a
-			}
-		}
-		if len(x.BalancesType) > 0 {
-			i -= len(x.BalancesType)
-			copy(dAtA[i:], x.BalancesType)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.BalancesType)))
-			i--
-			dAtA[i] = 0x22
 		}
 		if len(x.TokenMetadataTimeline) > 0 {
 			for iNdEx := len(x.TokenMetadataTimeline) - 1; iNdEx >= 0; iNdEx-- {
@@ -1695,72 +1598,6 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BalancesType", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.BalancesType = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
-			case 5:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OffChainBalancesMetadataTimeline", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.OffChainBalancesMetadataTimeline = append(x.OffChainBalancesMetadataTimeline, &OffChainBalancesMetadataTimeline{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.OffChainBalancesMetadataTimeline[len(x.OffChainBalancesMetadataTimeline)-1]); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 7:
-				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CustomDataTimeline", wireType)
 				}
 				var msglen int
@@ -1793,7 +1630,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 8:
+			case 5:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ManagerTimeline", wireType)
 				}
@@ -1827,7 +1664,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 9:
+			case 6:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CollectionPermissions", wireType)
 				}
@@ -1863,7 +1700,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 10:
+			case 7:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CollectionApprovals", wireType)
 				}
@@ -1897,7 +1734,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 11:
+			case 8:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field StandardsTimeline", wireType)
 				}
@@ -1931,7 +1768,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 12:
+			case 9:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IsArchivedTimeline", wireType)
 				}
@@ -1965,7 +1802,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 13:
+			case 10:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DefaultBalances", wireType)
 				}
@@ -2001,7 +1838,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 14:
+			case 11:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CreatedBy", wireType)
 				}
@@ -2033,7 +1870,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				}
 				x.CreatedBy = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 15:
+			case 12:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidTokenIds", wireType)
 				}
@@ -2067,7 +1904,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 16:
+			case 13:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MintEscrowAddress", wireType)
 				}
@@ -2099,7 +1936,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				}
 				x.MintEscrowAddress = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 17:
+			case 14:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CosmosCoinWrapperPaths", wireType)
 				}
@@ -2130,6 +1967,42 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 				}
 				x.CosmosCoinWrapperPaths = append(x.CosmosCoinWrapperPaths, &CosmosCoinWrapperPath{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CosmosCoinWrapperPaths[len(x.CosmosCoinWrapperPaths)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 15:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Invariants", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Invariants == nil {
+					x.Invariants = &CollectionInvariants{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Invariants); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -2171,7 +2044,7 @@ func (x *fastReflection_TokenCollection) ProtoMethods() *protoiface.Methods {
 var _ protoreflect.List = (*_CosmosCoinWrapperPath_3_list)(nil)
 
 type _CosmosCoinWrapperPath_3_list struct {
-	list *[]*UintRange
+	list *[]*Balance
 }
 
 func (x *_CosmosCoinWrapperPath_3_list) Len() int {
@@ -2187,18 +2060,18 @@ func (x *_CosmosCoinWrapperPath_3_list) Get(i int) protoreflect.Value {
 
 func (x *_CosmosCoinWrapperPath_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
+	concreteValue := valueUnwrapped.Interface().(*Balance)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_CosmosCoinWrapperPath_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
+	concreteValue := valueUnwrapped.Interface().(*Balance)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_CosmosCoinWrapperPath_3_list) AppendMutable() protoreflect.Value {
-	v := new(UintRange)
+	v := new(Balance)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -2211,7 +2084,7 @@ func (x *_CosmosCoinWrapperPath_3_list) Truncate(n int) {
 }
 
 func (x *_CosmosCoinWrapperPath_3_list) NewElement() protoreflect.Value {
-	v := new(UintRange)
+	v := new(Balance)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -2219,116 +2092,66 @@ func (x *_CosmosCoinWrapperPath_3_list) IsValid() bool {
 	return x.list != nil
 }
 
-var _ protoreflect.List = (*_CosmosCoinWrapperPath_4_list)(nil)
+var _ protoreflect.List = (*_CosmosCoinWrapperPath_5_list)(nil)
 
-type _CosmosCoinWrapperPath_4_list struct {
-	list *[]*UintRange
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) Len() int {
-	if x.list == nil {
-		return 0
-	}
-	return len(*x.list)
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
-	(*x.list)[i] = concreteValue
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*UintRange)
-	*x.list = append(*x.list, concreteValue)
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) AppendMutable() protoreflect.Value {
-	v := new(UintRange)
-	*x.list = append(*x.list, v)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) Truncate(n int) {
-	for i := n; i < len(*x.list); i++ {
-		(*x.list)[i] = nil
-	}
-	*x.list = (*x.list)[:n]
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) NewElement() protoreflect.Value {
-	v := new(UintRange)
-	return protoreflect.ValueOfMessage(v.ProtoReflect())
-}
-
-func (x *_CosmosCoinWrapperPath_4_list) IsValid() bool {
-	return x.list != nil
-}
-
-var _ protoreflect.List = (*_CosmosCoinWrapperPath_6_list)(nil)
-
-type _CosmosCoinWrapperPath_6_list struct {
+type _CosmosCoinWrapperPath_5_list struct {
 	list *[]*DenomUnit
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) Len() int {
+func (x *_CosmosCoinWrapperPath_5_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) Get(i int) protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_5_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) Set(i int, value protoreflect.Value) {
+func (x *_CosmosCoinWrapperPath_5_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*DenomUnit)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) Append(value protoreflect.Value) {
+func (x *_CosmosCoinWrapperPath_5_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*DenomUnit)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) AppendMutable() protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_5_list) AppendMutable() protoreflect.Value {
 	v := new(DenomUnit)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) Truncate(n int) {
+func (x *_CosmosCoinWrapperPath_5_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) NewElement() protoreflect.Value {
+func (x *_CosmosCoinWrapperPath_5_list) NewElement() protoreflect.Value {
 	v := new(DenomUnit)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_CosmosCoinWrapperPath_6_list) IsValid() bool {
+func (x *_CosmosCoinWrapperPath_5_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_CosmosCoinWrapperPath                protoreflect.MessageDescriptor
-	fd_CosmosCoinWrapperPath_address        protoreflect.FieldDescriptor
-	fd_CosmosCoinWrapperPath_denom          protoreflect.FieldDescriptor
-	fd_CosmosCoinWrapperPath_ownershipTimes protoreflect.FieldDescriptor
-	fd_CosmosCoinWrapperPath_tokenIds       protoreflect.FieldDescriptor
-	fd_CosmosCoinWrapperPath_symbol         protoreflect.FieldDescriptor
-	fd_CosmosCoinWrapperPath_denomUnits     protoreflect.FieldDescriptor
+	md_CosmosCoinWrapperPath                                protoreflect.MessageDescriptor
+	fd_CosmosCoinWrapperPath_address                        protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_denom                          protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_balances                       protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_symbol                         protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_denomUnits                     protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_allowOverrideWithAnyValidToken protoreflect.FieldDescriptor
+	fd_CosmosCoinWrapperPath_allowCosmosWrapping            protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -2336,10 +2159,11 @@ func init() {
 	md_CosmosCoinWrapperPath = File_badges_collections_proto.Messages().ByName("CosmosCoinWrapperPath")
 	fd_CosmosCoinWrapperPath_address = md_CosmosCoinWrapperPath.Fields().ByName("address")
 	fd_CosmosCoinWrapperPath_denom = md_CosmosCoinWrapperPath.Fields().ByName("denom")
-	fd_CosmosCoinWrapperPath_ownershipTimes = md_CosmosCoinWrapperPath.Fields().ByName("ownershipTimes")
-	fd_CosmosCoinWrapperPath_tokenIds = md_CosmosCoinWrapperPath.Fields().ByName("tokenIds")
+	fd_CosmosCoinWrapperPath_balances = md_CosmosCoinWrapperPath.Fields().ByName("balances")
 	fd_CosmosCoinWrapperPath_symbol = md_CosmosCoinWrapperPath.Fields().ByName("symbol")
 	fd_CosmosCoinWrapperPath_denomUnits = md_CosmosCoinWrapperPath.Fields().ByName("denomUnits")
+	fd_CosmosCoinWrapperPath_allowOverrideWithAnyValidToken = md_CosmosCoinWrapperPath.Fields().ByName("allowOverrideWithAnyValidToken")
+	fd_CosmosCoinWrapperPath_allowCosmosWrapping = md_CosmosCoinWrapperPath.Fields().ByName("allowCosmosWrapping")
 }
 
 var _ protoreflect.Message = (*fastReflection_CosmosCoinWrapperPath)(nil)
@@ -2419,15 +2243,9 @@ func (x *fastReflection_CosmosCoinWrapperPath) Range(f func(protoreflect.FieldDe
 			return
 		}
 	}
-	if len(x.OwnershipTimes) != 0 {
-		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes})
-		if !f(fd_CosmosCoinWrapperPath_ownershipTimes, value) {
-			return
-		}
-	}
-	if len(x.TokenIds) != 0 {
-		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &x.TokenIds})
-		if !f(fd_CosmosCoinWrapperPath_tokenIds, value) {
+	if len(x.Balances) != 0 {
+		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{list: &x.Balances})
+		if !f(fd_CosmosCoinWrapperPath_balances, value) {
 			return
 		}
 	}
@@ -2438,8 +2256,20 @@ func (x *fastReflection_CosmosCoinWrapperPath) Range(f func(protoreflect.FieldDe
 		}
 	}
 	if len(x.DenomUnits) != 0 {
-		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_6_list{list: &x.DenomUnits})
+		value := protoreflect.ValueOfList(&_CosmosCoinWrapperPath_5_list{list: &x.DenomUnits})
 		if !f(fd_CosmosCoinWrapperPath_denomUnits, value) {
+			return
+		}
+	}
+	if x.AllowOverrideWithAnyValidToken != false {
+		value := protoreflect.ValueOfBool(x.AllowOverrideWithAnyValidToken)
+		if !f(fd_CosmosCoinWrapperPath_allowOverrideWithAnyValidToken, value) {
+			return
+		}
+	}
+	if x.AllowCosmosWrapping != false {
+		value := protoreflect.ValueOfBool(x.AllowCosmosWrapping)
+		if !f(fd_CosmosCoinWrapperPath_allowCosmosWrapping, value) {
 			return
 		}
 	}
@@ -2462,14 +2292,16 @@ func (x *fastReflection_CosmosCoinWrapperPath) Has(fd protoreflect.FieldDescript
 		return x.Address != ""
 	case "badges.CosmosCoinWrapperPath.denom":
 		return x.Denom != ""
-	case "badges.CosmosCoinWrapperPath.ownershipTimes":
-		return len(x.OwnershipTimes) != 0
-	case "badges.CosmosCoinWrapperPath.tokenIds":
-		return len(x.TokenIds) != 0
+	case "badges.CosmosCoinWrapperPath.balances":
+		return len(x.Balances) != 0
 	case "badges.CosmosCoinWrapperPath.symbol":
 		return x.Symbol != ""
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		return len(x.DenomUnits) != 0
+	case "badges.CosmosCoinWrapperPath.allowOverrideWithAnyValidToken":
+		return x.AllowOverrideWithAnyValidToken != false
+	case "badges.CosmosCoinWrapperPath.allowCosmosWrapping":
+		return x.AllowCosmosWrapping != false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2490,14 +2322,16 @@ func (x *fastReflection_CosmosCoinWrapperPath) Clear(fd protoreflect.FieldDescri
 		x.Address = ""
 	case "badges.CosmosCoinWrapperPath.denom":
 		x.Denom = ""
-	case "badges.CosmosCoinWrapperPath.ownershipTimes":
-		x.OwnershipTimes = nil
-	case "badges.CosmosCoinWrapperPath.tokenIds":
-		x.TokenIds = nil
+	case "badges.CosmosCoinWrapperPath.balances":
+		x.Balances = nil
 	case "badges.CosmosCoinWrapperPath.symbol":
 		x.Symbol = ""
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		x.DenomUnits = nil
+	case "badges.CosmosCoinWrapperPath.allowOverrideWithAnyValidToken":
+		x.AllowOverrideWithAnyValidToken = false
+	case "badges.CosmosCoinWrapperPath.allowCosmosWrapping":
+		x.AllowCosmosWrapping = false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2520,27 +2354,27 @@ func (x *fastReflection_CosmosCoinWrapperPath) Get(descriptor protoreflect.Field
 	case "badges.CosmosCoinWrapperPath.denom":
 		value := x.Denom
 		return protoreflect.ValueOfString(value)
-	case "badges.CosmosCoinWrapperPath.ownershipTimes":
-		if len(x.OwnershipTimes) == 0 {
+	case "badges.CosmosCoinWrapperPath.balances":
+		if len(x.Balances) == 0 {
 			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{})
 		}
-		listValue := &_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes}
-		return protoreflect.ValueOfList(listValue)
-	case "badges.CosmosCoinWrapperPath.tokenIds":
-		if len(x.TokenIds) == 0 {
-			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{})
-		}
-		listValue := &_CosmosCoinWrapperPath_4_list{list: &x.TokenIds}
+		listValue := &_CosmosCoinWrapperPath_3_list{list: &x.Balances}
 		return protoreflect.ValueOfList(listValue)
 	case "badges.CosmosCoinWrapperPath.symbol":
 		value := x.Symbol
 		return protoreflect.ValueOfString(value)
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		if len(x.DenomUnits) == 0 {
-			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_6_list{})
+			return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_5_list{})
 		}
-		listValue := &_CosmosCoinWrapperPath_6_list{list: &x.DenomUnits}
+		listValue := &_CosmosCoinWrapperPath_5_list{list: &x.DenomUnits}
 		return protoreflect.ValueOfList(listValue)
+	case "badges.CosmosCoinWrapperPath.allowOverrideWithAnyValidToken":
+		value := x.AllowOverrideWithAnyValidToken
+		return protoreflect.ValueOfBool(value)
+	case "badges.CosmosCoinWrapperPath.allowCosmosWrapping":
+		value := x.AllowCosmosWrapping
+		return protoreflect.ValueOfBool(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2565,20 +2399,20 @@ func (x *fastReflection_CosmosCoinWrapperPath) Set(fd protoreflect.FieldDescript
 		x.Address = value.Interface().(string)
 	case "badges.CosmosCoinWrapperPath.denom":
 		x.Denom = value.Interface().(string)
-	case "badges.CosmosCoinWrapperPath.ownershipTimes":
+	case "badges.CosmosCoinWrapperPath.balances":
 		lv := value.List()
 		clv := lv.(*_CosmosCoinWrapperPath_3_list)
-		x.OwnershipTimes = *clv.list
-	case "badges.CosmosCoinWrapperPath.tokenIds":
-		lv := value.List()
-		clv := lv.(*_CosmosCoinWrapperPath_4_list)
-		x.TokenIds = *clv.list
+		x.Balances = *clv.list
 	case "badges.CosmosCoinWrapperPath.symbol":
 		x.Symbol = value.Interface().(string)
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		lv := value.List()
-		clv := lv.(*_CosmosCoinWrapperPath_6_list)
+		clv := lv.(*_CosmosCoinWrapperPath_5_list)
 		x.DenomUnits = *clv.list
+	case "badges.CosmosCoinWrapperPath.allowOverrideWithAnyValidToken":
+		x.AllowOverrideWithAnyValidToken = value.Bool()
+	case "badges.CosmosCoinWrapperPath.allowCosmosWrapping":
+		x.AllowCosmosWrapping = value.Bool()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2599,23 +2433,17 @@ func (x *fastReflection_CosmosCoinWrapperPath) Set(fd protoreflect.FieldDescript
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_CosmosCoinWrapperPath) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "badges.CosmosCoinWrapperPath.ownershipTimes":
-		if x.OwnershipTimes == nil {
-			x.OwnershipTimes = []*UintRange{}
+	case "badges.CosmosCoinWrapperPath.balances":
+		if x.Balances == nil {
+			x.Balances = []*Balance{}
 		}
-		value := &_CosmosCoinWrapperPath_3_list{list: &x.OwnershipTimes}
-		return protoreflect.ValueOfList(value)
-	case "badges.CosmosCoinWrapperPath.tokenIds":
-		if x.TokenIds == nil {
-			x.TokenIds = []*UintRange{}
-		}
-		value := &_CosmosCoinWrapperPath_4_list{list: &x.TokenIds}
+		value := &_CosmosCoinWrapperPath_3_list{list: &x.Balances}
 		return protoreflect.ValueOfList(value)
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		if x.DenomUnits == nil {
 			x.DenomUnits = []*DenomUnit{}
 		}
-		value := &_CosmosCoinWrapperPath_6_list{list: &x.DenomUnits}
+		value := &_CosmosCoinWrapperPath_5_list{list: &x.DenomUnits}
 		return protoreflect.ValueOfList(value)
 	case "badges.CosmosCoinWrapperPath.address":
 		panic(fmt.Errorf("field address of message badges.CosmosCoinWrapperPath is not mutable"))
@@ -2623,6 +2451,10 @@ func (x *fastReflection_CosmosCoinWrapperPath) Mutable(fd protoreflect.FieldDesc
 		panic(fmt.Errorf("field denom of message badges.CosmosCoinWrapperPath is not mutable"))
 	case "badges.CosmosCoinWrapperPath.symbol":
 		panic(fmt.Errorf("field symbol of message badges.CosmosCoinWrapperPath is not mutable"))
+	case "badges.CosmosCoinWrapperPath.allowOverrideWithAnyValidToken":
+		panic(fmt.Errorf("field allowOverrideWithAnyValidToken of message badges.CosmosCoinWrapperPath is not mutable"))
+	case "badges.CosmosCoinWrapperPath.allowCosmosWrapping":
+		panic(fmt.Errorf("field allowCosmosWrapping of message badges.CosmosCoinWrapperPath is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2640,17 +2472,18 @@ func (x *fastReflection_CosmosCoinWrapperPath) NewField(fd protoreflect.FieldDes
 		return protoreflect.ValueOfString("")
 	case "badges.CosmosCoinWrapperPath.denom":
 		return protoreflect.ValueOfString("")
-	case "badges.CosmosCoinWrapperPath.ownershipTimes":
-		list := []*UintRange{}
+	case "badges.CosmosCoinWrapperPath.balances":
+		list := []*Balance{}
 		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_3_list{list: &list})
-	case "badges.CosmosCoinWrapperPath.tokenIds":
-		list := []*UintRange{}
-		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_4_list{list: &list})
 	case "badges.CosmosCoinWrapperPath.symbol":
 		return protoreflect.ValueOfString("")
 	case "badges.CosmosCoinWrapperPath.denomUnits":
 		list := []*DenomUnit{}
-		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_6_list{list: &list})
+		return protoreflect.ValueOfList(&_CosmosCoinWrapperPath_5_list{list: &list})
+	case "badges.CosmosCoinWrapperPath.allowOverrideWithAnyValidToken":
+		return protoreflect.ValueOfBool(false)
+	case "badges.CosmosCoinWrapperPath.allowCosmosWrapping":
+		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CosmosCoinWrapperPath"))
@@ -2728,14 +2561,8 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.OwnershipTimes) > 0 {
-			for _, e := range x.OwnershipTimes {
-				l = options.Size(e)
-				n += 1 + l + runtime.Sov(uint64(l))
-			}
-		}
-		if len(x.TokenIds) > 0 {
-			for _, e := range x.TokenIds {
+		if len(x.Balances) > 0 {
+			for _, e := range x.Balances {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -2749,6 +2576,12 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
+		}
+		if x.AllowOverrideWithAnyValidToken {
+			n += 2
+		}
+		if x.AllowCosmosWrapping {
+			n += 2
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -2779,6 +2612,26 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
+		if x.AllowCosmosWrapping {
+			i--
+			if x.AllowCosmosWrapping {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x38
+		}
+		if x.AllowOverrideWithAnyValidToken {
+			i--
+			if x.AllowOverrideWithAnyValidToken {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x30
+		}
 		if len(x.DenomUnits) > 0 {
 			for iNdEx := len(x.DenomUnits) - 1; iNdEx >= 0; iNdEx-- {
 				encoded, err := options.Marshal(x.DenomUnits[iNdEx])
@@ -2792,7 +2645,7 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				copy(dAtA[i:], encoded)
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 				i--
-				dAtA[i] = 0x32
+				dAtA[i] = 0x2a
 			}
 		}
 		if len(x.Symbol) > 0 {
@@ -2800,27 +2653,11 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 			copy(dAtA[i:], x.Symbol)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Symbol)))
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x22
 		}
-		if len(x.TokenIds) > 0 {
-			for iNdEx := len(x.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.TokenIds[iNdEx])
-				if err != nil {
-					return protoiface.MarshalOutput{
-						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-						Buf:               input.Buf,
-					}, err
-				}
-				i -= len(encoded)
-				copy(dAtA[i:], encoded)
-				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-				i--
-				dAtA[i] = 0x22
-			}
-		}
-		if len(x.OwnershipTimes) > 0 {
-			for iNdEx := len(x.OwnershipTimes) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.OwnershipTimes[iNdEx])
+		if len(x.Balances) > 0 {
+			for iNdEx := len(x.Balances) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Balances[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2963,7 +2800,7 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OwnershipTimes", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Balances", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -2990,46 +2827,12 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.OwnershipTimes = append(x.OwnershipTimes, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.OwnershipTimes[len(x.OwnershipTimes)-1]); err != nil {
+				x.Balances = append(x.Balances, &Balance{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Balances[len(x.Balances)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
 			case 4:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.TokenIds = append(x.TokenIds, &UintRange{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenIds[len(x.TokenIds)-1]); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 5:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Symbol", wireType)
 				}
@@ -3061,7 +2864,7 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 				}
 				x.Symbol = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 6:
+			case 5:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DenomUnits", wireType)
 				}
@@ -3095,6 +2898,46 @@ func (x *fastReflection_CosmosCoinWrapperPath) ProtoMethods() *protoiface.Method
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
+			case 6:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowOverrideWithAnyValidToken", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.AllowOverrideWithAnyValidToken = bool(v != 0)
+			case 7:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowCosmosWrapping", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.AllowCosmosWrapping = bool(v != 0)
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -3668,6 +3511,480 @@ func (x *fastReflection_DenomUnit) ProtoMethods() *protoiface.Methods {
 	}
 }
 
+var (
+	md_CollectionInvariants                        protoreflect.MessageDescriptor
+	fd_CollectionInvariants_noCustomOwnershipTimes protoreflect.FieldDescriptor
+	fd_CollectionInvariants_maxSupplyPerId         protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_badges_collections_proto_init()
+	md_CollectionInvariants = File_badges_collections_proto.Messages().ByName("CollectionInvariants")
+	fd_CollectionInvariants_noCustomOwnershipTimes = md_CollectionInvariants.Fields().ByName("noCustomOwnershipTimes")
+	fd_CollectionInvariants_maxSupplyPerId = md_CollectionInvariants.Fields().ByName("maxSupplyPerId")
+}
+
+var _ protoreflect.Message = (*fastReflection_CollectionInvariants)(nil)
+
+type fastReflection_CollectionInvariants CollectionInvariants
+
+func (x *CollectionInvariants) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_CollectionInvariants)(x)
+}
+
+func (x *CollectionInvariants) slowProtoReflect() protoreflect.Message {
+	mi := &file_badges_collections_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_CollectionInvariants_messageType fastReflection_CollectionInvariants_messageType
+var _ protoreflect.MessageType = fastReflection_CollectionInvariants_messageType{}
+
+type fastReflection_CollectionInvariants_messageType struct{}
+
+func (x fastReflection_CollectionInvariants_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_CollectionInvariants)(nil)
+}
+func (x fastReflection_CollectionInvariants_messageType) New() protoreflect.Message {
+	return new(fastReflection_CollectionInvariants)
+}
+func (x fastReflection_CollectionInvariants_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_CollectionInvariants
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_CollectionInvariants) Descriptor() protoreflect.MessageDescriptor {
+	return md_CollectionInvariants
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_CollectionInvariants) Type() protoreflect.MessageType {
+	return _fastReflection_CollectionInvariants_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_CollectionInvariants) New() protoreflect.Message {
+	return new(fastReflection_CollectionInvariants)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_CollectionInvariants) Interface() protoreflect.ProtoMessage {
+	return (*CollectionInvariants)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_CollectionInvariants) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.NoCustomOwnershipTimes != false {
+		value := protoreflect.ValueOfBool(x.NoCustomOwnershipTimes)
+		if !f(fd_CollectionInvariants_noCustomOwnershipTimes, value) {
+			return
+		}
+	}
+	if x.MaxSupplyPerId != "" {
+		value := protoreflect.ValueOfString(x.MaxSupplyPerId)
+		if !f(fd_CollectionInvariants_maxSupplyPerId, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_CollectionInvariants) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "badges.CollectionInvariants.noCustomOwnershipTimes":
+		return x.NoCustomOwnershipTimes != false
+	case "badges.CollectionInvariants.maxSupplyPerId":
+		return x.MaxSupplyPerId != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CollectionInvariants"))
+		}
+		panic(fmt.Errorf("message badges.CollectionInvariants does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_CollectionInvariants) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "badges.CollectionInvariants.noCustomOwnershipTimes":
+		x.NoCustomOwnershipTimes = false
+	case "badges.CollectionInvariants.maxSupplyPerId":
+		x.MaxSupplyPerId = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CollectionInvariants"))
+		}
+		panic(fmt.Errorf("message badges.CollectionInvariants does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_CollectionInvariants) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "badges.CollectionInvariants.noCustomOwnershipTimes":
+		value := x.NoCustomOwnershipTimes
+		return protoreflect.ValueOfBool(value)
+	case "badges.CollectionInvariants.maxSupplyPerId":
+		value := x.MaxSupplyPerId
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CollectionInvariants"))
+		}
+		panic(fmt.Errorf("message badges.CollectionInvariants does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_CollectionInvariants) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "badges.CollectionInvariants.noCustomOwnershipTimes":
+		x.NoCustomOwnershipTimes = value.Bool()
+	case "badges.CollectionInvariants.maxSupplyPerId":
+		x.MaxSupplyPerId = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CollectionInvariants"))
+		}
+		panic(fmt.Errorf("message badges.CollectionInvariants does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_CollectionInvariants) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "badges.CollectionInvariants.noCustomOwnershipTimes":
+		panic(fmt.Errorf("field noCustomOwnershipTimes of message badges.CollectionInvariants is not mutable"))
+	case "badges.CollectionInvariants.maxSupplyPerId":
+		panic(fmt.Errorf("field maxSupplyPerId of message badges.CollectionInvariants is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CollectionInvariants"))
+		}
+		panic(fmt.Errorf("message badges.CollectionInvariants does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_CollectionInvariants) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "badges.CollectionInvariants.noCustomOwnershipTimes":
+		return protoreflect.ValueOfBool(false)
+	case "badges.CollectionInvariants.maxSupplyPerId":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.CollectionInvariants"))
+		}
+		panic(fmt.Errorf("message badges.CollectionInvariants does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_CollectionInvariants) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in badges.CollectionInvariants", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_CollectionInvariants) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_CollectionInvariants) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_CollectionInvariants) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_CollectionInvariants) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*CollectionInvariants)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		if x.NoCustomOwnershipTimes {
+			n += 2
+		}
+		l = len(x.MaxSupplyPerId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*CollectionInvariants)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.MaxSupplyPerId) > 0 {
+			i -= len(x.MaxSupplyPerId)
+			copy(dAtA[i:], x.MaxSupplyPerId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.MaxSupplyPerId)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if x.NoCustomOwnershipTimes {
+			i--
+			if x.NoCustomOwnershipTimes {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x8
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*CollectionInvariants)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: CollectionInvariants: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: CollectionInvariants: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field NoCustomOwnershipTimes", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.NoCustomOwnershipTimes = bool(v != 0)
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field MaxSupplyPerId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.MaxSupplyPerId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -3707,36 +4024,35 @@ type TokenCollection struct {
 	CollectionMetadataTimeline []*CollectionMetadataTimeline `protobuf:"bytes,2,rep,name=collectionMetadataTimeline,proto3" json:"collectionMetadataTimeline,omitempty"`
 	// The metadata for each token in the collection, also subject to changes over time.
 	TokenMetadataTimeline []*TokenMetadataTimeline `protobuf:"bytes,3,rep,name=tokenMetadataTimeline,proto3" json:"tokenMetadataTimeline,omitempty"`
-	// The type of balances this collection uses ("Standard", "Off-Chain - Indexed", "Off-Chain - Non-Indexed", or "Non-Public").
-	BalancesType string `protobuf:"bytes,4,opt,name=balancesType,proto3" json:"balancesType,omitempty"`
-	// Metadata for fetching balances for collections with off-chain balances, subject to changes over time.
-	OffChainBalancesMetadataTimeline []*OffChainBalancesMetadataTimeline `protobuf:"bytes,5,rep,name=offChainBalancesMetadataTimeline,proto3" json:"offChainBalancesMetadataTimeline,omitempty"`
 	// An arbitrary field that can store any data, subject to changes over time.
-	CustomDataTimeline []*CustomDataTimeline `protobuf:"bytes,7,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
+	CustomDataTimeline []*CustomDataTimeline `protobuf:"bytes,4,rep,name=customDataTimeline,proto3" json:"customDataTimeline,omitempty"`
 	// The address of the manager of this collection, subject to changes over time.
-	ManagerTimeline []*ManagerTimeline `protobuf:"bytes,8,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
+	ManagerTimeline []*ManagerTimeline `protobuf:"bytes,5,rep,name=managerTimeline,proto3" json:"managerTimeline,omitempty"`
 	// Permissions that define what the manager of the collection can do or not do.
-	CollectionPermissions *CollectionPermissions `protobuf:"bytes,9,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
+	CollectionPermissions *CollectionPermissions `protobuf:"bytes,6,opt,name=collectionPermissions,proto3" json:"collectionPermissions,omitempty"`
 	// Transferability of the collection for collections with standard balances, subject to changes over time.
 	// Overrides user approvals for a transfer if specified.
 	// Transfer must satisfy both user and collection-level approvals.
 	// Only applicable to on-chain balances.
-	CollectionApprovals []*CollectionApproval `protobuf:"bytes,10,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
+	CollectionApprovals []*CollectionApproval `protobuf:"bytes,7,rep,name=collectionApprovals,proto3" json:"collectionApprovals,omitempty"`
 	// Standards that define how to interpret the fields of the collection, subject to changes over time.
-	StandardsTimeline []*StandardsTimeline `protobuf:"bytes,11,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
+	StandardsTimeline []*StandardsTimeline `protobuf:"bytes,8,rep,name=standardsTimeline,proto3" json:"standardsTimeline,omitempty"`
 	// Whether the collection is archived or not, subject to changes over time.
 	// When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
-	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,12,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
-	// The default store of a balance for a user, upon genesis.
-	DefaultBalances *UserBalanceStore `protobuf:"bytes,13,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
+	IsArchivedTimeline []*IsArchivedTimeline `protobuf:"bytes,9,rep,name=isArchivedTimeline,proto3" json:"isArchivedTimeline,omitempty"`
+	// The default store of a balance / approvals for a user, upon genesis.
+	DefaultBalances *UserBalanceStore `protobuf:"bytes,10,opt,name=defaultBalances,proto3" json:"defaultBalances,omitempty"`
 	// The user or entity who created the collection.
-	CreatedBy string `protobuf:"bytes,14,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
+	CreatedBy string `protobuf:"bytes,11,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
 	// The valid token IDs for this collection.
-	ValidTokenIds []*UintRange `protobuf:"bytes,15,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
+	ValidTokenIds []*UintRange `protobuf:"bytes,12,rep,name=validTokenIds,proto3" json:"validTokenIds,omitempty"`
 	// The generated address of the collection. Also used to escrow Mint balances.
-	MintEscrowAddress string `protobuf:"bytes,16,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
+	MintEscrowAddress string `protobuf:"bytes,13,opt,name=mintEscrowAddress,proto3" json:"mintEscrowAddress,omitempty"`
 	// The IBC wrapper (sdk.coin) paths for the collection.
-	CosmosCoinWrapperPaths []*CosmosCoinWrapperPath `protobuf:"bytes,17,rep,name=cosmosCoinWrapperPaths,proto3" json:"cosmosCoinWrapperPaths,omitempty"`
+	CosmosCoinWrapperPaths []*CosmosCoinWrapperPath `protobuf:"bytes,14,rep,name=cosmosCoinWrapperPaths,proto3" json:"cosmosCoinWrapperPaths,omitempty"`
+	// Collection-level invariants that cannot be broken.
+	// These are set upon genesis and cannot be modified.
+	Invariants *CollectionInvariants `protobuf:"bytes,15,opt,name=invariants,proto3" json:"invariants,omitempty"`
 }
 
 func (x *TokenCollection) Reset() {
@@ -3776,20 +4092,6 @@ func (x *TokenCollection) GetCollectionMetadataTimeline() []*CollectionMetadataT
 func (x *TokenCollection) GetTokenMetadataTimeline() []*TokenMetadataTimeline {
 	if x != nil {
 		return x.TokenMetadataTimeline
-	}
-	return nil
-}
-
-func (x *TokenCollection) GetBalancesType() string {
-	if x != nil {
-		return x.BalancesType
-	}
-	return ""
-}
-
-func (x *TokenCollection) GetOffChainBalancesMetadataTimeline() []*OffChainBalancesMetadataTimeline {
-	if x != nil {
-		return x.OffChainBalancesMetadataTimeline
 	}
 	return nil
 }
@@ -3871,17 +4173,25 @@ func (x *TokenCollection) GetCosmosCoinWrapperPaths() []*CosmosCoinWrapperPath {
 	return nil
 }
 
+func (x *TokenCollection) GetInvariants() *CollectionInvariants {
+	if x != nil {
+		return x.Invariants
+	}
+	return nil
+}
+
 type CosmosCoinWrapperPath struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Address        string       `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	Denom          string       `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	OwnershipTimes []*UintRange `protobuf:"bytes,3,rep,name=ownershipTimes,proto3" json:"ownershipTimes,omitempty"`
-	TokenIds       []*UintRange `protobuf:"bytes,4,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
-	Symbol         string       `protobuf:"bytes,5,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	DenomUnits     []*DenomUnit `protobuf:"bytes,6,rep,name=denomUnits,proto3" json:"denomUnits,omitempty"`
+	Address                        string       `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Denom                          string       `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	Balances                       []*Balance   `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
+	Symbol                         string       `protobuf:"bytes,4,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	DenomUnits                     []*DenomUnit `protobuf:"bytes,5,rep,name=denomUnits,proto3" json:"denomUnits,omitempty"`
+	AllowOverrideWithAnyValidToken bool         `protobuf:"varint,6,opt,name=allowOverrideWithAnyValidToken,proto3" json:"allowOverrideWithAnyValidToken,omitempty"`
+	AllowCosmosWrapping            bool         `protobuf:"varint,7,opt,name=allowCosmosWrapping,proto3" json:"allowCosmosWrapping,omitempty"`
 }
 
 func (x *CosmosCoinWrapperPath) Reset() {
@@ -3918,16 +4228,9 @@ func (x *CosmosCoinWrapperPath) GetDenom() string {
 	return ""
 }
 
-func (x *CosmosCoinWrapperPath) GetOwnershipTimes() []*UintRange {
+func (x *CosmosCoinWrapperPath) GetBalances() []*Balance {
 	if x != nil {
-		return x.OwnershipTimes
-	}
-	return nil
-}
-
-func (x *CosmosCoinWrapperPath) GetTokenIds() []*UintRange {
-	if x != nil {
-		return x.TokenIds
+		return x.Balances
 	}
 	return nil
 }
@@ -3944,6 +4247,20 @@ func (x *CosmosCoinWrapperPath) GetDenomUnits() []*DenomUnit {
 		return x.DenomUnits
 	}
 	return nil
+}
+
+func (x *CosmosCoinWrapperPath) GetAllowOverrideWithAnyValidToken() bool {
+	if x != nil {
+		return x.AllowOverrideWithAnyValidToken
+	}
+	return false
+}
+
+func (x *CosmosCoinWrapperPath) GetAllowCosmosWrapping() bool {
+	if x != nil {
+		return x.AllowCosmosWrapping
+	}
+	return false
 }
 
 type DenomUnit struct {
@@ -3997,6 +4314,54 @@ func (x *DenomUnit) GetIsDefaultDisplay() bool {
 	return false
 }
 
+// CollectionInvariants defines the invariants that apply to a collection.
+type CollectionInvariants struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
+	// This prevents time-based restrictions on token ownership.
+	NoCustomOwnershipTimes bool `protobuf:"varint,1,opt,name=noCustomOwnershipTimes,proto3" json:"noCustomOwnershipTimes,omitempty"`
+	// Maximum supply per token ID. If set, no balance can exceed this amount.
+	// This prevents any single token ID from having more than the specified supply.
+	MaxSupplyPerId string `protobuf:"bytes,2,opt,name=maxSupplyPerId,proto3" json:"maxSupplyPerId,omitempty"`
+}
+
+func (x *CollectionInvariants) Reset() {
+	*x = CollectionInvariants{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_badges_collections_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CollectionInvariants) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CollectionInvariants) ProtoMessage() {}
+
+// Deprecated: Use CollectionInvariants.ProtoReflect.Descriptor instead.
+func (*CollectionInvariants) Descriptor() ([]byte, []int) {
+	return file_badges_collections_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CollectionInvariants) GetNoCustomOwnershipTimes() bool {
+	if x != nil {
+		return x.NoCustomOwnershipTimes
+	}
+	return false
+}
+
+func (x *CollectionInvariants) GetMaxSupplyPerId() string {
+	if x != nil {
+		return x.MaxSupplyPerId
+	}
+	return ""
+}
+
 var File_badges_collections_proto protoreflect.FileDescriptor
 
 var file_badges_collections_proto_rawDesc = []byte{
@@ -4012,8 +4377,8 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x16, 0x62,
 	0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xfd, 0x08, 0x0a, 0x0f,
-	0x42, 0x61, 0x64, 0x67, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12,
+	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xa1, 0x08, 0x0a, 0x0f,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12,
 	0x30, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55,
 	0x69, 0x6e, 0x74, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49,
@@ -4023,99 +4388,106 @@ var file_badges_collections_proto_rawDesc = []byte{
 	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
 	0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x1a, 0x63, 0x6f, 0x6c, 0x6c, 0x65,
 	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d,
-	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x53, 0x0a, 0x15, 0x62, 0x61, 0x64, 0x67, 0x65, 0x4d, 0x65,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x53, 0x0a, 0x15, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x4d, 0x65,
 	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x03,
-	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x42, 0x61,
-	0x64, 0x67, 0x65, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x52, 0x15, 0x62, 0x61, 0x64, 0x67, 0x65, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x22, 0x0a, 0x0c, 0x62, 0x61,
-	0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x54, 0x79, 0x70, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x0c, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x54, 0x79, 0x70, 0x65, 0x12, 0x74,
-	0x0a, 0x20, 0x6f, 0x66, 0x66, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63,
-	0x65, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69,
-	0x6e, 0x65, 0x18, 0x05, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x28, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65,
-	0x73, 0x2e, 0x4f, 0x66, 0x66, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63,
-	0x65, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69,
-	0x6e, 0x65, 0x52, 0x20, 0x6f, 0x66, 0x66, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x42, 0x61, 0x6c, 0x61,
-	0x6e, 0x63, 0x65, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65,
-	0x6c, 0x69, 0x6e, 0x65, 0x12, 0x4a, 0x0a, 0x12, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61,
-	0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x07, 0x20, 0x03, 0x28, 0x0b,
-	0x32, 0x1a, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d,
-	0x44, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x12, 0x63, 0x75,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c,
+	0x69, 0x6e, 0x65, 0x52, 0x15, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x4a, 0x0a, 0x12, 0x63, 0x75,
 	0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x12, 0x41, 0x0a, 0x0f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x54, 0x69, 0x6d, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x62, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x2e, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69,
-	0x6e, 0x65, 0x52, 0x0f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x54, 0x69, 0x6d, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x12, 0x53, 0x0a, 0x15, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f,
-	0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x09, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43, 0x6f, 0x6c, 0x6c,
-	0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x73, 0x52, 0x15, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72,
-	0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x4c, 0x0a, 0x13, 0x63, 0x6f, 0x6c, 0x6c,
-	0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x73, 0x18,
-	0x0a, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43,
-	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61,
-	0x6c, 0x52, 0x13, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x70, 0x70,
-	0x72, 0x6f, 0x76, 0x61, 0x6c, 0x73, 0x12, 0x47, 0x0a, 0x11, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x61,
-	0x72, 0x64, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x0b, 0x20, 0x03, 0x28,
-	0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x53, 0x74, 0x61, 0x6e, 0x64,
-	0x61, 0x72, 0x64, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x11, 0x73, 0x74,
-	0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12,
-	0x4a, 0x0a, 0x12, 0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x54, 0x69, 0x6d,
-	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x0c, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x62, 0x61,
-	0x64, 0x67, 0x65, 0x73, 0x2e, 0x49, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x54,
-	0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x12, 0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69,
-	0x76, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x42, 0x0a, 0x0f, 0x64,
-	0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x18, 0x0d,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x73,
-	0x65, 0x72, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x0f,
-	0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x12,
-	0x1c, 0x0a, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x18, 0x0e, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x12, 0x37, 0x0a,
-	0x0d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x42, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x18, 0x0f,
-	0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69,
-	0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x42, 0x61,
-	0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x12, 0x2c, 0x0a, 0x11, 0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73,
-	0x63, 0x72, 0x6f, 0x77, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x10, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x11, 0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73, 0x63, 0x72, 0x6f, 0x77, 0x41, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x12, 0x55, 0x0a, 0x16, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f,
-	0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x18, 0x11,
-	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43, 0x6f,
+	0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e,
+	0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69,
+	0x6e, 0x65, 0x52, 0x12, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x44, 0x61, 0x74, 0x61, 0x54, 0x69,
+	0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x41, 0x0a, 0x0f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65,
+	0x72, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x05, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x17, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72,
+	0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x0f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65,
+	0x72, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x53, 0x0a, 0x15, 0x63, 0x6f, 0x6c,
+	0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65,
+	0x73, 0x2e, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d,
+	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x15, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74,
+	0x69, 0x6f, 0x6e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x4c,
+	0x0a, 0x13, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x70, 0x70, 0x72,
+	0x6f, 0x76, 0x61, 0x6c, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x62, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x2e, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x41,
+	0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x52, 0x13, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74,
+	0x69, 0x6f, 0x6e, 0x41, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x73, 0x12, 0x47, 0x0a, 0x11,
+	0x73, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73,
+	0x2e, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69,
+	0x6e, 0x65, 0x52, 0x11, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x54, 0x69, 0x6d,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x12, 0x4a, 0x0a, 0x12, 0x69, 0x73, 0x41, 0x72, 0x63, 0x68, 0x69,
+	0x76, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x09, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x1a, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x49, 0x73, 0x41, 0x72, 0x63,
+	0x68, 0x69, 0x76, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x12, 0x69,
+	0x73, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x12, 0x42, 0x0a, 0x0f, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c, 0x61,
+	0x6e, 0x63, 0x65, 0x73, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x53,
+	0x74, 0x6f, 0x72, 0x65, 0x52, 0x0f, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x42, 0x61, 0x6c,
+	0x61, 0x6e, 0x63, 0x65, 0x73, 0x12, 0x1c, 0x0a, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
+	0x42, 0x79, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x64, 0x42, 0x79, 0x12, 0x37, 0x0a, 0x0d, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x49, 0x64, 0x73, 0x18, 0x0c, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x0d, 0x76,
+	0x61, 0x6c, 0x69, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x49, 0x64, 0x73, 0x12, 0x2c, 0x0a, 0x11,
+	0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73, 0x63, 0x72, 0x6f, 0x77, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x6d, 0x69, 0x6e, 0x74, 0x45, 0x73, 0x63,
+	0x72, 0x6f, 0x77, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x55, 0x0a, 0x16, 0x63, 0x6f,
 	0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50,
-	0x61, 0x74, 0x68, 0x52, 0x16, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57,
-	0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x73, 0x22, 0xfc, 0x01, 0x0a, 0x15,
-	0x43, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65,
-	0x72, 0x50, 0x61, 0x74, 0x68, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12,
-	0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
-	0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x39, 0x0a, 0x0e, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68,
-	0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65,
-	0x52, 0x0e, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68, 0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73,
-	0x12, 0x2d, 0x0a, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x18, 0x04, 0x20, 0x03,
-	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x55, 0x69, 0x6e, 0x74,
-	0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x08, 0x62, 0x61, 0x64, 0x67, 0x65, 0x49, 0x64, 0x73, 0x12,
-	0x16, 0x0a, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x12, 0x31, 0x0a, 0x0a, 0x64, 0x65, 0x6e, 0x6f, 0x6d,
-	0x55, 0x6e, 0x69, 0x74, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61,
-	0x64, 0x67, 0x65, 0x73, 0x2e, 0x44, 0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x52, 0x0a,
-	0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x73, 0x22, 0x79, 0x0a, 0x09, 0x44, 0x65,
-	0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x12, 0x28, 0x0a, 0x08, 0x64, 0x65, 0x63, 0x69, 0x6d,
-	0x61, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda,
-	0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x08, 0x64, 0x65, 0x63, 0x69, 0x6d, 0x61, 0x6c,
-	0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x12, 0x2a, 0x0a, 0x10, 0x69, 0x73, 0x44,
-	0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x44, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x08, 0x52, 0x10, 0x69, 0x73, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x44, 0x69,
-	0x73, 0x70, 0x6c, 0x61, 0x79, 0x42, 0x71, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64,
-	0x67, 0x65, 0x73, 0x42, 0x10, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67,
-	0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65,
-	0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64,
-	0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
-	0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x74, 0x68, 0x73, 0x18, 0x0e, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x62, 0x61, 0x64,
+	0x67, 0x65, 0x73, 0x2e, 0x43, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72,
+	0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x52, 0x16, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
+	0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68,
+	0x73, 0x12, 0x3c, 0x0a, 0x0a, 0x69, 0x6e, 0x76, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x73, 0x18,
+	0x0f, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x43,
+	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x76, 0x61, 0x72, 0x69, 0x61,
+	0x6e, 0x74, 0x73, 0x52, 0x0a, 0x69, 0x6e, 0x76, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x73, 0x22,
+	0xb9, 0x02, 0x0a, 0x15, 0x43, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x43, 0x6f, 0x69, 0x6e, 0x57, 0x72,
+	0x61, 0x70, 0x70, 0x65, 0x72, 0x50, 0x61, 0x74, 0x68, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72,
+	0x65, 0x73, 0x73, 0x12, 0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x2b, 0x0a, 0x08, 0x62, 0x61, 0x6c,
+	0x61, 0x6e, 0x63, 0x65, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x62, 0x61,
+	0x64, 0x67, 0x65, 0x73, 0x2e, 0x42, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x62, 0x61,
+	0x6c, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x12, 0x31,
+	0x0a, 0x0a, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x73, 0x18, 0x05, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2e, 0x44, 0x65, 0x6e, 0x6f,
+	0x6d, 0x55, 0x6e, 0x69, 0x74, 0x52, 0x0a, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74,
+	0x73, 0x12, 0x46, 0x0a, 0x1e, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x4f, 0x76, 0x65, 0x72, 0x72, 0x69,
+	0x64, 0x65, 0x57, 0x69, 0x74, 0x68, 0x41, 0x6e, 0x79, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x1e, 0x61, 0x6c, 0x6c, 0x6f, 0x77,
+	0x4f, 0x76, 0x65, 0x72, 0x72, 0x69, 0x64, 0x65, 0x57, 0x69, 0x74, 0x68, 0x41, 0x6e, 0x79, 0x56,
+	0x61, 0x6c, 0x69, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x30, 0x0a, 0x13, 0x61, 0x6c, 0x6c,
+	0x6f, 0x77, 0x43, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x57, 0x72, 0x61, 0x70, 0x70, 0x69, 0x6e, 0x67,
+	0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x13, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x43, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x57, 0x72, 0x61, 0x70, 0x70, 0x69, 0x6e, 0x67, 0x22, 0x79, 0x0a, 0x09, 0x44,
+	0x65, 0x6e, 0x6f, 0x6d, 0x55, 0x6e, 0x69, 0x74, 0x12, 0x28, 0x0a, 0x08, 0x64, 0x65, 0x63, 0x69,
+	0x6d, 0x61, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00,
+	0xda, 0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x08, 0x64, 0x65, 0x63, 0x69, 0x6d, 0x61,
+	0x6c, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x12, 0x2a, 0x0a, 0x10, 0x69, 0x73,
+	0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x44, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x10, 0x69, 0x73, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x44,
+	0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x84, 0x01, 0x0a, 0x14, 0x43, 0x6f, 0x6c, 0x6c, 0x65,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x76, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x73, 0x12,
+	0x36, 0x0a, 0x16, 0x6e, 0x6f, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x4f, 0x77, 0x6e, 0x65, 0x72,
+	0x73, 0x68, 0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x16, 0x6e, 0x6f, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x68,
+	0x69, 0x70, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x12, 0x34, 0x0a, 0x0e, 0x6d, 0x61, 0x78, 0x53, 0x75,
+	0x70, 0x70, 0x6c, 0x79, 0x50, 0x65, 0x72, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42,
+	0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04, 0x55, 0x69, 0x6e, 0x74, 0x52, 0x0e, 0x6d,
+	0x61, 0x78, 0x53, 0x75, 0x70, 0x70, 0x6c, 0x79, 0x50, 0x65, 0x72, 0x49, 0x64, 0x42, 0x71, 0x0a,
+	0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x10, 0x43, 0x6f, 0x6c,
+	0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a,
+	0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58,
+	0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -4130,44 +4502,44 @@ func file_badges_collections_proto_rawDescGZIP() []byte {
 	return file_badges_collections_proto_rawDescData
 }
 
-var file_badges_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_badges_collections_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_badges_collections_proto_goTypes = []interface{}{
-	(*TokenCollection)(nil),                  // 0: badges.TokenCollection
-	(*CosmosCoinWrapperPath)(nil),            // 1: badges.CosmosCoinWrapperPath
-	(*DenomUnit)(nil),                        // 2: badges.DenomUnit
-	(*CollectionMetadataTimeline)(nil),       // 3: badges.CollectionMetadataTimeline
-	(*TokenMetadataTimeline)(nil),            // 4: badges.TokenMetadataTimeline
-	(*OffChainBalancesMetadataTimeline)(nil), // 5: badges.OffChainBalancesMetadataTimeline
-	(*CustomDataTimeline)(nil),               // 6: badges.CustomDataTimeline
-	(*ManagerTimeline)(nil),                  // 7: badges.ManagerTimeline
-	(*CollectionPermissions)(nil),            // 8: badges.CollectionPermissions
-	(*CollectionApproval)(nil),               // 9: badges.CollectionApproval
-	(*StandardsTimeline)(nil),                // 10: badges.StandardsTimeline
-	(*IsArchivedTimeline)(nil),               // 11: badges.IsArchivedTimeline
-	(*UserBalanceStore)(nil),                 // 12: badges.UserBalanceStore
-	(*UintRange)(nil),                        // 13: badges.UintRange
+	(*TokenCollection)(nil),            // 0: badges.TokenCollection
+	(*CosmosCoinWrapperPath)(nil),      // 1: badges.CosmosCoinWrapperPath
+	(*DenomUnit)(nil),                  // 2: badges.DenomUnit
+	(*CollectionInvariants)(nil),       // 3: badges.CollectionInvariants
+	(*CollectionMetadataTimeline)(nil), // 4: badges.CollectionMetadataTimeline
+	(*TokenMetadataTimeline)(nil),      // 5: badges.TokenMetadataTimeline
+	(*CustomDataTimeline)(nil),         // 6: badges.CustomDataTimeline
+	(*ManagerTimeline)(nil),            // 7: badges.ManagerTimeline
+	(*CollectionPermissions)(nil),      // 8: badges.CollectionPermissions
+	(*CollectionApproval)(nil),         // 9: badges.CollectionApproval
+	(*StandardsTimeline)(nil),          // 10: badges.StandardsTimeline
+	(*IsArchivedTimeline)(nil),         // 11: badges.IsArchivedTimeline
+	(*UserBalanceStore)(nil),           // 12: badges.UserBalanceStore
+	(*UintRange)(nil),                  // 13: badges.UintRange
+	(*Balance)(nil),                    // 14: badges.Balance
 }
 var file_badges_collections_proto_depIdxs = []int32{
-	3,  // 0: badges.TokenCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
-	4,  // 1: badges.TokenCollection.tokenMetadataTimeline:type_name -> badges.TokenMetadataTimeline
-	5,  // 2: badges.TokenCollection.offChainBalancesMetadataTimeline:type_name -> badges.OffChainBalancesMetadataTimeline
-	6,  // 3: badges.TokenCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
-	7,  // 4: badges.TokenCollection.managerTimeline:type_name -> badges.ManagerTimeline
-	8,  // 5: badges.TokenCollection.collectionPermissions:type_name -> badges.CollectionPermissions
-	9,  // 6: badges.TokenCollection.collectionApprovals:type_name -> badges.CollectionApproval
-	10, // 7: badges.TokenCollection.standardsTimeline:type_name -> badges.StandardsTimeline
-	11, // 8: badges.TokenCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
-	12, // 9: badges.TokenCollection.defaultBalances:type_name -> badges.UserBalanceStore
-	13, // 10: badges.TokenCollection.validTokenIds:type_name -> badges.UintRange
-	1,  // 11: badges.TokenCollection.cosmosCoinWrapperPaths:type_name -> badges.CosmosCoinWrapperPath
-	13, // 12: badges.CosmosCoinWrapperPath.ownershipTimes:type_name -> badges.UintRange
-	13, // 13: badges.CosmosCoinWrapperPath.tokenIds:type_name -> badges.UintRange
-	2,  // 14: badges.CosmosCoinWrapperPath.denomUnits:type_name -> badges.DenomUnit
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	4,  // 0: badges.TokenCollection.collectionMetadataTimeline:type_name -> badges.CollectionMetadataTimeline
+	5,  // 1: badges.TokenCollection.tokenMetadataTimeline:type_name -> badges.TokenMetadataTimeline
+	6,  // 2: badges.TokenCollection.customDataTimeline:type_name -> badges.CustomDataTimeline
+	7,  // 3: badges.TokenCollection.managerTimeline:type_name -> badges.ManagerTimeline
+	8,  // 4: badges.TokenCollection.collectionPermissions:type_name -> badges.CollectionPermissions
+	9,  // 5: badges.TokenCollection.collectionApprovals:type_name -> badges.CollectionApproval
+	10, // 6: badges.TokenCollection.standardsTimeline:type_name -> badges.StandardsTimeline
+	11, // 7: badges.TokenCollection.isArchivedTimeline:type_name -> badges.IsArchivedTimeline
+	12, // 8: badges.TokenCollection.defaultBalances:type_name -> badges.UserBalanceStore
+	13, // 9: badges.TokenCollection.validTokenIds:type_name -> badges.UintRange
+	1,  // 10: badges.TokenCollection.cosmosCoinWrapperPaths:type_name -> badges.CosmosCoinWrapperPath
+	3,  // 11: badges.TokenCollection.invariants:type_name -> badges.CollectionInvariants
+	14, // 12: badges.CosmosCoinWrapperPath.balances:type_name -> badges.Balance
+	2,  // 13: badges.CosmosCoinWrapperPath.denomUnits:type_name -> badges.DenomUnit
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_badges_collections_proto_init() }
@@ -4217,6 +4589,18 @@ func file_badges_collections_proto_init() {
 				return nil
 			}
 		}
+		file_badges_collections_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CollectionInvariants); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -4224,7 +4608,7 @@ func file_badges_collections_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_badges_collections_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

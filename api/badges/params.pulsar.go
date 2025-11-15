@@ -14,13 +14,63 @@ import (
 	sync "sync"
 )
 
+var _ protoreflect.List = (*_Params_1_list)(nil)
+
+type _Params_1_list struct {
+	list *[]string
+}
+
+func (x *_Params_1_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_Params_1_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_Params_1_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_Params_1_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_Params_1_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message Params at list field AllowedDenoms as it is not of Message kind"))
+}
+
+func (x *_Params_1_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_Params_1_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_Params_1_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_Params protoreflect.MessageDescriptor
+	md_Params                      protoreflect.MessageDescriptor
+	fd_Params_allowed_denoms       protoreflect.FieldDescriptor
+	fd_Params_affiliate_percentage protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_badges_params_proto_init()
 	md_Params = File_badges_params_proto.Messages().ByName("Params")
+	fd_Params_allowed_denoms = md_Params.Fields().ByName("allowed_denoms")
+	fd_Params_affiliate_percentage = md_Params.Fields().ByName("affiliate_percentage")
 }
 
 var _ protoreflect.Message = (*fastReflection_Params)(nil)
@@ -88,6 +138,18 @@ func (x *fastReflection_Params) Interface() protoreflect.ProtoMessage {
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_Params) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.AllowedDenoms) != 0 {
+		value := protoreflect.ValueOfList(&_Params_1_list{list: &x.AllowedDenoms})
+		if !f(fd_Params_allowed_denoms, value) {
+			return
+		}
+	}
+	if x.AffiliatePercentage != "" {
+		value := protoreflect.ValueOfString(x.AffiliatePercentage)
+		if !f(fd_Params_affiliate_percentage, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -103,6 +165,10 @@ func (x *fastReflection_Params) Range(f func(protoreflect.FieldDescriptor, proto
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_Params) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
+	case "badges.Params.allowed_denoms":
+		return len(x.AllowedDenoms) != 0
+	case "badges.Params.affiliate_percentage":
+		return x.AffiliatePercentage != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Params"))
@@ -119,6 +185,10 @@ func (x *fastReflection_Params) Has(fd protoreflect.FieldDescriptor) bool {
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
+	case "badges.Params.allowed_denoms":
+		x.AllowedDenoms = nil
+	case "badges.Params.affiliate_percentage":
+		x.AffiliatePercentage = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Params"))
@@ -135,6 +205,15 @@ func (x *fastReflection_Params) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_Params) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
+	case "badges.Params.allowed_denoms":
+		if len(x.AllowedDenoms) == 0 {
+			return protoreflect.ValueOfList(&_Params_1_list{})
+		}
+		listValue := &_Params_1_list{list: &x.AllowedDenoms}
+		return protoreflect.ValueOfList(listValue)
+	case "badges.Params.affiliate_percentage":
+		value := x.AffiliatePercentage
+		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Params"))
@@ -155,6 +234,12 @@ func (x *fastReflection_Params) Get(descriptor protoreflect.FieldDescriptor) pro
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
+	case "badges.Params.allowed_denoms":
+		lv := value.List()
+		clv := lv.(*_Params_1_list)
+		x.AllowedDenoms = *clv.list
+	case "badges.Params.affiliate_percentage":
+		x.AffiliatePercentage = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Params"))
@@ -175,6 +260,14 @@ func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value proto
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "badges.Params.allowed_denoms":
+		if x.AllowedDenoms == nil {
+			x.AllowedDenoms = []string{}
+		}
+		value := &_Params_1_list{list: &x.AllowedDenoms}
+		return protoreflect.ValueOfList(value)
+	case "badges.Params.affiliate_percentage":
+		panic(fmt.Errorf("field affiliate_percentage of message badges.Params is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Params"))
@@ -188,6 +281,11 @@ func (x *fastReflection_Params) Mutable(fd protoreflect.FieldDescriptor) protore
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_Params) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "badges.Params.allowed_denoms":
+		list := []string{}
+		return protoreflect.ValueOfList(&_Params_1_list{list: &list})
+	case "badges.Params.affiliate_percentage":
+		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: badges.Params"))
@@ -257,6 +355,16 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
+		if len(x.AllowedDenoms) > 0 {
+			for _, s := range x.AllowedDenoms {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
+		l = len(x.AffiliatePercentage)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -285,6 +393,22 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.AffiliatePercentage) > 0 {
+			i -= len(x.AffiliatePercentage)
+			copy(dAtA[i:], x.AffiliatePercentage)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AffiliatePercentage)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.AllowedDenoms) > 0 {
+			for iNdEx := len(x.AllowedDenoms) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.AllowedDenoms[iNdEx])
+				copy(dAtA[i:], x.AllowedDenoms[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AllowedDenoms[iNdEx])))
+				i--
+				dAtA[i] = 0xa
+			}
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -335,6 +459,70 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Params: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowedDenoms", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.AllowedDenoms = append(x.AllowedDenoms, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AffiliatePercentage", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.AffiliatePercentage = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -388,6 +576,11 @@ type Params struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	// allowed_denoms defines the list of denoms that are allowed to be used in coin_transfers
+	AllowedDenoms []string `protobuf:"bytes,1,rep,name=allowed_denoms,json=allowedDenoms,proto3" json:"allowed_denoms,omitempty"`
+	// affiliate_percentage defines the percentage of the transfer amount that goes to the affiliate
+	AffiliatePercentage string `protobuf:"bytes,2,opt,name=affiliate_percentage,json=affiliatePercentage,proto3" json:"affiliate_percentage,omitempty"`
 }
 
 func (x *Params) Reset() {
@@ -410,6 +603,20 @@ func (*Params) Descriptor() ([]byte, []int) {
 	return file_badges_params_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *Params) GetAllowedDenoms() []string {
+	if x != nil {
+		return x.AllowedDenoms
+	}
+	return nil
+}
+
+func (x *Params) GetAffiliatePercentage() string {
+	if x != nil {
+		return x.AffiliatePercentage
+	}
+	return ""
+}
+
 var File_badges_params_proto protoreflect.FileDescriptor
 
 var file_badges_params_proto_rawDesc = []byte{
@@ -417,19 +624,25 @@ var file_badges_params_proto_rawDesc = []byte{
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x1a, 0x11, 0x61,
 	0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x46, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x3a, 0x3c, 0xe8, 0xa0, 0x1f, 0x01, 0x8a, 0xe7, 0xb0, 0x2a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f,
-	0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x78,
-	0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x6c,
-	0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x0b, 0x50, 0x61,
-	0x72, 0x61, 0x6d, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f,
-	0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2, 0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42,
-	0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02,
-	0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
-	0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xae, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d,
+	0x73, 0x12, 0x25, 0x0a, 0x0e, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x64, 0x5f, 0x64, 0x65, 0x6e,
+	0x6f, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d, 0x61, 0x6c, 0x6c, 0x6f, 0x77,
+	0x65, 0x64, 0x44, 0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x12, 0x3f, 0x0a, 0x14, 0x61, 0x66, 0x66, 0x69,
+	0x6c, 0x69, 0x61, 0x74, 0x65, 0x5f, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0c, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x04,
+	0x55, 0x69, 0x6e, 0x74, 0x52, 0x13, 0x61, 0x66, 0x66, 0x69, 0x6c, 0x69, 0x61, 0x74, 0x65, 0x50,
+	0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x61, 0x67, 0x65, 0x3a, 0x3c, 0xe8, 0xa0, 0x1f, 0x01, 0x8a,
+	0xe7, 0xb0, 0x2a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62,
+	0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x2f, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67,
+	0x65, 0x73, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x78, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73,
+	0x2f, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x6c, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x2e, 0x62,
+	0x61, 0x64, 0x67, 0x65, 0x73, 0x42, 0x0b, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x62, 0x69, 0x74, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0x63,
+	0x68, 0x61, 0x69, 0x6e, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x61, 0x64, 0x67, 0x65, 0x73, 0xa2,
+	0x02, 0x03, 0x42, 0x58, 0x58, 0xaa, 0x02, 0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xca, 0x02,
+	0x06, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73, 0xe2, 0x02, 0x12, 0x42, 0x61, 0x64, 0x67, 0x65, 0x73,
+	0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x06, 0x42,
+	0x61, 0x64, 0x67, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

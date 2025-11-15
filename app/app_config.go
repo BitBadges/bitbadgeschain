@@ -65,6 +65,10 @@ import (
 	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
+	managersplittermodulev1 "github.com/bitbadges/bitbadgeschain/api/managersplitter/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/managersplitter/module" // import for side-effects
+	managersplittermoduletypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
+
 	// import for side-effects
 
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
@@ -114,6 +118,7 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
@@ -146,6 +151,7 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
@@ -172,6 +178,7 @@ var (
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
+		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		wasmtypes.ModuleName,
 		wasmxmoduletypes.ModuleName,
@@ -344,6 +351,10 @@ var (
 			{
 				Name:   mapsmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&mapsmodulev1.Module{}),
+			},
+			{
+				Name:   managersplittermoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&managersplittermodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
