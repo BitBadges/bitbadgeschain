@@ -2,7 +2,7 @@
 package gammv1beta1
 
 import (
-	v1beta11 "bitbadgeschain/api/poolmanager/v1beta1"
+	v1beta11 "github.com/bitbadges/bitbadgeschain/api/poolmanager/v1beta1"
 	_ "cosmossdk.io/api/amino"
 	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
 	_ "cosmossdk.io/api/cosmos/msg/v1"

@@ -2,7 +2,7 @@
 package gammv2
 
 import (
-	_ "bitbadgeschain/api/gamm/v1beta1"
+	_ "github.com/bitbadges/bitbadgeschain/api/gamm/v1beta1"
 	_ "cosmossdk.io/api/cosmos/base/query/v1beta1"
 	_ "cosmossdk.io/api/cosmos/base/v1beta1"
 	fmt "fmt"
