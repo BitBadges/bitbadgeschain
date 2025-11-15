@@ -193,6 +193,9 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 	}, collectionsToCreate[0].CollectionApprovals...,
 	)
 
+	// Only add transfers if invariants are not set (invariants are set after this function is called)
+	// If invariants will be set, transfers should be empty to comply with the rule that no normal mint transfers are allowed
+	// The caller should clear transfers after setting invariants if needed
 	collectionsToCreate[0].Transfers = []*types.Transfer{
 		{
 			From:        "Mint",

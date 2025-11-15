@@ -250,11 +250,12 @@ func (k Keeper) HandleSpecialAddressBacking(
 	initiatedBy string,
 ) error {
 	// Get denomination information
-	denomInfo := &types.CosmosCoinBackedPath{}
+	var denomInfo *types.CosmosCoinBackedPath
 	isSendingToSpecialAddress := false
 	isSendingFromSpecialAddress := false
 
-	for _, path := range collection.CosmosCoinBackedPaths {
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		path := collection.Invariants.CosmosCoinBackedPath
 		if path.Address == to {
 			isSendingToSpecialAddress = true
 			denomInfo = path
@@ -276,8 +277,11 @@ func (k Keeper) HandleSpecialAddressBacking(
 		return err
 	}
 
-	if denomInfo.IbcDenom == "" {
-		return sdkerrors.Wrapf(ErrNotImplemented, "no ibc denom info found for %s", denomInfo.Address)
+	if denomInfo == nil || denomInfo.IbcDenom == "" {
+		if denomInfo != nil {
+			return sdkerrors.Wrapf(ErrNotImplemented, "no ibc denom info found for %s", denomInfo.Address)
+		}
+		return nil // No backed path configured
 	}
 
 	ibcDenom := denomInfo.IbcDenom
@@ -305,13 +309,11 @@ func (k Keeper) HandleSpecialAddressBacking(
 
 		userAddressAcc := sdk.MustAccAddressFromBech32(from)
 		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
-
 		// Send coins from special address to user
 		err = bankKeeper.SendCoins(ctx, specialAddressAcc, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
 		}
-
 	} else if isSendingFromSpecialAddress {
 		userAddressAcc := sdk.MustAccAddressFromBech32(to)
 		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
@@ -333,8 +335,8 @@ func (k Keeper) IsSpecialAddress(ctx sdk.Context, collection *types.TokenCollect
 			return true
 		}
 	}
-	for _, path := range collection.CosmosCoinBackedPaths {
-		if path.Address == address {
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		if collection.Invariants.CosmosCoinBackedPath.Address == address {
 			return true
 		}
 	}
@@ -343,8 +345,8 @@ func (k Keeper) IsSpecialAddress(ctx sdk.Context, collection *types.TokenCollect
 
 // IsSpecialAddress checks if an address is a cosmos coin wrapper path address or backed path address
 func (k Keeper) IsSpecialBackedAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
-	for _, path := range collection.CosmosCoinBackedPaths {
-		if path.Address == address {
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		if collection.Invariants.CosmosCoinBackedPath.Address == address {
 			return true
 		}
 	}

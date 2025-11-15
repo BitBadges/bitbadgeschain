@@ -23,6 +23,57 @@ const (
 	MaxUint64Value = math.MaxUint64
 )
 
+// createMintForbiddenPermission creates a collection approval permission that forbids
+// updates to approvals with fromList matching Mint when cosmosCoinBackedPath is set.
+// This should be prepended to CanUpdateCollectionApprovals for first-match behavior.
+func createMintForbiddenPermission() *types.CollectionApprovalPermission {
+	fullRanges := []*types.UintRange{
+		{
+			Start: sdkmath.NewUint(1),
+			End:   sdkmath.NewUint(MaxUint64Value),
+		},
+	}
+
+	return &types.CollectionApprovalPermission{
+		FromListId:                types.MintAddress,
+		ToListId:                  "All",
+		InitiatedByListId:         "All",
+		ApprovalId:                "All",
+		TransferTimes:             fullRanges,
+		TokenIds:                  fullRanges,
+		OwnershipTimes:            fullRanges,
+		PermanentlyPermittedTimes: []*types.UintRange{},
+		PermanentlyForbiddenTimes: fullRanges,
+	}
+}
+
+// ensureMintForbiddenPermission ensures that the Mint forbidden permission is prepended
+// to CanUpdateCollectionApprovals when cosmosCoinBackedPath is set.
+func ensureMintForbiddenPermission(permissions *types.CollectionPermissions, hasCosmosCoinBackedPath bool) {
+	if !hasCosmosCoinBackedPath {
+		return
+	}
+
+	mintForbiddenPerm := createMintForbiddenPermission()
+
+	// Check if the permission already exists (compare key fields)
+	alreadyExists := false
+	for _, perm := range permissions.CanUpdateCollectionApprovals {
+		if perm.FromListId == types.MintAddress &&
+			perm.ToListId == "All" &&
+			perm.InitiatedByListId == "All" &&
+			perm.ApprovalId == "All" {
+			alreadyExists = true
+			break
+		}
+	}
+
+	// If it doesn't exist, prepend it
+	if !alreadyExists {
+		permissions.CanUpdateCollectionApprovals = append([]*types.CollectionApprovalPermission{mintForbiddenPerm}, permissions.CanUpdateCollectionApprovals...)
+	}
+}
+
 // generatePathAddress generates an address from a path string using the given prefix
 func generatePathAddress(pathString string, prefix []byte) (sdk.AccAddress, error) {
 	fullPathBytes := []byte(pathString)
@@ -120,7 +171,37 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				},
 			},
 			MintEscrowAddress: accountAddr.String(),
-			Invariants:        msg.Invariants,
+		}
+
+		// Convert InvariantsAddObject to CollectionInvariants if present
+		if msg.Invariants != nil {
+			collection.Invariants = &types.CollectionInvariants{
+				NoCustomOwnershipTimes: msg.Invariants.NoCustomOwnershipTimes,
+				MaxSupplyPerId:         msg.Invariants.MaxSupplyPerId,
+			}
+
+			// Handle cosmos coin backed path - generate address
+			if msg.Invariants.CosmosCoinBackedPath != nil {
+				pathAddObject := msg.Invariants.CosmosCoinBackedPath
+				backedAccountAddr, err := generatePathAddress(pathAddObject.IbcDenom, BackedPathGenerationPrefix)
+				if err != nil {
+					return nil, err
+				}
+
+				backedPath := &types.CosmosCoinBackedPath{
+					Address:   backedAccountAddr.String(),
+					IbcDenom:  pathAddObject.IbcDenom,
+					Balances:  pathAddObject.Balances,
+					IbcAmount: pathAddObject.IbcAmount,
+				}
+
+				// Auto-set the cosmoscoinbacked path address as a reserved protocol address
+				if err := k.setReservedProtocolAddressForPath(ctx, backedAccountAddr.String(), "cosmoscoinbacked"); err != nil {
+					return nil, err
+				}
+
+				collection.Invariants.CosmosCoinBackedPath = backedPath
+			}
 		}
 	} else {
 		//Update case
@@ -278,21 +359,31 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.CosmosCoinWrapperPaths = append(collection.CosmosCoinWrapperPaths, pathsToAdd...)
 	}
 
-	if len(msg.CosmosCoinBackedPathsToAdd) > 0 {
-		pathsToAdd := make([]*types.CosmosCoinBackedPath, len(msg.CosmosCoinBackedPathsToAdd))
-		for i, path := range msg.CosmosCoinBackedPathsToAdd {
-			accountAddr, err := generatePathAddress(path.IbcDenom, BackedPathGenerationPrefix)
+	// Handle invariants - convert InvariantsAddObject to CollectionInvariants
+	if msg.Invariants != nil {
+		if collection.Invariants == nil {
+			collection.Invariants = &types.CollectionInvariants{}
+		}
+
+		// Set basic invariant fields
+		collection.Invariants.NoCustomOwnershipTimes = msg.Invariants.NoCustomOwnershipTimes
+		collection.Invariants.MaxSupplyPerId = msg.Invariants.MaxSupplyPerId
+
+		// Handle cosmos coin backed path - generate address
+		if msg.Invariants.CosmosCoinBackedPath != nil {
+			pathAddObject := msg.Invariants.CosmosCoinBackedPath
+			accountAddr, err := generatePathAddress(pathAddObject.IbcDenom, BackedPathGenerationPrefix)
 			if err != nil {
 				return nil, err
 			}
 
 			// ibcAmount is validated in ValidateBasic to be non-zero
-			ibcAmount := path.IbcAmount
+			ibcAmount := pathAddObject.IbcAmount
 
-			pathsToAdd[i] = &types.CosmosCoinBackedPath{
+			backedPath := &types.CosmosCoinBackedPath{
 				Address:   accountAddr.String(),
-				IbcDenom:  path.IbcDenom,
-				Balances:  path.Balances,
+				IbcDenom:  pathAddObject.IbcDenom,
+				Balances:  pathAddObject.Balances,
 				IbcAmount: ibcAmount,
 			}
 
@@ -300,9 +391,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			if err := k.setReservedProtocolAddressForPath(ctx, accountAddr.String(), "cosmoscoinbacked"); err != nil {
 				return nil, err
 			}
-		}
 
-		collection.CosmosCoinBackedPaths = append(collection.CosmosCoinBackedPaths, pathsToAdd...)
+			// Set the backed path in invariants
+			collection.Invariants.CosmosCoinBackedPath = backedPath
+		}
 	}
 
 	// Ensure no duplicate denom paths for wrapper paths
@@ -314,14 +406,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		denomPaths[path.Denom] = true
 	}
 
-	// Ensure no duplicate ibc denom paths for backed paths
-	ibcDenomPaths := make(map[string]bool)
-	for _, path := range collection.CosmosCoinBackedPaths {
-		if _, ok := ibcDenomPaths[path.IbcDenom]; ok {
-			return nil, fmt.Errorf("duplicate ibc backed path denom: %s", path.IbcDenom)
-		}
-		ibcDenomPaths[path.IbcDenom] = true
-	}
+	// No need to check for duplicate ibc denom paths for backed paths since only one is allowed
 
 	// Ensure no duplicate symbols (including base symbol and denom unit symbols)
 	symbolPaths := make(map[string]bool)
@@ -370,6 +455,15 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
+	// Auto-set collection permission to forbid Mint address approvals if cosmosCoinBackedPath is set
+	hasCosmosCoinBackedPath := collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil
+	if hasCosmosCoinBackedPath {
+		if collection.CollectionPermissions == nil {
+			collection.CollectionPermissions = &types.CollectionPermissions{}
+		}
+		ensureMintForbiddenPermission(collection.CollectionPermissions, true)
+	}
+
 	if err := k.SetCollectionInStore(ctx, collection); err != nil {
 		return nil, err
 	}
@@ -382,8 +476,8 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	for _, path := range collection.CosmosCoinBackedPaths {
-		if err := k.setAutoApproveFlagsForPathAddress(ctx, collection, path.Address, "cosmoscoinbacked"); err != nil {
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		if err := k.setAutoApproveFlagsForPathAddress(ctx, collection, collection.Invariants.CosmosCoinBackedPath.Address, "cosmoscoinbacked"); err != nil {
 			return nil, err
 		}
 	}

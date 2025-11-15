@@ -817,10 +817,19 @@ func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChan
 	}
 
 	// Check invariants if collection is provided
-	if collection != nil && collection.Invariants != nil && collection.Invariants.NoCustomOwnershipTimes {
-		for _, balance := range transfer.Balances {
-			if err := ValidateNoCustomOwnershipTimesInvariant(balance.OwnershipTimes, true); err != nil {
-				return err
+	if collection != nil && collection.Invariants != nil {
+		if collection.Invariants.NoCustomOwnershipTimes {
+			for _, balance := range transfer.Balances {
+				if err := ValidateNoCustomOwnershipTimesInvariant(balance.OwnershipTimes, true); err != nil {
+					return err
+				}
+			}
+		}
+
+		// If cosmosCoinBackedPath is set, transfers from Mint address are not allowed
+		if collection.Invariants.CosmosCoinBackedPath != nil {
+			if IsMintAddress(transfer.From) {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "transfers from Mint address are not allowed when cosmosCoinBackedPath is set")
 			}
 		}
 	}

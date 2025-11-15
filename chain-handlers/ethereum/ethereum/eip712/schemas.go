@@ -705,18 +705,16 @@ func GetSchemas() []string {
 					"allowCosmosWrapping": false
 				}
 			],
-			"cosmosCoinBackedPathsToAdd": [
-				{
+			"invariants": {
+				"noCustomOwnershipTimes": false,
+				"maxSupplyPerId": "",
+				"cosmosCoinBackedPath": {
 					"ibcDenom": "",
 					"balances": [
 						`+getBalanceSchema()+`
 					],
 					"ibcAmount": ""
 				}
-			],
-			"invariants": {
-				"noCustomOwnershipTimes": false,
-				"maxSupplyPerId": ""
 			}
 		}
 	}`)
@@ -838,18 +836,16 @@ func GetSchemas() []string {
 					"allowCosmosWrapping": false
 				}
 			],
-			"cosmosCoinBackedPathsToAdd": [
-				{
+			"invariants": {
+				"noCustomOwnershipTimes": false,
+				"maxSupplyPerId": "",
+				"cosmosCoinBackedPath": {
 					"ibcDenom": "",
 					"balances": [
 						`+getBalanceSchema()+`
 					],
 					"ibcAmount": ""
 				}
-			],
-			"invariants": {
-				"noCustomOwnershipTimes": false,
-				"maxSupplyPerId": ""
 			}
 		}
 	}`)
@@ -942,18 +938,16 @@ func GetSchemas() []string {
 					"allowCosmosWrapping": false
 				}
 			],
-			"cosmosCoinBackedPathsToAdd": [
-				{
+			"invariants": {
+				"noCustomOwnershipTimes": false,
+				"maxSupplyPerId": "",
+				"cosmosCoinBackedPath": {
 					"ibcDenom": "",
 					"balances": [
 						`+getBalanceSchema()+`
 					],
 					"ibcAmount": ""
 				}
-			],
-			"invariants": {
-				"noCustomOwnershipTimes": false,
-				"maxSupplyPerId": ""
 			}
 		}
 	}`)

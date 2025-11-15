@@ -226,8 +226,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			CustomDataTimeline:          collectionToCreate.CustomDataTimeline,
 			StandardsTimeline:           collectionToCreate.StandardsTimeline,
 			CosmosCoinWrapperPathsToAdd: collectionToCreate.CosmosCoinWrapperPathsToAdd,
-			CosmosCoinBackedPathsToAdd:  collectionToCreate.CosmosCoinBackedPathsToAdd,
 			ValidTokenIds:               allTokenIds,
+			Invariants:                  collectionToCreate.Invariants,
 			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
 
 			// ManagerTimeline: collectionToCreate.ManagerTimeline,

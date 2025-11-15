@@ -75,9 +75,6 @@ message TokenCollection {
   // The IBC wrapper (sdk.coin) paths for the collection.
   repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 14;
 
-  // The IBC backed (sdk.coin) paths for the collection.
-  repeated CosmosCoinBackedPath cosmosCoinBackedPaths = 16;
-
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
   CollectionInvariants invariants = 15;
@@ -115,4 +112,7 @@ message CollectionInvariants {
   // Maximum supply per token ID. If set, no balance can exceed this amount.
   // This prevents any single token ID from having more than the specified supply.
   string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
+  CosmosCoinBackedPath cosmosCoinBackedPath = 3;
 }
