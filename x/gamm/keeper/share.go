@@ -9,7 +9,9 @@ import (
 )
 
 func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, joiner sdk.AccAddress, numShares osmomath.Int, joinCoins sdk.Coins) error {
-	err := k.SendCoinsToPoolWithWrapping(ctx, joiner, pool.GetAddress(), joinCoins)
+	poolAddress := pool.GetAddress()
+
+	err := k.SendCoinsToPoolWithWrapping(ctx, joiner, poolAddress, joinCoins)
 	if err != nil {
 		return err
 	}
@@ -25,11 +27,21 @@ func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.
 	}
 
 	k.RecordTotalLiquidityIncrease(ctx, joinCoins)
+
+	// Global pool invariant check: ensure pool has enough underlying assets for all recorded liquidity
+	// This check happens after liquidity increments/decrements
+	err = k.CheckPoolLiquidityInvariant(ctx, pool)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (k Keeper) applyExitPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, exiter sdk.AccAddress, numShares osmomath.Int, exitCoins sdk.Coins) error {
-	err := k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), exiter, exitCoins)
+	poolAddress := pool.GetAddress()
+
+	err := k.SendCoinsFromPoolWithUnwrapping(ctx, poolAddress, exiter, exitCoins)
 	if err != nil {
 		return err
 	}
@@ -45,6 +57,14 @@ func (k Keeper) applyExitPoolStateChange(ctx sdk.Context, pool poolmanagertypes.
 	}
 
 	k.RecordTotalLiquidityDecrease(ctx, exitCoins)
+
+	// Global pool invariant check: ensure pool has enough underlying assets for all recorded liquidity
+	// This check happens after liquidity increments/decrements
+	err = k.CheckPoolLiquidityInvariant(ctx, pool)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

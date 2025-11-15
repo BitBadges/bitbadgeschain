@@ -10,9 +10,12 @@ import (
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+
+	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 
 func CheckStartsWithBadges(denom string) bool {
@@ -352,6 +355,70 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 			err := k.communityPoolKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
 			if err != nil {
 				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// CheckPoolLiquidityInvariant checks that the pool address has enough underlying assets for all recorded pool liquidity
+// This is a global invariant check that compares recorded liquidity with actual balances behind the scenes
+func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertypes.PoolI) error {
+	poolAddress := pool.GetAddress()
+
+	// Convert to CFMMPoolI to access GetTotalPoolLiquidity
+	cfmmPool, ok := pool.(gammtypes.CFMMPoolI)
+	if !ok {
+		return sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "pool does not implement CFMMPoolI")
+	}
+
+	poolLiquidity := cfmmPool.GetTotalPoolLiquidity(ctx)
+
+	// Iterate over all denoms in the pool's liquidity
+	for _, coin := range poolLiquidity {
+		// Check if this is a wrapped badges denom
+		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+			collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
+			if err != nil {
+				return sdkerrors.Wrapf(err, "failed to parse collection from denom: %s", coin.Denom)
+			}
+
+			// Get the balances that would be needed for the recorded amount
+			balancesNeeded, err := GetBalancesToTransfer(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			if err != nil {
+				return sdkerrors.Wrapf(err, "failed to get balances to transfer for denom: %s", coin.Denom)
+			}
+
+			// Get the pool's current balance
+			poolBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
+
+			// Try to subtract needed balances from pool balances - will error on underflow
+			poolBalancesCopy := badgestypes.DeepCopyBalances(poolBalances.Balances)
+			_, err = badgestypes.SubtractBalances(ctx, balancesNeeded, poolBalancesCopy)
+			if err != nil {
+				return sdkerrors.Wrapf(
+					badgestypes.ErrInvalidRequest,
+					"pool address %s has insufficient badges liquidity for denom %s: %v",
+					poolAddress.String(),
+					coin.Denom,
+					err,
+				)
+			}
+		} else {
+			// For all other denoms (including IBC and native), check bank balance
+			allBalances := k.bankKeeper.GetAllBalances(ctx, poolAddress)
+			poolBalance := allBalances.AmountOf(coin.Denom)
+
+			if poolBalance.LT(coin.Amount) {
+				return sdkerrors.Wrapf(
+					badgestypes.ErrInvalidRequest,
+					"pool address %s has insufficient liquidity: required %s, available %s for denom %s",
+					poolAddress.String(),
+					coin.Amount.String(),
+					poolBalance.String(),
+					coin.Denom,
+				)
 			}
 		}
 	}

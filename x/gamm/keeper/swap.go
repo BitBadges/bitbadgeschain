@@ -189,12 +189,14 @@ func (k Keeper) updatePoolForSwap(
 	tokensIn := sdk.Coins{tokenIn}
 	tokensOut := sdk.Coins{tokenOut}
 
+	poolAddress := pool.GetAddress()
+
 	err := k.setPool(ctx, pool)
 	if err != nil {
 		return err
 	}
 
-	err = k.SendCoinsToPoolWithWrapping(ctx, sender, pool.GetAddress(), sdk.Coins{
+	err = k.SendCoinsToPoolWithWrapping(ctx, sender, poolAddress, sdk.Coins{
 		tokenIn,
 	})
 	if err != nil {
@@ -214,6 +216,13 @@ func (k Keeper) updatePoolForSwap(
 	// Each new pool module will have to emit this event separately
 	k.RecordTotalLiquidityIncrease(ctx, tokensIn)
 	k.RecordTotalLiquidityDecrease(ctx, tokensOut)
+
+	// Global pool invariant check: ensure pool has enough underlying assets for all recorded liquidity
+	// This check happens after liquidity increments/decrements
+	err = k.CheckPoolLiquidityInvariant(ctx, pool)
+	if err != nil {
+		return err
+	}
 
 	return err
 }
