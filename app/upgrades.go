@@ -5,6 +5,7 @@ import (
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v19 "github.com/bitbadges/bitbadgeschain/app/upgrades/v19"
 	ibchookstypes "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/types"
+	managersplittermoduletypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -35,7 +36,10 @@ func (app *App) RegisterUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v19.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{ibchookstypes.StoreKey},
+			Added: []string{
+				ibchookstypes.StoreKey,
+				managersplittermoduletypes.StoreKey,
+			},
 		}
 	}
 

@@ -130,6 +130,14 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
 
+		// Migrate invariants: set new fields to default values
+		if newCollection.Invariants != nil {
+			// Set cosmosCoinBackedPath to nil (default for message type)
+			newCollection.Invariants.CosmosCoinBackedPath = nil
+			// Set noForcefulPostMintTransfers to false (default for bool)
+			newCollection.Invariants.NoForcefulPostMintTransfers = false
+		}
+
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {
 			return err

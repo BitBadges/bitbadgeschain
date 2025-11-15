@@ -48,4 +48,3 @@ func TestCollectionInvariants_MaxSupplyPerId_GreaterThanZero(t *testing.T) {
 	require.False(t, invariants2.NoCustomOwnershipTimes)
 	require.Equal(t, sdkmath.NewUint(2), invariants2.MaxSupplyPerId)
 }
-
