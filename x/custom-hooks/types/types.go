@@ -11,10 +11,11 @@ type HookData struct {
 
 // SwapAndAction represents the Skip-style format for swap and action
 type SwapAndAction struct {
-	UserSwap         *UserSwap       `json:"user_swap,omitempty"`
-	MinAsset         *MinAsset       `json:"min_asset,omitempty"`
-	TimeoutTimestamp *uint64         `json:"timeout_timestamp,omitempty"`
-	PostSwapAction   *PostSwapAction `json:"post_swap_action,omitempty"`
+	UserSwap                  *UserSwap       `json:"user_swap,omitempty"`
+	MinAsset                  *MinAsset       `json:"min_asset,omitempty"`
+	TimeoutTimestamp          *uint64         `json:"timeout_timestamp,omitempty"`
+	PostSwapAction            *PostSwapAction `json:"post_swap_action,omitempty"`
+	DestinationRecoverAddress string          `json:"destination_recover_address,omitempty"`
 }
 
 // UserSwap contains the swap operation

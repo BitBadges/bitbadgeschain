@@ -144,7 +144,22 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 		return fmt.Errorf("post_swap_action validation failed: %w", err)
 	}
 
-	// Execute the swap first
+	// Validate destination recover address if provided
+	if swapAndAction.DestinationRecoverAddress != "" {
+		_, err := sdk.AccAddressFromBech32(swapAndAction.DestinationRecoverAddress)
+		if err != nil {
+			return fmt.Errorf("invalid destination_recover_address: %w", err)
+		}
+	}
+
+	// Store original tokenIn for fallback handling
+	originalTokenIn := sdk.Coin{
+		Denom:  tokenIn.Denom,
+		Amount: tokenIn.Amount,
+	}
+
+	// Execute the swap first in a cached context
+	// This ensures we can rollback the swap if it fails and we use the fallback
 	if swapAndAction.UserSwap != nil && swapAndAction.UserSwap.SwapExactAssetIn != nil {
 		operations := swapAndAction.UserSwap.SwapExactAssetIn.Operations
 		if len(operations) == 0 {
@@ -167,7 +182,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			return fmt.Errorf("denom_in does not match token_in: %s != %s", operation.DenomIn, tokenIn.Denom)
 		}
 
-		// Get the pool
+		// Get the pool (read-only, can use main context)
 		pool, err := k.gammKeeper.GetCFMMPool(ctx, poolId)
 		if err != nil {
 			return fmt.Errorf("failed to get pool %d: %w", poolId, err)
@@ -185,12 +200,13 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			}
 		}
 
-		// Get spread factor from pool
+		// Get spread factor from pool (read-only, can use main context)
 		spreadFactor := pool.GetSpreadFactor(ctx)
 
-		// Execute swap using Gamm keeper directly
+		// Execute swap in a cached context so we can rollback if it fails
+		swapCacheCtx, writeSwapCache := ctx.CacheContext()
 		tokenOut, err = k.gammKeeper.SwapExactAmountIn(
-			ctx,
+			swapCacheCtx,
 			sender,
 			pool,
 			tokenIn,
@@ -199,10 +215,64 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			spreadFactor,
 		)
 		if err != nil {
+			// Swap failed - check if we have a destination recover address
+			if swapAndAction.DestinationRecoverAddress != "" {
+				// Cache context is automatically discarded - swap never happened
+				// Log the fallback action
+				k.Logger(ctx).Info("custom-hooks: swap failed, using destination recover address",
+					"error", err,
+					"destination_recover_address", swapAndAction.DestinationRecoverAddress,
+					"original_token", originalTokenIn.String())
+
+				// Send original token to destination recover address in the main context
+				// This allows the IBC transfer to succeed without the swap
+				if err := k.ExecuteLocalTransfer(ctx, sender, &types.TransferInfo{ToAddress: swapAndAction.DestinationRecoverAddress}, originalTokenIn); err != nil {
+					return fmt.Errorf("failed to send tokens to destination recover address: %w", err)
+				}
+
+				// Emit event for fallback path
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent(
+						"swap_and_action_fallback",
+						sdk.NewAttribute("module", "custom-hooks"),
+						sdk.NewAttribute("sender", sender.String()),
+						sdk.NewAttribute("swap_error", err.Error()),
+						sdk.NewAttribute("destination_recover_address", swapAndAction.DestinationRecoverAddress),
+						sdk.NewAttribute("original_token", originalTokenIn.String()),
+						sdk.NewAttribute("pool_id", operation.Pool),
+						sdk.NewAttribute("denom_in", operation.DenomIn),
+						sdk.NewAttribute("denom_out", operation.DenomOut),
+					),
+				)
+
+				// Successfully handled fallback - return nil to allow IBC transfer to succeed
+				// The swap cache context is automatically discarded, so no swap state changes
+				return nil
+			}
+
+			// No fallback address - cache context is automatically discarded
+			// Return error as before
 			return fmt.Errorf("swap failed: %w", err)
 		}
 
-		//for post-swap, we need to use the exact amount
+		// Swap succeeded - commit the swap cache context
+		writeSwapCache()
+
+		// Emit event for successful swap path
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				"swap_and_action_success",
+				sdk.NewAttribute("module", "custom-hooks"),
+				sdk.NewAttribute("sender", sender.String()),
+				sdk.NewAttribute("pool_id", operation.Pool),
+				sdk.NewAttribute("token_in", tokenIn.String()),
+				sdk.NewAttribute("token_out", sdk.NewCoin(operation.DenomOut, tokenOut).String()),
+				sdk.NewAttribute("denom_in", operation.DenomIn),
+				sdk.NewAttribute("denom_out", operation.DenomOut),
+			),
+		)
+
+		// For post-swap, we need to use the exact amount
 		tokenIn = sdk.NewCoin(operation.DenomOut, tokenOut)
 	}
 
