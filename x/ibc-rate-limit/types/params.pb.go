@@ -343,7 +343,7 @@ func (m *RateLimitConfig) GetAddressLimits() []AddressLimit {
 // Params defines the parameters for the module.
 type Params struct {
 	// rate_limits is an array of rate limit configurations
-	// Each configuration can specify channel_id, denom, max_supply_shift, and window_duration
+	// Each configuration can specify channel_id, denom, and various limit types (supply_shift_limits, unique_sender_limits, address_limits)
 	// Configurations are checked in order, and the first matching config is used
 	// If no config matches, the transfer is allowed (no rate limit)
 	RateLimits []RateLimitConfig `protobuf:"bytes,1,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits"`

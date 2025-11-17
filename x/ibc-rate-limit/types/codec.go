@@ -9,11 +9,13 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateParams{}, "ibcratelimit/MsgUpdateParams", nil)
+	cdc.RegisterConcrete(&MsgUpdateRateLimit{}, "ibcratelimit/MsgUpdateRateLimit", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateParams{},
+		&MsgUpdateRateLimit{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
