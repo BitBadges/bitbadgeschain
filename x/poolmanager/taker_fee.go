@@ -127,7 +127,6 @@ func (k Keeper) GetAllTradingPairTakerFees(ctx sdk.Context) ([]types.DenomPairTa
 // If the sender is in the taker fee reduced whitelisted, it returns the tokenIn without extracting the taker fee.
 // In the future, we might charge a lower taker fee as opposed to no fee at all.
 // TODO: Gas optimize this function, its expensive in both gas and CPU.
-// NOTE: Taker fees are disabled in this fork - always return tokenIn without charging any fee
 func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom string, sender sdk.AccAddress, exactIn bool) (sdk.Coin, sdk.Coin, error) {
 
 	// reducedFeeWhitelist := []string{}
@@ -155,6 +154,7 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}
+
 	return tokenInAfterTakerFee, takerFeeCoin, nil
 }
 

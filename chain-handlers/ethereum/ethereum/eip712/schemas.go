@@ -612,7 +612,6 @@ func GetSchemas() []string {
 						"overrideTimestamp": "0",
 						"tokenIdsOverride": [`+getUintRangeSchema()+`]
 					},
-					"affiliateAddress": "",
 					"numAttempts": "0"
 				}
 			]
@@ -1327,7 +1326,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/swap-exact-amount-in",
+		"type": "gamm/SwapExactAmountIn",
 		"value": {
 			"sender": "",
 			"routes": [
@@ -1351,7 +1350,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/swap-exact-amount-in-with-ibc-transfer",
+		"type": "gamm/SwapExactAmountInWithIBCTransfer",
 		"value": {
 			"sender": "",
 			"routes": [
@@ -1381,7 +1380,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/swap-exact-amount-out",
+		"type": "gamm/SwapExactAmountOut",
 		"value": {
 			"sender": "",
 			"routes": [
@@ -1399,7 +1398,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/join-swap-extern-amount-in",
+		"type": "gamm/JoinSwapExternAmountIn",
 		"value": {
 			"sender": "",
 			"pool_id": "0",
@@ -1412,7 +1411,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/join-swap-share-amount-out",
+		"type": "gamm/JoinSwapShareAmountOut",
 		"value": {
 			"sender": "",
 			"pool_id": "0",
@@ -1423,7 +1422,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/exit-swap-share-amount-in",
+		"type": "gamm/ExitSwapShareAmountIn",
 		"value": {
 			"sender": "",
 			"pool_id": "0",
@@ -1434,7 +1433,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/exit-swap-extern-amount-out",
+		"type": "gamm/ExitSwapExternAmountOut",
 		"value": {
 			"sender": "",
 			"pool_id": "0",
@@ -1447,7 +1446,7 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/create-balancer-pool",
+		"type": "gamm/CreateBalancerPool",
 		"value": {
 			"sender": "",
 			"pool_params": {

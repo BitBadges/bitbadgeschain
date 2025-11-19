@@ -180,7 +180,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 				}
 
 				// Calculate and distribute protocol fees
-				protocolFeeTransfers, err := k.CalculateAndDistributeProtocolFees(ctx, coinTransfers, initiatedBy, transfer.AffiliateAddress)
+				protocolFeeTransfers, err := k.CalculateAndDistributeProtocolFees(ctx, coinTransfers, initiatedBy)
 				if err != nil {
 					return err
 				}
@@ -296,7 +296,6 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
 				PrecalculationOptions:                   transfer.PrecalculationOptions,
-				AffiliateAddress:                        transfer.AffiliateAddress,
 				NumAttempts:                             transfer.NumAttempts,
 			}
 

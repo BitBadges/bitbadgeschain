@@ -33,7 +33,7 @@ service Msg {
 // ===================== MsgJoinPool
 // This is really MsgJoinPoolNoSwap
 message MsgJoinPool {
-  option (amino.name) = "gamm/join-pool";
+  option (amino.name) = "gamm/JoinPool";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -65,7 +65,7 @@ message MsgJoinPoolResponse {
 
 // ===================== MsgExitPool
 message MsgExitPool {
-  option (amino.name) = "gamm/exit-pool";
+  option (amino.name) = "gamm/ExitPool";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -92,7 +92,7 @@ message MsgExitPoolResponse {
 
 // ===================== MsgSwapExactAmountIn
 message MsgSwapExactAmountIn {
-  option (amino.name) = "gamm/swap-exact-amount-in";
+  option (amino.name) = "gamm/SwapExactAmountIn";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -134,7 +134,7 @@ message IBCTransferInfo {
 
 // ===================== MsgSwapExactAmountInWithIBCTransfer
 message MsgSwapExactAmountInWithIBCTransfer {
-  option (amino.name) = "gamm/swap-exact-amount-in-with-ibc-transfer";
+  option (amino.name) = "gamm/SwapExactAmountInWithIBCTransfer";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -171,7 +171,7 @@ message MsgSwapExactAmountInWithIBCTransferResponse {
 }
 
 message MsgSwapExactAmountOut {
-  option (amino.name) = "gamm/swap-exact-amount-out";
+  option (amino.name) = "gamm/SwapExactAmountOut";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -201,7 +201,7 @@ message MsgSwapExactAmountOutResponse {
 // ===================== MsgJoinSwapExternAmountIn
 // TODO: Rename to MsgJoinSwapExactAmountIn
 message MsgJoinSwapExternAmountIn {
-  option (amino.name) = "gamm/join-swap-extern-amount-in";
+  option (amino.name) = "gamm/JoinSwapExternAmountIn";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -233,7 +233,7 @@ message MsgJoinSwapExternAmountInResponse {
 
 // ===================== MsgJoinSwapShareAmountOut
 message MsgJoinSwapShareAmountOut {
-  option (amino.name) = "gamm/join-swap-share-amount-out";
+  option (amino.name) = "gamm/JoinSwapShareAmountOut";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -265,7 +265,7 @@ message MsgJoinSwapShareAmountOutResponse {
 
 // ===================== MsgExitSwapShareAmountIn
 message MsgExitSwapShareAmountIn {
-  option (amino.name) = "gamm/exit-swap-share-amount-in";
+  option (amino.name) = "gamm/ExitSwapShareAmountIn";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -297,7 +297,7 @@ message MsgExitSwapShareAmountInResponse {
 
 // ===================== MsgExitSwapExternAmountOut
 message MsgExitSwapExternAmountOut {
-  option (amino.name) = "gamm/exit-swap-extern-amount-out";
+  option (amino.name) = "gamm/ExitSwapExternAmountOut";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];

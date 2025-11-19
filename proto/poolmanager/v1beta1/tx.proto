@@ -28,7 +28,7 @@ service Msg {
 
 // ===================== MsgSwapExactAmountIn
 message MsgSwapExactAmountIn {
-  option (amino.name) = "poolmanager/swap-exact-amount-in";
+  option (amino.name) = "poolmanager/SwapExactAmountIn";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -56,7 +56,7 @@ message MsgSwapExactAmountInResponse {
 
 // ===================== MsgSplitRouteSwapExactAmountIn
 message MsgSplitRouteSwapExactAmountIn {
-  option (amino.name) = "poolmanager/split-amount-in";
+  option (amino.name) = "poolmanager/SplitRouteSwapExactAmountIn";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -82,7 +82,7 @@ message MsgSplitRouteSwapExactAmountInResponse {
 
 // ===================== MsgSwapExactAmountOut
 message MsgSwapExactAmountOut {
-  option (amino.name) = "poolmanager/swap-exact-amount-out";
+  option (amino.name) = "poolmanager/SwapExactAmountOut";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -110,7 +110,7 @@ message MsgSwapExactAmountOutResponse {
 
 // ===================== MsgSplitRouteSwapExactAmountOut
 message MsgSplitRouteSwapExactAmountOut {
-  option (amino.name) = "poolmanager/split-amount-out";
+  option (amino.name) = "poolmanager/SplitRouteSwapExactAmountOut";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -136,7 +136,7 @@ message MsgSplitRouteSwapExactAmountOutResponse {
 
 // ===================== MsgSetDenomPairTakerFee
 message MsgSetDenomPairTakerFee {
-  option (amino.name) = "poolmanager/set-denom-pair-taker-fee";
+  option (amino.name) = "poolmanager/SetDenomPairTakerFee";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -151,7 +151,7 @@ message MsgSetDenomPairTakerFeeResponse { bool success = 1; }
 // ===================== MsgSetTakerFeeShareAgreementForDenom
 message MsgSetTakerFeeShareAgreementForDenom {
   option (amino.name) =
-      "poolmanager/set-taker-fee-share-agreement-for-denom";
+      "poolmanager/SetTakerFeeShareAgreementForDenom";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -180,7 +180,7 @@ message MsgSetTakerFeeShareAgreementForDenomResponse {}
 
 // ===================== MsgSetRegisteredAlloyedPool
 message MsgSetRegisteredAlloyedPool {
-  option (amino.name) = "poolmanager/set-registered-alloyed-pool";
+  option (amino.name) = "poolmanager/SetRegisteredAlloyedPool";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];

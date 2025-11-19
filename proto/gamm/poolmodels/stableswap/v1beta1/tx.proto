@@ -20,7 +20,7 @@ service Msg {
 
 // ===================== MsgCreatePool
 message MsgCreateStableswapPool {
-  option (amino.name) = "gamm/create-stableswap-pool";
+  option (amino.name) = "gamm/CreateStableswapPool";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
@@ -50,7 +50,7 @@ message MsgCreateStableswapPoolResponse {
 // Sender must be the pool's scaling_factor_governor in order for the tx to
 // succeed. Adjusts stableswap scaling factors.
 message MsgStableSwapAdjustScalingFactors {
-  option (amino.name) = "gamm/stableswap-adjust-scaling-factors";
+  option (amino.name) = "gamm/StableSwapAdjustScalingFactors";
   option (cosmos.msg.v1.signer) = "sender";
 
   string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];

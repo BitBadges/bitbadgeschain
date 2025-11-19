@@ -18,17 +18,14 @@ const (
 	ProtocolFeeNumerator = 5
 	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.5% = 5/1000)
 	ProtocolFeeDenominator = 1000
-	// AffiliatePercentageDenominator represents the denominator for affiliate percentage calculation (0-10000)
-	AffiliatePercentageDenominator = 10000
 )
 
 // CalculateAndDistributeProtocolFees calculates protocol fees from coin transfers and distributes them
-// between community pool and affiliate address (if specified)
+// to the community pool
 func (k Keeper) CalculateAndDistributeProtocolFees(
 	ctx sdk.Context,
 	coinTransfers []CoinTransfers,
 	initiatedBy string,
-	affiliateAddress string,
 ) ([]CoinTransfers, error) {
 	// Calculate protocol fees for all denoms (0.5% of each denom transferred)
 	protocolFees := sdk.NewCoins()
@@ -58,8 +55,6 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 		}
 	}
 
-	affiliatePercentage := k.GetParams(ctx).AffiliatePercentage // 0 to AffiliatePercentageDenominator
-
 	fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
 	if err != nil {
 		return nil, err
@@ -68,84 +63,21 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 	var protocolFeeTransfers []CoinTransfers
 
 	if !protocolFees.IsZero() {
-		// If no affiliate address is specified, send all fees to community pool
-		if affiliateAddress == "" {
-			err = k.distributionKeeper.FundCommunityPool(ctx, protocolFees, fromAddressAcc)
-			if err != nil {
-				return nil, sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", protocolFees)
-			}
+		// Send all fees to community pool
+		err = k.distributionKeeper.FundCommunityPool(ctx, protocolFees, fromAddressAcc)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", protocolFees)
+		}
 
-			// Add all protocol fees to coinTransfers for community pool
-			for _, protocolFee := range protocolFees {
-				protocolFeeTransfers = append(protocolFeeTransfers, CoinTransfers{
-					From:          initiatedBy,
-					To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
-					Amount:        protocolFee.Amount.String(),
-					Denom:         protocolFee.Denom,
-					IsProtocolFee: true,
-				})
-			}
-		} else {
-			// Split protocol fees between community pool and affiliate
-			affiliateFees := sdk.NewCoins()
-			communityPoolFees := sdk.NewCoins()
-
-			for _, protocolFee := range protocolFees {
-				// Calculate affiliate portion (affiliatePercentage is 0-AffiliatePercentageDenominator, so divide by AffiliatePercentageDenominator)
-				affiliateAmount := protocolFee.Amount.Mul(sdkmath.NewIntFromUint64(affiliatePercentage.Uint64())).Quo(sdkmath.NewInt(AffiliatePercentageDenominator))
-				communityPoolAmount := protocolFee.Amount.Sub(affiliateAmount)
-
-				if affiliateAmount.GT(sdkmath.ZeroInt()) {
-					affiliateFees = affiliateFees.Add(sdk.NewCoin(protocolFee.Denom, affiliateAmount))
-				}
-				if communityPoolAmount.GT(sdkmath.ZeroInt()) {
-					communityPoolFees = communityPoolFees.Add(sdk.NewCoin(protocolFee.Denom, communityPoolAmount))
-				}
-			}
-
-			// Send affiliate fees to affiliate address
-			if !affiliateFees.IsZero() {
-				affiliateAddressAcc, err := sdk.AccAddressFromBech32(affiliateAddress)
-				if err != nil {
-					return nil, err
-				}
-
-				err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, affiliateAddressAcc, affiliateFees)
-				if err != nil {
-					return nil, sdkerrors.Wrapf(err, "error sending affiliate fees: %s", affiliateFees)
-				}
-			}
-
-			// Send remaining fees to community pool
-			if !communityPoolFees.IsZero() {
-				err = k.distributionKeeper.FundCommunityPool(ctx, communityPoolFees, fromAddressAcc)
-				if err != nil {
-					return nil, sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", communityPoolFees)
-				}
-			}
-
-			// Add protocol fee transfers to coinTransfers for each denom
-			// Add affiliate fee transfers
-			for _, affiliateFee := range affiliateFees {
-				protocolFeeTransfers = append(protocolFeeTransfers, CoinTransfers{
-					From:          initiatedBy,
-					To:            affiliateAddress,
-					Amount:        affiliateFee.Amount.String(),
-					Denom:         affiliateFee.Denom,
-					IsProtocolFee: true,
-				})
-			}
-
-			// Add community pool fee transfers
-			for _, communityPoolFee := range communityPoolFees {
-				protocolFeeTransfers = append(protocolFeeTransfers, CoinTransfers{
-					From:          initiatedBy,
-					To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
-					Amount:        communityPoolFee.Amount.String(),
-					Denom:         communityPoolFee.Denom,
-					IsProtocolFee: true,
-				})
-			}
+		// Add all protocol fees to coinTransfers for community pool
+		for _, protocolFee := range protocolFees {
+			protocolFeeTransfers = append(protocolFeeTransfers, CoinTransfers{
+				From:          initiatedBy,
+				To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
+				Amount:        protocolFee.Amount.String(),
+				Denom:         protocolFee.Denom,
+				IsProtocolFee: true,
+			})
 		}
 	}
 

@@ -10,10 +10,10 @@ import (
 // RegisterLegacyAminoCodec registers the necessary x/gamm interfaces and concrete types
 // on the provided LegacyAmino codec. These types are used for Amino JSON serialization.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgSwapExactAmountIn{}, "poolmanager/swap-exact-amount-in", nil)
-	cdc.RegisterConcrete(&MsgSwapExactAmountOut{}, "poolmanager/swap-exact-amount-out", nil)
-	cdc.RegisterConcrete(&MsgSplitRouteSwapExactAmountIn{}, "poolmanager/split-amount-in", nil)
-	cdc.RegisterConcrete(&MsgSplitRouteSwapExactAmountOut{}, "poolmanager/split-amount-out", nil)
+	cdc.RegisterConcrete(&MsgSwapExactAmountIn{}, "poolmanager/SwapExactAmountIn", nil)
+	cdc.RegisterConcrete(&MsgSwapExactAmountOut{}, "poolmanager/SwapExactAmountOut", nil)
+	cdc.RegisterConcrete(&MsgSplitRouteSwapExactAmountIn{}, "poolmanager/SplitRouteSwapExactAmountIn", nil)
+	cdc.RegisterConcrete(&MsgSplitRouteSwapExactAmountOut{}, "poolmanager/SplitRouteSwapExactAmountOut", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {

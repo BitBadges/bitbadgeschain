@@ -611,10 +611,8 @@ message Transfer {
   bool onlyCheckPrioritizedOutgoingApprovals = 11;
   // The options for precalculating the balances.
   PrecalculationOptions precalculationOptions = 12;
-  // Affiliate address for the transfer.
-  string affiliateAddress = 13;
   // The number of times to attempt approval validation. If 0 / not specified, we default to only one.
-  string numAttempts = 14 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string numAttempts = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // PrecalculationOptions defines the options for precalculating the balances.
