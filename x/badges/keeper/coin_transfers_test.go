@@ -39,9 +39,11 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 					MaxNumTransfers: &types.MaxNumTransfers{
 						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "test-tracker",
 					},
 					ApprovalAmounts: &types.ApprovalAmounts{
 						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "test-tracker",
 					},
 					CoinTransfers: []*types.CoinTransfer{
 						{
@@ -122,9 +124,11 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 				ApprovalCriteria: &types.OutgoingApprovalCriteria{
 					MaxNumTransfers: &types.MaxNumTransfers{
 						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "test-tracker",
 					},
 					ApprovalAmounts: &types.ApprovalAmounts{
 						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "test-tracker",
 					},
 					CoinTransfers: []*types.CoinTransfer{
 						{

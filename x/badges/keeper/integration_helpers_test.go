@@ -92,9 +92,11 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					ApprovalCriteria: &types.ApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+							AmountTrackerId:        "test-tracker",
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+							AmountTrackerId:              "test-tracker",
 						},
 					},
 				}},
@@ -108,12 +110,13 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 
 					ApprovalId: "test",
 					ApprovalCriteria: &types.IncomingApprovalCriteria{
-
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+							AmountTrackerId:        "test-tracker",
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+							AmountTrackerId:              "test-tracker",
 						},
 					},
 				},
@@ -130,9 +133,11 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 					ApprovalCriteria: &types.OutgoingApprovalCriteria{
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+							AmountTrackerId:        "test-tracker",
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+							AmountTrackerId:              "test-tracker",
 						},
 					},
 				},
@@ -182,9 +187,11 @@ func GetTransferableCollectionToCreateAllMintedToCreator(creator string) []*type
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
 			},
 			OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals:   true,

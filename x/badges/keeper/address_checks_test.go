@@ -53,9 +53,11 @@ func (suite *TestSuite) TestAddressChecks_CollectionApproval() {
 						},
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+							AmountTrackerId:        "test-tracker",
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(uint64(math.MaxUint64)),
+							AmountTrackerId:              "test-tracker",
 						},
 					},
 				},
@@ -172,9 +174,11 @@ func (suite *TestSuite) TestAddressChecks_OutgoingApproval() {
 					},
 					MaxNumTransfers: &types.MaxNumTransfers{
 						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "test-tracker",
 					},
 					ApprovalAmounts: &types.ApprovalAmounts{
 						PerFromAddressApprovalAmount: sdkmath.NewUint(uint64(math.MaxUint64)),
+						AmountTrackerId:              "test-tracker",
 					},
 				},
 			},
@@ -270,9 +274,11 @@ func (suite *TestSuite) TestAddressChecks_IncomingApproval() {
 					},
 					MaxNumTransfers: &types.MaxNumTransfers{
 						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "test-tracker",
 					},
 					ApprovalAmounts: &types.ApprovalAmounts{
 						PerFromAddressApprovalAmount: sdkmath.NewUint(uint64(math.MaxUint64)),
+						AmountTrackerId:              "test-tracker",
 					},
 				},
 			},
@@ -406,9 +412,11 @@ func (suite *TestSuite) TestAddressChecks_EmptyChecks() {
 						},
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+							AmountTrackerId:        "test-tracker",
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(uint64(math.MaxUint64)),
+							AmountTrackerId:              "test-tracker",
 						},
 					},
 				},
@@ -716,9 +724,11 @@ func (suite *TestSuite) TestAddressChecks_EnforcedInApprovals() {
 						},
 						MaxNumTransfers: &types.MaxNumTransfers{
 							OverallMaxNumTransfers: sdkmath.NewUint(1000),
+							AmountTrackerId:        "test-tracker",
 						},
 						ApprovalAmounts: &types.ApprovalAmounts{
 							PerFromAddressApprovalAmount: sdkmath.NewUint(uint64(math.MaxUint64)),
+							AmountTrackerId:              "test-tracker",
 						},
 					},
 				},

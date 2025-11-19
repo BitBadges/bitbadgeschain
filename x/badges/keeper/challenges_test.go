@@ -160,9 +160,11 @@ func (suite *TestSuite) TestLeafSignature() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			MerkleChallenges: []*types.MerkleChallenge{
@@ -265,9 +267,11 @@ func (suite *TestSuite) TestSendAllToClaimsAccountTypeInvalid() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			MerkleChallenges: []*types.MerkleChallenge{
@@ -433,9 +437,11 @@ func (suite *TestSuite) TestFailsOnUseCreatorAddressAsLeaf() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			MerkleChallenges: []*types.MerkleChallenge{
@@ -532,9 +538,11 @@ func (suite *TestSuite) TestWrongExpectedProofLength() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			MerkleChallenges: []*types.MerkleChallenge{
@@ -638,9 +646,11 @@ func (suite *TestSuite) TestIncrements() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
@@ -790,9 +800,11 @@ func (suite *TestSuite) TestIncrementsMismatchingTrackerId() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
@@ -939,9 +951,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			PredeterminedBalances: &types.PredeterminedBalances{
@@ -1067,9 +1081,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
@@ -1243,9 +1259,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseMerkleChallengeLeafIndex: true},
@@ -1369,9 +1387,11 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseMerkleChallengeLeafIndex: true},
@@ -1536,9 +1556,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
@@ -1694,9 +1716,11 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UsePerToAddressNumTransfers: true},
@@ -1846,9 +1870,11 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
@@ -2001,9 +2027,11 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
@@ -2164,9 +2192,11 @@ func (suite *TestSuite) TestRequestMalformedPredeterminedTransfer() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
@@ -2382,9 +2412,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
 		MaxNumTransfers: &types.MaxNumTransfers{
 			OverallMaxNumTransfers: sdkmath.NewUint(1000),
+			AmountTrackerId:        "test-tracker",
 		},
 		ApprovalAmounts: &types.ApprovalAmounts{
 			PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+			AmountTrackerId:              "test-tracker",
 		},
 		PredeterminedBalances: &types.PredeterminedBalances{
 			// ManualBalances: &types.ManualBalances{},
@@ -2411,9 +2443,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteria() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -2779,9 +2813,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria = &types.ApprovalCriteria{
 		MaxNumTransfers: &types.MaxNumTransfers{
 			OverallMaxNumTransfers: sdkmath.NewUint(1000),
+			AmountTrackerId:        "test-tracker",
 		},
 		ApprovalAmounts: &types.ApprovalAmounts{
 			PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+			AmountTrackerId:              "test-tracker",
 		},
 		PredeterminedBalances: &types.PredeterminedBalances{
 			// ManualBalances: &types.ManualBalances{},
@@ -2808,9 +2844,11 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaSameAmountTrackerId() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -3595,9 +3633,11 @@ func (suite *TestSuite) TestTokenIdsOverride() {
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
@@ -3694,9 +3734,11 @@ func (suite *TestSuite) TestTokenIdsOverrideWithMoreThanOneBadge() {
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
@@ -3800,9 +3842,11 @@ func (suite *TestSuite) TestTokenIdsOverrideNoPrecalcSpecified() {
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 			PredeterminedBalances: &types.PredeterminedBalances{
 				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{

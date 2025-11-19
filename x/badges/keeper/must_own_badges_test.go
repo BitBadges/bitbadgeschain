@@ -29,9 +29,11 @@ func (suite *TestSuite) TestMustOwnTokens() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -94,9 +96,11 @@ func (suite *TestSuite) TestMustOwnTokensMustSatisfyForAllAssets() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -170,9 +174,11 @@ func (suite *TestSuite) TestMustOwnTokensMustSatisfyForAllAssets2() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -244,9 +250,11 @@ func (suite *TestSuite) TestMustOwnTokensMustOwnOne() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -309,9 +317,11 @@ func (suite *TestSuite) TestMustOwnTokensMustOwnOne2() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -374,9 +384,11 @@ func (suite *TestSuite) TestMustOwnTokensDoesntOwnBadges() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -438,9 +450,11 @@ func (suite *TestSuite) TestMustOwnTokensMustOwnZero() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,
@@ -523,9 +537,11 @@ func (suite *TestSuite) TestMustOwnTokensMustOwnGreaterThan() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(10),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				OverallApprovalAmount: sdkmath.NewUint(10),
+				AmountTrackerId:       "test-tracker",
 			},
 
 			OverridesFromOutgoingApprovals: true,

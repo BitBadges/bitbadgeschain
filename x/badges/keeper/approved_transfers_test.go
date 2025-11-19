@@ -676,9 +676,11 @@ func (suite *TestSuite) TestNotExplicitlyDefined() {
 			ApprovalCriteria: &types.OutgoingApprovalCriteria{
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(1000),
+					AmountTrackerId:        "test-tracker",
 				},
 				ApprovalAmounts: &types.ApprovalAmounts{
 					PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+					AmountTrackerId:              "test-tracker",
 				},
 			},
 		},
@@ -1020,9 +1022,11 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:              "test-tracker",
 			},
 			OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals:   true,
@@ -1133,9 +1137,11 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:              "test-tracker",
 			},
 			OverridesFromOutgoingApprovals: true,
 			OverridesToIncomingApprovals:   true,
@@ -1280,9 +1286,11 @@ func (suite *TestSuite) TestVersionControlUserApprovals() {
 
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "test-tracker",
 			},
 			ApprovalAmounts: &types.ApprovalAmounts{
 				PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+				AmountTrackerId:              "test-tracker",
 			},
 		},
 	}
@@ -2108,6 +2116,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				PredeterminedBalances:          predeterminedBalances,
 				MaxNumTransfers: &types.MaxNumTransfers{
 					OverallMaxNumTransfers: sdkmath.NewUint(2),
+					AmountTrackerId:        "test-tracker",
 				},
 			},
 			// No criteria - this will always succeed

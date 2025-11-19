@@ -1433,6 +1433,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 				ApprovalCriteria: &types.ApprovalCriteria{
 					ApprovalAmounts: &types.ApprovalAmounts{
 						OverallApprovalAmount: sdkmath.NewUint(10),
+						AmountTrackerId:       "test-tracker",
 					},
 
 					MaxNumTransfers: &types.MaxNumTransfers{},
@@ -1450,6 +1451,7 @@ func (suite *TestSuite) TestGetMaxPossible() {
 
 					ApprovalAmounts: &types.ApprovalAmounts{
 						OverallApprovalAmount: sdkmath.NewUint(10),
+						AmountTrackerId:       "test-tracker",
 					},
 					MaxNumTransfers: &types.MaxNumTransfers{},
 				},
