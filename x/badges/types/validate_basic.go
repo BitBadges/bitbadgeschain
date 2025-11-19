@@ -495,6 +495,19 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				}
 			}
 
+			// Validate ApprovalAmounts: if amountTrackerId is empty/nil but other fields are set, throw error
+			if approvalCriteria.ApprovalAmounts != nil {
+				hasNonNilFields := (!approvalCriteria.ApprovalAmounts.OverallApprovalAmount.IsNil() && !approvalCriteria.ApprovalAmounts.OverallApprovalAmount.IsZero()) ||
+					(!approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount.IsNil() && !approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount.IsZero()) ||
+					(!approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount.IsNil() && !approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount.IsZero()) ||
+					(!approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() && !approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount.IsZero()) ||
+					(approvalCriteria.ApprovalAmounts.ResetTimeIntervals != nil && !IsResetTimeIntervalBasicallyNil(approvalCriteria.ApprovalAmounts.ResetTimeIntervals))
+
+				if hasNonNilFields && approvalCriteria.ApprovalAmounts.AmountTrackerId == "" {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "approvalAmounts has non-nil fields set but amountTrackerId is empty or nil")
+				}
+			}
+
 			if canChangeValues {
 				if approvalCriteria.AutoDeletionOptions == nil {
 					approvalCriteria.AutoDeletionOptions = &AutoDeletionOptions{}
@@ -538,6 +551,19 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 				if approvalCriteria.MaxNumTransfers.ResetTimeIntervals.IntervalLength.IsNil() {
 					approvalCriteria.MaxNumTransfers.ResetTimeIntervals.IntervalLength = sdkmath.NewUint(0)
+				}
+			}
+
+			// Validate MaxNumTransfers: if amountTrackerId is empty/nil but other fields are set, throw error
+			if approvalCriteria.MaxNumTransfers != nil {
+				hasNonNilFields := (!approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsNil() && !approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers.IsZero()) ||
+					(!approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers.IsNil() && !approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers.IsZero()) ||
+					(!approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() && !approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers.IsZero()) ||
+					(!approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() && !approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsZero()) ||
+					(approvalCriteria.MaxNumTransfers.ResetTimeIntervals != nil && !IsResetTimeIntervalBasicallyNil(approvalCriteria.MaxNumTransfers.ResetTimeIntervals))
+
+				if hasNonNilFields && approvalCriteria.MaxNumTransfers.AmountTrackerId == "" {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "maxNumTransfers has non-nil fields set but amountTrackerId is empty or nil")
 				}
 			}
 
