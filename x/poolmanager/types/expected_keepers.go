@@ -60,6 +60,7 @@ type PoolModuleI interface {
 		tokenOutDenom string,
 		tokenOutMinAmount osmomath.Int,
 		spreadFactor osmomath.Dec,
+		affiliates []Affiliate,
 	) (osmomath.Int, error)
 	// CalcOutAmtGivenIn calculates the amount of tokenOut given tokenIn and the pool's current state.
 	// Returns error if the given pool is not a CFMM pool. Returns error on internal calculations.

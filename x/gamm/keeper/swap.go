@@ -3,6 +3,7 @@ package keeper
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 
@@ -28,6 +29,7 @@ func (k Keeper) SwapExactAmountIn(
 	tokenOutDenom string,
 	tokenOutMinAmount osmomath.Int,
 	spreadFactor osmomath.Dec,
+	affiliates []poolmanagertypes.Affiliate,
 ) (tokenOutAmount osmomath.Int, err error) {
 	if tokenIn.Denom == tokenOutDenom {
 		return osmomath.Int{}, errors.New("cannot trade same denomination in and out")
@@ -71,10 +73,34 @@ func (k Keeper) SwapExactAmountIn(
 		return osmomath.Int{}, errorsmod.Wrapf(types.ErrLimitMinAmount, "%s token is lesser than min amount", tokenOutDenom)
 	}
 
+	// Calculate affiliate fees if provided
+	totalFeeAmount := osmomath.ZeroInt()
+	if len(affiliates) > 0 {
+		var calcErr error
+		totalFeeAmount, _, calcErr = k.calculateAffiliateFees(ctx, affiliates, tokenOutMinAmount, tokenOutDenom)
+		if calcErr != nil {
+			return osmomath.Int{}, calcErr
+		}
+
+		// Validate that fees don't exceed output
+		if totalFeeAmount.IsPositive() {
+			if tokenOutAmount.LT(totalFeeAmount) {
+				return osmomath.Int{}, fmt.Errorf("affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOutAmount.String())
+			}
+		}
+	}
+
 	// Settles balances between the tx sender and the pool to match the swap that was executed earlier.
 	// Also emits swap event and updates related liquidity metrics
-	if err := k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOutCoin); err != nil {
+	// Affiliates are processed inside updatePoolForSwap
+	err = k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOutCoin, affiliates, tokenOutMinAmount)
+	if err != nil {
 		return osmomath.Int{}, err
+	}
+
+	// Return adjusted tokenOutAmount after affiliate fees
+	if totalFeeAmount.IsPositive() {
+		tokenOutAmount = tokenOutAmount.Sub(totalFeeAmount)
 	}
 
 	return tokenOutAmount, nil
@@ -137,7 +163,7 @@ func (k Keeper) SwapExactAmountOut(
 		return osmomath.Int{}, errorsmod.Wrapf(types.ErrLimitMaxAmount, "Swap requires %s, which is greater than the amount %s", tokenIn, tokenInMaxAmount)
 	}
 
-	err = k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOut)
+	err = k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOut, nil, osmomath.ZeroInt())
 	if err != nil {
 		return osmomath.Int{}, err
 	}
@@ -176,19 +202,97 @@ func (k Keeper) CalcInAmtGivenOut(
 	return cfmmPool.CalcInAmtGivenOut(ctx, sdk.NewCoins(tokenOut), tokenInDenom, spreadFactor)
 }
 
+// calculateAffiliateFees calculates the total affiliate fees and validates affiliates
+// Returns the total fee amount and individual fee amounts per affiliate
+// Fees are calculated from tokenOutMinAmount (minimum expected output), not the actual swap output
+func (k Keeper) calculateAffiliateFees(
+	ctx sdk.Context,
+	affiliates []poolmanagertypes.Affiliate,
+	tokenOutMinAmount osmomath.Int,
+	tokenOutDenom string,
+) (totalFeeAmount osmomath.Int, affiliateFees []sdk.Coin, err error) {
+	totalFeeAmount = osmomath.ZeroInt()
+	affiliateFees = make([]sdk.Coin, 0, len(affiliates))
+
+	if len(affiliates) == 0 {
+		return totalFeeAmount, affiliateFees, nil
+	}
+
+	// Validate affiliates
+	totalBasisPoints := uint64(0)
+	for i, affiliate := range affiliates {
+		// Validate address
+		if affiliate.Address == "" {
+			return osmomath.ZeroInt(), nil, fmt.Errorf("affiliate_%d.address is required", i)
+		}
+
+		_, err := sdk.AccAddressFromBech32(affiliate.Address)
+		if err != nil {
+			return osmomath.ZeroInt(), nil, fmt.Errorf("invalid affiliate_%d.address: %w", i, err)
+		}
+
+		// Validate basis_points_fee
+		if affiliate.BasisPointsFee == "" {
+			return osmomath.ZeroInt(), nil, fmt.Errorf("affiliate_%d.basis_points_fee is required", i)
+		}
+
+		basisPoints, err := strconv.ParseUint(affiliate.BasisPointsFee, 10, 64)
+		if err != nil {
+			return osmomath.ZeroInt(), nil, fmt.Errorf("invalid affiliate_%d.basis_points_fee: %w", i, err)
+		}
+
+		// Basis points should not exceed 10000 (100%)
+		if basisPoints > 10000 {
+			return osmomath.ZeroInt(), nil, fmt.Errorf("affiliate_%d.basis_points_fee cannot exceed 10000 (100%%)", i)
+		}
+
+		totalBasisPoints += basisPoints
+	}
+
+	// Total basis points should not exceed 10000 (100%)
+	if totalBasisPoints > 10000 {
+		return osmomath.ZeroInt(), nil, fmt.Errorf("total affiliate basis_points_fee cannot exceed 10000 (100%%), got %d", totalBasisPoints)
+	}
+
+	// Calculate fees for each affiliate
+	for i, affiliate := range affiliates {
+		basisPoints, err := strconv.ParseUint(affiliate.BasisPointsFee, 10, 64)
+		if err != nil {
+			// This should not happen as we validated earlier, but handle it just in case
+			return osmomath.ZeroInt(), nil, fmt.Errorf("invalid affiliate_%d.basis_points_fee: %w", i, err)
+		}
+
+		// Calculate fee from minimum output amount: (tokenOutMinAmount * basisPoints) / 10000
+		feeAmount := tokenOutMinAmount.Mul(osmomath.NewIntFromUint64(basisPoints)).Quo(osmomath.NewInt(10000))
+
+		if feeAmount.IsPositive() {
+			affiliateFee := sdk.NewCoin(tokenOutDenom, feeAmount)
+			affiliateFees = append(affiliateFees, affiliateFee)
+			totalFeeAmount = totalFeeAmount.Add(feeAmount)
+		} else {
+			// Add zero coin to maintain index alignment
+			affiliateFees = append(affiliateFees, sdk.NewCoin(tokenOutDenom, osmomath.ZeroInt()))
+		}
+	}
+
+	return totalFeeAmount, affiliateFees, nil
+}
+
 // updatePoolForSwap takes a pool, sender, and tokenIn, tokenOut amounts
 // It then updates the pool's balances to the new reserve amounts, and
 // sends the in tokens from the sender to the pool, and the out tokens from the pool to the sender.
+// If affiliates are provided, fees are deducted from tokenOut before sending to sender,
+// and fees are sent directly from the pool to affiliates.
 func (k Keeper) updatePoolForSwap(
 	ctx sdk.Context,
 	pool poolmanagertypes.PoolI,
 	sender sdk.AccAddress,
 	tokenIn sdk.Coin,
 	tokenOut sdk.Coin,
+	affiliates []poolmanagertypes.Affiliate,
+	tokenOutMinAmount osmomath.Int,
 ) error {
 	tokensIn := sdk.Coins{tokenIn}
-	tokensOut := sdk.Coins{tokenOut}
-
 	poolAddress := pool.GetAddress()
 
 	err := k.setPool(ctx, pool)
@@ -196,6 +300,25 @@ func (k Keeper) updatePoolForSwap(
 		return err
 	}
 
+	// 1. Calculate affiliate fees (no sends)
+	totalFeeAmount := osmomath.ZeroInt()
+	var affiliateFees []sdk.Coin
+	if len(affiliates) > 0 {
+		var err error
+		totalFeeAmount, affiliateFees, err = k.calculateAffiliateFees(ctx, affiliates, tokenOutMinAmount, tokenOut.Denom)
+		if err != nil {
+			return err
+		}
+
+		// Validate that fees don't exceed tokenOut
+		if totalFeeAmount.IsPositive() {
+			if tokenOut.Amount.LT(totalFeeAmount) {
+				return fmt.Errorf("affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOut.Amount.String())
+			}
+		}
+	}
+
+	// 2. Send tokenIn from sender to pool
 	err = k.SendCoinsToPoolWithWrapping(ctx, sender, poolAddress, sdk.Coins{
 		tokenIn,
 	})
@@ -203,12 +326,47 @@ func (k Keeper) updatePoolForSwap(
 		return err
 	}
 
-	err = k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), sender, sdk.Coins{
-		tokenOut,
-	})
-	if err != nil {
-		return err
+	// 3. Send (tokenOut - fees) from pool to sender
+	tokenOutToSender := tokenOut.Amount.Sub(totalFeeAmount)
+	if tokenOutToSender.IsPositive() {
+		tokenOutCoinToSender := sdk.NewCoin(tokenOut.Denom, tokenOutToSender)
+		err = k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), sender, sdk.NewCoins(tokenOutCoinToSender))
+		if err != nil {
+			return err
+		}
 	}
+
+	// 4. Send fees from pool to affiliates
+	if len(affiliates) > 0 && totalFeeAmount.IsPositive() {
+		for i, affiliate := range affiliates {
+			if affiliateFees[i].Amount.IsPositive() {
+				affiliateAddr, err := sdk.AccAddressFromBech32(affiliate.Address)
+				if err != nil {
+					return fmt.Errorf("invalid affiliate_%d.address: %w", i, err)
+				}
+
+				// Send affiliate fee from pool to affiliate using wrapper functions
+				err = k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), affiliateAddr, sdk.NewCoins(affiliateFees[i]))
+				if err != nil {
+					return fmt.Errorf("failed to send affiliate fee to %s: %w", affiliate.Address, err)
+				}
+
+				// Emit event for affiliate fee distribution
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent(
+						"affiliate_fee_distributed",
+						sdk.NewAttribute("module", "gamm"),
+						sdk.NewAttribute("affiliate_address", affiliate.Address),
+						sdk.NewAttribute("basis_points_fee", affiliate.BasisPointsFee),
+						sdk.NewAttribute("fee_amount", affiliateFees[i].String()),
+					),
+				)
+			}
+		}
+	}
+
+	// Calculate tokensOut for liquidity tracking (full amount, before fee deduction)
+	tokensOut := sdk.Coins{tokenOut}
 
 	// Emit swap event. Note that we emit these at the layer of each pool module rather than the poolmanager module
 	// since poolmanager has many swap wrapper APIs that we would need to consider.
@@ -224,5 +382,5 @@ func (k Keeper) updatePoolForSwap(
 		return err
 	}
 
-	return err
+	return nil
 }

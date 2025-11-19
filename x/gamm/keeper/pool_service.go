@@ -397,7 +397,7 @@ func (k Keeper) ExitSwapShareAmountIn(
 		if coin.Denom == tokenOutDenom {
 			continue
 		}
-		swapOut, err := k.SwapExactAmountIn(ctx, sender, pool, coin, tokenOutDenom, osmomath.ZeroInt(), spreadFactor)
+		swapOut, err := k.SwapExactAmountIn(ctx, sender, pool, coin, tokenOutDenom, osmomath.ZeroInt(), spreadFactor, nil)
 		if err != nil {
 			return osmomath.Int{}, err
 		}

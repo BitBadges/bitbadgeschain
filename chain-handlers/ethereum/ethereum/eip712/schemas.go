@@ -1327,59 +1327,71 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/SwapExactAmountIn",
+		"type": "gamm/swap-exact-amount-in",
 		"value": {
 			"sender": "",
 			"routes": [
 				{
-					"poolId": "0",
-					"tokenOutDenom": ""
+					"pool_id": "0",
+					"token_out_denom": ""
 				}
 			],
-			"tokenIn": {
+			"token_in": {
 				"amount": "",
 				"denom": ""
 			},
-			"tokenOutMinAmount": ""
+			"token_out_min_amount": "",
+			"affiliates": [
+				{
+					"basis_points_fee": "",
+					"address": ""
+				}
+			]
 		}
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/SwapExactAmountInWithIBCTransfer",
+		"type": "gamm/swap-exact-amount-in-with-ibc-transfer",
 		"value": {
 			"sender": "",
 			"routes": [
 				{
-					"poolId": "0",
-					"tokenOutDenom": ""
+					"pool_id": "0",
+					"token_out_denom": ""
 				}
 			],
-			"tokenIn": {
+			"token_in": {
 				"amount": "",
 				"denom": ""
 			},
-			"tokenOutMinAmount": "",
-			"ibcTransferInfo": {
-				"sourceChannel": "",
+			"token_out_min_amount": "",
+			"ibc_transfer_info": {
+				"source_channel": "",
 				"receiver": "",
 				"memo": "",
-				"timeoutTimestamp": "0"
-			}
+				"timeout_timestamp": "0"
+			},
+			"affiliates": [
+				{
+					"basis_points_fee": "",
+					"address": ""
+				}
+			]
 		}
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/SwapExactAmountOut",
+		"type": "gamm/swap-exact-amount-out",
 		"value": {
 			"sender": "",
 			"routes": [
 				{
-					"poolId": "0",
-					"tokenInDenom": ""
+					"pool_id": "0",
+					"token_in_denom": ""
 				}
 			],
-			"tokenInMaxAmount": "",
-			"tokenOut": {
+			"token_in_max_amount": "",
+			"token_out": {
 				"amount": "",
 				"denom": ""
 			}
@@ -1387,62 +1399,62 @@ func GetSchemas() []string {
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/JoinSwapExternAmountIn",
+		"type": "gamm/join-swap-extern-amount-in",
 		"value": {
 			"sender": "",
-			"poolId": "0",
-			"tokenIn": {
+			"pool_id": "0",
+			"token_in": {
 				"amount": "",
 				"denom": ""
 			},
-			"shareOutMinAmount": ""
+			"share_out_min_amount": ""
 		}
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/JoinSwapShareAmountOut",
+		"type": "gamm/join-swap-share-amount-out",
 		"value": {
 			"sender": "",
-			"poolId": "0",
-			"tokenInDenom": "",
-			"shareOutAmount": "",
-			"tokenInMaxAmount": ""
+			"pool_id": "0",
+			"token_in_denom": "",
+			"share_out_amount": "",
+			"token_in_max_amount": ""
 		}
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/ExitSwapShareAmountIn",
+		"type": "gamm/exit-swap-share-amount-in",
 		"value": {
 			"sender": "",
-			"poolId": "0",
-			"tokenOutDenom": "",
-			"shareInAmount": "",
-			"tokenOutMinAmount": ""
+			"pool_id": "0",
+			"token_out_denom": "",
+			"share_in_amount": "",
+			"token_out_min_amount": ""
 		}
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/ExitSwapExternAmountOut",
+		"type": "gamm/exit-swap-extern-amount-out",
 		"value": {
 			"sender": "",
-			"poolId": "0",
-			"tokenOut": {
+			"pool_id": "0",
+			"token_out": {
 				"amount": "",
 				"denom": ""
 			},
-			"shareInMaxAmount": ""
+			"share_in_max_amount": ""
 		}
 	}`)
 
 	schemas = append(schemas, `{
-		"type": "gamm/CreateBalancerPool",
+		"type": "gamm/create-balancer-pool",
 		"value": {
 			"sender": "",
-			"poolParams": {
-				"swapFee": "",
-				"exitFee": ""
+			"pool_params": {
+				"swap_fee": "",
+				"exit_fee": ""
 			},
-			"poolAssets": [
+			"pool_assets": [
 				{
 					"token": {
 						"amount": "",

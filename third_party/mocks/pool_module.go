@@ -8,11 +8,11 @@ import (
 	context "context"
 	reflect "reflect"
 
+	osmomath "github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	types1 "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	types "github.com/cosmos/cosmos-sdk/types"
 	types0 "github.com/cosmos/cosmos-sdk/x/bank/types"
 	gomock "github.com/golang/mock/gomock"
-	osmomath "github.com/bitbadges/bitbadgeschain/third_party/osmomath"
-	types1 "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // MockAccountI is a mock of AccountI interface.
@@ -364,18 +364,18 @@ func (mr *MockPoolModuleIMockRecorder) InitializePool(ctx, pool, creatorAddress 
 }
 
 // SwapExactAmountIn mocks base method.
-func (m *MockPoolModuleI) SwapExactAmountIn(ctx types.Context, sender types.AccAddress, pool types1.PoolI, tokenIn types.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec) (osmomath.Int, error) {
+func (m *MockPoolModuleI) SwapExactAmountIn(ctx types.Context, sender types.AccAddress, pool types1.PoolI, tokenIn types.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []types1.Affiliate) (osmomath.Int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SwapExactAmountIn", ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, spreadFactor)
+	ret := m.ctrl.Call(m, "SwapExactAmountIn", ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, spreadFactor, affiliates)
 	ret0, _ := ret[0].(osmomath.Int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SwapExactAmountIn indicates an expected call of SwapExactAmountIn.
-func (mr *MockPoolModuleIMockRecorder) SwapExactAmountIn(ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, spreadFactor interface{}) *gomock.Call {
+func (mr *MockPoolModuleIMockRecorder) SwapExactAmountIn(ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, spreadFactor, affiliates interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SwapExactAmountIn", reflect.TypeOf((*MockPoolModuleI)(nil).SwapExactAmountIn), ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, spreadFactor)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SwapExactAmountIn", reflect.TypeOf((*MockPoolModuleI)(nil).SwapExactAmountIn), ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, spreadFactor, affiliates)
 }
 
 // SwapExactAmountOut mocks base method.

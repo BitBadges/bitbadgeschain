@@ -16,6 +16,7 @@ type SwapAndAction struct {
 	TimeoutTimestamp          *uint64         `json:"timeout_timestamp,omitempty"`
 	PostSwapAction            *PostSwapAction `json:"post_swap_action,omitempty"`
 	DestinationRecoverAddress string          `json:"destination_recover_address,omitempty"`
+	Affiliates                []Affiliate     `json:"affiliates,omitempty"`
 }
 
 // UserSwap contains the swap operation
@@ -69,6 +70,12 @@ type IBCInfo struct {
 	Receiver       string `json:"receiver"`
 	Memo           string `json:"memo,omitempty"`
 	RecoverAddress string `json:"recover_address,omitempty"`
+}
+
+// Affiliate represents an affiliate fee recipient
+type Affiliate struct {
+	BasisPointsFee string `json:"basis_points_fee"`
+	Address        string `json:"address"`
 }
 
 // ParseHookDataFromMemo parses hook data from IBC memo

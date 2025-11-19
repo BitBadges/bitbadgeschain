@@ -38,3 +38,12 @@ message SwapAmountOutSplitRoute {
     (gogoproto.nullable) = false
   ];
 }
+
+// ===================== Affiliate
+// Affiliate represents an affiliate fee recipient
+message Affiliate {
+  // basis_points_fee is the fee in basis points (1/10000, e.g., 100 = 1%)
+  string basis_points_fee = 1 [ (gogoproto.moretags) = "yaml:\"basis_points_fee\"" ];
+  // address is the affiliate recipient address
+  string address = 2 [ (gogoproto.moretags) = "yaml:\"address\"" ];
+}

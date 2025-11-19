@@ -143,7 +143,7 @@ func (s *KeeperTestSuite) TestBalancerPoolSimpleSwapExactAmountIn() {
 				s.NoError(err, "test: %v", test.name)
 
 				prevGasConsumed := s.Ctx.GasMeter().GasConsumed()
-				tokenOutAmount, err := keeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, test.param.tokenIn, test.param.tokenOutDenom, test.param.tokenOutMinAmount, spreadFactor)
+				tokenOutAmount, err := keeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, test.param.tokenIn, test.param.tokenOutDenom, test.param.tokenOutMinAmount, spreadFactor, nil)
 				s.NoError(err, "test: %v", test.name)
 				s.Require().Equal(test.param.expectedTokenOut.String(), tokenOutAmount.String())
 				gasConsumedForSwap := s.Ctx.GasMeter().GasConsumed() - prevGasConsumed
@@ -161,7 +161,7 @@ func (s *KeeperTestSuite) TestBalancerPoolSimpleSwapExactAmountIn() {
 				tradeAvgPrice := osmomath.BigDecFromDec(test.param.tokenIn.Amount.ToLegacyDec().Quo(tokenOutAmount.ToLegacyDec()))
 				s.True(tradeAvgPrice.GT(spotPriceBefore) && tradeAvgPrice.LT(spotPriceAfter), "test: %v", test.name)
 			} else {
-				_, err := keeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, test.param.tokenIn, test.param.tokenOutDenom, test.param.tokenOutMinAmount, spreadFactor)
+				_, err := keeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, test.param.tokenIn, test.param.tokenOutDenom, test.param.tokenOutMinAmount, spreadFactor, nil)
 				s.Error(err, "test: %v", test.name)
 			}
 		})
@@ -449,12 +449,12 @@ func (s *KeeperTestSuite) TestActiveBalancerPoolSwap() {
 			foocoin := sdk.NewCoin("foo", osmomath.NewInt(10))
 
 			if tc.expectPass {
-				_, err := s.App.GammKeeper.SwapExactAmountIn(s.Ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor)
+				_, err := s.App.GammKeeper.SwapExactAmountIn(s.Ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor, nil)
 				s.Require().NoError(err)
 				_, err = s.App.GammKeeper.SwapExactAmountOut(s.Ctx, s.TestAccs[0], pool, "bar", osmomath.NewInt(1000000000000000000), foocoin, spreadFactor)
 				s.Require().NoError(err)
 			} else {
-				_, err := s.App.GammKeeper.SwapExactAmountIn(s.Ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor)
+				_, err := s.App.GammKeeper.SwapExactAmountIn(s.Ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor, nil)
 				s.Require().Error(err)
 				_, err = s.App.GammKeeper.SwapExactAmountOut(s.Ctx, s.TestAccs[0], pool, "bar", osmomath.NewInt(1000000000000000000), foocoin, spreadFactor)
 				s.Require().Error(err)
@@ -472,7 +472,7 @@ func (s *KeeperTestSuite) TestOutOfGasError() {
 	foocoin := sdk.NewCoin("foo", osmomath.NewInt(10))
 	spreadFactor := pool.GetSpreadFactor(s.Ctx)
 	ctx := s.Ctx.WithGasMeter(storetypes.NewGasMeter(10))
-	_, err = s.App.GammKeeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor)
+	_, err = s.App.GammKeeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor, nil)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "lack of gas")
 }

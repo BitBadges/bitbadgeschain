@@ -25,7 +25,7 @@ type (
 	// Note: This should match the gamm.Keeper methods
 	GammKeeper interface {
 		GetCFMMPool(ctx sdk.Context, poolId uint64) (gammtypes.CFMMPoolI, error)
-		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec) (osmomath.Int, error)
+		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		CheckIsWrappedDenom(ctx sdk.Context, denom string) bool
 		SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
 	}
@@ -152,6 +152,11 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 		}
 	}
 
+	// Validate: min_asset is always required for swaps
+	if swapAndAction.MinAsset == nil || swapAndAction.MinAsset.Native == nil {
+		return fmt.Errorf("min_asset is required for swaps")
+	}
+
 	// Store original tokenIn for fallback handling
 	originalTokenIn := sdk.Coin{
 		Denom:  tokenIn.Denom,
@@ -188,7 +193,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			return fmt.Errorf("failed to get pool %d: %w", poolId, err)
 		}
 
-		// Get minimum amount from min_asset
+		// Get minimum amount from min_asset for swap validation
 		var tokenOut osmomath.Int
 		tokenOutMinAmount := osmomath.ZeroInt()
 
@@ -203,6 +208,18 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 		// Get spread factor from pool (read-only, can use main context)
 		spreadFactor := pool.GetSpreadFactor(ctx)
 
+		// Convert custom hooks Affiliate types to poolmanager Affiliate types
+		var poolmanagerAffiliates []poolmanagertypes.Affiliate
+		if len(swapAndAction.Affiliates) > 0 {
+			poolmanagerAffiliates = make([]poolmanagertypes.Affiliate, len(swapAndAction.Affiliates))
+			for i, affiliate := range swapAndAction.Affiliates {
+				poolmanagerAffiliates[i] = poolmanagertypes.Affiliate{
+					BasisPointsFee: affiliate.BasisPointsFee,
+					Address:        affiliate.Address,
+				}
+			}
+		}
+
 		// Execute swap in a cached context so we can rollback if it fails
 		swapCacheCtx, writeSwapCache := ctx.CacheContext()
 		tokenOut, err = k.gammKeeper.SwapExactAmountIn(
@@ -213,6 +230,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			operation.DenomOut,
 			tokenOutMinAmount,
 			spreadFactor,
+			poolmanagerAffiliates,
 		)
 		if err != nil {
 			// Swap failed - check if we have a destination recover address
@@ -272,7 +290,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			),
 		)
 
-		// For post-swap, we need to use the exact amount
+		// For post-swap, we need to use the exact amount (affiliates already processed in SwapExactAmountIn)
 		tokenIn = sdk.NewCoin(operation.DenomOut, tokenOut)
 	}
 

@@ -713,14 +713,14 @@ func (s *KeeperTestSuite) TestMultihopSwapExactAmountIn() {
 
 			if tc.expectError {
 				// execute the swap
-				_, err := poolmanagerKeeper.RouteExactAmountIn(s.Ctx, s.TestAccs[0], tc.routes, tc.tokenIn, tc.tokenOutMinAmount)
+				_, err := poolmanagerKeeper.RouteExactAmountIn(s.Ctx, s.TestAccs[0], tc.routes, tc.tokenIn, tc.tokenOutMinAmount, nil)
 				s.Require().Error(err)
 			} else {
 				// calculate the swap as separate swaps
 				expectedMultihopTokenOutAmount := s.calcOutGivenInAmountAsSeparatePoolSwaps(tc.routes, tc.tokenIn)
 
 				// execute the swap
-				multihopTokenOutAmount, err := poolmanagerKeeper.RouteExactAmountIn(s.Ctx, s.TestAccs[0], tc.routes, tc.tokenIn, tc.tokenOutMinAmount)
+				multihopTokenOutAmount, err := poolmanagerKeeper.RouteExactAmountIn(s.Ctx, s.TestAccs[0], tc.routes, tc.tokenIn, tc.tokenOutMinAmount, nil)
 				// compare the expected tokenOut to the actual tokenOut
 				s.Require().NoError(err)
 				s.Require().Equal(expectedMultihopTokenOutAmount.Amount.String(), multihopTokenOutAmount.String())
@@ -1120,7 +1120,8 @@ func (s *KeeperTestSuite) TestEstimateMultihopSwapExactAmountIn() {
 				s.TestAccs[0],
 				test.param.routes,
 				test.param.tokenIn,
-				test.param.tokenOutMinAmount)
+				test.param.tokenOutMinAmount,
+				nil)
 
 			// calculate token out amount using `EstimateMultihopSwapExactAmountIn`
 			estimateMultihopTokenOutAmount, errEstimate := poolmanagerKeeper.MultihopEstimateOutGivenExactAmountIn(
@@ -1376,7 +1377,7 @@ func (s *KeeperTestSuite) calcOutGivenInAmountAsSeparatePoolSwaps(routes []types
 		nextTokenInAfterSubTakerFee, _ := poolmanager.CalcTakerFeeExactIn(nextTokenIn, takerFee)
 
 		// we then do individual swaps until we reach the end of the swap route
-		tokenOut, err := swapModule.SwapExactAmountIn(cacheCtx, s.TestAccs[0], pool, nextTokenInAfterSubTakerFee, hop.TokenOutDenom, osmomath.OneInt(), spreadFactor)
+		tokenOut, err := swapModule.SwapExactAmountIn(cacheCtx, s.TestAccs[0], pool, nextTokenInAfterSubTakerFee, hop.TokenOutDenom, osmomath.OneInt(), spreadFactor, nil)
 		s.Require().NoError(err)
 
 		nextTokenIn = sdk.NewCoin(hop.TokenOutDenom, tokenOut)
@@ -1553,9 +1554,9 @@ func (s *KeeperTestSuite) TestSingleSwapExactAmountIn() {
 				poolmanagerKeeper.SetDenomPairTakerFee(s.Ctx, tc.poolCoins[0].Denom, tc.poolCoins[1].Denom, tc.takerFee)
 				poolmanagerKeeper.SetDenomPairTakerFee(s.Ctx, tc.poolCoins[1].Denom, tc.poolCoins[0].Denom, tc.takerFee)
 
-				multihopTokenOutAmount, takerFeeCharged, err = poolmanagerKeeper.SwapExactAmountIn(s.Ctx, s.TestAccs[0], tc.poolId, tc.tokenIn, tc.tokenOutDenom, tc.tokenOutMinAmount)
+				multihopTokenOutAmount, takerFeeCharged, err = poolmanagerKeeper.SwapExactAmountIn(s.Ctx, s.TestAccs[0], tc.poolId, tc.tokenIn, tc.tokenOutDenom, tc.tokenOutMinAmount, nil)
 			} else {
-				multihopTokenOutAmount, err = poolmanagerKeeper.SwapExactAmountInNoTakerFee(s.Ctx, s.TestAccs[0], tc.poolId, tc.tokenIn, tc.tokenOutDenom, tc.tokenOutMinAmount)
+				multihopTokenOutAmount, err = poolmanagerKeeper.SwapExactAmountInNoTakerFee(s.Ctx, s.TestAccs[0], tc.poolId, tc.tokenIn, tc.tokenOutDenom, tc.tokenOutMinAmount, nil)
 			}
 			if tc.expectError {
 				s.Require().Error(err)

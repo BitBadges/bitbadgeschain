@@ -56,6 +56,7 @@ func (k Keeper) RouteExactAmountIn(
 	route []types.SwapAmountInRoute,
 	tokenIn sdk.Coin,
 	tokenOutMinAmount osmomath.Int,
+	affiliates []types.Affiliate,
 ) (tokenOutAmount osmomath.Int, err error) {
 	// Ensure that provided route is not empty and has valid denom format.
 	if err := types.SwapAmountInRoutes(route).Validate(); err != nil {
@@ -74,8 +75,14 @@ func (k Keeper) RouteExactAmountIn(
 			_outMinAmount = tokenOutMinAmount
 		}
 
+		// Only pass affiliates on the last hop
+		var hopAffiliates []types.Affiliate
+		if len(route)-1 == i {
+			hopAffiliates = affiliates
+		}
+
 		var takerFeeCharged sdk.Coin
-		tokenOutAmount, takerFeeCharged, err = k.SwapExactAmountIn(ctx, sender, routeStep.PoolId, tokenIn, routeStep.TokenOutDenom, _outMinAmount)
+		tokenOutAmount, takerFeeCharged, err = k.SwapExactAmountIn(ctx, sender, routeStep.PoolId, tokenIn, routeStep.TokenOutDenom, _outMinAmount, hopAffiliates)
 		if err != nil {
 			return osmomath.Int{}, err
 		}
@@ -141,7 +148,8 @@ func (k Keeper) SplitRouteExactAmountIn(
 			sender,
 			types.SwapAmountInRoutes(multihopRoute.Pools),
 			sdk.NewCoin(tokenInDenom, multihopRoute.TokenInAmount),
-			multihopStartTokenOutMinAmount)
+			multihopStartTokenOutMinAmount,
+			nil) // Split routes don't support affiliates
 		if err != nil {
 			return osmomath.Int{}, err
 		}
@@ -181,6 +189,7 @@ func (k Keeper) SwapExactAmountIn(
 	tokenIn sdk.Coin,
 	tokenOutDenom string,
 	tokenOutMinAmount osmomath.Int,
+	affiliates []types.Affiliate,
 ) (tokenOutAmount osmomath.Int, takerFeeCharged sdk.Coin, err error) {
 	swapModule, pool, err := k.GetPoolModuleAndPool(ctx, poolId)
 	if err != nil {
@@ -198,7 +207,8 @@ func (k Keeper) SwapExactAmountIn(
 	}
 
 	// routeStep to the pool-specific SwapExactAmountIn implementation.
-	tokenOutAmount, err = swapModule.SwapExactAmountIn(ctx, sender, pool, tokenInAfterSubTakerFee, tokenOutDenom, tokenOutMinAmount, pool.GetSpreadFactor(ctx))
+	// Pass affiliates through to the pool module (gamm handles them)
+	tokenOutAmount, err = swapModule.SwapExactAmountIn(ctx, sender, pool, tokenInAfterSubTakerFee, tokenOutDenom, tokenOutMinAmount, pool.GetSpreadFactor(ctx), affiliates)
 	if err != nil {
 		return osmomath.Int{}, sdk.Coin{}, err
 	}
@@ -221,6 +231,7 @@ func (k Keeper) SwapExactAmountInNoTakerFee(
 	tokenIn sdk.Coin,
 	tokenOutDenom string,
 	tokenOutMinAmount osmomath.Int,
+	affiliates []types.Affiliate,
 ) (tokenOutAmount osmomath.Int, err error) {
 	swapModule, pool, err := k.GetPoolModuleAndPool(ctx, poolId)
 	if err != nil {
@@ -233,7 +244,8 @@ func (k Keeper) SwapExactAmountInNoTakerFee(
 	}
 
 	// routeStep to the pool-specific SwapExactAmountIn implementation.
-	tokenOutAmount, err = swapModule.SwapExactAmountIn(ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, pool.GetSpreadFactor(ctx))
+	// Pass nil for affiliates as poolmanager doesn't handle affiliates (only gamm does)
+	tokenOutAmount, err = swapModule.SwapExactAmountIn(ctx, sender, pool, tokenIn, tokenOutDenom, tokenOutMinAmount, pool.GetSpreadFactor(ctx), affiliates)
 	if err != nil {
 		return osmomath.Int{}, err
 	}

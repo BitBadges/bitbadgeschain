@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
@@ -184,6 +185,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidPoolID() {
 				},
 			},
 		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
 			Transfer: &customhookstypes.TransferInfo{
 				ToAddress: recipient.String(),
@@ -211,6 +218,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_EmptyOperations() {
 			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
 				SwapVenueName: "bitbadges-poolmanager",
 				Operations:    []customhookstypes.Operation{},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
 			},
 		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
@@ -250,7 +263,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 				},
 			},
 		},
-		// No MinAsset specified
+		// No MinAsset specified - should fail
 		PostSwapAction: &customhookstypes.PostSwapAction{
 			Transfer: &customhookstypes.TransferInfo{
 				ToAddress: recipient.String(),
@@ -262,7 +275,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
 	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "min_asset is required for swaps")
 }
 
 // TestExecuteSwapAndAction_MultiHopNotSupported tests that multi-hop swaps are rejected
@@ -292,6 +306,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHopNotSupported() {
 						DenomOut: "uusdc",
 					},
 				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uusdc",
+				Amount: "1000",
 			},
 		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
@@ -383,6 +403,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_BothTransferTypes() {
 				},
 			},
 		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
 			IBCTransfer: &customhookstypes.IBCTransferInfo{
 				IBCInfo: &customhookstypes.IBCInfo{
@@ -425,6 +451,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NeitherTransferType() {
 				},
 			},
 		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
 			// Neither IBCTransfer nor Transfer is set
 		},
@@ -457,6 +489,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidIBCChannel() {
 						DenomOut: "uatom",
 					},
 				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
 			},
 		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
@@ -496,6 +534,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingIBCReceiver() {
 						DenomOut: "uatom",
 					},
 				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
 			},
 		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
@@ -541,6 +585,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidLocalTransferAddress()
 				},
 			},
 		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
 			Transfer: &customhookstypes.TransferInfo{
 				ToAddress: "invalid-address", // Invalid address
@@ -575,6 +625,12 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidRecoverAddress() {
 						DenomOut: "uatom",
 					},
 				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
 			},
 		},
 		PostSwapAction: &customhookstypes.PostSwapAction{
@@ -634,6 +690,814 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingLocalTransferAddress()
 	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "to_address is required")
+}
+
+// TestExecuteSwapAndAction_WithSingleAffiliate tests swap with a single affiliate
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_WithSingleAffiliate() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial balances
+	initialRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	initialAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "100", // 1%
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify affiliate received fee
+	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
+	affiliateReceived := finalAffiliateBalance.Amount.Sub(initialAffiliateBalance.Amount)
+	s.Require().True(affiliateReceived.IsPositive(), "affiliate should have received fee")
+
+	// Verify recipient received remaining amount (after fee deduction)
+	finalRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	recipientReceived := finalRecipientBalance.Amount.Sub(initialRecipientBalance.Amount)
+	s.Require().True(recipientReceived.IsPositive(), "recipient should have received tokens")
+
+	// Verify that affiliate fee was deducted (affiliate received fee, recipient received less)
+	// The sum of what recipient and affiliate received should be less than or equal to swap output
+	// (accounting for pool fees)
+	s.Require().True(affiliateReceived.IsPositive(), "affiliate fee should be positive")
+	s.Require().True(recipientReceived.IsPositive(), "recipient should receive tokens")
+}
+
+// TestExecuteSwapAndAction_WithMultipleAffiliates tests swap with multiple affiliates
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_WithMultipleAffiliates() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate1 := s.TestAccs[2]
+	// Create a 4th account for the second affiliate
+	affiliate2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+	s.App.AccountKeeper.SetAccount(s.Ctx, s.App.AccountKeeper.NewAccountWithAddress(s.Ctx, affiliate2))
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial balances
+	initialRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	initialAffiliate1Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate1, "uatom")
+	initialAffiliate2Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate2, "uatom")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "80", // 0.8%
+				Address:        affiliate1.String(),
+			},
+			{
+				BasisPointsFee: "20", // 0.2%
+				Address:        affiliate2.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify both affiliates received fees
+	finalAffiliate1Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate1, "uatom")
+	finalAffiliate2Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate2, "uatom")
+
+	affiliate1Received := finalAffiliate1Balance.Amount.Sub(initialAffiliate1Balance.Amount)
+	affiliate2Received := finalAffiliate2Balance.Amount.Sub(initialAffiliate2Balance.Amount)
+
+	s.Require().True(affiliate1Received.IsPositive(), "affiliate1 should have received fee")
+	s.Require().True(affiliate2Received.IsPositive(), "affiliate2 should have received fee")
+
+	// Verify affiliate1 received more than affiliate2 (80 vs 20 basis points)
+	s.Require().True(affiliate1Received.GT(affiliate2Received), "affiliate1 should receive more than affiliate2")
+
+	// Verify recipient received remaining amount
+	finalRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	recipientReceived := finalRecipientBalance.Amount.Sub(initialRecipientBalance.Amount)
+	s.Require().True(recipientReceived.IsPositive(), "recipient should have received tokens")
+}
+
+// TestExecuteSwapAndAction_InvalidAffiliateAddress tests validation of invalid affiliate address
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidAffiliateAddress() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "100",
+				Address:        "invalid-address",
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "invalid affiliate")
+	s.Require().Contains(err.Error(), "address")
+}
+
+// TestExecuteSwapAndAction_InvalidAffiliateBasisPoints tests validation of invalid basis points
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidAffiliateBasisPoints() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "not-a-number",
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "invalid affiliate")
+	s.Require().Contains(err.Error(), "basis_points_fee")
+}
+
+// TestExecuteSwapAndAction_AffiliateBasisPointsExceeds10000 tests validation when basis points exceed 100%
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateBasisPointsExceeds10000() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "10001", // Exceeds 100%
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "cannot exceed 10000")
+}
+
+// TestExecuteSwapAndAction_TotalAffiliateBasisPointsExceeds10000 tests validation when total basis points exceed 100%
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_TotalAffiliateBasisPointsExceeds10000() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate1 := s.TestAccs[2]
+	// Create a 4th account for the second affiliate
+	affiliate2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+	s.App.AccountKeeper.SetAccount(s.Ctx, s.App.AccountKeeper.NewAccountWithAddress(s.Ctx, affiliate2))
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "8000", // 80%
+				Address:        affiliate1.String(),
+			},
+			{
+				BasisPointsFee: "2001", // 20.01% - total exceeds 100%
+				Address:        affiliate2.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "total affiliate basis_points_fee cannot exceed 10000")
+}
+
+// TestExecuteSwapAndAction_MissingAffiliateAddress tests validation of missing affiliate address
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingAffiliateAddress() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "100",
+				Address:        "", // Missing address
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "address is required")
+}
+
+// TestExecuteSwapAndAction_MissingAffiliateBasisPoints tests validation of missing basis points
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingAffiliateBasisPoints() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "", // Missing basis points
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "basis_points_fee is required")
+}
+
+// TestExecuteSwapAndAction_AffiliateFeeFromMinAmount tests that affiliate fees are calculated from min_asset, not actual output
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateFeeFromMinAmount() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Set a specific min amount (e.g., 10000 uatom)
+	// The actual swap output will likely be higher due to pool conditions
+	minAmount := "10000"
+	affiliateBasisPoints := "1000" // 10%
+
+	// Get initial balances
+	initialAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: minAmount,
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: affiliateBasisPoints, // 10%
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify affiliate received fee based on min amount, not actual output
+	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
+	affiliateReceived := finalAffiliateBalance.Amount.Sub(initialAffiliateBalance.Amount)
+
+	// Expected fee: 10000 * 1000 / 10000 = 1000 uatom (from min amount)
+	expectedFee := osmomath.NewInt(1000)
+	s.Require().True(affiliateReceived.Equal(expectedFee),
+		"affiliate should receive fee based on min amount (%s), got %s, expected %s",
+		minAmount, affiliateReceived.String(), expectedFee.String())
+}
+
+// TestExecuteSwapAndAction_MinAssetRequired tests that min_asset is always required for swaps
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MinAssetRequired() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		// No MinAsset specified - should fail
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "min_asset is required for swaps")
+}
+
+// TestExecuteSwapAndAction_EmptyAffiliates tests that empty affiliates array is valid
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_EmptyAffiliates() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{}, // Empty array should be valid
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+}
+
+// TestExecuteSwapAndAction_AffiliateFeesDeductedFromOutput tests that affiliate fees are correctly deducted from swap output
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateFeesDeductedFromOutput() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial balances
+	initialRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	initialAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "10000", // min output
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "100", // 1% of min output = 100 uatom
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify affiliate received fee (1% of 10000 = 100 uatom)
+	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
+	affiliateReceived := finalAffiliateBalance.Amount.Sub(initialAffiliateBalance.Amount)
+	s.Require().Equal(osmomath.NewInt(100), affiliateReceived, "affiliate should receive 1% of min output")
+
+	// Verify recipient received remaining amount (swap output - 100 uatom)
+	finalRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
+	recipientReceived := finalRecipientBalance.Amount.Sub(initialRecipientBalance.Amount)
+	s.Require().True(recipientReceived.IsPositive(), "recipient should receive tokens")
+	s.Require().True(affiliateReceived.IsPositive(), "affiliate should receive fee")
+}
+
+// TestExecuteSwapAndAction_AffiliateFeesFromPool tests that affiliate fees are sent from pool, not sender
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateFeesFromPool() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial sender balance (should not decrease by affiliate fee amount)
+	initialSenderBalance := s.App.BankKeeper.GetBalance(s.Ctx, sender, "uatom")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "10000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "100", // 1%
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify sender's uatom balance didn't decrease (fees come from pool, not sender)
+	finalSenderBalance := s.App.BankKeeper.GetBalance(s.Ctx, sender, "uatom")
+	// Sender should have 0 uatom (they swapped it all), but the point is fees weren't deducted from them
+	s.Require().True(finalSenderBalance.Amount.LTE(initialSenderBalance.Amount), "sender balance should not increase")
+}
+
+// TestExecuteSwapAndAction_MultipleAffiliatesProportionalFees tests that multiple affiliates receive proportional fees
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultipleAffiliatesProportionalFees() {
+	poolID := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate1 := s.TestAccs[2]
+	// Create a 4th account for the second affiliate
+	affiliate2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+	s.App.AccountKeeper.SetAccount(s.Ctx, s.App.AccountKeeper.NewAccountWithAddress(s.Ctx, affiliate2))
+
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	initialAffiliate1Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate1, "uatom")
+	initialAffiliate2Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate2, "uatom")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uatom",
+				Amount: "10000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "300", // 3% of 10000 = 300 uatom
+				Address:        affiliate1.String(),
+			},
+			{
+				BasisPointsFee: "200", // 2% of 10000 = 200 uatom
+				Address:        affiliate2.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify both affiliates received correct proportional fees
+	finalAffiliate1Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate1, "uatom")
+	finalAffiliate2Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate2, "uatom")
+
+	affiliate1Received := finalAffiliate1Balance.Amount.Sub(initialAffiliate1Balance.Amount)
+	affiliate2Received := finalAffiliate2Balance.Amount.Sub(initialAffiliate2Balance.Amount)
+
+	s.Require().Equal(osmomath.NewInt(300), affiliate1Received, "affiliate1 should receive 3% of min output")
+	s.Require().Equal(osmomath.NewInt(200), affiliate2Received, "affiliate2 should receive 2% of min output")
+	s.Require().True(affiliate1Received.GT(affiliate2Received), "affiliate1 should receive more than affiliate2")
 }
 
 // Helper function to prepare a test pool

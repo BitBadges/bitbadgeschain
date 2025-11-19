@@ -109,7 +109,19 @@ func (server msgServer) SwapExactAmountIn(goCtx context.Context, msg *types.MsgS
 		return nil, err
 	}
 
-	tokenOutAmount, err := server.keeper.poolManager.RouteExactAmountIn(ctx, sender, msg.Routes, msg.TokenIn, msg.TokenOutMinAmount)
+	// Convert gamm Affiliate types to poolmanager Affiliate types
+	var poolmanagerAffiliates []poolmanagertypes.Affiliate
+	if len(msg.Affiliates) > 0 {
+		poolmanagerAffiliates = make([]poolmanagertypes.Affiliate, len(msg.Affiliates))
+		for i, affiliate := range msg.Affiliates {
+			poolmanagerAffiliates[i] = poolmanagertypes.Affiliate{
+				BasisPointsFee: affiliate.BasisPointsFee,
+				Address:        affiliate.Address,
+			}
+		}
+	}
+
+	tokenOutAmount, err := server.keeper.poolManager.RouteExactAmountIn(ctx, sender, msg.Routes, msg.TokenIn, msg.TokenOutMinAmount, poolmanagerAffiliates)
 	if err != nil {
 		return nil, err
 	}
@@ -127,12 +139,6 @@ func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, 
 		return nil, err
 	}
 
-	// Perform the swap first
-	tokenOutAmount, err := server.keeper.poolManager.RouteExactAmountIn(ctx, sender, msg.Routes, msg.TokenIn, msg.TokenOutMinAmount)
-	if err != nil {
-		return nil, err
-	}
-
 	// Get the token out denom from the last route
 	if len(msg.Routes) == 0 {
 		return nil, fmt.Errorf("routes cannot be empty")
@@ -140,6 +146,23 @@ func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, 
 	lastRoute := msg.Routes[len(msg.Routes)-1]
 	tokenOutDenom := lastRoute.TokenOutDenom
 
+	// Convert gamm Affiliate types to poolmanager Affiliate types
+	var poolmanagerAffiliates []poolmanagertypes.Affiliate
+	if len(msg.Affiliates) > 0 {
+		poolmanagerAffiliates = make([]poolmanagertypes.Affiliate, len(msg.Affiliates))
+		for i, affiliate := range msg.Affiliates {
+			poolmanagerAffiliates[i] = poolmanagertypes.Affiliate{
+				BasisPointsFee: affiliate.BasisPointsFee,
+				Address:        affiliate.Address,
+			}
+		}
+	}
+
+	// Perform the swap first (affiliates are processed inside updatePoolForSwap)
+	tokenOutAmount, err := server.keeper.poolManager.RouteExactAmountIn(ctx, sender, msg.Routes, msg.TokenIn, msg.TokenOutMinAmount, poolmanagerAffiliates)
+	if err != nil {
+		return nil, err
+	}
 	// Create the token out coin
 	tokenOut := sdk.NewCoin(tokenOutDenom, tokenOutAmount)
 
@@ -148,7 +171,6 @@ func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, 
 	if err := server.keeper.ExecuteIBCTransfer(ctx, sender, &msg.IbcTransferInfo, tokenOut); err != nil {
 		return nil, err
 	}
-
 
 	return &types.MsgSwapExactAmountInWithIBCTransferResponse{TokenOutAmount: tokenOutAmount}, nil
 }

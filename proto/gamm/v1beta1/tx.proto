@@ -108,6 +108,11 @@ message MsgSwapExactAmountIn {
     (gogoproto.moretags) = "yaml:\"token_out_min_amount\"",
     (gogoproto.nullable) = false
   ];
+  // affiliates are optional fee recipients that receive fees calculated from token_out_min_amount
+  repeated poolmanager.v1beta1.Affiliate affiliates = 5 [
+    (gogoproto.moretags) = "yaml:\"affiliates\"",
+    (gogoproto.nullable) = false
+  ];
 }
 
 message MsgSwapExactAmountInResponse {
@@ -147,6 +152,11 @@ message MsgSwapExactAmountInWithIBCTransfer {
   ];
   IBCTransferInfo ibc_transfer_info = 5 [
     (gogoproto.moretags) = "yaml:\"ibc_transfer_info\"",
+    (gogoproto.nullable) = false
+  ];
+  // affiliates are optional fee recipients that receive fees calculated from token_out_min_amount
+  repeated poolmanager.v1beta1.Affiliate affiliates = 6 [
+    (gogoproto.moretags) = "yaml:\"affiliates\"",
     (gogoproto.nullable) = false
   ];
 }
