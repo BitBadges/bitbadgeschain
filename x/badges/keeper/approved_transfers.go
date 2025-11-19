@@ -866,7 +866,6 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				maxNumTransfersTrackerDetails.LastUpdatedAt,
 			)
 
-			amountsTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers
 			err = k.SetApprovalTrackerInStore(
 				ctx,
 				collection.CollectionId,
