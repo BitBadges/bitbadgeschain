@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v18;
+package badges.v19;
 
 import "google/protobuf/any.proto";
-import "badges/v18/transfers.proto";
-import "badges/v18/balances.proto";
-import "badges/v18/permissions.proto";
-import "badges/v18/metadata.proto";
-import "badges/v18/timelines.proto";
+import "badges/v19/transfers.proto";
+import "badges/v19/balances.proto";
+import "badges/v19/permissions.proto";
+import "badges/v19/metadata.proto";
+import "badges/v19/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v18";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v19";
 
 /* 
   A TokenCollection is the top-level object for a collection of tokens. 
@@ -90,6 +90,13 @@ message CosmosCoinWrapperPath {
   bool allowCosmosWrapping = 7;
 }
 
+message CosmosCoinBackedPath {
+  string address = 1;
+  string ibcDenom = 2;
+  repeated Balance balances = 3;
+  string ibcAmount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
 message DenomUnit {
   string decimals = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   string symbol = 2;
@@ -105,4 +112,16 @@ message CollectionInvariants {
   // Maximum supply per token ID. If set, no balance can exceed this amount.
   // This prevents any single token ID from having more than the specified supply.
   string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
+  CosmosCoinBackedPath cosmosCoinBackedPath = 3;
+  
+  // If true, disallows any collection approvals that have overridesFromOutgoingApprovals or overridesToIncomingApprovals set to true.
+  // This prevents forceful transfers that bypass user-level approvals.
+  // This only applies to transfers where the from address does not equal "Mint".
+  bool noForcefulPostMintTransfers = 4;
+  
+  // If true, disallows pool creation with this collection's assets.
+  // When true, any attempt to create a pool with badges assets from this collection will fail.
+  bool disablePoolCreation = 5;
 }

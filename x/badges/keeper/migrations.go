@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,7 +10,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v18"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v19"
 )
 
 // MigrateBadgesKeeper migrates the tokens keeper to set all approval versions to 0
@@ -53,14 +52,6 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 			continue
 		}
 
-		// Ensure address checks are properly initialized (nil is fine, but ensure they're not uninitialized)
-		// Address checks will be nil for old data, which is the correct default
-		if approval.ApprovalCriteria.SenderChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
-		if approval.ApprovalCriteria.InitiatorChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
 	}
 
 	return incomingApprovals
@@ -72,14 +63,6 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 			continue
 		}
 
-		// Ensure address checks are properly initialized (nil is fine, but ensure they're not uninitialized)
-		// Address checks will be nil for old data, which is the correct default
-		if approval.ApprovalCriteria.RecipientChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
-		if approval.ApprovalCriteria.InitiatorChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
 	}
 
 	return outgoingApprovals
@@ -91,17 +74,6 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 			continue
 		}
 
-		// Ensure address checks are properly initialized (nil is fine, but ensure they're not uninitialized)
-		// Address checks will be nil for old data, which is the correct default
-		if approval.ApprovalCriteria.SenderChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
-		if approval.ApprovalCriteria.RecipientChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
-		if approval.ApprovalCriteria.InitiatorChecks == nil {
-			// Keep as nil - this is the default for new fields
-		}
 	}
 
 	return collectionApprovals
@@ -127,35 +99,29 @@ func convertUintRanges(oldRanges []*oldtypes.UintRange) []*newtypes.UintRange {
 // MigratePools iterates through all existing pools and sets their addresses as reserved protocol addresses
 // and caches them in the pool address cache
 func MigratePools(ctx sdk.Context, k Keeper) error {
-	if k.gammKeeper == nil {
-		// If GammKeeper is not set, skip pool migration
-		// This allows the migration to work even if gamm module is not available
-		return nil
-	}
-
 	// Iterate through pool IDs from 1 to a reasonable upper bound
 	// We check up to 10000 pools - if there are more, they will be handled when created
-	maxPoolId := uint64(10000)
-	for poolId := uint64(1); poolId < maxPoolId; poolId++ {
-		pool, err := k.gammKeeper.GetPool(ctx, poolId)
-		if err != nil {
-			// Pool doesn't exist, continue to next ID
-			continue
-		}
+	// maxPoolId := uint64(10000)
+	// for poolId := uint64(1); poolId < maxPoolId; poolId++ {
+	// 	pool, err := k.gammKeeper.GetPool(ctx, poolId)
+	// 	if err != nil {
+	// 		// Pool doesn't exist, continue to next ID
+	// 		continue
+	// 	}
 
-		// Get pool address
-		poolAddress := pool.GetAddress().String()
+	// 	// Get pool address
+	// 	poolAddress := pool.GetAddress().String()
 
-		// Set pool address as reserved protocol address
-		if err := k.SetReservedProtocolAddressInStore(ctx, poolAddress, true); err != nil {
-			// Log error but continue - don't fail migration for individual pools
-			ctx.Logger().Error(fmt.Sprintf("Failed to set pool %d address as reserved protocol: %v", poolId, err))
-			continue
-		}
+	// 	// Set pool address as reserved protocol address
+	// 	if err := k.SetReservedProtocolAddressInStore(ctx, poolAddress, true); err != nil {
+	// 		// Log error but continue - don't fail migration for individual pools
+	// 		ctx.Logger().Error(fmt.Sprintf("Failed to set pool %d address as reserved protocol: %v", poolId, err))
+	// 		continue
+	// 	}
 
-		// Cache the pool address -> pool ID mapping
-		k.SetPoolAddressInCache(ctx, poolAddress, poolId)
-	}
+	// 	// Cache the pool address -> pool ID mapping
+	// 	k.SetPoolAddressInCache(ctx, poolAddress, poolId)
+	// }
 
 	return nil
 }
@@ -182,38 +148,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
-
-		// Migrate invariants: set new fields to default values
-		if newCollection.Invariants != nil {
-			// Set cosmosCoinBackedPath to nil (default for message type)
-			newCollection.Invariants.CosmosCoinBackedPath = nil
-			// Set noForcefulPostMintTransfers to false (default for bool)
-			newCollection.Invariants.NoForcefulPostMintTransfers = false
-			// Set disablePoolCreation to false (default for bool - allows pool creation by default)
-			newCollection.Invariants.DisablePoolCreation = false
-		}
-
-		// Set reserved protocol addresses for cosmos coin backed path and wrapper paths
-		// This mirrors the logic in msg_server_universal_update_collection.go
-		if newCollection.Invariants != nil && newCollection.Invariants.CosmosCoinBackedPath != nil {
-			backedPathAddress := newCollection.Invariants.CosmosCoinBackedPath.Address
-			if backedPathAddress != "" {
-				if err := k.SetReservedProtocolAddressInStore(ctx, backedPathAddress, true); err != nil {
-					// Log error but continue - don't fail migration for individual collections
-					ctx.Logger().Error(fmt.Sprintf("Failed to set cosmos coin backed path address as reserved protocol for collection %s: %v", newCollection.CollectionId.String(), err))
-				}
-			}
-		}
-
-		// Set reserved protocol addresses for cosmos coin wrapper paths
-		for _, wrapperPath := range newCollection.CosmosCoinWrapperPaths {
-			if wrapperPath.Address != "" {
-				if err := k.SetReservedProtocolAddressInStore(ctx, wrapperPath.Address, true); err != nil {
-					// Log error but continue - don't fail migration for individual collections
-					ctx.Logger().Error(fmt.Sprintf("Failed to set cosmos coin wrapper path address as reserved protocol for collection %s: %v", newCollection.CollectionId.String(), err))
-				}
-			}
-		}
 
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {

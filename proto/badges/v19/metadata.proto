@@ -1,11 +1,11 @@
 syntax = "proto3";
-package badges.v18;
+package badges.v19;
 
 import "google/protobuf/any.proto";
-import "badges/v18/balances.proto";
+import "badges/v19/balances.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v18";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v19";
 
 /* 
   This message defines the metadata for specific token IDs.
