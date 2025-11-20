@@ -52,6 +52,12 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 			continue
 		}
 
+		// Ensure altTimeChecks is properly initialized (nil for migrated data)
+		// This field is new and won't exist in old data, so it will be nil by default
+		// We explicitly set it to nil to ensure proper migration
+		if approval.ApprovalCriteria.AltTimeChecks == nil {
+			approval.ApprovalCriteria.AltTimeChecks = nil
+		}
 	}
 
 	return incomingApprovals
@@ -63,6 +69,12 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 			continue
 		}
 
+		// Ensure altTimeChecks is properly initialized (nil for migrated data)
+		// This field is new and won't exist in old data, so it will be nil by default
+		// We explicitly set it to nil to ensure proper migration
+		if approval.ApprovalCriteria.AltTimeChecks == nil {
+			approval.ApprovalCriteria.AltTimeChecks = nil
+		}
 	}
 
 	return outgoingApprovals
@@ -74,6 +86,12 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 			continue
 		}
 
+		// Ensure altTimeChecks is properly initialized (nil for migrated data)
+		// This field is new and won't exist in old data, so it will be nil by default
+		// We explicitly set it to nil to ensure proper migration
+		if approval.ApprovalCriteria.AltTimeChecks == nil {
+			approval.ApprovalCriteria.AltTimeChecks = nil
+		}
 	}
 
 	return collectionApprovals

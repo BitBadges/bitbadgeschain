@@ -109,6 +109,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		EthSignatureChallenges:             approvalCriteria.EthSignatureChallenges,
 		SenderChecks:                       approvalCriteria.SenderChecks,
 		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
+		AltTimeChecks:                      approvalCriteria.AltTimeChecks,
 		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
@@ -132,6 +133,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		EthSignatureChallenges:           approvalCriteria.EthSignatureChallenges,
 		RecipientChecks:                  approvalCriteria.RecipientChecks,
 		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
+		AltTimeChecks:                    approvalCriteria.AltTimeChecks,
 		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }
@@ -155,6 +157,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		EthSignatureChallenges:             approvalCriteria.EthSignatureChallenges,
 		SenderChecks:                       approvalCriteria.SenderChecks,
 		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
+		AltTimeChecks:                      approvalCriteria.AltTimeChecks,
 		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
@@ -178,6 +181,7 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		EthSignatureChallenges:           approvalCriteria.EthSignatureChallenges,
 		RecipientChecks:                  approvalCriteria.RecipientChecks,
 		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
+		AltTimeChecks:                    approvalCriteria.AltTimeChecks,
 		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }

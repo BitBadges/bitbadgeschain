@@ -21,6 +21,46 @@ type UserApprovalsToCheck struct {
 	UserRoyalties *types.UserRoyalties
 }
 
+// CheckAltTimeChecks validates if the current UTC time falls within any offline hours or days specified in altTimeChecks.
+// Returns an error if the time is within an offline period (i.e., the approval should be denied).
+func (k Keeper) CheckAltTimeChecks(ctx sdk.Context, altTimeChecks *types.AltTimeChecks) error {
+	if altTimeChecks == nil {
+		return nil
+	}
+
+	// Get UTC time from block time
+	blockTime := ctx.BlockTime()
+	utcTime := blockTime.UTC()
+
+	// Get current hour (0-23) and day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+	currentHour := sdkmath.NewUint(uint64(utcTime.Hour()))
+	currentDay := sdkmath.NewUint(uint64(utcTime.Weekday()))
+
+	// Check if current hour falls within any offline hours range
+	if len(altTimeChecks.OfflineHours) > 0 {
+		found, err := types.SearchUintRangesForUint(currentHour, altTimeChecks.OfflineHours)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "error checking offline hours")
+		}
+		if found {
+			return sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer denied: current UTC hour %d falls within offline hours", currentHour.Uint64())
+		}
+	}
+
+	// Check if current day falls within any offline days range
+	if len(altTimeChecks.OfflineDays) > 0 {
+		found, err := types.SearchUintRangesForUint(currentDay, altTimeChecks.OfflineDays)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "error checking offline days")
+		}
+		if found {
+			return sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer denied: current UTC day %d falls within offline days", currentDay.Uint64())
+		}
+	}
+
+	return nil
+}
+
 // All in one approval deduction function. We also return the user approvals to check (only used when collection approvals)
 func (k Keeper) DeductAndGetUserApprovals(
 	ctx sdk.Context,
@@ -186,6 +226,15 @@ func (k Keeper) DeductAndGetUserApprovals(
 				err = k.CheckAddressChecks(ctx, approvalCriteria.InitiatorChecks, initiatedBy)
 				if err != nil {
 					addPotentialError(isPrioritizedApproval, fmt.Sprintf("initiator address check failed: %s", err))
+					continue
+				}
+			}
+
+			// Check alternative time checks (offline hours/days)
+			if approvalCriteria.AltTimeChecks != nil {
+				err = k.CheckAltTimeChecks(ctx, approvalCriteria.AltTimeChecks)
+				if err != nil {
+					addPotentialError(isPrioritizedApproval, fmt.Sprintf("alt time check failed: %s", err))
 					continue
 				}
 			}

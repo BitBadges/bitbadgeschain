@@ -140,3 +140,238 @@ func TestValidateNoCustomOwnershipTimesInvariant(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateAltTimeChecks(t *testing.T) {
+	tests := []struct {
+		name        string
+		altTimeChecks *AltTimeChecks
+		expectError bool
+	}{
+		{
+			name:        "nil altTimeChecks - should pass",
+			altTimeChecks: nil,
+			expectError:  false,
+		},
+		{
+			name: "empty ranges - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{},
+				OfflineDays:  []*UintRange{},
+			},
+			expectError: false,
+		},
+		{
+			name: "valid single hour range - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(9),
+						End:   sdkmath.NewUint(17),
+					},
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: false,
+		},
+		{
+			name: "valid single day range - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{},
+				OfflineDays: []*UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(5),
+					},
+				},
+			},
+			expectError: false,
+		},
+		{
+			name: "valid multiple hour ranges - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(9),
+						End:   sdkmath.NewUint(12),
+					},
+					{
+						Start: sdkmath.NewUint(14),
+						End:   sdkmath.NewUint(17),
+					},
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: false,
+		},
+		{
+			name: "valid ranges including zero - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(5),
+					},
+				},
+				OfflineDays: []*UintRange{
+					{
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(0),
+					},
+				},
+			},
+			expectError: false,
+		},
+		{
+			name: "valid ranges at boundaries - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(23),
+					},
+				},
+				OfflineDays: []*UintRange{
+					{
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(6),
+					},
+				},
+			},
+			expectError: false,
+		},
+		{
+			name: "hour range exceeds maximum - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(9),
+						End:   sdkmath.NewUint(24), // Invalid: max is 23
+					},
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: true,
+		},
+		{
+			name: "day range exceeds maximum - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{},
+				OfflineDays: []*UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(7), // Invalid: max is 6
+					},
+				},
+			},
+			expectError: true,
+		},
+		{
+			name: "duplicate hour values across ranges - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(9),
+						End:   sdkmath.NewUint(12),
+					},
+					{
+						Start: sdkmath.NewUint(11), // Overlaps with previous range (11-12)
+						End:   sdkmath.NewUint(15),
+					},
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: true,
+		},
+		{
+			name: "duplicate day values across ranges - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{},
+				OfflineDays: []*UintRange{
+					{
+						Start: sdkmath.NewUint(1),
+						End:   sdkmath.NewUint(3),
+					},
+					{
+						Start: sdkmath.NewUint(2), // Overlaps with previous range (2-3)
+						End:   sdkmath.NewUint(5),
+					},
+				},
+			},
+			expectError: true,
+		},
+		{
+			name: "wrapping hour range (start > end) - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(23),
+						End:   sdkmath.NewUint(0), // Invalid: wrapping not allowed
+					},
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: true,
+		},
+		{
+			name: "wrapping day range (start > end) - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{},
+				OfflineDays: []*UintRange{
+					{
+						Start: sdkmath.NewUint(6),
+						End:   sdkmath.NewUint(0), // Invalid: wrapping not allowed
+					},
+				},
+			},
+			expectError: true,
+		},
+		{
+			name: "nil range in hours - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					nil,
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: true,
+		},
+		{
+			name: "nil range in days - should fail",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{},
+				OfflineDays: []*UintRange{
+					nil,
+				},
+			},
+			expectError: true,
+		},
+		{
+			name: "valid separate ranges for wrapping scenario - should pass",
+			altTimeChecks: &AltTimeChecks{
+				OfflineHours: []*UintRange{
+					{
+						Start: sdkmath.NewUint(23),
+						End:   sdkmath.NewUint(23), // Hour 23
+					},
+					{
+						Start: sdkmath.NewUint(0),
+						End:   sdkmath.NewUint(0), // Hour 0 (separate range)
+					},
+				},
+				OfflineDays: []*UintRange{},
+			},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidateAltTimeChecks(tt.altTimeChecks)
+			if tt.expectError {
+				require.Error(t, err, "expected error but got none")
+			} else {
+				require.NoError(t, err, "expected no error but got: %v", err)
+			}
+		})
+	}
+}

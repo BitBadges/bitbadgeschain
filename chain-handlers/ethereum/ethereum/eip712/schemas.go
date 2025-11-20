@@ -219,7 +219,8 @@ func getCollectionApprovalCriteriaSchema() string {
 		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"recipientChecks": ` + getAddressChecksSchema() + `,
-		"initiatorChecks": ` + getAddressChecksSchema() + `
+		"initiatorChecks": ` + getAddressChecksSchema() + `,
+		"altTimeChecks": ` + getAltTimeChecksSchema() + `
 	}`
 }
 
@@ -248,7 +249,8 @@ func getOutgoingApprovalCriteriaSchema() string {
 			` + getETHSignatureChallengeSchema() + `
 		],
 		"recipientChecks": ` + getAddressChecksSchema() + `,
-		"initiatorChecks": ` + getAddressChecksSchema() + `
+		"initiatorChecks": ` + getAddressChecksSchema() + `,
+		"altTimeChecks": ` + getAltTimeChecksSchema() + `
 	}`
 }
 
@@ -277,13 +279,22 @@ func getIncomingApprovalCriteriaSchema() string {
 			` + getETHSignatureChallengeSchema() + `
 		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
-		"initiatorChecks": ` + getAddressChecksSchema() + `
+		"initiatorChecks": ` + getAddressChecksSchema() + `,
+		"altTimeChecks": ` + getAltTimeChecksSchema() + `
 	}`
 }
 
 // getUintRangeSchema returns the schema for a uint range
 func getUintRangeSchema() string {
 	return `{"start": "", "end": ""}`
+}
+
+// getAltTimeChecksSchema returns the schema for alternative time checks
+func getAltTimeChecksSchema() string {
+	return `{
+		"offlineHours": [` + getUintRangeSchema() + `],
+		"offlineDays": [` + getUintRangeSchema() + `]
+	}`
 }
 
 // getCollectionApprovalSchema returns the schema for collection approval

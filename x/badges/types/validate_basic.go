@@ -186,6 +186,76 @@ func ValidateNoStringElementIsX(addresses []string, x string) error {
 	return nil
 }
 
+// ValidateAltTimeChecks validates alt time checks for offline hours and days
+func ValidateAltTimeChecks(altTimeChecks *AltTimeChecks) error {
+	if altTimeChecks == nil {
+		return nil
+	}
+
+	// Validate offline hours (0-23)
+	if err := validateTimeRanges(altTimeChecks.OfflineHours, 0, 23, "offline hours"); err != nil {
+		return err
+	}
+
+	// Validate offline days (0-6)
+	if err := validateTimeRanges(altTimeChecks.OfflineDays, 0, 6, "offline days"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateTimeRanges validates time ranges for hours or days
+// It ensures:
+// 1. Ranges are valid numbers within min-max (inclusive, allowing zero)
+// 2. No duplicate values across multiple range objects
+// 3. No wrapping allowed (if you need to wrap, create two separate ranges)
+func validateTimeRanges(ranges []*UintRange, min, max uint64, fieldName string) error {
+	if len(ranges) == 0 {
+		return nil
+	}
+
+	// Track all values to check for duplicates
+	seenValues := make(map[uint64]bool)
+
+	for i, r := range ranges {
+		if r == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d is nil", fieldName, i)
+		}
+
+		if r.Start.IsNil() || r.End.IsNil() {
+			return sdkerrors.Wrapf(ErrUintUnititialized, "%s range at index %d has nil start or end", fieldName, i)
+		}
+
+		start := r.Start.Uint64()
+		end := r.End.Uint64()
+
+		// Check that start and end are within valid range (0 to max, inclusive)
+		if start > max {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has start value %d which exceeds maximum %d", fieldName, i, start, max)
+		}
+
+		if end > max {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has end value %d which exceeds maximum %d", fieldName, i, end, max)
+		}
+
+		// Check that start <= end (no wrapping allowed)
+		if start > end {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has start %d greater than end %d (wrapping not allowed, use two separate ranges)", fieldName, i, start, end)
+		}
+
+		// Check for duplicates and collect all values in the range
+		for val := start; val <= end; val++ {
+			if seenValues[val] {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d contains duplicate value %d that was already defined in another range", fieldName, i, val)
+			}
+			seenValues[val] = true
+		}
+	}
+
+	return nil
+}
+
 func ValidateAddressList(addressList *AddressList) error {
 	if addressList.ListId == "" ||
 		addressList.ListId == "Mint" ||
@@ -702,6 +772,13 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 			} else {
 				approvalCriteria.PredeterminedBalances = nil
+			}
+
+			// Validate AltTimeChecks
+			if approvalCriteria.AltTimeChecks != nil {
+				if err := ValidateAltTimeChecks(approvalCriteria.AltTimeChecks); err != nil {
+					return sdkerrors.Wrapf(err, "invalid alt time checks")
+				}
 			}
 		} else {
 			approvalCriteria = &ApprovalCriteria{}
