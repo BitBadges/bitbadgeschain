@@ -83,6 +83,13 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	h.keeper.Logger(ctx).Info("custom-hooks: channel", "channel", channel)
 
 	// Derive intermediate sender address
+	// TODO: I think we can explore removing this
+	// This was from the Osmosis IBC hooks implementation
+	// Their reasons was that they were doing any WASM contract call, so they obviously can't trust any other chain
+	// arbitrarily specifying a sender address.
+	//
+	// However, we are not doing any WASM contract calls. We are only ever doing swaps and transfers
+	// with the received funds.
 	senderBech32, err := ibchookstypes.DeriveIntermediateSender(channel, sender, h.bech32PrefixAccAddr)
 	if err != nil {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to derive intermediate sender", "error", err)

@@ -281,7 +281,7 @@ func (k Keeper) HandleTransfer(
 	transferBalances := types.DeepCopyBalances(transfer.Balances)
 	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, transferMetadata, eventTracking)
 	if err != nil {
-		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals not satisfied")
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals (transferability) not satisfied")
 	}
 
 	if len(userApprovals) > 0 {
