@@ -15,6 +15,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.Configurator(),
 			app.BadgesKeeper,
 			app.PoolManagerKeeper,
+			app.IBCRateLimitKeeper,
 		),
 	)
 

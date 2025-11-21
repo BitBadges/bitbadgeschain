@@ -12,6 +12,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v19"
+	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
@@ -60,6 +61,39 @@ func MigratePoolManagerTakerFee(ctx sdk.Context, poolManagerKeeper PoolManagerKe
 	poolManagerParams.TakerFeeParams.DefaultTakerFee = osmomath.MustNewDecFromStr("0.001")
 	poolManagerKeeper.SetParams(ctx, poolManagerParams)
 	return nil
+}
+
+// IBCRateLimitKeeperI defines the interface needed for IBC rate limit migrations
+type IBCRateLimitKeeperI interface {
+	GetParams(ctx sdk.Context) ibcratelimittypes.Params
+	SetParams(ctx sdk.Context, params ibcratelimittypes.Params) error
+}
+
+// MigrateIBCRateLimit adds or updates an IBC rate limit configuration
+// If a rate limit with the same channel_id and denom exists, it will be updated
+func MigrateIBCRateLimit(ctx sdk.Context, rateLimitKeeper IBCRateLimitKeeperI, rateLimitConfig ibcratelimittypes.RateLimitConfig) error {
+	params := rateLimitKeeper.GetParams(ctx)
+
+	// Find if a rate limit with the same channel_id and denom exists
+	foundIndex := -1
+	for i, config := range params.RateLimits {
+		if config.ChannelId == rateLimitConfig.ChannelId && config.Denom == rateLimitConfig.Denom {
+			foundIndex = i
+			break
+		}
+	}
+
+	// Update or append the rate limit
+	if foundIndex >= 0 {
+		// Update existing rate limit
+		params.RateLimits[foundIndex] = rateLimitConfig
+	} else {
+		// Append new rate limit
+		params.RateLimits = append(params.RateLimits, rateLimitConfig)
+	}
+
+	// Validate and set the updated params
+	return rateLimitKeeper.SetParams(ctx, params)
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
