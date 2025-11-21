@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	// ProtocolFeeNumerator represents the numerator for protocol fee calculation (0.5% = 5/1000)
-	ProtocolFeeNumerator = 5
-	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.5% = 5/1000)
+	// ProtocolFeeNumerator represents the numerator for protocol fee calculation (0.1% = 1/1000)
+	ProtocolFeeNumerator = 1
+	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.1% = 1/1000)
 	ProtocolFeeDenominator = 1000
 )
 
@@ -27,7 +27,7 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 	coinTransfers []CoinTransfers,
 	initiatedBy string,
 ) ([]CoinTransfers, error) {
-	// Calculate protocol fees for all denoms (0.5% of each denom transferred)
+	// Calculate protocol fees for all denoms (0.1% of each denom transferred)
 	protocolFees := sdk.NewCoins()
 	denomAmounts := make(map[string]sdkmath.Uint)
 
@@ -42,14 +42,14 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 	}
 
 	for denom, totalAmount := range denomAmounts {
-		// 0.5% of the total amount for this denom
+		// 0.1% of the total amount for this denom
 		// Safety check to prevent division by zero
 		if ProtocolFeeDenominator == 0 {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "protocol fee denominator cannot be zero")
 		}
 		protocolFee := totalAmount.Mul(sdkmath.NewUint(ProtocolFeeNumerator)).Quo(sdkmath.NewUint(ProtocolFeeDenominator))
 
-		// For other denoms, just use 0.5%
+		// For other denoms, just use 0.1%
 		if !protocolFee.IsZero() {
 			protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromUint64(protocolFee.Uint64())))
 		}

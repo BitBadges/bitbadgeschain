@@ -811,10 +811,10 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 // 	suite.Require().Error(err, "Error deducting outgoing approvals")
 // }
 
-// ProtocolFee is now calculated as 0.5% of the transfer amount
-// For 100 ubadge: 0.5% = 0.5, rounded down to 0
-// For 200 ubadge: 0.5% = 1
-// For 300 ubadge: 0.5% = 1.5, rounded down to 1
+// ProtocolFee is now calculated as 0.1% of the transfer amount
+// For 100 ubadge: 0.1% = 0.1, rounded down to 0
+// For 200 ubadge: 0.1% = 0.2, rounded down to 0
+// For 300 ubadge: 0.1% = 0.3, rounded down to 0
 
 func (suite *TestSuite) TestCoinTransfersWithApprovals() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -980,7 +980,7 @@ func (suite *TestSuite) TestCoinTransfersWithApprovalsMultiple() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-200-1), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-200), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "ubadge").Amount, "Error deducting outgoing approvals")
 }
@@ -1095,7 +1095,7 @@ func (suite *TestSuite) TestCoinTransfersWithOverflowIntoNextApprovals() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-300-1), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-300), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "ubadge").Amount, "Error deducting outgoing approvals")
 }
@@ -1210,7 +1210,7 @@ func (suite *TestSuite) TestWeirdBootstrapThing() {
 
 	bobBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(bob), "ubadge")
 	aliceBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(sdkmath.NewInt(100000000000-300-1), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
+	suite.Require().Equal(sdkmath.NewInt(100000000000-300), bobBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+200), aliceBalanceAfter.Amount, "Error deducting outgoing approvals")
 	suite.Require().Equal(sdkmath.NewInt(100000000000+100), suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(charlie), "ubadge").Amount, "Error deducting outgoing approvals")
 }
