@@ -99,7 +99,7 @@ func CustomUpgradeHandlerLogic(ctx context.Context, badgesKeeper badgeskeeper.Ke
 						TimeframeDuration: 1,
 					},
 					{
-						MaxUniqueSenders:  100,
+						MaxUniqueSenders:  500,
 						TimeframeType:     ibcratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK,
 						TimeframeDuration: 1,
 					},
