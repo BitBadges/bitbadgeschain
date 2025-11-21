@@ -9,8 +9,10 @@ import (
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v19"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // MigrateBadgesKeeper migrates the tokens keeper to set all approval versions to 0
@@ -43,6 +45,20 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 		return err
 	}
 
+	return nil
+}
+
+// PoolManagerKeeperI defines the interface needed for poolmanager migrations
+type PoolManagerKeeperI interface {
+	GetParams(ctx sdk.Context) poolmanagertypes.Params
+	SetParams(ctx sdk.Context, params poolmanagertypes.Params)
+}
+
+// MigratePoolManagerTakerFee updates the poolmanager default taker fee to 0.1% (0.001)
+func MigratePoolManagerTakerFee(ctx sdk.Context, poolManagerKeeper PoolManagerKeeperI) error {
+	poolManagerParams := poolManagerKeeper.GetParams(ctx)
+	poolManagerParams.TakerFeeParams.DefaultTakerFee = osmomath.MustNewDecFromStr("0.001")
+	poolManagerKeeper.SetParams(ctx, poolManagerParams)
 	return nil
 }
 
