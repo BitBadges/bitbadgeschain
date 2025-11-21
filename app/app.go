@@ -319,17 +319,6 @@ func New(
 		return nil, err
 	}
 
-	// Set IBC keepers on GammKeeper for IBC transfer functionality
-	// This must be done after both registerIBCModules and registerGammModules
-	// because we need the IBC keepers from registerIBCModules and GammKeeper from registerGammModules
-	if app.TransferICS4Wrapper != nil {
-		app.GammKeeper.SetIBCKeepers(
-			app.TransferICS4Wrapper,
-			app.IBCKeeper.ChannelKeeper,
-			app.ScopedIBCTransferKeeper,
-		)
-	}
-
 	storeService, err := app.registerWasmModules(appOpts)
 	if err != nil {
 		return nil, err

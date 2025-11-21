@@ -280,7 +280,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
 	transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
 	app.TransferICS4Wrapper = transferStack.(porttypes.ICS4Wrapper)
-	transferICS4Wrapper := app.TransferICS4Wrapper
 
 	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
 	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
@@ -289,7 +288,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		app.Logger(),
 		&app.GammKeeper,
 		app.BankKeeper,
-		transferICS4Wrapper,
+		&app.BadgesKeeper,
+		app.TransferICS4Wrapper,
 		app.IBCKeeper.ChannelKeeper,
 		scopedIBCTransferKeeper,
 	)
@@ -339,7 +339,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// This ensures error acknowledgements from hooks are properly returned
 	hooksTransferModule := ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
 	transferStack = hooksTransferModule
-	app.TransferKeeper.WithICS4Wrapper(transferICS4Wrapper)
+	app.TransferKeeper.WithICS4Wrapper(app.TransferICS4Wrapper)
 
 	// Add the transfer stack (with hooks) to the router
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)

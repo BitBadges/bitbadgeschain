@@ -9,18 +9,6 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 )
 
-// NewEmitErrorAcknowledgement creates an error acknowledgement with events
-func NewEmitErrorAcknowledgement(ctx sdk.Context, err errorsmod.Error, description string) channeltypes.Acknowledgement {
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			"ibc-hooks-error",
-			sdk.NewAttribute("error", err.Error()),
-			sdk.NewAttribute("description", description),
-		),
-	)
-	return channeltypes.NewErrorAcknowledgement(errorsmod.Wrap(err, description))
-}
-
 // MustExtractDenomFromPacketOnRecv extracts the denom from an IBC packet on receive
 func MustExtractDenomFromPacketOnRecv(packet channeltypes.Packet) string {
 	var data transfertypes.FungibleTokenPacketData

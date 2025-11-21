@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
@@ -15,6 +16,7 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
 
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -26,6 +28,7 @@ type (
 	GammKeeper interface {
 		GetCFMMPool(ctx sdk.Context, poolId uint64) (gammtypes.CFMMPoolI, error)
 		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
+		RouteExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, routes []poolmanagertypes.SwapAmountInRoute, tokenIn sdk.Coin, tokenOutMinAmount osmomath.Int, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		CheckIsWrappedDenom(ctx sdk.Context, denom string) bool
 		SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
 	}
@@ -33,6 +36,13 @@ type (
 	// BankKeeper interface for bank module
 	BankKeeper interface {
 		SendCoins(ctx context.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
+	}
+
+	// BadgesKeeper interface for badges module operations
+	BadgesKeeper interface {
+		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool)
+		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
+		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
 	}
 
 	// ICS4Wrapper interface for sending IBC packets
@@ -62,6 +72,7 @@ type (
 		logger        log.Logger
 		gammKeeper    GammKeeper
 		bankKeeper    BankKeeper
+		badgesKeeper  BadgesKeeper
 		ics4Wrapper   ICS4Wrapper
 		channelKeeper ChannelKeeper
 		scopedKeeper  ScopedKeeper
@@ -72,6 +83,7 @@ func NewKeeper(
 	logger log.Logger,
 	gammKeeper GammKeeper,
 	bankKeeper BankKeeper,
+	badgesKeeper BadgesKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
 	scopedKeeper ScopedKeeper,
@@ -80,6 +92,7 @@ func NewKeeper(
 		logger:        logger,
 		gammKeeper:    gammKeeper,
 		bankKeeper:    bankKeeper,
+		badgesKeeper:  badgesKeeper,
 		ics4Wrapper:   ics4Wrapper,
 		channelKeeper: channelKeeper,
 		scopedKeeper:  scopedKeeper,
@@ -171,26 +184,29 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			return fmt.Errorf("no operations provided for swap")
 		}
 
-		if len(operations) > 1 {
-			return fmt.Errorf("multi-hop swaps are not supported")
+		// Convert operations to routes and validate pool IDs first
+		routes := make([]poolmanagertypes.SwapAmountInRoute, len(operations))
+		for i, operation := range operations {
+			poolId, err := strconv.ParseUint(operation.Pool, 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid pool ID in operation %d: %s", i, operation.Pool)
+			}
+			routes[i] = poolmanagertypes.SwapAmountInRoute{
+				PoolId:        poolId,
+				TokenOutDenom: operation.DenomOut,
+			}
 		}
 
-		// For now, we only support single-hop swaps (one operation)
-		// Multi-hop swaps would require chaining multiple swaps
-		operation := operations[0]
-		poolId, err := strconv.ParseUint(operation.Pool, 10, 64)
-		if err != nil {
-			return fmt.Errorf("invalid pool ID: %s", operation.Pool)
+		// Validate first operation matches tokenIn
+		if operations[0].DenomIn != tokenIn.Denom {
+			return fmt.Errorf("first operation denom_in does not match token_in: %s != %s", operations[0].DenomIn, tokenIn.Denom)
 		}
 
-		if operation.DenomIn != tokenIn.Denom {
-			return fmt.Errorf("denom_in does not match token_in: %s != %s", operation.DenomIn, tokenIn.Denom)
-		}
-
-		// Get the pool (read-only, can use main context)
-		pool, err := k.gammKeeper.GetCFMMPool(ctx, poolId)
-		if err != nil {
-			return fmt.Errorf("failed to get pool %d: %w", poolId, err)
+		// Validate operations chain correctly (each DenomOut matches next DenomIn)
+		for i := 0; i < len(operations)-1; i++ {
+			if operations[i].DenomOut != operations[i+1].DenomIn {
+				return fmt.Errorf("operations do not chain correctly: operation %d denom_out %s does not match operation %d denom_in %s", i, operations[i].DenomOut, i+1, operations[i+1].DenomIn)
+			}
 		}
 
 		// Get minimum amount from min_asset for swap validation
@@ -205,12 +221,44 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			}
 		}
 
-		// Get spread factor from pool (read-only, can use main context)
-		spreadFactor := pool.GetSpreadFactor(ctx)
-
-		// Convert custom hooks Affiliate types to poolmanager Affiliate types
+		// Validate and convert custom hooks Affiliate types to poolmanager Affiliate types
 		var poolmanagerAffiliates []poolmanagertypes.Affiliate
 		if len(swapAndAction.Affiliates) > 0 {
+			// Validate affiliates before converting
+			totalBasisPoints := uint64(0)
+			for i, affiliate := range swapAndAction.Affiliates {
+				// Validate address
+				if affiliate.Address == "" {
+					return fmt.Errorf("affiliate_%d.address is required", i)
+				}
+				_, err := sdk.AccAddressFromBech32(affiliate.Address)
+				if err != nil {
+					return fmt.Errorf("invalid affiliate_%d.address: %w", i, err)
+				}
+
+				// Validate basis_points_fee
+				if affiliate.BasisPointsFee == "" {
+					return fmt.Errorf("affiliate_%d.basis_points_fee is required", i)
+				}
+				basisPoints, err := strconv.ParseUint(affiliate.BasisPointsFee, 10, 64)
+				if err != nil {
+					return fmt.Errorf("invalid affiliate_%d.basis_points_fee: %w", i, err)
+				}
+
+				// Validate individual basis points don't exceed 10000
+				if basisPoints > 10000 {
+					return fmt.Errorf("affiliate_%d.basis_points_fee cannot exceed 10000", i)
+				}
+
+				totalBasisPoints += basisPoints
+			}
+
+			// Validate total basis points don't exceed 10000
+			if totalBasisPoints > 10000 {
+				return fmt.Errorf("total affiliate basis_points_fee cannot exceed 10000")
+			}
+
+			// Convert to poolmanager types
 			poolmanagerAffiliates = make([]poolmanagertypes.Affiliate, len(swapAndAction.Affiliates))
 			for i, affiliate := range swapAndAction.Affiliates {
 				poolmanagerAffiliates[i] = poolmanagertypes.Affiliate{
@@ -220,16 +268,31 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			}
 		}
 
+		// Set up auto-approve for intermediate address if dealing with wrapped denoms
+		// This must be done before the swap call to ensure tokens can be received
+		// Check all denoms in the route (input and all intermediate/output denoms)
+		allDenoms := []string{tokenIn.Denom}
+		for _, operation := range operations {
+			allDenoms = append(allDenoms, operation.DenomOut)
+		}
+		for _, denom := range allDenoms {
+			if k.gammKeeper.CheckIsWrappedDenom(ctx, denom) {
+				if err := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom); err != nil {
+					return fmt.Errorf("failed to set auto-approve for intermediate address (denom %s): %w", denom, err)
+				}
+			}
+		}
+
 		// Execute swap in a cached context so we can rollback if it fails
 		swapCacheCtx, writeSwapCache := ctx.CacheContext()
-		tokenOut, err = k.gammKeeper.SwapExactAmountIn(
+
+		// Always use RouteExactAmountIn (works for both single-hop and multi-hop swaps)
+		tokenOut, err := k.gammKeeper.RouteExactAmountIn(
 			swapCacheCtx,
 			sender,
-			pool,
+			routes,
 			tokenIn,
-			operation.DenomOut,
 			tokenOutMinAmount,
-			spreadFactor,
 			poolmanagerAffiliates,
 		)
 		if err != nil {
@@ -249,19 +312,24 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 				}
 
 				// Emit event for fallback path
-				ctx.EventManager().EmitEvent(
-					sdk.NewEvent(
-						"swap_and_action_fallback",
-						sdk.NewAttribute("module", "custom-hooks"),
-						sdk.NewAttribute("sender", sender.String()),
-						sdk.NewAttribute("swap_error", err.Error()),
-						sdk.NewAttribute("destination_recover_address", swapAndAction.DestinationRecoverAddress),
-						sdk.NewAttribute("original_token", originalTokenIn.String()),
-						sdk.NewAttribute("pool_id", operation.Pool),
-						sdk.NewAttribute("denom_in", operation.DenomIn),
-						sdk.NewAttribute("denom_out", operation.DenomOut),
-					),
+				event := sdk.NewEvent(
+					"swap_and_action_fallback",
+					sdk.NewAttribute("module", "custom-hooks"),
+					sdk.NewAttribute("sender", sender.String()),
+					sdk.NewAttribute("swap_error", err.Error()),
+					sdk.NewAttribute("destination_recover_address", swapAndAction.DestinationRecoverAddress),
+					sdk.NewAttribute("original_token", originalTokenIn.String()),
+					sdk.NewAttribute("num_operations", strconv.Itoa(len(operations))),
 				)
+				// Add operation details for debugging
+				for i, op := range operations {
+					event = event.AppendAttributes(
+						sdk.NewAttribute(fmt.Sprintf("operation_%d_pool", i), op.Pool),
+						sdk.NewAttribute(fmt.Sprintf("operation_%d_denom_in", i), op.DenomIn),
+						sdk.NewAttribute(fmt.Sprintf("operation_%d_denom_out", i), op.DenomOut),
+					)
+				}
+				ctx.EventManager().EmitEvent(event)
 
 				// Successfully handled fallback - return nil to allow IBC transfer to succeed
 				// The swap cache context is automatically discarded, so no swap state changes
@@ -277,21 +345,30 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 		writeSwapCache()
 
 		// Emit event for successful swap path
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				"swap_and_action_success",
-				sdk.NewAttribute("module", "custom-hooks"),
-				sdk.NewAttribute("sender", sender.String()),
-				sdk.NewAttribute("pool_id", operation.Pool),
-				sdk.NewAttribute("token_in", tokenIn.String()),
-				sdk.NewAttribute("token_out", sdk.NewCoin(operation.DenomOut, tokenOut).String()),
-				sdk.NewAttribute("denom_in", operation.DenomIn),
-				sdk.NewAttribute("denom_out", operation.DenomOut),
-			),
+		firstOperation := operations[0]
+		lastOperation := operations[len(operations)-1]
+		event := sdk.NewEvent(
+			"swap_and_action_success",
+			sdk.NewAttribute("module", "custom-hooks"),
+			sdk.NewAttribute("sender", sender.String()),
+			sdk.NewAttribute("token_in", tokenIn.String()),
+			sdk.NewAttribute("token_out", sdk.NewCoin(lastOperation.DenomOut, tokenOut).String()),
+			sdk.NewAttribute("denom_in", firstOperation.DenomIn),
+			sdk.NewAttribute("denom_out", lastOperation.DenomOut),
+			sdk.NewAttribute("num_operations", strconv.Itoa(len(operations))),
 		)
+		// Add operation details for debugging
+		for i, op := range operations {
+			event = event.AppendAttributes(
+				sdk.NewAttribute(fmt.Sprintf("operation_%d_pool", i), op.Pool),
+				sdk.NewAttribute(fmt.Sprintf("operation_%d_denom_in", i), op.DenomIn),
+				sdk.NewAttribute(fmt.Sprintf("operation_%d_denom_out", i), op.DenomOut),
+			)
+		}
+		ctx.EventManager().EmitEvent(event)
 
-		// For post-swap, we need to use the exact amount (affiliates already processed in SwapExactAmountIn)
-		tokenIn = sdk.NewCoin(operation.DenomOut, tokenOut)
+		// For post-swap, we need to use the exact amount (affiliates already processed)
+		tokenIn = sdk.NewCoin(lastOperation.DenomOut, tokenOut)
 	}
 
 	// Execute post-swap action (IBC transfer or local transfer)
@@ -470,7 +547,7 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 	return nil
 }
 
-// IMPORTANT: Should ONLY be called when from address is a pool address
+// IMPORTANT: Should ONLY be called when from address is an intermediate address
 func (k Keeper) SendCoinsFromIntermediateAddress(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	for _, coin := range coins {
 		if k.gammKeeper.CheckIsWrappedDenom(ctx, coin.Denom) {
@@ -483,6 +560,56 @@ func (k Keeper) SendCoinsFromIntermediateAddress(ctx sdk.Context, from sdk.AccAd
 			if err != nil {
 				return err
 			}
+		}
+	}
+
+	return nil
+}
+
+// setAutoApproveForIntermediateAddress sets auto-approve flags for an intermediate address
+// This is similar to how it's done for pool addresses in gamm keeper
+func (k Keeper) setAutoApproveForIntermediateAddress(ctx sdk.Context, intermediateAddress string, denom string) error {
+	// Parse collection ID from denom (format: badges:COLL_ID:* or badgeslp:COLL_ID:*)
+	parts := strings.Split(denom, ":")
+	if len(parts) < 3 {
+		return fmt.Errorf("invalid denom format: %s", denom)
+	}
+
+	collectionIdStr := parts[1]
+	collectionId, err := strconv.ParseUint(collectionIdStr, 10, 64)
+	if err != nil {
+		return fmt.Errorf("invalid collection ID in denom: %w", err)
+	}
+
+	// Get collection
+	collection, found := k.badgesKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
+	if !found {
+		return fmt.Errorf("collection %s not found", collectionIdStr)
+	}
+
+	// Get current balance or apply default
+	currBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
+
+	// Check if already auto-approved (all flags)
+	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
+	alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
+	alreadyAutoApprovedSelfInitiatedIncomingTransfers := currBalances.AutoApproveSelfInitiatedIncomingTransfers
+
+	autoApprovedAll := alreadyAutoApprovedAllIncomingTransfers && alreadyAutoApprovedSelfInitiatedOutgoingTransfers && alreadyAutoApprovedSelfInitiatedIncomingTransfers
+
+	if !autoApprovedAll {
+		// Set all auto-approve flags to true
+		// Incoming - All, no matter what
+		// Outgoing - Self-initiated
+		// Incoming - Self-initiated
+		currBalances.AutoApproveAllIncomingTransfers = true
+		currBalances.AutoApproveSelfInitiatedOutgoingTransfers = true
+		currBalances.AutoApproveSelfInitiatedIncomingTransfers = true
+
+		// Save the balance
+		err = k.badgesKeeper.SetBalanceForAddress(ctx, collection, intermediateAddress, currBalances)
+		if err != nil {
+			return fmt.Errorf("failed to set auto-approve for intermediate address: %w", err)
 		}
 	}
 

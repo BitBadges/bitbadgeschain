@@ -37,6 +37,7 @@ func (s *HooksTestSuite) SetupTest() {
 		s.App.Logger(),
 		&s.App.GammKeeper,
 		s.App.BankKeeper,
+		&s.App.BadgesKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,
 		s.App.ScopedIBCTransferKeeper,

@@ -35,6 +35,7 @@ func (s *KeeperTestSuite) SetupTest() {
 		s.App.Logger(),
 		&s.App.GammKeeper,
 		s.App.BankKeeper,
+		&s.App.BadgesKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,
 		s.App.ScopedIBCTransferKeeper,
@@ -279,16 +280,46 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 	s.Require().Contains(err.Error(), "min_asset is required for swaps")
 }
 
-// TestExecuteSwapAndAction_MultiHopNotSupported tests that multi-hop swaps are rejected
-func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHopNotSupported() {
+// TestExecuteSwapAndAction_MultiHop tests that multi-hop swaps work correctly
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop() {
+	// Create first pool: baseDenom <-> uatom
 	poolID1 := s.prepareTestPool()
-	poolID2 := s.prepareTestPool()
+
+	// Create second pool: uatom <-> uusdc
+	testDenom1 := "uatom"
+	testDenom2 := "uusdc"
+
+	poolAssets2 := []balancer.PoolAsset{
+		{Token: sdk.NewInt64Coin(testDenom1, 1000000), Weight: osmomath.NewInt(1)},
+		{Token: sdk.NewInt64Coin(testDenom2, 1000000), Weight: osmomath.NewInt(1)},
+	}
+
+	poolParams2 := balancer.PoolParams{
+		SwapFee: osmomath.MustNewDecFromStr("0.025"),
+		ExitFee: osmomath.ZeroDec(),
+	}
+
+	balances2 := sdk.Coins{
+		sdk.NewCoin(testDenom1, osmomath.NewInt(1000000)),
+		sdk.NewCoin(testDenom2, osmomath.NewInt(1000000)),
+	}
+
+	s.FundAcc(s.TestAccs[0], balances2)
+
+	poolID2, err := s.App.PoolManagerKeeper.CreatePool(
+		s.Ctx,
+		balancer.NewMsgCreateBalancerPool(s.TestAccs[0], poolParams2, poolAssets2),
+	)
+	s.Require().NoError(err)
 
 	sender := s.TestAccs[0]
 	recipient := s.TestAccs[1]
 	s.FundAcc(sender, sdk.Coins{
 		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
 	})
+
+	// Get initial recipient balance
+	initialBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdc")
 
 	swapAndAction := &customhookstypes.SwapAndAction{
 		UserSwap: &customhookstypes.UserSwap{
@@ -323,9 +354,319 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHopNotSupported() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
+	err = s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify transfer was executed (check balance changes)
+	finalBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdc")
+	s.Require().True(finalBalance.Amount.GT(initialBalance.Amount), "recipient should have received tokens from multi-hop swap")
+}
+
+// TestExecuteSwapAndAction_MultiHop_ThreeHops tests a three-hop swap
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_ThreeHops() {
+	// Create first pool: baseDenom <-> uatom
+	poolID1 := s.prepareTestPool()
+
+	// Create second pool: uatom <-> uusdc
+	testDenom1 := "uatom"
+	testDenom2 := "uusdc"
+
+	poolAssets2 := []balancer.PoolAsset{
+		{Token: sdk.NewInt64Coin(testDenom1, 1000000), Weight: osmomath.NewInt(1)},
+		{Token: sdk.NewInt64Coin(testDenom2, 1000000), Weight: osmomath.NewInt(1)},
+	}
+
+	poolParams2 := balancer.PoolParams{
+		SwapFee: osmomath.MustNewDecFromStr("0.025"),
+		ExitFee: osmomath.ZeroDec(),
+	}
+
+	balances2 := sdk.Coins{
+		sdk.NewCoin(testDenom1, osmomath.NewInt(1000000)),
+		sdk.NewCoin(testDenom2, osmomath.NewInt(1000000)),
+	}
+
+	s.FundAcc(s.TestAccs[0], balances2)
+
+	poolID2, err := s.App.PoolManagerKeeper.CreatePool(
+		s.Ctx,
+		balancer.NewMsgCreateBalancerPool(s.TestAccs[0], poolParams2, poolAssets2),
+	)
+	s.Require().NoError(err)
+
+	// Create third pool: uusdc <-> uusdt
+	testDenom3 := "uusdt"
+
+	poolAssets3 := []balancer.PoolAsset{
+		{Token: sdk.NewInt64Coin(testDenom2, 1000000), Weight: osmomath.NewInt(1)},
+		{Token: sdk.NewInt64Coin(testDenom3, 1000000), Weight: osmomath.NewInt(1)},
+	}
+
+	poolParams3 := balancer.PoolParams{
+		SwapFee: osmomath.MustNewDecFromStr("0.025"),
+		ExitFee: osmomath.ZeroDec(),
+	}
+
+	balances3 := sdk.Coins{
+		sdk.NewCoin(testDenom2, osmomath.NewInt(1000000)),
+		sdk.NewCoin(testDenom3, osmomath.NewInt(1000000)),
+	}
+
+	s.FundAcc(s.TestAccs[0], balances3)
+
+	poolID3, err := s.App.PoolManagerKeeper.CreatePool(
+		s.Ctx,
+		balancer.NewMsgCreateBalancerPool(s.TestAccs[0], poolParams3, poolAssets3),
+	)
+	s.Require().NoError(err)
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial recipient balance
+	initialBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdt")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID1, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+					{
+						Pool:     strconv.FormatUint(poolID2, 10),
+						DenomIn:  "uatom",
+						DenomOut: "uusdc",
+					},
+					{
+						Pool:     strconv.FormatUint(poolID3, 10),
+						DenomIn:  "uusdc",
+						DenomOut: "uusdt",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uusdt",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err = s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify transfer was executed (check balance changes)
+	finalBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdt")
+	s.Require().True(finalBalance.Amount.GT(initialBalance.Amount), "recipient should have received tokens from three-hop swap")
+}
+
+// TestExecuteSwapAndAction_MultiHop_WithAffiliates tests multi-hop swap with affiliates
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_WithAffiliates() {
+	// Create first pool: baseDenom <-> uatom
+	poolID1 := s.prepareTestPool()
+
+	// Create second pool: uatom <-> uusdc
+	testDenom1 := "uatom"
+	testDenom2 := "uusdc"
+
+	poolAssets2 := []balancer.PoolAsset{
+		{Token: sdk.NewInt64Coin(testDenom1, 1000000), Weight: osmomath.NewInt(1)},
+		{Token: sdk.NewInt64Coin(testDenom2, 1000000), Weight: osmomath.NewInt(1)},
+	}
+
+	poolParams2 := balancer.PoolParams{
+		SwapFee: osmomath.MustNewDecFromStr("0.025"),
+		ExitFee: osmomath.ZeroDec(),
+	}
+
+	balances2 := sdk.Coins{
+		sdk.NewCoin(testDenom1, osmomath.NewInt(1000000)),
+		sdk.NewCoin(testDenom2, osmomath.NewInt(1000000)),
+	}
+
+	s.FundAcc(s.TestAccs[0], balances2)
+
+	poolID2, err := s.App.PoolManagerKeeper.CreatePool(
+		s.Ctx,
+		balancer.NewMsgCreateBalancerPool(s.TestAccs[0], poolParams2, poolAssets2),
+	)
+	s.Require().NoError(err)
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	affiliate := s.TestAccs[2]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	// Get initial balances
+	initialRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdc")
+	initialAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uusdc")
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID1, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+					{
+						Pool:     strconv.FormatUint(poolID2, 10),
+						DenomIn:  "uatom",
+						DenomOut: "uusdc",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uusdc",
+				Amount: "10000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+		Affiliates: []customhookstypes.Affiliate{
+			{
+				BasisPointsFee: "100", // 1%
+				Address:        affiliate.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err = s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().NoError(err)
+
+	// Verify affiliate received fee
+	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uusdc")
+	affiliateReceived := finalAffiliateBalance.Amount.Sub(initialAffiliateBalance.Amount)
+	s.Require().True(affiliateReceived.IsPositive(), "affiliate should have received fee from multi-hop swap")
+
+	// Verify recipient received remaining amount
+	finalRecipientBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdc")
+	recipientReceived := finalRecipientBalance.Amount.Sub(initialRecipientBalance.Amount)
+	s.Require().True(recipientReceived.IsPositive(), "recipient should have received tokens from multi-hop swap")
+}
+
+// TestExecuteSwapAndAction_MultiHop_InvalidChain tests that operations must chain correctly
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_InvalidChain() {
+	poolID1 := s.prepareTestPool()
+	poolID2 := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID1, 10),
+						DenomIn:  sdk.DefaultBondDenom,
+						DenomOut: "uatom",
+					},
+					{
+						Pool:     strconv.FormatUint(poolID2, 10),
+						DenomIn:  "uusdc", // Wrong! Should be "uatom" to chain correctly
+						DenomOut: "uusdc",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uusdc",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
 	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "multi-hop swaps are not supported")
+	s.Require().Contains(err.Error(), "operations do not chain correctly")
+}
+
+// TestExecuteSwapAndAction_MultiHop_FirstOperationMismatch tests that first operation must match tokenIn
+func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_FirstOperationMismatch() {
+	poolID1 := s.prepareTestPool()
+	poolID2 := s.prepareTestPool()
+
+	sender := s.TestAccs[0]
+	recipient := s.TestAccs[1]
+	s.FundAcc(sender, sdk.Coins{
+		sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(1000000)),
+	})
+
+	swapAndAction := &customhookstypes.SwapAndAction{
+		UserSwap: &customhookstypes.UserSwap{
+			SwapExactAssetIn: &customhookstypes.SwapExactAssetIn{
+				SwapVenueName: "bitbadges-poolmanager",
+				Operations: []customhookstypes.Operation{
+					{
+						Pool:     strconv.FormatUint(poolID1, 10),
+						DenomIn:  "uatom", // Wrong! Should match tokenIn (sdk.DefaultBondDenom)
+						DenomOut: "uusdc",
+					},
+					{
+						Pool:     strconv.FormatUint(poolID2, 10),
+						DenomIn:  "uusdc",
+						DenomOut: "uusdt",
+					},
+				},
+			},
+		},
+		MinAsset: &customhookstypes.MinAsset{
+			Native: &customhookstypes.NativeAsset{
+				Denom:  "uusdt",
+				Amount: "1000",
+			},
+		},
+		PostSwapAction: &customhookstypes.PostSwapAction{
+			Transfer: &customhookstypes.TransferInfo{
+				ToAddress: recipient.String(),
+			},
+		},
+	}
+
+	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
+
+	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "first operation denom_in does not match token_in")
 }
 
 // TestExecuteSwapAndAction_LocalTransfer tests swap with local transfer

@@ -46,7 +46,12 @@ type Keeper struct {
 	scopedKeeper  types.ScopedKeeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, badgesKeeper badgeskeeper.Keeper) Keeper {
+func NewKeeper(
+	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, badgesKeeper badgeskeeper.Keeper,
+	ics4Wrapper types.ICS4Wrapper,
+	channelKeeper types.ChannelKeeper,
+	scopedKeeper types.ScopedKeeper,
+) Keeper {
 	// Ensure that the module account are set.
 	moduleAddr, perms := accountKeeper.GetModuleAddressAndPermissions(types.ModuleName)
 	if moduleAddr == nil {
@@ -70,18 +75,14 @@ func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace p
 		bankKeeper:          bankKeeper,
 		communityPoolKeeper: communityPoolKeeper,
 		badgesKeeper:        badgesKeeper,
+		ics4Wrapper:         ics4Wrapper,
+		channelKeeper:       channelKeeper,
+		scopedKeeper:        scopedKeeper,
 	}
 }
 
 func (k *Keeper) SetPoolManager(poolManager types.PoolManager) {
 	k.poolManager = poolManager
-}
-
-// SetIBCKeepers sets the IBC keepers for IBC transfer functionality
-func (k *Keeper) SetIBCKeepers(ics4Wrapper types.ICS4Wrapper, channelKeeper types.ChannelKeeper, scopedKeeper types.ScopedKeeper) {
-	k.ics4Wrapper = ics4Wrapper
-	k.channelKeeper = channelKeeper
-	k.scopedKeeper = scopedKeeper
 }
 
 // ExecuteIBCTransfer executes an IBC transfer
@@ -91,8 +92,16 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("ibc_transfer_info cannot be nil")
 	}
 
-	if k.ics4Wrapper == nil || k.channelKeeper == nil || k.scopedKeeper == nil {
-		return fmt.Errorf("IBC keepers not set")
+	if k.ics4Wrapper == nil {
+		return fmt.Errorf("ICS4 wrapper not set")
+	}
+
+	if k.channelKeeper == nil {
+		return fmt.Errorf("channel keeper not set")
+	}
+
+	if k.scopedKeeper == nil {
+		return fmt.Errorf("scoped keeper not set")
 	}
 
 	// Validate channel exists

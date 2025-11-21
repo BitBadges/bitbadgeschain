@@ -39,6 +39,9 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 		app.BankKeeper,
 		app.DistrKeeper,
 		app.BadgesKeeper,
+		app.TransferICS4Wrapper,
+		app.IBCKeeper.ChannelKeeper,
+		app.ScopedIBCTransferKeeper,
 	)
 
 	app.PoolManagerKeeper = *poolmanager.NewKeeper(

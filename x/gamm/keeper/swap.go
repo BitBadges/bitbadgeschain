@@ -73,6 +73,14 @@ func (k Keeper) SwapExactAmountIn(
 		return osmomath.Int{}, errorsmod.Wrapf(types.ErrLimitMinAmount, "%s token is lesser than min amount", tokenOutDenom)
 	}
 
+	// Settles balances between the tx sender and the pool to match the swap that was executed earlier.
+	// Also emits swap event and updates related liquidity metrics
+	// Affiliates are processed inside updatePoolForSwap
+	err = k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOutCoin, affiliates, tokenOutMinAmount)
+	if err != nil {
+		return osmomath.Int{}, err
+	}
+
 	// Calculate affiliate fees if provided
 	totalFeeAmount := osmomath.ZeroInt()
 	if len(affiliates) > 0 {
@@ -90,20 +98,28 @@ func (k Keeper) SwapExactAmountIn(
 		}
 	}
 
-	// Settles balances between the tx sender and the pool to match the swap that was executed earlier.
-	// Also emits swap event and updates related liquidity metrics
-	// Affiliates are processed inside updatePoolForSwap
-	err = k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOutCoin, affiliates, tokenOutMinAmount)
-	if err != nil {
-		return osmomath.Int{}, err
-	}
-
 	// Return adjusted tokenOutAmount after affiliate fees
 	if totalFeeAmount.IsPositive() {
 		tokenOutAmount = tokenOutAmount.Sub(totalFeeAmount)
 	}
 
 	return tokenOutAmount, nil
+}
+
+// RouteExactAmountIn routes a swap through multiple pools using the poolmanager
+// This method forwards to the poolmanager's RouteExactAmountIn for multi-hop swaps
+func (k Keeper) RouteExactAmountIn(
+	ctx sdk.Context,
+	sender sdk.AccAddress,
+	routes []poolmanagertypes.SwapAmountInRoute,
+	tokenIn sdk.Coin,
+	tokenOutMinAmount osmomath.Int,
+	affiliates []poolmanagertypes.Affiliate,
+) (tokenOutAmount osmomath.Int, err error) {
+	if k.poolManager == nil {
+		return osmomath.Int{}, fmt.Errorf("pool manager not set")
+	}
+	return k.poolManager.RouteExactAmountIn(ctx, sender, routes, tokenIn, tokenOutMinAmount, affiliates)
 }
 
 // SwapExactAmountOut is a method for swapping to get an exact number of tokens out of a pool,
@@ -381,6 +397,20 @@ func (k Keeper) updatePoolForSwap(
 	if err != nil {
 		return err
 	}
+
+	// Emit event for fallback path
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			"pool_swap_success",
+			sdk.NewAttribute("module", "gamm"),
+			sdk.NewAttribute("sender", sender.String()),
+			sdk.NewAttribute("pool_id", strconv.FormatUint(pool.GetId(), 10)),
+			sdk.NewAttribute("token_in", tokensIn.String()),
+			sdk.NewAttribute("token_out", tokensOut.String()),
+			sdk.NewAttribute("denom_in", tokenIn.Denom),
+			sdk.NewAttribute("denom_out", tokenOut.Denom),
+		),
+	)
 
 	return nil
 }
