@@ -49,11 +49,14 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 }
 
 // Sets a token in the store using BadgeKey ([]byte{0x01}) as the prefix. No check if store has key already.
-func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCollection) error {
+func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCollection, skipInvariants bool) error {
 	// Validate collection before storing
-	if err := k.validateCollectionBeforeStore(ctx, collection); err != nil {
-		return err
+	if !skipInvariants {
+		if err := k.validateCollectionBeforeStore(ctx, collection); err != nil {
+			return err
+		}
 	}
+
 	marshaled_token, err := k.cdc.Marshal(collection)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.TokenCollection failed")
@@ -171,10 +174,12 @@ func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey strin
 }
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore) error {
+func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore, skipInvariants bool) error {
 	// Validate user balance before storing
-	if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, UserBalance, nil); err != nil {
-		return err
+	if !skipInvariants {
+		if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, UserBalance, nil); err != nil {
+			return err
+		}
 	}
 
 	// NOTE: We always store a non-nil permissions object to prevent issues where

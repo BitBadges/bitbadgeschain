@@ -116,7 +116,7 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 			OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 			PrecalculationOptions:                   precalculationOptions,
 			NumAttempts:                             numAttempts,
-		}, transferMetadata, eventTracking)
+		}, transferMetadata, eventTracking, "collection")
 }
 
 func (suite *TestSuite) TestDeductFromOutgoing() {

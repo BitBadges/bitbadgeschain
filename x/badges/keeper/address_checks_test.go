@@ -596,66 +596,66 @@ func (suite *TestSuite) TestAddressChecks_DirectValidation() {
 	testKeeper.SetPoolAddressInCache(suite.ctx, poolAddr, 1)
 
 	// Test 1: MustBeWasmContract - should pass for WASM contract
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustBeWasmContract: true,
 	}, wasmContractAddr)
 	suite.Require().Nil(err, "MustBeWasmContract should pass for WASM contract")
 
 	// Test 2: MustBeWasmContract - should fail for non-WASM contract
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustBeWasmContract: true,
 	}, bob)
 	suite.Require().NotNil(err, "MustBeWasmContract should fail for non-WASM contract")
 	suite.Require().Contains(err.Error(), "must be a WASM contract", "Error should mention WASM contract")
 
 	// Test 3: MustNotBeWasmContract - should pass for non-WASM contract
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustNotBeWasmContract: true,
 	}, bob)
 	suite.Require().Nil(err, "MustNotBeWasmContract should pass for non-WASM contract")
 
 	// Test 4: MustNotBeWasmContract - should fail for WASM contract
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustNotBeWasmContract: true,
 	}, wasmContractAddr)
 	suite.Require().NotNil(err, "MustNotBeWasmContract should fail for WASM contract")
 	suite.Require().Contains(err.Error(), "must not be a WASM contract", "Error should mention must not be WASM contract")
 
 	// Test 5: MustBeLiquidityPool - should pass for pool
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustBeLiquidityPool: true,
 	}, poolAddr)
 	suite.Require().Nil(err, "MustBeLiquidityPool should pass for pool")
 
 	// Test 6: MustBeLiquidityPool - should fail for non-pool
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustBeLiquidityPool: true,
 	}, bob)
 	suite.Require().NotNil(err, "MustBeLiquidityPool should fail for non-pool")
 	suite.Require().Contains(err.Error(), "must be a liquidity pool", "Error should mention liquidity pool")
 
 	// Test 7: MustNotBeLiquidityPool - should pass for non-pool
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustNotBeLiquidityPool: true,
 	}, bob)
 	suite.Require().Nil(err, "MustNotBeLiquidityPool should pass for non-pool")
 
 	// Test 8: MustNotBeLiquidityPool - should fail for pool
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustNotBeLiquidityPool: true,
 	}, poolAddr)
 	suite.Require().NotNil(err, "MustNotBeLiquidityPool should fail for pool")
 	suite.Require().Contains(err.Error(), "must not be a liquidity pool", "Error should mention must not be liquidity pool")
 
 	// Test 9: Multiple checks - all must pass
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustBeWasmContract:     true,
 		MustNotBeLiquidityPool: true,
 	}, wasmContractAddr)
 	suite.Require().Nil(err, "Multiple checks should pass when all conditions are met")
 
 	// Test 10: Multiple checks - one fails
-	err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, &types.AddressChecks{
 		MustBeWasmContract:     true,
 		MustNotBeLiquidityPool: true,
 	}, bob)
@@ -663,7 +663,7 @@ func (suite *TestSuite) TestAddressChecks_DirectValidation() {
 	suite.Require().Contains(err.Error(), "must be a WASM contract", "Error should mention the failing check")
 
 	// Test 11: Nil checks should pass
-	err = testKeeper.CheckAddressChecks(suite.ctx, nil, bob)
+	_, err = testKeeper.CheckAddressChecks(suite.ctx, nil, bob)
 	suite.Require().Nil(err, "Nil checks should always pass")
 }
 
@@ -985,7 +985,7 @@ func (suite *TestSuite) TestAddressChecks_AllCombinations() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
-			err := testKeeper.CheckAddressChecks(suite.ctx, tc.checks, tc.address)
+			_, err := testKeeper.CheckAddressChecks(suite.ctx, tc.checks, tc.address)
 			if tc.shouldPass {
 				suite.Require().Nil(err, "Check should pass for: %s", tc.name)
 			} else {

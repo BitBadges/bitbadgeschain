@@ -7,6 +7,8 @@ import (
 
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
@@ -40,6 +42,18 @@ func (s *KeeperTestSuite) SetupTest() {
 		s.App.IBCKeeper.ChannelKeeper,
 		s.App.ScopedIBCTransferKeeper,
 	)
+}
+
+// getAckError extracts the error message from an acknowledgement
+func getAckError(ack ibcexported.Acknowledgement) string {
+	channelAck, ok := ack.(channeltypes.Acknowledgement)
+	if !ok {
+		return ""
+	}
+	if errResp, ok := channelAck.Response.(*channeltypes.Acknowledgement_Error); ok {
+		return errResp.Error
+	}
+	return ""
 }
 
 // TestExecuteSwapAndAction_NoPostSwapAction tests error when post_swap_action is missing
@@ -78,9 +92,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoPostSwapAction() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "post_swap_action is required")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "post_swap_action is required")
 }
 
 // TestExecuteSwapAndAction_SwapWithPostAction tests swap with IBC transfer
@@ -131,14 +145,15 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_SwapWithPostAction() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
 	// Note: This will fail if IBC channel doesn't exist, which is expected in unit tests
 	// In integration tests, we'd set up proper IBC channels
 	// The validation now happens before the swap, so we catch channel issues earlier
-	s.Require().Error(err)
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
 	s.Require().True(
-		strings.Contains(err.Error(), "IBC channel") || strings.Contains(err.Error(), "channel capability not found"),
-		"error should mention channel issue: %s", err.Error(),
+		strings.Contains(ackErr, "IBC channel") || strings.Contains(ackErr, "channel capability not found"),
+		"error should mention channel issue: %s", ackErr,
 	)
 }
 
@@ -160,9 +175,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_PostActionWithoutSwap() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "post_swap_action requires a swap to be defined")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "post_swap_action requires a swap to be defined")
 }
 
 // TestExecuteSwapAndAction_InvalidPoolID tests error handling for invalid pool ID
@@ -201,9 +216,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidPoolID() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "invalid pool ID")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "invalid pool ID")
 }
 
 // TestExecuteSwapAndAction_EmptyOperations tests error handling for empty operations
@@ -236,8 +251,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_EmptyOperations() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
 }
 
 // TestExecuteSwapAndAction_NoMinAsset tests swap without min_asset
@@ -275,9 +290,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NoMinAsset() {
 	// Use a smaller amount that the sender actually has
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "min_asset is required for swaps")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "min_asset is required for swaps")
 }
 
 // TestExecuteSwapAndAction_MultiHop tests that multi-hop swaps work correctly
@@ -354,8 +369,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err = s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify transfer was executed (check balance changes)
 	finalBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdc")
@@ -467,8 +482,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_ThreeHops() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err = s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify transfer was executed (check balance changes)
 	finalBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uusdt")
@@ -557,8 +572,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_WithAffiliates() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err = s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify affiliate received fee
 	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uusdc")
@@ -615,9 +630,13 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_InvalidChain() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "operations do not chain correctly")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
+	s.Require().True(
+		strings.Contains(ackErr, "operations do not chain correctly") || strings.Contains(ackErr, "denom_out") && strings.Contains(ackErr, "denom_in"),
+		"error should mention operations chaining issue: %s", ackErr,
+	)
 }
 
 // TestExecuteSwapAndAction_MultiHop_FirstOperationMismatch tests that first operation must match tokenIn
@@ -664,9 +683,13 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultiHop_FirstOperationMismat
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "first operation denom_in does not match token_in")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
+	s.Require().True(
+		strings.Contains(ackErr, "first operation denom_in") && strings.Contains(ackErr, "does not match token_in"),
+		"error should mention first operation denom_in mismatch: %s", ackErr,
+	)
 }
 
 // TestExecuteSwapAndAction_LocalTransfer tests swap with local transfer
@@ -713,8 +736,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_LocalTransfer() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify transfer was executed (check balance changes)
 	finalBalance := s.App.BankKeeper.GetBalance(s.Ctx, recipient, "uatom")
@@ -765,9 +788,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_BothTransferTypes() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "cannot have both ibc_transfer and transfer")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "cannot have both ibc_transfer and transfer")
 }
 
 // TestExecuteSwapAndAction_NeitherTransferType tests error when neither IBCTransfer nor Transfer is set
@@ -805,9 +828,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_NeitherTransferType() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "must have either ibc_transfer or transfer")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "must have either ibc_transfer or transfer")
 }
 
 // TestExecuteSwapAndAction_InvalidIBCChannel tests validation of non-existent IBC channel
@@ -850,9 +873,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidIBCChannel() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "IBC channel")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "IBC channel")
 }
 
 // TestExecuteSwapAndAction_MissingIBCReceiver tests validation of missing receiver
@@ -895,12 +918,13 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingIBCReceiver() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
 	// Channel validation happens first, so we check for either error
 	s.Require().True(
-		strings.Contains(err.Error(), "receiver is required") || strings.Contains(err.Error(), "IBC channel"),
-		"error should mention receiver or channel issue: %s", err.Error(),
+		strings.Contains(ackErr, "receiver is required") || strings.Contains(ackErr, "IBC channel"),
+		"error should mention receiver or channel issue: %s", ackErr,
 	)
 }
 
@@ -941,9 +965,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidLocalTransferAddress()
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "invalid transfer.to_address")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "invalid transfer.to_address")
 }
 
 // TestExecuteSwapAndAction_InvalidRecoverAddress tests validation of invalid recover address
@@ -987,13 +1011,14 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidRecoverAddress() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
 	// Channel validation happens first, so we check for either error
 	s.Require().True(
-		(strings.Contains(err.Error(), "invalid") && strings.Contains(err.Error(), "recover_address")) ||
-			strings.Contains(err.Error(), "IBC channel"),
-		"error should mention invalid recover_address or channel issue: %s", err.Error(),
+		(strings.Contains(ackErr, "invalid") && strings.Contains(ackErr, "recover_address")) ||
+			strings.Contains(ackErr, "IBC channel"),
+		"error should mention invalid recover_address or channel issue: %s", ackErr,
 	)
 }
 
@@ -1028,9 +1053,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingLocalTransferAddress()
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "to_address is required")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "to_address is required")
 }
 
 // TestExecuteSwapAndAction_WithSingleAffiliate tests swap with a single affiliate
@@ -1083,8 +1108,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_WithSingleAffiliate() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify affiliate received fee
 	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
@@ -1161,8 +1186,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_WithMultipleAffiliates() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify both affiliates received fees
 	finalAffiliate1Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate1, "uatom")
@@ -1228,10 +1253,11 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidAffiliateAddress() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "invalid affiliate")
-	s.Require().Contains(err.Error(), "address")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
+	s.Require().Contains(ackErr, "invalid affiliate")
+	s.Require().Contains(ackErr, "address")
 }
 
 // TestExecuteSwapAndAction_InvalidAffiliateBasisPoints tests validation of invalid basis points
@@ -1280,10 +1306,11 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_InvalidAffiliateBasisPoints()
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "invalid affiliate")
-	s.Require().Contains(err.Error(), "basis_points_fee")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	ackErr := getAckError(ack)
+	s.Require().Contains(ackErr, "invalid affiliate")
+	s.Require().Contains(ackErr, "basis_points_fee")
 }
 
 // TestExecuteSwapAndAction_AffiliateBasisPointsExceeds10000 tests validation when basis points exceed 100%
@@ -1332,9 +1359,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateBasisPointsExceeds10
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "cannot exceed 10000")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "cannot exceed 10000")
 }
 
 // TestExecuteSwapAndAction_TotalAffiliateBasisPointsExceeds10000 tests validation when total basis points exceed 100%
@@ -1390,9 +1417,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_TotalAffiliateBasisPointsExce
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "total affiliate basis_points_fee cannot exceed 10000")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "total affiliate basis_points_fee cannot exceed 10000")
 }
 
 // TestExecuteSwapAndAction_MissingAffiliateAddress tests validation of missing affiliate address
@@ -1440,9 +1467,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingAffiliateAddress() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "address is required")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "address is required")
 }
 
 // TestExecuteSwapAndAction_MissingAffiliateBasisPoints tests validation of missing basis points
@@ -1491,9 +1518,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MissingAffiliateBasisPoints()
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "basis_points_fee is required")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "basis_points_fee is required")
 }
 
 // TestExecuteSwapAndAction_AffiliateFeeFromMinAmount tests that affiliate fees are calculated from min_asset, not actual output
@@ -1550,8 +1577,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateFeeFromMinAmount() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify affiliate received fee based on min amount, not actual output
 	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
@@ -1598,9 +1625,9 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MinAssetRequired() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "min_asset is required for swaps")
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().False(ack.Success())
+	s.Require().Contains(getAckError(ack), "min_asset is required for swaps")
 }
 
 // TestExecuteSwapAndAction_EmptyAffiliates tests that empty affiliates array is valid
@@ -1643,8 +1670,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_EmptyAffiliates() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 }
 
 // TestExecuteSwapAndAction_AffiliateFeesDeductedFromOutput tests that affiliate fees are correctly deducted from swap output
@@ -1697,8 +1724,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateFeesDeductedFromOutp
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify affiliate received fee (1% of 10000 = 100 uatom)
 	finalAffiliateBalance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate, "uatom")
@@ -1761,8 +1788,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateFeesFromPool() {
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify sender's uatom balance didn't decrease (fees come from pool, not sender)
 	finalSenderBalance := s.App.BankKeeper.GetBalance(s.Ctx, sender, "uatom")
@@ -1826,8 +1853,8 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_MultipleAffiliatesProportiona
 
 	tokenIn := sdk.NewCoin(sdk.DefaultBondDenom, osmomath.NewInt(100000))
 
-	err := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn)
-	s.Require().NoError(err)
+	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
+	s.Require().True(ack.Success())
 
 	// Verify both affiliates received correct proportional fees
 	finalAffiliate1Balance := s.App.BankKeeper.GetBalance(s.Ctx, affiliate1, "uatom")

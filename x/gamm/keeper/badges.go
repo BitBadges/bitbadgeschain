@@ -10,6 +10,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -143,7 +144,8 @@ func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badges
 
 	collection, found := k.badgesKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
 	if !found {
-		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidCollectionID, "collection %s not found", sdkmath.NewUint(collectionId).String())
+		return nil, customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidCollectionID, "collection %s not found",
+			sdkmath.NewUint(collectionId).String())
 	}
 
 	return collection, nil
@@ -193,6 +195,8 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 		}
 	}
 
+	// Important: We should only allow auto-scanned approvals here
+	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
 	msg := &badgestypes.MsgTransferTokens{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
@@ -255,6 +259,9 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 		return err
 	}
 
+	// Important: We should only allow auto-scanned approvals here
+	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
+	// The one time outgoing approval is safe because it is hardcoded
 	msg := &badgestypes.MsgTransferTokens{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
@@ -311,7 +318,8 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress
 			// otherwise, send the coins normally
 			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
-				return err
+				return customhookstypes.WrapErr(&ctx, err, "failed to send coins to pool: %s",
+					coin.Denom)
 			}
 		}
 	}
@@ -333,7 +341,8 @@ func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAdd
 			// otherwise, send the coins normally
 			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
-				return err
+				return customhookstypes.WrapErr(&ctx, err, "failed to send native tokens from pool: %s",
+					coin.Denom)
 			}
 		}
 	}
@@ -354,7 +363,8 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 		} else {
 			err := k.communityPoolKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
 			if err != nil {
-				return err
+				return customhookstypes.WrapErr(&ctx, err, "failed to fund community pool: %s",
+					coin.Denom)
 			}
 		}
 	}
@@ -370,7 +380,7 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 	// Convert to CFMMPoolI to access GetTotalPoolLiquidity
 	cfmmPool, ok := pool.(gammtypes.CFMMPoolI)
 	if !ok {
-		return sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "pool does not implement CFMMPoolI")
+		return customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidRequest, "pool does not implement CFMMPoolI")
 	}
 
 	poolLiquidity := cfmmPool.GetTotalPoolLiquidity(ctx)
@@ -381,13 +391,15 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
 			collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
 			if err != nil {
-				return sdkerrors.Wrapf(err, "failed to parse collection from denom: %s", coin.Denom)
+				return customhookstypes.WrapErr(&ctx, err, "failed to parse collection from denom: %s",
+					coin.Denom)
 			}
 
 			// Get the balances that would be needed for the recorded amount
 			balancesNeeded, err := GetBalancesToTransfer(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
-				return sdkerrors.Wrapf(err, "failed to get balances to transfer for denom: %s", coin.Denom)
+				return customhookstypes.WrapErr(&ctx, err, "failed to get balances to transfer for denom: %s",
+					coin.Denom)
 			}
 
 			// Get the pool's current balance
@@ -397,13 +409,8 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 			poolBalancesCopy := badgestypes.DeepCopyBalances(poolBalances.Balances)
 			_, err = badgestypes.SubtractBalances(ctx, balancesNeeded, poolBalancesCopy)
 			if err != nil {
-				return sdkerrors.Wrapf(
-					badgestypes.ErrInvalidRequest,
-					"pool address %s has insufficient badges liquidity for denom %s: %v",
-					poolAddress.String(),
-					coin.Denom,
-					err,
-				)
+				return customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidRequest, "pool address %s has insufficient badges liquidity for denom %s",
+					poolAddress.String(), coin.Denom)
 			}
 		} else {
 			// For all other denoms (including IBC and native), check bank balance
@@ -411,14 +418,8 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 			poolBalance := allBalances.AmountOf(coin.Denom)
 
 			if poolBalance.LT(coin.Amount) {
-				return sdkerrors.Wrapf(
-					badgestypes.ErrInvalidRequest,
-					"pool address %s has insufficient liquidity: required %s, available %s for denom %s",
-					poolAddress.String(),
-					coin.Amount.String(),
-					poolBalance.String(),
-					coin.Denom,
-				)
+				return customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidRequest, "pool address %s has insufficient liquidity: required %s, available %s for denom %s",
+					poolAddress.String(), coin.Amount.String(), poolBalance.String(), coin.Denom)
 			}
 		}
 	}

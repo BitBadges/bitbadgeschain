@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -23,44 +24,50 @@ func formatDenomForDisplay(denom string) string {
 	return denom
 }
 
+// SimulateCoinTransfers simulates coin transfers for approval validation
+// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) SimulateCoinTransfers(
 	ctx sdk.Context,
 	coinTransfers []*types.CoinTransfer,
 	transferMetadata TransferMetadata,
 	collection *types.TokenCollection,
 	royalties *types.UserRoyalties,
-) error {
+) (string, error) {
 	initiatedBy := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
 	if len(coinTransfers) == 0 {
-		return nil
+		return "", nil
 	}
 
 	allowedDenoms := k.GetAllowedDenoms(ctx)
 	if len(allowedDenoms) == 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "allowed denoms is empty")
+		detErrMsg := "allowed denoms is empty"
+		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 	}
 
 	royaltyPercentage := royalties.Percentage
 	royaltyPayoutAddress := royalties.PayoutAddress
 	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
 		if royaltyPayoutAddress == "" {
-			return sdkerrors.Wrap(types.ErrInvalidAddress, "payout address is required when royalty percentage is greater than 0")
+			detErrMsg := "payout address is required when royalty percentage is greater than 0"
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidAddress, detErrMsg)
 		}
 
 		_, err := sdk.AccAddressFromBech32(royaltyPayoutAddress)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid payout address %s", royaltyPayoutAddress)
+			return "", sdkerrors.Wrapf(err, "invalid payout address %s", royaltyPayoutAddress)
 		}
 	}
 
 	for _, coinTransfer := range coinTransfers {
 		if len(coinTransfer.Coins) == 0 {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
+			detErrMsg := "coin transfer cannot have empty coins slice"
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 		if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
-			return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
+			detErrMsg := fmt.Sprintf("denom %s is not allowed", coinTransfer.Coins[0].Denom)
+			return detErrMsg, sdkerrors.Wrap(ErrInvalidDenom, detErrMsg)
 		}
 	}
 
@@ -75,7 +82,8 @@ func (k Keeper) SimulateCoinTransfers(
 
 			fromAddress = approverAddress
 			if fromAddress == "" {
-				return sdkerrors.Wrap(types.ErrInvalidAddress, "approver address is required when overrideFromWithApproverAddress is true")
+				detErrMsg := "approver address is required when overrideFromWithApproverAddress is true"
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidAddress, detErrMsg)
 			}
 		}
 
@@ -97,13 +105,14 @@ func (k Keeper) SimulateCoinTransfers(
 		for _, coin := range toTransfer {
 			newCoins, underflow := spendableCoinsMap[fromAddress].SafeSub(*coin)
 			if underflow {
-				return sdkerrors.Wrapf(types.ErrUnderflow, "insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
+				detErrMsg := fmt.Sprintf("insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
+				return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, detErrMsg)
 			}
 			spendableCoinsMap[fromAddress] = newCoins
 		}
 	}
 
-	return nil
+	return "", nil
 }
 
 func (k Keeper) ExecuteCoinTransfers(

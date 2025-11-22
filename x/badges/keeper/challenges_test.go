@@ -47,6 +47,7 @@ func (suite *TestSuite) TestNoMerkleChallengeWorking() {
 			ApprovalLevel:   "collection",
 		},
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
+		"collection",
 	)
 	suite.Require().Nil(err, "Error getting user balance: %s")
 }
@@ -91,6 +92,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 			ApprovalLevel:   "collection",
 		},
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
+		"collection",
 	)
 
 	suite.Require().Error(err, "Error getting user balance: %s")
@@ -124,6 +126,7 @@ func (suite *TestSuite) TestMerkleChallengeInvalidSolutions() {
 			ApprovalLevel:   "collection",
 		},
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
+		"collection",
 	)
 	suite.Require().Error(err, "Error getting user balance: %s")
 }

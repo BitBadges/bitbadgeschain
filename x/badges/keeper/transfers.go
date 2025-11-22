@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -47,13 +48,15 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 
 	isArchived := types.GetIsArchived(ctx, collection)
 	if isArchived {
-		return ErrCollectionIsArchived
+		return customhookstypes.WrapErr(&ctx, ErrCollectionIsArchived, "collection is currently archived (read-only)")
 	}
 
 	// Validate transfers with invariants
 	for _, transfer := range transfers {
 		if err := types.ValidateTransferWithInvariants(ctx, transfer, true, collection); err != nil {
-			return err
+			// Create deterministic error message without using err.Error()
+			detErrMsg := fmt.Sprintf("invariants validation failed for collection %s", collection.CollectionId.String())
+			return customhookstypes.WrapErrSimple(&ctx, err, detErrMsg)
 		}
 	}
 
@@ -66,7 +69,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 		// Convert to uint64 for more efficient loop iteration
 		// Add bounds checking to prevent potential issues with very large values
 		if numAttempts.GT(sdkmath.NewUint(10000)) {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "numAttempts cannot exceed 10000, got %s", numAttempts.String())
+			return customhookstypes.WrapErr(&ctx, types.ErrInvalidRequest, "numAttempts cannot exceed 10000, got %s", numAttempts.String())
 		}
 
 		numAttemptsUint64 := numAttempts.Uint64()
@@ -279,9 +282,9 @@ func (k Keeper) HandleTransfer(
 	}
 
 	transferBalances := types.DeepCopyBalances(transfer.Balances)
-	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, transferMetadata, eventTracking)
+	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, transferMetadata, eventTracking, "collection")
 	if err != nil {
-		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection approvals (transferability) not satisfied")
+		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection transferability error")
 	}
 
 	if len(userApprovals) > 0 {
@@ -305,7 +308,7 @@ func (k Keeper) HandleTransfer(
 
 				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalances, newTransfer, transferMetadata, fromUserBalance, eventTracking, userApproval.UserRoyalties)
 				if err != nil {
-					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s not satisfied", from)
+					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s", from)
 				}
 			} else {
 				transferMetadata.ApproverAddress = to
@@ -313,7 +316,7 @@ func (k Keeper) HandleTransfer(
 
 				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalances, newTransfer, transferMetadata, toUserBalance, eventTracking, userApproval.UserRoyalties)
 				if err != nil {
-					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s not satisfied", to)
+					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s", to)
 				}
 			}
 		}
@@ -325,7 +328,8 @@ func (k Keeper) HandleTransfer(
 		if !types.IsMintAddress(from) && !k.IsSpecialBackedAddress(ctx, collection, from) {
 			fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
 			if err != nil {
-				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "inadequate balances for transfer from %s", from)
+				detErrMsg := fmt.Sprintf("inadequate balances for transfer from %s", from)
+				return &types.UserBalanceStore{}, &types.UserBalanceStore{}, customhookstypes.WrapErrSimple(&ctx, err, detErrMsg)
 			}
 		}
 

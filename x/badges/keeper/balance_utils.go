@@ -59,5 +59,5 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 // SetBalanceForAddress stores a user balance for a specific address
 func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.TokenCollection, userAddress string, balance *types.UserBalanceStore) error {
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
-	return k.SetUserBalanceInStore(ctx, balanceKey, balance)
+	return k.SetUserBalanceInStore(ctx, balanceKey, balance, false)
 }

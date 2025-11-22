@@ -3,9 +3,11 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -23,9 +25,11 @@ type UserApprovalsToCheck struct {
 
 // CheckAltTimeChecks validates if the current UTC time falls within any offline hours or days specified in altTimeChecks.
 // Returns an error if the time is within an offline period (i.e., the approval should be denied).
-func (k Keeper) CheckAltTimeChecks(ctx sdk.Context, altTimeChecks *types.AltTimeChecks) error {
+// CheckAltTimeChecks validates alternative time checks
+// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
+func (k Keeper) CheckAltTimeChecks(ctx sdk.Context, altTimeChecks *types.AltTimeChecks) (string, error) {
 	if altTimeChecks == nil {
-		return nil
+		return "", nil
 	}
 
 	// Get UTC time from block time
@@ -40,10 +44,11 @@ func (k Keeper) CheckAltTimeChecks(ctx sdk.Context, altTimeChecks *types.AltTime
 	if len(altTimeChecks.OfflineHours) > 0 {
 		found, err := types.SearchUintRangesForUint(currentHour, altTimeChecks.OfflineHours)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "error checking offline hours")
+			return "", sdkerrors.Wrapf(err, "error checking offline hours")
 		}
 		if found {
-			return sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer denied: current UTC hour %d falls within offline hours", currentHour.Uint64())
+			detErrMsg := fmt.Sprintf("transfer denied: current UTC hour %d falls within offline hours", currentHour.Uint64())
+			return detErrMsg, sdkerrors.Wrap(ErrDisallowedTransfer, detErrMsg)
 		}
 	}
 
@@ -51,14 +56,15 @@ func (k Keeper) CheckAltTimeChecks(ctx sdk.Context, altTimeChecks *types.AltTime
 	if len(altTimeChecks.OfflineDays) > 0 {
 		found, err := types.SearchUintRangesForUint(currentDay, altTimeChecks.OfflineDays)
 		if err != nil {
-			return sdkerrors.Wrapf(err, "error checking offline days")
+			return "", sdkerrors.Wrapf(err, "error checking offline days")
 		}
 		if found {
-			return sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer denied: current UTC day %d falls within offline days", currentDay.Uint64())
+			detErrMsg := fmt.Sprintf("transfer denied: current UTC day %d falls within offline days", currentDay.Uint64())
+			return detErrMsg, sdkerrors.Wrap(ErrDisallowedTransfer, detErrMsg)
 		}
 	}
 
-	return nil
+	return "", nil
 }
 
 // All in one approval deduction function. We also return the user approvals to check (only used when collection approvals)
@@ -71,11 +77,12 @@ func (k Keeper) DeductAndGetUserApprovals(
 	transferMetadata TransferMetadata,
 	eventTracking *EventTracking,
 	royalties *types.UserRoyalties,
+	approvalLevel string,
 ) ([]*UserApprovalsToCheck, error) {
 	fromAddress := transferMetadata.From
 	toAddress := transferMetadata.To
 	initiatedBy := transferMetadata.InitiatedBy
-	approvalLevel := transferMetadata.ApprovalLevel
+	// Use the approvalLevel parameter passed in (not from transferMetadata)
 	approverAddress := transferMetadata.ApproverAddress
 
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
@@ -87,19 +94,44 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	potentialErrors := []string{}
 
+	type ErrorWithIdx struct {
+		ErrorMsgs []string
+		Idx       int
+	}
+
+	errorsWithIdx := []ErrorWithIdx{}
+
+	addToPotentialErrors := func(errorMsg string, idx int) {
+		exists := false
+		for _, errorWithIdx := range errorsWithIdx {
+			if errorWithIdx.Idx == idx {
+				errorWithIdx.ErrorMsgs = append(errorWithIdx.ErrorMsgs, errorMsg)
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			errorsWithIdx = append(errorsWithIdx, ErrorWithIdx{ErrorMsgs: []string{errorMsg}, Idx: idx})
+		}
+	}
+
 	// Helper function to add potential errors for prioritized approvals
-	addPotentialError := func(isPrioritizedApproval bool, errorMsg string) {
-		if isPrioritizedApproval {
+	addPotentialError := func(isExplicitlyPrioritized bool, idx int, errorMsg string) {
+		addToPotentialErrors(errorMsg, idx)
+
+		if isExplicitlyPrioritized {
 			potentialErrors = append(potentialErrors, errorMsg)
 		}
 	}
+
+	approvalIdxsChecked := []int{} //We keep track of the indexes of the approvals that we have checked
 
 	//For each approved transfer, we check if the transfer is allowed
 	// 1: If transfer meets all criteria, we deduct, get user approvals to check, and continue (if there are any remaining balances)
 	// 2. If transfer does not meet all criteria, we continue and do not mark anything as handled
 	// 3. At the end, if there are any unhandled transfers, we throw (not enough approvals = transfer disallowed)
 	userApprovalsToCheck := []*UserApprovalsToCheck{}
-	for _, approval := range approvals {
+	for idx, approval := range approvals {
 		remainingBalances = types.FilterZeroBalances(remainingBalances)
 		if len(remainingBalances) == 0 {
 			break
@@ -113,10 +145,10 @@ func (k Keeper) DeductAndGetUserApprovals(
 			userRoyalties = approval.ApprovalCriteria.UserRoyalties
 		}
 
-		isPrioritizedApproval := false
+		isExplicitlyPrioritized := false
 		for _, prioritizedApproval := range transfer.PrioritizedApprovals {
 			if prioritizedApproval.ApprovalId == approval.ApprovalId && prioritizedApproval.ApprovalLevel == approvalLevel && prioritizedApproval.ApproverAddress == approverAddress {
-				isPrioritizedApproval = true
+				isExplicitlyPrioritized = true
 				break
 			}
 		}
@@ -124,7 +156,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 		//Initial checks: Make sure (from, to, initiatedBy) match the approval's collection list IDs
 		doAddressesMatch := k.CheckIfAddressesMatchCollectionListIds(ctx, approval, fromAddress, toAddress, initiatedBy)
 		if !doAddressesMatch {
-			addPotentialError(isPrioritizedApproval, fmt.Sprintf("addresses do not match (from, to, initiatedBy): %s, %s, %s", fromAddress, toAddress, initiatedBy))
+			addPotentialError(isExplicitlyPrioritized, idx, fmt.Sprintf("addresses do not match (from, to, initiatedBy): %s, %s, %s", fromAddress, toAddress, initiatedBy))
 			continue
 		}
 
@@ -132,9 +164,12 @@ func (k Keeper) DeductAndGetUserApprovals(
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 		currTimeFound, err := types.SearchUintRangesForUint(currTime, approval.TransferTimes)
 		if !currTimeFound || err != nil {
-			addPotentialError(isPrioritizedApproval, "transfer time not in range")
+			addPotentialError(isExplicitlyPrioritized, idx, "transfer time not in range")
 			continue
 		}
+
+		// Only after we sanity check the addresses and times
+		approvalIdxsChecked = append(approvalIdxsChecked, idx)
 
 		transferStr := "attempting to transfer ID " + approval.TokenIds[0].Start.String()
 
@@ -180,61 +215,81 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			approvalCriteria := approval.ApprovalCriteria
 			if approvalCriteria.RequireFromDoesNotEqualInitiatedBy && fromAddress == initiatedBy {
-				addPotentialError(isPrioritizedApproval, "from address equals initiated by")
+				addPotentialError(isExplicitlyPrioritized, idx, "from address equals initiated by")
 				continue
 			}
 
 			if approvalCriteria.RequireFromEqualsInitiatedBy && fromAddress != initiatedBy {
-				addPotentialError(isPrioritizedApproval, "from address does not equal initiated by")
+				addPotentialError(isExplicitlyPrioritized, idx, "from address does not equal initiated by")
 				continue
 			}
 
 			if approvalCriteria.RequireToDoesNotEqualInitiatedBy && toAddress == initiatedBy {
-				addPotentialError(isPrioritizedApproval, "to address equals initiated by")
+				addPotentialError(isExplicitlyPrioritized, idx, "to address equals initiated by")
 				continue
 			}
 
 			if approvalCriteria.RequireToEqualsInitiatedBy && toAddress != initiatedBy {
-				addPotentialError(isPrioritizedApproval, "to address does not equal initiated by")
+				addPotentialError(isExplicitlyPrioritized, idx, "to address does not equal initiated by")
 				continue
 			}
 
-			err = k.CheckMustOwnTokens(ctx, approvalCriteria.MustOwnTokens, initiatedBy, fromAddress, toAddress)
+			detErrMsg, err := k.CheckMustOwnTokens(ctx, approvalCriteria.MustOwnTokens, initiatedBy, fromAddress, toAddress)
 			if err != nil {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("ownership check failed: %s", err))
+				if detErrMsg != "" {
+					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+				} else {
+					addPotentialError(isExplicitlyPrioritized, idx, "ownership check failed")
+				}
 				continue
 			}
 
 			// Check address checks for sender, recipient, and initiator
 			if approvalCriteria.SenderChecks != nil {
-				err = k.CheckAddressChecks(ctx, approvalCriteria.SenderChecks, fromAddress)
+				detErrMsg, err := k.CheckAddressChecks(ctx, approvalCriteria.SenderChecks, fromAddress)
 				if err != nil {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("sender address check failed: %s", err))
+					if detErrMsg != "" {
+						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+					} else {
+						addPotentialError(isExplicitlyPrioritized, idx, "sender address check failed")
+					}
 					continue
 				}
 			}
 
 			if approvalCriteria.RecipientChecks != nil {
-				err = k.CheckAddressChecks(ctx, approvalCriteria.RecipientChecks, toAddress)
+				detErrMsg, err := k.CheckAddressChecks(ctx, approvalCriteria.RecipientChecks, toAddress)
 				if err != nil {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("recipient address check failed: %s", err))
+					if detErrMsg != "" {
+						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+					} else {
+						addPotentialError(isExplicitlyPrioritized, idx, "recipient address check failed")
+					}
 					continue
 				}
 			}
 
 			if approvalCriteria.InitiatorChecks != nil {
-				err = k.CheckAddressChecks(ctx, approvalCriteria.InitiatorChecks, initiatedBy)
+				detErrMsg, err := k.CheckAddressChecks(ctx, approvalCriteria.InitiatorChecks, initiatedBy)
 				if err != nil {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("initiator address check failed: %s", err))
+					if detErrMsg != "" {
+						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+					} else {
+						addPotentialError(isExplicitlyPrioritized, idx, "initiator address check failed")
+					}
 					continue
 				}
 			}
 
 			// Check alternative time checks (offline hours/days)
 			if approvalCriteria.AltTimeChecks != nil {
-				err = k.CheckAltTimeChecks(ctx, approvalCriteria.AltTimeChecks)
+				detErrMsg, err := k.CheckAltTimeChecks(ctx, approvalCriteria.AltTimeChecks)
 				if err != nil {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("alt time check failed: %s", err))
+					if detErrMsg != "" {
+						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+					} else {
+						addPotentialError(isExplicitlyPrioritized, idx, "alt time check failed")
+					}
 					continue
 				}
 			}
@@ -245,11 +300,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 				if fromAddress != types.MintAddress {
 					// Only check if fromAddress is not "Mint"
 					if approvalCriteria.OverridesFromOutgoingApprovals {
-						addPotentialError(isPrioritizedApproval, fmt.Sprintf("forceful transfers that bypass user outgoing approvals are disallowed when noForcefulPostMintTransfers invariant is enabled (unless from address is Mint)"))
+						addPotentialError(isExplicitlyPrioritized, idx, fmt.Sprintf("forceful transfers that bypass user outgoing approvals are disallowed when noForcefulPostMintTransfers invariant is enabled (unless from address is Mint)"))
 						continue
 					}
 					if approvalCriteria.OverridesToIncomingApprovals {
-						addPotentialError(isPrioritizedApproval, fmt.Sprintf("forceful transfers that bypass user incoming approvals are disallowed when noForcefulPostMintTransfers invariant is enabled (unless from address is Mint)"))
+						addPotentialError(isExplicitlyPrioritized, idx, fmt.Sprintf("forceful transfers that bypass user incoming approvals are disallowed when noForcefulPostMintTransfers invariant is enabled (unless from address is Mint)"))
 						continue
 					}
 				}
@@ -263,7 +318,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			//     because this would mess up the entire escrow system and could cause infinite liquidity glitches
 			if approvalCriteria.OverridesFromOutgoingApprovals && fromAddress != initiatedBy {
 				if k.IsAddressReservedProtocolInStore(ctx, fromAddress) {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("forceful transfers that bypass user approvals from reserved protocol addresses are globally disallowed (please use an approval that checks user-level approvals): %s", fromAddress))
+					addPotentialError(isExplicitlyPrioritized, idx, fmt.Sprintf("forceful transfers that bypass user approvals from reserved protocol addresses are globally disallowed (please use an approval that checks user-level approvals): %s", fromAddress))
 					continue
 				}
 			}
@@ -274,17 +329,23 @@ func (k Keeper) DeductAndGetUserApprovals(
 				ctx,
 				approvalCriteria.DynamicStoreChallenges,
 				initiatedBy,
-				isPrioritizedApproval,
-				addPotentialError,
+				isExplicitlyPrioritized,
+				func(isExplicitlyPrioritized bool, errorMsg string) {
+					addPotentialError(isExplicitlyPrioritized, idx, errorMsg)
+				},
 			)
 			if err != nil {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("dynamic store challenge error: %s", err))
+				addPotentialError(isExplicitlyPrioritized, idx, "dynamic store challenge error")
 				continue
 			}
 
-			err = k.SimulateCoinTransfers(ctx, approvalCriteria.CoinTransfers, transferMetadata, collection, royalties)
+			detErrMsg, err = k.SimulateCoinTransfers(ctx, approvalCriteria.CoinTransfers, transferMetadata, collection, royalties)
 			if err != nil {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("coin transfer error: %s", err))
+				if detErrMsg != "" {
+					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+				} else {
+					addPotentialError(isExplicitlyPrioritized, idx, "coin transfer error")
+				}
 				continue
 			}
 
@@ -297,11 +358,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			transferBalancesToCheck = types.FilterZeroBalances(transferBalancesToCheck)
 			if len(transferBalancesToCheck) == 0 {
-				addPotentialError(isPrioritizedApproval, "no balances to check")
+				addPotentialError(isExplicitlyPrioritized, idx, "no balances to check")
 				continue
 			}
 
-			challengeNumIncrements, err := k.SimulateMerkleChallenges(
+			detErrMsg, challengeNumIncrements, err := k.SimulateMerkleChallenges(
 				ctx,
 				collection.CollectionId,
 				transfer,
@@ -309,12 +370,16 @@ func (k Keeper) DeductAndGetUserApprovals(
 				transferMetadata,
 			)
 			if err != nil {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("merkle challenge error: %s", err))
+				if detErrMsg != "" {
+					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+				} else {
+					addPotentialError(isExplicitlyPrioritized, idx, "merkle challenge error")
+				}
 				continue
 			}
 
 			// Handle ETH signature challenges
-			err = k.SimulateETHSignatureChallenges(
+			detErrMsg, err = k.SimulateETHSignatureChallenges(
 				ctx,
 				collection.CollectionId,
 				transfer,
@@ -322,7 +387,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 				transferMetadata,
 			)
 			if err != nil {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("eth signature challenge error: %s", err))
+				if detErrMsg != "" {
+					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+				} else {
+					addPotentialError(isExplicitlyPrioritized, idx, "eth signature challenge error")
+				}
 				continue
 			}
 
@@ -345,7 +414,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			failed := false
 			for i, trackerType := range trackerTypes {
 				//Get max allowed by criteria
-				maxPossible, err := k.GetMaxPossible(
+				detErrMsg, maxPossible, err := k.GetMaxPossible(
 					ctx,
 					collection,
 					approval,
@@ -358,7 +427,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 					approvedAddresses[i],
 				)
 				if err != nil {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("get max possible error: %s", err))
+					if detErrMsg != "" {
+						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+					} else {
+						addPotentialError(isExplicitlyPrioritized, idx, "get max possible error")
+					}
 					failed = true
 					break
 				}
@@ -366,7 +439,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				//Get max allowed by remaining balances to check
 				transferBalancesToCheck, err = types.GetOverlappingBalances(ctx, maxPossible, transferBalancesToCheck)
 				if err != nil {
-					addPotentialError(isPrioritizedApproval, fmt.Sprintf("get overlapping balances error: %s", err))
+					addPotentialError(isExplicitlyPrioritized, idx, "get overlapping balances error")
 					failed = true
 					break
 				}
@@ -382,14 +455,18 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			//here, we assert that the transfer can be incremented and is within the threshold for all trackers (this is a simulation)
 			for i, trackerType := range trackerTypes {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, transferMetadata, trackerType, approvedAddresses[i], true, transfer.PrecalculationOptions)
+				detErrMsg, err := k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, transferMetadata, trackerType, approvedAddresses[i], true, transfer.PrecalculationOptions)
 				if err != nil {
+					if detErrMsg != "" {
+						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
+					} else {
+						addPotentialError(isExplicitlyPrioritized, idx, "increment approval and assert within threshold error")
+					}
 					failed = true
 					break
 				}
 			}
 			if failed {
-				addPotentialError(isPrioritizedApproval, fmt.Sprintf("increment approval and assert within threshold error: %s", err))
 				continue
 			}
 
@@ -409,8 +486,10 @@ func (k Keeper) DeductAndGetUserApprovals(
 				ctx,
 				approvalCriteria.DynamicStoreChallenges,
 				initiatedBy,
-				isPrioritizedApproval,
-				addPotentialError,
+				isExplicitlyPrioritized,
+				func(isExplicitlyPrioritized bool, errorMsg string) {
+					addPotentialError(isExplicitlyPrioritized, idx, errorMsg)
+				},
 			)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "%s", transferStr)
@@ -419,7 +498,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
 			//If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
 			//    If so, useLeafIndexForNumIncrements will be true
-			challengeNumIncrements, err = k.HandleMerkleChallenges(
+			_, challengeNumIncrements, err = k.HandleMerkleChallenges(
 				ctx,
 				collection.CollectionId,
 				transfer,
@@ -444,7 +523,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			for i, trackerType := range trackerTypes {
-				err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, transferMetadata, trackerType, approvedAddresses[i], false, transfer.PrecalculationOptions)
+				_, err = k.IncrementApprovalsAndAssertWithinThreshold(ctx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, transferMetadata, trackerType, approvedAddresses[i], false, transfer.PrecalculationOptions)
 				if err != nil {
 					return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "error incrementing approvals")
 				}
@@ -470,9 +549,37 @@ func (k Keeper) DeductAndGetUserApprovals(
 		if len(potentialErrors) > 0 {
 			potentialErrorsStr = " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
 		} else {
-			potentialErrorsStr = " - auto-scan failed"
+			approvalsWithPluralConditional := "approval"
+			if len(approvalIdxsChecked) > 1 {
+				approvalsWithPluralConditional = "approvals"
+			}
+			approvalIdxsCheckedStr := []string{}
+			for _, idx := range approvalIdxsChecked {
+				approvalIdxsCheckedStr = append(approvalIdxsCheckedStr, strconv.Itoa(idx))
+			}
+			potentialErrorsStr = " - auto-scan failed (checked " + strconv.Itoa(len(approvalIdxsChecked)) + " potentially matching " + approvalsWithPluralConditional
+			if len(approvalIdxsChecked) > 0 {
+				potentialErrorsStr += ", idxs: " + strings.Join(approvalIdxsCheckedStr, ", ")
+			}
+			potentialErrorsStr += ")"
+
+			// Try to be smart about error logs. If we only checked one approval via auto-scan, we can just log the errors for that approval
+			if len(approvalIdxsChecked) == 1 {
+				idxChecked := approvalIdxsChecked[0]
+				errorsForIdx := []string{}
+				for _, errorWithIdx := range errorsWithIdx {
+					if errorWithIdx.Idx == idxChecked {
+						errorsForIdx = errorWithIdx.ErrorMsgs
+						break
+					}
+				}
+				potentialErrorsStr = ": errors for only matching approval idx " + strconv.Itoa(idxChecked) + ": " + strings.Join(errorsForIdx, ", ")
+			}
 		}
-		return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "no approval satisfied for transfer: %s%s", transferStr, potentialErrorsStr)
+
+		// Prefix deterministic error message with approval level
+		detErrMsg := fmt.Sprintf("%s approvals not satisfied: %s%s", approvalLevel, transferStr, potentialErrorsStr)
+		return []*UserApprovalsToCheck{}, customhookstypes.WrapErrSimple(&ctx, ErrInadequateApprovals, detErrMsg)
 	}
 
 	// cannot have two different user royalty percentages
@@ -484,7 +591,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			if !userApproval.UserRoyalties.Percentage.Equal(userRoyalties.Percentage) {
-				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(ErrInadequateApprovals, "multiple user-level royalties found - please split your transfer up to use one collection approval w/ royalty per transfer")
+				detErrMsg := "multiple user-level royalties found - please split your transfer up to use one collection approval w/ royalty per transfer"
+				return []*UserApprovalsToCheck{}, customhookstypes.WrapErrSimple(&ctx, ErrInadequateApprovals, detErrMsg)
 			}
 		}
 	}
@@ -546,6 +654,7 @@ func (k Keeper) GetApprovalTrackerFromStoreAndResetIfNeeded(ctx sdk.Context, col
 }
 
 // GetMaxPossible calculates the maximum possible transfer amounts based on approval criteria
+// Returns (deterministicErrorMsg, balances, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) GetMaxPossible(
 	ctx sdk.Context,
 	collection *types.TokenCollection,
@@ -557,7 +666,7 @@ func (k Keeper) GetMaxPossible(
 	transferMetadata TransferMetadata,
 	trackerType string,
 	address string,
-) ([]*types.Balance, error) {
+) (string, []*types.Balance, error) {
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
 	// Initialize with transfer balances
@@ -565,7 +674,7 @@ func (k Keeper) GetMaxPossible(
 
 	// If no amount restrictions, return full transfer balances
 	if approvedAmount.IsNil() || approvedAmount.IsZero() {
-		return transferBalances, nil
+		return "", transferBalances, nil
 	}
 
 	// Get approval tracker details
@@ -585,7 +694,7 @@ func (k Keeper) GetMaxPossible(
 		false,
 	)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	// Calculate current tally for specific IDs and times
@@ -596,7 +705,7 @@ func (k Keeper) GetMaxPossible(
 		amountsTrackerDetails.Amounts,
 	)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	// Calculate maximum balances that can be added without exceeding threshold
@@ -608,10 +717,10 @@ func (k Keeper) GetMaxPossible(
 
 	maxBalancesWeCanAdd, err := types.SubtractBalances(ctx, currTallyForCurrentIdsAndTimes, allApprovals)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	return maxBalancesWeCanAdd, nil
+	return "", maxBalancesWeCanAdd, nil
 }
 
 // handlePredeterminedBalances checks if the transfer matches predetermined balance requirements
@@ -683,6 +792,7 @@ func handlePredeterminedBalances(
 }
 
 // IncrementApprovalsAndAssertWithinThreshold handles approval tracking and threshold checks
+// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	ctx sdk.Context,
 	collection *types.TokenCollection,
@@ -697,7 +807,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	address string,
 	simulate bool,
 	precalculationOptions *types.PrecalculationOptions,
-) error {
+) (string, error) {
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
 	approvalCriteria := approval.ApprovalCriteria
@@ -744,7 +854,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			false,
 		)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		maxNumTransfersTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
@@ -760,7 +870,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			true,
 		)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
@@ -776,7 +886,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		collection,
 	)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Handle amount approvals
@@ -788,7 +898,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			amountsTrackerDetails.Amounts,
 		)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		thresholdAmounts := []*types.Balance{{
@@ -804,7 +914,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			thresholdAmounts,
 		)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		amountsTrackerDetails.Amounts, err = types.AddBalances(
@@ -813,7 +923,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			transferBalances,
 		)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
@@ -821,7 +931,8 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	if maxNumTransfers.GT(sdkmath.NewUint(0)) || isCustomChallengeOrderCalculation(approvalCriteria.PredeterminedBalances, trackerType) {
 		maxNumTransfersTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
 		if maxNumTransfers.GT(sdkmath.NewUint(0)) && maxNumTransfersTrackerDetails.NumTransfers.GT(maxNumTransfers) {
-			return sdkerrors.Wrapf(ErrDisallowedTransfer, "exceeded max transfers allowed - %s", maxNumTransfers.String())
+			detErrMsg := fmt.Sprintf("exceeded max transfers allowed - %s", maxNumTransfers.String())
+			return detErrMsg, sdkerrors.Wrap(ErrDisallowedTransfer, detErrMsg)
 		}
 	}
 
@@ -837,22 +948,22 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 
 		amountsStr, err := marshalToString(amountsTrackerDetails.Amounts)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		numTransfersStr, err := marshalToString(maxNumTransfersTrackerDetails.NumTransfers)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		amountsNumTransfersStr, err := marshalToString(amountsTrackerDetails.NumTransfers)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		maxNumTransfersAmountsStr, err := marshalToString(maxNumTransfersTrackerDetails.Amounts)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		isSameId := amountsTrackerId == maxNumTransfersTrackerId
@@ -884,7 +995,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 			)
 			if err != nil {
-				return err
+				return "", err
 			}
 		} else {
 			EmitApprovalEvent(
@@ -927,7 +1038,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 			)
 			if err != nil {
-				return err
+				return "", err
 			}
 
 			err = k.SetApprovalTrackerInStore(
@@ -942,12 +1053,12 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 			)
 			if err != nil {
-				return err
+				return "", err
 			}
 		}
 	}
 
-	return nil
+	return "", nil
 }
 
 func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
@@ -986,7 +1097,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 
 				//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
 				//If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
-				numIncrementsFetched, err := k.SimulateMerkleChallenges(
+				_, numIncrementsFetched, err := k.SimulateMerkleChallenges(
 					ctx,
 					collection.CollectionId,
 					transfer,

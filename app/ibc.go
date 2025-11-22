@@ -61,6 +61,7 @@ import (
 
 	customhooks "github.com/bitbadges/bitbadgeschain/x/custom-hooks"
 	customhookskeeper "github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	ibchookstypes "github.com/bitbadges/bitbadgeschain/x/ibc-hooks/types"
 	ibcratelimithooks "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/hooks"
@@ -128,6 +129,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		storetypes.NewKVStoreKey(ibcratelimittypes.StoreKey),
 		storetypes.NewMemoryStoreKey(capabilitytypes.MemStoreKey),
 		storetypes.NewTransientStoreKey(paramstypes.TStoreKey),
+		customhookstypes.TransientStoreKey,
 	); err != nil {
 		return err
 	}

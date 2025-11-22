@@ -488,7 +488,7 @@ func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
 				},
 			},
 		},
-	})
+	}, true)
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	createMsg := GetDefaultCreateMsg()
@@ -515,7 +515,7 @@ func (suite *TestSuite) TestCollectionIdReservedMapsWithManagerNotManager() {
 				},
 			},
 		},
-	})
+	}, true)
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	createMsg := GetDefaultCreateMsg()
@@ -550,7 +550,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 				},
 			},
 		},
-	})
+	}, true)
 
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
@@ -573,7 +573,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 				},
 			},
 		},
-	})
+	}, true)
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,
@@ -628,7 +628,7 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 				},
 			},
 		},
-	})
+	}, true)
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{
 		Creator: alice,

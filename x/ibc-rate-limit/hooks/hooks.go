@@ -2,8 +2,8 @@ package hooks
 
 import (
 	"encoding/json"
+	"fmt"
 
-	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
@@ -14,7 +14,6 @@ import (
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
-	ratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
 
 var _ ibchooks.OnRecvPacketBeforeHooks = &RateLimitHooks{}
@@ -57,10 +56,10 @@ func (h *RateLimitHooks) OnRecvPacketBeforeHook(ctx sdk.Context, packet channelt
 	senderAddr := data.Sender
 
 	// Check rate limit for inflow
-	if err := h.keeper.CheckRateLimit(ctx, channelID, denom, amount, true, senderAddr); err != nil {
+	ack := h.keeper.CheckRateLimit(ctx, channelID, denom, amount, true, senderAddr)
+	if !ack.Success() {
 		// Rate limit exceeded - this will be caught by the override hook
-		// We log here but the actual rejection happens in the override hook
-		h.keeper.Logger(ctx).Error("rate limit check failed on receive", "error", err, "channel", channelID, "denom", denom, "amount", amount)
+		h.keeper.Logger(ctx).Error("rate limit check failed on receive", "channel", channelID, "denom", denom, "amount", amount)
 	}
 }
 
@@ -101,9 +100,10 @@ func (h *RateLimitHooks) SendPacketBeforeHook(ctx sdk.Context, chanCap *capabili
 	senderAddr := packetData.Sender
 
 	// Check rate limit for outflow
-	if err := h.keeper.CheckRateLimit(ctx, sourceChannel, denom, amount, false, senderAddr); err != nil {
+	ack := h.keeper.CheckRateLimit(ctx, sourceChannel, denom, amount, false, senderAddr)
+	if !ack.Success() {
 		// Rate limit exceeded - log but don't fail here as we need to fail in override hook
-		h.keeper.Logger(ctx).Error("rate limit check failed on send", "error", err, "channel", sourceChannel, "denom", denom, "amount", amount)
+		h.keeper.Logger(ctx).Error("rate limit check failed on send", "channel", sourceChannel, "denom", denom, "amount", amount)
 	}
 }
 
@@ -144,9 +144,17 @@ func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware,
 	senderAddr := data.Sender
 
 	// Check rate limit for inflow
-	if err := h.keeper.CheckRateLimit(ctx, channelID, denom, amount, true, senderAddr); err != nil {
+	rateLimitAck := h.keeper.CheckRateLimit(ctx, channelID, denom, amount, true, senderAddr)
+	if !rateLimitAck.Success() {
 		// Rate limit exceeded - reject packet
-		return channeltypes.NewErrorAcknowledgement(errorsmod.Wrap(ratelimittypes.ErrRateLimitExceeded, err.Error()))
+		h.keeper.Logger(ctx).Error("rate limit exceeded, rejecting packet",
+			"channel", channelID,
+			"denom", denom,
+			"amount", amount.String(),
+			"sender", senderAddr,
+		)
+		// Return the error acknowledgement from CheckRateLimit (already has deterministic error message)
+		return rateLimitAck
 	}
 
 	// Rate limit check passed, process packet
@@ -193,9 +201,24 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	senderAddr := packetData.Sender
 
 	// Check rate limit for outflow
-	if err := h.keeper.CheckRateLimit(ctx, sourceChannel, denom, amount, false, senderAddr); err != nil {
+	ack := h.keeper.CheckRateLimit(ctx, sourceChannel, denom, amount, false, senderAddr)
+	if !ack.Success() {
 		// Rate limit exceeded - reject send
-		return 0, errorsmod.Wrap(ratelimittypes.ErrRateLimitExceeded, err.Error())
+		h.keeper.Logger(ctx).Error("rate limit exceeded, rejecting send",
+			"channel", sourceChannel,
+			"denom", denom,
+			"amount", amount.String(),
+			"sender", senderAddr,
+		)
+		// Extract error message from acknowledgement for return
+		channelAck, ok := ack.(channeltypes.Acknowledgement)
+		if ok {
+			if errResp, ok := channelAck.Response.(*channeltypes.Acknowledgement_Error); ok {
+				return 0, fmt.Errorf("%s: %s", "rate limit exceeded", errResp.Error)
+			}
+		}
+		// Fallback if acknowledgement format is unexpected
+		return 0, fmt.Errorf("rate limit exceeded: channel=%s, denom=%s, amount=%s, sender=%s", sourceChannel, denom, amount.String(), senderAddr)
 	}
 
 	// Rate limit check passed, send packet

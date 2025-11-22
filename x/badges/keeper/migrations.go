@@ -218,7 +218,7 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
 
 		// Save the updated collection
-		if err := k.SetCollectionInStore(ctx, &newCollection); err != nil {
+		if err := k.SetCollectionInStore(ctx, &newCollection, true); err != nil {
 			return err
 		}
 	}

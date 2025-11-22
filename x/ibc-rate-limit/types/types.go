@@ -2,6 +2,9 @@ package types
 
 import (
 	"fmt"
+
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
 
 // DefaultGenesis returns the default genesis state
@@ -149,4 +152,26 @@ func (p Params) FindMatchingConfig(channelID, denom string) *RateLimitConfig {
 		}
 	}
 	return nil
+}
+
+// NewCustomErrorAcknowledgement creates a custom error acknowledgement with a deterministic error string
+// IMPORTANT: The error string must be deterministic (no traces, logs, or non-deterministic values)
+// This is used instead of channeltypes.NewErrorAcknowledgement to provide more friendly error messages
+func NewCustomErrorAcknowledgement(errorMsg string) ibcexported.Acknowledgement {
+	return channeltypes.Acknowledgement{
+		Response: &channeltypes.Acknowledgement_Error{
+			Error: fmt.Sprintf("ibc-rate-limit: %s", errorMsg),
+		},
+	}
+}
+
+// NewSuccessAcknowledgement creates a success acknowledgement
+// This is used internally to indicate successful execution
+func NewSuccessAcknowledgement() ibcexported.Acknowledgement {
+	return channeltypes.NewResultAcknowledgement([]byte("success"))
+}
+
+// IsSuccessAcknowledgement checks if an acknowledgement indicates success
+func IsSuccessAcknowledgement(ack ibcexported.Acknowledgement) bool {
+	return ack.Success()
 }

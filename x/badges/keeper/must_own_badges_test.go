@@ -272,7 +272,11 @@ func (suite *TestSuite) TestMustOwnTokensMustOwnOne() {
 
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err)
-	// collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+
+	// Create second collection (will be collection ID 2) so bob owns tokens in it
+	collectionsToCreate2 := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err = CreateCollections(suite, wctx, collectionsToCreate2)
+	suite.Require().Nil(err, "Error creating second collection")
 
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
@@ -722,4 +726,182 @@ func (suite *TestSuite) TestMustOwnTokensOwnershipCheckParty() {
 		},
 	})
 	suite.Require().NotNil(err, "Transfer should fail when recipient doesn't own required tokens")
+}
+
+// TestCheckMustOwnTokensBreakLogic tests the break/continue logic for MustSatisfyForAllAssets
+func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create first collection (will be collection ID 1)
+	collectionsToCreate1 := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate1)
+	suite.Require().Nil(err, "Error creating first collection")
+
+	// Create second collection (will be collection ID 2)
+	collectionsToCreate2 := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err = CreateCollections(suite, wctx, collectionsToCreate2)
+	suite.Require().Nil(err, "Error creating second collection")
+
+	// Test 1: MustSatisfyForAllAssets = false, first requirement satisfied - should continue to check second
+	// Collection 1 exists and bob owns tokens
+	mustOwnTokens1 := []*types.MustOwnTokens{
+		{
+			CollectionId: sdkmath.NewUint(1), // bob owns this - should pass
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+		{
+			CollectionId: sdkmath.NewUint(2), // bob owns this - should pass
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+	}
+	detErrMsg, err := suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens1, bob, bob, alice)
+	suite.Require().Nil(err, "Should succeed - both requirements satisfied, should continue through all")
+	suite.Require().Equal("", detErrMsg, "Should have no error message")
+
+	// Test 2: MustSatisfyForAllAssets = false, first requirement satisfied, second failed - should continue and fail
+	mustOwnTokens2 := []*types.MustOwnTokens{
+		{
+			CollectionId: sdkmath.NewUint(1), // bob owns this - should pass
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+		{
+			CollectionId: sdkmath.NewUint(999), // doesn't exist - should fail
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+	}
+	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens2, bob, bob, alice)
+	suite.Require().NotNil(err, "Should fail - second requirement failed, should continue and return error")
+	suite.Require().Contains(detErrMsg, "token ownership requirement idx 1 failed", "Should have error message for second requirement")
+
+	// Test 3: MustSatisfyForAllAssets = false, all requirements failed - should continue through all and return error
+	mustOwnTokens3 := []*types.MustOwnTokens{
+		{
+			CollectionId: sdkmath.NewUint(999), // doesn't exist
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+		{
+			CollectionId: sdkmath.NewUint(998), // doesn't exist
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+	}
+	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens3, bob, bob, alice)
+	suite.Require().NotNil(err, "Should fail - all requirements failed")
+	suite.Require().Contains(detErrMsg, "token ownership requirement idx 0 failed", "Should have error message for first requirement")
+
+	// Test 4: MustSatisfyForAllAssets = true, first requirement failed - should break early
+	mustOwnTokens4 := []*types.MustOwnTokens{
+		{
+			CollectionId: sdkmath.NewUint(999), // doesn't exist - should fail and break
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: true,
+		},
+		{
+			CollectionId: sdkmath.NewUint(1), // bob owns this - should not be checked if first fails
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: true,
+		},
+	}
+	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens4, bob, bob, alice)
+	suite.Require().NotNil(err, "Should fail - first requirement failed, should break early")
+	suite.Require().Contains(detErrMsg, "token ownership requirement idx 0 failed", "Should have error message for first requirement")
+
+	// Test 5: MustSatisfyForAllAssets = true, first satisfied, second failed - should break after second
+	mustOwnTokens5 := []*types.MustOwnTokens{
+		{
+			CollectionId: sdkmath.NewUint(1), // bob owns this - should pass
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: true,
+		},
+		{
+			CollectionId: sdkmath.NewUint(999), // doesn't exist - should fail and break
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: true,
+		},
+	}
+	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens5, bob, bob, alice)
+	suite.Require().NotNil(err, "Should fail - second requirement failed, should break after second")
+	suite.Require().Contains(detErrMsg, "token ownership requirement idx 1 failed", "Should have error message for second requirement")
+
+	// Test 6: MustSatisfyForAllAssets = false, first requirement fails amount check, second satisfied - should fail because all requirements must pass
+	mustOwnTokens6 := []*types.MustOwnTokens{
+		{
+			CollectionId: sdkmath.NewUint(1), // bob owns 1 token
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(2), // requires 2, but bob only has 1 - should fail
+				End:   sdkmath.NewUint(2),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+		{
+			CollectionId: sdkmath.NewUint(2), // bob owns this - should pass
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:                GetFullUintRanges(),
+			OwnershipTimes:          GetFullUintRanges(),
+			MustSatisfyForAllAssets: false,
+		},
+	}
+	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens6, bob, bob, alice)
+	suite.Require().NotNil(err, "Should fail - first requirement failed, all requirements must pass")
+	suite.Require().Contains(detErrMsg, "token ownership requirement idx 0 failed", "Should have error message for first requirement")
 }

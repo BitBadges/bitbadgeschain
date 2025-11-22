@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
@@ -36,7 +37,7 @@ func (k Keeper) SwapExactAmountIn(
 	}
 	poolSpreadFactor := pool.GetSpreadFactor(ctx)
 	if spreadFactor.LT(poolSpreadFactor.QuoInt64(2)) {
-		return osmomath.Int{}, fmt.Errorf("given spread factor (%s) must be greater than or equal to half of the pool's spread factor (%s)", spreadFactor, poolSpreadFactor)
+		return osmomath.Int{}, customhookstypes.Err(&ctx, "given spread factor (%s) must be greater than or equal to half of the pool's spread factor (%s)", spreadFactor, poolSpreadFactor)
 	}
 	tokensIn := sdk.Coins{tokenIn}
 
@@ -66,11 +67,12 @@ func (k Keeper) SwapExactAmountIn(
 	tokenOutAmount = tokenOutCoin.Amount
 
 	if !tokenOutAmount.IsPositive() {
-		return osmomath.Int{}, errorsmod.Wrapf(types.ErrInvalidMathApprox, "token amount must be positive")
+		return osmomath.Int{}, customhookstypes.WrapErr(&ctx, types.ErrInvalidMathApprox, "calculated token out amount must be positive")
 	}
 
 	if tokenOutAmount.LT(tokenOutMinAmount) {
-		return osmomath.Int{}, errorsmod.Wrapf(types.ErrLimitMinAmount, "%s token is lesser than min amount", tokenOutDenom)
+		return osmomath.Int{}, customhookstypes.WrapErr(&ctx, types.ErrLimitMinAmount, "%s token calculated amount is lesser than min amount: got %s, required %s",
+			tokenOutDenom, tokenOutAmount.String(), tokenOutMinAmount.String())
 	}
 
 	// Settles balances between the tx sender and the pool to match the swap that was executed earlier.
@@ -93,7 +95,7 @@ func (k Keeper) SwapExactAmountIn(
 		// Validate that fees don't exceed output
 		if totalFeeAmount.IsPositive() {
 			if tokenOutAmount.LT(totalFeeAmount) {
-				return osmomath.Int{}, fmt.Errorf("affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOutAmount.String())
+				return osmomath.Int{}, customhookstypes.Err(&ctx, "affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOutAmount.String())
 			}
 		}
 	}
@@ -117,7 +119,7 @@ func (k Keeper) RouteExactAmountIn(
 	affiliates []poolmanagertypes.Affiliate,
 ) (tokenOutAmount osmomath.Int, err error) {
 	if k.poolManager == nil {
-		return osmomath.Int{}, fmt.Errorf("pool manager not set")
+		return osmomath.Int{}, customhookstypes.Err(&ctx, "pool manager not set")
 	}
 	return k.poolManager.RouteExactAmountIn(ctx, sender, routes, tokenIn, tokenOutMinAmount, affiliates)
 }
@@ -239,27 +241,27 @@ func (k Keeper) calculateAffiliateFees(
 	for i, affiliate := range affiliates {
 		// Validate address
 		if affiliate.Address == "" {
-			return osmomath.ZeroInt(), nil, fmt.Errorf("affiliate_%d.address is required", i)
+			return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "affiliate_%d.address is required", i)
 		}
 
 		_, err := sdk.AccAddressFromBech32(affiliate.Address)
 		if err != nil {
-			return osmomath.ZeroInt(), nil, fmt.Errorf("invalid affiliate_%d.address: %w", i, err)
+			return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "invalid affiliate_%d.address", i)
 		}
 
 		// Validate basis_points_fee
 		if affiliate.BasisPointsFee == "" {
-			return osmomath.ZeroInt(), nil, fmt.Errorf("affiliate_%d.basis_points_fee is required", i)
+			return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "affiliate_%d.basis_points_fee is required", i)
 		}
 
 		basisPoints, err := strconv.ParseUint(affiliate.BasisPointsFee, 10, 64)
 		if err != nil {
-			return osmomath.ZeroInt(), nil, fmt.Errorf("invalid affiliate_%d.basis_points_fee: %w", i, err)
+			return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "invalid affiliate_%d.basis_points_fee", i)
 		}
 
 		// Basis points should not exceed 10000 (100%)
 		if basisPoints > 10000 {
-			return osmomath.ZeroInt(), nil, fmt.Errorf("affiliate_%d.basis_points_fee cannot exceed 10000 (100%%)", i)
+			return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "affiliate_%d.basis_points_fee cannot exceed 10000 (100%%)", i)
 		}
 
 		totalBasisPoints += basisPoints
@@ -267,7 +269,7 @@ func (k Keeper) calculateAffiliateFees(
 
 	// Total basis points should not exceed 10000 (100%)
 	if totalBasisPoints > 10000 {
-		return osmomath.ZeroInt(), nil, fmt.Errorf("total affiliate basis_points_fee cannot exceed 10000 (100%%), got %d", totalBasisPoints)
+		return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "total affiliate basis_points_fee cannot exceed 10000 (100%%), got %d", totalBasisPoints)
 	}
 
 	// Calculate fees for each affiliate
@@ -275,7 +277,7 @@ func (k Keeper) calculateAffiliateFees(
 		basisPoints, err := strconv.ParseUint(affiliate.BasisPointsFee, 10, 64)
 		if err != nil {
 			// This should not happen as we validated earlier, but handle it just in case
-			return osmomath.ZeroInt(), nil, fmt.Errorf("invalid affiliate_%d.basis_points_fee: %w", i, err)
+			return osmomath.ZeroInt(), nil, customhookstypes.Err(&ctx, "invalid affiliate_%d.basis_points_fee", i)
 		}
 
 		// Calculate fee from minimum output amount: (tokenOutMinAmount * basisPoints) / 10000
@@ -329,7 +331,7 @@ func (k Keeper) updatePoolForSwap(
 		// Validate that fees don't exceed tokenOut
 		if totalFeeAmount.IsPositive() {
 			if tokenOut.Amount.LT(totalFeeAmount) {
-				return fmt.Errorf("affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOut.Amount.String())
+				return customhookstypes.Err(&ctx, "affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOut.Amount.String())
 			}
 		}
 	}
@@ -358,7 +360,7 @@ func (k Keeper) updatePoolForSwap(
 			if affiliateFees[i].Amount.IsPositive() {
 				affiliateAddr, err := sdk.AccAddressFromBech32(affiliate.Address)
 				if err != nil {
-					return fmt.Errorf("invalid affiliate_%d.address: %w", i, err)
+					return customhookstypes.Err(&ctx, "invalid affiliate_%d.address", i)
 				}
 
 				// Send affiliate fee from pool to affiliate using wrapper functions

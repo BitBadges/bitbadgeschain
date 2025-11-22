@@ -42,13 +42,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	for _, collection := range genState.Collections {
-		if err := k.SetCollectionInStore(ctx, collection); err != nil {
+		if err := k.SetCollectionInStore(ctx, collection, true); err != nil {
 			panic(err)
 		}
 	}
 
 	for idx, balance := range genState.Balances {
-		if err := k.SetUserBalanceInStore(ctx, genState.BalanceStoreKeys[idx], balance); err != nil {
+		if err := k.SetUserBalanceInStore(ctx, genState.BalanceStoreKeys[idx], balance, true); err != nil {
 			panic(err)
 		}
 	}

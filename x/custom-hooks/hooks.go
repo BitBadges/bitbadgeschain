@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
@@ -36,6 +34,7 @@ func NewCustomHooks(keeper keeper.Keeper, bech32PrefixAccAddr string) *CustomHoo
 // OnRecvPacketOverride implements OnRecvPacketOverrideHooks interface
 // This allows us to control the acknowledgement and fail the packet if the hook fails
 func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+	h.keeper.Logger(ctx).Info("custom-hooks: OnRecvPacketOverride", "packet", packet)
 
 	// First, process the IBC transfer by calling the underlying app
 	ack := im.App.OnRecvPacket(ctx, packet, relayer)
@@ -55,8 +54,8 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	hookData, err := customhookstypes.ParseHookDataFromMemo(data.GetMemo())
 	if err != nil {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to parse memo", "error", err)
-		// Return error acknowledgement - hook execution is required if memo is malformed
-		return NewErrorAcknowledgement(errorsmod.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("failed to parse hook data from memo: %v", err)))
+		// Return custom error acknowledgement with deterministic error string
+		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse hook data from memo"))
 	}
 
 	// If no hook data, just return success (normal IBC transfer)
@@ -68,7 +67,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	amount, ok := osmomath.NewIntFromString(data.Amount)
 	if !ok {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to parse amount from packet")
-		return NewErrorAcknowledgement(errorsmod.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("failed to parse amount from packet: %s", data.Amount)))
+		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse amount from packet: %s", data.Amount))
 	}
 
 	// The packet's denom is the denom in the sender chain. This needs to be converted to the local denom.
@@ -82,6 +81,9 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	h.keeper.Logger(ctx).Info("custom-hooks: sender", "sender", sender)
 	h.keeper.Logger(ctx).Info("custom-hooks: channel", "channel", channel)
 
+	// Store original sender address as string (from source chain, can't convert to AccAddress)
+	originalSender := sender
+
 	// Derive intermediate sender address
 	// TODO: I think we can explore removing this
 	// This was from the Osmosis IBC hooks implementation
@@ -93,14 +95,14 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	senderBech32, err := ibchookstypes.DeriveIntermediateSender(channel, sender, h.bech32PrefixAccAddr)
 	if err != nil {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to derive intermediate sender", "error", err)
-		return NewErrorAcknowledgement(errorsmod.Wrap(sdkerrors.ErrInvalidAddress, fmt.Sprintf("failed to derive intermediate sender: %v", err)))
+		return customhookstypes.NewCustomErrorAcknowledgement("failed to derive intermediate sender")
 	}
 
 	// Convert sender string to AccAddress
 	senderAddr, err := sdk.AccAddressFromBech32(senderBech32)
 	if err != nil {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to convert sender to AccAddress", "error", err)
-		return NewErrorAcknowledgement(errorsmod.Wrap(sdkerrors.ErrInvalidAddress, fmt.Sprintf("invalid sender address: %v", err)))
+		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid sender address: %s", senderBech32))
 	}
 
 	// Convert osmomath.Int to sdkmath.Int for sdk.Coin
@@ -110,29 +112,18 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	// Execute custom hooks from intermediate sender address in a cache context
 	// This ensures state changes are only committed if the hook succeeds
 	cacheCtx, writeCache := ctx.CacheContext()
-	if err := h.keeper.ExecuteHook(cacheCtx, senderAddr, hookData, tokenCoin); err != nil {
-		h.keeper.Logger(ctx).Error("custom-hooks: failed to execute hook", "error", err)
+	hookAck := h.keeper.ExecuteHook(cacheCtx, senderAddr, hookData, tokenCoin, originalSender)
+	if !hookAck.Success() {
+		h.keeper.Logger(ctx).Error("custom-hooks: failed to execute hook")
 		// Cache context is automatically discarded on error - no state changes committed
-		// Return error acknowledgement - this will roll back the IBC transfer
-
-		return NewErrorAcknowledgement(errorsmod.Wrap(sdkerrors.ErrInvalidRequest, fmt.Sprintf("hook execution failed: %v", err)))
+		// Return the error acknowledgement - this will roll back the IBC transfer
+		return hookAck
 	}
 
 	// Hook succeeded - write cache to commit state changes
 	writeCache()
+
 	return ack
-}
-
-func NewErrorAcknowledgement(err error) channeltypes.Acknowledgement {
-	// the ABCI code is included in the abcitypes.ResponseDeliverTx hash
-	// constructed in Tendermint and is therefore deterministic
-	_, code, _ := errorsmod.ABCIInfo(err, false) // discard non-determinstic codespace and log values
-
-	return channeltypes.Acknowledgement{
-		Response: &channeltypes.Acknowledgement_Error{
-			Error: fmt.Sprintf("ABCI code: %d: error handling packet on BitBadges: %s", code, err.Error()),
-		},
-	}
 }
 
 // isIcs20Packet checks if the packet data is an ICS20 transfer packet

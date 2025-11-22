@@ -482,7 +482,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		ensureMintForbiddenPermission(collection.CollectionPermissions, true)
 	}
 
-	if err := k.SetCollectionInStore(ctx, collection); err != nil {
+	if err := k.SetCollectionInStore(ctx, collection, false); err != nil {
 		return nil, err
 	}
 

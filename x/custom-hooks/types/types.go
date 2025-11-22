@@ -2,7 +2,113 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
+	"regexp"
+	"strings"
+
+	sdkerrors "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
+
+// SetDeterministicError sets a deterministic error message in the transient store.
+// This should be called before returning an error to capture a deterministic error string.
+// The error message should be deterministic (no traces, logs, or non-deterministic values).
+// Panics if the error message contains patterns indicating stack traces or non-deterministic content.
+// Uses transient store so the value is automatically cleared at the end of the transaction.
+func SetDeterministicError(ctx sdk.Context, errorMsg string) {
+	// Validate that the error message doesn't contain stack traces or non-deterministic patterns
+	// Check for file paths (indicated by ".go")
+	if strings.Contains(errorMsg, ".go") {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains '.go' (likely a stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+
+	// Check for goroutine IDs
+	if strings.Contains(errorMsg, "goroutine") {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains 'goroutine' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+
+	// Check for runtime package references (runtime.xxx)
+	if strings.Contains(errorMsg, "runtime.") {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains 'runtime.' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+
+	// Check for "panic" keyword (often in stack traces)
+	if strings.Contains(errorMsg, "panic(") || strings.Contains(errorMsg, "panic:") {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains 'panic' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+
+	// Check for full package paths (github.com/... or similar)
+	if matched, _ := regexp.MatchString(`(github\.com|golang\.org|go\.pkg\.dev)/`, errorMsg); matched {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains package path (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+
+	// Store in transient store - this persists across function calls even when context is passed by value
+	// Transient stores are automatically cleared at the end of each transaction
+	store := ctx.TransientStore(TransientStoreKey)
+	store.Set(DeterministicErrorKey, []byte(errorMsg))
+}
+
+// GetDeterministicError retrieves the deterministic error message from the transient store, if any.
+// Returns the error message and true if found, empty string and false otherwise.
+func GetDeterministicError(ctx sdk.Context) (string, bool) {
+	store := ctx.TransientStore(TransientStoreKey)
+	value := store.Get(DeterministicErrorKey)
+	if value == nil || len(value) == 0 {
+		return "", false
+	}
+	return string(value), true
+}
+
+// ClearDeterministicError clears any deterministic error message from the transient store.
+// This should be called before starting a new operation to avoid using stale error messages.
+func ClearDeterministicError(ctx sdk.Context) {
+	store := ctx.TransientStore(TransientStoreKey)
+	store.Delete(DeterministicErrorKey)
+}
+
+// WrapErr sets a deterministic error in transient store and returns a wrapped error.
+// The detMsg is used both for caching and as the format string for the error.
+// Usage: return customhookstypes.WrapErr(&ctx, errType, detMsg, args...)
+func WrapErr(ctx *sdk.Context, errType error, detMsg string, args ...interface{}) error {
+	// Use detMsg as the format string - if it has format verbs, format it first for caching
+	var cachedMsg string
+	if len(args) > 0 {
+		cachedMsg = fmt.Sprintf(detMsg, args...)
+	} else {
+		cachedMsg = detMsg
+	}
+	SetDeterministicError(*ctx, cachedMsg)
+	// Use Wrap when no args (to avoid linter warning about non-constant format string)
+	if len(args) == 0 {
+		return sdkerrors.Wrap(errType, detMsg)
+	}
+	return sdkerrors.Wrapf(errType, detMsg, args...)
+}
+
+// WrapErrSimple sets a deterministic error in transient store and returns a wrapped error.
+// This is for cases where detMsg is already a complete string (not a format string).
+// Usage: return customhookstypes.WrapErrSimple(&ctx, errType, detMsg)
+func WrapErrSimple(ctx *sdk.Context, errType error, detMsg string) error {
+	SetDeterministicError(*ctx, detMsg)
+	return sdkerrors.Wrap(errType, detMsg)
+}
+
+// Err sets a deterministic error in transient store and returns a new error.
+// The detMsg is used both for caching and as the format string for the error.
+// Usage: return customhookstypes.Err(&ctx, detMsg, args...)
+func Err(ctx *sdk.Context, detMsg string, args ...interface{}) error {
+	// Use detMsg as the format string - if it has format verbs, format it first for caching
+	var cachedMsg string
+	if len(args) > 0 {
+		cachedMsg = fmt.Sprintf(detMsg, args...)
+	} else {
+		cachedMsg = detMsg
+	}
+	SetDeterministicError(*ctx, cachedMsg)
+	return fmt.Errorf(detMsg, args...)
+}
 
 // HookData represents the data that can be executed via IBC hooks
 type HookData struct {
@@ -107,4 +213,39 @@ func ParseHookDataFromMemo(memo string) (*HookData, error) {
 	}
 
 	return nil, nil
+}
+
+// NewCustomErrorAcknowledgement creates a custom error acknowledgement with a deterministic error string
+// IMPORTANT: The error string must be deterministic (no traces, logs, or non-deterministic values)
+// This is used instead of channeltypes.NewErrorAcknowledgement to provide more friendly error messages
+func NewCustomErrorAcknowledgement(errorMsg string) ibcexported.Acknowledgement {
+	return channeltypes.Acknowledgement{
+		Response: &channeltypes.Acknowledgement_Error{
+			Error: fmt.Sprintf("swap-and-action-hooks: %s", errorMsg),
+		},
+	}
+}
+
+// NewSuccessAcknowledgement creates a success acknowledgement
+// This is used internally to indicate successful execution
+func NewSuccessAcknowledgement() ibcexported.Acknowledgement {
+	return channeltypes.NewResultAcknowledgement([]byte("success"))
+}
+
+// IsSuccessAcknowledgement checks if an acknowledgement indicates success
+func IsSuccessAcknowledgement(ack ibcexported.Acknowledgement) bool {
+	return ack.Success()
+}
+
+// GetAckError extracts the error message from an acknowledgement.
+// Returns the error message and true if the acknowledgement is an error, empty string and false otherwise.
+func GetAckError(ack ibcexported.Acknowledgement) (string, bool) {
+	channelAck, ok := ack.(channeltypes.Acknowledgement)
+	if !ok {
+		return "", false
+	}
+	if errResp, ok := channelAck.Response.(*channeltypes.Acknowledgement_Error); ok {
+		return errResp.Error, true
+	}
+	return "", false
 }

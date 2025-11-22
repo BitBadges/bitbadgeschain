@@ -11,15 +11,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/internal/cfmm_common"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 //nolint:deadcode
 const (
 	nonPostiveSharesAmountErrFormat = "shares amount must be positive, was %s"
-	nonPostiveTokenAmountErrFormat  = "token amount must be positive, was %s"
+	nonPostiveTokenAmountErrFormat  = "calculated token out amount must be positive, was %s"
 	sharesLargerThanMaxErrFormat    = "%s resulted shares is larger than the max amount of %s"
 	invalidInputDenomsErrFormat     = "input denoms must already exist in the pool (%s)"
 
@@ -429,7 +431,7 @@ func (p Pool) CalcOutAmtGivenIn(
 	// We ignore the decimal component, as we round down the token amount out.
 	tokenAmountOutInt := tokenAmountOut.TruncateInt()
 	if !tokenAmountOutInt.IsPositive() {
-		return sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidMathApprox, "token amount must be positive")
+		return sdk.Coin{}, customhookstypes.WrapErr(&ctx, gammtypes.ErrInvalidMathApprox, "calculated token out amount must be positive")
 	}
 
 	return sdk.NewCoin(tokenOutDenom, tokenAmountOutInt), nil
@@ -486,7 +488,7 @@ func (p Pool) CalcInAmtGivenOut(
 	tokenInAmt := tokenAmountInBeforeFee.Ceil().TruncateInt()
 
 	if !tokenInAmt.IsPositive() {
-		return sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidMathApprox, "token amount must be positive")
+		return sdk.Coin{}, customhookstypes.WrapErr(&ctx, gammtypes.ErrInvalidMathApprox, "calculated token out amount must be positive")
 	}
 	return sdk.NewCoin(tokenInDenom, tokenInAmt), nil
 }
@@ -818,7 +820,7 @@ func (p *Pool) CalcTokenInShareAmountOut(
 	).Ceil().TruncateInt()
 
 	if !tokenInAmount.IsPositive() {
-		return osmomath.Int{}, errorsmod.Wrapf(types.ErrNotPositiveRequireAmount, nonPostiveTokenAmountErrFormat, tokenInAmount)
+		return osmomath.Int{}, customhookstypes.WrapErr(&ctx, types.ErrNotPositiveRequireAmount, nonPostiveTokenAmountErrFormat, tokenInAmount)
 	}
 
 	return tokenInAmount, nil
@@ -845,7 +847,7 @@ func (p *Pool) JoinPoolTokenInMaxShareAmountOut(
 	).TruncateInt()
 
 	if !tokenInAmount.IsPositive() {
-		return osmomath.Int{}, errorsmod.Wrapf(types.ErrNotPositiveRequireAmount, nonPostiveTokenAmountErrFormat, tokenInAmount)
+		return osmomath.Int{}, customhookstypes.WrapErr(&ctx, types.ErrNotPositiveRequireAmount, nonPostiveTokenAmountErrFormat, tokenInAmount)
 	}
 
 	poolAssetIn.Token.Amount = poolAssetIn.Token.Amount.Add(tokenInAmount)

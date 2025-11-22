@@ -295,7 +295,7 @@ func (k Keeper) HandleAutoDeletions(
 
 			collection.CollectionApprovals = newCollectionApprovals
 			if edited {
-				err = k.SetCollectionInStore(ctx, collection)
+				err = k.SetCollectionInStore(ctx, collection, false)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, err
 				}

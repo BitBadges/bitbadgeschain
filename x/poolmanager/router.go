@@ -13,6 +13,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -320,7 +321,7 @@ func (k Keeper) multihopEstimateOutGivenExactAmountInInternal(
 
 		tokenOutAmount = tokenOut.Amount
 		if !tokenOutAmount.IsPositive() {
-			return osmomath.Int{}, errors.New("token amount must be positive")
+			return osmomath.Int{}, customhookstypes.WrapErr(&ctx, gammtypes.ErrInvalidMathApprox, "calculated token out amount must be positive")
 		}
 
 		// Chain output of current pool as the input for the next routed pool

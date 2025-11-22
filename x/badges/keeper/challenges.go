@@ -19,6 +19,8 @@ const (
 	MaxMerkleProofLength = 10
 )
 
+// HandleMerkleChallenges processes merkle challenges for approval validation
+// Returns (deterministicErrorMsg, numIncrements, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) HandleMerkleChallenges(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
@@ -26,7 +28,7 @@ func (k Keeper) HandleMerkleChallenges(
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
 	simulation bool,
-) (sdkmath.Uint, error) {
+) (string, sdkmath.Uint, error) {
 	creatorAddress := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
@@ -45,18 +47,21 @@ func (k Keeper) HandleMerkleChallenges(
 		}
 
 		if !hasMatchingChallenge {
-			return numIncrements, sdkerrors.Wrapf(ErrNoMatchingChallengeForChallengeTrackerId, "expected to calculate balances from challenge but no matching challenge for challenge tracker id %s", approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId)
+			detErrMsg := fmt.Sprintf("expected to calculate balances from challenge but no matching challenge for challenge tracker id %s", approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId)
+			return detErrMsg, numIncrements, sdkerrors.Wrap(ErrNoMatchingChallengeForChallengeTrackerId, detErrMsg)
 		}
 	}
 
 	for _, challenge := range challenges {
 		if challenge == nil || challenge.Root == "" {
-			return numIncrements, sdkerrors.Wrapf(types.ErrChallengeTrackerIdIsNil, "challenge is nil or has empty root")
+			detErrMsg := "challenge is nil or has empty root"
+			return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrChallengeTrackerIdIsNil, detErrMsg)
 		}
 
 		// Early validation of proof length to prevent DoS attacks
 		if challenge.ExpectedProofLength.GT(sdkmath.NewUint(MaxMerkleProofLength)) {
-			return numIncrements, sdkerrors.Wrapf(types.ErrInvalidRequest, "expected proof length %s exceeds maximum allowed %d", challenge.ExpectedProofLength.String(), MaxMerkleProofLength)
+			detErrMsg := fmt.Sprintf("expected proof length %s exceeds maximum allowed %d", challenge.ExpectedProofLength.String(), MaxMerkleProofLength)
+			return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 
 		challengeId := challenge.ChallengeTrackerId
@@ -185,13 +190,16 @@ func (k Keeper) HandleMerkleChallenges(
 		}
 
 		if !hasValidSolution {
-			return numIncrements, sdkerrors.Wrapf(ErrNoValidSolutionForChallenge, "%s - %s", baseErrorStr, detailedErrorStr)
+			detErrMsg := fmt.Sprintf("%s - %s", baseErrorStr, detailedErrorStr)
+			return detErrMsg, numIncrements, sdkerrors.Wrap(ErrNoValidSolutionForChallenge, detErrMsg)
 		}
 	}
 
-	return numIncrements, nil
+	return "", numIncrements, nil
 }
 
+// HandleETHSignatureChallenges processes ETH signature challenges for approval validation
+// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) HandleETHSignatureChallenges(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
@@ -199,7 +207,7 @@ func (k Keeper) HandleETHSignatureChallenges(
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
 	simulation bool,
-) error {
+) (string, error) {
 	creatorAddress := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
@@ -208,7 +216,8 @@ func (k Keeper) HandleETHSignatureChallenges(
 
 	for _, challenge := range challenges {
 		if challenge == nil || challenge.Signer == "" {
-			return sdkerrors.Wrapf(types.ErrChallengeTrackerIdIsNil, "challenge is nil or has empty signer")
+			detErrMsg := "challenge is nil or has empty signer"
+			return detErrMsg, sdkerrors.Wrap(types.ErrChallengeTrackerIdIsNil, detErrMsg)
 		}
 
 		challengeId := challenge.ChallengeTrackerId
@@ -275,11 +284,12 @@ func (k Keeper) HandleETHSignatureChallenges(
 		}
 
 		if !hasValidSolution {
-			return sdkerrors.Wrapf(ErrNoValidSolutionForChallenge, "invalid ETH signature - signature not provided or already used")
+			detErrMsg := "invalid ETH signature - signature not provided or already used"
+			return detErrMsg, sdkerrors.Wrap(ErrNoValidSolutionForChallenge, detErrMsg)
 		}
 	}
 
-	return nil
+	return "", nil
 }
 
 func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.MerklePathItem) error {
@@ -327,14 +337,16 @@ func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 }
 
 // SimulateMerkleChallenges is a wrapper around HandleMerkleChallenges for simulation
+// Returns (deterministicErrorMsg, numIncrements, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) SimulateMerkleChallenges(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
 	transfer *types.Transfer,
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
-) (sdkmath.Uint, error) {
-	return k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
+) (string, sdkmath.Uint, error) {
+	detErrMsg, numIncrements, err := k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
+	return detErrMsg, numIncrements, err
 }
 
 // ExecuteMerkleChallenges is a wrapper around HandleMerkleChallenges for execution
@@ -345,18 +357,21 @@ func (k Keeper) ExecuteMerkleChallenges(
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
 ) (sdkmath.Uint, error) {
-	return k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
+	_, numIncrements, err := k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
+	return numIncrements, err
 }
 
 // SimulateETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for simulation
+// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) SimulateETHSignatureChallenges(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
 	transfer *types.Transfer,
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
-) error {
-	return k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
+) (string, error) {
+	detErrMsg, err := k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
+	return detErrMsg, err
 }
 
 // ExecuteETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for execution
@@ -367,5 +382,6 @@ func (k Keeper) ExecuteETHSignatureChallenges(
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
 ) error {
-	return k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
+	_, err := k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
+	return err
 }

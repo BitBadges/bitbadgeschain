@@ -38,6 +38,7 @@ func (k Keeper) DeductUserOutgoingApprovals(
 		transferMetadata,
 		eventTracking,
 		royalties,
+		"outgoing",
 	)
 	return err
 }
@@ -76,6 +77,7 @@ func (k Keeper) DeductUserIncomingApprovals(
 		transferMetadata,
 		eventTracking,
 		royalties,
+		"incoming",
 	)
 	return err
 }
@@ -87,6 +89,7 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 	transfer *types.Transfer,
 	transferMetadata TransferMetadata,
 	eventTracking *EventTracking,
+	approvalLevel string,
 ) ([]*UserApprovalsToCheck, error) {
 	blankRoyalties := &types.UserRoyalties{
 		Percentage:    sdkmath.NewUint(0),
@@ -102,6 +105,7 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 		transferMetadata,
 		eventTracking,
 		blankRoyalties,
+		approvalLevel,
 	)
 }
 

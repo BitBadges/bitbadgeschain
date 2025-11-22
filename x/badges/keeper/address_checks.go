@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -8,33 +10,36 @@ import (
 )
 
 // CheckAddressChecks validates address checks for a given address
+// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) CheckAddressChecks(
 	ctx sdk.Context,
 	addressChecks *types.AddressChecks,
 	address string,
-) error {
+) (string, error) {
 	if addressChecks == nil {
-		return nil
+		return "", nil
 	}
 
 	// Check WASM contract requirements
 	if addressChecks.MustBeWasmContract {
 		isWasm, err := k.IsWasmContract(ctx, address)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if !isWasm {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "address %s must be a WASM contract", address)
+			detErrMsg := fmt.Sprintf("address %s must be a WASM contract", address)
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
 	if addressChecks.MustNotBeWasmContract {
 		isWasm, err := k.IsWasmContract(ctx, address)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if isWasm {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "address %s must not be a WASM contract", address)
+			detErrMsg := fmt.Sprintf("address %s must not be a WASM contract", address)
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
@@ -42,24 +47,26 @@ func (k Keeper) CheckAddressChecks(
 	if addressChecks.MustBeLiquidityPool {
 		isPool, err := k.IsLiquidityPool(ctx, address)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if !isPool {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "address %s must be a liquidity pool", address)
+			detErrMsg := fmt.Sprintf("address %s must be a liquidity pool", address)
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
 	if addressChecks.MustNotBeLiquidityPool {
 		isPool, err := k.IsLiquidityPool(ctx, address)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if isPool {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "address %s must not be a liquidity pool", address)
+			detErrMsg := fmt.Sprintf("address %s must not be a liquidity pool", address)
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
-	return nil
+	return "", nil
 }
 
 // IsWasmContract checks if an address is a WASM contract

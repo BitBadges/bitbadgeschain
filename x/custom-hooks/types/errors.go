@@ -1,0 +1,52 @@
+package types
+
+// DONTCOVER
+
+import (
+	sdkerrors "cosmossdk.io/errors"
+)
+
+// x/custom-hooks module sentinel errors
+var (
+	ErrInvalidRequest                    = sdkerrors.Register(ModuleName, 1, "invalid request")
+	ErrInvalidAddress                    = sdkerrors.Register(ModuleName, 2, "invalid address")
+	ErrPostSwapActionRequired            = sdkerrors.Register(ModuleName, 3, "post_swap_action is required and must have either ibc_transfer or transfer")
+	ErrPostSwapActionConflict            = sdkerrors.Register(ModuleName, 4, "post_swap_action cannot have both ibc_transfer and transfer; must specify exactly one")
+	ErrPostSwapActionMissing             = sdkerrors.Register(ModuleName, 5, "post_swap_action must have either ibc_transfer or transfer")
+	ErrSwapRequired                      = sdkerrors.Register(ModuleName, 6, "post_swap_action requires a swap to be defined; use packet-forward-middleware for transfers without swaps")
+	ErrPostSwapActionValidation          = sdkerrors.Register(ModuleName, 7, "post_swap_action validation failed")
+	ErrInvalidDestinationRecover         = sdkerrors.Register(ModuleName, 8, "invalid destination_recover_address")
+	ErrMinAssetRequired                  = sdkerrors.Register(ModuleName, 9, "min_asset is required for swaps")
+	ErrNoOperations                      = sdkerrors.Register(ModuleName, 10, "no operations provided for swap")
+	ErrInvalidPoolID                     = sdkerrors.Register(ModuleName, 11, "invalid pool ID in operation")
+	ErrDenomMismatch                     = sdkerrors.Register(ModuleName, 12, "first operation denom_in does not match token_in")
+	ErrOperationsChainInvalid            = sdkerrors.Register(ModuleName, 13, "operations do not chain correctly")
+	ErrInvalidMinAssetAmount             = sdkerrors.Register(ModuleName, 14, "invalid min_asset amount")
+	ErrAffiliateAddressRequired          = sdkerrors.Register(ModuleName, 15, "affiliate address is required")
+	ErrInvalidAffiliateAddress           = sdkerrors.Register(ModuleName, 16, "invalid affiliate address")
+	ErrAffiliateBasisPointsRequired      = sdkerrors.Register(ModuleName, 17, "affiliate basis_points_fee is required")
+	ErrInvalidAffiliateBasisPoints       = sdkerrors.Register(ModuleName, 18, "invalid affiliate basis_points_fee")
+	ErrAffiliateBasisPointsExceeded      = sdkerrors.Register(ModuleName, 19, "affiliate basis_points_fee cannot exceed 10000")
+	ErrTotalAffiliateBasisPointsExceeded = sdkerrors.Register(ModuleName, 20, "total affiliate basis_points_fee cannot exceed 10000")
+	ErrAutoApproveFailed                 = sdkerrors.Register(ModuleName, 21, "failed to set auto-approve for intermediate address")
+	ErrSwapFailed                        = sdkerrors.Register(ModuleName, 22, "swap failed")
+	ErrDestinationRecoverFailed          = sdkerrors.Register(ModuleName, 23, "failed to send tokens to destination recover address")
+	ErrCannotIBCTransferWrapped          = sdkerrors.Register(ModuleName, 24, "cannot IBC transfer BitBadges denominations")
+	ErrInvalidRecoverAddress             = sdkerrors.Register(ModuleName, 25, "invalid recover address")
+	ErrPostSwapActionNil                 = sdkerrors.Register(ModuleName, 26, "post_swap_action cannot be nil")
+	ErrIBCInfoRequired                   = sdkerrors.Register(ModuleName, 27, "ibc_transfer.ibc_info is required")
+	ErrSourceChannelRequired             = sdkerrors.Register(ModuleName, 28, "ibc_transfer.ibc_info.source_channel is required")
+	ErrIBCChannelNotFound                = sdkerrors.Register(ModuleName, 29, "IBC channel does not exist")
+	ErrReceiverRequired                  = sdkerrors.Register(ModuleName, 30, "ibc_transfer.ibc_info.receiver is required")
+	ErrInvalidIBCRecoverAddress          = sdkerrors.Register(ModuleName, 31, "invalid ibc_transfer.ibc_info.recover_address")
+	ErrChannelCapabilityNotFound         = sdkerrors.Register(ModuleName, 32, "channel capability not found")
+	ErrToAddressRequired                 = sdkerrors.Register(ModuleName, 33, "transfer.to_address is required")
+	ErrInvalidToAddress                  = sdkerrors.Register(ModuleName, 34, "invalid transfer.to_address")
+	ErrTransferInfoNil                   = sdkerrors.Register(ModuleName, 35, "transfer info is nil")
+	ErrToAddressRequiredForTransfer      = sdkerrors.Register(ModuleName, 36, "to_address is required for local transfer")
+	ErrSendCoinsFailed                   = sdkerrors.Register(ModuleName, 37, "failed to send coins")
+	ErrInvalidDenomFormat                = sdkerrors.Register(ModuleName, 38, "invalid denom format")
+	ErrInvalidCollectionID               = sdkerrors.Register(ModuleName, 39, "invalid collection ID in denom")
+	ErrCollectionNotFound                = sdkerrors.Register(ModuleName, 40, "collection not found")
+	ErrSetAutoApproveFailed              = sdkerrors.Register(ModuleName, 41, "failed to set auto-approve for intermediate address")
+)

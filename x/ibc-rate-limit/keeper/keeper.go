@@ -8,6 +8,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
@@ -151,9 +152,9 @@ func (k Keeper) UpdateChannelFlow(ctx sdk.Context, channelID, denom string, amou
 }
 
 // CheckRateLimit checks if a transfer would exceed the rate limit
-// Returns error if rate limit would be exceeded
+// Returns error acknowledgement if rate limit would be exceeded, success acknowledgement otherwise
 // senderAddr is the address of the sender (empty string if not available)
-func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, amount sdkmath.Int, isInflow bool, senderAddr string) error {
+func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, amount sdkmath.Int, isInflow bool, senderAddr string) ibcexported.Acknowledgement {
 	params := k.GetParams(ctx)
 
 	// Find matching config for this channel and denom
@@ -161,7 +162,7 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 
 	// If no config matches, allow the transfer (no rate limit)
 	if config == nil {
-		return nil
+		return types.NewSuccessAcknowledgement()
 	}
 
 	// Check multiple timeframe supply shift limits
@@ -187,7 +188,9 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 		// Check if the absolute value of net flow exceeds the limit
 		absNewFlow := newFlow.Abs()
 		if absNewFlow.GT(limit.MaxAmount) {
-			return types.ErrRateLimitExceeded
+			return types.NewCustomErrorAcknowledgement(
+				fmt.Sprintf("rate limit exceeded: supply shift limit exceeded: channel=%s, denom=%s, amount=%s, limit=%s, new_flow=%s", channelID, denom, amount.String(), limit.MaxAmount.String(), absNewFlow.String()),
+			)
 		}
 	}
 
@@ -216,7 +219,9 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 			// If sender doesn't exist, check if adding them would exceed limit
 			if !senderExists {
 				if int64(len(senders.Senders)) >= limit.MaxUniqueSenders {
-					return types.ErrRateLimitExceeded
+					return types.NewCustomErrorAcknowledgement(
+						fmt.Sprintf("rate limit exceeded: unique sender limit exceeded: channel=%s, denom=%s, sender=%s, current_unique_senders=%d, max_unique_senders=%d", channelID, denom, senderAddr, len(senders.Senders), limit.MaxUniqueSenders),
+					)
 				}
 			}
 		}
@@ -235,7 +240,9 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 			if limit.MaxTransfers > 0 {
 				newCount := data.TransferCount + 1
 				if newCount > limit.MaxTransfers {
-					return types.ErrRateLimitExceeded
+					return types.NewCustomErrorAcknowledgement(
+						fmt.Sprintf("rate limit exceeded: address transfer count limit exceeded: channel=%s, denom=%s, sender=%s, current_count=%d, max_transfers=%d", channelID, denom, senderAddr, data.TransferCount, limit.MaxTransfers),
+					)
 				}
 			}
 
@@ -243,11 +250,13 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 			if !limit.MaxAmount.IsZero() {
 				newAmount := data.TotalAmount.Add(amount)
 				if newAmount.GT(limit.MaxAmount) {
-					return types.ErrRateLimitExceeded
+					return types.NewCustomErrorAcknowledgement(
+						fmt.Sprintf("rate limit exceeded: address amount limit exceeded: channel=%s, denom=%s, sender=%s, current_amount=%s, new_amount=%s, max_amount=%s", channelID, denom, senderAddr, data.TotalAmount.String(), newAmount.String(), limit.MaxAmount.String()),
+					)
 				}
 			}
 		}
 	}
 
-	return nil
+	return types.NewSuccessAcknowledgement()
 }

@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
@@ -96,6 +98,18 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.keeper.SetParams(ctx, defaultParams)
 	suite.bankKeeper = bankKeeper
 	suite.ctx = ctx
+}
+
+// getAckError extracts the error message from an acknowledgement
+func getAckError(ack ibcexported.Acknowledgement) string {
+	channelAck, ok := ack.(channeltypes.Acknowledgement)
+	if !ok {
+		return ""
+	}
+	if errResp, ok := channelAck.Response.(*channeltypes.Acknowledgement_Error); ok {
+		return errResp.Error
+	}
+	return ""
 }
 
 // MockBankKeeper is a simple mock for testing
@@ -219,8 +233,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_WithinLimit() {
 
 	// Config has max shift of 300,000 tokens
 	// Try to transfer 200,000 (within limit)
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(200000), true, "")
-	suite.Require().NoError(err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(200000), true, "")
+	suite.Require().True(ack.Success())
 }
 
 func (suite *KeeperTestSuite) TestCheckRateLimit_ExceedsLimit() {
@@ -229,9 +243,9 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_ExceedsLimit() {
 
 	// Config has max shift of 300,000 tokens
 	// Try to transfer 400,000 (exceeds limit)
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(400000), true, "")
-	suite.Require().Error(err)
-	suite.Require().Equal(ratelimittypes.ErrRateLimitExceeded, err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(400000), true, "")
+	suite.Require().False(ack.Success())
+	suite.Require().Contains(getAckError(ack), "rate limit exceeded")
 }
 
 func (suite *KeeperTestSuite) TestCheckRateLimit_NetFlow() {
@@ -250,12 +264,12 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_NetFlow() {
 	suite.keeper.SetChannelFlowWithTimeframe(suite.ctx, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000, flow)
 
 	// Try to add more inflow that would exceed limit
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), true, "")
-	suite.Require().Error(err) // Total would be 350,000 > 300,000
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), true, "")
+	suite.Require().False(ack.Success()) // Total would be 350,000 > 300,000
 
 	// But 100,000 more would be OK
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(100000), true, "")
-	suite.Require().NoError(err) // Total would be 300,000 = limit
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(100000), true, "")
+	suite.Require().True(ack.Success()) // Total would be 300,000 = limit
 }
 
 func (suite *KeeperTestSuite) TestCheckRateLimit_Outflow() {
@@ -274,8 +288,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_Outflow() {
 	suite.keeper.SetChannelFlowWithTimeframe(suite.ctx, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000, flow)
 
 	// Try to add more outflow
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), false, "")
-	suite.Require().Error(err) // Net flow would be -350,000, abs > 300,000
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), false, "")
+	suite.Require().False(ack.Success()) // Net flow would be -350,000, abs > 300,000
 }
 
 func (suite *KeeperTestSuite) TestCheckRateLimit_Disabled() {
@@ -284,8 +298,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_Disabled() {
 	suite.keeper.SetParams(suite.ctx, params)
 
 	// Should allow any transfer when no config matches
-	err := suite.keeper.CheckRateLimit(suite.ctx, "channel-0", "uatom", sdkmath.NewInt(1000000), true, "")
-	suite.Require().NoError(err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, "channel-0", "uatom", sdkmath.NewInt(1000000), true, "")
+	suite.Require().True(ack.Success())
 }
 
 func (suite *KeeperTestSuite) TestCheckRateLimit_NoSupply() {
@@ -294,8 +308,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_NoSupply() {
 
 	// Don't set supply in mock - GetSupply will return zero coin
 	// With the updated keeper logic, zero supply should allow transfers
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000000), true, "")
-	suite.Require().NoError(err) // Should allow transfer if supply is zero or not found
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000000), true, "")
+	suite.Require().True(ack.Success()) // Should allow transfer if supply is zero or not found
 }
 
 // TestCheckRateLimit_MultipleTimeframes tests multiple timeframe limits
@@ -332,13 +346,13 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_MultipleTimeframes() {
 	suite.keeper.SetParams(suite.ctx, params)
 
 	// Test: Transfer within all limits
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(50000), true, senderAddr)
-	suite.Require().NoError(err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(50000), true, senderAddr)
+	suite.Require().True(ack.Success())
 
 	// Test: Transfer exceeds block limit
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), true, senderAddr)
-	suite.Require().Error(err)
-	suite.Require().Equal(ratelimittypes.ErrRateLimitExceeded, err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(150000), true, senderAddr)
+	suite.Require().False(ack.Success())
+	suite.Require().Contains(getAckError(ack), "rate limit exceeded")
 }
 
 // TestCheckRateLimit_UniqueSenders tests unique sender tracking
@@ -369,26 +383,26 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_UniqueSenders() {
 	sender3 := "cosmos1sender3"
 	sender4 := "cosmos1sender4"
 
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender1)
-	suite.Require().NoError(err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender1)
+	suite.Require().True(ack.Success())
 	suite.keeper.AddUniqueSender(suite.ctx, channelID, sender1, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender2)
-	suite.Require().NoError(err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender2)
+	suite.Require().True(ack.Success())
 	suite.keeper.AddUniqueSender(suite.ctx, channelID, sender2, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender3)
-	suite.Require().NoError(err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender3)
+	suite.Require().True(ack.Success())
 	suite.keeper.AddUniqueSender(suite.ctx, channelID, sender3, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 
 	// 4th unique sender should be rejected
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender4)
-	suite.Require().Error(err)
-	suite.Require().Equal(ratelimittypes.ErrRateLimitExceeded, err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender4)
+	suite.Require().False(ack.Success())
+	suite.Require().Contains(getAckError(ack), "rate limit exceeded")
 
 	// But same sender (sender1) should still be allowed
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender1)
-	suite.Require().NoError(err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender1)
+	suite.Require().True(ack.Success())
 }
 
 // TestCheckRateLimit_AddressLimits tests per-address transfer limits
@@ -417,8 +431,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressLimits() {
 
 	// First 5 transfers should be allowed
 	for i := 0; i < 5; i++ {
-		err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, senderAddr)
-		suite.Require().NoError(err)
+		ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, senderAddr)
+		suite.Require().True(ack.Success())
 		// Update tracking
 		suite.keeper.ResetAddressTransferWindow(suite.ctx, senderAddr, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 		data, _ := suite.keeper.GetAddressTransferData(suite.ctx, senderAddr, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
@@ -428,9 +442,9 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressLimits() {
 	}
 
 	// 6th transfer should be rejected (exceeds transfer count limit)
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, senderAddr)
-	suite.Require().Error(err)
-	suite.Require().Equal(ratelimittypes.ErrRateLimitExceeded, err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, senderAddr)
+	suite.Require().False(ack.Success())
+	suite.Require().Contains(getAckError(ack), "rate limit exceeded")
 }
 
 // TestCheckRateLimit_AddressAmountLimit tests per-address amount limits
@@ -458,8 +472,8 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressAmountLimit() {
 	suite.keeper.SetParams(suite.ctx, params)
 
 	// Transfer within limit
-	err := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(5000), true, senderAddr)
-	suite.Require().NoError(err)
+	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(5000), true, senderAddr)
+	suite.Require().True(ack.Success())
 
 	// Update tracking
 	suite.keeper.ResetAddressTransferWindow(suite.ctx, senderAddr, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
@@ -469,13 +483,13 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressAmountLimit() {
 	suite.keeper.SetAddressTransferData(suite.ctx, senderAddr, channelID, denom, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1, data)
 
 	// Another transfer that would exceed total amount limit
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(6000), true, senderAddr)
-	suite.Require().Error(err)
-	suite.Require().Equal(ratelimittypes.ErrRateLimitExceeded, err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(6000), true, senderAddr)
+	suite.Require().False(ack.Success())
+	suite.Require().Contains(getAckError(ack), "rate limit exceeded")
 
 	// But a smaller transfer within limit should work
-	err = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(4000), true, senderAddr)
-	suite.Require().NoError(err)
+	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(4000), true, senderAddr)
+	suite.Require().True(ack.Success())
 }
 
 // TestTimeframeDurationInBlocks tests timeframe conversion
