@@ -173,10 +173,8 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 	}
 
 	// Store original tokenIn for fallback handling
-	originalTokenIn := sdk.Coin{
-		Denom:  tokenIn.Denom,
-		Amount: tokenIn.Amount,
-	}
+	// Use sdk.NewCoin to ensure proper deep copy of the coin
+	originalTokenIn := sdk.NewCoin(tokenIn.Denom, tokenIn.Amount)
 
 	// Execute the swap first in a cached context
 	// This ensures we can rollback the swap if it fails and we use the fallback
@@ -611,7 +609,7 @@ func (k Keeper) SendCoinsFromIntermediateAddress(ctx sdk.Context, from sdk.AccAd
 		} else {
 			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
-				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send coins: denom=%s, from=%s, to=%s", coin.Denom, from.String(), to.String()))
+				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send coins: amount=%s, denom=%s, from=%s, to=%s", coin.Amount.String(), coin.Denom, from.String(), to.String()))
 			}
 		}
 	}
