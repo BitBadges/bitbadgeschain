@@ -544,6 +544,39 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	//If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
+		// If we used approvals and had partial success for some balances, we need to add an error for that
+		for _, approvalUsed := range *eventTracking.ApprovalsUsed {
+			matchingIdx := -1
+			for i, approval := range approvals {
+				if approvalUsed.ApprovalId == approval.ApprovalId {
+					matchingIdx = i
+					break
+				}
+			}
+
+			// Skip if we can't find the approval in our approvals array
+			if matchingIdx == -1 {
+				continue
+			}
+
+			matchingErrorElementIdx := -1
+			for i, errorWithIdx := range errorsWithIdx {
+				if errorWithIdx.Idx == matchingIdx {
+					matchingErrorElementIdx = i
+					break
+				}
+			}
+
+			if matchingErrorElementIdx == -1 {
+				errorsWithIdx = append(errorsWithIdx, ErrorWithIdx{ErrorMsgs: []string{}, Idx: matchingIdx})
+				matchingErrorElementIdx = len(errorsWithIdx) - 1
+			}
+
+			if len(errorsWithIdx[matchingErrorElementIdx].ErrorMsgs) == 0 {
+				errorsWithIdx[matchingErrorElementIdx].ErrorMsgs = append(errorsWithIdx[matchingErrorElementIdx].ErrorMsgs, "approval had partial success but not full success for all balances")
+			}
+		}
+
 		transferStr := fmt.Sprintf("attempting to transfer ID %s from %s to %s initiated by %s", remainingBalances[0].TokenIds[0].Start.String(), fromAddress, toAddress, initiatedBy)
 		potentialErrorsStr := ""
 		if len(potentialErrors) > 0 {
@@ -573,6 +606,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 						break
 					}
 				}
+
 				potentialErrorsStr = ": errors for only matching approval idx " + strconv.Itoa(idxChecked) + ": " + strings.Join(errorsForIdx, ", ")
 			}
 		}
