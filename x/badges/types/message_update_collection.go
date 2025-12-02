@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -204,6 +205,30 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
 		if err != nil {
 			return err
+		}
+
+		// Validate basic checks for cosmos coin wrapper paths
+		// Ensure path.balances len == 1
+		if len(path.Balances) != 1 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path must have exactly one balance, found %d", len(path.Balances))
+		}
+
+		// Validate each balance in path.balances
+		for _, balance := range path.Balances {
+			// Ensure amount = 1n
+			if !balance.Amount.Equal(sdkmath.NewUint(1)) {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path balance amount must be 1, found %s", balance.Amount.String())
+			}
+
+			// Ensure tokenIds len == 1
+			if len(balance.TokenIds) != 1 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path balance must have exactly one tokenId range, found %d", len(balance.TokenIds))
+			}
+
+			// Ensure ownershipTimes len == 1
+			if len(balance.OwnershipTimes) != 1 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path balance must have exactly one ownershipTime range, found %d", len(balance.OwnershipTimes))
+			}
 		}
 
 		// Validate that only one denom unit per path has isDefaultDisplay set to true
