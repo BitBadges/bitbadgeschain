@@ -262,6 +262,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	}
 
 	// Validate cosmos coin backed path in invariants
+	// If validation fails, the entire backed path step is disabled/rejected
 	if msg.Invariants != nil && msg.Invariants.CosmosCoinBackedPath != nil {
 		path := msg.Invariants.CosmosCoinBackedPath
 		// Validate ibc denom is not empty
@@ -274,10 +275,22 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return sdkerrors.Wrapf(ErrInvalidRequest, "ibcAmount cannot be zero")
 		}
 
+		// Validate balances length > 0 - if empty, disable the entire step
+		if len(path.Balances) == 0 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin backed path must have at least one balance - step disabled")
+		}
+
 		// Validate balances
 		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
 		if err != nil {
 			return err
+		}
+
+		// Validate all amounts are > 0 - if any amount is zero, disable the entire step
+		for i, balance := range path.Balances {
+			if balance.Amount.IsZero() {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin backed path balance[%d] amount must be greater than zero - step disabled", i)
+			}
 		}
 	}
 

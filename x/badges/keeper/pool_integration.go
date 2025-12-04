@@ -6,50 +6,21 @@ import (
 	"strconv"
 	"strings"
 
-	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
-	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-
-	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 
+// CheckStartsWithBadges checks if a denom starts with "badges:" or "badgeslp:"
 func CheckStartsWithBadges(denom string) bool {
 	return strings.HasPrefix(denom, "badges:") || strings.HasPrefix(denom, "badgeslp:")
 }
 
-func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
-	if !CheckStartsWithBadges(denom) {
-		return false
-	}
-
-	collection, err := k.ParseCollectionFromDenom(ctx, denom)
-	if err != nil {
-		return false
-	}
-
-	path, err := GetCorrespondingPath(collection, denom)
-	if err != nil {
-		return false
-	}
-
-	// This is a little bit of an edge case
-	// It is possible to have a badges: denom that is not the auto-converted denom
-	// If this flag is true, we assume that they have to be wrapped first
-	//
-	// Ex: chaosnet denomination (badges:49:chaosnet)
-	if path.AllowCosmosWrapping {
-		return false
-	}
-
-	return true
-}
-
+// GetPartsFromDenom parses a badges denom into its parts
 func GetPartsFromDenom(denom string) ([]string, error) {
 	if !CheckStartsWithBadges(denom) {
 		return nil, fmt.Errorf("invalid denom: %s", denom)
@@ -62,6 +33,7 @@ func GetPartsFromDenom(denom string) ([]string, error) {
 	return parts, nil
 }
 
+// ParseDenomCollectionId extracts the collection ID from a badges denom
 func ParseDenomCollectionId(denom string) (uint64, error) {
 	parts, err := GetPartsFromDenom(denom)
 	if err != nil {
@@ -72,15 +44,17 @@ func ParseDenomCollectionId(denom string) (uint64, error) {
 	return strconv.ParseUint(parts[1], 10, 64)
 }
 
+// ParseDenomPath extracts the path from a badges denom
 func ParseDenomPath(denom string) (string, error) {
 	parts, err := GetPartsFromDenom(denom)
 	if err != nil {
 		return "", err
 	}
-	// this is equivalent to split(':')[1]
+	// this is equivalent to split(':')[2]
 	return parts[2], nil
 }
 
+// GetCorrespondingPath finds the CosmosCoinWrapperPath for a given denom
 func GetCorrespondingPath(collection *badgestypes.TokenCollection, denom string) (*badgestypes.CosmosCoinWrapperPath, error) {
 	baseDenom, err := ParseDenomPath(denom)
 	if err != nil {
@@ -122,6 +96,7 @@ func GetCorrespondingPath(collection *badgestypes.TokenCollection, denom string)
 	return nil, fmt.Errorf("path not found for denom: %s", denom)
 }
 
+// GetBalancesToTransfer calculates the balances to transfer for a given denom and amount
 func GetBalancesToTransfer(collection *badgestypes.TokenCollection, denom string, amount sdkmath.Uint) ([]*badgestypes.Balance, error) {
 	path, err := GetCorrespondingPath(collection, denom)
 	if err != nil {
@@ -136,13 +111,42 @@ func GetBalancesToTransfer(collection *badgestypes.TokenCollection, denom string
 	return balancesToTransfer, nil
 }
 
+// CheckIsWrappedDenom checks if a denom is a wrapped badges denom
+func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
+	if !CheckStartsWithBadges(denom) {
+		return false
+	}
+
+	collection, err := k.ParseCollectionFromDenom(ctx, denom)
+	if err != nil {
+		return false
+	}
+
+	path, err := GetCorrespondingPath(collection, denom)
+	if err != nil {
+		return false
+	}
+
+	// This is a little bit of an edge case
+	// It is possible to have a badges: denom that is not the auto-converted denom
+	// If this flag is true, we assume that they have to be wrapped first
+	//
+	// Ex: chaosnet denomination (badges:49:chaosnet)
+	if path.AllowCosmosWrapping {
+		return false
+	}
+
+	return true
+}
+
+// ParseCollectionFromDenom parses a collection from a badges denom
 func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error) {
 	collectionId, err := ParseDenomCollectionId(denom)
 	if err != nil {
 		return nil, err
 	}
 
-	collection, found := k.badgesKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
+	collection, found := k.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
 	if !found {
 		return nil, customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidCollectionID, "collection %s not found",
 			sdkmath.NewUint(collectionId).String())
@@ -151,6 +155,7 @@ func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badges
 	return collection, nil
 }
 
+// SendNativeTokensToPool sends native badges tokens to a pool address
 func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
@@ -163,9 +168,9 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 	}
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
-	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
+	badgesMsgServer := NewMsgServerImpl(k)
 
-	currBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress)
+	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, poolAddress)
 
 	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
 	alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
@@ -213,6 +218,7 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 	return err
 }
 
+// SendNativeTokensFromPool sends native badges tokens from a pool address
 func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
@@ -225,7 +231,7 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 	}
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
-	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
+	badgesMsgServer := NewMsgServerImpl(k)
 
 	// Just for sanity checks, we override all approvals to be default allowed
 	// Incoming - All, no matter what
@@ -305,8 +311,10 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 	return nil
 }
 
+// SendCoinsToPoolWithWrapping sends coins to a pool, wrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
-func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+// bankKeeper is required for sending non-badges coins
+func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, bankKeeper types.BankKeeper, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, wrap it
 	for _, coin := range coins {
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
@@ -316,7 +324,7 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress
 			}
 		} else {
 			// otherwise, send the coins normally
-			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
+			err := bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
 				return customhookstypes.WrapErr(&ctx, err, "failed to send coins to pool: %s",
 					coin.Denom)
@@ -327,8 +335,10 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress
 	return nil
 }
 
+// SendCoinsFromPoolWithUnwrapping sends coins from a pool, unwrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when from address is a pool address
-func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+// bankKeeper is required for sending non-badges coins
+func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, bankKeeper types.BankKeeper, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
@@ -339,7 +349,7 @@ func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAdd
 
 		} else {
 			// otherwise, send the coins normally
-			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
+			err := bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
 				return customhookstypes.WrapErr(&ctx, err, "failed to send native tokens from pool: %s",
 					coin.Denom)
@@ -350,8 +360,10 @@ func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAdd
 	return nil
 }
 
+// FundCommunityPoolWithWrapping funds the community pool, wrapping badges denoms if needed.
 // Used for taker fees
-func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, coins sdk.Coins) error {
+// bankKeeper and communityPoolKeeper are required for non-badges coins
+func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, bankKeeper types.BankKeeper, communityPoolKeeper types.DistributionKeeper, from sdk.AccAddress, coins sdk.Coins) error {
 	for _, coin := range coins {
 		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
@@ -361,98 +373,11 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddre
 				return err
 			}
 		} else {
-			err := k.communityPoolKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
+			err := communityPoolKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
 			if err != nil {
 				return customhookstypes.WrapErr(&ctx, err, "failed to fund community pool: %s",
 					coin.Denom)
 			}
-		}
-	}
-
-	return nil
-}
-
-// CheckPoolLiquidityInvariant checks that the pool address has enough underlying assets for all recorded pool liquidity
-// This is a global invariant check that compares recorded liquidity with actual balances behind the scenes
-func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertypes.PoolI) error {
-	poolAddress := pool.GetAddress()
-
-	// Convert to CFMMPoolI to access GetTotalPoolLiquidity
-	cfmmPool, ok := pool.(gammtypes.CFMMPoolI)
-	if !ok {
-		return customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidRequest, "pool does not implement CFMMPoolI")
-	}
-
-	poolLiquidity := cfmmPool.GetTotalPoolLiquidity(ctx)
-
-	// Iterate over all denoms in the pool's liquidity
-	for _, coin := range poolLiquidity {
-		// Check if this is a wrapped badges denom
-		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
-			collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
-			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to parse collection from denom: %s",
-					coin.Denom)
-			}
-
-			// Get the balances that would be needed for the recorded amount
-			balancesNeeded, err := GetBalancesToTransfer(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
-			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to get balances to transfer for denom: %s",
-					coin.Denom)
-			}
-
-			// Get the pool's current balance
-			poolBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
-
-			// Try to subtract needed balances from pool balances - will error on underflow
-			poolBalancesCopy := badgestypes.DeepCopyBalances(poolBalances.Balances)
-			_, err = badgestypes.SubtractBalances(ctx, balancesNeeded, poolBalancesCopy)
-			if err != nil {
-				return customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidRequest, "pool address %s has insufficient badges liquidity for denom %s",
-					poolAddress.String(), coin.Denom)
-			}
-		} else {
-			// For all other denoms (including IBC and native), check bank balance
-			allBalances := k.bankKeeper.GetAllBalances(ctx, poolAddress)
-			poolBalance := allBalances.AmountOf(coin.Denom)
-
-			if poolBalance.LT(coin.Amount) {
-				return customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidRequest, "pool address %s has insufficient liquidity: required %s, available %s for denom %s",
-					poolAddress.String(), coin.Amount.String(), poolBalance.String(), coin.Denom)
-			}
-		}
-	}
-
-	return nil
-}
-
-// ValidatePoolCreationAllowed checks if pool creation is allowed for all badges assets in the given coins.
-// Returns an error if any badges asset has disablePoolCreation set to true.
-func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) error {
-	for _, coin := range coins {
-		// Check if this is a badges denom
-		if !CheckStartsWithBadges(coin.Denom) {
-			continue
-		}
-
-		// Parse collection from denom
-		collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
-		if err != nil {
-			// If we can't parse the collection, skip it (might be a malformed denom)
-			continue
-		}
-
-		// Check if the collection disables pool creation
-		// If invariants is nil or disablePoolCreation is not explicitly set to true, allow it (default behavior)
-		// Only fail if disablePoolCreation is explicitly set to true
-		if collection.Invariants != nil && collection.Invariants.DisablePoolCreation {
-			return sdkerrors.Wrapf(
-				badgestypes.ErrInvalidRequest,
-				"pool creation is not allowed for collection %s (denom: %s). The collection's disablePoolCreation invariant is set to true",
-				collection.CollectionId.String(),
-				coin.Denom,
-			)
 		}
 	}
 

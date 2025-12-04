@@ -1,8 +1,8 @@
 package keeper_test
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -1210,27 +1210,27 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 
 	// Test denom parsing functions
 	// Test CheckStartsWithBadges
-	suite.Require().True(gammkeeper.CheckStartsWithBadges(wrapperDenom), "Should recognize badges denom")
-	suite.Require().False(gammkeeper.CheckStartsWithBadges("ubadge"), "Should not recognize non-badges denom")
+	suite.Require().True(keeper.CheckStartsWithBadges(wrapperDenom), "Should recognize badges denom")
+	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should not recognize non-badges denom")
 
 	// Test ParseDenomCollectionId
-	collectionId, err := gammkeeper.ParseDenomCollectionId(wrapperDenom)
+	collectionId, err := keeper.ParseDenomCollectionId(wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection ID from denom")
 	suite.Require().Equal(uint64(1), collectionId, "Collection ID should be 1")
 
 	// Test ParseDenomPath
-	path, err := gammkeeper.ParseDenomPath(wrapperDenom)
+	path, err := keeper.ParseDenomPath(wrapperDenom)
 	suite.Require().Nil(err, "Error parsing path from denom")
 	suite.Require().Equal("parsetest", path, "Path should be parsetest")
 
 	// Test GetCorrespondingPath
-	correspondingPath, err := gammkeeper.GetCorrespondingPath(collection, wrapperDenom)
+	correspondingPath, err := keeper.GetCorrespondingPath(collection, wrapperDenom)
 	suite.Require().Nil(err, "Error getting corresponding path")
 	suite.Require().Equal(wrapperPath.Address, correspondingPath.Address, "Addresses should match")
 	suite.Require().Equal(wrapperPath.Denom, correspondingPath.Denom, "Denoms should match")
 
 	// Test GetBalancesToTransfer
-	balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
+	balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1270,16 +1270,16 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 
 	// Test case: GetCorrespondingPath with AllowOverrideWithAnyValidToken should work with {id} placeholder
 	// Since the denom "errortest" doesn't contain numeric characters, it should not match any path
-	_, err = gammkeeper.GetCorrespondingPath(collection, wrapperDenom)
+	_, err = keeper.GetCorrespondingPath(collection, wrapperDenom)
 	suite.Require().Error(err, "Should error when no matching path is found")
 	suite.Require().Contains(err.Error(), "path not found for denom", "Error should mention path not found")
 
 	// Test error case: invalid denom format
-	_, err = gammkeeper.ParseDenomCollectionId("invalid-denom")
+	_, err = keeper.ParseDenomCollectionId("invalid-denom")
 	suite.Require().Error(err, "Should error with invalid denom format")
 
 	// Test error case: non-badges denom
-	suite.Require().False(gammkeeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
+	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
 }
 
 // TestGammKeeperSimpleIntegration tests the gamm keeper functionality with a simpler approach
@@ -1388,7 +1388,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	suite.Require().Equal(collection.CollectionId, parsedCollection.CollectionId, "Collection IDs should match")
 
 	// Test 2: Test GetBalancesToTransfer
-	balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
+	balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1526,7 +1526,7 @@ func (suite *TestSuite) testDenomParsingAndValidation(wrapperDenom string, colle
 	suite.Require().Equal(collection.CollectionId, parsedCollection.CollectionId, "Collection IDs should match")
 
 	// Test GetBalancesToTransfer
-	balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
+	balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1566,7 +1566,7 @@ func (suite *TestSuite) testBalanceCalculations(collection *types.TokenCollectio
 	testAmounts := []sdkmath.Uint{sdkmath.NewUint(1), sdkmath.NewUint(5), sdkmath.NewUint(10), sdkmath.NewUint(100)}
 
 	for _, amount := range testAmounts {
-		balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(collection, wrapperDenom, amount)
+		balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, amount)
 		suite.Require().Nil(err, "Error getting balances to transfer for amount %s", amount.String())
 		suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance for amount %s", amount.String())
 		suite.Require().Equal(amount, balancesToTransfer[0].Amount, "Amount should match for %s", amount.String())
@@ -1590,7 +1590,7 @@ func (suite *TestSuite) testPoolOperations(userAddr string, wrapperDenom string,
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
 	// Test balance calculations
-	balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
+	balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1608,7 +1608,7 @@ func (suite *TestSuite) testSimpleIntegration(userAddr string, wrapperDenom stri
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
 	// Test balance calculations
-	balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(10))
+	balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(10))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(10), balancesToTransfer[0].Amount, "Amount should be 10")
@@ -1651,7 +1651,7 @@ func (suite *TestSuite) testComprehensivePoolOperations(userAddr string, wrapper
 	// Test 2: Balance calculations with various amounts
 	testAmounts := []sdkmath.Uint{sdkmath.NewUint(1), sdkmath.NewUint(5), sdkmath.NewUint(10), sdkmath.NewUint(100)}
 	for _, amount := range testAmounts {
-		balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, amount)
+		balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, amount)
 		suite.Require().Nil(err, "Error getting balances to transfer for amount %s", amount.String())
 		suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance for amount %s", amount.String())
 		suite.Require().Equal(amount, balancesToTransfer[0].Amount, "Amount should match for %s", amount.String())
@@ -1731,8 +1731,8 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 
 	// Test 1: CheckStartsWithBadges
 	suite.T().Logf("Testing CheckStartsWithBadges...")
-	suite.Require().True(gammkeeper.CheckStartsWithBadges(wrapperDenom), "Should return true for tokens denom")
-	suite.Require().False(gammkeeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
+	suite.Require().True(keeper.CheckStartsWithBadges(wrapperDenom), "Should return true for tokens denom")
+	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
 
 	// Test 2: ParseCollectionFromDenom
 	suite.T().Logf("Testing ParseCollectionFromDenom...")
@@ -1742,7 +1742,7 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 
 	// Test 3: GetBalancesToTransfer
 	suite.T().Logf("Testing GetBalancesToTransfer...")
-	balancesToTransfer, err := gammkeeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
+	balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
