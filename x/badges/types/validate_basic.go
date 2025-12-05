@@ -330,9 +330,13 @@ func ApprovalAmountsIsBasicallyNil(approvalAmounts *ApprovalAmounts) bool {
 		(approvalAmounts.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(approvalAmounts.ResetTimeIntervals)))
 }
 
-func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool {
+func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool {
 	if approvalCriteria == nil {
 		return true
+	}
+
+	if approvalCriteria.MustPrioritize {
+		return false
 	}
 
 	if approvalCriteria.CoinTransfers != nil && len(approvalCriteria.CoinTransfers) > 0 {
@@ -355,17 +359,17 @@ func CollectionApprovalHasNoSideEffects(approvalCriteria *ApprovalCriteria) bool
 		return false
 	}
 
-	if approvalCriteria.MaxNumTransfers != nil && !MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
-		return false
-	}
+	// if approvalCriteria.MaxNumTransfers != nil && !MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
+	// 	return false
+	// }
 
-	if approvalCriteria.DynamicStoreChallenges != nil && len(approvalCriteria.DynamicStoreChallenges) > 0 {
-		return false
-	}
+	// if approvalCriteria.DynamicStoreChallenges != nil && len(approvalCriteria.DynamicStoreChallenges) > 0 {
+	// 	return false
+	// }
 
-	if approvalCriteria.ApprovalAmounts != nil && !ApprovalAmountsIsBasicallyNil(approvalCriteria.ApprovalAmounts) {
-		return false
-	}
+	// if approvalCriteria.ApprovalAmounts != nil && !ApprovalAmountsIsBasicallyNil(approvalCriteria.ApprovalAmounts) {
+	// 	return false
+	// }
 
 	// Note: mustOwnTokens, etc are fine since they are read-only during MsgTransferTokens
 

@@ -494,6 +494,8 @@ message ApprovalCriteria {
   AddressChecks initiatorChecks = 19;
   // Alternative time-based checks for approval denial (offline hours/days).
   AltTimeChecks altTimeChecks = 20;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 21;
 }
 
 // UserRoyalties defines the royalties for a user.
@@ -536,6 +538,8 @@ message OutgoingApprovalCriteria {
   AddressChecks initiatorChecks = 13;
   // Alternative time-based checks for approval denial (offline hours/days).
   AltTimeChecks altTimeChecks = 14;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 15;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -570,6 +574,8 @@ message IncomingApprovalCriteria {
   AddressChecks initiatorChecks = 13;
   // Alternative time-based checks for approval denial (offline hours/days).
   AltTimeChecks altTimeChecks = 14;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 15;
 }
 
 

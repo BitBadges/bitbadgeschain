@@ -147,14 +147,14 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	//           We can allow stuff on a more fine-grained level in the future but for now, we just disallow this
 	for _, incomingApproval := range msg.DefaultBalances.IncomingApprovals {
 		approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(incomingApproval.ApprovalCriteria)
-		if approvalCriteria != nil && !CollectionApprovalHasNoSideEffects(approvalCriteria) {
+		if approvalCriteria != nil && !CollectionApprovalIsAutoScannable(approvalCriteria) {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "incoming approval criteria must be nil for default balances")
 		}
 	}
 
 	for _, outgoingApproval := range msg.DefaultBalances.OutgoingApprovals {
 		approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(outgoingApproval.ApprovalCriteria)
-		if approvalCriteria != nil && !CollectionApprovalHasNoSideEffects(approvalCriteria) {
+		if approvalCriteria != nil && !CollectionApprovalIsAutoScannable(approvalCriteria) {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "outgoing approval criteria must be nil for default balances")
 		}
 	}

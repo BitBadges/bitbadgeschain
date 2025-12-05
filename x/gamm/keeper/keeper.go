@@ -296,14 +296,16 @@ func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
 
 // SendNativeTokensFromPool sends native badges tokens from a pool address.
 // This method is required by the custom-hooks GammKeeper interface.
+// NOTE: This is a wrapper that calls SendNativeTokensFromAddress for backward compatibility.
 func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
-	return k.badgesKeeper.SendNativeTokensFromPool(ctx, poolAddress, recipientAddress, denom, amount)
+	return k.badgesKeeper.SendNativeTokensFromAddress(ctx, poolAddress, recipientAddress, denom, amount)
 }
 
 // SendNativeTokensToPool sends native badges tokens to a pool address.
 // This method is used by tests and may be used by other modules.
+// NOTE: This is a wrapper that calls SendNativeTokensToAddress for backward compatibility.
 func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
-	return k.badgesKeeper.SendNativeTokensToPool(ctx, recipientAddress, poolAddress, denom, amount)
+	return k.badgesKeeper.SendNativeTokensToAddress(ctx, recipientAddress, poolAddress, denom, amount)
 }
 
 // ParseCollectionFromDenom parses a collection from a badges denom.

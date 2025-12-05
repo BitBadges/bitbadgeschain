@@ -1855,6 +1855,7 @@ func (suite *TestSuite) TestAutoDeletingAfterOverallMaxNumTransfers() {
 						Version:         sdkmath.NewUint(0),
 					},
 				},
+				OnlyCheckPrioritizedCollectionApprovals: true,
 			},
 		},
 		bob,

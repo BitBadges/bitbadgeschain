@@ -155,8 +155,8 @@ func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badges
 	return collection, nil
 }
 
-// SendNativeTokensToPool sends native badges tokens to a pool address
-func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
+// SendNativeTokensToAddress sends native badges tokens to an address
+func (k Keeper) SendNativeTokensToAddress(ctx sdk.Context, recipientAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -170,7 +170,7 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	badgesMsgServer := NewMsgServerImpl(k)
 
-	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, poolAddress)
+	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, toAddress)
 
 	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
 	alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
@@ -185,7 +185,7 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 		//
 		// This should cover the transfer to this address (rare edge case where default opt-in only)
 		updateApprovalsMsg := &badgestypes.MsgUpdateUserApprovals{
-			Creator:                               poolAddress,
+			Creator:                               toAddress,
 			CollectionId:                          collection.CollectionId,
 			UpdateAutoApproveAllIncomingTransfers: true,
 			AutoApproveAllIncomingTransfers:       true,
@@ -208,7 +208,7 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 		Transfers: []*badgestypes.Transfer{
 			{
 				From:        recipientAddress,
-				ToAddresses: []string{poolAddress},
+				ToAddresses: []string{toAddress},
 				Balances:    balancesToTransfer,
 			},
 		},
@@ -218,8 +218,8 @@ func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string,
 	return err
 }
 
-// SendNativeTokensFromPool sends native badges tokens from a pool address
-func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+// SendNativeTokensFromAddress sends native badges tokens from an address
+func (k Keeper) SendNativeTokensFromAddress(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -237,7 +237,7 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 	// Incoming - All, no matter what
 	// Outgoing - Self-initiated
 	updateApprovalsMsg := &badgestypes.MsgUpdateUserApprovals{
-		Creator:                               poolAddress,
+		Creator:                               fromAddress,
 		CollectionId:                          collection.CollectionId,
 		UpdateAutoApproveAllIncomingTransfers: true,
 		AutoApproveAllIncomingTransfers:       true,
@@ -246,7 +246,7 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 		UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
 		AutoApproveSelfInitiatedIncomingTransfers:       true,
 
-		//One-time outgoing approval for the pool to send tokens to the recipient
+		//One-time outgoing approval for the address to send tokens to the recipient
 		UpdateOutgoingApprovals: true,
 		OutgoingApprovals: []*badgestypes.UserOutgoingApproval{
 			{
@@ -273,14 +273,14 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 		CollectionId: collection.CollectionId,
 		Transfers: []*badgestypes.Transfer{
 			{
-				From:        poolAddress,
+				From:        fromAddress,
 				ToAddresses: []string{recipientAddress},
 				Balances:    balancesToTransfer,
 				PrioritizedApprovals: []*badgestypes.ApprovalIdentifierDetails{
 					{
 						ApprovalId:      "one-time-outgoing",
 						ApprovalLevel:   "outgoing",
-						ApproverAddress: poolAddress,
+						ApproverAddress: fromAddress,
 						Version:         sdkmath.NewUint(0),
 					},
 				},
@@ -294,11 +294,11 @@ func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, re
 		return err
 	}
 
-	// We then make sure that the pool no longer has the one-time outgoing approval
+	// We then make sure that the address no longer has the one-time outgoing approval
 	// This is needed as opposed to auto-deletion because technically the approval might not
 	// be used if there is some forceful override (thus never deletes and we have a dangling approval)
 	updateApprovalsMsg2 := &badgestypes.MsgUpdateUserApprovals{
-		Creator:      poolAddress,
+		Creator:      fromAddress,
 		CollectionId: collection.CollectionId,
 
 		UpdateOutgoingApprovals: true,
@@ -318,7 +318,7 @@ func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, bankKeeper types.Ba
 	// if denom is a badges denom, wrap it
 	for _, coin := range coins {
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeTokensToPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			err := k.SendNativeTokensToAddress(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
@@ -342,7 +342,7 @@ func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, bankKeeper type
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeTokensFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			err := k.SendNativeTokensFromAddress(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
@@ -368,7 +368,7 @@ func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, bankKeeper types.
 		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeTokensToPool(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			err := k.SendNativeTokensToAddress(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
