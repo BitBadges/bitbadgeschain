@@ -110,6 +110,7 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		SenderChecks:                       approvalCriteria.SenderChecks,
 		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
 		AltTimeChecks:                      approvalCriteria.AltTimeChecks,
+		MustPrioritize:                     approvalCriteria.MustPrioritize,
 		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
@@ -134,6 +135,7 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		RecipientChecks:                  approvalCriteria.RecipientChecks,
 		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
 		AltTimeChecks:                    approvalCriteria.AltTimeChecks,
+		MustPrioritize:                   approvalCriteria.MustPrioritize,
 		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }
@@ -158,6 +160,7 @@ func CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(approvalCriter
 		SenderChecks:                       approvalCriteria.SenderChecks,
 		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
 		AltTimeChecks:                      approvalCriteria.AltTimeChecks,
+		MustPrioritize:                     approvalCriteria.MustPrioritize,
 		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
@@ -182,6 +185,7 @@ func CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(approvalCriter
 		RecipientChecks:                  approvalCriteria.RecipientChecks,
 		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
 		AltTimeChecks:                    approvalCriteria.AltTimeChecks,
+		MustPrioritize:                   approvalCriteria.MustPrioritize,
 		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }

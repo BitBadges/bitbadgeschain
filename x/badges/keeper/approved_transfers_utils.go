@@ -163,7 +163,7 @@ func SortViaPrioritizedApprovals(
 	//Filter approvals where approvalCriteria != nil and not in prioritizedApprovals
 	filteredApprovals := []*types.CollectionApproval{}
 	for _, approval := range approvals {
-		if approval.ApprovalCriteria == nil || types.CollectionApprovalHasNoSideEffects(approval.ApprovalCriteria) {
+		if approval.ApprovalCriteria == nil || types.CollectionApprovalIsAutoScannable(approval.ApprovalCriteria) {
 			filteredApprovals = append(filteredApprovals, approval)
 			continue
 		}
@@ -184,6 +184,14 @@ func SortViaPrioritizedApprovals(
 			}
 		}
 
+		// Check if this approval has mustPrioritize set
+		// If mustPrioritize is true, only include if it's explicitly prioritized
+		if approval.ApprovalCriteria.MustPrioritize && !prioritized {
+			// Skip this approval - it requires prioritization but wasn't prioritized
+			continue
+		}
+
+		// Include the approval if it's prioritized (maintain original behavior)
 		if prioritized {
 			filteredApprovals = append(filteredApprovals, approval)
 		}

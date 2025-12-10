@@ -121,8 +121,8 @@ func (suite *TestSuite) TestReservedProtocolAddressGovernanceSetUnset() {
 
 	// Test 1: Non-authority cannot set reservedProtocol address
 	msg := &types.MsgSetReservedProtocolAddress{
-		Authority:     bob, // Not the authority
-		Address:       testAddress,
+		Authority:          bob, // Not the authority
+		Address:            testAddress,
 		IsReservedProtocol: true,
 	}
 	_, err := suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -131,8 +131,8 @@ func (suite *TestSuite) TestReservedProtocolAddressGovernanceSetUnset() {
 
 	// Test 2: Authority can set reservedProtocol address
 	msg = &types.MsgSetReservedProtocolAddress{
-		Authority:     authority,
-		Address:       testAddress,
+		Authority:          authority,
+		Address:            testAddress,
 		IsReservedProtocol: true,
 	}
 	_, err = suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -144,8 +144,8 @@ func (suite *TestSuite) TestReservedProtocolAddressGovernanceSetUnset() {
 
 	// Test 3: Authority can unset reservedProtocol address
 	msg = &types.MsgSetReservedProtocolAddress{
-		Authority:     authority,
-		Address:       testAddress,
+		Authority:          authority,
+		Address:            testAddress,
 		IsReservedProtocol: false,
 	}
 	_, err = suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -166,8 +166,8 @@ func (suite *TestSuite) TestReservedProtocolAddressGetAll() {
 	testAddresses := []string{bob, alice, charlie}
 	for _, addr := range testAddresses {
 		msg := &types.MsgSetReservedProtocolAddress{
-			Authority:     authority,
-			Address:       addr,
+			Authority:          authority,
+			Address:            addr,
 			IsReservedProtocol: true,
 		}
 		_, err := suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -191,8 +191,8 @@ func (suite *TestSuite) TestReservedProtocolAddressGetAll() {
 	// Clean up - unset the test addresses
 	for _, addr := range testAddresses {
 		msg := &types.MsgSetReservedProtocolAddress{
-			Authority:     authority,
-			Address:       addr,
+			Authority:          authority,
+			Address:            addr,
 			IsReservedProtocol: false,
 		}
 		_, err := suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -228,8 +228,8 @@ func (suite *TestSuite) TestReservedProtocolAddressForcefulTransferError() {
 	reservedProtocolAddress := alice
 
 	msg := &types.MsgSetReservedProtocolAddress{
-		Authority:     authority,
-		Address:       reservedProtocolAddress,
+		Authority:          authority,
+		Address:            reservedProtocolAddress,
 		IsReservedProtocol: true,
 	}
 	_, err = suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -248,6 +248,14 @@ func (suite *TestSuite) TestReservedProtocolAddressForcefulTransferError() {
 						Amount:         sdkmath.NewUint(1),
 						TokenIds:       GetOneUintRange(),
 						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "test-approval-forceful",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
 					},
 				},
 			},
@@ -271,6 +279,15 @@ func (suite *TestSuite) TestReservedProtocolAddressForcefulTransferError() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "test-approval-forceful",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+				OnlyCheckPrioritizedCollectionApprovals: true,
 			},
 		},
 	})
@@ -278,8 +295,8 @@ func (suite *TestSuite) TestReservedProtocolAddressForcefulTransferError() {
 
 	// Clean up
 	msg = &types.MsgSetReservedProtocolAddress{
-		Authority:     authority,
-		Address:       reservedProtocolAddress,
+		Authority:          authority,
+		Address:            reservedProtocolAddress,
 		IsReservedProtocol: false,
 	}
 	_, err = suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -314,8 +331,8 @@ func (suite *TestSuite) TestReservedProtocolAddressNonForcefulTransferSucceeds()
 	reservedProtocolAddress := alice
 
 	msg := &types.MsgSetReservedProtocolAddress{
-		Authority:     authority,
-		Address:       reservedProtocolAddress,
+		Authority:          authority,
+		Address:            reservedProtocolAddress,
 		IsReservedProtocol: true,
 	}
 	_, err = suite.msgServer.SetReservedProtocolAddress(wctx, msg)
@@ -363,8 +380,8 @@ func (suite *TestSuite) TestReservedProtocolAddressNonForcefulTransferSucceeds()
 
 	// Clean up
 	msg = &types.MsgSetReservedProtocolAddress{
-		Authority:     authority,
-		Address:       reservedProtocolAddress,
+		Authority:          authority,
+		Address:            reservedProtocolAddress,
 		IsReservedProtocol: false,
 	}
 	_, err = suite.msgServer.SetReservedProtocolAddress(wctx, msg)

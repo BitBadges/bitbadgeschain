@@ -220,7 +220,8 @@ func getCollectionApprovalCriteriaSchema() string {
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"recipientChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
-		"altTimeChecks": ` + getAltTimeChecksSchema() + `
+		"altTimeChecks": ` + getAltTimeChecksSchema() + `,
+		"mustPrioritize": false
 	}`
 }
 
@@ -250,7 +251,8 @@ func getOutgoingApprovalCriteriaSchema() string {
 		],
 		"recipientChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
-		"altTimeChecks": ` + getAltTimeChecksSchema() + `
+		"altTimeChecks": ` + getAltTimeChecksSchema() + `,
+		"mustPrioritize": false
 	}`
 }
 
@@ -280,7 +282,8 @@ func getIncomingApprovalCriteriaSchema() string {
 		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
-		"altTimeChecks": ` + getAltTimeChecksSchema() + `
+		"altTimeChecks": ` + getAltTimeChecksSchema() + `,
+		"mustPrioritize": false
 	}`
 }
 
