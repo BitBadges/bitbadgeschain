@@ -43,6 +43,7 @@ type Keeper struct {
 	communityPoolKeeper types.CommunityPoolKeeper
 	poolManager         types.PoolManager
 	badgesKeeper        badgeskeeper.Keeper
+	transferKeeper      types.TransferKeeper
 
 	// IBC keepers (optional, for IBC transfer functionality)
 	ics4Wrapper   types.ICS4Wrapper
@@ -52,6 +53,7 @@ type Keeper struct {
 
 func NewKeeper(
 	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, badgesKeeper badgeskeeper.Keeper,
+	transferKeeper types.TransferKeeper,
 	ics4Wrapper types.ICS4Wrapper,
 	channelKeeper types.ChannelKeeper,
 	scopedKeeper types.ScopedKeeper,
@@ -79,6 +81,7 @@ func NewKeeper(
 		bankKeeper:          bankKeeper,
 		communityPoolKeeper: communityPoolKeeper,
 		badgesKeeper:        badgesKeeper,
+		transferKeeper:      transferKeeper,
 		ics4Wrapper:         ics4Wrapper,
 		channelKeeper:       channelKeeper,
 		scopedKeeper:        scopedKeeper,
@@ -131,8 +134,13 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 	}
 
 	// Create transfer packet data
+	denom, err := types.ExpandIBCDenomToFullPath(ctx, token.Denom, k.transferKeeper)
+	if err != nil {
+		return fmt.Errorf("failed to expand IBC denom: %w", err)
+	}
+
 	packetData := transfertypes.FungibleTokenPacketData{
-		Denom:    token.Denom,
+		Denom:    denom,
 		Amount:   token.Amount.String(),
 		Sender:   sender.String(),
 		Receiver: ibcTransferInfo.Receiver,

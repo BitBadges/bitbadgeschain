@@ -70,13 +70,14 @@ type (
 	}
 
 	Keeper struct {
-		logger        log.Logger
-		gammKeeper    GammKeeper
-		bankKeeper    BankKeeper
-		badgesKeeper  BadgesKeeper
-		ics4Wrapper   ICS4Wrapper
-		channelKeeper ChannelKeeper
-		scopedKeeper  ScopedKeeper
+		logger         log.Logger
+		gammKeeper     GammKeeper
+		bankKeeper     BankKeeper
+		badgesKeeper   BadgesKeeper
+		transferKeeper gammtypes.TransferKeeper
+		ics4Wrapper    ICS4Wrapper
+		channelKeeper  ChannelKeeper
+		scopedKeeper   ScopedKeeper
 	}
 )
 
@@ -85,18 +86,20 @@ func NewKeeper(
 	gammKeeper GammKeeper,
 	bankKeeper BankKeeper,
 	badgesKeeper BadgesKeeper,
+	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
 	scopedKeeper ScopedKeeper,
 ) Keeper {
 	return Keeper{
-		logger:        logger,
-		gammKeeper:    gammKeeper,
-		bankKeeper:    bankKeeper,
-		badgesKeeper:  badgesKeeper,
-		ics4Wrapper:   ics4Wrapper,
-		channelKeeper: channelKeeper,
-		scopedKeeper:  scopedKeeper,
+		logger:         logger,
+		gammKeeper:     gammKeeper,
+		bankKeeper:     bankKeeper,
+		badgesKeeper:   badgesKeeper,
+		transferKeeper: transferKeeper,
+		ics4Wrapper:    ics4Wrapper,
+		channelKeeper:  channelKeeper,
+		scopedKeeper:   scopedKeeper,
 	}
 }
 
@@ -542,8 +545,13 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 	timeoutHeight := clienttypes.ZeroHeight()
 
 	// Create transfer packet data
+	denom, err := gammtypes.ExpandIBCDenomToFullPath(ctx, token.Denom, k.transferKeeper)
+	if err != nil {
+		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to expand IBC denom: %v", err))
+	}
+
 	packetData := transfertypes.FungibleTokenPacketData{
-		Denom:    token.Denom,
+		Denom:    denom,
 		Amount:   token.Amount.String(),
 		Sender:   sender.String(),
 		Receiver: ibcInfo.Receiver,
