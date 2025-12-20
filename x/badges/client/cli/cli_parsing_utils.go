@@ -13,16 +13,6 @@ func GetUintRange(start types.Uint, end types.Uint) *types.UintRange {
 	}
 }
 
-func parseJson(jsonStr string) (map[string]interface{}, error) {
-	var result map[string]interface{}
-	err := json.Unmarshal([]byte(jsonStr), &result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
 func parseJsonArr(jsonStr string) ([]interface{}, error) {
 	var result []interface{}
 	err := json.Unmarshal([]byte(jsonStr), &result)

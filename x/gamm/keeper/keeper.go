@@ -188,20 +188,14 @@ func (k Keeper) SetParam(ctx sdk.Context, key []byte, value interface{}) {
 
 // Wrapper methods that delegate to badges keeper for pool integration
 
-// SendCoinsToPoolWithWrapping sends coins to a pool, wrapping badges denoms if needed.
-// IMPORTANT: Should ONLY be called when to address is a pool address
-func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+// SendCoinsWithBadgesRouting sends coins between addresses, routing badges denoms to the badges keeper
+// and regular denoms to the bank keeper. This function handles both directions (to/from pool) - the
+// direction is determined by the from/to parameters.
+// IMPORTANT: Should ONLY be called when one of the addresses is a pool address
+func (k Keeper) SendCoinsWithBadgesRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// Create an adapter that implements badges BankKeeper interface
 	bankKeeperAdapter := &bankKeeperAdapter{bankKeeper: k.bankKeeper}
-	return k.badgesKeeper.SendCoinsToPoolWithWrapping(ctx, bankKeeperAdapter, from, to, coins)
-}
-
-// SendCoinsFromPoolWithUnwrapping sends coins from a pool, unwrapping badges denoms if needed.
-// IMPORTANT: Should ONLY be called when from address is a pool address
-func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// Create an adapter that implements badges BankKeeper interface
-	bankKeeperAdapter := &bankKeeperAdapter{bankKeeper: k.bankKeeper}
-	return k.badgesKeeper.SendCoinsFromPoolWithUnwrapping(ctx, bankKeeperAdapter, from, to, coins)
+	return k.badgesKeeper.SendCoinsWithBadgesRouting(ctx, bankKeeperAdapter, from, to, coins)
 }
 
 // FundCommunityPoolWithWrapping funds the community pool, wrapping badges denoms if needed.

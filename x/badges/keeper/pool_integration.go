@@ -311,48 +311,24 @@ func (k Keeper) SendNativeTokensFromAddress(ctx sdk.Context, fromAddress string,
 	return nil
 }
 
-// SendCoinsToPoolWithWrapping sends coins to a pool, wrapping badges denoms if needed.
-// IMPORTANT: Should ONLY be called when to address is a pool address
+// SendCoinsWithBadgesRouting sends coins between addresses, routing badges denoms to the badges keeper
+// and regular denoms to the bank keeper. This function handles both directions (to/from pool) - the
+// direction is determined by the from/to parameters.
+// IMPORTANT: Should ONLY be called when one of the addresses is a pool address
 // bankKeeper is required for sending non-badges coins
-func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, bankKeeper types.BankKeeper, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// if denom is a badges denom, wrap it
+func (k Keeper) SendCoinsWithBadgesRouting(ctx sdk.Context, bankKeeper types.BankKeeper, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	for _, coin := range coins {
 		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
-			err := k.SendNativeTokensToAddress(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
-			if err != nil {
-				return err
-			}
-		} else {
-			// otherwise, send the coins normally
-			err := bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
-			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to send coins to pool: %s",
-					coin.Denom)
-			}
-		}
-	}
-
-	return nil
-}
-
-// SendCoinsFromPoolWithUnwrapping sends coins from a pool, unwrapping badges denoms if needed.
-// IMPORTANT: Should ONLY be called when from address is a pool address
-// bankKeeper is required for sending non-badges coins
-func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, bankKeeper types.BankKeeper, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// if denom is a badges denom, unwrap it
-	for _, coin := range coins {
-		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+			// If denom is a BitBadges denom, use the BitBadges standard
 			err := k.SendNativeTokensFromAddress(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}
-
 		} else {
-			// otherwise, send the coins normally
+			// If denom is not a BitBadges denom, send the coins normally with x/bank keeper
 			err := bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
 			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to send native tokens from pool: %s",
-					coin.Denom)
+				return customhookstypes.WrapErr(&ctx, err, "failed to send coins: %s", coin.Denom)
 			}
 		}
 	}

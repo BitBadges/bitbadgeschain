@@ -337,7 +337,7 @@ func (k Keeper) updatePoolForSwap(
 	}
 
 	// 2. Send tokenIn from sender to pool
-	err = k.SendCoinsToPoolWithWrapping(ctx, sender, poolAddress, sdk.Coins{
+	err = k.SendCoinsWithBadgesRouting(ctx, sender, poolAddress, sdk.Coins{
 		tokenIn,
 	})
 	if err != nil {
@@ -348,7 +348,7 @@ func (k Keeper) updatePoolForSwap(
 	tokenOutToSender := tokenOut.Amount.Sub(totalFeeAmount)
 	if tokenOutToSender.IsPositive() {
 		tokenOutCoinToSender := sdk.NewCoin(tokenOut.Denom, tokenOutToSender)
-		err = k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), sender, sdk.NewCoins(tokenOutCoinToSender))
+		err = k.SendCoinsWithBadgesRouting(ctx, pool.GetAddress(), sender, sdk.NewCoins(tokenOutCoinToSender))
 		if err != nil {
 			return err
 		}
@@ -364,7 +364,7 @@ func (k Keeper) updatePoolForSwap(
 				}
 
 				// Send affiliate fee from pool to affiliate using wrapper functions
-				err = k.SendCoinsFromPoolWithUnwrapping(ctx, pool.GetAddress(), affiliateAddr, sdk.NewCoins(affiliateFees[i]))
+				err = k.SendCoinsWithBadgesRouting(ctx, pool.GetAddress(), affiliateAddr, sdk.NewCoins(affiliateFees[i]))
 				if err != nil {
 					return fmt.Errorf("failed to send affiliate fee to %s: %w", affiliate.Address, err)
 				}
