@@ -17,12 +17,13 @@ import (
 
 func CmdPurgeApprovals() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "purge-approvals [collection-id] [purge-expired] [approver-address] [purge-counterparty-approvals] [approvals-to-purge-json]",
+		Use:   "purge-approvals [collection-id] [purge-expired] [approver-address] [purge-counterparty-approvals] [approvals-to-purge-json-or-file]",
 		Short: "Broadcast message PurgeApprovals",
 		Long: `Broadcast message PurgeApprovals with specific approvals to purge.
 
-The approvals-to-purge-json parameter is REQUIRED and must be a JSON array of approval identifier details.
-Example: '[{"approvalId":"approval1","approvalLevel":"collection","approverAddress":"","version":"1"},{"approvalId":"approval2","approvalLevel":"incoming","approverAddress":"cosmos1...","version":"1"}]'
+The approvals-to-purge-json-or-file parameter is REQUIRED and must be a JSON array of approval identifier details.
+Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.
+Example inline: '[{"approvalId":"approval1","approvalLevel":"collection","approverAddress":"","version":"1"},{"approvalId":"approval2","approvalLevel":"incoming","approverAddress":"cosmos1...","version":"1"}]'
 
 Rules:
 - For self-purge (creator purging own approvals): purgeExpired must be true, purgeCounterpartyApprovals must be false
@@ -62,7 +63,13 @@ Rules:
 				return fmt.Errorf("approvalsToPurge cannot be empty - you must specify exactly which approvals to purge")
 			}
 
-			err = json.Unmarshal([]byte(argApprovalsToPurgeJson), &approvalsToPurge)
+			// Support file or inline JSON
+			jsonBytes, err := ReadJSONBytesFromFileOrString(argApprovalsToPurgeJson)
+			if err != nil {
+				return err
+			}
+
+			err = json.Unmarshal(jsonBytes, &approvalsToPurge)
 			if err != nil {
 				return err
 			}

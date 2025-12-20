@@ -16,9 +16,10 @@ var _ = strconv.Itoa(0)
 
 func CmdCreateAddressLists() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-address-lists [tx-json]",
+		Use:   "create-address-lists [tx-json-or-file]",
 		Short: "Broadcast message createAddressLists",
-		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
+		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
+		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string or file path)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -26,8 +27,11 @@ func CmdCreateAddressLists() *cobra.Command {
 				return err
 			}
 
-			// Retrieve the JSON string from the command-line argument
-			txJSON := args[0]
+			// Retrieve the JSON string from the command-line argument or file
+			txJSON, err := ReadJSONFromFileOrString(args[0])
+			if err != nil {
+				return err
+			}
 
 			// Unmarshal the JSON into a transaction structure
 			var txData types.MsgCreateAddressLists

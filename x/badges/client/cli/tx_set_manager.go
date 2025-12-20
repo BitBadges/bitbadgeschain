@@ -16,8 +16,9 @@ var _ = strconv.Itoa(0)
 
 func CmdSetManager() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-manager [tx-json]",
+		Use:   "set-manager [tx-json-or-file]",
 		Short: "Broadcast message setManager",
+		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -25,7 +26,10 @@ func CmdSetManager() *cobra.Command {
 				return err
 			}
 
-			txJSON := args[0]
+			txJSON, err := ReadJSONFromFileOrString(args[0])
+			if err != nil {
+				return err
+			}
 
 			var txData types.MsgSetManager
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {

@@ -35,16 +35,20 @@ your-cli-command transfer-tokens '{
 
 func CmdTransferTokens() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-tokens [tx-json]",
+		Use:   "transfer-tokens [tx-json-or-file]",
 		Short: "Broadcast message transferTokens",
-		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string)
+		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
+		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string or file path)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			txJSON := args[0]
+			txJSON, err := ReadJSONFromFileOrString(args[0])
+			if err != nil {
+				return err
+			}
 
 			var txData types.MsgTransferTokens
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {
