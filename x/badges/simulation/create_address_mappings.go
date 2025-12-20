@@ -21,11 +21,10 @@ func SimulateMsgCreateAddressLists(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgCreateAddressLists{
 			Creator: simAccount.Address.String(),
-			AddressLists: []*types.AddressList{
+			AddressLists: []*types.AddressListInput{
 				{
 					Addresses: []string{simAccount.Address.String()},
 					ListId:    simtypes.RandStringOfLength(r, 10),
-					CreatedBy: simAccount.Address.String(),
 				},
 			},
 		}

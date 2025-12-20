@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,10 +18,9 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 		return nil, err
 	}
 
-	collectionId := msg.CollectionId
-	if collectionId.Equal(sdkmath.NewUint(0)) {
-		nextCollectionId := k.GetNextCollectionId(ctx)
-		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
+	collectionId, err := k.resolveCollectionIdWithAutoPrev(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
 	}
 
 	// Get current user balance to filter out the approval to delete

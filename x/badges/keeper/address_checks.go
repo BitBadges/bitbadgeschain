@@ -11,57 +11,53 @@ import (
 
 // CheckAddressChecks validates address checks for a given address
 // Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) CheckAddressChecks(
-	ctx sdk.Context,
-	addressChecks *types.AddressChecks,
-	address string,
-) (string, error) {
+func (k Keeper) CheckAddressChecks(ctx sdk.Context, addressChecks *types.AddressChecks, address string) (string, error) {
 	if addressChecks == nil {
 		return "", nil
 	}
 
 	// Check WASM contract requirements
 	if addressChecks.MustBeWasmContract {
+		detErrMsg := fmt.Sprintf("address %s must be a WASM contract", address)
 		isWasm, err := k.IsWasmContract(ctx, address)
 		if err != nil {
-			return "", err
+			return detErrMsg, err
 		}
 		if !isWasm {
-			detErrMsg := fmt.Sprintf("address %s must be a WASM contract", address)
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
 	if addressChecks.MustNotBeWasmContract {
+		detErrMsg := fmt.Sprintf("address %s must not be a WASM contract", address)
 		isWasm, err := k.IsWasmContract(ctx, address)
 		if err != nil {
-			return "", err
+			return detErrMsg, err
 		}
 		if isWasm {
-			detErrMsg := fmt.Sprintf("address %s must not be a WASM contract", address)
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
 	// Check liquidity pool requirements
 	if addressChecks.MustBeLiquidityPool {
+		detErrMsg := fmt.Sprintf("address %s must be a liquidity pool", address)
 		isPool, err := k.IsLiquidityPool(ctx, address)
 		if err != nil {
-			return "", err
+			return detErrMsg, err
 		}
 		if !isPool {
-			detErrMsg := fmt.Sprintf("address %s must be a liquidity pool", address)
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
 	if addressChecks.MustNotBeLiquidityPool {
+		detErrMsg := fmt.Sprintf("address %s must not be a liquidity pool", address)
 		isPool, err := k.IsLiquidityPool(ctx, address)
 		if err != nil {
-			return "", err
+			return detErrMsg, err
 		}
 		if isPool {
-			detErrMsg := fmt.Sprintf("address %s must not be a liquidity pool", address)
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
@@ -100,13 +96,11 @@ func (k Keeper) IsLiquidityPool(ctx sdk.Context, address string) (bool, error) {
 		return false, err
 	}
 
-	// Check cache first - pool addresses are static, so if cached, it's valid
 	// The cache is populated when pools are created (see x/gamm/keeper/pool_service.go)
 	_, found := k.GetPoolIdFromAddressCache(ctx, address)
 	if found {
 		return true, nil
 	}
 
-	// If not in cache, it's not a pool (cache is populated when pools are created)
 	return false, nil
 }

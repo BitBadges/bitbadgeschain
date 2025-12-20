@@ -10,7 +10,6 @@ import (
 
 // Create tokens and update the unminted / total supplys for the collection
 func (k Keeper) CreateTokens(ctx sdk.Context, collection *types.TokenCollection, newValidTokenIds []*types.UintRange) (*types.TokenCollection, error) {
-
 	var err error
 	allTokenIds := []*types.UintRange{}
 	allTokenIds = append(allTokenIds, newValidTokenIds...)

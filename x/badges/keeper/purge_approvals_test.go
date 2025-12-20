@@ -207,7 +207,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeCounterpartyApprovalsAllowed() {
 	// Create address list with alice BEFORE setting the approval
 	err := CreateAddressLists(&suite.TestSuite, wctx, &types.MsgCreateAddressLists{
 		Creator: bob,
-		AddressLists: []*types.AddressList{{
+		AddressLists: []*types.AddressListInput{{
 			ListId:    "bobonly",
 			Addresses: []string{alice},
 			Whitelist: true,

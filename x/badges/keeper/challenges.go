@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	// MaxMerkleProofLength represents the maximum allowed Merkle proof length to prevent DoS attacks
 	MaxMerkleProofLength = 10
 )
 
@@ -86,11 +85,13 @@ func (k Keeper) HandleMerkleChallenges(
 					continue
 				}
 
+				// Use local variable to avoid mutating the original transfer object
+				leafValue := proof.Leaf
 				if challenge.UseCreatorAddressAsLeaf {
-					proof.Leaf = creatorAddress //overwrites it with creator address
+					leafValue = creatorAddress
 				}
 
-				if proof.Leaf == "" {
+				if leafValue == "" {
 					detailedErrorStr = "empty leaf"
 					continue
 				}
@@ -106,7 +107,7 @@ func (k Keeper) HandleMerkleChallenges(
 
 					ethAddress := ethcommon.HexToAddress(leafSignerEthAddress)
 
-					leafSignatureString := proof.Leaf + "-" + creatorAddress
+					leafSignatureString := leafValue + "-" + creatorAddress
 					isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 						ethAddress,
 						[]byte(leafSignatureString),
@@ -139,7 +140,7 @@ func (k Keeper) HandleMerkleChallenges(
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
 				}
 
-				err := CheckMerklePath(proof.Leaf, root, proof.Aunts)
+				err := CheckMerklePath(leafValue, root, proof.Aunts)
 				if err != nil {
 					detailedErrorStr = ""
 					continue
@@ -164,7 +165,8 @@ func (k Keeper) HandleMerkleChallenges(
 					if !simulation {
 						newNumUsed, err := k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 						if err != nil {
-							continue
+							detErrMsg := "failed to increment challenge tracker"
+							return detErrMsg, numIncrements, sdkerrors.Wrap(err, detErrMsg)
 						}
 
 						//Currently added for indexer, but note that it is planned to be deprecated

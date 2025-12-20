@@ -123,9 +123,20 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating token: %s")
 
+	// Convert AddressList to AddressListInput (remove createdBy field)
+	addressListInputs := make([]*types.AddressListInput, len(collectionsToCreate[0].AddressLists))
+	for i, addrList := range collectionsToCreate[0].AddressLists {
+		addressListInputs[i] = &types.AddressListInput{
+			ListId:     addrList.ListId,
+			Addresses:  addrList.Addresses,
+			Whitelist:  addrList.Whitelist,
+			Uri:        addrList.Uri,
+			CustomData: addrList.CustomData,
+		}
+	}
 	err = CreateAddressLists(suite, wctx, &types.MsgCreateAddressLists{
 		Creator:      alice,
-		AddressLists: collectionsToCreate[0].AddressLists,
+		AddressLists: addressListInputs,
 	})
 	suite.Require().Error(err, "Error creating token: %s")
 }

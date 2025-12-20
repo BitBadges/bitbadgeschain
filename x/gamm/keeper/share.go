@@ -11,11 +11,10 @@ import (
 func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, joiner sdk.AccAddress, numShares osmomath.Int, joinCoins sdk.Coins) error {
 	poolAddress := pool.GetAddress()
 
-	err := k.SendCoinsToPoolWithWrapping(ctx, joiner, poolAddress, joinCoins)
+	err := k.SendCoinsToPoolWithAliasRouting(ctx, joiner, poolAddress, joinCoins)
 	if err != nil {
 		return err
 	}
-
 	err = k.MintPoolShareToAccount(ctx, pool, joiner, numShares)
 	if err != nil {
 		return err
@@ -41,7 +40,7 @@ func (k Keeper) applyJoinPoolStateChange(ctx sdk.Context, pool poolmanagertypes.
 func (k Keeper) applyExitPoolStateChange(ctx sdk.Context, pool poolmanagertypes.PoolI, exiter sdk.AccAddress, numShares osmomath.Int, exitCoins sdk.Coins) error {
 	poolAddress := pool.GetAddress()
 
-	err := k.SendCoinsFromPoolWithUnwrapping(ctx, poolAddress, exiter, exitCoins)
+	err := k.SendCoinsFromPoolWithAliasRouting(ctx, poolAddress, exiter, exitCoins)
 	if err != nil {
 		return err
 	}

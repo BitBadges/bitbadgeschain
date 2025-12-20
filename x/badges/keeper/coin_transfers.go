@@ -25,10 +25,10 @@ func formatDenomForDisplay(denom string) string {
 	return denom
 }
 
-// GetSpendableCoinAmountWithWrapping gets the spendable amount for a specific denom, handling wrapped badgeslp denoms
+// GetSpendableCoinAmountWithAliasRouting gets the spendable amount for a specific denom, handling wrapped badgeslp denoms
 // For badgeslp: denoms, calculates from badge balances (wrapped approach)
 // For all other denoms (including badges:), uses bank module directly
-func (k Keeper) GetSpendableCoinAmountWithWrapping(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
+func (k Keeper) GetSpendableCoinAmountWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
 	// Only badgeslp: denoms use the wrapped approach
 	parts := strings.Split(denom, ":")
 	if len(parts) >= 2 && parts[0] == "badgeslp" {
@@ -79,6 +79,16 @@ func (k Keeper) SimulateCoinTransfers(
 		return "", nil
 	}
 
+	if royalties == nil {
+		detErrMsg := "royalties is nil"
+		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+	}
+
+	if collection == nil {
+		detErrMsg := "collection is nil"
+		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+	}
+
 	allowedDenoms := k.GetAllowedDenoms(ctx)
 	if len(allowedDenoms) == 0 {
 		detErrMsg := "allowed denoms is empty"
@@ -100,6 +110,10 @@ func (k Keeper) SimulateCoinTransfers(
 	}
 
 	for _, coinTransfer := range coinTransfers {
+		if coinTransfer == nil {
+			detErrMsg := "coin transfer is nil"
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
 		if len(coinTransfer.Coins) == 0 {
 			detErrMsg := "coin transfer cannot have empty coins slice"
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
@@ -135,7 +149,7 @@ func (k Keeper) SimulateCoinTransfers(
 			if len(parts) >= 2 && parts[0] == "badgeslp" {
 				// badgeslp: denom - check badge balances (wrapped approach)
 				fromAddressAcc := sdk.MustAccAddressFromBech32(fromAddress)
-				availableAmount, err := k.GetSpendableCoinAmountWithWrapping(ctx, fromAddressAcc, coin.Denom)
+				availableAmount, err := k.GetSpendableCoinAmountWithAliasRouting(ctx, fromAddressAcc, coin.Denom)
 				if err != nil {
 					return "", sdkerrors.Wrapf(err, "error checking wrapped denom balance for %s", coin.Denom)
 				}
@@ -176,27 +190,15 @@ func (k Keeper) sendCoinWithRoyalty(
 	toAddressAcc sdk.AccAddress,
 	royaltyPayoutAddress string,
 	coinTransfersUsed *[]CoinTransfers,
-	useWrappedApproach bool,
 ) error {
 	// Send royalty to payout address
 	if !royaltyAmountInt.IsZero() {
 		payoutAddressAcc := sdk.MustAccAddressFromBech32(royaltyPayoutAddress)
-		var err error
+		royaltyCoin := sdk.NewCoin(coin.Denom, royaltyAmountInt)
 
-		if useWrappedApproach {
-			// Use badge transfer functions for badgeslp: denoms
-			royaltyAmountUint := sdkmath.NewUintFromBigInt(royaltyAmountInt.BigInt())
-			err = k.SendNativeTokensToAddress(ctx, fromAddressAcc.String(), payoutAddressAcc.String(), coin.Denom, royaltyAmountUint)
-			if err != nil {
-				return sdkerrors.Wrapf(err, "error sending royalty to payout address for badgeslp denom")
-			}
-		} else {
-			// Use bank keeper for all other denoms
-			royaltyCoin := sdk.NewCoin(coin.Denom, royaltyAmountInt)
-			err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, payoutAddressAcc, sdk.NewCoins(royaltyCoin))
-			if err != nil {
-				return sdkerrors.Wrapf(err, "error sending royalty to payout address")
-			}
+		err := k.SendCoinWithAliasRouting(ctx, fromAddressAcc, payoutAddressAcc, &royaltyCoin)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "error sending royalty to payout address")
 		}
 
 		*coinTransfersUsed = append(*coinTransfersUsed, CoinTransfers{
@@ -209,22 +211,11 @@ func (k Keeper) sendCoinWithRoyalty(
 
 	// Send remaining amount to recipient
 	if !remainingAmount.IsZero() {
-		var err error
+		remainingCoin := sdk.NewCoin(coin.Denom, remainingAmount)
 
-		if useWrappedApproach {
-			// Use badge transfer functions for badgeslp: denoms
-			remainingAmountUint := sdkmath.NewUintFromBigInt(remainingAmount.BigInt())
-			err = k.SendNativeTokensToAddress(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, remainingAmountUint)
-			if err != nil {
-				return sdkerrors.Wrapf(err, "error sending remaining amount to recipient for badgeslp denom")
-			}
-		} else {
-			// Use bank keeper for all other denoms
-			remainingCoin := sdk.NewCoin(coin.Denom, remainingAmount)
-			err = k.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(remainingCoin))
-			if err != nil {
-				return sdkerrors.Wrapf(err, "error sending remaining amount to recipient")
-			}
+		err := k.SendCoinWithAliasRouting(ctx, fromAddressAcc, toAddressAcc, &remainingCoin)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "error sending remaining amount to recipient")
 		}
 
 		*coinTransfersUsed = append(*coinTransfersUsed, CoinTransfers{
@@ -253,6 +244,14 @@ func (k Keeper) ExecuteCoinTransfers(
 		return nil
 	}
 
+	if royalties == nil {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "royalties is nil")
+	}
+
+	if collection == nil {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "collection is nil")
+	}
+
 	royaltyPercentage := royalties.Percentage
 	royaltyPayoutAddress := royalties.PayoutAddress
 	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
@@ -272,6 +271,9 @@ func (k Keeper) ExecuteCoinTransfers(
 	}
 
 	for _, coinTransfer := range coinTransfers {
+		if coinTransfer == nil {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer is nil")
+		}
 		if len(coinTransfer.Coins) == 0 {
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
 		}
@@ -296,30 +298,18 @@ func (k Keeper) ExecuteCoinTransfers(
 				approverAddress = collection.MintEscrowAddress
 			}
 
+			if approverAddress == "" {
+				return sdkerrors.Wrapf(types.ErrInvalidAddress, "approver address is required when overrideFromWithApproverAddress is true")
+			}
+
 			fromAddressAcc = sdk.MustAccAddressFromBech32(approverAddress)
 		}
 
 		for _, coin := range coinsToTransfer {
-			// Calculate royalty amount
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-
-			// Validate royalty divisor to prevent division by zero
-			if RoyaltyDivisor == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidRequest, "royalty divisor cannot be zero")
-			}
-
 			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
-
-			// Convert royalty amount to Int for coin operations
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
-
-			// Calculate remaining amount after royalty
 			remainingAmount := coin.Amount.Sub(royaltyAmountInt)
-
-			// Only badgeslp: denoms use the wrapped approach (badge transfer functions)
-			// All other denoms (badges: and non-badges) use bank.SendCoins
-			parts := strings.Split(coin.Denom, ":")
-			useWrappedApproach := len(parts) >= 2 && parts[0] == "badgeslp"
 
 			err := k.sendCoinWithRoyalty(
 				ctx,
@@ -330,7 +320,6 @@ func (k Keeper) ExecuteCoinTransfers(
 				toAddressAcc,
 				royaltyPayoutAddress,
 				coinTransfersUsed,
-				useWrappedApproach,
 			)
 			if err != nil {
 				return err

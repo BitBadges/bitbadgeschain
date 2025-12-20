@@ -22,6 +22,12 @@ func (k Keeper) CheckDynamicStoreChallenges(
 	simulation bool,
 ) error {
 	for _, challenge := range challenges {
+		if challenge == nil {
+			errorMsg := "challenge is nil"
+			addPotentialError(isPrioritizedApproval, errorMsg)
+			return sdkerrors.New("invalid_challenge", 1, errorMsg)
+		}
+
 		storeId := challenge.StoreId
 
 		// Get the current value for the initiator
@@ -50,17 +56,17 @@ func (k Keeper) CheckDynamicStoreChallenges(
 
 		// Decrement the usage count only if not simulating
 		if !simulation {
-			newValue := val.SubUint64(1)
-			if found {
-				// Update existing value
-				if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-					return sdkerrors.Wrapf(err, "failed to decrement dynamic store value for storeId %s", storeId.String())
-				}
-			} else {
-				// Create new value with decremented default
-				if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-					return sdkerrors.Wrapf(err, "failed to create dynamic store value for storeId %s", storeId.String())
-				}
+			// Safe subtract to prevent underflow (defensive check, though val should be >= 1 at this point)
+			newValue, err := types.SafeSubtract(val, sdkmath.NewUint(1))
+			if err != nil {
+				errorMsg := fmt.Sprintf("underflow when decrementing dynamic store value for storeId %s", storeId.String())
+				addPotentialError(isPrioritizedApproval, errorMsg)
+				return sdkerrors.Wrap(types.ErrUnderflow, errorMsg)
+			}
+
+			// SetDynamicStoreValueInStore handles both creating new values and updating existing ones
+			if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
+				return sdkerrors.Wrapf(err, "failed to set dynamic store value for storeId %s", storeId.String())
 			}
 		}
 	}

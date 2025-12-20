@@ -15,6 +15,8 @@ import "badges/collections.proto";
 import "badges/address_lists.proto";
 import "badges/timelines.proto";
 import "badges/dynamic_stores.proto";
+import "badges/approvals.proto";
+import "badges/user_balance_store.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
@@ -388,8 +390,8 @@ message MsgCreateAddressLists {
   // Address of the creator.
   string creator = 1;
   
-  // Address lists to create.
-  repeated AddressList addressLists = 2;
+  // Address lists to create. The createdBy field will be automatically set to the creator address.
+  repeated AddressListInput addressLists = 2;
 }
 
 // MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.

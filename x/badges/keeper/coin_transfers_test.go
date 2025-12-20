@@ -225,7 +225,10 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+			OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -318,6 +321,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 						Percentage:    sdkmath.NewUint(1000), // 10%
 						PayoutAddress: charlie,
 					},
+					OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+					OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
 				},
 			},
 		},
@@ -400,7 +405,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 	})
 	suite.Require().Nil(err, "Error executing transfer with wrapped denom coin transfer")
 
-	// For badgeslp: denoms, the wrapped approach transfers underlying badges via SendNativeTokensToAddress
+	// For badgeslp: denoms, the wrapped approach transfers underlying badges via sendNativeTokensToAddressWithPoolApprovals
 	// Verify alice received the underlying badges
 	aliceBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().Nil(err, "Error getting alice's badge balance after transfer")
@@ -462,7 +467,10 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+			OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -631,7 +639,10 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+			OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -754,6 +765,12 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 				},
 				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 					{
+						ApprovalId:      "wrapper-transfer",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+					{
 						ApprovalId:      "mixed-transfer",
 						ApprovalLevel:   "outgoing",
 						ApproverAddress: bob,
@@ -779,6 +796,6 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	suite.Require().NotNil(aliceBalanceAfter, "Alice should have received badges from the wrapped approach")
 
 	// Note: For badgeslp: denoms, the wrapped coins in bank are just representations
-	// The actual transfer uses SendNativeTokensToAddress which transfers underlying badges
+	// The actual transfer uses sendNativeTokensToAddressWithPoolApprovals which transfers underlying badges
 	// So we check badge balances, not bank balances for the wrapped coins
 }

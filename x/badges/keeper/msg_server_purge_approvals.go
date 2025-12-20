@@ -20,10 +20,9 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 		return nil, err
 	}
 
-	collectionId := msg.CollectionId
-	if collectionId.Equal(sdkmath.NewUint(0)) {
-		nextCollectionId := k.GetNextCollectionId(ctx)
-		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
+	collectionId, err := k.resolveCollectionIdWithAutoPrev(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
 	}
 
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)

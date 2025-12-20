@@ -1,0 +1,132 @@
+syntax = "proto3";
+package badges;
+
+import "gogoproto/gogo.proto";
+import "badges/challenges.proto";
+import "badges/predetermined_balances.proto";
+import "badges/approval_tracking.proto";
+import "badges/approval_conditions.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
+
+// ApprovalCriteria defines the criteria for approving transfers.
+message ApprovalCriteria {
+  // Merkle challenge that must be satisfied for approval.
+  repeated MerkleChallenge merkleChallenges = 1;
+  // Predetermined balances for eeach approval.
+  PredeterminedBalances predeterminedBalances = 2;
+  // Threshold limit of amounts that can be transferred using this approval.
+  ApprovalAmounts approvalAmounts = 3;
+  // Maximum number of transfers that can be processed using this approval.
+  MaxNumTransfers maxNumTransfers = 4;
+  // The sdk.Coins that need to be transferred for approval.
+  repeated CoinTransfer coinTransfers = 5;
+
+  // Require the "to" address to be equal to the "initiated by" address for approval.
+  bool requireToEqualsInitiatedBy = 6;
+  // Require the "from" address to be equal to the "initiated by" address for approval.
+  bool requireFromEqualsInitiatedBy = 7;
+  // Require the "to" address to not be equal to the "initiated by" address for approval.
+  bool requireToDoesNotEqualInitiatedBy = 8;
+  // Require the "from" address to not be equal to the "initiated by" address for approval.
+  bool requireFromDoesNotEqualInitiatedBy = 9;
+
+  // Overrides the user's outgoing approvals for approval.
+  bool overridesFromOutgoingApprovals = 10;
+  // Overrides the user's incoming approvals for approval.
+  bool overridesToIncomingApprovals = 11;
+
+  // Auto-deletion options.
+  AutoDeletionOptions autoDeletionOptions = 12;
+
+  // User level royalties to apply to the transfer.
+  UserRoyalties userRoyalties = 13;
+
+  // Must own tokens for approval.
+  repeated MustOwnTokens mustOwnTokens = 14;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 15;
+  // ETH signature challenges that the initiator must pass for approval.
+  repeated ETHSignatureChallenge ethSignatureChallenges = 16;
+  // Address checks for sender, recipient, and initiator.
+  AddressChecks senderChecks = 17;
+  AddressChecks recipientChecks = 18;
+  AddressChecks initiatorChecks = 19;
+  // Alternative time-based checks for approval denial (offline hours/days).
+  AltTimeChecks altTimeChecks = 20;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 21;
+}
+
+// OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
+message OutgoingApprovalCriteria {
+  // Merkle challenge that must be satisfied for approval.
+  repeated MerkleChallenge merkleChallenges = 1;
+  // Predetermined balances for eeach approval.
+  PredeterminedBalances predeterminedBalances = 2;
+  // Threshold limit of amounts that can be transferred using this approval.
+  ApprovalAmounts approvalAmounts = 3;
+  // Maximum number of transfers that can be processed using this approval.
+  MaxNumTransfers maxNumTransfers = 4;
+  // The sdk.Coins that need to be transferred for approval.
+  repeated CoinTransfer coinTransfers = 5;
+
+  // Require the "to" address to be equal to the "initiated by" address for approval.
+  bool requireToEqualsInitiatedBy = 6;
+  // Require the "to" address to not be equal to the "initiated by" address for approval.
+  bool requireToDoesNotEqualInitiatedBy = 7;
+
+  // Auto-deletion options.
+  AutoDeletionOptions autoDeletionOptions = 8;
+
+  // Must own tokens for approval.
+  repeated MustOwnTokens mustOwnTokens = 9;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
+  // ETH signature challenges that the initiator must pass for approval.
+  repeated ETHSignatureChallenge ethSignatureChallenges = 11;
+  // Address checks for recipient and initiator (no sender checks for outgoing approvals).
+  AddressChecks recipientChecks = 12;
+  AddressChecks initiatorChecks = 13;
+  // Alternative time-based checks for approval denial (offline hours/days).
+  AltTimeChecks altTimeChecks = 14;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 15;
+}
+
+// IncomingApprovalCriteria defines the criteria for approving incoming transfers.
+message IncomingApprovalCriteria {
+  // Merkle challenge that must be satisfied for approval.
+  repeated MerkleChallenge merkleChallenges= 1;
+  // Predetermined balances for eeach approval.
+  PredeterminedBalances predeterminedBalances = 2;
+  // Threshold limit of amounts that can be transferred using this approval.
+  ApprovalAmounts approvalAmounts = 3;
+  // Maximum number of transfers that can be processed using this approval.
+  MaxNumTransfers maxNumTransfers = 4;
+  // The sdk.Coins that need to be transferred for approval.
+  repeated CoinTransfer coinTransfers = 5;
+
+  // Require the "from" address to be equal to the "initiated by" address for approval.
+  bool requireFromEqualsInitiatedBy = 6;
+  // Require the "from" address to not be equal to the "initiated by" address for approval.
+  bool requireFromDoesNotEqualInitiatedBy = 7;
+
+  // Auto-deletion options.
+  AutoDeletionOptions autoDeletionOptions = 8;
+
+  // Must own tokens for approval.
+  repeated MustOwnTokens mustOwnTokens = 9;
+  // Dynamic store challenges that the initiator must pass for approval.
+  repeated DynamicStoreChallenge dynamicStoreChallenges = 10;
+  // ETH signature challenges that the initiator must pass for approval.
+  repeated ETHSignatureChallenge ethSignatureChallenges = 11;
+  // Address checks for sender and initiator (no recipient checks for incoming approvals).
+  AddressChecks senderChecks = 12;
+  AddressChecks initiatorChecks = 13;
+  // Alternative time-based checks for approval denial (offline hours/days).
+  AltTimeChecks altTimeChecks = 14;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 15;
+}
+

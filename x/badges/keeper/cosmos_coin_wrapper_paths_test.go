@@ -1049,7 +1049,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 
 	// Test SendNativeTokensToPool - this handles the wrapping internally
 	// Use bob as the sender since he has the tokens
-	err = suite.app.GammKeeper.SendNativeTokensToPool(ctx, bob, poolAddress, wrapperDenom, sdkmath.NewUint(1))
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, sdk.AccAddress(bob), sdk.AccAddress(poolAddress), sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))})
 	suite.Require().Nil(err, "Error sending native tokens to pool")
 
 	// Verify badges were transferred to pool
@@ -1061,9 +1061,9 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	poolCoinBalance := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, wrapperDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), poolCoinBalance.Amount, "Pool should have 1 wrapped coin")
 
-	// Test SendCoinsFromPoolWithUnwrapping
+	// Test SendCoinsFromPoolWithAliasRouting
 	coinsToUnwrap := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsFromPoolWithUnwrapping(ctx, poolAccAddr, userAddr, coinsToUnwrap)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, sdk.AccAddress(userAddr), coinsToUnwrap)
 	suite.Require().Nil(err, "Error sending coins from pool with unwrapping")
 
 	// Verify badges were transferred back to user
@@ -1129,8 +1129,8 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 	suite.T().Logf("✅ Community pool test completed successfully")
 }
 
-// TestGammKeeperPoolWithWrapping tests the pool wrapping/unwrapping functionality
-func (suite *TestSuite) TestGammKeeperPoolWithWrapping() {
+// TestGammKeeperPoolWithAliasRouting tests the pool wrapping/unwrapping functionality
+func (suite *TestSuite) TestGammKeeperPoolWithAliasRouting() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	// Create a collection with cosmos coin wrapper paths
@@ -1393,7 +1393,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
 
-	// Test 3: Test FundCommunityPoolWithWrapping with non-badges denom (should work normally)
+	// Test 3: Test FundCommunityPoolWithAliasRouting with non-badges denom (should work normally)
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 
@@ -1403,7 +1403,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 
 	// Test community pool funding with regular coins
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(suite.ctx, bobAccAddr, coins)
+	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(suite.ctx, bobAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify bob's ubalance decreased
@@ -1547,10 +1547,10 @@ func (suite *TestSuite) testCommunityPoolFundingWithBadges(userAddr string, wrap
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
-	// Test FundCommunityPoolWithWrapping with regular coins (not badges)
+	// Test FundCommunityPoolWithAliasRouting with regular coins (not badges)
 	// This tests the function works correctly for non-badge denoms
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err := suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err := suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1622,9 +1622,9 @@ func (suite *TestSuite) testSimpleIntegration(userAddr string, wrapperDenom stri
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
-	// Test FundCommunityPoolWithWrapping with regular coins
+	// Test FundCommunityPoolWithAliasRouting with regular coins
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1662,7 +1662,7 @@ func (suite *TestSuite) testComprehensivePoolOperations(userAddr string, wrapper
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1747,47 +1747,49 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
 
-	// Test 4: FundCommunityPoolWithWrapping with regular coins
-	suite.T().Logf("Testing FundCommunityPoolWithWrapping...")
+	// Test 4: FundCommunityPoolWithAliasRouting with regular coins
+	suite.T().Logf("Testing FundCommunityPoolWithAliasRouting...")
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
 	poolBalance := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, "ubadge")
 	suite.Require().Equal(sdkmath.NewInt(90), poolBalance.Amount, "Pool should have 90 ubadge remaining")
 
-	// Test 5: SendCoinsToPoolWithWrapping (this will fail because no wrapped coins exist, but we test the function)
-	suite.T().Logf("Testing SendCoinsToPoolWithWrapping...")
+	// Test 5: SendCoinsToPoolWithAliasRouting (this will fail because no wrapped coins exist, but we test the function)
+	suite.T().Logf("Testing SendCoinsToPoolWithAliasRouting...")
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsToPoolWithWrapping(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	// This will fail because user doesn't have wrapped coins, but we're testing the function exists and is callable
 	if err != nil {
-		suite.T().Logf("SendCoinsToPoolWithWrapping correctly failed: %s", err.Error())
+		suite.T().Logf("SendCoinsToPoolWithAliasRouting correctly failed: %s", err.Error())
 	} else {
-		suite.T().Logf("SendCoinsToPoolWithWrapping succeeded unexpectedly")
+		suite.T().Logf("SendCoinsToPoolWithAliasRouting succeeded unexpectedly")
 	}
 
-	// Test 6: SendCoinsFromPoolWithUnwrapping (this will fail because pool has no wrapped coins, but we test the function)
-	suite.T().Logf("Testing SendCoinsFromPoolWithUnwrapping...")
+	// Test 6: SendCoinsFromPoolWithAliasRouting (this will fail because pool has no wrapped coins, but we test the function)
+	suite.T().Logf("Testing SendCoinsFromPoolWithAliasRouting...")
 	coinsToUnwrap := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsFromPoolWithUnwrapping(ctx, poolAccAddr, userAccAddr, coinsToUnwrap)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, coinsToUnwrap)
 	// This will fail because pool doesn't have wrapped coins, but we're testing the function exists and is callable
 	if err != nil {
-		suite.T().Logf("SendCoinsFromPoolWithUnwrapping correctly failed: %s", err.Error())
+		suite.T().Logf("SendCoinsFromPoolWithAliasRouting correctly failed: %s", err.Error())
 	} else {
-		suite.T().Logf("SendCoinsFromPoolWithUnwrapping succeeded unexpectedly")
+		suite.T().Logf("SendCoinsFromPoolWithAliasRouting succeeded unexpectedly")
 	}
 
 	// Test 7: SendNativeTokensToPool (this will fail because user has no tokens, but we test the function)
 	suite.T().Logf("Testing SendNativeTokensToPool...")
-	err = suite.app.GammKeeper.SendNativeTokensToPool(ctx, userAddr, poolAccAddr.String(), wrapperDenom, sdkmath.NewUint(1))
+	// Use SendCoinsToPoolWithAliasRouting which handles native tokens internally
+	tokenCoinsToPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoinsToPool)
 	// This will fail because user has no tokens, but we're testing the function exists and is callable
 	if err != nil {
 		suite.T().Logf("SendNativeTokensToPool correctly failed: %s", err.Error())
@@ -1797,7 +1799,9 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 
 	// Test 8: SendNativeTokensFromPool (this will fail because pool has no tokens, but we test the function)
 	suite.T().Logf("Testing SendNativeTokensFromPool...")
-	err = suite.app.GammKeeper.SendNativeTokensFromPool(ctx, poolAccAddr.String(), userAddr, wrapperDenom, sdkmath.NewUint(1))
+	// Use SendCoinsFromPoolWithAliasRouting which handles native tokens internally
+	tokenCoinsFromPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
 	// This will fail because pool has no tokens, but we're testing the function exists and is callable
 	if err != nil {
 		suite.T().Logf("SendNativeTokensFromPool correctly failed: %s", err.Error())
@@ -1902,9 +1906,9 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(1000000))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", userAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(1000000))})
 
-	// Test SendCoinsToPoolWithWrapping to send tokens to pool (use 1 token since that's what we have)
+	// Test SendCoinsToPoolWithAliasRouting to send tokens to pool (use 1 token since that's what we have)
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsToPoolWithWrapping(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool with wrapping")
 
 	// Verify badges were transferred to pool
@@ -1940,9 +1944,9 @@ func (suite *TestSuite) testJoinPool(userAddr string, wrapperDenom string, wrapp
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
-	// Test SendCoinsToPoolWithWrapping for join operation
+	// Test SendCoinsToPoolWithAliasRouting for join operation
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(5))}
-	err = suite.app.GammKeeper.SendCoinsToPoolWithWrapping(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for join")
 
 	// Send ubadge for join
@@ -1973,9 +1977,9 @@ func (suite *TestSuite) testExitPool(userAddr string, wrapperDenom string, wrapp
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
-	// Test SendCoinsFromPoolWithUnwrapping for exit operation
+	// Test SendCoinsFromPoolWithAliasRouting for exit operation
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(3))}
-	err = suite.app.GammKeeper.SendCoinsFromPoolWithUnwrapping(ctx, poolAccAddr, userAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens from pool for exit")
 
 	// Send ubadge for exit
@@ -2008,7 +2012,7 @@ func (suite *TestSuite) testSwapOperations(userAddr string, wrapperDenom string,
 
 	// Test swap: badges -> ubadge
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.SendCoinsToPoolWithWrapping(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for swap")
 
 	// Send ubadge back to user (simulating swap)
@@ -2023,7 +2027,7 @@ func (suite *TestSuite) testSwapOperations(userAddr string, wrapperDenom string,
 
 	// Send badges back to user (simulating swap)
 	tokenCoinsFromPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(5))}
-	err = suite.app.GammKeeper.SendCoinsFromPoolWithUnwrapping(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
 	suite.Require().Nil(err, "Error sending tokens to user for swap")
 
 	suite.T().Logf("✅ Swap operations successful")
@@ -2043,15 +2047,15 @@ func (suite *TestSuite) testSwapWithTakerFees(userAddr string, wrapperDenom stri
 
 	// Test swap with taker fee: badges -> ubadge
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(20))}
-	err = suite.app.GammKeeper.SendCoinsToPoolWithWrapping(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for swap with fee")
 
 	// Calculate taker fee (1% of 20 = 0.2, but we'll use 1 for simplicity)
 	takerFeeAmount := sdkmath.NewInt(1)
 
-	// Send taker fee to community pool using FundCommunityPoolWithWrapping
+	// Send taker fee to community pool using FundCommunityPoolWithAliasRouting
 	takerFeeCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, takerFeeAmount)}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, takerFeeCoins)
+	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, takerFeeCoins)
 	suite.Require().Nil(err, "Error funding community pool with taker fee")
 
 	// Send remaining ubadge to user (simulating swap after fee)

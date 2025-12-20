@@ -205,7 +205,12 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	if err != nil {
 		return sdkerrors.Wrapf(err, "invalid balance key format")
 	}
-	if !types.IsSpecialAddress(balanceKeyDetails.address) {
+
+	if types.IsMintAddress(balanceKeyDetails.address) {
+		return sdkerrors.Wrap(types.ErrInvalidRequest, "mint address cannot be stored")
+	}
+
+	if !types.IsTotalAddress(balanceKeyDetails.address) {
 		if err = types.ValidateAddress(balanceKeyDetails.address, false); err != nil {
 			return sdkerrors.Wrap(err, "Invalid address")
 		}

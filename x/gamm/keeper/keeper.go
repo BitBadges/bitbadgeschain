@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
@@ -188,30 +187,22 @@ func (k Keeper) SetParam(ctx sdk.Context, key []byte, value interface{}) {
 
 // Wrapper methods that delegate to badges keeper for pool integration
 
-// SendCoinsToPoolWithWrapping sends coins to a pool, wrapping badges denoms if needed.
+// SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
-func (k Keeper) SendCoinsToPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// Create an adapter that implements badges BankKeeper interface
-	bankKeeperAdapter := &bankKeeperAdapter{bankKeeper: k.bankKeeper}
-	return k.badgesKeeper.SendCoinsToPoolWithWrapping(ctx, bankKeeperAdapter, from, to, coins)
+func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+	return k.badgesKeeper.SendCoinsToPoolWithAliasRouting(ctx, from, to, coins)
 }
 
-// SendCoinsFromPoolWithUnwrapping sends coins from a pool, unwrapping badges denoms if needed.
+// SendCoinsFromPoolWithAliasRouting sends coins from a pool, unwrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when from address is a pool address
-func (k Keeper) SendCoinsFromPoolWithUnwrapping(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// Create an adapter that implements badges BankKeeper interface
-	bankKeeperAdapter := &bankKeeperAdapter{bankKeeper: k.bankKeeper}
-	return k.badgesKeeper.SendCoinsFromPoolWithUnwrapping(ctx, bankKeeperAdapter, from, to, coins)
+func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+	return k.badgesKeeper.SendCoinsFromPoolWithAliasRouting(ctx, from, to, coins)
 }
 
-// FundCommunityPoolWithWrapping funds the community pool, wrapping badges denoms if needed.
+// FundCommunityPoolWithAliasRouting funds the community pool, wrapping badges denoms if needed.
 // Used for taker fees
-func (k Keeper) FundCommunityPoolWithWrapping(ctx sdk.Context, from sdk.AccAddress, coins sdk.Coins) error {
-	// Create an adapter that implements badges BankKeeper interface
-	bankKeeperAdapter := &bankKeeperAdapter{bankKeeper: k.bankKeeper}
-	// Create an adapter for community pool keeper
-	communityPoolKeeperAdapter := &communityPoolKeeperAdapter{communityPoolKeeper: k.communityPoolKeeper}
-	return k.badgesKeeper.FundCommunityPoolWithWrapping(ctx, bankKeeperAdapter, communityPoolKeeperAdapter, from, coins)
+func (k Keeper) FundCommunityPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, coins sdk.Coins) error {
+	return k.badgesKeeper.FundCommunityPoolWithAliasRouting(ctx, from, coins)
 }
 
 // CheckPoolLiquidityInvariant checks that the pool address has enough underlying assets for all recorded pool liquidity.
@@ -302,65 +293,8 @@ func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
 	return k.badgesKeeper.CheckIsWrappedDenom(ctx, denom)
 }
 
-// SendNativeTokensFromPool sends native badges tokens from a pool address.
-// This method is required by the custom-hooks GammKeeper interface.
-// NOTE: This is a wrapper that calls SendNativeTokensFromAddress for backward compatibility.
-func (k Keeper) SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
-	return k.badgesKeeper.SendNativeTokensFromAddress(ctx, poolAddress, recipientAddress, denom, amount)
-}
-
-// SendNativeTokensToPool sends native badges tokens to a pool address.
-// This method is used by tests and may be used by other modules.
-// NOTE: This is a wrapper that calls SendNativeTokensToAddress for backward compatibility.
-func (k Keeper) SendNativeTokensToPool(ctx sdk.Context, recipientAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
-	return k.badgesKeeper.SendNativeTokensToAddress(ctx, recipientAddress, poolAddress, denom, amount)
-}
-
 // ParseCollectionFromDenom parses a collection from a badges denom.
 // This method is used by tests.
 func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error) {
 	return k.badgesKeeper.ParseCollectionFromDenom(ctx, denom)
-}
-
-// bankKeeperAdapter adapts gamm BankKeeper to badges BankKeeper interface
-type bankKeeperAdapter struct {
-	bankKeeper types.BankKeeper
-}
-
-func (a *bankKeeperAdapter) SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins {
-	// Not used in pool integration, return empty coins
-	return sdk.Coins{}
-}
-
-func (a *bankKeeperAdapter) SendCoins(ctx context.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
-	return a.bankKeeper.SendCoins(ctx, fromAddr, toAddr, amt)
-}
-
-func (a *bankKeeperAdapter) MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error {
-	return a.bankKeeper.MintCoins(ctx, moduleName, amt)
-}
-
-func (a *bankKeeperAdapter) BurnCoins(ctx context.Context, name string, amt sdk.Coins) error {
-	return a.bankKeeper.BurnCoins(ctx, name, amt)
-}
-
-func (a *bankKeeperAdapter) SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
-	return a.bankKeeper.SendCoinsFromModuleToAccount(ctx, senderModule, recipientAddr, amt)
-}
-
-func (a *bankKeeperAdapter) SendCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
-	return a.bankKeeper.SendCoinsFromAccountToModule(ctx, senderAddr, recipientModule, amt)
-}
-
-func (a *bankKeeperAdapter) GetAllBalances(ctx context.Context, addr sdk.AccAddress) sdk.Coins {
-	return a.bankKeeper.GetAllBalances(ctx, addr)
-}
-
-// communityPoolKeeperAdapter adapts gamm CommunityPoolKeeper to badges DistributionKeeper interface
-type communityPoolKeeperAdapter struct {
-	communityPoolKeeper types.CommunityPoolKeeper
-}
-
-func (a *communityPoolKeeperAdapter) FundCommunityPool(ctx context.Context, amount sdk.Coins, sender sdk.AccAddress) error {
-	return a.communityPoolKeeper.FundCommunityPool(ctx, amount, sender)
 }

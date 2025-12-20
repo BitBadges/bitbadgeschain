@@ -559,8 +559,7 @@ func GetSchemas() []string {
 					"addresses": [],
 					"whitelist": false,
 					"uri": "",
-					"customData": "",
-					"createdBy": ""
+					"customData": ""
 				}
 			]
 		}
@@ -625,8 +624,7 @@ func GetSchemas() []string {
 					"precalculationOptions": {
 						"overrideTimestamp": "0",
 						"tokenIdsOverride": [`+getUintRangeSchema()+`]
-					},
-					"numAttempts": "0"
+					}
 				}
 			]
 		}

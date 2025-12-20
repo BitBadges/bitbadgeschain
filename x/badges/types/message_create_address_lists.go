@@ -9,7 +9,7 @@ const TypeMsgCreateAddressLists = "create_address_lists"
 
 var _ sdk.Msg = &MsgCreateAddressLists{}
 
-func NewMsgCreateAddressLists(creator string, addressLists []*AddressList) *MsgCreateAddressLists {
+func NewMsgCreateAddressLists(creator string, addressLists []*AddressListInput) *MsgCreateAddressLists {
 	return &MsgCreateAddressLists{
 		Creator:      creator,
 		AddressLists: addressLists,
@@ -44,7 +44,7 @@ func (msg *MsgCreateAddressLists) ValidateBasic() error {
 	}
 
 	for _, list := range msg.AddressLists {
-		if err := ValidateAddressList(list); err != nil {
+		if err := ValidateAddressListInput(list); err != nil {
 			return err
 		}
 	}

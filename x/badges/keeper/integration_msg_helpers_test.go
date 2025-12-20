@@ -307,9 +307,20 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			}
 		}
 
+		// Convert AddressList to AddressListInput (remove createdBy field)
+		addressListInputs := make([]*types.AddressListInput, len(collectionToCreate.AddressLists))
+		for i, addrList := range collectionToCreate.AddressLists {
+			addressListInputs[i] = &types.AddressListInput{
+				ListId:     addrList.ListId,
+				Addresses:  addrList.Addresses,
+				Whitelist:  addrList.Whitelist,
+				Uri:        addrList.Uri,
+				CustomData: addrList.CustomData,
+			}
+		}
 		err = CreateAddressLists(suite, ctx, &types.MsgCreateAddressLists{
 			Creator:      bob,
-			AddressLists: collectionToCreate.AddressLists,
+			AddressLists: addressListInputs,
 		})
 		if err != nil {
 			return err

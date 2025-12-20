@@ -14,8 +14,6 @@ import (
 )
 
 const (
-	// ProtocolFeeNumerator represents the numerator for protocol fee calculation (0.1% = 1/1000)
-	ProtocolFeeNumerator = 1
 	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.1% = 1/1000)
 	ProtocolFeeDenominator = 1000
 )
@@ -47,7 +45,7 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 		if ProtocolFeeDenominator == 0 {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "protocol fee denominator cannot be zero")
 		}
-		protocolFee := totalAmount.Mul(sdkmath.NewUint(ProtocolFeeNumerator)).Quo(sdkmath.NewUint(ProtocolFeeDenominator))
+		protocolFee := totalAmount.Quo(sdkmath.NewUint(ProtocolFeeDenominator))
 
 		// For other denoms, just use 0.1%
 		if !protocolFee.IsZero() {
@@ -63,8 +61,8 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 	var protocolFeeTransfers []CoinTransfers
 
 	if !protocolFees.IsZero() {
-		// Send all fees to community pool
-		err = k.distributionKeeper.FundCommunityPool(ctx, protocolFees, fromAddressAcc)
+		// Send all fees to community pool using FundCommunityPoolWithAliasRouting to support wrapped badge denoms
+		err = k.FundCommunityPoolWithAliasRouting(ctx, fromAddressAcc, protocolFees)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", protocolFees)
 		}

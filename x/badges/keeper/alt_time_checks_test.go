@@ -128,7 +128,6 @@ func (suite *TestSuite) TestAltTimeChecks_CollectionApproval_OfflineHours() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().NotNil(err, "transfer should be denied during offline hours")
@@ -177,7 +176,6 @@ func (suite *TestSuite) TestAltTimeChecks_CollectionApproval_OfflineHours() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().Nil(err, "transfer should be allowed outside offline hours")
@@ -300,7 +298,6 @@ func (suite *TestSuite) TestAltTimeChecks_CollectionApproval_OfflineDays() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().NotNil(err, "transfer should be denied on offline days")
@@ -350,7 +347,6 @@ func (suite *TestSuite) TestAltTimeChecks_CollectionApproval_OfflineDays() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().Nil(err, "transfer should be allowed on non-offline days")
@@ -850,7 +846,6 @@ func (suite *TestSuite) TestAltTimeChecks_CombinedHoursAndDays() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().NotNil(err, "transfer should be denied on Monday at 10am")
@@ -899,7 +894,6 @@ func (suite *TestSuite) TestAltTimeChecks_CombinedHoursAndDays() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().NotNil(err, "transfer should be denied on Saturday at 10am (offline hour)")
@@ -943,7 +937,6 @@ func (suite *TestSuite) TestAltTimeChecks_CombinedHoursAndDays() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().NotNil(err, "transfer should be denied on Monday at 8am (offline day)")
@@ -987,7 +980,6 @@ func (suite *TestSuite) TestAltTimeChecks_CombinedHoursAndDays() {
 		false,
 		nil,
 		eventTracking,
-		sdkmath.NewUint(1),
 	)
 
 	suite.Require().Nil(err, "transfer should be allowed on Saturday at 8am")

@@ -15,8 +15,9 @@ import (
 
 func CmdSetIncomingApproval() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-incoming-approval [collection-id] [approval-json]",
+		Use:   "set-incoming-approval [collection-id] [approval-json-or-file]",
 		Short: "Broadcast message SetIncomingApproval",
+		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCollectionId := args[0]
@@ -32,8 +33,14 @@ func CmdSetIncomingApproval() *cobra.Command {
 				return err
 			}
 
+			// Support file or inline JSON
+			jsonBytes, err := ReadJSONBytesFromFileOrString(argApprovalJSON)
+			if err != nil {
+				return err
+			}
+
 			var approval types.UserIncomingApproval
-			if err := clientCtx.Codec.UnmarshalJSON([]byte(argApprovalJSON), &approval); err != nil {
+			if err := clientCtx.Codec.UnmarshalJSON(jsonBytes, &approval); err != nil {
 				return err
 			}
 

@@ -95,9 +95,7 @@ func ValidateAddress(address string, alowMint bool) error {
 func DoRangesOverlap(ids []*UintRange) bool {
 	// Create a copy to avoid modifying the input slice
 	idsCopy := make([]*UintRange, len(ids))
-	for i, id := range ids {
-		idsCopy[i] = id
-	}
+	copy(idsCopy, ids)
 
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(idsCopy)
@@ -291,6 +289,48 @@ func ValidateAddressList(addressList *AddressList) error {
 
 	//check duplicate addresses
 	if duplicateInStringArray(addressList.Addresses) {
+		return ErrDuplicateAddresses
+	}
+
+	return nil
+}
+
+// ValidateAddressListInput validates an AddressListInput (same validation as AddressList but without createdBy check)
+func ValidateAddressListInput(addressListInput *AddressListInput) error {
+	if addressListInput.ListId == "" ||
+		addressListInput.ListId == "Mint" ||
+		addressListInput.ListId == "Manager" ||
+		addressListInput.ListId == "AllWithoutMint" ||
+		addressListInput.ListId == "None" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized")
+	}
+
+	if err := ValidateAddress(addressListInput.ListId, false); err == nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot be a valid address")
+	}
+
+	if strings.Contains(addressListInput.ListId, ":") || strings.Contains(addressListInput.ListId, "!") {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot contain : or !")
+	}
+
+	if addressListInput.Uri != "" {
+		if err := ValidateURI(addressListInput.Uri); err != nil {
+			return err
+		}
+	}
+
+	for _, address := range addressListInput.Addresses {
+		// Check for empty addresses
+		if address == "" {
+			return sdkerrors.Wrapf(ErrInvalidAddress, "address list cannot contain empty addresses")
+		}
+		if err := ValidateAddress(address, false); err != nil {
+			return err
+		}
+	}
+
+	//check duplicate addresses
+	if duplicateInStringArray(addressListInput.Addresses) {
 		return ErrDuplicateAddresses
 	}
 
@@ -981,12 +1021,6 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 			if prioritizedApproval.Version.IsNil() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
 			}
-		}
-	}
-
-	if canChangeValues {
-		if transfer.NumAttempts.IsNil() || transfer.NumAttempts.IsZero() {
-			transfer.NumAttempts = sdkmath.NewUint(1)
 		}
 	}
 

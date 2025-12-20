@@ -32,9 +32,6 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 	}
 
 	k.DeleteCollectionFromStore(ctx, collection.CollectionId)
-	if err != nil {
-		return nil, err
-	}
 
 	msgBytes, err := json.Marshal(msg)
 	if err != nil {

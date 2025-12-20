@@ -16,8 +16,9 @@ var _ = strconv.Itoa(0)
 
 func CmdSetCustomData() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-setcustomdata [tx-json]",
+		Use:   "set-setcustomdata [tx-json-or-file]",
 		Short: "Broadcast message setSetCustomData",
+		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -25,7 +26,10 @@ func CmdSetCustomData() *cobra.Command {
 				return err
 			}
 
-			txJSON := args[0]
+			txJSON, err := ReadJSONFromFileOrString(args[0])
+			if err != nil {
+				return err
+			}
 
 			var txData types.MsgSetCustomData
 			if err := jsonpb.UnmarshalString(txJSON, &txData); err != nil {

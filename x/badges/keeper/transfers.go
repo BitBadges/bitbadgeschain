@@ -61,157 +61,139 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 	}
 
 	for _, transfer := range transfers {
-		numAttempts := sdkmath.NewUint(1)
-		if !transfer.NumAttempts.IsNil() {
-			numAttempts = transfer.NumAttempts
-		}
+		fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+		totalMinted := []*types.Balance{}
 
-		// Convert to uint64 for more efficient loop iteration
-		// Add bounds checking to prevent potential issues with very large values
-		if numAttempts.GT(sdkmath.NewUint(10000)) {
-			return customhookstypes.WrapErr(&ctx, types.ErrInvalidRequest, "numAttempts cannot exceed 10000, got %s", numAttempts.String())
-		}
-
-		numAttemptsUint64 := numAttempts.Uint64()
-		for i := uint64(0); i < numAttemptsUint64; i++ {
-			if i > 0 {
-				ctx.GasMeter().ConsumeGas(1000, "HandleTransfers: Gas consumed for each attempt")
+		for _, to := range transfer.ToAddresses {
+			approvalsUsed := []ApprovalsUsed{}
+			coinTransfers := []CoinTransfers{}
+			eventTracking := &EventTracking{
+				ApprovalsUsed: &approvalsUsed,
+				CoinTransfers: &coinTransfers,
 			}
 
-			fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
-			totalMinted := []*types.Balance{}
+			toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
 
-			for _, to := range transfer.ToAddresses {
-				approvalsUsed := []ApprovalsUsed{}
-				coinTransfers := []CoinTransfers{}
-				eventTracking := &EventTracking{
-					ApprovalsUsed: &approvalsUsed,
-					CoinTransfers: &coinTransfers,
+			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
+				//Here, we precalculate balances from a specified approval
+				transferMetadata := TransferMetadata{
+					From:            transfer.From,
+					To:              to,
+					InitiatedBy:     initiatedBy,
+					ApproverAddress: "",
+					ApprovalLevel:   "collection",
 				}
-
-				toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
-
-				if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
-					//Here, we precalculate balances from a specified approval
-					transferMetadata := TransferMetadata{
-						From:            transfer.From,
-						To:              to,
-						InitiatedBy:     initiatedBy,
-						ApproverAddress: "",
-						ApprovalLevel:   "collection",
+				approvals := collection.CollectionApprovals
+				if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "collection" {
+					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
+						return sdkerrors.Wrapf(ErrNotImplemented, "approver address must be blank for collection level approvals")
 					}
-					approvals := collection.CollectionApprovals
-					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "collection" {
-						if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
-							return sdkerrors.Wrapf(ErrNotImplemented, "approver address must be blank for collection level approvals")
-						}
-					} else {
-						if transfer.PrecalculateBalancesFromApproval.ApproverAddress != to && transfer.PrecalculateBalancesFromApproval.ApproverAddress != transfer.From {
-							return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
-						}
-
-						handled := false
-						if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to && transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
-							userApprovals := toUserBalance.IncomingApprovals
-							approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
-							handled = true
-						}
-
-						if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" && !handled && transfer.PrecalculateBalancesFromApproval.ApproverAddress == transfer.From {
-							userApprovals := fromUserBalance.OutgoingApprovals
-							approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
-							handled = true
-						}
-
-						if !handled {
-							return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
-						}
+				} else {
+					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != to && transfer.PrecalculateBalancesFromApproval.ApproverAddress != transfer.From {
+						return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
 					}
 
-					//Precaluclate the balances that will be transferred
-					transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(
-						ctx,
-						collection,
-						approvals,
-						transfer,
-						transferMetadata,
-					)
-					if err != nil {
-						return err
+					handled := false
+					if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to && transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
+						userApprovals := toUserBalance.IncomingApprovals
+						approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
+						handled = true
 					}
 
-					//TODO: Deprecate this in favor of actually calculating the balances in indexer
-					amountsJsonData, err := json.Marshal(transfer)
-					if err != nil {
-						return err
+					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" && !handled && transfer.PrecalculateBalancesFromApproval.ApproverAddress == transfer.From {
+						userApprovals := fromUserBalance.OutgoingApprovals
+						approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
+						handled = true
 					}
-					amountsStr := string(amountsJsonData)
 
-					EmitMessageAndIndexerEvents(ctx,
-						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-						sdk.NewAttribute("creator", initiatedBy),
-						sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
-						sdk.NewAttribute("transfer", amountsStr),
-					)
-				}
-
-				if types.IsMintAddress(transfer.From) {
-					copiedBalances := types.DeepCopyBalances(transfer.Balances)
-					totalMinted, err = types.AddBalances(ctx, totalMinted, copiedBalances)
-					if err != nil {
-						return err
+					if !handled {
+						return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
 					}
 				}
 
-				fromUserBalance, toUserBalance, err = k.HandleTransfer(
+				//Precaluclate the balances that will be transferred
+				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(
 					ctx,
 					collection,
+					approvals,
 					transfer,
-					fromUserBalance,
-					toUserBalance,
-					transfer.From,
-					to,
-					initiatedBy,
-					eventTracking,
+					transferMetadata,
 				)
 				if err != nil {
 					return err
 				}
 
-				if err := k.SetBalanceForAddress(ctx, collection, to, toUserBalance); err != nil {
-					return err
-				}
-
-				// Calculate and distribute protocol fees
-				protocolFeeTransfers, err := k.CalculateAndDistributeProtocolFees(ctx, coinTransfers, initiatedBy)
+				//TODO: Deprecate this in favor of actually calculating the balances in indexer
+				amountsJsonData, err := json.Marshal(transfer)
 				if err != nil {
 					return err
 				}
+				amountsStr := string(amountsJsonData)
 
-				// Add protocol fee transfers to the main coinTransfers slice
-				coinTransfers = append(coinTransfers, protocolFeeTransfers...)
+				EmitMessageAndIndexerEvents(ctx,
+					sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+					sdk.NewAttribute("creator", initiatedBy),
+					sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
+					sdk.NewAttribute("transfer", amountsStr),
+				)
+			}
 
-				err = EmitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
+			if types.IsMintAddress(transfer.From) {
+				copiedBalances := types.DeepCopyBalances(transfer.Balances)
+				totalMinted, err = types.AddBalances(ctx, totalMinted, copiedBalances)
 				if err != nil {
 					return err
 				}
 			}
 
-			if !types.IsMintAddress(transfer.From) {
-				if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
-					return err
-				}
-			} else {
-				// Get current Total and increment it
-				totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
-				totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
-				if err != nil {
-					return err
-				}
+			fromUserBalance, toUserBalance, err = k.HandleTransfer(
+				ctx,
+				collection,
+				transfer,
+				fromUserBalance,
+				toUserBalance,
+				transfer.From,
+				to,
+				initiatedBy,
+				eventTracking,
+			)
+			if err != nil {
+				return err
+			}
 
-				if err := k.SetBalanceForAddress(ctx, collection, types.TotalAddress, totalBalances); err != nil {
-					return err
-				}
+			if err := k.SetBalanceForAddress(ctx, collection, to, toUserBalance); err != nil {
+				return err
+			}
+
+			// Calculate and distribute protocol fees
+			protocolFeeTransfers, err := k.CalculateAndDistributeProtocolFees(ctx, coinTransfers, initiatedBy)
+			if err != nil {
+				return err
+			}
+
+			// Add protocol fee transfers to the main coinTransfers slice
+			coinTransfers = append(coinTransfers, protocolFeeTransfers...)
+
+			err = EmitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
+			if err != nil {
+				return err
+			}
+		}
+
+		if !types.IsMintAddress(transfer.From) {
+			if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
+				return err
+			}
+		} else {
+			// Get current Total and increment it
+			totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
+			totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
+			if err != nil {
+				return err
+			}
+
+			if err := k.SetBalanceForAddress(ctx, collection, types.TotalAddress, totalBalances); err != nil {
+				return err
 			}
 		}
 	}
@@ -299,7 +281,6 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
 				PrecalculationOptions:                   transfer.PrecalculationOptions,
-				NumAttempts:                             transfer.NumAttempts,
 			}
 
 			if userApproval.Outgoing {

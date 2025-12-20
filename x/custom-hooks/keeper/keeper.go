@@ -31,7 +31,6 @@ type (
 		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		RouteExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, routes []poolmanagertypes.SwapAmountInRoute, tokenIn sdk.Coin, tokenOutMinAmount osmomath.Int, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		CheckIsWrappedDenom(ctx sdk.Context, denom string) bool
-		SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
 	}
 
 	// BankKeeper interface for bank module
@@ -41,9 +40,13 @@ type (
 
 	// BadgesKeeper interface for badges module operations
 	BadgesKeeper interface {
+		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error)
+		SetAllAutoApprovalFlagsForAddressUnsafe(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error
 		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool)
 		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
 		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
+		SendNativeTokensViaAliasDenom(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
+		SendCoinWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coin *sdk.Coin) error
 	}
 
 	// ICS4Wrapper interface for sending IBC packets
@@ -597,6 +600,22 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid transfer.to_address: %s", transfer.ToAddress))
 	}
 
+	// Only set auto-approve flags for wrapped badges denoms
+	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
+	if k.gammKeeper.CheckIsWrappedDenom(ctx, token.Denom) {
+		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, token.Denom)
+		if err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse collection from denom: %s", token.Denom))
+		}
+
+		// This is setting the auto-approve flags for the intermediate sender address
+		// Edge case, but this sets it in the case of default self initiated outgoing is not approved
+		err = k.badgesKeeper.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, sender.String())
+		if err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set all auto approval flags for address: %s", toAddr.String()))
+		}
+	}
+
 	// Execute bank transfer
 	ack := k.SendCoinsFromIntermediateAddress(ctx, sender, toAddr, sdk.Coins{token})
 	if !ack.Success() {
@@ -609,16 +628,9 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 // IMPORTANT: Should ONLY be called when from address is an intermediate address
 func (k Keeper) SendCoinsFromIntermediateAddress(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) ibcexported.Acknowledgement {
 	for _, coin := range coins {
-		if k.gammKeeper.CheckIsWrappedDenom(ctx, coin.Denom) {
-			err := k.gammKeeper.SendNativeTokensFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
-			if err != nil {
-				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send wrapped tokens: denom=%s, from=%s, to=%s", coin.Denom, from.String(), to.String()))
-			}
-		} else {
-			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
-			if err != nil {
-				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send coins: amount=%s, denom=%s, from=%s, to=%s", coin.Amount.String(), coin.Denom, from.String(), to.String()))
-			}
+		err := k.badgesKeeper.SendCoinWithAliasRouting(ctx, from, to, &coin)
+		if err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send wrapped tokens: denom=%s, from=%s, to=%s", coin.Denom, from.String(), to.String()))
 		}
 	}
 

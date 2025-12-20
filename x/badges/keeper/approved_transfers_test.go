@@ -45,7 +45,6 @@ func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 		OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 		PrecalculationOptions:                   precalculationOptions,
-		NumAttempts:                             sdkmath.NewUint(1),
 	}, transferMetadata, userBalance, eventTracking, userRoyalties)
 }
 
@@ -78,7 +77,6 @@ func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 		OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 		PrecalculationOptions:                   precalculationOptions,
-		NumAttempts:                             sdkmath.NewUint(1),
 	}, transferMetadata, userBalance, eventTracking, userRoyalties)
 }
 
@@ -88,8 +86,7 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 	onlyCheckPrioritizedCollectionApprovals bool,
 	onlyCheckProritizedIncomingApprovals bool,
 	onlyCheckPrioritizedOutgoingApprovals bool,
-	precalculationOptions *types.PrecalculationOptions, eventTracking *keeper.EventTracking,
-	numAttempts sdkmath.Uint) ([]*keeper.UserApprovalsToCheck, error) {
+	precalculationOptions *types.PrecalculationOptions, eventTracking *keeper.EventTracking) ([]*keeper.UserApprovalsToCheck, error) {
 	transferMetadata := keeper.TransferMetadata{
 		To:              to,
 		From:            from,
@@ -115,7 +112,6 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 			OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 			OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
 			PrecalculationOptions:                   precalculationOptions,
-			NumAttempts:                             numAttempts,
 		}, transferMetadata, eventTracking, "collection")
 }
 
@@ -149,10 +145,10 @@ func (suite *TestSuite) TestDeductFromOutgoing() {
 	err = DeductUserIncomingApprovals(suite, suite.ctx, overallTransferBalances, collection, bobBalance, GetFullUintRanges(), GetFullUintRanges(), bob, alice, bob, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, nil)
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 
-	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1))
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1))
+	_, err = DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, overallTransferBalances, collection, GetFullUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}})
 	suite.Require().Error(err, "Error deducting outgoing approvals")
 }
 
@@ -708,7 +704,7 @@ func (suite *TestSuite) TestUserApprovalsReturned() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1))
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(2, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing != x[1].Outgoing, "Error deducting outgoing approvals")
@@ -725,7 +721,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesOutgoing() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1))
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().False(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -742,7 +738,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesIncoming() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1))
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(1, len(x), "Error deducting outgoing approvals")
 	suite.Require().True(x[0].Outgoing, "Error deducting outgoing approvals")
@@ -760,7 +756,7 @@ func (suite *TestSuite) TestUserApprovalsReturnedOverridesBoth() {
 
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
-	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1))
+	x, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx, []*types.Balance{}, collection, GetTopHalfUintRanges(), GetFullUintRanges(), bob, alice, alice, sdkmath.NewUint(1), []*types.MerkleProof{}, GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)), false, false, false, nil, &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 	suite.Require().Equal(0, len(x), "Error deducting outgoing approvals")
 }
@@ -2164,7 +2160,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 		"Mint", alice, bob, // from, to, initiatedBy (different addresses to trigger failures)
 		sdkmath.NewUint(1), []*types.MerkleProof{},
 		prioritizedApprovals, false, false, false, &types.PrecalculationOptions{},
-		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(2),
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Nil(err, "Should succeed with retry logic")
 
@@ -2215,16 +2211,15 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				},
 				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
 				OnlyCheckPrioritizedCollectionApprovals: true,
-				NumAttempts:                             sdkmath.NewUint(2),
 				PrecalculationOptions:                   &types.PrecalculationOptions{},
 			},
 		},
 		alice,
 	)
 
-	suite.Require().Nil(err, "Should succeed with sufficient attempts")
+	suite.Require().Nil(err, "Should succeed with first transfer")
 
-	// This should fail because we need 3 successful attempts but only have 2 attempts
+	// Second transfer should also succeed since MaxNumTransfers is 2 and we've only used 1
 	err = suite.app.BadgesKeeper.HandleTransfers(
 		suite.ctx,
 		collection,
@@ -2241,13 +2236,36 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				},
 				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
 				OnlyCheckPrioritizedCollectionApprovals: true,
-				NumAttempts:                             sdkmath.NewUint(3),
 				PrecalculationOptions:                   &types.PrecalculationOptions{},
 			},
 		},
 		alice,
 	)
-	suite.Require().Error(err, "Should fail with insufficient attempts")
+	suite.Require().Nil(err, "Should succeed with second transfer (within MaxNumTransfers limit)")
+
+	// Third transfer should fail because MaxNumTransfers limit of 2 has been reached
+	err = suite.app.BadgesKeeper.HandleTransfers(
+		suite.ctx,
+		collection,
+		[]*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						TokenIds:       GetFullUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
+				OnlyCheckPrioritizedCollectionApprovals: true,
+				PrecalculationOptions:                   &types.PrecalculationOptions{},
+			},
+		},
+		alice,
+	)
+	suite.Require().Error(err, "Should fail when MaxNumTransfers limit is exceeded")
 
 	// Test 4: All attempts fail and minSuccessfulAttempts > 0
 	prioritizedApprovalsAllFail := []*types.ApprovalIdentifierDetails{
@@ -2266,7 +2284,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 		"Mint", alice, charlie, // from, to, initiatedBy (different addresses to trigger failures)
 		sdkmath.NewUint(1), []*types.MerkleProof{},
 		prioritizedApprovalsAllFail, false, false, false, &types.PrecalculationOptions{},
-		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(11),
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Error(err, "Should fail when all attempts fail")
 }
@@ -2312,7 +2330,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 		GetFullUintRanges(), GetFullUintRanges(),
 		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
 		prioritizedApprovalsZeroAttempts, false, false, false, &types.PrecalculationOptions{},
-		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(0),
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Nil(err, "Should succeed with zero attempts (defaults to 1)")
 
@@ -2331,7 +2349,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 		GetFullUintRanges(), GetFullUintRanges(),
 		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
 		prioritizedApprovalsNilMinSuccess, false, false, false, nil,
-		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1),
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Nil(err, "Should succeed with nil minSuccessfulAttempts (defaults to 1)")
 
@@ -2350,7 +2368,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 		GetFullUintRanges(), GetFullUintRanges(),
 		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
 		prioritizedApprovalsSingleAttempt, false, false, false, nil,
-		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(1),
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Nil(err, "Should succeed with single attempt")
 
@@ -2369,7 +2387,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 		GetFullUintRanges(), GetFullUintRanges(),
 		bob, alice, charlie, sdkmath.NewUint(1), []*types.MerkleProof{},
 		prioritizedApprovalsLargeAttempts, false, false, false, nil,
-		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}, sdkmath.NewUint(100),
+		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
 	)
 	suite.Require().Nil(err, "Should succeed with large number of attempts")
 }
