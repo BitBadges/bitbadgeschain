@@ -8,6 +8,8 @@ import "badges/balances.proto";
 import "badges/transfers.proto";
 import "badges/address_lists.proto";
 import "badges/dynamic_stores.proto";
+import "badges/user_balance_store.proto";
+import "badges/approval_tracking.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";

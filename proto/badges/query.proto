@@ -11,13 +11,14 @@ import "badges/balances.proto";
 import "badges/transfers.proto";
 import "badges/address_lists.proto";
 import "badges/dynamic_stores.proto";
+import "badges/user_balance_store.proto";
+import "badges/approval_tracking.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
 
 // Query defines the gRPC querier service.
 service Query {
-  
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
       option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/params";
