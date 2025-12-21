@@ -6,12 +6,11 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// CheckDynamicStoreChallenges validates and processes dynamic store challenges for an approval
-// It checks if the initiator has sufficient remaining uses for each challenge and decrements the usage count
+// CheckDynamicStoreChallenges validates dynamic store challenges for an approval
+// It checks if the initiator has a true value for each challenge (read-only check)
 // Returns error if validation fails, nil on success
 func (k Keeper) CheckDynamicStoreChallenges(
 	ctx sdk.Context,
@@ -33,7 +32,7 @@ func (k Keeper) CheckDynamicStoreChallenges(
 		// Get the current value for the initiator
 		dynamicStoreValue, found := k.GetDynamicStoreValueFromStore(ctx, storeId, initiatedBy)
 
-		var val sdkmath.Uint
+		var val bool
 		if found {
 			val = dynamicStoreValue.Value
 		} else {
@@ -47,27 +46,11 @@ func (k Keeper) CheckDynamicStoreChallenges(
 			val = dynamicStore.DefaultValue
 		}
 
-		// Check if the initiator has remaining uses
-		if val.Equal(sdkmath.NewUint(0)) {
-			errorMsg := fmt.Sprintf("initiator has no remaining uses for dynamic store challenge storeId %s", storeId.String())
+		// Check if the initiator has a true value (read-only check, no updates)
+		if !val {
+			errorMsg := fmt.Sprintf("initiator does not have permission for dynamic store challenge storeId %s", storeId.String())
 			addPotentialError(isPrioritizedApproval, errorMsg)
-			return sdkerrors.New("no_remaining_uses", 1, errorMsg)
-		}
-
-		// Decrement the usage count only if not simulating
-		if !simulation {
-			// Safe subtract to prevent underflow (defensive check, though val should be >= 1 at this point)
-			newValue, err := types.SafeSubtract(val, sdkmath.NewUint(1))
-			if err != nil {
-				errorMsg := fmt.Sprintf("underflow when decrementing dynamic store value for storeId %s", storeId.String())
-				addPotentialError(isPrioritizedApproval, errorMsg)
-				return sdkerrors.Wrap(types.ErrUnderflow, errorMsg)
-			}
-
-			// SetDynamicStoreValueInStore handles both creating new values and updating existing ones
-			if err := k.SetDynamicStoreValueInStore(ctx, storeId, initiatedBy, newValue); err != nil {
-				return sdkerrors.Wrapf(err, "failed to set dynamic store value for storeId %s", storeId.String())
-			}
+			return sdkerrors.New("no_permission", 1, errorMsg)
 		}
 	}
 

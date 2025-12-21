@@ -174,25 +174,6 @@ func SetDynamicStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgS
 	return err
 }
 
-func IncrementStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgIncrementStoreValue) error {
-	err := msg.ValidateBasic()
-	if err != nil {
-		return err
-	}
-
-	_, err = suite.msgServer.IncrementStoreValue(ctx, msg)
-	return err
-}
-
-func DecrementStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgDecrementStoreValue) error {
-	err := msg.ValidateBasic()
-	if err != nil {
-		return err
-	}
-
-	_, err = suite.msgServer.DecrementStoreValue(ctx, msg)
-	return err
-}
 
 /** Legacy casts for test compatibility */
 

@@ -506,6 +506,17 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				}
 			}
 
+			// This is a sanity check to preventt accidental unlimited approvals from the current address
+			// If they really do want a very, very large number, they can just set max transfers to a large number
+			// Validate that if maxNumTransfers is unlimited, coinTransfers cannot have overrideFromWithApproverAddress
+			if MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
+				for _, coinTransfer := range approvalCriteria.CoinTransfers {
+					if coinTransfer != nil && coinTransfer.OverrideFromWithApproverAddress {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "overrideFromWithApproverAddress cannot be used when maxNumTransfers is unlimited (nothing set)")
+					}
+				}
+			}
+
 			usingLeafIndexForTransferOrder := false
 			challengeTrackerIdForTransferOrder := ""
 			if approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {

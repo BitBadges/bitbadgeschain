@@ -10,7 +10,7 @@ const TypeMsgUpdateDynamicStore = "msg_update_dynamic_store"
 
 var _ sdk.Msg = &MsgUpdateDynamicStore{}
 
-func NewMsgUpdateDynamicStore(creator string, storeId sdkmath.Uint, defaultValue sdkmath.Uint) *MsgUpdateDynamicStore {
+func NewMsgUpdateDynamicStore(creator string, storeId sdkmath.Uint, defaultValue bool) *MsgUpdateDynamicStore {
 	return &MsgUpdateDynamicStore{
 		Creator:      creator,
 		StoreId:      storeId,

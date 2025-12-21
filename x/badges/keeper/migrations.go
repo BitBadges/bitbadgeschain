@@ -268,6 +268,26 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 			return err
 		}
 
+		// Convert defaultValue from Uint to bool if needed
+		// Check if the JSON contains a string defaultValue (old Uint format) or bool (new format)
+		var jsonData map[string]interface{}
+		if err := json.Unmarshal(jsonBytes, &jsonData); err == nil {
+			if defaultValue, exists := jsonData["defaultValue"]; exists {
+				// If it's a string (old Uint format like "0" or "1"), convert to bool
+				if strValue, ok := defaultValue.(string); ok {
+					// Parse the string as Uint and convert: "0" -> false, anything else -> true
+					// Since Uint is stored as string in JSON, check if it's "0"
+					newDynamicStore.DefaultValue = strValue != "0" && strValue != ""
+				} else if boolValue, ok := defaultValue.(bool); ok {
+					// Already bool, use as-is
+					newDynamicStore.DefaultValue = boolValue
+				} else if numValue, ok := defaultValue.(float64); ok {
+					// If it's a number (shouldn't happen but handle it), convert to bool
+					newDynamicStore.DefaultValue = numValue != 0
+				}
+			}
+		}
+
 		// Save the updated dynamic store
 		if err := k.SetDynamicStoreInStore(sdk.UnwrapSDKContext(ctx), newDynamicStore); err != nil {
 			return err
@@ -291,6 +311,26 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		var newDynamicStoreValue newtypes.DynamicStoreValue
 		if err := json.Unmarshal(jsonBytes, &newDynamicStoreValue); err != nil {
 			return err
+		}
+
+		// Convert value from Uint to bool if needed
+		// Check if the JSON contains a string value (old Uint format) or bool (new format)
+		var jsonData map[string]interface{}
+		if err := json.Unmarshal(jsonBytes, &jsonData); err == nil {
+			if value, exists := jsonData["value"]; exists {
+				// If it's a string (old Uint format like "0" or "1"), convert to bool
+				if strValue, ok := value.(string); ok {
+					// Parse the string as Uint and convert: "0" -> false, anything else -> true
+					// Since Uint is stored as string in JSON, check if it's "0"
+					newDynamicStoreValue.Value = strValue != "0" && strValue != ""
+				} else if boolValue, ok := value.(bool); ok {
+					// Already bool, use as-is
+					newDynamicStoreValue.Value = boolValue
+				} else if numValue, ok := value.(float64); ok {
+					// If it's a number (shouldn't happen but handle it), convert to bool
+					newDynamicStoreValue.Value = numValue != 0
+				}
+			}
 		}
 
 		// Save the updated dynamic store value

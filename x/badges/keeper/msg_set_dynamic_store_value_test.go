@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"testing"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -24,7 +23,7 @@ func TestKeeper_MsgSetDynamicStoreValue(t *testing.T) {
 	}
 
 	// Create a dynamic store with defaultValue = true
-	msgCreate := types.NewMsgCreateDynamicStore(creator, sdkmath.NewUint(1))
+	msgCreate := types.NewMsgCreateDynamicStore(creator, true)
 	resp, err := suite.msgServer.CreateDynamicStore(wctx, msgCreate)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
@@ -36,10 +35,10 @@ func TestKeeper_MsgSetDynamicStoreValue(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, queryResp)
-	require.True(t, queryResp.Value.Value.Uint64() == 1)
+	require.True(t, queryResp.Value.Value == true)
 
 	// Set a value for the address to false
-	msg := types.NewMsgSetDynamicStoreValue(creator, resp.StoreId, address, sdkmath.NewUint(0))
+	msg := types.NewMsgSetDynamicStoreValue(creator, resp.StoreId, address, false)
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, msg)
 	require.NoError(t, err)
 
@@ -50,10 +49,10 @@ func TestKeeper_MsgSetDynamicStoreValue(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, queryResp2)
-	require.True(t, queryResp2.Value.Value.Uint64() == 0)
+	require.True(t, queryResp2.Value.Value == false)
 
 	// Update the defaultValue to false
-	msgUpdate := types.NewMsgUpdateDynamicStore(creator, resp.StoreId, sdkmath.NewUint(0))
+	msgUpdate := types.NewMsgUpdateDynamicStore(creator, resp.StoreId, false)
 	_, err = suite.msgServer.UpdateDynamicStore(wctx, msgUpdate)
 	require.NoError(t, err)
 
@@ -64,17 +63,17 @@ func TestKeeper_MsgSetDynamicStoreValue(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, queryResp3)
-	require.True(t, queryResp3.Value.Value.Uint64() == 0)
+	require.True(t, queryResp3.Value.Value == false)
 
 	// Test that only creator can set values
 	wrongCreator := "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430"
-	msgWrongCreator := types.NewMsgSetDynamicStoreValue(wrongCreator, resp.StoreId, address, sdkmath.NewUint(0))
+	msgWrongCreator := types.NewMsgSetDynamicStoreValue(wrongCreator, resp.StoreId, address, false)
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, msgWrongCreator)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Only the creator can set values in the dynamic store")
 
 	// Test invalid address
-	msgInvalidAddress := types.NewMsgSetDynamicStoreValue(creator, resp.StoreId, "invalid-address", sdkmath.NewUint(0))
+	msgInvalidAddress := types.NewMsgSetDynamicStoreValue(creator, resp.StoreId, "invalid-address", false)
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, msgInvalidAddress)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid address")

@@ -680,16 +680,13 @@ func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
 /****************************************DYNAMIC STORE VALUES****************************************/
 
 // Sets a dynamic store value in the store using DynamicStoreValueKey ([]byte{0x0F}) as the prefix.
-func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value sdkmath.Uint) error {
+func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value bool) error {
 	// Validate inputs
 	if storeId.IsZero() {
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "store ID cannot be zero")
 	}
 	if address == "" {
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "address cannot be empty")
-	}
-	if value.IsNil() {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "value cannot be nil")
 	}
 
 	dynamicStoreValue := types.DynamicStoreValue{

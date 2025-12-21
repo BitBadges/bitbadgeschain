@@ -990,7 +990,7 @@ func GetSchemas() []string {
 		"type": "badges/CreateDynamicStore",
 		"value": {
 			"creator": "",
-			"defaultValue": ""
+			"defaultValue": false
 		}
 	}`)
 
@@ -999,7 +999,7 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"storeId": "",
-			"defaultValue": ""
+			"defaultValue": false
 		}
 	}`)
 
@@ -1017,7 +1017,7 @@ func GetSchemas() []string {
 			"creator": "",
 			"storeId": "",
 			"address": "",
-			"value": ""
+			"value": false
 		}
 	}`)
 

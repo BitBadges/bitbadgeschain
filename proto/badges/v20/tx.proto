@@ -43,8 +43,6 @@ service Msg {
   rpc UpdateDynamicStore    (MsgUpdateDynamicStore) returns (MsgUpdateDynamicStoreResponse);
   rpc DeleteDynamicStore    (MsgDeleteDynamicStore) returns (MsgDeleteDynamicStoreResponse);
   rpc SetDynamicStoreValue  (MsgSetDynamicStoreValue) returns (MsgSetDynamicStoreValueResponse);
-  rpc IncrementStoreValue   (MsgIncrementStoreValue) returns (MsgIncrementStoreValueResponse);
-  rpc DecrementStoreValue   (MsgDecrementStoreValue) returns (MsgDecrementStoreValueResponse);
   
   // Helper message types for UniversalUpdateCollection subsets
   rpc SetValidTokenIds(MsgSetValidTokenIds) returns (MsgSetValidTokenIdsResponse);
@@ -71,8 +69,6 @@ message BadgeCustomMsgType {
   MsgUpdateDynamicStore updateDynamicStoreMsg = 9;
   MsgDeleteDynamicStore deleteDynamicStoreMsg = 10;
   MsgSetDynamicStoreValue setDynamicStoreValueMsg = 11;
-  MsgIncrementStoreValue incrementStoreValueMsg = 12;
-  MsgDecrementStoreValue decrementStoreValueMsg = 13;
   MsgSetIncomingApproval setIncomingApprovalMsg = 14;
   MsgDeleteIncomingApproval deleteIncomingApprovalMsg = 15;
   MsgSetOutgoingApproval setOutgoingApprovalMsg = 16;
@@ -588,8 +584,8 @@ message MsgCreateDynamicStore {
 
   // Address of the creator.
   string creator = 1;
-  // The default value for uninitialized addresses (number of uses).
-  string defaultValue = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The default value for uninitialized addresses (true/false).
+  bool defaultValue = 2;
 }
 
 // MsgCreateDynamicStoreResponse is the response to MsgCreateDynamicStore.
@@ -607,8 +603,8 @@ message MsgUpdateDynamicStore {
   string creator = 1;
   // ID of the dynamic store to update.
   string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // The new default value for uninitialized addresses (optional, only set if updating).
-  string defaultValue = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The new default value for uninitialized addresses (true/false).
+  bool defaultValue = 3;
 }
 
 // MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.
@@ -629,7 +625,7 @@ message MsgDeleteDynamicStore {
 // MsgDeleteDynamicStoreResponse is the response to MsgDeleteDynamicStore.
 message MsgDeleteDynamicStoreResponse {}
 
-// MsgSetDynamicStoreValue is used to set a usage count for a specific address in a dynamic store.
+// MsgSetDynamicStoreValue is used to set a boolean value for a specific address in a dynamic store.
 message MsgSetDynamicStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/v20/SetDynamicStoreValue";
@@ -643,57 +639,12 @@ message MsgSetDynamicStoreValue {
   // The address for which to set the value.
   string address = 3;
   
-  // The usage count to set (number of times this address can use the approval).
-  string value = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The boolean value to set (true/false).
+  bool value = 4;
 }
 
 // MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
 message MsgSetDynamicStoreValueResponse {}
-
-// MsgIncrementStoreValue is used to increment a usage count for a specific address in a dynamic store.
-message MsgIncrementStoreValue {
-  option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/IncrementStoreValue";
-
-  // Address of the creator.
-  string creator = 1;
-  
-  // ID of the dynamic store.
-  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
-  // The address for which to increment the value.
-  string address = 3;
-  
-  // The amount to increment by.
-  string amount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-}
-
-// MsgIncrementStoreValueResponse is the response to MsgIncrementStoreValue.
-message MsgIncrementStoreValueResponse {}
-
-// MsgDecrementStoreValue is used to decrement a usage count for a specific address in a dynamic store.
-message MsgDecrementStoreValue {
-  option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/DecrementStoreValue";
-
-  // Address of the creator.
-  string creator = 1;
-  
-  // ID of the dynamic store.
-  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
-  // The address for which to decrement the value.
-  string address = 3;
-  
-  // The amount to decrement by.
-  string amount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
-  // If true, set to zero on underflow. If false, throw error on underflow.
-  bool setToZeroOnUnderflow = 5;
-}
-
-// MsgDecrementStoreValueResponse is the response to MsgDecrementStoreValue.
-message MsgDecrementStoreValueResponse {}
 
 // Helper message types for UniversalUpdateCollection subsets
 // These are convenience messages that set specific subsets of the UniversalUpdateCollection message
