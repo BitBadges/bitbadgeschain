@@ -30,7 +30,6 @@ type (
 		GetCFMMPool(ctx sdk.Context, poolId uint64) (gammtypes.CFMMPoolI, error)
 		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		RouteExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, routes []poolmanagertypes.SwapAmountInRoute, tokenIn sdk.Coin, tokenOutMinAmount osmomath.Int, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
-		CheckIsAliasDenom(ctx sdk.Context, denom string) bool
 	}
 
 	// BankKeeper interface for bank module
@@ -46,7 +45,14 @@ type (
 		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
 		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
 		SendNativeTokensViaAliasDenom(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
+		CheckIsAliasDenom(ctx sdk.Context, denom string) bool
+	}
+
+	// SendManagerKeeper interface for sendmanager module operations
+	SendManagerKeeper interface {
 		SendCoinWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coin *sdk.Coin) error
+		IsICS20Compatible(ctx sdk.Context, denom string) bool
+		StandardName(ctx sdk.Context, denom string) string
 	}
 
 	// ICS4Wrapper interface for sending IBC packets
@@ -73,14 +79,15 @@ type (
 	}
 
 	Keeper struct {
-		logger         log.Logger
-		gammKeeper     GammKeeper
-		bankKeeper     BankKeeper
-		badgesKeeper   BadgesKeeper
-		transferKeeper gammtypes.TransferKeeper
-		ics4Wrapper    ICS4Wrapper
-		channelKeeper  ChannelKeeper
-		scopedKeeper   ScopedKeeper
+		logger            log.Logger
+		gammKeeper        GammKeeper
+		bankKeeper        BankKeeper
+		badgesKeeper      BadgesKeeper
+		sendManagerKeeper SendManagerKeeper
+		transferKeeper    gammtypes.TransferKeeper
+		ics4Wrapper       ICS4Wrapper
+		channelKeeper     ChannelKeeper
+		scopedKeeper      ScopedKeeper
 	}
 )
 
@@ -89,20 +96,22 @@ func NewKeeper(
 	gammKeeper GammKeeper,
 	bankKeeper BankKeeper,
 	badgesKeeper BadgesKeeper,
+	sendManagerKeeper SendManagerKeeper,
 	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
 	scopedKeeper ScopedKeeper,
 ) Keeper {
 	return Keeper{
-		logger:         logger,
-		gammKeeper:     gammKeeper,
-		bankKeeper:     bankKeeper,
-		badgesKeeper:   badgesKeeper,
-		transferKeeper: transferKeeper,
-		ics4Wrapper:    ics4Wrapper,
-		channelKeeper:  channelKeeper,
-		scopedKeeper:   scopedKeeper,
+		logger:            logger,
+		gammKeeper:        gammKeeper,
+		bankKeeper:        bankKeeper,
+		badgesKeeper:      badgesKeeper,
+		sendManagerKeeper: sendManagerKeeper,
+		transferKeeper:    transferKeeper,
+		ics4Wrapper:       ics4Wrapper,
+		channelKeeper:     channelKeeper,
+		scopedKeeper:      scopedKeeper,
 	}
 }
 
@@ -282,7 +291,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			allDenoms = append(allDenoms, operation.DenomOut)
 		}
 		for _, denom := range allDenoms {
-			if k.gammKeeper.CheckIsAliasDenom(ctx, denom) {
+			if k.badgesKeeper.CheckIsAliasDenom(ctx, denom) {
 				ack := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom)
 				if !ack.Success() {
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set auto-approve for intermediate address, denom: %s", denom))
@@ -410,9 +419,10 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 
 	// Execute post-swap action (IBC transfer or local transfer)
 	if swapAndAction.PostSwapAction.IBCTransfer != nil {
-		// Check if attempting to IBC transfer a wrapped denomination
-		if k.gammKeeper.CheckIsAliasDenom(ctx, tokenIn.Denom) {
-			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("cannot IBC transfer BitBadges denominations: %s", tokenIn.Denom))
+		// Check if attempting to IBC transfer a non-ICS20 compatible denomination
+		if !k.sendManagerKeeper.IsICS20Compatible(ctx, tokenIn.Denom) {
+			standardName := k.sendManagerKeeper.StandardName(ctx, tokenIn.Denom)
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("cannot IBC transfer %s denominations: %s", standardName, tokenIn.Denom))
 		}
 
 		// Use timeout_timestamp if provided, otherwise use default
@@ -602,7 +612,7 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 
 	// Only set auto-approve flags for wrapped badges denoms
 	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
-	if k.gammKeeper.CheckIsAliasDenom(ctx, token.Denom) {
+	if k.badgesKeeper.CheckIsAliasDenom(ctx, token.Denom) {
 		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, token.Denom)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse collection from denom: %s", token.Denom))
@@ -628,7 +638,7 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 // IMPORTANT: Should ONLY be called when from address is an intermediate address
 func (k Keeper) SendCoinsFromIntermediateAddress(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) ibcexported.Acknowledgement {
 	for _, coin := range coins {
-		err := k.badgesKeeper.SendCoinWithAliasRouting(ctx, from, to, &coin)
+		err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, from, to, &coin)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send wrapped tokens: denom=%s, from=%s, to=%s", coin.Denom, from.String(), to.String()))
 		}

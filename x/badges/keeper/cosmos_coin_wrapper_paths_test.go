@@ -1404,7 +1404,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test ParseCollectionFromDenom
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(suite.ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(suite.ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(collection.CollectionId, parsedCollection.CollectionId, "Collection IDs should match")
 
@@ -1424,7 +1424,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 
 	// Test community pool funding with regular coins
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(suite.ctx, bobAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(suite.ctx, bobAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify bob's ubalance decreased
@@ -1542,7 +1542,7 @@ func (suite *TestSuite) testDenomParsingAndValidation(wrapperDenom string, colle
 	ctx := suite.ctx
 
 	// Test ParseCollectionFromDenom
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(collection.CollectionId, parsedCollection.CollectionId, "Collection IDs should match")
 
@@ -1571,7 +1571,7 @@ func (suite *TestSuite) testCommunityPoolFundingWithBadges(userAddr string, wrap
 	// Test FundCommunityPoolWithAliasRouting with regular coins (not badges)
 	// This tests the function works correctly for non-badge denoms
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err := suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
+	err := suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1606,7 +1606,7 @@ func (suite *TestSuite) testPoolOperations(userAddr string, wrapperDenom string,
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
 
 	// Test denom parsing
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
@@ -1624,7 +1624,7 @@ func (suite *TestSuite) testSimpleIntegration(userAddr string, wrapperDenom stri
 	ctx := suite.ctx
 
 	// Test denom parsing
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
@@ -1645,7 +1645,7 @@ func (suite *TestSuite) testSimpleIntegration(userAddr string, wrapperDenom stri
 
 	// Test FundCommunityPoolWithAliasRouting with regular coins
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1665,7 +1665,7 @@ func (suite *TestSuite) testComprehensivePoolOperations(userAddr string, wrapper
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
 
 	// Test 1: Denom parsing and validation
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
@@ -1683,7 +1683,7 @@ func (suite *TestSuite) testComprehensivePoolOperations(userAddr string, wrapper
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1757,7 +1757,7 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 
 	// Test 2: ParseCollectionFromDenom
 	suite.T().Logf("Testing ParseCollectionFromDenom...")
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
@@ -1774,7 +1774,7 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -2079,7 +2079,7 @@ func (suite *TestSuite) testSwapWithTakerFees(userAddr string, wrapperDenom stri
 
 	// Send taker fee to community pool using FundCommunityPoolWithAliasRouting
 	takerFeeCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, takerFeeAmount)}
-	err = suite.app.GammKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, takerFeeCoins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, takerFeeCoins)
 	suite.Require().Nil(err, "Error funding community pool with taker fee")
 
 	// Send remaining ubadge to user (simulating swap after fee)

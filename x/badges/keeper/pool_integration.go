@@ -10,8 +10,6 @@ import (
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 func CheckStartsWithWrappedOrAliasDenom(denom string) bool {
@@ -352,6 +350,26 @@ func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress 
 	return err
 }
 
+// FundCommunityPoolViaAliasDenom funds the community pool using alias denom routing
+// This handles the alias denom-specific logic (e.g., setting auto-approvals for the module address)
+func (k Keeper) FundCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+	collection, err := k.ParseCollectionFromDenom(ctx, denom)
+	if err != nil {
+		return err
+	}
+
+	// To accept incoming transfers (if disallowed by default)
+	err = k.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, toAddress)
+	if err != nil {
+		return err
+	}
+
+	// No approvals to be set here
+	return k.SendNativeTokensViaAliasDenom(ctx, fromAddress, toAddress, denom, amount)
+}
+
+// TODO: For both of these, I'd love to DRY more with sendManager. I just need to handle the pre/post approvals (and also the prioritized correctly which isn't supported natively)
+
 // SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
 // bankKeeper is required for sending non-badges coins
@@ -365,14 +383,12 @@ func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAdd
 			}
 		} else {
 			// otherwise, send the coins normally
-			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
+			err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, from, to, &coin)
 			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to send coins to pool: %s",
-					coin.Denom)
+				return err
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -391,86 +407,7 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 
 		} else {
 			// otherwise, send the coins normally
-			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
-			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to send native tokens from pool: %s",
-					coin.Denom)
-			}
-		}
-	}
-
-	return nil
-}
-
-// FundCommunityPoolWithAliasRouting funds the community pool, wrapping badges denoms if needed.
-// Used for taker fees
-// bankKeeper and communityPoolKeeper are required for non-badges coins
-func (k Keeper) FundCommunityPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, coins sdk.Coins) error {
-	for _, coin := range coins {
-		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
-
-		if k.CheckIsAliasDenom(ctx, coin.Denom) {
-			collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
-			if err != nil {
-				return err
-			}
-
-			// To accept incoming transfers (if disallowed by default)
-			err = k.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, moduleAddress)
-			if err != nil {
-				return err
-			}
-
-			// No approvals to be set here
-			err = k.SendNativeTokensViaAliasDenom(ctx, from.String(), moduleAddress, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
-			if err != nil {
-				return err
-			}
-		} else {
-			err := k.distributionKeeper.FundCommunityPool(ctx, sdk.NewCoins(coin), from)
-			if err != nil {
-				return customhookstypes.WrapErr(&ctx, err, "failed to fund community pool: %s",
-					coin.Denom)
-			}
-		}
-	}
-
-	return nil
-}
-
-// SendCoinWithAliasRouting sends a coin using the appropriate routing (wrapped badges or bank)
-// For wrapped badges denoms, uses sendNativeTokensToAddressWithPoolApprovals which sets up recipient approvals
-// For regular denoms, uses bank keeper SendCoins
-func (k Keeper) SendCoinWithAliasRouting(
-	ctx sdk.Context,
-	fromAddressAcc sdk.AccAddress,
-	toAddressAcc sdk.AccAddress,
-	coin *sdk.Coin,
-) error {
-	// Check if this is a wrapped badges denom
-	if k.CheckIsAliasDenom(ctx, coin.Denom) {
-		amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-		return k.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, amountUint)
-	} else {
-		return k.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(*coin))
-	}
-}
-
-func (k Keeper) SendCoinsWithAliasRouting(
-	ctx sdk.Context,
-	fromAddressAcc sdk.AccAddress,
-	toAddressAcc sdk.AccAddress,
-	coins sdk.Coins,
-) error {
-	// Check if this is a wrapped badges denom
-	for _, coin := range coins {
-		if k.CheckIsAliasDenom(ctx, coin.Denom) {
-			err := k.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
-			if err != nil {
-				return err
-			}
-		} else {
-			err := k.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(coin))
+			err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, from, to, &coin)
 			if err != nil {
 				return err
 			}
@@ -478,4 +415,31 @@ func (k Keeper) SendCoinsWithAliasRouting(
 	}
 
 	return nil
+}
+
+func (k Keeper) GetSpendableCoinAmountBadgesLPOnly(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
+
+	// badgeslp: denom - calculate from badge balances
+	// Parse collection from denom
+	collection, err := k.ParseCollectionFromDenom(ctx, denom)
+	if err != nil {
+		return sdkmath.ZeroInt(), err
+	}
+
+	// Get the corresponding wrapper path
+	path, err := GetCorrespondingPath(collection, denom)
+	if err != nil {
+		return sdkmath.ZeroInt(), err
+	}
+
+	// Get user's badge balance
+	userBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
+
+	// Use the same calculation as GetWrappableBalances
+	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path.Balances)
+	if err != nil {
+		return sdkmath.ZeroInt(), err
+	}
+
+	return sdkmath.NewIntFromBigInt(maxWrappableAmount.BigInt()), nil
 }

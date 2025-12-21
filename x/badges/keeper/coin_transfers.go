@@ -25,44 +25,6 @@ func formatDenomForDisplay(denom string) string {
 	return denom
 }
 
-// GetSpendableCoinAmountWithAliasRouting gets the spendable amount for a specific denom, handling wrapped badgeslp denoms
-// For badgeslp: denoms, calculates from badge balances (wrapped approach)
-// For all other denoms (including badges:), uses bank module directly
-func (k Keeper) GetSpendableCoinAmountWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
-	// Only badgeslp: denoms use the wrapped approach
-	parts := strings.Split(denom, ":")
-	if len(parts) >= 2 && parts[0] == "badgeslp" {
-		// badgeslp: denom - calculate from badge balances
-		// Parse collection from denom
-		collection, err := k.ParseCollectionFromDenom(ctx, denom)
-		if err != nil {
-			return sdkmath.ZeroInt(), err
-		}
-
-		// Get the corresponding wrapper path
-		path, err := GetCorrespondingPath(collection, denom)
-		if err != nil {
-			return sdkmath.ZeroInt(), err
-		}
-
-		// Get user's badge balance
-		userBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
-
-		// Use the same calculation as GetWrappableBalances
-		maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path.Balances)
-		if err != nil {
-			return sdkmath.ZeroInt(), err
-		}
-
-		return sdkmath.NewIntFromBigInt(maxWrappableAmount.BigInt()), nil
-	}
-
-	// For all other denoms (badges: and non-badges), use bank keeper
-	spendableCoins := k.bankKeeper.SpendableCoins(ctx, address)
-	coin := spendableCoins.AmountOf(denom)
-	return coin, nil
-}
-
 // SimulateCoinTransfers simulates coin transfers for approval validation
 // Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
 func (k Keeper) SimulateCoinTransfers(
@@ -149,13 +111,13 @@ func (k Keeper) SimulateCoinTransfers(
 			if len(parts) >= 2 && parts[0] == "badgeslp" {
 				// badgeslp: denom - check badge balances (wrapped approach)
 				fromAddressAcc := sdk.MustAccAddressFromBech32(fromAddress)
-				availableAmount, err := k.GetSpendableCoinAmountWithAliasRouting(ctx, fromAddressAcc, coin.Denom)
+				balanceCoin, err := k.sendManagerKeeper.GetBalanceWithAliasRouting(ctx, fromAddressAcc, coin.Denom)
 				if err != nil {
 					return "", sdkerrors.Wrapf(err, "error checking wrapped denom balance for %s", coin.Denom)
 				}
 
 				requiredAmount := coin.Amount
-				if availableAmount.LT(requiredAmount) {
+				if balanceCoin.Amount.LT(requiredAmount) {
 					detErrMsg := fmt.Sprintf("insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
 					return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, detErrMsg)
 				}
@@ -196,7 +158,7 @@ func (k Keeper) sendCoinWithRoyalty(
 		payoutAddressAcc := sdk.MustAccAddressFromBech32(royaltyPayoutAddress)
 		royaltyCoin := sdk.NewCoin(coin.Denom, royaltyAmountInt)
 
-		err := k.SendCoinWithAliasRouting(ctx, fromAddressAcc, payoutAddressAcc, &royaltyCoin)
+		err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, fromAddressAcc, payoutAddressAcc, &royaltyCoin)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "error sending royalty to payout address")
 		}
@@ -213,7 +175,7 @@ func (k Keeper) sendCoinWithRoyalty(
 	if !remainingAmount.IsZero() {
 		remainingCoin := sdk.NewCoin(coin.Denom, remainingAmount)
 
-		err := k.SendCoinWithAliasRouting(ctx, fromAddressAcc, toAddressAcc, &remainingCoin)
+		err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, fromAddressAcc, toAddressAcc, &remainingCoin)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "error sending remaining amount to recipient")
 		}

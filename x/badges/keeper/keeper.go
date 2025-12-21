@@ -43,6 +43,9 @@ type (
 		wasmViewKeeper types.WasmViewKeeper
 		gammKeeper     types.GammKeeper
 
+		// SendManager keeper for alias denom routing
+		sendManagerKeeper types.SendManagerKeeper
+
 		ibcKeeperFn        func() *ibckeeper.Keeper
 		capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper
 	}
@@ -56,6 +59,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
 	distributionKeeper types.DistributionKeeper,
+	sendManagerKeeper types.SendManagerKeeper,
 	ibcKeeperFn func() *ibckeeper.Keeper,
 	capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper,
 ) Keeper {
@@ -71,6 +75,7 @@ func NewKeeper(
 		bankKeeper:         bankKeeper,
 		accountKeeper:      accountKeeper,
 		distributionKeeper: distributionKeeper,
+		sendManagerKeeper:  sendManagerKeeper,
 		ibcKeeperFn:        ibcKeeperFn,
 		capabilityScopedFn: capabilityScopedFn,
 	}

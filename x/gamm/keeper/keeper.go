@@ -20,7 +20,6 @@ import (
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
-
 func permContains(perms []string, perm string) bool {
 	for _, v := range perms {
 		if v == perm {
@@ -43,6 +42,7 @@ type Keeper struct {
 	communityPoolKeeper types.CommunityPoolKeeper
 	poolManager         types.PoolManager
 	badgesKeeper        badgeskeeper.Keeper
+	sendManagerKeeper   types.SendManagerKeeper
 	transferKeeper      types.TransferKeeper
 
 	// IBC keepers (optional, for IBC transfer functionality)
@@ -53,6 +53,7 @@ type Keeper struct {
 
 func NewKeeper(
 	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, badgesKeeper badgeskeeper.Keeper,
+	sendManagerKeeper types.SendManagerKeeper,
 	transferKeeper types.TransferKeeper,
 	ics4Wrapper types.ICS4Wrapper,
 	channelKeeper types.ChannelKeeper,
@@ -81,6 +82,7 @@ func NewKeeper(
 		bankKeeper:          bankKeeper,
 		communityPoolKeeper: communityPoolKeeper,
 		badgesKeeper:        badgesKeeper,
+		sendManagerKeeper:   sendManagerKeeper,
 		transferKeeper:      transferKeeper,
 		ics4Wrapper:         ics4Wrapper,
 		channelKeeper:       channelKeeper,
@@ -203,7 +205,7 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 // FundCommunityPoolWithAliasRouting funds the community pool, wrapping badges denoms if needed.
 // Used for taker fees
 func (k Keeper) FundCommunityPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, coins sdk.Coins) error {
-	return k.badgesKeeper.FundCommunityPoolWithAliasRouting(ctx, from, coins)
+	return k.sendManagerKeeper.FundCommunityPoolWithAliasRouting(ctx, from, coins)
 }
 
 // CheckPoolLiquidityInvariant checks that the pool address has enough underlying assets for all recorded pool liquidity.
@@ -286,16 +288,4 @@ func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) er
 	}
 
 	return nil
-}
-
-// CheckIsAliasDenom checks if a denom is a wrapped badges denom.
-// This method is required by the custom-hooks GammKeeper interface.
-func (k Keeper) CheckIsAliasDenom(ctx sdk.Context, denom string) bool {
-	return k.badgesKeeper.CheckIsAliasDenom(ctx, denom)
-}
-
-// ParseCollectionFromDenom parses a collection from a badges denom.
-// This method is used by tests.
-func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error) {
-	return k.badgesKeeper.ParseCollectionFromDenom(ctx, denom)
 }

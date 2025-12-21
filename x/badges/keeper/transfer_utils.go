@@ -62,7 +62,7 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 
 	if !protocolFees.IsZero() {
 		// Send all fees to community pool using FundCommunityPoolWithAliasRouting to support wrapped badge denoms
-		err = k.FundCommunityPoolWithAliasRouting(ctx, fromAddressAcc, protocolFees)
+		err = k.sendManagerKeeper.FundCommunityPoolWithAliasRouting(ctx, fromAddressAcc, protocolFees)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", protocolFees)
 		}

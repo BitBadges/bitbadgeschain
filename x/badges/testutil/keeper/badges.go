@@ -45,6 +45,11 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	dk := distributionkeeper.Keeper{}
 
+	// Create a mock SendManagerKeeper to avoid nil pointer panics
+	mockSendManagerKeeper := &mockSendManagerKeeper{
+		bankKeeper: bankKeeper,
+	}
+
 	k := keeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
@@ -52,9 +57,10 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		bankKeeper,
 		ak,
-		dk,  // DistributionKeeper
-		nil, // IBCKeeperFn
-		nil, // CapabilityScopedFn
+		dk,                    // DistributionKeeper
+		mockSendManagerKeeper, // SendManagerKeeper
+		nil,                   // IBCKeeperFn
+		nil,                   // CapabilityScopedFn
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
@@ -65,4 +71,43 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	}
 
 	return k, ctx
+}
+
+// mockSendManagerKeeper is a minimal mock implementation of SendManagerKeeper for testing
+type mockSendManagerKeeper struct {
+	bankKeeper bankkeeper.Keeper
+}
+
+func (m *mockSendManagerKeeper) SendCoinWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coin *sdk.Coin) error {
+	// For tests, just use bank keeper directly
+	// BankKeeper.SendCoins uses context.Context, so we need to wrap the sdk.Context
+	return m.bankKeeper.SendCoins(sdk.WrapSDKContext(ctx), fromAddressAcc, toAddressAcc, sdk.NewCoins(*coin))
+}
+
+func (m *mockSendManagerKeeper) SendCoinsWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coins sdk.Coins) error {
+	// For tests, just use bank keeper directly
+	// BankKeeper.SendCoins uses context.Context, so we need to wrap the sdk.Context
+	return m.bankKeeper.SendCoins(sdk.WrapSDKContext(ctx), fromAddressAcc, toAddressAcc, coins)
+}
+
+func (m *mockSendManagerKeeper) FundCommunityPoolWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, coins sdk.Coins) error {
+	// For tests, we can't easily mock distribution keeper, so just return nil
+	// This is acceptable for unit tests that don't test community pool funding
+	return nil
+}
+
+func (m *mockSendManagerKeeper) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error) {
+	// For tests, just use bank keeper directly
+	// BankKeeper.GetBalance uses context.Context, so we need to wrap the sdk.Context
+	return m.bankKeeper.GetBalance(sdk.WrapSDKContext(ctx), address, denom), nil
+}
+
+func (m *mockSendManagerKeeper) IsICS20Compatible(ctx sdk.Context, denom string) bool {
+	// For tests, assume all denoms are ICS20 compatible
+	return true
+}
+
+func (m *mockSendManagerKeeper) StandardName(ctx sdk.Context, denom string) string {
+	// For tests, return "x/bank" for all denoms
+	return "x/bank"
 }
