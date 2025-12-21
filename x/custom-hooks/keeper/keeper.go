@@ -30,7 +30,7 @@ type (
 		GetCFMMPool(ctx sdk.Context, poolId uint64) (gammtypes.CFMMPoolI, error)
 		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		RouteExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, routes []poolmanagertypes.SwapAmountInRoute, tokenIn sdk.Coin, tokenOutMinAmount osmomath.Int, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
-		CheckIsWrappedDenom(ctx sdk.Context, denom string) bool
+		CheckIsAliasDenom(ctx sdk.Context, denom string) bool
 	}
 
 	// BankKeeper interface for bank module
@@ -282,7 +282,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			allDenoms = append(allDenoms, operation.DenomOut)
 		}
 		for _, denom := range allDenoms {
-			if k.gammKeeper.CheckIsWrappedDenom(ctx, denom) {
+			if k.gammKeeper.CheckIsAliasDenom(ctx, denom) {
 				ack := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom)
 				if !ack.Success() {
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set auto-approve for intermediate address, denom: %s", denom))
@@ -411,7 +411,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 	// Execute post-swap action (IBC transfer or local transfer)
 	if swapAndAction.PostSwapAction.IBCTransfer != nil {
 		// Check if attempting to IBC transfer a wrapped denomination
-		if k.gammKeeper.CheckIsWrappedDenom(ctx, tokenIn.Denom) {
+		if k.gammKeeper.CheckIsAliasDenom(ctx, tokenIn.Denom) {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("cannot IBC transfer BitBadges denominations: %s", tokenIn.Denom))
 		}
 
@@ -602,7 +602,7 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 
 	// Only set auto-approve flags for wrapped badges denoms
 	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
-	if k.gammKeeper.CheckIsWrappedDenom(ctx, token.Denom) {
+	if k.gammKeeper.CheckIsAliasDenom(ctx, token.Denom) {
 		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, token.Denom)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse collection from denom: %s", token.Denom))

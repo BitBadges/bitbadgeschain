@@ -20,6 +20,7 @@ import (
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
+
 func permContains(perms []string, perm string) bool {
 	for _, v := range perms {
 		if v == perm {
@@ -221,7 +222,7 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 	// Iterate over all denoms in the pool's liquidity
 	for _, coin := range poolLiquidity {
 		// Check if this is a wrapped badges denom
-		if k.badgesKeeper.CheckIsWrappedDenom(ctx, coin.Denom) {
+		if k.badgesKeeper.CheckIsAliasDenom(ctx, coin.Denom) {
 			collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, coin.Denom)
 			if err != nil {
 				return fmt.Errorf("failed to parse collection from denom: %s: %w", coin.Denom, err)
@@ -263,7 +264,7 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) error {
 	for _, coin := range coins {
 		// Check if this is a badges denom
-		if !badgeskeeper.CheckStartsWithBadges(coin.Denom) {
+		if !badgeskeeper.CheckStartsWithWrappedOrAliasDenom(coin.Denom) {
 			continue
 		}
 
@@ -287,10 +288,10 @@ func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) er
 	return nil
 }
 
-// CheckIsWrappedDenom checks if a denom is a wrapped badges denom.
+// CheckIsAliasDenom checks if a denom is a wrapped badges denom.
 // This method is required by the custom-hooks GammKeeper interface.
-func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
-	return k.badgesKeeper.CheckIsWrappedDenom(ctx, denom)
+func (k Keeper) CheckIsAliasDenom(ctx sdk.Context, denom string) bool {
+	return k.badgesKeeper.CheckIsAliasDenom(ctx, denom)
 }
 
 // ParseCollectionFromDenom parses a collection from a badges denom.

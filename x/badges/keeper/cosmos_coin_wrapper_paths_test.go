@@ -10,9 +10,9 @@ import (
 
 // generateWrapperDenom generates the correct token denom based on AllowCosmosWrapping setting
 func generateWrapperDenom(collectionId sdkmath.Uint, wrapperPath *types.CosmosCoinWrapperPath) string {
-	prefix := "badges:"
+	prefix := keeper.WrappedDenomPrefix
 	if !wrapperPath.AllowCosmosWrapping {
-		prefix = "badgeslp:"
+		prefix = keeper.AliasDenomPrefix
 	}
 	return prefix + collectionId.String() + ":" + wrapperPath.Denom
 }
@@ -728,7 +728,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 	// The denom should be replaced: "badge_1_coin" (with {id} replaced by 1)
-	replacedDenom := "badges:" + collection.CollectionId.String() + ":badge_1_coin"
+	replacedDenom := keeper.WrappedDenomPrefix + collection.CollectionId.String() + ":badge_1_coin"
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, replacedDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom.Amount, "Cosmos coin should be minted with replaced denom")
 
@@ -1230,9 +1230,9 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test denom parsing functions
-	// Test CheckStartsWithBadges
-	suite.Require().True(keeper.CheckStartsWithBadges(wrapperDenom), "Should recognize badges denom")
-	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should not recognize non-badges denom")
+	// Test CheckStartsWithWrappedOrAliasDenom
+	suite.Require().True(keeper.CheckStartsWithWrappedOrAliasDenom(wrapperDenom), "Should recognize badges denom")
+	suite.Require().False(keeper.CheckStartsWithWrappedOrAliasDenom("ubadge"), "Should not recognize non-badges denom")
 
 	// Test ParseDenomCollectionId
 	collectionId, err := keeper.ParseDenomCollectionId(wrapperDenom)
@@ -1300,7 +1300,7 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	suite.Require().Error(err, "Should error with invalid denom format")
 
 	// Test error case: non-badges denom
-	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
+	suite.Require().False(keeper.CheckStartsWithWrappedOrAliasDenom("ubadge"), "Should return false for non-badges denom")
 }
 
 // TestGammKeeperSimpleIntegration tests the gamm keeper functionality with a simpler approach
@@ -1750,10 +1750,10 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 	poolAcc := suite.app.AccountKeeper.NewAccountWithAddress(ctx, poolAccAddr)
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
 
-	// Test 1: CheckStartsWithBadges
-	suite.T().Logf("Testing CheckStartsWithBadges...")
-	suite.Require().True(keeper.CheckStartsWithBadges(wrapperDenom), "Should return true for tokens denom")
-	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
+	// Test 1: CheckStartsWithWrappedOrAliasDenom
+	suite.T().Logf("Testing CheckStartsWithWrappedOrAliasDenom...")
+	suite.Require().True(keeper.CheckStartsWithWrappedOrAliasDenom(wrapperDenom), "Should return true for tokens denom")
+	suite.Require().False(keeper.CheckStartsWithWrappedOrAliasDenom("ubadge"), "Should return false for non-badges denom")
 
 	// Test 2: ParseCollectionFromDenom
 	suite.T().Logf("Testing ParseCollectionFromDenom...")

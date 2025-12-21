@@ -1,9 +1,11 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -22,11 +24,11 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 		Address: bob,
 	})
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "denom must start with 'badges:'")
+	require.Contains(t, err.Error(), fmt.Sprintf("denom must start with '%s'", keeper.WrappedDenomPrefix))
 
 	// Test with invalid denom format (missing parts)
 	_, err = suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:1",
+		Denom:   keeper.WrappedDenomPrefix + "1",
 		Address: bob,
 	})
 	require.Error(t, err)
@@ -34,7 +36,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 
 	// Test with non-existent collection
 	_, err = suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:999:test",
+		Denom:   keeper.WrappedDenomPrefix + "999:test",
 		Address: bob,
 	})
 	require.Error(t, err)
@@ -95,7 +97,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 
 	// Test with valid denom but no wrapper path found
 	_, err = suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:1:nonexistent",
+		Denom:   keeper.WrappedDenomPrefix + "1:nonexistent",
 		Address: bob,
 	})
 	require.Error(t, err)
@@ -103,7 +105,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 
 	// Test with valid denom and wrapper path
 	response, err := suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:1:testcoin",
+		Denom:   keeper.WrappedDenomPrefix + "1:testcoin",
 		Address: bob,
 	})
 	require.NoError(t, err)
@@ -171,7 +173,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	// Charlie should have 1 token, and since 1 native badge = 1 wrapped token,
 	// the max wrappable amount should be 1 (1 token / 1 = 1)
 	response2, err := suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:2:testcoin-two",
+		Denom:   keeper.WrappedDenomPrefix + "2:testcoin-two",
 		Address: charlie,
 	})
 	require.NoError(t, err)
@@ -233,7 +235,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	require.NoError(t, err, "error minting and distributing badges to alice")
 
 	response3, err := suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badgeslp:3:nowrap",
+		Denom:   keeper.AliasDenomPrefix + "3:nowrap",
 		Address: alice,
 	})
 	require.NoError(t, err)
@@ -276,7 +278,7 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	// Wrapper needs: 1 of token ID 1 for 1 wrapped token
 	// So max wrappable should be 1 (1 >= 1)
 	response, err := suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:1:advanced-test",
+		Denom:   keeper.WrappedDenomPrefix + "1:advanced-test",
 		Address: bob,
 	})
 	require.NoError(t, err)
@@ -309,7 +311,7 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	// Wrapper needs: 1 of token ID 1 for 1 wrapped token
 	// So max wrappable should be 1 (1 >= 1)
 	response2, err := suite.app.BadgesKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
-		Denom:   "badges:2:advanced-test-two",
+		Denom:   keeper.WrappedDenomPrefix + "2:advanced-test-two",
 		Address: charlie,
 	})
 	require.NoError(t, err)

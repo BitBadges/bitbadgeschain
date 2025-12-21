@@ -122,8 +122,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	}
 
 	// Construct the full IBC denomination
-	badgePrefix := "badges:"
-	ibcDenom = badgePrefix + collection.CollectionId.String() + ":" + ibcDenom
+	ibcDenom = WrappedDenomPrefix + collection.CollectionId.String() + ":" + ibcDenom
 
 	bankKeeper := k.bankKeeper
 	amountInt := multiplier.BigInt()

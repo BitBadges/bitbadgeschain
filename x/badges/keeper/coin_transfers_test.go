@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"strings"
 
+	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -238,7 +239,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
-	suite.Require().True(strings.HasPrefix(wrapperDenom, "badgeslp:"), "Wrapper denom should use badgeslp: prefix")
+	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
 	// First, mint more badges to bob so he has enough to wrap
 	// The collection only mints 1 badge initially, so we need to mint more
@@ -480,7 +481,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
-	suite.Require().True(strings.HasPrefix(wrapperDenom, "badgeslp:"), "Wrapper denom should use badgeslp: prefix")
+	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
 	// For badgeslp: denoms, we need to check badge balances, not bank balances
 	// First, verify bob has badges
@@ -652,7 +653,7 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
-	suite.Require().True(strings.HasPrefix(wrapperDenom, "badgeslp:"), "Wrapper denom should use badgeslp: prefix")
+	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
 	// First, mint more badges to bob so he has enough
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{

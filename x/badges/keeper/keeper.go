@@ -20,6 +20,11 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 )
 
+const (
+	WrappedDenomPrefix = "badges:"
+	AliasDenomPrefix   = "badgeslp:"
+)
+
 type (
 	Keeper struct {
 		cdc          codec.BinaryCodec

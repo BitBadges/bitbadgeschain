@@ -14,14 +14,13 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
-// CheckStartsWithBadges checks if a denom starts with "badges:" or "badgeslp:"
-func CheckStartsWithBadges(denom string) bool {
-	return strings.HasPrefix(denom, "badges:") || strings.HasPrefix(denom, "badgeslp:")
+func CheckStartsWithWrappedOrAliasDenom(denom string) bool {
+	return strings.HasPrefix(denom, WrappedDenomPrefix) || strings.HasPrefix(denom, AliasDenomPrefix)
 }
 
 // GetPartsFromDenom parses a badges denom into its parts
 func GetPartsFromDenom(denom string) ([]string, error) {
-	if !CheckStartsWithBadges(denom) {
+	if !CheckStartsWithWrappedOrAliasDenom(denom) {
 		return nil, fmt.Errorf("invalid denom: %s", denom)
 	}
 
@@ -110,9 +109,9 @@ func GetBalancesToTransfer(collection *badgestypes.TokenCollection, denom string
 	return balancesToTransfer, nil
 }
 
-// CheckIsWrappedDenom checks if a denom is a wrapped badges denom
-func (k Keeper) CheckIsWrappedDenom(ctx sdk.Context, denom string) bool {
-	if !CheckStartsWithBadges(denom) {
+// CheckIsAliasDenom checks if a denom is a wrapped badges denom
+func (k Keeper) CheckIsAliasDenom(ctx sdk.Context, denom string) bool {
+	if !CheckStartsWithWrappedOrAliasDenom(denom) {
 		return false
 	}
 
@@ -359,7 +358,7 @@ func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress 
 func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, wrap it
 	for _, coin := range coins {
-		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			err := k.sendNativeTokensToAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
@@ -383,7 +382,7 @@ func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAdd
 func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
-		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 
 			err := k.sendNativeTokensFromAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
@@ -410,7 +409,7 @@ func (k Keeper) FundCommunityPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 	for _, coin := range coins {
 		moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
-		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			collection, err := k.ParseCollectionFromDenom(ctx, coin.Denom)
 			if err != nil {
 				return err
@@ -449,7 +448,7 @@ func (k Keeper) SendCoinWithAliasRouting(
 	coin *sdk.Coin,
 ) error {
 	// Check if this is a wrapped badges denom
-	if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+	if k.CheckIsAliasDenom(ctx, coin.Denom) {
 		amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 		return k.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, amountUint)
 	} else {
@@ -465,7 +464,7 @@ func (k Keeper) SendCoinsWithAliasRouting(
 ) error {
 	// Check if this is a wrapped badges denom
 	for _, coin := range coins {
-		if k.CheckIsWrappedDenom(ctx, coin.Denom) {
+		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			err := k.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
