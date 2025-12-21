@@ -86,6 +86,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -163,6 +164,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -190,6 +192,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -258,6 +261,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -292,6 +296,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -356,6 +361,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -376,6 +382,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -396,6 +403,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 						OwnershipTimes: GetTwoUintRanges(), // Wrong ownership times
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -470,6 +478,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -497,6 +506,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -561,6 +571,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -634,6 +645,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -706,6 +718,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -784,6 +797,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -805,6 +819,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -826,6 +841,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -897,6 +913,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -917,6 +934,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -1023,6 +1041,8 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	// First, transfer tokens from bob to the wrapper path address so it has badges to work with
 	// Transfer only 1 token, leave the rest with bob
 	transferAmount := sdkmath.NewUint(1)
+	collection, err := GetCollection(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, sdk.WrapSDKContext(ctx), &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1037,6 +1057,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -1876,6 +1897,8 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 
 	// Transfer some badges to wrapper path address for pool creation (use user's actual balance)
 	transferAmount := userBalance.Balances[0].Amount // Transfer all user's badges to wrapper path
+	collection, err := GetCollection(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, sdk.WrapSDKContext(ctx), &types.MsgTransferTokens{
 		Creator:      userAddr,
 		CollectionId: sdkmath.NewUint(1),
@@ -1890,6 +1913,7 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})

@@ -222,7 +222,15 @@ func (k Keeper) HandleTransfer(
 	var err error
 
 	// Check if sending from a special address (cosmos coin wrapper path) and set up one-time approval
-	isSendingFromSpecialAddress := k.IsSpecialAddress(ctx, collection, from)
+	isSendingFromSpecialAddress := k.IsBackedOrWrappingPathAddress(ctx, collection, from)
+	isSendingToSpecialAddress := k.IsBackedOrWrappingPathAddress(ctx, collection, to)
+
+	// Little hacky way of doing this, but any transfer on the collection level that involves special addresses
+	// should always specify the collection approvals
+	if isSendingFromSpecialAddress || isSendingToSpecialAddress {
+		transfer.OnlyCheckPrioritizedCollectionApprovals = true
+	}
+
 	if isSendingFromSpecialAddress {
 		// Set up one-time outgoing approval for the special address to send tokens to the recipient
 		// Similar to gamm pools

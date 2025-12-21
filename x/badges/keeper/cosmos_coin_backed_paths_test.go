@@ -83,6 +83,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -118,6 +119,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -199,6 +201,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -225,6 +228,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -249,6 +253,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -326,6 +331,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -352,6 +358,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -381,6 +388,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -524,6 +532,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -550,6 +559,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -620,6 +630,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsInadequateBalance() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -687,6 +698,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackInadequateBalance() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -760,6 +772,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -793,6 +806,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -873,6 +887,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -906,6 +921,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})

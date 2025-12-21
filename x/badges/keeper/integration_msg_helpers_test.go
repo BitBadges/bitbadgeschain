@@ -174,7 +174,6 @@ func SetDynamicStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgS
 	return err
 }
 
-
 /** Legacy casts for test compatibility */
 
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []*types.MsgNewCollection) error {

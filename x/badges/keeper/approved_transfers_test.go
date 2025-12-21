@@ -300,6 +300,28 @@ func GetDefaultPrioritizedApprovals(ctx sdk.Context, k keeper.Keeper, collection
 	return prioritizedApprovals
 }
 
+// GetPrioritizedApprovalsFromCollection gets all collection approvals as prioritized approvals
+// This is useful for tests involving special addresses where OnlyCheckPrioritizedCollectionApprovals is set
+func GetPrioritizedApprovalsFromCollection(ctx sdk.Context, k keeper.Keeper, collection *types.TokenCollection) []*types.ApprovalIdentifierDetails {
+	prioritizedApprovals := []*types.ApprovalIdentifierDetails{}
+	for _, approval := range collection.CollectionApprovals {
+		version, found := k.GetApprovalTrackerVersionFromStore(
+			ctx,
+			keeper.ConstructApprovalVersionKey(collection.CollectionId, "collection", "", approval.ApprovalId),
+		)
+		if !found {
+			version = sdkmath.NewUint(0)
+		}
+		prioritizedApprovals = append(prioritizedApprovals, &types.ApprovalIdentifierDetails{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      approval.ApprovalId,
+			Version:         version,
+		})
+	}
+	return prioritizedApprovals
+}
+
 func (suite *TestSuite) TestClaimIncrementsExceedsBalances() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 

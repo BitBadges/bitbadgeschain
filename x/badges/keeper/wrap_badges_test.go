@@ -60,6 +60,7 @@ func (suite *TestSuite) TestWrapTokens() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -109,6 +110,7 @@ func (suite *TestSuite) TestWrapTokens() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -172,6 +174,8 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 	}
 
 	// Test more than one balance
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -184,6 +188,7 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 					TokenIds:       GetOneUintRange(),
 					OwnershipTimes: GetFullUintRanges(),
 				}),
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -200,9 +205,10 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:        bob,
-				ToAddresses: []string{denomAddress},
-				Balances:    newBalancesClone,
+				From:                 bob,
+				ToAddresses:          []string{denomAddress},
+				Balances:             newBalancesClone,
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -217,9 +223,10 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:        bob,
-				ToAddresses: []string{denomAddress},
-				Balances:    newBalancesClone,
+				From:                 bob,
+				ToAddresses:          []string{denomAddress},
+				Balances:             newBalancesClone,
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -279,6 +286,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -334,12 +342,15 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Error(err, "Error unwrapping tokens")
 
 	// Unwrap the tokens - alice should succeed
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
@@ -354,6 +365,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
