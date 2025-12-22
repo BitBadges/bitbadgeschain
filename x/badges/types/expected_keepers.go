@@ -58,6 +58,4 @@ type SendManagerKeeper interface {
 	SendCoinsFromModuleToAccountWithAliasRouting(ctx sdk.Context, moduleName string, toAddressAcc sdk.AccAddress, coins sdk.Coins) error
 	SendCoinsFromAccountToModuleWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, moduleName string, coins sdk.Coins) error
 	GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error)
-	IsICS20Compatible(ctx sdk.Context, denom string) bool
-	StandardName(ctx sdk.Context, denom string) string
 }
