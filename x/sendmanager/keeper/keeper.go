@@ -239,6 +239,54 @@ func (k Keeper) FundCommunityPoolWithAliasRouting(
 	return nil
 }
 
+// SpendFromCommunityPoolWithAliasRouting spends from the community pool, using alias denom routing if needed
+// For alias denoms, it finds the appropriate router and uses SpendFromCommunityPoolViaAliasDenom (standard send)
+// For regular denoms, it uses bank keeper SendCoinsFromModuleToAccount with the distribution module
+func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
+	ctx sdk.Context,
+	toAddressAcc sdk.AccAddress,
+	coins sdk.Coins,
+) error {
+	// Get community pool module address (distribution module)
+	moduleName := distrtypes.ModuleName
+	moduleAddress := authtypes.NewModuleAddress(moduleName)
+
+	for _, coin := range coins {
+		// Check if this denom matches any known prefix
+		router, found := k.getRouterForDenom(coin.Denom)
+		if found {
+			// Prefix matched and router is registered - use standard send for badges keeper
+			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
+			err := router.SpendFromCommunityPoolViaAliasDenom(ctx, moduleAddress.String(), toAddressAcc.String(), coin.Denom, amountUint)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		// Check if prefix matched but no router was registered (error condition)
+		matchedPrefix := ""
+		for _, prefix := range k.registeredPrefixes {
+			if strings.HasPrefix(coin.Denom, prefix) {
+				matchedPrefix = prefix
+				break
+			}
+		}
+		if matchedPrefix != "" {
+			// Prefix matches but no router registered - this is an error
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
+		}
+
+		// No prefix matched, use standard bank routing
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, moduleName, toAddressAcc, sdk.NewCoins(coin))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // GetBalanceWithAliasRouting gets the balance for a specific denom, handling alias denom routing
 // Mirrors bankKeeper.GetBalance but routes alias denoms through their respective routers
 // For alias denoms (e.g., badgeslp:), uses the router's GetBalanceWithAliasRouting
@@ -277,4 +325,98 @@ func (k Keeper) StandardName(ctx sdk.Context, denom string) string {
 	}
 	// Regular ICS20 denom
 	return "x/bank"
+}
+
+// SendCoinsFromModuleToAccountWithAliasRouting sends coins from a module account to an account, using alias denom routing if needed
+// For alias denoms, it finds the appropriate router and uses SendNativeTokensViaAliasDenom (standard send)
+// For regular denoms, it uses bank keeper SendCoinsFromModuleToAccount
+func (k Keeper) SendCoinsFromModuleToAccountWithAliasRouting(
+	ctx sdk.Context,
+	moduleName string,
+	toAddressAcc sdk.AccAddress,
+	coins sdk.Coins,
+) error {
+	moduleAddress := authtypes.NewModuleAddress(moduleName)
+
+	for _, coin := range coins {
+		// Check if this denom matches any known prefix
+		router, found := k.getRouterForDenom(coin.Denom)
+		if found {
+			// Prefix matched and router is registered - use adapter method
+			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
+			err := router.SendFromModuleToAccountViaAliasDenom(ctx, moduleAddress.String(), toAddressAcc.String(), coin.Denom, amountUint)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		// Check if prefix matched but no router was registered (error condition)
+		matchedPrefix := ""
+		for _, prefix := range k.registeredPrefixes {
+			if strings.HasPrefix(coin.Denom, prefix) {
+				matchedPrefix = prefix
+				break
+			}
+		}
+		if matchedPrefix != "" {
+			// Prefix matches but no router registered - this is an error
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
+		}
+
+		// No prefix matched, use standard bank routing
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, moduleName, toAddressAcc, sdk.NewCoins(coin))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// SendCoinsFromAccountToModuleWithAliasRouting sends coins from an account to a module account, using alias denom routing if needed
+// For alias denoms, it finds the appropriate router and uses SendNativeTokensViaAliasDenom (standard send)
+// For regular denoms, it uses bank keeper SendCoinsFromAccountToModule
+func (k Keeper) SendCoinsFromAccountToModuleWithAliasRouting(
+	ctx sdk.Context,
+	fromAddressAcc sdk.AccAddress,
+	moduleName string,
+	coins sdk.Coins,
+) error {
+	moduleAddress := authtypes.NewModuleAddress(moduleName)
+
+	for _, coin := range coins {
+		// Check if this denom matches any known prefix
+		router, found := k.getRouterForDenom(coin.Denom)
+		if found {
+			// Prefix matched and router is registered - use adapter method
+			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
+			err := router.SendFromAccountToModuleViaAliasDenom(ctx, fromAddressAcc.String(), moduleAddress.String(), coin.Denom, amountUint)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		// Check if prefix matched but no router was registered (error condition)
+		matchedPrefix := ""
+		for _, prefix := range k.registeredPrefixes {
+			if strings.HasPrefix(coin.Denom, prefix) {
+				matchedPrefix = prefix
+				break
+			}
+		}
+		if matchedPrefix != "" {
+			// Prefix matches but no router registered - this is an error
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
+		}
+
+		// No prefix matched, use standard bank routing
+		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, fromAddressAcc, moduleName, sdk.NewCoins(coin))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

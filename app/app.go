@@ -87,7 +87,9 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
@@ -331,6 +333,23 @@ func New(
 	// Wire up keepers for address checks
 	app.BadgesKeeper.SetWasmViewKeeper(&app.WasmKeeper)
 	app.BadgesKeeper.SetGammKeeper(&app.GammKeeper)
+
+	// Register custom approval criteria checkers (optional)
+	app.BadgesKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+		// Add custom logic as needed here
+		return nil
+	})
+
+	// Register custom global transfer checkers (optional)
+	app.BadgesKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []badgesmodulekeeper.GlobalTransferChecker {
+		// Add custom logic as needed here
+		return nil
+	})
+
+	// Register custom collection verifiers (optional)
+	// Example:
+	// app.BadgesKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
+	app.BadgesKeeper.RegisterCustomCollectionVerifier(&badgesmodulekeeper.NoOpCollectionVerifier{})
 
 	// Register badges router with sendmanager (deferred to avoid circular dependency)
 	// This must happen after both keepers are created

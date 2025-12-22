@@ -209,13 +209,21 @@ func (m *TokenCollection) GetInvariants() *CollectionInvariants {
 }
 
 type CosmosCoinWrapperPath struct {
-	Address                        string       `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	Denom                          string       `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	Balances                       []*Balance   `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
-	Symbol                         string       `protobuf:"bytes,4,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	DenomUnits                     []*DenomUnit `protobuf:"bytes,5,rep,name=denomUnits,proto3" json:"denomUnits,omitempty"`
-	AllowOverrideWithAnyValidToken bool         `protobuf:"varint,6,opt,name=allowOverrideWithAnyValidToken,proto3" json:"allowOverrideWithAnyValidToken,omitempty"`
-	AllowCosmosWrapping            bool         `protobuf:"varint,7,opt,name=allowCosmosWrapping,proto3" json:"allowCosmosWrapping,omitempty"`
+	// The BitBadges address associated with this wrapper path. Used for routing and identifying the wrapper.
+	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	// The denomination (denom) to be used for the wrapped coin or the alias denom.
+	Denom string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
+	// The token balances that correspond to this wrapper path. Defines how much you have to wrap to get x1 of corresponding base level unit.
+	Balances []*Balance `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
+	// The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
+	Symbol string `protobuf:"bytes,4,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// Denomination units for the wrapped coin. Defines how the coin can be displayed with different
+	// decimal places and symbols (e.g., base unit, display unit). You can specify which is the default display unit (base level or one of these).
+	DenomUnits []*DenomUnit `protobuf:"bytes,5,rep,name=denomUnits,proto3" json:"denomUnits,omitempty"`
+	// If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
+	AllowOverrideWithAnyValidToken bool `protobuf:"varint,6,opt,name=allowOverrideWithAnyValidToken,proto3" json:"allowOverrideWithAnyValidToken,omitempty"`
+	// If true, allows tokens to be wrapped into Cosmos SDK coins. When false, this path is just an alias
+	AllowCosmosWrapping bool `protobuf:"varint,7,opt,name=allowCosmosWrapping,proto3" json:"allowCosmosWrapping,omitempty"`
 }
 
 func (m *CosmosCoinWrapperPath) Reset()         { *m = CosmosCoinWrapperPath{} }
@@ -301,10 +309,17 @@ func (m *CosmosCoinWrapperPath) GetAllowCosmosWrapping() bool {
 }
 
 type CosmosCoinBackedPath struct {
-	Address   string     `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	IbcDenom  string     `protobuf:"bytes,2,opt,name=ibcDenom,proto3" json:"ibcDenom,omitempty"`
-	Balances  []*Balance `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
-	IbcAmount Uint       `protobuf:"bytes,4,opt,name=ibcAmount,proto3,customtype=Uint" json:"ibcAmount"`
+	// The address associated with this backed path. Used for routing and escrowing IBC tokens.
+	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	// The IBC denomination of the backing token. This identifies which IBC token backs the badges
+	// (e.g., "ibc/..." or "ubadge"). Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
+	IbcDenom string `protobuf:"bytes,2,opt,name=ibcDenom,proto3" json:"ibcDenom,omitempty"`
+	// The token balances that correspond to this backed path. Defines which token IDs and amounts
+	// are backed by the IBC tokens. Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
+	Balances []*Balance `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
+	// The amount of IBC tokens that back the tokens. This defines the exchange rate or backing amount
+	// for the tokens in this path. Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
+	IbcAmount Uint `protobuf:"bytes,4,opt,name=ibcAmount,proto3,customtype=Uint" json:"ibcAmount"`
 }
 
 func (m *CosmosCoinBackedPath) Reset()         { *m = CosmosCoinBackedPath{} }
@@ -362,9 +377,13 @@ func (m *CosmosCoinBackedPath) GetBalances() []*Balance {
 }
 
 type DenomUnit struct {
-	Decimals         Uint   `protobuf:"bytes,1,opt,name=decimals,proto3,customtype=Uint" json:"decimals"`
-	Symbol           string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	IsDefaultDisplay bool   `protobuf:"varint,3,opt,name=isDefaultDisplay,proto3" json:"isDefaultDisplay,omitempty"`
+	// The number of decimal places for this unit. Defines the precision of the unit.
+	Decimals Uint `protobuf:"bytes,1,opt,name=decimals,proto3,customtype=Uint" json:"decimals"`
+	// The symbol for this unit (e.g., "BADGE", "nBADGE"). Used for display purposes.
+	Symbol string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// If true, this is the default display unit. Only one unit should be marked as the default display unit.
+	// This unit will be used by default when displaying the coin amount. If none are marked default, we use the base level.
+	IsDefaultDisplay bool `protobuf:"varint,3,opt,name=isDefaultDisplay,proto3" json:"isDefaultDisplay,omitempty"`
 }
 
 func (m *DenomUnit) Reset()         { *m = DenomUnit{} }

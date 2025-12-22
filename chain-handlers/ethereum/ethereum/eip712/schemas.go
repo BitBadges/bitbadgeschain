@@ -1097,6 +1097,21 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	// SendManager messages
+	schemas = append(schemas, `{
+		"type": "sendmanager/SendWithAliasRouting",
+		"value": {
+			"from_address": "",
+			"to_address": "",
+			"amount": [
+				{
+					"denom": "",
+					"amount": ""
+				}
+			]
+		}
+	}`)
+
 	// UniversalUpdateCollection helper message types
 	schemas = append(schemas, `{
 		"type": "badges/SetValidTokenIds",

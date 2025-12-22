@@ -34,6 +34,25 @@ func (r *BadgesAliasDenomRouter) FundCommunityPoolViaAliasDenom(ctx sdk.Context,
 	return r.badgesKeeper.FundCommunityPoolViaAliasDenom(ctx, fromAddress, toAddress, denom, amount)
 }
 
+// SpendFromCommunityPoolViaAliasDenom implements AliasDenomRouter interface
+func (r *BadgesAliasDenomRouter) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+	return r.badgesKeeper.SpendFromCommunityPoolViaAliasDenom(ctx, fromAddress, toAddress, denom, amount)
+}
+
+// SendFromModuleToAccountViaAliasDenom implements AliasDenomRouter interface
+// For badges keeper, this is just a standard send
+func (r *BadgesAliasDenomRouter) SendFromModuleToAccountViaAliasDenom(ctx sdk.Context, moduleAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+	// For badges keeper, module-to-account is just a standard send
+	return r.badgesKeeper.SendNativeTokensViaAliasDenom(ctx, moduleAddress, toAddress, denom, amount)
+}
+
+// SendFromAccountToModuleViaAliasDenom implements AliasDenomRouter interface
+// For badges keeper, this is just a standard send
+func (r *BadgesAliasDenomRouter) SendFromAccountToModuleViaAliasDenom(ctx sdk.Context, fromAddress string, moduleAddress string, denom string, amount sdkmath.Uint) error {
+	// For badges keeper, account-to-module is just a standard send
+	return r.badgesKeeper.SendNativeTokensViaAliasDenom(ctx, fromAddress, moduleAddress, denom, amount)
+}
+
 // GetBalanceWithAliasRouting implements AliasDenomRouter interface
 // Uses getMaxWrappableAmount flow via GetSpendableCoinAmountWithAliasRouting
 // This function is only called when the prefix matches, so we can assume it's a badgeslp: denom

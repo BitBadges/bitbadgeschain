@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"cosmossdk.io/core/store"
@@ -48,6 +49,19 @@ type (
 
 		ibcKeeperFn        func() *ibckeeper.Keeper
 		capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper
+
+		// Custom approval criteria checkers
+		// Each function receives the approval and can return custom checkers to append
+		customCheckerProviders []func(*types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker
+
+		// Custom global transfer checkers
+		// Each function receives transfer details and can return custom checkers to run
+		// These checkers run before HandleTransfer() and can validate transfers globally
+		customGlobalTransferCheckerProviders []func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []GlobalTransferChecker
+
+		// Custom collection verifiers
+		// These verifiers run before SetCollectionInStore and can validate collections
+		customCollectionVerifiers []CollectionVerifier
 	}
 )
 
@@ -68,16 +82,19 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		cdc:                cdc,
-		storeService:       storeService,
-		authority:          authority,
-		logger:             logger,
-		bankKeeper:         bankKeeper,
-		accountKeeper:      accountKeeper,
-		distributionKeeper: distributionKeeper,
-		sendManagerKeeper:  sendManagerKeeper,
-		ibcKeeperFn:        ibcKeeperFn,
-		capabilityScopedFn: capabilityScopedFn,
+		cdc:                                  cdc,
+		storeService:                         storeService,
+		authority:                            authority,
+		logger:                               logger,
+		bankKeeper:                           bankKeeper,
+		accountKeeper:                        accountKeeper,
+		distributionKeeper:                   distributionKeeper,
+		sendManagerKeeper:                    sendManagerKeeper,
+		ibcKeeperFn:                          ibcKeeperFn,
+		capabilityScopedFn:                   capabilityScopedFn,
+		customCheckerProviders:               []func(*types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker{},
+		customGlobalTransferCheckerProviders: []func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []GlobalTransferChecker{},
+		customCollectionVerifiers:            []CollectionVerifier{},
 	}
 }
 
@@ -89,6 +106,51 @@ func (k *Keeper) SetWasmViewKeeper(wasmViewKeeper types.WasmViewKeeper) {
 // SetGammKeeper sets the gamm keeper (optional)
 func (k *Keeper) SetGammKeeper(gammKeeper types.GammKeeper) {
 	k.gammKeeper = gammKeeper
+}
+
+// RegisterCustomApprovalCriteriaChecker registers a custom checker provider function.
+// The provider function receives the approval and can return custom checkers to append.
+// This allows developers to add custom validation logic that runs alongside the built-in checkers.
+// Example usage in app.go:
+//
+//	app.BadgesKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+//	    // Add custom checkers based on approval criteria
+//	    if approval.ApprovalCriteria != nil && /* some condition */ {
+//	        return []approvalcriteria.ApprovalCriteriaChecker{myCustomChecker}
+//	    }
+//	    return nil
+//	})
+func (k *Keeper) RegisterCustomApprovalCriteriaChecker(provider func(*types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker) {
+	k.customCheckerProviders = append(k.customCheckerProviders, provider)
+}
+
+// RegisterCustomGlobalTransferChecker registers a custom global transfer checker provider function.
+// The provider function receives transfer details and can return custom checkers to run.
+// Global transfer checkers run before HandleTransfer() and can validate transfers
+// based on from, to, initiatedBy, collection, transfer balances, and memo.
+// This allows developers to add custom validation logic that runs at a global level
+// before any transfer processing occurs.
+// Example usage in app.go:
+//
+//	app.BadgesKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []GlobalTransferChecker {
+//	    // Add custom checkers based on transfer details
+//	    if /* some condition */ {
+//	        return []GlobalTransferChecker{&MyGlobalTransferChecker{}}
+//	    }
+//	    return nil
+//	})
+func (k *Keeper) RegisterCustomGlobalTransferChecker(provider func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []GlobalTransferChecker) {
+	k.customGlobalTransferCheckerProviders = append(k.customGlobalTransferCheckerProviders, provider)
+}
+
+// RegisterCustomCollectionVerifier registers a custom collection verifier.
+// Collection verifiers run before SetCollectionInStore and can validate collections.
+// This allows developers to add custom validation logic that runs before collections are stored.
+// Example usage in app.go:
+//
+//	app.BadgesKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
+func (k *Keeper) RegisterCustomCollectionVerifier(verifier CollectionVerifier) {
+	k.customCollectionVerifiers = append(k.customCollectionVerifiers, verifier)
 }
 
 // GetAuthority returns the module's authority.

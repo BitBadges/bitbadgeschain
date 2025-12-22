@@ -146,6 +146,23 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 				}
 			}
 
+			// Run global transfer checkers before HandleTransfer()
+			// All must pass for the transfer to be allowed
+			// In case of failure, whole transfer fails so it is rolled back
+			for _, provider := range k.customGlobalTransferCheckerProviders {
+				checkers := provider(ctx, transfer.From, to, initiatedBy, collection, transfer.Balances, transfer.Memo)
+				for _, checker := range checkers {
+					balances := types.DeepCopyBalances(transfer.Balances)
+					detErrMsg, err := checker.Check(ctx, transfer.From, to, initiatedBy, collection, balances, transfer.Memo)
+					if err != nil {
+						if detErrMsg != "" {
+							return sdkerrors.Wrapf(err, "%s: %s", checker.Name(), detErrMsg)
+						}
+						return sdkerrors.Wrapf(err, "%s: global transfer check failed", checker.Name())
+					}
+				}
+			}
+
 			fromUserBalance, toUserBalance, err = k.HandleTransfer(
 				ctx,
 				collection,

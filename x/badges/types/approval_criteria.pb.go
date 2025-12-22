@@ -24,46 +24,72 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // ApprovalCriteria defines the criteria for approving transfers.
+// All criteria must be satisfied for the approval to be considered valid.
 type ApprovalCriteria struct {
-	// Merkle challenge that must be satisfied for approval.
+	// Merkle challenges that must be satisfied for approval. The initiator must provide valid Merkle proofs
+	// that satisfy all specified challenges. Each challenge requires a proof that leads to a specific root hash.
 	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
-	// Predetermined balances for eeach approval.
+	// Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
+	// that can be transferred when using this approval.
 	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	// Threshold limit of amounts that can be transferred using this approval.
+	// Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
+	// transferred and enforces maximum limits per approval.
 	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	// Maximum number of transfers that can be processed using this approval.
+	// Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
+	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The sdk.Coins that need to be transferred for approval.
+	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
+	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the recipient matches the initiator are allowed.
 	RequireToEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the sender matches the initiator are allowed.
 	RequireFromEqualsInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
 	// Require the "to" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the recipient equals the initiator are forbidden.
 	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,8,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
 	// Require the "from" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the sender equals the initiator are forbidden.
 	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,9,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
-	// Overrides the user's outgoing approvals for approval.
+	// Overrides the user's outgoing approvals for approval. If true, this collection-level approval
+	// takes precedence over any outgoing approvals defined by the sender, allowing the collection to
+	// control outgoing transfer behavior.
 	OverridesFromOutgoingApprovals bool `protobuf:"varint,10,opt,name=overridesFromOutgoingApprovals,proto3" json:"overridesFromOutgoingApprovals,omitempty"`
-	// Overrides the user's incoming approvals for approval.
+	// Overrides the user's incoming approvals for approval. If true, this collection-level approval
+	// takes precedence over any incoming approvals defined by the recipient, allowing the collection to
+	// control incoming transfer behavior.
 	OverridesToIncomingApprovals bool `protobuf:"varint,11,opt,name=overridesToIncomingApprovals,proto3" json:"overridesToIncomingApprovals,omitempty"`
-	// Auto-deletion options.
+	// Auto-deletion options for this approval. Defines conditions under which this approval should be
+	// automatically deleted (e.g., after a certain number of uses or time period).
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,12,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// User level royalties to apply to the transfer.
+	// User level royalties to apply to the transfer. Defines the percentage and payout address for
+	// royalties that should be collected when this approval is used for a transfer.
 	UserRoyalties *UserRoyalties `protobuf:"bytes,13,opt,name=userRoyalties,proto3" json:"userRoyalties,omitempty"`
-	// Must own tokens for approval.
+	// Must own tokens for approval. Defines token ownership requirements that must be satisfied for
+	// the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
 	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,14,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
-	// Dynamic store challenges that the initiator must pass for approval.
+	// Dynamic store challenges that the initiator must pass for approval. The initiator must provide
+	// valid proofs that satisfy all specified dynamic store challenges (e.g., key-value store lookups).
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,15,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
-	// ETH signature challenges that the initiator must pass for approval.
+	// ETH signature challenges that the initiator must pass for approval. The initiator must provide
+	// valid Ethereum signatures for all specified challenges. Each signature can only be used once.
 	EthSignatureChallenges []*ETHSignatureChallenge `protobuf:"bytes,16,rep,name=ethSignatureChallenges,proto3" json:"ethSignatureChallenges,omitempty"`
-	// Address checks for sender, recipient, and initiator.
-	SenderChecks    *AddressChecks `protobuf:"bytes,17,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the sender of the transfer. Validates that the sender address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
+	SenderChecks *AddressChecks `protobuf:"bytes,17,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the recipient of the transfer. Validates that the recipient address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	RecipientChecks *AddressChecks `protobuf:"bytes,18,opt,name=recipientChecks,proto3" json:"recipientChecks,omitempty"`
+	// Address checks for the initiator of the transfer. Validates that the initiator address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	InitiatorChecks *AddressChecks `protobuf:"bytes,19,opt,name=initiatorChecks,proto3" json:"initiatorChecks,omitempty"`
-	// Alternative time-based checks for approval denial (offline hours/days).
+	// Alternative time-based checks for approval denial (offline hours/days). Defines time periods
+	// during which this approval should be denied, such as specific hours of the day or days of the week.
 	AltTimeChecks *AltTimeChecks `protobuf:"bytes,20,opt,name=altTimeChecks,proto3" json:"altTimeChecks,omitempty"`
 	// If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+	// This allows fine-grained control over which approvals are applied when multiple approvals could match.
 	MustPrioritize bool `protobuf:"varint,21,opt,name=mustPrioritize,proto3" json:"mustPrioritize,omitempty"`
 }
 
@@ -248,35 +274,54 @@ func (m *ApprovalCriteria) GetMustPrioritize() bool {
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
+// This is used for user-level outgoing approvals and only includes fields relevant to outgoing transfers.
+// All criteria must be satisfied for the approval to be considered valid.
 type OutgoingApprovalCriteria struct {
-	// Merkle challenge that must be satisfied for approval.
+	// Merkle challenges that must be satisfied for approval. The initiator must provide valid Merkle proofs
+	// that satisfy all specified challenges. Each challenge requires a proof that leads to a specific root hash.
 	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
-	// Predetermined balances for eeach approval.
+	// Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
+	// that can be transferred when using this approval.
 	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	// Threshold limit of amounts that can be transferred using this approval.
+	// Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
+	// transferred and enforces maximum limits per approval.
 	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	// Maximum number of transfers that can be processed using this approval.
+	// Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
+	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The sdk.Coins that need to be transferred for approval.
+	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
+	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the recipient matches the initiator are allowed.
 	RequireToEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
 	// Require the "to" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the recipient equals the initiator are forbidden.
 	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
-	// Auto-deletion options.
+	// Auto-deletion options for this approval. Defines conditions under which this approval should be
+	// automatically deleted (e.g., after a certain number of uses or time period).
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// Must own tokens for approval.
+	// Must own tokens for approval. Defines token ownership requirements that must be satisfied for
+	// the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
 	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
-	// Dynamic store challenges that the initiator must pass for approval.
+	// Dynamic store challenges that the initiator must pass for approval. The initiator must provide
+	// valid proofs that satisfy all specified dynamic store challenges (e.g., key-value store lookups).
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,10,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
-	// ETH signature challenges that the initiator must pass for approval.
+	// ETH signature challenges that the initiator must pass for approval. The initiator must provide
+	// valid Ethereum signatures for all specified challenges. Each signature can only be used once.
 	EthSignatureChallenges []*ETHSignatureChallenge `protobuf:"bytes,11,rep,name=ethSignatureChallenges,proto3" json:"ethSignatureChallenges,omitempty"`
-	// Address checks for recipient and initiator (no sender checks for outgoing approvals).
+	// Address checks for the recipient of the transfer. Validates that the recipient address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
+	// Note: No sender checks are included for outgoing approvals since the sender is the user themselves.
 	RecipientChecks *AddressChecks `protobuf:"bytes,12,opt,name=recipientChecks,proto3" json:"recipientChecks,omitempty"`
+	// Address checks for the initiator of the transfer. Validates that the initiator address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	InitiatorChecks *AddressChecks `protobuf:"bytes,13,opt,name=initiatorChecks,proto3" json:"initiatorChecks,omitempty"`
-	// Alternative time-based checks for approval denial (offline hours/days).
+	// Alternative time-based checks for approval denial (offline hours/days). Defines time periods
+	// during which this approval should be denied, such as specific hours of the day or days of the week.
 	AltTimeChecks *AltTimeChecks `protobuf:"bytes,14,opt,name=altTimeChecks,proto3" json:"altTimeChecks,omitempty"`
 	// If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+	// This allows fine-grained control over which approvals are applied when multiple approvals could match.
 	MustPrioritize bool `protobuf:"varint,15,opt,name=mustPrioritize,proto3" json:"mustPrioritize,omitempty"`
 }
 
@@ -419,35 +464,54 @@ func (m *OutgoingApprovalCriteria) GetMustPrioritize() bool {
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
+// This is used for user-level incoming approvals and only includes fields relevant to incoming transfers.
+// All criteria must be satisfied for the approval to be considered valid.
 type IncomingApprovalCriteria struct {
-	// Merkle challenge that must be satisfied for approval.
+	// Merkle challenges that must be satisfied for approval. The initiator must provide valid Merkle proofs
+	// that satisfy all specified challenges. Each challenge requires a proof that leads to a specific root hash.
 	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
-	// Predetermined balances for eeach approval.
+	// Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
+	// that can be transferred when using this approval.
 	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	// Threshold limit of amounts that can be transferred using this approval.
+	// Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
+	// transferred and enforces maximum limits per approval.
 	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	// Maximum number of transfers that can be processed using this approval.
+	// Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
+	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The sdk.Coins that need to be transferred for approval.
+	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
+	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the sender matches the initiator are allowed.
 	RequireFromEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
 	// Require the "from" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the sender equals the initiator are forbidden.
 	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
-	// Auto-deletion options.
+	// Auto-deletion options for this approval. Defines conditions under which this approval should be
+	// automatically deleted (e.g., after a certain number of uses or time period).
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// Must own tokens for approval.
+	// Must own tokens for approval. Defines token ownership requirements that must be satisfied for
+	// the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
 	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
-	// Dynamic store challenges that the initiator must pass for approval.
+	// Dynamic store challenges that the initiator must pass for approval. The initiator must provide
+	// valid proofs that satisfy all specified dynamic store challenges (e.g., key-value store lookups).
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,10,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
-	// ETH signature challenges that the initiator must pass for approval.
+	// ETH signature challenges that the initiator must pass for approval. The initiator must provide
+	// valid Ethereum signatures for all specified challenges. Each signature can only be used once.
 	EthSignatureChallenges []*ETHSignatureChallenge `protobuf:"bytes,11,rep,name=ethSignatureChallenges,proto3" json:"ethSignatureChallenges,omitempty"`
-	// Address checks for sender and initiator (no recipient checks for incoming approvals).
-	SenderChecks    *AddressChecks `protobuf:"bytes,12,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the sender of the transfer. Validates that the sender address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
+	// Note: No recipient checks are included for incoming approvals since the recipient is the user themselves.
+	SenderChecks *AddressChecks `protobuf:"bytes,12,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the initiator of the transfer. Validates that the initiator address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	InitiatorChecks *AddressChecks `protobuf:"bytes,13,opt,name=initiatorChecks,proto3" json:"initiatorChecks,omitempty"`
-	// Alternative time-based checks for approval denial (offline hours/days).
+	// Alternative time-based checks for approval denial (offline hours/days). Defines time periods
+	// during which this approval should be denied, such as specific hours of the day or days of the week.
 	AltTimeChecks *AltTimeChecks `protobuf:"bytes,14,opt,name=altTimeChecks,proto3" json:"altTimeChecks,omitempty"`
 	// If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+	// This allows fine-grained control over which approvals are applied when multiple approvals could match.
 	MustPrioritize bool `protobuf:"varint,15,opt,name=mustPrioritize,proto3" json:"mustPrioritize,omitempty"`
 }
 

@@ -208,7 +208,6 @@ func (k Keeper) HandleETHSignatureChallenges(
 	transfer *types.Transfer,
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
-	simulation bool,
 ) (string, error) {
 	creatorAddress := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
@@ -258,28 +257,26 @@ func (k Keeper) HandleETHSignatureChallenges(
 				continue
 			}
 
-			// Increment the usage count if we are doing it for real
-			if !simulation {
-				newNumUsed, err := k.IncrementETHSignatureTrackerInStore(ctx, signatureKey)
-				if err != nil {
-					continue
-				}
-
-				// Currently added for indexer, but note that it is planned to be deprecated
-				ctx.EventManager().EmitEvent(
-					sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
-						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-						sdk.NewAttribute("creator", creatorAddress),
-						sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-						sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
-						sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
-						sdk.NewAttribute("signature", fmt.Sprint(proof.Signature)),
-						sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-						sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
-						sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
-					),
-				)
+			// Increment the usage count
+			newNumUsed, err := k.IncrementETHSignatureTrackerInStore(ctx, signatureKey)
+			if err != nil {
+				continue
 			}
+
+			// Currently added for indexer, but note that it is planned to be deprecated
+			ctx.EventManager().EmitEvent(
+				sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
+					sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+					sdk.NewAttribute("creator", creatorAddress),
+					sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+					sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
+					sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
+					sdk.NewAttribute("signature", fmt.Sprint(proof.Signature)),
+					sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+					sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
+					sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+				),
+			)
 
 			hasValidSolution = true
 			break
@@ -336,54 +333,4 @@ func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 	}
 
 	return leafIndex
-}
-
-// SimulateMerkleChallenges is a wrapper around HandleMerkleChallenges for simulation
-// Returns (deterministicErrorMsg, numIncrements, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) SimulateMerkleChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) (string, sdkmath.Uint, error) {
-	detErrMsg, numIncrements, err := k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
-	return detErrMsg, numIncrements, err
-}
-
-// ExecuteMerkleChallenges is a wrapper around HandleMerkleChallenges for execution
-func (k Keeper) ExecuteMerkleChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) (sdkmath.Uint, error) {
-	_, numIncrements, err := k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
-	return numIncrements, err
-}
-
-// SimulateETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for simulation
-// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) SimulateETHSignatureChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) (string, error) {
-	detErrMsg, err := k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
-	return detErrMsg, err
-}
-
-// ExecuteETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for execution
-func (k Keeper) ExecuteETHSignatureChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) error {
-	_, err := k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
-	return err
 }

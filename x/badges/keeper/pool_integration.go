@@ -368,6 +368,24 @@ func (k Keeper) FundCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress stri
 	return k.SendNativeTokensViaAliasDenom(ctx, fromAddress, toAddress, denom, amount)
 }
 
+// SpendFromCommunityPoolViaAliasDenom spends from the community pool using alias denom routing
+// This handles the alias denom-specific logic (e.g., setting auto-approvals for the recipient address)
+func (k Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+	collection, err := k.ParseCollectionFromDenom(ctx, denom)
+	if err != nil {
+		return err
+	}
+
+	// To set outgoing transfers (if disallowed by default)
+	err = k.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, fromAddress)
+	if err != nil {
+		return err
+	}
+
+	// Standard send from community pool to recipient
+	return k.SendNativeTokensViaAliasDenom(ctx, fromAddress, toAddress, denom, amount)
+}
+
 // TODO: For both of these, I'd love to DRY more with sendManager. I just need to handle the pre/post approvals (and also the prioritized correctly which isn't supported natively)
 
 // SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping badges denoms if needed.

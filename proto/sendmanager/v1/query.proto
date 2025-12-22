@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "sendmanager/v1/params.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/sendmanager/types";
 
@@ -14,6 +15,12 @@ service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/sendmanager/params";
+  }
+
+  // Balance queries the balance of a specific denom for an address with alias routing.
+  // This allows querying both standard coins and alias denoms (e.g., badgeslp:).
+  rpc Balance(QueryBalanceRequest) returns (QueryBalanceResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/sendmanager/balance/{address}/{denom}";
   }
 }
 
@@ -27,4 +34,18 @@ message QueryParamsResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+}
+
+// QueryBalanceRequest is request type for the Query/Balance RPC method.
+message QueryBalanceRequest {
+  // address is the address to query balances for.
+  string address = 1;
+  // denom is the specific denomination to query the balance for.
+  string denom = 2;
+}
+
+// QueryBalanceResponse is response type for the Query/Balance RPC method.
+message QueryBalanceResponse {
+  // balance is the balance of the specified denom for the address.
+  cosmos.base.v1beta1.Coin balance = 1 [(gogoproto.nullable) = false];
 }

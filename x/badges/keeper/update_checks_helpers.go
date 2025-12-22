@@ -58,6 +58,8 @@ func GetPotentialUpdatesForTimelineValues(ctx sdk.Context,
 // Make a struct with a bool flag isApproved and an approval details arr
 type ApprovalCriteriaWithIsApproved struct {
 	ApprovalCriteria *types.ApprovalCriteria
+	Uri              string
+	CustomData       string
 }
 
 func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
@@ -79,9 +81,12 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 			for _, timelineTime := range timelineTimes {
 				for _, transferTime := range transferTimes {
 					for _, ownershipTime := range ownershipTimes {
+						approval := permission.ArbitraryValue.(*types.CollectionApproval)
 						arbValue := []*ApprovalCriteriaWithIsApproved{
 							{
-								ApprovalCriteria: permission.ArbitraryValue.(*types.CollectionApproval).ApprovalCriteria,
+								ApprovalCriteria: approval.ApprovalCriteria,
+								Uri:              approval.Uri,
+								CustomData:       approval.CustomData,
 							},
 						}
 
@@ -224,7 +229,16 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 					for i := 0; i < len(oldVal); i++ {
 						oldApprovalCriteria := oldVal[i].ApprovalCriteria
 						newApprovalCriteria := newVal[i].ApprovalCriteria
+						// Check approval criteria changes using stringification
 						if proto.MarshalTextString(oldApprovalCriteria) != proto.MarshalTextString(newApprovalCriteria) {
+							different = true
+						}
+						// Check URI changes
+						if oldVal[i].Uri != newVal[i].Uri {
+							different = true
+						}
+						// Check custom data changes
+						if oldVal[i].CustomData != newVal[i].CustomData {
 							different = true
 						}
 					}

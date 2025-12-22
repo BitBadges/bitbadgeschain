@@ -57,6 +57,13 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCol
 		}
 	}
 
+	// Run custom collection verifiers
+	for _, verifier := range k.customCollectionVerifiers {
+		if err := verifier.VerifyCollection(ctx, collection); err != nil {
+			return sdkerrors.Wrapf(err, "%s: collection verification failed", verifier.Name())
+		}
+	}
+
 	marshaled_token, err := k.cdc.Marshal(collection)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.TokenCollection failed")

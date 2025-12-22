@@ -83,25 +83,44 @@ message TokenCollection {
 }
 
 message CosmosCoinWrapperPath {
+  // The BitBadges address associated with this wrapper path. Used for routing and identifying the wrapper.
   string address = 1;
+  // The denomination (denom) to be used for the wrapped coin or the alias denom.
   string denom = 2;
+  // The token balances that correspond to this wrapper path. Defines how much you have to wrap to get x1 of corresponding base level unit.
   repeated Balance balances = 3;
+  // The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 4;
+  // Denomination units for the wrapped coin. Defines how the coin can be displayed with different
+  // decimal places and symbols (e.g., base unit, display unit). You can specify which is the default display unit (base level or one of these).
   repeated DenomUnit denomUnits = 5;
+  // If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
   bool allowOverrideWithAnyValidToken = 6;
+  // If true, allows tokens to be wrapped into Cosmos SDK coins. When false, this path is just an alias
   bool allowCosmosWrapping = 7;
 }
 
 message CosmosCoinBackedPath {
+  // The address associated with this backed path. Used for routing and escrowing IBC tokens.
   string address = 1;
+  // The IBC denomination of the backing token. This identifies which IBC token backs the badges
+  // (e.g., "ibc/..." or "ubadge"). Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
   string ibcDenom = 2;
+  // The token balances that correspond to this backed path. Defines which token IDs and amounts
+  // are backed by the IBC tokens. Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
   repeated Balance balances = 3;
+  // The amount of IBC tokens that back the tokens. This defines the exchange rate or backing amount
+  // for the tokens in this path. Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
   string ibcAmount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message DenomUnit {
+  // The number of decimal places for this unit. Defines the precision of the unit.
   string decimals = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The symbol for this unit (e.g., "BADGE", "nBADGE"). Used for display purposes.
   string symbol = 2;
+  // If true, this is the default display unit. Only one unit should be marked as the default display unit.
+  // This unit will be used by default when displaying the coin amount. If none are marked default, we use the base level.
   bool isDefaultDisplay = 3;
 }
 

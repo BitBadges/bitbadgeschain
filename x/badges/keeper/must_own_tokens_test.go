@@ -766,7 +766,19 @@ func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 			MustSatisfyForAllAssets: false,
 		},
 	}
-	detErrMsg, err := suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens1, bob, bob, alice)
+	approval1 := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MustOwnTokens: mustOwnTokens1,
+		},
+	}
+	checkers := suite.app.BadgesKeeper.GetApprovalCriteriaCheckers(approval1)
+	var detErrMsg string
+	for _, checker := range checkers {
+		detErrMsg, err = checker.Check(suite.ctx, approval1, nil, alice, bob, bob, "", "", nil, nil, "", false)
+		if err != nil {
+			break
+		}
+	}
 	suite.Require().Nil(err, "Should succeed - both requirements satisfied, should continue through all")
 	suite.Require().Equal("", detErrMsg, "Should have no error message")
 
@@ -793,7 +805,20 @@ func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 			MustSatisfyForAllAssets: false,
 		},
 	}
-	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens2, bob, bob, alice)
+	approval2 := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MustOwnTokens: mustOwnTokens2,
+		},
+	}
+	checkers = suite.app.BadgesKeeper.GetApprovalCriteriaCheckers(approval2)
+	detErrMsg = ""
+	err = nil
+	for _, checker := range checkers {
+		detErrMsg, err = checker.Check(suite.ctx, approval2, nil, alice, bob, bob, "", "", nil, nil, "", false)
+		if err != nil {
+			break
+		}
+	}
 	suite.Require().NotNil(err, "Should fail - second requirement failed, should continue and return error")
 	suite.Require().Contains(detErrMsg, "token ownership requirement idx 1 failed", "Should have error message for second requirement")
 
@@ -820,7 +845,20 @@ func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 			MustSatisfyForAllAssets: false,
 		},
 	}
-	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens3, bob, bob, alice)
+	approval3 := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MustOwnTokens: mustOwnTokens3,
+		},
+	}
+	checkers = suite.app.BadgesKeeper.GetApprovalCriteriaCheckers(approval3)
+	detErrMsg = ""
+	err = nil
+	for _, checker := range checkers {
+		detErrMsg, err = checker.Check(suite.ctx, approval3, nil, alice, bob, bob, "", "", nil, nil, "", false)
+		if err != nil {
+			break
+		}
+	}
 	suite.Require().NotNil(err, "Should fail - all requirements failed")
 	suite.Require().Contains(detErrMsg, "token ownership requirement idx 0 failed", "Should have error message for first requirement")
 
@@ -847,7 +885,20 @@ func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 			MustSatisfyForAllAssets: true,
 		},
 	}
-	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens4, bob, bob, alice)
+	approval4 := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MustOwnTokens: mustOwnTokens4,
+		},
+	}
+	checkers = suite.app.BadgesKeeper.GetApprovalCriteriaCheckers(approval4)
+	detErrMsg = ""
+	err = nil
+	for _, checker := range checkers {
+		detErrMsg, err = checker.Check(suite.ctx, approval4, nil, alice, bob, bob, "", "", nil, nil, "", false)
+		if err != nil {
+			break
+		}
+	}
 	suite.Require().NotNil(err, "Should fail - first requirement failed, should break early")
 	suite.Require().Contains(detErrMsg, "token ownership requirement idx 0 failed", "Should have error message for first requirement")
 
@@ -874,7 +925,20 @@ func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 			MustSatisfyForAllAssets: true,
 		},
 	}
-	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens5, bob, bob, alice)
+	approval5 := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MustOwnTokens: mustOwnTokens5,
+		},
+	}
+	checkers = suite.app.BadgesKeeper.GetApprovalCriteriaCheckers(approval5)
+	detErrMsg = ""
+	err = nil
+	for _, checker := range checkers {
+		detErrMsg, err = checker.Check(suite.ctx, approval5, nil, alice, bob, bob, "", "", nil, nil, "", false)
+		if err != nil {
+			break
+		}
+	}
 	suite.Require().NotNil(err, "Should fail - second requirement failed, should break after second")
 	suite.Require().Contains(detErrMsg, "token ownership requirement idx 1 failed", "Should have error message for second requirement")
 
@@ -901,7 +965,20 @@ func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 			MustSatisfyForAllAssets: false,
 		},
 	}
-	detErrMsg, err = suite.app.BadgesKeeper.CheckMustOwnTokens(suite.ctx, mustOwnTokens6, bob, bob, alice)
+	approval6 := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MustOwnTokens: mustOwnTokens6,
+		},
+	}
+	checkers = suite.app.BadgesKeeper.GetApprovalCriteriaCheckers(approval6)
+	detErrMsg = ""
+	err = nil
+	for _, checker := range checkers {
+		detErrMsg, err = checker.Check(suite.ctx, approval6, nil, alice, bob, bob, "", "", nil, nil, "", false)
+		if err != nil {
+			break
+		}
+	}
 	suite.Require().NotNil(err, "Should fail - first requirement failed, all requirements must pass")
 	suite.Require().Contains(detErrMsg, "token ownership requirement idx 0 failed", "Should have error message for first requirement")
 }

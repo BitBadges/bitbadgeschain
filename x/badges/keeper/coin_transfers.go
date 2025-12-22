@@ -3,7 +3,6 @@ package keeper
 import (
 	"fmt"
 	"slices"
-	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -25,12 +24,11 @@ func formatDenomForDisplay(denom string) string {
 	return denom
 }
 
-// SimulateCoinTransfers simulates coin transfers for approval validation
-// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) SimulateCoinTransfers(
+func (k Keeper) ExecuteCoinTransfers(
 	ctx sdk.Context,
 	coinTransfers []*types.CoinTransfer,
 	transferMetadata TransferMetadata,
+	coinTransfersUsed *[]CoinTransfers,
 	collection *types.TokenCollection,
 	royalties *types.UserRoyalties,
 ) (string, error) {
@@ -51,12 +49,6 @@ func (k Keeper) SimulateCoinTransfers(
 		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 	}
 
-	allowedDenoms := k.GetAllowedDenoms(ctx)
-	if len(allowedDenoms) == 0 {
-		detErrMsg := "allowed denoms is empty"
-		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
-	}
-
 	royaltyPercentage := royalties.Percentage
 	royaltyPayoutAddress := royalties.PayoutAddress
 	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
@@ -69,6 +61,12 @@ func (k Keeper) SimulateCoinTransfers(
 		if err != nil {
 			return "", sdkerrors.Wrapf(err, "invalid payout address %s", royaltyPayoutAddress)
 		}
+	}
+
+	allowedDenoms := k.GetAllowedDenoms(ctx)
+	if len(allowedDenoms) == 0 {
+		detErrMsg := "allowed denoms is empty"
+		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 	}
 
 	for _, coinTransfer := range coinTransfers {
@@ -86,54 +84,55 @@ func (k Keeper) SimulateCoinTransfers(
 		}
 	}
 
-	spendableCoinsMap := make(map[string]sdk.Coins)
-
+	// Execute coin transfers directly - if they fail, the cached context will rollback
 	for _, coinTransfer := range coinTransfers {
-		toTransfer := coinTransfer.Coins
-		fromAddress := initiatedBy
+		coinsToTransfer := coinTransfer.Coins
+
+		to := coinTransfer.To
+		if coinTransfer.OverrideToWithInitiator {
+			to = initiatedBy
+		}
+
+		toAddressAcc := sdk.MustAccAddressFromBech32(to)
+		fromAddressAcc := sdk.MustAccAddressFromBech32(initiatedBy)
 		if coinTransfer.OverrideFromWithApproverAddress {
 			// collection-level
 			if approverAddress == "" && approvalLevel == "collection" {
 				approverAddress = collection.MintEscrowAddress
 			}
 
-			fromAddress = approverAddress
-			if fromAddress == "" {
+			if approverAddress == "" {
 				detErrMsg := "approver address is required when overrideFromWithApproverAddress is true"
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidAddress, detErrMsg)
 			}
+
+			fromAddressAcc = sdk.MustAccAddressFromBech32(approverAddress)
 		}
 
-		for _, coin := range toTransfer {
-			// Only badgeslp: denoms use the wrapped approach (check badge balances)
-			// All other denoms (badges: and non-badges) use standard bank logic
-			parts := strings.Split(coin.Denom, ":")
-			if len(parts) >= 2 && parts[0] == "badgeslp" {
-				// badgeslp: denom - check badge balances (wrapped approach)
-				fromAddressAcc := sdk.MustAccAddressFromBech32(fromAddress)
-				balanceCoin, err := k.sendManagerKeeper.GetBalanceWithAliasRouting(ctx, fromAddressAcc, coin.Denom)
-				if err != nil {
-					return "", sdkerrors.Wrapf(err, "error checking wrapped denom balance for %s", coin.Denom)
-				}
+		for _, coin := range coinsToTransfer {
+			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
+			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
+			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
+			remainingAmount := coin.Amount.Sub(royaltyAmountInt)
 
-				requiredAmount := coin.Amount
-				if balanceCoin.Amount.LT(requiredAmount) {
-					detErrMsg := fmt.Sprintf("insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
-					return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, detErrMsg)
+			err := k.sendCoinWithRoyalty(
+				ctx,
+				coin,
+				royaltyAmountInt,
+				remainingAmount,
+				fromAddressAcc,
+				toAddressAcc,
+				royaltyPayoutAddress,
+				coinTransfersUsed,
+			)
+			if err != nil {
+				// Extract a more descriptive error message if possible
+				detErrMsg := fmt.Sprintf("insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
+				if err.Error() != "" {
+					// If the error already has a descriptive message, use it
+					return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, err.Error())
 				}
-			} else {
-				// For all other denoms (badges: and non-badges), use standard bank coin logic
-				// Lazy-load spendable coins only when needed
-				if _, exists := spendableCoinsMap[fromAddress]; !exists {
-					spendableCoinsMap[fromAddress] = k.bankKeeper.SpendableCoins(ctx, sdk.MustAccAddressFromBech32(fromAddress))
-				}
-
-				newCoins, underflow := spendableCoinsMap[fromAddress].SafeSub(*coin)
-				if underflow {
-					detErrMsg := fmt.Sprintf("insufficient %s balance to complete transfer", formatDenomForDisplay(coin.Denom))
-					return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, detErrMsg)
-				}
-				spendableCoinsMap[fromAddress] = newCoins
+				return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, detErrMsg)
 			}
 		}
 	}
@@ -186,107 +185,6 @@ func (k Keeper) sendCoinWithRoyalty(
 			Amount: remainingAmount.String(),
 			Denom:  coin.Denom,
 		})
-	}
-
-	return nil
-}
-
-func (k Keeper) ExecuteCoinTransfers(
-	ctx sdk.Context,
-	coinTransfers []*types.CoinTransfer,
-	transferMetadata TransferMetadata,
-	coinTransfersUsed *[]CoinTransfers,
-	collection *types.TokenCollection,
-	royalties *types.UserRoyalties,
-) error {
-	initiatedBy := transferMetadata.InitiatedBy
-	approverAddress := transferMetadata.ApproverAddress
-	approvalLevel := transferMetadata.ApprovalLevel
-	if len(coinTransfers) == 0 {
-		return nil
-	}
-
-	if royalties == nil {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "royalties is nil")
-	}
-
-	if collection == nil {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "collection is nil")
-	}
-
-	royaltyPercentage := royalties.Percentage
-	royaltyPayoutAddress := royalties.PayoutAddress
-	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
-		if royaltyPayoutAddress == "" {
-			return sdkerrors.Wrap(types.ErrInvalidAddress, "payout address is required when royalty percentage is greater than 0")
-		}
-
-		_, err := sdk.AccAddressFromBech32(royaltyPayoutAddress)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid payout address %s", royaltyPayoutAddress)
-		}
-	}
-
-	allowedDenoms := k.GetAllowedDenoms(ctx)
-	if len(allowedDenoms) == 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "allowed denoms is empty")
-	}
-
-	for _, coinTransfer := range coinTransfers {
-		if coinTransfer == nil {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer is nil")
-		}
-		if len(coinTransfer.Coins) == 0 {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin transfer cannot have empty coins slice")
-		}
-		if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
-			return sdkerrors.Wrapf(ErrInvalidDenom, "denom %s is not allowed", coinTransfer.Coins[0].Denom)
-		}
-	}
-
-	for _, coinTransfer := range coinTransfers {
-		coinsToTransfer := coinTransfer.Coins
-
-		to := coinTransfer.To
-		if coinTransfer.OverrideToWithInitiator {
-			to = initiatedBy
-		}
-
-		toAddressAcc := sdk.MustAccAddressFromBech32(to)
-		fromAddressAcc := sdk.MustAccAddressFromBech32(initiatedBy)
-		if coinTransfer.OverrideFromWithApproverAddress {
-			// collection-level
-			if approverAddress == "" && approvalLevel == "collection" {
-				approverAddress = collection.MintEscrowAddress
-			}
-
-			if approverAddress == "" {
-				return sdkerrors.Wrapf(types.ErrInvalidAddress, "approver address is required when overrideFromWithApproverAddress is true")
-			}
-
-			fromAddressAcc = sdk.MustAccAddressFromBech32(approverAddress)
-		}
-
-		for _, coin := range coinsToTransfer {
-			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
-			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
-			remainingAmount := coin.Amount.Sub(royaltyAmountInt)
-
-			err := k.sendCoinWithRoyalty(
-				ctx,
-				coin,
-				royaltyAmountInt,
-				remainingAmount,
-				fromAddressAcc,
-				toAddressAcc,
-				royaltyPayoutAddress,
-				coinTransfersUsed,
-			)
-			if err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil

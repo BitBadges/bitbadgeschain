@@ -111,3 +111,21 @@ func (m *mockSendManagerKeeper) StandardName(ctx sdk.Context, denom string) stri
 	// For tests, return "x/bank" for all denoms
 	return "x/bank"
 }
+
+func (m *mockSendManagerKeeper) SendCoinsFromModuleToAccountWithAliasRouting(ctx sdk.Context, moduleName string, toAddressAcc sdk.AccAddress, coins sdk.Coins) error {
+	// For tests, just use bank keeper directly
+	// BankKeeper.SendCoinsFromModuleToAccount uses context.Context, so we need to wrap the sdk.Context
+	return m.bankKeeper.SendCoinsFromModuleToAccount(sdk.WrapSDKContext(ctx), moduleName, toAddressAcc, coins)
+}
+
+func (m *mockSendManagerKeeper) SendCoinsFromAccountToModuleWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, moduleName string, coins sdk.Coins) error {
+	// For tests, just use bank keeper directly
+	// BankKeeper.SendCoinsFromAccountToModule uses context.Context, so we need to wrap the sdk.Context
+	return m.bankKeeper.SendCoinsFromAccountToModule(sdk.WrapSDKContext(ctx), fromAddressAcc, moduleName, coins)
+}
+
+func (m *mockSendManagerKeeper) SpendFromCommunityPoolWithAliasRouting(ctx sdk.Context, toAddressAcc sdk.AccAddress, coins sdk.Coins) error {
+	// For tests, just use bank keeper directly with distribution module
+	// BankKeeper.SendCoinsFromModuleToAccount uses context.Context, so we need to wrap the sdk.Context
+	return m.bankKeeper.SendCoinsFromModuleToAccount(sdk.WrapSDKContext(ctx), "distribution", toAddressAcc, coins)
+}
