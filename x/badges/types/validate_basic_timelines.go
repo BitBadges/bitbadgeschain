@@ -2,145 +2,52 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
-func ValidateTimelineTimesDoNotOverlap(times [][]*UintRange) error {
-	handledTokenIds := []*UintRange{}
-	for _, time := range times {
-		if len(time) == 0 {
-			return ErrNoTimelineTimeSpecified
-		}
+// ValidateApproval validates collection approvals (non-timeline version)
+func ValidateApproval(ctx sdk.Context, approvals []*CollectionApproval, canChangeValues bool) error {
+	return ValidateCollectionApprovals(ctx, approvals, canChangeValues)
+}
 
-		err := AssertRangesDoNotOverlapAtAll(time, handledTokenIds)
-		if err != nil {
-			return err
-		}
-
-		handledTokenIds = append(handledTokenIds, time...)
+// ValidateCollectionMetadata validates collection metadata
+func ValidateCollectionMetadata(metadata *CollectionMetadata) error {
+	if metadata == nil {
+		return nil // nil is allowed when not updating metadata
 	}
+	return ValidateURI(metadata.Uri)
+}
+
+// ValidateStandards validates standards (non-timeline version)
+func ValidateStandards(standards []string) error {
+	// Standards is just a list of strings, no validation needed
 	return nil
 }
 
-func ValidateApprovalTimeline(ctx sdk.Context, timeline []*CollectionApprovalTimeline, canChangeValues bool) error {
-	var err error
-	for _, timelineVal := range timeline {
-		err = ValidateCollectionApprovals(ctx, timelineVal.CollectionApprovals, canChangeValues)
-		if err != nil {
-			return err
-		}
-	}
-
-	times, _ := GetCollectionApprovalTimesAndValues(timeline)
-	err = ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
+// ValidateCustomData validates custom data (non-timeline version)
+func ValidateCustomData(customData string) error {
+	// Custom data is just a string, no validation needed
 	return nil
 }
 
-func ValidateTokenMetadataTimeline(timeline []*TokenMetadataTimeline, canChangeValues bool) error {
-	for _, timelineVal := range timeline {
-		err := ValidateTokenMetadata(timelineVal.TokenMetadata, canChangeValues)
-		if err != nil {
-			return err
-		}
+// ValidateManager validates a manager address
+func ValidateManager(manager string) error {
+	if len(manager) == 0 {
+		return nil // empty manager is allowed
 	}
+	_, err := sdk.AccAddressFromBech32(manager)
+	return err
+}
 
-	times, _ := GetTokenMetadataTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
+// ValidateIsArchived validates isArchived (non-timeline version)
+func ValidateIsArchived(isArchived bool) error {
+	// IsArchived is just a bool, no validation needed
 	return nil
 }
 
-func ValidateCollectionMetadataTimeline(timeline []*CollectionMetadataTimeline) error {
-	for _, timelineVal := range timeline {
-		err := ValidateURI(timelineVal.CollectionMetadata.Uri)
-		if err != nil {
-			return err
-		}
-	}
-
-	times, _ := GetCollectionMetadataTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
+// ValidateUserOutgoingApproval validates user outgoing approvals (non-timeline version)
+func ValidateUserOutgoingApproval(ctx sdk.Context, approvals []*UserOutgoingApproval, address string, canChangeValues bool) error {
+	return ValidateUserOutgoingApprovals(ctx, approvals, address, canChangeValues)
 }
 
-func ValidateStandardsTimeline(timeline []*StandardsTimeline) error {
-	times, _ := GetStandardsTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateCustomDataTimeline(timeline []*CustomDataTimeline) error {
-	times, _ := GetCustomDataTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateManagerTimeline(timeline []*ManagerTimeline) error {
-	times, _ := GetManagerTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateIsArchivedTimeline(timeline []*IsArchivedTimeline) error {
-	times, _ := GetIsArchivedTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateUserOutgoingApprovalTimeline(ctx sdk.Context, timeline []*UserOutgoingApprovalTimeline, address string, canChangeValues bool) error {
-	for _, timelineVal := range timeline {
-		err := ValidateUserOutgoingApprovals(ctx, timelineVal.OutgoingApprovals, address, canChangeValues)
-		if err != nil {
-			return err
-		}
-	}
-
-	times, _ := GetUserOutgoingApprovalTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateUserIncomingApprovalTimeline(ctx sdk.Context, timeline []*UserIncomingApprovalTimeline, address string, canChangeValues bool) error {
-	for _, timelineVal := range timeline {
-		err := ValidateUserIncomingApprovals(ctx, timelineVal.IncomingApprovals, address, canChangeValues)
-		if err != nil {
-			return err
-		}
-	}
-
-	times, _ := GetUserIncomingApprovalTimesAndValues(timeline)
-	err := ValidateTimelineTimesDoNotOverlap(times)
-	if err != nil {
-		return err
-	}
-
-	return nil
+// ValidateUserIncomingApproval validates user incoming approvals (non-timeline version)
+func ValidateUserIncomingApproval(ctx sdk.Context, approvals []*UserIncomingApproval, address string, canChangeValues bool) error {
+	return ValidateUserIncomingApprovals(ctx, approvals, address, canChangeValues)
 }

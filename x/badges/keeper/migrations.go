@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -105,6 +106,59 @@ func convertUintRanges(oldRanges []*oldtypes.UintRange) []*newtypes.UintRange {
 	return newRanges
 }
 
+// convertActionPermissions converts old ActionPermission to new ActionPermission
+func convertActionPermissions(oldPerms []*oldtypes.ActionPermission) []*newtypes.ActionPermission {
+	if oldPerms == nil {
+		return nil
+	}
+	newPerms := make([]*newtypes.ActionPermission, len(oldPerms))
+	for i, oldPerm := range oldPerms {
+		newPerms[i] = &newtypes.ActionPermission{
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+		}
+	}
+	return newPerms
+}
+
+// convertTokenIdsActionPermissions converts old TokenIdsActionPermission to new TokenIdsActionPermission
+func convertTokenIdsActionPermissions(oldPerms []*oldtypes.TokenIdsActionPermission) []*newtypes.TokenIdsActionPermission {
+	if oldPerms == nil {
+		return nil
+	}
+	newPerms := make([]*newtypes.TokenIdsActionPermission, len(oldPerms))
+	for i, oldPerm := range oldPerms {
+		newPerms[i] = &newtypes.TokenIdsActionPermission{
+			TokenIds:                  convertUintRanges(oldPerm.TokenIds),
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+		}
+	}
+	return newPerms
+}
+
+// convertCollectionApprovalPermissions converts old CollectionApprovalPermission to new CollectionApprovalPermission
+func convertCollectionApprovalPermissions(oldPerms []*oldtypes.CollectionApprovalPermission) []*newtypes.CollectionApprovalPermission {
+	if oldPerms == nil {
+		return nil
+	}
+	newPerms := make([]*newtypes.CollectionApprovalPermission, len(oldPerms))
+	for i, oldPerm := range oldPerms {
+		newPerms[i] = &newtypes.CollectionApprovalPermission{
+			FromListId:                oldPerm.FromListId,
+			ToListId:                  oldPerm.ToListId,
+			InitiatedByListId:         oldPerm.InitiatedByListId,
+			TransferTimes:             convertUintRanges(oldPerm.TransferTimes),
+			TokenIds:                  convertUintRanges(oldPerm.TokenIds),
+			OwnershipTimes:            convertUintRanges(oldPerm.OwnershipTimes),
+			ApprovalId:                oldPerm.ApprovalId,
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+		}
+	}
+	return newPerms
+}
+
 // MigratePools iterates through all existing pools and sets their addresses as reserved protocol addresses
 // and caches them in the pool address cache
 func MigratePools(ctx sdk.Context, k Keeper) error {
@@ -138,6 +192,9 @@ func MigratePools(ctx sdk.Context, k Keeper) error {
 func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer iterator.Close()
+
+	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+
 	for ; iterator.Valid(); iterator.Next() {
 		var oldCollection oldtypes.TokenCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &oldCollection)
@@ -154,6 +211,31 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			return err
 		}
 
+		// Migrate timeline fields to simple fields by extracting current value at block time
+		// Manager
+		newCollection.Manager = getCurrentManagerFromTimeline(blockTime, oldCollection.ManagerTimeline)
+
+		// CollectionMetadata
+		newCollection.CollectionMetadata = getCurrentCollectionMetadataFromTimeline(blockTime, oldCollection.CollectionMetadataTimeline)
+
+		// TokenMetadata
+		newCollection.TokenMetadata = getCurrentTokenMetadataFromTimeline(blockTime, oldCollection.TokenMetadataTimeline)
+
+		// CustomData
+		newCollection.CustomData = getCurrentCustomDataFromTimeline(blockTime, oldCollection.CustomDataTimeline)
+
+		// Standards
+		newCollection.Standards = getCurrentStandardsFromTimeline(blockTime, oldCollection.StandardsTimeline)
+
+		// IsArchived
+		newCollection.IsArchived = getCurrentIsArchivedFromTimeline(blockTime, oldCollection.IsArchivedTimeline)
+
+		// Migrate permissions - only keep those where current time is in timeline times
+		// Work with old types first to access TimelineTimes
+		if oldCollection.CollectionPermissions != nil {
+			newCollection.CollectionPermissions = MigrateCollectionPermissions(blockTime, oldCollection.CollectionPermissions)
+		}
+
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
@@ -167,30 +249,331 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	return nil
 }
 
+// Helper functions for specific timeline types
+func getCurrentManagerFromTimeline(blockTime sdkmath.Uint, timeline []*oldtypes.ManagerTimeline) string {
+	for _, timelineVal := range timeline {
+		for _, timeRange := range timelineVal.TimelineTimes {
+			start := newtypes.Uint(timeRange.Start)
+			end := newtypes.Uint(timeRange.End)
+			if blockTime.GTE(start) && blockTime.LTE(end) {
+				return timelineVal.Manager
+			}
+		}
+	}
+	// Return first value if no match found (fallback)
+	if len(timeline) > 0 {
+		return timeline[0].Manager
+	}
+	return ""
+}
+
+func getCurrentCustomDataFromTimeline(blockTime sdkmath.Uint, timeline []*oldtypes.CustomDataTimeline) string {
+	for _, timelineVal := range timeline {
+		for _, timeRange := range timelineVal.TimelineTimes {
+			start := newtypes.Uint(timeRange.Start)
+			end := newtypes.Uint(timeRange.End)
+			if blockTime.GTE(start) && blockTime.LTE(end) {
+				return timelineVal.CustomData
+			}
+		}
+	}
+	// Return first value if no match found (fallback)
+	if len(timeline) > 0 {
+		return timeline[0].CustomData
+	}
+	return ""
+}
+
+func getCurrentStandardsFromTimeline(blockTime sdkmath.Uint, timeline []*oldtypes.StandardsTimeline) []string {
+	for _, timelineVal := range timeline {
+		for _, timeRange := range timelineVal.TimelineTimes {
+			start := newtypes.Uint(timeRange.Start)
+			end := newtypes.Uint(timeRange.End)
+			if blockTime.GTE(start) && blockTime.LTE(end) {
+				return timelineVal.Standards
+			}
+		}
+	}
+	// Return first value if no match found (fallback)
+	if len(timeline) > 0 {
+		return timeline[0].Standards
+	}
+	return nil
+}
+
+func getCurrentIsArchivedFromTimeline(blockTime sdkmath.Uint, timeline []*oldtypes.IsArchivedTimeline) bool {
+	for _, timelineVal := range timeline {
+		for _, timeRange := range timelineVal.TimelineTimes {
+			start := newtypes.Uint(timeRange.Start)
+			end := newtypes.Uint(timeRange.End)
+			if blockTime.GTE(start) && blockTime.LTE(end) {
+				return timelineVal.IsArchived
+			}
+		}
+	}
+	// Return first value if no match found (fallback)
+	if len(timeline) > 0 {
+		return timeline[0].IsArchived
+	}
+	return false
+}
+func getCurrentCollectionMetadataFromTimeline(blockTime sdkmath.Uint, timeline []*oldtypes.CollectionMetadataTimeline) *newtypes.CollectionMetadata {
+	for _, timelineVal := range timeline {
+		for _, timeRange := range timelineVal.TimelineTimes {
+			start := newtypes.Uint(timeRange.Start)
+			end := newtypes.Uint(timeRange.End)
+			if blockTime.GTE(start) && blockTime.LTE(end) {
+				return &newtypes.CollectionMetadata{
+					Uri:        timelineVal.CollectionMetadata.Uri,
+					CustomData: timelineVal.CollectionMetadata.CustomData,
+				}
+			}
+		}
+	}
+	// Return first value if no match found (fallback)
+	if len(timeline) > 0 {
+		return &newtypes.CollectionMetadata{
+			Uri:        timeline[0].CollectionMetadata.Uri,
+			CustomData: timeline[0].CollectionMetadata.CustomData,
+		}
+	}
+	return nil
+}
+
+func getCurrentTokenMetadataFromTimeline(blockTime sdkmath.Uint, timeline []*oldtypes.TokenMetadataTimeline) []*newtypes.TokenMetadata {
+	for _, timelineVal := range timeline {
+		for _, timeRange := range timelineVal.TimelineTimes {
+			start := newtypes.Uint(timeRange.Start)
+			end := newtypes.Uint(timeRange.End)
+			if blockTime.GTE(start) && blockTime.LTE(end) {
+				// Convert old TokenMetadata to new TokenMetadata
+				result := make([]*newtypes.TokenMetadata, len(timelineVal.TokenMetadata))
+				for i, tm := range timelineVal.TokenMetadata {
+					result[i] = &newtypes.TokenMetadata{
+						Uri:      tm.Uri,
+						TokenIds: convertUintRanges(tm.TokenIds),
+					}
+				}
+				return result
+			}
+		}
+	}
+	// Return first value if no match found (fallback)
+	if len(timeline) > 0 {
+		result := make([]*newtypes.TokenMetadata, len(timeline[0].TokenMetadata))
+		for i, tm := range timeline[0].TokenMetadata {
+			result[i] = &newtypes.TokenMetadata{
+				Uri:      tm.Uri,
+				TokenIds: convertUintRanges(tm.TokenIds),
+			}
+		}
+		return result
+	}
+	return nil
+}
+
+// MigrateCollectionPermissions filters permissions to only keep those where current time is in timeline times
+func MigrateCollectionPermissions(blockTime sdkmath.Uint, oldPerms *oldtypes.CollectionPermissions) *newtypes.CollectionPermissions {
+	if oldPerms == nil {
+		return nil
+	}
+
+	newPerms := &newtypes.CollectionPermissions{}
+
+	// Migrate each permission type - work with old types to access TimelineTimes
+	// Convert TimedUpdatePermission to ActionPermission (only keep those where current time is in timeline times)
+	if oldPerms.CanUpdateManager != nil {
+		newPerms.CanUpdateManager = filterTimedUpdatePermissionsToActionPermissions(blockTime, oldPerms.CanUpdateManager)
+	}
+	if oldPerms.CanUpdateCollectionMetadata != nil {
+		newPerms.CanUpdateCollectionMetadata = filterTimedUpdatePermissionsToActionPermissions(blockTime, oldPerms.CanUpdateCollectionMetadata)
+	}
+	if oldPerms.CanUpdateTokenMetadata != nil {
+		// Convert TimedUpdateWithTokenIdsPermission to TokenIdsActionPermission
+		newPerms.CanUpdateTokenMetadata = filterTimedUpdateWithTokenIdsPermissionsToTokenIdsActionPermissions(blockTime, oldPerms.CanUpdateTokenMetadata)
+	}
+	if oldPerms.CanUpdateCustomData != nil {
+		newPerms.CanUpdateCustomData = filterTimedUpdatePermissionsToActionPermissions(blockTime, oldPerms.CanUpdateCustomData)
+	}
+	if oldPerms.CanUpdateStandards != nil {
+		newPerms.CanUpdateStandards = filterTimedUpdatePermissionsToActionPermissions(blockTime, oldPerms.CanUpdateStandards)
+	}
+	if oldPerms.CanDeleteCollection != nil {
+		// ActionPermission doesn't have timeline times, just convert directly
+		newPerms.CanDeleteCollection = convertActionPermissions(oldPerms.CanDeleteCollection)
+	}
+	if oldPerms.CanArchiveCollection != nil {
+		newPerms.CanArchiveCollection = filterTimedUpdatePermissionsToActionPermissions(blockTime, oldPerms.CanArchiveCollection)
+	}
+	if oldPerms.CanUpdateCollectionApprovals != nil {
+		// CollectionApprovalPermission doesn't have timeline times in the same way
+		newPerms.CanUpdateCollectionApprovals = convertCollectionApprovalPermissions(oldPerms.CanUpdateCollectionApprovals)
+	}
+	if oldPerms.CanUpdateValidTokenIds != nil {
+		// TokenIdsActionPermission doesn't have timeline times
+		newPerms.CanUpdateValidTokenIds = convertTokenIdsActionPermissions(oldPerms.CanUpdateValidTokenIds)
+	}
+
+	return newPerms
+}
+
+// filterTimedUpdatePermissionsToActionPermissions filters permissions to only keep those where current time is in timeline times
+// and converts them to ActionPermission (removing timeline times)
+func filterTimedUpdatePermissionsToActionPermissions(blockTime sdkmath.Uint, oldPerms []*oldtypes.TimedUpdatePermission) []*newtypes.ActionPermission {
+	if oldPerms == nil {
+		return nil
+	}
+
+	filtered := []*newtypes.ActionPermission{}
+	for _, oldPerm := range oldPerms {
+		// Check if blockTime is in any of the timeline times
+		// Only keep permissions where current time is in timeline times
+		if len(oldPerm.TimelineTimes) > 0 {
+			found, err := newtypes.SearchUintRangesForUint(blockTime, convertUintRanges(oldPerm.TimelineTimes))
+			if err != nil || !found {
+				continue // Skip this permission if blockTime is not in timeline times
+			}
+		}
+		// Convert to ActionPermission (removing TimelineTimes)
+		filtered = append(filtered, &newtypes.ActionPermission{
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+		})
+	}
+	return filtered
+}
+
+// filterTimedUpdateWithTokenIdsPermissionsToTokenIdsActionPermissions filters permissions to only keep those where current time is in timeline times
+// and converts them to TokenIdsActionPermission (removing timeline times)
+func filterTimedUpdateWithTokenIdsPermissionsToTokenIdsActionPermissions(blockTime sdkmath.Uint, oldPerms []*oldtypes.TimedUpdateWithTokenIdsPermission) []*newtypes.TokenIdsActionPermission {
+	if oldPerms == nil {
+		return nil
+	}
+
+	filtered := []*newtypes.TokenIdsActionPermission{}
+	for _, oldPerm := range oldPerms {
+		// Check if blockTime is in any of the timeline times
+		// Only keep permissions where current time is in timeline times
+		if len(oldPerm.TimelineTimes) > 0 {
+			found, err := newtypes.SearchUintRangesForUint(blockTime, convertUintRanges(oldPerm.TimelineTimes))
+			if err != nil || !found {
+				continue // Skip this permission if blockTime is not in timeline times
+			}
+		}
+		// Convert to TokenIdsActionPermission (removing TimelineTimes)
+		filtered = append(filtered, &newtypes.TokenIdsActionPermission{
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+			TokenIds:                  convertUintRanges(oldPerm.TokenIds),
+		})
+	}
+	return filtered
+}
+
+// MigrateUserPermissions migrates user permissions (these don't have TimelineTimes, so we keep all)
+func MigrateUserPermissions(blockTime sdkmath.Uint, oldPerms *oldtypes.UserPermissions) *newtypes.UserPermissions {
+	if oldPerms == nil {
+		return nil
+	}
+
+	newPerms := &newtypes.UserPermissions{}
+
+	// These permissions don't have TimelineTimes, so we keep all and just convert
+	if oldPerms.CanUpdateOutgoingApprovals != nil {
+		newPerms.CanUpdateOutgoingApprovals = convertUserOutgoingApprovalPermissions(oldPerms.CanUpdateOutgoingApprovals)
+	}
+	if oldPerms.CanUpdateIncomingApprovals != nil {
+		newPerms.CanUpdateIncomingApprovals = convertUserIncomingApprovalPermissions(oldPerms.CanUpdateIncomingApprovals)
+	}
+	if oldPerms.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers != nil {
+		newPerms.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers = convertActionPermissions(oldPerms.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers)
+	}
+	if oldPerms.CanUpdateAutoApproveSelfInitiatedIncomingTransfers != nil {
+		newPerms.CanUpdateAutoApproveSelfInitiatedIncomingTransfers = convertActionPermissions(oldPerms.CanUpdateAutoApproveSelfInitiatedIncomingTransfers)
+	}
+	if oldPerms.CanUpdateAutoApproveAllIncomingTransfers != nil {
+		newPerms.CanUpdateAutoApproveAllIncomingTransfers = convertActionPermissions(oldPerms.CanUpdateAutoApproveAllIncomingTransfers)
+	}
+
+	return newPerms
+}
+
+// convertUserOutgoingApprovalPermissions converts old UserOutgoingApprovalPermission to new UserOutgoingApprovalPermission
+func convertUserOutgoingApprovalPermissions(oldPerms []*oldtypes.UserOutgoingApprovalPermission) []*newtypes.UserOutgoingApprovalPermission {
+	if oldPerms == nil {
+		return nil
+	}
+	newPerms := make([]*newtypes.UserOutgoingApprovalPermission, len(oldPerms))
+	for i, oldPerm := range oldPerms {
+		newPerms[i] = &newtypes.UserOutgoingApprovalPermission{
+			ToListId:                  oldPerm.ToListId,
+			InitiatedByListId:         oldPerm.InitiatedByListId,
+			TransferTimes:             convertUintRanges(oldPerm.TransferTimes),
+			TokenIds:                  convertUintRanges(oldPerm.TokenIds),
+			OwnershipTimes:            convertUintRanges(oldPerm.OwnershipTimes),
+			ApprovalId:                oldPerm.ApprovalId,
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+		}
+	}
+	return newPerms
+}
+
+// convertUserIncomingApprovalPermissions converts old UserIncomingApprovalPermission to new UserIncomingApprovalPermission
+func convertUserIncomingApprovalPermissions(oldPerms []*oldtypes.UserIncomingApprovalPermission) []*newtypes.UserIncomingApprovalPermission {
+	if oldPerms == nil {
+		return nil
+	}
+	newPerms := make([]*newtypes.UserIncomingApprovalPermission, len(oldPerms))
+	for i, oldPerm := range oldPerms {
+		newPerms[i] = &newtypes.UserIncomingApprovalPermission{
+			FromListId:                oldPerm.FromListId,
+			InitiatedByListId:         oldPerm.InitiatedByListId,
+			TransferTimes:             convertUintRanges(oldPerm.TransferTimes),
+			TokenIds:                  convertUintRanges(oldPerm.TokenIds),
+			OwnershipTimes:            convertUintRanges(oldPerm.OwnershipTimes),
+			ApprovalId:                oldPerm.ApprovalId,
+			PermanentlyPermittedTimes: convertUintRanges(oldPerm.PermanentlyPermittedTimes),
+			PermanentlyForbiddenTimes: convertUintRanges(oldPerm.PermanentlyForbiddenTimes),
+		}
+	}
+	return newPerms
+}
+
 func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
 	defer iterator.Close()
 
+	// Get block time from context (convert context.Context to sdk.Context)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	blockTime := sdkmath.NewUint(uint64(sdkCtx.BlockTime().UnixMilli()))
+
 	for ; iterator.Valid(); iterator.Next() {
-		var UserBalance oldtypes.UserBalanceStore
-		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
+		var oldBalance oldtypes.UserBalanceStore
+		k.cdc.MustUnmarshal(iterator.Value(), &oldBalance)
 
 		// Convert to JSON
-		jsonBytes, err := json.Marshal(UserBalance)
+		jsonBytes, err := json.Marshal(oldBalance)
 		if err != nil {
 			return err
 		}
 
-		// Unmarshal into old type
-		var oldBalance newtypes.UserBalanceStore
-		if err := json.Unmarshal(jsonBytes, &oldBalance); err != nil {
+		// Unmarshal into new type
+		var newBalance newtypes.UserBalanceStore
+		if err := json.Unmarshal(jsonBytes, &newBalance); err != nil {
 			return err
 		}
 
-		oldBalance.IncomingApprovals = MigrateIncomingApprovals(oldBalance.IncomingApprovals)
-		oldBalance.OutgoingApprovals = MigrateOutgoingApprovals(oldBalance.OutgoingApprovals)
+		// Migrate approvals
+		newBalance.IncomingApprovals = MigrateIncomingApprovals(newBalance.IncomingApprovals)
+		newBalance.OutgoingApprovals = MigrateOutgoingApprovals(newBalance.OutgoingApprovals)
 
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&oldBalance))
+		// Migrate permissions - work with old types first to access TimelineTimes if any
+		if oldBalance.UserPermissions != nil {
+			newBalance.UserPermissions = MigrateUserPermissions(blockTime, oldBalance.UserPermissions)
+		}
+
+		store.Set(iterator.Key(), k.cdc.MustMarshal(&newBalance))
 	}
 
 	return nil

@@ -408,14 +408,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
 		CollectionPermissions: &badgestypes.CollectionPermissions{},
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				TimelineTimes: []*badgestypes.UintRange{
-					{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
-				},
-				Manager: creatorStr,
-			},
-		},
+		Manager: creatorStr,
 		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadge",
@@ -487,14 +480,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
 		CollectionPermissions: &badgestypes.CollectionPermissions{},
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				TimelineTimes: []*badgestypes.UintRange{
-					{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
-				},
-				Manager: creatorStr,
-			},
-		},
+		Manager: creatorStr,
 		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadgeallowed",

@@ -314,9 +314,9 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 func (suite *TestSuite) TestDefaultBalances() {
 	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
-		CollectionId:    sdkmath.NewUint(0),
-		Creator:         alice,
-		ManagerTimeline: []*types.ManagerTimeline{},
+		CollectionId: sdkmath.NewUint(0),
+		Creator:      alice,
+		Manager:      "",
 		DefaultBalances: &types.UserBalanceStore{
 			Balances: []*types.Balance{
 				{
@@ -361,7 +361,7 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 	collectionRes, err := UpdateCollectionWithRes(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
 		CollectionId:              sdkmath.NewUint(0),
 		Creator:                   alice,
-		ManagerTimeline:           []*types.ManagerTimeline{},
+		Manager:                   "",
 		UpdateCollectionApprovals: true,
 		CollectionApprovals: []*types.CollectionApproval{
 			GetBobApproval(),
@@ -594,7 +594,7 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
 		CollectionId:              sdkmath.NewUint(0),
 		Creator:                   alice,
-		ManagerTimeline:           []*types.ManagerTimeline{},
+		Manager:                   "",
 		UpdateCollectionApprovals: true,
 		CollectionApprovals: []*types.CollectionApproval{
 			GetBobApproval(),

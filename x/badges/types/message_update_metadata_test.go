@@ -21,29 +21,20 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:                          "invalid_address",
-				CollectionId:                     sdkmath.NewUint(1),
-				UpdateCollectionMetadataTimeline: true,
-				UpdateTokenMetadataTimeline:      true,
-				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
-					{
-						CollectionMetadata: &types.CollectionMetadata{
-							Uri: "https://example.com/{id}",
-						},
-					},
+				Creator:                  "invalid_address",
+				CollectionId:             sdkmath.NewUint(1),
+				UpdateCollectionMetadata: true,
+				UpdateTokenMetadata:      true,
+				CollectionMetadata: &types.CollectionMetadata{
+					Uri: "https://example.com/{id}",
 				},
-				TokenMetadataTimeline: []*types.TokenMetadataTimeline{
+				TokenMetadata: []*types.TokenMetadata{
 					{
-						TokenMetadata: []*types.TokenMetadata{
+						Uri: "https://example.com/{id}",
+						TokenIds: []*types.UintRange{
 							{
-								Uri: "https://example.com/{id}",
-								TokenIds: []*types.UintRange{
-									{
-										Start: sdkmath.NewUint(1),
-
-										End: sdkmath.NewUint(math.MaxUint64),
-									},
-								},
+								Start: sdkmath.NewUint(1),
+								End:   sdkmath.NewUint(math.MaxUint64),
 							},
 						},
 					},
@@ -53,38 +44,17 @@ func TestMsgUpdateMetadata_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:                          sample.AccAddress(),
-				CollectionId:                     sdkmath.NewUint(1),
-				UpdateCollectionMetadataTimeline: true,
-				UpdateTokenMetadataTimeline:      true,
-				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
-					{
-						CollectionMetadata: &types.CollectionMetadata{
-							Uri: "https://example.com/{id}",
-						},
-						TimelineTimes: []*types.UintRange{
-							{
-								Start: sdkmath.NewUint(1),
-								End:   sdkmath.NewUint(math.MaxUint64),
-							},
-						},
-					},
+				Creator:                  sample.AccAddress(),
+				CollectionId:             sdkmath.NewUint(1),
+				UpdateCollectionMetadata: true,
+				UpdateTokenMetadata:      true,
+				CollectionMetadata: &types.CollectionMetadata{
+					Uri: "https://example.com/{id}",
 				},
-				TokenMetadataTimeline: []*types.TokenMetadataTimeline{
+				TokenMetadata: []*types.TokenMetadata{
 					{
-						TokenMetadata: []*types.TokenMetadata{
-							{
-								Uri: "https://example.com/{id}",
-								TokenIds: []*types.UintRange{
-									{
-										Start: sdkmath.NewUint(1),
-
-										End: sdkmath.NewUint(math.MaxUint64),
-									},
-								},
-							},
-						},
-						TimelineTimes: []*types.UintRange{
+						Uri: "https://example.com/{id}",
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(math.MaxUint64),

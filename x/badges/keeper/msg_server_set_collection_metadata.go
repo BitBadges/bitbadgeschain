@@ -24,11 +24,11 @@ func (k msgServer) SetCollectionMetadata(goCtx context.Context, msg *types.MsgSe
 
 	// Construct the full UniversalUpdateCollection message
 	universalMsg := &types.MsgUniversalUpdateCollection{
-		Creator:                          msg.Creator,
-		CollectionId:                     msg.CollectionId,
-		UpdateCollectionMetadataTimeline: true,
-		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
-		UpdateCollectionPermissions:      true,
+		Creator:                     msg.Creator,
+		CollectionId:                msg.CollectionId,
+		UpdateCollectionMetadata:    true,
+		CollectionMetadata:          msg.CollectionMetadata,
+		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCollectionMetadata: msg.CanUpdateCollectionMetadata,
 			// Copy existing permissions for other fields

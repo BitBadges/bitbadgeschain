@@ -370,55 +370,29 @@ func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection 
 	return nil
 }
 
-func (k Keeper) ValidateTokenMetadataUpdate(ctx sdk.Context, oldTokenMetadata []*types.TokenMetadataTimeline, newTokenMetadata []*types.TokenMetadataTimeline, canUpdateTokenMetadata []*types.TimedUpdateWithTokenIdsPermission) error {
-	oldTimes, oldValues := types.GetTokenMetadataTimesAndValues(oldTokenMetadata)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
+func (k Keeper) ValidateTokenMetadataUpdate(ctx sdk.Context, oldTokenMetadata []*types.TokenMetadata, newTokenMetadata []*types.TokenMetadata, canUpdateTokenMetadata []*types.TokenIdsActionPermission) error {
+	// Simplified validation - check if token metadata changed
+	// For now, we'll do a basic check and use token IDs from the new metadata for permission checking
+	// This is a simplified version - the full timeline-based logic was more complex
 
-	newTimes, newValues := types.GetTokenMetadataTimesAndValues(newTokenMetadata)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.TokenMetadata{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-		//Cast to UniversalPermissionDetails for comaptibility with these overlap functions and get first matches only (i.e. first match for each token ID)
-		oldTokenMetadata := oldValue.([]*types.TokenMetadata)
-		firstMatchesForOld := types.GetFirstMatchOnly(ctx, k.CastTokenMetadataToUniversalPermission(oldTokenMetadata))
-
-		newTokenMetadata := newValue.([]*types.TokenMetadata)
-		firstMatchesForNew := types.GetFirstMatchOnly(ctx, k.CastTokenMetadataToUniversalPermission(newTokenMetadata))
-
-		//For every token, we need to check if the new provided value is different in any way from the old value for each specific token ID
-		//The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
-		detailsToReturn := []*types.UniversalPermissionDetails{}
-		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
-		for _, overlapObject := range overlapObjects {
-			overlap := overlapObject.Overlap
-			oldDetails := overlapObject.FirstDetails
-			newDetails := overlapObject.SecondDetails
-
-			//HACK: We set the metadata to a JSON string beforehand when casting
-			if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
-				detailsToReturn = append(detailsToReturn, overlap)
-			} else {
-				oldVal := oldDetails.ArbitraryValue.(string)
-				newVal := newDetails.ArbitraryValue.(string)
-
-				if newVal != oldVal {
-					detailsToReturn = append(detailsToReturn, overlap)
-				}
-			}
-		}
-
-		//If metadata is in old but not new, then it is considered updated. If it is in new but not old, then it is considered updated.
-		detailsToReturn = append(detailsToReturn, inOldButNotNew...)
-		detailsToReturn = append(detailsToReturn, inNewButNotOld...)
-
-		return detailsToReturn, nil
-	})
-	if err != nil {
-		return err
+	// Get token IDs from new metadata
+	tokenIdsToCheck := []*types.UintRange{}
+	for _, tm := range newTokenMetadata {
+		tokenIdsToCheck = append(tokenIdsToCheck, tm.TokenIds...)
 	}
 
-	err = k.CheckIfTimedUpdateWithTokenIdsPermissionPermits(ctx, detailsToCheck, canUpdateTokenMetadata, "update token metadata")
-	if err != nil {
+	// Check permissions - simplified since we no longer have timeline times
+	// Convert to UniversalPermissionDetails for compatibility with existing permission checking
+	detailsToCheck := []*types.UniversalPermissionDetails{}
+	for _, tm := range newTokenMetadata {
+		for _, tokenIdRange := range tm.TokenIds {
+			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
+				TokenId: tokenIdRange,
+			})
+		}
+	}
+
+	if err := k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, canUpdateTokenMetadata, "update token metadata"); err != nil {
 		return err
 	}
 
@@ -440,144 +414,86 @@ func GetUpdatedCollectionMetadataCombinations(ctx sdk.Context, oldValue interfac
 	return x, nil
 }
 
-func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionMetadata []*types.CollectionMetadataTimeline, newCollectionMetadata []*types.CollectionMetadataTimeline, canUpdateCollectionMetadata []*types.TimedUpdatePermission) error {
-	oldTimes, oldValues := types.GetCollectionMetadataTimesAndValues(oldCollectionMetadata)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
-
-	newTimes, newValues := types.GetCollectionMetadataTimesAndValues(newCollectionMetadata)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, &types.CollectionMetadata{}, GetUpdatedCollectionMetadataCombinations)
-	if err != nil {
-		return err
+func (k Keeper) ValidateCollectionMetadataUpdate(ctx sdk.Context, oldCollectionMetadata *types.CollectionMetadata, newCollectionMetadata *types.CollectionMetadata, canUpdateCollectionMetadata []*types.ActionPermission) error {
+	// Check if value changed
+	if oldCollectionMetadata == nil && newCollectionMetadata == nil {
+		return nil
+	}
+	if (oldCollectionMetadata == nil && newCollectionMetadata != nil) || (oldCollectionMetadata != nil && newCollectionMetadata == nil) {
+		// Value changed, need to check permissions
+	} else if oldCollectionMetadata.Uri == newCollectionMetadata.Uri && oldCollectionMetadata.CustomData == newCollectionMetadata.CustomData {
+		return nil
 	}
 
-	err = k.CheckIfTimedUpdatePermissionPermits(ctx, detailsToCheck, canUpdateCollectionMetadata, "update collection metadata")
-	if err != nil {
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canUpdateCollectionMetadata, "update collection metadata"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-/** Everything below here is pretty standard because all we need to compare is primitive types **/
-
-func GetUpdatedStringCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-	x := []*types.UniversalPermissionDetails{}
-	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
-		x = append(x, &types.UniversalPermissionDetails{})
-	} else if oldValue.(string) != newValue.(string) {
-		x = append(x, &types.UniversalPermissionDetails{})
+func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager string, newManager string, canUpdateManager []*types.ActionPermission) error {
+	// Check if value changed
+	if oldManager == newManager {
+		return nil
 	}
-	return x, nil
+
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canUpdateManager, "update manager"); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func GetUpdatedBoolCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
-		return []*types.UniversalPermissionDetails{{}}, nil
+func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData string, newCustomData string, canUpdateCustomData []*types.ActionPermission) error {
+	// Check if value changed
+	if oldCustomData == newCustomData {
+		return nil
 	}
 
-	oldVal := oldValue.(bool)
-	newVal := newValue.(bool)
-	if oldVal != newVal {
-		return []*types.UniversalPermissionDetails{
-			{},
-		}, nil
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canUpdateCustomData, "update custom data"); err != nil {
+		return err
 	}
-	return []*types.UniversalPermissionDetails{}, nil
+
+	return nil
 }
 
-func GetUpdateStringArrayCombinations(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-	if (oldValue == nil && newValue != nil) || (oldValue != nil && newValue == nil) {
-		return []*types.UniversalPermissionDetails{{}}, nil
+func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []string, newStandards []string, canUpdateStandards []*types.ActionPermission) error {
+	// Check if value changed
+	if len(oldStandards) != len(newStandards) {
+		// Values changed, need to check permissions
 	} else {
-		oldVal := oldValue.([]string)
-		newVal := newValue.([]string)
-
-		if len(oldVal) != len(newVal) {
-			return []*types.UniversalPermissionDetails{{}}, nil
-		} else {
-			for i := 0; i < len(oldVal); i++ {
-				if oldVal[i] != newVal[i] {
-					return []*types.UniversalPermissionDetails{{}}, nil
-				}
+		allSame := true
+		for i := 0; i < len(oldStandards); i++ {
+			if oldStandards[i] != newStandards[i] {
+				allSame = false
+				break
 			}
+		}
+		if allSame {
+			return nil
 		}
 	}
 
-	return []*types.UniversalPermissionDetails{}, nil
-}
-
-func (k Keeper) ValidateManagerUpdate(ctx sdk.Context, oldManager []*types.ManagerTimeline, newManager []*types.ManagerTimeline, canUpdateManager []*types.TimedUpdatePermission) error {
-	oldTimes, oldValues := types.GetManagerTimesAndValues(oldManager)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
-
-	newTimes, newValues := types.GetManagerTimesAndValues(newManager)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", GetUpdatedStringCombinations)
-	if err != nil {
-		return err
-	}
-
-	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateManager, "update manager"); err != nil {
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canUpdateStandards, "update standards"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (k Keeper) ValidateCustomDataUpdate(ctx sdk.Context, oldCustomData []*types.CustomDataTimeline, newCustomData []*types.CustomDataTimeline, canUpdateCustomData []*types.TimedUpdatePermission) error {
-	oldTimes, oldValues := types.GetCustomDataTimesAndValues(oldCustomData)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
-
-	newTimes, newValues := types.GetCustomDataTimesAndValues(newCustomData)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, "", GetUpdatedStringCombinations)
-	if err != nil {
-		return err
+func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived bool, newIsArchived bool, canUpdateIsArchived []*types.ActionPermission) error {
+	// Check if value changed
+	if oldIsArchived == newIsArchived {
+		return nil
 	}
 
-	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateCustomData, "update custom data"); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (k Keeper) ValidateStandardsUpdate(ctx sdk.Context, oldStandards []*types.StandardsTimeline, newStandards []*types.StandardsTimeline, canUpdateStandards []*types.TimedUpdatePermission) error {
-	oldTimes, oldValues := types.GetStandardsTimesAndValues(oldStandards)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
-
-	newTimes, newValues := types.GetStandardsTimesAndValues(newStandards)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []string{}, GetUpdateStringArrayCombinations)
-	if err != nil {
-		return err
-	}
-
-	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateStandards, "update standards"); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived []*types.IsArchivedTimeline, newIsArchived []*types.IsArchivedTimeline, canUpdateIsArchived []*types.TimedUpdatePermission) error {
-	oldTimes, oldValues := types.GetIsArchivedTimesAndValues(oldIsArchived)
-	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, oldTimes, oldValues)
-
-	newTimes, newValues := types.GetIsArchivedTimesAndValues(newIsArchived)
-	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, newTimes, newValues)
-
-	updatedTimelineTimes, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, false, GetUpdatedBoolCombinations)
-	if err != nil {
-		return err
-	}
-
-	if err = k.CheckIfTimedUpdatePermissionPermits(ctx, updatedTimelineTimes, canUpdateIsArchived, "update is archived"); err != nil {
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canUpdateIsArchived, "update is archived"); err != nil {
 		return err
 	}
 

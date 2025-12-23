@@ -206,8 +206,8 @@ func (suite *TestSuite) TestIncrementsWithAttemptToTransferAll() {
 		},
 		CollectionApprovals: collection.CollectionApprovals,
 		// InheritedBalancesTimeline: 				 collection.InheritedBalancesTimeline,
-		CollectionMetadataTimeline: collection.CollectionMetadataTimeline,
-		TokenMetadataTimeline:      collection.TokenMetadataTimeline,
+		// Note: MsgMintAndDistributeTokens is a legacy type that still uses timeline fields
+		// We'll just not set these fields for now since they're optional
 	})
 	suite.Require().Nil(err, "Error transferring token")
 

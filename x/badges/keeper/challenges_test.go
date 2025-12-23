@@ -1008,7 +1008,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1137,7 +1137,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1187,7 +1187,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1314,7 +1314,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1442,7 +1442,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1492,7 +1492,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1610,7 +1610,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1769,7 +1769,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1926,7 +1926,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -2091,7 +2091,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -2620,7 +2620,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
@@ -2731,7 +2731,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
@@ -2759,7 +2759,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
@@ -3019,7 +3019,7 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3132,14 +3132,14 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
-			},
-			PrecalculationOptions: &types.PrecalculationOptions{
-				OverrideTimestamp: sdkmath.NewUint(10),
+				PrecalculationOptions: &types.PrecalculationOptions{
+					OverrideTimestamp: sdkmath.NewUint(10),
+				},
 			},
 		}},
 	})
@@ -3209,14 +3209,14 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
-			},
-			PrecalculationOptions: &types.PrecalculationOptions{
-				OverrideTimestamp: sdkmath.NewUint(10),
+				PrecalculationOptions: &types.PrecalculationOptions{
+					OverrideTimestamp: sdkmath.NewUint(10),
+				},
 			},
 		}},
 	})
@@ -3284,7 +3284,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3308,7 +3308,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3331,7 +3331,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3358,7 +3358,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3386,7 +3386,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3463,14 +3463,14 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
-			},
-			PrecalculationOptions: &types.PrecalculationOptions{
-				OverrideTimestamp: sdkmath.NewUint(2000),
+				PrecalculationOptions: &types.PrecalculationOptions{
+					OverrideTimestamp: sdkmath.NewUint(2000),
+				},
 			},
 		}},
 	})
@@ -3535,7 +3535,7 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "incoming", ApproverAddress: charlie, Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "incoming",
 				ApproverAddress: charlie,
@@ -3605,7 +3605,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3708,14 +3708,17 @@ func (suite *TestSuite) TestTokenIdsOverride() {
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+	if msg.Transfers[0].PrecalculateBalancesFromApproval == nil {
+		msg.Transfers[0].PrecalculateBalancesFromApproval = &types.PrecalculateBalancesFromApprovalDetails{}
+	}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions = &types.PrecalculationOptions{
 		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
 	}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Nil(err)
@@ -3809,21 +3812,24 @@ func (suite *TestSuite) TestTokenIdsOverrideWithMoreThanOneBadge() {
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+	if msg.Transfers[0].PrecalculateBalancesFromApproval == nil {
+		msg.Transfers[0].PrecalculateBalancesFromApproval = &types.PrecalculateBalancesFromApprovalDetails{}
+	}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions = &types.PrecalculationOptions{
 		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
 	}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions = &types.PrecalculationOptions{
 		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 	}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Nil(err)

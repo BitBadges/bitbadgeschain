@@ -158,18 +158,8 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			CollectionPermissions: &types.CollectionPermissions{},
 			DefaultBalances:       msg.DefaultBalances,
 			CreatedBy:             msg.Creator,
-			// Default manager is the creator if not updating manager timeline
-			ManagerTimeline: []*types.ManagerTimeline{
-				{
-					Manager: msg.Creator,
-					TimelineTimes: []*types.UintRange{
-						{
-							Start: sdkmath.NewUint(1),
-							End:   sdkmath.NewUint(MaxUint64Value),
-						},
-					},
-				},
-			},
+			// Default manager is the creator if not updating manager
+			Manager:           msg.Creator,
 			MintEscrowAddress: accountAddr.String(),
 		}
 
@@ -228,11 +218,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	//not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
 	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
 	previouslyArchived := types.GetIsArchived(ctx, collection)
-	if msg.UpdateIsArchivedTimeline {
-		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchivedTimeline, msg.IsArchivedTimeline, collection.CollectionPermissions.CanArchiveCollection); err != nil {
+	if msg.UpdateIsArchived {
+		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchived, msg.IsArchived, collection.CollectionPermissions.CanArchiveCollection); err != nil {
 			return nil, err
 		}
-		collection.IsArchivedTimeline = msg.IsArchivedTimeline
+		collection.IsArchived = msg.IsArchived
 	}
 	stillArchived := types.GetIsArchived(ctx, collection)
 	if previouslyArchived && stillArchived {
@@ -281,39 +271,39 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.CollectionApprovals = newApprovalsWithVersion
 	}
 
-	if msg.UpdateCollectionMetadataTimeline {
-		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadataTimeline, msg.CollectionMetadataTimeline, collection.CollectionPermissions.CanUpdateCollectionMetadata); err != nil {
+	if msg.UpdateCollectionMetadata {
+		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadata, msg.CollectionMetadata, collection.CollectionPermissions.CanUpdateCollectionMetadata); err != nil {
 			return nil, err
 		}
-		collection.CollectionMetadataTimeline = msg.CollectionMetadataTimeline
+		collection.CollectionMetadata = msg.CollectionMetadata
 	}
 
-	if msg.UpdateTokenMetadataTimeline {
-		if err := k.ValidateTokenMetadataUpdate(ctx, collection.TokenMetadataTimeline, msg.TokenMetadataTimeline, collection.CollectionPermissions.CanUpdateTokenMetadata); err != nil {
+	if msg.UpdateTokenMetadata {
+		if err := k.ValidateTokenMetadataUpdate(ctx, collection.TokenMetadata, msg.TokenMetadata, collection.CollectionPermissions.CanUpdateTokenMetadata); err != nil {
 			return nil, err
 		}
-		collection.TokenMetadataTimeline = msg.TokenMetadataTimeline
+		collection.TokenMetadata = msg.TokenMetadata
 	}
 
-	if msg.UpdateManagerTimeline {
-		if err := k.ValidateManagerUpdate(ctx, collection.ManagerTimeline, msg.ManagerTimeline, collection.CollectionPermissions.CanUpdateManager); err != nil {
+	if msg.UpdateManager {
+		if err := k.ValidateManagerUpdate(ctx, collection.Manager, msg.Manager, collection.CollectionPermissions.CanUpdateManager); err != nil {
 			return nil, err
 		}
-		collection.ManagerTimeline = msg.ManagerTimeline
+		collection.Manager = msg.Manager
 	}
 
-	if msg.UpdateStandardsTimeline {
-		if err := k.ValidateStandardsUpdate(ctx, collection.StandardsTimeline, msg.StandardsTimeline, collection.CollectionPermissions.CanUpdateStandards); err != nil {
+	if msg.UpdateStandards {
+		if err := k.ValidateStandardsUpdate(ctx, collection.Standards, msg.Standards, collection.CollectionPermissions.CanUpdateStandards); err != nil {
 			return nil, err
 		}
-		collection.StandardsTimeline = msg.StandardsTimeline
+		collection.Standards = msg.Standards
 	}
 
-	if msg.UpdateCustomDataTimeline {
-		if err := k.ValidateCustomDataUpdate(ctx, collection.CustomDataTimeline, msg.CustomDataTimeline, collection.CollectionPermissions.CanUpdateCustomData); err != nil {
+	if msg.UpdateCustomData {
+		if err := k.ValidateCustomDataUpdate(ctx, collection.CustomData, msg.CustomData, collection.CollectionPermissions.CanUpdateCustomData); err != nil {
 			return nil, err
 		}
-		collection.CustomDataTimeline = msg.CustomDataTimeline
+		collection.CustomData = msg.CustomData
 	}
 
 	if msg.UpdateValidTokenIds {

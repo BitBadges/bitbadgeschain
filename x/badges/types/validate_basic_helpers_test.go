@@ -19,40 +19,19 @@ func GetValidUserPermissions() *types.UserPermissions {
 	}
 }
 
-func GetValidCollectionMetadataTimeline() []*types.CollectionMetadataTimeline {
-	return []*types.CollectionMetadataTimeline{
-		{
-			CollectionMetadata: &types.CollectionMetadata{
-				Uri: "https://example.com/{id}",
-			},
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(math.MaxUint64),
-				},
-			},
-		},
+func GetValidCollectionMetadata() *types.CollectionMetadata {
+	return &types.CollectionMetadata{
+		Uri: "https://example.com/{id}",
 	}
 }
 
-func GetValidTokenMetadataTimeline() []*types.TokenMetadataTimeline {
-	return []*types.TokenMetadataTimeline{
+func GetValidTokenMetadata() []*types.TokenMetadata {
+	return []*types.TokenMetadata{
 		{
-			TokenMetadata: []*types.TokenMetadata{
+			Uri: "https://example.com/{id}",
+			TokenIds: []*types.UintRange{
 				{
-					Uri: "https://example.com/{id}",
-					TokenIds: []*types.UintRange{
-						{
-							Start: sdkmath.NewUint(1),
-
-							End: sdkmath.NewUint(math.MaxUint64),
-						},
-					},
-				},
-			},
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(0),
+					Start: sdkmath.NewUint(1),
 					End:   sdkmath.NewUint(math.MaxUint64),
 				},
 			},

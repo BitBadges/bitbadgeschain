@@ -13,7 +13,6 @@ import "badges/permissions.proto";
 import "badges/metadata.proto";
 import "badges/collections.proto";
 import "badges/address_lists.proto";
-import "badges/timelines.proto";
 import "badges/dynamic_stores.proto";
 import "badges/approvals.proto";
 import "badges/user_balance_store.proto";
@@ -178,30 +177,30 @@ message MsgUniversalUpdateCollection {
   // New collection permissions to set.
   CollectionPermissions collectionPermissions = 7;
   
-  // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateManagerTimeline = 8;
+  // Indicates if the manager should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateManager = 8;
   
-  // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 9;
+  // New manager to set.
+  string manager = 9;
   
-  // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionMetadataTimeline = 10;
+  // Indicates if the collection metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionMetadata = 10;
   
-  // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 11;
+  // New collection metadata to set.
+  CollectionMetadata collectionMetadata = 11;
   
-  // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateTokenMetadataTimeline = 12;
+  // Indicates if the token metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateTokenMetadata = 12;
   
-  // New token metadata timeline to set.
-  repeated TokenMetadataTimeline tokenMetadataTimeline = 13;
+  // New token metadata to set.
+  repeated TokenMetadata tokenMetadata = 13;
   
   
-  // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCustomDataTimeline = 14;
+  // Indicates if the custom data should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCustomData = 14;
   
-  // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 15;
+  // New custom data to set.
+  string customData = 15;
   
   // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionApprovals = 16;
@@ -209,17 +208,17 @@ message MsgUniversalUpdateCollection {
   // New collection approvals to set.
   repeated CollectionApproval collectionApprovals = 17;
   
-  // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateStandardsTimeline = 18;
+  // Indicates if the standards should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateStandards = 18;
   
-  // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 19;
+  // New standards to set.
+  repeated string standards = 19;
   
-  // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 20;
+  // Indicates if the isArchived should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateIsArchived = 20;
   
-  // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 21;
+  // New isArchived to set.
+  bool isArchived = 21;
 
   // Coins to be transferred to the mint escrow address.
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 22;
@@ -262,30 +261,30 @@ message MsgUpdateCollection {
   // New collection permissions to set.
   CollectionPermissions collectionPermissions = 6;
   
-  // Indicates if the manager timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateManagerTimeline = 7;
+  // Indicates if the manager should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateManager = 7;
   
-  // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 8;
+  // New manager to set.
+  string manager = 8;
   
-  // Indicates if the collection metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCollectionMetadataTimeline = 9;
+  // Indicates if the collection metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionMetadata = 9;
   
-  // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 10;
+  // New collection metadata to set.
+  CollectionMetadata collectionMetadata = 10;
   
-  // Indicates if the token metadata timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateTokenMetadataTimeline = 11;
+  // Indicates if the token metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateTokenMetadata = 11;
   
-  // New token metadata timeline to set.
-  repeated TokenMetadataTimeline tokenMetadataTimeline = 12;
+  // New token metadata to set.
+  repeated TokenMetadata tokenMetadata = 12;
   
   
-  // Indicates if the custom data timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateCustomDataTimeline = 13;
+  // Indicates if the custom data should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCustomData = 13;
   
-  // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 14;
+  // New custom data to set.
+  string customData = 14;
   
   // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
   bool updateCollectionApprovals = 15;
@@ -293,17 +292,17 @@ message MsgUpdateCollection {
   // New collection approvals to set.
   repeated CollectionApproval collectionApprovals = 16;
   
-  // Indicates if the standards timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateStandardsTimeline = 17;
+  // Indicates if the standards should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateStandards = 17;
   
-  // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 18;
+  // New standards to set.
+  repeated string standards = 18;
   
-  // Indicates if the isArchived timeline should be updated. If true, we set to value in this Msg. If false, we keep existing value.
-  bool updateIsArchivedTimeline = 19;
+  // Indicates if the isArchived should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateIsArchived = 19;
   
-  // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 20;
+  // New isArchived to set.
+  bool isArchived = 20;
 
   // Coins to be transferred to the mint escrow address.
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 21;
@@ -340,26 +339,26 @@ message MsgCreateCollection {
   // Collection permissions.
   CollectionPermissions collectionPermissions = 4;
   
-  // Manager timeline entries.
-  repeated ManagerTimeline managerTimeline = 5;
+  // Manager address.
+  string manager = 5;
   
-  // Collection metadata timeline entries.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 6;
+  // Collection metadata.
+  CollectionMetadata collectionMetadata = 6;
   
-  // Token metadata timeline entries.
-  repeated TokenMetadataTimeline tokenMetadataTimeline = 7;
+  // Token metadata entries.
+  repeated TokenMetadata tokenMetadata = 7;
   
-  // Custom data timeline entries.
-  repeated CustomDataTimeline customDataTimeline = 8;
+  // Custom data.
+  string customData = 8;
   
   // Collection approvals.
   repeated CollectionApproval collectionApprovals = 9;
   
-  // Standards timeline entries.
-  repeated StandardsTimeline standardsTimeline = 10;
+  // Standards entries.
+  repeated string standards = 10;
   
-  // isArchived timeline entries.
-  repeated IsArchivedTimeline isArchivedTimeline = 11;
+  // isArchived flag.
+  bool isArchived = 11;
 
   // Coins to be transferred to the mint escrow address.
   repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 12;
@@ -675,7 +674,7 @@ message MsgSetValidTokenIdsResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetManager sets the manager timeline and canUpdateManager permission
+// MsgSetManager sets the manager and canUpdateManager permission
 message MsgSetManager {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetManager";
@@ -686,11 +685,11 @@ message MsgSetManager {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New manager timeline to set.
-  repeated ManagerTimeline managerTimeline = 3;
+  // New manager to set.
+  string manager = 3;
   
-  // Permission to update manager timeline
-  repeated TimedUpdatePermission canUpdateManager = 4;
+  // Permission to update manager
+  repeated ActionPermission canUpdateManager = 4;
 }
 
 // MsgSetManagerResponse is the response to MsgSetManager.
@@ -699,7 +698,7 @@ message MsgSetManagerResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetCollectionMetadata sets the collection metadata timeline and canUpdateCollectionMetadata permission
+// MsgSetCollectionMetadata sets the collection metadata and canUpdateCollectionMetadata permission
 message MsgSetCollectionMetadata {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetCollectionMetadata";
@@ -710,11 +709,11 @@ message MsgSetCollectionMetadata {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New collection metadata timeline to set.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 3;
+  // New collection metadata to set.
+  CollectionMetadata collectionMetadata = 3;
   
-  // Permission to update collection metadata timeline
-  repeated TimedUpdatePermission canUpdateCollectionMetadata = 4;
+  // Permission to update collection metadata
+  repeated ActionPermission canUpdateCollectionMetadata = 4;
 }
 
 // MsgSetCollectionMetadataResponse is the response to MsgSetCollectionMetadata.
@@ -723,7 +722,7 @@ message MsgSetCollectionMetadataResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetTokenMetadata sets the token metadata timeline and canUpdateTokenMetadata permission
+// MsgSetTokenMetadata sets the token metadata and canUpdateTokenMetadata permission
 message MsgSetTokenMetadata {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetTokenMetadata";
@@ -734,11 +733,11 @@ message MsgSetTokenMetadata {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New token metadata timeline to set.
-  repeated TokenMetadataTimeline tokenMetadataTimeline = 3;
+  // New token metadata to set.
+  repeated TokenMetadata tokenMetadata = 3;
   
-  // Permission to update token metadata timeline
-  repeated TimedUpdateWithTokenIdsPermission canUpdateTokenMetadata = 4;
+  // Permission to update token metadata
+  repeated TokenIdsActionPermission canUpdateTokenMetadata = 4;
 }
 
 // MsgSetTokenMetadataResponse is the response to MsgSetTokenMetadata.
@@ -747,7 +746,7 @@ message MsgSetTokenMetadataResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetCustomData sets the custom data timeline and canUpdateCustomData permission
+// MsgSetCustomData sets the custom data and canUpdateCustomData permission
 message MsgSetCustomData {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetCustomData";
@@ -758,11 +757,11 @@ message MsgSetCustomData {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New custom data timeline to set.
-  repeated CustomDataTimeline customDataTimeline = 3;
+  // New custom data to set.
+  string customData = 3;
   
-  // Permission to update custom data timeline
-  repeated TimedUpdatePermission canUpdateCustomData = 4;
+  // Permission to update custom data
+  repeated ActionPermission canUpdateCustomData = 4;
 }
 
 // MsgSetCustomDataResponse is the response to MsgSetCustomData.
@@ -771,7 +770,7 @@ message MsgSetCustomDataResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetStandards sets the standards timeline and canUpdateStandards permission
+// MsgSetStandards sets the standards and canUpdateStandards permission
 message MsgSetStandards {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetStandards";
@@ -782,11 +781,11 @@ message MsgSetStandards {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New standards timeline to set.
-  repeated StandardsTimeline standardsTimeline = 3;
+  // New standards to set.
+  repeated string standards = 3;
   
-  // Permission to update standards timeline
-  repeated TimedUpdatePermission canUpdateStandards = 4;
+  // Permission to update standards
+  repeated ActionPermission canUpdateStandards = 4;
 }
 
 // MsgSetStandardsResponse is the response to MsgSetStandards.
@@ -819,7 +818,7 @@ message MsgSetCollectionApprovalsResponse {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// MsgSetIsArchived sets the isArchived timeline and canArchiveCollection permission
+// MsgSetIsArchived sets the isArchived and canArchiveCollection permission
 message MsgSetIsArchived {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "badges/SetIsArchived";
@@ -830,11 +829,11 @@ message MsgSetIsArchived {
   // ID of the collection.
   string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // New isArchived timeline to set.
-  repeated IsArchivedTimeline isArchivedTimeline = 3;
+  // New isArchived to set.
+  bool isArchived = 3;
   
   // Permission to archive collection
-  repeated TimedUpdatePermission canArchiveCollection = 4;
+  repeated ActionPermission canArchiveCollection = 4;
 }
 
 // MsgSetIsArchivedResponse is the response to MsgSetIsArchived.

@@ -93,26 +93,8 @@ func (k Keeper) CheckIfActionPermissionPermits(ctx sdk.Context, permissions []*t
 	}, permissionStr)
 }
 
-func (k Keeper) CheckIfTimedUpdatePermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdatePermission, permissionStr string) error {
-	castedPermissions, err := k.CastTimedUpdatePermissionToUniversalPermission(permissions)
-	if err != nil {
-		return err
-	}
-
-	return CheckNotForbiddenForAllOverlaps(ctx, castedPermissions, detailsToCheck, permissionStr)
-}
-
 func (k Keeper) CheckIfTokenIdsActionPermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TokenIdsActionPermission, permissionStr string) error {
 	castedPermissions, err := k.CastTokenIdsActionPermissionToUniversalPermission(permissions)
-	if err != nil {
-		return err
-	}
-
-	return CheckNotForbiddenForAllOverlaps(ctx, castedPermissions, detailsToCheck, permissionStr)
-}
-
-func (k Keeper) CheckIfTimedUpdateWithTokenIdsPermissionPermits(ctx sdk.Context, detailsToCheck []*types.UniversalPermissionDetails, permissions []*types.TimedUpdateWithTokenIdsPermission, permissionStr string) error {
-	castedPermissions, err := k.CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(permissions)
 	if err != nil {
 		return err
 	}

@@ -12,17 +12,17 @@ const TypeMsgCreateMap = "create_map"
 
 var _ sdk.Msg = &MsgCreateMap{}
 
-func NewMsgCreateMap(creator string, mapId string, updateCriteria *MapUpdateCriteria, valueOptions *ValueOptions, defaultValue string, managerTimeline []*ManagerTimeline, metadataTimeline []*MapMetadataTimeline, permissions *MapPermissions, inheritManagerTimelineFrom sdkmath.Uint) *MsgCreateMap {
+func NewMsgCreateMap(creator string, mapId string, updateCriteria *MapUpdateCriteria, valueOptions *ValueOptions, defaultValue string, manager string, metadata *Metadata, permissions *MapPermissions, inheritManagerFrom sdkmath.Uint) *MsgCreateMap {
 	return &MsgCreateMap{
-		Creator:                    creator,
-		MapId:                      mapId,
-		UpdateCriteria:             updateCriteria,
-		ValueOptions:               valueOptions,
-		DefaultValue:               defaultValue,
-		ManagerTimeline:            managerTimeline,
-		MetadataTimeline:           metadataTimeline,
-		Permissions:                permissions,
-		InheritManagerTimelineFrom: inheritManagerTimelineFrom,
+		Creator:            creator,
+		MapId:              mapId,
+		UpdateCriteria:     updateCriteria,
+		ValueOptions:       valueOptions,
+		DefaultValue:       defaultValue,
+		Manager:            manager,
+		Metadata:           metadata,
+		Permissions:        permissions,
+		InheritManagerFrom: inheritManagerFrom,
 	}
 }
 
@@ -57,12 +57,12 @@ func (msg *MsgCreateMap) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
 
-	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline))
+	err = badgestypes.ValidateManager(msg.Manager)
 	if err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequest, "manager timeline cannot be invalid")
 	}
 
-	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))
+	err = badgestypes.ValidateCollectionMetadata(CastMapMetadataToCollectionMetadata(msg.Metadata))
 	if err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequest, "metadata timeline cannot be invalid")
 	}

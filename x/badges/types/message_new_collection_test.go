@@ -21,50 +21,40 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:                          "invalid_address",
-				CollectionId:                     sdkmath.NewUint(0),
-				UpdateCollectionMetadataTimeline: true,
-				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
-				UpdateTokenMetadataTimeline:      true,
-				TokenMetadataTimeline:            GetValidTokenMetadataTimeline(),
-				UpdateCollectionPermissions:      true,
-				CollectionPermissions:            &types.CollectionPermissions{},
+				Creator:                     "invalid_address",
+				CollectionId:                sdkmath.NewUint(0),
+				UpdateCollectionMetadata:    true,
+				CollectionMetadata:          GetValidCollectionMetadata(),
+				UpdateTokenMetadata:         true,
+				TokenMetadata:               GetValidTokenMetadata(),
+				UpdateCollectionPermissions: true,
+				CollectionPermissions:       &types.CollectionPermissions{},
 			},
 			err: types.ErrInvalidAddress,
 		}, {
 			name: "valid state",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:                          sample.AccAddress(),
-				CollectionId:                     sdkmath.NewUint(0),
-				UpdateCollectionMetadataTimeline: true,
-				UpdateCollectionPermissions:      true,
-				UpdateTokenMetadataTimeline:      true,
-				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
-				TokenMetadataTimeline:            GetValidTokenMetadataTimeline(),
-				CollectionPermissions:            &types.CollectionPermissions{},
+				Creator:                     sample.AccAddress(),
+				CollectionId:                sdkmath.NewUint(0),
+				UpdateCollectionMetadata:    true,
+				UpdateCollectionPermissions: true,
+				UpdateTokenMetadata:         true,
+				CollectionMetadata:          GetValidCollectionMetadata(),
+				TokenMetadata:               GetValidTokenMetadata(),
+				CollectionPermissions:       &types.CollectionPermissions{},
 			},
 		}, {
 			name: "invalid URI",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:                          sample.AccAddress(),
-				CollectionId:                     sdkmath.NewUint(0),
-				UpdateCollectionMetadataTimeline: true,
-				UpdateCollectionPermissions:      true,
-				UpdateTokenMetadataTimeline:      true,
-				CollectionMetadataTimeline: []*types.CollectionMetadataTimeline{
-					{
-						CollectionMetadata: &types.CollectionMetadata{
-							Uri: "asdfasdfasdf",
-						},
-						TimelineTimes: []*types.UintRange{
-							{
-								Start: sdkmath.NewUint(1),
-								End:   sdkmath.NewUint(math.MaxUint64),
-							},
-						},
-					},
+				Creator:                     sample.AccAddress(),
+				CollectionId:                sdkmath.NewUint(0),
+				UpdateCollectionMetadata:    true,
+				UpdateCollectionPermissions: true,
+				UpdateTokenMetadata:         true,
+				CollectionMetadata: &types.CollectionMetadata{
+					Uri: "asdfasdfasdf",
 				},
-				TokenMetadataTimeline: GetValidTokenMetadataTimeline(),
+				TokenMetadata:         GetValidTokenMetadata(),
 				CollectionPermissions: &types.CollectionPermissions{},
 			},
 
@@ -73,26 +63,16 @@ func TestMsgNewBadge_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid Token URI",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:                          sample.AccAddress(),
-				CollectionId:                     sdkmath.NewUint(0),
-				CollectionMetadataTimeline:       GetValidCollectionMetadataTimeline(),
-				UpdateCollectionMetadataTimeline: true,
-				UpdateCollectionPermissions:      true,
-				UpdateTokenMetadataTimeline:      true,
-				TokenMetadataTimeline: []*types.TokenMetadataTimeline{
+				Creator:                     sample.AccAddress(),
+				CollectionId:                sdkmath.NewUint(0),
+				CollectionMetadata:          GetValidCollectionMetadata(),
+				UpdateCollectionMetadata:    true,
+				UpdateCollectionPermissions: true,
+				UpdateTokenMetadata:         true,
+				TokenMetadata: []*types.TokenMetadata{
 					{
-						TokenMetadata: []*types.TokenMetadata{
-							{
-								Uri: "asdfasdfas",
-								TokenIds: []*types.UintRange{
-									{
-										Start: sdkmath.NewUint(1),
-										End:   sdkmath.NewUint(math.MaxUint64),
-									},
-								},
-							},
-						},
-						TimelineTimes: []*types.UintRange{
+						Uri: "asdfasdfas",
+						TokenIds: []*types.UintRange{
 							{
 								Start: sdkmath.NewUint(1),
 								End:   sdkmath.NewUint(math.MaxUint64),

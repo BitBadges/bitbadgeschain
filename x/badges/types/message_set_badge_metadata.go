@@ -8,11 +8,11 @@ const TypeMsgSetTokenMetadata = "set_token_metadata"
 
 var _ sdk.Msg = &MsgSetTokenMetadata{}
 
-func NewMsgSetTokenMetadata(creator string, collectionId Uint, tokenMetadataTimeline []*TokenMetadataTimeline, canUpdateTokenMetadata []*TimedUpdateWithTokenIdsPermission) *MsgSetTokenMetadata {
+func NewMsgSetTokenMetadata(creator string, collectionId Uint, tokenMetadata []*TokenMetadata, canUpdateTokenMetadata []*TokenIdsActionPermission) *MsgSetTokenMetadata {
 	return &MsgSetTokenMetadata{
 		Creator:                creator,
 		CollectionId:           collectionId,
-		TokenMetadataTimeline:  tokenMetadataTimeline,
+		TokenMetadata:          tokenMetadata,
 		CanUpdateTokenMetadata: canUpdateTokenMetadata,
 	}
 }
@@ -51,8 +51,8 @@ func (msg *MsgSetTokenMetadata) ToUniversalUpdateCollection() (*MsgUniversalUpda
 	ms := &MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateTokenMetadataTimeline: true,
-		TokenMetadataTimeline:       msg.TokenMetadataTimeline,
+		UpdateTokenMetadata:         true,
+		TokenMetadata:               msg.TokenMetadata,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
 			CanUpdateTokenMetadata: msg.CanUpdateTokenMetadata,

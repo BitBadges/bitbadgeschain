@@ -42,3 +42,11 @@ message Balance {
   // The token IDs for which the user owns the token.
   repeated UintRange tokenIds = 3;
 }
+
+// PrecalculationOptions defines the options for precalculating the balances.
+message PrecalculationOptions {
+  // The timestamp to override with when calculating the balances.
+  string overrideTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The IDs to override for the transfer. Only applicable if using this option in precalculation.
+  repeated UintRange tokenIdsOverride = 2;
+}

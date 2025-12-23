@@ -49,15 +49,15 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 	}
 
 	mapToAdd := types.Map{
-		Creator:                    msg.Creator,
-		MapId:                      msg.MapId,
-		UpdateCriteria:             msg.UpdateCriteria,
-		ValueOptions:               msg.ValueOptions,
-		DefaultValue:               msg.DefaultValue,
-		ManagerTimeline:            msg.ManagerTimeline,
-		MetadataTimeline:           msg.MetadataTimeline,
-		Permissions:                msg.Permissions,
-		InheritManagerTimelineFrom: msg.InheritManagerTimelineFrom,
+		Creator:            msg.Creator,
+		MapId:              msg.MapId,
+		UpdateCriteria:     msg.UpdateCriteria,
+		ValueOptions:       msg.ValueOptions,
+		DefaultValue:       msg.DefaultValue,
+		Manager:            msg.Manager,
+		Metadata:           msg.Metadata,
+		Permissions:        msg.Permissions,
+		InheritManagerFrom: msg.InheritManagerFrom,
 	}
 	if msg.Permissions == nil {
 		mapToAdd.Permissions = &types.MapPermissions{}

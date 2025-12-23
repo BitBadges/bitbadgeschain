@@ -26,8 +26,8 @@ func (k msgServer) SetIsArchived(goCtx context.Context, msg *types.MsgSetIsArchi
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateIsArchivedTimeline:    true,
-		IsArchivedTimeline:          msg.IsArchivedTimeline,
+		UpdateIsArchived:           true,
+		IsArchived:                 msg.IsArchived,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanArchiveCollection: msg.CanArchiveCollection,

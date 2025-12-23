@@ -44,7 +44,9 @@ func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		OnlyCheckPrioritizedCollectionApprovals: onlyCheckPrioritizedCollectionApprovals,
 		OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 		OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
-		PrecalculationOptions:                   precalculationOptions,
+		PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+			PrecalculationOptions: precalculationOptions,
+		},
 	}, transferMetadata, userBalance, eventTracking, userRoyalties)
 }
 
@@ -76,7 +78,9 @@ func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		OnlyCheckPrioritizedCollectionApprovals: onlyCheckPrioritizedCollectionApprovals,
 		OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 		OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
-		PrecalculationOptions:                   precalculationOptions,
+		PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+			PrecalculationOptions: precalculationOptions,
+		},
 	}, transferMetadata, userBalance, eventTracking, userRoyalties)
 }
 
@@ -111,7 +115,9 @@ func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx s
 			OnlyCheckPrioritizedCollectionApprovals: onlyCheckPrioritizedCollectionApprovals,
 			OnlyCheckPrioritizedIncomingApprovals:   onlyCheckProritizedIncomingApprovals,
 			OnlyCheckPrioritizedOutgoingApprovals:   onlyCheckPrioritizedOutgoingApprovals,
-			PrecalculationOptions:                   precalculationOptions,
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+				PrecalculationOptions: precalculationOptions,
+			},
 		}, transferMetadata, eventTracking, "collection")
 }
 
@@ -2233,7 +2239,9 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				},
 				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
 				OnlyCheckPrioritizedCollectionApprovals: true,
-				PrecalculationOptions:                   &types.PrecalculationOptions{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					PrecalculationOptions: &types.PrecalculationOptions{},
+				},
 			},
 		},
 		alice,
@@ -2258,7 +2266,9 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				},
 				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
 				OnlyCheckPrioritizedCollectionApprovals: true,
-				PrecalculationOptions:                   &types.PrecalculationOptions{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					PrecalculationOptions: &types.PrecalculationOptions{},
+				},
 			},
 		},
 		alice,
@@ -2282,7 +2292,9 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogic() {
 				},
 				PrioritizedApprovals:                    prioritizedApprovalsInsufficient,
 				OnlyCheckPrioritizedCollectionApprovals: true,
-				PrecalculationOptions:                   &types.PrecalculationOptions{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					PrecalculationOptions: &types.PrecalculationOptions{},
+				},
 			},
 		},
 		alice,

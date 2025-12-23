@@ -149,40 +149,6 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 	return castedPermissions, nil
 }
 
-func (k Keeper) CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(timedUpdateWithTokenIdsPermission []*types.TimedUpdateWithTokenIdsPermission) ([]*types.UniversalPermission, error) {
-	castedPermissions := []*types.UniversalPermission{}
-	for _, timedUpdateWithTokenIdsPermission := range timedUpdateWithTokenIdsPermission {
-
-		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-
-			TimelineTimes:     timedUpdateWithTokenIdsPermission.TimelineTimes,
-			TokenIds:          timedUpdateWithTokenIdsPermission.TokenIds,
-			UsesTimelineTimes: true,
-			UsesTokenIds:      true,
-
-			PermanentlyPermittedTimes: timedUpdateWithTokenIdsPermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes: timedUpdateWithTokenIdsPermission.PermanentlyForbiddenTimes,
-		})
-	}
-	return castedPermissions, nil
-}
-
-func (k Keeper) CastTimedUpdatePermissionToUniversalPermission(timedUpdatePermission []*types.TimedUpdatePermission) ([]*types.UniversalPermission, error) {
-	castedPermissions := []*types.UniversalPermission{}
-	for _, timedUpdatePermission := range timedUpdatePermission {
-
-		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-
-			TimelineTimes:     timedUpdatePermission.TimelineTimes,
-			UsesTimelineTimes: true,
-
-			PermanentlyPermittedTimes: timedUpdatePermission.PermanentlyPermittedTimes,
-			PermanentlyForbiddenTimes: timedUpdatePermission.PermanentlyForbiddenTimes,
-		})
-	}
-	return castedPermissions, nil
-}
-
 func (k Keeper) CastTokenIdsActionPermissionToUniversalPermission(TokenIdsActionPermission []*types.TokenIdsActionPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, TokenIdsActionPermission := range TokenIdsActionPermission {

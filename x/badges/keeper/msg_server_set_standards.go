@@ -26,8 +26,8 @@ func (k msgServer) SetStandards(goCtx context.Context, msg *types.MsgSetStandard
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateStandardsTimeline:     true,
-		StandardsTimeline:           msg.StandardsTimeline,
+		UpdateStandards:             true,
+		Standards:                   msg.Standards,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateStandards: msg.CanUpdateStandards,

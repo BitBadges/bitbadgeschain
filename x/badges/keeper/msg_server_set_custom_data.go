@@ -26,8 +26,8 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateCustomDataTimeline:    true,
-		CustomDataTimeline:          msg.CustomDataTimeline,
+		UpdateCustomData:            true,
+		CustomData:                  msg.CustomData,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCustomData: msg.CanUpdateCustomData,

@@ -77,49 +77,43 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 	randomCollectionPermissions := &types.CollectionPermissions{
 		CanDeleteCollection: []*types.ActionPermission{
 			{
+				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
+				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
+			},
+		},
+		CanArchiveCollection: []*types.ActionPermission{
+			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
 			},
 		},
-		CanArchiveCollection: []*types.TimedUpdatePermission{
+		CanUpdateStandards: []*types.ActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateStandards: []*types.TimedUpdatePermission{
+		CanUpdateCustomData: []*types.ActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateCustomData: []*types.TimedUpdatePermission{
+		CanUpdateManager: []*types.ActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateManager: []*types.TimedUpdatePermission{
+		CanUpdateCollectionMetadata: []*types.ActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
-			},
-		},
-		CanUpdateCollectionMetadata: []*types.TimedUpdatePermission{
-			{
-
-				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
-				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
 			},
 		},
 		CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
@@ -130,12 +124,11 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				TokenIds:                  GetTimelineTimes(r, 3),
 			},
 		},
-		CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{
+		CanUpdateTokenMetadata: []*types.TokenIdsActionPermission{
 			{
 
 				PermanentlyPermittedTimes: GetTimelineTimes(r, 3),
 				PermanentlyForbiddenTimes: GetTimelineTimes(r, 3),
-				TimelineTimes:             GetTimelineTimes(r, 3),
 				TokenIds:                  GetTimelineTimes(r, 3),
 			},
 		},

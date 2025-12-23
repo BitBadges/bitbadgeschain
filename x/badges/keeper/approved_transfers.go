@@ -299,7 +299,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			// Increment approvals and assert within threshold on cached context
 			for i, trackerType := range trackerTypes {
-				detErrMsg, err := k.IncrementApprovalsAndAssertWithinThreshold(cachedCtx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, transferMetadata, trackerType, approvedAddresses[i], transfer.PrecalculationOptions)
+				var precalculationOptions *types.PrecalculationOptions
+				if transfer.PrecalculateBalancesFromApproval != nil {
+					precalculationOptions = transfer.PrecalculateBalancesFromApproval.PrecalculationOptions
+				}
+				detErrMsg, err := k.IncrementApprovalsAndAssertWithinThreshold(cachedCtx, collection, approval, originalTransferBalances, approvedAmounts[i], maxNumTransfers[i], transferBalancesToCheck, challengeNumIncrements, transferMetadata, trackerType, approvedAddresses[i], precalculationOptions)
 				if err != nil {
 					if detErrMsg != "" {
 						addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
@@ -835,10 +839,16 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	initiatedBy := transferMetadata.InitiatedBy
 	approvalId := ""
 	precalcDetails := transfer.PrecalculateBalancesFromApproval
-	precalculationOptions := transfer.PrecalculationOptions
-	approverAddress := precalcDetails.ApproverAddress
-	approvalLevel := precalcDetails.ApprovalLevel
-	precalculationId := precalcDetails.ApprovalId
+	var precalculationOptions *types.PrecalculationOptions
+	var approverAddress string
+	var approvalLevel string
+	var precalculationId string
+	if precalcDetails != nil {
+		precalculationOptions = precalcDetails.PrecalculationOptions
+		approverAddress = precalcDetails.ApproverAddress
+		approvalLevel = precalcDetails.ApprovalLevel
+		precalculationId = precalcDetails.ApprovalId
+	}
 
 	for _, approval := range approvals {
 		maxNumTransfersTrackerId := approval.ApprovalCriteria.MaxNumTransfers.AmountTrackerId
@@ -848,8 +858,10 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 			continue
 		}
 
-		if !approval.Version.Equal(transfer.PrecalculateBalancesFromApproval.Version) {
-			return []*types.Balance{}, sdkerrors.Wrapf(types.ErrMismatchedVersions, "versions are mismatched for a prioritized approval")
+		if transfer.PrecalculateBalancesFromApproval != nil {
+			if !approval.Version.Equal(transfer.PrecalculateBalancesFromApproval.Version) {
+				return []*types.Balance{}, sdkerrors.Wrapf(types.ErrMismatchedVersions, "versions are mismatched for a prioritized approval")
+			}
 		}
 
 		if approvalCriteria.PredeterminedBalances != nil {

@@ -58,19 +58,17 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return err
 		}
 	}
-
-	if err := ValidateIsArchivedTimeline(msg.IsArchivedTimeline); err != nil {
+	if err := ValidateIsArchived(msg.IsArchived); err != nil {
 		return err
 	}
 
-	if err := ValidateTokenMetadataTimeline(msg.TokenMetadataTimeline, canChangeValues); err != nil {
+	if err := ValidateTokenMetadata(msg.TokenMetadata, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
+	if err := ValidateCollectionMetadata(msg.CollectionMetadata); err != nil {
 		return err
 	}
-
 	if err := ValidateCollectionApprovals(ctx, msg.CollectionApprovals, canChangeValues); err != nil {
 		return err
 	}
@@ -89,20 +87,19 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return err
 		}
 	}
-
-	if err := ValidateTokenMetadataTimeline(msg.TokenMetadataTimeline, canChangeValues); err != nil {
+	if err := ValidateTokenMetadata(msg.TokenMetadata, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
+	if err := ValidateCollectionMetadata(msg.CollectionMetadata); err != nil {
 		return err
 	}
 
-	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
+	if err := ValidateCustomData(msg.CustomData); err != nil {
 		return err
 	}
 
-	if err := ValidateStandardsTimeline(msg.StandardsTimeline); err != nil {
+	if err := ValidateStandards(msg.Standards); err != nil {
 		return err
 	}
 
@@ -163,30 +160,23 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	if err := ValidateTokenMetadataTimeline(msg.TokenMetadataTimeline, canChangeValues); err != nil {
+	if err := ValidateTokenMetadata(msg.TokenMetadata, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateCollectionMetadataTimeline(msg.CollectionMetadataTimeline); err != nil {
+	if err := ValidateCollectionMetadata(msg.CollectionMetadata); err != nil {
 		return err
 	}
 
-	if err := ValidateCustomDataTimeline(msg.CustomDataTimeline); err != nil {
+	if err := ValidateCustomData(msg.CustomData); err != nil {
 		return err
 	}
 
-	if err := ValidateStandardsTimeline(msg.StandardsTimeline); err != nil {
+	if err := ValidateStandards(msg.Standards); err != nil {
 		return err
 	}
 
-	for _, timelineVal := range msg.ManagerTimeline {
-		_, err = sdk.AccAddressFromBech32(timelineVal.Manager)
-		if err != nil {
-			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid provided address (%s)", err)
-		}
-	}
-
-	if err := ValidateManagerTimeline(msg.ManagerTimeline); err != nil {
+	if err := ValidateManager(msg.Manager); err != nil {
 		return err
 	}
 

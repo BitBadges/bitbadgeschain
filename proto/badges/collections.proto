@@ -6,7 +6,6 @@ import "badges/transfers.proto";
 import "badges/balances.proto";
 import "badges/permissions.proto";
 import "badges/metadata.proto";
-import "badges/timelines.proto";
 import "badges/approvals.proto";
 import "badges/user_balance_store.proto";
 import "gogoproto/gogo.proto";
@@ -22,10 +21,6 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
   All collections can have a manager who is responsible for managing the collection and can be granted certain admin
   permissions, such as the ability to mint new tokens.
 
-  Certain fields are timeline-based, which means they may have different values at different block heights. 
-  We fetch the value according to the current time.
-  For example, we may set the manager to be Alice from Time1 to Time2, and then set the manager to be Bob from Time2 to Time3.
-
   Collections may have different balance types: standard vs. off-chain - indexed vs. inherited.vs off-chain - non-indexed vs non-public.
   
   See documentation for more details.
@@ -34,17 +29,17 @@ message TokenCollection {
   // The unique identifier for this collection. This is assigned by the blockchain. First collection has ID 1.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
-  // The metadata for the collection itself, which can vary over time.
-  repeated CollectionMetadataTimeline collectionMetadataTimeline = 2;
+  // The metadata for the collection itself.
+  CollectionMetadata collectionMetadata = 2;
   
-  // The metadata for each token in the collection, also subject to changes over time.
-  repeated TokenMetadataTimeline tokenMetadataTimeline = 3;
+  // The metadata for each token in the collection.
+  repeated TokenMetadata tokenMetadata = 3;
   
-  // An arbitrary field that can store any data, subject to changes over time.
-  repeated CustomDataTimeline customDataTimeline = 4;
+  // An arbitrary field that can store any data.
+  string customData = 4;
   
-  // The address of the manager of this collection, subject to changes over time.
-  repeated ManagerTimeline managerTimeline = 5;
+  // The address of the manager of this collection.
+  string manager = 5;
   
   // Permissions that define what the manager of the collection can do or not do.
   CollectionPermissions collectionPermissions = 6;
@@ -55,12 +50,12 @@ message TokenCollection {
   // Only applicable to on-chain balances.
   repeated CollectionApproval collectionApprovals = 7;
   
-  // Standards that define how to interpret the fields of the collection, subject to changes over time.
-  repeated StandardsTimeline standardsTimeline = 8;
+  // Standards that define how to interpret the fields of the collection.
+  repeated string standards = 8;
 
-  // Whether the collection is archived or not, subject to changes over time.
+  // Whether the collection is archived or not.
   // When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
-  repeated IsArchivedTimeline isArchivedTimeline = 9;
+  bool isArchived = 9;
 
   // The default store of a balance / approvals for a user, upon genesis.
   UserBalanceStore defaultBalances = 10;

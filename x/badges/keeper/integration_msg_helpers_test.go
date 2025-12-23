@@ -176,6 +176,39 @@ func SetDynamicStoreValue(suite *TestSuite, ctx context.Context, msg *types.MsgS
 
 /** Legacy casts for test compatibility */
 
+// Helper functions to extract current values from timeline arrays (for legacy MsgNewCollection compatibility)
+func getCurrentCollectionMetadataFromTimeline(timeline []*types.CollectionMetadataTimeline) *types.CollectionMetadata {
+	if len(timeline) == 0 {
+		return nil
+	}
+	// Return the first timeline entry's metadata
+	return timeline[0].CollectionMetadata
+}
+
+func getCurrentTokenMetadataFromTimeline(timeline []*types.TokenMetadataTimeline) []*types.TokenMetadata {
+	if len(timeline) == 0 {
+		return nil
+	}
+	// Return the first timeline entry's token metadata
+	return timeline[0].TokenMetadata
+}
+
+func getCurrentCustomDataFromTimeline(timeline []*types.CustomDataTimeline) string {
+	if len(timeline) == 0 {
+		return ""
+	}
+	// Return the first timeline entry's custom data
+	return timeline[0].CustomData
+}
+
+func getCurrentStandardsFromTimeline(timeline []*types.StandardsTimeline) []string {
+	if len(timeline) == 0 {
+		return nil
+	}
+	// Return the first timeline entry's standards
+	return timeline[0].Standards
+}
+
 func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreate []*types.MsgNewCollection) error {
 	for _, collectionToCreate := range collectionsToCreate {
 		// All collections now use Standard balances
@@ -200,26 +233,26 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 				AutoApproveSelfInitiatedIncomingTransfers: true,
 				UserPermissions: nil,
 			},
-			CollectionMetadataTimeline: collectionToCreate.CollectionMetadataTimeline,
-			TokenMetadataTimeline:      collectionToCreate.TokenMetadataTimeline,
-			// InheritedCollectionId: collectionToCreate.InheritedCollectionId,
-			CustomDataTimeline:          collectionToCreate.CustomDataTimeline,
-			StandardsTimeline:           collectionToCreate.StandardsTimeline,
+			// Convert timeline fields to simple values (use first timeline entry or empty)
+			CollectionMetadata:          getCurrentCollectionMetadataFromTimeline(collectionToCreate.CollectionMetadataTimeline),
+			TokenMetadata:               getCurrentTokenMetadataFromTimeline(collectionToCreate.TokenMetadataTimeline),
+			CustomData:                  getCurrentCustomDataFromTimeline(collectionToCreate.CustomDataTimeline),
+			Standards:                   getCurrentStandardsFromTimeline(collectionToCreate.StandardsTimeline),
 			CosmosCoinWrapperPathsToAdd: collectionToCreate.CosmosCoinWrapperPathsToAdd,
 			ValidTokenIds:               allTokenIds,
 			Invariants:                  collectionToCreate.Invariants,
-			// IsArchivedTimeline: collectionToCreate.IsArchivedTimeline,
+			IsArchived:                  false, // Default to not archived
 
-			// ManagerTimeline: collectionToCreate.ManagerTimeline,
+			Manager:                     "", // Default manager will be set to creator
 			UpdateValidTokenIds:         true,
 			UpdateCollectionPermissions: true,
-			// UpdateManagerTimeline: true,
-			UpdateCollectionMetadataTimeline: true,
-			UpdateTokenMetadataTimeline:      true,
-			UpdateCustomDataTimeline:         true,
-			UpdateCollectionApprovals:        true,
-			UpdateStandardsTimeline:          true,
-			// UpdateIsArchivedTimeline: true,
+			UpdateManager:               false, // Don't update manager, use default
+			UpdateCollectionMetadata:    len(collectionToCreate.CollectionMetadataTimeline) > 0,
+			UpdateTokenMetadata:         len(collectionToCreate.TokenMetadataTimeline) > 0,
+			UpdateCustomData:            len(collectionToCreate.CustomDataTimeline) > 0,
+			UpdateCollectionApprovals:   true,
+			UpdateStandards:             len(collectionToCreate.StandardsTimeline) > 0,
+			UpdateIsArchived:            false,
 		})
 		if err != nil {
 			return err
@@ -318,17 +351,17 @@ func MintAndDistributeTokens(suite *TestSuite, ctx context.Context, msg *types.M
 	allTokenIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allTokenIds)
 
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
-		Creator:                          bob,
-		CollectionId:                     msg.CollectionId,
-		UpdateValidTokenIds:              true,
-		ValidTokenIds:                    allTokenIds,
-		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
-		UpdateCollectionMetadataTimeline: true,
-		TokenMetadataTimeline:            msg.TokenMetadataTimeline,
-		UpdateTokenMetadataTimeline:      true,
-		CollectionApprovals:              msg.CollectionApprovals,
-		UpdateCollectionApprovals:        true,
-		DefaultBalances:                  &types.UserBalanceStore{},
+		Creator:                   bob,
+		CollectionId:              msg.CollectionId,
+		UpdateValidTokenIds:       true,
+		ValidTokenIds:             allTokenIds,
+		CollectionMetadata:        getCurrentCollectionMetadataFromTimeline(msg.CollectionMetadataTimeline),
+		UpdateCollectionMetadata:  len(msg.CollectionMetadataTimeline) > 0,
+		TokenMetadata:             getCurrentTokenMetadataFromTimeline(msg.TokenMetadataTimeline),
+		UpdateTokenMetadata:       len(msg.TokenMetadataTimeline) > 0,
+		CollectionApprovals:       msg.CollectionApprovals,
+		UpdateCollectionApprovals: true,
+		DefaultBalances:           &types.UserBalanceStore{},
 	})
 	if err != nil {
 		return err
@@ -362,37 +395,53 @@ func UpdateCollectionApprovals(suite *TestSuite, ctx context.Context, msg *types
 }
 
 func ArchiveCollection(suite *TestSuite, ctx context.Context, msg *types.MsgArchiveCollection) error {
+	// Extract isArchived value from timeline (use first entry or default to true for archive)
+	isArchived := true
+	if len(msg.IsArchivedTimeline) > 0 {
+		isArchived = msg.IsArchivedTimeline[0].IsArchived
+	}
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
-		Creator:                  bob,
-		CollectionId:             msg.CollectionId,
-		IsArchivedTimeline:       msg.IsArchivedTimeline,
-		UpdateIsArchivedTimeline: true,
+		Creator:          bob,
+		CollectionId:     msg.CollectionId,
+		IsArchived:       isArchived,
+		UpdateIsArchived: true,
 	})
 	return err
 }
 
 func UpdateManager(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateManager) error {
+	// Extract manager value from timeline (use first entry)
+	manager := ""
+	if len(msg.ManagerTimeline) > 0 {
+		manager = msg.ManagerTimeline[0].Manager
+	}
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
-		Creator:               bob,
-		CollectionId:          msg.CollectionId,
-		ManagerTimeline:       msg.ManagerTimeline,
-		UpdateManagerTimeline: true,
+		Creator:       bob,
+		CollectionId:  msg.CollectionId,
+		Manager:       manager,
+		UpdateManager: true,
 	})
 	return err
 }
 
 func UpdateMetadata(suite *TestSuite, ctx context.Context, msg *types.MsgUpdateMetadata) error {
+	// Extract values from timelines (use first entry for each)
+	collectionMetadata := getCurrentCollectionMetadataFromTimeline(msg.CollectionMetadataTimeline)
+	tokenMetadata := getCurrentTokenMetadataFromTimeline(msg.TokenMetadataTimeline)
+	standards := getCurrentStandardsFromTimeline(msg.StandardsTimeline)
+	customData := getCurrentCustomDataFromTimeline(msg.CustomDataTimeline)
+
 	_, err := suite.msgServer.UniversalUpdateCollection(ctx, &types.MsgUniversalUpdateCollection{
-		Creator:                          bob,
-		CollectionId:                     msg.CollectionId,
-		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
-		UpdateCollectionMetadataTimeline: true,
-		TokenMetadataTimeline:            msg.TokenMetadataTimeline,
-		UpdateTokenMetadataTimeline:      true,
-		StandardsTimeline:                msg.StandardsTimeline,
-		UpdateStandardsTimeline:          true,
-		CustomDataTimeline:               msg.CustomDataTimeline,
-		UpdateCustomDataTimeline:         true,
+		Creator:                  bob,
+		CollectionId:             msg.CollectionId,
+		CollectionMetadata:       collectionMetadata,
+		UpdateCollectionMetadata: len(msg.CollectionMetadataTimeline) > 0,
+		TokenMetadata:            tokenMetadata,
+		UpdateTokenMetadata:      len(msg.TokenMetadataTimeline) > 0,
+		Standards:                standards,
+		UpdateStandards:          len(msg.StandardsTimeline) > 0,
+		CustomData:               customData,
+		UpdateCustomData:         len(msg.CustomDataTimeline) > 0,
 	})
 	if err != nil {
 		return err
@@ -434,10 +483,15 @@ func SetValidTokenIds(suite *TestSuite, ctx context.Context, creator string, col
 }
 
 func SetManager(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, managerTimeline []*types.ManagerTimeline) error {
+	// Extract manager from timeline (use first entry)
+	manager := ""
+	if len(managerTimeline) > 0 {
+		manager = managerTimeline[0].Manager
+	}
 	msg := &types.MsgSetManager{
-		Creator:         creator,
-		CollectionId:    collectionId,
-		ManagerTimeline: managerTimeline,
+		Creator:      creator,
+		CollectionId: collectionId,
+		Manager:      manager,
 	}
 	_, err := suite.msgServer.SetManager(ctx, msg)
 	return err
@@ -445,9 +499,9 @@ func SetManager(suite *TestSuite, ctx context.Context, creator string, collectio
 
 func SetCollectionMetadata(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, collectionMetadataTimeline []*types.CollectionMetadataTimeline) error {
 	msg := &types.MsgSetCollectionMetadata{
-		Creator:                    creator,
-		CollectionId:               collectionId,
-		CollectionMetadataTimeline: collectionMetadataTimeline,
+		Creator:            creator,
+		CollectionId:       collectionId,
+		CollectionMetadata: getCurrentCollectionMetadataFromTimeline(collectionMetadataTimeline),
 	}
 	_, err := suite.msgServer.SetCollectionMetadata(ctx, msg)
 	return err
@@ -455,9 +509,9 @@ func SetCollectionMetadata(suite *TestSuite, ctx context.Context, creator string
 
 func SetTokenMetadata(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, tokenMetadataTimeline []*types.TokenMetadataTimeline) error {
 	msg := &types.MsgSetTokenMetadata{
-		Creator:               creator,
-		CollectionId:          collectionId,
-		TokenMetadataTimeline: tokenMetadataTimeline,
+		Creator:       creator,
+		CollectionId:  collectionId,
+		TokenMetadata: getCurrentTokenMetadataFromTimeline(tokenMetadataTimeline),
 	}
 	_, err := suite.msgServer.SetTokenMetadata(ctx, msg)
 	return err
@@ -465,9 +519,9 @@ func SetTokenMetadata(suite *TestSuite, ctx context.Context, creator string, col
 
 func SetCustomData(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, customDataTimeline []*types.CustomDataTimeline) error {
 	msg := &types.MsgSetCustomData{
-		Creator:            creator,
-		CollectionId:       collectionId,
-		CustomDataTimeline: customDataTimeline,
+		Creator:      creator,
+		CollectionId: collectionId,
+		CustomData:   getCurrentCustomDataFromTimeline(customDataTimeline),
 	}
 	_, err := suite.msgServer.SetCustomData(ctx, msg)
 	return err
@@ -475,9 +529,9 @@ func SetCustomData(suite *TestSuite, ctx context.Context, creator string, collec
 
 func SetStandards(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, standardsTimeline []*types.StandardsTimeline) error {
 	msg := &types.MsgSetStandards{
-		Creator:           creator,
-		CollectionId:      collectionId,
-		StandardsTimeline: standardsTimeline,
+		Creator:      creator,
+		CollectionId: collectionId,
+		Standards:    getCurrentStandardsFromTimeline(standardsTimeline),
 	}
 	_, err := suite.msgServer.SetStandards(ctx, msg)
 	return err
@@ -494,10 +548,15 @@ func SetCollectionApprovals(suite *TestSuite, ctx context.Context, creator strin
 }
 
 func SetIsArchived(suite *TestSuite, ctx context.Context, creator string, collectionId sdkmath.Uint, isArchivedTimeline []*types.IsArchivedTimeline) error {
+	// Extract isArchived from timeline (use first entry or default to false)
+	isArchived := false
+	if len(isArchivedTimeline) > 0 {
+		isArchived = isArchivedTimeline[0].IsArchived
+	}
 	msg := &types.MsgSetIsArchived{
-		Creator:            creator,
-		CollectionId:       collectionId,
-		IsArchivedTimeline: isArchivedTimeline,
+		Creator:      creator,
+		CollectionId: collectionId,
+		IsArchived:   isArchived,
 	}
 	_, err := suite.msgServer.SetIsArchived(ctx, msg)
 	return err

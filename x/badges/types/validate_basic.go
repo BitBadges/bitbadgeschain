@@ -1036,28 +1036,29 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 	}
 
 	if transfer.PrecalculateBalancesFromApproval != nil {
-		if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "" && transfer.PrecalculateBalancesFromApproval.ApproverAddress == "" && transfer.PrecalculateBalancesFromApproval.ApprovalId == "" {
+		precalcDetails := transfer.PrecalculateBalancesFromApproval
+		if precalcDetails.ApprovalLevel == "" && precalcDetails.ApproverAddress == "" && precalcDetails.ApprovalId == "" {
 			//basically nil
 		} else {
-			if transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "collection" && transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "incoming" && transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "outgoing" {
+			if precalcDetails.ApprovalLevel != "collection" && precalcDetails.ApprovalLevel != "incoming" && precalcDetails.ApprovalLevel != "outgoing" {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
 			}
 
-			if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
-				if err := ValidateAddress(transfer.PrecalculateBalancesFromApproval.ApproverAddress, false); err != nil {
+			if precalcDetails.ApproverAddress != "" {
+				if err := ValidateAddress(precalcDetails.ApproverAddress, false); err != nil {
 					return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
 				}
 			}
 
-			if transfer.PrecalculateBalancesFromApproval.Version.IsNil() {
+			if precalcDetails.Version.IsNil() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
 			}
 		}
 	}
 
 	if canChangeValues {
-		if transfer.PrecalculationOptions == nil {
-			transfer.PrecalculationOptions = &PrecalculationOptions{
+		if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.PrecalculationOptions == nil {
+			transfer.PrecalculateBalancesFromApproval.PrecalculationOptions = &PrecalculationOptions{
 				OverrideTimestamp: sdkmath.NewUint(0),
 				TokenIdsOverride:  nil,
 			}

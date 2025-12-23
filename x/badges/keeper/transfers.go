@@ -76,6 +76,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 
 			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
 				//Here, we precalculate balances from a specified approval
+				precalcDetails := transfer.PrecalculateBalancesFromApproval
 				transferMetadata := TransferMetadata{
 					From:            transfer.From,
 					To:              to,
@@ -84,30 +85,30 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 					ApprovalLevel:   "collection",
 				}
 				approvals := collection.CollectionApprovals
-				if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "collection" {
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
+				if precalcDetails.ApprovalLevel == "collection" {
+					if precalcDetails.ApproverAddress != "" {
 						return sdkerrors.Wrapf(ErrNotImplemented, "approver address must be blank for collection level approvals")
 					}
 				} else {
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress != to && transfer.PrecalculateBalancesFromApproval.ApproverAddress != transfer.From {
-						return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
+					if precalcDetails.ApproverAddress != to && precalcDetails.ApproverAddress != transfer.From {
+						return sdkerrors.Wrapf(ErrNotImplemented, "approver address %s must match to or from address for user level precalculations", precalcDetails.ApproverAddress)
 					}
 
 					handled := false
-					if transfer.PrecalculateBalancesFromApproval.ApproverAddress == to && transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "incoming" {
+					if precalcDetails.ApproverAddress == to && precalcDetails.ApprovalLevel == "incoming" {
 						userApprovals := toUserBalance.IncomingApprovals
 						approvals = types.CastIncomingTransfersToCollectionTransfers(userApprovals, to)
 						handled = true
 					}
 
-					if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "outgoing" && !handled && transfer.PrecalculateBalancesFromApproval.ApproverAddress == transfer.From {
+					if precalcDetails.ApprovalLevel == "outgoing" && !handled && precalcDetails.ApproverAddress == transfer.From {
 						userApprovals := fromUserBalance.OutgoingApprovals
 						approvals = types.CastOutgoingTransfersToCollectionTransfers(userApprovals, transfer.From)
 						handled = true
 					}
 
 					if !handled {
-						return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", transfer.PrecalculateBalancesFromApproval.ApproverAddress)
+						return sdkerrors.Wrapf(ErrNotImplemented, "could not determine approval to precalculate from %s", precalcDetails.ApproverAddress)
 					}
 				}
 
@@ -305,7 +306,7 @@ func (k Keeper) HandleTransfer(
 				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
 				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
-				PrecalculationOptions:                   transfer.PrecalculationOptions,
+				PrecalculateBalancesFromApproval:        transfer.PrecalculateBalancesFromApproval,
 			}
 
 			if userApproval.Outgoing {

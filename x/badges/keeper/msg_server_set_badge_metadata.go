@@ -26,8 +26,8 @@ func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetToke
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateTokenMetadataTimeline: true,
-		TokenMetadataTimeline:       msg.TokenMetadataTimeline,
+		UpdateTokenMetadata:         true,
+		TokenMetadata:               msg.TokenMetadata,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateTokenMetadata: msg.CanUpdateTokenMetadata,

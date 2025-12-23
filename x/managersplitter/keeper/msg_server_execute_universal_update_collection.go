@@ -96,25 +96,25 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 		}
 	}
 
-	if msg.UpdateManagerTimeline {
+	if msg.UpdateManager {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateManager"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateCollectionMetadataTimeline {
+	if msg.UpdateCollectionMetadata {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCollectionMetadata"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateTokenMetadataTimeline {
+	if msg.UpdateTokenMetadata {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateTokenMetadata"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateCustomDataTimeline {
+	if msg.UpdateCustomData {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCustomData"); err != nil {
 			return err
 		}
@@ -126,13 +126,13 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 		}
 	}
 
-	if msg.UpdateStandardsTimeline {
+	if msg.UpdateStandards {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateStandards"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateIsArchivedTimeline {
+	if msg.UpdateIsArchived {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canArchiveCollection"); err != nil {
 			return err
 		}

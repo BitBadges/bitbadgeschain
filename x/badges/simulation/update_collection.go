@@ -21,24 +21,19 @@ func SimulateMsgUniversalUpdateCollection(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		msg := &types.MsgUniversalUpdateCollection{
-			Creator:                          simAccount.Address.String(),
-			UpdateCollectionPermissions:      r.Int63n(2) == 0,
-			UpdateIsArchivedTimeline:         r.Int63n(2) == 0,
-			UpdateManagerTimeline:            r.Int63n(2) == 0,
-			UpdateCollectionMetadataTimeline: r.Int63n(2) == 0,
-			UpdateTokenMetadataTimeline:      r.Int63n(2) == 0,
-			UpdateCustomDataTimeline:         r.Int63n(2) == 0,
-			UpdateCollectionApprovals:        r.Int63n(2) == 0,
-			UpdateStandardsTimeline:          r.Int63n(2) == 0,
-			UpdateValidTokenIds:              r.Int63n(2) == 0,
+			Creator:                     simAccount.Address.String(),
+			UpdateCollectionPermissions: r.Int63n(2) == 0,
+			UpdateIsArchived:            r.Int63n(2) == 0,
+			UpdateManager:               r.Int63n(2) == 0,
+			UpdateCollectionMetadata:    r.Int63n(2) == 0,
+			UpdateTokenMetadata:         r.Int63n(2) == 0,
+			UpdateCustomData:            r.Int63n(2) == 0,
+			UpdateCollectionApprovals:   r.Int63n(2) == 0,
+			UpdateStandards:             r.Int63n(2) == 0,
+			UpdateValidTokenIds:         r.Int63n(2) == 0,
 
-			CollectionId: sdkmath.NewUint(uint64(r.Int63n(5))),
-			IsArchivedTimeline: []*types.IsArchivedTimeline{
-				{
-					IsArchived:    r.Int63n(2) == 0,
-					TimelineTimes: GetTimelineTimes(r, 3),
-				},
-			},
+			CollectionId:  sdkmath.NewUint(uint64(r.Int63n(5))),
+			IsArchived:    r.Int63n(2) == 0,
 			ValidTokenIds: GetTimelineTimes(r, 3),
 			CollectionApprovals: []*types.CollectionApproval{
 				{
@@ -50,12 +45,7 @@ func SimulateMsgUniversalUpdateCollection(
 					TokenIds:          GetTimelineTimes(r, 3),
 				},
 			},
-			ManagerTimeline: []*types.ManagerTimeline{
-				{
-					Manager:       simAccount.Address.String(),
-					TimelineTimes: GetTimelineTimes(r, 3),
-				},
-			},
+			Manager:               simAccount.Address.String(),
 			CollectionPermissions: GetRandomCollectionPermissions(r, accs),
 		}
 

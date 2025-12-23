@@ -42,13 +42,13 @@ func (msg *MsgExecuteUniversalUpdateCollection) ValidateBasic() error {
 	badgesMsg := msg.UniversalUpdateCollectionMsg
 	hasUpdateFlag := badgesMsg.UpdateValidTokenIds ||
 		badgesMsg.UpdateCollectionPermissions ||
-		badgesMsg.UpdateManagerTimeline ||
-		badgesMsg.UpdateCollectionMetadataTimeline ||
-		badgesMsg.UpdateTokenMetadataTimeline ||
-		badgesMsg.UpdateCustomDataTimeline ||
+		badgesMsg.UpdateManager ||
+		badgesMsg.UpdateCollectionMetadata ||
+		badgesMsg.UpdateTokenMetadata ||
+		badgesMsg.UpdateCustomData ||
 		badgesMsg.UpdateCollectionApprovals ||
-		badgesMsg.UpdateStandardsTimeline ||
-		badgesMsg.UpdateIsArchivedTimeline
+		badgesMsg.UpdateStandards ||
+		badgesMsg.UpdateIsArchived
 
 	if !hasUpdateFlag {
 		return sdkerrors.Wrap(ErrInvalidRequest, "at least one update flag must be set in UniversalUpdateCollection message")

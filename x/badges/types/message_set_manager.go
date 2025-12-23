@@ -8,11 +8,11 @@ const TypeMsgSetManager = "set_manager"
 
 var _ sdk.Msg = &MsgSetManager{}
 
-func NewMsgSetManager(creator string, collectionId Uint, managerTimeline []*ManagerTimeline, canUpdateManager []*TimedUpdatePermission) *MsgSetManager {
+func NewMsgSetManager(creator string, collectionId Uint, manager string, canUpdateManager []*ActionPermission) *MsgSetManager {
 	return &MsgSetManager{
 		Creator:          creator,
 		CollectionId:     collectionId,
-		ManagerTimeline:  managerTimeline,
+		Manager:          manager,
 		CanUpdateManager: canUpdateManager,
 	}
 }
@@ -51,8 +51,8 @@ func (msg *MsgSetManager) ToUniversalUpdateCollection() (*MsgUniversalUpdateColl
 	ms := &MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateManagerTimeline:       true,
-		ManagerTimeline:             msg.ManagerTimeline,
+		UpdateManager:               true,
+		Manager:                     msg.Manager,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
 			CanUpdateManager: msg.CanUpdateManager,

@@ -66,13 +66,13 @@ func (suite *TestSuite) TestAltTimeChecks_CollectionApproval_OfflineHours() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -236,13 +236,13 @@ func (suite *TestSuite) TestAltTimeChecks_CollectionApproval_OfflineDays() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -404,13 +404,13 @@ func (suite *TestSuite) TestAltTimeChecks_IncomingApproval() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -590,13 +590,13 @@ func (suite *TestSuite) TestAltTimeChecks_OutgoingApproval() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -785,13 +785,13 @@ func (suite *TestSuite) TestAltTimeChecks_CombinedHoursAndDays() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{

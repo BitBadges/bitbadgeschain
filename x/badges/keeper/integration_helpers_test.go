@@ -151,13 +151,13 @@ func GetCollectionsToCreate() []*types.MsgNewCollection {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{

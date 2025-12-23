@@ -26,8 +26,8 @@ func (k msgServer) SetManager(goCtx context.Context, msg *types.MsgSetManager) (
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateManagerTimeline:       true,
-		ManagerTimeline:             msg.ManagerTimeline,
+		UpdateManager:               true,
+		Manager:                     msg.Manager,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateManager: msg.CanUpdateManager,

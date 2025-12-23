@@ -479,8 +479,12 @@ func IncrementBalances(
 	allowOverrideTimestamp := incrementedBalances.AllowOverrideTimestamp
 	allowOverrideTokenIdsWithAnyValidTokenId := incrementedBalances.AllowOverrideWithAnyValidToken
 
-	overrideTimestamp := precalculationOptions.OverrideTimestamp
-	overrideTokenIds := precalculationOptions.TokenIdsOverride
+	var overrideTimestamp sdkmath.Uint
+	var overrideTokenIds []*UintRange
+	if precalculationOptions != nil {
+		overrideTimestamp = precalculationOptions.OverrideTimestamp
+		overrideTokenIds = precalculationOptions.TokenIdsOverride
+	}
 	balances := DeepCopyBalances(startBalances)
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
