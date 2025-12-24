@@ -666,6 +666,7 @@ func GetSchemas() []string {
 					"balances": [
 						`+getBalanceSchema()+`
 					],
+					"amount": "",
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -674,8 +675,24 @@ func GetSchemas() []string {
 							"isDefaultDisplay": false
 						}
 					],
-					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"allowOverrideWithAnyValidToken": false
+				}
+			],
+			"aliasPathsToAdd": [
+				{
+					"denom": "",
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"amount": "",
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false
+						}
+					]
 				}
 			],
 			"invariants": {
@@ -769,6 +786,7 @@ func GetSchemas() []string {
 					"balances": [
 						`+getBalanceSchema()+`
 					],
+					"amount": "",
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -777,8 +795,24 @@ func GetSchemas() []string {
 							"isDefaultDisplay": false
 						}
 					],
-					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"allowOverrideWithAnyValidToken": false
+				}
+			],
+			"aliasPathsToAdd": [
+				{
+					"denom": "",
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"amount": "",
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false
+						}
+					]
 				}
 			],
 			"invariants": {
@@ -843,6 +877,7 @@ func GetSchemas() []string {
 					"balances": [
 						`+getBalanceSchema()+`
 					],
+					"amount": "",
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -851,8 +886,24 @@ func GetSchemas() []string {
 							"isDefaultDisplay": false
 						}
 					],
-					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"allowOverrideWithAnyValidToken": false
+				}
+			],
+			"aliasPathsToAdd": [
+				{
+					"denom": "",
+					"balances": [
+						`+getBalanceSchema()+`
+					],
+					"amount": "",
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false
+						}
+					]
 				}
 			],
 			"invariants": {
@@ -1171,7 +1222,8 @@ func GetSchemas() []string {
 				"updateIsArchived": false,
 				"isArchived": false,
 				"mintEscrowCoinsToTransfer": [{"amount": "", "denom": ""}],
-				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false, "allowCosmosWrapping": false}],
+				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "amount": "", "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false}],
+				"aliasPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "amount": "", "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}]}],
 				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": "", "disablePoolCreation": false}
 			}
 		}

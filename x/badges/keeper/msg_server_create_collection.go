@@ -52,6 +52,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		MintEscrowCoinsToTransfer:   msg.MintEscrowCoinsToTransfer,
 		CosmosCoinWrapperPathsToAdd: msg.CosmosCoinWrapperPathsToAdd,
 		Invariants:                  msg.Invariants,
+		AliasPathsToAdd:             msg.AliasPathsToAdd,
 	}
 
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)

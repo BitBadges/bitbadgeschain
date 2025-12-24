@@ -408,7 +408,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
 		CollectionPermissions: &badgestypes.CollectionPermissions{},
-		Manager: creatorStr,
+		Manager:               creatorStr,
 		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadge",
@@ -419,9 +419,9 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 						TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 					},
 				},
-				Symbol:              "TEST",
-				DenomUnits:          []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
-				AllowCosmosWrapping: true,
+				Amount:     sdkmath.NewUint(1),
+				Symbol:     "TEST",
+				DenomUnits: []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
 			},
 		},
 		Invariants: &badgestypes.InvariantsAddObject{
@@ -480,7 +480,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
 		CollectionPermissions: &badgestypes.CollectionPermissions{},
-		Manager: creatorStr,
+		Manager:               creatorStr,
 		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadgeallowed",
@@ -491,9 +491,9 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 						TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 					},
 				},
-				Symbol:              "TESTALLOWED",
-				DenomUnits:          []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
-				AllowCosmosWrapping: true,
+				Amount:     sdkmath.NewUint(1),
+				Symbol:     "TESTALLOWED",
+				DenomUnits: []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
 			},
 		},
 		Invariants: &badgestypes.InvariantsAddObject{

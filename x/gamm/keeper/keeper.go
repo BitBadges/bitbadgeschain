@@ -231,7 +231,7 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 			}
 
 			// Get the balances that would be needed for the recorded amount
-			balancesNeeded, err := badgeskeeper.GetBalancesToTransfer(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			balancesNeeded, err := badgeskeeper.GetBalancesToTransferWithAlias(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return fmt.Errorf("failed to get balances to transfer for denom: %s: %w", coin.Denom, err)
 			}
@@ -273,7 +273,6 @@ func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) er
 		// Parse collection from denom
 		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, coin.Denom)
 		if err != nil {
-			// If we can't parse the collection, skip it (might be a malformed denom)
 			continue
 		}
 

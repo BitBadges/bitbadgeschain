@@ -69,6 +69,7 @@ func BlankUniversalMsg() *MsgUniversalUpdateCollection {
 
 		MintEscrowCoinsToTransfer:   []*sdk.Coin{},
 		CosmosCoinWrapperPathsToAdd: []*CosmosCoinWrapperPathAddObject{},
+		AliasPathsToAdd:             []*AliasPathAddObject{},
 		Invariants:                  &InvariantsAddObject{},
 	}
 }

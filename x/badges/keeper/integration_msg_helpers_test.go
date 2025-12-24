@@ -219,6 +219,22 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 		}
 		allTokenIds = types.SortUintRangesAndMergeAdjacentAndIntersecting(allTokenIds)
 
+		normalizedWrapperPaths := []*types.CosmosCoinWrapperPathAddObject{}
+		for _, wrapperPath := range collectionToCreate.CosmosCoinWrapperPathsToAdd {
+			if wrapperPath.Amount.IsNil() || wrapperPath.Amount.IsZero() {
+				wrapperPath.Amount = sdkmath.NewUint(1)
+			}
+			normalizedWrapperPaths = append(normalizedWrapperPaths, wrapperPath)
+		}
+
+		normalizedAliasPaths := []*types.AliasPathAddObject{}
+		for _, aliasPath := range collectionToCreate.AliasPathsToAdd {
+			if aliasPath.Amount.IsNil() || aliasPath.Amount.IsZero() {
+				aliasPath.Amount = sdkmath.NewUint(1)
+			}
+			normalizedAliasPaths = append(normalizedAliasPaths, aliasPath)
+		}
+
 		//For legacy purposes, we will use tokensToCreate which mints them to the mint address
 		collectionRes, err := UpdateCollectionWithRes(suite, ctx, &types.MsgUniversalUpdateCollection{
 			CollectionId:          sdkmath.NewUint(0),
@@ -238,7 +254,8 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			TokenMetadata:               getCurrentTokenMetadataFromTimeline(collectionToCreate.TokenMetadataTimeline),
 			CustomData:                  getCurrentCustomDataFromTimeline(collectionToCreate.CustomDataTimeline),
 			Standards:                   getCurrentStandardsFromTimeline(collectionToCreate.StandardsTimeline),
-			CosmosCoinWrapperPathsToAdd: collectionToCreate.CosmosCoinWrapperPathsToAdd,
+			CosmosCoinWrapperPathsToAdd: normalizedWrapperPaths,
+			AliasPathsToAdd:             normalizedAliasPaths,
 			ValidTokenIds:               allTokenIds,
 			Invariants:                  collectionToCreate.Invariants,
 			IsArchived:                  false, // Default to not archived

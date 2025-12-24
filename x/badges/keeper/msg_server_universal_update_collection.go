@@ -138,20 +138,13 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 		// From cosmos SDK x/group module
 		// Generate account address of collection
-		var accountAddr sdk.AccAddress
-		for {
-			derivationKey := make([]byte, DerivationKeyLength)
-			binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
-
-			ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
-			if err != nil {
-				return nil, err
-			}
-			//generate the address from the credential
-			accountAddr = sdk.AccAddress(ac.Address())
-
-			break
+		derivationKey := make([]byte, DerivationKeyLength)
+		binary.BigEndian.PutUint64(derivationKey, nextCollectionId.Uint64())
+		ac, err := authtypes.NewModuleCredential(types.ModuleName, AccountGenerationPrefix, derivationKey)
+		if err != nil {
+			return nil, err
 		}
+		accountAddr := sdk.AccAddress(ac.Address())
 
 		collection = &types.TokenCollection{
 			CollectionId:          nextCollectionId,
@@ -353,7 +346,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				Symbol:                         path.Symbol,
 				DenomUnits:                     path.DenomUnits,
 				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
-				AllowCosmosWrapping:            path.AllowCosmosWrapping,
+				Amount:                         path.Amount,
 			}
 
 			// Auto-set the cosmoscoinwrapper path address as a reserved protocol address
@@ -363,6 +356,21 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 
 		collection.CosmosCoinWrapperPaths = append(collection.CosmosCoinWrapperPaths, pathsToAdd...)
+	}
+
+	if len(msg.AliasPathsToAdd) > 0 {
+		pathsToAdd := make([]*types.AliasPath, len(msg.AliasPathsToAdd))
+		for i, path := range msg.AliasPathsToAdd {
+			pathsToAdd[i] = &types.AliasPath{
+				Denom:      path.Denom,
+				Balances:   path.Balances,
+				Symbol:     path.Symbol,
+				DenomUnits: path.DenomUnits,
+				Amount:     path.Amount,
+			}
+		}
+
+		collection.AliasPaths = append(collection.AliasPaths, pathsToAdd...)
 	}
 
 	// Handle invariants - convert InvariantsAddObject to CollectionInvariants
@@ -414,52 +422,32 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		denomPaths[path.Denom] = true
 	}
 
+	// Ensure no duplicate denom paths for alias paths and no collisions with wrappers
+	aliasDenoms := make(map[string]bool)
+	for _, path := range collection.AliasPaths {
+		if _, ok := aliasDenoms[path.Denom]; ok {
+			return nil, fmt.Errorf("duplicate alias path denom: %s", path.Denom)
+		}
+		if _, wrapperConflict := denomPaths[path.Denom]; wrapperConflict {
+			return nil, fmt.Errorf("alias path denom conflicts with wrapper denom: %s", path.Denom)
+		}
+		aliasDenoms[path.Denom] = true
+	}
+
 	// No need to check for duplicate ibc denom paths for backed paths since only one is allowed
 
 	// Ensure no duplicate symbols (including base symbol and denom unit symbols)
 	symbolPaths := make(map[string]bool)
 	for _, path := range collection.CosmosCoinWrapperPaths {
-		// Check the main path symbol
-		if path.Symbol != "" {
-			if _, ok := symbolPaths[path.Symbol]; ok {
-				return nil, fmt.Errorf("duplicate ibc wrapper path symbol: %s", path.Symbol)
-			}
-			symbolPaths[path.Symbol] = true
+		if err := validatePathSymbols(path.Symbol, path.DenomUnits, symbolPaths, "ibc wrapper"); err != nil {
+			return nil, err
 		}
+	}
 
-		// Check denom unit symbols
-		for _, denomUnit := range path.DenomUnits {
-			if denomUnit.Symbol != "" {
-				if _, ok := symbolPaths[denomUnit.Symbol]; ok {
-					return nil, fmt.Errorf("duplicate denom unit symbol: %s", denomUnit.Symbol)
-				}
-				symbolPaths[denomUnit.Symbol] = true
-			}
-		}
-
-		// Validate that only one denom unit per path has isDefaultDisplay set to true
-		defaultDisplayCount := 0
-		decimalsSet := make(map[string]bool)
-		for _, denomUnit := range path.DenomUnits {
-			if denomUnit.IsDefaultDisplay {
-				defaultDisplayCount++
-			}
-
-			// Check that decimals is not 0
-			if denomUnit.Decimals.IsZero() {
-				return nil, fmt.Errorf("denom unit decimals cannot be 0")
-			}
-
-			// Check for duplicate decimals
-			decimalsStr := denomUnit.Decimals.String()
-			if _, ok := decimalsSet[decimalsStr]; ok {
-				return nil, fmt.Errorf("duplicate denom unit decimals: %s", decimalsStr)
-			}
-			decimalsSet[decimalsStr] = true
-		}
-
-		if defaultDisplayCount > 1 {
-			return nil, fmt.Errorf("only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
+	// Also ensure alias path symbols / denom unit symbols are unique across all paths (wrappers + aliases)
+	for _, path := range collection.AliasPaths {
+		if err := validatePathSymbols(path.Symbol, path.DenomUnits, symbolPaths, "alias"); err != nil {
+			return nil, err
 		}
 	}
 
@@ -506,4 +494,47 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	return &types.MsgUniversalUpdateCollectionResponse{
 		CollectionId: collection.CollectionId,
 	}, nil
+}
+
+// validatePathSymbols enforces uniqueness of symbols/denom unit symbols across all paths,
+// and per-path constraints (single default display, non-zero decimals, unique decimals per path).
+func validatePathSymbols(pathSymbol string, denomUnits []*types.DenomUnit, symbolPaths map[string]bool, pathType string) error {
+	if pathSymbol != "" {
+		if _, ok := symbolPaths[pathSymbol]; ok {
+			return fmt.Errorf("duplicate %s path symbol: %s", pathType, pathSymbol)
+		}
+		symbolPaths[pathSymbol] = true
+	}
+
+	defaultDisplayCount := 0
+	decimalsSet := make(map[string]bool)
+
+	for _, denomUnit := range denomUnits {
+		if denomUnit.Symbol != "" {
+			if _, ok := symbolPaths[denomUnit.Symbol]; ok {
+				return fmt.Errorf("duplicate denom unit symbol: %s", denomUnit.Symbol)
+			}
+			symbolPaths[denomUnit.Symbol] = true
+		}
+
+		if denomUnit.IsDefaultDisplay {
+			defaultDisplayCount++
+		}
+
+		if denomUnit.Decimals.IsZero() {
+			return fmt.Errorf("denom unit decimals cannot be 0")
+		}
+
+		decimalsStr := denomUnit.Decimals.String()
+		if _, ok := decimalsSet[decimalsStr]; ok {
+			return fmt.Errorf("duplicate denom unit decimals: %s", decimalsStr)
+		}
+		decimalsSet[decimalsStr] = true
+	}
+
+	if defaultDisplayCount > 1 {
+		return fmt.Errorf("only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
+	}
+
+	return nil
 }

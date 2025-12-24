@@ -75,14 +75,18 @@ message TokenCollection {
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
   CollectionInvariants invariants = 15;
+
+  // The alias (non-wrapping) paths for the collection.
+  repeated AliasPath aliasPaths = 16;
 }
 
 message CosmosCoinWrapperPath {
+
   // The BitBadges address associated with this wrapper path. Used for routing and identifying the wrapper.
   string address = 1;
   // The denomination (denom) to be used for the wrapped coin or the alias denom.
   string denom = 2;
-  // The token balances that correspond to this wrapper path. Defines how much you have to wrap to get x1 of corresponding base level unit.
+  // The token balances that correspond to this wrapper path. Defines how much you have to wrap to get the corresponding base level unit.
   repeated Balance balances = 3;
   // The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 4;
@@ -91,8 +95,21 @@ message CosmosCoinWrapperPath {
   repeated DenomUnit denomUnits = 5;
   // If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
   bool allowOverrideWithAnyValidToken = 6;
-  // If true, allows tokens to be wrapped into Cosmos SDK coins. When false, this path is just an alias
-  bool allowCosmosWrapping = 7;
+  // The base amount of the wrapped denom (0 decimals) that maps to balances[] for conversions.
+  string amount = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message AliasPath {
+  // The denomination (denom) to be used for the alias.
+  string denom = 1;
+  // The token balances that correspond to this alias path. Defines how much of the base level unit the alias maps to.
+  repeated Balance balances = 2;
+  // The symbol for the alias (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
+  string symbol = 3;
+  // Denomination units for the alias. Defines how the coin can be displayed with different decimal places and symbols.
+  repeated DenomUnit denomUnits = 4;
+  // The base amount of the alias denom (0 decimals) that maps to balances[] for conversions.
+  string amount = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message CosmosCoinBackedPath {

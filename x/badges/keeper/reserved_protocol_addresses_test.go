@@ -26,7 +26,6 @@ func (suite *TestSuite) TestReservedProtocolAddressCosmosCoinWrapperPath() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 

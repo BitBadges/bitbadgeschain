@@ -2,7 +2,6 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -65,11 +64,16 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	if err := ValidateTokenMetadata(msg.TokenMetadata, canChangeValues); err != nil {
 		return err
 	}
-
 	if err := ValidateCollectionMetadata(msg.CollectionMetadata); err != nil {
 		return err
 	}
 	if err := ValidateCollectionApprovals(ctx, msg.CollectionApprovals, canChangeValues); err != nil {
+		return err
+	}
+	if err := ValidateCustomData(msg.CustomData); err != nil {
+		return err
+	}
+	if err := ValidateStandards(msg.Standards); err != nil {
 		return err
 	}
 
@@ -86,21 +90,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		if err := ValidateCollectionApprovalsWithInvariants(ctx, msg.CollectionApprovals, canChangeValues, tempCollection); err != nil {
 			return err
 		}
-	}
-	if err := ValidateTokenMetadata(msg.TokenMetadata, canChangeValues); err != nil {
-		return err
-	}
-
-	if err := ValidateCollectionMetadata(msg.CollectionMetadata); err != nil {
-		return err
-	}
-
-	if err := ValidateCustomData(msg.CustomData); err != nil {
-		return err
-	}
-
-	if err := ValidateStandards(msg.Standards); err != nil {
-		return err
 	}
 
 	if msg.CollectionPermissions == nil {
@@ -160,22 +149,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	if err := ValidateTokenMetadata(msg.TokenMetadata, canChangeValues); err != nil {
-		return err
-	}
-
-	if err := ValidateCollectionMetadata(msg.CollectionMetadata); err != nil {
-		return err
-	}
-
-	if err := ValidateCustomData(msg.CustomData); err != nil {
-		return err
-	}
-
-	if err := ValidateStandards(msg.Standards); err != nil {
-		return err
-	}
-
 	if err := ValidateManager(msg.Manager); err != nil {
 		return err
 	}
@@ -197,6 +170,10 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return err
 		}
 
+		if path.Amount.IsNil() || path.Amount.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "wrapper path amount cannot be zero")
+		}
+
 		// Validate basic checks for cosmos coin wrapper paths
 		// Ensure path.balances len == 1
 		if len(path.Balances) != 1 {
@@ -205,11 +182,6 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 
 		// Validate each balance in path.balances
 		for _, balance := range path.Balances {
-			// Ensure amount = 1n
-			if !balance.Amount.Equal(sdkmath.NewUint(1)) {
-				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path balance amount must be 1, found %s", balance.Amount.String())
-			}
-
 			// Ensure tokenIds len == 1
 			if len(balance.TokenIds) != 1 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path balance must have exactly one tokenId range, found %d", len(balance.TokenIds))
@@ -249,6 +221,86 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		if defaultDisplayCount > 1 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
 		}
+	}
+
+	for _, path := range msg.AliasPathsToAdd {
+		// Validate denom format
+		if err := ValidateCosmosWrapperPathDenom(path.Denom); err != nil {
+			return err
+		}
+
+		// Validate symbol format
+		if err := ValidateCosmosWrapperPathSymbol(path.Symbol); err != nil {
+			return err
+		}
+
+		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
+		if err != nil {
+			return err
+		}
+
+		if path.Amount.IsNil() || path.Amount.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path amount cannot be zero")
+		}
+
+		if len(path.Balances) != 1 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path must have exactly one balance, found %d", len(path.Balances))
+		}
+
+		for _, balance := range path.Balances {
+			if len(balance.TokenIds) != 1 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "alias path balance must have exactly one tokenId range, found %d", len(balance.TokenIds))
+			}
+
+			if len(balance.OwnershipTimes) != 1 {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "alias path balance must have exactly one ownershipTime range, found %d", len(balance.OwnershipTimes))
+			}
+		}
+
+		defaultDisplayCount := 0
+		decimalsSet := make(map[string]bool)
+		for _, denomUnit := range path.DenomUnits {
+			if err := ValidateCosmosWrapperPathSymbol(denomUnit.Symbol); err != nil {
+				return err
+			}
+
+			if denomUnit.IsDefaultDisplay {
+				defaultDisplayCount++
+			}
+
+			if denomUnit.Decimals.IsZero() {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "denom unit decimals cannot be 0")
+			}
+
+			decimalsStr := denomUnit.Decimals.String()
+			if _, ok := decimalsSet[decimalsStr]; ok {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate denom unit decimals: %s", decimalsStr)
+			}
+			decimalsSet[decimalsStr] = true
+		}
+		if defaultDisplayCount > 1 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
+		}
+	}
+
+	// Ensure no duplicate denoms across wrapper and alias paths (and none within each set)
+	wrapperDenoms := make(map[string]struct{})
+	for _, path := range msg.CosmosCoinWrapperPathsToAdd {
+		if _, exists := wrapperDenoms[path.Denom]; exists {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate cosmos coin wrapper path denom: %s", path.Denom)
+		}
+		wrapperDenoms[path.Denom] = struct{}{}
+	}
+
+	aliasDenoms := make(map[string]struct{})
+	for _, path := range msg.AliasPathsToAdd {
+		if _, exists := aliasDenoms[path.Denom]; exists {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate alias path denom: %s", path.Denom)
+		}
+		if _, conflict := wrapperDenoms[path.Denom]; conflict {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path denom conflicts with wrapper denom: %s", path.Denom)
+		}
+		aliasDenoms[path.Denom] = struct{}{}
 	}
 
 	// Validate cosmos coin backed path in invariants

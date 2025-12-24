@@ -1,154 +1,38 @@
 package keeper
 
 import (
-	"fmt"
 	"math"
-	"strconv"
-	"strings"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CheckStartsWithWrappedOrAliasDenom(denom string) bool {
-	return strings.HasPrefix(denom, WrappedDenomPrefix) || strings.HasPrefix(denom, AliasDenomPrefix)
-}
-
-// GetPartsFromDenom parses a badges denom into its parts
-func GetPartsFromDenom(denom string) ([]string, error) {
-	if !CheckStartsWithWrappedOrAliasDenom(denom) {
-		return nil, fmt.Errorf("invalid denom: %s", denom)
-	}
-
-	parts := strings.Split(denom, ":")
-	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid denom: %s", denom)
-	}
-	return parts, nil
-}
-
-// ParseDenomCollectionId extracts the collection ID from a badges denom
-func ParseDenomCollectionId(denom string) (uint64, error) {
-	parts, err := GetPartsFromDenom(denom)
-	if err != nil {
-		return 0, err
-	}
-
-	// this is equivalent to split(':')[1]
-	return strconv.ParseUint(parts[1], 10, 64)
-}
-
-// ParseDenomPath extracts the path from a badges denom
-func ParseDenomPath(denom string) (string, error) {
-	parts, err := GetPartsFromDenom(denom)
-	if err != nil {
-		return "", err
-	}
-	// this is equivalent to split(':')[2]
-	return parts[2], nil
-}
-
-// GetCorrespondingPath finds the CosmosCoinWrapperPath for a given denom
-func GetCorrespondingPath(collection *badgestypes.TokenCollection, denom string) (*badgestypes.CosmosCoinWrapperPath, error) {
-	baseDenom, err := ParseDenomPath(denom)
+// GetBalancesToTransferWithAlias calculates the balances to transfer for a given denom and amount
+func GetBalancesToTransferWithAlias(collection *badgestypes.TokenCollection, denom string, amount sdkmath.Uint) ([]*badgestypes.Balance, error) {
+	path, err := GetCorrespondingAliasPath(collection, denom)
 	if err != nil {
 		return nil, err
 	}
 
-	// This is okay because we don't allow numeric chars in denoms
-	numericStr := ""
-	for _, char := range baseDenom {
-		if char >= '0' && char <= '9' {
-			numericStr += string(char)
-		}
+	conversionAmount := path.Amount
+	if conversionAmount.IsZero() || conversionAmount.IsNil() {
+		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "conversion amount is zero")
 	}
 
-	cosmosPaths := collection.CosmosCoinWrapperPaths
-	for _, path := range cosmosPaths {
-		if path.AllowOverrideWithAnyValidToken {
-			// 1. Replace the {id} placeholder with the actual denom
-			// 2. Convert all balance.tokenIds to the actual token ID
-			if numericStr == "" {
-				continue
-			}
-
-			idFromDenom := sdkmath.NewUintFromString(numericStr)
-			path.Denom = strings.ReplaceAll(path.Denom, "{id}", idFromDenom.String())
-			path.Balances = badgestypes.DeepCopyBalances(path.Balances)
-			for _, balance := range path.Balances {
-				balance.TokenIds = []*badgestypes.UintRange{
-					{Start: idFromDenom, End: idFromDenom},
-				}
-			}
-		}
-
-		if path.Denom == baseDenom {
-			return path, nil
-		}
+	// Throw if not evenly divisible
+	if !amount.Mod(conversionAmount).IsZero() {
+		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "amount is not evenly divisible by path amount")
 	}
 
-	return nil, fmt.Errorf("path not found for denom: %s", denom)
-}
-
-// GetBalancesToTransfer calculates the balances to transfer for a given denom and amount
-func GetBalancesToTransfer(collection *badgestypes.TokenCollection, denom string, amount sdkmath.Uint) ([]*badgestypes.Balance, error) {
-	path, err := GetCorrespondingPath(collection, denom)
-	if err != nil {
-		return nil, err
-	}
-
+	multiplierToUse := amount.Quo(conversionAmount)
 	balancesToTransfer := badgestypes.DeepCopyBalances(path.Balances)
 	for _, balance := range balancesToTransfer {
-		balance.Amount = balance.Amount.Mul(amount)
+		balance.Amount = balance.Amount.Mul(multiplierToUse)
 	}
 
 	return balancesToTransfer, nil
-}
-
-// CheckIsAliasDenom checks if a denom is a wrapped badges denom
-func (k Keeper) CheckIsAliasDenom(ctx sdk.Context, denom string) bool {
-	if !CheckStartsWithWrappedOrAliasDenom(denom) {
-		return false
-	}
-
-	collection, err := k.ParseCollectionFromDenom(ctx, denom)
-	if err != nil {
-		return false
-	}
-
-	path, err := GetCorrespondingPath(collection, denom)
-	if err != nil {
-		return false
-	}
-
-	// This is a little bit of an edge case
-	// It is possible to have a badges: denom that is not the auto-converted denom
-	// If this flag is true, we assume that they have to be wrapped first
-	//
-	// Ex: chaosnet denomination (badges:49:chaosnet)
-	if path.AllowCosmosWrapping {
-		return false
-	}
-
-	return true
-}
-
-// ParseCollectionFromDenom parses a collection from a badges denom
-func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error) {
-	collectionId, err := ParseDenomCollectionId(denom)
-	if err != nil {
-		return nil, err
-	}
-
-	collection, found := k.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
-	if !found {
-		return nil, customhookstypes.WrapErr(&ctx, badgestypes.ErrInvalidCollectionID, "collection %s not found",
-			sdkmath.NewUint(collectionId).String())
-	}
-
-	return collection, nil
 }
 
 func (k Keeper) SetAllAutoApprovalFlagsForAddressUnsafe(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
@@ -193,7 +77,7 @@ func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, pool
 		return err
 	}
 
-	balancesToTransfer, err := GetBalancesToTransfer(collection, denom, amount)
+	balancesToTransfer, err := GetBalancesToTransferWithAlias(collection, denom, amount)
 	if err != nil {
 		return err
 	}
@@ -231,7 +115,7 @@ func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 		return err
 	}
 
-	balancesToTransfer, err := GetBalancesToTransfer(collection, denom, amount)
+	balancesToTransfer, err := GetBalancesToTransferWithAlias(collection, denom, amount)
 	if err != nil {
 		return err
 	}
@@ -324,7 +208,7 @@ func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress 
 		return err
 	}
 
-	balancesToTransfer, err := GetBalancesToTransfer(collection, denom, amount)
+	balancesToTransfer, err := GetBalancesToTransferWithAlias(collection, denom, amount)
 	if err != nil {
 		return err
 	}
@@ -436,25 +320,20 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 }
 
 func (k Keeper) GetSpendableCoinAmountBadgesLPOnly(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
-
-	// badgeslp: denom - calculate from badge balances
-	// Parse collection from denom
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return sdkmath.ZeroInt(), err
 	}
 
 	// Get the corresponding wrapper path
-	path, err := GetCorrespondingPath(collection, denom)
+	path, err := GetCorrespondingAliasPath(collection, denom)
 	if err != nil {
 		return sdkmath.ZeroInt(), err
 	}
 
 	// Get user's badge balance
 	userBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
-
-	// Use the same calculation as GetWrappableBalances
-	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path.Balances)
+	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path)
 	if err != nil {
 		return sdkmath.ZeroInt(), err
 	}

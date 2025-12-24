@@ -201,7 +201,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 
 	// Create a collection with cosmos coin wrapper paths using badgeslp: prefix
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "wrappedcoin",
 			Balances: []*types.Balance{
@@ -211,9 +211,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
-			Symbol:              "WRAP",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "wrappedcoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: false, // Use badgeslp: prefix (wrapped approach)
+			Symbol:     "WRAP",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "wrappedcoin", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -237,8 +236,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperPath := collection.AliasPaths[0]
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
 	// First, mint more badges to bob so he has enough to wrap
@@ -446,7 +445,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 
 	// Create a collection with cosmos coin wrapper paths using badgeslp: prefix
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "insufficientcoin",
 			Balances: []*types.Balance{
@@ -456,7 +455,6 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 					TokenIds:       GetOneUintRange(),
 				},
 			},
-			AllowCosmosWrapping: false, // Use badgeslp: prefix (wrapped approach)
 		},
 	}
 
@@ -479,8 +477,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperPath := collection.AliasPaths[0]
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
 	// For badgeslp: denoms, we need to check badge balances, not bank balances
@@ -618,7 +616,7 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 
 	// Create a collection with cosmos coin wrapper paths using badgeslp: prefix
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "mixedcoin",
 			Balances: []*types.Balance{
@@ -628,7 +626,6 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 					TokenIds:       GetOneUintRange(),
 				},
 			},
-			AllowCosmosWrapping: false, // Use badgeslp: prefix (wrapped approach)
 		},
 	}
 
@@ -651,8 +648,8 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperPath := collection.AliasPaths[0]
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
 	// First, mint more badges to bob so he has enough
