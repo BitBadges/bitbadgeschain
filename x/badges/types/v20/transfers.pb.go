@@ -252,7 +252,7 @@ func (m *MerkleChallenge) GetLeafSigner() string {
 // ETHSignatureChallenge defines a rule for the approval in the form of an Ethereum signature challenge.
 //
 // An ETH signature challenge is a challenge where the user must provide a valid Ethereum signature for a specific nonce.
-// The signature scheme is ETHSign(nonce + "-" + creatorAddress) and each signature can only be used once.
+// The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId) and each signature can only be used once.
 // All challenges must be met with valid solutions for the transfer to be approved.
 //
 // IMPORTANT: We track the usage of each signature to prevent replay attacks. Each signature can only be used once.
@@ -2565,7 +2565,7 @@ func (m *MerkleProof) GetLeafSignature() string {
 
 // ETHSignatureProof represents an Ethereum signature proof for a challenge.
 type ETHSignatureProof struct {
-	// The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + creatorAddress).
+	// The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId).
 	Nonce string `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	// The Ethereum signature of the nonce.
 	Signature string `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`

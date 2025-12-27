@@ -101,6 +101,11 @@ func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallen
 		codeLeafIndex.String())
 }
 
+// ConstructETHSignatureTrackerKey constructs a unique key for tracking ETH signature usage.
+// The key includes: collectionId, approverAddress (addressForChallenge), approvalLevel, approvalId, challengeId, and the signature itself.
+// This key is used to track how many times a specific signature has been used for a given approval/challenge context.
+// Note: The signature field in the tracker key is the actual signature bytes (from the proof), not part of what gets signed.
+// The signed message includes: nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
 func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, signature string) string {
 	collection_id_str := collectionId.String()
 	challenge_id_str := challengeId

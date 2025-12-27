@@ -48,7 +48,7 @@ message MerkleChallenge {
   ETHSignatureChallenge defines a rule for the approval in the form of an Ethereum signature challenge.
 
   An ETH signature challenge is a challenge where the user must provide a valid Ethereum signature for a specific nonce.
-  The signature scheme is ETHSign(nonce + "-" + creatorAddress) and each signature can only be used once.
+  The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId) and each signature can only be used once.
   All challenges must be met with valid solutions for the transfer to be approved.
 
   IMPORTANT: We track the usage of each signature to prevent replay attacks. Each signature can only be used once.
@@ -89,7 +89,7 @@ message MerkleProof {
 
 // ETHSignatureProof represents an Ethereum signature proof for a challenge.
 message ETHSignatureProof {
-  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + creatorAddress).
+  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId).
   string nonce = 1;
   // The Ethereum signature of the nonce.
   string signature = 2;

@@ -63,7 +63,7 @@ func (k Keeper) HandleMerkleChallenges(
 			detErrMsg := fmt.Sprintf("expected proof length %s exceeds maximum allowed %d", challenge.ExpectedProofLength.String(), MaxMerkleProofLength)
 			return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
-		
+
 		// Additional validation: check actual proof lengths before processing to prevent DoS
 		for _, proof := range merkleProofs {
 			if len(proof.Aunts) > MaxMerkleProofLength {
@@ -224,7 +224,7 @@ func (k Keeper) HandleETHSignatureChallenges(
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
 ) (string, error) {
-	creatorAddress := transferMetadata.InitiatedBy
+	initiatorAddress := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
 	challenges := approval.ApprovalCriteria.EthSignatureChallenges
@@ -247,8 +247,9 @@ func (k Keeper) HandleETHSignatureChallenges(
 			}
 
 			// Verify the signature
+			// Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
 			ethAddress := ethcommon.HexToAddress(signerAddress)
-			signatureString := proof.Nonce + "-" + creatorAddress
+			signatureString := proof.Nonce + "-" + initiatorAddress + "-" + collectionId.String() + "-" + approverAddress + "-" + approvalLevel + "-" + approval.ApprovalId + "-" + challengeId
 
 			isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 				ethAddress,
@@ -282,7 +283,8 @@ func (k Keeper) HandleETHSignatureChallenges(
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
 					sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-					sdk.NewAttribute("creator", creatorAddress),
+					sdk.NewAttribute("creator", initiatorAddress),
+					sdk.NewAttribute("initiator", initiatorAddress),
 					sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 					sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
 					sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
