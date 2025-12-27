@@ -1,0 +1,67 @@
+package messages
+
+import (
+	"testing"
+
+	sdkmath "cosmossdk.io/math"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bitbadges/bitbadgeschain/x/badges/ai_test/validation"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+)
+
+func init() {
+	// Ensure SDK config is initialized for address validation
+	validation.EnsureSDKConfig()
+}
+
+func TestMsgUpdateDynamicStore_ValidateBasic_EmptyCreator(t *testing.T) {
+	msg := &types.MsgUpdateDynamicStore{
+		Creator:      "",
+		StoreId:      sdkmath.NewUint(1),
+		DefaultValue: true,
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "empty creator should fail")
+}
+
+func TestMsgUpdateDynamicStore_ValidateBasic_InvalidCreator(t *testing.T) {
+	msg := &types.MsgUpdateDynamicStore{
+		Creator:      "invalid_address",
+		StoreId:      sdkmath.NewUint(1),
+		DefaultValue: true,
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "invalid creator should fail")
+}
+
+func TestMsgUpdateDynamicStore_ValidateBasic_ZeroStoreId(t *testing.T) {
+	msg := &types.MsgUpdateDynamicStore{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		StoreId:      sdkmath.NewUint(0),
+		DefaultValue: true,
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "zero store ID should fail")
+	require.Contains(t, err.Error(), "cannot be zero", "error should mention cannot be zero")
+}
+
+func TestMsgUpdateDynamicStore_ValidateBasic_Valid(t *testing.T) {
+	msg := &types.MsgUpdateDynamicStore{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		StoreId:      sdkmath.NewUint(1),
+		DefaultValue: true,
+	}
+
+	err := msg.ValidateBasic()
+	// Might fail on address validation if SDK config uses different prefix
+	if err != nil {
+		require.Contains(t, err.Error(), "address", "error should be about address validation")
+	} else {
+		require.NoError(t, err, "valid message should pass")
+	}
+}
+

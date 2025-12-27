@@ -238,17 +238,38 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			trackerTypes := []string{"overall", "to", "from", "initiatedBy"}
-			approvedAmounts := []sdkmath.Uint{
-				approvalCriteria.ApprovalAmounts.OverallApprovalAmount,
-				approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount,
-				approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount,
-				approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount,
+			// Initialize default values if ApprovalAmounts or MaxNumTransfers are nil
+			var approvedAmounts []sdkmath.Uint
+			if approvalCriteria.ApprovalAmounts != nil {
+				approvedAmounts = []sdkmath.Uint{
+					approvalCriteria.ApprovalAmounts.OverallApprovalAmount,
+					approvalCriteria.ApprovalAmounts.PerToAddressApprovalAmount,
+					approvalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount,
+					approvalCriteria.ApprovalAmounts.PerInitiatedByAddressApprovalAmount,
+				}
+			} else {
+				approvedAmounts = []sdkmath.Uint{
+					sdkmath.NewUint(0),
+					sdkmath.NewUint(0),
+					sdkmath.NewUint(0),
+					sdkmath.NewUint(0),
+				}
 			}
-			maxNumTransfers := []sdkmath.Uint{
-				approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers,
-				approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers,
-				approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers,
-				approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers,
+			var maxNumTransfers []sdkmath.Uint
+			if approvalCriteria.MaxNumTransfers != nil {
+				maxNumTransfers = []sdkmath.Uint{
+					approvalCriteria.MaxNumTransfers.OverallMaxNumTransfers,
+					approvalCriteria.MaxNumTransfers.PerToAddressMaxNumTransfers,
+					approvalCriteria.MaxNumTransfers.PerFromAddressMaxNumTransfers,
+					approvalCriteria.MaxNumTransfers.PerInitiatedByAddressMaxNumTransfers,
+				}
+			} else {
+				maxNumTransfers = []sdkmath.Uint{
+					sdkmath.NewUint(0),
+					sdkmath.NewUint(0),
+					sdkmath.NewUint(0),
+					sdkmath.NewUint(0),
+				}
 			}
 			approvedAddresses := []string{"", toAddress, fromAddress, initiatedBy}
 
@@ -327,7 +348,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// If we get here, all operations succeeded on the cached context
-			// Write the cache back to the main context
+			// Write the cache back to the main context atomically
 			writeCache()
 
 			if !approvalCriteria.OverridesFromOutgoingApprovals {
@@ -446,6 +467,10 @@ func (k Keeper) GetMaxPossible(
 	}
 
 	// Get approval tracker details
+	// Check if ApprovalAmounts is nil before accessing
+	if approval.ApprovalCriteria.ApprovalAmounts == nil {
+		panic("ApprovalAmounts is nil")
+	}
 	amountsTrackerId := approval.ApprovalCriteria.ApprovalAmounts.AmountTrackerId
 
 	// Fetch current approval tracker state
@@ -578,8 +603,15 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
 	approvalCriteria := approval.ApprovalCriteria
-	amountsTrackerId := approvalCriteria.ApprovalAmounts.AmountTrackerId
-	maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
+	// Initialize default values if ApprovalAmounts or MaxNumTransfers are nil
+	var amountsTrackerId string
+	if approvalCriteria.ApprovalAmounts != nil {
+		amountsTrackerId = approvalCriteria.ApprovalAmounts.AmountTrackerId
+	}
+	var maxNumTransfersTrackerId string
+	if approvalCriteria.MaxNumTransfers != nil {
+		maxNumTransfersTrackerId = approvalCriteria.MaxNumTransfers.AmountTrackerId
+	}
 
 	// Initialize default values
 	if approvedAmount.IsNil() {
@@ -608,6 +640,10 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 
 	var err error
 	if needToFetchApprovalTrackerDetails {
+		var resetTimeIntervals *types.ResetTimeIntervals
+		if approvalCriteria.ApprovalAmounts != nil {
+			resetTimeIntervals = approvalCriteria.ApprovalAmounts.ResetTimeIntervals
+		}
 		amountsTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
 			collection.CollectionId,
@@ -617,13 +653,17 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			approvalLevel,
 			trackerType,
 			address,
-			approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals,
+			resetTimeIntervals,
 			false,
 		)
 		if err != nil {
 			return "", err
 		}
 
+		var maxNumTransfersResetTimeIntervals *types.ResetTimeIntervals
+		if approvalCriteria.MaxNumTransfers != nil {
+			maxNumTransfersResetTimeIntervals = approvalCriteria.MaxNumTransfers.ResetTimeIntervals
+		}
 		maxNumTransfersTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
 			collection.CollectionId,
@@ -633,7 +673,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			approvalLevel,
 			trackerType,
 			address,
-			approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals,
+			maxNumTransfersResetTimeIntervals,
 			true,
 		)
 		if err != nil {
@@ -851,12 +891,17 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 	}
 
 	for _, approval := range approvals {
-		maxNumTransfersTrackerId := approval.ApprovalCriteria.MaxNumTransfers.AmountTrackerId
 		approvalCriteria := approval.ApprovalCriteria
 		approvalId = approval.ApprovalId
 		if approvalCriteria == nil || approvalId != precalculationId || approvalId == "" {
 			continue
 		}
+
+		// Check if MaxNumTransfers is nil before accessing
+		if approvalCriteria.MaxNumTransfers == nil {
+			panic("MaxNumTransfers is nil")
+		}
+		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
 
 		if transfer.PrecalculateBalancesFromApproval != nil {
 			if !approval.Version.Equal(transfer.PrecalculateBalancesFromApproval.Version) {

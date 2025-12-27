@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"math"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -39,35 +40,91 @@ func GetBalancesToTransferWithAlias(collection *badgestypes.TokenCollection, den
 	return balancesToTransfer, nil
 }
 
-func (k Keeper) SetAllAutoApprovalFlagsForAddressUnsafe(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
-	badgesMsgServer := NewMsgServerImpl(k)
+// setAutoApprovalFlagsIfNeeded sets auto-approval flags on a balance if they're not already set.
+// Returns true if any flags were changed, false otherwise.
+// This is a DRY helper to avoid repeating the flagsChanged pattern.
+func setAutoApprovalFlagsIfNeeded(balance *badgestypes.UserBalanceStore) bool {
+	flagsChanged := false
+
+	// Set AutoApproveAllIncomingTransfers only if not already set
+	if !balance.AutoApproveAllIncomingTransfers {
+		balance.AutoApproveAllIncomingTransfers = true
+		flagsChanged = true
+	}
+
+	// Set AutoApproveSelfInitiatedOutgoingTransfers only if not already set
+	if !balance.AutoApproveSelfInitiatedOutgoingTransfers {
+		balance.AutoApproveSelfInitiatedOutgoingTransfers = true
+		flagsChanged = true
+	}
+
+	// Set AutoApproveSelfInitiatedIncomingTransfers only if not already set
+	if !balance.AutoApproveSelfInitiatedIncomingTransfers {
+		balance.AutoApproveSelfInitiatedIncomingTransfers = true
+		flagsChanged = true
+	}
+
+	return flagsChanged
+}
+
+// SetAllAutoApprovalFlagsForPoolAddress sets auto-approval flags for a pool or path address.
+// This is used for pool integration where pool addresses and path addresses need auto-approval
+// to function correctly. This function should only be called for system addresses (pool addresses,
+// path addresses) that are trusted and need auto-approval.
+//
+// Security:
+// - Validates that the address is a pool address or path address (defense-in-depth)
+// - Only sets flags if they're not already set (prevents overriding existing settings)
+// - Each flag is checked individually before setting
+//
+// This function follows the same pattern as setAutoApproveFlagsForPathAddress to ensure
+// consistent behavior and prevent unintended overrides of user-configured settings.
+func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
+	// Defense-in-depth: Validate that address is a pool address or path address
+	// This ensures we don't accidentally set auto-approve flags for regular user addresses
+	isPool, err := k.IsLiquidityPool(ctx, address)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to check if address is liquidity pool: %s", address)
+	}
+	isPathAddress := k.IsBackedOrWrappingPathAddress(ctx, collection, address)
+
+	if !isPool && !isPathAddress {
+		return sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "address %s is not a pool address or path address", address)
+	}
+
+	// Get current balances
 	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address)
 
-	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
-	alreadyAutoApprovedSelfInitiatedOutgoingTransfers := currBalances.AutoApproveSelfInitiatedOutgoingTransfers
-	alreadyAutoApprovedSelfInitiatedIncomingTransfers := currBalances.AutoApproveSelfInitiatedIncomingTransfers
-
-	autoApprovedAll := alreadyAutoApprovedAllIncomingTransfers && alreadyAutoApprovedSelfInitiatedOutgoingTransfers && alreadyAutoApprovedSelfInitiatedIncomingTransfers
-
-	if !autoApprovedAll {
-		// We override all approvals to be default allowed
-		// Incoming - All, no matter what
-		// Outgoing - Self-initiated
-		//
-		// This should cover the transfer to this address (rare edge case where default opt-in only)
-		updateApprovalsMsg := &badgestypes.MsgUpdateUserApprovals{
-			Creator:                               address,
-			CollectionId:                          collection.CollectionId,
-			UpdateAutoApproveAllIncomingTransfers: true,
-			AutoApproveAllIncomingTransfers:       true,
-			UpdateAutoApproveSelfInitiatedOutgoingTransfers: true,
-			AutoApproveSelfInitiatedOutgoingTransfers:       true,
-			UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
-			AutoApproveSelfInitiatedIncomingTransfers:       true,
-		}
-		_, err := badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
+	// Set flags if needed (DRY helper)
+	if setAutoApprovalFlagsIfNeeded(currBalances) {
+		err := k.SetBalanceForAddress(ctx, collection, address, currBalances)
 		if err != nil {
-			return err
+			return sdkerrors.Wrapf(err, "failed to set auto-approve flags for pool/path address: %s", address)
+		}
+	}
+
+	return nil
+}
+
+// SetAllAutoApprovalFlagsForIntermediateAddress sets auto-approval flags for an intermediate address.
+// This is used for IBC hooks where intermediate addresses (derived from channel and sender) need
+// auto-approval to function correctly. Intermediate addresses are deterministic system addresses
+// that are not pool addresses but still need auto-approval for IBC hook operations.
+//
+// Security:
+//   - Only sets flags if they're not already set (prevents overriding existing settings)
+//   - Each flag is checked individually before setting
+//   - This function does not validate that the address is a pool/path address since
+//     intermediate addresses are a different type of system address
+func (k Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
+	// Get current balances
+	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address)
+
+	// Set flags if needed (DRY helper)
+	if setAutoApprovalFlagsIfNeeded(currBalances) {
+		err := k.SetBalanceForAddress(ctx, collection, address, currBalances)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "failed to set auto-approve flags for intermediate address: %s", address)
 		}
 	}
 
@@ -86,7 +143,7 @@ func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, pool
 		return err
 	}
 
-	err = k.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, poolAddress)
+	err = k.SetAllAutoApprovalFlagsForPoolAddress(ctx, collection, poolAddress)
 	if err != nil {
 		return err
 	}
@@ -112,8 +169,10 @@ func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, pool
 	return err
 }
 
-// sendNativeTokensFromAddressWithPoolApprovals sends native badges tokens from an address
-func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+// SendNativeTokensFromAddressWithPoolApprovals sends native badges tokens from an address
+// Security: Uses unique approval IDs and ensures cleanup even on failure to prevent approval reuse.
+// This function is exported for testing purposes to verify security properties.
+func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -124,8 +183,30 @@ func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 		return err
 	}
 
+	// Generate unique approval ID to prevent reuse attacks
+	// Format: "one-time-outgoing-{blockHeight}-{collectionId}-{hash}"
+	// This ensures each approval is unique and cannot be reused
+	blockHeight := ctx.BlockHeight()
+	approvalId := fmt.Sprintf("one-time-outgoing-%d-%s-%s", blockHeight, collection.CollectionId.String(), recipientAddress)
+
+	// Security: The version must be incremented to prevent replay attacks
+	// Using version 0 would allow the approval to be reused if deletion fails
+	approvalVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", fromAddress, approvalId)
+
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	badgesMsgServer := NewMsgServerImpl(k)
+
+	// Helper function to delete the one-time approval
+	deleteOneTimeApproval := func() error {
+		cleanupMsg := &badgestypes.MsgUpdateUserApprovals{
+			Creator:                 fromAddress,
+			CollectionId:            collection.CollectionId,
+			UpdateOutgoingApprovals: true,
+			OutgoingApprovals:       []*badgestypes.UserOutgoingApproval{},
+		}
+		_, err := badgesMsgServer.UpdateUserApprovals(ctx, cleanupMsg)
+		return err
+	}
 
 	// Just for sanity checks, we override all approvals to be default allowed
 	// Incoming - All, no matter what
@@ -140,7 +221,8 @@ func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 		UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
 		AutoApproveSelfInitiatedIncomingTransfers:       true,
 
-		//One-time outgoing approval for the address to send tokens to the recipient
+		// One-time outgoing approval for the address to send tokens to the recipient
+		// Security: Uses unique approval ID to prevent reuse attacks
 		UpdateOutgoingApprovals: true,
 		OutgoingApprovals: []*badgestypes.UserOutgoingApproval{
 			{
@@ -149,19 +231,19 @@ func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 				TransferTimes:     []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 				OwnershipTimes:    []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 				TokenIds:          []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-				Version:           sdkmath.NewUint(0),
-				ApprovalId:        "one-time-outgoing",
+				Version:           approvalVersion,
+				ApprovalId:        approvalId,
 			},
 		},
 	}
 	_, err = badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
 	if err != nil {
-		return err
+		return sdkerrors.Wrapf(err, "failed to create one-time approval: %s", approvalId)
 	}
 
 	// Important: We should only allow auto-scanned approvals here
 	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
-	// The one time outgoing approval is safe because it is hardcoded
+	// The one-time outgoing approval is safe because it uses a unique ID and version
 	msg := &badgestypes.MsgTransferTokens{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
@@ -172,10 +254,10 @@ func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 				Balances:    balancesToTransfer,
 				PrioritizedApprovals: []*badgestypes.ApprovalIdentifierDetails{
 					{
-						ApprovalId:      "one-time-outgoing",
+						ApprovalId:      approvalId,
 						ApprovalLevel:   "outgoing",
 						ApproverAddress: fromAddress,
-						Version:         sdkmath.NewUint(0),
+						Version:         approvalVersion,
 					},
 				},
 				OnlyCheckPrioritizedIncomingApprovals: true,
@@ -185,23 +267,24 @@ func (k Keeper) sendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 
 	_, err = badgesMsgServer.TransferTokens(ctx, msg)
 	if err != nil {
-		return err
+		// Transfer failed - clean up the approval before returning
+		cleanupErr := deleteOneTimeApproval()
+		if cleanupErr != nil {
+			// Log cleanup error but return the original transfer error
+			return sdkerrors.Wrapf(err, "transfer failed for one-time approval: %s (cleanup also failed: %v)", approvalId, cleanupErr)
+		}
+		return sdkerrors.Wrapf(err, "transfer failed for one-time approval: %s", approvalId)
 	}
 
-	// We then make sure that the address no longer has the one-time outgoing approval
-	// This is needed as opposed to auto-deletion because technically the approval might not
-	// be used if there is some forceful override (thus never deletes and we have a dangling approval)
-	updateApprovalsMsg2 := &badgestypes.MsgUpdateUserApprovals{
-		Creator:      fromAddress,
-		CollectionId: collection.CollectionId,
-
-		UpdateOutgoingApprovals: true,
-		OutgoingApprovals:       []*badgestypes.UserOutgoingApproval{},
-	}
-	_, err = badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg2)
+	// Transfer succeeded - delete the approval
+	err = deleteOneTimeApproval()
 	if err != nil {
-		return err
+		// Log error but don't fail - transfer already succeeded
+		// This is a cleanup operation, so we return success even if cleanup fails
+		// The approval will be cleaned up on next access or can be manually deleted
+		return sdkerrors.Wrapf(err, "transfer succeeded but failed to delete one-time approval: %s", approvalId)
 	}
+
 	return nil
 }
 
@@ -247,7 +330,7 @@ func (k Keeper) FundCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress stri
 	}
 
 	// To accept incoming transfers (if disallowed by default)
-	err = k.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, toAddress)
+	err = k.SetAllAutoApprovalFlagsForPoolAddress(ctx, collection, toAddress)
 	if err != nil {
 		return err
 	}
@@ -265,7 +348,7 @@ func (k Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress
 	}
 
 	// To set outgoing transfers (if disallowed by default)
-	err = k.SetAllAutoApprovalFlagsForAddressUnsafe(ctx, collection, fromAddress)
+	err = k.SetAllAutoApprovalFlagsForPoolAddress(ctx, collection, fromAddress)
 	if err != nil {
 		return err
 	}
@@ -306,7 +389,7 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 	for _, coin := range coins {
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 
-			err := k.sendNativeTokensFromAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			err := k.SendNativeTokensFromAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err
 			}

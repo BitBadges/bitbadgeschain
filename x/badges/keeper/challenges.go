@@ -58,9 +58,18 @@ func (k Keeper) HandleMerkleChallenges(
 		}
 
 		// Early validation of proof length to prevent DoS attacks
+		// This check must happen before processing any proofs to prevent gas consumption attacks
 		if challenge.ExpectedProofLength.GT(sdkmath.NewUint(MaxMerkleProofLength)) {
 			detErrMsg := fmt.Sprintf("expected proof length %s exceeds maximum allowed %d", challenge.ExpectedProofLength.String(), MaxMerkleProofLength)
 			return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
+		
+		// Additional validation: check actual proof lengths before processing to prevent DoS
+		for _, proof := range merkleProofs {
+			if len(proof.Aunts) > MaxMerkleProofLength {
+				detErrMsg := fmt.Sprintf("proof length %d exceeds maximum allowed %d", len(proof.Aunts), MaxMerkleProofLength)
+				return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
 		}
 
 		challengeId := challenge.ChallengeTrackerId
@@ -137,6 +146,12 @@ func (k Keeper) HandleMerkleChallenges(
 				}
 
 				if useLeafIndexForTransferOrder {
+					// Prevent underflow: ensure leafIndex >= leftmostLeafIndex
+					// If leafIndex < leftmostLeafIndex, the proof is invalid for predetermined balance calculation
+					if leafIndex.LT(leftmostLeafIndex) {
+						detErrMsg := fmt.Sprintf("leaf index %s is less than leftmost leaf index %s, invalid for predetermined balance calculation", leafIndex.String(), leftmostLeafIndex.String())
+						return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+					}
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
 				}
 

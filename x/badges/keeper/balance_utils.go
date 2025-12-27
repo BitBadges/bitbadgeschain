@@ -56,7 +56,11 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 		balance = getDefaultBalanceStoreForCollection(collection)
 		appliedDefault = true
 
-		// We need to set the version to "0" for all incoming and outgoing approvals
+		// Initialize approval versions for default approvals when balance is first accessed.
+		// This is necessary to ensure approval versioning works correctly for default approvals.
+		// Note: This has a side effect - first access to a balance increments approval versions,
+		// which is intentional to prevent replay attacks using old default approval versions.
+		// The version is incremented (not set to 0) to ensure uniqueness and prevent conflicts.
 		for _, approval := range balance.IncomingApprovals {
 			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
 		}

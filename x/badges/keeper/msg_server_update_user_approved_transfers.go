@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
@@ -67,8 +66,8 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			for _, newApproval := range msg.OutgoingApprovals {
 				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 
-				// Only increment version if approval is new or changed
-				if !exists || existingApproval.String() != newApproval.String() {
+				// Only increment version if approval is new or changed (excluding Version field)
+				if !exists || !userOutgoingApprovalEqual(existingApproval, newApproval) {
 					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, newApproval.ApprovalId)
 					newApproval.Version = newVersion
 				} else {
@@ -104,8 +103,8 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 			for _, newApproval := range msg.IncomingApprovals {
 				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 
-				// Only increment version if approval is new or changed
-				if !exists || existingApproval.String() != newApproval.String() {
+				// Only increment version if approval is new or changed (excluding Version field)
+				if !exists || !userIncomingApprovalEqual(existingApproval, newApproval) {
 					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, newApproval.ApprovalId)
 					newApproval.Version = newVersion
 				} else {
@@ -165,7 +164,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, err
 	}
 
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +173,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "update_user_approvals"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 

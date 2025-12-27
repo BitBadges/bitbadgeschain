@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -27,7 +26,7 @@ func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreat
 		}
 	}
 
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +35,7 @@ func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreat
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_address_lists"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 	)
 
 	return &types.MsgCreateAddressListsResponse{}, nil

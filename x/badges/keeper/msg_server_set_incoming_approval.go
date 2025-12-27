@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -70,7 +69,7 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 	}
 
 	// Emit events
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +78,7 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_incoming_approval"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 

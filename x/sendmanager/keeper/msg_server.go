@@ -42,6 +42,11 @@ func (k msgServer) SendWithAliasRouting(goCtx context.Context, msg *types.MsgSen
 		return nil, sdkerrors.Wrapf(errortypes.ErrInvalidCoins, "invalid coins: %s", err)
 	}
 
+	// Validate that coins is not empty
+	if coins.IsZero() {
+		return nil, sdkerrors.Wrapf(errortypes.ErrInvalidCoins, "coins cannot be empty")
+	}
+
 	// Use sendmanager's SendCoinsWithAliasRouting which handles both standard coins and alias denoms
 	if err := k.SendCoinsWithAliasRouting(ctx, fromAddress, toAddress, coins); err != nil {
 		return nil, err

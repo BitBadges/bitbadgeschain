@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -31,19 +30,24 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 		return nil, err
 	}
 
+	// Purge all collection-related state before deleting the collection
+	// This includes balances, approval trackers, challenge trackers, approval versions, and ETH signature trackers
+	if err := k.PurgeCollectionState(ctx, collection.CollectionId); err != nil {
+		return nil, err
+	}
+
 	k.DeleteCollectionFromStore(ctx, collection.CollectionId)
 
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO: should we purge all balances and challenge stores here too?
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "delete_collection"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 	)
 	return &types.MsgDeleteCollectionResponse{}, nil
 }

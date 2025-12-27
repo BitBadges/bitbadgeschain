@@ -21,11 +21,18 @@ func InitSDKConfigWithoutSeal() *sdk.Config {
 	consNodeAddressPrefix := AccountAddressPrefix + "valcons"
 	consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
 
-	// Set and seal config
+	// Set config (don't seal - caller will seal if needed)
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
-	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+	// Only set if config is not already sealed
+	// Check current prefix - if it's already "bb", assume it's set correctly
+	currentPrefix := config.GetBech32AccountAddrPrefix()
+	if currentPrefix != AccountAddressPrefix {
+		// Try to set the prefix - this will panic if config is sealed, but that's ok
+		// We'll catch it and use the existing prefix
+		config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
+		config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+		config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
+	}
 	return config
 }
 

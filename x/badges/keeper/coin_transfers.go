@@ -78,9 +78,13 @@ func (k Keeper) ExecuteCoinTransfers(
 			detErrMsg := "coin transfer cannot have empty coins slice"
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
-		if !slices.Contains(allowedDenoms, coinTransfer.Coins[0].Denom) {
-			detErrMsg := fmt.Sprintf("denom %s is not allowed", coinTransfer.Coins[0].Denom)
-			return detErrMsg, sdkerrors.Wrap(ErrInvalidDenom, detErrMsg)
+		// Security: Validate ALL coins in the transfer, not just the first
+		// This prevents unauthorized denoms from bypassing validation in multi-coin transfers
+		for _, coin := range coinTransfer.Coins {
+			if !slices.Contains(allowedDenoms, coin.Denom) {
+				detErrMsg := fmt.Sprintf("denom %s is not allowed", coin.Denom)
+				return detErrMsg, sdkerrors.Wrap(ErrInvalidDenom, detErrMsg)
+			}
 		}
 	}
 

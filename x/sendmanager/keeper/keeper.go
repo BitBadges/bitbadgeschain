@@ -65,6 +65,7 @@ func (k Keeper) GetAuthority() []byte {
 // RegisterRouter registers an alias denom router for a specific prefix
 // The prefix is stored globally and used for all routing operations
 // This ensures that specific prefixes always route to the correct router
+// Prevents overlapping prefixes to avoid routing ambiguity
 func (k *Keeper) RegisterRouter(prefix string, router types.AliasDenomRouter) error {
 	// Validate prefix is not empty
 	if prefix == "" {
@@ -76,10 +77,55 @@ func (k *Keeper) RegisterRouter(prefix string, router types.AliasDenomRouter) er
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "prefix %s is already registered", prefix)
 	}
 
+	// Check for overlapping prefixes (prevent sub-prefix or super-prefix conflicts)
+	// A prefix overlaps if one is a prefix of the other
+	for existingPrefix := range k.prefixToRouter {
+		if strings.HasPrefix(prefix, existingPrefix) {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "prefix %s overlaps with existing prefix %s (new prefix starts with existing prefix)", prefix, existingPrefix)
+		}
+		if strings.HasPrefix(existingPrefix, prefix) {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "prefix %s overlaps with existing prefix %s (existing prefix starts with new prefix)", prefix, existingPrefix)
+		}
+	}
+
 	// Register the prefix and router
 	k.prefixToRouter[prefix] = router
 	k.registeredPrefixes = append(k.registeredPrefixes, prefix)
+	
+	// Sort registeredPrefixes by length (longest first) for longest-prefix matching
+	// This ensures that longer prefixes are checked before shorter ones
+	k.sortPrefixesByLength()
+	
 	return nil
+}
+
+// sortPrefixesByLength sorts registeredPrefixes by length in descending order (longest first)
+// This enables longest-prefix matching in getRouterForDenom
+func (k *Keeper) sortPrefixesByLength() {
+	// Create a slice of prefix-length pairs
+	type prefixLen struct {
+		prefix string
+		length int
+	}
+	pairs := make([]prefixLen, len(k.registeredPrefixes))
+	for i, prefix := range k.registeredPrefixes {
+		pairs[i] = prefixLen{prefix: prefix, length: len(prefix)}
+	}
+	
+	// Sort by length descending (longest first), then by string order for stability
+	for i := 0; i < len(pairs)-1; i++ {
+		for j := i + 1; j < len(pairs); j++ {
+			if pairs[i].length < pairs[j].length || (pairs[i].length == pairs[j].length && pairs[i].prefix > pairs[j].prefix) {
+				pairs[i], pairs[j] = pairs[j], pairs[i]
+			}
+		}
+	}
+	
+	// Rebuild registeredPrefixes in sorted order
+	k.registeredPrefixes = make([]string, len(pairs))
+	for i, pair := range pairs {
+		k.registeredPrefixes[i] = pair.prefix
+	}
 }
 
 // GetRegisteredPrefixes returns all registered prefixes in registration order
@@ -90,17 +136,27 @@ func (k Keeper) GetRegisteredPrefixes() []string {
 	return result
 }
 
-// getRouterForDenom returns the router for a given denom based on prefix matching
+// getRouterForDenom returns the router for a given denom based on longest-prefix matching
 // Returns the router and true if a matching prefix is found, nil and false otherwise
-// Uses the globally stored registered prefixes
+// Uses longest-prefix matching: if multiple prefixes match, the longest one is used
+// registeredPrefixes is sorted by length (longest first) to enable this
 func (k Keeper) getRouterForDenom(denom string) (types.AliasDenomRouter, bool) {
-	// Check all registered prefixes in registration order
+	// Validate denom is not empty
+	if denom == "" {
+		return nil, false
+	}
+	
+	// Check all registered prefixes (sorted by length, longest first)
+	// This implements longest-prefix matching
 	for _, prefix := range k.registeredPrefixes {
 		if strings.HasPrefix(denom, prefix) {
 			router, exists := k.prefixToRouter[prefix]
+			// Security: MED-003 - Router inconsistency detection
+			// If prefix exists in registeredPrefixes but not in prefixToRouter, this indicates
+			// data corruption or an inconsistent state. This should never happen in normal operation.
+			// Panic to detect corruption early - this is a critical invariant violation.
 			if !exists {
-				// This should never happen if registration is correct, but handle it gracefully
-				return nil, false
+				panic(fmt.Sprintf("sendmanager: router inconsistency detected - prefix '%s' exists in registeredPrefixes but not in prefixToRouter. This indicates data corruption.", prefix))
 			}
 			return router, true
 		}
@@ -116,28 +172,23 @@ func (k Keeper) Logger() log.Logger {
 // SendCoinWithAliasRouting sends a coin using the appropriate routing (alias denom or bank)
 // For alias denoms, it finds the appropriate router based on prefix matching and uses SendNativeTokensViaAliasDenom
 // For regular denoms, it uses bank keeper SendCoins
-// Fails if a prefix matches but no router is registered for it
 func (k Keeper) SendCoinWithAliasRouting(
 	ctx sdk.Context,
 	fromAddressAcc sdk.AccAddress,
 	toAddressAcc sdk.AccAddress,
 	coin *sdk.Coin,
 ) error {
-	// Check if this denom matches any known prefix
+	// Validate coin denom is not empty
+	if coin.Denom == "" {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
+	}
+
+	// Check if this denom matches any known prefix using longest-prefix matching
 	router, found := k.getRouterForDenom(coin.Denom)
 	if found {
 		// Prefix matched and router is registered - use it
 		amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 		return router.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, amountUint)
-	}
-
-	// Check if prefix matched but no router was registered (error condition)
-	// This should not happen if getRouterForDenom is working correctly, but check for safety
-	for _, prefix := range k.registeredPrefixes {
-		if strings.HasPrefix(coin.Denom, prefix) {
-			// Prefix matches but no router registered - this is an error
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, prefix)
-		}
 	}
 
 	// No prefix matched, use standard bank routing
@@ -147,7 +198,6 @@ func (k Keeper) SendCoinWithAliasRouting(
 // SendCoinsWithAliasRouting sends coins using the appropriate routing (alias denom or bank)
 // For alias denoms, it finds the appropriate router based on prefix matching and uses SendNativeTokensViaAliasDenom
 // For regular denoms, it uses bank keeper SendCoins
-// Fails if a prefix matches but no router is registered for it
 func (k Keeper) SendCoinsWithAliasRouting(
 	ctx sdk.Context,
 	fromAddressAcc sdk.AccAddress,
@@ -156,7 +206,12 @@ func (k Keeper) SendCoinsWithAliasRouting(
 ) error {
 	// Process each coin individually
 	for _, coin := range coins {
-		// Check if this denom matches any known prefix
+		// Validate coin denom is not empty
+		if coin.Denom == "" {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
+		}
+
+		// Check if this denom matches any known prefix using longest-prefix matching
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
 			// Prefix matched and router is registered - use it
@@ -166,20 +221,6 @@ func (k Keeper) SendCoinsWithAliasRouting(
 				return err
 			}
 			continue
-		}
-
-		// Check if prefix matched but no router was registered (error condition)
-		// This should not happen if getRouterForDenom is working correctly, but check for safety
-		matchedPrefix := ""
-		for _, prefix := range k.registeredPrefixes {
-			if strings.HasPrefix(coin.Denom, prefix) {
-				matchedPrefix = prefix
-				break
-			}
-		}
-		if matchedPrefix != "" {
-			// Prefix matches but no router registered - this is an error
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
 		}
 
 		// No prefix matched, use standard bank routing
@@ -204,7 +245,12 @@ func (k Keeper) FundCommunityPoolWithAliasRouting(
 	moduleAddress := authtypes.NewModuleAddress(distrtypes.ModuleName).String()
 
 	for _, coin := range coins {
-		// Check if this denom matches any known prefix
+		// Validate coin denom is not empty
+		if coin.Denom == "" {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
+		}
+
+		// Check if this denom matches any known prefix using longest-prefix matching
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
 			// Prefix matched and router is registered - use it
@@ -214,19 +260,6 @@ func (k Keeper) FundCommunityPoolWithAliasRouting(
 				return err
 			}
 			continue
-		}
-
-		// Check if prefix matched but no router was registered (error condition)
-		matchedPrefix := ""
-		for _, prefix := range k.registeredPrefixes {
-			if strings.HasPrefix(coin.Denom, prefix) {
-				matchedPrefix = prefix
-				break
-			}
-		}
-		if matchedPrefix != "" {
-			// Prefix matches but no router registered - this is an error
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
 		}
 
 		// No prefix matched, use standard distribution routing
@@ -252,7 +285,12 @@ func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
 	moduleAddress := authtypes.NewModuleAddress(moduleName)
 
 	for _, coin := range coins {
-		// Check if this denom matches any known prefix
+		// Validate coin denom is not empty
+		if coin.Denom == "" {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
+		}
+
+		// Check if this denom matches any known prefix using longest-prefix matching
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
 			// Prefix matched and router is registered - use standard send for badges keeper
@@ -262,19 +300,6 @@ func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
 				return err
 			}
 			continue
-		}
-
-		// Check if prefix matched but no router was registered (error condition)
-		matchedPrefix := ""
-		for _, prefix := range k.registeredPrefixes {
-			if strings.HasPrefix(coin.Denom, prefix) {
-				matchedPrefix = prefix
-				break
-			}
-		}
-		if matchedPrefix != "" {
-			// Prefix matches but no router registered - this is an error
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
 		}
 
 		// No prefix matched, use standard bank routing
@@ -292,7 +317,12 @@ func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
 // For alias denoms (e.g., badgeslp:), uses the router's GetBalanceWithAliasRouting
 // For regular denoms, uses bankKeeper.GetBalance
 func (k Keeper) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error) {
-	// Check if this denom matches any known prefix
+	// Validate denom is not empty
+	if denom == "" {
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "denom cannot be empty")
+	}
+
+	// Check if this denom matches any known prefix using longest-prefix matching
 	router, found := k.getRouterForDenom(denom)
 	if found {
 		// Prefix matched and router is registered - use it
@@ -307,7 +337,12 @@ func (k Keeper) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddre
 // Returns true if and only if the denom doesn't match any registered prefix (is a bank keeper denom)
 // Returns false if the denom matches any registered prefix (is an alias denom)
 func (k Keeper) IsICS20Compatible(ctx sdk.Context, denom string) bool {
-	// Check if this denom matches any known prefix
+	// Validate denom is not empty
+	if denom == "" {
+		return true // Empty denom is considered ICS20 compatible (will be handled by bank keeper)
+	}
+
+	// Check if this denom matches any known prefix using longest-prefix matching
 	_, found := k.getRouterForDenom(denom)
 	// Return true if no prefix matched (ICS20 compatible), false if prefix matched (not ICS20 compatible)
 	return !found
@@ -317,7 +352,12 @@ func (k Keeper) IsICS20Compatible(ctx sdk.Context, denom string) bool {
 // For alias denoms (e.g., badgeslp:, badges:), returns "BitBadges"
 // For regular ICS20 denoms, returns "ICS20"
 func (k Keeper) StandardName(ctx sdk.Context, denom string) string {
-	// Check if this denom matches any known prefix
+	// Validate denom is not empty
+	if denom == "" {
+		return "x/bank" // Empty denom defaults to bank
+	}
+
+	// Check if this denom matches any known prefix using longest-prefix matching
 	_, found := k.getRouterForDenom(denom)
 	if found {
 		// Alias denom - return "BitBadges"
@@ -339,7 +379,12 @@ func (k Keeper) SendCoinsFromModuleToAccountWithAliasRouting(
 	moduleAddress := authtypes.NewModuleAddress(moduleName)
 
 	for _, coin := range coins {
-		// Check if this denom matches any known prefix
+		// Validate coin denom is not empty
+		if coin.Denom == "" {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
+		}
+
+		// Check if this denom matches any known prefix using longest-prefix matching
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
 			// Prefix matched and router is registered - use adapter method
@@ -349,19 +394,6 @@ func (k Keeper) SendCoinsFromModuleToAccountWithAliasRouting(
 				return err
 			}
 			continue
-		}
-
-		// Check if prefix matched but no router was registered (error condition)
-		matchedPrefix := ""
-		for _, prefix := range k.registeredPrefixes {
-			if strings.HasPrefix(coin.Denom, prefix) {
-				matchedPrefix = prefix
-				break
-			}
-		}
-		if matchedPrefix != "" {
-			// Prefix matches but no router registered - this is an error
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
 		}
 
 		// No prefix matched, use standard bank routing
@@ -386,7 +418,12 @@ func (k Keeper) SendCoinsFromAccountToModuleWithAliasRouting(
 	moduleAddress := authtypes.NewModuleAddress(moduleName)
 
 	for _, coin := range coins {
-		// Check if this denom matches any known prefix
+		// Validate coin denom is not empty
+		if coin.Denom == "" {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
+		}
+
+		// Check if this denom matches any known prefix using longest-prefix matching
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
 			// Prefix matched and router is registered - use adapter method
@@ -396,19 +433,6 @@ func (k Keeper) SendCoinsFromAccountToModuleWithAliasRouting(
 				return err
 			}
 			continue
-		}
-
-		// Check if prefix matched but no router was registered (error condition)
-		matchedPrefix := ""
-		for _, prefix := range k.registeredPrefixes {
-			if strings.HasPrefix(coin.Denom, prefix) {
-				matchedPrefix = prefix
-				break
-			}
-		}
-		if matchedPrefix != "" {
-			// Prefix matches but no router registered - this is an error
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "denom %s matches prefix %s but no router is registered for this prefix", coin.Denom, matchedPrefix)
 		}
 
 		// No prefix matched, use standard bank routing

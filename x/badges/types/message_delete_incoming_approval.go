@@ -45,8 +45,10 @@ func (msg *MsgDeleteIncomingApproval) ValidateBasic() error {
 	}
 
 	// Validate collection ID
-	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidCollectionID, "collection ID cannot be zero")
+	// Allow collectionId = 0 for auto-prev resolution (used in multi-msg transactions)
+	// The actual validation and resolution happens in resolveCollectionIdWithAutoPrev
+	if msg.CollectionId.IsNil() {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "collection ID cannot be nil")
 	}
 
 	// Validate approval ID

@@ -85,6 +85,7 @@ func ValidateAddress(address string, alowMint bool) error {
 		return nil
 	}
 
+	// Validate address using global SDK config (should be "bb" prefix)
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s", err)

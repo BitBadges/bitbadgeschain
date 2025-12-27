@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
@@ -21,27 +22,46 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bitbadges/bitbadgeschain/app/params"
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 )
 
 func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
+	// Add transient store for custom-hooks module (needed for deterministic error handling)
+	transientStoreKey := customhookstypes.TransientStoreKey
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
+	stateStore.MountStoreWithDB(transientStoreKey, storetypes.StoreTypeTransient, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
-	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
+	
+	// Ensure SDK config is initialized with "bb" prefix before it gets sealed
+	// This must be called before any address validation happens
+	params.InitSDKConfigWithoutSeal()
+	
+	// Use bech32 codec with "bb" prefix
+	bech32Codec := address.NewBech32Codec("bb")
+	
+	authorityAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	
+	// Convert authority to "bb" prefix to match account keeper setup
+	authorityStr, err := bech32Codec.BytesToString(authorityAddr)
+	if err != nil {
+		panic(err)
+	}
 
-	ak := accountkeeper.NewAccountKeeper(appCodec, runtime.NewKVStoreService(storeKey), func() sdk.AccountI { return &authtypes.BaseAccount{} }, map[string][]string{}, address.NewBech32Codec("bb"), "bb", authority.String())
+	ak := accountkeeper.NewAccountKeeper(appCodec, runtime.NewKVStoreService(storeKey), func() sdk.AccountI { return &authtypes.BaseAccount{} }, map[string][]string{}, bech32Codec, "bb", authorityStr)
 
-	bankKeeper := bankkeeper.NewBaseKeeper(appCodec, runtime.NewKVStoreService(storeKey), ak, map[string]bool{}, authority.String(), log.NewNopLogger())
+	bankKeeper := bankkeeper.NewBaseKeeper(appCodec, runtime.NewKVStoreService(storeKey), ak, map[string]bool{}, authorityStr, log.NewNopLogger())
 
 	dk := distributionkeeper.Keeper{}
 
@@ -54,7 +74,7 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		appCodec,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
-		authority.String(),
+		authorityStr,
 		bankKeeper,
 		ak,
 		dk,                    // DistributionKeeper
@@ -69,6 +89,10 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	if err := k.SetParams(ctx, types.DefaultParams()); err != nil {
 		panic(err)
 	}
+
+	// Initialize next collection ID to 1 (first collection will get ID 1)
+	// This matches the behavior in InitGenesis
+	k.SetNextCollectionId(ctx, math.NewUint(1))
 
 	return k, ctx
 }

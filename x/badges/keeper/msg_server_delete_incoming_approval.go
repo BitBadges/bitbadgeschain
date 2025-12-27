@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
@@ -69,7 +68,7 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 	}
 
 	// Emit events
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +77,7 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "delete_incoming_approval"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 

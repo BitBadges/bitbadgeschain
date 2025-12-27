@@ -77,6 +77,7 @@ func NewKeeper(
 	ibcKeeperFn func() *ibckeeper.Keeper,
 	capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper,
 ) Keeper {
+	// Validate authority address (should use "bb" prefix)
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
 	}

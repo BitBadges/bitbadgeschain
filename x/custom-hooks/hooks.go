@@ -33,40 +33,48 @@ func NewCustomHooks(keeper keeper.Keeper, bech32PrefixAccAddr string) *CustomHoo
 
 // OnRecvPacketOverride implements OnRecvPacketOverrideHooks interface
 // This allows us to control the acknowledgement and fail the packet if the hook fails
+// Both IBC transfer and hook execution are wrapped in a cached context to ensure atomicity
 func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	h.keeper.Logger(ctx).Info("custom-hooks: OnRecvPacketOverride", "packet", packet)
 
-	// First, process the IBC transfer by calling the underlying app
-	ack := im.App.OnRecvPacket(ctx, packet, relayer)
-
-	// If the IBC transfer itself failed, return the error acknowledgement
-	if !ack.Success() {
-		return ack
-	}
-
-	// Check if this is an ICS20 packet
+	// Check if this is an ICS20 packet and parse hook data before executing IBC transfer
+	// This allows us to determine if we need atomicity before committing IBC transfer state
 	isIcs20, data := isIcs20Packet(packet.GetData())
-	if !isIcs20 {
+	var hookData *customhookstypes.HookData
+	var parseErr error
+	if isIcs20 {
+		hookData, parseErr = customhookstypes.ParseHookDataFromMemo(data.GetMemo())
+		if parseErr != nil {
+			h.keeper.Logger(ctx).Error("custom-hooks: failed to parse memo", "error", parseErr)
+			// Return custom error acknowledgement with deterministic error string
+			return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse hook data from memo"))
+		}
+	}
+
+	// If no hook data, execute IBC transfer normally (no atomicity needed)
+	if !isIcs20 || hookData == nil {
+		return im.App.OnRecvPacket(ctx, packet, relayer)
+	}
+
+	// We have hook data - need atomicity between IBC transfer and hook execution
+	// Wrap both operations in a cached context to ensure atomicity
+	cacheCtx, writeCache := ctx.CacheContext()
+
+	// Execute IBC transfer in cached context
+	ack := im.App.OnRecvPacket(cacheCtx, packet, relayer)
+
+	// If the IBC transfer itself failed, discard cache and return error
+	if !ack.Success() {
+		// Cache context is automatically discarded - no state changes committed
 		return ack
 	}
 
-	// Parse hook data from memo
-	hookData, err := customhookstypes.ParseHookDataFromMemo(data.GetMemo())
-	if err != nil {
-		h.keeper.Logger(ctx).Error("custom-hooks: failed to parse memo", "error", err)
-		// Return custom error acknowledgement with deterministic error string
-		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse hook data from memo"))
-	}
-
-	// If no hook data, just return success (normal IBC transfer)
-	if hookData == nil {
-		return ack
-	}
-
+	// IBC transfer succeeded in cached context - now execute hook in same cached context
 	// Extract amount and denom from packet
 	amount, ok := osmomath.NewIntFromString(data.Amount)
 	if !ok {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to parse amount from packet")
+		// Cache context is automatically discarded - no state changes committed
 		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse amount from packet: %s", data.Amount))
 	}
 
@@ -91,6 +99,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	senderBech32, err := ibchookstypes.DeriveIntermediateSender(channel, sender, h.bech32PrefixAccAddr)
 	if err != nil {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to derive intermediate sender", "error", err)
+		// Cache context is automatically discarded - no state changes committed
 		return customhookstypes.NewCustomErrorAcknowledgement("failed to derive intermediate sender")
 	}
 
@@ -98,6 +107,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	senderAddr, err := sdk.AccAddressFromBech32(senderBech32)
 	if err != nil {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to convert sender to AccAddress", "error", err)
+		// Cache context is automatically discarded - no state changes committed
 		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid sender address: %s", senderBech32))
 	}
 
@@ -105,20 +115,21 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	amountSDK := sdkmath.NewIntFromBigInt(amount.BigInt())
 	tokenCoin := sdk.NewCoin(denom, amountSDK)
 
-	// Execute custom hooks from intermediate sender address in a cache context
-	// This ensures state changes are only committed if the hook succeeds
-	cacheCtx, writeCache := ctx.CacheContext()
+	// Execute hook in the same cached context as IBC transfer
 	hookAck := h.keeper.ExecuteHook(cacheCtx, senderAddr, hookData, tokenCoin, originalSender)
 	if !hookAck.Success() {
 		h.keeper.Logger(ctx).Error("custom-hooks: failed to execute hook")
-		// Cache context is automatically discarded on error - no state changes committed
-		// Return the error acknowledgement - this will roll back the IBC transfer
+		// Cache context is automatically discarded - no state changes committed
+		// Both IBC transfer and hook state changes are rolled back atomically
 		return hookAck
 	}
 
-	// Hook succeeded - write cache to commit state changes
+	// Both IBC transfer and hook succeeded in cached context
+	// Commit all state changes atomically
 	writeCache()
 
+	// Return the IBC transfer ack (which we know is successful)
+	// Both IBC transfer and hook state are now committed atomically
 	return ack
 }
 

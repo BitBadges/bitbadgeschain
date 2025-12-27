@@ -126,7 +126,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsNotAll
 		CollectionId:               sdkmath.NewUint(1),
 		PurgeExpired:               true,
 		ApproverAddress:            alice,
-		PurgeCounterpartyApprovals: false,
+		PurgeCounterpartyApprovals: false, // Bob cannot purge Alice's approvals without this flag
 		ApprovalsToPurge: []*types.ApprovalIdentifierDetails{{
 			ApprovalId:      "expired-approval",
 			ApprovalLevel:   "outgoing",
@@ -135,7 +135,9 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsNotAll
 		}},
 	}
 	_, err = suite.msgServer.PurgeApprovals(wctx, msg)
-	suite.Require().NoError(err)
+	// Bob cannot purge Alice's approvals without PurgeCounterpartyApprovals flag
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "PurgeCounterpartyApprovals")
 
 	balance, err = GetUserBalance(&suite.TestSuite, wctx, sdkmath.NewUint(1), alice)
 	suite.Require().NoError(err)
@@ -184,7 +186,7 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeAnotherUserExpiredApprovalsAllowe
 		CollectionId:               sdkmath.NewUint(1),
 		PurgeExpired:               true,
 		ApproverAddress:            alice,
-		PurgeCounterpartyApprovals: false,
+		PurgeCounterpartyApprovals: true, // Bob can purge Alice's expired approvals with this flag
 		ApprovalsToPurge: []*types.ApprovalIdentifierDetails{{
 			ApprovalId:      "expired-approval",
 			ApprovalLevel:   "outgoing",

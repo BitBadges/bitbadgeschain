@@ -179,6 +179,17 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 				return err
 			}
 
+			// Save balances after each recipient to ensure consistency.
+			// This ensures that if the transaction fails partway through,
+			// the state is consistent (though the cache context will roll back all changes).
+			// More importantly, this ensures that fromUserBalance reflects the cumulative
+			// deductions across all recipients in the loop, preventing balance calculation errors.
+			if !types.IsMintAddress(transfer.From) {
+				if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
+					return err
+				}
+			}
+
 			if err := k.SetBalanceForAddress(ctx, collection, to, toUserBalance); err != nil {
 				return err
 			}
@@ -198,11 +209,9 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 			}
 		}
 
-		if !types.IsMintAddress(transfer.From) {
-			if err := k.SetBalanceForAddress(ctx, collection, transfer.From, fromUserBalance); err != nil {
-				return err
-			}
-		} else {
+		// Note: fromUserBalance is already saved after each recipient in the loop above.
+		// We only need to handle the mint case here (total balances).
+		if types.IsMintAddress(transfer.From) {
 			// Get current Total and increment it
 			totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
 			totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
