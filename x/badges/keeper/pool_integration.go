@@ -67,32 +67,9 @@ func setAutoApprovalFlagsIfNeeded(balance *badgestypes.UserBalanceStore) bool {
 	return flagsChanged
 }
 
-// SetAllAutoApprovalFlagsForPoolAddress sets auto-approval flags for a pool or path address.
-// This is used for pool integration where pool addresses and path addresses need auto-approval
-// to function correctly. This function should only be called for system addresses (pool addresses,
-// path addresses) that are trusted and need auto-approval.
-//
-// Security:
-// - Validates that the address is a pool address or path address (defense-in-depth)
-// - Only sets flags if they're not already set (prevents overriding existing settings)
-// - Each flag is checked individually before setting
-//
 // This function follows the same pattern as setAutoApproveFlagsForPathAddress to ensure
 // consistent behavior and prevent unintended overrides of user-configured settings.
 func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
-	// Defense-in-depth: Validate that address is a pool address or path address
-	// This ensures we don't accidentally set auto-approve flags for regular user addresses
-	isPool, err := k.IsLiquidityPool(ctx, address)
-	if err != nil {
-		return sdkerrors.Wrapf(err, "failed to check if address is liquidity pool: %s", address)
-	}
-	isPathAddress := k.IsBackedOrWrappingPathAddress(ctx, collection, address)
-
-	if !isPool && !isPathAddress {
-		return sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "address %s is not a pool address or path address", address)
-	}
-
-	// Get current balances
 	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address)
 
 	// Set flags if needed (DRY helper)

@@ -27,12 +27,13 @@ func (suite *PoolAutoApprovalTestSuite) SetupTest() {
 // TestPoolAutoApproval_OnlySetsIfNotAlreadySet verifies that auto-approve flags
 // are only set if they're not already set, preventing unintended overrides.
 // This test addresses HIGH-009: Pool Integration Auto-Approval Security.
+// Note: The function no longer validates that the address is a pool/path address,
+// so it can be called on any address.
 func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_OnlySetsIfNotAlreadySet() {
 	collection := suite.GetCollection(suite.CollectionId)
 
-	// Create a test pool address (we'll use a mock pool address for testing)
-	// In real scenarios, this would be a validated pool address
-	poolAddress := suite.Alice // Using Alice as a test address - in real code this would be validated
+	// Use a regular address for testing - validation is no longer performed
+	poolAddress := suite.Alice
 
 	// First, manually set one flag to true
 	balance, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
@@ -44,12 +45,17 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_OnlySetsIfNotAlread
 	balanceBefore, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
 	suite.Require().True(balanceBefore.AutoApproveAllIncomingTransfers, "flag should be set before calling function")
 
-	// Note: The function will fail validation because Alice is not a pool address
-	// This is expected - the validation prevents setting flags for non-pool addresses
-	// In a real scenario, we would use an actual pool address
+	// Call the function - it should succeed and only set flags that aren't already set
 	err = suite.Keeper.SetAllAutoApprovalFlagsForPoolAddress(suite.Ctx, collection, poolAddress)
-	suite.Require().Error(err, "should fail validation for non-pool address")
-	suite.Require().Contains(err.Error(), "not a pool address or path address", "error should mention validation failure")
+	suite.Require().NoError(err, "should succeed for any address")
+
+	// Verify that the already-set flag remains true
+	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
+	suite.Require().True(balanceAfter.AutoApproveAllIncomingTransfers, "flag that was already set should remain true")
+
+	// Verify that other flags were set
+	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedOutgoingTransfers, "flag should be set")
+	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedIncomingTransfers, "flag should be set")
 }
 
 // TestPoolAutoApproval_IndividualFlagCheck verifies that each flag is checked
@@ -121,15 +127,21 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_IndividualFlagCheck
 	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedIncomingTransfers, "flag should be set")
 }
 
-// TestPoolAutoApproval_ValidationRejectsRegularAddress verifies that the function
-// rejects regular user addresses, only allowing pool/path addresses.
-func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_ValidationRejectsRegularAddress() {
+// TestPoolAutoApproval_WorksForRegularAddress verifies that the function
+// works for any address, not just pool/path addresses.
+// Note: Validation was removed, so the function can be called on any address.
+func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_WorksForRegularAddress() {
 	collection := suite.GetCollection(suite.CollectionId)
 
-	// Try to call with a regular user address - should fail validation
+	// Call with a regular user address - should succeed
 	err := suite.Keeper.SetAllAutoApprovalFlagsForPoolAddress(suite.Ctx, collection, suite.Alice)
-	suite.Require().Error(err, "should reject regular user address")
-	suite.Require().Contains(err.Error(), "not a pool address or path address", "error should mention validation failure")
+	suite.Require().NoError(err, "should succeed for regular address")
+
+	// Verify that flags were set
+	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	suite.Require().True(balanceAfter.AutoApproveAllIncomingTransfers, "flag should be set")
+	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedOutgoingTransfers, "flag should be set")
+	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedIncomingTransfers, "flag should be set")
 }
 
 // TestPoolAutoApproval_NoChangeIfAllFlagsSet verifies that the function doesn't
