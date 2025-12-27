@@ -26,11 +26,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "testcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "TEST",
@@ -118,11 +123,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "unwraptest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},
@@ -214,11 +224,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "transfertest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},
@@ -313,11 +328,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "errortest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},
@@ -414,22 +434,32 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "coin-one",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol: "COIN-ONE",
 		},
 		{
 			Denom: "coin-two",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol: "COIN-TWO",
@@ -515,11 +545,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "disabledcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "DISABLED",
@@ -586,11 +621,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "overridecoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(), // This will be overridden
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(), // This will be overridden
+					},
 				},
 			},
 			Symbol:                         "OVERRIDE",
@@ -658,11 +698,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "badge_{id}_coin", // Use {id} placeholder
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "BADGE",
@@ -734,11 +779,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "badge_{id}_coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "BADGE",
@@ -846,11 +896,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "validationcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "VALIDATION",
@@ -939,11 +994,16 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "integrationtest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "INTEGRATION",
@@ -1096,11 +1156,16 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "communitytest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "COMMUNITY",
@@ -1143,11 +1208,16 @@ func (suite *TestSuite) TestGammKeeperPoolWithAliasRouting() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "pooltest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "POOLTEST",
@@ -1191,11 +1261,16 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "parsetest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "PARSETEST",
@@ -1251,11 +1326,16 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "errortest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "ERRORTEST",
@@ -1296,11 +1376,16 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "simpletest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "SIMPLETEST",
@@ -1344,11 +1429,16 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "basictest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "BASICTEST",
@@ -1428,11 +1518,16 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "poolbadge",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "POOLBADGE",
@@ -1476,11 +1571,16 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "simplepool",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "SIMPLEPOOL",
@@ -1685,11 +1785,16 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "allfunctionstest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "ALLFUNCTIONS",
@@ -1825,11 +1930,16 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "comprehensivepool",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "COMPREHENSIVE",

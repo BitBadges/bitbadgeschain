@@ -164,24 +164,33 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return err
 		}
 
+		// Validate conversion
+		if path.Conversion == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "wrapper path conversion cannot be nil")
+		}
+
+		if path.Conversion.SideA == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "wrapper path conversion sideA cannot be nil")
+		}
+
+		if path.Conversion.SideA.Amount.IsNil() || path.Conversion.SideA.Amount.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "wrapper path conversion sideA amount cannot be zero")
+		}
+
 		// Validate balances
-		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
+		_, err = ValidateBalances(ctx, path.Conversion.SideB, canChangeValues)
 		if err != nil {
 			return err
 		}
 
-		if path.Amount.IsNil() || path.Amount.IsZero() {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "wrapper path amount cannot be zero")
-		}
-
 		// Validate basic checks for cosmos coin wrapper paths
-		// Ensure path.balances len == 1
-		if len(path.Balances) != 1 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path must have exactly one balance, found %d", len(path.Balances))
+		// Ensure path.conversion.sideB len == 1
+		if len(path.Conversion.SideB) != 1 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path must have exactly one balance, found %d", len(path.Conversion.SideB))
 		}
 
-		// Validate each balance in path.balances
-		for _, balance := range path.Balances {
+		// Validate each balance in path.conversion.sideB
+		for _, balance := range path.Conversion.SideB {
 			// Ensure tokenIds len == 1
 			if len(balance.TokenIds) != 1 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin wrapper path balance must have exactly one tokenId range, found %d", len(balance.TokenIds))
@@ -234,20 +243,29 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			return err
 		}
 
-		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
+		// Validate conversion
+		if path.Conversion == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path conversion cannot be nil")
+		}
+
+		if path.Conversion.SideA == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path conversion sideA cannot be nil")
+		}
+
+		if path.Conversion.SideA.Amount.IsNil() || path.Conversion.SideA.Amount.IsZero() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path conversion sideA amount cannot be zero")
+		}
+
+		_, err = ValidateBalances(ctx, path.Conversion.SideB, canChangeValues)
 		if err != nil {
 			return err
 		}
 
-		if path.Amount.IsNil() || path.Amount.IsZero() {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path amount cannot be zero")
+		if len(path.Conversion.SideB) != 1 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path must have exactly one balance, found %d", len(path.Conversion.SideB))
 		}
 
-		if len(path.Balances) != 1 {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "alias path must have exactly one balance, found %d", len(path.Balances))
-		}
-
-		for _, balance := range path.Balances {
+		for _, balance := range path.Conversion.SideB {
 			if len(balance.TokenIds) != 1 {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "alias path balance must have exactly one tokenId range, found %d", len(balance.TokenIds))
 			}
@@ -307,29 +325,38 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	// If validation fails, the entire backed path step is disabled/rejected
 	if msg.Invariants != nil && msg.Invariants.CosmosCoinBackedPath != nil {
 		path := msg.Invariants.CosmosCoinBackedPath
+		// Validate conversion
+		if path.Conversion == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin backed path conversion cannot be nil")
+		}
+
+		if path.Conversion.SideA == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin backed path conversion sideA cannot be nil")
+		}
+
 		// Validate ibc denom is not empty
-		if path.IbcDenom == "" {
+		if path.Conversion.SideA.Denom == "" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "ibc denom cannot be empty")
 		}
 
 		// Validate ibcAmount is set and non-zero
-		if path.IbcAmount.IsZero() {
+		if path.Conversion.SideA.Amount.IsZero() || path.Conversion.SideA.Amount.IsNil() {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "ibcAmount cannot be zero")
 		}
 
 		// Validate balances length > 0 - if empty, disable the entire step
-		if len(path.Balances) == 0 {
+		if len(path.Conversion.SideB) == 0 {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin backed path must have at least one balance - step disabled")
 		}
 
 		// Validate balances
-		_, err = ValidateBalances(ctx, path.Balances, canChangeValues)
+		_, err = ValidateBalances(ctx, path.Conversion.SideB, canChangeValues)
 		if err != nil {
 			return err
 		}
 
 		// Validate all amounts are > 0 - if any amount is zero, disable the entire step
-		for i, balance := range path.Balances {
+		for i, balance := range path.Conversion.SideB {
 			if balance.Amount.IsZero() {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "cosmos coin backed path balance[%d] amount must be greater than zero - step disabled", i)
 			}

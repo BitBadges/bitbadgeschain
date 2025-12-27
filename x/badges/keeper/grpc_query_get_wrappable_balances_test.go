@@ -47,11 +47,16 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "testcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1), // 1 native badge = 1 wrapped token
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1), // 1 native badge = 1 wrapped token
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "TESTCOIN",
@@ -121,11 +126,16 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	collectionsToCreate2[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "testcoin-two",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1), // 1 native badge = 1 wrapped token
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1), // 1 native badge = 1 wrapped token
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "TESTCOIN-TWO",
@@ -184,16 +194,20 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	collectionsToCreate4[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "twox",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1), // base badge amount per unit
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(2), // 2 badge units per denom unit
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1), // base badge amount per unit
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "TWOX",
 			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "twox", IsDefaultDisplay: true}},
-			Amount:     sdkmath.NewUint(2), // 2 badge units per denom unit
 		},
 	}
 
@@ -249,11 +263,16 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	collectionsToCreate3[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "nowrap",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(), // Use GetOneUintRange to match what the user gets
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(), // Use GetOneUintRange to match what the user gets
+					},
 				},
 			},
 			Symbol:     "NOWRAP",
@@ -319,11 +338,16 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "advanced-test",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1), // 1 of token ID 1
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1), // 1 of token ID 1
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					},
 				},
 			},
 			Symbol:     "ADVANCED-TEST",
@@ -352,11 +376,16 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	collectionsToCreate2[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "advanced-test-two",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1), // 1 of token ID 1
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1), // 1 of token ID 1
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					},
 				},
 			},
 			Symbol:     "ADVANCED-TEST-TWO",
@@ -474,16 +503,20 @@ func TestKeeper_GetWrappableBalances_Comprehensive(t *testing.T) {
 			collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 				{
 					Denom: denomName,
-					Balances: []*types.Balance{
-						{
-							Amount:         tt.pathBalanceAmount,
-							OwnershipTimes: GetFullUintRanges(),
-							TokenIds:       GetOneUintRange(),
+					Conversion: &types.ConversionWithoutDenom{
+						SideA: &types.ConversionSideA{
+							Amount: tt.pathAmount,
+						},
+						SideB: []*types.Balance{
+							{
+								Amount:         tt.pathBalanceAmount,
+								OwnershipTimes: GetFullUintRanges(),
+								TokenIds:       GetOneUintRange(),
+							},
 						},
 					},
 					Symbol:     "TEST",
 					DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "test", IsDefaultDisplay: true}},
-					Amount:     tt.pathAmount,
 				},
 			}
 
@@ -662,16 +695,20 @@ func TestKeeper_GetWrappableBalances_MultipleUserBalances(t *testing.T) {
 			collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 				{
 					Denom: denomName,
-					Balances: []*types.Balance{
-						{
-							Amount:         tt.pathBalanceAmount,
-							OwnershipTimes: GetFullUintRanges(),
-							TokenIds:       GetOneUintRange(),
+					Conversion: &types.ConversionWithoutDenom{
+						SideA: &types.ConversionSideA{
+							Amount: tt.pathAmount,
+						},
+						SideB: []*types.Balance{
+							{
+								Amount:         tt.pathBalanceAmount,
+								OwnershipTimes: GetFullUintRanges(),
+								TokenIds:       GetOneUintRange(),
+							},
 						},
 					},
 					Symbol:     "MULTITEST",
 					DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "multitest", IsDefaultDisplay: true}},
-					Amount:     tt.pathAmount,
 				},
 			}
 

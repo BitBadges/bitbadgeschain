@@ -63,19 +63,23 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 
 // calculateMaxWrappableAmount calculates the maximum amount that can be wrapped.
 //
-// The conversion rate is: 1 x { amount: path.Amount, denom } = 1 x path.Balances
+// The conversion rate is: 1 x { amount: path.Conversion.SideA.Amount, denom } = 1 x path.Conversion.SideB
 //
 // Algorithm:
-// 1. For each balance in path.Balances, find the corresponding user balance (matching token IDs and ownership times)
+// 1. For each balance in path.Conversion.SideB, find the corresponding user balance (matching token IDs and ownership times)
 // 2. Calculate how many times that path balance can fit: userBalance.Amount / pathBalance.Amount
 // 3. Take the minimum across all path balances (since we need all of them to perform a conversion)
-// 4. Multiply by path.Amount to get the total wrappable amount
+// 4. Multiply by path.Conversion.SideA.Amount to get the total wrappable amount
 func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*types.Balance, path *types.AliasPath) (sdkmath.Uint, error) {
-	if len(path.Balances) == 0 {
+	if path.Conversion == nil || path.Conversion.SideA == nil {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "conversion or sideA is nil")
+	}
+
+	if len(path.Conversion.SideB) == 0 {
 		return sdkmath.NewUint(0), nil
 	}
 
-	if path.Amount.IsZero() || path.Amount.IsNil() {
+	if path.Conversion.SideA.Amount.IsZero() || path.Conversion.SideA.Amount.IsNil() {
 		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "path amount is zero")
 	}
 
@@ -84,7 +88,7 @@ func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*typ
 	var minConversions *sdkmath.Uint
 
 	// For each balance required by the path, find how many conversions are possible
-	for _, pathBalance := range path.Balances {
+	for _, pathBalance := range path.Conversion.SideB {
 		// Calculate how many times this path balance can fit into the user's total balance
 		// If pathBalance.Amount is zero, we can't perform any conversions
 		if pathBalance.Amount.IsZero() {
@@ -124,7 +128,7 @@ func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*typ
 		return sdkmath.NewUint(0), nil
 	}
 
-	// Multiply by path.Amount to get the total wrappable amount
-	// This represents how many wrapped units (denom with amount path.Amount) can be created
-	return minConversions.Mul(path.Amount), nil
+	// Multiply by path.Conversion.SideA.Amount to get the total wrappable amount
+	// This represents how many wrapped units (denom with amount path.Conversion.SideA.Amount) can be created
+	return minConversions.Mul(path.Conversion.SideA.Amount), nil
 }

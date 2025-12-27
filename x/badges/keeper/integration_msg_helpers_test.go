@@ -221,16 +221,30 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 
 		normalizedWrapperPaths := []*types.CosmosCoinWrapperPathAddObject{}
 		for _, wrapperPath := range collectionToCreate.CosmosCoinWrapperPathsToAdd {
-			if wrapperPath.Amount.IsNil() || wrapperPath.Amount.IsZero() {
-				wrapperPath.Amount = sdkmath.NewUint(1)
+			if wrapperPath.Conversion == nil || wrapperPath.Conversion.SideA == nil {
+				wrapperPath.Conversion = &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{},
+				}
+			} else if wrapperPath.Conversion.SideA.Amount.IsNil() || wrapperPath.Conversion.SideA.Amount.IsZero() {
+				wrapperPath.Conversion.SideA.Amount = sdkmath.NewUint(1)
 			}
 			normalizedWrapperPaths = append(normalizedWrapperPaths, wrapperPath)
 		}
 
 		normalizedAliasPaths := []*types.AliasPathAddObject{}
 		for _, aliasPath := range collectionToCreate.AliasPathsToAdd {
-			if aliasPath.Amount.IsNil() || aliasPath.Amount.IsZero() {
-				aliasPath.Amount = sdkmath.NewUint(1)
+			if aliasPath.Conversion == nil || aliasPath.Conversion.SideA == nil {
+				aliasPath.Conversion = &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{},
+				}
+			} else if aliasPath.Conversion.SideA.Amount.IsNil() || aliasPath.Conversion.SideA.Amount.IsZero() {
+				aliasPath.Conversion.SideA.Amount = sdkmath.NewUint(1)
 			}
 			normalizedAliasPaths = append(normalizedAliasPaths, aliasPath)
 		}

@@ -168,16 +168,18 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			// Handle cosmos coin backed path - generate address
 			if msg.Invariants.CosmosCoinBackedPath != nil {
 				pathAddObject := msg.Invariants.CosmosCoinBackedPath
-				backedAccountAddr, err := generatePathAddress(pathAddObject.IbcDenom, BackedPathGenerationPrefix)
+				if pathAddObject.Conversion == nil || pathAddObject.Conversion.SideA == nil {
+					return nil, fmt.Errorf("cosmos coin backed path conversion or sideA is nil")
+				}
+
+				backedAccountAddr, err := generatePathAddress(pathAddObject.Conversion.SideA.Denom, BackedPathGenerationPrefix)
 				if err != nil {
 					return nil, err
 				}
 
 				backedPath := &types.CosmosCoinBackedPath{
-					Address:   backedAccountAddr.String(),
-					IbcDenom:  pathAddObject.IbcDenom,
-					Balances:  pathAddObject.Balances,
-					IbcAmount: pathAddObject.IbcAmount,
+					Address:    backedAccountAddr.String(),
+					Conversion: pathAddObject.Conversion,
 				}
 
 				// Auto-set the cosmoscoinbacked path address as a reserved protocol address
@@ -342,11 +344,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			pathsToAdd[i] = &types.CosmosCoinWrapperPath{
 				Address:                        accountAddr.String(),
 				Denom:                          path.Denom,
-				Balances:                       path.Balances,
+				Conversion:                     path.Conversion,
 				Symbol:                         path.Symbol,
 				DenomUnits:                     path.DenomUnits,
 				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
-				Amount:                         path.Amount,
 			}
 
 			// Auto-set the cosmoscoinwrapper path address as a reserved protocol address
@@ -363,10 +364,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		for i, path := range msg.AliasPathsToAdd {
 			pathsToAdd[i] = &types.AliasPath{
 				Denom:      path.Denom,
-				Balances:   path.Balances,
+				Conversion: path.Conversion,
 				Symbol:     path.Symbol,
 				DenomUnits: path.DenomUnits,
-				Amount:     path.Amount,
 			}
 		}
 
@@ -388,19 +388,18 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		// Handle cosmos coin backed path - generate address
 		if msg.Invariants.CosmosCoinBackedPath != nil {
 			pathAddObject := msg.Invariants.CosmosCoinBackedPath
-			accountAddr, err := generatePathAddress(pathAddObject.IbcDenom, BackedPathGenerationPrefix)
+			if pathAddObject.Conversion == nil || pathAddObject.Conversion.SideA == nil {
+				return nil, fmt.Errorf("cosmos coin backed path conversion or sideA is nil")
+			}
+
+			accountAddr, err := generatePathAddress(pathAddObject.Conversion.SideA.Denom, BackedPathGenerationPrefix)
 			if err != nil {
 				return nil, err
 			}
 
-			// ibcAmount is validated in ValidateBasic to be non-zero
-			ibcAmount := pathAddObject.IbcAmount
-
 			backedPath := &types.CosmosCoinBackedPath{
-				Address:   accountAddr.String(),
-				IbcDenom:  pathAddObject.IbcDenom,
-				Balances:  pathAddObject.Balances,
-				IbcAmount: ibcAmount,
+				Address:    accountAddr.String(),
+				Conversion: pathAddObject.Conversion,
 			}
 
 			// Auto-set the cosmoscoinbacked path address as a reserved protocol address

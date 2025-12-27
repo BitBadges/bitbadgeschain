@@ -204,11 +204,16 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "wrappedcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:     "WRAP",
@@ -448,11 +453,16 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "insufficientcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},
@@ -619,11 +629,16 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "mixedcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},

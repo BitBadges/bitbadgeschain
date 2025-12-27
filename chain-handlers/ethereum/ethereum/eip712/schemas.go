@@ -69,6 +69,31 @@ func getBalanceSchema() string {
 	}`
 }
 
+// getConversionWithoutDenomSchema returns the schema for ConversionWithoutDenom
+func getConversionWithoutDenomSchema() string {
+	return `{
+		"sideA": {
+			"amount": ""
+		},
+		"sideB": [
+			` + getBalanceSchema() + `
+		]
+	}`
+}
+
+// getConversionSchema returns the schema for Conversion (with denom)
+func getConversionSchema() string {
+	return `{
+		"sideA": {
+			"amount": "",
+			"denom": ""
+		},
+		"sideB": [
+			` + getBalanceSchema() + `
+		]
+	}`
+}
+
 // getPredeterminedBalancesSchema returns the schema for predetermined balances
 func getPredeterminedBalancesSchema() string {
 	return `{
@@ -157,31 +182,6 @@ func getAddressChecksSchema() string {
 		"mustNotBeWasmContract": false,
 		"mustBeLiquidityPool": false,
 		"mustNotBeLiquidityPool": false
-	}`
-}
-
-// getBaseApprovalCriteriaSchema returns the base approval criteria schema without collection-specific fields
-func getBaseApprovalCriteriaSchema() string {
-	return `{
-		"mustOwnTokens": [
-			` + getMustOwnTokensSchema() + `
-		],
-		"merkleChallenges": [
-			` + getMerkleChallengeSchema() + `
-		],
-		"coinTransfers": [
-			` + getCoinTransferSchema() + `
-		],
-		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
-		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
-		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
-		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
-		"dynamicStoreChallenges": [
-			` + getDynamicStoreChallengeSchema() + `
-		],
-		"ethSignatureChallenges": [
-			` + getETHSignatureChallengeSchema() + `
-		]
 	}`
 }
 
@@ -663,10 +663,7 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"amount": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -681,10 +678,7 @@ func GetSchemas() []string {
 			"aliasPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"amount": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -699,11 +693,7 @@ func GetSchemas() []string {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": "",
 				"cosmosCoinBackedPath": {
-					"ibcDenom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"ibcAmount": ""
+					"conversion": `+getConversionSchema()+`
 				},
 				"noForcefulPostMintTransfers": false,
 				"disablePoolCreation": false
@@ -783,10 +773,7 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"amount": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -801,10 +788,7 @@ func GetSchemas() []string {
 			"aliasPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"amount": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -819,11 +803,7 @@ func GetSchemas() []string {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": "",
 				"cosmosCoinBackedPath": {
-					"ibcDenom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"ibcAmount": ""
+					"conversion": `+getConversionSchema()+`
 				},
 				"noForcefulPostMintTransfers": false,
 				"disablePoolCreation": false
@@ -874,10 +854,7 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"amount": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -892,10 +869,7 @@ func GetSchemas() []string {
 			"aliasPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"amount": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
@@ -910,11 +884,7 @@ func GetSchemas() []string {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": "",
 				"cosmosCoinBackedPath": {
-					"ibcDenom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"ibcAmount": ""
+					"conversion": `+getConversionSchema()+`
 				},
 				"noForcefulPostMintTransfers": false,
 				"disablePoolCreation": false
@@ -1222,8 +1192,8 @@ func GetSchemas() []string {
 				"updateIsArchived": false,
 				"isArchived": false,
 				"mintEscrowCoinsToTransfer": [{"amount": "", "denom": ""}],
-				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "amount": "", "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false}],
-				"aliasPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "amount": "", "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}]}],
+				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false}],
+				"aliasPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}]}],
 				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": "", "disablePoolCreation": false}
 			}
 		}

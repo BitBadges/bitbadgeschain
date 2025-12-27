@@ -14,11 +14,16 @@ func (suite *TestSuite) TestWrapTokens() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "test-coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},
@@ -132,11 +137,16 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "test-coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},
@@ -238,11 +248,16 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "test-coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 		},

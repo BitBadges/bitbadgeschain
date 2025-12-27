@@ -111,25 +111,21 @@ message MsgUpdateParamsResponse {}
 
 message CosmosCoinWrapperPathAddObject {
   string denom = 1;
-  repeated Balance balances = 2;
-  string amount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string symbol = 4;
-  repeated DenomUnit denomUnits = 5;
-  bool allowOverrideWithAnyValidToken = 6;
+  ConversionWithoutDenom conversion = 2;
+  string symbol = 3;
+  repeated DenomUnit denomUnits = 4;
+  bool allowOverrideWithAnyValidToken = 5;
 }
 
 message AliasPathAddObject {
   string denom = 1;
-  repeated Balance balances = 2;
-  string amount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  string symbol = 4;
-  repeated DenomUnit denomUnits = 5;
+  ConversionWithoutDenom conversion = 2;
+  string symbol = 3;
+  repeated DenomUnit denomUnits = 4;
 }
 
 message CosmosCoinBackedPathAddObject {
-  string ibcDenom = 1;
-  repeated Balance balances = 2;
-  string ibcAmount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  Conversion conversion = 1;
 }
 
 // InvariantsAddObject is used for adding invariants without specifying addresses.

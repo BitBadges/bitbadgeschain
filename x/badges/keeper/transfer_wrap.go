@@ -95,7 +95,11 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	}
 
 	// If allowOverrideWithAnyValidToken is true, allow any valid token ID
-	conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
+	if denomInfo.Conversion == nil || denomInfo.Conversion.SideA == nil {
+		return sdkerrors.Wrapf(ErrNotImplemented, "conversion or sideA is nil")
+	}
+
+	conversionBalances := types.DeepCopyBalances(denomInfo.Conversion.SideB)
 	if denomInfo.AllowOverrideWithAnyValidToken {
 		for _, balance := range conversionBalances {
 			balance.TokenIds = []*types.UintRange{
@@ -107,7 +111,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 		}
 	}
 
-	// Conversion Rate = [{ amount: ibcAmount, denom: ibcDenom }] x 1 -> path.Balances x 1
+	// Conversion Rate = [{ amount: conversion.SideA.Amount, denom: denom }] x 1 -> conversion.SideB x 1
 	multiplier, err := k.calculateConversionMultiplier(ctx, transferBalances, conversionBalances)
 	if err != nil {
 		return err
@@ -116,7 +120,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	// This is important. Prefixing allows only our module to control such denominations
 	// and doesn't allow users to mint other coins like "ubadge" or "factory/..."
 	ibcDenom = WrappedDenomPrefix + collection.CollectionId.String() + ":" + ibcDenom
-	amountInt := multiplier.Mul(denomInfo.Amount).BigInt()
+	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
 
 	if isSendingToSpecialAddress {
 		userAddressAcc := sdk.MustAccAddressFromBech32(from)
@@ -176,7 +180,7 @@ func (k Keeper) HandleSpecialAddressBacking(
 		return nil
 	}
 
-	if denomInfo == nil || denomInfo.IbcDenom == "" {
+	if denomInfo == nil || denomInfo.Conversion == nil || denomInfo.Conversion.SideA == nil || denomInfo.Conversion.SideA.Denom == "" {
 		return sdkerrors.Wrapf(ErrNotImplemented, "no ibc denom info found")
 	}
 
@@ -185,15 +189,19 @@ func (k Keeper) HandleSpecialAddressBacking(
 		return err
 	}
 
-	// Conversion Rate = [{ amount: ibcAmount, denom: ibcDenom }] x 1 -> path.Balances x 1
-	ibcDenom := denomInfo.IbcDenom
-	conversionBalances := types.DeepCopyBalances(denomInfo.Balances)
+	// Conversion Rate = [{ amount: conversion.SideA.Amount, denom: conversion.SideA.Denom }] x 1 -> conversion.SideB x 1
+	if denomInfo.Conversion == nil || denomInfo.Conversion.SideA == nil {
+		return sdkerrors.Wrapf(ErrNotImplemented, "conversion or sideA is nil")
+	}
+
+	ibcDenom := denomInfo.Conversion.SideA.Denom
+	conversionBalances := types.DeepCopyBalances(denomInfo.Conversion.SideB)
 	multiplier, err := k.calculateConversionMultiplier(ctx, transferBalances, conversionBalances)
 	if err != nil {
 		return err
 	}
 
-	amountInt := multiplier.Mul(denomInfo.IbcAmount).BigInt()
+	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
 
 	if isSendingToSpecialAddress {
 		userAddressAcc := sdk.MustAccAddressFromBech32(from)

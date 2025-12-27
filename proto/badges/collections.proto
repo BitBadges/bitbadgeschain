@@ -80,14 +80,44 @@ message TokenCollection {
   repeated AliasPath aliasPaths = 16;
 }
 
-message CosmosCoinWrapperPath {
+// Conversion defines a bidirectional conversion between a cosmos coin (with denom) and badge balances.
+message Conversion {
+  // Side A: The cosmos coin side of the conversion (amount + denom).
+  ConversionSideAWithDenom sideA = 1;
+  // Side B: The badge balances side of the conversion.
+  repeated Balance sideB = 2;
+}
 
+// ConversionSideAWithDenom represents the cosmos coin side of a conversion with denomination.
+message ConversionSideAWithDenom {
+  // The amount of the cosmos coin (0 decimals).
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The denomination of the cosmos coin.
+  string denom = 2;
+}
+
+// ConversionWithoutDenom defines a bidirectional conversion between a cosmos coin amount (without denom) and badge balances.
+// The denom is stored at the base level (e.g., in AliasPath or CosmosCoinWrapperPath).
+message ConversionWithoutDenom {
+  // Side A: The cosmos coin amount side of the conversion (amount only, denom stored separately).
+  ConversionSideA sideA = 1;
+  // Side B: The badge balances side of the conversion.
+  repeated Balance sideB = 2;
+}
+
+// ConversionSideA represents the cosmos coin amount side of a conversion without denomination.
+message ConversionSideA {
+  // The amount of the cosmos coin (0 decimals).
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message CosmosCoinWrapperPath {
   // The BitBadges address associated with this wrapper path. Used for routing and identifying the wrapper.
   string address = 1;
   // The denomination (denom) to be used for the wrapped coin or the alias denom.
   string denom = 2;
-  // The token balances that correspond to this wrapper path. Defines how much you have to wrap to get the corresponding base level unit.
-  repeated Balance balances = 3;
+  // The conversion between cosmos coin and badge balances.
+  ConversionWithoutDenom conversion = 3;
   // The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 4;
   // Denomination units for the wrapped coin. Defines how the coin can be displayed with different
@@ -95,35 +125,24 @@ message CosmosCoinWrapperPath {
   repeated DenomUnit denomUnits = 5;
   // If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
   bool allowOverrideWithAnyValidToken = 6;
-  // The base amount of the wrapped denom (0 decimals) that maps to balances[] for conversions.
-  string amount = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message AliasPath {
   // The denomination (denom) to be used for the alias.
   string denom = 1;
-  // The token balances that correspond to this alias path. Defines how much of the base level unit the alias maps to.
-  repeated Balance balances = 2;
+  // The conversion between cosmos coin and badge balances.
+  ConversionWithoutDenom conversion = 2;
   // The symbol for the alias (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 3;
   // Denomination units for the alias. Defines how the coin can be displayed with different decimal places and symbols.
   repeated DenomUnit denomUnits = 4;
-  // The base amount of the alias denom (0 decimals) that maps to balances[] for conversions.
-  string amount = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message CosmosCoinBackedPath {
   // The address associated with this backed path. Used for routing and escrowing IBC tokens.
   string address = 1;
-  // The IBC denomination of the backing token. This identifies which IBC token backs the badges
-  // (e.g., "ibc/..." or "ubadge"). Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
-  string ibcDenom = 2;
-  // The token balances that correspond to this backed path. Defines which token IDs and amounts
-  // are backed by the IBC tokens. Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
-  repeated Balance balances = 3;
-  // The amount of IBC tokens that back the tokens. This defines the exchange rate or backing amount
-  // for the tokens in this path. Conversion is Balances[] = sdk.Coins([{ amount: ibcAmount, denom: ibcDenom }])
-  string ibcAmount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The conversion between IBC cosmos coin and badge balances.
+  Conversion conversion = 2;
 }
 
 message DenomUnit {

@@ -16,7 +16,11 @@ func GetBalancesToTransferWithAlias(collection *badgestypes.TokenCollection, den
 		return nil, err
 	}
 
-	conversionAmount := path.Amount
+	if path.Conversion == nil || path.Conversion.SideA == nil {
+		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "conversion or sideA is nil")
+	}
+
+	conversionAmount := path.Conversion.SideA.Amount
 	if conversionAmount.IsZero() || conversionAmount.IsNil() {
 		return nil, sdkerrors.Wrapf(badgestypes.ErrInvalidRequest, "conversion amount is zero")
 	}
@@ -27,7 +31,7 @@ func GetBalancesToTransferWithAlias(collection *badgestypes.TokenCollection, den
 	}
 
 	multiplierToUse := amount.Quo(conversionAmount)
-	balancesToTransfer := badgestypes.DeepCopyBalances(path.Balances)
+	balancesToTransfer := badgestypes.DeepCopyBalances(path.Conversion.SideB)
 	for _, balance := range balancesToTransfer {
 		balance.Amount = balance.Amount.Mul(multiplierToUse)
 	}
