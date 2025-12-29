@@ -1,15 +1,15 @@
 package keeper_test
 
 import (
+	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"time"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-
-	"crypto/ecdsa"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -3956,6 +3956,7 @@ func generateTestETHPrivateKey() (string, string, error) {
 
 // generateETHSignature generates a valid ETH signature for the given message components
 // Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
+// Uses ethers.signMessage format (EIP-191) which prefixes message with "\x19Ethereum Signed Message:\n<length>"
 func generateETHSignature(nonce, initiatorAddress, collectionId, approverAddress, approvalLevel, approvalId, challengeId string, privateKeyHex string) (string, error) {
 	// Construct the message to sign
 	message := nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
@@ -3966,8 +3967,14 @@ func generateETHSignature(nonce, initiatorAddress, collectionId, approverAddress
 		return "", err
 	}
 
-	// Sign the message
-	hash := ethcrypto.Keccak256Hash([]byte(message))
+	// Use ethers.signMessage format (EIP-191): prefix with "\x19Ethereum Signed Message:\n<length>"
+	// This matches what ethers.Wallet.signMessage() does
+	messageBytes := []byte(message)
+	prefix := fmt.Sprintf("\x19Ethereum Signed Message:\n%d", len(messageBytes))
+	prefixedMessage := append([]byte(prefix), messageBytes...)
+
+	// Hash the prefixed message and sign
+	hash := ethcrypto.Keccak256Hash(prefixedMessage)
 	signature, err := ethcrypto.Sign(hash.Bytes(), privateKey)
 	if err != nil {
 		return "", err
@@ -3996,8 +4003,59 @@ func (suite *TestSuite) TestETHSignatureChallenge_ValidSignature() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
 
 	// Generate valid signature
 	nonce := "test-nonce-123"
@@ -4300,8 +4358,59 @@ func (suite *TestSuite) TestETHSignatureChallenge_SignatureReuse() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(2), // Mint 2 for reuse test
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
 
 	// Generate valid signature
 	nonce := "test-nonce-123"
@@ -4712,8 +4821,59 @@ func (suite *TestSuite) TestETHSignatureChallenge_MultipleChallenges() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
 
 	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 
@@ -4994,6 +5154,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_WithOtherCriteria() {
 			{
 				Root:                rootHash,
 				ExpectedProofLength: sdkmath.NewUint(0),
+				MaxUsesPerLeaf:      sdkmath.NewUint(1),
 				ChallengeTrackerId:  "merkle-challenge-1",
 			},
 		}
@@ -5006,8 +5167,59 @@ func (suite *TestSuite) TestETHSignatureChallenge_WithOtherCriteria() {
 		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
+		// Add mint approval so we can mint badges to bob
+		collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+			ToListId:          "AllWithoutMint",
+			FromListId:        "Mint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "mint-test",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(1000),
+					AmountTrackerId:        "mint-test-tracker",
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+					AmountTrackerId:              "mint-test-tracker",
+				},
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+			},
+		}}, collectionsToCreate[0].CollectionApprovals...)
+
 		err = CreateCollections(suite, wctx, collectionsToCreate)
 		suite.Require().NoError(err)
+
+		// Mint badges to bob so he can transfer them
+		err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+			Creator:      bob,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        "Mint",
+					ToAddresses: []string{bob},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+						{
+							ApprovalId:      "mint-test",
+							ApprovalLevel:   "collection",
+							ApproverAddress: "",
+							Version:         sdkmath.NewUint(0),
+						},
+					},
+				},
+			},
+		})
+		suite.Require().NoError(err, "Error minting badges to bob")
 
 		privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 		nonce := "test-nonce-combined"
@@ -5079,8 +5291,59 @@ func (suite *TestSuite) TestETHSignatureChallenge_TrackerQuery() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
 
 	// Generate and use signature
 	nonce := "test-nonce-query"

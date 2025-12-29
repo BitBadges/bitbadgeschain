@@ -669,10 +669,18 @@ func GetSchemas() []string {
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
 					],
-					"allowOverrideWithAnyValidToken": false
+					"allowOverrideWithAnyValidToken": false,
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"aliasPathsToAdd": [
@@ -684,9 +692,17 @@ func GetSchemas() []string {
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
-					]
+					],
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"invariants": {
@@ -779,10 +795,18 @@ func GetSchemas() []string {
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
 					],
-					"allowOverrideWithAnyValidToken": false
+					"allowOverrideWithAnyValidToken": false,
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"aliasPathsToAdd": [
@@ -794,9 +818,17 @@ func GetSchemas() []string {
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
-					]
+					],
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"invariants": {
@@ -860,10 +892,18 @@ func GetSchemas() []string {
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
 					],
-					"allowOverrideWithAnyValidToken": false
+					"allowOverrideWithAnyValidToken": false,
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"aliasPathsToAdd": [
@@ -875,9 +915,17 @@ func GetSchemas() []string {
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
-					]
+					],
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"invariants": {
@@ -1192,8 +1240,8 @@ func GetSchemas() []string {
 				"updateIsArchived": false,
 				"isArchived": false,
 				"mintEscrowCoinsToTransfer": [{"amount": "", "denom": ""}],
-				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false}],
-				"aliasPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}]}],
+				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false, "metadata": {"uri": "", "customData": ""}}], "allowOverrideWithAnyValidToken": false, "metadata": {"uri": "", "customData": ""}}],
+				"aliasPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false, "metadata": {"uri": "", "customData": ""}}], "metadata": {"uri": "", "customData": ""}}],
 				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": "", "disablePoolCreation": false}
 			}
 		}

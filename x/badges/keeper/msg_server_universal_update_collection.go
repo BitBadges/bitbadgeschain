@@ -414,6 +414,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				Symbol:                         path.Symbol,
 				DenomUnits:                     path.DenomUnits,
 				AllowOverrideWithAnyValidToken: path.AllowOverrideWithAnyValidToken,
+				Metadata:                       path.Metadata,
 			}
 		}
 
@@ -428,6 +429,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				Conversion: path.Conversion,
 				Symbol:     path.Symbol,
 				DenomUnits: path.DenomUnits,
+				Metadata:   path.Metadata,
 			}
 		}
 

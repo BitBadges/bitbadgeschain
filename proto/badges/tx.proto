@@ -115,6 +115,8 @@ message CosmosCoinWrapperPathAddObject {
   string symbol = 3;
   repeated DenomUnit denomUnits = 4;
   bool allowOverrideWithAnyValidToken = 5;
+  // The metadata for this wrapper path.
+  PathMetadata metadata = 6;
 }
 
 message AliasPathAddObject {
@@ -122,6 +124,8 @@ message AliasPathAddObject {
   ConversionWithoutDenom conversion = 2;
   string symbol = 3;
   repeated DenomUnit denomUnits = 4;
+  // The metadata for this alias path.
+  PathMetadata metadata = 5;
 }
 
 message CosmosCoinBackedPathAddObject {

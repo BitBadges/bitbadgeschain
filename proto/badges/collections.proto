@@ -125,6 +125,8 @@ message CosmosCoinWrapperPath {
   repeated DenomUnit denomUnits = 5;
   // If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
   bool allowOverrideWithAnyValidToken = 6;
+  // The metadata for this wrapper path.
+  PathMetadata metadata = 7;
 }
 
 message AliasPath {
@@ -136,6 +138,8 @@ message AliasPath {
   string symbol = 3;
   // Denomination units for the alias. Defines how the coin can be displayed with different decimal places and symbols.
   repeated DenomUnit denomUnits = 4;
+  // The metadata for this alias path.
+  PathMetadata metadata = 5;
 }
 
 message CosmosCoinBackedPath {
@@ -153,6 +157,8 @@ message DenomUnit {
   // If true, this is the default display unit. Only one unit should be marked as the default display unit.
   // This unit will be used by default when displaying the coin amount. If none are marked default, we use the base level.
   bool isDefaultDisplay = 3;
+  // The metadata for this denomination unit.
+  PathMetadata metadata = 4;
 }
 
 // CollectionInvariants defines the invariants that apply to a collection.
