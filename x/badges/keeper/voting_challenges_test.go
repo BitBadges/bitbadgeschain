@@ -90,6 +90,10 @@ func (suite *TestSuite) TestVotingChallenge_ValidVotes() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -198,16 +202,20 @@ func (suite *TestSuite) TestVotingChallenge_NoVotes() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 		ToListId:          "AllWithoutMint",
 		FromListId:        "Mint",
-		InitiatedByListId:  "AllWithoutMint",
-		TransferTimes:      GetFullUintRanges(),
-		TokenIds:           GetFullUintRanges(),
-		OwnershipTimes:     GetFullUintRanges(),
-		ApprovalId:         "mint-test",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			MaxNumTransfers: &types.MaxNumTransfers{
 				OverallMaxNumTransfers: sdkmath.NewUint(1000),
@@ -292,6 +300,10 @@ func (suite *TestSuite) TestVotingChallenge_InsufficientVotes() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -610,6 +622,10 @@ func (suite *TestSuite) TestVotingChallenge_MultipleVoters() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -732,6 +748,10 @@ func (suite *TestSuite) TestVotingChallenge_ZeroThreshold() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -826,6 +846,10 @@ func (suite *TestSuite) TestVotingChallenge_HundredPercentThreshold() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -1335,12 +1359,12 @@ func (suite *TestSuite) TestVotingChallenge_IncomingApprovalLevel() {
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Approval: &types.UserIncomingApproval{
-			ApprovalId:      "incoming-test",
-			FromListId:      "AllWithoutMint",
+			ApprovalId:        "incoming-test",
+			FromListId:        "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
-			TransferTimes:   GetFullUintRanges(),
-			TokenIds:        GetFullUintRanges(),
-			OwnershipTimes:  GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalCriteria: &types.IncomingApprovalCriteria{
 				VotingChallenges: []*types.VotingChallenge{votingChallenge},
 				SenderChecks:     &types.AddressChecks{},
@@ -1457,16 +1481,16 @@ func (suite *TestSuite) TestVotingChallenge_OutgoingApprovalLevel() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Approval: &types.UserOutgoingApproval{
-			ApprovalId:      "outgoing-test",
-			ToListId:        "AllWithoutMint",
+			ApprovalId:        "outgoing-test",
+			ToListId:          "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
-			TransferTimes:   GetFullUintRanges(),
-			TokenIds:        GetFullUintRanges(),
-			OwnershipTimes:  GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalCriteria: &types.OutgoingApprovalCriteria{
 				VotingChallenges: []*types.VotingChallenge{votingChallenge},
 				RecipientChecks:  &types.AddressChecks{},
-				InitiatorChecks: &types.AddressChecks{},
+				InitiatorChecks:  &types.AddressChecks{},
 			},
 		},
 	})
@@ -1682,6 +1706,10 @@ func (suite *TestSuite) TestVotingChallenge_ExactlyAtThreshold() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -1833,6 +1861,10 @@ func (suite *TestSuite) TestVotingChallenge_ZeroYesWeight() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
 
 	// Add mint approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
@@ -1960,12 +1992,12 @@ func (suite *TestSuite) TestVotingChallenge_WrongApproverAddress() {
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
 		Approval: &types.UserIncomingApproval{
-			ApprovalId:      "incoming-test",
-			FromListId:      "AllWithoutMint",
+			ApprovalId:        "incoming-test",
+			FromListId:        "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
-			TransferTimes:   GetFullUintRanges(),
-			TokenIds:        GetFullUintRanges(),
-			OwnershipTimes:  GetFullUintRanges(),
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
 			ApprovalCriteria: &types.IncomingApprovalCriteria{
 				VotingChallenges: []*types.VotingChallenge{votingChallenge},
 				SenderChecks:     &types.AddressChecks{},
@@ -2258,3 +2290,2036 @@ func (suite *TestSuite) TestVotingChallenge_DuplicateVoters() {
 	suite.Require().NoError(err, "VotingChallenge with no duplicate voters should pass validation")
 }
 
+// TestVotingChallenge_VoterSetCompleteChange tests that when voter set completely changes, old votes are ignored
+func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice and bob
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast votes from voter set A: alice and bob both vote 100% yes
+	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	// Verify transfer succeeds with initial voter set
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
+
+	// Verify old votes are still in store
+	aliceVoteKey := keeper.ConstructVotingTrackerKey(sdkmath.NewUint(1), "", "collection", "test", "proposal-1", alice)
+	bobVoteKey := keeper.ConstructVotingTrackerKey(sdkmath.NewUint(1), "", "collection", "test", "proposal-1", bob)
+	aliceVote, found := suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, aliceVoteKey)
+	suite.Require().True(found, "Alice's vote should still be in store")
+	suite.Require().Equal(sdkmath.NewUint(100), aliceVote.YesWeight)
+	bobVote, found := suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, bobVoteKey)
+	suite.Require().True(found, "Bob's vote should still be in store")
+	suite.Require().Equal(sdkmath.NewUint(100), bobVote.YesWeight)
+
+	// Mint more badges to bob for next transfer
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Update voter set to completely different set B: charlie and signer
+	// Same proposalId, same threshold 50%
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: charlie, Weight: sdkmath.NewUint(100)},
+			{Address: signer, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	// Debug: Print newApproval before update
+	for _, approval := range newApprovals {
+		if approval.ApprovalId == "test" {
+			suite.T().Logf("New approval before update - FromListId: %s, ToListId: %s, InitiatedByListId: %s",
+				approval.FromListId, approval.ToListId, approval.InitiatedByListId)
+			break
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Verify the approval was updated correctly
+	collection, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	var updatedApproval *types.CollectionApproval
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			updatedApproval = approval
+			break
+		}
+	}
+	suite.Require().NotNil(updatedApproval, "Updated approval should exist")
+	suite.Require().Equal("AllWithoutMint", updatedApproval.FromListId, "FromListId should be preserved")
+	suite.Require().Equal("AllWithoutMint", updatedApproval.ToListId, "ToListId should be preserved")
+	suite.Require().Equal("AllWithoutMint", updatedApproval.InitiatedByListId, "InitiatedByListId should be preserved")
+
+	// Debug: Print updated approval
+	suite.T().Logf("Updated approval after update - FromListId: %s, ToListId: %s, InitiatedByListId: %s, Version: %s",
+		updatedApproval.FromListId, updatedApproval.ToListId, updatedApproval.InitiatedByListId, updatedApproval.Version.String())
+
+	// Verify the approval can be retrieved from store with correct list IDs
+	// Get the approval version to verify it was incremented
+	testVersion, found := suite.app.BadgesKeeper.GetApprovalTrackerVersionFromStore(suite.ctx, keeper.ConstructApprovalVersionKey(sdkmath.NewUint(1), "collection", "", "test"))
+	suite.Require().True(found, "Test approval version should be found")
+	suite.Require().True(testVersion.GT(sdkmath.NewUint(0)), "Test approval version should be > 0 after update")
+
+	// Verify the approval from collection matches what we expect
+	suite.Require().Equal(updatedApproval.Version, testVersion, "Approval version should match stored version")
+
+	// Transfer should fail because alice and bob's votes are not counted (they're not in new set)
+	// charlie and signer haven't voted yet
+	// Use version 1 for test approval (incremented after update) and version 0 for mint-test
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						ApprovalId:      "mint-test",
+						Version:         sdkmath.NewUint(0),
+					},
+					{
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						ApprovalId:      "test",
+						Version:         testVersion, // Version 1 after update
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail - old votes not counted, new voters haven't voted")
+
+	// Verify old votes are still in store (they're just not counted)
+	aliceVote, found = suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, aliceVoteKey)
+	suite.Require().True(found, "Alice's vote should still be in store")
+	bobVote, found = suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, bobVoteKey)
+	suite.Require().True(found, "Bob's vote should still be in store")
+
+	// Now charlie and signer vote 100% yes
+	err = castVoteAndExecute(suite, wctx, charlie, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Charlie should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, signer, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Signer should be able to cast vote")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Transfer should now succeed with new voter set votes
+	// Verify the approval in the collection has correct list IDs before transfer
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().NoError(err, "Error getting collection before transfer")
+	var finalApproval *types.CollectionApproval
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			finalApproval = approval
+			break
+		}
+	}
+	suite.Require().NotNil(finalApproval, "Test approval should exist in collection")
+	suite.Require().Equal("AllWithoutMint", finalApproval.FromListId, "FromListId should be AllWithoutMint before transfer")
+	suite.Require().Equal("AllWithoutMint", finalApproval.ToListId, "ToListId should be AllWithoutMint before transfer")
+	suite.Require().Equal("AllWithoutMint", finalApproval.InitiatedByListId, "InitiatedByListId should be AllWithoutMint before transfer")
+	suite.Require().Equal(testVersion, finalApproval.Version, "Approval version should match stored version")
+
+	// Debug: Print approval details
+	suite.T().Logf("Final approval - FromListId: %s, ToListId: %s, InitiatedByListId: %s, Version: %s",
+		finalApproval.FromListId, finalApproval.ToListId, finalApproval.InitiatedByListId, finalApproval.Version.String())
+
+	// Manually set prioritized approvals with correct versions:
+	// - test approval: version 1 (incremented after update)
+	// - mint-test approval: version 0 (unchanged)
+	prioritizedApprovals := []*types.ApprovalIdentifierDetails{
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      "mint-test",
+			Version:         sdkmath.NewUint(0),
+		},
+		{
+			ApprovalLevel:   "collection",
+			ApproverAddress: "",
+			ApprovalId:      "test",
+			Version:         testVersion, // Version 1 after update
+		},
+	}
+
+	// Debug: Print prioritized approvals
+	for _, pa := range prioritizedApprovals {
+		suite.T().Logf("Prioritized approval - ApprovalId: %s, Version: %s", pa.ApprovalId, pa.Version.String())
+	}
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: prioritizedApprovals,
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with new voter set votes meeting threshold")
+}
+
+// TestVotingChallenge_VoterSetPartialOverlap tests that when voter set partially overlaps with weight changes, votes use new weights
+func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice (weight 100), bob (weight 100)
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast votes from voter set A: alice and bob both vote 100% yes
+	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	// Verify transfer succeeds with initial voter set
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Update voter set to B: alice (weight 50), charlie (weight 150)
+	// Same proposalId, same threshold 50%
+	// alice's vote should count with NEW weight 50 (not old 100)
+	// bob's vote should NOT count (not in new set)
+	// alice's contribution: 50 * 100% = 50
+	// Total yes weight: 50/200 = 25% (does NOT meet 50% threshold)
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(50)},
+			{Address: charlie, Weight: sdkmath.NewUint(150)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Transfer should fail because:
+	// - alice's vote counts with NEW weight 50: 50 * 100% = 50
+	// - bob's vote does NOT count (not in new set)
+	// - Total yes weight: 50/200 = 25% < 50% threshold
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail - alice's vote uses new weight 50, threshold not met")
+
+	// Now charlie votes 100% yes
+	// alice: 50 * 100% = 50, charlie: 150 * 100% = 150
+	// Total yes weight: 200/200 = 100% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, charlie, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Charlie should be able to cast vote")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Transfer should now succeed
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed - alice's vote uses new weight, charlie voted")
+}
+
+// TestVotingChallenge_VoterSetExpands tests that when voter set expands, existing votes count but may not meet threshold
+func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice (weight 100)
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast vote from alice: 100% yes
+	// Total weight: 100, yes weight: 100, percentage: 100% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	// Verify transfer succeeds with initial voter set
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with initial vote meeting threshold")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Update voter set to B: alice (weight 100), bob (weight 100), charlie (weight 100)
+	// Same proposalId, same threshold 50%
+	// alice's vote should count with weight 100
+	// Total yes weight: 100/300 = 33.33% (does NOT meet 50% threshold)
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+			{Address: charlie, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Transfer should fail because:
+	// - alice's vote counts: 100 * 100% = 100
+	// - Total yes weight: 100/300 = 33.33% < 50% threshold
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail - threshold not met with expanded voter set")
+
+	// Now bob votes 100% yes
+	// alice: 100 * 100% = 100, bob: 100 * 100% = 100
+	// Total yes weight: 200/300 = 66.67% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Transfer should now succeed
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed - alice and bob voted, threshold met")
+}
+
+// TestVotingChallenge_VoterSetShrinks tests that when voter set shrinks, existing votes from remaining voters still count
+func (suite *TestSuite) TestVotingChallenge_VoterSetShrinks() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice, bob, charlie (all weight 100)
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+			{Address: charlie, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast votes from alice and bob: both vote 100% yes
+	// Total weight: 300, yes weight: 200, percentage: 66.67% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	// Verify transfer succeeds with initial voter set
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Update voter set to B: alice (weight 100), bob (weight 100) - charlie removed
+	// Same proposalId, same threshold 50%
+	// alice and bob's votes should count with weight 100 each
+	// charlie's vote should NOT count (not in new set)
+	// Total yes weight: 200/200 = 100% >= 50% threshold
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Transfer should succeed because:
+	// - alice's vote counts: 100 * 100% = 100
+	// - bob's vote counts: 100 * 100% = 100
+	// - charlie's vote does NOT count (not in new set)
+	// - Total yes weight: 200/200 = 100% >= 50% threshold
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed - alice and bob's votes count, threshold met")
+}
+
+// TestVotingChallenge_WeightChangesSameVoters tests that when same voters have weight changes, votes use new weights
+func (suite *TestSuite) TestVotingChallenge_WeightChangesSameVoters() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice (weight 100), bob (weight 100)
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast votes: alice 100% yes, bob 50% yes
+	// alice: 100 * 100% = 100, bob: 100 * 50% = 50
+	// Total yes weight: 150/200 = 75% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(50))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	// Verify transfer succeeds with initial voter set
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Update voter set to B: alice (weight 200), bob (weight 50)
+	// Same proposalId, same threshold 50%
+	// alice's vote should count with NEW weight 200: 200 * 100% = 200
+	// bob's vote should count with NEW weight 50: 50 * 50% = 25
+	// Total yes weight: 225/250 = 90% >= 50% threshold
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(200)},
+			{Address: bob, Weight: sdkmath.NewUint(50)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Transfer should succeed because:
+	// - alice's vote counts with NEW weight 200: 200 * 100% = 200
+	// - bob's vote counts with NEW weight 50: 50 * 50% = 25
+	// - Total yes weight: 225/250 = 90% >= 50% threshold
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed - votes use new weights, threshold met")
+}
+
+// TestVotingChallenge_VoterRemovedAfterVoting tests that when a voter is removed, their vote doesn't count
+func (suite *TestSuite) TestVotingChallenge_VoterRemovedAfterVoting() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice (weight 100), bob (weight 100)
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast votes from alice and bob: both vote 100% yes
+	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	// Verify transfer succeeds with initial voter set
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
+
+	// Verify votes are in store
+	bobVoteKey := keeper.ConstructVotingTrackerKey(sdkmath.NewUint(1), "", "collection", "test", "proposal-1", bob)
+	bobVote, found := suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, bobVoteKey)
+	suite.Require().True(found, "Bob's vote should be in store")
+	suite.Require().Equal(sdkmath.NewUint(100), bobVote.YesWeight)
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Update voter set to B: alice (weight 100) - bob removed
+	// Same proposalId, same threshold 50%
+	// alice's vote should count with weight 100
+	// bob's vote should NOT count (not in new set)
+	// Total yes weight: 100/100 = 100% >= 50% threshold
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Verify bob's vote is still in store (but not counted)
+	bobVote, found = suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, bobVoteKey)
+	suite.Require().True(found, "Bob's vote should still be in store")
+
+	// Transfer should succeed because:
+	// - alice's vote counts: 100 * 100% = 100
+	// - bob's vote does NOT count (not in new set)
+	// - Total yes weight: 100/100 = 100% >= 50% threshold
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed - alice's vote counts, bob's vote ignored")
+}
+
+// TestVotingChallenge_VotePersistenceAfterVoterSetChange verifies that old votes remain in store but are not counted
+func (suite *TestSuite) TestVotingChallenge_VotePersistenceAfterVoterSetChange() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with initial voter set A: alice, bob, charlie
+	collectionsToCreate := GetCollectionsToCreate()
+	votingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+			{Address: charlie, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{votingChallenge}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+	if collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts != nil {
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+	}
+
+	// Add mint approval
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Cast votes from all three voters
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast vote")
+
+	err = castVoteAndExecute(suite, wctx, charlie, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Charlie should be able to cast vote")
+
+	// Verify all votes are in store
+	aliceVoteKey := keeper.ConstructVotingTrackerKey(sdkmath.NewUint(1), "", "collection", "test", "proposal-1", alice)
+	bobVoteKey := keeper.ConstructVotingTrackerKey(sdkmath.NewUint(1), "", "collection", "test", "proposal-1", bob)
+	charlieVoteKey := keeper.ConstructVotingTrackerKey(sdkmath.NewUint(1), "", "collection", "test", "proposal-1", charlie)
+
+	aliceVote, found := suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, aliceVoteKey)
+	suite.Require().True(found, "Alice's vote should be in store")
+	suite.Require().Equal(sdkmath.NewUint(100), aliceVote.YesWeight)
+
+	bobVote, found := suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, bobVoteKey)
+	suite.Require().True(found, "Bob's vote should be in store")
+	suite.Require().Equal(sdkmath.NewUint(100), bobVote.YesWeight)
+
+	charlieVote, found := suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, charlieVoteKey)
+	suite.Require().True(found, "Charlie's vote should be in store")
+	suite.Require().Equal(sdkmath.NewUint(100), charlieVote.YesWeight)
+
+	// Update voter set to B: only alice (bob and charlie removed)
+	newVotingChallenge := createVotingChallenge(
+		"proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	// Build new approvals list - update the test approval, preserve all others
+	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals))
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Create a shallow copy first (this preserves all fields including list IDs)
+			newApproval := *approval
+			// Deep copy ApprovalCriteria and only update VotingChallenges
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newVotingChallenge}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			newApprovals = append(newApprovals, &newApproval)
+		} else {
+			// Preserve other approvals as-is
+			newApprovals = append(newApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: newApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approvals")
+
+	// Verify all votes are STILL in store (they're just not counted)
+	aliceVote, found = suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, aliceVoteKey)
+	suite.Require().True(found, "Alice's vote should still be in store after voter set change")
+	suite.Require().Equal(sdkmath.NewUint(100), aliceVote.YesWeight, "Alice's vote should be unchanged")
+
+	bobVote, found = suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, bobVoteKey)
+	suite.Require().True(found, "Bob's vote should still be in store after voter set change")
+	suite.Require().Equal(sdkmath.NewUint(100), bobVote.YesWeight, "Bob's vote should be unchanged")
+
+	charlieVote, found = suite.app.BadgesKeeper.GetVoteFromStore(suite.ctx, charlieVoteKey)
+	suite.Require().True(found, "Charlie's vote should still be in store after voter set change")
+	suite.Require().Equal(sdkmath.NewUint(100), charlieVote.YesWeight, "Charlie's vote should be unchanged")
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Transfer should succeed because only alice's vote counts (bob and charlie's votes are ignored)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().NoError(err, "Transfer should succeed - only alice's vote counts, old votes persist but ignored")
+}
+
+// TestVotingChallenge_VoterSetUpdateMultipleApprovalLevels tests voter set updates work for collection, incoming, and outgoing approvals
+func (suite *TestSuite) TestVotingChallenge_VoterSetUpdateMultipleApprovalLevels() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection with mint approval
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Test 1: Collection-level approval with voter set update
+	collectionVotingChallenge := createVotingChallenge(
+		"collection-proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	collectionApprovals := []*types.CollectionApproval{}
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Update the approval with new voter set - need to deep copy ApprovalCriteria
+			newApproval := *approval
+			// Explicitly preserve address list IDs
+			newApproval.FromListId = approval.FromListId
+			newApproval.ToListId = approval.ToListId
+			newApproval.InitiatedByListId = approval.InitiatedByListId
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				// Only update VotingChallenges, preserve all other fields
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{collectionVotingChallenge}
+				newApprovalCriteria.OverridesToIncomingApprovals = true
+				newApprovalCriteria.OverridesFromOutgoingApprovals = true
+				// Increase PerFromAddressApprovalAmount to allow multiple transfers from same address
+				if newApprovalCriteria.ApprovalAmounts != nil {
+					newApprovalCriteria.ApprovalAmounts.PerFromAddressApprovalAmount = sdkmath.NewUint(100)
+				}
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			collectionApprovals = append(collectionApprovals, &newApproval)
+		} else {
+			collectionApprovals = append(collectionApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: collectionApprovals,
+	})
+	suite.Require().NoError(err, "Error setting collection approval")
+
+	// Cast votes for collection approval
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "collection-proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast collection vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "collection-proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast collection vote")
+
+	// Update collection voter set: alice (weight 50), charlie (weight 150)
+	newCollectionVotingChallenge := createVotingChallenge(
+		"collection-proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(50)},
+			{Address: charlie, Weight: sdkmath.NewUint(150)},
+		},
+	)
+	collection, _ = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	collectionApprovals = []*types.CollectionApproval{}
+	for _, approval := range collection.CollectionApprovals {
+		if approval.ApprovalId == "test" {
+			// Update the approval with new voter set - need to deep copy ApprovalCriteria
+			newApproval := *approval
+			// Explicitly preserve address list IDs
+			newApproval.FromListId = approval.FromListId
+			newApproval.ToListId = approval.ToListId
+			newApproval.InitiatedByListId = approval.InitiatedByListId
+			if approval.ApprovalCriteria != nil {
+				newApprovalCriteria := *approval.ApprovalCriteria
+				// Only update VotingChallenges, preserve all other fields
+				newApprovalCriteria.VotingChallenges = []*types.VotingChallenge{newCollectionVotingChallenge}
+				newApprovalCriteria.OverridesToIncomingApprovals = true
+				newApprovalCriteria.OverridesFromOutgoingApprovals = true
+				newApproval.ApprovalCriteria = &newApprovalCriteria
+			}
+			collectionApprovals = append(collectionApprovals, &newApproval)
+		} else {
+			collectionApprovals = append(collectionApprovals, approval)
+		}
+	}
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: collectionApprovals,
+	})
+	suite.Require().NoError(err, "Error updating collection approval voter set")
+
+	// Transfer should fail - alice's vote uses new weight 50, bob's vote doesn't count, charlie hasn't voted
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail - collection approval threshold not met after voter set update")
+
+	// Test 2: Incoming approval with voter set update
+	incomingVotingChallenge := createVotingChallenge(
+		"incoming-proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	err = SetIncomingApproval(suite, wctx, &types.MsgSetIncomingApproval{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserIncomingApproval{
+			ApprovalId:        "incoming-test",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalCriteria: &types.IncomingApprovalCriteria{
+				VotingChallenges: []*types.VotingChallenge{incomingVotingChallenge},
+				SenderChecks:     &types.AddressChecks{},
+				InitiatorChecks:  &types.AddressChecks{},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error setting incoming approval")
+
+	// Cast votes for incoming approval
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "incoming", alice, "incoming-test", "incoming-proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast incoming vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "incoming", alice, "incoming-test", "incoming-proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast incoming vote")
+
+	// Update incoming voter set: alice (weight 50), charlie (weight 150)
+	newIncomingVotingChallenge := createVotingChallenge(
+		"incoming-proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(50)},
+			{Address: charlie, Weight: sdkmath.NewUint(150)},
+		},
+	)
+	err = SetIncomingApproval(suite, wctx, &types.MsgSetIncomingApproval{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserIncomingApproval{
+			ApprovalId:        "incoming-test",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalCriteria: &types.IncomingApprovalCriteria{
+				VotingChallenges: []*types.VotingChallenge{newIncomingVotingChallenge},
+				SenderChecks:     &types.AddressChecks{},
+				InitiatorChecks:  &types.AddressChecks{},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error updating incoming approval voter set")
+
+	// Transfer should fail - alice's vote uses new weight 50, bob's vote doesn't count, charlie hasn't voted
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "incoming-test",
+						ApprovalLevel:   "incoming",
+						ApproverAddress: alice,
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail - incoming approval threshold not met after voter set update")
+
+	// Test 3: Outgoing approval with voter set update
+	outgoingVotingChallenge := createVotingChallenge(
+		"outgoing-proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(100)},
+			{Address: bob, Weight: sdkmath.NewUint(100)},
+		},
+	)
+	err = SetOutgoingApproval(suite, wctx, &types.MsgSetOutgoingApproval{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "outgoing-test",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{
+				VotingChallenges: []*types.VotingChallenge{outgoingVotingChallenge},
+				RecipientChecks:  &types.AddressChecks{},
+				InitiatorChecks:  &types.AddressChecks{},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error setting outgoing approval")
+
+	// Cast votes for outgoing approval
+	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "outgoing", bob, "outgoing-test", "outgoing-proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Alice should be able to cast outgoing vote")
+
+	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "outgoing", bob, "outgoing-test", "outgoing-proposal-1", sdkmath.NewUint(100))
+	suite.Require().NoError(err, "Bob should be able to cast outgoing vote")
+
+	// Update outgoing voter set: alice (weight 50), charlie (weight 150)
+	newOutgoingVotingChallenge := createVotingChallenge(
+		"outgoing-proposal-1",
+		sdkmath.NewUint(50), // 50% threshold
+		[]*types.Voter{
+			{Address: alice, Weight: sdkmath.NewUint(50)},
+			{Address: charlie, Weight: sdkmath.NewUint(150)},
+		},
+	)
+	err = SetOutgoingApproval(suite, wctx, &types.MsgSetOutgoingApproval{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "outgoing-test",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{
+				VotingChallenges: []*types.VotingChallenge{newOutgoingVotingChallenge},
+				RecipientChecks:  &types.AddressChecks{},
+				InitiatorChecks:  &types.AddressChecks{},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error updating outgoing approval voter set")
+
+	// Mint more badges to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting more badges to bob")
+
+	// Transfer should fail - alice's vote uses new weight 50, bob's vote doesn't count, charlie hasn't voted
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail - outgoing approval threshold not met after voter set update")
+}

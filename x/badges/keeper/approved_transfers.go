@@ -315,6 +315,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 			transferBalancesToCheck = types.FilterZeroBalances(transferBalancesToCheck)
 			if len(transferBalancesToCheck) == 0 {
+				addPotentialError(isExplicitlyPrioritized, idx, "no balances found for approval")
 				continue
 			}
 
@@ -368,7 +369,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 		// If we used approvals and had partial success for some balances, we need to add an error for that
 		errorsWithIdx = addPartialSuccessErrors(errorsWithIdx, *eventTracking.ApprovalsUsed, approvals)
 		transferStr := buildTransferString(remainingBalances, fromAddress, toAddress, initiatedBy)
-		potentialErrorsStr := buildPotentialErrorsString(potentialErrors, approvalIdxsChecked, errorsWithIdx)
+		potentialErrorsStr := buildPotentialErrorsString(potentialErrors, approvalIdxsChecked, errorsWithIdx, approvals)
 		return []*UserApprovalsToCheck{}, buildApprovalFailureError(ctx, approvalLevel, transferStr, potentialErrorsStr)
 	}
 

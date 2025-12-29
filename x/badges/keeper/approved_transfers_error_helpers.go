@@ -58,15 +58,63 @@ func addPartialSuccessErrors(
 	return errorsWithIdx
 }
 
+// formatApprovalId formats an approval ID to show first 10 characters with ellipsis if longer
+func formatApprovalId(approvalId string) string {
+	if len(approvalId) <= 10 {
+		return approvalId
+	}
+	return approvalId[:10] + "..."
+}
+
+// getApprovalIdByIndex safely gets the approval ID for a given index, or returns "unknown"
+func getApprovalIdByIndex(approvals []*types.CollectionApproval, idx int) string {
+	if idx < 0 || idx >= len(approvals) || approvals[idx] == nil {
+		return "unknown"
+	}
+	return formatApprovalId(approvals[idx].ApprovalId)
+}
+
 // buildPotentialErrorsString builds the potential errors string based on whether there are prioritized errors
 // or auto-scan errors
 func buildPotentialErrorsString(
 	potentialErrors []string,
 	approvalIdxsChecked []int,
 	errorsWithIdx []ErrorWithIdx,
+	approvals []*types.CollectionApproval,
 ) string {
 	if len(potentialErrors) > 0 {
-		return " - errors w/ prioritized approvals: " + strings.Join(potentialErrors, ", ")
+		// Build error string with index prefixes for prioritized approvals
+		// Find which errors in errorsWithIdx correspond to prioritized approvals
+		prioritizedErrorsWithIdx := []string{}
+		for _, errorWithIdx := range errorsWithIdx {
+			// Check if any of this index's errors are in potentialErrors (prioritized)
+			hasPrioritizedError := false
+			for _, potentialError := range potentialErrors {
+				for _, errorMsg := range errorWithIdx.ErrorMsgs {
+					if errorMsg == potentialError {
+						hasPrioritizedError = true
+						break
+					}
+				}
+				if hasPrioritizedError {
+					break
+				}
+			}
+			if hasPrioritizedError {
+				// Prefix each error message with its index and approval ID
+				approvalId := getApprovalIdByIndex(approvals, errorWithIdx.Idx)
+				for _, errorMsg := range errorWithIdx.ErrorMsgs {
+					// Only include errors that are in potentialErrors
+					for _, potentialError := range potentialErrors {
+						if errorMsg == potentialError {
+							prioritizedErrorsWithIdx = append(prioritizedErrorsWithIdx, fmt.Sprintf("idx %d (%s): %s", errorWithIdx.Idx, approvalId, errorMsg))
+							break
+						}
+					}
+				}
+			}
+		}
+		return " - errors w/ prioritized approvals: " + strings.Join(prioritizedErrorsWithIdx, ", ")
 	}
 
 	approvalsWithPluralConditional := "approval"
@@ -86,6 +134,7 @@ func buildPotentialErrorsString(
 	// Try to be smart about error logs. If we only checked one approval via auto-scan, we can just log the errors for that approval
 	if len(approvalIdxsChecked) == 1 {
 		idxChecked := approvalIdxsChecked[0]
+		approvalId := getApprovalIdByIndex(approvals, idxChecked)
 		errorsForIdx := []string{}
 		for _, errorWithIdx := range errorsWithIdx {
 			if errorWithIdx.Idx == idxChecked {
@@ -94,7 +143,25 @@ func buildPotentialErrorsString(
 			}
 		}
 
-		potentialErrorsStr = ": errors for only matching approval idx " + strconv.Itoa(idxChecked) + ": " + strings.Join(errorsForIdx, ", ")
+		potentialErrorsStr = fmt.Sprintf(": errors for only matching approval idx %d (%s): %s", idxChecked, approvalId, strings.Join(errorsForIdx, ", "))
+	} else if len(approvalIdxsChecked) > 1 {
+		// Multiple approvals checked - prefix each error with its index and approval ID
+		allErrorsWithIdx := []string{}
+		for _, errorWithIdx := range errorsWithIdx {
+			// Only include errors for indices that were checked
+			for _, checkedIdx := range approvalIdxsChecked {
+				if errorWithIdx.Idx == checkedIdx {
+					approvalId := getApprovalIdByIndex(approvals, errorWithIdx.Idx)
+					for _, errorMsg := range errorWithIdx.ErrorMsgs {
+						allErrorsWithIdx = append(allErrorsWithIdx, fmt.Sprintf("idx %d (%s): %s", errorWithIdx.Idx, approvalId, errorMsg))
+					}
+					break
+				}
+			}
+		}
+		if len(allErrorsWithIdx) > 0 {
+			potentialErrorsStr += ": " + strings.Join(allErrorsWithIdx, ", ")
+		}
 	}
 
 	return potentialErrorsStr

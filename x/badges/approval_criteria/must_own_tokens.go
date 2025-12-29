@@ -123,7 +123,8 @@ func (c *MustOwnTokensChecker) determinePartyToCheck(
 	default:
 		// Check if ownershipCheckParty is a valid bb1 address
 		// If it is, return it directly (allows checking ownership for arbitrary addresses)
-		if _, err := sdk.AccAddressFromBech32(ownershipCheckParty); err == nil {
+		// Use types.ValidateAddress to ensure bb1 prefix is handled correctly
+		if err := types.ValidateAddress(ownershipCheckParty, false); err == nil {
 			return ownershipCheckParty
 		}
 
