@@ -1,24 +1,24 @@
 syntax = "proto3";
-package badges.v20;
+package badges.v21;
 
 import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-import "badges/v20/params.proto";
+import "badges/v21/params.proto";
 
-import "badges/v20/transfers.proto";
-import "badges/v20/balances.proto";
-import "badges/v20/permissions.proto";
-import "badges/v20/metadata.proto";
-import "badges/v20/collections.proto";
-import "badges/v20/address_lists.proto";
-import "badges/v20/timelines.proto";
-import "badges/v20/dynamic_stores.proto";
+import "badges/v21/transfers.proto";
+import "badges/v21/balances.proto";
+import "badges/v21/permissions.proto";
+import "badges/v21/metadata.proto";
+import "badges/v21/collections.proto";
+import "badges/v21/address_lists.proto";
+import "badges/v21/timelines.proto";
+import "badges/v21/dynamic_stores.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v20";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v21";
 
 // Msg defines the Msg service.
 service Msg {
@@ -43,6 +43,8 @@ service Msg {
   rpc UpdateDynamicStore    (MsgUpdateDynamicStore) returns (MsgUpdateDynamicStoreResponse);
   rpc DeleteDynamicStore    (MsgDeleteDynamicStore) returns (MsgDeleteDynamicStoreResponse);
   rpc SetDynamicStoreValue  (MsgSetDynamicStoreValue) returns (MsgSetDynamicStoreValueResponse);
+  rpc IncrementStoreValue   (MsgIncrementStoreValue) returns (MsgIncrementStoreValueResponse);
+  rpc DecrementStoreValue   (MsgDecrementStoreValue) returns (MsgDecrementStoreValueResponse);
   
   // Helper message types for UniversalUpdateCollection subsets
   rpc SetValidTokenIds(MsgSetValidTokenIds) returns (MsgSetValidTokenIdsResponse);
@@ -69,6 +71,8 @@ message BadgeCustomMsgType {
   MsgUpdateDynamicStore updateDynamicStoreMsg = 9;
   MsgDeleteDynamicStore deleteDynamicStoreMsg = 10;
   MsgSetDynamicStoreValue setDynamicStoreValueMsg = 11;
+  MsgIncrementStoreValue incrementStoreValueMsg = 12;
+  MsgDecrementStoreValue decrementStoreValueMsg = 13;
   MsgSetIncomingApproval setIncomingApprovalMsg = 14;
   MsgDeleteIncomingApproval deleteIncomingApprovalMsg = 15;
   MsgSetOutgoingApproval setOutgoingApprovalMsg = 16;
@@ -90,7 +94,7 @@ message BadgeCustomMsgType {
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
   option (cosmos.msg.v1.signer) = "authority";
-  option (amino.name) = "badges/v20/MsgUpdateParams";
+  option (amino.name) = "badges/v21/MsgUpdateParams";
 
   // authority is the address that controls the module (defaults to x/gov unless overwritten).
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
@@ -153,7 +157,7 @@ message InvariantsAddObject {
 // We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
 message MsgUniversalUpdateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/UniversalUpdateCollection";
+  option (amino.name) = "badges/v21/UniversalUpdateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -240,7 +244,7 @@ message MsgUniversalUpdateCollectionResponse {
 // MsgUpdateCollection is used to update a collection.
 message MsgUpdateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/UpdateCollection";
+  option (amino.name) = "badges/v21/UpdateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -324,7 +328,7 @@ message MsgUpdateCollectionResponse {
 // MsgCreateCollection is used to create a new collection.
 message MsgCreateCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/CreateCollection";
+  option (amino.name) = "badges/v21/CreateCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -379,7 +383,7 @@ message MsgCreateCollectionResponse {
 // MsgCreateAddressLists is used to create address lists.
 message MsgCreateAddressLists {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/CreateAddressLists";
+  option (amino.name) = "badges/v21/CreateAddressLists";
 
   // Address of the creator.
   string creator = 1;
@@ -394,7 +398,7 @@ message MsgCreateAddressListsResponse {}
 // MsgTransferTokens is used to transfer tokens.
 message MsgTransferTokens {
   option (cosmos.msg.v1.signer) = "creator";
-    option (amino.name) = "badges/v20/TransferTokens";
+    option (amino.name) = "badges/v21/TransferTokens";
 
   // Address of the creator.
   string creator = 1;
@@ -412,7 +416,7 @@ message MsgTransferTokensResponse {}
 // MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/DeleteCollection";
+  option (amino.name) = "badges/v21/DeleteCollection";
 
   // Address of the creator.
   string creator = 1;
@@ -427,7 +431,7 @@ message MsgDeleteCollectionResponse {}
 // MsgUpdateUserApprovals is used to update user approvals.
 message MsgUpdateUserApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/UpdateUserApprovals";
+  option (amino.name) = "badges/v21/UpdateUserApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -478,7 +482,7 @@ message MsgUpdateUserApprovalsResponse {}
 // MsgSetIncomingApproval is a helper message to set a single incoming approval.
 message MsgSetIncomingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetIncomingApproval";
+  option (amino.name) = "badges/v21/SetIncomingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -496,7 +500,7 @@ message MsgSetIncomingApprovalResponse {}
 // MsgDeleteIncomingApproval is a helper message to delete a single incoming approval.
 message MsgDeleteIncomingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/DeleteIncomingApproval";
+  option (amino.name) = "badges/v21/DeleteIncomingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -514,7 +518,7 @@ message MsgDeleteIncomingApprovalResponse {}
 // MsgSetOutgoingApproval is a helper message to set a single outgoing approval.
 message MsgSetOutgoingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetOutgoingApproval";
+  option (amino.name) = "badges/v21/SetOutgoingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -532,7 +536,7 @@ message MsgSetOutgoingApprovalResponse {}
 // MsgDeleteOutgoingApproval is a helper message to delete a single outgoing approval.
 message MsgDeleteOutgoingApproval {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/DeleteOutgoingApproval";
+  option (amino.name) = "badges/v21/DeleteOutgoingApproval";
 
   // Address of the creator.
   string creator = 1;
@@ -550,7 +554,7 @@ message MsgDeleteOutgoingApprovalResponse {}
 // MsgPurgeApprovals is a helper message to purge expired approvals.
 message MsgPurgeApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/PurgeApprovals";
+  option (amino.name) = "badges/v21/PurgeApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -580,12 +584,12 @@ message MsgPurgeApprovalsResponse {
 // MsgCreateDynamicStore is used to create a new dynamic store.
 message MsgCreateDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/CreateDynamicStore";
+  option (amino.name) = "badges/v21/CreateDynamicStore";
 
   // Address of the creator.
   string creator = 1;
-  // The default value for uninitialized addresses (true/false).
-  bool defaultValue = 2;
+  // The default value for uninitialized addresses (number of uses).
+  string defaultValue = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MsgCreateDynamicStoreResponse is the response to MsgCreateDynamicStore.
@@ -597,14 +601,14 @@ message MsgCreateDynamicStoreResponse {
 // MsgUpdateDynamicStore is used to update an existing dynamic store.
 message MsgUpdateDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/UpdateDynamicStore";
+  option (amino.name) = "badges/v21/UpdateDynamicStore";
 
   // Address of the creator.
   string creator = 1;
   // ID of the dynamic store to update.
   string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // The new default value for uninitialized addresses (true/false).
-  bool defaultValue = 3;
+  // The new default value for uninitialized addresses (optional, only set if updating).
+  string defaultValue = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.
@@ -613,7 +617,7 @@ message MsgUpdateDynamicStoreResponse {}
 // MsgDeleteDynamicStore is used to delete a dynamic store.
 message MsgDeleteDynamicStore {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/DeleteDynamicStore";
+  option (amino.name) = "badges/v21/DeleteDynamicStore";
 
   // Address of the creator.
   string creator = 1;
@@ -625,10 +629,10 @@ message MsgDeleteDynamicStore {
 // MsgDeleteDynamicStoreResponse is the response to MsgDeleteDynamicStore.
 message MsgDeleteDynamicStoreResponse {}
 
-// MsgSetDynamicStoreValue is used to set a boolean value for a specific address in a dynamic store.
+// MsgSetDynamicStoreValue is used to set a usage count for a specific address in a dynamic store.
 message MsgSetDynamicStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetDynamicStoreValue";
+  option (amino.name) = "badges/v21/SetDynamicStoreValue";
 
   // Address of the creator.
   string creator = 1;
@@ -639,12 +643,57 @@ message MsgSetDynamicStoreValue {
   // The address for which to set the value.
   string address = 3;
   
-  // The boolean value to set (true/false).
-  bool value = 4;
+  // The usage count to set (number of times this address can use the approval).
+  string value = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
 message MsgSetDynamicStoreValueResponse {}
+
+// MsgIncrementStoreValue is used to increment a usage count for a specific address in a dynamic store.
+message MsgIncrementStoreValue {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/v21/IncrementStoreValue";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the dynamic store.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The address for which to increment the value.
+  string address = 3;
+  
+  // The amount to increment by.
+  string amount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgIncrementStoreValueResponse is the response to MsgIncrementStoreValue.
+message MsgIncrementStoreValueResponse {}
+
+// MsgDecrementStoreValue is used to decrement a usage count for a specific address in a dynamic store.
+message MsgDecrementStoreValue {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/v21/DecrementStoreValue";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the dynamic store.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The address for which to decrement the value.
+  string address = 3;
+  
+  // The amount to decrement by.
+  string amount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // If true, set to zero on underflow. If false, throw error on underflow.
+  bool setToZeroOnUnderflow = 5;
+}
+
+// MsgDecrementStoreValueResponse is the response to MsgDecrementStoreValue.
+message MsgDecrementStoreValueResponse {}
 
 // Helper message types for UniversalUpdateCollection subsets
 // These are convenience messages that set specific subsets of the UniversalUpdateCollection message
@@ -652,7 +701,7 @@ message MsgSetDynamicStoreValueResponse {}
 // MsgSetValidTokenIds sets the validTokenIds and canUpdateValidTokenIds permission
 message MsgSetValidTokenIds {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetValidTokenIds";
+  option (amino.name) = "badges/v21/SetValidTokenIds";
 
   // Address of the creator.
   string creator = 1;
@@ -676,7 +725,7 @@ message MsgSetValidTokenIdsResponse {
 // MsgSetManager sets the manager timeline and canUpdateManager permission
 message MsgSetManager {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetManager";
+  option (amino.name) = "badges/v21/SetManager";
 
   // Address of the creator.
   string creator = 1;
@@ -700,7 +749,7 @@ message MsgSetManagerResponse {
 // MsgSetCollectionMetadata sets the collection metadata timeline and canUpdateCollectionMetadata permission
 message MsgSetCollectionMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetCollectionMetadata";
+  option (amino.name) = "badges/v21/SetCollectionMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -724,7 +773,7 @@ message MsgSetCollectionMetadataResponse {
 // MsgSetTokenMetadata sets the token metadata timeline and canUpdateTokenMetadata permission
 message MsgSetTokenMetadata {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetTokenMetadata";
+  option (amino.name) = "badges/v21/SetTokenMetadata";
 
   // Address of the creator.
   string creator = 1;
@@ -748,7 +797,7 @@ message MsgSetTokenMetadataResponse {
 // MsgSetCustomData sets the custom data timeline and canUpdateCustomData permission
 message MsgSetCustomData {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetCustomData";
+  option (amino.name) = "badges/v21/SetCustomData";
 
   // Address of the creator.
   string creator = 1;
@@ -772,7 +821,7 @@ message MsgSetCustomDataResponse {
 // MsgSetStandards sets the standards timeline and canUpdateStandards permission
 message MsgSetStandards {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetStandards";
+  option (amino.name) = "badges/v21/SetStandards";
 
   // Address of the creator.
   string creator = 1;
@@ -796,7 +845,7 @@ message MsgSetStandardsResponse {
 // MsgSetCollectionApprovals sets the collection approvals and canUpdateCollectionApprovals permission
 message MsgSetCollectionApprovals {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetCollectionApprovals";
+  option (amino.name) = "badges/v21/SetCollectionApprovals";
 
   // Address of the creator.
   string creator = 1;
@@ -820,7 +869,7 @@ message MsgSetCollectionApprovalsResponse {
 // MsgSetIsArchived sets the isArchived timeline and canArchiveCollection permission
 message MsgSetIsArchived {
   option (cosmos.msg.v1.signer) = "creator";
-  option (amino.name) = "badges/v20/SetIsArchived";
+  option (amino.name) = "badges/v21/SetIsArchived";
 
   // Address of the creator.
   string creator = 1;
@@ -844,7 +893,7 @@ message MsgSetIsArchivedResponse {
 // MsgSetReservedProtocolAddress sets or unsets a reserved protocol address (governance-only).
 message MsgSetReservedProtocolAddress {
   option (cosmos.msg.v1.signer) = "authority";
-  option (amino.name) = "badges/v20/SetReservedProtocolAddress";
+  option (amino.name) = "badges/v21/SetReservedProtocolAddress";
 
   // authority is the address that controls the module (defaults to x/gov unless overwritten).
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];

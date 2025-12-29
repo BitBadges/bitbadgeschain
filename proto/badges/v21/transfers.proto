@@ -1,13 +1,13 @@
 syntax = "proto3";
-package badges.v20;
+package badges.v21;
 
 import "gogoproto/gogo.proto";
-import "badges/v20/permissions.proto";
-import "badges/v20/address_lists.proto";
-import "badges/v20/balances.proto";
+import "badges/v21/permissions.proto";
+import "badges/v21/address_lists.proto";
+import "badges/v21/balances.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v20";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v21";
 
 /*
   UserBalanceStore is the store for the user balances for a collection.
@@ -98,7 +98,7 @@ message MerkleChallenge {
   ETHSignatureChallenge defines a rule for the approval in the form of an Ethereum signature challenge.
 
   An ETH signature challenge is a challenge where the user must provide a valid Ethereum signature for a specific nonce.
-  The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId) and each signature can only be used once.
+  The signature scheme is ETHSign(nonce + "-" + creatorAddress) and each signature can only be used once.
   All challenges must be met with valid solutions for the transfer to be approved.
 
   IMPORTANT: We track the usage of each signature to prevent replay attacks. Each signature can only be used once.
@@ -437,6 +437,18 @@ message AddressChecks {
   bool mustNotBeLiquidityPool = 4;
 }
 
+// AltTimeChecks defines alternative time-based checks for approval denial.
+// If the transfer time falls within any of the specified offline hours or days, the approval is denied.
+// Uses UTC timezone for neutral timezone approach.
+// offlineHours: ranges of hours (0-23) when transfers should be denied
+// offlineDays: ranges of days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied
+message AltTimeChecks {
+  // Hours (0-23) when transfers should be denied. Uses UTC timezone.
+  repeated UintRange offlineHours = 1;
+  // Days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied. Uses UTC timezone.
+  repeated UintRange offlineDays = 2;
+}
+
 // ApprovalCriteria defines the criteria for approving transfers.
 message ApprovalCriteria {
   // Merkle challenge that must be satisfied for approval.
@@ -480,6 +492,10 @@ message ApprovalCriteria {
   AddressChecks senderChecks = 17;
   AddressChecks recipientChecks = 18;
   AddressChecks initiatorChecks = 19;
+  // Alternative time-based checks for approval denial (offline hours/days).
+  AltTimeChecks altTimeChecks = 20;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 21;
 }
 
 // UserRoyalties defines the royalties for a user.
@@ -520,6 +536,10 @@ message OutgoingApprovalCriteria {
   // Address checks for recipient and initiator (no sender checks for outgoing approvals).
   AddressChecks recipientChecks = 12;
   AddressChecks initiatorChecks = 13;
+  // Alternative time-based checks for approval denial (offline hours/days).
+  AltTimeChecks altTimeChecks = 14;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 15;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -552,6 +572,10 @@ message IncomingApprovalCriteria {
   // Address checks for sender and initiator (no recipient checks for incoming approvals).
   AddressChecks senderChecks = 12;
   AddressChecks initiatorChecks = 13;
+  // Alternative time-based checks for approval denial (offline hours/days).
+  AltTimeChecks altTimeChecks = 14;
+  // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+  bool mustPrioritize = 15;
 }
 
 
@@ -633,10 +657,8 @@ message Transfer {
   bool onlyCheckPrioritizedOutgoingApprovals = 11;
   // The options for precalculating the balances.
   PrecalculationOptions precalculationOptions = 12;
-  // Affiliate address for the transfer.
-  string affiliateAddress = 13;
   // The number of times to attempt approval validation. If 0 / not specified, we default to only one.
-  string numAttempts = 14 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string numAttempts = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // PrecalculationOptions defines the options for precalculating the balances.
@@ -667,7 +689,7 @@ message MerkleProof {
 
 // ETHSignatureProof represents an Ethereum signature proof for a challenge.
 message ETHSignatureProof {
-  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId).
+  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + creatorAddress).
   string nonce = 1;
   // The Ethereum signature of the nonce.
   string signature = 2;

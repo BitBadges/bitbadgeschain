@@ -1,15 +1,15 @@
 syntax = "proto3";
-package badges.v20;
+package badges.v21;
 
 import "google/protobuf/any.proto";
-import "badges/v20/transfers.proto";
-import "badges/v20/balances.proto";
-import "badges/v20/permissions.proto";
-import "badges/v20/metadata.proto";
-import "badges/v20/timelines.proto";
+import "badges/v21/transfers.proto";
+import "badges/v21/balances.proto";
+import "badges/v21/permissions.proto";
+import "badges/v21/metadata.proto";
+import "badges/v21/timelines.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v20";
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v21";
 
 /* 
   A TokenCollection is the top-level object for a collection of tokens. 

@@ -121,7 +121,10 @@ type MustOwnTokens struct {
 	OverrideWithCurrentTime bool `protobuf:"varint,5,opt,name=overrideWithCurrentTime,proto3" json:"overrideWithCurrentTime,omitempty"`
 	// If true, the user must meet ownership requirements for all specified tokens; else, must meet requirements for any single token.
 	MustSatisfyForAllAssets bool `protobuf:"varint,6,opt,name=mustSatisfyForAllAssets,proto3" json:"mustSatisfyForAllAssets,omitempty"`
-	// The party to check ownership for. Options are "initiator", "sender", or "recipient". Defaults to "initiator" if empty.
+	// The party to check ownership for. Options are "initiator", "sender", "recipient", or any valid bb1 address.
+	// If a valid bb1 address is provided, ownership will be checked for that specific address.
+	// This enables use cases like halt tokens where ownership is checked for an arbitrary address (e.g., halt token owner).
+	// Defaults to "initiator" if empty or if the value is not a recognized option or valid bb1 address.
 	OwnershipCheckParty string `protobuf:"bytes,7,opt,name=ownershipCheckParty,proto3" json:"ownershipCheckParty,omitempty"`
 }
 

@@ -1,4 +1,4 @@
-package v21
+package v22
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	UpgradeName = "v21"
+	UpgradeName = "v22"
 )
 
 // This is in a separate function so we can test it locally with a snapshot

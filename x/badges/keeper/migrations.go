@@ -11,7 +11,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v20"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v21"
 )
 
 // MigrateBadgesKeeper migrates the tokens keeper to set all approval versions to 0
@@ -56,6 +56,11 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 		// Set mustPrioritize to false for migrated data
 		// This ensures existing approvals continue to work without requiring explicit prioritization
 		approval.ApprovalCriteria.MustPrioritize = false
+
+		// Initialize votingChallenges to empty array if nil
+		if approval.ApprovalCriteria.VotingChallenges == nil {
+			approval.ApprovalCriteria.VotingChallenges = []*newtypes.VotingChallenge{}
+		}
 	}
 
 	return incomingApprovals
@@ -70,6 +75,11 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 		// Set mustPrioritize to false for migrated data
 		// This ensures existing approvals continue to work without requiring explicit prioritization
 		approval.ApprovalCriteria.MustPrioritize = false
+
+		// Initialize votingChallenges to empty array if nil
+		if approval.ApprovalCriteria.VotingChallenges == nil {
+			approval.ApprovalCriteria.VotingChallenges = []*newtypes.VotingChallenge{}
+		}
 	}
 
 	return outgoingApprovals
@@ -84,6 +94,11 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 		// Set mustPrioritize to false for migrated data
 		// This ensures existing approvals continue to work without requiring explicit prioritization
 		approval.ApprovalCriteria.MustPrioritize = false
+
+		// Initialize votingChallenges to empty array if nil
+		if approval.ApprovalCriteria.VotingChallenges == nil {
+			approval.ApprovalCriteria.VotingChallenges = []*newtypes.VotingChallenge{}
+		}
 	}
 
 	return collectionApprovals
@@ -240,6 +255,23 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
 
+		// Migrate cosmosCoinWrapperPaths from old format to new format
+		// Old format has balances and allowCosmosWrapping, new format has conversion
+		// If allowCosmosWrapping is false, convert to aliasPaths instead
+		newCollection.CosmosCoinWrapperPaths, newCollection.AliasPaths = MigrateCosmosCoinWrapperPaths(oldCollection.CosmosCoinWrapperPaths)
+
+		// Migrate CollectionInvariants.CosmosCoinBackedPath from old format to new format
+		// Old format: has ibcDenom, balances, and ibcAmount
+		// New format: has conversion (with sideA containing amount+denom, and sideB containing balances)
+		if oldCollection.Invariants != nil && oldCollection.Invariants.CosmosCoinBackedPath != nil {
+			// Ensure newCollection.Invariants is initialized
+			if newCollection.Invariants == nil {
+				newCollection.Invariants = &newtypes.CollectionInvariants{}
+			}
+			// Migrate the CosmosCoinBackedPath
+			newCollection.Invariants.CosmosCoinBackedPath = MigrateCosmosCoinBackedPath(oldCollection.Invariants.CosmosCoinBackedPath)
+		}
+
 		// Save the updated collection
 		if err := k.SetCollectionInStore(ctx, &newCollection, true); err != nil {
 			return err
@@ -247,6 +279,146 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	}
 
 	return nil
+}
+
+// MigrateCosmosCoinWrapperPaths migrates old format cosmosCoinWrapperPaths to new format
+// Old format: has balances and allowCosmosWrapping
+// New format: has conversion (with sideA.amount and sideB balances)
+// If allowCosmosWrapping is false, convert to aliasPaths instead
+func MigrateCosmosCoinWrapperPaths(oldPaths []*oldtypes.CosmosCoinWrapperPath) ([]*newtypes.CosmosCoinWrapperPath, []*newtypes.AliasPath) {
+	var newWrapperPaths []*newtypes.CosmosCoinWrapperPath
+	var newAliasPaths []*newtypes.AliasPath
+
+	for _, oldPath := range oldPaths {
+		if oldPath == nil {
+			continue
+		}
+
+		// Convert balances to new format
+		// Old format has balances directly, new format has conversion.sideB
+		var sideBBalances []*newtypes.Balance
+		if oldPath.Balances != nil {
+			sideBBalances = convertBalances(oldPath.Balances)
+		}
+
+		// Set amount to 1 if not already set (default to 1)
+		// Note: In old format, there was no explicit amount field, so we default to 1
+		amount := newtypes.Uint(sdkmath.NewUint(1))
+
+		// Create conversion
+		conversion := &newtypes.ConversionWithoutDenom{
+			SideA: &newtypes.ConversionSideA{
+				Amount: amount,
+			},
+			SideB: sideBBalances,
+		}
+
+		// Migrate DenomUnits to include metadata field
+		var newDenomUnits []*newtypes.DenomUnit
+		if oldPath.DenomUnits != nil {
+			newDenomUnits = convertDenomUnits(oldPath.DenomUnits)
+		}
+
+		// If allowCosmosWrapping is false, convert to aliasPath
+		if !oldPath.AllowCosmosWrapping {
+			aliasPath := &newtypes.AliasPath{
+				Denom:      oldPath.Denom,
+				Conversion: conversion,
+				Symbol:     oldPath.Symbol,
+				DenomUnits: newDenomUnits,
+				Metadata:   nil, // Old format didn't have metadata, set to nil
+			}
+			newAliasPaths = append(newAliasPaths, aliasPath)
+		} else {
+			// Convert to new CosmosCoinWrapperPath format
+			wrapperPath := &newtypes.CosmosCoinWrapperPath{
+				Address:                        oldPath.Address,
+				Denom:                          oldPath.Denom,
+				Conversion:                     conversion,
+				Symbol:                         oldPath.Symbol,
+				DenomUnits:                     newDenomUnits,
+				AllowOverrideWithAnyValidToken: oldPath.AllowOverrideWithAnyValidToken,
+				Metadata:                       nil, // Old format didn't have metadata, set to nil
+			}
+			newWrapperPaths = append(newWrapperPaths, wrapperPath)
+		}
+	}
+
+	return newWrapperPaths, newAliasPaths
+}
+
+// convertBalances converts old Balance format to new Balance format
+func convertBalances(oldBalances []*oldtypes.Balance) []*newtypes.Balance {
+	if oldBalances == nil {
+		return nil
+	}
+	var newBalances []*newtypes.Balance
+	for _, oldBalance := range oldBalances {
+		if oldBalance == nil {
+			continue
+		}
+		newBalances = append(newBalances, &newtypes.Balance{
+			Amount:         newtypes.Uint(oldBalance.Amount),
+			OwnershipTimes: convertUintRanges(oldBalance.OwnershipTimes),
+			TokenIds:       convertUintRanges(oldBalance.TokenIds),
+		})
+	}
+	return newBalances
+}
+
+// convertDenomUnits converts old DenomUnit format to new DenomUnit format (adds metadata field)
+func convertDenomUnits(oldUnits []*oldtypes.DenomUnit) []*newtypes.DenomUnit {
+	if oldUnits == nil {
+		return nil
+	}
+	newUnits := make([]*newtypes.DenomUnit, len(oldUnits))
+	for i, oldUnit := range oldUnits {
+		if oldUnit == nil {
+			continue
+		}
+		newUnits[i] = &newtypes.DenomUnit{
+			Decimals:         newtypes.Uint(oldUnit.Decimals),
+			Symbol:           oldUnit.Symbol,
+			IsDefaultDisplay: oldUnit.IsDefaultDisplay,
+			Metadata:         nil, // Old format didn't have metadata, set to nil
+		}
+	}
+	return newUnits
+}
+
+// MigrateCosmosCoinBackedPath migrates old format CosmosCoinBackedPath to new format
+// Old format: has address, ibcDenom, balances, and ibcAmount
+// New format: has address and conversion (with sideA containing amount+denom, and sideB containing balances)
+func MigrateCosmosCoinBackedPath(oldPath *oldtypes.CosmosCoinBackedPath) *newtypes.CosmosCoinBackedPath {
+	if oldPath == nil {
+		return nil
+	}
+
+	// Convert balances to new format
+	var sideBBalances []*newtypes.Balance
+	if oldPath.Balances != nil {
+		sideBBalances = convertBalances(oldPath.Balances)
+	}
+
+	// Convert ibcAmount and ibcDenom to conversion.sideA
+	// Old format has ibcAmount (Uint) and ibcDenom (string)
+	// New format has conversion.sideA (ConversionSideAWithDenom) with amount and denom
+	sideA := &newtypes.ConversionSideAWithDenom{
+		Amount: newtypes.Uint(oldPath.IbcAmount),
+		Denom:  oldPath.IbcDenom,
+	}
+
+	// Create conversion
+	conversion := &newtypes.Conversion{
+		SideA: sideA,
+		SideB: sideBBalances,
+	}
+
+	// Create new CosmosCoinBackedPath
+	return &newtypes.CosmosCoinBackedPath{
+		Address:    oldPath.Address,
+		Conversion: conversion,
+	}
 }
 
 // Helper functions for specific timeline types
