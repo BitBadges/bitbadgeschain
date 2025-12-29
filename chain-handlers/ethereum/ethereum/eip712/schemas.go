@@ -32,6 +32,34 @@ func getETHSignatureChallengeSchema() string {
 	}`
 }
 
+// getVotingChallengeSchema returns the schema for a voting challenge
+func getVotingChallengeSchema() string {
+	return `{
+		"proposalId": "",
+		"quorumThreshold": "",
+		"voters": [` + getVoterSchema() + `],
+		"uri": "",
+		"customData": ""
+	}`
+}
+
+// getVoterSchema returns the schema for a voter
+func getVoterSchema() string {
+	return `{
+		"address": "",
+		"weight": ""
+	}`
+}
+
+// getVoteProofSchema returns the schema for a vote proof
+func getVoteProofSchema() string {
+	return `{
+		"proposalId": "",
+		"voter": "",
+		"yesWeight": ""
+	}`
+}
+
 // getMustOwnTokensSchema returns the schema for must own tokens criteria
 func getMustOwnTokensSchema() string {
 	return `{
@@ -217,6 +245,9 @@ func getCollectionApprovalCriteriaSchema() string {
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
 		],
+		"votingChallenges": [
+			` + getVotingChallengeSchema() + `
+		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"recipientChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
@@ -249,6 +280,9 @@ func getOutgoingApprovalCriteriaSchema() string {
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
 		],
+		"votingChallenges": [
+			` + getVotingChallengeSchema() + `
+		],
 		"recipientChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
 		"altTimeChecks": ` + getAltTimeChecksSchema() + `,
@@ -279,6 +313,9 @@ func getIncomingApprovalCriteriaSchema() string {
 		],
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
+		],
+		"votingChallenges": [
+			` + getVotingChallengeSchema() + `
 		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
@@ -1155,6 +1192,19 @@ func GetSchemas() []string {
 			"collectionId": "",
 			"isArchived": false,
 			"canArchiveCollection": [{"permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/CastVote",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"approvalLevel": "",
+			"approverAddress": "",
+			"approvalId": "",
+			"proposalId": "",
+			"yesWeight": ""
 		}
 	}`)
 

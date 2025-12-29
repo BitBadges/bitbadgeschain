@@ -13,6 +13,7 @@ import "badges/address_lists.proto";
 import "badges/dynamic_stores.proto";
 import "badges/user_balance_store.proto";
 import "badges/approval_tracking.proto";
+import "badges/challenges.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
 
@@ -77,6 +78,16 @@ service Query {
   // Queries all reserved protocol addresses.
   rpc GetAllReservedProtocolAddresses(QueryGetAllReservedProtocolAddressesRequest) returns (QueryGetAllReservedProtocolAddressesResponse) {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_all_reserved_protocol_addresses";
+	}
+
+  // Queries a vote by collection ID, approval level, approver address, approval ID, proposal ID, and voter address.
+  rpc GetVote(QueryGetVoteRequest) returns (QueryGetVoteResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_vote/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{proposalId}/{voterAddress}";
+	}
+
+  // Queries all votes for a proposal.
+  rpc GetVotes(QueryGetVotesRequest) returns (QueryGetVotesResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/badges/get_votes/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{proposalId}";
 	}
 
   // this line is used by starport scaffolding # 2
@@ -194,6 +205,31 @@ message QueryGetAllReservedProtocolAddressesRequest {}
 
 message QueryGetAllReservedProtocolAddressesResponse {
   repeated string addresses = 1;
+}
+
+message QueryGetVoteRequest {
+  string collectionId = 1;
+  string approvalLevel = 2; // "collection" or "incoming" or "outgoing"
+  string approverAddress = 3; // if approvalLevel is "collection", leave blank
+  string approvalId = 4;
+  string proposalId = 5;
+  string voterAddress = 6;
+}
+
+message QueryGetVoteResponse {
+  VoteProof vote = 1;
+}
+
+message QueryGetVotesRequest {
+  string collectionId = 1;
+  string approvalLevel = 2; // "collection" or "incoming" or "outgoing"
+  string approverAddress = 3; // if approvalLevel is "collection", leave blank
+  string approvalId = 4;
+  string proposalId = 5;
+}
+
+message QueryGetVotesResponse {
+  repeated VoteProof votes = 1;
 }
 
 // this line is used by starport scaffolding # 3

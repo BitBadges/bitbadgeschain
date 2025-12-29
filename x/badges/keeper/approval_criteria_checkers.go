@@ -67,6 +67,19 @@ func (a *dynamicStoreServiceAdapter) GetDynamicStoreValue(ctx sdk.Context, store
 	return &value, true
 }
 
+// votingServiceAdapter adapts the Keeper to the VotingService interface
+type votingServiceAdapter struct {
+	keeper *Keeper
+}
+
+func (a *votingServiceAdapter) GetVoteFromStore(ctx sdk.Context, key string) (*types.VoteProof, bool) {
+	vote, found := a.keeper.GetVoteFromStore(ctx, key)
+	if !found {
+		return nil, false
+	}
+	return vote, true
+}
+
 // GetApprovalCriteriaCheckers returns all applicable checkers for the given approval
 // This includes basic validation checkers (address matching, transfer times) and approval criteria checkers
 func (k Keeper) GetApprovalCriteriaCheckers(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
@@ -128,6 +141,12 @@ func (k Keeper) GetApprovalCriteriaCheckers(approval *types.CollectionApproval) 
 	if len(approvalCriteria.DynamicStoreChallenges) > 0 {
 		dynamicStoreService := &dynamicStoreServiceAdapter{keeper: &k}
 		checkers = append(checkers, approvalcriteria.NewDynamicStoreChallengesChecker(dynamicStoreService))
+	}
+
+	// VotingChallenges checker
+	if len(approvalCriteria.VotingChallenges) > 0 {
+		votingService := &votingServiceAdapter{keeper: &k}
+		checkers = append(checkers, approvalcriteria.NewVotingChallengesChecker(votingService))
 	}
 
 	// NoForcefulPostMintTransfers checker (always added, will check if invariant is enabled in Check method)

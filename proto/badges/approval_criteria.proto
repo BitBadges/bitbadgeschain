@@ -82,6 +82,9 @@ message ApprovalCriteria {
   // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
   // This allows fine-grained control over which approvals are applied when multiple approvals could match.
   bool mustPrioritize = 21;
+  // Voting challenges that must be satisfied for approval. The initiator must provide
+  // valid votes that meet the quorum threshold for all specified challenges.
+  repeated VotingChallenge votingChallenges = 22;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -137,6 +140,9 @@ message OutgoingApprovalCriteria {
   // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
   // This allows fine-grained control over which approvals are applied when multiple approvals could match.
   bool mustPrioritize = 15;
+  // Voting challenges that must be satisfied for approval. The initiator must provide
+  // valid votes that meet the quorum threshold for all specified challenges.
+  repeated VotingChallenge votingChallenges = 16;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -192,5 +198,8 @@ message IncomingApprovalCriteria {
   // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
   // This allows fine-grained control over which approvals are applied when multiple approvals could match.
   bool mustPrioritize = 15;
+  // Voting challenges that must be satisfied for approval. The initiator must provide
+  // valid votes that meet the quorum threshold for all specified challenges.
+  repeated VotingChallenge votingChallenges = 16;
 }
 

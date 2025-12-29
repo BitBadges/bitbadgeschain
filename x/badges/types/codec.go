@@ -39,6 +39,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetCollectionApprovals{}, "badges/SetCollectionApprovals", nil)
 	cdc.RegisterConcrete(&MsgSetIsArchived{}, "badges/SetIsArchived", nil)
 	cdc.RegisterConcrete(&MsgSetReservedProtocolAddress{}, "badges/SetReservedProtocolAddress", nil)
+	cdc.RegisterConcrete(&MsgCastVote{}, "badges/CastVote", nil)
 
 	encodingcodec.RegisterLegacyAminoCodec(cdc)
 	// this line is used by starport scaffolding # 2
@@ -71,6 +72,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSetCollectionApprovals{},
 		&MsgSetIsArchived{},
 		&MsgSetReservedProtocolAddress{},
+		&MsgCastVote{},
 	)
 	// this line is used by starport scaffolding # 3
 

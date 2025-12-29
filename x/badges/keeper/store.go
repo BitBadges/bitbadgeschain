@@ -829,6 +829,59 @@ func (k Keeper) IncrementETHSignatureTrackerInStore(ctx sdk.Context, key string)
 	return newNumUsed, nil
 }
 
+/****************************************VOTING TRACKERS****************************************/
+
+// SetVoteInStore sets a vote in the store using VotingTrackerKey ([]byte{0x14}) as the prefix.
+func (k Keeper) SetVoteInStore(ctx sdk.Context, key string, vote *types.VoteProof) error {
+	marshaled_vote, err := k.cdc.Marshal(vote)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.VoteProof failed")
+	}
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(votingTrackerStoreKey(key), marshaled_vote)
+	return nil
+}
+
+// GetVoteFromStore gets a vote from the store.
+func (k Keeper) GetVoteFromStore(ctx sdk.Context, key string) (*types.VoteProof, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled_vote := store.Get(votingTrackerStoreKey(key))
+
+	if len(marshaled_vote) == 0 {
+		return nil, false
+	}
+
+	var vote types.VoteProof
+	k.cdc.MustUnmarshal(marshaled_vote, &vote)
+	return &vote, true
+}
+
+// GetVotesFromStore gets all votes from the store.
+func (k Keeper) GetVotesFromStore(ctx sdk.Context) (votes []*types.VoteProof, ids []string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, VotingTrackerKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var vote types.VoteProof
+		k.cdc.MustUnmarshal(iterator.Value(), &vote)
+		votes = append(votes, &vote)
+		ids = append(ids, string(iterator.Key()[len(VotingTrackerKey):]))
+	}
+	return
+}
+
+// DeleteVoteFromStore deletes a vote from the store.
+func (k Keeper) DeleteVoteFromStore(ctx sdk.Context, key string) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Delete(votingTrackerStoreKey(key))
+	return nil
+}
+
 /****************************************RESERVED PROTOCOL ADDRESSES****************************************/
 
 // SetReservedProtocolAddressInStore sets a reserved protocol address in the store.

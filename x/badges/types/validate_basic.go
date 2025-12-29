@@ -588,6 +588,28 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					storeIds[storeIdStr] = true
 				}
 
+				// Validate voting challenges
+				if approvalCriteria.VotingChallenges == nil {
+					approvalCriteria.VotingChallenges = []*VotingChallenge{}
+				}
+
+				// Check for duplicate proposal IDs
+				proposalIds := make(map[string]bool)
+				for _, challenge := range approvalCriteria.VotingChallenges {
+					if challenge == nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "voting challenge is nil")
+					}
+
+					if err := challenge.ValidateBasic(); err != nil {
+						return sdkerrors.Wrapf(err, "invalid voting challenge")
+					}
+
+					if proposalIds[challenge.ProposalId] {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate voting challenge proposalId: %s", challenge.ProposalId)
+					}
+					proposalIds[challenge.ProposalId] = true
+				}
+
 				if approvalCriteria.ApprovalAmounts == nil {
 					approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}
 				}
@@ -1118,6 +1140,79 @@ func ValidateNoCustomOwnershipTimesInvariant(ownershipTimes []*UintRange, invari
 
 	if !IsFullOwnershipTimesRange(ownershipTimes) {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "noCustomOwnershipTimes invariant is enabled: ownership times must be full range [{ start: 1, end: 18446744073709551615 }]")
+	}
+
+	return nil
+}
+
+// ValidateBasic validates a VotingChallenge
+func (vc *VotingChallenge) ValidateBasic() error {
+	if vc.ProposalId == "" {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "proposalId cannot be empty")
+	}
+
+	if vc.QuorumThreshold.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "quorumThreshold must be between 0 and 100, got %s", vc.QuorumThreshold.String())
+	}
+
+	if len(vc.Voters) == 0 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "voters list cannot be empty")
+	}
+
+	// Check for duplicate voters
+	voterAddresses := make(map[string]bool)
+	for _, voter := range vc.Voters {
+		if err := voter.ValidateBasic(); err != nil {
+			return err
+		}
+		if voterAddresses[voter.Address] {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate voter address: %s", voter.Address)
+		}
+		voterAddresses[voter.Address] = true
+	}
+
+	if vc.Uri != "" {
+		if err := ValidateURI(vc.Uri); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ValidateBasic validates a Voter
+func (v *Voter) ValidateBasic() error {
+	if v.Address == "" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "voter address cannot be empty")
+	}
+
+	if err := ValidateAddress(v.Address, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+
+	if v.Weight.IsZero() {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "voter weight cannot be zero")
+	}
+
+	return nil
+}
+
+// ValidateBasic validates a VoteProof
+func (vp *VoteProof) ValidateBasic() error {
+	if vp.ProposalId == "" {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "proposalId cannot be empty")
+	}
+
+	if vp.Voter == "" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "voter address cannot be empty")
+	}
+
+	if err := ValidateAddress(vp.Voter, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+
+	if vp.YesWeight.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100, got %s", vp.YesWeight.String())
 	}
 
 	return nil

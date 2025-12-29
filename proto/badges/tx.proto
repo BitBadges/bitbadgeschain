@@ -55,6 +55,7 @@ service Msg {
   rpc SetCollectionApprovals(MsgSetCollectionApprovals) returns (MsgSetCollectionApprovalsResponse);
   rpc SetIsArchived(MsgSetIsArchived) returns (MsgSetIsArchivedResponse);
   rpc SetReservedProtocolAddress(MsgSetReservedProtocolAddress) returns (MsgSetReservedProtocolAddressResponse);
+  rpc CastVote(MsgCastVote) returns (MsgCastVoteResponse);
 }
 
 //Used for WASM bindings and JSON parsing
@@ -86,6 +87,7 @@ message BadgeCustomMsgType {
   MsgSetCollectionApprovals setCollectionApprovalsMsg = 25;
   MsgSetIsArchived setIsArchivedMsg = 26;
   MsgSetReservedProtocolAddress setReservedProtocolAddressMsg = 27;
+  MsgCastVote castVoteMsg = 28;
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -876,3 +878,34 @@ message MsgSetReservedProtocolAddress {
 
 // MsgSetReservedProtocolAddressResponse is the response to MsgSetReservedProtocolAddress.
 message MsgSetReservedProtocolAddressResponse {}
+
+// MsgCastVote allows a voter to cast or update their vote for a voting challenge.
+message MsgCastVote {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "badges/CastVote";
+
+  // The address of the voter casting the vote.
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  
+  // The collection ID for the voting challenge.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The approval level ("collection", "incoming", or "outgoing").
+  string approvalLevel = 3;
+  
+  // The approver address (empty string for collection-level approvals).
+  string approverAddress = 4;
+  
+  // The approval ID.
+  string approvalId = 5;
+  
+  // The proposal ID (challenge ID) from the VotingChallenge.
+  string proposalId = 6;
+  
+  // The percentage weight (0-100) allocated to "yes" vote.
+  // The remaining percentage (100 - yesWeight) is allocated to "no" vote.
+  // Example: yesWeight=70 means 70% yes, 30% no.
+  string yesWeight = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message MsgCastVoteResponse {}
