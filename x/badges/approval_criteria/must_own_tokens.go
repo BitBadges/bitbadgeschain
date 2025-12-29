@@ -121,7 +121,13 @@ func (c *MustOwnTokensChecker) determinePartyToCheck(
 	case "":
 		return initiatedBy
 	default:
-		// TODO: We could support any bb1 address here as well
+		// Check if ownershipCheckParty is a valid bb1 address
+		// If it is, return it directly (allows checking ownership for arbitrary addresses)
+		if _, err := sdk.AccAddressFromBech32(ownershipCheckParty); err == nil {
+			return ownershipCheckParty
+		}
+
+		// If not a valid address, fall back to default behavior
 		return initiatedBy
 	}
 }

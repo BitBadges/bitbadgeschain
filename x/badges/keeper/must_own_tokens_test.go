@@ -728,6 +728,406 @@ func (suite *TestSuite) TestMustOwnTokensOwnershipCheckParty() {
 	suite.Require().NotNil(err, "Transfer should fail when recipient doesn't own required tokens")
 }
 
+func (suite *TestSuite) TestMustOwnTokensBb1AddressSupport() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	// Test: Check ownership for arbitrary bb1 address (halt token scenario)
+	// Create a halt token collection first (will be collection ID 1)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(charlie)
+	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
+		{
+			ApprovalId: "default",
+			ApprovalCriteria: &types.ApprovalCriteria{},
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			OwnershipTimes:    GetFullUintRanges(),
+			FromListId:        "Mint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	haltTokenCollectionId := sdkmath.NewUint(1) // First collection gets ID 1
+
+	// Mint halt token to charlie
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      charlie,
+		CollectionId: haltTokenCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        types.MintAddress,
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, haltTokenCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting halt token to charlie")
+
+	// Create main collection (will be collection ID 2) with approval that requires halt token owner to own halt token
+	collectionsToCreate2 := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate2[0].CollectionApprovals[1].ApprovalCriteria.MustOwnTokens = []*types.MustOwnTokens{
+		{
+			CollectionId: haltTokenCollectionId, // Halt token collection
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:            []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			OwnershipTimes:      GetFullUintRanges(),
+			OwnershipCheckParty: charlie, // Use bb1 address directly - halt token owner
+		},
+	}
+
+	err = CreateCollections(suite, wctx, collectionsToCreate2)
+	suite.Require().Nil(err)
+
+	mainCollectionId := sdkmath.NewUint(2) // Second collection gets ID 2
+
+	// Test 1: Transfer should succeed because charlie (halt token owner) owns the halt token
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: mainCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, mainCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Transfer should succeed when halt token owner owns the halt token")
+
+	// Test 2: Transfer halt token away from charlie (simulating halt)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      charlie,
+		CollectionId: haltTokenCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        charlie,
+				ToAddresses: []string{alice}, // Transfer halt token to alice
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, haltTokenCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring halt token")
+
+	// Test 3: Transfer should now fail because charlie (halt token owner) no longer owns the halt token
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: mainCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, mainCollectionId),
+			},
+		},
+	})
+	suite.Require().NotNil(err, "Transfer should fail when halt token owner doesn't own the halt token")
+	suite.Require().Contains(err.Error(), "token ownership requirement", "Error should mention token ownership requirement")
+}
+
+func (suite *TestSuite) Test2FAVaultEndToEnd() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := *new(error)
+
+	// This test demonstrates a complete 2FA vault setup with:
+	// 1. Time-sensitive signatures (via time tokens with ownership times)
+	// 2. Quick halting (via halt tokens with bb1 address support)
+
+	// Step 1: Create time token collection (collection ID 1)
+	timeTokenCollections := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	timeTokenCollections[0].CollectionApprovals = []*types.CollectionApproval{
+		{
+			ApprovalId: "default",
+			ApprovalCriteria: &types.ApprovalCriteria{},
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			OwnershipTimes:    GetFullUintRanges(),
+			FromListId:        "Mint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+		},
+	}
+
+	err = CreateCollections(suite, wctx, timeTokenCollections)
+	suite.Require().Nil(err)
+	timeTokenCollectionId := sdkmath.NewUint(1)
+
+	// Step 2: Create halt token collection (collection ID 2)
+	haltTokenCollections := GetTransferableCollectionToCreateAllMintedToCreator(charlie)
+	haltTokenCollections[0].CollectionApprovals = []*types.CollectionApproval{
+		{
+			ApprovalId: "default",
+			ApprovalCriteria: &types.ApprovalCriteria{},
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			OwnershipTimes:    GetFullUintRanges(),
+			FromListId:        "Mint",
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+		},
+	}
+
+	err = CreateCollections(suite, wctx, haltTokenCollections)
+	suite.Require().Nil(err)
+	haltTokenCollectionId := sdkmath.NewUint(2)
+
+	// Step 3: Mint halt token to charlie (halt token owner)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      charlie,
+		CollectionId: haltTokenCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        types.MintAddress,
+				ToAddresses: []string{charlie},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, haltTokenCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting halt token to charlie")
+
+	// Step 4: Create main collection (collection ID 3) with 2FA vault approval
+	mainCollections := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	mainCollections[0].CollectionApprovals[1].ApprovalCriteria.MustOwnTokens = []*types.MustOwnTokens{
+		// Time token check (expires after TTL)
+		{
+			CollectionId: timeTokenCollectionId,
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:            []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			OwnershipTimes:      GetFullUintRanges(),
+			OverrideWithCurrentTime: true, // Always check current time
+			OwnershipCheckParty: "initiator", // Check initiator owns time token
+		},
+		// Halt token check (transfer token = halt all approvals)
+		{
+			CollectionId: haltTokenCollectionId,
+			AmountRange: &types.UintRange{
+				Start: sdkmath.NewUint(1),
+				End:   sdkmath.NewUint(1),
+			},
+			TokenIds:            []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+			OwnershipTimes:      GetFullUintRanges(),
+			OwnershipCheckParty: charlie, // Use bb1 address directly - halt token owner
+		},
+	}
+
+	err = CreateCollections(suite, wctx, mainCollections)
+	suite.Require().Nil(err)
+	mainCollectionId := sdkmath.NewUint(3)
+
+	// Step 5: Mint time token to bob with ownership time = [now, now + 5 minutes]
+	currentTime := suite.ctx.BlockTime().UnixMilli()
+	ttl := int64(5 * 60 * 1000) // 5 minutes in milliseconds
+	timeTokenOwnershipTimes := []*types.UintRange{
+		{
+			Start: sdkmath.NewUint(uint64(currentTime)),
+			End:   sdkmath.NewUint(uint64(currentTime + ttl)),
+		},
+	}
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: timeTokenCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        types.MintAddress,
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: timeTokenOwnershipTimes,
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, timeTokenCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting time token to bob")
+
+	// Step 6: Transfer should succeed - bob owns time token and charlie owns halt token
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: mainCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, mainCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Transfer should succeed when both time token and halt token requirements are met")
+
+	// Step 7: Simulate time token expiration by advancing block time
+	suite.ctx = suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(6 * 60 * 1000 * 1000000)) // Add 6 minutes (in nanoseconds)
+
+	// Step 8: Transfer should fail - time token has expired
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: mainCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, mainCollectionId),
+			},
+		},
+	})
+	suite.Require().NotNil(err, "Transfer should fail when time token has expired")
+	suite.Require().Contains(err.Error(), "token ownership requirement", "Error should mention token ownership requirement")
+
+	// Step 9: Mint new time token and reset block time
+	currentTime = suite.ctx.BlockTime().UnixMilli()
+	timeTokenOwnershipTimes = []*types.UintRange{
+		{
+			Start: sdkmath.NewUint(uint64(currentTime)),
+			End:   sdkmath.NewUint(uint64(currentTime + ttl)),
+		},
+	}
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: timeTokenCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        types.MintAddress,
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: timeTokenOwnershipTimes,
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, timeTokenCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting new time token to bob")
+
+	// Step 10: Transfer should succeed again with new time token
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: mainCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, mainCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Transfer should succeed again with new time token")
+
+	// Step 11: Emergency halt - transfer halt token away from charlie
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      charlie,
+		CollectionId: haltTokenCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        charlie,
+				ToAddresses: []string{alice}, // Transfer halt token to alice
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, haltTokenCollectionId),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error transferring halt token")
+
+	// Step 12: Transfer should now fail - halt token has been transferred (emergency halt)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: mainCollectionId,
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, mainCollectionId),
+			},
+		},
+	})
+	suite.Require().NotNil(err, "Transfer should fail after emergency halt")
+	suite.Require().Contains(err.Error(), "token ownership requirement", "Error should mention token ownership requirement")
+}
+
 // TestCheckMustOwnTokensBreakLogic tests the break/continue logic for MustSatisfyForAllAssets
 func (suite *TestSuite) TestCheckMustOwnTokensBreakLogic() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
