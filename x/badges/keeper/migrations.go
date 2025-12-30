@@ -326,7 +326,7 @@ func MigrateCosmosCoinWrapperPaths(oldPaths []*oldtypes.CosmosCoinWrapperPath) (
 				Conversion: conversion,
 				Symbol:     oldPath.Symbol,
 				DenomUnits: newDenomUnits,
-				Metadata:   nil, // Old format didn't have metadata, set to nil
+				Metadata:   &newtypes.PathMetadata{Uri: "", CustomData: ""}, // Old format didn't have metadata, set to blank
 			}
 			newAliasPaths = append(newAliasPaths, aliasPath)
 		} else {
@@ -338,7 +338,7 @@ func MigrateCosmosCoinWrapperPaths(oldPaths []*oldtypes.CosmosCoinWrapperPath) (
 				Symbol:                         oldPath.Symbol,
 				DenomUnits:                     newDenomUnits,
 				AllowOverrideWithAnyValidToken: oldPath.AllowOverrideWithAnyValidToken,
-				Metadata:                       nil, // Old format didn't have metadata, set to nil
+				Metadata:                       &newtypes.PathMetadata{Uri: "", CustomData: ""}, // Old format didn't have metadata, set to blank
 			}
 			newWrapperPaths = append(newWrapperPaths, wrapperPath)
 		}
@@ -380,7 +380,7 @@ func convertDenomUnits(oldUnits []*oldtypes.DenomUnit) []*newtypes.DenomUnit {
 			Decimals:         newtypes.Uint(oldUnit.Decimals),
 			Symbol:           oldUnit.Symbol,
 			IsDefaultDisplay: oldUnit.IsDefaultDisplay,
-			Metadata:         nil, // Old format didn't have metadata, set to nil
+			Metadata:         &newtypes.PathMetadata{Uri: "", CustomData: ""}, // Old format didn't have metadata, set to blank
 		}
 	}
 	return newUnits
