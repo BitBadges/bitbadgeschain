@@ -259,7 +259,64 @@ Common message types that need schema updates:
 -   `maps/UpdateMap`
 -   `maps/SetValue`
 
-## Step 4: Handle Business Logic
+## Step 4: Update Simulation Files (if Message Fields Changed)
+
+### Purpose
+
+Simulation files are used for Cosmos SDK stress testing and fuzzing. When you modify message fields (add, remove, or change), you must update the corresponding simulation function.
+
+### Location
+
+Simulation files are located in `x/badges/simulation/`
+
+### When to Update
+
+-   **Adding a new message type**: Create a new simulation file
+-   **Modifying existing message fields**: Update the existing simulation file
+-   **Removing message fields**: Update the existing simulation file
+
+### Files to Modify
+
+-   `x/badges/simulation/<action>.go` - Update or create simulation function
+-   `x/badges/simulation/simulation_test.go` - Add/update test case
+
+### Example: Updating Simulation for Modified Message
+
+If you add a new field to `MsgUpdateDynamicStore`:
+
+```go
+// Before (old simulation)
+msg := types.NewMsgUpdateDynamicStore(
+    creatorAccount.Address.String(),
+    storeId,
+    defaultValue,
+)
+
+// After (updated simulation with new field)
+msg := types.NewMsgUpdateDynamicStoreWithGlobalEnabled(
+    creatorAccount.Address.String(),
+    storeId,
+    defaultValue,
+    globalEnabled, // NEW FIELD
+)
+```
+
+### Important Notes
+
+-   **Always update simulation files when message fields change** - this is often forgotten but critical for testing
+-   Use random values for all fields
+-   Handle cases where required resources don't exist
+-   For update operations, verify the resource exists and use the correct creator account
+-   Add test cases to `simulation_test.go` to ensure functions don't panic
+
+### Commands
+
+```bash
+# Run simulation tests
+go test ./x/badges/simulation/...
+```
+
+## Step 5: Handle Business Logic
 
 ### Location
 
@@ -341,7 +398,7 @@ func (k Keeper) NewField(goCtx context.Context, req *types.QueryNewFieldRequest)
 }
 ```
 
-### Step 4.5: Handle New Stored Value Types
+### Step 5.5: Handle New Stored Value Types
 
 If your new fields introduce new types that need to be stored persistently (like new collections, balances, or custom data structures), you need to handle genesis state integration.
 
@@ -575,6 +632,8 @@ See the implementation of dynamic stores for a complete example:
 -   `x/badges/keeper/store.go` - Storage methods
 -   `x/badges/keeper/keys.go` - Key definitions
 -   `x/badges/module/genesis.go` - Genesis integration
+
+**Note**: Dynamic stores now include a `globalEnabled` field that acts as a global kill switch. When `globalEnabled = false`, all approvals using that store via `DynamicStoreChallenge` will fail immediately, regardless of per-address values. This enables quick halting of approvals (e.g., when a 2FA protocol is compromised). The field defaults to `true` on creation and can be toggled via `MsgUpdateDynamicStore`.
 
 ## Testing Your Changes
 

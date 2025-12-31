@@ -18,6 +18,9 @@ message DynamicStore {
   string createdBy = 2;
   // The default value for uninitialized addresses (true/false).
   bool defaultValue = 3;
+  // Global kill switch state (defaults to true on creation, can be toggled via UpdateDynamicStore).
+  // When false, all approvals using this store via DynamicStoreChallenge will fail immediately.
+  bool globalEnabled = 4;
 }
 
 /*

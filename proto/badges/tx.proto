@@ -625,6 +625,9 @@ message MsgUpdateDynamicStore {
   string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The new default value for uninitialized addresses (true/false).
   bool defaultValue = 3;
+  // The global kill switch state (true = enabled, false = disabled/halted).
+  // Callers should query the current value first if they want to keep it unchanged.
+  bool globalEnabled = 4;
 }
 
 // MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.

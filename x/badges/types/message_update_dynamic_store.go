@@ -12,9 +12,20 @@ var _ sdk.Msg = &MsgUpdateDynamicStore{}
 
 func NewMsgUpdateDynamicStore(creator string, storeId sdkmath.Uint, defaultValue bool) *MsgUpdateDynamicStore {
 	return &MsgUpdateDynamicStore{
-		Creator:      creator,
-		StoreId:      storeId,
-		DefaultValue: defaultValue,
+		Creator:       creator,
+		StoreId:       storeId,
+		DefaultValue:  defaultValue,
+		GlobalEnabled: true, // Default to enabled for backward compatibility
+	}
+}
+
+// NewMsgUpdateDynamicStoreWithGlobalEnabled creates a new MsgUpdateDynamicStore with explicit globalEnabled
+func NewMsgUpdateDynamicStoreWithGlobalEnabled(creator string, storeId sdkmath.Uint, defaultValue bool, globalEnabled bool) *MsgUpdateDynamicStore {
+	return &MsgUpdateDynamicStore{
+		Creator:       creator,
+		StoreId:       storeId,
+		DefaultValue:  defaultValue,
+		GlobalEnabled: globalEnabled,
 	}
 }
 

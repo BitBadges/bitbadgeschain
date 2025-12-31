@@ -843,6 +843,10 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 			}
 		}
 
+		// Set globalEnabled = true for existing stores to maintain backward compatibility
+		// (all stores enabled by default)
+		newDynamicStore.GlobalEnabled = true
+
 		// Save the updated dynamic store
 		if err := k.SetDynamicStoreInStore(sdk.UnwrapSDKContext(ctx), newDynamicStore); err != nil {
 			return err

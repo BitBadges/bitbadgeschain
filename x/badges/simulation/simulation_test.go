@@ -119,5 +119,21 @@ func TestSimulationOperations(t *testing.T) {
 		require.NotEmpty(t, opMsg.Route)
 		_ = futureOps
 	})
+
+	t.Run("SimulateMsgCreateDynamicStore", func(t *testing.T) {
+		op := SimulateMsgCreateDynamicStore(ak, bk, k)
+		opMsg, futureOps, err := op(r, nil, ctx, accs, "test-chain")
+		require.NoError(t, err)
+		require.NotEmpty(t, opMsg.Route)
+		_ = futureOps
+	})
+
+	t.Run("SimulateMsgUpdateDynamicStore", func(t *testing.T) {
+		op := SimulateMsgUpdateDynamicStore(ak, bk, k)
+		opMsg, futureOps, err := op(r, nil, ctx, accs, "test-chain")
+		require.NoError(t, err)
+		require.NotEmpty(t, opMsg.Route)
+		_ = futureOps
+	})
 }
 

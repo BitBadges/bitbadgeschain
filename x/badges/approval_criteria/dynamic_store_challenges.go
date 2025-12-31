@@ -41,6 +41,20 @@ func (c *DynamicStoreChallengesChecker) Check(ctx sdk.Context, approval *types.C
 
 		storeId := challenge.StoreId
 
+		// Get the dynamic store to check global kill switch first
+		dynamicStore, foundStore := c.dynamicStoreService.GetDynamicStore(ctx, storeId)
+		if !foundStore {
+			detErrMsg := fmt.Sprintf("dynamic store not found for storeId %s", storeId.String())
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
+
+		// First check global kill switch - if disabled, fail immediately
+		if !dynamicStore.GlobalEnabled {
+			detErrMsg := fmt.Sprintf("dynamic store storeId %s is globally disabled", storeId.String())
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
+
+		// If globalEnabled = true, proceed with existing per-address logic
 		// Get the current value for the initiator
 		dynamicStoreValue, found := c.dynamicStoreService.GetDynamicStoreValue(ctx, storeId, initiator)
 
@@ -48,12 +62,7 @@ func (c *DynamicStoreChallengesChecker) Check(ctx sdk.Context, approval *types.C
 		if found {
 			val = dynamicStoreValue.Value
 		} else {
-			// If no specific value found, get the default value from the store
-			dynamicStore, foundStore := c.dynamicStoreService.GetDynamicStore(ctx, storeId)
-			if !foundStore {
-				detErrMsg := fmt.Sprintf("dynamic store not found for storeId %s", storeId.String())
-				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
-			}
+			// If no specific value found, use the default value from the store
 			val = dynamicStore.DefaultValue
 		}
 

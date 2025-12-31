@@ -990,7 +990,8 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"storeId": "",
-			"defaultValue": false
+			"defaultValue": false,
+			"globalEnabled": false
 		}
 	}`)
 

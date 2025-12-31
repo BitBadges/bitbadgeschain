@@ -30,17 +30,25 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 	// Update the default value if set (always set, since proto3 bools default to false)
 	dynamicStore.DefaultValue = msg.DefaultValue
 
+	// Update the global kill switch state
+	dynamicStore.GlobalEnabled = msg.GlobalEnabled
+
 	// Store the updated dynamic store
 	if err := k.SetDynamicStoreInStore(ctx, dynamicStore); err != nil {
 		return nil, sdkerrors.Wrap(err, "Failed to store dynamic store")
 	}
 
 	// Emit event
+	globalEnabledStr := "false"
+	if msg.GlobalEnabled {
+		globalEnabledStr = "true"
+	}
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "update_dynamic_store"),
 		sdk.NewAttribute("store_id", msg.StoreId.String()),
+		sdk.NewAttribute("global_enabled", globalEnabledStr),
 	)
 
 	return &types.MsgUpdateDynamicStoreResponse{}, nil
