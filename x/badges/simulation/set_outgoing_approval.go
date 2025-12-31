@@ -19,10 +19,25 @@ func SimulateMsgSetOutgoingApproval(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		// Get a random existing collection
-		collectionId, found := GetRandomCollectionId(r, ctx, k)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetOutgoingApproval, "no accounts available"), nil, nil
+		}
+		
+		// Try to get a known-good collection ID first
+		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetOutgoingApproval, "no collections exist"), nil, nil
+			// Fallback: try to get a random existing collection
+			collectionId, found = GetRandomCollectionId(r, ctx, k)
+			if !found {
+				// Try to create one first
+				simAccount := EnsureAccountExists(r, accs)
+				createdId, err := GetOrCreateCollection(ctx, k, simAccount.Address.String(), r, accs)
+				if err != nil {
+					return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetOutgoingApproval, "no collections exist and failed to create one"), nil, nil
+				}
+				collectionId = createdId
+			}
 		}
 		
 		// Check if collection exists
@@ -31,13 +46,16 @@ func SimulateMsgSetOutgoingApproval(
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetOutgoingApproval, "collection not found"), nil, nil
 		}
 		
-		simAccount, _ := simtypes.RandomAcc(r, accs)
+		simAccount := EnsureAccountExists(r, accs)
 		
 		// Generate outgoing approval
 		approvalId := simtypes.RandStringOfLength(r, 10)
 		toListId := "All"
-		if r.Intn(3) == 0 {
-			toListId = GetRandomAddresses(r, 1, accs)[0]
+		if len(accs) > 0 && r.Intn(3) == 0 {
+			addr := GetRandomAddresses(r, 1, accs)
+			if len(addr) > 0 {
+				toListId = addr[0]
+			}
 		}
 		
 		approval := &types.UserOutgoingApproval{

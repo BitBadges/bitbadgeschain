@@ -18,10 +18,25 @@ func SimulateMsgTransferTokens(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		// Get a random existing collection
-		collectionId, found := GetRandomCollectionId(r, ctx, k)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokens, "no accounts available"), nil, nil
+		}
+		
+		// Try to get a known-good collection ID first
+		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokens, "no collections exist"), nil, nil
+			// Fallback: try to get a random existing collection
+			collectionId, found = GetRandomCollectionId(r, ctx, k)
+			if !found {
+				// Try to create one first
+				simAccount := EnsureAccountExists(r, accs)
+				createdId, err := GetOrCreateCollection(ctx, k, simAccount.Address.String(), r, accs)
+				if err != nil {
+					return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokens, "no collections exist and failed to create one"), nil, nil
+				}
+				collectionId = createdId
+			}
 		}
 		
 		// Check if collection exists
@@ -38,13 +53,10 @@ func SimulateMsgTransferTokens(
 		
 		if isMint {
 			// Minting: from Mint address
-			creator, _ = simtypes.RandomAcc(r, accs)
+			creator = EnsureAccountExists(r, accs)
 			toAddresses := GetRandomAddresses(r, r.Intn(3)+1, accs)
-			balances := GetRandomValidBalances(r, 3)
-			// Use valid token IDs from collection
-			for _, balance := range balances {
-				balance.TokenIds = GetRandomValidTokenIds(r, collection, 1)
-			}
+			// Use valid balances from collection
+			balances := GetValidBalancesFromCollection(r, collection, r.Intn(3)+1)
 			transfers = []*types.Transfer{
 				{
 					From:        types.MintAddress,
@@ -54,7 +66,7 @@ func SimulateMsgTransferTokens(
 			}
 		} else {
 			// Regular transfer: need sender with balance
-			creator, _ = simtypes.RandomAcc(r, accs)
+			creator = EnsureAccountExists(r, accs)
 			fromAddress := creator.Address.String()
 			
 			// Get sender's balance
@@ -70,23 +82,27 @@ func SimulateMsgTransferTokens(
 			}
 			
 			if !hasBalance {
-				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokens, "sender has no balance"), nil, nil
-			}
-			
-			// Generate transfers using valid token IDs and amounts from balance
-			toAddresses := GetRandomAddresses(r, r.Intn(3)+1, accs)
-			transfers = []*types.Transfer{
-				{
-					From:        fromAddress,
-					ToAddresses: toAddresses,
-					Balances:    GetRandomValidBalances(r, 2),
-				},
-			}
-			
-			// Use valid token IDs from collection
-			for _, transfer := range transfers {
-				for _, balance := range transfer.Balances {
-					balance.TokenIds = GetRandomValidTokenIds(r, collection, 1)
+				// Try minting instead if sender has no balance
+				toAddresses := GetRandomAddresses(r, r.Intn(3)+1, accs)
+				balances := GetValidBalancesFromCollection(r, collection, r.Intn(3)+1)
+				transfers = []*types.Transfer{
+					{
+						From:        types.MintAddress,
+						ToAddresses: toAddresses,
+						Balances:    balances,
+					},
+				}
+			} else {
+				// Generate transfers using valid token IDs and amounts from balance
+				toAddresses := GetRandomAddresses(r, r.Intn(3)+1, accs)
+				// Use valid balances from collection
+				balances := GetValidBalancesFromCollection(r, collection, r.Intn(2)+1)
+				transfers = []*types.Transfer{
+					{
+						From:        fromAddress,
+						ToAddresses: toAddresses,
+						Balances:    balances,
+					},
 				}
 			}
 		}

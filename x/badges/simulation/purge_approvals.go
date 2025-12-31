@@ -18,10 +18,25 @@ func SimulateMsgPurgeApprovals(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		// Get a random existing collection
-		collectionId, found := GetRandomCollectionId(r, ctx, k)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPurgeApprovals, "no accounts available"), nil, nil
+		}
+		
+		// Try to get a known-good collection ID first
+		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPurgeApprovals, "no collections exist"), nil, nil
+			// Fallback: try to get a random existing collection
+			collectionId, found = GetRandomCollectionId(r, ctx, k)
+			if !found {
+				// Try to create one first
+				simAccount := EnsureAccountExists(r, accs)
+				createdId, err := GetOrCreateCollection(ctx, k, simAccount.Address.String(), r, accs)
+				if err != nil {
+					return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPurgeApprovals, "no collections exist and failed to create one"), nil, nil
+				}
+				collectionId = createdId
+			}
 		}
 		
 		// Check if collection exists
@@ -30,7 +45,7 @@ func SimulateMsgPurgeApprovals(
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPurgeApprovals, "collection not found"), nil, nil
 		}
 		
-		simAccount, _ := simtypes.RandomAcc(r, accs)
+		simAccount := EnsureAccountExists(r, accs)
 		
 		// Generate specific approvals to purge (required - cannot be empty)
 		// Randomly decide approval level

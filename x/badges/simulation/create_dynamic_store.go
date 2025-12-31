@@ -18,7 +18,12 @@ func SimulateMsgCreateDynamicStore(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		simAccount, _ := simtypes.RandomAcc(r, accs)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateDynamicStore, "no accounts available"), nil, nil
+		}
+		
+		simAccount := EnsureAccountExists(r, accs)
 
 		// Random boolean for defaultValue
 		defaultValue := r.Intn(2) == 0

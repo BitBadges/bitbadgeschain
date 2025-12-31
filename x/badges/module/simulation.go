@@ -3,6 +3,7 @@ package badges
 import (
 	"math/rand"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -50,12 +51,56 @@ const (
 )
 
 // GenerateGenesisState creates a randomized GenState of the module.
-func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	accs := make([]string, len(simState.Accounts))
 	for i, acc := range simState.Accounts {
 		accs[i] = acc.Address.String()
 	}
 	badgesGenesis := types.DefaultGenesis()
+	
+	// Pre-create collections, dynamic stores, and balances for better simulation starting state
+	// This ensures simulation operations have valid state to work with from the start
+	if len(simState.Accounts) > 0 {
+		// Convert accounts to simtypes.Account format for SetupSimulationState
+		simAccounts := make([]simtypes.Account, len(simState.Accounts))
+		for i, acc := range simState.Accounts {
+			simAccounts[i] = simtypes.Account{
+				Address: acc.Address,
+				PrivKey: acc.PrivKey,
+			}
+		}
+		
+		// Create a temporary context and keeper to setup state
+		// Note: In actual simulation, this will be done during InitGenesis
+		// But we can pre-populate the genesis state with collections and dynamic stores
+		// The actual state setup will happen when InitGenesis is called
+		r := rand.New(rand.NewSource(simState.Rand.Int63()))
+		
+		// Pre-create some collections in genesis state
+		// Collections will be created during simulation operations, not in genesis
+		// This ensures simulation starts with a clean state but operations can create resources
+		
+		// Pre-create some dynamic stores in genesis state
+		for i := 0; i < badgessimulation.DefaultSimDynamicStoreCount && i < len(simAccounts); i++ {
+			creator := simAccounts[i].Address.String()
+			defaultValue := r.Intn(2) == 0
+			
+			// Create dynamic store that will be initialized in InitGenesis
+			dynamicStore := &types.DynamicStore{
+				StoreId:      sdkmath.NewUint(uint64(i + 1)),
+				CreatedBy:    creator,
+				DefaultValue: defaultValue,
+				GlobalEnabled: true,
+			}
+			badgesGenesis.DynamicStores = append(badgesGenesis.DynamicStores, dynamicStore)
+		}
+		
+		// Update next IDs to reflect pre-created resources
+		if len(badgesGenesis.DynamicStores) > 0 {
+			badgesGenesis.NextDynamicStoreId = sdkmath.NewUint(uint64(len(badgesGenesis.DynamicStores) + 1))
+		}
+	}
+	
 	// Use default genesis which already initializes NextCollectionId to 1
 	// this line is used by starport scaffolding # simapp/module/genesisState
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(badgesGenesis)
@@ -76,7 +121,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCreateCollection,
-		badgessimulation.SimulateMsgCreateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgCreateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgUniversalUpdateCollection int
@@ -87,7 +135,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgUniversalUpdateCollection,
-		badgessimulation.SimulateMsgUniversalUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgUniversalUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgDeleteCollection int
@@ -98,7 +149,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgDeleteCollection,
-		badgessimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgTransferTokens int
@@ -109,7 +163,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgTransferTokens,
-		badgessimulation.SimulateMsgTransferTokens(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgTransferTokens(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgUpdateUserApprovals int
@@ -120,7 +177,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgUpdateUserApprovals,
-		badgessimulation.SimulateMsgUpdateUserApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgUpdateUserApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgSetIncomingApproval int
@@ -131,7 +191,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSetIncomingApproval,
-		badgessimulation.SimulateMsgSetIncomingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgSetIncomingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgSetOutgoingApproval int
@@ -142,7 +205,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSetOutgoingApproval,
-		badgessimulation.SimulateMsgSetOutgoingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgSetOutgoingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgPurgeApprovals int
@@ -153,7 +219,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgPurgeApprovals,
-		badgessimulation.SimulateMsgPurgeApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgPurgeApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgCreateAddressLists int
@@ -164,7 +233,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCreateAddressLists,
-		badgessimulation.SimulateMsgCreateAddressLists(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgCreateAddressLists(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	var weightMsgSetDynamicStoreValue int
@@ -175,7 +247,10 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSetDynamicStoreValue,
-		badgessimulation.SimulateMsgSetDynamicStoreValue(am.accountKeeper, am.bankKeeper, am.keeper),
+		badgessimulation.MultiRunOperation(
+			badgessimulation.SimulateMsgSetDynamicStoreValue(am.accountKeeper, am.bankKeeper, am.keeper),
+			badgessimulation.DefaultMultiRunAttempts,
+		),
 	))
 
 	return operations

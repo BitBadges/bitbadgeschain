@@ -18,10 +18,15 @@ func SimulateMsgCreateCollection(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		simAccount, _ := simtypes.RandomAcc(r, accs)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateCollection, "no accounts available"), nil, nil
+		}
+		
+		simAccount := EnsureAccountExists(r, accs)
 
-		// Generate valid token IDs (at least one required)
-		validTokenIds := GetTimelineTimes(r, r.Intn(3)+1)
+		// Generate valid token IDs (at least one required) using bounded ranges
+		validTokenIds := GetBoundedTimelineTimes(r, r.Intn(3)+1, MinTimelineRange, MaxTimelineRange)
 
 		// Generate collection permissions
 		collectionPermissions := GetRandomCollectionPermissions(r, accs)

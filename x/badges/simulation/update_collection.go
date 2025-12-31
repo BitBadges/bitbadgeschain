@@ -18,10 +18,25 @@ func SimulateMsgUniversalUpdateCollection(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		// Get a random existing collection
-		collectionId, found := GetRandomCollectionId(r, ctx, k)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUniversalUpdateCollection, "no accounts available"), nil, nil
+		}
+		
+		// Try to get a known-good collection ID first
+		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUniversalUpdateCollection, "no collections exist"), nil, nil
+			// Fallback: try to get a random existing collection
+			collectionId, found = GetRandomCollectionId(r, ctx, k)
+			if !found {
+				// Try to create one first
+				simAccount := EnsureAccountExists(r, accs)
+				createdId, err := GetOrCreateCollection(ctx, k, simAccount.Address.String(), r, accs)
+				if err != nil {
+					return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUniversalUpdateCollection, "no collections exist and failed to create one"), nil, nil
+				}
+				collectionId = createdId
+			}
 		}
 		
 		// Check if collection exists
@@ -38,10 +53,10 @@ func SimulateMsgUniversalUpdateCollection(
 			if found {
 				simAccount = managerAcc
 			} else {
-				simAccount, _ = simtypes.RandomAcc(r, accs)
+				simAccount = EnsureAccountExists(r, accs)
 			}
 		} else {
-			simAccount, _ = simtypes.RandomAcc(r, accs)
+			simAccount = EnsureAccountExists(r, accs)
 		}
 		
 		// Randomly decide which fields to update
@@ -84,7 +99,7 @@ func SimulateMsgUniversalUpdateCollection(
 			msg.CollectionApprovals = approvals
 		}
 		if updateManager {
-			newManager, _ := simtypes.RandomAcc(r, accs)
+			newManager := EnsureAccountExists(r, accs)
 			msg.Manager = newManager.Address.String()
 		}
 		if updateCollectionPermissions {

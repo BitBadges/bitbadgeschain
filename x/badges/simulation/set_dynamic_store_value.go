@@ -19,32 +19,63 @@ func SimulateMsgSetDynamicStoreValue(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		simAccount, _ := simtypes.RandomAcc(r, accs)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "no accounts available"), nil, nil
+		}
+		
+		simAccount := EnsureAccountExists(r, accs)
 
-		// Get a random existing collection (dynamic stores are associated with collections)
-		collectionId, found := GetRandomCollectionId(r, ctx, k)
+		// Try to get a known-good dynamic store ID first
+		storeId, found := GetKnownGoodDynamicStoreId(ctx, k)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "no collections exist"), nil, nil
+			// Fallback: try to get a random existing store ID
+			nextStoreId := k.GetNextDynamicStoreId(ctx)
+			if nextStoreId.LTE(sdkmath.NewUint(1)) {
+				// No dynamic stores exist - try to create one first
+				createMsg := &types.MsgCreateDynamicStore{
+					Creator:      simAccount.Address.String(),
+					DefaultValue: r.Intn(2) == 0,
+				}
+				msgServer := keeper.NewMsgServerImpl(k)
+				createResp, err := msgServer.CreateDynamicStore(ctx, createMsg)
+				if err != nil {
+					return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "no dynamic stores exist and failed to create one"), nil, nil
+				}
+				storeId = createResp.StoreId
+			} else {
+				// Get a random existing store ID (stores exist from 1 to (nextStoreId - 1))
+				maxId := nextStoreId.Sub(sdkmath.NewUint(1))
+				if maxId.IsZero() {
+					return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "no dynamic stores exist"), nil, nil
+				}
+				// Random ID between 1 and maxId
+				storeId = sdkmath.NewUint(uint64(r.Int63n(int64(maxId.Uint64()))) + 1)
+			}
 		}
 
-		// Check if collection exists
-		_, found = k.GetCollectionFromStore(ctx, collectionId)
+		// Verify the store exists and get it to check creator
+		store, found := k.GetDynamicStoreFromStore(ctx, storeId)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "collection not found"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "dynamic store not found"), nil, nil
 		}
 
-		// For now, use a random store ID (we'd need to track dynamic stores to get existing ones)
-		// Using a small random ID that might exist
-		storeId := sdkmath.NewUint(uint64(r.Int63n(10)) + 1)
+		// Only the creator can set values, so use the creator account
+		creatorAccount, found := FindAccount(accs, store.CreatedBy)
+		if !found {
+			// Creator not in simulation accounts - this will fail, but try anyway for simulation coverage
+			creatorAccount = simAccount
+		}
 
 		// Random address (could be the creator or another account)
-		targetAccount, _ := simtypes.RandomAcc(r, accs)
+		targetAccount := EnsureAccountExists(r, accs)
 
 		// Random boolean value
 		value := r.Intn(2) == 0
-
+		
+		// Use creator as the message creator (required for setting values)
 		msg := &types.MsgSetDynamicStoreValue{
-			Creator: simAccount.Address.String(),
+			Creator: creatorAccount.Address.String(),
 			StoreId: storeId,
 			Address: targetAccount.Address.String(),
 			Value:   value,

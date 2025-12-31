@@ -18,10 +18,19 @@ func SimulateMsgDeleteCollection(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		// Get a random existing collection
-		collectionId, found := GetRandomCollectionId(r, ctx, k)
+		// Ensure we have valid accounts
+		if len(accs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDeleteCollection, "no accounts available"), nil, nil
+		}
+		
+		// Try to get a known-good collection ID first
+		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDeleteCollection, "no collections exist"), nil, nil
+			// Fallback: try to get a random existing collection
+			collectionId, found = GetRandomCollectionId(r, ctx, k)
+			if !found {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDeleteCollection, "no collections exist"), nil, nil
+			}
 		}
 		
 		// Check if collection exists
@@ -38,10 +47,10 @@ func SimulateMsgDeleteCollection(
 			if found {
 				simAccount = managerAcc
 			} else {
-				simAccount, _ = simtypes.RandomAcc(r, accs)
+				simAccount = EnsureAccountExists(r, accs)
 			}
 		} else {
-			simAccount, _ = simtypes.RandomAcc(r, accs)
+			simAccount = EnsureAccountExists(r, accs)
 		}
 		
 		msg := &types.MsgDeleteCollection{
