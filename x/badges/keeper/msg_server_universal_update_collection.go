@@ -360,14 +360,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	if msg.UpdateCollectionPermissions {
-		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions)
-		if err != nil {
-			return nil, err
-		}
-		collection.CollectionPermissions = msg.CollectionPermissions
-	}
-
 	if len(msg.MintEscrowCoinsToTransfer) > 0 {
 		from := sdk.MustAccAddressFromBech32(msg.Creator)
 		to := sdk.MustAccAddressFromBech32(collection.MintEscrowAddress)
@@ -386,6 +378,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
+		if err := k.ValidateCosmosCoinWrapperPathsAdd(ctx, collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths); err != nil {
+			return nil, err
+		}
 		pathsToAdd := make([]*types.CosmosCoinWrapperPath, len(msg.CosmosCoinWrapperPathsToAdd))
 		for i, path := range msg.CosmosCoinWrapperPathsToAdd {
 			// Generate path address with validation
@@ -422,6 +417,9 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if len(msg.AliasPathsToAdd) > 0 {
+		if err := k.ValidateAliasPathsAdd(ctx, collection.CollectionPermissions.CanAddMoreAliasPaths); err != nil {
+			return nil, err
+		}
 		pathsToAdd := make([]*types.AliasPath, len(msg.AliasPathsToAdd))
 		for i, path := range msg.AliasPathsToAdd {
 			pathsToAdd[i] = &types.AliasPath{
@@ -529,6 +527,15 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			collection.CollectionPermissions = &types.CollectionPermissions{}
 		}
 		ensureMintForbiddenPermission(collection.CollectionPermissions, true)
+	}
+
+	// Update permissions at the end after all changes are applied
+	if msg.UpdateCollectionPermissions {
+		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions)
+		if err != nil {
+			return nil, err
+		}
+		collection.CollectionPermissions = msg.CollectionPermissions
 	}
 
 	if err := k.SetCollectionInStore(ctx, collection, false); err != nil {

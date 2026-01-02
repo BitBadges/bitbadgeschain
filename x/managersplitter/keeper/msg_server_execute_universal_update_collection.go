@@ -63,6 +63,14 @@ func (k Keeper) checkPermission(ctx sdk.Context, executor string, managerSplitte
 		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanUpdateCollectionApprovals != nil {
 			criteria = managerSplitter.Permissions.CanUpdateCollectionApprovals
 		}
+	case "canAddMoreAliasPaths":
+		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanAddMoreAliasPaths != nil {
+			criteria = managerSplitter.Permissions.CanAddMoreAliasPaths
+		}
+	case "canAddMoreCosmosCoinWrapperPaths":
+		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanAddMoreCosmosCoinWrapperPaths != nil {
+			criteria = managerSplitter.Permissions.CanAddMoreCosmosCoinWrapperPaths
+		}
 	}
 
 	// If no criteria set, deny by default (except admin)
@@ -134,6 +142,18 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 
 	if msg.UpdateIsArchived {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canArchiveCollection"); err != nil {
+			return err
+		}
+	}
+
+	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
+		if err := k.checkPermission(ctx, executor, managerSplitter, "canAddMoreCosmosCoinWrapperPaths"); err != nil {
+			return err
+		}
+	}
+
+	if len(msg.AliasPathsToAdd) > 0 {
+		if err := k.checkPermission(ctx, executor, managerSplitter, "canAddMoreAliasPaths"); err != nil {
 			return err
 		}
 	}

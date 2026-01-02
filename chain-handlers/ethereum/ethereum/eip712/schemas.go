@@ -397,7 +397,9 @@ func getCollectionPermissionsSchema() string {
 		"canUpdateCollectionMetadata": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateValidTokenIds": [{"tokenIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateTokenMetadata": [{"tokenIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
+		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canAddMoreAliasPaths": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canAddMoreCosmosCoinWrapperPaths": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
 	}`
 }
 
@@ -703,14 +705,14 @@ func GetSchemas() []string {
 					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
-						{
-							"decimals": "0",
-							"symbol": "",
-							"isDefaultDisplay": false,
-							"metadata": {
-								"uri": "",
-								"customData": ""
-							}
+							{
+								"decimals": "0",
+								"symbol": "",
+								"isDefaultDisplay": false,
+								"metadata": {
+									"uri": "",
+									"customData": ""
+								}
 						}
 					],
 					"allowOverrideWithAnyValidToken": false,

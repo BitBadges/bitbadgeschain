@@ -61,6 +61,12 @@ message CollectionPermissions {
 
   // Permissions related to updating collection approvals.
   repeated CollectionApprovalPermission canUpdateCollectionApprovals = 9;
+
+  // Permissions related to adding more alias paths to the collection.
+  repeated ActionPermission canAddMoreAliasPaths = 10;
+
+  // Permissions related to adding more cosmos coin wrapper paths to the collection.
+  repeated ActionPermission canAddMoreCosmosCoinWrapperPaths = 11;
 }
 
 /* 

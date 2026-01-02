@@ -1507,6 +1507,224 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	suite.Require().Equal(expectedBalance, bobBalance.Amount, "Bob's balance should have decreased by 100")
 }
 
+// TestCanAddMoreAliasPathsPermission_Allowed tests that adding alias paths succeeds when permission is allowed
+func (suite *TestSuite) TestCanAddMoreAliasPathsPermission_Allowed() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to allow adding alias paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreAliasPaths: []*types.ActionPermission{
+				{
+					PermanentlyPermittedTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add alias paths - should succeed
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		AliasPathsToAdd: []*types.AliasPathAddObject{
+			{
+				Denom: "testalias",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "ALIAS",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testalias", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Should be able to add alias paths when permission is allowed")
+
+	// Verify the alias path was added
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	suite.Require().Equal(1, len(collection.AliasPaths), "Collection should have one alias path")
+	suite.Require().Equal("testalias", collection.AliasPaths[0].Denom, "Alias path denom should match")
+}
+
+// TestCanAddMoreAliasPathsPermission_Forbidden tests that adding alias paths fails when permission is forbidden
+func (suite *TestSuite) TestCanAddMoreAliasPathsPermission_Forbidden() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to forbid adding alias paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreAliasPaths: []*types.ActionPermission{
+				{
+					PermanentlyForbiddenTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add alias paths - should fail
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		AliasPathsToAdd: []*types.AliasPathAddObject{
+			{
+				Denom: "testalias",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "ALIAS",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testalias", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Error(err, "Should not be able to add alias paths when permission is forbidden")
+	suite.Require().Contains(err.Error(), "add alias paths", "Error should mention alias paths")
+}
+
+// TestCanAddMoreCosmosCoinWrapperPathsPermission_Allowed tests that adding cosmos coin wrapper paths succeeds when permission is allowed
+func (suite *TestSuite) TestCanAddMoreCosmosCoinWrapperPathsPermission_Allowed() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to allow adding cosmos coin wrapper paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreCosmosCoinWrapperPaths: []*types.ActionPermission{
+				{
+					PermanentlyPermittedTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add cosmos coin wrapper paths - should succeed
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CosmosCoinWrapperPathsToAdd: []*types.CosmosCoinWrapperPathAddObject{
+			{
+				Denom: "testwrapper",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "WRAPPER",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testwrapper", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Should be able to add cosmos coin wrapper paths when permission is allowed")
+
+	// Verify the wrapper path was added
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	suite.Require().Equal(1, len(collection.CosmosCoinWrapperPaths), "Collection should have one cosmos coin wrapper path")
+	suite.Require().Equal("testwrapper", collection.CosmosCoinWrapperPaths[0].Denom, "Wrapper path denom should match")
+}
+
+// TestCanAddMoreCosmosCoinWrapperPathsPermission_Forbidden tests that adding cosmos coin wrapper paths fails when permission is forbidden
+func (suite *TestSuite) TestCanAddMoreCosmosCoinWrapperPathsPermission_Forbidden() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to forbid adding cosmos coin wrapper paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreCosmosCoinWrapperPaths: []*types.ActionPermission{
+				{
+					PermanentlyForbiddenTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add cosmos coin wrapper paths - should fail
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CosmosCoinWrapperPathsToAdd: []*types.CosmosCoinWrapperPathAddObject{
+			{
+				Denom: "testwrapper",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "WRAPPER",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testwrapper", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Error(err, "Should not be able to add cosmos coin wrapper paths when permission is forbidden")
+	suite.Require().Contains(err.Error(), "add cosmos coin wrapper paths", "Error should mention cosmos coin wrapper paths")
+}
+
 // ==================== COMPREHENSIVE POOL OPERATIONS TESTS ====================
 
 // TestGammKeeperPoolOperations tests comprehensive pool operations with tokens

@@ -228,5 +228,13 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanAddMoreAliasPaths, newPermissions.CanAddMoreAliasPaths); err != nil {
+		return err
+	}
+
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanAddMoreCosmosCoinWrapperPaths, newPermissions.CanAddMoreCosmosCoinWrapperPaths); err != nil {
+		return err
+	}
+
 	return nil
 }

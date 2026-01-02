@@ -265,6 +265,18 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 				InitiatedByListId:         "All",
 			},
 		},
+		CanAddMoreAliasPaths: []*types.ActionPermission{
+			{
+				PermanentlyPermittedTimes: permTimes,
+				PermanentlyForbiddenTimes: forbTimes,
+			},
+		},
+		CanAddMoreCosmosCoinWrapperPaths: []*types.ActionPermission{
+			{
+				PermanentlyPermittedTimes: permTimes,
+				PermanentlyForbiddenTimes: forbTimes,
+			},
+		},
 	}
 
 	return randomCollectionPermissions

@@ -266,5 +266,13 @@ func ValidatePermissions(permissions *CollectionPermissions, canChangeValues boo
 		return err
 	}
 
+	if err := ValidateActionPermission(permissions.CanAddMoreAliasPaths, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateActionPermission(permissions.CanAddMoreCosmosCoinWrapperPaths, canChangeValues); err != nil {
+		return err
+	}
+
 	return nil
 }

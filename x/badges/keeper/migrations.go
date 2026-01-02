@@ -586,6 +586,11 @@ func MigrateCollectionPermissions(blockTime sdkmath.Uint, oldPerms *oldtypes.Col
 		newPerms.CanUpdateValidTokenIds = convertTokenIdsActionPermissions(oldPerms.CanUpdateValidTokenIds)
 	}
 
+	// New permissions that don't exist in v21 - explicitly set to nil (defaults to allowed/neutral)
+	// These are ActionPermission types that were added after v21
+	newPerms.CanAddMoreAliasPaths = []*newtypes.ActionPermission{}
+	newPerms.CanAddMoreCosmosCoinWrapperPaths = []*newtypes.ActionPermission{}
+
 	return newPerms
 }
 

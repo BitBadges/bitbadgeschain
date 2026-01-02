@@ -31,14 +31,16 @@ func (k msgServer) SetCollectionMetadata(goCtx context.Context, msg *types.MsgSe
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCollectionMetadata: msg.CanUpdateCollectionMetadata,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:          collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidTokenIds:       collection.CollectionPermissions.CanUpdateValidTokenIds,
-			CanUpdateTokenMetadata:       collection.CollectionPermissions.CanUpdateTokenMetadata,
-			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:                collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:                collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:                  collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:                 collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:                    collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidTokenIds:              collection.CollectionPermissions.CanUpdateValidTokenIds,
+			CanUpdateTokenMetadata:              collection.CollectionPermissions.CanUpdateTokenMetadata,
+			CanUpdateCollectionApprovals:         collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanAddMoreAliasPaths:                collection.CollectionPermissions.CanAddMoreAliasPaths,
+			CanAddMoreCosmosCoinWrapperPaths:    collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths,
 		},
 	}
 

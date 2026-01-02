@@ -519,3 +519,21 @@ func (k Keeper) ValidateIsArchivedUpdate(ctx sdk.Context, oldIsArchived bool, ne
 
 	return nil
 }
+
+func (k Keeper) ValidateAliasPathsAdd(ctx sdk.Context, canAddMoreAliasPaths []*types.ActionPermission) error {
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canAddMoreAliasPaths, "add alias paths"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (k Keeper) ValidateCosmosCoinWrapperPathsAdd(ctx sdk.Context, canAddMoreCosmosCoinWrapperPaths []*types.ActionPermission) error {
+	// Check permissions
+	if err := k.CheckIfActionPermissionPermits(ctx, canAddMoreCosmosCoinWrapperPaths, "add cosmos coin wrapper paths"); err != nil {
+		return err
+	}
+
+	return nil
+}
