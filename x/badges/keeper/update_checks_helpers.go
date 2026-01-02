@@ -371,29 +371,49 @@ func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection 
 }
 
 func (k Keeper) ValidateTokenMetadataUpdate(ctx sdk.Context, oldTokenMetadata []*types.TokenMetadata, newTokenMetadata []*types.TokenMetadata, canUpdateTokenMetadata []*types.TokenIdsActionPermission) error {
-	// Simplified validation - check if token metadata changed
-	// For now, we'll do a basic check and use token IDs from the new metadata for permission checking
-	// This is a simplified version - the full timeline-based logic was more complex
+	// Cast to UniversalPermissionDetails for compatibility with overlap functions and get first matches only (i.e. first match for each token ID)
+	oldCasted := k.CastTokenMetadataToUniversalPermission(oldTokenMetadata)
+	firstMatchesForOld := types.GetFirstMatchOnly(ctx, oldCasted)
 
-	// Get token IDs from new metadata
-	tokenIdsToCheck := []*types.UintRange{}
-	for _, tm := range newTokenMetadata {
-		tokenIdsToCheck = append(tokenIdsToCheck, tm.TokenIds...)
-	}
+	newCasted := k.CastTokenMetadataToUniversalPermission(newTokenMetadata)
+	firstMatchesForNew := types.GetFirstMatchOnly(ctx, newCasted)
 
-	// Check permissions - simplified since we no longer have timeline times
-	// Convert to UniversalPermissionDetails for compatibility with existing permission checking
+	// For every token, we need to check if the new provided value is different in any way from the old value for each specific token ID
+	// The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
 	detailsToCheck := []*types.UniversalPermissionDetails{}
-	for _, tm := range newTokenMetadata {
-		for _, tokenIdRange := range tm.TokenIds {
-			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-				TokenId: tokenIdRange,
-			})
+	overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
+
+	for _, overlapObject := range overlapObjects {
+		overlap := overlapObject.Overlap
+		oldDetails := overlapObject.FirstDetails
+		newDetails := overlapObject.SecondDetails
+
+		// ArbitraryValue contains the JSON-marshaled metadata string
+		if (oldDetails.ArbitraryValue == nil && newDetails.ArbitraryValue != nil) || (oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue == nil) {
+			detailsToCheck = append(detailsToCheck, overlap)
+		} else if oldDetails.ArbitraryValue != nil && newDetails.ArbitraryValue != nil {
+			oldVal, ok1 := oldDetails.ArbitraryValue.(string)
+			newVal, ok2 := newDetails.ArbitraryValue.(string)
+
+			if !ok1 || !ok2 {
+				// Type assertion failed - treat as changed to be safe
+				detailsToCheck = append(detailsToCheck, overlap)
+			} else if newVal != oldVal {
+				detailsToCheck = append(detailsToCheck, overlap)
+			}
 		}
+		// If both are nil, no change, so we don't add to detailsToCheck
 	}
 
-	if err := k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, canUpdateTokenMetadata, "update token metadata"); err != nil {
-		return err
+	// If metadata is in old but not new, then it is considered updated. If it is in new but not old, then it is considered updated.
+	detailsToCheck = append(detailsToCheck, inOldButNotNew...)
+	detailsToCheck = append(detailsToCheck, inNewButNotOld...)
+
+	// Only check permissions if there are actually changes
+	if len(detailsToCheck) > 0 {
+		if err := k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, canUpdateTokenMetadata, "update token metadata"); err != nil {
+			return err
+		}
 	}
 
 	return nil

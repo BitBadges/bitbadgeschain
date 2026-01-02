@@ -27,17 +27,24 @@ func (k Keeper) CreateTokens(ctx sdk.Context, collection *types.TokenCollection,
 		return collection, nil
 	}
 
-	//Check if we are allowed to create these tokens
-	detailsToCheck := []*types.UniversalPermissionDetails{}
-	for _, tokenIdRange := range newValidTokenIds {
-		detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
-			TokenId: tokenIdRange,
-		})
-	}
+	// Only check permissions for NEW token IDs (not already in collection.ValidTokenIds)
+	existingTokenIds := types.DeepCopyRanges(collection.ValidTokenIds)
+	newTokenIdsCopy := types.DeepCopyRanges(newValidTokenIds)
+	newTokenIdsOnly, _ := types.RemoveUintRangesFromUintRanges(existingTokenIds, newTokenIdsCopy)
 
-	err = k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidTokenIds, "can create more tokens")
-	if err != nil {
-		return &types.TokenCollection{}, err
+	// Only check permissions if there are actually new token IDs
+	if len(newTokenIdsOnly) > 0 {
+		detailsToCheck := []*types.UniversalPermissionDetails{}
+		for _, tokenIdRange := range newTokenIdsOnly {
+			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
+				TokenId: tokenIdRange,
+			})
+		}
+
+		err = k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidTokenIds, "can create more tokens")
+		if err != nil {
+			return &types.TokenCollection{}, err
+		}
 	}
 
 	collection.ValidTokenIds = allTokenIds
