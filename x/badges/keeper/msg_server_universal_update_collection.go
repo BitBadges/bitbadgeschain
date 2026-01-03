@@ -520,15 +520,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	// Auto-set collection permission to forbid Mint address approvals if cosmosCoinBackedPath is set
-	hasCosmosCoinBackedPath := collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil
-	if hasCosmosCoinBackedPath {
-		if collection.CollectionPermissions == nil {
-			collection.CollectionPermissions = &types.CollectionPermissions{}
-		}
-		ensureMintForbiddenPermission(collection.CollectionPermissions, true)
-	}
-
 	// Update permissions at the end after all changes are applied
 	if msg.UpdateCollectionPermissions {
 		err = k.ValidatePermissionsUpdate(ctx, collection.CollectionPermissions, msg.CollectionPermissions)
@@ -536,6 +527,15 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			return nil, err
 		}
 		collection.CollectionPermissions = msg.CollectionPermissions
+	}
+
+	// Auto-set collection permission to forbid Mint address approvals if cosmosCoinBackedPath is set
+	hasCosmosCoinBackedPath := collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil
+	if hasCosmosCoinBackedPath {
+		if collection.CollectionPermissions == nil {
+			collection.CollectionPermissions = &types.CollectionPermissions{}
+		}
+		ensureMintForbiddenPermission(collection.CollectionPermissions, true)
 	}
 
 	if err := k.SetCollectionInStore(ctx, collection, false); err != nil {
