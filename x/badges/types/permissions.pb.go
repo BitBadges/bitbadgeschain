@@ -26,17 +26,14 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // CollectionPermissions defines the permissions for the collection (i.e., what the manager can and cannot do).
 //
-// There are five types of permissions for a collection: ActionPermission, TimedUpdatePermission, TimedUpdateWithTokenIdsPermission, TokenIdsActionPermission, and CollectionApprovalPermission.
+// There are three types of permissions for a collection: ActionPermission, TokenIdsActionPermission, and CollectionApprovalPermission.
 //
 // The permission type allows fine-grained access control for each action.
-// - ActionPermission: defines when the manager can perform an action.
-// - TimedUpdatePermission: defines when the manager can update a timeline-based field and what times of the timeline can be updated.
-// - TimedUpdateWithTokenIdsPermission: defines when the manager can update a timeline-based field for specific tokens and what times of the timeline can be updated.
+// - ActionPermission: defines when the manager can perform an action or update a field.
 // - TokenIdsActionPermission: defines when the manager can perform an action for specific tokens
 // - CollectionApprovalPermission: defines when the manager can update the transferability of the collection and what transfers can be updated vs. locked.
 //
 // Note there are a few different times here which could get confusing:
-// - timelineTimes: the times when a timeline-based field is a specific value
 // - permanentlyPermitted/ForbiddenTimes - the times that a permission can be performed
 // - transferTimes - the times that a transfer occurs
 // - ownershipTimes - the times when a token is owned by a user
@@ -51,21 +48,25 @@ type CollectionPermissions struct {
 	// Permissions related to deleting the collection.
 	CanDeleteCollection []*ActionPermission `protobuf:"bytes,1,rep,name=canDeleteCollection,proto3" json:"canDeleteCollection,omitempty"`
 	// Permissions related to archiving the collection.
-	CanArchiveCollection []*TimedUpdatePermission `protobuf:"bytes,2,rep,name=canArchiveCollection,proto3" json:"canArchiveCollection,omitempty"`
+	CanArchiveCollection []*ActionPermission `protobuf:"bytes,2,rep,name=canArchiveCollection,proto3" json:"canArchiveCollection,omitempty"`
 	// Permissions related to updating standards for the collection.
-	CanUpdateStandards []*TimedUpdatePermission `protobuf:"bytes,3,rep,name=canUpdateStandards,proto3" json:"canUpdateStandards,omitempty"`
+	CanUpdateStandards []*ActionPermission `protobuf:"bytes,3,rep,name=canUpdateStandards,proto3" json:"canUpdateStandards,omitempty"`
 	// Permissions related to updating custom data for the collection.
-	CanUpdateCustomData []*TimedUpdatePermission `protobuf:"bytes,4,rep,name=canUpdateCustomData,proto3" json:"canUpdateCustomData,omitempty"`
+	CanUpdateCustomData []*ActionPermission `protobuf:"bytes,4,rep,name=canUpdateCustomData,proto3" json:"canUpdateCustomData,omitempty"`
 	// Permissions related to updating the collection's manager.
-	CanUpdateManager []*TimedUpdatePermission `protobuf:"bytes,5,rep,name=canUpdateManager,proto3" json:"canUpdateManager,omitempty"`
+	CanUpdateManager []*ActionPermission `protobuf:"bytes,5,rep,name=canUpdateManager,proto3" json:"canUpdateManager,omitempty"`
 	// Permissions related to updating the metadata of the collection.
-	CanUpdateCollectionMetadata []*TimedUpdatePermission `protobuf:"bytes,6,rep,name=canUpdateCollectionMetadata,proto3" json:"canUpdateCollectionMetadata,omitempty"`
+	CanUpdateCollectionMetadata []*ActionPermission `protobuf:"bytes,6,rep,name=canUpdateCollectionMetadata,proto3" json:"canUpdateCollectionMetadata,omitempty"`
 	// Permissions related to creating more tokens for the collection.
 	CanUpdateValidTokenIds []*TokenIdsActionPermission `protobuf:"bytes,7,rep,name=canUpdateValidTokenIds,proto3" json:"canUpdateValidTokenIds,omitempty"`
 	// Permissions related to updating token metadata for specific tokens.
-	CanUpdateTokenMetadata []*TimedUpdateWithTokenIdsPermission `protobuf:"bytes,8,rep,name=canUpdateTokenMetadata,proto3" json:"canUpdateTokenMetadata,omitempty"`
+	CanUpdateTokenMetadata []*TokenIdsActionPermission `protobuf:"bytes,8,rep,name=canUpdateTokenMetadata,proto3" json:"canUpdateTokenMetadata,omitempty"`
 	// Permissions related to updating collection approvals.
 	CanUpdateCollectionApprovals []*CollectionApprovalPermission `protobuf:"bytes,9,rep,name=canUpdateCollectionApprovals,proto3" json:"canUpdateCollectionApprovals,omitempty"`
+	// Permissions related to adding more alias paths to the collection.
+	CanAddMoreAliasPaths []*ActionPermission `protobuf:"bytes,10,rep,name=canAddMoreAliasPaths,proto3" json:"canAddMoreAliasPaths,omitempty"`
+	// Permissions related to adding more cosmos coin wrapper paths to the collection.
+	CanAddMoreCosmosCoinWrapperPaths []*ActionPermission `protobuf:"bytes,11,rep,name=canAddMoreCosmosCoinWrapperPaths,proto3" json:"canAddMoreCosmosCoinWrapperPaths,omitempty"`
 }
 
 func (m *CollectionPermissions) Reset()         { *m = CollectionPermissions{} }
@@ -108,35 +109,35 @@ func (m *CollectionPermissions) GetCanDeleteCollection() []*ActionPermission {
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanArchiveCollection() []*TimedUpdatePermission {
+func (m *CollectionPermissions) GetCanArchiveCollection() []*ActionPermission {
 	if m != nil {
 		return m.CanArchiveCollection
 	}
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateStandards() []*TimedUpdatePermission {
+func (m *CollectionPermissions) GetCanUpdateStandards() []*ActionPermission {
 	if m != nil {
 		return m.CanUpdateStandards
 	}
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateCustomData() []*TimedUpdatePermission {
+func (m *CollectionPermissions) GetCanUpdateCustomData() []*ActionPermission {
 	if m != nil {
 		return m.CanUpdateCustomData
 	}
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateManager() []*TimedUpdatePermission {
+func (m *CollectionPermissions) GetCanUpdateManager() []*ActionPermission {
 	if m != nil {
 		return m.CanUpdateManager
 	}
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateCollectionMetadata() []*TimedUpdatePermission {
+func (m *CollectionPermissions) GetCanUpdateCollectionMetadata() []*ActionPermission {
 	if m != nil {
 		return m.CanUpdateCollectionMetadata
 	}
@@ -150,7 +151,7 @@ func (m *CollectionPermissions) GetCanUpdateValidTokenIds() []*TokenIdsActionPer
 	return nil
 }
 
-func (m *CollectionPermissions) GetCanUpdateTokenMetadata() []*TimedUpdateWithTokenIdsPermission {
+func (m *CollectionPermissions) GetCanUpdateTokenMetadata() []*TokenIdsActionPermission {
 	if m != nil {
 		return m.CanUpdateTokenMetadata
 	}
@@ -160,6 +161,20 @@ func (m *CollectionPermissions) GetCanUpdateTokenMetadata() []*TimedUpdateWithTo
 func (m *CollectionPermissions) GetCanUpdateCollectionApprovals() []*CollectionApprovalPermission {
 	if m != nil {
 		return m.CanUpdateCollectionApprovals
+	}
+	return nil
+}
+
+func (m *CollectionPermissions) GetCanAddMoreAliasPaths() []*ActionPermission {
+	if m != nil {
+		return m.CanAddMoreAliasPaths
+	}
+	return nil
+}
+
+func (m *CollectionPermissions) GetCanAddMoreCosmosCoinWrapperPaths() []*ActionPermission {
+	if m != nil {
+		return m.CanAddMoreCosmosCoinWrapperPaths
 	}
 	return nil
 }
@@ -258,15 +273,14 @@ func (m *UserPermissions) GetCanUpdateAutoApproveAllIncomingTransfers() []*Actio
 // These are determined by the fromListId, toListId, initiatedByListId, transferTimes, tokenIds fields.
 // AddressLists are used for (from, to, initiatedBy) which are a permanent list of addresses identified by an ID (see AddressLists).
 //
-// TimelineTimes: which timeline times of the collection's approvalsTimeline field can be updated or not?
 // permanentlyPermitted/ForbiddenTimes: when can the manager execute this permission?
 //
-// Ex: Let's say we are updating the transferability for timelineTime 1 and the transfer tuple ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", 10, 1000).
+// Ex: Let's say we are updating the transferability for the transfer tuple ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", 10, 1000).
 // We would check to find the FIRST CollectionApprovalPermission that matches this combination.
 // If we find a match, we would check the permitted/forbidden times to see if we can execute this permission (default is ALLOWED).
 //
 // Ex: So if you wanted to freeze the transferability to enforce that token ID 1 will always be transferable, you could set
-// the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden at all timelineTimes.
+// the combination ("AllWithoutMint", "AllWithoutMint", "AllWithoutMint", "All Transfer Times", 1) to always be forbidden.
 type CollectionApprovalPermission struct {
 	// Identifier for the sender list.
 	FromListId string `protobuf:"bytes,1,opt,name=fromListId,proto3" json:"fromListId,omitempty"`
@@ -613,11 +627,11 @@ func (m *UserIncomingApprovalPermission) GetPermanentlyForbiddenTimes() []*UintR
 	return nil
 }
 
-// TokenIdsActionPermission defines the permissions for updating a timeline-based field for specific tokens and specific token ownership times.
+// TokenIdsActionPermission defines the permissions for performing an action for specific tokens.
 // Currently, this is only used for creating new tokens.
 //
 // Ex: If you want to lock the ability to create new tokens for tokenIds [1,2] at ownershipTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (tokenIds: [1,2], ownershipTimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
+// you could set the combination (tokenIds: [1,2], ownershipTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
 type TokenIdsActionPermission struct {
 	// Specifies the token IDs involved in the transfer.
 	TokenIds []*UintRange `protobuf:"bytes,1,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
@@ -738,149 +752,6 @@ func (m *ActionPermission) GetPermanentlyForbiddenTimes() []*UintRange {
 	return nil
 }
 
-// TimedUpdatePermission defines the permissions for updating a timeline-based field.
-//
-// Ex: If you want to lock the ability to update the collection's metadata for timelineTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-type TimedUpdatePermission struct {
-	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,1,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
-	// Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-	PermanentlyForbiddenTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyForbiddenTimes,proto3" json:"permanentlyForbiddenTimes,omitempty"`
-	// Specifies the times when the timeline-based field is a specific value.
-	TimelineTimes []*UintRange `protobuf:"bytes,3,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-}
-
-func (m *TimedUpdatePermission) Reset()         { *m = TimedUpdatePermission{} }
-func (m *TimedUpdatePermission) String() string { return proto.CompactTextString(m) }
-func (*TimedUpdatePermission) ProtoMessage()    {}
-func (*TimedUpdatePermission) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1298419e4a97cfe6, []int{7}
-}
-func (m *TimedUpdatePermission) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *TimedUpdatePermission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TimedUpdatePermission.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *TimedUpdatePermission) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TimedUpdatePermission.Merge(m, src)
-}
-func (m *TimedUpdatePermission) XXX_Size() int {
-	return m.Size()
-}
-func (m *TimedUpdatePermission) XXX_DiscardUnknown() {
-	xxx_messageInfo_TimedUpdatePermission.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TimedUpdatePermission proto.InternalMessageInfo
-
-func (m *TimedUpdatePermission) GetPermanentlyPermittedTimes() []*UintRange {
-	if m != nil {
-		return m.PermanentlyPermittedTimes
-	}
-	return nil
-}
-
-func (m *TimedUpdatePermission) GetPermanentlyForbiddenTimes() []*UintRange {
-	if m != nil {
-		return m.PermanentlyForbiddenTimes
-	}
-	return nil
-}
-
-func (m *TimedUpdatePermission) GetTimelineTimes() []*UintRange {
-	if m != nil {
-		return m.TimelineTimes
-	}
-	return nil
-}
-
-// TimedUpdateWithTokenIdsPermission defines the permissions for updating a timeline-based field for specific tokens.
-//
-// Ex: If you want to lock the ability to update the metadata for tokenIds [1,2] for timelineTimes 1/1/2020 - 1/1/2021,
-// you could set the combination (tokenIds: [1,2], TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-type TimedUpdateWithTokenIdsPermission struct {
-	// Specifies the token IDs involved in the transfer.
-	TokenIds []*UintRange `protobuf:"bytes,1,rep,name=tokenIds,proto3" json:"tokenIds,omitempty"`
-	// Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-	PermanentlyPermittedTimes []*UintRange `protobuf:"bytes,2,rep,name=permanentlyPermittedTimes,proto3" json:"permanentlyPermittedTimes,omitempty"`
-	// Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-	PermanentlyForbiddenTimes []*UintRange `protobuf:"bytes,3,rep,name=permanentlyForbiddenTimes,proto3" json:"permanentlyForbiddenTimes,omitempty"`
-	// Specifies the times when the timeline-based field is a specific value.
-	TimelineTimes []*UintRange `protobuf:"bytes,4,rep,name=timelineTimes,proto3" json:"timelineTimes,omitempty"`
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) Reset()         { *m = TimedUpdateWithTokenIdsPermission{} }
-func (m *TimedUpdateWithTokenIdsPermission) String() string { return proto.CompactTextString(m) }
-func (*TimedUpdateWithTokenIdsPermission) ProtoMessage()    {}
-func (*TimedUpdateWithTokenIdsPermission) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1298419e4a97cfe6, []int{8}
-}
-func (m *TimedUpdateWithTokenIdsPermission) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *TimedUpdateWithTokenIdsPermission) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TimedUpdateWithTokenIdsPermission.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *TimedUpdateWithTokenIdsPermission) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TimedUpdateWithTokenIdsPermission.Merge(m, src)
-}
-func (m *TimedUpdateWithTokenIdsPermission) XXX_Size() int {
-	return m.Size()
-}
-func (m *TimedUpdateWithTokenIdsPermission) XXX_DiscardUnknown() {
-	xxx_messageInfo_TimedUpdateWithTokenIdsPermission.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TimedUpdateWithTokenIdsPermission proto.InternalMessageInfo
-
-func (m *TimedUpdateWithTokenIdsPermission) GetTokenIds() []*UintRange {
-	if m != nil {
-		return m.TokenIds
-	}
-	return nil
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) GetPermanentlyPermittedTimes() []*UintRange {
-	if m != nil {
-		return m.PermanentlyPermittedTimes
-	}
-	return nil
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) GetPermanentlyForbiddenTimes() []*UintRange {
-	if m != nil {
-		return m.PermanentlyForbiddenTimes
-	}
-	return nil
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) GetTimelineTimes() []*UintRange {
-	if m != nil {
-		return m.TimelineTimes
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*CollectionPermissions)(nil), "badges.CollectionPermissions")
 	proto.RegisterType((*UserPermissions)(nil), "badges.UserPermissions")
@@ -889,67 +760,64 @@ func init() {
 	proto.RegisterType((*UserIncomingApprovalPermission)(nil), "badges.UserIncomingApprovalPermission")
 	proto.RegisterType((*TokenIdsActionPermission)(nil), "badges.TokenIdsActionPermission")
 	proto.RegisterType((*ActionPermission)(nil), "badges.ActionPermission")
-	proto.RegisterType((*TimedUpdatePermission)(nil), "badges.TimedUpdatePermission")
-	proto.RegisterType((*TimedUpdateWithTokenIdsPermission)(nil), "badges.TimedUpdateWithTokenIdsPermission")
 }
 
 func init() { proto.RegisterFile("badges/permissions.proto", fileDescriptor_1298419e4a97cfe6) }
 
 var fileDescriptor_1298419e4a97cfe6 = []byte{
-	// 843 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0xcd, 0x6e, 0xd3, 0x4a,
-	0x14, 0xae, 0xf3, 0xd7, 0x74, 0xae, 0xee, 0xbd, 0xed, 0xdc, 0xf6, 0xca, 0x0d, 0xc5, 0x2a, 0x11,
-	0x42, 0x45, 0x82, 0x44, 0x2a, 0x0b, 0xc4, 0x32, 0x6d, 0x85, 0x14, 0xd4, 0xaa, 0x90, 0xb6, 0x80,
-	0xd8, 0x54, 0x13, 0xcf, 0xc4, 0x19, 0xe1, 0xcc, 0x44, 0x9e, 0x49, 0x21, 0x6f, 0xc0, 0x92, 0xd7,
-	0x60, 0xc1, 0x8e, 0x87, 0x60, 0x47, 0x25, 0x36, 0x2c, 0x51, 0xbb, 0x44, 0xdd, 0xf0, 0x04, 0x28,
-	0xfe, 0x8b, 0x13, 0xff, 0xc4, 0x98, 0x2e, 0x2a, 0xc4, 0xce, 0x3d, 0xe7, 0x7c, 0x3f, 0xe7, 0x1c,
-	0xcf, 0xd4, 0x01, 0x6a, 0x1b, 0x61, 0x83, 0x88, 0x7a, 0x9f, 0x58, 0x3d, 0x2a, 0x04, 0xe5, 0x4c,
-	0xd4, 0xfa, 0x16, 0x97, 0x1c, 0x96, 0x9c, 0x4c, 0x65, 0xd5, 0xe0, 0xdc, 0x30, 0x49, 0xdd, 0x8e,
-	0xb6, 0x07, 0x9d, 0x3a, 0x62, 0x43, 0xa7, 0xa4, 0xb2, 0xe2, 0x82, 0xdb, 0xc8, 0x44, 0x4c, 0x27,
-	0x2e, 0xb2, 0x52, 0x71, 0xc3, 0x08, 0x63, 0x8b, 0x08, 0x71, 0x6c, 0x52, 0x21, 0xbd, 0xdc, 0xb2,
-	0xc1, 0x0d, 0x6e, 0x3f, 0xd6, 0x47, 0x4f, 0x4e, 0xb4, 0xfa, 0xae, 0x04, 0x56, 0xb6, 0xb9, 0x69,
-	0x12, 0x5d, 0x52, 0xce, 0x1e, 0x8f, 0xbd, 0xc0, 0x47, 0xe0, 0x3f, 0x1d, 0xb1, 0x1d, 0x62, 0x12,
-	0x49, 0xc6, 0x15, 0xaa, 0xb2, 0x9e, 0xdf, 0xf8, 0x6b, 0x53, 0xad, 0x39, 0x4a, 0xb5, 0xc6, 0x14,
-	0xae, 0x15, 0x05, 0x82, 0x4f, 0xc0, 0xb2, 0x8e, 0x58, 0xc3, 0xd2, 0xbb, 0xf4, 0x24, 0x48, 0x96,
-	0xb3, 0xc9, 0xae, 0x7b, 0x64, 0x87, 0xb4, 0x47, 0xf0, 0x51, 0x1f, 0x23, 0x49, 0x02, 0x8c, 0x91,
-	0x50, 0xb8, 0x07, 0xa0, 0x8e, 0x98, 0x53, 0x7c, 0x20, 0x11, 0xc3, 0xc8, 0xc2, 0x42, 0xcd, 0xa7,
-	0x21, 0x8c, 0x00, 0xc2, 0x7d, 0xbb, 0x5b, 0x27, 0xba, 0x3d, 0x10, 0x92, 0xf7, 0x76, 0x90, 0x44,
-	0x6a, 0x21, 0x0d, 0x5f, 0x14, 0x12, 0x36, 0xc1, 0xa2, 0x1f, 0xde, 0x43, 0x0c, 0x19, 0xc4, 0x52,
-	0x8b, 0x69, 0xd8, 0x42, 0x30, 0x78, 0x0c, 0xae, 0x8d, 0x15, 0xfc, 0x09, 0xec, 0x11, 0x89, 0xf0,
-	0xc8, 0x63, 0x29, 0x0d, 0x6b, 0x12, 0x03, 0x7c, 0x0e, 0xfe, 0xf7, 0xd3, 0x4f, 0x91, 0x49, 0xf1,
-	0x21, 0x7f, 0x49, 0x58, 0x13, 0x0b, 0x75, 0xde, 0xe6, 0x5e, 0xf7, 0xb9, 0xdd, 0x78, 0x68, 0xeb,
-	0x31, 0x78, 0x88, 0x02, 0xcc, 0x76, 0xd0, 0x77, 0x5d, 0xb6, 0x99, 0x6f, 0x47, 0xb8, 0x7e, 0x46,
-	0x65, 0xd7, 0x23, 0x88, 0x94, 0x98, 0x20, 0x82, 0x5d, 0xb0, 0x16, 0xd1, 0x5b, 0xa3, 0xdf, 0xb7,
-	0xf8, 0x09, 0x32, 0x85, 0xba, 0x60, 0x0b, 0xdd, 0xf4, 0x84, 0xc2, 0x25, 0x01, 0x8d, 0x44, 0xa6,
-	0xea, 0x45, 0x01, 0xfc, 0x7b, 0x24, 0x88, 0x15, 0x3c, 0x25, 0x1d, 0x50, 0xf1, 0x31, 0xfb, 0x03,
-	0x69, 0x70, 0xca, 0x8c, 0xb1, 0xb6, 0x73, 0x58, 0x6e, 0x79, 0xda, 0x23, 0xf0, 0x74, 0x51, 0x40,
-	0x3d, 0x81, 0x69, 0x42, 0xa7, 0xc9, 0x74, 0xde, 0x9b, 0xd0, 0xc9, 0x85, 0x75, 0xa6, 0x8b, 0x22,
-	0x75, 0x42, 0x4c, 0xf0, 0x8d, 0x02, 0x36, 0xfd, 0x74, 0x63, 0x20, 0xb9, 0x93, 0x22, 0x07, 0xc4,
-	0xec, 0x34, 0x19, 0x95, 0x14, 0x49, 0x82, 0x3d, 0x7b, 0x87, 0x16, 0x62, 0xa2, 0x43, 0x2c, 0xef,
-	0xdc, 0xc5, 0xdf, 0x0a, 0x19, 0x38, 0xd3, 0x59, 0xf1, 0x3a, 0x18, 0x5b, 0x29, 0xfc, 0xb2, 0x95,
-	0x10, 0x27, 0x94, 0x60, 0x23, 0x0a, 0xd5, 0x30, 0xcd, 0xb0, 0x7e, 0x71, 0x86, 0x7e, 0x6a, 0xa6,
-	0xea, 0x45, 0x1e, 0xac, 0x25, 0xbd, 0xae, 0x50, 0x03, 0xa0, 0x63, 0xf1, 0xde, 0x2e, 0x15, 0xb2,
-	0x89, 0x55, 0x65, 0x5d, 0xd9, 0x58, 0x68, 0x05, 0x22, 0xb0, 0x02, 0xca, 0x92, 0xbb, 0xd9, 0x9c,
-	0x9d, 0xf5, 0xff, 0x86, 0x77, 0xc0, 0x12, 0xf5, 0x1a, 0xde, 0x1a, 0xba, 0x45, 0x79, 0xbb, 0x28,
-	0x9c, 0x80, 0xf7, 0xc1, 0xdf, 0xd2, 0xf5, 0x35, 0x3a, 0xa9, 0xde, 0x94, 0x97, 0xfc, 0x37, 0x8e,
-	0x32, 0xd9, 0x42, 0xcc, 0x20, 0xad, 0xc9, 0x3a, 0x78, 0x77, 0x64, 0xc1, 0xbd, 0x4c, 0x8a, 0x71,
-	0x18, 0xbf, 0x04, 0x3e, 0x00, 0xff, 0xf0, 0x57, 0x8c, 0x58, 0xa2, 0x4b, 0xfb, 0x8e, 0x50, 0x29,
-	0x0e, 0x34, 0x55, 0x38, 0x1a, 0x06, 0x72, 0x47, 0xd4, 0xc4, 0xea, 0xbc, 0x33, 0x8c, 0x71, 0x04,
-	0xee, 0x83, 0xd5, 0xd1, 0xbf, 0x5a, 0xc4, 0x08, 0x93, 0xe6, 0xd0, 0x9e, 0xa2, 0x94, 0x04, 0x3b,
-	0x2a, 0xe5, 0x38, 0x95, 0x78, 0xcc, 0x14, 0xe1, 0x43, 0x6e, 0xb5, 0x29, 0xc6, 0x84, 0x39, 0x84,
-	0x0b, 0x69, 0x08, 0x27, 0x31, 0xd5, 0x4f, 0x79, 0xa0, 0x25, 0x5f, 0x11, 0x13, 0x1b, 0x55, 0xd2,
-	0x6c, 0x34, 0x97, 0x7a, 0xa3, 0xf9, 0x0c, 0x1b, 0x2d, 0x64, 0xd9, 0x68, 0x31, 0xdb, 0x46, 0x4b,
-	0x3f, 0xb7, 0xd1, 0xf9, 0xcb, 0xde, 0x68, 0x39, 0xc3, 0x46, 0x3f, 0xbb, 0x1b, 0x8d, 0xbf, 0x8c,
-	0x67, 0x9e, 0xe1, 0x3f, 0x5b, 0xbd, 0x72, 0x5b, 0xfd, 0xa6, 0x00, 0x35, 0xee, 0x4b, 0x68, 0x62,
-	0x90, 0xca, 0xec, 0x41, 0x26, 0x76, 0x9b, 0xbb, 0xec, 0x6e, 0xf3, 0x19, 0xba, 0xfd, 0xa0, 0x80,
-	0xc5, 0x50, 0x97, 0x89, 0xb6, 0x95, 0xcb, 0xb6, 0x9d, 0xcb, 0x60, 0xfb, 0xbb, 0x02, 0x56, 0x22,
-	0x3f, 0x85, 0xaf, 0xbe, 0x77, 0xfb, 0x14, 0xd3, 0x1e, 0x31, 0x29, 0x23, 0x33, 0x4f, 0x71, 0xb0,
-	0xae, 0xfa, 0x3e, 0x07, 0x6e, 0xcc, 0xfc, 0x92, 0xfe, 0xed, 0x5e, 0xd1, 0xf0, 0xbc, 0x0a, 0xe9,
-	0xe6, 0xb5, 0xb5, 0xfb, 0xf1, 0x4c, 0x53, 0x4e, 0xcf, 0x34, 0xe5, 0xeb, 0x99, 0xa6, 0xbc, 0x3d,
-	0xd7, 0xe6, 0x4e, 0xcf, 0xb5, 0xb9, 0x2f, 0xe7, 0xda, 0xdc, 0x8b, 0x4d, 0x83, 0xca, 0xee, 0xa0,
-	0x5d, 0xd3, 0x79, 0xaf, 0xde, 0xa6, 0xd2, 0xfb, 0xb9, 0xed, 0x3d, 0xe9, 0x5d, 0x44, 0x59, 0xfd,
-	0x75, 0xdd, 0x8d, 0xcb, 0x61, 0x9f, 0x88, 0x76, 0xc9, 0xfe, 0x49, 0x7d, 0xef, 0x47, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x7c, 0x6e, 0xf3, 0xee, 0xda, 0x0f, 0x00, 0x00,
+	// 822 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x97, 0xcd, 0x6e, 0xd3, 0x4a,
+	0x14, 0xc7, 0xeb, 0x24, 0x4d, 0xd2, 0xa9, 0xee, 0xbd, 0xed, 0xdc, 0xf6, 0xca, 0xcd, 0xad, 0xac,
+	0x28, 0x42, 0xa8, 0x0b, 0x48, 0xa4, 0xb2, 0x40, 0x2c, 0xd3, 0x54, 0x88, 0xa0, 0x56, 0xad, 0xd2,
+	0x16, 0x50, 0x37, 0x68, 0xe2, 0x99, 0x38, 0x23, 0x9c, 0x19, 0x6b, 0x66, 0x52, 0xc8, 0x1b, 0xb0,
+	0xe4, 0x61, 0xd8, 0xf1, 0x02, 0xec, 0xa8, 0xc4, 0x86, 0x25, 0x6a, 0x97, 0xa8, 0xef, 0x80, 0xe2,
+	0xaf, 0xc4, 0x71, 0x12, 0xbb, 0xa1, 0x0b, 0x16, 0xec, 0xdc, 0x73, 0xce, 0xff, 0x77, 0xbe, 0x3c,
+	0xd3, 0x18, 0xe8, 0x6d, 0x84, 0x2d, 0x22, 0x6b, 0x0e, 0x11, 0x3d, 0x2a, 0x25, 0xe5, 0x4c, 0x56,
+	0x1d, 0xc1, 0x15, 0x87, 0x79, 0xcf, 0x53, 0xda, 0xb2, 0x38, 0xb7, 0x6c, 0x52, 0x73, 0xad, 0xed,
+	0x7e, 0xa7, 0x86, 0xd8, 0xc0, 0x0b, 0x29, 0x6d, 0xfa, 0xe2, 0x36, 0xb2, 0x11, 0x33, 0x89, 0xaf,
+	0x2c, 0x95, 0x7c, 0x33, 0xc2, 0x58, 0x10, 0x29, 0x5f, 0xdb, 0x54, 0xaa, 0xc0, 0xb7, 0x61, 0x71,
+	0x8b, 0xbb, 0x8f, 0xb5, 0xe1, 0x93, 0x67, 0xad, 0x7c, 0x2a, 0x80, 0xcd, 0x06, 0xb7, 0x6d, 0x62,
+	0x2a, 0xca, 0xd9, 0xf1, 0xa8, 0x16, 0xf8, 0x1c, 0xfc, 0x6b, 0x22, 0xb6, 0x4f, 0x6c, 0xa2, 0xc8,
+	0x28, 0x42, 0xd7, 0xca, 0xd9, 0x9d, 0xd5, 0x5d, 0xbd, 0xea, 0x65, 0xaa, 0xd6, 0x27, 0x74, 0xad,
+	0x69, 0x22, 0x78, 0x00, 0x36, 0x4c, 0xc4, 0xea, 0xc2, 0xec, 0xd2, 0x8b, 0x71, 0x58, 0x26, 0x01,
+	0x36, 0x55, 0x05, 0x9f, 0x01, 0x68, 0x22, 0x76, 0xe6, 0x60, 0xa4, 0xc8, 0x89, 0x42, 0x0c, 0x23,
+	0x81, 0xa5, 0x9e, 0x4d, 0x60, 0x4d, 0xd1, 0xf8, 0x3d, 0x7a, 0xd6, 0x46, 0x5f, 0x2a, 0xde, 0xdb,
+	0x47, 0x0a, 0xe9, 0xb9, 0x14, 0x3d, 0x4e, 0x8a, 0xe0, 0x3e, 0x58, 0x0b, 0xcd, 0x87, 0x88, 0x21,
+	0x8b, 0x08, 0x7d, 0x39, 0x01, 0x14, 0x53, 0xc0, 0x73, 0xf0, 0xff, 0x08, 0x1e, 0xb6, 0x7c, 0x48,
+	0x14, 0xc2, 0xc3, 0xca, 0xf2, 0x09, 0xc0, 0x79, 0x62, 0xf8, 0x0a, 0xfc, 0x17, 0xba, 0x5f, 0x20,
+	0x9b, 0xe2, 0x53, 0xfe, 0x86, 0xb0, 0x26, 0x96, 0x7a, 0xc1, 0xc5, 0x96, 0x03, 0x6c, 0x60, 0x8f,
+	0xe1, 0x67, 0xe8, 0x23, 0x64, 0xd7, 0x18, 0x16, 0x5c, 0xbc, 0x35, 0x39, 0xa2, 0x87, 0x5d, 0xb0,
+	0x3d, 0xa5, 0xa5, 0xba, 0xe3, 0x08, 0x7e, 0x81, 0x6c, 0xa9, 0xaf, 0xb8, 0xfc, 0x7b, 0x01, 0x3f,
+	0x1e, 0x32, 0x96, 0x63, 0x2e, 0x29, 0x78, 0x47, 0x31, 0x3e, 0xe4, 0x82, 0xd4, 0x6d, 0x8a, 0xe4,
+	0x31, 0x52, 0x5d, 0xa9, 0x83, 0x34, 0xef, 0xe8, 0xa4, 0x0a, 0x62, 0x50, 0x1e, 0xd9, 0x1b, 0x5c,
+	0xf6, 0xb8, 0x6c, 0x70, 0xca, 0x5e, 0x0a, 0xe4, 0x38, 0x44, 0x78, 0xe4, 0xd5, 0x04, 0x72, 0x22,
+	0xa1, 0x72, 0x93, 0x03, 0xff, 0x9c, 0x49, 0x22, 0xc6, 0xcf, 0x6d, 0x07, 0x94, 0xc2, 0x3e, 0x8f,
+	0xfa, 0xca, 0xe2, 0x94, 0x59, 0xa3, 0x79, 0x79, 0xc7, 0xf7, 0x7e, 0x90, 0x73, 0x28, 0x9e, 0x0c,
+	0x1a, 0xab, 0x60, 0x0e, 0x29, 0x92, 0xa7, 0xc9, 0x4c, 0xde, 0x8b, 0xe4, 0xc9, 0xc4, 0xf3, 0x4c,
+	0x06, 0x4d, 0xcd, 0x13, 0x23, 0xc1, 0xf7, 0x1a, 0xd8, 0x0d, 0xdd, 0xf5, 0xbe, 0xe2, 0x9e, 0x8b,
+	0x9c, 0x10, 0xbb, 0xd3, 0x64, 0x54, 0x51, 0xa4, 0x08, 0x0e, 0xca, 0x3b, 0x15, 0x88, 0xc9, 0x0e,
+	0x11, 0xc9, 0xd7, 0xc1, 0x02, 0xcc, 0x74, 0xa5, 0x04, 0x1d, 0x8c, 0x4a, 0xc9, 0xfd, 0x72, 0x29,
+	0x31, 0x26, 0x54, 0x60, 0x67, 0x9a, 0xaa, 0x6e, 0xdb, 0xf1, 0xfc, 0x49, 0xb7, 0x50, 0x6a, 0x52,
+	0xe5, 0x26, 0x0b, 0xb6, 0xe7, 0x1d, 0x31, 0x68, 0x00, 0xd0, 0x11, 0xbc, 0x77, 0x40, 0xa5, 0x6a,
+	0x62, 0x5d, 0x2b, 0x6b, 0x3b, 0x2b, 0xad, 0x31, 0x0b, 0x2c, 0x81, 0xa2, 0xe2, 0xbe, 0x37, 0xe3,
+	0x7a, 0xc3, 0xbf, 0xe1, 0x03, 0xb0, 0x4e, 0x83, 0x86, 0xf7, 0x06, 0x7e, 0x50, 0xd6, 0x0d, 0x8a,
+	0x3b, 0xe0, 0x63, 0xf0, 0x97, 0xf2, 0xeb, 0x3a, 0xa5, 0x3d, 0x12, 0x4c, 0x79, 0x3d, 0x7c, 0xe3,
+	0x28, 0x53, 0x2d, 0xc4, 0x2c, 0xd2, 0x8a, 0xc6, 0xc1, 0x87, 0xc3, 0x12, 0xfc, 0x7b, 0x6f, 0x79,
+	0x96, 0x26, 0x0c, 0x81, 0x4f, 0xc0, 0xdf, 0xfc, 0x2d, 0x23, 0x42, 0x76, 0xa9, 0xe3, 0x25, 0xca,
+	0xcf, 0x12, 0x4d, 0x04, 0x0e, 0x87, 0x81, 0xfc, 0x11, 0x35, 0xb1, 0x5e, 0xf0, 0x86, 0x31, 0xb2,
+	0xc0, 0x23, 0xb0, 0x35, 0xfc, 0xe7, 0x8f, 0x18, 0x61, 0xca, 0x1e, 0xb8, 0x53, 0x54, 0x8a, 0x60,
+	0x2f, 0x4b, 0x71, 0x56, 0x96, 0xd9, 0x9a, 0x09, 0xe0, 0x53, 0x2e, 0xda, 0x14, 0x63, 0xc2, 0x3c,
+	0xe0, 0x4a, 0x1a, 0x60, 0x54, 0x53, 0xf9, 0x92, 0x05, 0xc6, 0xfc, 0x2b, 0x22, 0xb2, 0x51, 0x2d,
+	0xcd, 0x46, 0x33, 0xa9, 0x37, 0x9a, 0x5d, 0x60, 0xa3, 0xb9, 0x45, 0x36, 0xba, 0xbc, 0xd8, 0x46,
+	0xf3, 0xb7, 0xdb, 0x68, 0xe1, 0xae, 0x37, 0x5a, 0x5c, 0x60, 0xa3, 0x5f, 0xfd, 0x8d, 0xce, 0xbe,
+	0x8c, 0x13, 0xcf, 0xf0, 0x9f, 0xad, 0xfe, 0x76, 0x5b, 0xfd, 0xa1, 0x01, 0x7d, 0xd6, 0x4f, 0xab,
+	0xc8, 0x20, 0xb5, 0xe4, 0x41, 0xce, 0xed, 0x36, 0x73, 0xd7, 0xdd, 0x66, 0x17, 0xe8, 0xf6, 0xa3,
+	0x06, 0xd6, 0x62, 0x5d, 0xce, 0x2d, 0x5b, 0xbb, 0xeb, 0xb2, 0x33, 0xb7, 0x2f, 0x7b, 0xef, 0xe0,
+	0xf3, 0x95, 0xa1, 0x5d, 0x5e, 0x19, 0xda, 0xf7, 0x2b, 0x43, 0xfb, 0x70, 0x6d, 0x2c, 0x5d, 0x5e,
+	0x1b, 0x4b, 0xdf, 0xae, 0x8d, 0xa5, 0xf3, 0x5d, 0x8b, 0xaa, 0x6e, 0xbf, 0x5d, 0x35, 0x79, 0xaf,
+	0xd6, 0xa6, 0x2a, 0xf8, 0xb6, 0x0b, 0x9e, 0xcc, 0x2e, 0xa2, 0xac, 0xf6, 0xae, 0xe6, 0xdb, 0xd5,
+	0xc0, 0x21, 0xb2, 0x9d, 0x77, 0xbf, 0xdf, 0x1e, 0xfd, 0x0c, 0x00, 0x00, 0xff, 0xff, 0x7d, 0x21,
+	0x4f, 0xfc, 0x47, 0x0e, 0x00, 0x00,
 }
 
 func (m *CollectionPermissions) Marshal() (dAtA []byte, err error) {
@@ -972,6 +840,34 @@ func (m *CollectionPermissions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.CanAddMoreCosmosCoinWrapperPaths) > 0 {
+		for iNdEx := len(m.CanAddMoreCosmosCoinWrapperPaths) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanAddMoreCosmosCoinWrapperPaths[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintPermissions(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
+	if len(m.CanAddMoreAliasPaths) > 0 {
+		for iNdEx := len(m.CanAddMoreAliasPaths) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.CanAddMoreAliasPaths[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintPermissions(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x52
+		}
+	}
 	if len(m.CanUpdateCollectionApprovals) > 0 {
 		for iNdEx := len(m.CanUpdateCollectionApprovals) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1659,150 +1555,6 @@ func (m *ActionPermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *TimedUpdatePermission) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *TimedUpdatePermission) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *TimedUpdatePermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.TimelineTimes) > 0 {
-		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
-		}
-	}
-	if len(m.PermanentlyForbiddenTimes) > 0 {
-		for iNdEx := len(m.PermanentlyForbiddenTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.PermanentlyForbiddenTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.PermanentlyPermittedTimes) > 0 {
-		for iNdEx := len(m.PermanentlyPermittedTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.PermanentlyPermittedTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.TimelineTimes) > 0 {
-		for iNdEx := len(m.TimelineTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TimelineTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if len(m.PermanentlyForbiddenTimes) > 0 {
-		for iNdEx := len(m.PermanentlyForbiddenTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.PermanentlyForbiddenTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
-		}
-	}
-	if len(m.PermanentlyPermittedTimes) > 0 {
-		for iNdEx := len(m.PermanentlyPermittedTimes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.PermanentlyPermittedTimes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.TokenIds) > 0 {
-		for iNdEx := len(m.TokenIds) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TokenIds[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintPermissions(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintPermissions(dAtA []byte, offset int, v uint64) int {
 	offset -= sovPermissions(v)
 	base := offset
@@ -1870,6 +1622,18 @@ func (m *CollectionPermissions) Size() (n int) {
 	}
 	if len(m.CanUpdateCollectionApprovals) > 0 {
 		for _, e := range m.CanUpdateCollectionApprovals {
+			l = e.Size()
+			n += 1 + l + sovPermissions(uint64(l))
+		}
+	}
+	if len(m.CanAddMoreAliasPaths) > 0 {
+		for _, e := range m.CanAddMoreAliasPaths {
+			l = e.Size()
+			n += 1 + l + sovPermissions(uint64(l))
+		}
+	}
+	if len(m.CanAddMoreCosmosCoinWrapperPaths) > 0 {
+		for _, e := range m.CanAddMoreCosmosCoinWrapperPaths {
 			l = e.Size()
 			n += 1 + l + sovPermissions(uint64(l))
 		}
@@ -2121,66 +1885,6 @@ func (m *ActionPermission) Size() (n int) {
 	return n
 }
 
-func (m *TimedUpdatePermission) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.PermanentlyPermittedTimes) > 0 {
-		for _, e := range m.PermanentlyPermittedTimes {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	if len(m.PermanentlyForbiddenTimes) > 0 {
-		for _, e := range m.PermanentlyForbiddenTimes {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	if len(m.TimelineTimes) > 0 {
-		for _, e := range m.TimelineTimes {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *TimedUpdateWithTokenIdsPermission) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.TokenIds) > 0 {
-		for _, e := range m.TokenIds {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	if len(m.PermanentlyPermittedTimes) > 0 {
-		for _, e := range m.PermanentlyPermittedTimes {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	if len(m.PermanentlyForbiddenTimes) > 0 {
-		for _, e := range m.PermanentlyForbiddenTimes {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	if len(m.TimelineTimes) > 0 {
-		for _, e := range m.TimelineTimes {
-			l = e.Size()
-			n += 1 + l + sovPermissions(uint64(l))
-		}
-	}
-	return n
-}
-
 func sovPermissions(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -2279,7 +1983,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanArchiveCollection = append(m.CanArchiveCollection, &TimedUpdatePermission{})
+			m.CanArchiveCollection = append(m.CanArchiveCollection, &ActionPermission{})
 			if err := m.CanArchiveCollection[len(m.CanArchiveCollection)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2313,7 +2017,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateStandards = append(m.CanUpdateStandards, &TimedUpdatePermission{})
+			m.CanUpdateStandards = append(m.CanUpdateStandards, &ActionPermission{})
 			if err := m.CanUpdateStandards[len(m.CanUpdateStandards)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2347,7 +2051,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateCustomData = append(m.CanUpdateCustomData, &TimedUpdatePermission{})
+			m.CanUpdateCustomData = append(m.CanUpdateCustomData, &ActionPermission{})
 			if err := m.CanUpdateCustomData[len(m.CanUpdateCustomData)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2381,7 +2085,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateManager = append(m.CanUpdateManager, &TimedUpdatePermission{})
+			m.CanUpdateManager = append(m.CanUpdateManager, &ActionPermission{})
 			if err := m.CanUpdateManager[len(m.CanUpdateManager)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2415,7 +2119,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateCollectionMetadata = append(m.CanUpdateCollectionMetadata, &TimedUpdatePermission{})
+			m.CanUpdateCollectionMetadata = append(m.CanUpdateCollectionMetadata, &ActionPermission{})
 			if err := m.CanUpdateCollectionMetadata[len(m.CanUpdateCollectionMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2483,7 +2187,7 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CanUpdateTokenMetadata = append(m.CanUpdateTokenMetadata, &TimedUpdateWithTokenIdsPermission{})
+			m.CanUpdateTokenMetadata = append(m.CanUpdateTokenMetadata, &TokenIdsActionPermission{})
 			if err := m.CanUpdateTokenMetadata[len(m.CanUpdateTokenMetadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2519,6 +2223,74 @@ func (m *CollectionPermissions) Unmarshal(dAtA []byte) error {
 			}
 			m.CanUpdateCollectionApprovals = append(m.CanUpdateCollectionApprovals, &CollectionApprovalPermission{})
 			if err := m.CanUpdateCollectionApprovals[len(m.CanUpdateCollectionApprovals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanAddMoreAliasPaths", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPermissions
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPermissions
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPermissions
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanAddMoreAliasPaths = append(m.CanAddMoreAliasPaths, &ActionPermission{})
+			if err := m.CanAddMoreAliasPaths[len(m.CanAddMoreAliasPaths)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CanAddMoreCosmosCoinWrapperPaths", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPermissions
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPermissions
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPermissions
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CanAddMoreCosmosCoinWrapperPaths = append(m.CanAddMoreCosmosCoinWrapperPaths, &ActionPermission{})
+			if err := m.CanAddMoreCosmosCoinWrapperPaths[len(m.CanAddMoreCosmosCoinWrapperPaths)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3989,344 +3761,6 @@ func (m *ActionPermission) Unmarshal(dAtA []byte) error {
 			}
 			m.PermanentlyForbiddenTimes = append(m.PermanentlyForbiddenTimes, &UintRange{})
 			if err := m.PermanentlyForbiddenTimes[len(m.PermanentlyForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPermissions(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *TimedUpdatePermission) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPermissions
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TimedUpdatePermission: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TimedUpdatePermission: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PermanentlyPermittedTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PermanentlyPermittedTimes = append(m.PermanentlyPermittedTimes, &UintRange{})
-			if err := m.PermanentlyPermittedTimes[len(m.PermanentlyPermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PermanentlyForbiddenTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PermanentlyForbiddenTimes = append(m.PermanentlyForbiddenTimes, &UintRange{})
-			if err := m.PermanentlyForbiddenTimes[len(m.PermanentlyForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
-			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPermissions(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *TimedUpdateWithTokenIdsPermission) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPermissions
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TimedUpdateWithTokenIdsPermission: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TimedUpdateWithTokenIdsPermission: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TokenIds", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TokenIds = append(m.TokenIds, &UintRange{})
-			if err := m.TokenIds[len(m.TokenIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PermanentlyPermittedTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PermanentlyPermittedTimes = append(m.PermanentlyPermittedTimes, &UintRange{})
-			if err := m.PermanentlyPermittedTimes[len(m.PermanentlyPermittedTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PermanentlyForbiddenTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PermanentlyForbiddenTimes = append(m.PermanentlyForbiddenTimes, &UintRange{})
-			if err := m.PermanentlyForbiddenTimes[len(m.PermanentlyForbiddenTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimelineTimes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TimelineTimes = append(m.TimelineTimes, &UintRange{})
-			if err := m.TimelineTimes[len(m.TimelineTimes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

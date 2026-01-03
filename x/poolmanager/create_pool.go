@@ -53,7 +53,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, msg types.CreatePoolMsg) (uint64, er
 
 	// Send initial liquidity from pool creator to pool module account.
 	sender := msg.PoolCreator()
-	err = k.gammKeeper.SendCoinsWithBadgesRouting(ctx, sender, pool.GetAddress(), initialPoolLiquidity)
+	err = k.gammKeeper.SendCoinsToPoolWithAliasRouting(ctx, sender, pool.GetAddress(), initialPoolLiquidity)
 	if err != nil {
 		return 0, err
 	}

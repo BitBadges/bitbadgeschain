@@ -1,7 +1,10 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type msgServer struct {
@@ -15,3 +18,27 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
+
+// resolveCollectionIdWithAutoPrev resolves a collection ID, handling the case where collectionId is 0
+// (used for multi-msg transactions). If collectionId is 0, it uses the next collection ID minus 1.
+// Returns the resolved collection ID and an error if underflow would occur or if the resolved collection doesn't exist.
+func (k msgServer) resolveCollectionIdWithAutoPrev(ctx sdk.Context, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
+	var resolvedId sdkmath.Uint
+	if collectionId.Equal(sdkmath.NewUint(0)) {
+		nextCollectionId := k.GetNextCollectionId(ctx)
+		// Prevent underflow by checking if nextCollectionId is greater than 0
+		if nextCollectionId.IsZero() {
+			return sdkmath.Uint{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "cannot calculate collection ID: next collection ID is zero")
+		}
+		resolvedId = nextCollectionId.Sub(sdkmath.NewUint(1))
+	} else {
+		resolvedId = collectionId
+	}
+
+	// Validate that the resolved collection ID actually exists
+	if !k.StoreHasCollectionID(ctx, resolvedId) {
+		return sdkmath.Uint{}, sdkerrors.Wrapf(ErrCollectionNotExists, "resolved collection ID %s does not exist", resolvedId.String())
+	}
+
+	return resolvedId, nil
+}

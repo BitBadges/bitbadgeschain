@@ -32,6 +32,34 @@ func getETHSignatureChallengeSchema() string {
 	}`
 }
 
+// getVotingChallengeSchema returns the schema for a voting challenge
+func getVotingChallengeSchema() string {
+	return `{
+		"proposalId": "",
+		"quorumThreshold": "",
+		"voters": [` + getVoterSchema() + `],
+		"uri": "",
+		"customData": ""
+	}`
+}
+
+// getVoterSchema returns the schema for a voter
+func getVoterSchema() string {
+	return `{
+		"address": "",
+		"weight": ""
+	}`
+}
+
+// getVoteProofSchema returns the schema for a vote proof
+func getVoteProofSchema() string {
+	return `{
+		"proposalId": "",
+		"voter": "",
+		"yesWeight": ""
+	}`
+}
+
 // getMustOwnTokensSchema returns the schema for must own tokens criteria
 func getMustOwnTokensSchema() string {
 	return `{
@@ -66,6 +94,31 @@ func getBalanceSchema() string {
 		"amount": "",
 		"ownershipTimes": [` + getUintRangeSchema() + `],
 		"tokenIds": [` + getUintRangeSchema() + `]
+	}`
+}
+
+// getConversionWithoutDenomSchema returns the schema for ConversionWithoutDenom
+func getConversionWithoutDenomSchema() string {
+	return `{
+		"sideA": {
+			"amount": ""
+		},
+		"sideB": [
+			` + getBalanceSchema() + `
+		]
+	}`
+}
+
+// getConversionSchema returns the schema for Conversion (with denom)
+func getConversionSchema() string {
+	return `{
+		"sideA": {
+			"amount": "",
+			"denom": ""
+		},
+		"sideB": [
+			` + getBalanceSchema() + `
+		]
 	}`
 }
 
@@ -160,31 +213,6 @@ func getAddressChecksSchema() string {
 	}`
 }
 
-// getBaseApprovalCriteriaSchema returns the base approval criteria schema without collection-specific fields
-func getBaseApprovalCriteriaSchema() string {
-	return `{
-		"mustOwnTokens": [
-			` + getMustOwnTokensSchema() + `
-		],
-		"merkleChallenges": [
-			` + getMerkleChallengeSchema() + `
-		],
-		"coinTransfers": [
-			` + getCoinTransferSchema() + `
-		],
-		"predeterminedBalances": ` + getPredeterminedBalancesSchema() + `,
-		"approvalAmounts": ` + getApprovalAmountsSchema() + `,
-		"autoDeletionOptions": ` + getAutoDeletionOptionsSchema() + `,
-		"maxNumTransfers": ` + getMaxNumTransfersSchema() + `,
-		"dynamicStoreChallenges": [
-			` + getDynamicStoreChallengeSchema() + `
-		],
-		"ethSignatureChallenges": [
-			` + getETHSignatureChallengeSchema() + `
-		]
-	}`
-}
-
 // getCollectionApprovalCriteriaSchema returns the schema for collection approval criteria
 func getCollectionApprovalCriteriaSchema() string {
 	return `{
@@ -216,6 +244,9 @@ func getCollectionApprovalCriteriaSchema() string {
 		],
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
+		],
+		"votingChallenges": [
+			` + getVotingChallengeSchema() + `
 		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"recipientChecks": ` + getAddressChecksSchema() + `,
@@ -249,6 +280,9 @@ func getOutgoingApprovalCriteriaSchema() string {
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
 		],
+		"votingChallenges": [
+			` + getVotingChallengeSchema() + `
+		],
 		"recipientChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
 		"altTimeChecks": ` + getAltTimeChecksSchema() + `,
@@ -279,6 +313,9 @@ func getIncomingApprovalCriteriaSchema() string {
 		],
 		"ethSignatureChallenges": [
 			` + getETHSignatureChallengeSchema() + `
+		],
+		"votingChallenges": [
+			` + getVotingChallengeSchema() + `
 		],
 		"senderChecks": ` + getAddressChecksSchema() + `,
 		"initiatorChecks": ` + getAddressChecksSchema() + `,
@@ -353,14 +390,16 @@ func getOutgoingApprovalSchema() string {
 func getCollectionPermissionsSchema() string {
 	return `{
 		"canDeleteCollection": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canArchiveCollection": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateStandards": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateCustomData": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateManager": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateCollectionMetadata": [{"timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canArchiveCollection": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateStandards": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCustomData": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateManager": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCollectionMetadata": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
 		"canUpdateValidTokenIds": [{"tokenIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateTokenMetadata": [{"tokenIds": [` + getUintRangeSchema() + `], "timelineTimes": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
-		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
+		"canUpdateTokenMetadata": [{"tokenIds": [` + getUintRangeSchema() + `], "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canUpdateCollectionApprovals": [{"fromListId": "", "toListId": "", "initiatedByListId": "", "transferTimes": [` + getUintRangeSchema() + `], "tokenIds": [` + getUintRangeSchema() + `], "ownershipTimes": [` + getUintRangeSchema() + `], "approvalId": "", "permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canAddMoreAliasPaths": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}],
+		"canAddMoreCosmosCoinWrapperPaths": [{"permanentlyPermittedTimes": [` + getUintRangeSchema() + `], "permanentlyForbiddenTimes": [` + getUintRangeSchema() + `]}]
 	}`
 }
 
@@ -384,59 +423,47 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"mapId": "",
-					"inheritManagerTimelineFrom": "",
-		"managerTimeline": [
-			{
-				"manager": "",
-				"timelineTimes": [`+getUintRangeSchema()+`]
+			"inheritManagerFrom": "",
+			"manager": "",
+			"updateCriteria": {
+				"managerOnly": false,
+				"collectionId": "",
+				"creatorOnly": false,
+				"firstComeFirstServe": false
+			},
+			"valueOptions": {
+				"noDuplicates": false,
+				"permanentOnceSet": false,
+				"expectUint": false,
+				"expectBoolean": false,
+				"expectAddress": false,
+				"expectUri": false
+			},
+			"defaultValue": "",
+			"metadata": {
+				"uri": "",
+				"customData": ""
+			},
+			"permissions": {
+				"canUpdateMetadata": [
+					{
+						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
+					}
+				],
+				"canUpdateManager": [
+					{
+						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
+					}
+				],
+				"canDeleteMap": [
+					{
+						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
+						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
+					}
+				]
 			}
-		],
-		"updateCriteria": {
-			"managerOnly": false,
-			"collectionId": "",
-			"creatorOnly": false,
-			"firstComeFirstServe": false
-		},
-		"valueOptions": {
-			"noDuplicates": false,
-			"permanentOnceSet": false,
-			"expectUint": false,
-			"expectBoolean": false,
-			"expectAddress": false,
-			"expectUri": false
-		},
-		"defaultValue": "",
-		"metadataTimeline": [
-			{
-				"metadata": {
-					"uri": "",
-					"customData": ""
-				},
-				"timelineTimes": [`+getUintRangeSchema()+`]
-			}
-		],
-		"permissions": {
-			"canUpdateMetadata": [
-				{
-					"timelineTimes": [`+getUintRangeSchema()+`],
-					"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
-					"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canUpdateManager": [
-				{
-					"timelineTimes": [`+getUintRangeSchema()+`],
-					"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
-					"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canDeleteMap": [
-				{
-					"timelineTimes": [`+getUintRangeSchema()+`],
-					"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
-					"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
-				}
-			]
 		}
 	}`)
 
@@ -445,42 +472,29 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"mapId": "",
-			"updateManagerTimeline": false,
-			"managerTimeline": [
-				{
-					"manager": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateMetadataTimeline": false,
-			"metadataTimeline": [
-				{
-					"metadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
+			"updateManager": false,
+			"manager": "",
+			"updateMetadata": false,
+			"metadata": {
+				"uri": "",
+				"customData": ""
+			},
 			"updatePermissions": false,
 			"permissions": {
 				"canUpdateMetadata": [
 					{
-						"timelineTimes": [`+getUintRangeSchema()+`],
 						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
 						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 					}
 				],
 				"canUpdateManager": [
 					{
-						"timelineTimes": [`+getUintRangeSchema()+`],
 						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
 						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 					}
 				],
 				"canDeleteMap": [
 					{
-						"timelineTimes": [`+getUintRangeSchema()+`],
 						"permanentlyPermittedTimes": [`+getUintRangeSchema()+`],
 						"permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]
 					}
@@ -559,8 +573,7 @@ func GetSchemas() []string {
 					"addresses": [],
 					"whitelist": false,
 					"uri": "",
-					"customData": "",
-					"createdBy": ""
+					"customData": ""
 				}
 			]
 		}
@@ -590,7 +603,11 @@ func GetSchemas() []string {
 						"approvalId": "",
 						"approvalLevel": "",
 						"approverAddress": "",
-						"version": "0"
+						"version": "0",
+						"precalculationOptions": {
+							"overrideTimestamp": "0",
+							"tokenIdsOverride": [`+getUintRangeSchema()+`]
+						}
 					},
 					"merkleProofs": [
 						{
@@ -621,12 +638,7 @@ func GetSchemas() []string {
 					],
 					"onlyCheckPrioritizedCollectionApprovals": false,
 					"onlyCheckPrioritizedIncomingApprovals": false,
-					"onlyCheckPrioritizedOutgoingApprovals": false,
-					"precalculationOptions": {
-						"overrideTimestamp": "0",
-						"tokenIdsOverride": [`+getUintRangeSchema()+`]
-					},
-					"numAttempts": "0"
+					"onlyCheckPrioritizedOutgoingApprovals": false
 				}
 			]
 		}
@@ -656,61 +668,31 @@ func GetSchemas() []string {
 			"validTokenIds": [`+getUintRangeSchema()+`],
 			"updateCollectionPermissions": false,
 			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
-			"updateManagerTimeline": false,
-			"managerTimeline": [
+			"updateManager": false,
+			"manager": "",
+			"updateCollectionMetadata": false,
+			"collectionMetadata": {
+				"uri": "",
+				"customData": ""
+			},
+			"updateTokenMetadata": false,
+			"tokenMetadata": [
 				{
-					"manager": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateCollectionMetadataTimeline": false,
-			"collectionMetadataTimeline": [
-				{
-					"collectionMetadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateTokenMetadataTimeline": false,
-			"tokenMetadataTimeline": [
-				{
-					"tokenMetadata": [
-						{
-							"uri": "",
-							"customData": "",
-							"tokenIds": [`+getUintRangeSchema()+`]
-						}
-					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateCustomDataTimeline": false,
-			"customDataTimeline": [
-				{
+					"uri": "",
 					"customData": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
+					"tokenIds": [`+getUintRangeSchema()+`]
 				}
 			],
+			"updateCustomData": false,
+			"customData": "",
 			"updateCollectionApprovals": false,
 			"collectionApprovals": [
 				`+getCollectionApprovalSchema()+`
 			],
-			"updateStandardsTimeline": false,
-			"standardsTimeline": [
-				{
-					"standards": [],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateIsArchivedTimeline": false,
-			"isArchivedTimeline": [
-				{
-					"isArchived": false,
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
+			"updateStandards": false,
+			"standards": [],
+			"updateIsArchived": false,
+			"isArchived": false,
 			"mintEscrowCoinsToTransfer": [
 				{
 					"amount": "",
@@ -720,30 +702,53 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
+					"conversion": `+getConversionWithoutDenomSchema()+`,
+					"symbol": "",
+					"denomUnits": [
+							{
+								"decimals": "0",
+								"symbol": "",
+								"isDefaultDisplay": false,
+								"metadata": {
+									"uri": "",
+									"customData": ""
+								}
+						}
 					],
+					"allowOverrideWithAnyValidToken": false,
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
+				}
+			],
+			"aliasPathsToAdd": [
+				{
+					"denom": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
 					],
-					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"invariants": {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": "",
 				"cosmosCoinBackedPath": {
-					"ibcDenom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"ibcAmount": ""
+					"conversion": `+getConversionSchema()+`
 				},
 				"noForcefulPostMintTransfers": false,
 				"disablePoolCreation": false
@@ -796,54 +801,24 @@ func GetSchemas() []string {
 			},
 			"validTokenIds": [`+getUintRangeSchema()+`],
 			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
-			"managerTimeline": [
+			"manager": "",
+			"collectionMetadata": {
+				"uri": "",
+				"customData": ""
+			},
+			"tokenMetadata": [
 				{
-					"manager": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"collectionMetadataTimeline": [
-				{
-					"collectionMetadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"tokenMetadataTimeline": [
-				{
-					"tokenMetadata": [
-						{
-							"uri": "",
-							"customData": "",
-							"tokenIds": [`+getUintRangeSchema()+`]
-						}
-					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"customDataTimeline": [
-				{
+					"uri": "",
 					"customData": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
+					"tokenIds": [`+getUintRangeSchema()+`]
 				}
 			],
+			"customData": "",
 			"collectionApprovals": [
 				`+getCollectionApprovalSchema()+`
 			],
-			"standardsTimeline": [
-				{
-					"standards": [],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"isArchivedTimeline": [
-				{
-					"isArchived": false,
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
+			"standards": [],
+			"isArchived": false,
 			"mintEscrowCoinsToTransfer": [
 				{
 					"amount": "",
@@ -853,30 +828,53 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
 					],
 					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
+				}
+			],
+			"aliasPathsToAdd": [
+				{
+					"denom": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
+						}
+					],
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"invariants": {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": "",
 				"cosmosCoinBackedPath": {
-					"ibcDenom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"ibcAmount": ""
+					"conversion": `+getConversionSchema()+`
 				},
 				"noForcefulPostMintTransfers": false,
 				"disablePoolCreation": false
@@ -893,61 +891,31 @@ func GetSchemas() []string {
 			"validTokenIds": [`+getUintRangeSchema()+`],
 			"updateCollectionPermissions": false,
 			"collectionPermissions": `+getCollectionPermissionsSchema()+`,
-			"updateManagerTimeline": false,
-			"managerTimeline": [
+			"updateManager": false,
+			"manager": "",
+			"updateCollectionMetadata": false,
+			"collectionMetadata": {
+				"uri": "",
+				"customData": ""
+			},
+			"updateTokenMetadata": false,
+			"tokenMetadata": [
 				{
-					"manager": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateCollectionMetadataTimeline": false,
-			"collectionMetadataTimeline": [
-				{
-					"collectionMetadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateTokenMetadataTimeline": false,
-			"tokenMetadataTimeline": [
-				{
-					"tokenMetadata": [
-						{
-							"uri": "",
-							"customData": "",
-							"tokenIds": [`+getUintRangeSchema()+`]
-						}
-					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateCustomDataTimeline": false,
-			"customDataTimeline": [
-				{
+					"uri": "",
 					"customData": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
+					"tokenIds": [`+getUintRangeSchema()+`]
 				}
 			],
+			"updateCustomData": false,
+			"customData": "",
 			"updateCollectionApprovals": false,
 			"collectionApprovals": [
 				`+getCollectionApprovalSchema()+`
 			],
-			"updateStandardsTimeline": false,
-			"standardsTimeline": [
-				{
-					"standards": [],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"updateIsArchivedTimeline": false,
-			"isArchivedTimeline": [
-				{
-					"isArchived": false,
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
+			"updateStandards": false,
+			"standards": [],
+			"updateIsArchived": false,
+			"isArchived": false,
 			"mintEscrowCoinsToTransfer": [
 				{
 					"amount": "",
@@ -957,30 +925,53 @@ func GetSchemas() []string {
 			"cosmosCoinWrapperPathsToAdd": [
 				{
 					"denom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
+					"conversion": `+getConversionWithoutDenomSchema()+`,
 					"symbol": "",
 					"denomUnits": [
 						{
 							"decimals": "0",
 							"symbol": "",
-							"isDefaultDisplay": false
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
 						}
 					],
 					"allowOverrideWithAnyValidToken": false,
-					"allowCosmosWrapping": false
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
+				}
+			],
+			"aliasPathsToAdd": [
+				{
+					"denom": "",
+					"conversion": `+getConversionWithoutDenomSchema()+`,
+					"symbol": "",
+					"denomUnits": [
+						{
+							"decimals": "0",
+							"symbol": "",
+							"isDefaultDisplay": false,
+							"metadata": {
+								"uri": "",
+								"customData": ""
+							}
+						}
+					],
+					"metadata": {
+						"uri": "",
+						"customData": ""
+					}
 				}
 			],
 			"invariants": {
 				"noCustomOwnershipTimes": false,
 				"maxSupplyPerId": "",
 				"cosmosCoinBackedPath": {
-					"ibcDenom": "",
-					"balances": [
-						`+getBalanceSchema()+`
-					],
-					"ibcAmount": ""
+					"conversion": `+getConversionSchema()+`
 				},
 				"noForcefulPostMintTransfers": false,
 				"disablePoolCreation": false
@@ -992,7 +983,7 @@ func GetSchemas() []string {
 		"type": "badges/CreateDynamicStore",
 		"value": {
 			"creator": "",
-			"defaultValue": ""
+			"defaultValue": false
 		}
 	}`)
 
@@ -1001,7 +992,8 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"storeId": "",
-			"defaultValue": ""
+			"defaultValue": false,
+			"globalEnabled": false
 		}
 	}`)
 
@@ -1019,7 +1011,7 @@ func GetSchemas() []string {
 			"creator": "",
 			"storeId": "",
 			"address": "",
-			"value": ""
+			"value": false
 		}
 	}`)
 
@@ -1099,6 +1091,21 @@ func GetSchemas() []string {
 		}
 	}`)
 
+	// SendManager messages
+	schemas = append(schemas, `{
+		"type": "sendmanager/SendWithAliasRouting",
+		"value": {
+			"from_address": "",
+			"to_address": "",
+			"amount": [
+				{
+					"denom": "",
+					"amount": ""
+				}
+			]
+		}
+	}`)
+
 	// UniversalUpdateCollection helper message types
 	schemas = append(schemas, `{
 		"type": "badges/SetValidTokenIds",
@@ -1115,13 +1122,8 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"managerTimeline": [
-				{
-					"manager": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canUpdateManager": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"manager": "",
+			"canUpdateManager": [{"permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1130,16 +1132,11 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"collectionMetadataTimeline": [
-				{
-					"collectionMetadata": {
-						"uri": "",
-						"customData": ""
-					},
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canUpdateCollectionMetadata": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"collectionMetadata": {
+				"uri": "",
+				"customData": ""
+			},
+			"canUpdateCollectionMetadata": [{"permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1148,18 +1145,14 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"tokenMetadataTimeline": [
+			"tokenMetadata": [
 				{
-					"tokenMetadata": [
-						{
-							"uri": "",
-							"customData": ""
-						}
-					],
-					"timelineTimes": [`+getUintRangeSchema()+`]
+					"uri": "",
+					"customData": "",
+					"tokenIds": [`+getUintRangeSchema()+`]
 				}
 			],
-			"canUpdateTokenMetadata": [{"tokenIds": [`+getUintRangeSchema()+`], "timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"canUpdateTokenMetadata": [{"tokenIds": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1168,13 +1161,8 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"customDataTimeline": [
-				{
-					"customData": "",
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canUpdateCustomData": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"customData": "",
+			"canUpdateCustomData": [{"permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1183,13 +1171,8 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"standardsTimeline": [
-				{
-					"standards": [],
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canUpdateStandards": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"standards": [],
+			"canUpdateStandards": [{"permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
 		}
 	}`)
 
@@ -1210,13 +1193,21 @@ func GetSchemas() []string {
 		"value": {
 			"creator": "",
 			"collectionId": "",
-			"isArchivedTimeline": [
-				{
-					"isArchived": false,
-					"timelineTimes": [`+getUintRangeSchema()+`]
-				}
-			],
-			"canArchiveCollection": [{"timelineTimes": [`+getUintRangeSchema()+`], "permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+			"isArchived": false,
+			"canArchiveCollection": [{"permanentlyPermittedTimes": [`+getUintRangeSchema()+`], "permanentlyForbiddenTimes": [`+getUintRangeSchema()+`]}]
+		}
+	}`)
+
+	schemas = append(schemas, `{
+		"type": "badges/CastVote",
+		"value": {
+			"creator": "",
+			"collectionId": "",
+			"approvalLevel": "",
+			"approverAddress": "",
+			"approvalId": "",
+			"proposalId": "",
+			"yesWeight": ""
 		}
 	}`)
 
@@ -1287,22 +1278,23 @@ func GetSchemas() []string {
 				"validTokenIds": [`+getUintRangeSchema()+`],
 				"updateCollectionPermissions": false,
 				"collectionPermissions": `+getCollectionPermissionsSchema()+`,
-				"updateManagerTimeline": false,
-				"managerTimeline": [{"manager": "", "timelineTimes": [`+getUintRangeSchema()+`]}],
-				"updateCollectionMetadataTimeline": false,
-				"collectionMetadataTimeline": [{"collectionMetadata": {"uri": "", "customData": ""}, "timelineTimes": [`+getUintRangeSchema()+`]}],
-				"updateTokenMetadataTimeline": false,
-				"tokenMetadataTimeline": [{"tokenMetadata": [{"uri": "", "customData": "", "tokenIds": [`+getUintRangeSchema()+`]}], "timelineTimes": [`+getUintRangeSchema()+`]}],
-				"updateCustomDataTimeline": false,
-				"customDataTimeline": [{"customData": "", "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateManager": false,
+				"manager": "",
+				"updateCollectionMetadata": false,
+				"collectionMetadata": {"uri": "", "customData": ""},
+				"updateTokenMetadata": false,
+				"tokenMetadata": [{"uri": "", "customData": "", "tokenIds": [`+getUintRangeSchema()+`]}],
+				"updateCustomData": false,
+				"customData": "",
 				"updateCollectionApprovals": false,
 				"collectionApprovals": [`+getCollectionApprovalSchema()+`],
-				"updateStandardsTimeline": false,
-				"standardsTimeline": [{"standards": [], "timelineTimes": [`+getUintRangeSchema()+`]}],
-				"updateIsArchivedTimeline": false,
-				"isArchivedTimeline": [{"isArchived": false, "timelineTimes": [`+getUintRangeSchema()+`]}],
+				"updateStandards": false,
+				"standards": [],
+				"updateIsArchived": false,
+				"isArchived": false,
 				"mintEscrowCoinsToTransfer": [{"amount": "", "denom": ""}],
-				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "balances": [`+getBalanceSchema()+`], "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false}], "allowOverrideWithAnyValidToken": false, "allowCosmosWrapping": false}],
+				"cosmosCoinWrapperPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false, "metadata": {"uri": "", "customData": ""}}], "allowOverrideWithAnyValidToken": false, "metadata": {"uri": "", "customData": ""}}],
+				"aliasPathsToAdd": [{"denom": "", "conversion": `+getConversionWithoutDenomSchema()+`, "symbol": "", "denomUnits": [{"decimals": "0", "symbol": "", "isDefaultDisplay": false, "metadata": {"uri": "", "customData": ""}}], "metadata": {"uri": "", "customData": ""}}],
 				"invariants": {"noCustomOwnershipTimes": false, "maxSupplyPerId": "", "disablePoolCreation": false}
 			}
 		}

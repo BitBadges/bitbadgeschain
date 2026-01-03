@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -23,8 +22,8 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Parse collection ID from denom (format: badges:COLL_ID:*)
-	if !strings.HasPrefix(req.Denom, "badges:") && !strings.HasPrefix(req.Denom, "badgeslp:") {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "denom must start with 'badges:' or 'badgeslp:'")
+	if !strings.HasPrefix(req.Denom, WrappedDenomPrefix) && !strings.HasPrefix(req.Denom, AliasDenomPrefix) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "denom must start with '%s' or '%s'", WrappedDenomPrefix, AliasDenomPrefix)
 	}
 
 	parts := strings.Split(req.Denom, ":")
@@ -45,14 +44,14 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	}
 
 	// Find the corresponding cosmos wrapper path
-	wrapperPath, err := k.getCorrespondingWrapperPath(collection, req.Denom)
+	path, err := GetCorrespondingAliasPath(collection, req.Denom)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "wrapper path not found for denom: %s", req.Denom)
 	}
 
 	// Get user's native balances (non-wrapped)
 	userBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
-	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, wrapperPath.Balances)
+	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(err, "error calculating max wrappable amount")
 	}
@@ -62,126 +61,74 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	}, nil
 }
 
-// getCorrespondingWrapperPath finds the wrapper path that matches the given denom
-func (k Keeper) getCorrespondingWrapperPath(collection *types.TokenCollection, denom string) (*types.CosmosCoinWrapperPath, error) {
-	parts := strings.Split(denom, ":")
-	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid denom format")
-	}
-	baseDenom := parts[2]
-
-	// Extract numeric string from base denom for {id} placeholder replacement
-	numericStr := ""
-	for _, char := range baseDenom {
-		if char >= '0' && char <= '9' {
-			numericStr += string(char)
-		}
+// calculateMaxWrappableAmount calculates the maximum amount that can be wrapped.
+//
+// The conversion rate is: 1 x { amount: path.Conversion.SideA.Amount, denom } = 1 x path.Conversion.SideB
+//
+// Algorithm:
+// 1. For each balance in path.Conversion.SideB, find the corresponding user balance (matching token IDs and ownership times)
+// 2. Calculate how many times that path balance can fit: userBalance.Amount / pathBalance.Amount
+// 3. Take the minimum across all path balances (since we need all of them to perform a conversion)
+// 4. Multiply by path.Conversion.SideA.Amount to get the total wrappable amount
+func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*types.Balance, path *types.AliasPath) (sdkmath.Uint, error) {
+	if path.Conversion == nil || path.Conversion.SideA == nil {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "conversion or sideA is nil")
 	}
 
-	cosmosPaths := collection.CosmosCoinWrapperPaths
-	for _, path := range cosmosPaths {
-		// Handle {id} placeholder replacement
-		if path.AllowOverrideWithAnyValidToken && strings.Contains(path.Denom, "{id}") {
-			if numericStr == "" {
-				continue // Skip if no numeric part found
-			}
-
-			idFromDenom := sdkmath.NewUintFromString(numericStr)
-			replacedDenom := strings.ReplaceAll(path.Denom, "{id}", idFromDenom.String())
-			if replacedDenom == baseDenom {
-				return path, nil
-			}
-		} else if path.Denom == baseDenom {
-			return path, nil
-		}
-	}
-
-	return nil, fmt.Errorf("path not found for denom: %s", denom)
-}
-
-// calculateMaxWrappableAmount calculates the maximum amount that can be wrapped
-// by trying different amounts and checking if the user has enough balances to cover the conversion
-func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*types.Balance, wrapperPathBalances []*types.Balance) (sdkmath.Uint, error) {
-	if len(wrapperPathBalances) == 0 {
+	if len(path.Conversion.SideB) == 0 {
 		return sdkmath.NewUint(0), nil
 	}
 
-	// Get all token IDs and ownership times from wrapper path balances
-	var allTokenIds []*types.UintRange
-	var allOwnershipTimes []*types.UintRange
-
-	for _, wrapperBalance := range wrapperPathBalances {
-		allTokenIds = append(allTokenIds, wrapperBalance.TokenIds...)
-		allOwnershipTimes = append(allOwnershipTimes, wrapperBalance.OwnershipTimes...)
+	if path.Conversion.SideA.Amount.IsZero() || path.Conversion.SideA.Amount.IsNil() {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrInvalidRequest, "path amount is zero")
 	}
 
-	allTokenIds, err := types.SortUintRangesAndMerge(allTokenIds, true)
-	if err != nil {
-		return sdkmath.NewUint(0), err
-	}
+	// Track the minimum number of conversions possible across all path balances
+	// We need all path balances to perform a conversion, so we're limited by the scarcest one
+	var minConversions *sdkmath.Uint
 
-	allOwnershipTimes, err = types.SortUintRangesAndMerge(allOwnershipTimes, true)
-	if err != nil {
-		return sdkmath.NewUint(0), err
-	}
-
-	// Get user balances for the wrapper path token IDs and ownership times
-	balancesForIds, err := types.GetBalancesForIds(ctx, allTokenIds, allOwnershipTimes, userBalances)
-	if err != nil {
-		return sdkmath.NewUint(0), err
-	}
-
-	// Filter out zero balances
-	balancesForIds = types.FilterZeroBalances(balancesForIds)
-	if len(balancesForIds) == 0 {
-		return sdkmath.NewUint(0), nil
-	}
-
-	// Get all potential amounts from user balances and sort from largest to smallest
-	var potentialAmounts []sdkmath.Uint
-	for _, balance := range balancesForIds {
-		potentialAmounts = append(potentialAmounts, balance.Amount)
-	}
-
-	// Sort from largest to smallest
-	for i := 0; i < len(potentialAmounts); i++ {
-		for j := i + 1; j < len(potentialAmounts); j++ {
-			if potentialAmounts[i].LT(potentialAmounts[j]) {
-				potentialAmounts[i], potentialAmounts[j] = potentialAmounts[j], potentialAmounts[i]
-			}
-		}
-	}
-
-	alreadyChecked := make(map[string]bool)
-
-	// Find the largest amount that is less than or equal to the conversion amount
-	for _, amount := range potentialAmounts {
-		if alreadyChecked[amount.String()] {
-			continue
-		}
-		alreadyChecked[amount.String()] = true
-
-		// Create conversion balances by multiplying wrapper path balances by the amount
-		var conversionBalances []*types.Balance
-		for _, wrapperBalance := range wrapperPathBalances {
-			conversionBalance := &types.Balance{
-				Amount:         wrapperBalance.Amount.Mul(amount),
-				TokenIds:       wrapperBalance.TokenIds,
-				OwnershipTimes: wrapperBalance.OwnershipTimes,
-			}
-			conversionBalances = append(conversionBalances, conversionBalance)
+	// For each balance required by the path, find how many conversions are possible
+	for _, pathBalance := range path.Conversion.SideB {
+		// Calculate how many times this path balance can fit into the user's total balance
+		// If pathBalance.Amount is zero, we can't perform any conversions
+		if pathBalance.Amount.IsZero() {
+			return sdkmath.NewUint(0), nil
 		}
 
-		// Clone user balances and subtract conversion balances
-		userBalancesClone := types.DeepCopyBalances(userBalances)
-		userBalancesClone, err = types.SubtractBalances(ctx, conversionBalances, userBalancesClone)
+		// Get user balances that match this path balance's token IDs and ownership times
+		userBalancesForPath, err := types.GetBalancesForIds(ctx, pathBalance.TokenIds, pathBalance.OwnershipTimes, userBalances)
 		if err != nil {
-			continue // Skip this amount if subtraction fails
+			return sdkmath.NewUint(0), err
 		}
 
-		// If no error, no underflow and they have enough
-		return amount, nil
+		// If multiple balances are returned, they represent different ID/time combinations.
+		// We need to take the minimum amount, as each balance represents a different combination
+		// and we can only use the amount available for the specific ID/time combination we need.
+		if len(userBalancesForPath) == 0 {
+			return sdkmath.NewUint(0), nil
+		}
+
+		var minUserAmount sdkmath.Uint = userBalancesForPath[0].Amount
+		for i := 1; i < len(userBalancesForPath); i++ {
+			if userBalancesForPath[i].Amount.LT(minUserAmount) {
+				minUserAmount = userBalancesForPath[i].Amount
+			}
+		}
+
+		conversionsForThisBalance := minUserAmount.Quo(pathBalance.Amount)
+
+		// Update minimum conversions (first iteration or if this is smaller)
+		if minConversions == nil || conversionsForThisBalance.LT(*minConversions) {
+			minConversions = &conversionsForThisBalance
+		}
 	}
 
-	return sdkmath.NewUint(0), nil
+	// If we couldn't perform any conversions, return 0
+	if minConversions == nil {
+		return sdkmath.NewUint(0), nil
+	}
+
+	// Multiply by path.Conversion.SideA.Amount to get the total wrappable amount
+	// This represents how many wrapped units (denom with amount path.Conversion.SideA.Amount) can be created
+	return minConversions.Mul(path.Conversion.SideA.Amount), nil
 }

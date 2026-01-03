@@ -3,7 +3,6 @@ package cli
 import (
 	"strconv"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -16,12 +15,22 @@ var _ = strconv.Itoa(0)
 
 func CmdUpdateDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-dynamic-store [store-id] [default-value]",
+		Use:   "update-dynamic-store [store-id] [default-value] [global-enabled]",
 		Short: "Broadcast message updateDynamicStore",
-		Args:  cobra.ExactArgs(2),
+		Long: `Update a dynamic store. 
+		
+Arguments:
+  store-id: The ID of the dynamic store to update
+  default-value: The default value for uninitialized addresses (true/false)
+  global-enabled: The global kill switch state (true = enabled, false = disabled/halted)`,
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argStoreId := types.NewUintFromString(args[0])
-			defaultValue, err := strconv.ParseUint(args[1], 10, 64)
+			defaultValue, err := strconv.ParseBool(args[1])
+			if err != nil {
+				return err
+			}
+			globalEnabled, err := strconv.ParseBool(args[2])
 			if err != nil {
 				return err
 			}
@@ -31,10 +40,11 @@ func CmdUpdateDynamicStore() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateDynamicStore(
+			msg := types.NewMsgUpdateDynamicStoreWithGlobalEnabled(
 				clientCtx.GetFromAddress().String(),
 				argStoreId,
-				sdkmath.NewUint(defaultValue),
+				defaultValue,
+				globalEnabled,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

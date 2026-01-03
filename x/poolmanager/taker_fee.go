@@ -150,7 +150,7 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
 	}
 
-	err = k.gammKeeper.FundCommunityPoolWithWrapping(ctx, sender, sdk.NewCoins(takerFeeCoin))
+	err = k.gammKeeper.FundCommunityPoolWithAliasRouting(ctx, sender, sdk.NewCoins(takerFeeCoin))
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}

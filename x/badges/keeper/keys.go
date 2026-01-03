@@ -27,6 +27,7 @@ var (
 	ETHSignatureTrackerKey     = []byte{0x10}
 	ReservedProtocolAddressKey = []byte{0x11}
 	PoolAddressCacheKey        = []byte{0x13}
+	VotingTrackerKey           = []byte{0x14}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 	BackedPathGenerationPrefix  = []byte{0x12}
@@ -101,12 +102,29 @@ func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallen
 		codeLeafIndex.String())
 }
 
+// ConstructETHSignatureTrackerKey constructs a unique key for tracking ETH signature usage.
+// The key includes: collectionId, approverAddress (addressForChallenge), approvalLevel, approvalId, challengeId, and the signature itself.
+// This key is used to track how many times a specific signature has been used for a given approval/challenge context.
+// Note: The signature field in the tracker key is the actual signature bytes (from the proof), not part of what gets signed.
+// The signed message includes: nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
 func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, signature string) string {
 	collection_id_str := collectionId.String()
 	challenge_id_str := challengeId
 	address_for_challenge_str := addressForChallenge
 	challenge_level_str := approvalLevel
 	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + signature
+}
+
+// ConstructVotingTrackerKey constructs a unique key for tracking votes.
+// The key includes: collectionId, approverAddress, approvalLevel, approvalId, proposalId, and voterAddress.
+// This key is used to store and retrieve votes for a given voting challenge.
+func ConstructVotingTrackerKey(collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string, voterAddress string) string {
+	collection_id_str := collectionId.String()
+	proposal_id_str := proposalId
+	approver_address_str := approverAddress
+	approval_level_str := approvalLevel
+	voter_address_str := voterAddress
+	return collection_id_str + BalanceKeyDelimiter + approver_address_str + BalanceKeyDelimiter + approval_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposal_id_str + BalanceKeyDelimiter + voter_address_str
 }
 
 // Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.
@@ -229,6 +247,13 @@ func ethSignatureTrackerStoreKey(ethSignatureTrackerKey string) []byte {
 	key := make([]byte, len(ETHSignatureTrackerKey)+len(ethSignatureTrackerKey))
 	copy(key, ETHSignatureTrackerKey)
 	copy(key[len(ETHSignatureTrackerKey):], []byte(ethSignatureTrackerKey))
+	return key
+}
+
+func votingTrackerStoreKey(votingTrackerKey string) []byte {
+	key := make([]byte, len(VotingTrackerKey)+len(votingTrackerKey))
+	copy(key, VotingTrackerKey)
+	copy(key[len(VotingTrackerKey):], []byte(votingTrackerKey))
 	return key
 }
 

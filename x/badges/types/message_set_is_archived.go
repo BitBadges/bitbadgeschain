@@ -8,11 +8,11 @@ const TypeMsgSetIsArchived = "set_is_archived"
 
 var _ sdk.Msg = &MsgSetIsArchived{}
 
-func NewMsgSetIsArchived(creator string, collectionId Uint, isArchivedTimeline []*IsArchivedTimeline, canArchiveCollection []*TimedUpdatePermission) *MsgSetIsArchived {
+func NewMsgSetIsArchived(creator string, collectionId Uint, isArchived bool, canArchiveCollection []*ActionPermission) *MsgSetIsArchived {
 	return &MsgSetIsArchived{
 		Creator:              creator,
 		CollectionId:         collectionId,
-		IsArchivedTimeline:   isArchivedTimeline,
+		IsArchived:           isArchived,
 		CanArchiveCollection: canArchiveCollection,
 	}
 }
@@ -51,8 +51,8 @@ func (msg *MsgSetIsArchived) ToUniversalUpdateCollection() (*MsgUniversalUpdateC
 	ms := &MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateIsArchivedTimeline:    true,
-		IsArchivedTimeline:          msg.IsArchivedTimeline,
+		UpdateIsArchived:            true,
+		IsArchived:                  msg.IsArchived,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
 			CanArchiveCollection: msg.CanArchiveCollection,

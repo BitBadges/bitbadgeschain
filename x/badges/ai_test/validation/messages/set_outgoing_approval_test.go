@@ -1,0 +1,173 @@
+package messages
+
+import (
+	"math"
+	"testing"
+
+	sdkmath "cosmossdk.io/math"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bitbadges/bitbadgeschain/x/badges/ai_test/validation"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+)
+
+func init() {
+	// Ensure SDK config is initialized for address validation
+	validation.EnsureSDKConfig()
+}
+
+// ============================================================================
+// Creator Address Validation
+// ============================================================================
+
+func TestMsgSetOutgoingApproval_ValidateBasic_InvalidCreator(t *testing.T) {
+	msg := &types.MsgSetOutgoingApproval{
+		Creator:      "invalid_address",
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "test_approval",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			TokenIds: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)},
+			},
+			TransferTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{},
+			Version:          sdkmath.NewUint(0),
+		},
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "invalid creator should fail")
+}
+
+// ============================================================================
+// Collection ID Validation
+// ============================================================================
+
+func TestMsgSetOutgoingApproval_ValidateBasic_NilCollectionId(t *testing.T) {
+	msg := &types.MsgSetOutgoingApproval{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		CollectionId: sdkmath.Uint{},
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "test_approval",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			TokenIds: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)},
+			},
+			TransferTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{},
+			Version:          sdkmath.NewUint(0),
+		},
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "nil collection ID should fail")
+}
+
+func TestMsgSetOutgoingApproval_ValidateBasic_ZeroCollectionId(t *testing.T) {
+	msg := &types.MsgSetOutgoingApproval{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		CollectionId: sdkmath.NewUint(0),
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "test_approval",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			TokenIds: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)},
+			},
+			TransferTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{},
+			Version:          sdkmath.NewUint(0),
+		},
+	}
+
+	// Collection ID 0 is allowed for auto-prev resolution (checks happen later)
+	err := msg.ValidateBasic()
+	require.NoError(t, err, "zero collection ID is allowed for auto-prev")
+}
+
+// ============================================================================
+// Approval Validation
+// ============================================================================
+
+func TestMsgSetOutgoingApproval_ValidateBasic_NilApproval(t *testing.T) {
+	msg := &types.MsgSetOutgoingApproval{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		CollectionId: sdkmath.NewUint(1),
+		Approval:     nil,
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "nil approval should fail")
+	require.Contains(t, err.Error(), "cannot be nil", "error should mention cannot be nil")
+}
+
+func TestMsgSetOutgoingApproval_ValidateBasic_InvalidApproval(t *testing.T) {
+	msg := &types.MsgSetOutgoingApproval{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "", // Invalid: empty approval ID
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			TokenIds: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)},
+			},
+			TransferTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{},
+			Version:          sdkmath.NewUint(0),
+		},
+	}
+
+	err := msg.ValidateBasic()
+	require.Error(t, err, "invalid approval should fail")
+}
+
+func TestMsgSetOutgoingApproval_ValidateBasic_ValidApproval(t *testing.T) {
+	msg := &types.MsgSetOutgoingApproval{
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserOutgoingApproval{
+			ApprovalId:        "test_approval",
+			ToListId:          "All",
+			InitiatedByListId: "All",
+			TokenIds: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)},
+			},
+			TransferTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
+			},
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{},
+			Version:          sdkmath.NewUint(0),
+		},
+	}
+
+	err := msg.ValidateBasic()
+	require.NoError(t, err, "valid approval should pass")
+}
+

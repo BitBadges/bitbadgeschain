@@ -55,7 +55,7 @@ func SetDeterministicError(ctx sdk.Context, errorMsg string) {
 func GetDeterministicError(ctx sdk.Context) (string, bool) {
 	store := ctx.TransientStore(TransientStoreKey)
 	value := store.Get(DeterministicErrorKey)
-	if value == nil || len(value) == 0 {
+	if len(value) == 0 {
 		return "", false
 	}
 	return string(value), true
@@ -184,10 +184,23 @@ type Affiliate struct {
 	Address        string `json:"address"`
 }
 
+const (
+	// MaxMemoSize is the maximum size (in bytes) for IBC memo data
+	// Security: LOW-009 - Prevents DoS attacks via extremely large memo payloads
+	// 64KB is a reasonable limit that allows most legitimate memos while preventing abuse
+	MaxMemoSize = 64 * 1024 // 64KB
+)
+
 // ParseHookDataFromMemo parses hook data from IBC memo
+// Security: LOW-009 - Validates memo size before unmarshaling to prevent DoS attacks
 func ParseHookDataFromMemo(memo string) (*HookData, error) {
 	if len(memo) == 0 {
 		return nil, nil
+	}
+
+	// Security: Validate memo size before unmarshaling to prevent DoS
+	if len(memo) > MaxMemoSize {
+		return nil, fmt.Errorf("memo size exceeds maximum allowed size: %d bytes (max: %d bytes)", len(memo), MaxMemoSize)
 	}
 
 	var memoObj map[string]interface{}

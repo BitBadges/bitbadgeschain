@@ -95,6 +95,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(err)
 		}
 	}
+
+	// Initialize voting trackers
+	for idx, vote := range genState.VotingTrackers {
+		if err := k.SetVoteInStore(ctx, genState.VotingTrackerStoreKeys[idx], vote); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -130,6 +137,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	// Export ETH signature trackers
 	genesis.EthSignatureTrackers, genesis.EthSignatureTrackerStoreKeys = k.GetETHSignatureTrackersFromStore(ctx)
+
+	// Export voting trackers
+	genesis.VotingTrackers, genesis.VotingTrackerStoreKeys = k.GetVotesFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

@@ -10,6 +10,7 @@ import "badges/address_lists.proto";
 import "badges/dynamic_stores.proto";
 import "badges/user_balance_store.proto";
 import "badges/approval_tracking.proto";
+import "badges/challenges.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types";
@@ -34,5 +35,7 @@ message GenesisState {
   repeated DynamicStoreValue dynamicStoreValues = 16;
   repeated string ethSignatureTrackers = 17 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   repeated string ethSignatureTrackerStoreKeys = 18;
+  repeated VoteProof votingTrackers = 19;
+  repeated string votingTrackerStoreKeys = 20;
   // this line is used by starport scaffolding # genesis/proto/state
 }

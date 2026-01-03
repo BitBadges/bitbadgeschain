@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,20 +25,22 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateCustomDataTimeline:    true,
-		CustomDataTimeline:          msg.CustomDataTimeline,
+		UpdateCustomData:            true,
+		CustomData:                  msg.CustomData,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateCustomData: msg.CanUpdateCustomData,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:          collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:         collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateStandards:           collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateManager:             collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidTokenIds:       collection.CollectionPermissions.CanUpdateValidTokenIds,
-			CanUpdateCollectionMetadata:  collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateTokenMetadata:       collection.CollectionPermissions.CanUpdateTokenMetadata,
-			CanUpdateCollectionApprovals: collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanDeleteCollection:                collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:                collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:                  collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateManager:                    collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidTokenIds:              collection.CollectionPermissions.CanUpdateValidTokenIds,
+			CanUpdateCollectionMetadata:         collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateTokenMetadata:              collection.CollectionPermissions.CanUpdateTokenMetadata,
+			CanUpdateCollectionApprovals:        collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanAddMoreAliasPaths:                collection.CollectionPermissions.CanAddMoreAliasPaths,
+			CanAddMoreCosmosCoinWrapperPaths:    collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths,
 		},
 	}
 
@@ -49,7 +50,7 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 		return nil, err
 	}
 
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_custom_data"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 	)
 
 	return &types.MsgSetCustomDataResponse{

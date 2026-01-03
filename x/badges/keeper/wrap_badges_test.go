@@ -14,14 +14,18 @@ func (suite *TestSuite) TestWrapTokens() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "test-coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -60,6 +64,7 @@ func (suite *TestSuite) TestWrapTokens() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -88,7 +93,7 @@ func (suite *TestSuite) TestWrapTokens() {
 
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting user address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, collection.CosmosCoinWrapperPaths[0])
+	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, collection.CosmosCoinWrapperPaths[0])
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
@@ -109,6 +114,7 @@ func (suite *TestSuite) TestWrapTokens() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -131,14 +137,18 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "test-coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -172,6 +182,8 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 	}
 
 	// Test more than one balance
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -184,6 +196,7 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 					TokenIds:       GetOneUintRange(),
 					OwnershipTimes: GetFullUintRanges(),
 				}),
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -200,9 +213,10 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:        bob,
-				ToAddresses: []string{denomAddress},
-				Balances:    newBalancesClone,
+				From:                 bob,
+				ToAddresses:          []string{denomAddress},
+				Balances:             newBalancesClone,
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -217,9 +231,10 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				From:        bob,
-				ToAddresses: []string{denomAddress},
-				Balances:    newBalancesClone,
+				From:                 bob,
+				ToAddresses:          []string{denomAddress},
+				Balances:             newBalancesClone,
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -233,14 +248,18 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "test-coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -279,6 +298,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -307,7 +327,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting user address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, collection.CosmosCoinWrapperPaths[0])
+	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, collection.CosmosCoinWrapperPaths[0])
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
@@ -334,12 +354,15 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Error(err, "Error unwrapping tokens")
 
 	// Unwrap the tokens - alice should succeed
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      alice,
 		CollectionId: sdkmath.NewUint(1),
@@ -354,6 +377,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})

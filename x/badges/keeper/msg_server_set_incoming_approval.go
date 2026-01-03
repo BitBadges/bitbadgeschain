@@ -2,11 +2,8 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
-	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,14 +17,9 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 		return nil, err
 	}
 
-	collectionId := msg.CollectionId
-	if collectionId.Equal(sdkmath.NewUint(0)) {
-		nextCollectionId := k.GetNextCollectionId(ctx)
-		// Prevent underflow by checking if nextCollectionId is greater than 0
-		if nextCollectionId.IsZero() {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "cannot calculate collection ID: next collection ID is zero")
-		}
-		collectionId = nextCollectionId.Sub(sdkmath.NewUint(1))
+	collectionId, err := k.resolveCollectionIdWithAutoPrev(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
 	}
 
 	// Get current user balance to build the new approval list
@@ -77,7 +69,7 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 	}
 
 	// Emit events
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +78,7 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_incoming_approval"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 

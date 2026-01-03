@@ -41,6 +41,7 @@ require (
 )
 
 require (
+	cosmossdk.io/collections v1.2.1
 	cosmossdk.io/errors v1.0.2
 	cosmossdk.io/math v1.5.3
 	cosmossdk.io/x/tx v0.14.0
@@ -93,7 +94,6 @@ require (
 	cloud.google.com/go/storage v1.57.2 // indirect
 	connectrpc.com/connect v1.18.1 // indirect
 	connectrpc.com/otelconnect v0.7.2 // indirect
-	cosmossdk.io/collections v1.2.1 // indirect
 	cosmossdk.io/schema v1.1.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect

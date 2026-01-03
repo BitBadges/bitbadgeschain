@@ -8,11 +8,11 @@ const TypeMsgSetCollectionMetadata = "set_collection_metadata"
 
 var _ sdk.Msg = &MsgSetCollectionMetadata{}
 
-func NewMsgSetCollectionMetadata(creator string, collectionId Uint, collectionMetadataTimeline []*CollectionMetadataTimeline, canUpdateCollectionMetadata []*TimedUpdatePermission) *MsgSetCollectionMetadata {
+func NewMsgSetCollectionMetadata(creator string, collectionId Uint, collectionMetadata *CollectionMetadata, canUpdateCollectionMetadata []*ActionPermission) *MsgSetCollectionMetadata {
 	return &MsgSetCollectionMetadata{
 		Creator:                     creator,
 		CollectionId:                collectionId,
-		CollectionMetadataTimeline:  collectionMetadataTimeline,
+		CollectionMetadata:          collectionMetadata,
 		CanUpdateCollectionMetadata: canUpdateCollectionMetadata,
 	}
 }
@@ -49,11 +49,11 @@ func (msg *MsgSetCollectionMetadata) ValidateBasic() error {
 
 func (msg *MsgSetCollectionMetadata) ToUniversalUpdateCollection() (*MsgUniversalUpdateCollection, error) {
 	ms := &MsgUniversalUpdateCollection{
-		Creator:                          msg.Creator,
-		CollectionId:                     msg.CollectionId,
-		UpdateCollectionMetadataTimeline: true,
-		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
-		UpdateCollectionPermissions:      true,
+		Creator:                     msg.Creator,
+		CollectionId:                msg.CollectionId,
+		UpdateCollectionMetadata:    true,
+		CollectionMetadata:          msg.CollectionMetadata,
+		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
 			CanUpdateCollectionMetadata: msg.CanUpdateCollectionMetadata,
 		},

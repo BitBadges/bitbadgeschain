@@ -42,60 +42,6 @@ func (k Keeper) ValidateTokenIdsActionPermissionUpdate(ctx sdk.Context, oldPermi
 	return nil
 }
 
-func (k Keeper) ValidateTimedUpdatePermissionUpdate(ctx sdk.Context, oldPermissions []*types.TimedUpdatePermission, newPermissions []*types.TimedUpdatePermission) error {
-	if err := types.ValidateTimedUpdatePermission(oldPermissions, true); err != nil {
-		return err
-	}
-
-	if err := types.ValidateTimedUpdatePermission(newPermissions, true); err != nil {
-		return err
-	}
-
-	castedOldPermissions, err := k.CastTimedUpdatePermissionToUniversalPermission(oldPermissions)
-	if err != nil {
-		return err
-	}
-
-	castedNewPermissions, err := k.CastTimedUpdatePermissionToUniversalPermission(newPermissions)
-	if err != nil {
-		return err
-	}
-
-	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (k Keeper) ValidateTimedUpdateWithTokenIdsPermissionUpdate(ctx sdk.Context, oldPermissions []*types.TimedUpdateWithTokenIdsPermission, newPermissions []*types.TimedUpdateWithTokenIdsPermission) error {
-	if err := types.ValidateTimedUpdateWithTokenIdsPermission(oldPermissions, true); err != nil {
-		return err
-	}
-
-	if err := types.ValidateTimedUpdateWithTokenIdsPermission(newPermissions, true); err != nil {
-		return err
-	}
-
-	castedOldPermissions, err := k.CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(oldPermissions)
-	if err != nil {
-		return err
-	}
-
-	castedNewPermissions, err := k.CastTimedUpdateWithTokenIdsPermissionToUniversalPermission(newPermissions)
-	if err != nil {
-		return err
-	}
-
-	err = types.ValidateUniversalPermissionUpdate(ctx, types.GetFirstMatchOnly(ctx, castedOldPermissions), types.GetFirstMatchOnly(ctx, castedNewPermissions))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (k Keeper) ValidateCollectionApprovalPermissionsUpdate(ctx sdk.Context, oldPermissions []*types.CollectionApprovalPermission, newPermissions []*types.CollectionApprovalPermission) error {
 	if err := types.ValidateCollectionApprovalPermissions(oldPermissions, true); err != nil {
 		return err
@@ -250,23 +196,23 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateManager, newPermissions.CanUpdateManager); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateCustomData, newPermissions.CanUpdateCustomData); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateStandards, newPermissions.CanUpdateStandards); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateStandards, newPermissions.CanUpdateStandards); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanArchiveCollection, newPermissions.CanArchiveCollection); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanArchiveCollection, newPermissions.CanArchiveCollection); err != nil {
 		return err
 	}
 
-	if err := k.ValidateTimedUpdatePermissionUpdate(ctx, oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanUpdateCollectionMetadata, newPermissions.CanUpdateCollectionMetadata); err != nil {
 		return err
 	}
 
@@ -274,11 +220,19 @@ func (k Keeper) ValidatePermissionsUpdate(ctx sdk.Context, oldPermissions *types
 		return err
 	}
 
-	if err := k.ValidateTimedUpdateWithTokenIdsPermissionUpdate(ctx, oldPermissions.CanUpdateTokenMetadata, newPermissions.CanUpdateTokenMetadata); err != nil {
+	if err := k.ValidateTokenIdsActionPermissionUpdate(ctx, oldPermissions.CanUpdateTokenMetadata, newPermissions.CanUpdateTokenMetadata); err != nil {
 		return err
 	}
 
 	if err := k.ValidateCollectionApprovalPermissionsUpdate(ctx, oldPermissions.CanUpdateCollectionApprovals, newPermissions.CanUpdateCollectionApprovals); err != nil {
+		return err
+	}
+
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanAddMoreAliasPaths, newPermissions.CanAddMoreAliasPaths); err != nil {
+		return err
+	}
+
+	if err := k.ValidateActionPermissionUpdate(ctx, oldPermissions.CanAddMoreCosmosCoinWrapperPaths, newPermissions.CanAddMoreCosmosCoinWrapperPaths); err != nil {
 		return err
 	}
 

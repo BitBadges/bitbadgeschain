@@ -131,7 +131,7 @@ func NewAppModule(
 	}
 }
 
-const ConsensusVersion = 21
+const ConsensusVersion = 22
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
@@ -208,6 +208,7 @@ type ModuleInputs struct {
 	AccountKeeper      types.AccountKeeper
 	BankKeeper         types.BankKeeper
 	DistributionKeeper types.DistributionKeeper
+	SendManagerKeeper  types.SendManagerKeeper
 
 	IBCKeeperFn        func() *ibckeeper.Keeper                   `optional:"true"`
 	CapabilityScopedFn func(string) capabilitykeeper.ScopedKeeper `optional:"true"`
@@ -235,6 +236,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.BankKeeper,
 		in.AccountKeeper,
 		in.DistributionKeeper,
+		in.SendManagerKeeper,
 		in.IBCKeeperFn,
 		in.CapabilityScopedFn,
 	)

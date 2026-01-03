@@ -1,0 +1,14 @@
+syntax = "proto3";
+package sendmanager;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/sendmanager/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "bitbadgeschain/x/sendmanager/Params";
+  option (gogoproto.equal) = true;
+  
+}

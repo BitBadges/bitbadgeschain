@@ -1,34 +1,15 @@
 package types
 
 import (
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func GetCurrentManager(ctx sdk.Context, collection *TokenCollection) string {
-	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	managerTimeline := collection.ManagerTimeline
-	for _, managerTimelineVal := range managerTimeline {
-		found, err := SearchUintRangesForUint(blockTime, managerTimelineVal.TimelineTimes)
-		if found && err == nil {
-			return managerTimelineVal.Manager
-		}
-	}
-
-	return ""
+	return collection.Manager
 }
 
 func GetIsArchived(ctx sdk.Context, collection *TokenCollection) bool {
-	blockTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	isArchivedTimeline := collection.IsArchivedTimeline
-	for _, isArchivedTimelineVal := range isArchivedTimeline {
-		found, err := SearchUintRangesForUint(blockTime, isArchivedTimelineVal.TimelineTimes)
-		if found && err == nil {
-			return isArchivedTimelineVal.IsArchived
-		}
-	}
-
-	return false
+	return collection.IsArchived
 }
 
 func GetIsArchivedTimesAndValues(isArchivedTimeline []*IsArchivedTimeline) ([][]*UintRange, []interface{}) {

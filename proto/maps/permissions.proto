@@ -20,19 +20,3 @@ message ActionPermission {
   repeated UintRange permanentlyForbiddenTimes = 2;
 }
 
-/* 
-  TimedUpdatePermission defines the permissions for updating a timeline-based field.
-
-  Ex: If you want to lock the ability to update the collection's metadata for timelineTimes 1/1/2020 - 1/1/2021,
-  you could set the combination (TimelineTimes: [1/1/2020 - 1/1/2021]) to always be forbidden.
-*/
-message TimedUpdatePermission {
-  // Specifies the times when this permission is permitted. Can not overlap with permanentlyForbiddenTimes.
-  repeated UintRange permanentlyPermittedTimes = 1;
-
-  // Specifies the times when this permission is forbidden. Can not overlap with permanentlyPermittedTimes.
-  repeated UintRange permanentlyForbiddenTimes = 2;
-
-  // Specifies the times when the timeline-based field is a specific value.
-  repeated UintRange timelineTimes = 3;
-}

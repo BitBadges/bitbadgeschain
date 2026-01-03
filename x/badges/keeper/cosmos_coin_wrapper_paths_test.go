@@ -8,13 +8,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// generateWrapperDenom generates the correct token denom based on AllowCosmosWrapping setting
-func generateWrapperDenom(collectionId sdkmath.Uint, wrapperPath *types.CosmosCoinWrapperPath) string {
-	prefix := "badges:"
-	if !wrapperPath.AllowCosmosWrapping {
-		prefix = "badgeslp:"
-	}
-	return prefix + collectionId.String() + ":" + wrapperPath.Denom
+func generateAliasWrapperDenom(collectionId sdkmath.Uint, wrapperPath *types.AliasPath) string {
+	return keeper.AliasDenomPrefix + collectionId.String() + ":" + wrapperPath.Denom
+}
+
+func generateWrappedWrapperDenom(collectionId sdkmath.Uint, wrapperPath *types.CosmosCoinWrapperPath) string {
+	return keeper.WrappedDenomPrefix + collectionId.String() + ":" + wrapperPath.Denom
 }
 
 // TestCosmosCoinWrapperPathsBasic tests the basic functionality of cosmos coin wrapper paths
@@ -27,16 +26,20 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "testcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "TEST",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testcoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "TEST",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testcoin", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -86,6 +89,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -103,7 +107,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 	// Verify the cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath)
 
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
@@ -119,14 +123,18 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "unwraptest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -163,6 +171,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -171,7 +180,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 	// Get the wrapped coin amount
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath)
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	bobAmount := sdkmath.NewUintFromBigInt(bobBalanceDenom.Amount.BigInt())
 
@@ -190,6 +199,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -214,14 +224,18 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "transfertest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -258,6 +272,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -268,7 +283,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 	suite.Require().Nil(err, "Error getting bob's address")
 	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Error getting alice's address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath)
 
 	err = suite.app.BankKeeper.SendCoins(suite.ctx, bobAccAddr, aliceAccAddr, sdk.Coins{sdk.NewCoin(fullDenom, sdkmath.NewInt(1))})
 	suite.Require().Nil(err, "Error transferring wrapped coin to alice")
@@ -292,6 +307,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -312,14 +328,18 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "errortest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			AllowCosmosWrapping: true,
 		},
 	}
 
@@ -356,6 +376,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -376,6 +397,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -396,6 +418,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 						OwnershipTimes: GetTwoUintRanges(), // Wrong ownership times
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -411,27 +434,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "coin-one",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "COIN-ONE",
-			AllowCosmosWrapping: true,
+			Symbol: "COIN-ONE",
 		},
 		{
 			Denom: "coin-two",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "COIN-TWO",
-			AllowCosmosWrapping: true,
+			Symbol: "COIN-TWO",
 		},
 	}
 
@@ -470,6 +501,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -478,7 +510,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 	// Verify first denom was created
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom1 := generateWrapperDenom(collection.CollectionId, wrapperPath1)
+	fullDenom1 := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath1)
 	bobBalanceDenom1 := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom1)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom1.Amount, "Bob should have 1 of first wrapped coin")
 
@@ -497,6 +529,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -509,19 +542,23 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 
 	// Create a collection with cosmos coin wrapper paths but AllowCosmosWrapping disabled
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "disabledcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "DISABLED",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "disabledcoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: false, // Disabled!
+			Symbol:     "DISABLED",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "disabledcoin", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -541,10 +578,10 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
 	// Verify AllowCosmosWrapping is false
-	suite.Require().False(wrapperPath.AllowCosmosWrapping, "AllowCosmosWrapping should be false")
 
 	// Attempt to transfer token to the wrapper path address - should fail
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -553,7 +590,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 		Transfers: []*types.Transfer{
 			{
 				From:        bob,
-				ToAddresses: []string{wrapperPath.Address},
+				ToAddresses: []string{aliasAddress},
 				Balances: []*types.Balance{
 					{
 						Amount:         sdkmath.NewUint(1),
@@ -561,16 +598,16 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Error(err, "Should error when AllowCosmosWrapping is disabled")
-	suite.Require().Contains(err.Error(), "cosmos wrapping is not allowed for this wrapper path", "Error should mention cosmos wrapping is not allowed")
 
 	// Verify no cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	fullDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	suite.Require().Equal(sdkmath.NewInt(0), bobBalanceDenom.Amount, "No cosmos coin should be minted when wrapping is disabled")
 }
@@ -584,16 +621,20 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "overridecoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(), // This will be overridden
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(), // This will be overridden
+					},
 				},
 			},
 			Symbol:                         "OVERRIDE",
 			DenomUnits:                     []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "overridecoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping:            true,
 			AllowOverrideWithAnyValidToken: true, // Enable override
 		},
 	}
@@ -634,6 +675,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -642,7 +684,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 	// Verify cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath)
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom.Amount, "Cosmos coin should be minted when override is enabled")
 }
@@ -656,16 +698,20 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "badge_{id}_coin", // Use {id} placeholder
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "BADGE",
 			DenomUnits:                     []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "badgecoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping:            true,
 			AllowOverrideWithAnyValidToken: true, // Enable override for dynamic replacement
 		},
 	}
@@ -706,6 +752,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -715,7 +762,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 	// The denom should be replaced: "badge_1_coin" (with {id} replaced by 1)
-	replacedDenom := "badges:" + collection.CollectionId.String() + ":badge_1_coin"
+	replacedDenom := keeper.WrappedDenomPrefix + collection.CollectionId.String() + ":badge_1_coin"
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, replacedDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom.Amount, "Cosmos coin should be minted with replaced denom")
 
@@ -732,16 +779,20 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "badge_{id}_coin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "BADGE",
 			DenomUnits:                     []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "badgecoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping:            true,
 			AllowOverrideWithAnyValidToken: true,
 		},
 	}
@@ -784,6 +835,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -805,6 +857,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -826,6 +879,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -842,16 +896,20 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "validationcoin",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "VALIDATION",
 			DenomUnits:                     []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "validationcoin", IsDefaultDisplay: true}},
-			AllowCosmosWrapping:            true,
 			AllowOverrideWithAnyValidToken: true,
 		},
 	}
@@ -897,6 +955,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -917,11 +976,11 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
-	suite.Require().Error(err, "Should error when transferring invalid token ID")
-	suite.Require().Contains(err.Error(), "token ID not in valid range for overrideWithAnyValidToken", "Error should mention token ID validation")
+	suite.Require().Nil(err, "Transfer with invalid token ID should be allowed when override is enabled")
 }
 
 // ==================== GAMM KEEPER BADGES TESTS ====================
@@ -932,19 +991,23 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "integrationtest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "INTEGRATION",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "integrationtest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "INTEGRATION",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "integrationtest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -964,9 +1027,9 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test denom parsing and validation
 	suite.testDenomParsingAndValidation(wrapperDenom, collection)
@@ -1023,6 +1086,8 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	// First, transfer tokens from bob to the wrapper path address so it has badges to work with
 	// Transfer only 1 token, leave the rest with bob
 	transferAmount := sdkmath.NewUint(1)
+	collection, err := GetCollection(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, sdk.WrapSDKContext(ctx), &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1037,6 +1102,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -1049,7 +1115,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 
 	// Test SendNativeTokensToPool - this handles the wrapping internally
 	// Use bob as the sender since he has the tokens
-	err = suite.app.GammKeeper.SendNativeTokensToPool(ctx, bob, poolAddress, wrapperDenom, sdkmath.NewUint(1))
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, sdk.AccAddress(bob), sdk.AccAddress(poolAddress), sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))})
 	suite.Require().Nil(err, "Error sending native tokens to pool")
 
 	// Verify badges were transferred to pool
@@ -1061,9 +1127,9 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	poolCoinBalance := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, wrapperDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), poolCoinBalance.Amount, "Pool should have 1 wrapped coin")
 
-	// Test SendCoinsWithBadgesRouting (from pool)
+	// Test SendCoinsFromPoolWithAliasRouting
 	coinsToUnwrap := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, poolAccAddr, userAddr, coinsToUnwrap)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, sdk.AccAddress(userAddr), coinsToUnwrap)
 	suite.Require().Nil(err, "Error sending coins from pool with unwrapping")
 
 	// Verify badges were transferred back to user
@@ -1087,19 +1153,23 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "communitytest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "COMMUNITY",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "communitytest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "COMMUNITY",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "communitytest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1119,9 +1189,9 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test community pool funding with tokens
 	suite.testCommunityPoolFundingWithBadges(bob, wrapperDenom)
@@ -1129,25 +1199,29 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 	suite.T().Logf("✅ Community pool test completed successfully")
 }
 
-// TestGammKeeperPoolWithWrapping tests the pool wrapping/unwrapping functionality
-func (suite *TestSuite) TestGammKeeperPoolWithWrapping() {
+// TestGammKeeperPoolWithAliasRouting tests the pool wrapping/unwrapping functionality
+func (suite *TestSuite) TestGammKeeperPoolWithAliasRouting() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "pooltest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "POOLTEST",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "pooltest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "POOLTEST",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "pooltest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1167,12 +1241,13 @@ func (suite *TestSuite) TestGammKeeperPoolWithWrapping() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test pool operations
-	suite.testPoolOperations(bob, wrapperDenom, wrapperPath.Address)
+	suite.testPoolOperations(bob, wrapperDenom, aliasAddress)
 
 	suite.T().Logf("✅ Pool with wrapping test completed successfully")
 }
@@ -1183,19 +1258,23 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "parsetest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "PARSETEST",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "parsetest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "PARSETEST",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "parsetest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1204,14 +1283,15 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test denom parsing functions
-	// Test CheckStartsWithBadges
-	suite.Require().True(keeper.CheckStartsWithBadges(wrapperDenom), "Should recognize badges denom")
-	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should not recognize non-badges denom")
+	// Test CheckStartsWithWrappedOrAliasDenom
+	suite.Require().True(keeper.CheckStartsWithWrappedOrAliasDenom(wrapperDenom), "Should recognize badges denom")
+	suite.Require().False(keeper.CheckStartsWithWrappedOrAliasDenom("ubadge"), "Should not recognize non-badges denom")
 
 	// Test ParseDenomCollectionId
 	collectionId, err := keeper.ParseDenomCollectionId(wrapperDenom)
@@ -1224,13 +1304,14 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 	suite.Require().Equal("parsetest", path, "Path should be parsetest")
 
 	// Test GetCorrespondingPath
-	correspondingPath, err := keeper.GetCorrespondingPath(collection, wrapperDenom)
+	correspondingPath, err := keeper.GetCorrespondingAliasPath(collection, wrapperDenom)
 	suite.Require().Nil(err, "Error getting corresponding path")
-	suite.Require().Equal(wrapperPath.Address, correspondingPath.Address, "Addresses should match")
+	correspondingAliasAddress := keeper.MustGenerateAliasPathAddress(correspondingPath.Denom)
+	suite.Require().Equal(aliasAddress, correspondingAliasAddress, "Addresses should match")
 	suite.Require().Equal(wrapperPath.Denom, correspondingPath.Denom, "Denoms should match")
 
-	// Test GetBalancesToTransfer
-	balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
+	// Test GetBalancesToTransferWithAlias
+	balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(collection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1245,16 +1326,20 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
 			Denom: "errortest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
 			Symbol:                         "ERRORTEST",
 			DenomUnits:                     []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "errortest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping:            true,
 			AllowOverrideWithAnyValidToken: true, // This should cause an error in GetCorrespondingPath
 		},
 	}
@@ -1266,11 +1351,11 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test case: GetCorrespondingPath with AllowOverrideWithAnyValidToken should work with {id} placeholder
 	// Since the denom "errortest" doesn't contain numeric characters, it should not match any path
-	_, err = keeper.GetCorrespondingPath(collection, wrapperDenom)
+	_, err = keeper.GetCorrespondingAliasPath(collection, wrapperDenom)
 	suite.Require().Error(err, "Should error when no matching path is found")
 	suite.Require().Contains(err.Error(), "path not found for denom", "Error should mention path not found")
 
@@ -1279,7 +1364,7 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	suite.Require().Error(err, "Should error with invalid denom format")
 
 	// Test error case: non-badges denom
-	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
+	suite.Require().False(keeper.CheckStartsWithWrappedOrAliasDenom("ubadge"), "Should return false for non-badges denom")
 }
 
 // TestGammKeeperSimpleIntegration tests the gamm keeper functionality with a simpler approach
@@ -1288,19 +1373,23 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "simpletest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "SIMPLETEST",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "simpletest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "SIMPLETEST",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "simpletest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1320,12 +1409,13 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test simple integration functionality
-	suite.testSimpleIntegration(bob, wrapperDenom, wrapperPath.Address)
+	suite.testSimpleIntegration(bob, wrapperDenom, aliasAddress)
 
 	suite.T().Logf("✅ Simple integration test completed successfully")
 }
@@ -1336,19 +1426,23 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "basictest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "BASICTEST",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "basictest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "BASICTEST",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "basictest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1368,10 +1462,11 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
 	// Create accounts
-	wrapperPathAccAddr, err := sdk.AccAddressFromBech32(wrapperPath.Address)
+	wrapperPathAccAddr, err := sdk.AccAddressFromBech32(aliasAddress)
 	suite.Require().Nil(err, "Error getting wrapper path address")
 	wrapperPathAcc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, wrapperPathAccAddr)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, wrapperPathAcc)
@@ -1380,20 +1475,20 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	poolAcc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, poolAccAddr)
 	suite.app.AccountKeeper.SetAccount(suite.ctx, poolAcc)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test ParseCollectionFromDenom
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(suite.ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(suite.ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(collection.CollectionId, parsedCollection.CollectionId, "Collection IDs should match")
 
-	// Test 2: Test GetBalancesToTransfer
-	balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
+	// Test 2: Test GetBalancesToTransferWithAlias
+	balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(collection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
 
-	// Test 3: Test FundCommunityPoolWithWrapping with non-badges denom (should work normally)
+	// Test 3: Test FundCommunityPoolWithAliasRouting with non-badges denom (should work normally)
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 
@@ -1403,13 +1498,231 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 
 	// Test community pool funding with regular coins
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(suite.ctx, bobAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(suite.ctx, bobAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify bob's ubalance decreased
 	bobBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, "ubadge")
 	expectedBalance := initialBalance.Amount.Sub(sdkmath.NewInt(100))
 	suite.Require().Equal(expectedBalance, bobBalance.Amount, "Bob's balance should have decreased by 100")
+}
+
+// TestCanAddMoreAliasPathsPermission_Allowed tests that adding alias paths succeeds when permission is allowed
+func (suite *TestSuite) TestCanAddMoreAliasPathsPermission_Allowed() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to allow adding alias paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreAliasPaths: []*types.ActionPermission{
+				{
+					PermanentlyPermittedTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add alias paths - should succeed
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		AliasPathsToAdd: []*types.AliasPathAddObject{
+			{
+				Denom: "testalias",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "ALIAS",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testalias", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Should be able to add alias paths when permission is allowed")
+
+	// Verify the alias path was added
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	suite.Require().Equal(1, len(collection.AliasPaths), "Collection should have one alias path")
+	suite.Require().Equal("testalias", collection.AliasPaths[0].Denom, "Alias path denom should match")
+}
+
+// TestCanAddMoreAliasPathsPermission_Forbidden tests that adding alias paths fails when permission is forbidden
+func (suite *TestSuite) TestCanAddMoreAliasPathsPermission_Forbidden() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to forbid adding alias paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreAliasPaths: []*types.ActionPermission{
+				{
+					PermanentlyForbiddenTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add alias paths - should fail
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		AliasPathsToAdd: []*types.AliasPathAddObject{
+			{
+				Denom: "testalias",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "ALIAS",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testalias", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Error(err, "Should not be able to add alias paths when permission is forbidden")
+	suite.Require().Contains(err.Error(), "add alias paths", "Error should mention alias paths")
+}
+
+// TestCanAddMoreCosmosCoinWrapperPathsPermission_Allowed tests that adding cosmos coin wrapper paths succeeds when permission is allowed
+func (suite *TestSuite) TestCanAddMoreCosmosCoinWrapperPathsPermission_Allowed() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to allow adding cosmos coin wrapper paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreCosmosCoinWrapperPaths: []*types.ActionPermission{
+				{
+					PermanentlyPermittedTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add cosmos coin wrapper paths - should succeed
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CosmosCoinWrapperPathsToAdd: []*types.CosmosCoinWrapperPathAddObject{
+			{
+				Denom: "testwrapper",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "WRAPPER",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testwrapper", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Should be able to add cosmos coin wrapper paths when permission is allowed")
+
+	// Verify the wrapper path was added
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	suite.Require().Equal(1, len(collection.CosmosCoinWrapperPaths), "Collection should have one cosmos coin wrapper path")
+	suite.Require().Equal("testwrapper", collection.CosmosCoinWrapperPaths[0].Denom, "Wrapper path denom should match")
+}
+
+// TestCanAddMoreCosmosCoinWrapperPathsPermission_Forbidden tests that adding cosmos coin wrapper paths fails when permission is forbidden
+func (suite *TestSuite) TestCanAddMoreCosmosCoinWrapperPathsPermission_Forbidden() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	// Set permission to forbid adding cosmos coin wrapper paths
+	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Permissions: &types.CollectionPermissions{
+			CanAddMoreCosmosCoinWrapperPaths: []*types.ActionPermission{
+				{
+					PermanentlyForbiddenTimes: GetFullUintRanges(),
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error updating collection permissions")
+
+	// Try to add cosmos coin wrapper paths - should fail
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		CosmosCoinWrapperPathsToAdd: []*types.CosmosCoinWrapperPathAddObject{
+			{
+				Denom: "testwrapper",
+				Conversion: &types.ConversionWithoutDenom{
+					SideA: &types.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: GetFullUintRanges(),
+							TokenIds:       GetOneUintRange(),
+						},
+					},
+				},
+				Symbol:     "WRAPPER",
+				DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testwrapper", IsDefaultDisplay: true}},
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Error(err, "Should not be able to add cosmos coin wrapper paths when permission is forbidden")
+	suite.Require().Contains(err.Error(), "add cosmos coin wrapper paths", "Error should mention cosmos coin wrapper paths")
 }
 
 // ==================== COMPREHENSIVE POOL OPERATIONS TESTS ====================
@@ -1420,19 +1733,23 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "poolbadge",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "POOLBADGE",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "poolbadge", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "POOLBADGE",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "poolbadge", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1452,12 +1769,13 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test comprehensive pool operations
-	suite.testComprehensivePoolOperations(bob, wrapperDenom, wrapperPath.Address)
+	suite.testComprehensivePoolOperations(bob, wrapperDenom, aliasAddress)
 
 	suite.T().Logf("✅ Comprehensive pool operations test completed successfully")
 }
@@ -1468,19 +1786,23 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "simplepool",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "SIMPLEPOOL",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "simplepool", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "SIMPLEPOOL",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "simplepool", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1500,9 +1822,9 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test 1: Test denom parsing and validation
 	suite.testDenomParsingAndValidation(wrapperDenom, collection)
@@ -1521,12 +1843,12 @@ func (suite *TestSuite) testDenomParsingAndValidation(wrapperDenom string, colle
 	ctx := suite.ctx
 
 	// Test ParseCollectionFromDenom
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(collection.CollectionId, parsedCollection.CollectionId, "Collection IDs should match")
 
-	// Test GetBalancesToTransfer
-	balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, sdkmath.NewUint(5))
+	// Test GetBalancesToTransferWithAlias
+	balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(collection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1547,10 +1869,10 @@ func (suite *TestSuite) testCommunityPoolFundingWithBadges(userAddr string, wrap
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
-	// Test FundCommunityPoolWithWrapping with regular coins (not badges)
+	// Test FundCommunityPoolWithAliasRouting with regular coins (not badges)
 	// This tests the function works correctly for non-badge denoms
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err := suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err := suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1562,11 +1884,11 @@ func (suite *TestSuite) testCommunityPoolFundingWithBadges(userAddr string, wrap
 
 // testBalanceCalculations tests balance calculations
 func (suite *TestSuite) testBalanceCalculations(collection *types.TokenCollection, wrapperDenom string) {
-	// Test GetBalancesToTransfer with different amounts
+	// Test GetBalancesToTransferWithAlias with different amounts
 	testAmounts := []sdkmath.Uint{sdkmath.NewUint(1), sdkmath.NewUint(5), sdkmath.NewUint(10), sdkmath.NewUint(100)}
 
 	for _, amount := range testAmounts {
-		balancesToTransfer, err := keeper.GetBalancesToTransfer(collection, wrapperDenom, amount)
+		balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(collection, wrapperDenom, amount)
 		suite.Require().Nil(err, "Error getting balances to transfer for amount %s", amount.String())
 		suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance for amount %s", amount.String())
 		suite.Require().Equal(amount, balancesToTransfer[0].Amount, "Amount should match for %s", amount.String())
@@ -1585,12 +1907,12 @@ func (suite *TestSuite) testPoolOperations(userAddr string, wrapperDenom string,
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
 
 	// Test denom parsing
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
 	// Test balance calculations
-	balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
+	balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
@@ -1603,12 +1925,12 @@ func (suite *TestSuite) testSimpleIntegration(userAddr string, wrapperDenom stri
 	ctx := suite.ctx
 
 	// Test denom parsing
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
 	// Test balance calculations
-	balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(10))
+	balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(parsedCollection, wrapperDenom, sdkmath.NewUint(10))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(10), balancesToTransfer[0].Amount, "Amount should be 10")
@@ -1622,9 +1944,9 @@ func (suite *TestSuite) testSimpleIntegration(userAddr string, wrapperDenom stri
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
-	// Test FundCommunityPoolWithWrapping with regular coins
+	// Test FundCommunityPoolWithAliasRouting with regular coins
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1644,14 +1966,14 @@ func (suite *TestSuite) testComprehensivePoolOperations(userAddr string, wrapper
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
 
 	// Test 1: Denom parsing and validation
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
 	// Test 2: Balance calculations with various amounts
 	testAmounts := []sdkmath.Uint{sdkmath.NewUint(1), sdkmath.NewUint(5), sdkmath.NewUint(10), sdkmath.NewUint(100)}
 	for _, amount := range testAmounts {
-		balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, amount)
+		balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(parsedCollection, wrapperDenom, amount)
 		suite.Require().Nil(err, "Error getting balances to transfer for amount %s", amount.String())
 		suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance for amount %s", amount.String())
 		suite.Require().Equal(amount, balancesToTransfer[0].Amount, "Amount should match for %s", amount.String())
@@ -1662,7 +1984,7 @@ func (suite *TestSuite) testComprehensivePoolOperations(userAddr string, wrapper
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
@@ -1678,19 +2000,23 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "allfunctionstest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "ALLFUNCTIONS",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "allfunctionstest", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "ALLFUNCTIONS",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "allfunctionstest", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1710,12 +2036,13 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test ALL gamm keeper functions
-	suite.testAllGammKeeperFunctions(bob, wrapperDenom, wrapperPath.Address)
+	suite.testAllGammKeeperFunctions(bob, wrapperDenom, aliasAddress)
 
 	suite.T().Logf("✅ All gamm keeper functions test completed successfully")
 }
@@ -1729,65 +2056,67 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 	poolAcc := suite.app.AccountKeeper.NewAccountWithAddress(ctx, poolAccAddr)
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
 
-	// Test 1: CheckStartsWithBadges
-	suite.T().Logf("Testing CheckStartsWithBadges...")
-	suite.Require().True(keeper.CheckStartsWithBadges(wrapperDenom), "Should return true for tokens denom")
-	suite.Require().False(keeper.CheckStartsWithBadges("ubadge"), "Should return false for non-badges denom")
+	// Test 1: CheckStartsWithWrappedOrAliasDenom
+	suite.T().Logf("Testing CheckStartsWithWrappedOrAliasDenom...")
+	suite.Require().True(keeper.CheckStartsWithWrappedOrAliasDenom(wrapperDenom), "Should return true for tokens denom")
+	suite.Require().False(keeper.CheckStartsWithWrappedOrAliasDenom("ubadge"), "Should return false for non-badges denom")
 
 	// Test 2: ParseCollectionFromDenom
 	suite.T().Logf("Testing ParseCollectionFromDenom...")
-	parsedCollection, err := suite.app.GammKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
+	parsedCollection, err := suite.app.BadgesKeeper.ParseCollectionFromDenom(ctx, wrapperDenom)
 	suite.Require().Nil(err, "Error parsing collection from denom")
 	suite.Require().Equal(sdkmath.NewUint(1), parsedCollection.CollectionId, "Collection ID should be 1")
 
-	// Test 3: GetBalancesToTransfer
-	suite.T().Logf("Testing GetBalancesToTransfer...")
-	balancesToTransfer, err := keeper.GetBalancesToTransfer(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
+	// Test 3: GetBalancesToTransferWithAlias
+	suite.T().Logf("Testing GetBalancesToTransferWithAlias...")
+	balancesToTransfer, err := keeper.GetBalancesToTransferWithAlias(parsedCollection, wrapperDenom, sdkmath.NewUint(5))
 	suite.Require().Nil(err, "Error getting balances to transfer")
 	suite.Require().Equal(1, len(balancesToTransfer), "Should have one balance")
 	suite.Require().Equal(sdkmath.NewUint(5), balancesToTransfer[0].Amount, "Amount should be 5")
 
-	// Test 4: FundCommunityPoolWithWrapping with regular coins
-	suite.T().Logf("Testing FundCommunityPoolWithWrapping...")
+	// Test 4: FundCommunityPoolWithAliasRouting with regular coins
+	suite.T().Logf("Testing FundCommunityPoolWithAliasRouting...")
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", poolAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(100))})
 
 	coins := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, coins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, coins)
 	suite.Require().Nil(err, "Error funding community pool with regular coins")
 
 	// Verify pool account balance decreased
 	poolBalance := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, "ubadge")
 	suite.Require().Equal(sdkmath.NewInt(90), poolBalance.Amount, "Pool should have 90 ubadge remaining")
 
-	// Test 5: SendCoinsWithBadgesRouting (to pool) (this will fail because no wrapped coins exist, but we test the function)
-	suite.T().Logf("Testing SendCoinsWithBadgesRouting (to pool)...")
+	// Test 5: SendCoinsToPoolWithAliasRouting (this will fail because no wrapped coins exist, but we test the function)
+	suite.T().Logf("Testing SendCoinsToPoolWithAliasRouting...")
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	// This will fail because user doesn't have wrapped coins, but we're testing the function exists and is callable
 	if err != nil {
-		suite.T().Logf("SendCoinsWithBadgesRouting (to pool) correctly failed: %s", err.Error())
+		suite.T().Logf("SendCoinsToPoolWithAliasRouting correctly failed: %s", err.Error())
 	} else {
-		suite.T().Logf("SendCoinsWithBadgesRouting (to pool) succeeded unexpectedly")
+		suite.T().Logf("SendCoinsToPoolWithAliasRouting succeeded unexpectedly")
 	}
 
-	// Test 6: SendCoinsWithBadgesRouting (from pool) (this will fail because pool has no wrapped coins, but we test the function)
-	suite.T().Logf("Testing SendCoinsWithBadgesRouting (from pool)...")
+	// Test 6: SendCoinsFromPoolWithAliasRouting (this will fail because pool has no wrapped coins, but we test the function)
+	suite.T().Logf("Testing SendCoinsFromPoolWithAliasRouting...")
 	coinsToUnwrap := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, poolAccAddr, userAccAddr, coinsToUnwrap)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, coinsToUnwrap)
 	// This will fail because pool doesn't have wrapped coins, but we're testing the function exists and is callable
 	if err != nil {
-		suite.T().Logf("SendCoinsWithBadgesRouting (from pool) correctly failed: %s", err.Error())
+		suite.T().Logf("SendCoinsFromPoolWithAliasRouting correctly failed: %s", err.Error())
 	} else {
-		suite.T().Logf("SendCoinsWithBadgesRouting (from pool) succeeded unexpectedly")
+		suite.T().Logf("SendCoinsFromPoolWithAliasRouting succeeded unexpectedly")
 	}
 
 	// Test 7: SendNativeTokensToPool (this will fail because user has no tokens, but we test the function)
 	suite.T().Logf("Testing SendNativeTokensToPool...")
-	err = suite.app.GammKeeper.SendNativeTokensToPool(ctx, userAddr, poolAccAddr.String(), wrapperDenom, sdkmath.NewUint(1))
+	// Use SendCoinsToPoolWithAliasRouting which handles native tokens internally
+	tokenCoinsToPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoinsToPool)
 	// This will fail because user has no tokens, but we're testing the function exists and is callable
 	if err != nil {
 		suite.T().Logf("SendNativeTokensToPool correctly failed: %s", err.Error())
@@ -1797,7 +2126,9 @@ func (suite *TestSuite) testAllGammKeeperFunctions(userAddr string, wrapperDenom
 
 	// Test 8: SendNativeTokensFromPool (this will fail because pool has no tokens, but we test the function)
 	suite.T().Logf("Testing SendNativeTokensFromPool...")
-	err = suite.app.GammKeeper.SendNativeTokensFromPool(ctx, poolAccAddr.String(), userAddr, wrapperDenom, sdkmath.NewUint(1))
+	// Use SendCoinsFromPoolWithAliasRouting which handles native tokens internally
+	tokenCoinsFromPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
 	// This will fail because pool has no tokens, but we're testing the function exists and is callable
 	if err != nil {
 		suite.T().Logf("SendNativeTokensFromPool correctly failed: %s", err.Error())
@@ -1814,19 +2145,23 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 
 	// Create a collection with cosmos coin wrapper paths
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
 		{
 			Denom: "comprehensivepool",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			Symbol:              "COMPREHENSIVE",
-			DenomUnits:          []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "comprehensivepool", IsDefaultDisplay: true}},
-			AllowCosmosWrapping: true,
+			Symbol:     "COMPREHENSIVE",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "comprehensivepool", IsDefaultDisplay: true}},
 		},
 	}
 
@@ -1846,12 +2181,13 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
-	wrapperPath := collection.CosmosCoinWrapperPaths[0]
+	wrapperPath := collection.AliasPaths[0]
+	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
 
-	wrapperDenom := generateWrapperDenom(collection.CollectionId, wrapperPath)
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test all pool operations using the working approach
-	suite.testComprehensivePoolOperations(bob, wrapperDenom, wrapperPath.Address)
+	suite.testComprehensivePoolOperations(bob, wrapperDenom, aliasAddress)
 
 	suite.T().Logf("✅ Comprehensive pool operations test completed successfully")
 }
@@ -1872,6 +2208,8 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 
 	// Transfer some badges to wrapper path address for pool creation (use user's actual balance)
 	transferAmount := userBalance.Balances[0].Amount // Transfer all user's badges to wrapper path
+	collection, err := GetCollection(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, sdk.WrapSDKContext(ctx), &types.MsgTransferTokens{
 		Creator:      userAddr,
 		CollectionId: sdkmath.NewUint(1),
@@ -1886,6 +2224,7 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -1902,9 +2241,9 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 	suite.app.BankKeeper.MintCoins(ctx, "mint", sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(1000000))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", userAccAddr, sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(1000000))})
 
-	// Test SendCoinsWithBadgesRouting to send tokens to pool (use 1 token since that's what we have)
+	// Test SendCoinsToPoolWithAliasRouting to send tokens to pool (use 1 token since that's what we have)
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool with wrapping")
 
 	// Verify badges were transferred to pool
@@ -1940,9 +2279,9 @@ func (suite *TestSuite) testJoinPool(userAddr string, wrapperDenom string, wrapp
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
-	// Test SendCoinsWithBadgesRouting for join operation
+	// Test SendCoinsToPoolWithAliasRouting for join operation
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(5))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for join")
 
 	// Send ubadge for join
@@ -1973,9 +2312,9 @@ func (suite *TestSuite) testExitPool(userAddr string, wrapperDenom string, wrapp
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
-	// Test SendCoinsWithBadgesRouting for exit operation
+	// Test SendCoinsFromPoolWithAliasRouting for exit operation
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(3))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, poolAccAddr, userAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens from pool for exit")
 
 	// Send ubadge for exit
@@ -2008,7 +2347,7 @@ func (suite *TestSuite) testSwapOperations(userAddr string, wrapperDenom string,
 
 	// Test swap: badges -> ubadge
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(10))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for swap")
 
 	// Send ubadge back to user (simulating swap)
@@ -2023,7 +2362,7 @@ func (suite *TestSuite) testSwapOperations(userAddr string, wrapperDenom string,
 
 	// Send badges back to user (simulating swap)
 	tokenCoinsFromPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(5))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
+	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
 	suite.Require().Nil(err, "Error sending tokens to user for swap")
 
 	suite.T().Logf("✅ Swap operations successful")
@@ -2043,15 +2382,15 @@ func (suite *TestSuite) testSwapWithTakerFees(userAddr string, wrapperDenom stri
 
 	// Test swap with taker fee: badges -> ubadge
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(20))}
-	err = suite.app.GammKeeper.SendCoinsWithBadgesRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
+	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for swap with fee")
 
 	// Calculate taker fee (1% of 20 = 0.2, but we'll use 1 for simplicity)
 	takerFeeAmount := sdkmath.NewInt(1)
 
-	// Send taker fee to community pool using FundCommunityPoolWithWrapping
+	// Send taker fee to community pool using FundCommunityPoolWithAliasRouting
 	takerFeeCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, takerFeeAmount)}
-	err = suite.app.GammKeeper.FundCommunityPoolWithWrapping(ctx, poolAccAddr, takerFeeCoins)
+	err = suite.app.SendmanagerKeeper.FundCommunityPoolWithAliasRouting(ctx, poolAccAddr, takerFeeCoins)
 	suite.Require().Nil(err, "Error funding community pool with taker fee")
 
 	// Send remaining ubadge to user (simulating swap after fee)

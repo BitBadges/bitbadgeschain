@@ -19,11 +19,10 @@ func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermits() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateStandards: []*types.TimedUpdatePermission{
+			CanUpdateStandards: []*types.ActionPermission{
 				{
 
 					PermanentlyPermittedTimes: GetFullUintRanges(),
-					TimelineTimes:             GetFullUintRanges(),
 				},
 			},
 		},
@@ -55,7 +54,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsDefaultAllowed() 
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateStandards: []*types.TimedUpdatePermission{},
+			CanUpdateStandards: []*types.ActionPermission{},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
@@ -74,6 +73,9 @@ func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsDefaultAllowed() 
 }
 
 func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsInvalidTimes() {
+	// This test previously checked for invalid timeline times.
+	// Since timeline times have been removed, this test is no longer relevant.
+	// The test is kept for structure but now just verifies basic permission functionality.
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -81,20 +83,14 @@ func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsInvalidTimes() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating collections")
 
+	// Test with permitted times - update should succeed
 	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateStandards: []*types.TimedUpdatePermission{
+			CanUpdateStandards: []*types.ActionPermission{
 				{
-
 					PermanentlyPermittedTimes: GetFullUintRanges(),
-					TimelineTimes:             GetOneUintRange(),
-				},
-				{
-
-					PermanentlyForbiddenTimes: GetFullUintRanges(),
-					TimelineTimes:             GetTwoUintRanges(),
 				},
 			},
 		},
@@ -106,20 +102,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdatePermissionPermitsInvalidTimes() {
 		CollectionId: sdkmath.NewUint(1),
 		StandardsTimeline: []*types.StandardsTimeline{
 			{
-				TimelineTimes: GetFullUintRanges(),
-				Standards:     []string{"0x123"},
-			},
-		},
-	})
-	suite.Require().Error(err, "Error updating metadata")
-
-	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		StandardsTimeline: []*types.StandardsTimeline{
-			{
-				TimelineTimes: GetOneUintRange(),
-				Standards:     []string{"0x123"},
+				Standards: []string{"0x123"},
 			},
 		},
 	})
@@ -138,11 +121,10 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermits() {
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{
+			CanUpdateTokenMetadata: []*types.TokenIdsActionPermission{
 				{
 
 					PermanentlyPermittedTimes: GetFullUintRanges(),
-					TimelineTimes:             GetFullUintRanges(),
 					TokenIds:                  GetFullUintRanges(),
 				},
 			},
@@ -180,7 +162,7 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermitsDefau
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
 		Permissions: &types.CollectionPermissions{
-			CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{},
+			CanUpdateTokenMetadata: []*types.TokenIdsActionPermission{},
 		},
 	})
 	suite.Require().Nil(err, "Error updating collection permissions")
@@ -203,70 +185,6 @@ func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermitsDefau
 	suite.Require().Nil(err, "Error updating metadata")
 }
 
-func (suite *TestSuite) TestCheckIfTimedUpdateWithTokenIdsPermissionPermitsInvalidTimes() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
-
-	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating collections")
-
-	err = UpdateCollectionPermissions(suite, wctx, &types.MsgUniversalUpdateCollectionPermissions{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		Permissions: &types.CollectionPermissions{
-			CanUpdateTokenMetadata: []*types.TimedUpdateWithTokenIdsPermission{
-				{
-
-					PermanentlyPermittedTimes: GetFullUintRanges(),
-					TimelineTimes:             GetOneUintRange(),
-					TokenIds:                  GetFullUintRanges(),
-				},
-				{
-
-					PermanentlyForbiddenTimes: GetFullUintRanges(),
-					TimelineTimes:             GetTwoUintRanges(),
-					TokenIds:                  GetFullUintRanges(),
-				},
-			},
-		},
-	})
-	suite.Require().Nil(err, "Error updating collection permissions")
-
-	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		TokenMetadataTimeline: []*types.TokenMetadataTimeline{
-			{
-				TimelineTimes: GetFullUintRanges(),
-				TokenMetadata: []*types.TokenMetadata{
-					{
-						Uri:      "https://example.com",
-						TokenIds: GetFullUintRanges(),
-					},
-				},
-			},
-		},
-	})
-	suite.Require().Error(err, "Error updating metadata")
-
-	err = UpdateMetadata(suite, wctx, &types.MsgUpdateMetadata{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		TokenMetadataTimeline: []*types.TokenMetadataTimeline{
-			{
-				TimelineTimes: GetOneUintRange(),
-				TokenMetadata: []*types.TokenMetadata{
-					{
-						Uri:      "https://example.com",
-						TokenIds: GetFullUintRanges(),
-					},
-				},
-			},
-		},
-	})
-	suite.Require().Nil(err, "Error updating metadata")
-}
 
 func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 	wctx := sdk.WrapSDKContext(suite.ctx)

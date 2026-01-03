@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"math"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
@@ -27,55 +26,31 @@ func TestMsgUpdateManager_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:               sample.AccAddress(),
-				CollectionId:          sdkmath.NewUint(1),
-				UpdateManagerTimeline: true,
-				ManagerTimeline: []*types.ManagerTimeline{
-					{
-						TimelineTimes: []*types.UintRange{
-							{
-								Start: sdkmath.NewUint(0),
-								End:   sdkmath.NewUint(math.MaxUint64),
-							},
-						},
-						Manager: sample.AccAddress(),
-					},
-				},
+				Creator:       sample.AccAddress(),
+				CollectionId:  sdkmath.NewUint(1),
+				UpdateManager: true,
+				Manager:       sample.AccAddress(),
 			},
 		},
 		{
 			name: "invalid address 2",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:               sample.AccAddress(),
-				CollectionId:          sdkmath.NewUint(1),
-				UpdateManagerTimeline: true,
-				ManagerTimeline: []*types.ManagerTimeline{
-					{
-						TimelineTimes: []*types.UintRange{
-							{
-								Start: sdkmath.NewUint(0),
-								End:   sdkmath.NewUint(math.MaxUint64),
-							},
-						},
-						Manager: "invalid_address",
-					},
-				},
+				Creator:       sample.AccAddress(),
+				CollectionId:  sdkmath.NewUint(1),
+				UpdateManager: true,
+				Manager:       "invalid_address",
 			},
 			err: types.ErrInvalidAddress,
 		},
 		{
 			name: "invalid times",
 			msg: types.MsgUniversalUpdateCollection{
-				Creator:               sample.AccAddress(),
-				CollectionId:          sdkmath.NewUint(1),
-				UpdateManagerTimeline: true,
-				ManagerTimeline: []*types.ManagerTimeline{
-					{
-						Manager: "invalid_address",
-					},
-				},
+				Creator:       sample.AccAddress(),
+				CollectionId:  sdkmath.NewUint(1),
+				UpdateManager: true,
+				Manager:       "invalid_address",
 			},
-			err: types.ErrRangeDoesNotOverlap,
+			err: types.ErrInvalidAddress,
 		},
 	}
 	for _, tt := range tests {

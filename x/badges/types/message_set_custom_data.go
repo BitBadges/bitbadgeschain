@@ -8,11 +8,11 @@ const TypeMsgSetCustomData = "set_custom_data"
 
 var _ sdk.Msg = &MsgSetCustomData{}
 
-func NewMsgSetCustomData(creator string, collectionId Uint, customDataTimeline []*CustomDataTimeline, canUpdateCustomData []*TimedUpdatePermission) *MsgSetCustomData {
+func NewMsgSetCustomData(creator string, collectionId Uint, customData string, canUpdateCustomData []*ActionPermission) *MsgSetCustomData {
 	return &MsgSetCustomData{
 		Creator:             creator,
 		CollectionId:        collectionId,
-		CustomDataTimeline:  customDataTimeline,
+		CustomData:          customData,
 		CanUpdateCustomData: canUpdateCustomData,
 	}
 }
@@ -51,8 +51,8 @@ func (msg *MsgSetCustomData) ToUniversalUpdateCollection() (*MsgUniversalUpdateC
 	ms := &MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateCustomDataTimeline:    true,
-		CustomDataTimeline:          msg.CustomDataTimeline,
+		UpdateCustomData:            true,
+		CustomData:                  msg.CustomData,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &CollectionPermissions{
 			CanUpdateCustomData: msg.CanUpdateCustomData,

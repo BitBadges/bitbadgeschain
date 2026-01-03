@@ -9,8 +9,8 @@ const (
 	TotalAddress = "Total"
 )
 
-// IsSpecialAddress checks if the given address is a special system address
-func IsSpecialAddress(address string) bool {
+// IsMintOrTotalAddress checks if the given address is a mint or total address
+func IsMintOrTotalAddress(address string) bool {
 	return address == MintAddress || address == TotalAddress
 }
 

@@ -10,11 +10,11 @@ func ValidatePermissions(permissions *MapPermissions, canChangeValues bool) erro
 		return ErrPermissionsIsNil
 	}
 
-	if err := tokentypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateManager), canChangeValues); err != nil {
+	if err := tokentypes.ValidateActionPermission(CastActionPermissions(permissions.CanUpdateManager), canChangeValues); err != nil {
 		return err
 	}
 
-	if err := tokentypes.ValidateTimedUpdatePermission(CastTimedUpdatePermissions(permissions.CanUpdateMetadata), canChangeValues); err != nil {
+	if err := tokentypes.ValidateActionPermission(CastActionPermissions(permissions.CanUpdateMetadata), canChangeValues); err != nil {
 		return err
 	}
 

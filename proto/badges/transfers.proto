@@ -18,7 +18,7 @@ message Transfer {
   repeated Balance balances = 3;
   // If defined, we will use the predeterminedBalances from the specified approval to calculate the balances at execution time.
   // We will override the balances field with the precalculated balances. Only applicable for approvals with predeterminedBalances set.
-  ApprovalIdentifierDetails precalculateBalancesFromApproval = 4;
+  PrecalculateBalancesFromApprovalDetails precalculateBalancesFromApproval = 4;
   // The Merkle proofs / solutions for all Merkle challenges required for the transfer.
   repeated MerkleProof merkleProofs = 5;
   // The ETH signature proofs / solutions for all ETH signature challenges required for the transfer.
@@ -40,16 +40,18 @@ message Transfer {
   // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
   // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
   bool onlyCheckPrioritizedOutgoingApprovals = 11;
-  // The options for precalculating the balances.
-  PrecalculationOptions precalculationOptions = 12;
-  // The number of times to attempt approval validation. If 0 / not specified, we default to only one.
-  string numAttempts = 13 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
-// PrecalculationOptions defines the options for precalculating the balances.
-message PrecalculationOptions {
-  // The timestamp to override with when calculating the balances.
-  string overrideTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // The IDs to override for the transfer. Only applicable if using this option in precalculation.
-  repeated UintRange tokenIdsOverride = 2;
+// PrecalculateBalancesFromApprovalDetails defines the details for precalculating balances from an approval.
+message PrecalculateBalancesFromApprovalDetails {
+  // The ID of the approval.
+  string approvalId = 1;
+  // The level of the approval. Can be "collection", "incoming", or "outgoing".
+  string approvalLevel = 2;
+  // The address of the approver. Leave blank "" if approvalLevel == "collection".
+  string approverAddress = 3;
+  // The version of the approval.
+  string version = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The options for precalculating the balances.
+  PrecalculationOptions precalculationOptions = 5;
 }

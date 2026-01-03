@@ -1,8 +1,10 @@
 package keeper_test
 
 import (
+	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 func (suite *TestSuite) TestNoMerkleChallengeWorking() {
@@ -1008,7 +1011,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossible() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1137,7 +1140,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1187,7 +1190,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmount() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1314,7 +1317,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleGreaterAmountSolo(
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1442,7 +1445,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1492,7 +1495,7 @@ func (suite *TestSuite) TestIncrementsTransferGreaterThanMaxNumTransfers() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1610,7 +1613,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTx() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1769,7 +1772,7 @@ func (suite *TestSuite) TestIncrementsUsingPerToAddressNumTransfers() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -1926,7 +1929,7 @@ func (suite *TestSuite) TestIncrementsTransferAsMuchAsPossibleOneTxWithLeafIndex
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -2091,7 +2094,7 @@ func (suite *TestSuite) TestManualTransferDefinitionWithIncrements() {
 		CollectionId: sdkmath.NewUint(1),
 		Transfers: []*types.Transfer{
 			{
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "asadsdas",
 					ApproverAddress: "",
 					ApprovalLevel:   "collection",
@@ -2620,7 +2623,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
@@ -2731,7 +2734,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
@@ -2759,7 +2762,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 				From:        bob,
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
-				PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 					ApprovalId:      "target approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
@@ -3019,7 +3022,7 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNow() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3132,14 +3135,14 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
-			},
-			PrecalculationOptions: &types.PrecalculationOptions{
-				OverrideTimestamp: sdkmath.NewUint(10),
+				PrecalculationOptions: &types.PrecalculationOptions{
+					OverrideTimestamp: sdkmath.NewUint(10),
+				},
 			},
 		}},
 	})
@@ -3209,14 +3212,14 @@ func (suite *TestSuite) TestSequentialTransferApprovalDurationFromNowWithTimesta
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
-			},
-			PrecalculationOptions: &types.PrecalculationOptions{
-				OverrideTimestamp: sdkmath.NewUint(10),
+				PrecalculationOptions: &types.PrecalculationOptions{
+					OverrideTimestamp: sdkmath.NewUint(10),
+				},
 			},
 		}},
 	})
@@ -3284,7 +3287,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3308,7 +3311,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3331,7 +3334,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3358,7 +3361,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3386,7 +3389,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimes() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3463,14 +3466,14 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
 				Version:         sdkmath.NewUint(0),
-			},
-			PrecalculationOptions: &types.PrecalculationOptions{
-				OverrideTimestamp: sdkmath.NewUint(2000),
+				PrecalculationOptions: &types.PrecalculationOptions{
+					OverrideTimestamp: sdkmath.NewUint(2000),
+				},
 			},
 		}},
 	})
@@ -3535,7 +3538,7 @@ func (suite *TestSuite) TestSubscriptionApproach() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "incoming", ApproverAddress: charlie, Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "incoming",
 				ApproverAddress: charlie,
@@ -3605,7 +3608,7 @@ func (suite *TestSuite) TestRecurringOwnershipTimesChargeFirstInterval() {
 			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 				{ApprovalId: "asadsdasfghdsfasdfasdf", ApprovalLevel: "collection", ApproverAddress: "", Version: sdkmath.NewUint(0)},
 			},
-			PrecalculateBalancesFromApproval: &types.ApprovalIdentifierDetails{
+			PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 				ApprovalId:      "asadsdasfghdsfasdfasdf",
 				ApprovalLevel:   "collection",
 				ApproverAddress: "",
@@ -3708,14 +3711,17 @@ func (suite *TestSuite) TestTokenIdsOverride() {
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+	if msg.Transfers[0].PrecalculateBalancesFromApproval == nil {
+		msg.Transfers[0].PrecalculateBalancesFromApproval = &types.PrecalculateBalancesFromApprovalDetails{}
+	}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions = &types.PrecalculationOptions{
 		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
 	}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Nil(err)
@@ -3809,21 +3815,24 @@ func (suite *TestSuite) TestTokenIdsOverrideWithMoreThanOneBadge() {
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err, "Error transferring token: %s")
 
-	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+	if msg.Transfers[0].PrecalculateBalancesFromApproval == nil {
+		msg.Transfers[0].PrecalculateBalancesFromApproval = &types.PrecalculateBalancesFromApprovalDetails{}
+	}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions = &types.PrecalculationOptions{
 		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(2), End: sdkmath.NewUint(2)}},
 	}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions = &types.PrecalculationOptions{
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions = &types.PrecalculationOptions{
 		TokenIdsOverride: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 	}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
 
-	msg.Transfers[0].PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+	msg.Transfers[0].PrecalculateBalancesFromApproval.PrecalculationOptions.TokenIdsOverride = []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Nil(err)
@@ -3918,4 +3927,1479 @@ func (suite *TestSuite) TestTokenIdsOverrideNoPrecalcSpecified() {
 
 	err = TransferTokens(suite, wctx, msg)
 	suite.Require().Error(err)
+}
+
+// Helper functions for ETH signature testing
+
+// generateTestETHPrivateKey generates a deterministic test Ethereum private key
+// Returns (privateKeyHex, addressHex, error)
+func generateTestETHPrivateKey() (string, string, error) {
+	// Use a fixed private key for deterministic testing
+	// This is a well-known test private key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+
+	privateKey, err := ethcrypto.HexToECDSA(privateKeyHex)
+	if err != nil {
+		return "", "", err
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		return "", "", err
+	}
+
+	address := ethcrypto.PubkeyToAddress(*publicKeyECDSA)
+
+	return privateKeyHex, address.Hex(), nil
+}
+
+// generateETHSignature generates a valid ETH signature for the given message components
+// Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
+// Uses ethers.signMessage format (EIP-191) which prefixes message with "\x19Ethereum Signed Message:\n<length>"
+func generateETHSignature(nonce, initiatorAddress, collectionId, approverAddress, approvalLevel, approvalId, challengeId string, privateKeyHex string) (string, error) {
+	// Construct the message to sign
+	message := nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
+
+	// Get private key
+	privateKey, err := ethcrypto.HexToECDSA(privateKeyHex)
+	if err != nil {
+		return "", err
+	}
+
+	// Use ethers.signMessage format (EIP-191): prefix with "\x19Ethereum Signed Message:\n<length>"
+	// This matches what ethers.Wallet.signMessage() does
+	messageBytes := []byte(message)
+	prefix := fmt.Sprintf("\x19Ethereum Signed Message:\n%d", len(messageBytes))
+	prefixedMessage := append([]byte(prefix), messageBytes...)
+
+	// Hash the prefixed message and sign
+	hash := ethcrypto.Keccak256Hash(prefixedMessage)
+	signature, err := ethcrypto.Sign(hash.Bytes(), privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert to hex string (with 0x prefix for compatibility with sigverify)
+	return "0x" + hex.EncodeToString(signature), nil
+}
+
+// TestETHSignatureChallenge_ValidSignature tests that a valid ETH signature is accepted
+func (suite *TestSuite) TestETHSignatureChallenge_ValidSignature() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Create collection with ETH signature challenge
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-1",
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Generate valid signature
+	nonce := "test-nonce-123"
+	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+	signature, err := generateETHSignature(
+		nonce,
+		alice,              // initiatorAddress
+		"1",                // collectionId
+		"",                 // approverAddress (empty for collection level)
+		"collection",       // approvalLevel
+		"test",             // approvalId
+		"test-challenge-1", // challengeId
+		privateKeyHex,
+	)
+	suite.Require().NoError(err)
+
+	// Create transfer with valid signature
+	msg := &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				EthSignatureProofs: []*types.ETHSignatureProof{
+					{
+						Nonce:     nonce,
+						Signature: signature,
+					},
+				},
+			},
+		},
+	}
+
+	err = TransferTokens(suite, wctx, msg)
+	suite.Require().NoError(err, "Valid signature should be accepted")
+
+	// Verify signature tracker was incremented
+	signatureKey := keeper.ConstructETHSignatureTrackerKey(
+		sdkmath.NewUint(1),
+		"",                 // approverAddress
+		"collection",       // approvalLevel
+		"test",             // approvalId
+		"test-challenge-1", // challengeId
+		signature,
+	)
+	numUsed, exists := suite.app.BadgesKeeper.GetETHSignatureTrackerFromStore(suite.ctx, signatureKey)
+	suite.Require().True(exists, "Signature tracker should exist")
+	suite.Require().Equal(sdkmath.NewUint(1), numUsed, "Signature should be used once")
+}
+
+// TestETHSignatureChallenge_InvalidSignature tests various invalid signature scenarios
+func (suite *TestSuite) TestETHSignatureChallenge_InvalidSignature() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Create collection with ETH signature challenge
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-1",
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Test 1: Wrong signer (signature from different address)
+	suite.Run("WrongSigner", func() {
+		// Generate a different private key
+		wrongPrivateKey, err := ethcrypto.GenerateKey()
+		suite.Require().NoError(err)
+		wrongPrivateKeyHex := hex.EncodeToString(ethcrypto.FromECDSA(wrongPrivateKey))
+
+		nonce := "test-nonce-123"
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			wrongPrivateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Signature from wrong signer should be rejected")
+	})
+
+	// Test 2: Wrong message (signature for different context)
+	suite.Run("WrongMessage", func() {
+		privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+		nonce := "test-nonce-123"
+		// Sign for different collectionId
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"2", // Wrong collectionId
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1), // But trying to use for collection 1
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Signature for wrong context should be rejected")
+	})
+
+	// Test 3: Empty signature
+	suite.Run("EmptySignature", func() {
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     "test-nonce-123",
+							Signature: "", // Empty signature
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Empty signature should be rejected")
+	})
+
+	// Test 4: Empty nonce
+	suite.Run("EmptyNonce", func() {
+		privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+		signature, err := generateETHSignature(
+			"test-nonce-123",
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     "", // Empty nonce
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Empty nonce should be rejected")
+	})
+
+	// Test 5: Malformed signature
+	suite.Run("MalformedSignature", func() {
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     "test-nonce-123",
+							Signature: "0xinvalid", // Malformed signature
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Malformed signature should be rejected")
+	})
+}
+
+// TestETHSignatureChallenge_SignatureReuse tests that signatures cannot be reused
+func (suite *TestSuite) TestETHSignatureChallenge_SignatureReuse() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Create collection with ETH signature challenge
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-1",
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(2), // Mint 2 for reuse test
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Generate valid signature
+	nonce := "test-nonce-123"
+	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+	signature, err := generateETHSignature(
+		nonce,
+		alice,
+		"1",
+		"",
+		"collection",
+		"test",
+		"test-challenge-1",
+		privateKeyHex,
+	)
+	suite.Require().NoError(err)
+
+	// First transfer - should succeed
+	msg1 := &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				EthSignatureProofs: []*types.ETHSignatureProof{
+					{
+						Nonce:     nonce,
+						Signature: signature,
+					},
+				},
+			},
+		},
+	}
+
+	err = TransferTokens(suite, wctx, msg1)
+	suite.Require().NoError(err, "First use of signature should succeed")
+
+	// Verify signature tracker shows it was used
+	signatureKey := keeper.ConstructETHSignatureTrackerKey(
+		sdkmath.NewUint(1),
+		"",
+		"collection",
+		"test",
+		"test-challenge-1",
+		signature,
+	)
+	numUsed, exists := suite.app.BadgesKeeper.GetETHSignatureTrackerFromStore(suite.ctx, signatureKey)
+	suite.Require().True(exists)
+	suite.Require().Equal(sdkmath.NewUint(1), numUsed, "Signature should be marked as used once")
+
+	// Second transfer with same signature - should fail
+	msg2 := &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				EthSignatureProofs: []*types.ETHSignatureProof{
+					{
+						Nonce:     nonce,
+						Signature: signature, // Same signature
+					},
+				},
+			},
+		},
+	}
+
+	err = TransferTokens(suite, wctx, msg2)
+	suite.Require().Error(err, "Reusing signature should be rejected")
+}
+
+// TestETHSignatureChallenge_CrossContextRejection tests that signatures are rejected when used in different contexts
+func (suite *TestSuite) TestETHSignatureChallenge_CrossContextRejection() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+
+	// Test 1: Different collectionId
+	suite.Run("DifferentCollectionId", func() {
+		// Create two collections
+		collectionsToCreate := GetCollectionsToCreate()
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+			{
+				Signer:             signerAddress,
+				ChallengeTrackerId: "test-challenge-1",
+			},
+		}
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+		err = CreateCollections(suite, wctx, collectionsToCreate)
+		suite.Require().NoError(err)
+
+		// Create second collection
+		collectionsToCreate2 := GetCollectionsToCreate()
+		collectionsToCreate2[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+			{
+				Signer:             signerAddress,
+				ChallengeTrackerId: "test-challenge-1",
+			},
+		}
+		collectionsToCreate2[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+		collectionsToCreate2[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+		err = CreateCollections(suite, wctx, collectionsToCreate2)
+		suite.Require().NoError(err)
+
+		// Generate signature for collection 1
+		nonce := "test-nonce-123"
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"1", // collectionId 1
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		// Try to use it for collection 2
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(2), // Different collection
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(2)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Signature for different collectionId should be rejected")
+	})
+
+	// Test 2: Different approverAddress - tested via DifferentApprovalLevel
+
+	// Test 3: Different approvalLevel
+	suite.Run("DifferentApprovalLevel", func() {
+		collectionsToCreate := GetCollectionsToCreate()
+		// Add outgoing approval
+		collectionsToCreate[0].DefaultOutgoingApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+			{
+				Signer:             signerAddress,
+				ChallengeTrackerId: "test-challenge-1",
+			},
+		}
+
+		err = CreateCollections(suite, wctx, collectionsToCreate)
+		suite.Require().NoError(err)
+
+		// Generate signature for collection level
+		nonce := "test-nonce-789"
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"1",
+			"",           // approverAddress
+			"collection", // approvalLevel
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		// Try to use it for outgoing level (which has approverAddress = bob)
+		// The signature was signed with approverAddress = "", but outgoing level uses approverAddress = bob
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+						{
+							ApprovalId:      "test",
+							ApprovalLevel:   "outgoing",
+							ApproverAddress: bob,
+							Version:         sdkmath.NewUint(0),
+						},
+					},
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Signature for different approvalLevel should be rejected")
+	})
+
+	// Test 4: Different approvalId
+	suite.Run("DifferentApprovalId", func() {
+		collectionsToCreate := GetCollectionsToCreate()
+		// Add second approval with different ID
+		collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+			ApprovalId:        "test-2",
+			ToListId:          "AllWithoutMint",
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			ApprovalCriteria: &types.ApprovalCriteria{
+				EthSignatureChallenges: []*types.ETHSignatureChallenge{
+					{
+						Signer:             signerAddress,
+						ChallengeTrackerId: "test-challenge-1",
+					},
+				},
+				OverridesToIncomingApprovals:   true,
+				OverridesFromOutgoingApprovals: true,
+			},
+		})
+
+		err = CreateCollections(suite, wctx, collectionsToCreate)
+		suite.Require().NoError(err)
+
+		// Generate signature for approvalId = "test"
+		nonce := "test-nonce-abc"
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test", // approvalId
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		// Try to use it for approvalId = "test-2"
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+						{
+							ApprovalId:      "test-2", // Different approvalId
+							ApprovalLevel:   "collection",
+							ApproverAddress: "",
+							Version:         sdkmath.NewUint(0),
+						},
+					},
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Signature for different approvalId should be rejected")
+	})
+
+	// Test 5: Different challengeId
+	suite.Run("DifferentChallengeId", func() {
+		collectionsToCreate := GetCollectionsToCreate()
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+			{
+				Signer:             signerAddress,
+				ChallengeTrackerId: "test-challenge-1",
+			},
+			{
+				Signer:             signerAddress,
+				ChallengeTrackerId: "test-challenge-2", // Different challenge
+			},
+		}
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+		err = CreateCollections(suite, wctx, collectionsToCreate)
+		suite.Require().NoError(err)
+
+		// Generate signature for challengeId = "test-challenge-1"
+		nonce := "test-nonce-xyz"
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1", // challengeId
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		// Try to use it for challengeId = "test-challenge-2"
+		// We need to provide a signature for challenge-2, but we're providing one for challenge-1
+		// The code checks all challenges, so if we only provide signature for challenge-1, challenge-2 will fail
+		// Actually, the code requires ALL challenges to be satisfied, so we need signatures for both
+		// But if we provide signature for challenge-1 when challenge-2 is being checked, it should fail
+		// Let's test by only providing the signature for challenge-1 when both are required
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature, // Signature for challenge-1, but challenge-2 also needs a signature
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Missing signature for challenge-2 should cause failure")
+	})
+}
+
+// TestETHSignatureChallenge_MultipleChallenges tests multiple ETH signature challenges
+func (suite *TestSuite) TestETHSignatureChallenge_MultipleChallenges() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Create collection with multiple ETH signature challenges
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-1",
+		},
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-2",
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+
+	// Test: All signatures valid - should succeed
+	suite.Run("AllSignaturesValid", func() {
+		nonce1 := "test-nonce-1"
+		signature1, err := generateETHSignature(
+			nonce1,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		nonce2 := "test-nonce-2"
+		signature2, err := generateETHSignature(
+			nonce2,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-2",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce1,
+							Signature: signature1,
+						},
+						{
+							Nonce:     nonce2,
+							Signature: signature2,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().NoError(err, "All valid signatures should be accepted")
+	})
+
+	// Test: Missing one signature - should fail
+	suite.Run("MissingSignature", func() {
+		nonce1 := "test-nonce-3"
+		signature1, err := generateETHSignature(
+			nonce1,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		// Only provide signature for challenge-1, missing challenge-2
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce1,
+							Signature: signature1,
+						},
+						// Missing signature for challenge-2
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Missing signature should cause failure")
+	})
+
+	// Test: One invalid signature - should fail
+	suite.Run("InvalidSignature", func() {
+		nonce1 := "test-nonce-4"
+		signature1, err := generateETHSignature(
+			nonce1,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce1,
+							Signature: signature1,
+						},
+						{
+							Nonce:     "test-nonce-5",
+							Signature: "0xinvalid", // Invalid signature for challenge-2
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Invalid signature should cause failure")
+	})
+}
+
+// TestETHSignatureChallenge_MissingSignature tests that missing signatures are rejected
+func (suite *TestSuite) TestETHSignatureChallenge_MissingSignature() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Create collection with ETH signature challenge
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-1",
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Create transfer without ETH signature proofs
+	msg := &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				EthSignatureProofs:   []*types.ETHSignatureProof{}, // Empty - no signatures
+			},
+		},
+	}
+
+	err = TransferTokens(suite, wctx, msg)
+	suite.Require().Error(err, "Missing signature should be rejected")
+}
+
+// TestETHSignatureChallenge_EmptyChallenge tests edge cases with empty/nil challenges
+func (suite *TestSuite) TestETHSignatureChallenge_EmptyChallenge() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Test 1: Empty signer address
+	suite.Run("EmptySigner", func() {
+		collectionsToCreate := GetCollectionsToCreate()
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+			{
+				Signer:             "", // Empty signer
+				ChallengeTrackerId: "test-challenge-1",
+			},
+		}
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+		err := CreateCollections(suite, wctx, collectionsToCreate)
+		suite.Require().NoError(err)
+
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     "test-nonce",
+							Signature: "0x1234",
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().Error(err, "Empty signer should cause error")
+	})
+}
+
+// TestETHSignatureChallenge_WithOtherCriteria tests integration with other approval criteria
+func (suite *TestSuite) TestETHSignatureChallenge_WithOtherCriteria() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Test: ETH signature challenge combined with Merkle challenge
+	suite.Run("WithMerkleChallenge", func() {
+		// Create Merkle tree
+		aliceLeaf := "-" + alice + "-1-0-0"
+		leafs := [][]byte{[]byte(aliceLeaf)}
+		leafHashes := make([][]byte, len(leafs))
+		for i, leaf := range leafs {
+			initialHash := sha256.Sum256(leaf)
+			leafHashes[i] = initialHash[:]
+		}
+		rootHash := hex.EncodeToString(leafHashes[0])
+
+		collectionsToCreate := GetCollectionsToCreate()
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.MerkleChallenges = []*types.MerkleChallenge{
+			{
+				Root:                rootHash,
+				ExpectedProofLength: sdkmath.NewUint(0),
+				MaxUsesPerLeaf:      sdkmath.NewUint(1),
+				ChallengeTrackerId:  "merkle-challenge-1",
+			},
+		}
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+			{
+				Signer:             signerAddress,
+				ChallengeTrackerId: "test-challenge-1",
+			},
+		}
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+		// Add mint approval so we can mint badges to bob
+		collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+			ToListId:          "AllWithoutMint",
+			FromListId:        "Mint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			ApprovalId:        "mint-test",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				MaxNumTransfers: &types.MaxNumTransfers{
+					OverallMaxNumTransfers: sdkmath.NewUint(1000),
+					AmountTrackerId:        "mint-test-tracker",
+				},
+				ApprovalAmounts: &types.ApprovalAmounts{
+					PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+					AmountTrackerId:              "mint-test-tracker",
+				},
+				OverridesFromOutgoingApprovals: true,
+				OverridesToIncomingApprovals:   true,
+			},
+		}}, collectionsToCreate[0].CollectionApprovals...)
+
+		err = CreateCollections(suite, wctx, collectionsToCreate)
+		suite.Require().NoError(err)
+
+		// Mint badges to bob so he can transfer them
+		err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+			Creator:      bob,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        "Mint",
+					ToAddresses: []string{bob},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+						{
+							ApprovalId:      "mint-test",
+							ApprovalLevel:   "collection",
+							ApproverAddress: "",
+							Version:         sdkmath.NewUint(0),
+						},
+					},
+				},
+			},
+		})
+		suite.Require().NoError(err, "Error minting badges to bob")
+
+		privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+		nonce := "test-nonce-combined"
+		signature, err := generateETHSignature(
+			nonce,
+			alice,
+			"1",
+			"",
+			"collection",
+			"test",
+			"test-challenge-1",
+			privateKeyHex,
+		)
+		suite.Require().NoError(err)
+
+		// Transfer with both Merkle proof and ETH signature
+		msg := &types.MsgTransferTokens{
+			Creator:      alice,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        bob,
+					ToAddresses: []string{alice},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTopHalfUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
+					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+					MerkleProofs: []*types.MerkleProof{
+						{
+							Leaf:  aliceLeaf,
+							Aunts: []*types.MerklePathItem{},
+						},
+					},
+					EthSignatureProofs: []*types.ETHSignatureProof{
+						{
+							Nonce:     nonce,
+							Signature: signature,
+						},
+					},
+				},
+			},
+		}
+
+		err = TransferTokens(suite, wctx, msg)
+		suite.Require().NoError(err, "Both challenges satisfied should succeed")
+	})
+}
+
+// TestETHSignatureChallenge_TrackerQuery tests the signature tracker query functionality
+func (suite *TestSuite) TestETHSignatureChallenge_TrackerQuery() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Generate test private key and address
+	_, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	// Create collection with ETH signature challenge
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.EthSignatureChallenges = []*types.ETHSignatureChallenge{
+		{
+			Signer:             signerAddress,
+			ChallengeTrackerId: "test-challenge-1",
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
+	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
+
+	// Add mint approval so we can mint badges to bob
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{
+				OverallMaxNumTransfers: sdkmath.NewUint(1000),
+				AmountTrackerId:        "mint-test-tracker",
+			},
+			ApprovalAmounts: &types.ApprovalAmounts{
+				PerFromAddressApprovalAmount: sdkmath.NewUint(1000),
+				AmountTrackerId:              "mint-test-tracker",
+			},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+
+	err = CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	// Mint badges to bob so he can transfer them
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err, "Error minting badges to bob")
+
+	// Generate and use signature
+	nonce := "test-nonce-query"
+	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+	signature, err := generateETHSignature(
+		nonce,
+		alice,
+		"1",
+		"",
+		"collection",
+		"test",
+		"test-challenge-1",
+		privateKeyHex,
+	)
+	suite.Require().NoError(err)
+
+	msg := &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetTopHalfUintRanges(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.BadgesKeeper, sdkmath.NewUint(1)),
+				EthSignatureProofs: []*types.ETHSignatureProof{
+					{
+						Nonce:     nonce,
+						Signature: signature,
+					},
+				},
+			},
+		},
+	}
+
+	err = TransferTokens(suite, wctx, msg)
+	suite.Require().NoError(err)
+
+	// Query the signature tracker
+	response, err := suite.app.BadgesKeeper.GetETHSignatureTracker(
+		wctx,
+		&types.QueryGetETHSignatureTrackerRequest{
+			CollectionId:       "1",
+			ApproverAddress:    "",
+			ApprovalLevel:      "collection",
+			ApprovalId:         "test",
+			ChallengeTrackerId: "test-challenge-1",
+			Signature:          signature,
+		},
+	)
+	suite.Require().NoError(err)
+	suite.Require().Equal("1", response.NumUsed, "Signature should be used once")
 }

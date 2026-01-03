@@ -112,12 +112,6 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.SetDynamicStoreValueMsg != nil:
 				badgeCustomMsg.SetDynamicStoreValueMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetDynamicStoreValueMsg}, nil
-			case badgeCustomMsg.IncrementStoreValueMsg != nil:
-				badgeCustomMsg.IncrementStoreValueMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.IncrementStoreValueMsg}, nil
-			case badgeCustomMsg.DecrementStoreValueMsg != nil:
-				badgeCustomMsg.DecrementStoreValueMsg.Creator = sender.String()
-				return []sdk.Msg{badgeCustomMsg.DecrementStoreValueMsg}, nil
 			case badgeCustomMsg.SetIncomingApprovalMsg != nil:
 				badgeCustomMsg.SetIncomingApprovalMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetIncomingApprovalMsg}, nil
@@ -157,6 +151,9 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 			case badgeCustomMsg.SetIsArchivedMsg != nil:
 				badgeCustomMsg.SetIsArchivedMsg.Creator = sender.String()
 				return []sdk.Msg{badgeCustomMsg.SetIsArchivedMsg}, nil
+			case badgeCustomMsg.CastVoteMsg != nil:
+				badgeCustomMsg.CastVoteMsg.Creator = sender.String()
+				return []sdk.Msg{badgeCustomMsg.CastVoteMsg}, nil
 			default:
 				return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Unknown custom badge message variant %s", badgeCustomMsg)
 			}

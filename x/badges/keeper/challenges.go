@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	// MaxMerkleProofLength represents the maximum allowed Merkle proof length to prevent DoS attacks
 	MaxMerkleProofLength = 10
 )
 
@@ -59,9 +58,18 @@ func (k Keeper) HandleMerkleChallenges(
 		}
 
 		// Early validation of proof length to prevent DoS attacks
+		// This check must happen before processing any proofs to prevent gas consumption attacks
 		if challenge.ExpectedProofLength.GT(sdkmath.NewUint(MaxMerkleProofLength)) {
 			detErrMsg := fmt.Sprintf("expected proof length %s exceeds maximum allowed %d", challenge.ExpectedProofLength.String(), MaxMerkleProofLength)
 			return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
+
+		// Additional validation: check actual proof lengths before processing to prevent DoS
+		for _, proof := range merkleProofs {
+			if len(proof.Aunts) > MaxMerkleProofLength {
+				detErrMsg := fmt.Sprintf("proof length %d exceeds maximum allowed %d", len(proof.Aunts), MaxMerkleProofLength)
+				return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
 		}
 
 		challengeId := challenge.ChallengeTrackerId
@@ -86,11 +94,13 @@ func (k Keeper) HandleMerkleChallenges(
 					continue
 				}
 
+				// Use local variable to avoid mutating the original transfer object
+				leafValue := proof.Leaf
 				if challenge.UseCreatorAddressAsLeaf {
-					proof.Leaf = creatorAddress //overwrites it with creator address
+					leafValue = creatorAddress
 				}
 
-				if proof.Leaf == "" {
+				if leafValue == "" {
 					detailedErrorStr = "empty leaf"
 					continue
 				}
@@ -106,7 +116,7 @@ func (k Keeper) HandleMerkleChallenges(
 
 					ethAddress := ethcommon.HexToAddress(leafSignerEthAddress)
 
-					leafSignatureString := proof.Leaf + "-" + creatorAddress
+					leafSignatureString := leafValue + "-" + creatorAddress
 					isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 						ethAddress,
 						[]byte(leafSignatureString),
@@ -136,10 +146,16 @@ func (k Keeper) HandleMerkleChallenges(
 				}
 
 				if useLeafIndexForTransferOrder {
+					// Prevent underflow: ensure leafIndex >= leftmostLeafIndex
+					// If leafIndex < leftmostLeafIndex, the proof is invalid for predetermined balance calculation
+					if leafIndex.LT(leftmostLeafIndex) {
+						detErrMsg := fmt.Sprintf("leaf index %s is less than leftmost leaf index %s, invalid for predetermined balance calculation", leafIndex.String(), leftmostLeafIndex.String())
+						return detErrMsg, numIncrements, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+					}
 					numIncrements = leafIndex.Sub(leftmostLeafIndex)
 				}
 
-				err := CheckMerklePath(proof.Leaf, root, proof.Aunts)
+				err := CheckMerklePath(leafValue, root, proof.Aunts)
 				if err != nil {
 					detailedErrorStr = ""
 					continue
@@ -164,7 +180,8 @@ func (k Keeper) HandleMerkleChallenges(
 					if !simulation {
 						newNumUsed, err := k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 						if err != nil {
-							continue
+							detErrMsg := "failed to increment challenge tracker"
+							return detErrMsg, numIncrements, sdkerrors.Wrap(err, detErrMsg)
 						}
 
 						//Currently added for indexer, but note that it is planned to be deprecated
@@ -206,9 +223,8 @@ func (k Keeper) HandleETHSignatureChallenges(
 	transfer *types.Transfer,
 	approval *types.CollectionApproval,
 	transferMetadata TransferMetadata,
-	simulation bool,
 ) (string, error) {
-	creatorAddress := transferMetadata.InitiatedBy
+	initiatorAddress := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
 	approvalLevel := transferMetadata.ApprovalLevel
 	challenges := approval.ApprovalCriteria.EthSignatureChallenges
@@ -231,8 +247,9 @@ func (k Keeper) HandleETHSignatureChallenges(
 			}
 
 			// Verify the signature
+			// Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
 			ethAddress := ethcommon.HexToAddress(signerAddress)
-			signatureString := proof.Nonce + "-" + creatorAddress
+			signatureString := proof.Nonce + "-" + initiatorAddress + "-" + collectionId.String() + "-" + approverAddress + "-" + approvalLevel + "-" + approval.ApprovalId + "-" + challengeId
 
 			isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 				ethAddress,
@@ -256,28 +273,27 @@ func (k Keeper) HandleETHSignatureChallenges(
 				continue
 			}
 
-			// Increment the usage count if we are doing it for real
-			if !simulation {
-				newNumUsed, err := k.IncrementETHSignatureTrackerInStore(ctx, signatureKey)
-				if err != nil {
-					continue
-				}
-
-				// Currently added for indexer, but note that it is planned to be deprecated
-				ctx.EventManager().EmitEvent(
-					sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
-						sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
-						sdk.NewAttribute("creator", creatorAddress),
-						sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
-						sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
-						sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
-						sdk.NewAttribute("signature", fmt.Sprint(proof.Signature)),
-						sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
-						sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
-						sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
-					),
-				)
+			// Increment the usage count
+			newNumUsed, err := k.IncrementETHSignatureTrackerInStore(ctx, signatureKey)
+			if err != nil {
+				continue
 			}
+
+			// Currently added for indexer, but note that it is planned to be deprecated
+			ctx.EventManager().EmitEvent(
+				sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
+					sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+					sdk.NewAttribute("creator", initiatorAddress),
+					sdk.NewAttribute("initiator", initiatorAddress),
+					sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
+					sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
+					sdk.NewAttribute("approvalId", fmt.Sprint(approval.ApprovalId)),
+					sdk.NewAttribute("signature", fmt.Sprint(proof.Signature)),
+					sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),
+					sdk.NewAttribute("approvalLevel", fmt.Sprint(approvalLevel)),
+					sdk.NewAttribute("numUsed", fmt.Sprint(newNumUsed)),
+				),
+			)
 
 			hasValidSolution = true
 			break
@@ -334,54 +350,4 @@ func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 	}
 
 	return leafIndex
-}
-
-// SimulateMerkleChallenges is a wrapper around HandleMerkleChallenges for simulation
-// Returns (deterministicErrorMsg, numIncrements, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) SimulateMerkleChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) (string, sdkmath.Uint, error) {
-	detErrMsg, numIncrements, err := k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
-	return detErrMsg, numIncrements, err
-}
-
-// ExecuteMerkleChallenges is a wrapper around HandleMerkleChallenges for execution
-func (k Keeper) ExecuteMerkleChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) (sdkmath.Uint, error) {
-	_, numIncrements, err := k.HandleMerkleChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
-	return numIncrements, err
-}
-
-// SimulateETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for simulation
-// Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) SimulateETHSignatureChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) (string, error) {
-	detErrMsg, err := k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, true)
-	return detErrMsg, err
-}
-
-// ExecuteETHSignatureChallenges is a wrapper around HandleETHSignatureChallenges for execution
-func (k Keeper) ExecuteETHSignatureChallenges(
-	ctx sdk.Context,
-	collectionId sdkmath.Uint,
-	transfer *types.Transfer,
-	approval *types.CollectionApproval,
-	transferMetadata TransferMetadata,
-) error {
-	_, err := k.HandleETHSignatureChallenges(ctx, collectionId, transfer, approval, transferMetadata, false)
-	return err
 }

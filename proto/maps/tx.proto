@@ -7,9 +7,9 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "maps/permissions.proto";
-import "maps/timelines.proto";
 import "maps/balances.proto";
 import "maps/params.proto";
+import "maps/metadata.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/maps/types";
 
@@ -80,8 +80,8 @@ message ValueOptions {
 }
 
 message MapPermissions {
-  repeated TimedUpdatePermission canUpdateMetadata = 1;
-  repeated TimedUpdatePermission canUpdateManager = 2;
+  repeated ActionPermission canUpdateMetadata = 1;
+  repeated ActionPermission canUpdateManager = 2;
   repeated ActionPermission canDeleteMap = 3;
 }
 
@@ -90,15 +90,15 @@ message Map {
   string creator = 1;
   string mapId = 2; 
 
-  string inheritManagerTimelineFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated ManagerTimeline managerTimeline = 4;
+  string inheritManagerFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string manager = 4;
 
   //config options that will not change at all
   MapUpdateCriteria updateCriteria = 5;
   ValueOptions valueOptions = 6;
   string defaultValue = 7;
 
-  repeated MapMetadataTimeline metadataTimeline = 10;
+  Metadata metadata = 10;
 
   MapPermissions permissions = 11;
 }
@@ -110,15 +110,15 @@ message MsgCreateMap {
   string creator = 1;
   string mapId = 2; 
 
-  string inheritManagerTimelineFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  repeated ManagerTimeline managerTimeline = 4;
+  string inheritManagerFrom = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string manager = 4;
 
   //config options that will not change at all
   MapUpdateCriteria updateCriteria = 5;
   ValueOptions valueOptions = 6;
   string defaultValue = 7;
 
-  repeated MapMetadataTimeline metadataTimeline = 9;
+  Metadata metadata = 9;
 
   MapPermissions permissions = 10;
 }
@@ -132,11 +132,11 @@ message MsgUpdateMap {
   string creator = 1;
   string mapId = 2;
 
-  bool updateManagerTimeline = 3;
-  repeated ManagerTimeline managerTimeline = 4;
+  bool updateManager = 3;
+  string manager = 4;
 
-  bool updateMetadataTimeline = 7;
-  repeated MapMetadataTimeline metadataTimeline = 8;
+  bool updateMetadata = 7;
+  Metadata metadata = 8;
 
   bool updatePermissions = 9;
   MapPermissions permissions = 10;

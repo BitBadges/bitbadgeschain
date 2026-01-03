@@ -27,54 +27,22 @@ func GetDefaultCreateMsg() *types.MsgCreateMap {
 			NoDuplicates:     false,
 		},
 		DefaultValue: "",
-		ManagerTimeline: []*types.ManagerTimeline{
-			{
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-				Manager: bob,
-			},
-		},
-		MetadataTimeline: []*types.MapMetadataTimeline{
-			{
-				Metadata: &types.Metadata{
-					Uri:        "test",
-					CustomData: "",
-				},
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
+		Manager:      bob,
+		Metadata: &types.Metadata{
+			Uri:        "test",
+			CustomData: "",
 		},
 		Permissions: &types.MapPermissions{
-			CanUpdateMetadata: []*types.TimedUpdatePermission{
+			CanUpdateMetadata: []*types.ActionPermission{
 				{
 					PermanentlyPermittedTimes: []*types.UintRange{},
 					PermanentlyForbiddenTimes: []*types.UintRange{},
-					TimelineTimes: []*types.UintRange{
-						{
-							Start: sdkmath.NewUint(1),
-							End:   sdkmath.NewUint(math.MaxUint64),
-						},
-					},
 				},
 			},
-			CanUpdateManager: []*types.TimedUpdatePermission{
+			CanUpdateManager: []*types.ActionPermission{
 				{
 					PermanentlyPermittedTimes: []*types.UintRange{},
 					PermanentlyForbiddenTimes: []*types.UintRange{},
-					TimelineTimes: []*types.UintRange{
-						{
-							Start: sdkmath.NewUint(1),
-							End:   sdkmath.NewUint(math.MaxUint64),
-						},
-					},
 				},
 			},
 			CanDeleteMap: []*types.ActionPermission{
@@ -98,27 +66,17 @@ func (suite *TestSuite) TestMaps() {
 	suite.Require().NotNil(currMap, "Error getting map: %s")
 	suite.Require().Equal("test", currMap.MapId, "Error getting map: %s")
 
-	suite.Require().Equal(bob, currMap.ManagerTimeline[0].Manager, "Error getting map: %s")
+	suite.Require().Equal(bob, currMap.Manager, "Error getting map: %s")
 
 	updateMapMsg := &types.MsgUpdateMap{
-		Creator:               bob,
-		MapId:                 "test",
-		UpdateManagerTimeline: true,
-		ManagerTimeline: []*types.ManagerTimeline{
-			{
-				Manager: alice,
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
-		},
-		UpdateMetadataTimeline: false,
-		MetadataTimeline:       nil,
-		UpdatePermissions:      false,
-		Permissions:            nil,
+		Creator:           bob,
+		MapId:             "test",
+		UpdateManager:     true,
+		Manager:           alice,
+		UpdateMetadata:    false,
+		Metadata:          nil,
+		UpdatePermissions: false,
+		Permissions:       nil,
 	}
 
 	updateMapMsg.Creator = alice
@@ -146,19 +104,13 @@ func (suite *TestSuite) TestMaps() {
 func (suite *TestSuite) TestPermissions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	createMsg := GetDefaultCreateMsg()
-	createMsg.Permissions.CanUpdateManager = []*types.TimedUpdatePermission{
+	createMsg.Permissions.CanUpdateManager = []*types.ActionPermission{
 		{
 			PermanentlyPermittedTimes: []*types.UintRange{},
 			PermanentlyForbiddenTimes: []*types.UintRange{{
 				Start: sdkmath.NewUint(1),
 				End:   sdkmath.NewUint(math.MaxUint64),
 			}},
-			TimelineTimes: []*types.UintRange{
-				{
-					Start: sdkmath.NewUint(1),
-					End:   sdkmath.NewUint(math.MaxUint64),
-				},
-			},
 		},
 	}
 
@@ -166,20 +118,10 @@ func (suite *TestSuite) TestPermissions() {
 	suite.Require().Nil(err, "Error creating map: %s")
 
 	updateMapMsg := &types.MsgUpdateMap{
-		Creator:               bob,
-		MapId:                 "test",
-		UpdateManagerTimeline: true,
-		ManagerTimeline: []*types.ManagerTimeline{
-			{
-				Manager: alice,
-				TimelineTimes: []*types.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
-		},
+		Creator:       bob,
+		MapId:         "test",
+		UpdateManager: true,
+		Manager:       alice,
 	}
 
 	err = UpdateMap(suite, wctx, updateMapMsg)
@@ -477,17 +419,7 @@ func (suite *TestSuite) TestCollectionIdReservedMaps() {
 func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
 	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				Manager: alice,
-				TimelineTimes: []*badgestypes.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
-		},
+		Manager:      alice,
 	}, true)
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -504,17 +436,7 @@ func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
 func (suite *TestSuite) TestCollectionIdReservedMapsWithManagerNotManager() {
 	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				Manager: alice,
-				TimelineTimes: []*badgestypes.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
-		},
+		Manager:      alice,
 	}, true)
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -539,17 +461,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 
 	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				Manager: alice,
-				TimelineTimes: []*badgestypes.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
-		},
+		Manager:      alice,
 	}, true)
 
 	err := CreateMap(suite, wctx, createMsg)
@@ -609,25 +521,15 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 	createMsg.UpdateCriteria.FirstComeFirstServe = true
 	createMsg.MapId = "testing"
 	createMsg.Creator = alice
-	createMsg.ManagerTimeline = []*types.ManagerTimeline{}
-	createMsg.InheritManagerTimelineFrom = sdkmath.NewUint(1)
+	createMsg.Manager = ""
+	createMsg.InheritManagerFrom = sdkmath.NewUint(1)
 
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
 	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				Manager: alice,
-				TimelineTimes: []*badgestypes.UintRange{
-					{
-						Start: sdkmath.NewUint(1),
-						End:   sdkmath.NewUint(math.MaxUint64),
-					},
-				},
-			},
-		},
+		Manager:      alice,
 	}, true)
 
 	err = SetValue(suite, wctx, &types.MsgSetValue{

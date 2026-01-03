@@ -21,8 +21,8 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 	}
 
 	collection := &tokentypes.TokenCollection{}
-	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
+	if !currMap.InheritManagerFrom.IsNil() && !currMap.InheritManagerFrom.IsZero() {
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
@@ -35,18 +35,22 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 		return nil, sdkerrors.Wrapf(ErrNotMapCreator, "current manager is %s but got %s", currManager, msg.Creator)
 	}
 
-	if msg.UpdateManagerTimeline {
-		if err := k.badgesKeeper.ValidateManagerUpdate(ctx, types.CastManagerTimelineArray(currMap.ManagerTimeline), types.CastManagerTimelineArray(msg.ManagerTimeline), types.CastTimedUpdatePermissions(currMap.Permissions.CanUpdateManager)); err != nil {
+	if msg.UpdateManager {
+		oldManager := currMap.Manager
+		newManager := msg.Manager
+		if err := k.badgesKeeper.ValidateManagerUpdate(ctx, oldManager, newManager, types.CastActionPermissions(currMap.Permissions.CanUpdateManager)); err != nil {
 			return nil, err
 		}
-		currMap.ManagerTimeline = msg.ManagerTimeline
+		currMap.Manager = msg.Manager
 	}
 
-	if msg.UpdateMetadataTimeline {
-		if err := k.badgesKeeper.ValidateCollectionMetadataUpdate(ctx, types.CastMetadataTimelineArray(currMap.MetadataTimeline), types.CastMetadataTimelineArray(msg.MetadataTimeline), types.CastTimedUpdatePermissions(currMap.Permissions.CanUpdateMetadata)); err != nil {
+	if msg.UpdateMetadata {
+		oldMetadata := types.CastMapMetadataToCollectionMetadata(currMap.Metadata)
+		newMetadata := types.CastMapMetadataToCollectionMetadata(msg.Metadata)
+		if err := k.badgesKeeper.ValidateCollectionMetadataUpdate(ctx, oldMetadata, newMetadata, types.CastActionPermissions(currMap.Permissions.CanUpdateMetadata)); err != nil {
 			return nil, err
 		}
-		currMap.MetadataTimeline = msg.MetadataTimeline
+		currMap.Metadata = msg.Metadata
 	}
 
 	if msg.UpdatePermissions {
@@ -62,11 +66,11 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateTimedUpdatePermissionUpdate(ctx, types.CastTimedUpdatePermissions(currMap.Permissions.CanUpdateManager), types.CastTimedUpdatePermissions(msg.Permissions.CanUpdateManager)); err != nil {
+		if err := k.badgesKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanUpdateManager), types.CastActionPermissions(msg.Permissions.CanUpdateManager)); err != nil {
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateTimedUpdatePermissionUpdate(ctx, types.CastTimedUpdatePermissions(currMap.Permissions.CanUpdateMetadata), types.CastTimedUpdatePermissions(msg.Permissions.CanUpdateMetadata)); err != nil {
+		if err := k.badgesKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanUpdateMetadata), types.CastActionPermissions(msg.Permissions.CanUpdateMetadata)); err != nil {
 			return nil, err
 		}
 

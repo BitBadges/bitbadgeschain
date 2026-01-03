@@ -24,47 +24,76 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // ApprovalCriteria defines the criteria for approving transfers.
+// All criteria must be satisfied for the approval to be considered valid.
 type ApprovalCriteria struct {
-	// Merkle challenge that must be satisfied for approval.
+	// Merkle challenges that must be satisfied for approval. The initiator must provide valid Merkle proofs
+	// that satisfy all specified challenges. Each challenge requires a proof that leads to a specific root hash.
 	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
-	// Predetermined balances for eeach approval.
+	// Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
+	// that can be transferred when using this approval.
 	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	// Threshold limit of amounts that can be transferred using this approval.
+	// Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
+	// transferred and enforces maximum limits per approval.
 	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	// Maximum number of transfers that can be processed using this approval.
+	// Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
+	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The sdk.Coins that need to be transferred for approval.
+	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
+	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the recipient matches the initiator are allowed.
 	RequireToEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the sender matches the initiator are allowed.
 	RequireFromEqualsInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
 	// Require the "to" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the recipient equals the initiator are forbidden.
 	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,8,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
 	// Require the "from" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the sender equals the initiator are forbidden.
 	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,9,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
-	// Overrides the user's outgoing approvals for approval.
+	// Overrides the user's outgoing approvals for approval. If true, this collection-level approval
+	// takes precedence over any outgoing approvals defined by the sender, allowing the collection to
+	// control outgoing transfer behavior.
 	OverridesFromOutgoingApprovals bool `protobuf:"varint,10,opt,name=overridesFromOutgoingApprovals,proto3" json:"overridesFromOutgoingApprovals,omitempty"`
-	// Overrides the user's incoming approvals for approval.
+	// Overrides the user's incoming approvals for approval. If true, this collection-level approval
+	// takes precedence over any incoming approvals defined by the recipient, allowing the collection to
+	// control incoming transfer behavior.
 	OverridesToIncomingApprovals bool `protobuf:"varint,11,opt,name=overridesToIncomingApprovals,proto3" json:"overridesToIncomingApprovals,omitempty"`
-	// Auto-deletion options.
+	// Auto-deletion options for this approval. Defines conditions under which this approval should be
+	// automatically deleted (e.g., after a certain number of uses or time period).
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,12,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// User level royalties to apply to the transfer.
+	// User level royalties to apply to the transfer. Defines the percentage and payout address for
+	// royalties that should be collected when this approval is used for a transfer.
 	UserRoyalties *UserRoyalties `protobuf:"bytes,13,opt,name=userRoyalties,proto3" json:"userRoyalties,omitempty"`
-	// Must own tokens for approval.
+	// Must own tokens for approval. Defines token ownership requirements that must be satisfied for
+	// the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
 	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,14,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
-	// Dynamic store challenges that the initiator must pass for approval.
+	// Dynamic store challenges that the initiator must pass for approval. The initiator must provide
+	// valid proofs that satisfy all specified dynamic store challenges (e.g., key-value store lookups).
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,15,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
-	// ETH signature challenges that the initiator must pass for approval.
+	// ETH signature challenges that the initiator must pass for approval. The initiator must provide
+	// valid Ethereum signatures for all specified challenges. Each signature can only be used once.
 	EthSignatureChallenges []*ETHSignatureChallenge `protobuf:"bytes,16,rep,name=ethSignatureChallenges,proto3" json:"ethSignatureChallenges,omitempty"`
-	// Address checks for sender, recipient, and initiator.
-	SenderChecks    *AddressChecks `protobuf:"bytes,17,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the sender of the transfer. Validates that the sender address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
+	SenderChecks *AddressChecks `protobuf:"bytes,17,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the recipient of the transfer. Validates that the recipient address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	RecipientChecks *AddressChecks `protobuf:"bytes,18,opt,name=recipientChecks,proto3" json:"recipientChecks,omitempty"`
+	// Address checks for the initiator of the transfer. Validates that the initiator address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	InitiatorChecks *AddressChecks `protobuf:"bytes,19,opt,name=initiatorChecks,proto3" json:"initiatorChecks,omitempty"`
-	// Alternative time-based checks for approval denial (offline hours/days).
+	// Alternative time-based checks for approval denial (offline hours/days). Defines time periods
+	// during which this approval should be denied, such as specific hours of the day or days of the week.
 	AltTimeChecks *AltTimeChecks `protobuf:"bytes,20,opt,name=altTimeChecks,proto3" json:"altTimeChecks,omitempty"`
 	// If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+	// This allows fine-grained control over which approvals are applied when multiple approvals could match.
 	MustPrioritize bool `protobuf:"varint,21,opt,name=mustPrioritize,proto3" json:"mustPrioritize,omitempty"`
+	// Voting challenges that must be satisfied for approval. The initiator must provide
+	// valid votes that meet the quorum threshold for all specified challenges.
+	VotingChallenges []*VotingChallenge `protobuf:"bytes,22,rep,name=votingChallenges,proto3" json:"votingChallenges,omitempty"`
 }
 
 func (m *ApprovalCriteria) Reset()         { *m = ApprovalCriteria{} }
@@ -247,37 +276,66 @@ func (m *ApprovalCriteria) GetMustPrioritize() bool {
 	return false
 }
 
+func (m *ApprovalCriteria) GetVotingChallenges() []*VotingChallenge {
+	if m != nil {
+		return m.VotingChallenges
+	}
+	return nil
+}
+
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
+// This is used for user-level outgoing approvals and only includes fields relevant to outgoing transfers.
+// All criteria must be satisfied for the approval to be considered valid.
 type OutgoingApprovalCriteria struct {
-	// Merkle challenge that must be satisfied for approval.
+	// Merkle challenges that must be satisfied for approval. The initiator must provide valid Merkle proofs
+	// that satisfy all specified challenges. Each challenge requires a proof that leads to a specific root hash.
 	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
-	// Predetermined balances for eeach approval.
+	// Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
+	// that can be transferred when using this approval.
 	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	// Threshold limit of amounts that can be transferred using this approval.
+	// Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
+	// transferred and enforces maximum limits per approval.
 	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	// Maximum number of transfers that can be processed using this approval.
+	// Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
+	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The sdk.Coins that need to be transferred for approval.
+	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
+	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the recipient matches the initiator are allowed.
 	RequireToEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireToEqualsInitiatedBy,proto3" json:"requireToEqualsInitiatedBy,omitempty"`
 	// Require the "to" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the recipient equals the initiator are forbidden.
 	RequireToDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireToDoesNotEqualInitiatedBy,proto3" json:"requireToDoesNotEqualInitiatedBy,omitempty"`
-	// Auto-deletion options.
+	// Auto-deletion options for this approval. Defines conditions under which this approval should be
+	// automatically deleted (e.g., after a certain number of uses or time period).
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// Must own tokens for approval.
+	// Must own tokens for approval. Defines token ownership requirements that must be satisfied for
+	// the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
 	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
-	// Dynamic store challenges that the initiator must pass for approval.
+	// Dynamic store challenges that the initiator must pass for approval. The initiator must provide
+	// valid proofs that satisfy all specified dynamic store challenges (e.g., key-value store lookups).
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,10,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
-	// ETH signature challenges that the initiator must pass for approval.
+	// ETH signature challenges that the initiator must pass for approval. The initiator must provide
+	// valid Ethereum signatures for all specified challenges. Each signature can only be used once.
 	EthSignatureChallenges []*ETHSignatureChallenge `protobuf:"bytes,11,rep,name=ethSignatureChallenges,proto3" json:"ethSignatureChallenges,omitempty"`
-	// Address checks for recipient and initiator (no sender checks for outgoing approvals).
+	// Address checks for the recipient of the transfer. Validates that the recipient address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
+	// Note: No sender checks are included for outgoing approvals since the sender is the user themselves.
 	RecipientChecks *AddressChecks `protobuf:"bytes,12,opt,name=recipientChecks,proto3" json:"recipientChecks,omitempty"`
+	// Address checks for the initiator of the transfer. Validates that the initiator address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	InitiatorChecks *AddressChecks `protobuf:"bytes,13,opt,name=initiatorChecks,proto3" json:"initiatorChecks,omitempty"`
-	// Alternative time-based checks for approval denial (offline hours/days).
+	// Alternative time-based checks for approval denial (offline hours/days). Defines time periods
+	// during which this approval should be denied, such as specific hours of the day or days of the week.
 	AltTimeChecks *AltTimeChecks `protobuf:"bytes,14,opt,name=altTimeChecks,proto3" json:"altTimeChecks,omitempty"`
 	// If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+	// This allows fine-grained control over which approvals are applied when multiple approvals could match.
 	MustPrioritize bool `protobuf:"varint,15,opt,name=mustPrioritize,proto3" json:"mustPrioritize,omitempty"`
+	// Voting challenges that must be satisfied for approval. The initiator must provide
+	// valid votes that meet the quorum threshold for all specified challenges.
+	VotingChallenges []*VotingChallenge `protobuf:"bytes,16,rep,name=votingChallenges,proto3" json:"votingChallenges,omitempty"`
 }
 
 func (m *OutgoingApprovalCriteria) Reset()         { *m = OutgoingApprovalCriteria{} }
@@ -418,37 +476,66 @@ func (m *OutgoingApprovalCriteria) GetMustPrioritize() bool {
 	return false
 }
 
+func (m *OutgoingApprovalCriteria) GetVotingChallenges() []*VotingChallenge {
+	if m != nil {
+		return m.VotingChallenges
+	}
+	return nil
+}
+
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
+// This is used for user-level incoming approvals and only includes fields relevant to incoming transfers.
+// All criteria must be satisfied for the approval to be considered valid.
 type IncomingApprovalCriteria struct {
-	// Merkle challenge that must be satisfied for approval.
+	// Merkle challenges that must be satisfied for approval. The initiator must provide valid Merkle proofs
+	// that satisfy all specified challenges. Each challenge requires a proof that leads to a specific root hash.
 	MerkleChallenges []*MerkleChallenge `protobuf:"bytes,1,rep,name=merkleChallenges,proto3" json:"merkleChallenges,omitempty"`
-	// Predetermined balances for eeach approval.
+	// Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
+	// that can be transferred when using this approval.
 	PredeterminedBalances *PredeterminedBalances `protobuf:"bytes,2,opt,name=predeterminedBalances,proto3" json:"predeterminedBalances,omitempty"`
-	// Threshold limit of amounts that can be transferred using this approval.
+	// Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
+	// transferred and enforces maximum limits per approval.
 	ApprovalAmounts *ApprovalAmounts `protobuf:"bytes,3,opt,name=approvalAmounts,proto3" json:"approvalAmounts,omitempty"`
-	// Maximum number of transfers that can be processed using this approval.
+	// Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
+	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
-	// The sdk.Coins that need to be transferred for approval.
+	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
+	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
+	// If true, only transfers where the sender matches the initiator are allowed.
 	RequireFromEqualsInitiatedBy bool `protobuf:"varint,6,opt,name=requireFromEqualsInitiatedBy,proto3" json:"requireFromEqualsInitiatedBy,omitempty"`
 	// Require the "from" address to not be equal to the "initiated by" address for approval.
+	// If true, transfers where the sender equals the initiator are forbidden.
 	RequireFromDoesNotEqualInitiatedBy bool `protobuf:"varint,7,opt,name=requireFromDoesNotEqualInitiatedBy,proto3" json:"requireFromDoesNotEqualInitiatedBy,omitempty"`
-	// Auto-deletion options.
+	// Auto-deletion options for this approval. Defines conditions under which this approval should be
+	// automatically deleted (e.g., after a certain number of uses or time period).
 	AutoDeletionOptions *AutoDeletionOptions `protobuf:"bytes,8,opt,name=autoDeletionOptions,proto3" json:"autoDeletionOptions,omitempty"`
-	// Must own tokens for approval.
+	// Must own tokens for approval. Defines token ownership requirements that must be satisfied for
+	// the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
 	MustOwnTokens []*MustOwnTokens `protobuf:"bytes,9,rep,name=mustOwnTokens,proto3" json:"mustOwnTokens,omitempty"`
-	// Dynamic store challenges that the initiator must pass for approval.
+	// Dynamic store challenges that the initiator must pass for approval. The initiator must provide
+	// valid proofs that satisfy all specified dynamic store challenges (e.g., key-value store lookups).
 	DynamicStoreChallenges []*DynamicStoreChallenge `protobuf:"bytes,10,rep,name=dynamicStoreChallenges,proto3" json:"dynamicStoreChallenges,omitempty"`
-	// ETH signature challenges that the initiator must pass for approval.
+	// ETH signature challenges that the initiator must pass for approval. The initiator must provide
+	// valid Ethereum signatures for all specified challenges. Each signature can only be used once.
 	EthSignatureChallenges []*ETHSignatureChallenge `protobuf:"bytes,11,rep,name=ethSignatureChallenges,proto3" json:"ethSignatureChallenges,omitempty"`
-	// Address checks for sender and initiator (no recipient checks for incoming approvals).
-	SenderChecks    *AddressChecks `protobuf:"bytes,12,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the sender of the transfer. Validates that the sender address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
+	// Note: No recipient checks are included for incoming approvals since the recipient is the user themselves.
+	SenderChecks *AddressChecks `protobuf:"bytes,12,opt,name=senderChecks,proto3" json:"senderChecks,omitempty"`
+	// Address checks for the initiator of the transfer. Validates that the initiator address meets the
+	// specified criteria (e.g., whitelist, blacklist, protocol address requirements).
 	InitiatorChecks *AddressChecks `protobuf:"bytes,13,opt,name=initiatorChecks,proto3" json:"initiatorChecks,omitempty"`
-	// Alternative time-based checks for approval denial (offline hours/days).
+	// Alternative time-based checks for approval denial (offline hours/days). Defines time periods
+	// during which this approval should be denied, such as specific hours of the day or days of the week.
 	AltTimeChecks *AltTimeChecks `protobuf:"bytes,14,opt,name=altTimeChecks,proto3" json:"altTimeChecks,omitempty"`
 	// If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
+	// This allows fine-grained control over which approvals are applied when multiple approvals could match.
 	MustPrioritize bool `protobuf:"varint,15,opt,name=mustPrioritize,proto3" json:"mustPrioritize,omitempty"`
+	// Voting challenges that must be satisfied for approval. The initiator must provide
+	// valid votes that meet the quorum threshold for all specified challenges.
+	VotingChallenges []*VotingChallenge `protobuf:"bytes,16,rep,name=votingChallenges,proto3" json:"votingChallenges,omitempty"`
 }
 
 func (m *IncomingApprovalCriteria) Reset()         { *m = IncomingApprovalCriteria{} }
@@ -589,6 +676,13 @@ func (m *IncomingApprovalCriteria) GetMustPrioritize() bool {
 	return false
 }
 
+func (m *IncomingApprovalCriteria) GetVotingChallenges() []*VotingChallenge {
+	if m != nil {
+		return m.VotingChallenges
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*ApprovalCriteria)(nil), "badges.ApprovalCriteria")
 	proto.RegisterType((*OutgoingApprovalCriteria)(nil), "badges.OutgoingApprovalCriteria")
@@ -598,57 +692,58 @@ func init() {
 func init() { proto.RegisterFile("badges/approval_criteria.proto", fileDescriptor_ae3667979cfbe476) }
 
 var fileDescriptor_ae3667979cfbe476 = []byte{
-	// 793 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x97, 0x4f, 0x4f, 0xdb, 0x48,
-	0x18, 0xc6, 0xc9, 0xb2, 0x1b, 0xc2, 0x24, 0x21, 0xec, 0x00, 0x8b, 0xc5, 0xee, 0x5a, 0x11, 0x95,
-	0x2a, 0x4e, 0x89, 0x44, 0x4f, 0x6d, 0xa5, 0x56, 0x49, 0x00, 0x95, 0xaa, 0x01, 0x64, 0xc2, 0xa5,
-	0x17, 0x34, 0xb1, 0xdf, 0x3a, 0xa3, 0xd8, 0x33, 0x61, 0x66, 0x4c, 0x49, 0x3f, 0x45, 0xbf, 0x43,
-	0xd5, 0x4f, 0xd0, 0x2f, 0xd1, 0x23, 0xc7, 0x1e, 0x2b, 0xf8, 0x22, 0x95, 0x1d, 0xc7, 0x8d, 0x9d,
-	0x3f, 0xa4, 0x0d, 0xad, 0x5a, 0x89, 0x9b, 0xe5, 0xe7, 0x79, 0x7f, 0x33, 0x99, 0x3f, 0x4f, 0x5e,
-	0x23, 0xbd, 0x49, 0x2c, 0x1b, 0x64, 0x99, 0x74, 0x3a, 0x82, 0x9f, 0x13, 0xe7, 0xd4, 0x14, 0x54,
-	0x81, 0xa0, 0xa4, 0xd4, 0x11, 0x5c, 0x71, 0x9c, 0xee, 0xe9, 0x1b, 0xab, 0x36, 0xb7, 0x79, 0xf0,
-	0xaa, 0xec, 0x3f, 0xf5, 0xd4, 0x8d, 0xf5, 0xb0, 0xda, 0x6c, 0x11, 0xc7, 0x01, 0x66, 0x83, 0x0c,
-	0x85, 0x7b, 0xa1, 0xd0, 0x11, 0x60, 0x81, 0x02, 0xe1, 0x52, 0x06, 0xd6, 0x69, 0x93, 0x38, 0x84,
-	0x99, 0x91, 0x69, 0x68, 0x6c, 0x25, 0x88, 0xd9, 0xa6, 0xcc, 0x0e, 0xf5, 0xe2, 0xd0, 0xdc, 0x38,
-	0xb3, 0xa8, 0xa2, 0x9c, 0x85, 0x84, 0xcd, 0x0f, 0x59, 0xb4, 0x5c, 0x09, 0xd5, 0x5a, 0x38, 0x71,
-	0x5c, 0x43, 0xcb, 0x2e, 0x88, 0xb6, 0x03, 0xb5, 0x68, 0x56, 0x5a, 0xaa, 0x38, 0xbf, 0x95, 0xdd,
-	0x5e, 0x2f, 0xf5, 0x88, 0xa5, 0x7a, 0x5c, 0x37, 0x86, 0x0a, 0xf0, 0x31, 0x5a, 0x8b, 0xcd, 0xbd,
-	0x1a, 0x4e, 0x5d, 0xfb, 0xa3, 0x98, 0xda, 0xca, 0x6e, 0xff, 0xdf, 0x27, 0x1d, 0x8d, 0x32, 0x19,
-	0xa3, 0x6b, 0x71, 0x05, 0x15, 0xfa, 0xbf, 0xa5, 0xe2, 0x72, 0x8f, 0x29, 0xa9, 0xcd, 0x07, 0xb8,
-	0x68, 0x62, 0x95, 0xb8, 0x6c, 0x24, 0xfd, 0x3e, 0xc2, 0x25, 0x17, 0x07, 0x9e, 0xdb, 0x10, 0x84,
-	0xc9, 0x57, 0x20, 0xa4, 0xf6, 0x67, 0x1c, 0x51, 0x8f, 0xcb, 0x46, 0xd2, 0x8f, 0x1f, 0xa1, 0xbc,
-	0xc9, 0x29, 0xfb, 0x0a, 0xf8, 0x2b, 0x58, 0x9c, 0xd5, 0x3e, 0xa0, 0x36, 0x20, 0x1a, 0x71, 0x2b,
-	0x7e, 0x82, 0x36, 0x04, 0x9c, 0x79, 0x54, 0x40, 0x83, 0xef, 0x9e, 0x79, 0xc4, 0x91, 0xfb, 0x8c,
-	0x2a, 0x4a, 0x14, 0x58, 0xd5, 0xae, 0x96, 0x2e, 0xa6, 0xb6, 0x32, 0xc6, 0x04, 0x07, 0xae, 0xa2,
-	0xff, 0x42, 0x75, 0x4f, 0x70, 0x77, 0x98, 0xb0, 0x10, 0x10, 0x26, 0x7a, 0xf0, 0x73, 0x54, 0x8c,
-	0x46, 0xd8, 0xe1, 0x20, 0x0f, 0xb8, 0x0a, 0x4c, 0x83, 0x9c, 0x4c, 0xc0, 0xb9, 0xd1, 0x87, 0x0f,
-	0xd0, 0xe6, 0xc0, 0x58, 0xe3, 0x68, 0x8b, 0x01, 0x6d, 0x0a, 0x27, 0xde, 0x43, 0x3a, 0x3f, 0x07,
-	0x21, 0xa8, 0x05, 0xd2, 0xf7, 0x1d, 0x7a, 0xca, 0xe6, 0x94, 0xd9, 0xfd, 0x7d, 0x95, 0x1a, 0x0a,
-	0x58, 0x37, 0xb8, 0xfc, 0x75, 0x8a, 0x1c, 0x0d, 0xbe, 0xcf, 0x4c, 0xee, 0xc6, 0x28, 0xd9, 0xde,
-	0x3a, 0x4d, 0xf2, 0xe0, 0x3a, 0x5a, 0x21, 0x9e, 0xe2, 0x3b, 0xe0, 0x80, 0x7f, 0x67, 0x0e, 0x3b,
-	0xc1, 0xcd, 0xd1, 0x72, 0xc1, 0x71, 0xf9, 0x37, 0x3a, 0x71, 0xc3, 0x16, 0x63, 0x54, 0x1d, 0x7e,
-	0x8c, 0xf2, 0x9e, 0x04, 0x61, 0xf0, 0x2e, 0x71, 0x14, 0x05, 0xa9, 0xe5, 0x03, 0xd0, 0x5a, 0x1f,
-	0x74, 0x32, 0x28, 0x1a, 0x71, 0xaf, 0x5f, 0xec, 0x7a, 0x52, 0x1d, 0xbe, 0x66, 0x0d, 0xde, 0x06,
-	0x26, 0xb5, 0xa5, 0xe0, 0xcc, 0x45, 0xc5, 0xf5, 0x41, 0xd1, 0x88, 0x7b, 0xf1, 0x09, 0xfa, 0xc7,
-	0xea, 0x32, 0xe2, 0x52, 0xf3, 0x58, 0x71, 0x31, 0x78, 0xad, 0x0b, 0x01, 0x25, 0xba, 0x8c, 0x3b,
-	0xa3, 0x5c, 0xc6, 0x98, 0x62, 0x1f, 0x0b, 0xaa, 0x75, 0x4c, 0x6d, 0x46, 0x94, 0x17, 0xc3, 0x2e,
-	0xc7, 0xb1, 0xbb, 0x8d, 0x67, 0xc3, 0x2e, 0x63, 0x4c, 0x31, 0x7e, 0x88, 0x72, 0x12, 0x98, 0x05,
-	0xa2, 0xd6, 0x02, 0xb3, 0x2d, 0xb5, 0xbf, 0xe3, 0xcb, 0x54, 0xb1, 0x2c, 0x01, 0x52, 0xf6, 0x44,
-	0x23, 0x66, 0xc5, 0x4f, 0x51, 0x41, 0x80, 0x49, 0x3b, 0x14, 0x98, 0x0a, 0xab, 0xf1, 0xa4, 0xea,
-	0xa4, 0xdb, 0x07, 0xd0, 0xde, 0x69, 0xe4, 0xfd, 0xe1, 0x57, 0x26, 0x02, 0x12, 0x6e, 0x7f, 0x9f,
-	0x88, 0xa3, 0x1a, 0xd4, 0x85, 0xb0, 0x7c, 0x35, 0x51, 0x3e, 0x28, 0x1a, 0x71, 0x2f, 0xbe, 0x8f,
-	0x96, 0xfc, 0x8d, 0x3b, 0x12, 0x94, 0x0b, 0xaa, 0xe8, 0x1b, 0xd0, 0xd6, 0x82, 0x63, 0x9a, 0x78,
-	0xbb, 0xf9, 0x2e, 0x83, 0xb4, 0xe4, 0x91, 0xbf, 0x4b, 0xef, 0xdf, 0x20, 0xbd, 0xa7, 0x49, 0xde,
-	0x85, 0x29, 0x93, 0x77, 0x4c, 0x3a, 0x65, 0xbe, 0x3f, 0x9d, 0xe2, 0x01, 0xb3, 0x78, 0x2b, 0x01,
-	0x83, 0x7e, 0x4c, 0xc0, 0x64, 0x67, 0x09, 0x98, 0x11, 0x29, 0x91, 0x9b, 0x35, 0x25, 0xf2, 0xb3,
-	0xa5, 0xc4, 0xd2, 0x4c, 0x29, 0x51, 0x18, 0x99, 0x12, 0xef, 0x33, 0x48, 0x4b, 0xfe, 0xa9, 0xdd,
-	0xa5, 0xc4, 0x4f, 0x48, 0x89, 0x9b, 0x7a, 0xb4, 0xf4, 0x14, 0x3d, 0xda, 0x74, 0x7d, 0xd5, 0xc2,
-	0xd4, 0x7d, 0xd5, 0x5d, 0x5a, 0xdc, 0x56, 0x3b, 0x92, 0xfb, 0xa6, 0x76, 0xe4, 0xd7, 0xcf, 0x89,
-	0xea, 0x8b, 0x8f, 0x57, 0x7a, 0xea, 0xf2, 0x4a, 0x4f, 0x7d, 0xbe, 0xd2, 0x53, 0x6f, 0xaf, 0xf5,
-	0xb9, 0xcb, 0x6b, 0x7d, 0xee, 0xd3, 0xb5, 0x3e, 0xf7, 0x72, 0xdb, 0xa6, 0xaa, 0xe5, 0x35, 0x4b,
-	0x26, 0x77, 0xcb, 0x4d, 0xaa, 0xc2, 0xaf, 0xc9, 0xe8, 0xc9, 0x6c, 0x11, 0xca, 0xca, 0x17, 0xe5,
-	0xf0, 0xbd, 0xea, 0x76, 0x40, 0x36, 0xd3, 0xc1, 0x87, 0xe5, 0x83, 0x2f, 0x01, 0x00, 0x00, 0xff,
-	0xff, 0x9e, 0xb3, 0xa5, 0xa5, 0x18, 0x0f, 0x00, 0x00,
+	// 812 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0xcb, 0x6e, 0xeb, 0x44,
+	0x18, 0x6e, 0x38, 0x90, 0xe6, 0x4c, 0x92, 0x26, 0xcc, 0xe9, 0xc5, 0x2a, 0x60, 0x45, 0x45, 0x42,
+	0x5d, 0x25, 0x52, 0x59, 0x01, 0x12, 0x28, 0x49, 0x5b, 0x51, 0x44, 0xda, 0xca, 0x4d, 0x59, 0xb0,
+	0xa9, 0x26, 0xf6, 0x8f, 0x33, 0x8a, 0x3d, 0x93, 0xce, 0x8c, 0x4b, 0xc3, 0x53, 0xf0, 0x58, 0x2c,
+	0xbb, 0x64, 0x89, 0xda, 0x0d, 0xe2, 0x09, 0x58, 0x22, 0x3b, 0x8e, 0xf1, 0x38, 0x97, 0xa6, 0xa4,
+	0x20, 0xa1, 0xd3, 0x5d, 0x34, 0xdf, 0x65, 0xfe, 0xcc, 0xe5, 0x9b, 0xdf, 0xc8, 0xec, 0x11, 0xc7,
+	0x05, 0xd9, 0x20, 0xc3, 0xa1, 0xe0, 0x37, 0xc4, 0xbb, 0xb2, 0x05, 0x55, 0x20, 0x28, 0xa9, 0x0f,
+	0x05, 0x57, 0x1c, 0xe7, 0xc7, 0xf8, 0xee, 0xa6, 0xcb, 0x5d, 0x1e, 0x0d, 0x35, 0xc2, 0x5f, 0x63,
+	0x74, 0x77, 0x27, 0x56, 0xdb, 0x7d, 0xe2, 0x79, 0xc0, 0x5c, 0x90, 0x31, 0xf0, 0x71, 0x0c, 0x0c,
+	0x05, 0x38, 0xa0, 0x40, 0xf8, 0x94, 0x81, 0x73, 0xd5, 0x23, 0x1e, 0x61, 0x76, 0x42, 0x9a, 0x9a,
+	0x5b, 0x09, 0x62, 0x0f, 0x28, 0x73, 0x63, 0xbc, 0x36, 0x55, 0x1b, 0x67, 0x0e, 0x55, 0x94, 0xb3,
+	0xd8, 0x61, 0xef, 0xcf, 0x22, 0xaa, 0x36, 0x63, 0xb4, 0x1d, 0x17, 0x8e, 0xdb, 0xa8, 0xea, 0x83,
+	0x18, 0x78, 0xd0, 0x4e, 0xaa, 0x32, 0x72, 0xb5, 0x57, 0xfb, 0xc5, 0x83, 0x9d, 0xfa, 0xd8, 0xb1,
+	0xde, 0xd1, 0x71, 0x6b, 0x4a, 0x80, 0x2f, 0xd0, 0x96, 0x56, 0x7b, 0x2b, 0x2e, 0xdd, 0x78, 0xa7,
+	0x96, 0xdb, 0x2f, 0x1e, 0x7c, 0x34, 0x71, 0x3a, 0x9f, 0x45, 0xb2, 0x66, 0x6b, 0x71, 0x13, 0x55,
+	0x26, 0xff, 0xa5, 0xe9, 0xf3, 0x80, 0x29, 0x69, 0xbc, 0x8a, 0xec, 0x92, 0xc2, 0x9a, 0x3a, 0x6c,
+	0x65, 0xf9, 0xa1, 0x85, 0x4f, 0x6e, 0x4f, 0x03, 0xbf, 0x2b, 0x08, 0x93, 0x3f, 0x80, 0x90, 0xc6,
+	0xbb, 0xba, 0x45, 0x47, 0x87, 0xad, 0x2c, 0x1f, 0x7f, 0x8e, 0xca, 0x36, 0xa7, 0xec, 0x6f, 0x83,
+	0xf7, 0xa2, 0xc5, 0xd9, 0x9c, 0x18, 0xb4, 0x53, 0xa0, 0xa5, 0x53, 0xf1, 0x97, 0x68, 0x57, 0xc0,
+	0x75, 0x40, 0x05, 0x74, 0xf9, 0xd1, 0x75, 0x40, 0x3c, 0x79, 0xc2, 0xa8, 0xa2, 0x44, 0x81, 0xd3,
+	0x1a, 0x19, 0xf9, 0x5a, 0x6e, 0xbf, 0x60, 0x2d, 0x60, 0xe0, 0x16, 0xfa, 0x30, 0x46, 0x8f, 0x05,
+	0xf7, 0xa7, 0x1d, 0xd6, 0x23, 0x87, 0x85, 0x1c, 0xfc, 0x0d, 0xaa, 0x25, 0x33, 0x1c, 0x72, 0x90,
+	0xa7, 0x5c, 0x45, 0xa4, 0xb4, 0x4f, 0x21, 0xf2, 0x79, 0x94, 0x87, 0x4f, 0xd1, 0x5e, 0x6a, 0xae,
+	0x79, 0x6e, 0xaf, 0x23, 0xb7, 0x25, 0x98, 0xf8, 0x18, 0x99, 0xfc, 0x06, 0x84, 0xa0, 0x0e, 0xc8,
+	0x90, 0x77, 0x16, 0x28, 0x97, 0x53, 0xe6, 0x4e, 0xf6, 0x55, 0x1a, 0x28, 0xf2, 0x7a, 0x84, 0x15,
+	0xae, 0x53, 0xc2, 0xe8, 0xf2, 0x13, 0x66, 0x73, 0x5f, 0x73, 0x29, 0x8e, 0xd7, 0x69, 0x11, 0x07,
+	0x77, 0xd0, 0x1b, 0x12, 0x28, 0x7e, 0x08, 0x1e, 0x84, 0x77, 0xe6, 0x6c, 0x18, 0xdd, 0x1c, 0xa3,
+	0x14, 0x1d, 0x97, 0x0f, 0x92, 0x13, 0x37, 0x4d, 0xb1, 0x66, 0xe9, 0xf0, 0x17, 0xa8, 0x1c, 0x48,
+	0x10, 0x16, 0x1f, 0x11, 0x4f, 0x51, 0x90, 0x46, 0x39, 0x32, 0xda, 0x9a, 0x18, 0x5d, 0xa6, 0x41,
+	0x4b, 0xe7, 0x86, 0x62, 0x3f, 0x90, 0xea, 0xec, 0x47, 0xd6, 0xe5, 0x03, 0x60, 0xd2, 0xd8, 0x88,
+	0xce, 0x5c, 0x22, 0xee, 0xa4, 0x41, 0x4b, 0xe7, 0xe2, 0x4b, 0xb4, 0xed, 0x8c, 0x18, 0xf1, 0xa9,
+	0x7d, 0xa1, 0xb8, 0x48, 0x5f, 0xeb, 0x4a, 0xe4, 0x92, 0x5c, 0xc6, 0xc3, 0x59, 0x2c, 0x6b, 0x8e,
+	0x38, 0xb4, 0x05, 0xd5, 0xbf, 0xa0, 0x2e, 0x23, 0x2a, 0xd0, 0x6c, 0xab, 0xba, 0xed, 0x51, 0xf7,
+	0xeb, 0x69, 0x96, 0x35, 0x47, 0x8c, 0x3f, 0x43, 0x25, 0x09, 0xcc, 0x01, 0xd1, 0xee, 0x83, 0x3d,
+	0x90, 0xc6, 0xfb, 0xfa, 0x32, 0x35, 0x1d, 0x47, 0x80, 0x94, 0x63, 0xd0, 0xd2, 0xa8, 0xf8, 0x2b,
+	0x54, 0x11, 0x60, 0xd3, 0x21, 0x05, 0xa6, 0x62, 0x35, 0x5e, 0xa4, 0xce, 0xb2, 0x43, 0x03, 0x3a,
+	0x3e, 0x8d, 0x7c, 0x32, 0xfd, 0x9b, 0x85, 0x06, 0x19, 0x76, 0xb8, 0x4f, 0xc4, 0x53, 0x5d, 0xea,
+	0x43, 0x2c, 0xdf, 0xcc, 0xc8, 0xd3, 0xa0, 0xa5, 0x73, 0xf1, 0x27, 0x68, 0x23, 0xdc, 0xb8, 0x73,
+	0x41, 0xb9, 0xa0, 0x8a, 0xfe, 0x04, 0xc6, 0x56, 0x74, 0x4c, 0x33, 0xa3, 0x61, 0x40, 0xdf, 0x70,
+	0x45, 0x99, 0x9b, 0x5a, 0xf2, 0x6d, 0x3d, 0xa0, 0xbf, 0xd3, 0x71, 0x6b, 0x4a, 0xb0, 0xf7, 0x7b,
+	0x01, 0x19, 0xd9, 0x7b, 0xf3, 0xf2, 0x04, 0xfc, 0x0f, 0x9e, 0x80, 0x65, 0xe2, 0x7b, 0x7d, 0xc9,
+	0xf8, 0x9e, 0x13, 0x71, 0x85, 0x7f, 0x1e, 0x71, 0x7a, 0x4a, 0xbd, 0x7e, 0x96, 0x94, 0x42, 0xff,
+	0x4e, 0x4a, 0x15, 0x57, 0x49, 0xa9, 0x19, 0x51, 0x53, 0x5a, 0x35, 0x6a, 0xca, 0xab, 0x45, 0xcd,
+	0xc6, 0x4a, 0x51, 0x53, 0x59, 0x3a, 0x6a, 0xaa, 0x4f, 0x8d, 0x9a, 0x3f, 0x0a, 0xc8, 0xc8, 0x3e,
+	0xaf, 0x2f, 0x51, 0xf3, 0x1f, 0x44, 0xcd, 0x63, 0xdd, 0x62, 0x7e, 0x89, 0x6e, 0x71, 0xb9, 0x0e,
+	0x6f, 0x7d, 0xe9, 0x0e, 0xef, 0x25, 0x72, 0x9e, 0xab, 0x31, 0x2a, 0x3d, 0xa9, 0x31, 0x7a, 0x4b,
+	0xc2, 0xa6, 0xf5, 0xed, 0x2f, 0xf7, 0x66, 0xee, 0xee, 0xde, 0xcc, 0xfd, 0x76, 0x6f, 0xe6, 0x7e,
+	0x7e, 0x30, 0xd7, 0xee, 0x1e, 0xcc, 0xb5, 0x5f, 0x1f, 0xcc, 0xb5, 0xef, 0x0f, 0x5c, 0xaa, 0xfa,
+	0x41, 0xaf, 0x6e, 0x73, 0xbf, 0xd1, 0xa3, 0x2a, 0xfe, 0x38, 0x4e, 0x7e, 0xd9, 0x7d, 0x42, 0x59,
+	0xe3, 0xb6, 0x11, 0x8f, 0xab, 0xd1, 0x10, 0x64, 0x2f, 0x1f, 0x7d, 0x27, 0x7f, 0xfa, 0x57, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x6d, 0xdb, 0xf8, 0x78, 0xe7, 0x0f, 0x00, 0x00,
 }
 
 func (m *ApprovalCriteria) Marshal() (dAtA []byte, err error) {
@@ -671,6 +766,22 @@ func (m *ApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.VotingChallenges) > 0 {
+		for iNdEx := len(m.VotingChallenges) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.VotingChallenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApprovalCriteria(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xb2
+		}
+	}
 	if m.MustPrioritize {
 		i--
 		if m.MustPrioritize {
@@ -954,6 +1065,22 @@ func (m *OutgoingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
+	if len(m.VotingChallenges) > 0 {
+		for iNdEx := len(m.VotingChallenges) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.VotingChallenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApprovalCriteria(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x82
+		}
+	}
 	if m.MustPrioritize {
 		i--
 		if m.MustPrioritize {
@@ -1161,6 +1288,22 @@ func (m *IncomingApprovalCriteria) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
+	if len(m.VotingChallenges) > 0 {
+		for iNdEx := len(m.VotingChallenges) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.VotingChallenges[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApprovalCriteria(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x82
+		}
+	}
 	if m.MustPrioritize {
 		i--
 		if m.MustPrioritize {
@@ -1452,6 +1595,12 @@ func (m *ApprovalCriteria) Size() (n int) {
 	if m.MustPrioritize {
 		n += 3
 	}
+	if len(m.VotingChallenges) > 0 {
+		for _, e := range m.VotingChallenges {
+			l = e.Size()
+			n += 2 + l + sovApprovalCriteria(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -1528,6 +1677,12 @@ func (m *OutgoingApprovalCriteria) Size() (n int) {
 	if m.MustPrioritize {
 		n += 2
 	}
+	if len(m.VotingChallenges) > 0 {
+		for _, e := range m.VotingChallenges {
+			l = e.Size()
+			n += 2 + l + sovApprovalCriteria(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -1603,6 +1758,12 @@ func (m *IncomingApprovalCriteria) Size() (n int) {
 	}
 	if m.MustPrioritize {
 		n += 2
+	}
+	if len(m.VotingChallenges) > 0 {
+		for _, e := range m.VotingChallenges {
+			l = e.Size()
+			n += 2 + l + sovApprovalCriteria(uint64(l))
+		}
 	}
 	return n
 }
@@ -2276,6 +2437,40 @@ func (m *ApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.MustPrioritize = bool(v != 0)
+		case 22:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VotingChallenges", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApprovalCriteria
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApprovalCriteria
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApprovalCriteria
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VotingChallenges = append(m.VotingChallenges, &VotingChallenge{})
+			if err := m.VotingChallenges[len(m.VotingChallenges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApprovalCriteria(dAtA[iNdEx:])
@@ -2808,6 +3003,40 @@ func (m *OutgoingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.MustPrioritize = bool(v != 0)
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VotingChallenges", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApprovalCriteria
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApprovalCriteria
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApprovalCriteria
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VotingChallenges = append(m.VotingChallenges, &VotingChallenge{})
+			if err := m.VotingChallenges[len(m.VotingChallenges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApprovalCriteria(dAtA[iNdEx:])
@@ -3340,6 +3569,40 @@ func (m *IncomingApprovalCriteria) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.MustPrioritize = bool(v != 0)
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VotingChallenges", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApprovalCriteria
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApprovalCriteria
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApprovalCriteria
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VotingChallenges = append(m.VotingChallenges, &VotingChallenge{})
+			if err := m.VotingChallenges[len(m.VotingChallenges)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipApprovalCriteria(dAtA[iNdEx:])

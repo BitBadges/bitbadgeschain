@@ -70,13 +70,13 @@ func (suite *TestSuite) TestAddressChecks_CollectionApproval() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -119,7 +119,6 @@ func (suite *TestSuite) TestAddressChecks_CollectionApproval() {
 		false,
 		nil,
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
-		sdkmath.NewUint(1),
 	)
 
 	// Should fail because bob is not a WASM contract
@@ -369,7 +368,6 @@ func (suite *TestSuite) TestAddressChecks_NilChecks() {
 		false,
 		nil,
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
-		sdkmath.NewUint(1),
 	)
 
 	// Should succeed - nil address checks should not cause errors
@@ -429,13 +427,13 @@ func (suite *TestSuite) TestAddressChecks_EmptyChecks() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -477,7 +475,6 @@ func (suite *TestSuite) TestAddressChecks_EmptyChecks() {
 		false,
 		nil,
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
-		sdkmath.NewUint(1),
 	)
 
 	// Should succeed - empty address checks (all false) should not cause errors
@@ -741,13 +738,13 @@ func (suite *TestSuite) TestAddressChecks_EnforcedInApprovals() {
 				},
 			},
 			Permissions: &types.CollectionPermissions{
-				CanArchiveCollection:         []*types.TimedUpdatePermission{},
-				CanUpdateStandards:           []*types.TimedUpdatePermission{},
-				CanUpdateCustomData:          []*types.TimedUpdatePermission{},
+				CanArchiveCollection:         []*types.ActionPermission{},
+				CanUpdateStandards:           []*types.ActionPermission{},
+				CanUpdateCustomData:          []*types.ActionPermission{},
 				CanDeleteCollection:          []*types.ActionPermission{},
-				CanUpdateManager:             []*types.TimedUpdatePermission{},
-				CanUpdateCollectionMetadata:  []*types.TimedUpdatePermission{},
-				CanUpdateTokenMetadata:       []*types.TimedUpdateWithTokenIdsPermission{},
+				CanUpdateManager:             []*types.ActionPermission{},
+				CanUpdateCollectionMetadata:  []*types.ActionPermission{},
+				CanUpdateTokenMetadata:       []*types.TokenIdsActionPermission{},
 				CanUpdateCollectionApprovals: []*types.CollectionApprovalPermission{},
 				CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{
 					{
@@ -790,7 +787,6 @@ func (suite *TestSuite) TestAddressChecks_EnforcedInApprovals() {
 		false,
 		nil,
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
-		sdkmath.NewUint(1),
 	)
 	suite.Require().NotNil(err, "Transfer from non-WASM contract should fail")
 	// The error might be about address check or about inadequate approvals (if address check happens first)
@@ -827,7 +823,6 @@ func (suite *TestSuite) TestAddressChecks_EnforcedInApprovals() {
 		false,
 		nil,
 		&keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}},
-		sdkmath.NewUint(1),
 	)
 	// This might fail for other reasons (no tokens), but should NOT fail due to address check
 	if err != nil {

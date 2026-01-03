@@ -41,5 +41,11 @@ message ManagerSplitterPermissions {
 
   // Permissions related to updating collection approvals.
   PermissionCriteria canUpdateCollectionApprovals = 9;
+
+  // Permissions related to adding more alias paths to the collection.
+  PermissionCriteria canAddMoreAliasPaths = 10;
+
+  // Permissions related to adding more cosmos coin wrapper paths to the collection.
+  PermissionCriteria canAddMoreCosmosCoinWrapperPaths = 11;
 }
 

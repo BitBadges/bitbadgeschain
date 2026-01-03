@@ -157,7 +157,49 @@ go test ./x/badges/keeper/...
 -   Follow existing patterns for state management
 -   Use proper error types from the types package
 
-### 9. Register in Codec
+### 9. Add Simulation Support
+
+**Location**: `x/badges/simulation/`
+
+**Files to create/modify**:
+
+-   `<action>.go` - Simulation function for the new message type
+-   `simulation_test.go` - Add test case for the new simulation function
+
+**Purpose**: Enable the message type to be used in Cosmos SDK simulations (stress testing, fuzzing, etc.)
+
+**Gotchas**:
+
+-   **IMPORTANT**: If you modify an existing message type (add/remove fields), you MUST update the corresponding simulation file
+-   Follow the pattern: `SimulateMsg<Action><Entity>`
+-   Use random values for all fields
+-   Handle cases where required resources don't exist (return `NoOpMsg`)
+-   For update operations, verify the resource exists and use the correct creator account
+-   Add the simulation function to `simulation_test.go` to ensure it doesn't panic
+
+**Example**:
+
+```go
+func SimulateMsgUpdateDynamicStore(
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
+	k keeper.Keeper,
+) simtypes.Operation {
+	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
+	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
+		// Implementation...
+	}
+}
+```
+
+**Commands**:
+
+```bash
+# Run simulation tests
+go test ./x/badges/simulation/...
+```
+
+### 11. Register in Codec
 
 **Location**: `x/badges/types/codec.go`
 
@@ -169,7 +211,7 @@ go test ./x/badges/keeper/...
 -   Use proper concrete type names
 -   Follow existing naming patterns
 
-### 10. Ensure GetSignBytes Uses AminoCdc
+### 12. Ensure GetSignBytes Uses AminoCdc
 
 **Location**: `x/badges/types/`
 
@@ -190,6 +232,7 @@ go test ./x/badges/keeper/...
 -   [ ] Authorization tests
 -   [ ] Edge case handling
 -   [ ] Genesis state tests
+-   [ ] **Simulation tests** (if adding new message or modifying existing message fields)
 
 ## Common Issues and Solutions
 
@@ -287,6 +330,7 @@ go fmt ./x/badges/...
 -   **ValidateBasic errs on the side of caution (checks for empty/invalid fields).**
 -   **Test files for Msg types are present in both `/keeper` and `/types` as `msg_*_test.go`.**
 -   **Genesis state now includes dynamic stores and next dynamic store ID.**
+-   **Global Kill Switch**: All dynamic stores now have a `globalEnabled` field that acts as a global kill switch. When `globalEnabled = false`, all approvals using that store via `DynamicStoreChallenge` will fail immediately. This enables quick halting of approvals (e.g., when a 2FA protocol is compromised). See `_docs/PROTO_ADDITION_GUIDE.md` for details on the implementation.
 
 ## Next Steps
 
@@ -297,3 +341,19 @@ After completing all steps:
 3. Update documentation
 4. Consider backward compatibility
 5. Review security implications
+6. **Update simulation files** if message fields changed (see Step 9)
+7. **Update CLI commands** if message fields changed (see Step 6)
+
+## Important Reminders
+
+### When Modifying Existing Messages
+
+If you modify an existing message type (add, remove, or change fields), you MUST update:
+
+1. ✅ **CLI commands** (`x/badges/client/cli/tx_*.go`) - Update argument parsing
+2. ✅ **Simulation files** (`x/badges/simulation/*.go`) - Update simulation functions
+3. ✅ **EIP712 schemas** (`chain-handlers/ethereum/ethereum/eip712/schemas.go`) - Update schemas
+4. ✅ **Tests** - Update existing tests and add new ones for new fields
+5. ✅ **Documentation** - Update relevant docs in `_docs/` folder
+
+These are often forgotten but critical for maintaining a complete and tested codebase.

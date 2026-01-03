@@ -9,11 +9,11 @@ const TypeMsgSetStandards = "set_standards"
 
 var _ sdk.Msg = &MsgSetStandards{}
 
-func NewMsgSetStandards(creator string, collectionId Uint, standardsTimeline []*StandardsTimeline, canUpdateStandards []*TimedUpdatePermission) *MsgSetStandards {
+func NewMsgSetStandards(creator string, collectionId Uint, standards []string, canUpdateStandards []*ActionPermission) *MsgSetStandards {
 	return &MsgSetStandards{
 		Creator:            creator,
 		CollectionId:       collectionId,
-		StandardsTimeline:  standardsTimeline,
+		Standards:          standards,
 		CanUpdateStandards: canUpdateStandards,
 	}
 }
@@ -49,26 +49,27 @@ func BlankUniversalMsg() *MsgUniversalUpdateCollection {
 		DefaultBalances: &UserBalanceStore{},
 
 		//Applicable to creations and updates
-		ValidTokenIds:                    []*UintRange{},
-		UpdateCollectionPermissions:      false,
-		CollectionPermissions:            &CollectionPermissions{},
-		UpdateManagerTimeline:            false,
-		ManagerTimeline:                  []*ManagerTimeline{},
-		UpdateCollectionMetadataTimeline: false,
-		CollectionMetadataTimeline:       []*CollectionMetadataTimeline{},
-		UpdateTokenMetadataTimeline:      false,
-		TokenMetadataTimeline:            []*TokenMetadataTimeline{},
-		UpdateCustomDataTimeline:         false,
-		CustomDataTimeline:               []*CustomDataTimeline{},
-		UpdateCollectionApprovals:        false,
-		CollectionApprovals:              []*CollectionApproval{},
-		UpdateStandardsTimeline:          false,
-		StandardsTimeline:                []*StandardsTimeline{},
-		UpdateIsArchivedTimeline:         false,
-		IsArchivedTimeline:               []*IsArchivedTimeline{},
+		ValidTokenIds:               []*UintRange{},
+		UpdateCollectionPermissions: false,
+		CollectionPermissions:       &CollectionPermissions{},
+		UpdateManager:               false,
+		Manager:                     "",
+		UpdateCollectionMetadata:    false,
+		CollectionMetadata:          nil,
+		UpdateTokenMetadata:         false,
+		TokenMetadata:               []*TokenMetadata{},
+		UpdateCustomData:            false,
+		CustomData:                  "",
+		UpdateCollectionApprovals:    false,
+		CollectionApprovals:         []*CollectionApproval{},
+		UpdateStandards:             false,
+		Standards:                   []string{},
+		UpdateIsArchived:            false,
+		IsArchived:                  false,
 
 		MintEscrowCoinsToTransfer:   []*sdk.Coin{},
 		CosmosCoinWrapperPathsToAdd: []*CosmosCoinWrapperPathAddObject{},
+		AliasPathsToAdd:             []*AliasPathAddObject{},
 		Invariants:                  &InvariantsAddObject{},
 	}
 }
@@ -85,8 +86,8 @@ func (msg *MsgSetStandards) ToUniversalUpdateCollection() (*MsgUniversalUpdateCo
 	ms := BlankUniversalMsg()
 	ms.Creator = msg.Creator
 	ms.CollectionId = msg.CollectionId
-	ms.UpdateStandardsTimeline = true
-	ms.StandardsTimeline = msg.StandardsTimeline
+	ms.UpdateStandards = true
+	ms.Standards = msg.Standards
 	ms.UpdateCollectionPermissions = true
 	ms.CollectionPermissions = &CollectionPermissions{
 		CanUpdateStandards: msg.CanUpdateStandards,

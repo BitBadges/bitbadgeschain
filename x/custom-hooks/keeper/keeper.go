@@ -30,8 +30,6 @@ type (
 		GetCFMMPool(ctx sdk.Context, poolId uint64) (gammtypes.CFMMPoolI, error)
 		SwapExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, pool poolmanagertypes.PoolI, tokenIn sdk.Coin, tokenOutDenom string, tokenOutMinAmount osmomath.Int, spreadFactor osmomath.Dec, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
 		RouteExactAmountIn(ctx sdk.Context, sender sdk.AccAddress, routes []poolmanagertypes.SwapAmountInRoute, tokenIn sdk.Coin, tokenOutMinAmount osmomath.Int, affiliates []poolmanagertypes.Affiliate) (osmomath.Int, error)
-		CheckIsWrappedDenom(ctx sdk.Context, denom string) bool
-		SendNativeTokensFromPool(ctx sdk.Context, poolAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
 	}
 
 	// BankKeeper interface for bank module
@@ -41,9 +39,20 @@ type (
 
 	// BadgesKeeper interface for badges module operations
 	BadgesKeeper interface {
+		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error)
+		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error
 		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool)
 		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
 		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
+		SendNativeTokensViaAliasDenom(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
+		CheckIsAliasDenom(ctx sdk.Context, denom string) bool
+	}
+
+	// SendManagerKeeper interface for sendmanager module operations
+	SendManagerKeeper interface {
+		SendCoinWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coin *sdk.Coin) error
+		IsICS20Compatible(ctx sdk.Context, denom string) bool
+		StandardName(ctx sdk.Context, denom string) string
 	}
 
 	// ICS4Wrapper interface for sending IBC packets
@@ -70,14 +79,15 @@ type (
 	}
 
 	Keeper struct {
-		logger         log.Logger
-		gammKeeper     GammKeeper
-		bankKeeper     BankKeeper
-		badgesKeeper   BadgesKeeper
-		transferKeeper gammtypes.TransferKeeper
-		ics4Wrapper    ICS4Wrapper
-		channelKeeper  ChannelKeeper
-		scopedKeeper   ScopedKeeper
+		logger            log.Logger
+		gammKeeper        GammKeeper
+		bankKeeper        BankKeeper
+		badgesKeeper      BadgesKeeper
+		sendManagerKeeper SendManagerKeeper
+		transferKeeper    gammtypes.TransferKeeper
+		ics4Wrapper       ICS4Wrapper
+		channelKeeper     ChannelKeeper
+		scopedKeeper      ScopedKeeper
 	}
 )
 
@@ -86,20 +96,22 @@ func NewKeeper(
 	gammKeeper GammKeeper,
 	bankKeeper BankKeeper,
 	badgesKeeper BadgesKeeper,
+	sendManagerKeeper SendManagerKeeper,
 	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
 	scopedKeeper ScopedKeeper,
 ) Keeper {
 	return Keeper{
-		logger:         logger,
-		gammKeeper:     gammKeeper,
-		bankKeeper:     bankKeeper,
-		badgesKeeper:   badgesKeeper,
-		transferKeeper: transferKeeper,
-		ics4Wrapper:    ics4Wrapper,
-		channelKeeper:  channelKeeper,
-		scopedKeeper:   scopedKeeper,
+		logger:            logger,
+		gammKeeper:        gammKeeper,
+		bankKeeper:        bankKeeper,
+		badgesKeeper:      badgesKeeper,
+		sendManagerKeeper: sendManagerKeeper,
+		transferKeeper:    transferKeeper,
+		ics4Wrapper:       ics4Wrapper,
+		channelKeeper:     channelKeeper,
+		scopedKeeper:      scopedKeeper,
 	}
 }
 
@@ -212,6 +224,28 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			}
 		}
 
+		// Validate that last operation's DenomOut matches MinAsset.Denom
+		lastOperation := operations[len(operations)-1]
+		if swapAndAction.MinAsset != nil && swapAndAction.MinAsset.Native != nil {
+			if lastOperation.DenomOut != swapAndAction.MinAsset.Native.Denom {
+				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("last operation denom_out %s does not match min_asset denom %s", lastOperation.DenomOut, swapAndAction.MinAsset.Native.Denom))
+			}
+		}
+
+		// Pre-validate denom expansion for IBC transfers BEFORE executing swap
+		// This prevents swap from succeeding but IBC transfer failing due to denom expansion issues
+		if swapAndAction.PostSwapAction != nil && swapAndAction.PostSwapAction.IBCTransfer != nil {
+			expectedOutputDenom := lastOperation.DenomOut
+
+			// Try to expand the denom to validate it can be expanded
+			// Use a cache context to avoid side effects
+			testCtx, _ := ctx.CacheContext()
+			_, err := gammtypes.ExpandIBCDenomToFullPath(testCtx, expectedOutputDenom, k.transferKeeper)
+			if err != nil {
+				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("cannot expand IBC denom %s for post-swap IBC transfer: %v", expectedOutputDenom, err))
+			}
+		}
+
 		// Get minimum amount from min_asset for swap validation
 		var tokenOut osmomath.Int
 		tokenOutMinAmount := osmomath.ZeroInt()
@@ -279,7 +313,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			allDenoms = append(allDenoms, operation.DenomOut)
 		}
 		for _, denom := range allDenoms {
-			if k.gammKeeper.CheckIsWrappedDenom(ctx, denom) {
+			if k.badgesKeeper.CheckIsAliasDenom(ctx, denom) {
 				ack := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom)
 				if !ack.Success() {
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set auto-approve for intermediate address, denom: %s", denom))
@@ -324,23 +358,27 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 					"destination_recover_address", swapAndAction.DestinationRecoverAddress,
 					"original_token", originalTokenIn.String())
 
-				// Send original token to destination recover address in the main context
-				// This allows the IBC transfer to succeed without the swap
-				// Clear any previous deterministic errors before starting the transfer
-				types.ClearDeterministicError(ctx)
-				ack := k.ExecuteLocalTransfer(ctx, sender, &types.TransferInfo{ToAddress: swapAndAction.DestinationRecoverAddress}, originalTokenIn)
+				// Execute fallback transfer in a cache context to ensure atomicity
+				// If fallback transfer fails, we want to roll back the IBC transfer
+				fallbackCacheCtx, writeFallbackCache := ctx.CacheContext()
+				types.ClearDeterministicError(fallbackCacheCtx)
+				ack := k.ExecuteLocalTransfer(fallbackCacheCtx, sender, &types.TransferInfo{ToAddress: swapAndAction.DestinationRecoverAddress}, originalTokenIn)
 				if !ack.Success() {
+					// Fallback transfer failed - cache is automatically discarded
 					// Combine ack error message with deterministic error from context
 					ackErrMsg, _ := types.GetAckError(ack)
 					combinedMsg := "failed to send tokens to destination recover address: swap failed and fallback transfer failed"
 					if ackErrMsg != "" {
 						combinedMsg = fmt.Sprintf("%s: %s", combinedMsg, ackErrMsg)
 					}
-					if detErrMsg, found := types.GetDeterministicError(ctx); found {
+					if detErrMsg, found := types.GetDeterministicError(fallbackCacheCtx); found {
 						combinedMsg = fmt.Sprintf("%s: %s", combinedMsg, detErrMsg)
 					}
 					return types.NewCustomErrorAcknowledgement(combinedMsg)
 				}
+
+				// Fallback transfer succeeded - commit the fallback state
+				writeFallbackCache()
 
 				// Emit event for fallback path
 				event := sdk.NewEvent(
@@ -365,7 +403,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 				ctx.EventManager().EmitEvent(event)
 
 				// Successfully handled fallback - return success to allow IBC transfer to succeed
-				// The swap cache context is automatically discarded, so no swap state changes
+				// The swap cache context was automatically discarded, fallback cache was committed
 				return types.NewSuccessAcknowledgement()
 			}
 
@@ -379,7 +417,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 
 		// Emit event for successful swap path
 		firstOperation := operations[0]
-		lastOperation := operations[len(operations)-1]
+		lastOperation = operations[len(operations)-1]
 		event := sdk.NewEvent(
 			"swap_and_action_success",
 			sdk.NewAttribute("module", "custom-hooks"),
@@ -407,18 +445,34 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 
 	// Execute post-swap action (IBC transfer or local transfer)
 	if swapAndAction.PostSwapAction.IBCTransfer != nil {
-		// Check if attempting to IBC transfer a wrapped denomination
-		if k.gammKeeper.CheckIsWrappedDenom(ctx, tokenIn.Denom) {
-			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("cannot IBC transfer BitBadges denominations: %s", tokenIn.Denom))
+		// Check if attempting to IBC transfer a non-ICS20 compatible denomination
+		if !k.sendManagerKeeper.IsICS20Compatible(ctx, tokenIn.Denom) {
+			standardName := k.sendManagerKeeper.StandardName(ctx, tokenIn.Denom)
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("cannot IBC transfer %s denominations: %s", standardName, tokenIn.Denom))
 		}
 
+		// Security: LOW-010 - Timeout timestamp bounds validation
 		// Use timeout_timestamp if provided, otherwise use default
 		var timeoutTimestamp uint64
+		currentTime := uint64(ctx.BlockTime().UnixNano())
+		
 		if swapAndAction.TimeoutTimestamp != nil {
 			timeoutTimestamp = *swapAndAction.TimeoutTimestamp
+			
+			// Validate timeout is not in the past
+			if timeoutTimestamp <= currentTime {
+				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("timeout timestamp must be in the future: provided=%d, current=%d", timeoutTimestamp, currentTime))
+			}
+			
+			// Validate timeout is not too far in the future (max 1 week)
+			// 1 week is reasonable for IBC transfers which may take time to complete
+			maxTimeout := currentTime + uint64(7*24*60*60*1e9) // 1 week in nanoseconds
+			if timeoutTimestamp > maxTimeout {
+				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("timeout timestamp exceeds maximum allowed: provided=%d, max=%d", timeoutTimestamp, maxTimeout))
+			}
 		} else {
 			// Default: current time + 5 minutes
-			timeoutTimestamp = uint64(ctx.BlockTime().UnixNano()) + uint64(5*60*1e9)
+			timeoutTimestamp = currentTime + uint64(5*60*1e9)
 		}
 
 		recoverAddress := swapAndAction.PostSwapAction.IBCTransfer.IBCInfo.RecoverAddress
@@ -502,7 +556,11 @@ func (k Keeper) ValidatePostSwapAction(ctx sdk.Context, postSwapAction *types.Po
 			}
 		}
 
-		// Validate channel capability exists (this is what we'll need later)
+		// Security: MED-007 - Channel capability validation timing
+		// Note: Capability is validated here for early failure, but it's also validated
+		// immediately before IBC transfer execution in ExecuteIBCTransfer to prevent
+		// race conditions where capability is revoked between validation and execution.
+		// This early validation prevents wasting gas on swaps if capability is already missing.
 		capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcInfo.SourceChannel)
 		_, ok := k.scopedKeeper.GetCapability(ctx, capPath)
 		if !ok {
@@ -534,7 +592,11 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 
 	ibcInfo := ibcTransfer.IBCInfo
 
-	// Get channel capability
+	// Security: MED-007 - Channel capability validation timing
+	// Validate capability immediately before IBC transfer execution to prevent race conditions.
+	// Even though capability is also validated in ValidatePostSwapAction, we validate again here
+	// because capability could be revoked between validation and execution (e.g., by governance).
+	// This ensures swap doesn't succeed if IBC transfer will fail due to missing capability.
 	capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcInfo.SourceChannel)
 	channelCap, ok := k.scopedKeeper.GetCapability(ctx, capPath)
 	if !ok {
@@ -597,6 +659,22 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid transfer.to_address: %s", transfer.ToAddress))
 	}
 
+	// Only set auto-approve flags for wrapped badges denoms
+	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
+	if k.badgesKeeper.CheckIsAliasDenom(ctx, token.Denom) {
+		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, token.Denom)
+		if err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse collection from denom: %s", token.Denom))
+		}
+
+		// This is setting the auto-approve flags for the intermediate sender address
+		// Edge case, but this sets it in the case of default self initiated outgoing is not approved
+		err = k.badgesKeeper.SetAllAutoApprovalFlagsForIntermediateAddress(ctx, collection, sender.String())
+		if err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set all auto approval flags for address: %s", toAddr.String()))
+		}
+	}
+
 	// Execute bank transfer
 	ack := k.SendCoinsFromIntermediateAddress(ctx, sender, toAddr, sdk.Coins{token})
 	if !ack.Success() {
@@ -609,16 +687,9 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 // IMPORTANT: Should ONLY be called when from address is an intermediate address
 func (k Keeper) SendCoinsFromIntermediateAddress(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) ibcexported.Acknowledgement {
 	for _, coin := range coins {
-		if k.gammKeeper.CheckIsWrappedDenom(ctx, coin.Denom) {
-			err := k.gammKeeper.SendNativeTokensFromPool(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
-			if err != nil {
-				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send wrapped tokens: denom=%s, from=%s, to=%s", coin.Denom, from.String(), to.String()))
-			}
-		} else {
-			err := k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(coin))
-			if err != nil {
-				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send coins: amount=%s, denom=%s, from=%s, to=%s", coin.Amount.String(), coin.Denom, from.String(), to.String()))
-			}
+		err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, from, to, &coin)
+		if err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send wrapped tokens: denom=%s, from=%s, to=%s", coin.Denom, from.String(), to.String()))
 		}
 	}
 

@@ -38,6 +38,7 @@ func (s *KeeperTestSuite) SetupTest() {
 		&s.App.GammKeeper,
 		s.App.BankKeeper,
 		&s.App.BadgesKeeper,
+		&s.App.SendmanagerKeeper,
 		s.App.TransferKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,

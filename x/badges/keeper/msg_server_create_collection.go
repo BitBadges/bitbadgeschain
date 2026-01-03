@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
@@ -31,27 +30,28 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		DefaultBalances: msg.DefaultBalances,
 
 		//Applicable to creations and updates
-		ValidTokenIds:                    msg.ValidTokenIds,
-		UpdateCollectionPermissions:      true,
-		CollectionPermissions:            msg.CollectionPermissions,
-		UpdateManagerTimeline:            true,
-		ManagerTimeline:                  msg.ManagerTimeline,
-		UpdateCollectionMetadataTimeline: true,
-		CollectionMetadataTimeline:       msg.CollectionMetadataTimeline,
-		UpdateTokenMetadataTimeline:      true,
-		TokenMetadataTimeline:            msg.TokenMetadataTimeline,
-		UpdateCustomDataTimeline:         true,
-		CustomDataTimeline:               msg.CustomDataTimeline,
-		UpdateCollectionApprovals:        true,
-		CollectionApprovals:              msg.CollectionApprovals,
-		UpdateStandardsTimeline:          true,
-		StandardsTimeline:                msg.StandardsTimeline,
-		UpdateIsArchivedTimeline:         true,
-		IsArchivedTimeline:               msg.IsArchivedTimeline,
+		ValidTokenIds:               msg.ValidTokenIds,
+		UpdateCollectionPermissions: true,
+		CollectionPermissions:       msg.CollectionPermissions,
+		UpdateManager:               true,
+		Manager:                     msg.Manager,
+		UpdateCollectionMetadata:    true,
+		CollectionMetadata:          msg.CollectionMetadata,
+		UpdateTokenMetadata:         true,
+		TokenMetadata:               msg.TokenMetadata,
+		UpdateCustomData:            true,
+		CustomData:                  msg.CustomData,
+		UpdateCollectionApprovals:   true,
+		CollectionApprovals:         msg.CollectionApprovals,
+		UpdateStandards:             true,
+		Standards:                   msg.Standards,
+		UpdateIsArchived:            true,
+		IsArchived:                  msg.IsArchived,
 
 		MintEscrowCoinsToTransfer:   msg.MintEscrowCoinsToTransfer,
 		CosmosCoinWrapperPathsToAdd: msg.CosmosCoinWrapperPathsToAdd,
 		Invariants:                  msg.Invariants,
+		AliasPathsToAdd:             msg.AliasPathsToAdd,
 	}
 
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)
@@ -59,7 +59,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		return nil, err
 	}
 
-	msgBytes, err := json.Marshal(msg)
+	msgStr, err := MarshalMessageForEvent(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_collection"),
-		sdk.NewAttribute("msg", string(msgBytes)),
+		sdk.NewAttribute("msg", msgStr),
 	)
 
 	return &types.MsgCreateCollectionResponse{

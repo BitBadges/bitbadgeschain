@@ -50,6 +50,11 @@ type CommunityPoolKeeper interface {
 	FundCommunityPool(ctx context.Context, amount sdk.Coins, sender sdk.AccAddress) error
 }
 
+// SendManagerKeeper defines the expected interface for the SendManager module.
+type SendManagerKeeper interface {
+	FundCommunityPoolWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, coins sdk.Coins) error
+}
+
 // PoolManager defines the interface needed to be fulfilled for
 // the pool manager.
 type PoolManager interface {

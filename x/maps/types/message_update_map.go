@@ -1,26 +1,26 @@
 package types
 
 import (
+	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 const TypeMsgUpdateMap = "update_map"
 
 var _ sdk.Msg = &MsgUpdateMap{}
 
-func NewMsgUpdateMap(creator string, mapId string, updateManagerTimeline bool, managerTimeline []*ManagerTimeline, updateMetadataTimeline bool, metadataTimeline []*MapMetadataTimeline, updatePermissions bool, permissions *MapPermissions) *MsgUpdateMap {
+func NewMsgUpdateMap(creator string, mapId string, updateManager bool, manager string, updateMetadata bool, metadata *Metadata, updatePermissions bool, permissions *MapPermissions) *MsgUpdateMap {
 	return &MsgUpdateMap{
-		Creator:                creator,
-		MapId:                  mapId,
-		UpdateManagerTimeline:  updateManagerTimeline,
-		ManagerTimeline:        managerTimeline,
-		UpdateMetadataTimeline: updateMetadataTimeline,
-		MetadataTimeline:       metadataTimeline,
-		UpdatePermissions:      updatePermissions,
-		Permissions:            permissions,
+		Creator:           creator,
+		MapId:             mapId,
+		UpdateManager:     updateManager,
+		Manager:           manager,
+		UpdateMetadata:    updateMetadata,
+		Metadata:          metadata,
+		UpdatePermissions: updatePermissions,
+		Permissions:       permissions,
 	}
 }
 
@@ -55,12 +55,12 @@ func (msg *MsgUpdateMap) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
 
-	err = badgestypes.ValidateManagerTimeline(CastManagerTimelineArray(msg.ManagerTimeline))
+	err = badgestypes.ValidateManager(msg.Manager)
 	if err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequest, "manager timeline cannot be invalid")
 	}
 
-	err = badgestypes.ValidateCollectionMetadataTimeline(CastMetadataTimelineArray(msg.MetadataTimeline))
+	err = badgestypes.ValidateCollectionMetadata(CastMapMetadataToCollectionMetadata(msg.Metadata))
 	if err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequest, "metadata timeline cannot be invalid")
 	}

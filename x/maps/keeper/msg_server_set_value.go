@@ -65,8 +65,8 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 	}
 
 	collection := &tokentypes.TokenCollection{}
-	if !currMap.InheritManagerTimelineFrom.IsNil() && !currMap.InheritManagerTimelineFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerTimelineFrom.String()})
+	if !currMap.InheritManagerFrom.IsNil() && !currMap.InheritManagerFrom.IsZero() {
+		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}

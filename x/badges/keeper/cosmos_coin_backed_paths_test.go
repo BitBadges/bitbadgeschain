@@ -25,15 +25,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/1234567890ABCDEF",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/1234567890ABCDEF",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -65,8 +69,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 	// Fund bob with IBC coins (when unbacking FROM special address, user sends IBC coins TO special address)
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Unback to get tokens (backing minting process)
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -83,6 +87,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -94,14 +99,14 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 	suite.Require().Equal(sdkmath.NewUint(1), bobBalance.Balances[0].Amount, "Bob should have 1 token after unbacking")
 
 	// Verify bob sent IBC coin to special address
-	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.IbcDenom)
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.Conversion.SideA.Denom)
 	suite.Require().Equal(sdkmath.NewInt(0), bobIbcBalance.Amount, "Bob should have 0 IBC coins after unbacking")
 
 	// Fund special address with IBC coins (when backing TO special address, special address sends IBC coins to user)
 	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Back the token
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -118,13 +123,14 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Nil(err, "Error backing token")
 
 	// Verify bob received IBC coin from special address
-	bobIbcBalance = suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.IbcDenom)
+	bobIbcBalance = suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.Conversion.SideA.Denom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobIbcBalance.Amount, "Bob should have 1 IBC coin after backing")
 
 	// Verify bob has 0 tokens
@@ -148,15 +154,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/unwraptest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/unwraptest",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -181,8 +191,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 	// Fund bob with IBC coins
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Unback to get token
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -199,6 +209,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -207,8 +218,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 	// Fund special address for backing
 	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Back the token
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -225,14 +236,15 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Nil(err)
 
 	// Fund bob again for second unback
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Unback again
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -249,6 +261,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -275,15 +288,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/transfertest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/transfertest",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -308,8 +325,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 	// Fund bob with IBC coins
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Unback to get token
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -326,6 +343,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -334,8 +352,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 	// Fund special address for backing
 	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Back the token
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -352,6 +370,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -360,7 +379,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 	// Transfer IBC coin to alice
 	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err)
-	err = suite.app.BankKeeper.SendCoins(suite.ctx, backedPathAccAddr, aliceAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	err = suite.app.BankKeeper.SendCoins(suite.ctx, backedPathAccAddr, aliceAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 	suite.Require().Nil(err)
 
 	// Alice needs IBC coins to unback (when unbacking, user sends IBC coins to special address)
@@ -381,6 +400,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -407,15 +427,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsErrors() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/errortest",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/errortest",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -473,15 +497,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/coin-one",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/coin-one",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -506,8 +534,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 	// Fund bob with IBC coins
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath1.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath1.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath1.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath1.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Unback
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -524,6 +552,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -532,8 +561,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 	// Fund special address for backing
 	backedPath1AccAddr, err := sdk.AccAddressFromBech32(backedPath1.Address)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath1.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPath1AccAddr, sdk.Coins{sdk.NewCoin(backedPath1.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath1.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPath1AccAddr, sdk.Coins{sdk.NewCoin(backedPath1.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Back
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -550,13 +579,14 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Nil(err)
 
 	// Verify bob received IBC coin
-	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath1.IbcDenom)
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath1.Conversion.SideA.Denom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobIbcBalance.Amount, "Bob should have 1 IBC coin")
 }
 
@@ -575,15 +605,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsInadequateBalance() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/balance-test",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/balance-test",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -620,6 +654,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsInadequateBalance() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -642,15 +677,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackInadequateBalance() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/unback-balance-test",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/unback-balance-test",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -687,6 +726,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackInadequateBalance() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -709,15 +749,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/conversion-test",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(5), // 5 tokens = 1 IBC coin
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/conversion-test",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(5), // 5 tokens = 1 IBC coin
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(1),
 		},
 	}
 
@@ -742,8 +786,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 	// Fund bob with IBC coins (5 tokens = 1 IBC coin)
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Unback 5 tokens
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -760,6 +804,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -775,8 +820,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 	// Fund special address for backing
 	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
 	// Back 5 tokens
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -793,6 +838,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -821,15 +867,19 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 	collectionsToCreate[0].CollectionApprovals = filteredApprovals
 	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
 		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
-			IbcDenom: "ibc/ibcamount-test",
-			Balances: []*types.Balance{
-				{
-					Amount:         sdkmath.NewUint(1),
-					OwnershipTimes: GetFullUintRanges(),
-					TokenIds:       GetOneUintRange(),
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(10), // 10 IBC coins per conversion unit
+					Denom:  "ibc/ibcamount-test",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
 				},
 			},
-			IbcAmount: sdkmath.NewUint(10), // 10 IBC coins per conversion unit
 		},
 	}
 
@@ -850,13 +900,13 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err)
 	backedPath := collection.Invariants.CosmosCoinBackedPath
-	suite.Require().Equal(sdkmath.NewUint(10), backedPath.IbcAmount, "IbcAmount should be 10")
+	suite.Require().Equal(sdkmath.NewUint(10), backedPath.Conversion.SideA.Amount, "IbcAmount should be 10")
 
 	// Fund bob with 10 IBC coins
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(10))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(10))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(10))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(10))})
 
 	// Unback 1 token (requires 10 IBC coins)
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -873,6 +923,7 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
@@ -888,8 +939,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 	// Fund special address with 10 IBC coins for backing
 	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
 	suite.Require().Nil(err)
-	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(10))})
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.IbcDenom, sdkmath.NewInt(10))})
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(10))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(10))})
 
 	// Back 1 token (should send 10 IBC coins to bob)
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -906,13 +957,14 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 						OwnershipTimes: GetFullUintRanges(),
 					},
 				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.BadgesKeeper, collection),
 			},
 		},
 	})
 	suite.Require().Nil(err)
 
 	// Verify bob received 10 IBC coins
-	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.IbcDenom)
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.Conversion.SideA.Denom)
 	suite.Require().Equal(sdkmath.NewInt(10), bobIbcBalance.Amount, "Bob should have 10 IBC coins after backing")
 
 	// Verify bob has 0 tokens

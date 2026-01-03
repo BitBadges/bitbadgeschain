@@ -157,6 +157,8 @@ type AddressListManager struct {
 
 ### 5. Dynamic Store Engine
 
+**Global Kill Switch Feature**: All dynamic stores include a `globalEnabled` field that acts as a global kill switch. When `globalEnabled = false`, all approvals using that store via `DynamicStoreChallenge` will fail immediately, regardless of per-address values. This enables quick halting of approvals (e.g., when a 2FA protocol is compromised). The field defaults to `true` on creation and can be toggled via `MsgUpdateDynamicStore`.
+
 **Responsibility**: Provides flexible key-value storage for custom logic
 
 ```go

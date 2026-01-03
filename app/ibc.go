@@ -291,6 +291,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		&app.GammKeeper,
 		app.BankKeeper,
 		&app.BadgesKeeper,
+		&app.SendmanagerKeeper,
 		app.TransferKeeper,
 		app.TransferICS4Wrapper,
 		app.IBCKeeper.ChannelKeeper,

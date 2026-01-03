@@ -33,7 +33,7 @@ type Transfer struct {
 	Balances []*Balance `protobuf:"bytes,3,rep,name=balances,proto3" json:"balances,omitempty"`
 	// If defined, we will use the predeterminedBalances from the specified approval to calculate the balances at execution time.
 	// We will override the balances field with the precalculated balances. Only applicable for approvals with predeterminedBalances set.
-	PrecalculateBalancesFromApproval *ApprovalIdentifierDetails `protobuf:"bytes,4,opt,name=precalculateBalancesFromApproval,proto3" json:"precalculateBalancesFromApproval,omitempty"`
+	PrecalculateBalancesFromApproval *PrecalculateBalancesFromApprovalDetails `protobuf:"bytes,4,opt,name=precalculateBalancesFromApproval,proto3" json:"precalculateBalancesFromApproval,omitempty"`
 	// The Merkle proofs / solutions for all Merkle challenges required for the transfer.
 	MerkleProofs []*MerkleProof `protobuf:"bytes,5,rep,name=merkleProofs,proto3" json:"merkleProofs,omitempty"`
 	// The ETH signature proofs / solutions for all ETH signature challenges required for the transfer.
@@ -55,10 +55,6 @@ type Transfer struct {
 	// If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
 	// If false, we will check the prioritized approvals first and then scan through the rest of the approvals.
 	OnlyCheckPrioritizedOutgoingApprovals bool `protobuf:"varint,11,opt,name=onlyCheckPrioritizedOutgoingApprovals,proto3" json:"onlyCheckPrioritizedOutgoingApprovals,omitempty"`
-	// The options for precalculating the balances.
-	PrecalculationOptions *PrecalculationOptions `protobuf:"bytes,12,opt,name=precalculationOptions,proto3" json:"precalculationOptions,omitempty"`
-	// The number of times to attempt approval validation. If 0 / not specified, we default to only one.
-	NumAttempts Uint `protobuf:"bytes,13,opt,name=numAttempts,proto3,customtype=Uint" json:"numAttempts"`
 }
 
 func (m *Transfer) Reset()         { *m = Transfer{} }
@@ -115,7 +111,7 @@ func (m *Transfer) GetBalances() []*Balance {
 	return nil
 }
 
-func (m *Transfer) GetPrecalculateBalancesFromApproval() *ApprovalIdentifierDetails {
+func (m *Transfer) GetPrecalculateBalancesFromApproval() *PrecalculateBalancesFromApprovalDetails {
 	if m != nil {
 		return m.PrecalculateBalancesFromApproval
 	}
@@ -171,33 +167,34 @@ func (m *Transfer) GetOnlyCheckPrioritizedOutgoingApprovals() bool {
 	return false
 }
 
-func (m *Transfer) GetPrecalculationOptions() *PrecalculationOptions {
-	if m != nil {
-		return m.PrecalculationOptions
-	}
-	return nil
+// PrecalculateBalancesFromApprovalDetails defines the details for precalculating balances from an approval.
+type PrecalculateBalancesFromApprovalDetails struct {
+	// The ID of the approval.
+	ApprovalId string `protobuf:"bytes,1,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
+	// The level of the approval. Can be "collection", "incoming", or "outgoing".
+	ApprovalLevel string `protobuf:"bytes,2,opt,name=approvalLevel,proto3" json:"approvalLevel,omitempty"`
+	// The address of the approver. Leave blank "" if approvalLevel == "collection".
+	ApproverAddress string `protobuf:"bytes,3,opt,name=approverAddress,proto3" json:"approverAddress,omitempty"`
+	// The version of the approval.
+	Version Uint `protobuf:"bytes,4,opt,name=version,proto3,customtype=Uint" json:"version"`
+	// The options for precalculating the balances.
+	PrecalculationOptions *PrecalculationOptions `protobuf:"bytes,5,opt,name=precalculationOptions,proto3" json:"precalculationOptions,omitempty"`
 }
 
-// PrecalculationOptions defines the options for precalculating the balances.
-type PrecalculationOptions struct {
-	// The timestamp to override with when calculating the balances.
-	OverrideTimestamp Uint `protobuf:"bytes,1,opt,name=overrideTimestamp,proto3,customtype=Uint" json:"overrideTimestamp"`
-	// The IDs to override for the transfer. Only applicable if using this option in precalculation.
-	TokenIdsOverride []*UintRange `protobuf:"bytes,2,rep,name=tokenIdsOverride,proto3" json:"tokenIdsOverride,omitempty"`
+func (m *PrecalculateBalancesFromApprovalDetails) Reset() {
+	*m = PrecalculateBalancesFromApprovalDetails{}
 }
-
-func (m *PrecalculationOptions) Reset()         { *m = PrecalculationOptions{} }
-func (m *PrecalculationOptions) String() string { return proto.CompactTextString(m) }
-func (*PrecalculationOptions) ProtoMessage()    {}
-func (*PrecalculationOptions) Descriptor() ([]byte, []int) {
+func (m *PrecalculateBalancesFromApprovalDetails) String() string { return proto.CompactTextString(m) }
+func (*PrecalculateBalancesFromApprovalDetails) ProtoMessage()    {}
+func (*PrecalculateBalancesFromApprovalDetails) Descriptor() ([]byte, []int) {
 	return fileDescriptor_db7d8388ebf2a03f, []int{1}
 }
-func (m *PrecalculationOptions) XXX_Unmarshal(b []byte) error {
+func (m *PrecalculateBalancesFromApprovalDetails) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *PrecalculationOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PrecalculateBalancesFromApprovalDetails) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_PrecalculationOptions.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PrecalculateBalancesFromApprovalDetails.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -207,70 +204,90 @@ func (m *PrecalculationOptions) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *PrecalculationOptions) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PrecalculationOptions.Merge(m, src)
+func (m *PrecalculateBalancesFromApprovalDetails) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PrecalculateBalancesFromApprovalDetails.Merge(m, src)
 }
-func (m *PrecalculationOptions) XXX_Size() int {
+func (m *PrecalculateBalancesFromApprovalDetails) XXX_Size() int {
 	return m.Size()
 }
-func (m *PrecalculationOptions) XXX_DiscardUnknown() {
-	xxx_messageInfo_PrecalculationOptions.DiscardUnknown(m)
+func (m *PrecalculateBalancesFromApprovalDetails) XXX_DiscardUnknown() {
+	xxx_messageInfo_PrecalculateBalancesFromApprovalDetails.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PrecalculationOptions proto.InternalMessageInfo
+var xxx_messageInfo_PrecalculateBalancesFromApprovalDetails proto.InternalMessageInfo
 
-func (m *PrecalculationOptions) GetTokenIdsOverride() []*UintRange {
+func (m *PrecalculateBalancesFromApprovalDetails) GetApprovalId() string {
 	if m != nil {
-		return m.TokenIdsOverride
+		return m.ApprovalId
+	}
+	return ""
+}
+
+func (m *PrecalculateBalancesFromApprovalDetails) GetApprovalLevel() string {
+	if m != nil {
+		return m.ApprovalLevel
+	}
+	return ""
+}
+
+func (m *PrecalculateBalancesFromApprovalDetails) GetApproverAddress() string {
+	if m != nil {
+		return m.ApproverAddress
+	}
+	return ""
+}
+
+func (m *PrecalculateBalancesFromApprovalDetails) GetPrecalculationOptions() *PrecalculationOptions {
+	if m != nil {
+		return m.PrecalculationOptions
 	}
 	return nil
 }
 
 func init() {
 	proto.RegisterType((*Transfer)(nil), "badges.Transfer")
-	proto.RegisterType((*PrecalculationOptions)(nil), "badges.PrecalculationOptions")
+	proto.RegisterType((*PrecalculateBalancesFromApprovalDetails)(nil), "badges.PrecalculateBalancesFromApprovalDetails")
 }
 
 func init() { proto.RegisterFile("badges/transfers.proto", fileDescriptor_db7d8388ebf2a03f) }
 
 var fileDescriptor_db7d8388ebf2a03f = []byte{
-	// 566 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0x41, 0x6b, 0x13, 0x4f,
-	0x18, 0xc6, 0xb3, 0xff, 0xf6, 0x1f, 0xd3, 0xd9, 0x8a, 0x76, 0x6c, 0x74, 0x0d, 0xb8, 0x5d, 0x0b,
-	0x62, 0x40, 0x48, 0x20, 0x1e, 0x04, 0xc1, 0x43, 0x52, 0x15, 0x03, 0x4a, 0xc2, 0x36, 0x05, 0xf1,
-	0x36, 0xd9, 0x7d, 0xb3, 0x19, 0xb2, 0x33, 0xb3, 0xcc, 0x4c, 0x8a, 0xf5, 0x53, 0x88, 0x9f, 0xaa,
-	0xc7, 0x9e, 0x44, 0x3c, 0x14, 0x49, 0xbe, 0x88, 0x64, 0x77, 0xc7, 0x24, 0x66, 0x8b, 0xb9, 0x84,
-	0x97, 0x67, 0x7e, 0xcf, 0xf3, 0xbe, 0x3b, 0x99, 0x19, 0x74, 0x7f, 0x48, 0xc2, 0x08, 0x54, 0x53,
-	0x4b, 0xc2, 0xd5, 0x08, 0xa4, 0x6a, 0x24, 0x52, 0x68, 0x81, 0xcb, 0x99, 0x5e, 0x3b, 0x8c, 0x44,
-	0x24, 0x52, 0xa9, 0xb9, 0xa8, 0xb2, 0xd5, 0x5a, 0x35, 0x77, 0x0d, 0x49, 0x4c, 0x78, 0x00, 0xb9,
-	0xa9, 0x66, 0xc2, 0x48, 0x92, 0x48, 0x71, 0x4e, 0x62, 0xa3, 0x3f, 0xc8, 0xf5, 0x60, 0x4c, 0xe2,
-	0x18, 0x78, 0x64, 0x0c, 0xc7, 0xdf, 0xcb, 0xa8, 0x32, 0xc8, 0x3b, 0x63, 0x8c, 0x76, 0x47, 0x52,
-	0x30, 0xc7, 0xf2, 0xac, 0xfa, 0x9e, 0x9f, 0xd6, 0xd8, 0x43, 0xb6, 0x16, 0xed, 0x30, 0x94, 0xa0,
-	0x14, 0x28, 0xe7, 0x3f, 0x6f, 0xa7, 0xbe, 0xe7, 0xaf, 0x4a, 0xf8, 0x19, 0xaa, 0x98, 0x29, 0x9c,
-	0x1d, 0x6f, 0xa7, 0x6e, 0xb7, 0xee, 0x34, 0xb2, 0x76, 0x8d, 0x4e, 0xa6, 0xfb, 0x7f, 0x00, 0xcc,
-	0x90, 0x97, 0x48, 0x08, 0x48, 0x1c, 0x4c, 0x63, 0xa2, 0x21, 0x07, 0xd4, 0x5b, 0x29, 0x58, 0x3b,
-	0x9f, 0xd9, 0xd9, 0xf5, 0xac, 0xba, 0xdd, 0x7a, 0x6c, 0x42, 0x8c, 0xde, 0x0d, 0x81, 0x6b, 0x3a,
-	0xa2, 0x20, 0x5f, 0x83, 0x26, 0x34, 0x56, 0xfe, 0x3f, 0xa3, 0xf0, 0x0b, 0xb4, 0xcf, 0x40, 0x4e,
-	0x62, 0xe8, 0x4b, 0x21, 0x46, 0xca, 0xf9, 0x3f, 0x9d, 0xef, 0x9e, 0x89, 0xfe, 0xb0, 0x5c, 0xf3,
-	0xd7, 0x40, 0xdc, 0x45, 0x18, 0xf4, 0xf8, 0x94, 0x46, 0x9c, 0xe8, 0xa9, 0x34, 0xf6, 0x72, 0x6a,
-	0x7f, 0x68, 0xec, 0x6f, 0x06, 0xef, 0xd6, 0x09, 0xbf, 0xc0, 0xb4, 0xd8, 0x55, 0x06, 0x4c, 0x38,
-	0xb7, 0xb2, 0x5d, 0x5d, 0xd4, 0xf8, 0x0c, 0x1d, 0x26, 0x92, 0x0a, 0x49, 0x35, 0xfd, 0x02, 0xa1,
-	0x19, 0x57, 0x39, 0x95, 0xb4, 0xc1, 0x16, 0x9f, 0x5e, 0x68, 0xc7, 0x1f, 0xd1, 0x53, 0xc1, 0xe3,
-	0x8b, 0x93, 0x31, 0x04, 0x93, 0xfe, 0x12, 0x38, 0x11, 0x71, 0x0c, 0x81, 0xa6, 0x82, 0x2f, 0x3b,
-	0xed, 0x79, 0x56, 0xbd, 0xe2, 0x6f, 0x8b, 0xe3, 0x01, 0x7a, 0x52, 0x84, 0x76, 0x79, 0x20, 0x18,
-	0xe5, 0xd1, 0x32, 0x17, 0xa5, 0xb9, 0xdb, 0xc1, 0x37, 0xa5, 0xf6, 0xa6, 0x3a, 0x12, 0x6b, 0xa9,
-	0xf6, 0xcd, 0xa9, 0x1b, 0x30, 0x3e, 0x45, 0xd5, 0x95, 0x83, 0x41, 0x05, 0xef, 0x25, 0x8b, 0x5f,
-	0xe5, 0xec, 0xa7, 0x07, 0xeb, 0x91, 0xd9, 0xdd, 0x7e, 0x11, 0xe4, 0x17, 0x7b, 0x71, 0x03, 0xd9,
-	0x7c, 0xca, 0xda, 0x5a, 0x03, 0x4b, 0xb4, 0x72, 0x6e, 0x2f, 0xfe, 0xcc, 0xce, 0xfe, 0xe5, 0xf5,
-	0x51, 0xe9, 0xe7, 0xf5, 0xd1, 0xee, 0x19, 0xe5, 0xda, 0x5f, 0x05, 0x8e, 0xbf, 0x59, 0xa8, 0x5a,
-	0xd8, 0x00, 0xbf, 0x44, 0x07, 0xe2, 0x1c, 0xa4, 0xa4, 0x21, 0x0c, 0x28, 0x03, 0xa5, 0x09, 0x4b,
-	0xb2, 0x2b, 0xf7, 0x57, 0xde, 0x26, 0x86, 0x5f, 0xa1, 0xbb, 0x5a, 0x4c, 0x80, 0x77, 0x43, 0xd5,
-	0xcb, 0x17, 0xd3, 0x2b, 0x69, 0xb7, 0x0e, 0xcc, 0x57, 0xa5, 0x56, 0xc2, 0x23, 0xf0, 0x37, 0xd0,
-	0xce, 0xfb, 0xcb, 0x99, 0x6b, 0x5d, 0xcd, 0x5c, 0xeb, 0xd7, 0xcc, 0xb5, 0xbe, 0xce, 0xdd, 0xd2,
-	0xd5, 0xdc, 0x2d, 0xfd, 0x98, 0xbb, 0xa5, 0x4f, 0xad, 0x88, 0xea, 0xf1, 0x74, 0xd8, 0x08, 0x04,
-	0x6b, 0x0e, 0xa9, 0x36, 0xaf, 0x8b, 0xa9, 0x82, 0x31, 0xa1, 0xbc, 0xf9, 0xb9, 0x69, 0xde, 0xaa,
-	0x8b, 0x04, 0xd4, 0xb0, 0x9c, 0x3e, 0x21, 0xcf, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0xfa, 0x03,
-	0xa7, 0xc0, 0xc2, 0x04, 0x00, 0x00,
+	// 555 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0x5d, 0x6b, 0x13, 0x41,
+	0x14, 0xcd, 0x36, 0xfd, 0x48, 0x26, 0x95, 0xc2, 0xd8, 0xea, 0x1a, 0x70, 0xbb, 0x16, 0xb5, 0x0b,
+	0x42, 0x16, 0xe2, 0x83, 0xcf, 0x4d, 0x55, 0x0c, 0x54, 0x1a, 0xb6, 0x29, 0x88, 0x6f, 0x93, 0xcd,
+	0xcd, 0x66, 0xe8, 0xec, 0xcc, 0x32, 0x33, 0x09, 0x56, 0xff, 0x84, 0x4f, 0xfe, 0xa6, 0x3e, 0xf6,
+	0x51, 0x7c, 0xa8, 0x92, 0xfc, 0x11, 0xd9, 0x8f, 0x69, 0x12, 0x4d, 0x69, 0x5e, 0xc2, 0xcd, 0xb9,
+	0xe7, 0x9c, 0x7b, 0x77, 0xb8, 0xf7, 0xa2, 0x47, 0x3d, 0xd2, 0x8f, 0x40, 0xf9, 0x5a, 0x12, 0xae,
+	0x06, 0x20, 0x55, 0x23, 0x91, 0x42, 0x0b, 0xbc, 0x99, 0xe3, 0xf5, 0xdd, 0x48, 0x44, 0x22, 0x83,
+	0xfc, 0x34, 0xca, 0xb3, 0xf5, 0xbd, 0x42, 0xd5, 0x23, 0x8c, 0xf0, 0x10, 0x0a, 0x51, 0xdd, 0x98,
+	0x91, 0x24, 0x91, 0x62, 0x4c, 0x98, 0xc1, 0x1f, 0x17, 0x78, 0x38, 0x24, 0x8c, 0x01, 0x8f, 0x8c,
+	0xe0, 0xe0, 0xf7, 0x06, 0xaa, 0x74, 0x8b, 0xca, 0x18, 0xa3, 0xf5, 0x81, 0x14, 0xb1, 0x6d, 0xb9,
+	0x96, 0x57, 0x0d, 0xb2, 0x18, 0xbb, 0xa8, 0xa6, 0xc5, 0x51, 0xbf, 0x2f, 0x41, 0x29, 0x50, 0xf6,
+	0x9a, 0x5b, 0xf6, 0xaa, 0xc1, 0x3c, 0x84, 0x5f, 0xa1, 0x8a, 0xe9, 0xc2, 0x2e, 0xbb, 0x65, 0xaf,
+	0xd6, 0xdc, 0x69, 0xe4, 0xe5, 0x1a, 0xad, 0x1c, 0x0f, 0x6e, 0x09, 0xf8, 0x1b, 0x72, 0x13, 0x09,
+	0x21, 0x61, 0xe1, 0x88, 0x11, 0x0d, 0x05, 0x41, 0xbd, 0x97, 0x22, 0x3e, 0x2a, 0x7a, 0xb6, 0xd7,
+	0x5d, 0xcb, 0xab, 0x35, 0x7d, 0x63, 0xd2, 0xb9, 0x87, 0xff, 0x16, 0x34, 0xa1, 0x4c, 0x05, 0xf7,
+	0x1a, 0xe3, 0x37, 0x68, 0x3b, 0x06, 0x79, 0xc1, 0xa0, 0x23, 0x85, 0x18, 0x28, 0x7b, 0x23, 0xeb,
+	0xf6, 0xa1, 0x29, 0xf4, 0x71, 0x96, 0x0b, 0x16, 0x88, 0xb8, 0x8d, 0x30, 0xe8, 0xe1, 0x19, 0x8d,
+	0x38, 0xd1, 0x23, 0x69, 0xe4, 0x9b, 0x99, 0xfc, 0x89, 0x91, 0xbf, 0xeb, 0x7e, 0x58, 0x64, 0x04,
+	0x4b, 0x44, 0xe9, 0x1b, 0xc7, 0x10, 0x0b, 0x7b, 0x2b, 0x7f, 0xe3, 0x34, 0xc6, 0xe7, 0x68, 0x37,
+	0x91, 0x54, 0x48, 0xaa, 0xe9, 0x57, 0xe8, 0x9b, 0x76, 0x95, 0x5d, 0xc9, 0x0a, 0x3c, 0x33, 0x05,
+	0x4c, 0xa2, 0xdd, 0x07, 0xae, 0xe9, 0x80, 0x82, 0x34, 0x9f, 0xbe, 0x54, 0x8e, 0x3f, 0xa1, 0x43,
+	0xc1, 0xd9, 0xe5, 0xf1, 0x10, 0xc2, 0x8b, 0xce, 0x8c, 0x70, 0x2c, 0x18, 0x83, 0x50, 0x53, 0xc1,
+	0x67, 0x95, 0xaa, 0xae, 0xe5, 0x55, 0x82, 0x55, 0xe9, 0xb8, 0x8b, 0x5e, 0x2c, 0xa3, 0xb6, 0x79,
+	0x28, 0x62, 0xca, 0xa3, 0x99, 0x2f, 0xca, 0x7c, 0x57, 0x23, 0xdf, 0xe5, 0x7a, 0x3a, 0xd2, 0x91,
+	0x58, 0x70, 0xad, 0xdd, 0xed, 0xfa, 0x1f, 0xf9, 0xe0, 0xc7, 0x1a, 0x3a, 0x5c, 0x71, 0x84, 0xb0,
+	0x83, 0x10, 0xb9, 0x7d, 0xe4, 0x62, 0x0d, 0xe6, 0x10, 0xfc, 0x1c, 0x3d, 0x30, 0xff, 0x4e, 0x60,
+	0x0c, 0xcc, 0x5e, 0xcb, 0x28, 0x8b, 0x20, 0xf6, 0xd0, 0x4e, 0x0e, 0x80, 0x2c, 0xb6, 0xc4, 0x2e,
+	0x67, 0xbc, 0x7f, 0x61, 0xfc, 0x12, 0x6d, 0x8d, 0x41, 0x2a, 0x2a, 0x78, 0x36, 0xf4, 0xd5, 0xd6,
+	0xf6, 0xd5, 0xcd, 0x7e, 0xe9, 0xd7, 0xcd, 0xfe, 0xfa, 0x39, 0xe5, 0x3a, 0x30, 0x49, 0x7c, 0x86,
+	0xf6, 0xe6, 0x86, 0x9b, 0x0a, 0x7e, 0x9a, 0xa4, 0xbf, 0xe9, 0x04, 0xa7, 0xab, 0xf2, 0x74, 0xc9,
+	0xaa, 0xcc, 0x48, 0xc1, 0x72, 0x6d, 0xeb, 0xe4, 0x6a, 0xe2, 0x58, 0xd7, 0x13, 0xc7, 0xfa, 0x33,
+	0x71, 0xac, 0xef, 0x53, 0xa7, 0x74, 0x3d, 0x75, 0x4a, 0x3f, 0xa7, 0x4e, 0xe9, 0x73, 0x33, 0xa2,
+	0x7a, 0x38, 0xea, 0x35, 0x42, 0x11, 0xfb, 0x3d, 0xaa, 0xcd, 0xa9, 0x31, 0x51, 0x38, 0x24, 0x94,
+	0xfb, 0x5f, 0x7c, 0x73, 0xb8, 0x2e, 0x13, 0x50, 0xbd, 0xcd, 0xec, 0x9e, 0xbc, 0xfe, 0x1b, 0x00,
+	0x00, 0xff, 0xff, 0xba, 0xb0, 0x0d, 0x8f, 0xcf, 0x04, 0x00, 0x00,
 }
 
 func (m *Transfer) Marshal() (dAtA []byte, err error) {
@@ -293,28 +310,6 @@ func (m *Transfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.NumAttempts.Size()
-		i -= size
-		if _, err := m.NumAttempts.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTransfers(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x6a
-	if m.PrecalculationOptions != nil {
-		{
-			size, err := m.PrecalculationOptions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTransfers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x62
-	}
 	if m.OnlyCheckPrioritizedOutgoingApprovals {
 		i--
 		if m.OnlyCheckPrioritizedOutgoingApprovals {
@@ -439,7 +434,7 @@ func (m *Transfer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *PrecalculationOptions) Marshal() (dAtA []byte, err error) {
+func (m *PrecalculateBalancesFromApprovalDetails) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -449,40 +444,59 @@ func (m *PrecalculationOptions) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *PrecalculationOptions) MarshalTo(dAtA []byte) (int, error) {
+func (m *PrecalculateBalancesFromApprovalDetails) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *PrecalculationOptions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PrecalculateBalancesFromApprovalDetails) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.TokenIdsOverride) > 0 {
-		for iNdEx := len(m.TokenIdsOverride) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TokenIdsOverride[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTransfers(dAtA, i, uint64(size))
+	if m.PrecalculationOptions != nil {
+		{
+			size, err := m.PrecalculationOptions.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
 			}
-			i--
-			dAtA[i] = 0x12
+			i -= size
+			i = encodeVarintTransfers(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x2a
 	}
 	{
-		size := m.OverrideTimestamp.Size()
+		size := m.Version.Size()
 		i -= size
-		if _, err := m.OverrideTimestamp.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.Version.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintTransfers(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0xa
+	dAtA[i] = 0x22
+	if len(m.ApproverAddress) > 0 {
+		i -= len(m.ApproverAddress)
+		copy(dAtA[i:], m.ApproverAddress)
+		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApproverAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ApprovalLevel) > 0 {
+		i -= len(m.ApprovalLevel)
+		copy(dAtA[i:], m.ApprovalLevel)
+		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalLevel)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ApprovalId) > 0 {
+		i -= len(m.ApprovalId)
+		copy(dAtA[i:], m.ApprovalId)
+		i = encodeVarintTransfers(dAtA, i, uint64(len(m.ApprovalId)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -554,28 +568,32 @@ func (m *Transfer) Size() (n int) {
 	if m.OnlyCheckPrioritizedOutgoingApprovals {
 		n += 2
 	}
-	if m.PrecalculationOptions != nil {
-		l = m.PrecalculationOptions.Size()
-		n += 1 + l + sovTransfers(uint64(l))
-	}
-	l = m.NumAttempts.Size()
-	n += 1 + l + sovTransfers(uint64(l))
 	return n
 }
 
-func (m *PrecalculationOptions) Size() (n int) {
+func (m *PrecalculateBalancesFromApprovalDetails) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = m.OverrideTimestamp.Size()
+	l = len(m.ApprovalId)
+	if l > 0 {
+		n += 1 + l + sovTransfers(uint64(l))
+	}
+	l = len(m.ApprovalLevel)
+	if l > 0 {
+		n += 1 + l + sovTransfers(uint64(l))
+	}
+	l = len(m.ApproverAddress)
+	if l > 0 {
+		n += 1 + l + sovTransfers(uint64(l))
+	}
+	l = m.Version.Size()
 	n += 1 + l + sovTransfers(uint64(l))
-	if len(m.TokenIdsOverride) > 0 {
-		for _, e := range m.TokenIdsOverride {
-			l = e.Size()
-			n += 1 + l + sovTransfers(uint64(l))
-		}
+	if m.PrecalculationOptions != nil {
+		l = m.PrecalculationOptions.Size()
+		n += 1 + l + sovTransfers(uint64(l))
 	}
 	return n
 }
@@ -743,7 +761,7 @@ func (m *Transfer) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PrecalculateBalancesFromApproval == nil {
-				m.PrecalculateBalancesFromApproval = &ApprovalIdentifierDetails{}
+				m.PrecalculateBalancesFromApproval = &PrecalculateBalancesFromApprovalDetails{}
 			}
 			if err := m.PrecalculateBalancesFromApproval.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -943,7 +961,187 @@ func (m *Transfer) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.OnlyCheckPrioritizedOutgoingApprovals = bool(v != 0)
-		case 12:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTransfers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PrecalculateBalancesFromApprovalDetails) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTransfers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PrecalculateBalancesFromApprovalDetails: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PrecalculateBalancesFromApprovalDetails: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTransfers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ApprovalId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApprovalLevel", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTransfers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ApprovalLevel = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApproverAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTransfers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ApproverAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTransfers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransfers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PrecalculationOptions", wireType)
 			}
@@ -976,158 +1174,6 @@ func (m *Transfer) Unmarshal(dAtA []byte) error {
 				m.PrecalculationOptions = &PrecalculationOptions{}
 			}
 			if err := m.PrecalculationOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NumAttempts", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.NumAttempts.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTransfers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *PrecalculationOptions) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTransfers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: PrecalculationOptions: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PrecalculationOptions: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OverrideTimestamp", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.OverrideTimestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TokenIdsOverride", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTransfers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTransfers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TokenIdsOverride = append(m.TokenIdsOverride, &UintRange{})
-			if err := m.TokenIdsOverride[len(m.TokenIdsOverride)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

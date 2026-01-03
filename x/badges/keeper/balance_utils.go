@@ -1,33 +1,45 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // GetDefaultBalanceStoreForCollection creates a default balance store from collection defaults
-func GetDefaultBalanceStoreForCollection(collection *types.TokenCollection) *types.UserBalanceStore {
-	return &types.UserBalanceStore{
-		Balances:          collection.DefaultBalances.Balances,
-		OutgoingApprovals: collection.DefaultBalances.OutgoingApprovals,
-		IncomingApprovals: collection.DefaultBalances.IncomingApprovals,
-		AutoApproveSelfInitiatedOutgoingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
-		AutoApproveSelfInitiatedIncomingTransfers: collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
-		AutoApproveAllIncomingTransfers:           collection.DefaultBalances.AutoApproveAllIncomingTransfers,
-		UserPermissions:                           collection.DefaultBalances.UserPermissions,
+// This performs a deep copy using proto Marshal/Unmarshal to ensure modifications don't affect the original collection defaults
+func getDefaultBalanceStoreForCollection(collection *types.TokenCollection) *types.UserBalanceStore {
+	if collection.DefaultBalances == nil {
+		return &types.UserBalanceStore{}
 	}
+
+	// Use proto Marshal/Unmarshal for deep copy (standard proto deep copy pattern)
+	// If marshal/unmarshal fails, it indicates a programming error and we panic
+	data, err := proto.Marshal(collection.DefaultBalances)
+	if err != nil {
+		panic(fmt.Sprintf("failed to marshal UserBalanceStore for deep copy: %v", err))
+	}
+
+	var copied types.UserBalanceStore
+	if err := proto.Unmarshal(data, &copied); err != nil {
+		panic(fmt.Sprintf("failed to unmarshal UserBalanceStore for deep copy: %v", err))
+	}
+
+	return &copied
 }
 
 // GetBalanceOrApplyDefault retrieves user balance or applies default balance store
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool) {
 	//Mint has unlimited balances
-	if types.IsSpecialAddress(userAddress) {
+	if types.IsMintOrTotalAddress(userAddress) {
 		return &types.UserBalanceStore{}, false
 	}
 
+	//Special backed addresses also have unlimited balances
 	if k.IsSpecialBackedAddress(ctx, collection, userAddress) {
-		//Special backed addresses also have unlimited balances
 		return &types.UserBalanceStore{
 			Balances:                        []*types.Balance{},
 			AutoApproveAllIncomingTransfers: true,
@@ -41,16 +53,24 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 	balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
 	appliedDefault := false
 	if !found {
-		balance = GetDefaultBalanceStoreForCollection(collection)
+		balance = getDefaultBalanceStoreForCollection(collection)
 		appliedDefault = true
 
-		// We need to set the version to "0" for all incoming and outgoing approvals
+		// Initialize approval versions for default approvals when balance is first accessed.
+		// This is necessary to ensure approval versioning works correctly for default approvals.
+		// Note: This has a side effect - first access to a balance increments approval versions,
+		// which is intentional to prevent replay attacks using old default approval versions.
+		// The version is incremented (not set to 0) to ensure uniqueness and prevent conflicts.
 		for _, approval := range balance.IncomingApprovals {
 			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
 		}
 		for _, approval := range balance.OutgoingApprovals {
 			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
 		}
+	}
+
+	if balance.UserPermissions == nil {
+		balance.UserPermissions = &types.UserPermissions{}
 	}
 
 	return balance, appliedDefault

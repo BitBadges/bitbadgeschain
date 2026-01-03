@@ -48,7 +48,7 @@ message MerkleChallenge {
   ETHSignatureChallenge defines a rule for the approval in the form of an Ethereum signature challenge.
 
   An ETH signature challenge is a challenge where the user must provide a valid Ethereum signature for a specific nonce.
-  The signature scheme is ETHSign(nonce + "-" + creatorAddress) and each signature can only be used once.
+  The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId) and each signature can only be used once.
   All challenges must be met with valid solutions for the transfer to be approved.
 
   IMPORTANT: We track the usage of each signature to prevent replay attacks. Each signature can only be used once.
@@ -89,9 +89,61 @@ message MerkleProof {
 
 // ETHSignatureProof represents an Ethereum signature proof for a challenge.
 message ETHSignatureProof {
-  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + creatorAddress).
+  // The nonce that was signed. The signature scheme is ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId).
   string nonce = 1;
   // The Ethereum signature of the nonce.
   string signature = 2;
+}
+
+/*
+  VotingChallenge defines a rule for approval in the form of a voting/multi-sig challenge.
+  Requires a weighted quorum threshold to be met through votes from specified voters.
+  All challenges must be met with valid solutions for the transfer to be approved.
+
+  IMPORTANT: Votes are stored separately and can be updated. The threshold is calculated as a percentage
+  of total possible weight (all voters), not just voted weight. If you update the proposal ID, then the
+  vote tracker will reset and start a new tally. We recommend using a unique proposal ID for each challenge
+  to prevent overlap and unexpected behavior.
+*/
+message VotingChallenge {
+  // The ID of this voting challenge for tracking votes (scoped like challengeTrackerId).
+  // Format: collectionId-approverAddress-approvalLevel-approvalId-challengeId
+  string proposalId = 1;
+  
+  // The quorum threshold as a percentage (0-100) of total possible weight that must vote "yes".
+  // Example: 50 means 50% of total voter weight must vote yes for approval.
+  string quorumThreshold = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // List of voters with their weights. Each voter can cast a weighted vote.
+  repeated Voter voters = 3;
+  
+  // The URI associated with this voting challenge.
+  string uri = 4;
+  
+  // Arbitrary custom data associated with this voting challenge.
+  string customData = 5;
+}
+
+// Voter defines a voter with their address and weight.
+message Voter {
+  // The address of the voter.
+  string address = 1;
+  
+  // The weight of this voter's vote.
+  string weight = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// VoteProof represents a vote cast for a voting challenge.
+message VoteProof {
+  // The proposal ID this vote is for.
+  string proposalId = 1;
+  
+  // The address of the voter casting the vote.
+  string voter = 2;
+  
+  // The percentage weight (0-100) allocated to "yes" vote.
+  // The remaining percentage (100 - yesWeight) is allocated to "no" vote.
+  // Example: yesWeight=70 means 70% yes, 30% no.
+  string yesWeight = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 

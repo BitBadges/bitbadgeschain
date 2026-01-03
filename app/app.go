@@ -85,8 +85,11 @@ import (
 	"github.com/bitbadges/bitbadgeschain/app/ante"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
+	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
 	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 
@@ -180,6 +183,7 @@ type App struct {
 
 	GammKeeper        gammkeeper.Keeper
 	PoolManagerKeeper poolmanager.Keeper
+	SendmanagerKeeper sendmanagermodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -296,6 +300,8 @@ func New(
 		&app.BadgesKeeper,
 		&app.MapsKeeper,
 		&app.ManagerSplitterKeeper,
+		&app.SendmanagerKeeper,
+
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
@@ -327,6 +333,29 @@ func New(
 	// Wire up keepers for address checks
 	app.BadgesKeeper.SetWasmViewKeeper(&app.WasmKeeper)
 	app.BadgesKeeper.SetGammKeeper(&app.GammKeeper)
+
+	// Register custom approval criteria checkers (optional)
+	app.BadgesKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+		// Add custom logic as needed here
+		return nil
+	})
+
+	// Register custom global transfer checkers (optional)
+	app.BadgesKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []badgesmodulekeeper.GlobalTransferChecker {
+		// Add custom logic as needed here
+		return nil
+	})
+
+	// Register custom collection verifiers (optional)
+	// Example:
+	// app.BadgesKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
+	app.BadgesKeeper.RegisterCustomCollectionVerifier(&badgesmodulekeeper.NoOpCollectionVerifier{})
+
+	// Register badges router with sendmanager (deferred to avoid circular dependency)
+	// This must happen after both keepers are created
+	if err := app.registerSendManagerRouters(); err != nil {
+		return nil, fmt.Errorf("failed to register badges router: %w", err)
+	}
 
 	// register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {

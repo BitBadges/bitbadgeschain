@@ -32,3 +32,24 @@ message AddressList {
   // The user or entity who created the address list.
   string createdBy = 6;
 }
+
+/* 
+  AddressListInput is used for creating address lists via MsgCreateAddressLists.
+  It contains all fields from AddressList except createdBy, which is automatically set from the message creator.
+*/
+message AddressListInput {
+  // Unique identifier for the address list.
+  string listId = 1;
+  
+  // List of addresses included in the list.
+  repeated string addresses = 2;
+  
+  // Indicates whether the list includes the specified addresses (true) or excludes them (false).
+  bool whitelist = 3;
+  
+  // URI (Uniform Resource Identifier) associated with the address list to provide metadata, if applicable.
+  string uri = 4;
+  
+  // Custom arbitrary data or additional information related to the address list.
+  string customData = 5;
+}

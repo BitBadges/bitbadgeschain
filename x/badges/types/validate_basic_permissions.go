@@ -157,43 +157,7 @@ func ValidateUserIncomingApprovalPermissions(permissions []*UserIncomingApproval
 	return nil
 }
 
-func ValidateTimedUpdateWithTokenIdsPermission(permissions []*TimedUpdateWithTokenIdsPermission, canChangeValues bool) error {
-	for _, permission := range permissions {
-		if permission == nil {
-			return ErrPermissionsValueIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.TokenIds, false, false)
-		if err != nil {
-			return err
-		}
-
-		err = ValidateRangesAreValid(permission.TimelineTimes, false, false)
-		if err != nil {
-			return err
-		}
-
-		err = ValidatePermanentlyPermittedTimes(permission.PermanentlyPermittedTimes, permission.PermanentlyForbiddenTimes)
-		if err != nil {
-			return err
-		}
-
-		if canChangeValues {
-			permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
-			permission.TokenIds = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TokenIds)
-
-			permission.PermanentlyPermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyPermittedTimes)
-			permission.PermanentlyForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyForbiddenTimes)
-		}
-
-		//Note we can check overlap here with other tokenIds but
-		//that would take away from the flexibility of the TokenIdsOptions.
-		//Because if we have > 1 tokenIds[], then TokenIdsOptions on the second
-		//will always overlap with the first.
-	}
-
-	return nil
-}
+// ValidateTimedUpdateWithTokenIdsPermission is deprecated - removed, use ValidateTokenIdsActionPermission instead
 
 func ValidateTokenIdsActionPermission(permissions []*TokenIdsActionPermission, canChangeValues bool) error {
 	for _, permission := range permissions {
@@ -222,33 +186,7 @@ func ValidateTokenIdsActionPermission(permissions []*TokenIdsActionPermission, c
 	return nil
 }
 
-func ValidateTimedUpdatePermission(permissions []*TimedUpdatePermission, canChangeValues bool) error {
-	for _, permission := range permissions {
-		if permission == nil {
-			return ErrPermissionsValueIsNil
-		}
-
-		err := ValidateRangesAreValid(permission.TimelineTimes, false, false)
-		if err != nil {
-			return err
-		}
-
-		err = ValidatePermanentlyPermittedTimes(permission.PermanentlyPermittedTimes, permission.PermanentlyForbiddenTimes)
-		if err != nil {
-			return err
-		}
-
-		if canChangeValues {
-			permission.TimelineTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.TimelineTimes)
-
-			permission.PermanentlyPermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyPermittedTimes)
-			permission.PermanentlyForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyForbiddenTimes)
-		}
-
-	}
-
-	return nil
-}
+// ValidateTimedUpdatePermission is deprecated - removed, use ValidateActionPermission instead
 
 func ValidateActionPermission(permissions []*ActionPermission, canChangeValues bool) error {
 	if len(permissions) > 1 {
@@ -292,23 +230,23 @@ func ValidatePermissions(permissions *CollectionPermissions, canChangeValues boo
 		return ErrPermissionsIsNil
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanUpdateCustomData, canChangeValues); err != nil {
+	if err := ValidateActionPermission(permissions.CanUpdateCustomData, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanUpdateStandards, canChangeValues); err != nil {
+	if err := ValidateActionPermission(permissions.CanUpdateStandards, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanUpdateManager, canChangeValues); err != nil {
+	if err := ValidateActionPermission(permissions.CanUpdateManager, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateTimedUpdateWithTokenIdsPermission(permissions.CanUpdateTokenMetadata, canChangeValues); err != nil {
+	if err := ValidateTokenIdsActionPermission(permissions.CanUpdateTokenMetadata, canChangeValues); err != nil {
 		return err
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanUpdateCollectionMetadata, canChangeValues); err != nil {
+	if err := ValidateActionPermission(permissions.CanUpdateCollectionMetadata, canChangeValues); err != nil {
 		return err
 	}
 
@@ -324,7 +262,15 @@ func ValidatePermissions(permissions *CollectionPermissions, canChangeValues boo
 		return err
 	}
 
-	if err := ValidateTimedUpdatePermission(permissions.CanArchiveCollection, canChangeValues); err != nil {
+	if err := ValidateActionPermission(permissions.CanArchiveCollection, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateActionPermission(permissions.CanAddMoreAliasPaths, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateActionPermission(permissions.CanAddMoreCosmosCoinWrapperPaths, canChangeValues); err != nil {
 		return err
 	}
 

@@ -63,6 +63,14 @@ func (k Keeper) checkPermission(ctx sdk.Context, executor string, managerSplitte
 		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanUpdateCollectionApprovals != nil {
 			criteria = managerSplitter.Permissions.CanUpdateCollectionApprovals
 		}
+	case "canAddMoreAliasPaths":
+		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanAddMoreAliasPaths != nil {
+			criteria = managerSplitter.Permissions.CanAddMoreAliasPaths
+		}
+	case "canAddMoreCosmosCoinWrapperPaths":
+		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanAddMoreCosmosCoinWrapperPaths != nil {
+			criteria = managerSplitter.Permissions.CanAddMoreCosmosCoinWrapperPaths
+		}
 	}
 
 	// If no criteria set, deny by default (except admin)
@@ -96,25 +104,25 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 		}
 	}
 
-	if msg.UpdateManagerTimeline {
+	if msg.UpdateManager {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateManager"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateCollectionMetadataTimeline {
+	if msg.UpdateCollectionMetadata {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCollectionMetadata"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateTokenMetadataTimeline {
+	if msg.UpdateTokenMetadata {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateTokenMetadata"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateCustomDataTimeline {
+	if msg.UpdateCustomData {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCustomData"); err != nil {
 			return err
 		}
@@ -126,14 +134,26 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 		}
 	}
 
-	if msg.UpdateStandardsTimeline {
+	if msg.UpdateStandards {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateStandards"); err != nil {
 			return err
 		}
 	}
 
-	if msg.UpdateIsArchivedTimeline {
+	if msg.UpdateIsArchived {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canArchiveCollection"); err != nil {
+			return err
+		}
+	}
+
+	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
+		if err := k.checkPermission(ctx, executor, managerSplitter, "canAddMoreCosmosCoinWrapperPaths"); err != nil {
+			return err
+		}
+	}
+
+	if len(msg.AliasPathsToAdd) > 0 {
+		if err := k.checkPermission(ctx, executor, managerSplitter, "canAddMoreAliasPaths"); err != nil {
 			return err
 		}
 	}

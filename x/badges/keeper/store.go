@@ -57,6 +57,13 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCol
 		}
 	}
 
+	// Run custom collection verifiers
+	for _, verifier := range k.customCollectionVerifiers {
+		if err := verifier.VerifyCollection(ctx, collection); err != nil {
+			return sdkerrors.Wrapf(err, "%s: collection verification failed", verifier.Name())
+		}
+	}
+
 	marshaled_token, err := k.cdc.Marshal(collection)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.TokenCollection failed")
@@ -205,7 +212,12 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	if err != nil {
 		return sdkerrors.Wrapf(err, "invalid balance key format")
 	}
-	if !types.IsSpecialAddress(balanceKeyDetails.address) {
+
+	if types.IsMintAddress(balanceKeyDetails.address) {
+		return sdkerrors.Wrap(types.ErrInvalidRequest, "mint address cannot be stored")
+	}
+
+	if !types.IsTotalAddress(balanceKeyDetails.address) {
 		if err = types.ValidateAddress(balanceKeyDetails.address, false); err != nil {
 			return sdkerrors.Wrap(err, "Invalid address")
 		}
@@ -675,16 +687,13 @@ func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
 /****************************************DYNAMIC STORE VALUES****************************************/
 
 // Sets a dynamic store value in the store using DynamicStoreValueKey ([]byte{0x0F}) as the prefix.
-func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value sdkmath.Uint) error {
+func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value bool) error {
 	// Validate inputs
 	if storeId.IsZero() {
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "store ID cannot be zero")
 	}
 	if address == "" {
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "address cannot be empty")
-	}
-	if value.IsNil() {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "value cannot be nil")
 	}
 
 	dynamicStoreValue := types.DynamicStoreValue{
@@ -818,6 +827,59 @@ func (k Keeper) IncrementETHSignatureTrackerInStore(ctx sdk.Context, key string)
 	}
 
 	return newNumUsed, nil
+}
+
+/****************************************VOTING TRACKERS****************************************/
+
+// SetVoteInStore sets a vote in the store using VotingTrackerKey ([]byte{0x14}) as the prefix.
+func (k Keeper) SetVoteInStore(ctx sdk.Context, key string, vote *types.VoteProof) error {
+	marshaled_vote, err := k.cdc.Marshal(vote)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.VoteProof failed")
+	}
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(votingTrackerStoreKey(key), marshaled_vote)
+	return nil
+}
+
+// GetVoteFromStore gets a vote from the store.
+func (k Keeper) GetVoteFromStore(ctx sdk.Context, key string) (*types.VoteProof, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled_vote := store.Get(votingTrackerStoreKey(key))
+
+	if len(marshaled_vote) == 0 {
+		return nil, false
+	}
+
+	var vote types.VoteProof
+	k.cdc.MustUnmarshal(marshaled_vote, &vote)
+	return &vote, true
+}
+
+// GetVotesFromStore gets all votes from the store.
+func (k Keeper) GetVotesFromStore(ctx sdk.Context) (votes []*types.VoteProof, ids []string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, VotingTrackerKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var vote types.VoteProof
+		k.cdc.MustUnmarshal(iterator.Value(), &vote)
+		votes = append(votes, &vote)
+		ids = append(ids, string(iterator.Key()[len(VotingTrackerKey):]))
+	}
+	return
+}
+
+// DeleteVoteFromStore deletes a vote from the store.
+func (k Keeper) DeleteVoteFromStore(ctx sdk.Context, key string) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Delete(votingTrackerStoreKey(key))
+	return nil
 }
 
 /****************************************RESERVED PROTOCOL ADDRESSES****************************************/

@@ -85,6 +85,7 @@ func ValidateAddress(address string, alowMint bool) error {
 		return nil
 	}
 
+	// Validate address using global SDK config (should be "bb" prefix)
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s", err)
@@ -95,9 +96,7 @@ func ValidateAddress(address string, alowMint bool) error {
 func DoRangesOverlap(ids []*UintRange) bool {
 	// Create a copy to avoid modifying the input slice
 	idsCopy := make([]*UintRange, len(ids))
-	for i, id := range ids {
-		idsCopy[i] = id
-	}
+	copy(idsCopy, ids)
 
 	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
 	var n = len(idsCopy)
@@ -297,6 +296,48 @@ func ValidateAddressList(addressList *AddressList) error {
 	return nil
 }
 
+// ValidateAddressListInput validates an AddressListInput (same validation as AddressList but without createdBy check)
+func ValidateAddressListInput(addressListInput *AddressListInput) error {
+	if addressListInput.ListId == "" ||
+		addressListInput.ListId == "Mint" ||
+		addressListInput.ListId == "Manager" ||
+		addressListInput.ListId == "AllWithoutMint" ||
+		addressListInput.ListId == "None" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized")
+	}
+
+	if err := ValidateAddress(addressListInput.ListId, false); err == nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot be a valid address")
+	}
+
+	if strings.Contains(addressListInput.ListId, ":") || strings.Contains(addressListInput.ListId, "!") {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot contain : or !")
+	}
+
+	if addressListInput.Uri != "" {
+		if err := ValidateURI(addressListInput.Uri); err != nil {
+			return err
+		}
+	}
+
+	for _, address := range addressListInput.Addresses {
+		// Check for empty addresses
+		if address == "" {
+			return sdkerrors.Wrapf(ErrInvalidAddress, "address list cannot contain empty addresses")
+		}
+		if err := ValidateAddress(address, false); err != nil {
+			return err
+		}
+	}
+
+	//check duplicate addresses
+	if duplicateInStringArray(addressListInput.Addresses) {
+		return ErrDuplicateAddresses
+	}
+
+	return nil
+}
+
 func ValidateUserOutgoingApprovals(ctx sdk.Context, userOutgoingApprovals []*UserOutgoingApproval, fromAddress string, canChangeValues bool) error {
 	castedTransfers := CastOutgoingTransfersToCollectionTransfers(userOutgoingApprovals, fromAddress)
 	err := ValidateCollectionApprovals(ctx, castedTransfers, canChangeValues)
@@ -466,6 +507,17 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				}
 			}
 
+			// This is a sanity check to preventt accidental unlimited approvals from the current address
+			// If they really do want a very, very large number, they can just set max transfers to a large number
+			// Validate that if maxNumTransfers is unlimited, coinTransfers cannot have overrideFromWithApproverAddress
+			if MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
+				for _, coinTransfer := range approvalCriteria.CoinTransfers {
+					if coinTransfer != nil && coinTransfer.OverrideFromWithApproverAddress {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "overrideFromWithApproverAddress cannot be used when maxNumTransfers is unlimited (nothing set)")
+					}
+				}
+			}
+
 			usingLeafIndexForTransferOrder := false
 			challengeTrackerIdForTransferOrder := ""
 			if approvalCriteria.PredeterminedBalances != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
@@ -534,6 +586,28 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate dynamic store challenge storeId: %s", storeIdStr)
 					}
 					storeIds[storeIdStr] = true
+				}
+
+				// Validate voting challenges
+				if approvalCriteria.VotingChallenges == nil {
+					approvalCriteria.VotingChallenges = []*VotingChallenge{}
+				}
+
+				// Check for duplicate proposal IDs
+				proposalIds := make(map[string]bool)
+				for _, challenge := range approvalCriteria.VotingChallenges {
+					if challenge == nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "voting challenge is nil")
+					}
+
+					if err := challenge.ValidateBasic(); err != nil {
+						return sdkerrors.Wrapf(err, "invalid voting challenge")
+					}
+
+					if proposalIds[challenge.ProposalId] {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate voting challenge proposalId: %s", challenge.ProposalId)
+					}
+					proposalIds[challenge.ProposalId] = true
 				}
 
 				if approvalCriteria.ApprovalAmounts == nil {
@@ -984,35 +1058,30 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 		}
 	}
 
-	if canChangeValues {
-		if transfer.NumAttempts.IsNil() || transfer.NumAttempts.IsZero() {
-			transfer.NumAttempts = sdkmath.NewUint(1)
-		}
-	}
-
 	if transfer.PrecalculateBalancesFromApproval != nil {
-		if transfer.PrecalculateBalancesFromApproval.ApprovalLevel == "" && transfer.PrecalculateBalancesFromApproval.ApproverAddress == "" && transfer.PrecalculateBalancesFromApproval.ApprovalId == "" {
+		precalcDetails := transfer.PrecalculateBalancesFromApproval
+		if precalcDetails.ApprovalLevel == "" && precalcDetails.ApproverAddress == "" && precalcDetails.ApprovalId == "" {
 			//basically nil
 		} else {
-			if transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "collection" && transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "incoming" && transfer.PrecalculateBalancesFromApproval.ApprovalLevel != "outgoing" {
+			if precalcDetails.ApprovalLevel != "collection" && precalcDetails.ApprovalLevel != "incoming" && precalcDetails.ApprovalLevel != "outgoing" {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
 			}
 
-			if transfer.PrecalculateBalancesFromApproval.ApproverAddress != "" {
-				if err := ValidateAddress(transfer.PrecalculateBalancesFromApproval.ApproverAddress, false); err != nil {
+			if precalcDetails.ApproverAddress != "" {
+				if err := ValidateAddress(precalcDetails.ApproverAddress, false); err != nil {
 					return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approval id address (%s)", err)
 				}
 			}
 
-			if transfer.PrecalculateBalancesFromApproval.Version.IsNil() {
+			if precalcDetails.Version.IsNil() {
 				return sdkerrors.Wrapf(ErrUintUnititialized, "version is uninitialized")
 			}
 		}
 	}
 
 	if canChangeValues {
-		if transfer.PrecalculationOptions == nil {
-			transfer.PrecalculationOptions = &PrecalculationOptions{
+		if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.PrecalculationOptions == nil {
+			transfer.PrecalculateBalancesFromApproval.PrecalculationOptions = &PrecalculationOptions{
 				OverrideTimestamp: sdkmath.NewUint(0),
 				TokenIdsOverride:  nil,
 			}
@@ -1071,6 +1140,79 @@ func ValidateNoCustomOwnershipTimesInvariant(ownershipTimes []*UintRange, invari
 
 	if !IsFullOwnershipTimesRange(ownershipTimes) {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "noCustomOwnershipTimes invariant is enabled: ownership times must be full range [{ start: 1, end: 18446744073709551615 }]")
+	}
+
+	return nil
+}
+
+// ValidateBasic validates a VotingChallenge
+func (vc *VotingChallenge) ValidateBasic() error {
+	if vc.ProposalId == "" {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "proposalId cannot be empty")
+	}
+
+	if vc.QuorumThreshold.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "quorumThreshold must be between 0 and 100, got %s", vc.QuorumThreshold.String())
+	}
+
+	if len(vc.Voters) == 0 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "voters list cannot be empty")
+	}
+
+	// Check for duplicate voters
+	voterAddresses := make(map[string]bool)
+	for _, voter := range vc.Voters {
+		if err := voter.ValidateBasic(); err != nil {
+			return err
+		}
+		if voterAddresses[voter.Address] {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate voter address: %s", voter.Address)
+		}
+		voterAddresses[voter.Address] = true
+	}
+
+	if vc.Uri != "" {
+		if err := ValidateURI(vc.Uri); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ValidateBasic validates a Voter
+func (v *Voter) ValidateBasic() error {
+	if v.Address == "" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "voter address cannot be empty")
+	}
+
+	if err := ValidateAddress(v.Address, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+
+	if v.Weight.IsZero() {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "voter weight cannot be zero")
+	}
+
+	return nil
+}
+
+// ValidateBasic validates a VoteProof
+func (vp *VoteProof) ValidateBasic() error {
+	if vp.ProposalId == "" {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "proposalId cannot be empty")
+	}
+
+	if vp.Voter == "" {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "voter address cannot be empty")
+	}
+
+	if err := ValidateAddress(vp.Voter, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+
+	if vp.YesWeight.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100, got %s", vp.YesWeight.String())
 	}
 
 	return nil

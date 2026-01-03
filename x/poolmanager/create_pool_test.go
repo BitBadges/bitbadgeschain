@@ -408,27 +408,24 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
 		CollectionPermissions: &badgestypes.CollectionPermissions{},
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				TimelineTimes: []*badgestypes.UintRange{
-					{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
-				},
-				Manager: creatorStr,
-			},
-		},
+		Manager:               creatorStr,
 		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadge",
-				Balances: []*badgestypes.Balance{
-					{
-						Amount:         sdkmath.NewUint(1),
-						OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-						TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				Conversion: &badgestypes.ConversionWithoutDenom{
+					SideA: &badgestypes.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*badgestypes.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+							TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						},
 					},
 				},
-				Symbol:              "TEST",
-				DenomUnits:          []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
-				AllowCosmosWrapping: true,
+				Symbol:     "TEST",
+				DenomUnits: []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
 			},
 		},
 		Invariants: &badgestypes.InvariantsAddObject{
@@ -487,27 +484,24 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
 		CollectionPermissions: &badgestypes.CollectionPermissions{},
-		ManagerTimeline: []*badgestypes.ManagerTimeline{
-			{
-				TimelineTimes: []*badgestypes.UintRange{
-					{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)},
-				},
-				Manager: creatorStr,
-			},
-		},
+		Manager:               creatorStr,
 		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadgeallowed",
-				Balances: []*badgestypes.Balance{
-					{
-						Amount:         sdkmath.NewUint(1),
-						OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-						TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				Conversion: &badgestypes.ConversionWithoutDenom{
+					SideA: &badgestypes.ConversionSideA{
+						Amount: sdkmath.NewUint(1),
+					},
+					SideB: []*badgestypes.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+							TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+						},
 					},
 				},
-				Symbol:              "TESTALLOWED",
-				DenomUnits:          []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
-				AllowCosmosWrapping: true,
+				Symbol:     "TESTALLOWED",
+				DenomUnits: []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
 			},
 		},
 		Invariants: &badgestypes.InvariantsAddObject{

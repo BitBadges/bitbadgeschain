@@ -1,0 +1,17 @@
+syntax = "proto3";
+package sendmanager;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "sendmanager/v1/params.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/sendmanager/types";
+
+// GenesisState defines the sendmanager module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

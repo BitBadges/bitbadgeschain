@@ -1,71 +1,40 @@
 package keeper
 
 import (
-	"fmt"
-
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
-
-	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // CheckAddressChecks validates address checks for a given address
 // Returns (deterministicErrorMsg, error) where deterministicErrorMsg is a deterministic error string
-func (k Keeper) CheckAddressChecks(
-	ctx sdk.Context,
-	addressChecks *types.AddressChecks,
-	address string,
-) (string, error) {
+// This method is kept for backward compatibility with tests
+func (k Keeper) CheckAddressChecks(ctx sdk.Context, addressChecks *types.AddressChecks, address string) (string, error) {
 	if addressChecks == nil {
 		return "", nil
 	}
 
-	// Check WASM contract requirements
-	if addressChecks.MustBeWasmContract {
-		isWasm, err := k.IsWasmContract(ctx, address)
-		if err != nil {
-			return "", err
-		}
-		if !isWasm {
-			detErrMsg := fmt.Sprintf("address %s must be a WASM contract", address)
-			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
-		}
+	// Create a dummy approval with the address checks for the checker
+	approval := &types.CollectionApproval{
+		ApprovalCriteria: &types.ApprovalCriteria{
+			SenderChecks: addressChecks, // We'll use sender checks as default
+		},
 	}
 
-	if addressChecks.MustNotBeWasmContract {
-		isWasm, err := k.IsWasmContract(ctx, address)
-		if err != nil {
-			return "", err
-		}
-		if isWasm {
-			detErrMsg := fmt.Sprintf("address %s must not be a WASM contract", address)
-			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
-		}
-	}
-
-	// Check liquidity pool requirements
-	if addressChecks.MustBeLiquidityPool {
-		isPool, err := k.IsLiquidityPool(ctx, address)
-		if err != nil {
-			return "", err
-		}
-		if !isPool {
-			detErrMsg := fmt.Sprintf("address %s must be a liquidity pool", address)
-			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+	// Use the new dynamic checker approach
+	checkers := k.GetApprovalCriteriaCheckers(approval)
+	for _, checker := range checkers {
+		// Find the address checker (should be the sender one we just created)
+		if _, ok := checker.(*approvalcriteria.AddressChecksChecker); ok {
+			// Pass address as the "from" parameter since we're using "sender" check type
+			// Pass nil for collection as this is a backward compatibility wrapper
+			detErrMsg, err := checker.Check(ctx, approval, nil, "", address, "", "", "", nil, nil, "", false)
+			if err != nil {
+				return detErrMsg, err
+			}
+			return detErrMsg, nil
 		}
 	}
-
-	if addressChecks.MustNotBeLiquidityPool {
-		isPool, err := k.IsLiquidityPool(ctx, address)
-		if err != nil {
-			return "", err
-		}
-		if isPool {
-			detErrMsg := fmt.Sprintf("address %s must not be a liquidity pool", address)
-			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
-		}
-	}
-
 	return "", nil
 }
 
@@ -100,13 +69,11 @@ func (k Keeper) IsLiquidityPool(ctx sdk.Context, address string) (bool, error) {
 		return false, err
 	}
 
-	// Check cache first - pool addresses are static, so if cached, it's valid
 	// The cache is populated when pools are created (see x/gamm/keeper/pool_service.go)
 	_, found := k.GetPoolIdFromAddressCache(ctx, address)
 	if found {
 		return true, nil
 	}
 
-	// If not in cache, it's not a pool (cache is populated when pools are created)
 	return false, nil
 }

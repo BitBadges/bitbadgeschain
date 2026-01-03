@@ -43,7 +43,6 @@ func (k Keeper) DeductUserOutgoingApprovals(
 	return err
 }
 
-// DeductUserIncomingApprovals will check if the current transfer is approved from the to's outgoing approvals and handle the approval tallying accordingly
 func (k Keeper) DeductUserIncomingApprovals(
 	ctx sdk.Context,
 	collection *types.TokenCollection,
@@ -123,7 +122,7 @@ func onlyCheckPrioritizedApprovals(transfer *types.Transfer, approvalLevel strin
 	return onlyCheckPrioritized
 }
 
-func SortViaPrioritizedApprovals(
+func FilterApprovalsWithPrioritizedHandling(
 	_approvals []*types.CollectionApproval,
 	transfer *types.Transfer,
 	approvalLevel string,
@@ -163,12 +162,13 @@ func SortViaPrioritizedApprovals(
 	//Filter approvals where approvalCriteria != nil and not in prioritizedApprovals
 	filteredApprovals := []*types.CollectionApproval{}
 	for _, approval := range approvals {
-		if approval.ApprovalCriteria == nil || types.CollectionApprovalIsAutoScannable(approval.ApprovalCriteria) {
+		if types.CollectionApprovalIsAutoScannable(approval.ApprovalCriteria) {
 			filteredApprovals = append(filteredApprovals, approval)
 			continue
 		}
 
-		prioritized := false
+		// Check if this approval is explicitly prioritized and version is correct
+		prioritizedAndVersionCorrect := false
 		for _, prioritizedApproval := range prioritizedApprovals {
 			if approval.ApprovalId == prioritizedApproval.ApprovalId && prioritizedApproval.ApprovalLevel == approvalLevel && approverAddress == prioritizedApproval.ApproverAddress {
 				if prioritizedApproval.Version.IsNil() {
@@ -179,20 +179,19 @@ func SortViaPrioritizedApprovals(
 					return nil, sdkerrors.Wrapf(types.ErrMismatchedVersions, "versions are mismatched for a prioritized approval %s %s %s", prioritizedApproval.ApprovalId, prioritizedApproval.ApproverAddress, prioritizedApproval.ApprovalLevel)
 				}
 
-				prioritized = true
+				prioritizedAndVersionCorrect = true
 				break
 			}
 		}
 
 		// Check if this approval has mustPrioritize set
 		// If mustPrioritize is true, only include if it's explicitly prioritized
-		if approval.ApprovalCriteria.MustPrioritize && !prioritized {
-			// Skip this approval - it requires prioritization but wasn't prioritized
+		if approval.ApprovalCriteria.MustPrioritize && !prioritizedAndVersionCorrect {
 			continue
 		}
 
 		// Include the approval if it's prioritized (maintain original behavior)
-		if prioritized {
+		if prioritizedAndVersionCorrect {
 			filteredApprovals = append(filteredApprovals, approval)
 		}
 	}

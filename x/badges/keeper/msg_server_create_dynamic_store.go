@@ -28,6 +28,7 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 		StoreId:      nextStoreId,
 		CreatedBy:    msg.Creator,
 		DefaultValue: msg.DefaultValue,
+		GlobalEnabled: true, // Default to enabled for new stores
 	}
 
 	// Store the dynamic store
