@@ -28,9 +28,23 @@ func SimulateMsgCreateDynamicStore(
 		// Random boolean for defaultValue
 		defaultValue := r.Intn(2) == 0
 
+		// Random string for uri (sometimes empty, sometimes with value)
+		uri := ""
+		if r.Intn(2) == 0 {
+			uri = simtypes.RandStringOfLength(r, 20)
+		}
+
+		// Random string for customData (sometimes empty, sometimes with value)
+		customData := ""
+		if r.Intn(2) == 0 {
+			customData = simtypes.RandStringOfLength(r, 30)
+		}
+
 		msg := &types.MsgCreateDynamicStore{
 			Creator:      simAccount.Address.String(),
 			DefaultValue: defaultValue,
+			Uri:          uri,
+			CustomData:   customData,
 		}
 
 		// Validate message

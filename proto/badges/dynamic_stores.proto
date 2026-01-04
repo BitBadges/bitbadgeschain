@@ -21,6 +21,10 @@ message DynamicStore {
   // Global kill switch state (defaults to true on creation, can be toggled via UpdateDynamicStore).
   // When false, all approvals using this store via DynamicStoreChallenge will fail immediately.
   bool globalEnabled = 4;
+  // URI for additional metadata or resources associated with this dynamic store.
+  string uri = 5;
+  // Custom data field for storing arbitrary data associated with this dynamic store.
+  string customData = 6;
 }
 
 /*

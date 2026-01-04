@@ -606,6 +606,10 @@ message MsgCreateDynamicStore {
   string creator = 1;
   // The default value for uninitialized addresses (true/false).
   bool defaultValue = 2;
+  // URI for additional metadata or resources associated with this dynamic store.
+  string uri = 3;
+  // Custom data field for storing arbitrary data associated with this dynamic store.
+  string customData = 4;
 }
 
 // MsgCreateDynamicStoreResponse is the response to MsgCreateDynamicStore.
@@ -628,6 +632,10 @@ message MsgUpdateDynamicStore {
   // The global kill switch state (true = enabled, false = disabled/halted).
   // Callers should query the current value first if they want to keep it unchanged.
   bool globalEnabled = 4;
+  // URI for additional metadata or resources associated with this dynamic store.
+  string uri = 5;
+  // Custom data field for storing arbitrary data associated with this dynamic store.
+  string customData = 6;
 }
 
 // MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.

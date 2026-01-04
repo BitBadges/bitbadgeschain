@@ -23,7 +23,7 @@ func SimulateMsgUpdateDynamicStore(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateDynamicStore, "no accounts available"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
 
 		// Try to get a known-good dynamic store ID first
@@ -74,12 +74,26 @@ func SimulateMsgUpdateDynamicStore(
 		// Random boolean for globalEnabled (global kill switch)
 		globalEnabled := r.Intn(2) == 0
 
+		// Random string for uri (sometimes empty, sometimes with value)
+		uri := ""
+		if r.Intn(2) == 0 {
+			uri = simtypes.RandStringOfLength(r, 20)
+		}
+
+		// Random string for customData (sometimes empty, sometimes with value)
+		customData := ""
+		if r.Intn(2) == 0 {
+			customData = simtypes.RandStringOfLength(r, 30)
+		}
+
 		msg := types.NewMsgUpdateDynamicStoreWithGlobalEnabled(
 			creatorAccount.Address.String(),
 			storeId,
 			defaultValue,
 			globalEnabled,
 		)
+		msg.Uri = uri
+		msg.CustomData = customData
 
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {

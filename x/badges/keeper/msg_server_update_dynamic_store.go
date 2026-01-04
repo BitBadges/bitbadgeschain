@@ -33,6 +33,10 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 	// Update the global kill switch state
 	dynamicStore.GlobalEnabled = msg.GlobalEnabled
 
+	// Update uri and customData fields
+	dynamicStore.Uri = msg.Uri
+	dynamicStore.CustomData = msg.CustomData
+
 	// Store the updated dynamic store
 	if err := k.SetDynamicStoreInStore(ctx, dynamicStore); err != nil {
 		return nil, sdkerrors.Wrap(err, "Failed to store dynamic store")
