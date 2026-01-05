@@ -27,7 +27,7 @@ func (suite *ApprovalVersioningTestSuite) SetupTest() {
 // TestApprovalVersioning_IncrementOnChange tests that approval versions increment when approvals change
 func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_IncrementOnChange() {
 	// Setup initial collection approval
-	approval1 := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval1 := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg1 := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -43,7 +43,7 @@ func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_IncrementOnChan
 	initialVersion := collection1.CollectionApprovals[0].Version
 
 	// Update approval (change token IDs)
-	approval2 := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval2 := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	approval2.TokenIds = []*types.UintRange{
 		{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(50)}, // Changed from full range
 	}
@@ -66,7 +66,7 @@ func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_IncrementOnChan
 // TestApprovalVersioning_NoIncrementOnNoChange tests that approval versions don't increment when approvals don't change
 func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_NoIncrementOnNoChange() {
 	// Setup initial collection approval
-	approval1 := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval1 := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg1 := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -82,7 +82,7 @@ func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_NoIncrementOnNo
 	initialVersion := collection1.CollectionApprovals[0].Version
 
 	// Update with same approval (no changes)
-	approval2 := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval2 := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg2 := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -102,7 +102,7 @@ func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_NoIncrementOnNo
 // TestApprovalVersioning_UserApprovalVersioning tests user approval versioning
 func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_UserApprovalVersioning() {
 	// Setup collection approval
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -148,7 +148,7 @@ func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_UserApprovalVer
 func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_InvalidVersionReuse() {
 	// Setup approvals - need mint approval first
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

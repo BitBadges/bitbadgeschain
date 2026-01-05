@@ -27,7 +27,7 @@ func (suite *DoubleSpendAttackTestSuite) SetupTest() {
 // TestDoubleSpend_Prevented tests that the system prevents double-spending
 func (suite *DoubleSpendAttackTestSuite) TestDoubleSpend_Prevented() {
 	// Setup approvals
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -94,7 +94,7 @@ func (suite *DoubleSpendAttackTestSuite) TestDoubleSpend_Prevented() {
 // TestDoubleSpend_ConcurrentTransfers tests concurrent transfer attempts
 func (suite *DoubleSpendAttackTestSuite) TestDoubleSpend_ConcurrentTransfers() {
 	// Setup approvals
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

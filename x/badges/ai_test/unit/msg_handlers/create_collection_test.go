@@ -100,7 +100,7 @@ func (suite *CreateCollectionTestSuite) TestCreateCollection_InvalidTokenIds() {
 // TestCreateCollection_WithApprovals tests creating a collection with approval settings
 func (suite *CreateCollectionTestSuite) TestCreateCollection_WithApprovals() {
 	approvals := []*types.CollectionApproval{
-		testutil.GenerateCollectionApproval("approval1", "All", "All"),
+		testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All"),
 	}
 
 	msg := &types.MsgCreateCollection{

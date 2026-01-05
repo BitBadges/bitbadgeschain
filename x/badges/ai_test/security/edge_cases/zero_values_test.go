@@ -28,7 +28,7 @@ func (suite *ZeroValuesTestSuite) SetupTest() {
 // TestZeroValues_ZeroAmountTransfer tests that zero amount transfers are rejected
 func (suite *ZeroValuesTestSuite) TestZeroValues_ZeroAmountTransfer() {
 	// Setup approvals
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,

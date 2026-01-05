@@ -215,7 +215,7 @@ func (suite *TestSuite) TestReservedProtocolAddressForcefulTransferError() {
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		TokenIds:          GetOneUintRange(),
-		FromListId:        "All", // Allow from Mint too
+		FromListId:        "AllWithoutMint", // Allow from all except Mint
 		ToListId:          "All",
 		InitiatedByListId: "All",
 		ApprovalCriteria: &types.ApprovalCriteria{
@@ -318,7 +318,7 @@ func (suite *TestSuite) TestReservedProtocolAddressNonForcefulTransferSucceeds()
 		TransferTimes:     GetFullUintRanges(),
 		OwnershipTimes:    GetFullUintRanges(),
 		TokenIds:          GetOneUintRange(),
-		FromListId:        "All", // Allow from Mint too
+		FromListId:        "AllWithoutMint", // Allow from all except Mint
 		ToListId:          "All",
 		InitiatedByListId: "All",
 		ApprovalCriteria: &types.ApprovalCriteria{

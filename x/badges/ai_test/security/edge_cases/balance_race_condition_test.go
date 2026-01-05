@@ -39,7 +39,7 @@ func (suite *BalanceRaceConditionTestSuite) calculateTotalBalance(balances []*ty
 // This test addresses HIGH-005: Balance Calculation Race Condition Risk.
 func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_MultiRecipientTransfer() {
 	// Setup collection approval for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -144,7 +144,7 @@ func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_MultiRecipi
 // This test addresses HIGH-005: Balance Calculation Race Condition Risk.
 func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_MultipleTransfersSameSender() {
 	// Setup collection approval for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -251,7 +251,7 @@ func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_MultipleTra
 // This test addresses HIGH-005: Balance Calculation Race Condition Risk.
 func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_InsufficientBalance() {
 	// Setup collection approval for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

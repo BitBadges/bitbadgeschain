@@ -32,7 +32,7 @@ func (suite *CoinDenomValidationTestSuite) SetupTest() {
 	// Set up collection approval to allow transfers between users
 	// This is needed so transfers can proceed to coin validation
 	wctx := sdk.WrapSDKContext(suite.Ctx)
-	collectionApproval := testutil.GenerateCollectionApproval("transfer_approval", "All", "All")
+	collectionApproval := testutil.GenerateCollectionApproval("transfer_approval", "AllWithoutMint", "All")
 	updateMsg := &badgestypes.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

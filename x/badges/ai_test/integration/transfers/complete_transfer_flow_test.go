@@ -27,7 +27,7 @@ func (suite *CompleteTransferFlowTestSuite) SetupTest() {
 // TestCompleteTransferFlow_AllThreeApprovals tests complete transfer flow with all three approval levels
 func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_AllThreeApprovals() {
 	// Setup collection approval
-	collectionApproval := testutil.GenerateCollectionApproval("collection1", "All", "All")
+	collectionApproval := testutil.GenerateCollectionApproval("collection1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,
@@ -132,7 +132,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingColl
 // TestCompleteTransferFlow_MissingOutgoingApproval tests that transfer fails without outgoing approval
 func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingOutgoingApproval() {
 	// Setup collection approval
-	collectionApproval := testutil.GenerateCollectionApproval("collection1", "All", "All")
+	collectionApproval := testutil.GenerateCollectionApproval("collection1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,
@@ -176,7 +176,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingOutg
 // TestCompleteTransferFlow_MissingIncomingApproval tests that transfer fails without incoming approval
 func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingIncomingApproval() {
 	// Setup collection approval
-	collectionApproval := testutil.GenerateCollectionApproval("collection1", "All", "All")
+	collectionApproval := testutil.GenerateCollectionApproval("collection1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,

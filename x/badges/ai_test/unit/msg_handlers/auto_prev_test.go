@@ -36,7 +36,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_WithExistingCollection() {
 
 	// Test via TransferTokens with collectionId = 0
 	// First, we need to set up approvals
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:               collectionId,
@@ -110,7 +110,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_CreatorPermission_Manager() {
 	collectionId := suite.CreateTestCollection(suite.Manager)
 
 	// Set up approvals and mint tokens
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              collectionId,
@@ -176,7 +176,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_CreatorPermission_OriginalCreator()
 	suite.Require().NoError(err)
 
 	// Set up approvals and mint tokens
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg2 := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              collectionId,
@@ -241,7 +241,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_MultiMsgTransaction() {
 	collectionId1 := suite.CreateTestCollection(suite.Manager)
 
 	// Set up approvals for first collection
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              collectionId1,

@@ -265,7 +265,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				ApprovalCriteria:  &types.ApprovalCriteria{},
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -304,7 +304,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -333,7 +333,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -362,7 +362,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -470,7 +470,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -499,7 +499,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -578,7 +578,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				ApprovalCriteria: collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -607,7 +607,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -646,7 +646,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + alice,
+				FromListId:        "!" + alice + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -924,7 +924,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalent() {
 				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + bob,
+				FromListId:        "!" + bob + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -1005,7 +1005,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalances() 
 				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + bob,
+				FromListId:        "!" + bob + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),
@@ -1071,7 +1071,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparateBalancesTwo
 				ApprovalCriteria:  newApprovalCriteria,
 			},
 			{
-				FromListId:        "!" + bob,
+				FromListId:        "!" + bob + ":Mint",
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				TokenIds:          GetFullUintRanges(),

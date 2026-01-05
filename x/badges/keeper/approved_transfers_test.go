@@ -2332,7 +2332,7 @@ func (suite *TestSuite) TestPrioritizedApprovalRetryLogicEdgeCases() {
 	// Set up a simple approval that always succeeds
 	collectionsToCreate[0].CollectionApprovals = []*types.CollectionApproval{
 		{
-			FromListId:        "All",
+			FromListId:        "AllWithoutMint",
 			ToListId:          "All",
 			InitiatedByListId: "All",
 			TokenIds:          GetFullUintRanges(),

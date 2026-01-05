@@ -70,7 +70,7 @@ func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutCollection
 // TestApprovalBypass_WithoutOutgoingApproval tests that transfers fail without outgoing approval
 func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutOutgoingApproval() {
 	// Setup collection approval
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,
@@ -114,7 +114,7 @@ func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutOutgoingAp
 // TestApprovalBypass_WithoutIncomingApproval tests that transfers fail without incoming approval
 func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutIncomingApproval() {
 	// Setup collection approval
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,

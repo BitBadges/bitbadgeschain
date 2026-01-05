@@ -27,7 +27,7 @@ func (suite *BalanceConservationTestSuite) SetupTest() {
 // TestBalanceConservation_Transfer tests that total balances are conserved during transfers
 func (suite *BalanceConservationTestSuite) TestBalanceConservation_Transfer() {
 	// Setup approvals for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,
@@ -108,7 +108,7 @@ func (suite *BalanceConservationTestSuite) calculateTotalBalance(balances []*typ
 // TestBalanceConservation_MultiTransfer tests balance conservation across multiple transfers
 func (suite *BalanceConservationTestSuite) TestBalanceConservation_MultiTransfer() {
 	// Setup approvals for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,

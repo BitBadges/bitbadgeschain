@@ -45,7 +45,7 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_ValidTransfer() {
 	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Create a collection approval that allows transfers from All to All
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:            suite.Manager,
 		CollectionId:       suite.CollectionId,
@@ -164,7 +164,7 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_MultiRecipient() {
 	suite.Require().NoError(err)
 
 	// Setup approvals for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

@@ -102,7 +102,7 @@ func (suite *BalanceManagementTestSuite) TestBalanceManagement_SpecialAddresses(
 // TestBalanceManagement_BalanceUpdate tests balance updates during transfers
 func (suite *BalanceManagementTestSuite) TestBalanceManagement_BalanceUpdate() {
 	// Setup approvals for regular transfers
-	approval := testutil.GenerateCollectionApproval("approval1", "All", "All")
+	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

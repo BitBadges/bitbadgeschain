@@ -325,7 +325,7 @@ func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals[0].FromListId = "All"
+	collectionsToCreate[0].CollectionApprovals[0].FromListId = "AllWithoutMint"
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria = &types.ApprovalCriteria{
 		OverridesToIncomingApprovals:   true,
 		OverridesFromOutgoingApprovals: true,
