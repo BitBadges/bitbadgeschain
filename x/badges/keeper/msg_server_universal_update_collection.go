@@ -124,6 +124,31 @@ func (k msgServer) setReservedProtocolAddressForPath(ctx sdk.Context, address st
 	return nil
 }
 
+// validateAddressListIdsForMint checks FromListId in collection approvals only
+// to ensure Mint address is not included with other addresses.
+// Mint alone (in whitelist or blacklist) is fine, but Mint with other addresses is not allowed.
+func (k msgServer) validateAddressListIdsForMint(ctx sdk.Context, collection *types.TokenCollection) error {
+	// Validate only FromListId in collection approvals
+	for _, approval := range collection.CollectionApprovals {
+		hasMint, err := k.CheckAddresses(ctx, approval.FromListId, types.MintAddress)
+		if err != nil {
+			return err
+		}
+		if hasMint {
+			// Ensure whitelist true and addresses is only Mint
+			addressList, err := k.GetAddressListById(ctx, approval.FromListId)
+			if err != nil {
+				return err
+			}
+			if !addressList.Whitelist || len(addressList.Addresses) != 1 || addressList.Addresses[0] != types.MintAddress {
+				return fmt.Errorf("Mint address cannot be included in address list %s with other addresses (collection approval %s FromListId)", approval.FromListId, approval.ApprovalId)
+			}
+		}
+	}
+
+	return nil
+}
+
 // setAutoApproveFlagsForPathAddress sets auto-approve flags for a path address
 // Path addresses are module addresses that need auto-approve flags set for proper operation.
 // This function only sets flags if they haven't been explicitly set already, to avoid
@@ -536,6 +561,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			collection.CollectionPermissions = &types.CollectionPermissions{}
 		}
 		ensureMintForbiddenPermission(collection.CollectionPermissions, true)
+	}
+
+	// Validate all address list IDs for Mint address constraints
+	// This must be done after all updates are applied but before storing
+	if err := k.validateAddressListIdsForMint(ctx, collection); err != nil {
+		return nil, err
 	}
 
 	if err := k.SetCollectionInStore(ctx, collection, false); err != nil {

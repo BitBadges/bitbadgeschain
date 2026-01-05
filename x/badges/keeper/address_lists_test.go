@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -65,11 +67,11 @@ func (suite *TestSuite) TestReservedIds() {
 	suite.Require().False(found, "Error checking list addresses: %s", "Mint")
 	suite.Require().Nil(err, "Error checking list addresses: %s", "Mint")
 
-	// found, err = suite.app.BadgesKeeper.CheckAddresses(suite.ctx, "Manager", alice,)
+	// found, err = suite.app.BadgesKeeper.CheckAddresses(suite.ctx, "Manager", alice)
 	// suite.Require().True(found, "Error checking list addresses: %s", "Manager")
 	// suite.Require().Nil(err, "Error checking list addresses: %s", "Manager")
 
-	// found, err = suite.app.BadgesKeeper.CheckAddresses(suite.ctx, "Manager", "Mint",)
+	// found, err = suite.app.BadgesKeeper.CheckAddresses(suite.ctx, "Manager", "Mint")
 	// suite.Require().False(found, "Error checking list addresses: %s", "Manager")
 	// suite.Require().Nil(err, "Error checking list addresses: %s", "Manager")
 
@@ -463,3 +465,125 @@ func (suite *TestSuite) TestDuplicateStoreAddressLists() {
 // 	suite.Require().Nil(err, "Error checking bob which should not be in address list")
 // 	suite.Require().False(found, "Error checking address list")
 // }
+
+// TestValidateAddressListIdsForMint tests the validateAddressListIdsForMint function
+// which ensures Mint address is not included with other addresses in FromListId of collection approvals
+func (suite *TestSuite) TestValidateAddressListIdsForMint() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection first
+	collectionsToCreate := GetCollectionsToCreate()
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "Error creating collection")
+
+	collectionId := sdkmath.NewUint(1)
+
+	// Test 1: Mint alone in whitelist - should pass
+	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
+		ListId:    "mintAloneWhitelist",
+		Addresses: []string{types.MintAddress},
+		Whitelist: true,
+	})
+	suite.Require().Nil(err, "Error creating address list with Mint alone in whitelist")
+
+	updateMsg := &types.MsgUniversalUpdateCollection{
+		Creator:                   bob,
+		CollectionId:              collectionId,
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			{
+				FromListId:        "mintAloneWhitelist",
+				ToListId:          "All",
+				InitiatedByListId: "All",
+				ApprovalId:        "test1",
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Mint alone in whitelist should be allowed")
+
+	// Test 2: Mint alone in blacklist - should pass
+	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
+		ListId:    "mintAloneBlacklist",
+		Addresses: []string{types.MintAddress},
+		Whitelist: false,
+	})
+	suite.Require().Nil(err, "Error creating address list with Mint alone in blacklist")
+
+	updateMsg = &types.MsgUniversalUpdateCollection{
+		Creator:                   bob,
+		CollectionId:              collectionId,
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			{
+				FromListId:        "mintAloneBlacklist",
+				ToListId:          "All",
+				InitiatedByListId: "All",
+				ApprovalId:        "test2",
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Mint alone in blacklist should be allowed")
+
+	// Test 3: Mint with other addresses - should fail
+	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
+		ListId:    "mintWithOthers",
+		Addresses: []string{types.MintAddress, alice},
+		Whitelist: true,
+	})
+	suite.Require().Nil(err, "Error creating address list with Mint and other addresses")
+
+	updateMsg = &types.MsgUniversalUpdateCollection{
+		Creator:                   bob,
+		CollectionId:              collectionId,
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			{
+				FromListId:        "mintWithOthers",
+				ToListId:          "All",
+				InitiatedByListId: "All",
+				ApprovalId:        "test3",
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Error(err, "Mint with other addresses should fail")
+	suite.Require().Contains(err.Error(), "Mint address cannot be included in address list", "Error should mention Mint address validation")
+
+	// Test 4: No Mint address - should pass
+	err = suite.app.BadgesKeeper.CreateAddressList(suite.ctx, &types.AddressList{
+		ListId:    "noMint",
+		Addresses: []string{alice, bob},
+		Whitelist: true,
+	})
+	suite.Require().Nil(err, "Error creating address list without Mint")
+
+	updateMsg = &types.MsgUniversalUpdateCollection{
+		Creator:                   bob,
+		CollectionId:              collectionId,
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			{
+				FromListId:        "noMint",
+				ToListId:          "All",
+				InitiatedByListId: "All",
+				ApprovalId:        "test4",
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          GetFullUintRanges(),
+			},
+		},
+	}
+	_, err = suite.msgServer.UniversalUpdateCollection(wctx, updateMsg)
+	suite.Require().Nil(err, "Address list without Mint should be allowed")
+}
