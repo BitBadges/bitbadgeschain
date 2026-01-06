@@ -4,7 +4,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v22 "github.com/bitbadges/bitbadgeschain/app/upgrades/v22"
-	sendmanagertypes "github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -37,9 +36,7 @@ func (app *App) RegisterUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v22.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{
-				sendmanagertypes.StoreKey,
-			},
+			Added: []string{},
 		}
 	}
 
