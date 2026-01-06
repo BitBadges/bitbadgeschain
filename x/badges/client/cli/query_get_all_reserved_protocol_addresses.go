@@ -10,7 +10,7 @@ import (
 
 func CmdGetAllReservedProtocolAddresses() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-all-reserved-protocol-addresses",
+		Use:   "all-reserved-protocol-addresses",
 		Short: "Query all reserved protocol addresses",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

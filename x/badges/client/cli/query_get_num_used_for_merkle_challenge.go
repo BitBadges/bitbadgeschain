@@ -22,8 +22,8 @@ var _ = strconv.Itoa(0)
 
 func CmdGetChallengeTracker() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-num-used-for-merkle-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [leafIndex]",
-		Short: "Query getChallengeTracker",
+		Use:   "num-used-for-merkle-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [leafIndex]",
+		Short: "Query challenge tracker",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 

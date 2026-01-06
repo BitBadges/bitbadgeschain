@@ -23,8 +23,8 @@ var _ = strconv.Itoa(0)
 
 func CmdGetETHSignatureTracker() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-num-used-for-eth-signature-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [signature]",
-		Short: "Query getETHSignatureTracker",
+		Use:   "num-used-for-eth-signature-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [signature]",
+		Short: "Query ETH signature tracker",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 

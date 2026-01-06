@@ -14,8 +14,8 @@ var _ = fmt.Sprintf
 
 func CmdGetDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-dynamic-store [store-id]",
-		Short: "Query getDynamicStore",
+		Use:   "dynamic-store [store-id]",
+		Short: "Query dynamic store",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqStoreId := args[0]

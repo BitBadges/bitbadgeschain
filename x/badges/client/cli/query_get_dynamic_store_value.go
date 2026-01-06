@@ -14,8 +14,8 @@ var _ = fmt.Sprintf
 
 func CmdGetDynamicStoreValue() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-dynamic-store-value [store-id] [address]",
-		Short: "Query getDynamicStoreValue",
+		Use:   "dynamic-store-value [store-id] [address]",
+		Short: "Query dynamic store value",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqStoreId := args[0]
