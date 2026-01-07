@@ -33,6 +33,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
@@ -383,7 +384,7 @@ func New(
 		FeegrantKeeper:        app.FeeGrantKeeper,
 		IBCKeeper:             app.IBCKeeper,
 		SignModeHandler:       app.txConfig.SignModeHandler(),
-		SigGasConsumer:        ante.DefaultSigVerificationGasConsumer,
+		SigGasConsumer:        authante.DefaultSigVerificationGasConsumer,
 		CircuitKeeper:         &app.CircuitBreakerKeeper,
 		WasmConfig:            &wasmConfig,
 		WasmKeeper:            &app.WasmKeeper,

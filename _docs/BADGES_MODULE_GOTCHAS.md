@@ -303,24 +303,7 @@ for i := 0; i < 1000; i++ {
 
 ## Cross-Chain Considerations
 
-### 15. EIP712 Schema Completeness
-
-**Issue**: EIP712 schemas must include ALL possible fields, even optional ones, or Ethereum signatures will fail.
-
-```go
-// ❌ Missing fields in EIP712 schema
-schema := `{
-    "type": "badges/CreateCollection",
-    "value": {
-        "creator": "",
-        // Missing other fields - signatures will fail!
-    }
-}`
-```
-
-**Solution**: Always include all message fields in EIP712 schemas with appropriate default values.
-
-### 16. Multi-Chain Address Format Differences
+### 15. Address Format Differences
 
 **Issue**: Different blockchains have different address formats, but the module stores addresses as strings.
 
@@ -329,8 +312,6 @@ schema := `{
 addresses := []string{
     "bb1abc123...",           // BitBadges
     "cosmos1xyz789...",       // Cosmos
-    "0x1234567890abcdef...",  // Ethereum
-    "bc1qw508d6qejxtdg4y...", // Bitcoin
 }
 ```
 

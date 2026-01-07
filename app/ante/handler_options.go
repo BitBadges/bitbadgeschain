@@ -25,20 +25,57 @@ import (
 	corestoretypes "cosmossdk.io/core/store"
 )
 
+// NewAnteHandler returns an ante handler responsible for performing
+// transaction-level processing (e.g. fee payment, signature verification) before
+// being passed onto it's respective handler.
+//
+// Decorators are executed in the order listed below, combining standard SDK decorators
+// with custom decorators for Circuit Breaker, WASM, and IBC functionality.
+func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
+	return sdk.ChainAnteDecorators(
+		// Setup and context
+		ante.NewSetUpContextDecorator(),
+
+		// Custom: Circuit Breaker (must be early to protect against problematic txs)
+		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
+
+		// Custom: WASM decorators (after setup context to enforce limits early)
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
+		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
+		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
+
+		// Standard SDK decorators
+		ante.NewValidateBasicDecorator(),
+		ante.NewTxTimeoutHeightDecorator(),
+		ante.NewValidateMemoDecorator(options.AccountKeeper),
+		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+		// SetPubKeyDecorator must be called before all signature verification decorators
+		ante.NewSetPubKeyDecorator(options.AccountKeeper),
+		ante.NewValidateSigCountDecorator(options.AccountKeeper),
+		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
+		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
+		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
+
+		// Custom: IBC decorator (at the end)
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+	)
+}
+
 //TODO: We can play around with some more native ones
 // circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 // ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 // ante.NewUnorderedTxDecorator(unorderedtx.DefaultMaxUnOrderedTTL, options.TxManager, options.Environment, ante.DefaultSha256Cost),
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
-// channel keeper, EVM Keeper and Fee Market Keeper.
+// channel keeper, Circuit Breaker keeper, and WASM keepers.
 type HandlerOptions struct {
 	AccountKeeper         ante.AccountKeeper
 	BankKeeper            authtypes.BankKeeper
 	IBCKeeper             *ibckeeper.Keeper
 	FeegrantKeeper        ante.FeegrantKeeper
 	SignModeHandler       *txsigning.HandlerMap
-	SigGasConsumer        func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
+	SigGasConsumer        func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error // defaults to authante.DefaultSigVerificationGasConsumer
 	TxFeeChecker          ante.TxFeeChecker
 	CircuitKeeper         *circuitkeeper.Keeper
 	WasmConfig            *wasmTypes.WasmConfig
@@ -66,64 +103,4 @@ func (options HandlerOptions) Validate() error {
 		return sdkerrors.Wrap(types.ErrLogic, "wasm store service is required for ante builder")
 	}
 	return nil
-}
-
-func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
-	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(),
-		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
-
-		// ante.NewRejectExtensionOptionsDecorator(),
-		// ante.NewMempoolFeeDecorator(),
-
-		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
-		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
-		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
-
-		ante.NewValidateBasicDecorator(),
-		ante.NewTxTimeoutHeightDecorator(),
-		ante.NewValidateMemoDecorator(options.AccountKeeper),
-		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
-		// SetPubKeyDecorator must be called before all signature verification decorators
-		ante.NewSetPubKeyDecorator(options.AccountKeeper),
-		ante.NewValidateSigCountDecorator(options.AccountKeeper),
-		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
-		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
-		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
-	)
-}
-
-func newCosmosAnteHandlerEip712(options HandlerOptions, chain string) sdk.AnteHandler {
-	if chain != "Ethereum" && chain != "Solana" && chain != "Bitcoin" {
-		panic("chain must be either Ethereum or Solana")
-	}
-
-	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(),
-		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
-		// NOTE: extensions option decorator removed
-		// ante.NewRejectExtensionOptionsDecorator(),
-
-		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
-		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreService),
-		wasmkeeper.NewGasRegisterDecorator(options.WasmKeeper.GetGasRegister()),
-
-		// ante.NewMempoolFeeDecorator(),
-		ante.NewValidateBasicDecorator(),
-		ante.NewTxTimeoutHeightDecorator(),
-		ante.NewValidateMemoDecorator(options.AccountKeeper),
-		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
-		// SetPubKeyDecorator must be called before all signature verification decorators
-		ante.NewSetPubKeyDecorator(options.AccountKeeper),
-		ante.NewValidateSigCountDecorator(options.AccountKeeper),
-		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
-
-		NewCustomSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, chain),
-
-		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
-	)
 }

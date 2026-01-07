@@ -74,19 +74,7 @@ ignite generate proto-go
 -   Custom message types must be properly integrated with WASM bindings
 -   All fields must be serializable
 
-### 4. Add to EIP712 Schemas
-
-**Location**: `chain-handlers/ethereum/ethereum/eip712/schemas.go`
-
-**Purpose**: Enable Ethereum EIP712 signature support for the new message types
-
-**Gotchas**:
-
--   All fields must be represented as strings in the schema
--   Include all optional fields with empty string defaults
--   Follow the exact structure of existing schemas
-
-### 5. Update Custom Transaction Handler
+### 4. Update Custom Transaction Handler
 
 **Location**: `custom-bindings/custom_tx.go`
 
@@ -228,7 +216,6 @@ go test ./x/badges/simulation/...
 -   [ ] Integration tests with other modules
 -   [ ] CLI command tests
 -   [ ] WASM binding tests
--   [ ] EIP712 signature tests
 -   [ ] Authorization tests
 -   [ ] Edge case handling
 -   [ ] Genesis state tests
@@ -308,10 +295,9 @@ go fmt ./x/badges/...
 
 1. **Proto Definitions**: Added `dynamic_stores.proto`, updated `tx.proto` and `query.proto`
 2. **Genesis Files**: Updated `genesis.proto`, `types/genesis.go`, and `module/genesis.go`
-3. **EIP712 Schemas**: Added schemas for all three dynamic store message types
-4. **Custom Transaction Handler**: Updated `custom_tx.go` with dynamic store handlers
-5. **CLI Commands**: Created CLI commands for create, update, delete, and query operations
-6. **Integration Test Helpers**: Added helper functions in `integration_msg_helpers_test.go`
+3. **Custom Transaction Handler**: Updated `custom_tx.go` with dynamic store handlers
+4. **CLI Commands**: Created CLI commands for create, update, delete, and query operations
+5. **Integration Test Helpers**: Added helper functions in `integration_msg_helpers_test.go`
 7. **Core Functionality**: Implemented message handlers and store methods
 8. **Codec Registration**: Registered new message types in `codec.go`
 
@@ -352,8 +338,7 @@ If you modify an existing message type (add, remove, or change fields), you MUST
 
 1. ✅ **CLI commands** (`x/badges/client/cli/tx_*.go`) - Update argument parsing
 2. ✅ **Simulation files** (`x/badges/simulation/*.go`) - Update simulation functions
-3. ✅ **EIP712 schemas** (`chain-handlers/ethereum/ethereum/eip712/schemas.go`) - Update schemas
-4. ✅ **Tests** - Update existing tests and add new ones for new fields
-5. ✅ **Documentation** - Update relevant docs in `_docs/` folder
+3. ✅ **Tests** - Update existing tests and add new ones for new fields
+4. ✅ **Documentation** - Update relevant docs in `_docs/` folder
 
 These are often forgotten but critical for maintaining a complete and tested codebase.
