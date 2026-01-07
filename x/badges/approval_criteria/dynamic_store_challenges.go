@@ -25,8 +25,8 @@ func (c *DynamicStoreChallengesChecker) Name() string {
 	return "DynamicStoreChallenges"
 }
 
-// Check validates dynamic store challenges for the initiator
-// It checks if the initiator has a true value for each challenge (read-only check)
+// Check validates dynamic store challenges for the appropriate party
+// It checks if the specified party has a true value for each challenge (read-only check)
 func (c *DynamicStoreChallengesChecker) Check(ctx sdk.Context, approval *types.CollectionApproval, collection *types.TokenCollection, to string, from string, initiator string, approvalLevel string, approverAddress string, merkleProofs []*types.MerkleProof, ethSignatureProofs []*types.ETHSignatureProof, memo string, isPrioritized bool) (string, error) {
 	if approval.ApprovalCriteria == nil || len(approval.ApprovalCriteria.DynamicStoreChallenges) == 0 {
 		return "", nil
@@ -54,9 +54,12 @@ func (c *DynamicStoreChallengesChecker) Check(ctx sdk.Context, approval *types.C
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 
+		// Determine which party to check ownership for
+		partyToCheck := c.determinePartyToCheck(challenge.OwnershipCheckParty, initiator, from, to, collection)
+
 		// If globalEnabled = true, proceed with existing per-address logic
-		// Get the current value for the initiator
-		dynamicStoreValue, found := c.dynamicStoreService.GetDynamicStoreValue(ctx, storeId, initiator)
+		// Get the current value for the determined party
+		dynamicStoreValue, found := c.dynamicStoreService.GetDynamicStoreValue(ctx, storeId, partyToCheck)
 
 		var val bool
 		if found {
@@ -66,12 +69,44 @@ func (c *DynamicStoreChallengesChecker) Check(ctx sdk.Context, approval *types.C
 			val = dynamicStore.DefaultValue
 		}
 
-		// Check if the initiator has a true value (read-only check, no updates)
+		// Check if the party has a true value (read-only check, no updates)
 		if !val {
-			detErrMsg := fmt.Sprintf("initiator does not have permission for dynamic store challenge storeId %s", storeId.String())
+			detErrMsg := fmt.Sprintf("%s does not have permission for dynamic store challenge storeId %s", partyToCheck, storeId.String())
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
 	return "", nil
+}
+
+// determinePartyToCheck determines which party's ownership should be checked
+func (c *DynamicStoreChallengesChecker) determinePartyToCheck(
+	ownershipCheckParty string,
+	initiatedBy string,
+	fromAddress string,
+	toAddress string,
+	collection *types.TokenCollection,
+) string {
+	switch ownershipCheckParty {
+	case "initiator":
+		return initiatedBy
+	case "sender":
+		return fromAddress
+	case "recipient":
+		return toAddress
+	case types.MintAddress:
+		return collection.MintEscrowAddress
+	case "":
+		return initiatedBy
+	default:
+		// Check if ownershipCheckParty is a valid bb1 address
+		// If it is, return it directly (allows checking ownership for arbitrary addresses)
+		// Use types.ValidateAddress to ensure bb1 prefix is handled correctly
+		if err := types.ValidateAddress(ownershipCheckParty, false); err == nil {
+			return ownershipCheckParty
+		}
+
+		// If not a valid address, fall back to default behavior
+		return initiatedBy
+	}
 }

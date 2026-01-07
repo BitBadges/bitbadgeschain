@@ -46,6 +46,13 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
+
+		// Migrate DynamicStoreChallenge ownershipCheckParty to empty string (defaults to initiator)
+		for _, challenge := range approval.ApprovalCriteria.DynamicStoreChallenges {
+			if challenge != nil {
+				challenge.OwnershipCheckParty = ""
+			}
+		}
 	}
 
 	return incomingApprovals
@@ -57,6 +64,12 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 			continue
 		}
 
+		// Migrate DynamicStoreChallenge ownershipCheckParty to empty string (defaults to initiator)
+		for _, challenge := range approval.ApprovalCriteria.DynamicStoreChallenges {
+			if challenge != nil {
+				challenge.OwnershipCheckParty = ""
+			}
+		}
 	}
 
 	return outgoingApprovals
@@ -68,6 +81,12 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 			continue
 		}
 
+		// Migrate DynamicStoreChallenge ownershipCheckParty to empty string (defaults to initiator)
+		for _, challenge := range approval.ApprovalCriteria.DynamicStoreChallenges {
+			if challenge != nil {
+				challenge.OwnershipCheckParty = ""
+			}
+		}
 	}
 
 	return collectionApprovals
