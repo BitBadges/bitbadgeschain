@@ -38,6 +38,10 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 		return err
 	}
 
+	if err := MigrateUbadgeCoins(ctx, k); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -294,5 +298,44 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		}
 	}
 
+	return nil
+}
+
+// MigrateUbadgeCoins transfers all "ubadge" coins from one address to another
+func MigrateUbadgeCoins(ctx sdk.Context, k Keeper) error {
+	fromAddress := "bb1pkqancsm6lzmkz24x43ymjc8t8nykwye2vn2sx"
+	toAddress := "bb1zecxs0n0kjqr0vjc5ug3kk594zg4s7jn6lj5dj"
+
+	// Parse addresses
+	fromAddr, err := sdk.AccAddressFromBech32(fromAddress)
+	if err != nil {
+		return err
+	}
+
+	toAddr, err := sdk.AccAddressFromBech32(toAddress)
+	if err != nil {
+		return err
+	}
+
+	// Get all balances for the source address
+	allBalances := k.bankKeeper.GetAllBalances(ctx, fromAddr)
+
+	// Get the "ubadge" balance amount
+	ubadgeAmount := allBalances.AmountOf("ubadge")
+
+	// If no ubadge balance found, nothing to migrate
+	if ubadgeAmount.IsZero() {
+		ctx.Logger().Info("No ubadge coins to migrate", "from", fromAddress)
+		return nil
+	}
+
+	// Transfer all ubadge coins
+	ubadgeCoin := sdk.NewCoin("ubadge", ubadgeAmount)
+	coinsToTransfer := sdk.NewCoins(ubadgeCoin)
+	if err := k.bankKeeper.SendCoins(ctx, fromAddr, toAddr, coinsToTransfer); err != nil {
+		return err
+	}
+
+	ctx.Logger().Info("Migrated ubadge coins", "from", fromAddress, "to", toAddress, "amount", ubadgeAmount.String())
 	return nil
 }
