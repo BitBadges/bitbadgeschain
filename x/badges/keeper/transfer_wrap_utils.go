@@ -32,6 +32,26 @@ func (k Keeper) IsSpecialBackedAddress(ctx sdk.Context, collection *types.TokenC
 	return false
 }
 
+// IsBackingPathAddress checks if an address is a cosmos coin backed path address
+func (k Keeper) IsBackingPathAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		if collection.Invariants.CosmosCoinBackedPath.Address == address {
+			return true
+		}
+	}
+	return false
+}
+
+// IsWrappingPathAddress checks if an address is a cosmos coin wrapper path address
+func (k Keeper) IsWrappingPathAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
+	for _, path := range collection.CosmosCoinWrapperPaths {
+		if path.Address == address {
+			return true
+		}
+	}
+	return false
+}
+
 // validateSpecialAddressTransfer validates that the initiator matches the expected address
 // This is shared between wrapper and backed path handlers
 func validateSpecialAddressTransfer(

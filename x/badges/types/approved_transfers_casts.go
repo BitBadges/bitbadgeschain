@@ -112,6 +112,8 @@ func CastIncomingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		InitiatorChecks:                    approvalCriteria.InitiatorChecks,
 		AltTimeChecks:                      approvalCriteria.AltTimeChecks,
 		MustPrioritize:                     approvalCriteria.MustPrioritize,
+		AllowBackedMinting:                 false, // Not applicable to incoming approvals
+		AllowSpecialWrapping:               false, // Not applicable to incoming approvals
 		// Note: IncomingApprovalCriteria doesn't have recipientChecks
 	}
 }
@@ -138,6 +140,8 @@ func CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(approvalCriteria *
 		InitiatorChecks:                  approvalCriteria.InitiatorChecks,
 		AltTimeChecks:                    approvalCriteria.AltTimeChecks,
 		MustPrioritize:                   approvalCriteria.MustPrioritize,
+		AllowBackedMinting:               false, // Not applicable to outgoing approvals
+		AllowSpecialWrapping:             false, // Not applicable to outgoing approvals
 		// Note: OutgoingApprovalCriteria doesn't have senderChecks
 	}
 }

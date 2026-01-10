@@ -82,6 +82,11 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*newtypes.CollectionApproval {
 	for _, approval := range collectionApprovals {
 		if approval.ApprovalCriteria == nil {
+			// For backwards compatibility, create ApprovalCriteria with allowBackedMinting and allowSpecialWrapping set to true
+			approval.ApprovalCriteria = &newtypes.ApprovalCriteria{
+				AllowBackedMinting:   true,
+				AllowSpecialWrapping: true,
+			}
 			continue
 		}
 
@@ -91,6 +96,11 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 				challenge.OwnershipCheckParty = ""
 			}
 		}
+
+		// For backwards compatibility, set allowBackedMinting and allowSpecialWrapping to true if not already set
+		// This ensures existing approvals continue to work as they did before
+		approval.ApprovalCriteria.AllowBackedMinting = true
+		approval.ApprovalCriteria.AllowSpecialWrapping = true
 	}
 
 	return collectionApprovals

@@ -107,6 +107,33 @@ func (k Keeper) DeductAndGetUserApprovals(
 			continue
 		}
 
+		// For collection-level approvals, check if special transfer flags are required
+		// This prevents accidental allowances when toListIds is "All"
+		// If approvalCriteria is nil, we assume allowBackedMinting and allowSpecialWrapping are false
+		// Note: Wrapping and backing are bidirectional operations, so we check both from and to addresses
+		if approvalLevel == "collection" {
+			// Check if either from or to address is a backing path address (bidirectional: backing/unbacking)
+			isBackingTransfer := k.IsBackingPathAddress(ctx, collection, fromAddress) || k.IsBackingPathAddress(ctx, collection, toAddress)
+			// Check if either from or to address is a wrapping path address (bidirectional: wrapping/unwrapping)
+			isWrappingTransfer := k.IsWrappingPathAddress(ctx, collection, fromAddress) || k.IsWrappingPathAddress(ctx, collection, toAddress)
+
+			if isBackingTransfer {
+				// If approvalCriteria is nil, AllowBackedMinting defaults to false
+				if approval.ApprovalCriteria == nil || !approval.ApprovalCriteria.AllowBackedMinting {
+					addPotentialError(isExplicitlyPrioritized, idx, "collection approval does not allow backed minting operations")
+					continue
+				}
+			}
+
+			if isWrappingTransfer {
+				// If approvalCriteria is nil, AllowSpecialWrapping defaults to false
+				if approval.ApprovalCriteria == nil || !approval.ApprovalCriteria.AllowSpecialWrapping {
+					addPotentialError(isExplicitlyPrioritized, idx, "collection approval does not allow special wrapping operations")
+					continue
+				}
+			}
+		}
+
 		// Check valid transfer times
 		currTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 		currTimeFound, err := types.SearchUintRangesForUint(currTime, approval.TransferTimes)

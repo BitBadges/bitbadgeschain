@@ -49,7 +49,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -178,7 +180,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -312,7 +316,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -451,7 +457,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsErrors() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -521,7 +529,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -629,7 +639,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsInadequateBalance() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -701,7 +713,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackInadequateBalance() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -773,7 +787,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -891,7 +907,9 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 		FromListId:        "AllWithoutMint",
 		ToListId:          "AllWithoutMint",
 		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria:  &types.ApprovalCriteria{},
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true, // Required for backing transfers
+		},
 	})
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
