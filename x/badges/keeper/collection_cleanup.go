@@ -25,7 +25,9 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		balanceKey := string(balanceIterator.Key()[len(UserBalanceKey):])
 		balanceKeysToDelete = append(balanceKeysToDelete, balanceKey)
 	}
-	balanceIterator.Close()
+	if err := balanceIterator.Close(); err != nil {
+		k.logger.Error("failed to close balance iterator", "error", err)
+	}
 
 	// Delete all balance keys
 	for _, balanceKey := range balanceKeysToDelete {
@@ -43,7 +45,9 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		challengeKeysToDelete = append(challengeKeysToDelete, challengeKey)
 		store.Delete(challengeIterator.Key())
 	}
-	challengeIterator.Close()
+	if err := challengeIterator.Close(); err != nil {
+		k.logger.Error("failed to close challenge iterator", "error", err)
+	}
 
 	// 3. Purge all approval trackers for this collection
 	// Approval tracker keys format: collectionId-addressForApproval-approvalId-amountTrackerId-level-trackerType-address
@@ -56,7 +60,9 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		approvalKeysToDelete = append(approvalKeysToDelete, approvalKey)
 		store.Delete(approvalIterator.Key())
 	}
-	approvalIterator.Close()
+	if err := approvalIterator.Close(); err != nil {
+		k.logger.Error("failed to close approval iterator", "error", err)
+	}
 
 	// 4. Purge all approval versions for this collection
 	// Approval version keys format: collectionId-approvalLevel-approverAddress-approvalId
@@ -69,7 +75,9 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		versionKeysToDelete = append(versionKeysToDelete, versionKey)
 		store.Delete(versionIterator.Key())
 	}
-	versionIterator.Close()
+	if err := versionIterator.Close(); err != nil {
+		k.logger.Error("failed to close version iterator", "error", err)
+	}
 
 	// 5. Purge all ETH signature trackers for this collection
 	// ETH signature tracker keys format: collectionId-addressForChallenge-approvalLevel-approvalId-challengeId-signature
@@ -82,7 +90,9 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		ethKeysToDelete = append(ethKeysToDelete, ethKey)
 		store.Delete(ethIterator.Key())
 	}
-	ethIterator.Close()
+	if err := ethIterator.Close(); err != nil {
+		k.logger.Error("failed to close eth iterator", "error", err)
+	}
 
 	// Log the cleanup for monitoring
 	k.logger.Info("purged collection state",

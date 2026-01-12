@@ -2,9 +2,9 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
@@ -160,39 +160,39 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	for _, overlapObject := range overlaps {
 		// Validate overlap object structure
 		if overlapObject == nil {
-			return nil, fmt.Errorf("overlap object is nil")
+			return nil, errorsmod.Wrap(ErrOverlapObjectNil, "")
 		}
 
 		overlap := overlapObject.Overlap
 		if overlap == nil {
-			return nil, fmt.Errorf("overlap is nil in overlap object")
+			return nil, errorsmod.Wrap(ErrOverlapNil, "")
 		}
 
 		if overlap.TokenId == nil {
-			return nil, fmt.Errorf("TokenId is nil in overlap")
+			return nil, errorsmod.Wrap(ErrTokenIDNilInOverlap, "")
 		}
 
 		if overlap.OwnershipTime == nil {
-			return nil, fmt.Errorf("OwnershipTime is nil in overlap")
+			return nil, errorsmod.Wrap(ErrOwnershipTimeNilInOverlap, "")
 		}
 
 		// Safe type assertion with comprehensive error handling
 		if overlapObject.FirstDetails == nil {
-			return nil, fmt.Errorf("FirstDetails is nil in overlap object")
+			return nil, errorsmod.Wrap(ErrFirstDetailsNilInOverlap, "")
 		}
 
 		if overlapObject.FirstDetails.ArbitraryValue == nil {
-			return nil, fmt.Errorf("ArbitraryValue is nil in FirstDetails")
+			return nil, errorsmod.Wrap(ErrArbitraryValueNilInFirstDetails, "")
 		}
 
 		amount, ok := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
 		if !ok {
-			return nil, fmt.Errorf("invalid ArbitraryValue type: expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
+			return nil, errorsmod.Wrapf(ErrInvalidArbitraryValueType, "expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
 		}
 
 		// Additional validation: check for nil or invalid amount
 		if amount.IsNil() {
-			return nil, fmt.Errorf("amount is nil in ArbitraryValue")
+			return nil, errorsmod.Wrap(ErrAmountNilInArbitraryValue, "")
 		}
 
 		fetchedBalances = append(fetchedBalances, &Balance{

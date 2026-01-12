@@ -1,10 +1,10 @@
 package keeper
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
@@ -22,12 +22,12 @@ func CheckStartsWithWrappedOrAliasDenom(denom string) bool {
 // GetPartsFromDenom parses a badges denom into its parts
 func GetPartsFromDenom(denom string) ([]string, error) {
 	if !CheckStartsWithWrappedOrAliasDenom(denom) {
-		return nil, fmt.Errorf("invalid denom: %s", denom)
+		return nil, errorsmod.Wrapf(ErrInvalidDenomFormat, "denom: %s", denom)
 	}
 
 	parts := strings.Split(denom, ":")
 	if len(parts) < 3 {
-		return nil, fmt.Errorf("invalid denom: %s", denom)
+		return nil, errorsmod.Wrapf(ErrInvalidDenomFormat, "denom: %s", denom)
 	}
 	return parts, nil
 }
@@ -66,7 +66,7 @@ func GetCorrespondingAliasPath(collection *badgestypes.TokenCollection, denom st
 		}
 	}
 
-	return nil, fmt.Errorf("alias path not found for denom: %s", denom)
+	return nil, errorsmod.Wrapf(ErrAliasPathNotFound, "denom: %s", denom)
 }
 
 // CheckIsAliasDenom checks if a denom is a wrapped badges denom

@@ -125,7 +125,12 @@ func convertUintRanges(oldRanges []*oldtypes.UintRange) []*newtypes.UintRange {
 
 func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			// Log error but don't fail migration
+			k.Logger().Error("failed to close collection migration iterator", "error", err)
+		}
+	}()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldCollection oldtypes.TokenCollection
@@ -177,7 +182,12 @@ func convertBalances(oldBalances []*oldtypes.Balance) []*newtypes.Balance {
 
 func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			// Log error but don't fail migration
+			k.Logger().Error("failed to close balance migration iterator", "error", err)
+		}
+	}()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldBalance oldtypes.UserBalanceStore
@@ -207,7 +217,12 @@ func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) er
 
 func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, AddressListKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			// Log error but don't fail migration
+			k.Logger().Error("failed to close address list migration iterator", "error", err)
+		}
+	}()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldAddressList oldtypes.AddressList
@@ -233,7 +248,11 @@ func MigrateAddressLists(ctx context.Context, store storetypes.KVStore, k Keeper
 
 func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, ApprovalTrackerKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close approval tracker migration iterator", "error", err)
+		}
+	}()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldApprovalTracker oldtypes.ApprovalTracker
@@ -260,7 +279,11 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keeper) error {
 	// Migrate base dynamic stores
 	iterator := storetypes.KVStorePrefixIterator(store, DynamicStoreKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close dynamic store migration iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var oldDynamicStore oldtypes.DynamicStore
 		k.cdc.MustUnmarshal(iterator.Value(), &oldDynamicStore)
@@ -285,7 +308,11 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 
 	// Migrate dynamic store values
 	valueIterator := storetypes.KVStorePrefixIterator(store, DynamicStoreValueKey)
-	defer valueIterator.Close()
+	defer func() {
+		if err := valueIterator.Close(); err != nil {
+			k.Logger().Error("failed to close dynamic store value migration iterator", "error", err)
+		}
+	}()
 	for ; valueIterator.Valid(); valueIterator.Next() {
 		var oldDynamicStoreValue oldtypes.DynamicStoreValue
 		k.cdc.MustUnmarshal(valueIterator.Value(), &oldDynamicStoreValue)

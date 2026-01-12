@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdkerrors "cosmossdk.io/errors"
+	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -46,7 +47,7 @@ func (c *AddressChecksChecker) Check(ctx sdk.Context, approval *types.Collection
 	case "initiator":
 		addressToCheck = initiator
 	default:
-		return "", fmt.Errorf("invalid checkType: %s", c.checkType)
+		return "", errorsmod.Wrapf(types.ErrInvalidCheckType, "checkType: %s", c.checkType)
 	}
 
 	// Check WASM contract requirements

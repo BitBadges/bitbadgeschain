@@ -49,4 +49,6 @@ var (
 	ErrInvalidCollectionID               = sdkerrors.Register(ModuleName, 39, "invalid collection ID in denom")
 	ErrCollectionNotFound                = sdkerrors.Register(ModuleName, 40, "collection not found")
 	ErrSetAutoApproveFailed              = sdkerrors.Register(ModuleName, 41, "failed to set auto-approve for intermediate address")
+	ErrDeterministicError                = sdkerrors.Register(ModuleName, 42, "deterministic error")
+	ErrMemoSizeExceedsMaximum            = sdkerrors.Register(ModuleName, 43, "memo size exceeds maximum allowed size")
 )

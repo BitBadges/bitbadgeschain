@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
@@ -107,7 +108,7 @@ func Err(ctx *sdk.Context, detMsg string, args ...interface{}) error {
 		cachedMsg = detMsg
 	}
 	SetDeterministicError(*ctx, cachedMsg)
-	return fmt.Errorf(detMsg, args...)
+	return errorsmod.Wrap(ErrDeterministicError, cachedMsg)
 }
 
 // HookData represents the data that can be executed via IBC hooks
@@ -200,7 +201,7 @@ func ParseHookDataFromMemo(memo string) (*HookData, error) {
 
 	// Security: Validate memo size before unmarshaling to prevent DoS
 	if len(memo) > MaxMemoSize {
-		return nil, fmt.Errorf("memo size exceeds maximum allowed size: %d bytes (max: %d bytes)", len(memo), MaxMemoSize)
+		return nil, errorsmod.Wrapf(ErrMemoSizeExceedsMaximum, "size: %d bytes, max: %d bytes", len(memo), MaxMemoSize)
 	}
 
 	var memoObj map[string]interface{}

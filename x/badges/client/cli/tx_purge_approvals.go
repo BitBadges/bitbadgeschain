@@ -2,9 +2,9 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/spf13/cobra"
 
@@ -60,7 +60,7 @@ Rules:
 			// Parse the JSON for specific approvals to purge (now required)
 			var approvalsToPurge []*types.ApprovalIdentifierDetails
 			if argApprovalsToPurgeJson == "" {
-				return fmt.Errorf("approvalsToPurge cannot be empty - you must specify exactly which approvals to purge")
+				return errorsmod.Wrap(types.ErrApprovalsToPurgeEmpty, "")
 			}
 
 			// Support file or inline JSON
@@ -75,7 +75,7 @@ Rules:
 			}
 
 			if len(approvalsToPurge) == 0 {
-				return fmt.Errorf("approvalsToPurge cannot be empty - you must specify exactly which approvals to purge")
+				return errorsmod.Wrap(types.ErrApprovalsToPurgeEmpty, "")
 			}
 
 			msg := types.NewMsgPurgeApprovals(

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -46,7 +47,7 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 	}
 
 	if !foundApproval {
-		return nil, fmt.Errorf("approval with ID %s not found", msg.ApprovalId)
+		return nil, errorsmod.Wrapf(ErrApprovalNotFound, "approval ID: %s", msg.ApprovalId)
 	}
 
 	// Create UpdateUserApprovals message with filtered incoming approvals
