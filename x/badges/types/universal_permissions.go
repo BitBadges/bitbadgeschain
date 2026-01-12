@@ -8,7 +8,7 @@ import (
 //			It is also not user-facing or dev-facing, so I am okay with how it is now
 
 // For permissions, we have many types of permissions that are all very similar to each other
-//Here, we abstract all those permissions to a UniversalPermission struct in order to reuse code.
+// Here, we abstract all those permissions to a UniversalPermission struct in order to reuse code.
 //When casting to a UniversalPermission, we use fake dummy values for the unused values to avoid messing up the logic
 //
 //This file implements certain logic using UniversalPermissions such as overlaps and getting first match only

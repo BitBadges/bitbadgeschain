@@ -13,7 +13,7 @@ import (
 )
 
 // This file is responsible for verifying that if we go from Value A to Value B for a timeline, that the update is valid
-//So here, we check the following:
+// So here, we check the following:
 //-Assert the collection has the correct balances type, if we are updating a balance type-specific field
 //-For all updates, check that we are able to update according to the permissions.
 // This means we have to verify that the current permissions do not forbid the update.
@@ -63,7 +63,7 @@ type ApprovalCriteriaWithIsApproved struct {
 	CustomData       string
 }
 
-func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
+func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) ([]*types.UniversalPermissionDetails, error) {
 	handled := []*types.UniversalPermissionDetails{}
 	for _, permission := range permissions {
 		tokenIds := types.GetUintRangesWithOptions(permission.TokenIds, permission.UsesTokenIds)
@@ -114,8 +114,16 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 
 						// for overlaps, we append approval details
 						for _, overlap := range overlaps {
-							mergedApprovalCriteria := overlap.SecondDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
-							mergedApprovalCriteria = append(mergedApprovalCriteria, overlap.FirstDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)...)
+							secondCriteria, ok := overlap.SecondDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
+							if !ok {
+								return nil, sdkerrors.Wrapf(types.ErrInvalidArbitraryValueType, "expected []*ApprovalCriteriaWithIsApproved for SecondDetails, got %T", overlap.SecondDetails.ArbitraryValue)
+							}
+							firstCriteria, ok := overlap.FirstDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
+							if !ok {
+								return nil, sdkerrors.Wrapf(types.ErrInvalidArbitraryValueType, "expected []*ApprovalCriteriaWithIsApproved for FirstDetails, got %T", overlap.FirstDetails.ArbitraryValue)
+							}
+							mergedApprovalCriteria := secondCriteria
+							mergedApprovalCriteria = append(mergedApprovalCriteria, firstCriteria...)
 
 							newArbValue := mergedApprovalCriteria
 							handled = append(handled, &types.UniversalPermissionDetails{
@@ -155,7 +163,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		returnArr[idxToInsert] = handledItem
 	}
 
-	return handled
+	return handled, nil
 }
 
 func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
@@ -194,13 +202,19 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 		if err != nil {
 			return nil, err
 		}
-		firstMatchesForOld := GetFirstMatchOnlyWithApprovalCriteria(ctx, oldApprovalsCasted)
+		firstMatchesForOld, err := GetFirstMatchOnlyWithApprovalCriteria(ctx, oldApprovalsCasted)
+		if err != nil {
+			return nil, err
+		}
 
 		newApprovalsCasted, err := k.CastCollectionApprovalToUniversalPermission(ctx, newApprovals)
 		if err != nil {
 			return nil, err
 		}
-		firstMatchesForNew := GetFirstMatchOnlyWithApprovalCriteria(ctx, newApprovalsCasted)
+		firstMatchesForNew, err := GetFirstMatchOnlyWithApprovalCriteria(ctx, newApprovalsCasted)
+		if err != nil {
+			return nil, err
+		}
 
 		// Step 2:
 		// For every token, we need to check if the new provided value is different in any way from the old value for each token ID

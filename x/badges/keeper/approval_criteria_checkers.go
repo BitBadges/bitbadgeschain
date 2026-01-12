@@ -37,15 +37,6 @@ func (a *addressCheckServiceAdapter) IsAddressReservedProtocol(ctx sdk.Context, 
 	return a.keeper.IsAddressReservedProtocolInStore(ctx, address)
 }
 
-// addressListServiceAdapter adapts the Keeper to the AddressListService interface
-type addressListServiceAdapter struct {
-	keeper *Keeper
-}
-
-func (a *addressListServiceAdapter) CheckAddresses(ctx sdk.Context, addressListId string, addressToCheck string) (bool, error) {
-	return a.keeper.CheckAddresses(ctx, addressListId, addressToCheck)
-}
-
 // dynamicStoreServiceAdapter adapts the Keeper to the DynamicStoreService interface
 type dynamicStoreServiceAdapter struct {
 	keeper *Keeper

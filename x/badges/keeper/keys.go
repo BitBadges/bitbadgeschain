@@ -146,7 +146,7 @@ func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 
 	collection_id, err := strconv.ParseUint(result[0], 10, 64)
 	if err != nil {
-		return BalanceKeyDetails{}, errorsmod.Wrapf(ErrInvalidBalanceKeyFormat, "invalid collection ID '%s' in balance key: %w", result[0], err)
+		return BalanceKeyDetails{}, errorsmod.Wrapf(ErrInvalidBalanceKeyFormat, "invalid collection ID '%s' in balance key: %v", result[0], err)
 	}
 
 	// Validate collection ID is not zero (collection IDs start from 1)

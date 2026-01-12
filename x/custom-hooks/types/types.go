@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
-	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
@@ -83,9 +82,9 @@ func WrapErr(ctx *sdk.Context, errType error, detMsg string, args ...interface{}
 	SetDeterministicError(*ctx, cachedMsg)
 	// Use Wrap when no args (to avoid linter warning about non-constant format string)
 	if len(args) == 0 {
-		return sdkerrors.Wrap(errType, detMsg)
+		return errorsmod.Wrap(errType, detMsg)
 	}
-	return sdkerrors.Wrapf(errType, detMsg, args...)
+	return errorsmod.Wrapf(errType, detMsg, args...)
 }
 
 // WrapErrSimple sets a deterministic error in transient store and returns a wrapped error.
@@ -93,7 +92,7 @@ func WrapErr(ctx *sdk.Context, errType error, detMsg string, args ...interface{}
 // Usage: return customhookstypes.WrapErrSimple(&ctx, errType, detMsg)
 func WrapErrSimple(ctx *sdk.Context, errType error, detMsg string) error {
 	SetDeterministicError(*ctx, detMsg)
-	return sdkerrors.Wrap(errType, detMsg)
+	return errorsmod.Wrap(errType, detMsg)
 }
 
 // Err sets a deterministic error in transient store and returns a new error.

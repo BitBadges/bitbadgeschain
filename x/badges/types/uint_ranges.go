@@ -180,7 +180,7 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRa
 			} else if ids[j-1].Start.Equal(ids[j].Start) && ids[j-1].End.GT(ids[j].End) {
 				ids[j-1], ids[j] = ids[j], ids[j-1]
 			}
-			j = j - 1
+			j--
 		}
 	}
 

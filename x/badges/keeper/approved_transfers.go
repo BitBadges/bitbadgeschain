@@ -938,7 +938,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 		}
 
 		if approvalCriteria.PredeterminedBalances != nil {
-			numIncrements := sdkmath.NewUint(0)
+			var numIncrements sdkmath.Uint
 			hasOrderCalculationMethod := false
 			if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 				hasOrderCalculationMethod = true

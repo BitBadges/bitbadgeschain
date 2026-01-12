@@ -185,10 +185,10 @@ func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey strin
 }
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore, skipInvariants bool) error {
+func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, userBalance *types.UserBalanceStore, skipInvariants bool) error {
 	// Validate user balance before storing
 	if !skipInvariants {
-		if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, UserBalance, nil); err != nil {
+		if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, userBalance, nil); err != nil {
 			return err
 		}
 	}
@@ -196,8 +196,8 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	// NOTE: We always store a non-nil permissions object to prevent issues where
 	// nil permissions would marshal to zero length, causing default balances to be
 	// incorrectly populated again during deserialization.
-	if UserBalance.UserPermissions == nil {
-		UserBalance.UserPermissions = &types.UserPermissions{
+	if userBalance.UserPermissions == nil {
+		userBalance.UserPermissions = &types.UserPermissions{
 			CanUpdateOutgoingApprovals:                         []*types.UserOutgoingApprovalPermission{},
 			CanUpdateIncomingApprovals:                         []*types.UserIncomingApprovalPermission{},
 			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*types.ActionPermission{},
@@ -206,7 +206,7 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		}
 	}
 
-	marshaled_token_balance_info, err := k.cdc.Marshal(UserBalance)
+	marshaled_token_balance_info, err := k.cdc.Marshal(userBalance)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
 	}

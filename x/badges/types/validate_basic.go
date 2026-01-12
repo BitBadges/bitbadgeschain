@@ -108,7 +108,7 @@ func DoRangesOverlap(ids []*UintRange) bool {
 			} else if idsCopy[j-1].Start.Equal(idsCopy[j].Start) && idsCopy[j-1].End.GT(idsCopy[j].End) {
 				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
 			}
-			j = j - 1
+			j--
 		}
 	}
 
@@ -380,7 +380,7 @@ func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool 
 		return false
 	}
 
-	if approvalCriteria.CoinTransfers != nil && len(approvalCriteria.CoinTransfers) > 0 {
+	if len(approvalCriteria.CoinTransfers) > 0 {
 		return false
 	}
 
@@ -391,12 +391,12 @@ func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool 
 	// Theoretically, we might be able to remove this but two things:
 	// 1. It could potentially change which IDs are received (but that only makes sense if predetermined balances is true)
 	// 2. We need to pass stuff to MsgTransferTokens so this doesn't really make sense for auto-scanning
-	if approvalCriteria.MerkleChallenges != nil && len(approvalCriteria.MerkleChallenges) > 0 {
+	if len(approvalCriteria.MerkleChallenges) > 0 {
 		return false
 	}
 
 	// I guess ETH signatures also fall under same category
-	if approvalCriteria.EthSignatureChallenges != nil && len(approvalCriteria.EthSignatureChallenges) > 0 {
+	if len(approvalCriteria.EthSignatureChallenges) > 0 {
 		return false
 	}
 
@@ -885,7 +885,7 @@ func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprov
 }
 
 func IsManualBalancesBasicallyNil(manualBalances []*ManualBalances) bool {
-	return manualBalances == nil || len(manualBalances) == 0
+	return len(manualBalances) == 0
 }
 
 func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedOrderCalculationMethod) bool {
@@ -897,7 +897,7 @@ func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedO
 }
 
 func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) bool {
-	return incrementedBalances == nil || ((incrementedBalances.StartBalances == nil || len(incrementedBalances.StartBalances) == 0) &&
+	return incrementedBalances == nil || (len(incrementedBalances.StartBalances) == 0 &&
 		(!incrementedBalances.AllowOverrideWithAnyValidToken) &&
 		(!incrementedBalances.AllowOverrideTimestamp) &&
 		(incrementedBalances.IncrementTokenIdsBy.IsNil() ||

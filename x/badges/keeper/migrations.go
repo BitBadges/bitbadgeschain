@@ -106,23 +106,6 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 	return collectionApprovals
 }
 
-// convertUintRange converts old v9 UintRange to new UintRange
-func convertUintRange(oldRange *oldtypes.UintRange) *newtypes.UintRange {
-	return &newtypes.UintRange{
-		Start: newtypes.Uint(oldRange.Start),
-		End:   newtypes.Uint(oldRange.End),
-	}
-}
-
-// convertUintRanges converts a slice of old v9 UintRange to new UintRange
-func convertUintRanges(oldRanges []*oldtypes.UintRange) []*newtypes.UintRange {
-	newRanges := make([]*newtypes.UintRange, len(oldRanges))
-	for i, oldRange := range oldRanges {
-		newRanges[i] = convertUintRange(oldRange)
-	}
-	return newRanges
-}
-
 func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) error {
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
 	defer func() {
@@ -159,25 +142,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 	}
 
 	return nil
-}
-
-// convertBalances converts old Balance format to new Balance format
-func convertBalances(oldBalances []*oldtypes.Balance) []*newtypes.Balance {
-	if oldBalances == nil {
-		return nil
-	}
-	var newBalances []*newtypes.Balance
-	for _, oldBalance := range oldBalances {
-		if oldBalance == nil {
-			continue
-		}
-		newBalances = append(newBalances, &newtypes.Balance{
-			Amount:         newtypes.Uint(oldBalance.Amount),
-			OwnershipTimes: convertUintRanges(oldBalance.OwnershipTimes),
-			TokenIds:       convertUintRanges(oldBalance.TokenIds),
-		})
-	}
-	return newBalances
 }
 
 func MigrateBalances(ctx context.Context, store storetypes.KVStore, k Keeper) error {

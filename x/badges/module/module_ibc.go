@@ -177,8 +177,6 @@ func (im IBCModule) OnAcknowledgementPacket(
 		return errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal packet data: %s", err.Error())
 	}
 
-	var eventType string
-
 	// Dispatch packet
 	switch packet := modulePacketData.Packet.(type) {
 	// this line is used by starport scaffolding # ibc/packet/module/ack
@@ -187,24 +185,26 @@ func (im IBCModule) OnAcknowledgementPacket(
 		return errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
-	switch resp := ack.Response.(type) {
-	case *channeltypes.Acknowledgement_Result:
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				eventType,
-				sdk.NewAttribute(types.AttributeKeyAckSuccess, string(resp.Result)),
-			),
-		)
-	case *channeltypes.Acknowledgement_Error:
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				eventType,
-				sdk.NewAttribute(types.AttributeKeyAckError, resp.Error),
-			),
-		)
-	}
+	// var eventType string
+	// // Handle acknowledgement
+	// switch resp := ack.Response.(type) {
+	// case *channeltypes.Acknowledgement_Result:
+	// 	ctx.EventManager().EmitEvent(
+	// 		sdk.NewEvent(
+	// 			types.AttributeKeyAck,
+	// 			sdk.NewAttribute(types.AttributeKeyAckSuccess, string(resp.Result)),
+	// 		),
+	// 	)
+	// case *channeltypes.Acknowledgement_Error:
+	// 	ctx.EventManager().EmitEvent(
+	// 		sdk.NewEvent(
+	// 			types.AttributeKeyAck,
+	// 			sdk.NewAttribute(types.AttributeKeyAckError, resp.Error),
+	// 		),
+	// 	)
+	// }
 
-	return nil
+	// return nil
 }
 
 // OnTimeoutPacket implements the IBCModule interface

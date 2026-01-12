@@ -79,7 +79,12 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	}
 
 	// The packet's denom is the denom in the sender chain. This needs to be converted to the local denom.
-	denom := mustExtractDenomFromPacketOnRecv(packet)
+	denom, err := extractDenomFromPacketOnRecv(packet)
+	if err != nil {
+		h.keeper.Logger(ctx).Error("custom-hooks: failed to extract denom from packet", "error", err)
+		// Cache context is automatically discarded - no state changes committed
+		return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to extract denom from packet: %s", err.Error()))
+	}
 
 	// Get sender address from packet
 	sender := data.GetSender()
@@ -142,12 +147,13 @@ func isIcs20Packet(data []byte) (bool, transfertypes.FungibleTokenPacketData) {
 	return true, packetData
 }
 
-// mustExtractDenomFromPacketOnRecv extracts the denom from the packet on receive
+// extractDenomFromPacketOnRecv extracts the denom from the packet on receive
 // This is similar to the wasm hooks implementation
-func mustExtractDenomFromPacketOnRecv(packet channeltypes.Packet) string {
+// Returns the denom and an error if the packet data cannot be unmarshalled
+func extractDenomFromPacketOnRecv(packet channeltypes.Packet) (string, error) {
 	var data transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &data); err != nil {
-		panic(fmt.Errorf("cannot unmarshal ICS-20 transfer packet data: %w", err))
+		return "", fmt.Errorf("cannot unmarshal ICS-20 transfer packet data: %w", err)
 	}
 
 	// The denom in the packet is the denom in the sender chain.
@@ -170,5 +176,5 @@ func mustExtractDenomFromPacketOnRecv(packet channeltypes.Packet) string {
 			denom = unprefixedDenom
 		}
 	}
-	return denom
+	return denom, nil
 }

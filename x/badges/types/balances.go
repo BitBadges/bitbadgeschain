@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	errorsmod "cosmossdk.io/errors"
-	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,7 +40,7 @@ func AddBalancesAndAssertDoesntExceedThreshold(ctx sdk.Context, currTally []*Bal
 	// Check if we exceed the threshold; will underflow if we do exceed it
 	err = DoBalancesExceedThreshold(ctx, currTally, threshold)
 	if err != nil {
-		return []*Balance{}, sdkerrors.Wrapf(err, "curr tally plus added amounts exceeds threshold")
+		return []*Balance{}, errorsmod.Wrapf(err, "curr tally plus added amounts exceeds threshold")
 	}
 
 	return currTally, nil
@@ -498,7 +497,7 @@ func IncrementBalances(
 			// Edge case: Handle first charge period (throws with negative interval number if we don't handle this)
 			if now.LT(startTime) {
 				if chargePeriodLength.GT(startTime) {
-					return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+					return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 				}
 
 				// Check within first charge period
@@ -514,7 +513,7 @@ func IncrementBalances(
 					return balances, nil
 				}
 
-				return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 			}
 
 			// 1. Calculate what interval we are in
@@ -535,7 +534,7 @@ func IncrementBalances(
 					},
 				}
 			} else {
-				return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 			}
 		} else if durationFromTimestamp.IsZero() || durationFromTimestamp.IsNil() {
 			for _, time := range startBalance.OwnershipTimes {
@@ -561,18 +560,18 @@ func IncrementBalances(
 
 			// 1. Check size == 1
 			if len(overrideTokenIds) != 1 {
-				return balances, sdkerrors.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (length != 1)")
+				return balances, errorsmod.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (length != 1)")
 			}
 
 			// 2. Check that the token IDs are the same
 			if !overrideTokenIds[0].Start.Equal(overrideTokenIds[0].End) {
-				return balances, sdkerrors.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (start != end)")
+				return balances, errorsmod.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (start != end)")
 			}
 
 			// 3. Check that the token IDs are specified as valid in the collection
 			isValid, err := SearchUintRangesForUint(overrideTokenIds[0].Start, collection.ValidTokenIds)
 			if err != nil || !isValid {
-				return balances, sdkerrors.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (not valid ID in collection)")
+				return balances, errorsmod.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (not valid ID in collection)")
 			}
 
 			startBalance.TokenIds = overrideTokenIds
