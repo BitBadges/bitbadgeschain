@@ -47,7 +47,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 		if parseErr != nil {
 			h.keeper.Logger(ctx).Error("custom-hooks: failed to parse memo", "error", parseErr)
 			// Return custom error acknowledgement with deterministic error string
-			return customhookstypes.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse hook data from memo"))
+			return customhookstypes.NewCustomErrorAcknowledgement("failed to parse hook data from memo")
 		}
 	}
 
@@ -85,7 +85,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	sender := data.GetSender()
 	channel := packet.GetDestChannel()
 
-	//log sender and channel
+	// log sender and channel
 	h.keeper.Logger(ctx).Info("custom-hooks: sender", "sender", sender)
 	h.keeper.Logger(ctx).Info("custom-hooks: channel", "channel", channel)
 

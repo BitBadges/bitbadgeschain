@@ -23,4 +23,3 @@ func (k Keeper) GetAllReservedProtocolAddresses(goCtx context.Context, req *type
 		Addresses: addresses,
 	}, nil
 }
-

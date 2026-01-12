@@ -365,7 +365,6 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 	// if denom is a badges denom, unwrap it
 	for _, coin := range coins {
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
-
 			err := k.SendNativeTokensFromAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return err

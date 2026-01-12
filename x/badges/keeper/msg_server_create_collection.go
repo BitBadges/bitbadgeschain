@@ -24,12 +24,12 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 
 	newMsg := types.MsgUniversalUpdateCollection{
 		Creator:      msg.Creator,
-		CollectionId: sdkmath.NewUint(NewCollectionId), //We use 0 to indicate a new collection
+		CollectionId: sdkmath.NewUint(NewCollectionId), // We use 0 to indicate a new collection
 
-		//Exclusive to collection creations
+		// Exclusive to collection creations
 		DefaultBalances: msg.DefaultBalances,
 
-		//Applicable to creations and updates
+		// Applicable to creations and updates
 		ValidTokenIds:               msg.ValidTokenIds,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions:       msg.CollectionPermissions,

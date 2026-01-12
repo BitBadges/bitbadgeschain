@@ -12,13 +12,13 @@ var _ sdk.Msg = &MsgCastVote{}
 
 func NewMsgCastVote(creator string, collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string, proposalId string, yesWeight sdkmath.Uint) *MsgCastVote {
 	return &MsgCastVote{
-		Creator:        creator,
-		CollectionId:   collectionId,
-		ApprovalLevel:  approvalLevel,
+		Creator:         creator,
+		CollectionId:    collectionId,
+		ApprovalLevel:   approvalLevel,
 		ApproverAddress: approverAddress,
-		ApprovalId:     approvalId,
-		ProposalId:     proposalId,
-		YesWeight:      yesWeight,
+		ApprovalId:      approvalId,
+		ProposalId:      proposalId,
+		YesWeight:       yesWeight,
 	}
 }
 
@@ -89,4 +89,3 @@ func (msg *MsgCastVote) ValidateBasic() error {
 
 	return nil
 }
-

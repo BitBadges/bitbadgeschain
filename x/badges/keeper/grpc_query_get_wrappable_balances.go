@@ -108,7 +108,7 @@ func (k Keeper) calculateMaxWrappableAmount(ctx sdk.Context, userBalances []*typ
 			return sdkmath.NewUint(0), nil
 		}
 
-		var minUserAmount sdkmath.Uint = userBalancesForPath[0].Amount
+		minUserAmount := userBalancesForPath[0].Amount
 		for i := 1; i < len(userBalancesForPath); i++ {
 			if userBalancesForPath[i].Amount.LT(minUserAmount) {
 				minUserAmount = userBalancesForPath[i].Amount

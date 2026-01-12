@@ -37,7 +37,6 @@ func CmdGetBalance() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetBalanceRequest{
-
 				CollectionId: reqCollectionId,
 				Address:      reqAddress,
 			}

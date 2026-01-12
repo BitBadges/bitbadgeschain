@@ -98,8 +98,8 @@ func DoRangesOverlap(ids []*UintRange) bool {
 	idsCopy := make([]*UintRange, len(ids))
 	copy(idsCopy, ids)
 
-	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
-	var n = len(idsCopy)
+	// Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	n := len(idsCopy)
 	for i := 1; i < n; i++ {
 		j := i
 		for j > 0 {
@@ -112,7 +112,7 @@ func DoRangesOverlap(ids []*UintRange) bool {
 		}
 	}
 
-	//Check if any overlap
+	// Check if any overlap
 	for i := 1; i < n; i++ {
 		prevInsertedRange := idsCopy[i-1]
 		currRange := idsCopy[i]
@@ -288,7 +288,7 @@ func ValidateAddressList(addressList *AddressList) error {
 		}
 	}
 
-	//check duplicate addresses
+	// check duplicate addresses
 	if duplicateInStringArray(addressList.Addresses) {
 		return ErrDuplicateAddresses
 	}
@@ -330,7 +330,7 @@ func ValidateAddressListInput(addressListInput *AddressListInput) error {
 		}
 	}
 
-	//check duplicate addresses
+	// check duplicate addresses
 	if duplicateInStringArray(addressListInput.Addresses) {
 		return ErrDuplicateAddresses
 	}
@@ -395,7 +395,7 @@ func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool 
 		return false
 	}
 
-	//I guess ETH signatures also fall under same category
+	// I guess ETH signatures also fall under same category
 	if approvalCriteria.EthSignatureChallenges != nil && len(approvalCriteria.EthSignatureChallenges) > 0 {
 		return false
 	}
@@ -530,7 +530,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			if canChangeValues {
-
 				if approvalCriteria.MustOwnTokens == nil {
 					approvalCriteria.MustOwnTokens = []*MustOwnTokens{}
 				}
@@ -835,7 +834,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						if tokenIdOverrideCount > 1 {
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment token ids by, or allow override with any valid ID can be set")
 						}
-
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(ctx, manualTransfer.Balances, canChangeValues)
@@ -847,7 +845,6 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "manual transfers and sequential transfers cannot be both nil or both defined")
 					}
 				}
-
 			} else {
 				approvalCriteria.PredeterminedBalances = nil
 			}
@@ -882,7 +879,6 @@ func ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprov
 				}
 			}
 		}
-
 	}
 
 	return nil
@@ -893,17 +889,17 @@ func IsManualBalancesBasicallyNil(manualBalances []*ManualBalances) bool {
 }
 
 func IsOrderCalculationMethodBasicallyNil(orderCalculationMethod *PredeterminedOrderCalculationMethod) bool {
-	return orderCalculationMethod == nil || (orderCalculationMethod.UseMerkleChallengeLeafIndex == false &&
-		orderCalculationMethod.UseOverallNumTransfers == false &&
-		orderCalculationMethod.UsePerToAddressNumTransfers == false &&
-		orderCalculationMethod.UsePerFromAddressNumTransfers == false &&
-		orderCalculationMethod.UsePerInitiatedByAddressNumTransfers == false)
+	return orderCalculationMethod == nil || (!orderCalculationMethod.UseMerkleChallengeLeafIndex &&
+		!orderCalculationMethod.UseOverallNumTransfers &&
+		!orderCalculationMethod.UsePerToAddressNumTransfers &&
+		!orderCalculationMethod.UsePerFromAddressNumTransfers &&
+		!orderCalculationMethod.UsePerInitiatedByAddressNumTransfers)
 }
 
 func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) bool {
 	return incrementedBalances == nil || ((incrementedBalances.StartBalances == nil || len(incrementedBalances.StartBalances) == 0) &&
-		(incrementedBalances.AllowOverrideWithAnyValidToken == false) &&
-		(incrementedBalances.AllowOverrideTimestamp == false) &&
+		(!incrementedBalances.AllowOverrideWithAnyValidToken) &&
+		(!incrementedBalances.AllowOverrideTimestamp) &&
 		(incrementedBalances.IncrementTokenIdsBy.IsNil() ||
 			incrementedBalances.IncrementTokenIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||
@@ -927,7 +923,6 @@ func PredeterminedBalancesIsBasicallyNil(predeterminedBalances *PredeterminedBal
 }
 
 func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool, challengeTrackerIdForTransferOrder string) error {
-
 	for i, challenge := range challenges {
 		if challenge == nil || challenge.Root == "" {
 			challenge = &MerkleChallenge{}
@@ -948,7 +943,7 @@ func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTr
 			return ErrPrimaryChallengeMustBeOneUsePerLeaf
 		}
 
-		//For non-whitelist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
+		// For non-whitelist trees, we can only use max one use per leaf (bc as soon as we use a leaf, the merkle path is public so anyone can use it)
 		if !maxOneUsePerLeaf && !challenge.UseCreatorAddressAsLeaf {
 			return ErrCanOnlyUseMaxOneUsePerLeafWithWhitelistTree
 		}
@@ -1061,7 +1056,7 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 	if transfer.PrecalculateBalancesFromApproval != nil {
 		precalcDetails := transfer.PrecalculateBalancesFromApproval
 		if precalcDetails.ApprovalLevel == "" && precalcDetails.ApproverAddress == "" && precalcDetails.ApprovalId == "" {
-			//basically nil
+			// basically nil
 		} else {
 			if precalcDetails.ApprovalLevel != "collection" && precalcDetails.ApprovalLevel != "incoming" && precalcDetails.ApprovalLevel != "outgoing" {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "approval level must be collection, incoming, or outgoing")
@@ -1097,7 +1092,7 @@ func ValidateTokenMetadata(tokenMetadata []*TokenMetadata, canChangeValues bool)
 	handledTokenIds := []*UintRange{}
 	if len(tokenMetadata) > 0 {
 		for _, tokenMetadata := range tokenMetadata {
-			//Validate well-formedness of the message entries
+			// Validate well-formedness of the message entries
 			if err := ValidateURI(tokenMetadata.Uri); err != nil {
 				return err
 			}

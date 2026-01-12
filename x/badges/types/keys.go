@@ -20,14 +20,10 @@ const (
 	PortID = "badges"
 )
 
-var (
-	ParamsKey = []byte("p_badges")
-)
+var ParamsKey = []byte("p_badges")
 
-var (
-	// PortKey defines the key to store the port ID in store
-	PortKey = KeyPrefix("badges-port-")
-)
+// PortKey defines the key to store the port ID in store
+var PortKey = KeyPrefix("badges-port-")
 
 func KeyPrefix(p string) []byte {
 	return []byte(p)

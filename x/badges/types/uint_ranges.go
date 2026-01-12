@@ -29,7 +29,7 @@ func SearchUintRangesForUint(id sdkmath.Uint, uintRanges []*UintRange) (bool, er
 		return false, err
 	}
 
-	//Binary search because ID ranges will be sorted
+	// Binary search because ID ranges will be sorted
 	low := 0
 	high := len(ranges) - 1
 	for low <= high {
@@ -89,7 +89,7 @@ func RemoveUintRangeFromUintRange(idxsToRemove *UintRange, rangeObject *UintRang
 			End:   idxsToRemove.Start.SubUint64(1),
 		})
 
-		//get min of idxsToRemove.End and rangeObject.End
+		// get min of idxsToRemove.End and rangeObject.End
 		minEnd := idxsToRemove.End
 		if idxsToRemove.End.GT(rangeObject.End) {
 			minEnd = rangeObject.End
@@ -148,10 +148,10 @@ func RemoveUintRangesFromUintRanges(idsToRemove []*UintRange, rangeToRemoveFrom 
 }
 
 func AssertRangesDoNotOverlapAtAll(rangeToCheck []*UintRange, overlappingRange []*UintRange) error {
-	//Check that for old times, there is 100% overlap with new times and 0% overlap with the opposite
+	// Check that for old times, there is 100% overlap with new times and 0% overlap with the opposite
 	for _, oldAllowedTime := range rangeToCheck {
 		for _, newAllowedTime := range overlappingRange {
-			//Check that the new time completely overlaps with the old time
+			// Check that the new time completely overlaps with the old time
 			_, removed := RemoveUintRangeFromUintRange(newAllowedTime, oldAllowedTime)
 			if len(removed) > 0 {
 				return ErrRangesOverlap
@@ -170,8 +170,8 @@ func SortUintRangesAndMergeAdjacentAndIntersecting(ids []*UintRange) []*UintRang
 // Will sort the ID ranges in order and merge overlapping IDs if we can
 // If mergeIntersecting is true, we will merge intersecting ranges. If false, we will panic if any intersect and only sort and merge adjacent ranges (i.e. [1-5], [6-10])
 func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRange, error) {
-	//Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
-	var n = len(ids)
+	// Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	n := len(ids)
 	for i := 1; i < n; i++ {
 		j := i
 		for j > 0 {
@@ -185,7 +185,7 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRa
 	}
 
 	if !mergeIntersecting {
-		//We don't want to merge intersecting ranges, so we panic if any interesect
+		// We don't want to merge intersecting ranges, so we panic if any interesect
 		for i := 1; i < n; i++ {
 			if ids[i-1].End.GTE(ids[i].Start) {
 				return nil, sdkerrors.Wrap(ErrRangesOverlap, "ranges overlap but mergeIntersecting is not allowed")
@@ -193,28 +193,28 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRa
 		}
 	}
 
-	//Merge overlapping ranges
+	// Merge overlapping ranges
 	if n > 0 {
 		newUintRanges := []*UintRange{CreateUintRange(ids[0].Start, ids[0].End)}
-		//Iterate through and compare with previously inserted range
+		// Iterate through and compare with previously inserted range
 		for i := 1; i < n; i++ {
 			prevInsertedRange := newUintRanges[len(newUintRanges)-1]
 			currRange := ids[i]
 
 			if currRange.Start.Equal(prevInsertedRange.Start) {
-				//Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
-				//Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
+				// Both have same start, so we set to currRange.End because currRange.End is greater due to our sorting
+				// Example: prevRange = [1, 5], currRange = [1, 10] -> newRange = [1, 10]
 				newUintRanges[len(newUintRanges)-1].End = currRange.End
 			} else if currRange.End.GT(prevInsertedRange.End) {
-				//We have different starts and curr end is greater than prev end
+				// We have different starts and curr end is greater than prev end
 
 				if currRange.Start.GT(prevInsertedRange.End.AddUint64(1)) {
-					//We have a gap between the prev range end and curr range start, so we just append currRange
-					//Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
+					// We have a gap between the prev range end and curr range start, so we just append currRange
+					// Example: prevRange = [1, 5], currRange = [7, 10] -> newRange = [1, 5], [7, 10]
 					newUintRanges = append(newUintRanges, CreateUintRange(currRange.Start, currRange.End))
 				} else {
-					//They overlap and we can merge them
-					//Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
+					// They overlap and we can merge them
+					// Example: prevRange = [1, 5], currRange = [2, 10] -> newRange = [1, 10]
 					newUintRanges[len(newUintRanges)-1].End = currRange.End
 				}
 			} // else: If currRange.End <= prevInsertedRange.End, it is already fully contained within the previous. We can just continue.

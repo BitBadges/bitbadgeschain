@@ -97,7 +97,6 @@ func parseInversionPattern(listId string, allowParentheses bool) (bool, string, 
 }
 
 func getReservedListById(addressListId string, allowAliases bool) (*types.AddressList, error) {
-
 	// Handle special reserved IDs
 	switch {
 	case addressListId == types.MintAddress:

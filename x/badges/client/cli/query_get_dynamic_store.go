@@ -28,7 +28,6 @@ func CmdGetDynamicStore() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetDynamicStoreRequest{
-
 				StoreId: reqStoreId,
 			}
 

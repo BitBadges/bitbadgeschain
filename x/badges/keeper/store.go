@@ -207,7 +207,7 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
 	}
 
-	//Prevent accidental non-BitBadges addresses from being stored
+	// Prevent accidental non-BitBadges addresses from being stored
 	balanceKeyDetails, err := GetDetailsFromBalanceKey(balanceKey)
 	if err != nil {
 		return sdkerrors.Wrapf(err, "invalid balance key format")

@@ -50,4 +50,3 @@ func CmdGetVote() *cobra.Command {
 
 	return cmd
 }
-

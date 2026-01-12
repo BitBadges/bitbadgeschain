@@ -22,7 +22,7 @@ func SimulateMsgTransferTokens(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokens, "no accounts available"), nil, nil
 		}
-		
+
 		// Try to get a known-good collection ID first
 		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
@@ -38,19 +38,19 @@ func SimulateMsgTransferTokens(
 				collectionId = createdId
 			}
 		}
-		
+
 		// Check if collection exists
 		collection, found := k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgTransferTokens, "collection not found"), nil, nil
 		}
-		
+
 		// Randomly decide between minting and regular transfer
 		isMint := r.Intn(3) == 0 // 33% chance of minting
-		
+
 		var transfers []*types.Transfer
 		var creator simtypes.Account
-		
+
 		if isMint {
 			// Minting: from Mint address
 			creator = EnsureAccountExists(r, accs)
@@ -68,10 +68,10 @@ func SimulateMsgTransferTokens(
 			// Regular transfer: need sender with balance
 			creator = EnsureAccountExists(r, accs)
 			fromAddress := creator.Address.String()
-			
+
 			// Get sender's balance
 			balance, _ := k.GetBalanceOrApplyDefault(ctx, collection, fromAddress)
-			
+
 			// Check if sender has any balance
 			hasBalance := false
 			for _, bal := range balance.Balances {
@@ -80,7 +80,7 @@ func SimulateMsgTransferTokens(
 					break
 				}
 			}
-			
+
 			if !hasBalance {
 				// Try minting instead if sender has no balance
 				toAddresses := GetRandomAddresses(r, r.Intn(3)+1, accs)
@@ -106,18 +106,18 @@ func SimulateMsgTransferTokens(
 				}
 			}
 		}
-		
+
 		msg := &types.MsgTransferTokens{
 			Creator:      creator.Address.String(),
 			CollectionId: collectionId,
 			Transfers:    transfers,
 		}
-		
+
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), err.Error()), nil, nil
 		}
-		
+
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }

@@ -11,7 +11,7 @@ import (
 func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
 	currApprovals = append([]*types.UserIncomingApproval{
 		{
-			FromListId:        "AllWithMint", //everyone
+			FromListId:        "AllWithMint", // everyone
 			InitiatedByListId: userAddress,
 			TransferTimes: []*types.UintRange{
 				{
@@ -33,17 +33,18 @@ func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingAppr
 			},
 			ApprovalId: "self-initiated-incoming",
 			Version:    sdkmath.NewUint(0),
-		}}, currApprovals...)
+		},
+	}, currApprovals...)
 
 	return currApprovals
 }
 
 // By default, we approve all transfers if from === initiatedBy
 func AppendSelfInitiatedOutgoingApproval(currApprovals []*types.UserOutgoingApproval, userAddress string) []*types.UserOutgoingApproval {
-	//prepend it
+	// prepend it
 	currApprovals = append([]*types.UserOutgoingApproval{
 		{
-			ToListId:          "AllWithMint", //everyone
+			ToListId:          "AllWithMint", // everyone
 			InitiatedByListId: userAddress,
 			TransferTimes: []*types.UintRange{
 				{
@@ -65,7 +66,8 @@ func AppendSelfInitiatedOutgoingApproval(currApprovals []*types.UserOutgoingAppr
 			},
 			ApprovalId: "self-initiated-outgoing",
 			Version:    sdkmath.NewUint(0),
-		}}, currApprovals...)
+		},
+	}, currApprovals...)
 
 	return currApprovals
 }

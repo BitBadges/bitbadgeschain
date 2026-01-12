@@ -29,9 +29,9 @@ type AITestSuite struct {
 func (suite *AITestSuite) SetupTest() {
 	// Initialize app if not already done - Reset() will handle this, but ensure it's safe
 	if suite.App == nil {
-		suite.KeeperTestHelper.Setup()
+		suite.Setup()
 	} else {
-		suite.KeeperTestHelper.Reset()
+		suite.Reset()
 	}
 
 	// Create keeper with real app keepers (same as keeper_test.go)
@@ -78,4 +78,3 @@ func GetAckError(ack ibcexported.Acknowledgement) string {
 	}
 	return ""
 }
-

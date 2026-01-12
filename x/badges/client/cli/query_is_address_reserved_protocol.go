@@ -44,4 +44,3 @@ func CmdIsAddressReservedProtocol() *cobra.Command {
 
 	return cmd
 }
-

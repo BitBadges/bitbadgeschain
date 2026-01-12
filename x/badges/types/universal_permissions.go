@@ -4,10 +4,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//TODO: This file should probably be refactored a lot, but it currently works.
+// TODO: This file should probably be refactored a lot, but it currently works.
 //			It is also not user-facing or dev-facing, so I am okay with how it is now
 
-//For permissions, we have many types of permissions that are all very similar to each other
+// For permissions, we have many types of permissions that are all very similar to each other
 //Here, we abstract all those permissions to a UniversalPermission struct in order to reuse code.
 //When casting to a UniversalPermission, we use fake dummy values for the unused values to avoid messing up the logic
 //
@@ -52,8 +52,8 @@ type UniversalPermissionDetails struct {
 
 	ApprovalIdList *AddressList
 
-	//These fields are not actually used in the overlapping logic.
-	//They are just along for the ride and used later for lookups
+	// These fields are not actually used in the overlapping logic.
+	// They are just along for the ride and used later for lookups
 	PermanentlyPermittedTimes []*UintRange
 	PermanentlyForbiddenTimes []*UintRange
 
@@ -168,14 +168,14 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 	//						2. If we have removed anything at all, we need to continue to test field N + 1 (i.e. the next field) for overlap
 	//							 This is because we have not yet toRemove the cases for values which overlap with field N and field N + 1
 	//					  3. If we have not removed anything, we add the original value as outlined in 1) but we do not need to continue to test field N + 1
-	//							 because there are no cases untoRemove now where values overlap with field N and field N + 1 becuase nothing overlaps with N.
+	//							 because there are no cases untoRemove now where values overlap with field N and field N + 1 because nothing overlaps with N.
 	//							 If we do end up with this case, it means we end up with the original values because to overlap, it needs to overlap with all fields
 	//
 	//							 We optimize step 3) by checking right away if something does not overlap with some field. If it does not overlap with some field,
 	//							 we can just add the original values and be done with it. If it does overlap with all fields, we need to execute the algorithm
 
-	//If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
-	//The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
+	// If some field does not overlap, we simply end up with the original values because it is only considered an overlap if all fields overlap.
+	// The function would work fine without this but it makes it more efficient and less complicated because it will not get broken down further
 	if len(removedTimelineTimes) == 0 || len(removedTokens) == 0 || len(removedTransferTimes) == 0 || len(removedOwnershipTimes) == 0 || !toListRemoved || !fromListRemoved || !initiatedByListRemoved || !approvalIdListRemoved {
 		remaining = append(remaining, base)
 		return remaining, []*UniversalPermissionDetails{}
@@ -197,7 +197,7 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 
 	for _, tokenAfterRemoval := range tokensAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			TimelineTime:    removedTimelineTimes[0], // We know there is only one because there can only be one interesection between two ranges
 			TokenId:         tokenAfterRemoval,
 			TransferTime:    base.TransferTime,
 			OwnershipTime:   base.OwnershipTime,
@@ -211,8 +211,8 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 
 	for _, transferTimeAfterRemoval := range transferTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			TokenId:         removedTokens[0],        //We know there is only one because there can only be one interesection between two ranges
+			TimelineTime:    removedTimelineTimes[0], // We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedTokens[0],        // We know there is only one because there can only be one interesection between two ranges
 			TransferTime:    transferTimeAfterRemoval,
 			OwnershipTime:   base.OwnershipTime,
 			ToList:          base.ToList,
@@ -225,9 +225,9 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 
 	for _, ownershipTimeAfterRemoval := range ownershipTimesAfterRemoval {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			TokenId:         removedTokens[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			TimelineTime:    removedTimelineTimes[0], // We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedTokens[0],        // We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], // We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   ownershipTimeAfterRemoval,
 			ToList:          base.ToList,
 			FromList:        base.FromList,
@@ -239,9 +239,9 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 
 	if !IsAddressListEmpty(toListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			TokenId:         removedTokens[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			TimelineTime:    removedTimelineTimes[0], // We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedTokens[0],        // We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], // We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          toListAfterRemoval,
 			FromList:        base.FromList,
@@ -253,9 +253,9 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 
 	if !IsAddressListEmpty(fromListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			TokenId:         removedTokens[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			TimelineTime:    removedTimelineTimes[0], // We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedTokens[0],        // We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], // We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          removedToList,
 			FromList:        fromListAfterRemoval,
@@ -267,9 +267,9 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 
 	if !IsAddressListEmpty(initiatedByListAfterRemoval) {
 		remaining = append(remaining, &UniversalPermissionDetails{
-			TimelineTime:    removedTimelineTimes[0], //We know there is only one because there can only be one interesection between two ranges
-			TokenId:         removedTokens[0],        //We know there is only one because there can only be one interesection between two ranges
-			TransferTime:    removedTransferTimes[0], //We know there is only one because there can only be one interesection between two ranges
+			TimelineTime:    removedTimelineTimes[0], // We know there is only one because there can only be one interesection between two ranges
+			TokenId:         removedTokens[0],        // We know there is only one because there can only be one interesection between two ranges
+			TransferTime:    removedTransferTimes[0], // We know there is only one because there can only be one interesection between two ranges
 			OwnershipTime:   removedOwnershipTimes[0],
 			ToList:          removedToList,
 			FromList:        removedFromList,
@@ -322,7 +322,6 @@ func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetai
 func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*UniversalPermissionDetails {
 	toRemove := []*UniversalPermissionDetails{}
 	for _, permission := range permissions {
-
 		tokenIds := GetUintRangesWithOptions(permission.TokenIds, permission.UsesTokenIds)
 		timelineTimes := GetUintRangesWithOptions(permission.TimelineTimes, permission.UsesTimelineTimes)
 		transferTimes := GetUintRangesWithOptions(permission.TransferTimes, permission.UsesTransferTimes)
@@ -366,7 +365,7 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 								InitiatedByList: remaining.InitiatedByList,
 								ApprovalIdList:  remaining.ApprovalIdList,
 
-								//Appended for future lookups (not involved in overlap logic)
+								// Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,
 								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
 								ArbitraryValue:            arbitraryValue,
@@ -376,7 +375,6 @@ func GetFirstMatchOnly(ctx sdk.Context, permissions []*UniversalPermission) []*U
 				}
 			}
 		}
-
 	}
 
 	return toRemove

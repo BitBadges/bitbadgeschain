@@ -125,9 +125,9 @@ func (suite *AITestSuite) CreateTestCollectionWithApprovals(creator string, appr
 func (suite *AITestSuite) SetupMintApproval(collectionId sdkmath.Uint) {
 	// Get current collection to check existing approvals
 	collection := suite.GetCollection(collectionId)
-	
+
 	mintApprovalId := "mint_approval"
-	
+
 	// Check if mint approval already exists and has correct flags
 	hasMintApproval := false
 	needsUpdate := false
@@ -137,15 +137,15 @@ func (suite *AITestSuite) SetupMintApproval(collectionId sdkmath.Uint) {
 			hasMintApproval = true
 			existingMintApproval = approval
 			// Check if it has the required override flags
-			if approval.ApprovalCriteria == nil || 
-			   !approval.ApprovalCriteria.OverridesFromOutgoingApprovals ||
-			   approval.FromListId != types.MintAddress {
+			if approval.ApprovalCriteria == nil ||
+				!approval.ApprovalCriteria.OverridesFromOutgoingApprovals ||
+				approval.FromListId != types.MintAddress {
 				needsUpdate = true
 			}
 			break
 		}
 	}
-	
+
 	// Create or update mint approval with fromListId: 'Mint' as required by BitBadges docs
 	var mintApproval *types.CollectionApproval
 	if hasMintApproval && !needsUpdate {
@@ -164,10 +164,10 @@ func (suite *AITestSuite) SetupMintApproval(collectionId sdkmath.Uint) {
 		// Create new mint approval
 		mintApproval = GenerateCollectionApproval(mintApprovalId, types.MintAddress, "All")
 		// Mint approvals must forcefully override user-level outgoing approval because Mint cannot be managed
-		mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true  // Forcefully override outgoing approvals
-		mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true    // Allow mint to bypass incoming approvals
+		mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true // Forcefully override outgoing approvals
+		mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true   // Allow mint to bypass incoming approvals
 	}
-	
+
 	// Merge with existing approvals (prepend to ensure it's checked first due to first-match policy)
 	newApprovals := make([]*types.CollectionApproval, 0, len(collection.CollectionApprovals)+1)
 	if hasMintApproval {
@@ -183,7 +183,7 @@ func (suite *AITestSuite) SetupMintApproval(collectionId sdkmath.Uint) {
 		newApprovals = append(newApprovals, mintApproval)
 		newApprovals = append(newApprovals, collection.CollectionApprovals...)
 	}
-	
+
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              collectionId,
@@ -192,7 +192,7 @@ func (suite *AITestSuite) SetupMintApproval(collectionId sdkmath.Uint) {
 	}
 	_, err := suite.MsgServer.UniversalUpdateCollection(sdk.WrapSDKContext(suite.Ctx), updateMsg)
 	suite.Require().NoError(err, "failed to set up mint approval")
-	
+
 	// Verify the approval was saved by refreshing the collection
 	updatedCollection := suite.GetCollection(collectionId)
 	found := false

@@ -36,4 +36,3 @@ func CmdGetAllReservedProtocolAddresses() *cobra.Command {
 
 	return cmd
 }
-

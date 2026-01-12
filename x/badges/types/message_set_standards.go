@@ -43,12 +43,12 @@ func (msg *MsgSetStandards) GetSignBytes() []byte {
 func BlankUniversalMsg() *MsgUniversalUpdateCollection {
 	return &MsgUniversalUpdateCollection{
 		Creator:      "",
-		CollectionId: sdkmath.NewUint(0), //We use 0 to indicate a new collection
+		CollectionId: sdkmath.NewUint(0), // We use 0 to indicate a new collection
 
-		//Exclusive to collection creations
+		// Exclusive to collection creations
 		DefaultBalances: &UserBalanceStore{},
 
-		//Applicable to creations and updates
+		// Applicable to creations and updates
 		ValidTokenIds:               []*UintRange{},
 		UpdateCollectionPermissions: false,
 		CollectionPermissions:       &CollectionPermissions{},
@@ -60,7 +60,7 @@ func BlankUniversalMsg() *MsgUniversalUpdateCollection {
 		TokenMetadata:               []*TokenMetadata{},
 		UpdateCustomData:            false,
 		CustomData:                  "",
-		UpdateCollectionApprovals:    false,
+		UpdateCollectionApprovals:   false,
 		CollectionApprovals:         []*CollectionApproval{},
 		UpdateStandards:             false,
 		Standards:                   []string{},

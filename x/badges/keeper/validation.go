@@ -15,7 +15,6 @@ type UniversalValidationParams struct {
 
 // Validates everything about the Msg is valid and returns (creatorNum, collection, permissions, error).
 func (k Keeper) UniversalValidate(ctx sdk.Context, collection *types.TokenCollection, params UniversalValidationParams) error {
-
 	// Assert all permissions
 	if params.MustBeManager {
 		// Check if gov authority

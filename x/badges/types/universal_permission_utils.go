@@ -61,7 +61,7 @@ func AddDefaultsIfNil(permission *UniversalPermissionDetails) *UniversalPermissi
 
 func GetUintRangesWithOptions(ranges []*UintRange, uses bool) []*UintRange {
 	if !uses {
-		ranges = []*UintRange{{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}} //dummy range
+		ranges = []*UintRange{{Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64)}} // dummy range
 		return ranges
 	} else {
 		return ranges
@@ -70,7 +70,7 @@ func GetUintRangesWithOptions(ranges []*UintRange, uses bool) []*UintRange {
 
 func GetListIdWithOptions(listId string, uses bool) string {
 	if !uses {
-		listId = "All" //dummy all-inclusive list
+		listId = "All" // dummy all-inclusive list
 		return listId
 	} else {
 		return listId
@@ -79,7 +79,7 @@ func GetListIdWithOptions(listId string, uses bool) string {
 
 func GetListWithOptions(list *AddressList, uses bool) *AddressList {
 	if !uses {
-		list = &AddressList{Addresses: []string{}, Whitelist: false} //All addresses
+		list = &AddressList{Addresses: []string{}, Whitelist: false} // All addresses
 	}
 
 	return list

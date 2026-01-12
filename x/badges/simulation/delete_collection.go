@@ -22,7 +22,7 @@ func SimulateMsgDeleteCollection(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDeleteCollection, "no accounts available"), nil, nil
 		}
-		
+
 		// Try to get a known-good collection ID first
 		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
@@ -32,13 +32,13 @@ func SimulateMsgDeleteCollection(
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDeleteCollection, "no collections exist"), nil, nil
 			}
 		}
-		
+
 		// Check if collection exists
 		collection, found := k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgDeleteCollection, "collection not found"), nil, nil
 		}
-		
+
 		// Use the collection's manager as the creator (or random account with 50% chance)
 		var simAccount simtypes.Account
 		if r.Intn(2) == 0 && collection.Manager != "" {
@@ -52,17 +52,17 @@ func SimulateMsgDeleteCollection(
 		} else {
 			simAccount = EnsureAccountExists(r, accs)
 		}
-		
+
 		msg := &types.MsgDeleteCollection{
 			Creator:      simAccount.Address.String(),
 			CollectionId: collectionId,
 		}
-		
+
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), err.Error()), nil, nil
 		}
-		
+
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }

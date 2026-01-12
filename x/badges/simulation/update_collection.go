@@ -22,7 +22,7 @@ func SimulateMsgUniversalUpdateCollection(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUniversalUpdateCollection, "no accounts available"), nil, nil
 		}
-		
+
 		// Try to get a known-good collection ID first
 		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
@@ -38,13 +38,13 @@ func SimulateMsgUniversalUpdateCollection(
 				collectionId = createdId
 			}
 		}
-		
+
 		// Check if collection exists
 		collection, found := k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUniversalUpdateCollection, "collection not found"), nil, nil
 		}
-		
+
 		// Use the collection's manager as the creator (or random account with 50% chance)
 		var simAccount simtypes.Account
 		if r.Intn(2) == 0 && collection.Manager != "" {
@@ -58,7 +58,7 @@ func SimulateMsgUniversalUpdateCollection(
 		} else {
 			simAccount = EnsureAccountExists(r, accs)
 		}
-		
+
 		// Randomly decide which fields to update
 		updateCollectionPermissions := r.Intn(2) == 0
 		updateIsArchived := r.Intn(2) == 0
@@ -69,7 +69,7 @@ func SimulateMsgUniversalUpdateCollection(
 		updateCollectionApprovals := r.Intn(2) == 0
 		updateStandards := r.Intn(2) == 0
 		updateValidTokenIds := r.Intn(2) == 0
-		
+
 		msg := &types.MsgUniversalUpdateCollection{
 			Creator:                     simAccount.Address.String(),
 			CollectionId:                collectionId,
@@ -83,7 +83,7 @@ func SimulateMsgUniversalUpdateCollection(
 			UpdateStandards:             updateStandards,
 			UpdateValidTokenIds:         updateValidTokenIds,
 		}
-		
+
 		// Set values only if updating
 		if updateIsArchived {
 			msg.IsArchived = r.Intn(2) == 0
@@ -120,12 +120,12 @@ func SimulateMsgUniversalUpdateCollection(
 		if updateStandards {
 			msg.Standards = []string{}
 		}
-		
+
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), err.Error()), nil, nil
 		}
-		
+
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }

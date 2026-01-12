@@ -29,7 +29,6 @@ func CmdGetDynamicStoreValue() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetDynamicStoreValueRequest{
-
 				StoreId: reqStoreId,
 				Address: reqAddress,
 			}
@@ -46,4 +45,4 @@ func CmdGetDynamicStoreValue() *cobra.Command {
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
-} 
+}

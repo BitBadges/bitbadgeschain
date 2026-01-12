@@ -36,7 +36,6 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 }
 
 func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) *UserOutgoingApproval {
-
 	approvalCriteria := CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserOutgoingApproval{
@@ -54,7 +53,6 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 }
 
 func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, toAddress string) *CollectionApproval {
-
 	approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &CollectionApproval{
@@ -73,7 +71,6 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 }
 
 func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) *UserIncomingApproval {
-
 	approvalCriteria := CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserIncomingApproval{

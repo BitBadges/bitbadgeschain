@@ -43,7 +43,7 @@ func GenerateSwapAndActionWithIBCTransfer(poolID string, denomIn, denomOut strin
 		IBCTransfer: &customhookstypes.IBCTransferInfo{
 			IBCInfo: &customhookstypes.IBCInfo{
 				SourceChannel: channelID,
-				Receiver:     recipient,
+				Receiver:      recipient,
 			},
 		},
 	}
@@ -61,4 +61,3 @@ func GenerateHookData(swapAndAction *customhookstypes.SwapAndAction) *customhook
 func GenerateTokenCoin(denom string, amount int64) sdk.Coin {
 	return sdk.NewCoin(denom, sdkmath.NewInt(amount))
 }
-

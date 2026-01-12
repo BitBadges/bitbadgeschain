@@ -50,4 +50,3 @@ func (c *NoForcefulPostMintTransfersChecker) Check(ctx sdk.Context, approval *ty
 
 	return "", nil
 }
-

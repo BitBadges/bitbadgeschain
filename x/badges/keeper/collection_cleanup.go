@@ -1,9 +1,9 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -26,7 +26,7 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		balanceKeysToDelete = append(balanceKeysToDelete, balanceKey)
 	}
 	balanceIterator.Close()
-	
+
 	// Delete all balance keys
 	for _, balanceKey := range balanceKeysToDelete {
 		k.DeleteUserBalanceFromStore(ctx, balanceKey)
@@ -96,4 +96,3 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 
 	return nil
 }
-

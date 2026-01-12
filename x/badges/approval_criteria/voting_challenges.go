@@ -126,4 +126,3 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 
 	return "", nil
 }
-

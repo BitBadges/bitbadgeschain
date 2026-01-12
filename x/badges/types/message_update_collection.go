@@ -126,7 +126,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		}
 	}
 
-	//IMPORTANT: Default balances should only be able to specify general rules for incoming and outgoing approvals
+	// IMPORTANT: Default balances should only be able to specify general rules for incoming and outgoing approvals
 	//           They should not be able to specify approval criteria like coin transfers, approval amounts, etc.
 	//           This prevents default approval attacks where a creator can set an approval that approves a coin transfer
 	//           and then use that approval to transfer coins without their permissions

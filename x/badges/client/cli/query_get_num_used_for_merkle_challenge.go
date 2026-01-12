@@ -26,7 +26,6 @@ func CmdGetChallengeTracker() *cobra.Command {
 		Short: "Query challenge tracker",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

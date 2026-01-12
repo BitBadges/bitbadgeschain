@@ -27,7 +27,7 @@ func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferT
 		return nil, ErrCollectionNotExists
 	}
 
-	if err := k.Keeper.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
+	if err := k.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
 		return nil, err
 	}
 

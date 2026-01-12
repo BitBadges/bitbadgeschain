@@ -29,7 +29,9 @@ func (c *ReservedProtocolAddressChecker) Name() string {
 // Check validates that forceful transfers from reserved protocol addresses are disallowed
 // This is an important check to prevent abuse of systems built on top of our standard
 // Ex: For liquidity pools, we don't want to allow forceful revocations from manager or any addresses
-//     because this would mess up the entire escrow system and could cause infinite liquidity glitches
+//
+//	because this would mess up the entire escrow system and could cause infinite liquidity glitches
+//
 // Bypass this check if the address is actually initiating it
 func (c *ReservedProtocolAddressChecker) Check(ctx sdk.Context, approval *types.CollectionApproval, collection *types.TokenCollection, to string, from string, initiator string, approvalLevel string, approverAddress string, merkleProofs []*types.MerkleProof, ethSignatureProofs []*types.ETHSignatureProof, memo string, isPrioritized bool) (string, error) {
 	approvalCriteria := approval.ApprovalCriteria
@@ -50,4 +52,3 @@ func (c *ReservedProtocolAddressChecker) Check(ctx sdk.Context, approval *types.
 
 	return "", nil
 }
-

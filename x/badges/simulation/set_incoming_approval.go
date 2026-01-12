@@ -23,7 +23,7 @@ func SimulateMsgSetIncomingApproval(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetIncomingApproval, "no accounts available"), nil, nil
 		}
-		
+
 		// Try to get a known-good collection ID first
 		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
@@ -39,22 +39,22 @@ func SimulateMsgSetIncomingApproval(
 				collectionId = createdId
 			}
 		}
-		
+
 		// Check if collection exists
 		_, found = k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetIncomingApproval, "collection not found"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
-		
+
 		// Generate incoming approval
 		approvalId := simtypes.RandStringOfLength(r, 10)
 		fromListId := "All"
 		if r.Intn(3) == 0 {
 			fromListId = GetRandomAddresses(r, 1, accs)[0]
 		}
-		
+
 		approval := &types.UserIncomingApproval{
 			ApprovalId:        approvalId,
 			FromListId:        fromListId,
@@ -65,19 +65,18 @@ func SimulateMsgSetIncomingApproval(
 			ApprovalCriteria:  &types.IncomingApprovalCriteria{},
 			Version:           sdkmath.NewUint(0),
 		}
-		
+
 		msg := &types.MsgSetIncomingApproval{
 			Creator:      simAccount.Address.String(),
 			CollectionId: collectionId,
 			Approval:     approval,
 		}
-		
+
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), err.Error()), nil, nil
 		}
-		
+
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
-

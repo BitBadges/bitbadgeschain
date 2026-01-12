@@ -205,7 +205,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 	collection := &types.TokenCollection{}
 	if msg.CollectionId.Equal(sdkmath.NewUint(NewCollectionId)) {
-		//Creation case
+		// Creation case
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		if err := k.IncrementNextCollectionId(ctx); err != nil {
 			return nil, err
@@ -266,7 +266,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			}
 		}
 	} else {
-		//Update case
+		// Update case
 		found := false
 		collection, found = k.GetCollectionFromStore(ctx, msg.CollectionId)
 		if !found {
@@ -274,7 +274,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	//Check must be manager
+	// Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,
 		MustBeManager: true,
@@ -283,10 +283,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-	//Other cases:
-	//previouslyArchived && not stillArchived - we have just unarchived the collection
-	//not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
-	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
+	// Other cases:
+	// previouslyArchived && not stillArchived - we have just unarchived the collection
+	// not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
+	// not previouslyArchived && not stillArchived - unarchived before and now so we allow
 	previouslyArchived := types.GetIsArchived(ctx, collection)
 	if msg.UpdateIsArchived {
 		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchived, msg.IsArchived, collection.CollectionPermissions.CanArchiveCollection); err != nil {

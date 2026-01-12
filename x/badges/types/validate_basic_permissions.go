@@ -5,7 +5,7 @@ import (
 )
 
 func ValidatePermanentlyPermittedTimes(permanentlyPermittedTimes []*UintRange, permanentlyForbiddenTimes []*UintRange) error {
-	//Check if any overlap between permanentlyPermittedTimes and permanentlyForbiddenTimes
+	// Check if any overlap between permanentlyPermittedTimes and permanentlyForbiddenTimes
 	err := ValidateRangesAreValid(permanentlyPermittedTimes, false, false)
 	if err != nil {
 		return sdkerrors.Wrap(err, "permanentlyPermittedTimes is invalid")
@@ -151,7 +151,6 @@ func ValidateUserIncomingApprovalPermissions(permissions []*UserIncomingApproval
 			permission.PermanentlyPermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyPermittedTimes)
 			permission.PermanentlyForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyForbiddenTimes)
 		}
-
 	}
 
 	return nil
@@ -180,7 +179,6 @@ func ValidateTokenIdsActionPermission(permissions []*TokenIdsActionPermission, c
 			permission.PermanentlyPermittedTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyPermittedTimes)
 			permission.PermanentlyForbiddenTimes = SortUintRangesAndMergeAdjacentAndIntersecting(permission.PermanentlyForbiddenTimes)
 		}
-
 	}
 
 	return nil

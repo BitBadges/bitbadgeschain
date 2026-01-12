@@ -75,7 +75,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 			toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
 
 			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
-				//Here, we precalculate balances from a specified approval
+				// Here, we precalculate balances from a specified approval
 				precalcDetails := transfer.PrecalculateBalancesFromApproval
 				transferMetadata := TransferMetadata{
 					From:            transfer.From,
@@ -112,7 +112,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 					}
 				}
 
-				//Precaluclate the balances that will be transferred
+				// Precaluclate the balances that will be transferred
 				transfer.Balances, err = k.GetPredeterminedBalancesForPrecalculationId(
 					ctx,
 					collection,
@@ -124,7 +124,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 					return err
 				}
 
-				//TODO: Deprecate this in favor of actually calculating the balances in indexer
+				// TODO: Deprecate this in favor of actually calculating the balances in indexer
 				amountsJsonData, err := json.Marshal(transfer)
 				if err != nil {
 					return err
@@ -339,8 +339,8 @@ func (k Keeper) HandleTransfer(
 	}
 
 	for _, balance := range transferBalances {
-		//Mint has unlimited balances
-		//Backed addresses (wrapper and backed paths) have unlimited balances
+		// Mint has unlimited balances
+		// Backed addresses (wrapper and backed paths) have unlimited balances
 		if !types.IsMintAddress(from) && !k.IsSpecialBackedAddress(ctx, collection, from) {
 			fromUserBalance.Balances, err = types.SubtractBalance(ctx, fromUserBalance.Balances, balance, false)
 			if err != nil {

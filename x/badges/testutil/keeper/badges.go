@@ -43,16 +43,16 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
-	
+
 	// Ensure SDK config is initialized with "bb" prefix before it gets sealed
 	// This must be called before any address validation happens
 	params.InitSDKConfigWithoutSeal()
-	
+
 	// Use bech32 codec with "bb" prefix
 	bech32Codec := address.NewBech32Codec("bb")
-	
+
 	authorityAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
-	
+
 	// Convert authority to "bb" prefix to match account keeper setup
 	authorityStr, err := bech32Codec.BytesToString(authorityAddr)
 	if err != nil {
