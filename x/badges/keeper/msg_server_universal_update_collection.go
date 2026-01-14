@@ -127,7 +127,9 @@ func (k msgServer) setReservedProtocolAddressForPath(ctx sdk.Context, address st
 
 // validateAddressListIdsForMint checks FromListId in collection approvals only
 // to ensure Mint address is not included with other addresses.
-// Mint alone (in whitelist or blacklist) is fine, but Mint with other addresses is not allowed.
+// Mint alone (in whitelist) is fine, but Mint with other addresses is not allowed.
+// When Mint is used standalone, it must have overridesFromOutgoingApprovals = true
+// because the Mint address is uncontrollable, so you must override its outgoing approvals via the collection level.
 func (k msgServer) validateAddressListIdsForMint(ctx sdk.Context, collection *types.TokenCollection) error {
 	// Validate only FromListId in collection approvals
 	for _, approval := range collection.CollectionApprovals {
@@ -143,6 +145,11 @@ func (k msgServer) validateAddressListIdsForMint(ctx sdk.Context, collection *ty
 			}
 			if !addressList.Whitelist || len(addressList.Addresses) != 1 || addressList.Addresses[0] != types.MintAddress {
 				return errorsmod.Wrapf(ErrMintAddressInAddressList, "address list: %s, approval: %s", approval.FromListId, approval.ApprovalId)
+			}
+			// If Mint is used standalone, it must have overridesFromOutgoingApprovals = true
+			// because the Mint address is uncontrollable, so you must override its outgoing approvals via the collection level
+			if approval.ApprovalCriteria == nil || !approval.ApprovalCriteria.OverridesFromOutgoingApprovals {
+				return errorsmod.Wrapf(types.ErrInvalidRequest, "Mint address is uncontrollable, so when used standalone in fromList (address list: %s, approval: %s), you must set overridesFromOutgoingApprovals = true to override its outgoing approvals via the collection level", approval.FromListId, approval.ApprovalId)
 			}
 		}
 	}
@@ -271,7 +278,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		found := false
 		collection, found = k.GetCollectionFromStore(ctx, msg.CollectionId)
 		if !found {
-			return nil, ErrCollectionNotExists
+			return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", msg.CollectionId.String())
 		}
 	}
 
@@ -297,7 +304,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 	stillArchived := types.GetIsArchived(ctx, collection)
 	if previouslyArchived && stillArchived {
-		return nil, ErrCollectionIsArchived
+		return nil, errorsmod.Wrapf(ErrCollectionIsArchived, "collection ID %s is currently archived (read-only)", msg.CollectionId.String())
 	}
 
 	if msg.UpdateCollectionApprovals {

@@ -38,6 +38,19 @@ func duplicateInStringArray(arr []string) bool {
 	return false
 }
 
+// findDuplicateInStringArray returns the first duplicate value found and its indices
+func findDuplicateInStringArray(arr []string) (string, int, int) {
+	visited := make(map[string]int, 0)
+	for i := 0; i < len(arr); i++ {
+		if prevIndex, exists := visited[arr[i]]; exists {
+			return arr[i], prevIndex, i
+		} else {
+			visited[arr[i]] = i
+		}
+	}
+	return "", -1, -1
+}
+
 // Validate uri and subasset uri returns whether both the uri and subasset uri is valid. Max 100 characters each.
 func ValidateURI(uri string) error {
 	if uri == "" {
@@ -133,33 +146,48 @@ func ValidateRangesAreValid(tokenUintRanges []*UintRange, allowAllUints bool, er
 		}
 	}
 
-	for _, tokenUintRange := range tokenUintRanges {
+	for i, tokenUintRange := range tokenUintRanges {
 		if tokenUintRange == nil {
-			return ErrRangesIsNil
+			return sdkerrors.Wrapf(ErrRangesIsNil, "range at index %d is nil", i)
 		}
 
 		if tokenUintRange.Start.IsNil() || tokenUintRange.End.IsNil() {
-			return sdkerrors.Wrapf(ErrUintUnititialized, "ID range start and/or end is nil")
+			return sdkerrors.Wrapf(ErrUintUnititialized, "ID range at index %d has nil start and/or end", i)
 		}
 
 		if tokenUintRange.Start.GT(tokenUintRange.End) {
-			return ErrStartGreaterThanEnd
+			return sdkerrors.Wrapf(ErrStartGreaterThanEnd, "range at index %d has start %s greater than end %s", i, tokenUintRange.Start.String(), tokenUintRange.End.String())
 		}
 
 		if !allowAllUints {
 			if tokenUintRange.Start.IsZero() || tokenUintRange.End.IsZero() {
-				return sdkerrors.Wrapf(ErrUintUnititialized, "ID range start and/or end is zero")
+				return sdkerrors.Wrapf(ErrUintUnititialized, "ID range at index %d has zero start and/or end", i)
 			}
 
 			if tokenUintRange.Start.GT(sdkmath.NewUint(MaxUint64Value)) || tokenUintRange.End.GT(sdkmath.NewUint(MaxUint64Value)) {
-				return ErrUintGreaterThanMax
+				maxValue := sdkmath.NewUint(MaxUint64Value)
+				if tokenUintRange.Start.GT(maxValue) {
+					return sdkerrors.Wrapf(ErrUintGreaterThanMax, "range at index %d has start %s greater than max %s", i, tokenUintRange.Start.String(), maxValue.String())
+				}
+				return sdkerrors.Wrapf(ErrUintGreaterThanMax, "range at index %d has end %s greater than max %s", i, tokenUintRange.End.String(), maxValue.String())
 			}
 		}
 	}
 
 	overlap := DoRangesOverlap(tokenUintRanges)
 	if overlap {
-		return ErrRangesOverlap
+		// Find and report which ranges overlap
+		for i := 0; i < len(tokenUintRanges); i++ {
+			for j := i + 1; j < len(tokenUintRanges); j++ {
+				if tokenUintRanges[i] != nil && tokenUintRanges[j] != nil {
+					if tokenUintRanges[i].Start.LTE(tokenUintRanges[j].End) && tokenUintRanges[j].Start.LTE(tokenUintRanges[i].End) {
+						return sdkerrors.Wrapf(ErrRangesOverlap, "ranges at indices %d [%s-%s] and %d [%s-%s] overlap", i, tokenUintRanges[i].Start.String(), tokenUintRanges[i].End.String(), j, tokenUintRanges[j].Start.String(), tokenUintRanges[j].End.String())
+					}
+				}
+			}
+		}
+		// Fallback if we couldn't identify specific overlapping ranges (shouldn't happen, but safety check)
+		return sdkerrors.Wrapf(ErrRangesOverlap, "ranges overlap but could not identify specific overlapping pair")
 	}
 
 	return nil
@@ -290,7 +318,8 @@ func ValidateAddressList(addressList *AddressList) error {
 
 	// check duplicate addresses
 	if duplicateInStringArray(addressList.Addresses) {
-		return ErrDuplicateAddresses
+		dupValue, firstIdx, secondIdx := findDuplicateInStringArray(addressList.Addresses)
+		return sdkerrors.Wrapf(ErrDuplicateAddresses, "duplicate address '%s' found at indices %d and %d", dupValue, firstIdx, secondIdx)
 	}
 
 	return nil
@@ -332,7 +361,8 @@ func ValidateAddressListInput(addressListInput *AddressListInput) error {
 
 	// check duplicate addresses
 	if duplicateInStringArray(addressListInput.Addresses) {
-		return ErrDuplicateAddresses
+		dupValue, firstIdx, secondIdx := findDuplicateInStringArray(addressListInput.Addresses)
+		return sdkerrors.Wrapf(ErrDuplicateAddresses, "duplicate address '%s' found at indices %d and %d", dupValue, firstIdx, secondIdx)
 	}
 
 	return nil
@@ -724,29 +754,31 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(ErrInvalidRequest, "order type is nil")
 					}
 
-					numTrue := 0
+					var enabledOptions []string
 					if orderType.UseMerkleChallengeLeafIndex {
-						numTrue++
+						enabledOptions = append(enabledOptions, "useMerkleChallengeLeafIndex")
 					}
-
 					if orderType.UseOverallNumTransfers {
-						numTrue++
+						enabledOptions = append(enabledOptions, "useOverallNumTransfers")
 					}
-
 					if orderType.UsePerToAddressNumTransfers {
-						numTrue++
+						enabledOptions = append(enabledOptions, "usePerToAddressNumTransfers")
 					}
-
 					if orderType.UsePerFromAddressNumTransfers {
-						numTrue++
+						enabledOptions = append(enabledOptions, "usePerFromAddressNumTransfers")
 					}
-
 					if orderType.UsePerInitiatedByAddressNumTransfers {
-						numTrue++
+						enabledOptions = append(enabledOptions, "usePerInitiatedByAddressNumTransfers")
 					}
 
-					if numTrue != 1 {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "only one of use challenge leaf index, use overall num transfers, use per to address num transfers, use per from address num transfers, use per initiated by address num transfers can be true")
+					if len(enabledOptions) != 1 {
+						var statusMsg string
+						if len(enabledOptions) == 0 {
+							statusMsg = "none enabled"
+						} else {
+							statusMsg = fmt.Sprintf("enabled: %s", strings.Join(enabledOptions, ", "))
+						}
+						return sdkerrors.Wrapf(ErrInvalidRequest, "when using predetermined balances, exactly one order calculation can be set to true (%s)", statusMsg)
 					}
 
 					var err error
@@ -1026,7 +1058,7 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 
 	err = ValidateNoStringElementIsX(transfer.ToAddresses, transfer.From)
 	if err != nil {
-		return ErrSenderAndReceiverSame
+		return sdkerrors.Wrapf(ErrSenderAndReceiverSame, "sender address '%s' cannot equal any receiver address", transfer.From)
 	}
 
 	err = ValidateAddress(transfer.From, true)
@@ -1035,7 +1067,8 @@ func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool)
 	}
 
 	if duplicateInStringArray(transfer.ToAddresses) {
-		return ErrDuplicateAddresses
+		dupValue, firstIdx, secondIdx := findDuplicateInStringArray(transfer.ToAddresses)
+		return sdkerrors.Wrapf(ErrDuplicateAddresses, "duplicate address '%s' found in ToAddresses at indices %d and %d", dupValue, firstIdx, secondIdx)
 	}
 
 	for _, address := range transfer.ToAddresses {

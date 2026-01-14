@@ -499,6 +499,7 @@ func (suite *TestSuite) TestValidateAddressListIdsForMint() {
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
 				TokenIds:          GetFullUintRanges(),
+				ApprovalCriteria:  &types.ApprovalCriteria{OverridesFromOutgoingApprovals: true},
 			},
 		},
 	}

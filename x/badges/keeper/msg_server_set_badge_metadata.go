@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -18,7 +19,7 @@ func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetToke
 	// Get existing collection to fetch current permissions
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
-		return nil, ErrCollectionNotExists
+		return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", msg.CollectionId.String())
 	}
 
 	// Construct the full UniversalUpdateCollection message

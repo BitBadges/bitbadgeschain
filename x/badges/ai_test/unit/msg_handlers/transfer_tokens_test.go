@@ -29,6 +29,8 @@ func (suite *TransferTokensTestSuite) SetupTest() {
 func (suite *TransferTokensTestSuite) TestTransferTokens_ValidTransfer() {
 	// First, set up collection approval that allows minting (from Mint address)
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
+	mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true
 	updateMintMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -103,6 +105,8 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_ValidTransfer() {
 func (suite *TransferTokensTestSuite) TestTransferTokens_WithoutApprovals() {
 	// Set up collection approval that allows minting (from Mint address)
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
+	mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true
 	updateMintMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,
@@ -154,6 +158,8 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_InvalidCollection() {
 func (suite *TransferTokensTestSuite) TestTransferTokens_MultiRecipient() {
 	// First, set up collection approval that allows minting (from Mint address)
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
+	mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true
 	updateMintMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:              suite.CollectionId,

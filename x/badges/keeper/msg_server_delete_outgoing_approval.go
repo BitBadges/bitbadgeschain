@@ -26,7 +26,7 @@ func (k msgServer) DeleteOutgoingApproval(goCtx context.Context, msg *types.MsgD
 	// Get current user balance to filter out the approval to delete
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
-		return nil, ErrCollectionNotExists
+		return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", collectionId.String())
 	}
 
 	userBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
