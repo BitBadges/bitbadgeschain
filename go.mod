@@ -3,9 +3,8 @@ module github.com/bitbadges/bitbadgeschain
 go 1.24.5
 
 replace (
-	// fix upstream GHSA-h395-qcrw-5vmq vulnerability.
+	github.com/cometbft/cometbft => github.com/cometbft/cometbft-sec-tachyon v0.38.21-0.20260113214209-9ac677707f85
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
-	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
 

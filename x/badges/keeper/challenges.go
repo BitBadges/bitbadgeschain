@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	MaxMerkleProofLength = 10
+	MaxMerkleProofLength = 20
 )
 
 // HandleMerkleChallenges processes merkle challenges for approval validation
