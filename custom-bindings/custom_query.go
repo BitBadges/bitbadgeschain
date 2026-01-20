@@ -172,7 +172,7 @@ func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier
 			if err != nil {
 				return nil, err
 			}
-			return json.Marshal(tokenTypes.QueryGetWrappableBalancesResponse{MaxWrappableAmount: res.MaxWrappableAmount})
+			return json.Marshal(tokenTypes.QueryGetWrappableBalancesResponse{Amount: res.Amount})
 		}
 		return nil, sdkerrors.Wrap(types.ErrInvalidMsg, "Unknown Custom query variant")
 	}

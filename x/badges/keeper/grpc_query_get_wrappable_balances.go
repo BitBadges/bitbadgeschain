@@ -57,7 +57,7 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	}
 
 	return &types.QueryGetWrappableBalancesResponse{
-		MaxWrappableAmount: maxWrappableAmount,
+		Amount: maxWrappableAmount,
 	}, nil
 }
 
