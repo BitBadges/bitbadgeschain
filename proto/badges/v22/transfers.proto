@@ -1,0 +1,57 @@
+syntax = "proto3";
+package badges.v22;
+
+import "gogoproto/gogo.proto";
+import "badges/v22/balances.proto";
+import "badges/v22/approvals.proto";
+import "badges/v22/challenges.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v22";
+
+// Transfer defines the details of a transfer of tokens.
+message Transfer {
+  // The address of the sender of the transfer.
+  string from = 1;
+  // The addresses of the recipients of the transfer.
+  repeated string toAddresses = 2;
+  // The balances to be transferred.
+  repeated Balance balances = 3;
+  // If defined, we will use the predeterminedBalances from the specified approval to calculate the balances at execution time.
+  // We will override the balances field with the precalculated balances. Only applicable for approvals with predeterminedBalances set.
+  PrecalculateBalancesFromApprovalDetails precalculateBalancesFromApproval = 4;
+  // The Merkle proofs / solutions for all Merkle challenges required for the transfer.
+  repeated MerkleProof merkleProofs = 5;
+  // The ETH signature proofs / solutions for all ETH signature challenges required for the transfer.
+  repeated ETHSignatureProof ethSignatureProofs = 6;
+  // The memo for the transfer.
+  string memo = 7;
+  // The prioritized approvals for the transfer. By default, we scan linearly through the approvals and use the first match.
+  // This field can be used to prioritize specific approvals and scan through them first.
+  repeated ApprovalIdentifierDetails prioritizedApprovals = 8;
+  // Whether to only check prioritized approvals for the transfer. 
+  // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
+  // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
+  bool onlyCheckPrioritizedCollectionApprovals = 9;
+  // Whether to only check prioritized approvals for the transfer. 
+  // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
+  // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
+  bool onlyCheckPrioritizedIncomingApprovals = 10;
+  // Whether to only check prioritized approvals for the transfer. 
+  // If true, we will only check the prioritized approvals and fail if none of them match (i.e. do not check any non-prioritized approvals).
+  // If false, we will check the prioritized approvals first and then scan through the rest of the approvals. 
+  bool onlyCheckPrioritizedOutgoingApprovals = 11;
+}
+
+// PrecalculateBalancesFromApprovalDetails defines the details for precalculating balances from an approval.
+message PrecalculateBalancesFromApprovalDetails {
+  // The ID of the approval.
+  string approvalId = 1;
+  // The level of the approval. Can be "collection", "incoming", or "outgoing".
+  string approvalLevel = 2;
+  // The address of the approver. Leave blank "" if approvalLevel == "collection".
+  string approverAddress = 3;
+  // The version of the approval.
+  string version = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The options for precalculating the balances.
+  PrecalculationOptions precalculationOptions = 5;
+}

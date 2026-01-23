@@ -1,0 +1,185 @@
+syntax = "proto3";
+package badges.v22;
+
+import "google/protobuf/any.proto";
+import "badges/v22/transfers.proto";
+import "badges/v22/balances.proto";
+import "badges/v22/permissions.proto";
+import "badges/v22/metadata.proto";
+import "badges/v22/approvals.proto";
+import "badges/v22/user_balance_store.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/badges/types/v22";
+
+/* 
+  A TokenCollection is the top-level object for a collection of tokens. 
+  It defines everything about the collection, such as the manager, metadata, etc.
+
+  All collections are identified by a collectionId assigned by the blockchain, which is a uint64 that increments (i.e. the first collection has ID 1).
+
+  All collections can have a manager who is responsible for managing the collection and can be granted certain admin
+  permissions, such as the ability to mint new tokens.
+
+  Collections may have different balance types: standard vs. off-chain - indexed vs. inherited.vs off-chain - non-indexed vs non-public.
+  
+  See documentation for more details.
+*/
+message TokenCollection {
+  // The unique identifier for this collection. This is assigned by the blockchain. First collection has ID 1.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The metadata for the collection itself.
+  CollectionMetadata collectionMetadata = 2;
+  
+  // The metadata for each token in the collection.
+  repeated TokenMetadata tokenMetadata = 3;
+  
+  // An arbitrary field that can store any data.
+  string customData = 4;
+  
+  // The address of the manager of this collection.
+  string manager = 5;
+  
+  // Permissions that define what the manager of the collection can do or not do.
+  CollectionPermissions collectionPermissions = 6;
+  
+  // Transferability of the collection for collections with standard balances, subject to changes over time.
+  // Overrides user approvals for a transfer if specified.
+  // Transfer must satisfy both user and collection-level approvals.
+  // Only applicable to on-chain balances.
+  repeated CollectionApproval collectionApprovals = 7;
+  
+  // Standards that define how to interpret the fields of the collection.
+  repeated string standards = 8;
+
+  // Whether the collection is archived or not.
+  // When archived, it becomes read-only, and no transactions can be processed until it is unarchived.
+  bool isArchived = 9;
+
+  // The default store of a balance / approvals for a user, upon genesis.
+  UserBalanceStore defaultBalances = 10;
+
+  // The user or entity who created the collection.
+  string createdBy = 11;
+
+  // The valid token IDs for this collection.
+  repeated UintRange validTokenIds = 12;
+
+  //The generated address of the collection. Also used to escrow Mint balances.
+  string mintEscrowAddress = 13;
+
+  // The IBC wrapper (sdk.coin) paths for the collection.
+  repeated CosmosCoinWrapperPath cosmosCoinWrapperPaths = 14;
+
+  // Collection-level invariants that cannot be broken.
+  // These are set upon genesis and cannot be modified.
+  CollectionInvariants invariants = 15;
+
+  // The alias (non-wrapping) paths for the collection.
+  repeated AliasPath aliasPaths = 16;
+}
+
+// Conversion defines a bidirectional conversion between a cosmos coin (with denom) and badge balances.
+message Conversion {
+  // Side A: The cosmos coin side of the conversion (amount + denom).
+  ConversionSideAWithDenom sideA = 1;
+  // Side B: The badge balances side of the conversion.
+  repeated Balance sideB = 2;
+}
+
+// ConversionSideAWithDenom represents the cosmos coin side of a conversion with denomination.
+message ConversionSideAWithDenom {
+  // The amount of the cosmos coin (0 decimals).
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The denomination of the cosmos coin.
+  string denom = 2;
+}
+
+// ConversionWithoutDenom defines a bidirectional conversion between a cosmos coin amount (without denom) and badge balances.
+// The denom is stored at the base level (e.g., in AliasPath or CosmosCoinWrapperPath).
+message ConversionWithoutDenom {
+  // Side A: The cosmos coin amount side of the conversion (amount only, denom stored separately).
+  ConversionSideA sideA = 1;
+  // Side B: The badge balances side of the conversion.
+  repeated Balance sideB = 2;
+}
+
+// ConversionSideA represents the cosmos coin amount side of a conversion without denomination.
+message ConversionSideA {
+  // The amount of the cosmos coin (0 decimals).
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message CosmosCoinWrapperPath {
+  // The BitBadges address associated with this wrapper path. Used for routing and identifying the wrapper.
+  string address = 1;
+  // The denomination (denom) to be used for the wrapped coin or the alias denom.
+  string denom = 2;
+  // The conversion between cosmos coin and badge balances.
+  ConversionWithoutDenom conversion = 3;
+  // The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
+  string symbol = 4;
+  // Denomination units for the wrapped coin. Defines how the coin can be displayed with different
+  // decimal places and symbols (e.g., base unit, display unit). You can specify which is the default display unit (base level or one of these).
+  repeated DenomUnit denomUnits = 5;
+  // If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
+  bool allowOverrideWithAnyValidToken = 6;
+  // The metadata for this wrapper path.
+  PathMetadata metadata = 7;
+}
+
+message AliasPath {
+  // The denomination (denom) to be used for the alias.
+  string denom = 1;
+  // The conversion between cosmos coin and badge balances.
+  ConversionWithoutDenom conversion = 2;
+  // The symbol for the alias (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
+  string symbol = 3;
+  // Denomination units for the alias. Defines how the coin can be displayed with different decimal places and symbols.
+  repeated DenomUnit denomUnits = 4;
+  // The metadata for this alias path.
+  PathMetadata metadata = 5;
+}
+
+message CosmosCoinBackedPath {
+  // The address associated with this backed path. Used for routing and escrowing IBC tokens.
+  string address = 1;
+  // The conversion between IBC cosmos coin and badge balances.
+  Conversion conversion = 2;
+}
+
+message DenomUnit {
+  // The number of decimal places for this unit. Defines the precision of the unit.
+  string decimals = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The symbol for this unit (e.g., "BADGE", "nBADGE"). Used for display purposes.
+  string symbol = 2;
+  // If true, this is the default display unit. Only one unit should be marked as the default display unit.
+  // This unit will be used by default when displaying the coin amount. If none are marked default, we use the base level.
+  bool isDefaultDisplay = 3;
+  // The metadata for this denomination unit.
+  PathMetadata metadata = 4;
+}
+
+// CollectionInvariants defines the invariants that apply to a collection.
+message CollectionInvariants {
+  // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
+  // This prevents time-based restrictions on token ownership.
+  bool noCustomOwnershipTimes = 1;
+  
+  // Maximum supply per token ID. If set, no balance can exceed this amount.
+  // This prevents any single token ID from having more than the specified supply.
+  string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
+  CosmosCoinBackedPath cosmosCoinBackedPath = 3;
+  
+  // If true, disallows any collection approvals that have overridesFromOutgoingApprovals or overridesToIncomingApprovals set to true.
+  // This prevents forceful transfers that bypass user-level approvals.
+  // This only applies to transfers where the from address does not equal "Mint".
+  bool noForcefulPostMintTransfers = 4;
+  
+  // If true, disallows pool creation with this collection's assets.
+  // When true, any attempt to create a pool with badges assets from this collection will fail.
+  bool disablePoolCreation = 5;
+}

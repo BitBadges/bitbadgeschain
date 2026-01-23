@@ -10,7 +10,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v21"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/badges/types/v22"
 )
 
 // MigrateBadgesKeeper migrates the badges keeper from v21 to current version
