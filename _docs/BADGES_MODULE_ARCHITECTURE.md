@@ -384,18 +384,12 @@ func (k Keeper) ExecuteTransfer(ctx sdk.Context, transfer Transfer) error {
 
 ## Cross-Chain Integration Architecture
 
-### 1. Multi-Chain Signature Support
+### 1. Signature Support
 
 ```
 Signature Verification Layer:
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Ethereum        │    │ Bitcoin         │    │ Solana          │
-│ (EIP712)        │    │ (JSON Schema)   │    │ (JSON Schema)   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│ Unified Verification Engine                                     │
+│ Cosmos SDK Signature Verification                               │
 ├─────────────────────────────────────────────────────────────────┤
 │ • Schema validation                                             │
 │ • Signature verification                                        │

@@ -2,10 +2,9 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 
-	sdkerrors "cosmossdk.io/errors"
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -30,18 +29,18 @@ func DoBalancesExceedThreshold(ctx sdk.Context, balances []*Balance, thresholdBa
 
 func AddBalancesAndAssertDoesntExceedThreshold(ctx sdk.Context, currTally []*Balance, toAdd []*Balance, threshold []*Balance) ([]*Balance, error) {
 	var err error
-	//If we transferAsMuchAsPossible, we need to increment the currTally by all that we can
-	//We then need to return the updated toAdd
+	// If we transferAsMuchAsPossible, we need to increment the currTally by all that we can
+	// We then need to return the updated toAdd
 
 	currTally, err = AddBalances(ctx, toAdd, currTally)
 	if err != nil {
 		return []*Balance{}, err
 	}
 
-	//Check if we exceed the threshold; will underflow if we do exceed it
+	// Check if we exceed the threshold; will underflow if we do exceed it
 	err = DoBalancesExceedThreshold(ctx, currTally, threshold)
 	if err != nil {
-		return []*Balance{}, sdkerrors.Wrapf(err, "curr tally plus added amounts exceeds threshold")
+		return []*Balance{}, errorsmod.Wrapf(err, "curr tally plus added amounts exceeds threshold")
 	}
 
 	return currTally, nil
@@ -110,7 +109,7 @@ func HandleDuplicateTokenIds(ctx sdk.Context, balances []*Balance, canChangeValu
 
 // Updates the balance for a specific ids from what it currently is to newAmount. No add/subtract logic. Just set it.
 func UpdateBalance(ctx sdk.Context, newBalance *Balance, balances []*Balance) ([]*Balance, error) {
-	//Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
+	// Can maybe optimize this in the future by doing this all in one loop instead of deleting then setting
 	// ranges = SortUintRangesAndMerge(ranges)
 	var err error
 	balances, err = DeleteBalances(ctx, newBalance.TokenIds, newBalance.OwnershipTimes, balances)
@@ -156,43 +155,43 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	}
 
 	overlaps, _, inNewButNotOld := GetOverlapsAndNonOverlaps(ctx, currPermissionDetails, toFetchPermissionDetails)
-	//For all overlaps, we simply return the amount
+	// For all overlaps, we simply return the amount
 	for _, overlapObject := range overlaps {
 		// Validate overlap object structure
 		if overlapObject == nil {
-			return nil, fmt.Errorf("overlap object is nil")
+			return nil, errorsmod.Wrap(ErrOverlapObjectNil, "")
 		}
 
 		overlap := overlapObject.Overlap
 		if overlap == nil {
-			return nil, fmt.Errorf("overlap is nil in overlap object")
+			return nil, errorsmod.Wrap(ErrOverlapNil, "")
 		}
 
 		if overlap.TokenId == nil {
-			return nil, fmt.Errorf("TokenId is nil in overlap")
+			return nil, errorsmod.Wrap(ErrTokenIDNilInOverlap, "")
 		}
 
 		if overlap.OwnershipTime == nil {
-			return nil, fmt.Errorf("OwnershipTime is nil in overlap")
+			return nil, errorsmod.Wrap(ErrOwnershipTimeNilInOverlap, "")
 		}
 
 		// Safe type assertion with comprehensive error handling
 		if overlapObject.FirstDetails == nil {
-			return nil, fmt.Errorf("FirstDetails is nil in overlap object")
+			return nil, errorsmod.Wrap(ErrFirstDetailsNilInOverlap, "")
 		}
 
 		if overlapObject.FirstDetails.ArbitraryValue == nil {
-			return nil, fmt.Errorf("ArbitraryValue is nil in FirstDetails")
+			return nil, errorsmod.Wrap(ErrArbitraryValueNilInFirstDetails, "")
 		}
 
 		amount, ok := overlapObject.FirstDetails.ArbitraryValue.(sdkmath.Uint)
 		if !ok {
-			return nil, fmt.Errorf("invalid ArbitraryValue type: expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
+			return nil, errorsmod.Wrapf(ErrInvalidArbitraryValueType, "expected sdkmath.Uint, got %T", overlapObject.FirstDetails.ArbitraryValue)
 		}
 
 		// Additional validation: check for nil or invalid amount
 		if amount.IsNil() {
-			return nil, fmt.Errorf("amount is nil in ArbitraryValue")
+			return nil, errorsmod.Wrap(ErrAmountNilInArbitraryValue, "")
 		}
 
 		fetchedBalances = append(fetchedBalances, &Balance{
@@ -202,7 +201,7 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 		})
 	}
 
-	//For those that were in toFetch but not currBalances, we return amount == 0
+	// For those that were in toFetch but not currBalances, we return amount == 0
 	for _, detail := range inNewButNotOld {
 		fetchedBalances = append(fetchedBalances, &Balance{
 			Amount:         sdkmath.NewUint(0),
@@ -231,7 +230,7 @@ func GetOverlappingBalances(ctx sdk.Context, transferBalancesToCheck []*Balance,
 				OwnershipTimes: fetchedBalance.OwnershipTimes,
 			}
 
-			//Take min amount
+			// Take min amount
 			if balanceToAdd.Amount.GT(prevAmount) {
 				balanceToAdd.Amount = prevAmount
 			}
@@ -393,7 +392,7 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 
 	var err error
 
-	//Little clean up to start. We sort and if we have adjacent (note not intersecting), we  merge them
+	// Little clean up to start. We sort and if we have adjacent (note not intersecting), we  merge them
 	for _, balance := range balances {
 		balance.OwnershipTimes, err = SortUintRangesAndMerge(balance.OwnershipTimes, false)
 		if err != nil {
@@ -406,12 +405,12 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 		}
 	}
 
-	//Sort by amount in increasing order
+	// Sort by amount in increasing order
 	sort.Slice(balances, func(i, j int) bool {
 		return balances[i].Amount.LT(balances[j].Amount)
 	})
 
-	//See if we can merge on a cross-balance level
+	// See if we can merge on a cross-balance level
 	newBalances := []*Balance{}
 	for i := 0; i < len(balances); i++ {
 		currBalance := balances[i]
@@ -431,7 +430,7 @@ func SetBalances(newBalancesToSet []*Balance, balances []*Balance) ([]*Balance, 
 					break
 				}
 			} else if currBalance.Amount.GT(existingBalance.Amount) {
-				//We can't merge if the current balance has a greater amount (arr is sorted by amount)
+				// We can't merge if the current balance has a greater amount (arr is sorted by amount)
 				break
 			}
 		}
@@ -489,8 +488,7 @@ func IncrementBalances(
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	for _, startBalance := range balances {
-
-		if recurringOwnershipTimes != nil && !(recurringOwnershipTimes.IntervalLength.IsNil() || recurringOwnershipTimes.IntervalLength.IsZero()) {
+		if recurringOwnershipTimes != nil && (!recurringOwnershipTimes.IntervalLength.IsNil() && !recurringOwnershipTimes.IntervalLength.IsZero()) {
 			startTime := recurringOwnershipTimes.StartTime
 			intervalLength := recurringOwnershipTimes.IntervalLength
 			chargePeriodLength := recurringOwnershipTimes.ChargePeriodLength
@@ -499,7 +497,7 @@ func IncrementBalances(
 			// Edge case: Handle first charge period (throws with negative interval number if we don't handle this)
 			if now.LT(startTime) {
 				if chargePeriodLength.GT(startTime) {
-					return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+					return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 				}
 
 				// Check within first charge period
@@ -515,19 +513,19 @@ func IncrementBalances(
 					return balances, nil
 				}
 
-				return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 			}
 
-			//1. Calculate what interval we are in
+			// 1. Calculate what interval we are in
 			interval := now.Sub(startTime).Quo(intervalLength)
 			nextInterval := interval.Add(sdkmath.OneUint())
 
-			//2. Calculate the new intervals
+			// 2. Calculate the new intervals
 			newStartTime := startTime.Add(intervalLength.Mul(nextInterval))
 			newEndTime := newStartTime.Add(intervalLength).Sub(sdkmath.OneUint())
 			chargeAfterTime := newStartTime.Sub(chargePeriodLength)
 
-			//3. Assert that we are in the charge period
+			// 3. Assert that we are in the charge period
 			if now.GTE(chargeAfterTime) && now.LT(newStartTime) {
 				startBalance.OwnershipTimes = []*UintRange{
 					{
@@ -536,9 +534,8 @@ func IncrementBalances(
 					},
 				}
 			} else {
-				return balances, sdkerrors.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 			}
-
 		} else if durationFromTimestamp.IsZero() || durationFromTimestamp.IsNil() {
 			for _, time := range startBalance.OwnershipTimes {
 				time.Start = time.Start.Add(numIncrements.Mul(incrementOwnershipTimesBy))
@@ -557,24 +554,24 @@ func IncrementBalances(
 			}
 		}
 
-		//Handle token IDs override
+		// Handle token IDs override
 		if allowOverrideTokenIdsWithAnyValidTokenId {
-			//Verify that the token IDs are valid
+			// Verify that the token IDs are valid
 
-			//1. Check size == 1
+			// 1. Check size == 1
 			if len(overrideTokenIds) != 1 {
-				return balances, sdkerrors.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (length != 1)")
+				return balances, errorsmod.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (length != 1)")
 			}
 
-			//2. Check that the token IDs are the same
+			// 2. Check that the token IDs are the same
 			if !overrideTokenIds[0].Start.Equal(overrideTokenIds[0].End) {
-				return balances, sdkerrors.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (start != end)")
+				return balances, errorsmod.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (start != end)")
 			}
 
-			//3. Check that the token IDs are specified as valid in the collection
+			// 3. Check that the token IDs are specified as valid in the collection
 			isValid, err := SearchUintRangesForUint(overrideTokenIds[0].Start, collection.ValidTokenIds)
 			if err != nil || !isValid {
-				return balances, sdkerrors.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (not valid ID in collection)")
+				return balances, errorsmod.Wrapf(ErrInvalidTokenIds, "invalid token IDs override (not valid ID in collection)")
 			}
 
 			startBalance.TokenIds = overrideTokenIds

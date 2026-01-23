@@ -10,8 +10,8 @@ import (
 
 func CmdGetVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-vote [collection-id] [approval-level] [approver-address] [approval-id] [proposal-id] [voter-address]",
-		Short: "Query getVote",
+		Use:   "vote [collection-id] [approval-level] [approver-address] [approval-id] [proposal-id] [voter-address]",
+		Short: "Query vote",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqCollectionId := args[0]
@@ -50,4 +50,3 @@ func CmdGetVote() *cobra.Command {
 
 	return cmd
 }
-

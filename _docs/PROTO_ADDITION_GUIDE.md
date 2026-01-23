@@ -4,12 +4,11 @@ This guide explains how to add new fields to protobuf definitions in the BitBadg
 
 ## Overview
 
-When adding new fields to proto definitions, you need to follow a systematic approach to ensure all generated code, type definitions, and schemas are properly updated. This process involves four main steps:
+When adding new fields to proto definitions, you need to follow a systematic approach to ensure all generated code and type definitions are properly updated. This process involves three main steps:
 
 1. **Update proto definitions** in `./proto` directory
 2. **Generate Go code** using `ignite generate proto-go --yes`
-3. **Update EIP712 schemas** in `chain-handlers/ethereum/ethereum/eip712/schemas.go`
-4. **Handle business logic** in `x/badges` module (if required)
+3. **Handle business logic** in `x/badges` module (if required)
 
 ## Step 1: Update Proto Definitions
 
@@ -20,9 +19,6 @@ Proto definitions are located in the `./proto` directory, organized by module:
 -   `./proto/badges/` - Token-related definitions
 -   `./proto/maps/` - Map-related definitions
 -   `./proto/anchor/` - Anchor-related definitions
--   `./proto/ethereum/` - Ethereum-specific definitions
--   `./proto/bitcoin/` - Bitcoin-specific definitions
--   `./proto/solana/` - Solana-specific definitions
 
 ### Key Files to Modify
 
@@ -178,88 +174,7 @@ git add x/badges/types/*.pb.go
 
 **Note**: This automatically stages all generated protobuf files (_.pb.go and _.pulsar.go) so you don't have to manually track which files were generated. This is especially useful since these files are auto-generated and should always be committed together with proto changes.
 
-## Step 3: Update EIP712 Schemas
-
-### Purpose
-
-EIP712 schemas are used for Ethereum signature verification. They define the structure of messages that can be signed by Ethereum wallets.
-
-### Location
-
-Schemas are defined in `chain-handlers/ethereum/ethereum/eip712/schemas.go`
-
-### Adding New Schema Entries
-
-For each new message type or field, you need to add a corresponding schema entry. The schema should include **all possible fields** with empty/default values to ensure proper type generation.
-
-#### Schema Structure
-
-```go
-schemas = append(schemas, `{
-    "type": "badges/NewMessageType",
-    "value": {
-        "creator": "",
-        "newField": "",
-        "optionalField": false,
-        "arrayField": [],
-        "objectField": {
-            "nestedField": ""
-        }
-    }
-}`)
-```
-
-#### Important Notes
-
--   **Include all fields** - even optional ones
--   **Use empty strings** for string fields (`""`)
--   **Use false** for boolean fields
--   **Use empty arrays** for repeated fields (`[]`)
--   **Use empty objects** for nested message types (`{}`)
--   **Follow the exact field names** from the proto definition
-
-#### Example: Adding a New Field to Existing Message
-
-If you add a new field to `MsgCreateCollection`, you need to update the corresponding schema:
-
-```go
-// Before
-schemas = append(schemas, `{
-    "type": "badges/CreateCollection",
-    "value": {
-        "creator": "",
-        "collectionId": "",
-        // ... existing fields
-    }
-}`)
-
-// After
-schemas = append(schemas, `{
-    "type": "badges/CreateCollection",
-    "value": {
-        "creator": "",
-        "collectionId": "",
-        "newField": "",  // Add the new field
-        // ... existing fields
-    }
-}`)
-```
-
-#### Schema Locations to Update
-
-Common message types that need schema updates:
-
--   `badges/CreateCollection`
--   `badges/UpdateCollection`
--   `badges/UniversalUpdateCollection`
--   `badges/TransferTokens`
--   `badges/UpdateUserApprovals`
--   `badges/CreateAddressLists`
--   `maps/CreateMap`
--   `maps/UpdateMap`
--   `maps/SetValue`
-
-## Step 4: Update Simulation Files (if Message Fields Changed)
+## Step 3: Update Simulation Files (if Message Fields Changed)
 
 ### Purpose
 
@@ -316,7 +231,7 @@ msg := types.NewMsgUpdateDynamicStoreWithGlobalEnabled(
 go test ./x/badges/simulation/...
 ```
 
-## Step 5: Handle Business Logic
+## Step 4: Handle Business Logic
 
 ### Location
 
@@ -398,7 +313,7 @@ func (k Keeper) NewField(goCtx context.Context, req *types.QueryNewFieldRequest)
 }
 ```
 
-### Step 5.5: Handle New Stored Value Types
+### Step 4.5: Handle New Stored Value Types
 
 If your new fields introduce new types that need to be stored persistently (like new collections, balances, or custom data structures), you need to handle genesis state integration.
 
@@ -655,18 +570,6 @@ go test ./x/badges/...
 ignite chain test
 ```
 
-### 4. EIP712 Signature Test
-
-Test that new fields work with Ethereum signatures:
-
-```bash
-# Build and run the chain
-ignite chain serve --skip-proto
-
-# Test EIP712 signing with new fields
-# (Use your preferred testing method)
-```
-
 ## Common Pitfalls
 
 ### 1. Field Number Conflicts
@@ -674,27 +577,22 @@ ignite chain serve --skip-proto
 -   **Problem**: Reusing field numbers causes runtime errors
 -   **Solution**: Always use the next available field number
 
-### 2. Missing Schema Entries
-
--   **Problem**: New fields don't work with Ethereum signatures
--   **Solution**: Add corresponding schema entries with empty values
-
-### 3. Incomplete Validation
+### 2. Incomplete Validation
 
 -   **Problem**: Invalid data can be stored in state
 -   **Solution**: Implement proper validation in `ValidateBasic()` methods
 
-### 4. Missing Query Handlers
+### 3. Missing Query Handlers
 
 -   **Problem**: New fields can't be queried
 -   **Solution**: Add appropriate query handlers and update query.proto
 
-### 5. State Key Conflicts
+### 4. State Key Conflicts
 
 -   **Problem**: New state keys conflict with existing ones
 -   **Solution**: Use unique key prefixes and update key generation functions
 
-### 6. Forgetting API Cleanup
+### 5. Forgetting API Cleanup
 
 -   **Problem**: Versioned API folders are included in builds
 -   **Solution**: Always remove `api/badges/v*` folders after generation
@@ -733,22 +631,7 @@ go build ./cmd/bitbadgeschaind
 git add *.pb.go *.pulsar.go
 ```
 
-### 3. Update Schema
-
-```go
-// In chain-handlers/ethereum/ethereum/eip712/schemas.go
-schemas = append(schemas, `{
-    "type": "badges/CreateCollection",
-    "value": {
-        "creator": "",
-        "collectionId": "",
-        "description": "",  // Add new field
-        // ... other fields
-    }
-}`)
-```
-
-### 4. Update Business Logic
+### 3. Update Business Logic
 
 ```go
 // In x/badges/types/tx.pb.go (generated)
@@ -775,8 +658,7 @@ Following this systematic approach ensures that new fields are properly integrat
 
 -   Proto definitions define the structure
 -   Generated code provides type safety
--   EIP712 schemas enable Ethereum compatibility
 -   Business logic handles validation and state management
 -   API cleanup prevents versioned folders from being included
 
-Always test thoroughly after making changes, especially with Ethereum signature verification, as this is critical for cross-chain functionality.
+Always test thoroughly after making changes to ensure proper functionality.

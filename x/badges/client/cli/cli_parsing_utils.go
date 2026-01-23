@@ -67,7 +67,7 @@ func GetIdArrFromString(str string) ([]types.Uint, error) {
 		return nil, err
 	}
 
-	//convert vals to []uint64
+	// convert vals to []uint64
 	argStartValuesUint64 := []types.Uint{}
 	for _, val := range vals {
 		valAsUint64 := types.NewUintFromString(val.(string))

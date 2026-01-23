@@ -6,15 +6,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//This file checks that we are able to update some permission from A to B according to the rules:
+// This file checks that we are able to update some permission from A to B according to the rules:
 //-First match only (subsequent matches are ignored)
 //-If we have previously defined an explicit permitted time or forbidden time, we cannot remove or switch it. If it was previously unhandled, we can make it explciit and permanent
 //-Forbidden and permitted times cannot overlap (i.e. a time cannot be both permitted and forbidden)
 //-Other permission-specific validation checks
 //-Duplicate combinations are disallowed because they are redundant
 
-//HACK: For resuable code, we cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
-
+// HACK: For reusable code, we cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
 func (k Keeper) ValidateTokenIdsActionPermissionUpdate(ctx sdk.Context, oldPermissions []*types.TokenIdsActionPermission, newPermissions []*types.TokenIdsActionPermission) error {
 	if err := types.ValidateTokenIdsActionPermission(oldPermissions, true); err != nil {
 		return err

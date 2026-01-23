@@ -23,7 +23,7 @@ func SimulateMsgUpdateUserApprovals(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateUserApprovals, "no accounts available"), nil, nil
 		}
-		
+
 		// Try to get a known-good collection ID first
 		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
@@ -39,32 +39,32 @@ func SimulateMsgUpdateUserApprovals(
 				collectionId = createdId
 			}
 		}
-		
+
 		// Check if collection exists
 		_, found = k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgUpdateUserApprovals, "collection not found"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
-		
+
 		// Randomly decide which fields to update
 		updateOutgoingApprovals := r.Intn(2) == 0
 		updateIncomingApprovals := r.Intn(2) == 0
 		updateAutoApproveAllIncomingTransfers := r.Intn(2) == 0
 		updateAutoApproveSelfInitiatedOutgoingTransfers := r.Intn(2) == 0
 		updateAutoApproveSelfInitiatedIncomingTransfers := r.Intn(2) == 0
-		
+
 		msg := &types.MsgUpdateUserApprovals{
-			Creator:      simAccount.Address.String(),
-			CollectionId: collectionId,
-			UpdateOutgoingApprovals:                        updateOutgoingApprovals,
-			UpdateIncomingApprovals:                        updateIncomingApprovals,
-			UpdateAutoApproveAllIncomingTransfers:          updateAutoApproveAllIncomingTransfers,
+			Creator:                               simAccount.Address.String(),
+			CollectionId:                          collectionId,
+			UpdateOutgoingApprovals:               updateOutgoingApprovals,
+			UpdateIncomingApprovals:               updateIncomingApprovals,
+			UpdateAutoApproveAllIncomingTransfers: updateAutoApproveAllIncomingTransfers,
 			UpdateAutoApproveSelfInitiatedOutgoingTransfers: updateAutoApproveSelfInitiatedOutgoingTransfers,
 			UpdateAutoApproveSelfInitiatedIncomingTransfers: updateAutoApproveSelfInitiatedIncomingTransfers,
 		}
-		
+
 		// Set values only if updating
 		if updateOutgoingApprovals {
 			outgoingApprovals := []*types.UserOutgoingApproval{}
@@ -87,7 +87,7 @@ func SimulateMsgUpdateUserApprovals(
 			}
 			msg.OutgoingApprovals = outgoingApprovals
 		}
-		
+
 		if updateIncomingApprovals {
 			incomingApprovals := []*types.UserIncomingApproval{}
 			if r.Intn(2) == 0 {
@@ -109,7 +109,7 @@ func SimulateMsgUpdateUserApprovals(
 			}
 			msg.IncomingApprovals = incomingApprovals
 		}
-		
+
 		if updateAutoApproveAllIncomingTransfers {
 			msg.AutoApproveAllIncomingTransfers = r.Intn(2) == 0
 		}
@@ -119,12 +119,12 @@ func SimulateMsgUpdateUserApprovals(
 		if updateAutoApproveSelfInitiatedIncomingTransfers {
 			msg.AutoApproveSelfInitiatedIncomingTransfers = r.Intn(2) == 0
 		}
-		
+
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), err.Error()), nil, nil
 		}
-		
+
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }

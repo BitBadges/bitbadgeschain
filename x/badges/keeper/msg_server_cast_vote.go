@@ -146,4 +146,3 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 
 	return &types.MsgCastVoteResponse{}, nil
 }
-

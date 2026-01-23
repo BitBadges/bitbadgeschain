@@ -22,7 +22,7 @@ func SimulateMsgCreateDynamicStore(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateDynamicStore, "no accounts available"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
 
 		// Random boolean for defaultValue
@@ -55,4 +55,3 @@ func SimulateMsgCreateDynamicStore(
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
-

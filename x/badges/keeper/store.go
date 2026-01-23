@@ -94,7 +94,11 @@ func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.T
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close collection iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var collection types.TokenCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &collection)
@@ -181,10 +185,10 @@ func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey strin
 }
 
 // Sets a user balance in the store using UserBalanceKey ([]byte{0x02}) as the prefix. No check if store has key already.
-func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBalance *types.UserBalanceStore, skipInvariants bool) error {
+func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, userBalance *types.UserBalanceStore, skipInvariants bool) error {
 	// Validate user balance before storing
 	if !skipInvariants {
-		if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, UserBalance, nil); err != nil {
+		if err := k.validateUserBalanceBeforeStore(ctx, balanceKey, userBalance, nil); err != nil {
 			return err
 		}
 	}
@@ -192,8 +196,8 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 	// NOTE: We always store a non-nil permissions object to prevent issues where
 	// nil permissions would marshal to zero length, causing default balances to be
 	// incorrectly populated again during deserialization.
-	if UserBalance.UserPermissions == nil {
-		UserBalance.UserPermissions = &types.UserPermissions{
+	if userBalance.UserPermissions == nil {
+		userBalance.UserPermissions = &types.UserPermissions{
 			CanUpdateOutgoingApprovals:                         []*types.UserOutgoingApprovalPermission{},
 			CanUpdateIncomingApprovals:                         []*types.UserIncomingApprovalPermission{},
 			CanUpdateAutoApproveSelfInitiatedOutgoingTransfers: []*types.ActionPermission{},
@@ -202,12 +206,12 @@ func (k Keeper) SetUserBalanceInStore(ctx sdk.Context, balanceKey string, UserBa
 		}
 	}
 
-	marshaled_token_balance_info, err := k.cdc.Marshal(UserBalance)
+	marshaled_token_balance_info, err := k.cdc.Marshal(userBalance)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.UserBalanceStore failed")
 	}
 
-	//Prevent accidental non-BitBadges addresses from being stored
+	// Prevent accidental non-BitBadges addresses from being stored
 	balanceKeyDetails, err := GetDetailsFromBalanceKey(balanceKey)
 	if err != nil {
 		return sdkerrors.Wrapf(err, "invalid balance key format")
@@ -248,7 +252,11 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close user balance iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var UserBalance types.UserBalanceStore
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
@@ -273,7 +281,11 @@ func (k Keeper) GetUserBalanceIdsFromStore(ctx sdk.Context) (ids []string) {
 	store := prefix.NewStore(storeAdapter, []byte{})
 
 	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close user balance ids iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		ids = append(ids, string(iterator.Key()[1:]))
 	}
@@ -398,7 +410,11 @@ func (k Keeper) GetChallengeTrackersFromStore(ctx sdk.Context) (numUsed []sdkmat
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, UsedClaimChallengeKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close challenge tracker iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		curr, err := strconv.ParseUint(string((iterator.Value())), 10, 64)
 		if err != nil {
@@ -451,7 +467,11 @@ func (k Keeper) GetAddressListsFromStore(ctx sdk.Context) (addressLists []*types
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, AddressListKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close address list iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var addressList types.AddressList
 		k.cdc.MustUnmarshal(iterator.Value(), &addressList)
@@ -515,7 +535,11 @@ func (k Keeper) GetApprovalTrackersFromStore(ctx sdk.Context) (approvalTrackers 
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, ApprovalTrackerKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close approval tracker iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var approvalTracker types.ApprovalTracker
 		k.cdc.MustUnmarshal(iterator.Value(), &approvalTracker)
@@ -572,7 +596,11 @@ func (k Keeper) GetApprovalTrackerVersionsFromStore(ctx sdk.Context) (versions [
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, ApprovalVersionKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close approval version iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		version, err := strconv.ParseUint(string(iterator.Value()), 10, 64)
 		if err != nil {
@@ -637,7 +665,11 @@ func (k Keeper) GetDynamicStoresFromStore(ctx sdk.Context) (dynamicStores []*typ
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, DynamicStoreKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close dynamic store iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var dynamicStore types.DynamicStore
 		k.cdc.MustUnmarshal(iterator.Value(), &dynamicStore)
@@ -732,7 +764,11 @@ func (k Keeper) GetDynamicStoreValuesFromStore(ctx sdk.Context, storeId sdkmath.
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, append(DynamicStoreValueKey, []byte(storeId.String())...))
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close dynamic store value iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var dynamicStoreValue types.DynamicStoreValue
 		k.cdc.MustUnmarshal(iterator.Value(), &dynamicStoreValue)
@@ -746,7 +782,11 @@ func (k Keeper) GetAllDynamicStoreValuesFromStore(ctx sdk.Context) (dynamicStore
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, DynamicStoreValueKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close dynamic store values iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var dynamicStoreValue types.DynamicStoreValue
 		k.cdc.MustUnmarshal(iterator.Value(), &dynamicStoreValue)
@@ -801,7 +841,11 @@ func (k Keeper) GetETHSignatureTrackersFromStore(ctx sdk.Context) (numUsed []sdk
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, ETHSignatureTrackerKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close eth signature tracker iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		tracker, err := sdkmath.ParseUint(string(iterator.Value()))
 		if err != nil {
@@ -864,7 +908,11 @@ func (k Keeper) GetVotesFromStore(ctx sdk.Context) (votes []*types.VoteProof, id
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, VotingTrackerKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close voting tracker iterator", "error", err)
+		}
+	}()
 	for ; iterator.Valid(); iterator.Next() {
 		var vote types.VoteProof
 		k.cdc.MustUnmarshal(iterator.Value(), &vote)
@@ -941,7 +989,11 @@ func (k Keeper) GetAllReservedProtocolAddressesFromStore(ctx sdk.Context) []stri
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, ReservedProtocolAddressKey)
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close reserved protocol address iterator", "error", err)
+		}
+	}()
 
 	var addresses []string
 	for ; iterator.Valid(); iterator.Next() {

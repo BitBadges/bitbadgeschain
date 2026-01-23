@@ -23,7 +23,7 @@ func SimulateMsgSetDynamicStoreValue(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSetDynamicStoreValue, "no accounts available"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
 
 		// Try to get a known-good dynamic store ID first
@@ -72,7 +72,7 @@ func SimulateMsgSetDynamicStoreValue(
 
 		// Random boolean value
 		value := r.Intn(2) == 0
-		
+
 		// Use creator as the message creator (required for setting values)
 		msg := &types.MsgSetDynamicStoreValue{
 			Creator: creatorAccount.Address.String(),

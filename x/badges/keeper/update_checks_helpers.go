@@ -12,8 +12,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//This file is responsible for verifying that if we go from Value A to Value B for a timeline, that the update is valid
-//So here, we check the following:
+// This file is responsible for verifying that if we go from Value A to Value B for a timeline, that the update is valid
+// So here, we check the following:
 //-Assert the collection has the correct balances type, if we are updating a balance type-specific field
 //-For all updates, check that we are able to update according to the permissions.
 // This means we have to verify that the current permissions do not forbid the update.
@@ -41,7 +41,8 @@ import (
 
 // To make it easier, we first
 func GetPotentialUpdatesForTimelineValues(ctx sdk.Context,
-	times [][]*types.UintRange, values []interface{}) []*types.UniversalPermissionDetails {
+	times [][]*types.UintRange, values []interface{},
+) []*types.UniversalPermissionDetails {
 	castedPermissions := []*types.UniversalPermission{}
 	for idx, time := range times {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
@@ -51,7 +52,7 @@ func GetPotentialUpdatesForTimelineValues(ctx sdk.Context,
 		})
 	}
 
-	//I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic but I will keep it here for now
+	// I think this is unnecessary because we already disallow duplicate timeline times in ValidateBasic but I will keep it here for now
 	return types.GetFirstMatchOnly(ctx, castedPermissions)
 }
 
@@ -62,7 +63,7 @@ type ApprovalCriteriaWithIsApproved struct {
 	CustomData       string
 }
 
-func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) []*types.UniversalPermissionDetails {
+func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types.UniversalPermission) ([]*types.UniversalPermissionDetails, error) {
 	handled := []*types.UniversalPermissionDetails{}
 	for _, permission := range permissions {
 		tokenIds := types.GetUintRangesWithOptions(permission.TokenIds, permission.UsesTokenIds)
@@ -107,14 +108,22 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 
 						overlaps, inBrokenDownButNotHandled, inHandledButNotBrokenDown := types.GetOverlapsAndNonOverlaps(ctx, brokenDown, handled)
 						handled = []*types.UniversalPermissionDetails{}
-						//if no overlaps, we can just append all of them
+						// if no overlaps, we can just append all of them
 						handled = append(handled, inHandledButNotBrokenDown...)
 						handled = append(handled, inBrokenDownButNotHandled...)
 
-						//for overlaps, we append approval details
+						// for overlaps, we append approval details
 						for _, overlap := range overlaps {
-							mergedApprovalCriteria := overlap.SecondDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
-							mergedApprovalCriteria = append(mergedApprovalCriteria, overlap.FirstDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)...)
+							secondCriteria, ok := overlap.SecondDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
+							if !ok {
+								return nil, sdkerrors.Wrapf(types.ErrInvalidArbitraryValueType, "expected []*ApprovalCriteriaWithIsApproved for SecondDetails, got %T", overlap.SecondDetails.ArbitraryValue)
+							}
+							firstCriteria, ok := overlap.FirstDetails.ArbitraryValue.([]*ApprovalCriteriaWithIsApproved)
+							if !ok {
+								return nil, sdkerrors.Wrapf(types.ErrInvalidArbitraryValueType, "expected []*ApprovalCriteriaWithIsApproved for FirstDetails, got %T", overlap.FirstDetails.ArbitraryValue)
+							}
+							mergedApprovalCriteria := secondCriteria
+							mergedApprovalCriteria = append(mergedApprovalCriteria, firstCriteria...)
 
 							newArbValue := mergedApprovalCriteria
 							handled = append(handled, &types.UniversalPermissionDetails{
@@ -128,7 +137,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 
 								ApprovalIdList: overlap.Overlap.ApprovalIdList,
 
-								//Appended for future lookups (not involved in overlap logic)
+								// Appended for future lookups (not involved in overlap logic)
 								PermanentlyPermittedTimes: permanentlyPermittedTimes,
 								PermanentlyForbiddenTimes: permanentlyForbiddenTimes,
 								ArbitraryValue:            newArbValue,
@@ -138,11 +147,10 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 				}
 			}
 		}
-
 	}
 
-	//It is first match only, so we can do this
-	//To help with determinism in comparing later, we sort by token ID
+	// It is first match only, so we can do this
+	// To help with determinism in comparing later, we sort by token ID
 	returnArr := []*types.UniversalPermissionDetails{}
 	for _, handledItem := range handled {
 		idxToInsert := 0
@@ -155,13 +163,13 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		returnArr[idxToInsert] = handledItem
 	}
 
-	return handled
+	return handled, nil
 }
 
 func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
 	x := [][]*types.UintRange{}
 	x = append(x, []*types.UintRange{
-		//Dummmy range since collection approvals dont use timeline times
+		// Dummmy range since collection approvals dont use timeline times
 		{
 			Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
 		},
@@ -169,43 +177,49 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 
 	y := [][]*types.UintRange{}
 	y = append(y, []*types.UintRange{
-		//Dummmy range since collection approvals dont use timeline times
+		// Dummmy range since collection approvals dont use timeline times
 		{
 			Start: sdkmath.NewUint(math.MaxUint64), End: sdkmath.NewUint(math.MaxUint64),
 		},
 	})
 
-	//This is just to maintain consistency with the legacy features when we used to have timeline times
+	// This is just to maintain consistency with the legacy features when we used to have timeline times
 	oldTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, x, []interface{}{oldApprovals})
 	newTimelineFirstMatches := GetPotentialUpdatesForTimelineValues(ctx, y, []interface{}{newApprovals})
 
 	detailsToCheck, err := GetUpdateCombinationsToCheck(ctx, oldTimelineFirstMatches, newTimelineFirstMatches, []*types.CollectionApproval{}, func(ctx sdk.Context, oldValue interface{}, newValue interface{}) ([]*types.UniversalPermissionDetails, error) {
-		//This is a little different from the other functions because it is not first match only
+		// This is a little different from the other functions because it is not first match only
 
-		//Expand all collection approved transfers so that they are manipulated according to options and approvalCriteria / allowedCombinations are len 1
+		// Expand all collection approved transfers so that they are manipulated according to options and approvalCriteria / allowedCombinations are len 1
 		oldApprovals := oldValue.([]*types.CollectionApproval)
 		newApprovals := newValue.([]*types.CollectionApproval)
 
-		//Step 1: Merge so we get approvalCriteria arrays of proper length such that it is first match and each (to, from, init, time, ids, ownershipTimes) is only seen once
-		//Step 2: Compare as we had previously
+		// Step 1: Merge so we get approvalCriteria arrays of proper length such that it is first match and each (to, from, init, time, ids, ownershipTimes) is only seen once
+		// Step 2: Compare as we had previously
 
-		//Step 1:
+		// Step 1:
 		oldApprovalsCasted, err := k.CastCollectionApprovalToUniversalPermission(ctx, oldApprovals)
 		if err != nil {
 			return nil, err
 		}
-		firstMatchesForOld := GetFirstMatchOnlyWithApprovalCriteria(ctx, oldApprovalsCasted)
+		firstMatchesForOld, err := GetFirstMatchOnlyWithApprovalCriteria(ctx, oldApprovalsCasted)
+		if err != nil {
+			return nil, err
+		}
 
 		newApprovalsCasted, err := k.CastCollectionApprovalToUniversalPermission(ctx, newApprovals)
 		if err != nil {
 			return nil, err
 		}
-		firstMatchesForNew := GetFirstMatchOnlyWithApprovalCriteria(ctx, newApprovalsCasted)
+		firstMatchesForNew, err := GetFirstMatchOnlyWithApprovalCriteria(ctx, newApprovalsCasted)
+		if err != nil {
+			return nil, err
+		}
 
-		//Step 2:
-		//For every token, we need to check if the new provided value is different in any way from the old value for each token ID
-		//The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
-		//Note this okay since we already converted everything to first match only in the previous step
+		// Step 2:
+		// For every token, we need to check if the new provided value is different in any way from the old value for each token ID
+		// The overlapObjects from GetOverlapsAndNonOverlaps will return which token IDs overlap
+		// Note this okay since we already converted everything to first match only in the previous step
 		detailsToReturn := []*types.UniversalPermissionDetails{}
 		overlapObjects, inOldButNotNew, inNewButNotOld := types.GetOverlapsAndNonOverlaps(ctx, firstMatchesForOld, firstMatchesForNew)
 		for _, overlapObject := range overlapObjects {
@@ -222,7 +236,7 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 				oldVal := oldArbVal
 				newVal := newArbVal
 
-				//Go one by one comparing old to new as flat array (if 2d array is empty we still treat it as an empty element
+				// Go one by one comparing old to new as flat array (if 2d array is empty we still treat it as an empty element
 				if len(oldVal) != len(newVal) {
 					different = true
 				} else {
@@ -250,7 +264,7 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 			}
 		}
 
-		//If there are combinations in old but not new, then it is considered updated. If it is in new but not old, then it is considered updated.
+		// If there are combinations in old but not new, then it is considered updated. If it is in new but not old, then it is considered updated.
 		detailsToReturn = append(detailsToReturn, inOldButNotNew...)
 		detailsToReturn = append(detailsToReturn, inNewButNotOld...)
 

@@ -39,7 +39,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 	approverAddress := transferMetadata.ApproverAddress
 
 	originalTransferBalances = types.DeepCopyBalances(originalTransferBalances)
-	remainingBalances := types.DeepCopyBalances(transfer.Balances) //Keep a running tally of all the tokens we still have to handle
+	remainingBalances := types.DeepCopyBalances(transfer.Balances) // Keep a running tally of all the tokens we still have to handle
 	approvals, err := FilterApprovalsWithPrioritizedHandling(_approvals, transfer, approvalLevel, approverAddress)
 	if err != nil {
 		return []*UserApprovalsToCheck{}, err
@@ -71,9 +71,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 		}
 	}
 
-	approvalIdxsChecked := []int{} //We keep track of the indexes of the approvals that we have checked
+	approvalIdxsChecked := []int{} // We keep track of the indexes of the approvals that we have checked
 
-	//For each approved transfer, we check if the transfer is allowed
+	// For each approved transfer, we check if the transfer is allowed
 	// 1: If transfer meets all criteria, we deduct, get user approvals to check, and continue (if there are any remaining balances)
 	// 2. If transfer does not meet all criteria, we continue and do not mark anything as handled
 	// 3. At the end, if there are any unhandled transfers, we throw (not enough approvals = transfer disallowed)
@@ -100,11 +100,38 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 		}
 
-		//Initial checks: Make sure (from, to, initiatedBy) match the approval's collection list IDs
+		// Initial checks: Make sure (from, to, initiatedBy) match the approval's collection list IDs
 		doAddressesMatch := k.CheckIfAddressesMatchCollectionListIds(ctx, approval, fromAddress, toAddress, initiatedBy)
 		if !doAddressesMatch {
 			addPotentialError(isExplicitlyPrioritized, idx, fmt.Sprintf("addresses do not match (from, to, initiatedBy): %s, %s, %s", fromAddress, toAddress, initiatedBy))
 			continue
+		}
+
+		// For collection-level approvals, check if special transfer flags are required
+		// This prevents accidental allowances when toListIds is "All"
+		// If approvalCriteria is nil, we assume allowBackedMinting and allowSpecialWrapping are false
+		// Note: Wrapping and backing are bidirectional operations, so we check both from and to addresses
+		if approvalLevel == "collection" {
+			// Check if either from or to address is a backing path address (bidirectional: backing/unbacking)
+			isBackingTransfer := k.IsBackingPathAddress(ctx, collection, fromAddress) || k.IsBackingPathAddress(ctx, collection, toAddress)
+			// Check if either from or to address is a wrapping path address (bidirectional: wrapping/unwrapping)
+			isWrappingTransfer := k.IsWrappingPathAddress(ctx, collection, fromAddress) || k.IsWrappingPathAddress(ctx, collection, toAddress)
+
+			if isBackingTransfer {
+				// If approvalCriteria is nil, AllowBackedMinting defaults to false
+				if approval.ApprovalCriteria == nil || !approval.ApprovalCriteria.AllowBackedMinting {
+					addPotentialError(isExplicitlyPrioritized, idx, "collection approval does not allow backed minting operations")
+					continue
+				}
+			}
+
+			if isWrappingTransfer {
+				// If approvalCriteria is nil, AllowSpecialWrapping defaults to false
+				if approval.ApprovalCriteria == nil || !approval.ApprovalCriteria.AllowSpecialWrapping {
+					addPotentialError(isExplicitlyPrioritized, idx, "collection approval does not allow special wrapping operations")
+					continue
+				}
+			}
 		}
 
 		// Check valid transfer times
@@ -138,7 +165,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			})
 		}
 
-		//If there are no restrictions or criteria, it is a full match and we can deduct all the overlapping (tokenIds, ownershipTimes) from the remaining balances
+		// If there are no restrictions or criteria, it is a full match and we can deduct all the overlapping (tokenIds, ownershipTimes) from the remaining balances
 		approvalCriteria := approval.ApprovalCriteria
 		if approvalCriteria == nil {
 			allBalancesForIdsAndTimes, err := types.GetBalancesForIds(ctx, approval.TokenIds, approval.OwnershipTimes, remainingBalances)
@@ -151,7 +178,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: underflow error subtracting balances for transfer: %s", transferStr)
 			}
 
-			//If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
+			// If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
 			addToUserApprovalsToCheck(fromAddress, allBalancesForIdsAndTimes, true, userRoyalties)
 			addToUserApprovalsToCheck(toAddress, allBalancesForIdsAndTimes, false, userRoyalties)
 			markApprovalAsUsed(approval)
@@ -179,7 +206,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			//Get max balances allowed for this approvalCriteria element
+			// Get max balances allowed for this approvalCriteria element
 			transferBalancesToCheck, err := types.GetBalancesForIds(cachedCtx, approval.TokenIds, approval.OwnershipTimes, remainingBalances)
 			if err != nil {
 				return []*UserApprovalsToCheck{}, sdkerrors.Wrapf(err, "transfer disallowed: err fetching balances for transfer: %s", transferStr)
@@ -273,12 +300,12 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 			approvedAddresses := []string{"", toAddress, fromAddress, initiatedBy}
 
-			//Get max balances allowed for this approvalCriteria element
+			// Get max balances allowed for this approvalCriteria element
 			// Use original context for GetMaxPossible since it reads current approval tracker state
 			// (which may have been modified by previous transfers in the same transaction)
 			failed := false
 			for i, trackerType := range trackerTypes {
-				//Get max allowed by criteria
+				// Get max allowed by criteria
 				detErrMsg, maxPossible, err := k.GetMaxPossible(
 					cachedCtx,
 					collection,
@@ -301,7 +328,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 					break
 				}
 
-				//Get max allowed by remaining balances to check
+				// Get max allowed by remaining balances to check
 				transferBalancesToCheck, err = types.GetOverlappingBalances(cachedCtx, maxPossible, transferBalancesToCheck)
 				if err != nil {
 					addPotentialError(isExplicitlyPrioritized, idx, "get overlapping balances error")
@@ -364,7 +391,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 		}
 	}
 
-	//If we didn't find a successful approval, we throw
+	// If we didn't find a successful approval, we throw
 	if len(remainingBalances) > 0 {
 		// If we used approvals and had partial success for some balances, we need to add an error for that
 		errorsWithIdx = addPartialSuccessErrors(errorsWithIdx, *eventTracking.ApprovalsUsed, approvals)
@@ -404,12 +431,12 @@ func (k Keeper) ResetApprovalTrackerIfNeeded(ctx sdk.Context, approvalTracker *t
 		intervalLength := resetTimeIntervals.IntervalLength
 		lastResetAt := approvalTracker.LastUpdatedAt
 
-		//If the first reset time is in the future, we don't need to reset
+		// If the first reset time is in the future, we don't need to reset
 		if startTime.GT(now) {
 			return *approvalTracker
 		}
 
-		//1. Calculate what interval we are in
+		// 1. Calculate what interval we are in
 		currInterval := now.Sub(startTime).Quo(intervalLength)
 		currIntervalStart := startTime.Add(currInterval.Mul(intervalLength))
 
@@ -911,13 +938,13 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 		}
 
 		if approvalCriteria.PredeterminedBalances != nil {
-			numIncrements := sdkmath.NewUint(0)
+			var numIncrements sdkmath.Uint
 			hasOrderCalculationMethod := false
 			if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 				hasOrderCalculationMethod = true
 
-				//If the approval has challenges, we need to check that a valid solutions is provided for every challenge
-				//If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
+				// If the approval has challenges, we need to check that a valid solutions is provided for every challenge
+				// If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
 				_, numIncrementsFetched, err := k.HandleMerkleChallenges(
 					ctx,
 					collection.CollectionId,
@@ -975,7 +1002,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "no order calculation method found for approval id: %s", precalculationId)
 			}
 
-			//calculate the current approved balances from the numIncrements and predeterminedBalances
+			// calculate the current approved balances from the numIncrements and predeterminedBalances
 			predeterminedBalances := []*types.Balance{}
 			if approvalCriteria.PredeterminedBalances.ManualBalances != nil {
 				if numIncrements.LT(sdkmath.NewUint(uint64(len(approvalCriteria.PredeterminedBalances.ManualBalances)))) {

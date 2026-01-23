@@ -63,17 +63,17 @@ func (k Keeper) HandleSpecialAddressWrapping(
 			return sdkerrors.Wrapf(ErrInvalidConversion, "allowOverrideWithAnyValidToken is not true for this wrapper path")
 		}
 
-		//Throw if balances len != 1
+		// Throw if balances len != 1
 		if len(transferBalances) != 1 {
 			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine token ID for {id} placeholder replacement")
 		}
 
-		//Throw if TokenIds len != 1
+		// Throw if TokenIds len != 1
 		if len(transferBalances[0].TokenIds) != 1 {
 			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine token ID for {id} placeholder replacement")
 		}
 
-		//Throw if TokenIds[0].Start != TokenIds[0].End
+		// Throw if TokenIds[0].Start != TokenIds[0].End
 		if !transferBalances[0].TokenIds[0].Start.Equal(transferBalances[0].TokenIds[0].End) {
 			return sdkerrors.Wrapf(ErrInvalidConversion, "cannot determine token ID for {id} placeholder replacement")
 		}

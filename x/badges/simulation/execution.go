@@ -21,7 +21,7 @@ func ExecuteAndVerifyMessage(
 ) (bool, error) {
 	msgServer := keeper.NewMsgServerImpl(k)
 	sdkCtx := ctx
-	
+
 	// Execute the message based on its type
 	switch m := msg.(type) {
 	case *types.MsgCreateCollection:
@@ -37,7 +37,7 @@ func ExecuteAndVerifyMessage(
 		collectionId := nextId.Sub(sdkmath.NewUint(1))
 		_, found := k.GetCollectionFromStore(ctx, collectionId)
 		return found, nil
-		
+
 	case *types.MsgUniversalUpdateCollection:
 		_, err := msgServer.UniversalUpdateCollection(sdkCtx, m)
 		if err != nil {
@@ -46,7 +46,7 @@ func ExecuteAndVerifyMessage(
 		// Verify collection still exists (or was created)
 		_, found := k.GetCollectionFromStore(ctx, m.CollectionId)
 		return found, nil
-		
+
 	case *types.MsgDeleteCollection:
 		_, err := msgServer.DeleteCollection(sdkCtx, m)
 		if err != nil {
@@ -55,7 +55,7 @@ func ExecuteAndVerifyMessage(
 		// Verify collection was deleted (or doesn't exist)
 		_, found := k.GetCollectionFromStore(ctx, m.CollectionId)
 		return !found, nil
-		
+
 	case *types.MsgTransferTokens:
 		// Get balances before
 		balancesBefore := make(map[string]*types.UserBalanceStore)
@@ -71,15 +71,15 @@ func ExecuteAndVerifyMessage(
 				balancesBefore[toAddr] = bal
 			}
 		}
-		
+
 		_, err := msgServer.TransferTokens(sdkCtx, m)
 		if err != nil {
 			return false, err
 		}
-		
+
 		// Verify balances changed (simplified check - just verify no error)
 		return true, nil
-		
+
 	case *types.MsgCreateDynamicStore:
 		_, err := msgServer.CreateDynamicStore(sdkCtx, m)
 		if err != nil {
@@ -93,7 +93,7 @@ func ExecuteAndVerifyMessage(
 		storeId := nextStoreId.Sub(sdkmath.NewUint(1))
 		_, found := k.GetDynamicStoreFromStore(ctx, storeId)
 		return found, nil
-		
+
 	case *types.MsgUpdateDynamicStore:
 		_, err := msgServer.UpdateDynamicStore(sdkCtx, m)
 		if err != nil {
@@ -102,7 +102,7 @@ func ExecuteAndVerifyMessage(
 		// Verify dynamic store still exists
 		_, found := k.GetDynamicStoreFromStore(ctx, m.StoreId)
 		return found, nil
-		
+
 	case *types.MsgSetDynamicStoreValue:
 		_, err := msgServer.SetDynamicStoreValue(sdkCtx, m)
 		if err != nil {
@@ -111,7 +111,7 @@ func ExecuteAndVerifyMessage(
 		// Verify value was set (check if store exists)
 		_, found := k.GetDynamicStoreFromStore(ctx, m.StoreId)
 		return found, nil
-		
+
 	case *types.MsgUpdateUserApprovals:
 		_, err := msgServer.UpdateUserApprovals(sdkCtx, m)
 		if err != nil {
@@ -120,7 +120,7 @@ func ExecuteAndVerifyMessage(
 		// Verify collection still exists
 		_, found := k.GetCollectionFromStore(ctx, m.CollectionId)
 		return found, nil
-		
+
 	case *types.MsgSetIncomingApproval:
 		_, err := msgServer.SetIncomingApproval(sdkCtx, m)
 		if err != nil {
@@ -129,7 +129,7 @@ func ExecuteAndVerifyMessage(
 		// Verify collection still exists
 		_, found := k.GetCollectionFromStore(ctx, m.CollectionId)
 		return found, nil
-		
+
 	case *types.MsgSetOutgoingApproval:
 		_, err := msgServer.SetOutgoingApproval(sdkCtx, m)
 		if err != nil {
@@ -138,7 +138,7 @@ func ExecuteAndVerifyMessage(
 		// Verify collection still exists
 		_, found := k.GetCollectionFromStore(ctx, m.CollectionId)
 		return found, nil
-		
+
 	case *types.MsgPurgeApprovals:
 		_, err := msgServer.PurgeApprovals(sdkCtx, m)
 		if err != nil {
@@ -147,7 +147,7 @@ func ExecuteAndVerifyMessage(
 		// Verify collection still exists
 		_, found := k.GetCollectionFromStore(ctx, m.CollectionId)
 		return found, nil
-		
+
 	case *types.MsgCreateAddressLists:
 		_, err := msgServer.CreateAddressLists(sdkCtx, m)
 		if err != nil {
@@ -155,7 +155,7 @@ func ExecuteAndVerifyMessage(
 		}
 		// Address lists are stored internally, just verify no error
 		return true, nil
-		
+
 	default:
 		// Unknown message type - can't execute
 		return false, nil
@@ -173,12 +173,12 @@ func WrapOperationWithExecution(
 		if err != nil {
 			return opMsg, futureOps, err
 		}
-		
+
 		// If it's a NoOpMsg, return early
 		if !opMsg.OK {
 			return opMsg, futureOps, err
 		}
-		
+
 		// If app is available, try to execute the message
 		if app != nil {
 			// Get the keeper from the app (this is a simplified approach)
@@ -186,8 +186,7 @@ func WrapOperationWithExecution(
 			// For now, we'll just return the operation message
 			// The actual execution will happen in the simulation framework
 		}
-		
+
 		return opMsg, futureOps, err
 	}
 }
-

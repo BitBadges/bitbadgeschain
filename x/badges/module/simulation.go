@@ -26,19 +26,19 @@ var (
 )
 
 const (
-	opWeightMsgCreateCollection        = "op_weight_msg_create_collection"
+	opWeightMsgCreateCollection          = "op_weight_msg_create_collection"
 	opWeightMsgUniversalUpdateCollection = "op_weight_msg_universal_update_collection"
-	opWeightMsgDeleteCollection         = "op_weight_msg_delete_collection"
-	opWeightMsgTransferTokens           = "op_weight_msg_transfer_tokens"
-	opWeightMsgUpdateUserApprovals      = "op_weight_msg_update_user_approvals"
-	opWeightMsgSetIncomingApproval      = "op_weight_msg_set_incoming_approval"
-	opWeightMsgSetOutgoingApproval      = "op_weight_msg_set_outgoing_approval"
-	opWeightMsgPurgeApprovals           = "op_weight_msg_purge_approvals"
-	opWeightMsgCreateAddressLists       = "op_weight_msg_create_address_lists"
-	opWeightMsgSetDynamicStoreValue     = "op_weight_msg_set_dynamic_store_value"
-	
+	opWeightMsgDeleteCollection          = "op_weight_msg_delete_collection"
+	opWeightMsgTransferTokens            = "op_weight_msg_transfer_tokens"
+	opWeightMsgUpdateUserApprovals       = "op_weight_msg_update_user_approvals"
+	opWeightMsgSetIncomingApproval       = "op_weight_msg_set_incoming_approval"
+	opWeightMsgSetOutgoingApproval       = "op_weight_msg_set_outgoing_approval"
+	opWeightMsgPurgeApprovals            = "op_weight_msg_purge_approvals"
+	opWeightMsgCreateAddressLists        = "op_weight_msg_create_address_lists"
+	opWeightMsgSetDynamicStoreValue      = "op_weight_msg_set_dynamic_store_value"
+
 	// Default weights - higher for more common operations
-	defaultWeightMsgCreateCollection         = 100
+	defaultWeightMsgCreateCollection          = 100
 	defaultWeightMsgUniversalUpdateCollection = 80
 	defaultWeightMsgDeleteCollection          = 20
 	defaultWeightMsgTransferTokens            = 200 // Most common operation
@@ -57,7 +57,7 @@ func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		accs[i] = acc.Address.String()
 	}
 	badgesGenesis := types.DefaultGenesis()
-	
+
 	// Pre-create collections, dynamic stores, and balances for better simulation starting state
 	// This ensures simulation operations have valid state to work with from the start
 	if len(simState.Accounts) > 0 {
@@ -69,38 +69,38 @@ func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 				PrivKey: acc.PrivKey,
 			}
 		}
-		
+
 		// Create a temporary context and keeper to setup state
 		// Note: In actual simulation, this will be done during InitGenesis
 		// But we can pre-populate the genesis state with collections and dynamic stores
 		// The actual state setup will happen when InitGenesis is called
 		r := rand.New(rand.NewSource(simState.Rand.Int63()))
-		
+
 		// Pre-create some collections in genesis state
 		// Collections will be created during simulation operations, not in genesis
 		// This ensures simulation starts with a clean state but operations can create resources
-		
+
 		// Pre-create some dynamic stores in genesis state
 		for i := 0; i < badgessimulation.DefaultSimDynamicStoreCount && i < len(simAccounts); i++ {
 			creator := simAccounts[i].Address.String()
 			defaultValue := r.Intn(2) == 0
-			
+
 			// Create dynamic store that will be initialized in InitGenesis
 			dynamicStore := &types.DynamicStore{
-				StoreId:      sdkmath.NewUint(uint64(i + 1)),
-				CreatedBy:    creator,
-				DefaultValue: defaultValue,
+				StoreId:       sdkmath.NewUint(uint64(i + 1)),
+				CreatedBy:     creator,
+				DefaultValue:  defaultValue,
 				GlobalEnabled: true,
 			}
 			badgesGenesis.DynamicStores = append(badgesGenesis.DynamicStores, dynamicStore)
 		}
-		
+
 		// Update next IDs to reflect pre-created resources
 		if len(badgesGenesis.DynamicStores) > 0 {
 			badgesGenesis.NextDynamicStoreId = sdkmath.NewUint(uint64(len(badgesGenesis.DynamicStores) + 1))
 		}
 	}
-	
+
 	// Use default genesis which already initializes NextCollectionId to 1
 	// this line is used by starport scaffolding # simapp/module/genesisState
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(badgesGenesis)

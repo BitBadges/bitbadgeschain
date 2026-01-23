@@ -47,4 +47,3 @@ func CmdCastVote() *cobra.Command {
 
 	return cmd
 }
-

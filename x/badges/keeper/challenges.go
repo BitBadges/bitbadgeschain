@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	MaxMerkleProofLength = 10
+	MaxMerkleProofLength = 20
 )
 
 // HandleMerkleChallenges processes merkle challenges for approval validation
@@ -129,7 +129,7 @@ func (k Keeper) HandleMerkleChallenges(
 					}
 				}
 
-				//Get leftmost leaf index for layer === challenge.ExpectedProofLength
+				// Get leftmost leaf index for layer === challenge.ExpectedProofLength
 				leafIndex := GetLeafIndex(proof.Aunts)
 				leftmostLeafIndex := sdkmath.NewUint(1)
 
@@ -137,7 +137,7 @@ func (k Keeper) HandleMerkleChallenges(
 					leftmostLeafIndex = leftmostLeafIndex.Mul(sdkmath.NewUint(2))
 				}
 
-				//Predefined balances challenge tracker = current challenge tracker
+				// Predefined balances challenge tracker = current challenge tracker
 				useLeafIndexForTransferOrder := false
 				if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 					if approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId == challengeId {
@@ -161,7 +161,7 @@ func (k Keeper) HandleMerkleChallenges(
 					continue
 				}
 
-				//If there is a max uses per leaf, we need to check it has not exceeded the treshold uses
+				// If there is a max uses per leaf, we need to check it has not exceeded the treshold uses
 				if !challenge.MaxUsesPerLeaf.IsNil() && challenge.MaxUsesPerLeaf.GT(sdkmath.NewUint(0)) {
 					numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 					if err != nil {
@@ -176,7 +176,7 @@ func (k Keeper) HandleMerkleChallenges(
 						continue
 					}
 
-					//Increment the number of uses in store if we are doing it for real
+					// Increment the number of uses in store if we are doing it for real
 					if !simulation {
 						newNumUsed, err := k.IncrementChallengeTrackerInStore(ctx, collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, leafIndex.Sub(leftmostLeafIndex))
 						if err != nil {
@@ -184,7 +184,7 @@ func (k Keeper) HandleMerkleChallenges(
 							return detErrMsg, numIncrements, sdkerrors.Wrap(err, detErrMsg)
 						}
 
-						//Currently added for indexer, but note that it is planned to be deprecated
+						// Currently added for indexer, but note that it is planned to be deprecated
 						ctx.EventManager().EmitEvent(
 							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
 								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
@@ -337,7 +337,7 @@ func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.MerklePath
 
 func GetLeafIndex(aunts []*types.MerklePathItem) sdkmath.Uint {
 	leafIndex := sdkmath.NewUint(1)
-	//iterate through msg.WhitelistProof.Aunts backwards
+	// iterate through msg.WhitelistProof.Aunts backwards
 	for i := len(aunts) - 1; i >= 0; i-- {
 		aunt := aunts[i]
 		onRight := aunt.OnRight

@@ -148,6 +148,8 @@ func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_UserApprovalVer
 func (suite *ApprovalVersioningTestSuite) TestApprovalVersioning_InvalidVersionReuse() {
 	// Setup approvals - need mint approval first
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
+	mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true
 	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,

@@ -31,7 +31,7 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 
 	for _, coinTransfer := range coinTransfers {
 		amount := sdkmath.NewUintFromString(coinTransfer.Amount)
-		//initialize it if it doesn't exist
+		// initialize it if it doesn't exist
 		if _, ok := denomAmounts[coinTransfer.Denom]; !ok {
 			denomAmounts[coinTransfer.Denom] = sdkmath.NewUint(0)
 		}
@@ -213,7 +213,8 @@ func (k Keeper) HandleAutoDeletions(
 
 	// Per-transfer, we handle auto-deletions if applicable
 	for _, approvalUsed := range approvalsUsed {
-		if approvalUsed.ApprovalLevel == "incoming" {
+		switch approvalUsed.ApprovalLevel {
+		case "incoming":
 			newIncomingApprovals := []*types.UserIncomingApproval{}
 			for _, incomingApproval := range toUserBalance.IncomingApprovals {
 				if incomingApproval.ApprovalId != approvalUsed.ApprovalId {
@@ -238,7 +239,7 @@ func (k Keeper) HandleAutoDeletions(
 				}
 			}
 			toUserBalance.IncomingApprovals = newIncomingApprovals
-		} else if approvalUsed.ApprovalLevel == "outgoing" {
+		case "outgoing":
 			newOutgoingApprovals := []*types.UserOutgoingApproval{}
 			for _, outgoingApproval := range fromUserBalance.OutgoingApprovals {
 				if outgoingApproval.ApprovalId != approvalUsed.ApprovalId {
@@ -263,7 +264,7 @@ func (k Keeper) HandleAutoDeletions(
 				}
 			}
 			fromUserBalance.OutgoingApprovals = newOutgoingApprovals
-		} else if approvalUsed.ApprovalLevel == "collection" {
+		case "collection":
 			newCollectionApprovals := []*types.CollectionApproval{}
 			edited := false
 			for _, collectionApproval := range collection.CollectionApprovals {

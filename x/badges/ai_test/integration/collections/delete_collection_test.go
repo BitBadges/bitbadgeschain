@@ -31,6 +31,8 @@ func (suite *DeleteCollectionTestSuite) TestDeleteCollection_PurgesAllState() {
 
 	// Add collection approvals - need mint approval first
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
+	mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true
 	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
@@ -103,6 +105,8 @@ func (suite *DeleteCollectionTestSuite) TestDeleteCollection_NoOrphanedState() {
 
 	// Set up mint approval first
 	mintApproval := testutil.GenerateCollectionApproval("mint_approval", types.MintAddress, "All")
+	mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals = true
+	mintApproval.ApprovalCriteria.OverridesToIncomingApprovals = true
 	updateMintMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                   suite.Manager,
 		CollectionId:               collectionId,

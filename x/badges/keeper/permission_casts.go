@@ -7,8 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//HACK: We cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
-
+// HACK: We cast the permissions to their UniversalPermission equivalents, so we can reuse the UniversalPermission functions
 func (k Keeper) CastUserIncomingApprovalPermissionToUniversalPermission(ctx sdk.Context, permissions []*types.UserIncomingApprovalPermission) ([]*types.UniversalPermission, error) {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, permission := range permissions {
@@ -94,7 +93,6 @@ func (k Keeper) CastActionPermissionToUniversalPermission(actionPermission []*ty
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-
 			PermanentlyPermittedTimes: actionPermission.PermanentlyPermittedTimes,
 			PermanentlyForbiddenTimes: actionPermission.PermanentlyForbiddenTimes,
 		})
@@ -126,7 +124,6 @@ func (k Keeper) CastCollectionApprovalPermissionToUniversalPermission(ctx sdk.Co
 		}
 
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-
 			TransferTimes:       collectionUpdatePermission.TransferTimes,
 			OwnershipTimes:      collectionUpdatePermission.OwnershipTimes,
 			ToList:              toList,
@@ -153,7 +150,6 @@ func (k Keeper) CastTokenIdsActionPermissionToUniversalPermission(TokenIdsAction
 	castedPermissions := []*types.UniversalPermission{}
 	for _, TokenIdsActionPermission := range TokenIdsActionPermission {
 		castedPermissions = append(castedPermissions, &types.UniversalPermission{
-
 			TokenIds:     TokenIdsActionPermission.TokenIds,
 			UsesTokenIds: true,
 

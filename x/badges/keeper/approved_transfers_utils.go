@@ -25,7 +25,7 @@ func (k Keeper) DeductUserOutgoingApprovals(
 		currApprovals = AppendSelfInitiatedOutgoingApproval(currApprovals, from)
 	}
 
-	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
+	// Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedApprovals := types.CastOutgoingTransfersToCollectionTransfers(currApprovals, from)
 
 	// We do not care about the return value here because it is user-level
@@ -63,7 +63,7 @@ func (k Keeper) DeductUserIncomingApprovals(
 		currApprovals = AppendSelfInitiatedIncomingApproval(currApprovals, to)
 	}
 
-	//Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
+	// Little hack to reuse the same function for all transfer objects (we cast everything to a collection transfer)
 	castedApprovals := types.CastIncomingTransfersToCollectionTransfers(currApprovals, to)
 
 	// We do not care about the return value here because it is user-level
@@ -109,7 +109,7 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 }
 
 func onlyCheckPrioritizedApprovals(transfer *types.Transfer, approvalLevel string) bool {
-	//prioritized approvals are checked first and if the "only" flag is set, we only check prioritized approvals
+	// prioritized approvals are checked first and if the "only" flag is set, we only check prioritized approvals
 	onlyCheckPrioritized := false
 	if approvalLevel == "collection" && transfer.OnlyCheckPrioritizedCollectionApprovals {
 		onlyCheckPrioritized = true
@@ -131,9 +131,9 @@ func FilterApprovalsWithPrioritizedHandling(
 	prioritizedApprovals := transfer.PrioritizedApprovals
 	onlyCheckPrioritized := onlyCheckPrioritizedApprovals(transfer, approvalLevel)
 
-	//Reorder approvals based on prioritized approvals
-	//We want to check prioritized approvals first
-	//If onlyCheckPrioritized is true, we only check prioritized approvals and ignore the rest
+	// Reorder approvals based on prioritized approvals
+	// We want to check prioritized approvals first
+	// If onlyCheckPrioritized is true, we only check prioritized approvals and ignore the rest
 	approvals := []*types.CollectionApproval{}
 	prioritizedTransfers := []*types.CollectionApproval{}
 	for _, approval := range _approvals {
@@ -159,7 +159,7 @@ func FilterApprovalsWithPrioritizedHandling(
 		approvals = append(prioritizedTransfers, approvals...)
 	}
 
-	//Filter approvals where approvalCriteria != nil and not in prioritizedApprovals
+	// Filter approvals where approvalCriteria != nil and not in prioritizedApprovals
 	filteredApprovals := []*types.CollectionApproval{}
 	for _, approval := range approvals {
 		if types.CollectionApprovalIsAutoScannable(approval.ApprovalCriteria) {

@@ -748,7 +748,7 @@ func (suite *TestSuite) TestMustOwnTokensBb1AddressSupport() {
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{
 		{
 			ApprovalId:        "default",
-			ApprovalCriteria:  &types.ApprovalCriteria{},
+			ApprovalCriteria:  &types.ApprovalCriteria{OverridesFromOutgoingApprovals: true},
 			TransferTimes:     GetFullUintRanges(),
 			TokenIds:          GetFullUintRanges(), // Cover all token IDs to allow collection creation
 			OwnershipTimes:    GetFullUintRanges(),

@@ -4,7 +4,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
-//Needed for custom gogoproto types
+// Needed for custom gogoproto types
 
 type (
 	Int  = sdkmath.Int

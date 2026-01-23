@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -18,7 +19,7 @@ func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetToke
 	// Get existing collection to fetch current permissions
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
-		return nil, ErrCollectionNotExists
+		return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", msg.CollectionId.String())
 	}
 
 	// Construct the full UniversalUpdateCollection message
@@ -31,16 +32,16 @@ func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetToke
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateTokenMetadata: msg.CanUpdateTokenMetadata,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:                collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:               collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateStandards:                 collection.CollectionPermissions.CanUpdateStandards,
-			CanUpdateCustomData:                collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                   collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidTokenIds:             collection.CollectionPermissions.CanUpdateValidTokenIds,
-			CanUpdateCollectionMetadata:        collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateCollectionApprovals:       collection.CollectionPermissions.CanUpdateCollectionApprovals,
-			CanAddMoreAliasPaths:               collection.CollectionPermissions.CanAddMoreAliasPaths,
-			CanAddMoreCosmosCoinWrapperPaths:   collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths,
+			CanDeleteCollection:              collection.CollectionPermissions.CanDeleteCollection,
+			CanArchiveCollection:             collection.CollectionPermissions.CanArchiveCollection,
+			CanUpdateStandards:               collection.CollectionPermissions.CanUpdateStandards,
+			CanUpdateCustomData:              collection.CollectionPermissions.CanUpdateCustomData,
+			CanUpdateManager:                 collection.CollectionPermissions.CanUpdateManager,
+			CanUpdateValidTokenIds:           collection.CollectionPermissions.CanUpdateValidTokenIds,
+			CanUpdateCollectionMetadata:      collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateCollectionApprovals:     collection.CollectionPermissions.CanUpdateCollectionApprovals,
+			CanAddMoreAliasPaths:             collection.CollectionPermissions.CanAddMoreAliasPaths,
+			CanAddMoreCosmosCoinWrapperPaths: collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths,
 		},
 	}
 

@@ -25,12 +25,12 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 
 	// Create the dynamic store
 	dynamicStore := types.DynamicStore{
-		StoreId:      nextStoreId,
-		CreatedBy:    msg.Creator,
-		DefaultValue: msg.DefaultValue,
+		StoreId:       nextStoreId,
+		CreatedBy:     msg.Creator,
+		DefaultValue:  msg.DefaultValue,
 		GlobalEnabled: true, // Default to enabled for new stores
-		Uri:          msg.Uri,
-		CustomData:   msg.CustomData,
+		Uri:           msg.Uri,
+		CustomData:    msg.CustomData,
 	}
 
 	// Store the dynamic store

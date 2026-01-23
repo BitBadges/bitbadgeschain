@@ -52,4 +52,3 @@ func (k Keeper) GetVotes(goCtx context.Context, req *types.QueryGetVotesRequest)
 		Votes: matchingVotes,
 	}, nil
 }
-

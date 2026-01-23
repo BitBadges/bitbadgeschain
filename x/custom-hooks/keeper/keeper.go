@@ -141,7 +141,6 @@ func (k Keeper) ExecuteHook(ctx sdk.Context, sender sdk.AccAddress, hookData *ty
 
 // ExecuteSwapAndAction executes a SwapAndAction hook
 func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swapAndAction *types.SwapAndAction, tokenIn sdk.Coin, originalSender string) ibcexported.Acknowledgement {
-
 	if swapAndAction == nil {
 		return types.NewSuccessAcknowledgement()
 	}
@@ -455,15 +454,15 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 		// Use timeout_timestamp if provided, otherwise use default
 		var timeoutTimestamp uint64
 		currentTime := uint64(ctx.BlockTime().UnixNano())
-		
+
 		if swapAndAction.TimeoutTimestamp != nil {
 			timeoutTimestamp = *swapAndAction.TimeoutTimestamp
-			
+
 			// Validate timeout is not in the past
 			if timeoutTimestamp <= currentTime {
 				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("timeout timestamp must be in the future: provided=%d, current=%d", timeoutTimestamp, currentTime))
 			}
-			
+
 			// Validate timeout is not too far in the future (max 1 week)
 			// 1 week is reasonable for IBC transfers which may take time to complete
 			maxTimeout := currentTime + uint64(7*24*60*60*1e9) // 1 week in nanoseconds

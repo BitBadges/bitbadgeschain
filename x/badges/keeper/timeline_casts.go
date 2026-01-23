@@ -8,13 +8,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//For TimedUpdates that involve checking additonal information (i.e. TimedUpdateWithTokenIds, CollectionApprovals, UserIncomingApprovals, etc.)
-//We cast the values to a UniversalPermission struct, which is compatible with the permissions.go file in types
-//This allows us to easily check overlaps and get the correct permissions
+// For TimedUpdates that involve checking additional information (i.e. TimedUpdateWithTokenIds, CollectionApprovals, UserIncomingApprovals, etc.)
+// We cast the values to a UniversalPermission struct, which is compatible with the permissions.go file in types
+// This allows us to easily check overlaps and get the correct permissions
 
-//HACK: We use the ArbitraryValue field to store the original value, so we can cast it back later
-//HACK: We cast to a UniversalPermission for reusable code.
-
+// HACK: We use the ArbitraryValue field to store the original value, so we can cast it back later
+// HACK: We cast to a UniversalPermission for reusable code.
 func (k Keeper) CastTokenMetadataToUniversalPermission(tokenMetadata []*types.TokenMetadata) []*types.UniversalPermission {
 	castedPermissions := []*types.UniversalPermission{}
 	for _, tokenMetadata := range tokenMetadata {

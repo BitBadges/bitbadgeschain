@@ -190,7 +190,7 @@ message QueryGetWrappableBalancesRequest {
 }
 
 message QueryGetWrappableBalancesResponse {
-  string maxWrappableAmount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string amount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 message QueryIsAddressReservedProtocolRequest {

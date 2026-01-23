@@ -22,7 +22,7 @@ func SimulateMsgPurgeApprovals(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPurgeApprovals, "no accounts available"), nil, nil
 		}
-		
+
 		// Try to get a known-good collection ID first
 		collectionId, found := GetKnownGoodCollectionId(ctx, k)
 		if !found {
@@ -38,15 +38,15 @@ func SimulateMsgPurgeApprovals(
 				collectionId = createdId
 			}
 		}
-		
+
 		// Check if collection exists
 		_, found = k.GetCollectionFromStore(ctx, collectionId)
 		if !found {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgPurgeApprovals, "collection not found"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
-		
+
 		// Generate specific approvals to purge (required - cannot be empty)
 		// Randomly decide approval level
 		approvalLevel := "collection"
@@ -58,28 +58,28 @@ func SimulateMsgPurgeApprovals(
 			approvalLevel = "outgoing"
 			approverAddress = simAccount.Address.String()
 		}
-		
+
 		// Generate 1-3 approvals to purge
 		count := r.Intn(3) + 1
 		approvalsToPurge := []*types.ApprovalIdentifierDetails{}
 		for i := 0; i < count; i++ {
 			approvalsToPurge = append(approvalsToPurge, &types.ApprovalIdentifierDetails{
-				ApprovalId:     simtypes.RandStringOfLength(r, 10),
-				ApprovalLevel:  approvalLevel,
+				ApprovalId:      simtypes.RandStringOfLength(r, 10),
+				ApprovalLevel:   approvalLevel,
 				ApproverAddress: approverAddress,
 			})
 		}
-		
+
 		// Determine purge options based on whether we're purging own approvals
 		// If approverAddress is empty or matches creator, we're purging own approvals
-		purgeExpired := true // Required when purging own approvals
+		purgeExpired := true                // Required when purging own approvals
 		purgeCounterpartyApprovals := false // Must be false when purging own approvals
 		if approverAddress != "" && approverAddress != simAccount.Address.String() {
 			// Purging someone else's approvals
 			purgeExpired = r.Intn(2) == 0
 			purgeCounterpartyApprovals = r.Intn(2) == 0
 		}
-		
+
 		msg := &types.MsgPurgeApprovals{
 			Creator:                    simAccount.Address.String(),
 			CollectionId:               collectionId,
@@ -88,13 +88,12 @@ func SimulateMsgPurgeApprovals(
 			PurgeCounterpartyApprovals: purgeCounterpartyApprovals,
 			ApprovalsToPurge:           approvalsToPurge,
 		}
-		
+
 		// Validate message
 		if err := msg.ValidateBasic(); err != nil {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), err.Error()), nil, nil
 		}
-		
+
 		return simtypes.NewOperationMsg(msg, true, ""), nil, nil
 	}
 }
-

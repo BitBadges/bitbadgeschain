@@ -85,6 +85,14 @@ message ApprovalCriteria {
   // Voting challenges that must be satisfied for approval. The initiator must provide
   // valid votes that meet the quorum threshold for all specified challenges.
   repeated VotingChallenge votingChallenges = 22;
+  // If true, this collection approval allows backed minting operations (CosmosCoinBackedPath).
+  // When false, this approval cannot be used for transfers involving backed minting addresses.
+  // This prevents accidental allowances when toListIds is "All".
+  bool allowBackedMinting = 23;
+  // If true, this collection approval allows special wrapping operations (CosmosCoinWrapperPath).
+  // When false, this approval cannot be used for transfers involving wrapping addresses.
+  // This prevents accidental allowances when toListIds is "All".
+  bool allowSpecialWrapping = 24;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.

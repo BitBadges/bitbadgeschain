@@ -22,7 +22,7 @@ func SimulateMsgCreateCollection(
 		if len(accs) == 0 {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgCreateCollection, "no accounts available"), nil, nil
 		}
-		
+
 		simAccount := EnsureAccountExists(r, accs)
 
 		// Generate valid token IDs (at least one required) using bounded ranges

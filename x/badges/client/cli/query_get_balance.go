@@ -15,8 +15,8 @@ var _ = strconv.Itoa(0)
 
 func CmdGetBalance() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-balance [collection-id] [address]",
-		Short: "Query getBalance",
+		Use:   "balance [collection-id] [address]",
+		Short: "Query balance",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqCollectionId := args[0]
@@ -37,7 +37,6 @@ func CmdGetBalance() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetBalanceRequest{
-
 				CollectionId: reqCollectionId,
 				Address:      reqAddress,
 			}

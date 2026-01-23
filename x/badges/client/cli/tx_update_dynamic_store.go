@@ -23,7 +23,7 @@ Arguments:
   store-id: The ID of the dynamic store to update
   default-value: The default value for uninitialized addresses (true/false)
   global-enabled: The global kill switch state (true = enabled, false = disabled/halted)`,
-		Args:  cobra.ExactArgs(3),
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argStoreId := types.NewUintFromString(args[0])
 			defaultValue, err := strconv.ParseBool(args[1])

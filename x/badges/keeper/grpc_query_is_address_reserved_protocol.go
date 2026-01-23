@@ -23,4 +23,3 @@ func (k Keeper) IsAddressReservedProtocol(goCtx context.Context, req *types.Quer
 		IsReservedProtocol: isReservedProtocol,
 	}, nil
 }
-

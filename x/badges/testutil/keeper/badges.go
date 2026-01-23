@@ -43,16 +43,16 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
-	
+
 	// Ensure SDK config is initialized with "bb" prefix before it gets sealed
 	// This must be called before any address validation happens
 	params.InitSDKConfigWithoutSeal()
-	
+
 	// Use bech32 codec with "bb" prefix
 	bech32Codec := address.NewBech32Codec("bb")
-	
+
 	authorityAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
-	
+
 	// Convert authority to "bb" prefix to match account keeper setup
 	authorityStr, err := bech32Codec.BytesToString(authorityAddr)
 	if err != nil {
@@ -104,14 +104,13 @@ type mockSendManagerKeeper struct {
 
 func (m *mockSendManagerKeeper) SendCoinWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coin *sdk.Coin) error {
 	// For tests, just use bank keeper directly
-	// BankKeeper.SendCoins uses context.Context, so we need to wrap the sdk.Context
-	return m.bankKeeper.SendCoins(sdk.WrapSDKContext(ctx), fromAddressAcc, toAddressAcc, sdk.NewCoins(*coin))
+	return m.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(*coin))
 }
 
 func (m *mockSendManagerKeeper) SendCoinsWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, toAddressAcc sdk.AccAddress, coins sdk.Coins) error {
 	// For tests, just use bank keeper directly
 	// BankKeeper.SendCoins uses context.Context, so we need to wrap the sdk.Context
-	return m.bankKeeper.SendCoins(sdk.WrapSDKContext(ctx), fromAddressAcc, toAddressAcc, coins)
+	return m.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, coins)
 }
 
 func (m *mockSendManagerKeeper) FundCommunityPoolWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, coins sdk.Coins) error {
@@ -123,7 +122,7 @@ func (m *mockSendManagerKeeper) FundCommunityPoolWithAliasRouting(ctx sdk.Contex
 func (m *mockSendManagerKeeper) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error) {
 	// For tests, just use bank keeper directly
 	// BankKeeper.GetBalance uses context.Context, so we need to wrap the sdk.Context
-	return m.bankKeeper.GetBalance(sdk.WrapSDKContext(ctx), address, denom), nil
+	return m.bankKeeper.GetBalance(ctx, address, denom), nil
 }
 
 func (m *mockSendManagerKeeper) IsICS20Compatible(ctx sdk.Context, denom string) bool {
@@ -139,17 +138,17 @@ func (m *mockSendManagerKeeper) StandardName(ctx sdk.Context, denom string) stri
 func (m *mockSendManagerKeeper) SendCoinsFromModuleToAccountWithAliasRouting(ctx sdk.Context, moduleName string, toAddressAcc sdk.AccAddress, coins sdk.Coins) error {
 	// For tests, just use bank keeper directly
 	// BankKeeper.SendCoinsFromModuleToAccount uses context.Context, so we need to wrap the sdk.Context
-	return m.bankKeeper.SendCoinsFromModuleToAccount(sdk.WrapSDKContext(ctx), moduleName, toAddressAcc, coins)
+	return m.bankKeeper.SendCoinsFromModuleToAccount(ctx, moduleName, toAddressAcc, coins)
 }
 
 func (m *mockSendManagerKeeper) SendCoinsFromAccountToModuleWithAliasRouting(ctx sdk.Context, fromAddressAcc sdk.AccAddress, moduleName string, coins sdk.Coins) error {
 	// For tests, just use bank keeper directly
 	// BankKeeper.SendCoinsFromAccountToModule uses context.Context, so we need to wrap the sdk.Context
-	return m.bankKeeper.SendCoinsFromAccountToModule(sdk.WrapSDKContext(ctx), fromAddressAcc, moduleName, coins)
+	return m.bankKeeper.SendCoinsFromAccountToModule(ctx, fromAddressAcc, moduleName, coins)
 }
 
 func (m *mockSendManagerKeeper) SpendFromCommunityPoolWithAliasRouting(ctx sdk.Context, toAddressAcc sdk.AccAddress, coins sdk.Coins) error {
 	// For tests, just use bank keeper directly with distribution module
 	// BankKeeper.SendCoinsFromModuleToAccount uses context.Context, so we need to wrap the sdk.Context
-	return m.bankKeeper.SendCoinsFromModuleToAccount(sdk.WrapSDKContext(ctx), "distribution", toAddressAcc, coins)
+	return m.bankKeeper.SendCoinsFromModuleToAccount(ctx, "distribution", toAddressAcc, coins)
 }

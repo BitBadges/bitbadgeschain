@@ -25,7 +25,7 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 
 	// Check if all characters are alphanumeric
 	for _, char := range id {
-		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
+		if (char < 'a' || char > 'z') && (char < 'A' || char > 'Z') && (char < '0' || char > '9') {
 			return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id can only contain alphanumeric characters")
 		}
 	}
@@ -97,7 +97,6 @@ func parseInversionPattern(listId string, allowParentheses bool) (bool, string, 
 }
 
 func getReservedListById(addressListId string, allowAliases bool) (*types.AddressList, error) {
-
 	// Handle special reserved IDs
 	switch {
 	case addressListId == types.MintAddress:

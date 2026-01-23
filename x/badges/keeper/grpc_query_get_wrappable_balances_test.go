@@ -118,7 +118,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	// Bob should have tokens, and since 1 native badge = 1 wrapped token,
 	// the max wrappable amount should match the number of tokens he has
 	// (The exact amount depends on collection setup, but with 1:1 conversion it should match his balance)
-	require.GreaterOrEqual(t, response.MaxWrappableAmount.Uint64(), uint64(1), "Bob should be able to wrap at least 1 token")
+	require.GreaterOrEqual(t, response.Amount.Uint64(), uint64(1), "Bob should be able to wrap at least 1 token")
 
 	// Test with a different user who has more tokens
 	// Create another collection with a different wrapper path for charlie
@@ -186,7 +186,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, response2)
-	require.GreaterOrEqual(t, response2.MaxWrappableAmount.Uint64(), uint64(1), "Charlie should be able to wrap at least 1 token")
+	require.GreaterOrEqual(t, response2.Amount.Uint64(), uint64(1), "Charlie should be able to wrap at least 1 token")
 
 	// Test with alias path amount > 1 to ensure conversion math works (e.g., 2 badges -> 2 coins when user has 4)
 	nextId := suite.app.BadgesKeeper.GetNextCollectionId(suite.ctx)
@@ -254,7 +254,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	// Bob has 5 badges total (collection creation minted 1 + we minted 4 more).
 	// Path: Amount=2 means 2 wrapped units per conversion, and each conversion requires 1 badge.
 	// So: 5 badges / 1 badge per conversion = 5 conversions, and 5 conversions * 2 wrapped units = 10 wrapped units.
-	require.Equal(t, uint64(10), respAmount.MaxWrappableAmount.Uint64(), "Bob should be able to wrap 10 units (5 badges * 2 wrapped units per badge)")
+	require.Equal(t, uint64(10), respAmount.Amount.Uint64(), "Bob should be able to wrap 10 units (5 badges * 2 wrapped units per badge)")
 
 	// Test with a wrapper path that doesn't allow cosmos wrapping
 	// This should now work and return 0 since the user has 1 token but wrapper needs 1 token
@@ -323,7 +323,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	require.NotNil(t, response3)
 	// The main goal was to test that AllowCosmosWrapping=false doesn't cause an error
 	// The actual wrappable amount depends on the specific token setup, which can be 0 or more
-	require.True(t, response3.MaxWrappableAmount.GTE(sdkmath.NewUint(0)))
+	require.True(t, response3.Amount.GTE(sdkmath.NewUint(0)))
 }
 
 func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
@@ -368,7 +368,7 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, response)
-	require.Equal(t, sdkmath.NewUint(1), response.MaxWrappableAmount)
+	require.Equal(t, sdkmath.NewUint(1), response.Amount)
 
 	// Test with user who has more tokens
 	// Give charlie more tokens by creating another collection
@@ -405,7 +405,7 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, response2)
-	require.Equal(t, sdkmath.NewUint(1), response2.MaxWrappableAmount)
+	require.Equal(t, sdkmath.NewUint(1), response2.Amount)
 }
 
 // TestKeeper_GetWrappableBalances_Comprehensive tests various edge cases and scenarios
@@ -568,7 +568,7 @@ func TestKeeper_GetWrappableBalances_Comprehensive(t *testing.T) {
 			})
 			require.NoError(t, err, "error getting wrappable balances for test: %s", tt.name)
 			require.NotNil(t, response, "response should not be nil for test: %s", tt.name)
-			require.Equal(t, tt.expectedResult, response.MaxWrappableAmount, "test: %s - %s", tt.name, tt.description)
+			require.Equal(t, tt.expectedResult, response.Amount, "test: %s - %s", tt.name, tt.description)
 		})
 	}
 }
@@ -758,13 +758,13 @@ func TestKeeper_GetWrappableBalances_MultipleUserBalances(t *testing.T) {
 			})
 			require.NoError(t, err, "error getting wrappable balances for test: %s", tt.name)
 			require.NotNil(t, response, "response should not be nil for test: %s", tt.name)
-			require.Equal(t, tt.expectedResult, response.MaxWrappableAmount, "test: %s - %s", tt.name, tt.description)
+			require.Equal(t, tt.expectedResult, response.Amount, "test: %s - %s", tt.name, tt.description)
 		})
 	}
 }
 
-// FuzzCalculateMaxWrappableAmount tests the calculation with random values
-func FuzzCalculateMaxWrappableAmount(f *testing.F) {
+// FuzzCalculateAmount tests the calculation with random values
+func FuzzCalculateAmount(f *testing.F) {
 	// Add seed corpus
 	f.Add(uint64(1), uint64(1), uint64(1))
 	f.Add(uint64(2), uint64(1), uint64(5))

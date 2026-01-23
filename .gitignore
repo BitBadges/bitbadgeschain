@@ -46,3 +46,6 @@ genesis-test.json
 scripts-dev/
 
 new-genesis.json
+
+# Osmosis sync directory
+.osmosis-sync/

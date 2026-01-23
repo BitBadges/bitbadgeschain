@@ -39,4 +39,3 @@ func (k Keeper) GetVote(goCtx context.Context, req *types.QueryGetVoteRequest) (
 		Vote: vote,
 	}, nil
 }
-

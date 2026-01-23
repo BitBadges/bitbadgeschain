@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	sdkerrors "cosmossdk.io/errors"
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
@@ -82,9 +82,9 @@ func WrapErr(ctx *sdk.Context, errType error, detMsg string, args ...interface{}
 	SetDeterministicError(*ctx, cachedMsg)
 	// Use Wrap when no args (to avoid linter warning about non-constant format string)
 	if len(args) == 0 {
-		return sdkerrors.Wrap(errType, detMsg)
+		return errorsmod.Wrap(errType, detMsg)
 	}
-	return sdkerrors.Wrapf(errType, detMsg, args...)
+	return errorsmod.Wrapf(errType, detMsg, args...)
 }
 
 // WrapErrSimple sets a deterministic error in transient store and returns a wrapped error.
@@ -92,7 +92,7 @@ func WrapErr(ctx *sdk.Context, errType error, detMsg string, args ...interface{}
 // Usage: return customhookstypes.WrapErrSimple(&ctx, errType, detMsg)
 func WrapErrSimple(ctx *sdk.Context, errType error, detMsg string) error {
 	SetDeterministicError(*ctx, detMsg)
-	return sdkerrors.Wrap(errType, detMsg)
+	return errorsmod.Wrap(errType, detMsg)
 }
 
 // Err sets a deterministic error in transient store and returns a new error.
@@ -107,7 +107,7 @@ func Err(ctx *sdk.Context, detMsg string, args ...interface{}) error {
 		cachedMsg = detMsg
 	}
 	SetDeterministicError(*ctx, cachedMsg)
-	return fmt.Errorf(detMsg, args...)
+	return errorsmod.Wrap(ErrDeterministicError, cachedMsg)
 }
 
 // HookData represents the data that can be executed via IBC hooks
@@ -200,7 +200,7 @@ func ParseHookDataFromMemo(memo string) (*HookData, error) {
 
 	// Security: Validate memo size before unmarshaling to prevent DoS
 	if len(memo) > MaxMemoSize {
-		return nil, fmt.Errorf("memo size exceeds maximum allowed size: %d bytes (max: %d bytes)", len(memo), MaxMemoSize)
+		return nil, errorsmod.Wrapf(ErrMemoSizeExceedsMaximum, "size: %d bytes, max: %d bytes", len(memo), MaxMemoSize)
 	}
 
 	var memoObj map[string]interface{}

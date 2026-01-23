@@ -114,8 +114,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.PortId = k.GetPort(ctx)
 
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
-	addresses := []string{}
-	balanceIds := []sdkmath.Uint{}
+	var addresses []string
+	var balanceIds []sdkmath.Uint
 	genesis.Balances, addresses, balanceIds = k.GetUserBalancesFromStore(ctx)
 
 	for i, address := range addresses {

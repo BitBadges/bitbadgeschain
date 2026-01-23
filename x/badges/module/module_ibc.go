@@ -39,7 +39,6 @@ func (im IBCModule) OnChanOpenInit(
 	counterparty channeltypes.Counterparty,
 	version string,
 ) (string, error) {
-
 	// Require portID is the portID module is bound to
 	boundPort := im.keeper.GetPort(ctx)
 	if boundPort != portID {
@@ -69,7 +68,6 @@ func (im IBCModule) OnChanOpenTry(
 	counterparty channeltypes.Counterparty,
 	counterpartyVersion string,
 ) (string, error) {
-
 	// Require portID is the portID module is bound to
 	boundPort := im.keeper.GetPort(ctx)
 	if boundPort != portID {
@@ -142,8 +140,6 @@ func (im IBCModule) OnRecvPacket(
 	modulePacket channeltypes.Packet,
 	relayer sdk.AccAddress,
 ) ibcexported.Acknowledgement {
-	var ack channeltypes.Acknowledgement
-
 	// this line is used by starport scaffolding # oracle/packet/module/recv
 
 	var modulePacketData types.BadgesPacketData
@@ -155,12 +151,11 @@ func (im IBCModule) OnRecvPacket(
 	switch packet := modulePacketData.Packet.(type) {
 	// this line is used by starport scaffolding # ibc/packet/module/recv
 	default:
-		err := fmt.Errorf("unrecognized %s packet type: %T", types.ModuleName, packet)
+		err := errorsmod.Wrapf(types.ErrUnrecognizedPacketType, "packet type: %T", packet)
 		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	// NOTE: acknowledgement will be written synchronously during IBC handler execution.
-	return ack
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface
@@ -182,8 +177,6 @@ func (im IBCModule) OnAcknowledgementPacket(
 		return errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal packet data: %s", err.Error())
 	}
 
-	var eventType string
-
 	// Dispatch packet
 	switch packet := modulePacketData.Packet.(type) {
 	// this line is used by starport scaffolding # ibc/packet/module/ack
@@ -192,32 +185,26 @@ func (im IBCModule) OnAcknowledgementPacket(
 		return errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			eventType,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
-			sdk.NewAttribute(types.AttributeKeyAck, fmt.Sprintf("%v", ack)),
-		),
-	)
+	// var eventType string
+	// // Handle acknowledgement
+	// switch resp := ack.Response.(type) {
+	// case *channeltypes.Acknowledgement_Result:
+	// 	ctx.EventManager().EmitEvent(
+	// 		sdk.NewEvent(
+	// 			types.AttributeKeyAck,
+	// 			sdk.NewAttribute(types.AttributeKeyAckSuccess, string(resp.Result)),
+	// 		),
+	// 	)
+	// case *channeltypes.Acknowledgement_Error:
+	// 	ctx.EventManager().EmitEvent(
+	// 		sdk.NewEvent(
+	// 			types.AttributeKeyAck,
+	// 			sdk.NewAttribute(types.AttributeKeyAckError, resp.Error),
+	// 		),
+	// 	)
+	// }
 
-	switch resp := ack.Response.(type) {
-	case *channeltypes.Acknowledgement_Result:
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				eventType,
-				sdk.NewAttribute(types.AttributeKeyAckSuccess, string(resp.Result)),
-			),
-		)
-	case *channeltypes.Acknowledgement_Error:
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				eventType,
-				sdk.NewAttribute(types.AttributeKeyAckError, resp.Error),
-			),
-		)
-	}
-
-	return nil
+	// return nil
 }
 
 // OnTimeoutPacket implements the IBCModule interface
@@ -238,6 +225,4 @@ func (im IBCModule) OnTimeoutPacket(
 		errMsg := fmt.Sprintf("unrecognized %s packet type: %T", types.ModuleName, packet)
 		return errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
-
-	return nil
 }

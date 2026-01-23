@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -135,32 +136,32 @@ func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 
 	// Validate that we have the expected number of parts
 	if len(result) != 2 {
-		return BalanceKeyDetails{}, fmt.Errorf("invalid balance key format: expected 2 parts, got %d", len(result))
+		return BalanceKeyDetails{}, errorsmod.Wrapf(ErrInvalidBalanceKeyFormat, "expected 2 parts, got %d", len(result))
 	}
 
 	// Validate that the collection ID can be parsed
 	if result[0] == "" {
-		return BalanceKeyDetails{}, fmt.Errorf("empty collection ID in balance key")
+		return BalanceKeyDetails{}, errorsmod.Wrap(ErrEmptyCollectionIDInBalanceKey, "")
 	}
 
 	collection_id, err := strconv.ParseUint(result[0], 10, 64)
 	if err != nil {
-		return BalanceKeyDetails{}, fmt.Errorf("invalid collection ID '%s' in balance key: %w", result[0], err)
+		return BalanceKeyDetails{}, errorsmod.Wrapf(ErrInvalidBalanceKeyFormat, "invalid collection ID '%s' in balance key: %v", result[0], err)
 	}
 
 	// Validate collection ID is not zero (collection IDs start from 1)
 	if collection_id == 0 {
-		return BalanceKeyDetails{}, fmt.Errorf("collection ID cannot be zero")
+		return BalanceKeyDetails{}, errorsmod.Wrap(ErrCollectionIDCannotBeZero, "")
 	}
 
 	// Validate that the address is not empty
 	if result[1] == "" {
-		return BalanceKeyDetails{}, fmt.Errorf("empty address in balance key")
+		return BalanceKeyDetails{}, errorsmod.Wrap(ErrEmptyAddressInBalanceKey, "")
 	}
 
 	// Additional validation: check for potential delimiter conflicts
 	if strings.Contains(result[0], BalanceKeyDelimiter) || strings.Contains(result[1], BalanceKeyDelimiter) {
-		return BalanceKeyDetails{}, fmt.Errorf("balance key components cannot contain delimiter '%s'", BalanceKeyDelimiter)
+		return BalanceKeyDetails{}, errorsmod.Wrapf(ErrBalanceKeyDelimiterConflict, "delimiter '%s'", BalanceKeyDelimiter)
 	}
 
 	return BalanceKeyDetails{

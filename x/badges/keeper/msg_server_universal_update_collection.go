@@ -7,6 +7,7 @@ import (
 	"math"
 	"slices"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -82,19 +83,19 @@ func ensureMintForbiddenPermission(permissions *types.CollectionPermissions, has
 func generatePathAddress(pathString string, prefix []byte) (sdk.AccAddress, error) {
 	// Validate path string is not empty
 	if pathString == "" {
-		return nil, fmt.Errorf("path string cannot be empty")
+		return nil, errorsmod.Wrap(ErrPathStringEmpty, "")
 	}
 
 	// Validate path string length to prevent DoS attacks
 	// Reasonable limit: 1024 bytes (most denoms are much shorter)
 	if len(pathString) > 1024 {
-		return nil, fmt.Errorf("path string exceeds maximum length of 1024 bytes")
+		return nil, errorsmod.Wrapf(ErrPathStringExceedsMaxLength, "max: 1024 bytes")
 	}
 
 	fullPathBytes := []byte(pathString)
 	ac, err := authtypes.NewModuleCredential(types.ModuleName, prefix, fullPathBytes)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate module credential: %w", err)
+		return nil, errorsmod.Wrap(err, "failed to generate module credential")
 	}
 	generatedAddr := sdk.AccAddress(ac.Address())
 
@@ -102,14 +103,14 @@ func generatePathAddress(pathString string, prefix []byte) (sdk.AccAddress, erro
 	// This ensures the address derivation worked correctly and prevents potential issues
 	// Module addresses should always start with the module name prefix in their derivation
 	if generatedAddr.Empty() {
-		return nil, fmt.Errorf("generated path address is empty")
+		return nil, errorsmod.Wrap(ErrGeneratedPathAddressEmpty, "")
 	}
 
 	// Additional validation: Ensure the address can be converted to string (valid Bech32)
 	// This provides an extra layer of validation
 	addrString := generatedAddr.String()
 	if addrString == "" {
-		return nil, fmt.Errorf("generated path address cannot be converted to string")
+		return nil, errorsmod.Wrap(ErrGeneratedPathAddressConversionFailed, "")
 	}
 
 	return generatedAddr, nil
@@ -119,14 +120,16 @@ func generatePathAddress(pathString string, prefix []byte) (sdk.AccAddress, erro
 func (k msgServer) setReservedProtocolAddressForPath(ctx sdk.Context, address string, pathType string) error {
 	err := k.SetReservedProtocolAddressInStore(ctx, address, true)
 	if err != nil {
-		return fmt.Errorf("failed to set %s path address as reserved protocol: %w", pathType, err)
+		return errorsmod.Wrapf(err, "failed to set %s path address as reserved protocol", pathType)
 	}
 	return nil
 }
 
 // validateAddressListIdsForMint checks FromListId in collection approvals only
 // to ensure Mint address is not included with other addresses.
-// Mint alone (in whitelist or blacklist) is fine, but Mint with other addresses is not allowed.
+// Mint alone (in whitelist) is fine, but Mint with other addresses is not allowed.
+// When Mint is used standalone, it must have overridesFromOutgoingApprovals = true
+// because the Mint address is uncontrollable, so you must override its outgoing approvals via the collection level.
 func (k msgServer) validateAddressListIdsForMint(ctx sdk.Context, collection *types.TokenCollection) error {
 	// Validate only FromListId in collection approvals
 	for _, approval := range collection.CollectionApprovals {
@@ -141,7 +144,12 @@ func (k msgServer) validateAddressListIdsForMint(ctx sdk.Context, collection *ty
 				return err
 			}
 			if !addressList.Whitelist || len(addressList.Addresses) != 1 || addressList.Addresses[0] != types.MintAddress {
-				return fmt.Errorf("Mint address cannot be included in address list %s with other addresses (collection approval %s FromListId)", approval.FromListId, approval.ApprovalId)
+				return errorsmod.Wrapf(ErrMintAddressInAddressList, "address list: %s, approval: %s", approval.FromListId, approval.ApprovalId)
+			}
+			// If Mint is used standalone, it must have overridesFromOutgoingApprovals = true
+			// because the Mint address is uncontrollable, so you must override its outgoing approvals via the collection level
+			if approval.ApprovalCriteria == nil || !approval.ApprovalCriteria.OverridesFromOutgoingApprovals {
+				return errorsmod.Wrapf(types.ErrInvalidRequest, "Mint address is uncontrollable, so when used standalone in fromList (address list: %s, approval: %s), you must set overridesFromOutgoingApprovals = true to override its outgoing approvals via the collection level", approval.FromListId, approval.ApprovalId)
 			}
 		}
 	}
@@ -188,7 +196,7 @@ func (k msgServer) setAutoApproveFlagsForPathAddress(ctx sdk.Context, collection
 	if flagsChanged {
 		err := k.SetBalanceForAddress(ctx, collection, pathAddress, currBalances)
 		if err != nil {
-			return fmt.Errorf("failed to set auto-approve flags for %s path address: %w", pathType, err)
+			return errorsmod.Wrapf(err, "failed to set auto-approve flags for %s path address", pathType)
 		}
 	}
 	return nil
@@ -205,7 +213,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 	collection := &types.TokenCollection{}
 	if msg.CollectionId.Equal(sdkmath.NewUint(NewCollectionId)) {
-		//Creation case
+		// Creation case
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		if err := k.IncrementNextCollectionId(ctx); err != nil {
 			return nil, err
@@ -244,7 +252,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			if msg.Invariants.CosmosCoinBackedPath != nil {
 				pathAddObject := msg.Invariants.CosmosCoinBackedPath
 				if pathAddObject.Conversion == nil || pathAddObject.Conversion.SideA == nil {
-					return nil, fmt.Errorf("cosmos coin backed path conversion or sideA is nil")
+					return nil, errorsmod.Wrap(ErrCosmosCoinBackedPathConversionNil, "")
 				}
 
 				backedAccountAddr, err := generatePathAddress(pathAddObject.Conversion.SideA.Denom, BackedPathGenerationPrefix)
@@ -266,15 +274,15 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			}
 		}
 	} else {
-		//Update case
+		// Update case
 		found := false
 		collection, found = k.GetCollectionFromStore(ctx, msg.CollectionId)
 		if !found {
-			return nil, ErrCollectionNotExists
+			return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", msg.CollectionId.String())
 		}
 	}
 
-	//Check must be manager
+	// Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,
 		MustBeManager: true,
@@ -283,10 +291,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, err
 	}
 
-	//Other cases:
-	//previouslyArchived && not stillArchived - we have just unarchived the collection
-	//not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
-	//not previouslyArchived && not stillArchived - unarchived before and now so we allow
+	// Other cases:
+	// previouslyArchived && not stillArchived - we have just unarchived the collection
+	// not previouslyArchived && stillArchived - we have just archived the collection (all TXs moving forward will fail, but we allow this one)
+	// not previouslyArchived && not stillArchived - unarchived before and now so we allow
 	previouslyArchived := types.GetIsArchived(ctx, collection)
 	if msg.UpdateIsArchived {
 		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchived, msg.IsArchived, collection.CollectionPermissions.CanArchiveCollection); err != nil {
@@ -296,7 +304,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 	stillArchived := types.GetIsArchived(ctx, collection)
 	if previouslyArchived && stillArchived {
-		return nil, ErrCollectionIsArchived
+		return nil, errorsmod.Wrapf(ErrCollectionIsArchived, "collection ID %s is currently archived (read-only)", msg.CollectionId.String())
 	}
 
 	if msg.UpdateCollectionApprovals {
@@ -392,7 +400,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		for _, coin := range msg.MintEscrowCoinsToTransfer {
 			allowedDenoms := k.GetParams(ctx).AllowedDenoms
 			if !slices.Contains(allowedDenoms, coin.Denom) {
-				return nil, fmt.Errorf("denom %s is not allowed", coin.Denom)
+				return nil, errorsmod.Wrapf(ErrDenomNotAllowed, "denom: %s", coin.Denom)
 			}
 
 			err = k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(*coin))
@@ -411,7 +419,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			// Generate path address with validation
 			accountAddr, err := generatePathAddress(path.Denom, WrapperPathGenerationPrefix)
 			if err != nil {
-				return nil, fmt.Errorf("failed to generate path address for denom %s: %w", path.Denom, err)
+				return nil, errorsmod.Wrapf(err, "failed to generate path address for denom: %s", path.Denom)
 			}
 
 			addrString := accountAddr.String()
@@ -419,12 +427,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			// Security: Ensure the generated address is marked as reserved protocol address
 			// This prevents conflicts with user addresses and ensures proper access control
 			if err := k.setReservedProtocolAddressForPath(ctx, addrString, "cosmoscoinwrapper"); err != nil {
-				return nil, fmt.Errorf("failed to set reserved protocol address for path %s: %w", path.Denom, err)
+				return nil, errorsmod.Wrapf(err, "failed to set reserved protocol address for path: %s", path.Denom)
 			}
 
 			// Verify the address was properly reserved (defense in depth)
 			if !k.IsAddressReservedProtocolInStore(ctx, addrString) {
-				return nil, fmt.Errorf("generated path address %s was not properly reserved", addrString)
+				return nil, errorsmod.Wrapf(ErrPathAddressNotReserved, "address: %s", addrString)
 			}
 
 			pathsToAdd[i] = &types.CosmosCoinWrapperPath{
@@ -475,13 +483,13 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		if msg.Invariants.CosmosCoinBackedPath != nil {
 			pathAddObject := msg.Invariants.CosmosCoinBackedPath
 			if pathAddObject.Conversion == nil || pathAddObject.Conversion.SideA == nil {
-				return nil, fmt.Errorf("cosmos coin backed path conversion or sideA is nil")
+				return nil, errorsmod.Wrap(ErrCosmosCoinBackedPathConversionNil, "")
 			}
 
 			// Generate path address with validation
 			accountAddr, err := generatePathAddress(pathAddObject.Conversion.SideA.Denom, BackedPathGenerationPrefix)
 			if err != nil {
-				return nil, fmt.Errorf("failed to generate path address for cosmos coin backed path denom %s: %w", pathAddObject.Conversion.SideA.Denom, err)
+				return nil, errorsmod.Wrapf(err, "failed to generate path address for cosmos coin backed path denom: %s", pathAddObject.Conversion.SideA.Denom)
 			}
 
 			addrString := accountAddr.String()
@@ -489,12 +497,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			// Security: Ensure the generated address is marked as reserved protocol address
 			// This prevents conflicts with user addresses and ensures proper access control
 			if err := k.setReservedProtocolAddressForPath(ctx, addrString, "cosmoscoinbacked"); err != nil {
-				return nil, fmt.Errorf("failed to set reserved protocol address for cosmos coin backed path: %w", err)
+				return nil, errorsmod.Wrap(err, "failed to set reserved protocol address for cosmos coin backed path")
 			}
 
 			// Verify the address was properly reserved (defense in depth)
 			if !k.IsAddressReservedProtocolInStore(ctx, addrString) {
-				return nil, fmt.Errorf("generated cosmos coin backed path address %s was not properly reserved", addrString)
+				return nil, errorsmod.Wrapf(ErrPathAddressNotReserved, "cosmos coin backed path address: %s", addrString)
 			}
 
 			backedPath := &types.CosmosCoinBackedPath{
@@ -511,7 +519,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	denomPaths := make(map[string]bool)
 	for _, path := range collection.CosmosCoinWrapperPaths {
 		if _, ok := denomPaths[path.Denom]; ok {
-			return nil, fmt.Errorf("duplicate ibc wrapper path denom: %s", path.Denom)
+			return nil, errorsmod.Wrapf(ErrDuplicateIBCWrapperPathDenom, "denom: %s", path.Denom)
 		}
 		denomPaths[path.Denom] = true
 	}
@@ -520,10 +528,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	aliasDenoms := make(map[string]bool)
 	for _, path := range collection.AliasPaths {
 		if _, ok := aliasDenoms[path.Denom]; ok {
-			return nil, fmt.Errorf("duplicate alias path denom: %s", path.Denom)
+			return nil, errorsmod.Wrapf(ErrDuplicateAliasPathDenom, "denom: %s", path.Denom)
 		}
 		if _, wrapperConflict := denomPaths[path.Denom]; wrapperConflict {
-			return nil, fmt.Errorf("alias path denom conflicts with wrapper denom: %s", path.Denom)
+			return nil, errorsmod.Wrapf(ErrAliasPathDenomConflictsWithWrapper, "denom: %s", path.Denom)
 		}
 		aliasDenoms[path.Denom] = true
 	}
@@ -610,7 +618,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 func validatePathSymbols(pathSymbol string, denomUnits []*types.DenomUnit, symbolPaths map[string]bool, pathType string) error {
 	if pathSymbol != "" {
 		if _, ok := symbolPaths[pathSymbol]; ok {
-			return fmt.Errorf("duplicate %s path symbol: %s", pathType, pathSymbol)
+			return errorsmod.Wrapf(ErrDuplicatePathSymbol, "path type: %s, symbol: %s", pathType, pathSymbol)
 		}
 		symbolPaths[pathSymbol] = true
 	}
@@ -621,7 +629,7 @@ func validatePathSymbols(pathSymbol string, denomUnits []*types.DenomUnit, symbo
 	for _, denomUnit := range denomUnits {
 		if denomUnit.Symbol != "" {
 			if _, ok := symbolPaths[denomUnit.Symbol]; ok {
-				return fmt.Errorf("duplicate denom unit symbol: %s", denomUnit.Symbol)
+				return errorsmod.Wrapf(ErrDuplicateDenomUnitSymbol, "symbol: %s", denomUnit.Symbol)
 			}
 			symbolPaths[denomUnit.Symbol] = true
 		}
@@ -631,18 +639,18 @@ func validatePathSymbols(pathSymbol string, denomUnits []*types.DenomUnit, symbo
 		}
 
 		if denomUnit.Decimals.IsZero() {
-			return fmt.Errorf("denom unit decimals cannot be 0")
+			return errorsmod.Wrap(ErrDenomUnitDecimalsCannotBeZero, "")
 		}
 
 		decimalsStr := denomUnit.Decimals.String()
 		if _, ok := decimalsSet[decimalsStr]; ok {
-			return fmt.Errorf("duplicate denom unit decimals: %s", decimalsStr)
+			return errorsmod.Wrapf(ErrDuplicateDenomUnitDecimals, "decimals: %s", decimalsStr)
 		}
 		decimalsSet[decimalsStr] = true
 	}
 
 	if defaultDisplayCount > 1 {
-		return fmt.Errorf("only one denom unit per path can have isDefaultDisplay set to true, found %d", defaultDisplayCount)
+		return errorsmod.Wrapf(ErrMultipleDefaultDisplayDenomUnits, "found: %d", defaultDisplayCount)
 	}
 
 	return nil
