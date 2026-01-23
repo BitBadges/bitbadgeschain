@@ -8,9 +8,12 @@ package badges
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+
+	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -40,29 +43,29 @@ const (
 // Query defines the gRPC querier service.
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
-	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	Params(ctx context.Context, in *types.QueryParamsRequest, opts ...grpc.CallOption) (*types.QueryParamsResponse, error)
 	// Queries a collection by ID.
-	GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error)
+	GetCollection(ctx context.Context, in *types.QueryGetCollectionRequest, opts ...grpc.CallOption) (*types.QueryGetCollectionResponse, error)
 	// Queries an address list by ID.
-	GetAddressList(ctx context.Context, in *QueryGetAddressListRequest, opts ...grpc.CallOption) (*QueryGetAddressListResponse, error)
+	GetAddressList(ctx context.Context, in *types.QueryGetAddressListRequest, opts ...grpc.CallOption) (*types.QueryGetAddressListResponse, error)
 	// Queries an approvals tracker by ID.
-	GetApprovalTracker(ctx context.Context, in *QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalTrackerResponse, error)
+	GetApprovalTracker(ctx context.Context, in *types.QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*types.QueryGetApprovalTrackerResponse, error)
 	// Queries the number of times a given leaf has been used for a given merkle challenge.
-	GetChallengeTracker(ctx context.Context, in *QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*QueryGetChallengeTrackerResponse, error)
+	GetChallengeTracker(ctx context.Context, in *types.QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*types.QueryGetChallengeTrackerResponse, error)
 	// Queries the number of times a given signature has been used for a given ETH signature challenge.
-	GetETHSignatureTracker(ctx context.Context, in *QueryGetETHSignatureTrackerRequest, opts ...grpc.CallOption) (*QueryGetETHSignatureTrackerResponse, error)
+	GetETHSignatureTracker(ctx context.Context, in *types.QueryGetETHSignatureTrackerRequest, opts ...grpc.CallOption) (*types.QueryGetETHSignatureTrackerResponse, error)
 	// Queries an addresses balance for a collection, specified by its ID.
-	GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error)
+	GetBalance(ctx context.Context, in *types.QueryGetBalanceRequest, opts ...grpc.CallOption) (*types.QueryGetBalanceResponse, error)
 	// Queries a dynamic store by ID.
-	GetDynamicStore(ctx context.Context, in *QueryGetDynamicStoreRequest, opts ...grpc.CallOption) (*QueryGetDynamicStoreResponse, error)
+	GetDynamicStore(ctx context.Context, in *types.QueryGetDynamicStoreRequest, opts ...grpc.CallOption) (*types.QueryGetDynamicStoreResponse, error)
 	// Queries a dynamic store value by store ID and address.
-	GetDynamicStoreValue(ctx context.Context, in *QueryGetDynamicStoreValueRequest, opts ...grpc.CallOption) (*QueryGetDynamicStoreValueResponse, error)
+	GetDynamicStoreValue(ctx context.Context, in *types.QueryGetDynamicStoreValueRequest, opts ...grpc.CallOption) (*types.QueryGetDynamicStoreValueResponse, error)
 	// Queries the maximum wrappable amount for a given denom and user address.
-	GetWrappableBalances(ctx context.Context, in *QueryGetWrappableBalancesRequest, opts ...grpc.CallOption) (*QueryGetWrappableBalancesResponse, error)
+	GetWrappableBalances(ctx context.Context, in *types.QueryGetWrappableBalancesRequest, opts ...grpc.CallOption) (*types.QueryGetWrappableBalancesResponse, error)
 	// Queries if an address is a reserved protocol address.
-	IsAddressReservedProtocol(ctx context.Context, in *QueryIsAddressReservedProtocolRequest, opts ...grpc.CallOption) (*QueryIsAddressReservedProtocolResponse, error)
+	IsAddressReservedProtocol(ctx context.Context, in *types.QueryIsAddressReservedProtocolRequest, opts ...grpc.CallOption) (*types.QueryIsAddressReservedProtocolResponse, error)
 	// Queries all reserved protocol addresses.
-	GetAllReservedProtocolAddresses(ctx context.Context, in *QueryGetAllReservedProtocolAddressesRequest, opts ...grpc.CallOption) (*QueryGetAllReservedProtocolAddressesResponse, error)
+	GetAllReservedProtocolAddresses(ctx context.Context, in *types.QueryGetAllReservedProtocolAddressesRequest, opts ...grpc.CallOption) (*types.QueryGetAllReservedProtocolAddressesResponse, error)
 }
 
 type queryClient struct {
@@ -73,9 +76,9 @@ func NewQueryClient(cc grpc.ClientConnInterface) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
+func (c *queryClient) Params(ctx context.Context, in *types.QueryParamsRequest, opts ...grpc.CallOption) (*types.QueryParamsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryParamsResponse)
+	out := new(types.QueryParamsResponse)
 	err := c.cc.Invoke(ctx, Query_Params_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -83,9 +86,9 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) GetCollection(ctx context.Context, in *QueryGetCollectionRequest, opts ...grpc.CallOption) (*QueryGetCollectionResponse, error) {
+func (c *queryClient) GetCollection(ctx context.Context, in *types.QueryGetCollectionRequest, opts ...grpc.CallOption) (*types.QueryGetCollectionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetCollectionResponse)
+	out := new(types.QueryGetCollectionResponse)
 	err := c.cc.Invoke(ctx, Query_GetCollection_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -93,9 +96,9 @@ func (c *queryClient) GetCollection(ctx context.Context, in *QueryGetCollectionR
 	return out, nil
 }
 
-func (c *queryClient) GetAddressList(ctx context.Context, in *QueryGetAddressListRequest, opts ...grpc.CallOption) (*QueryGetAddressListResponse, error) {
+func (c *queryClient) GetAddressList(ctx context.Context, in *types.QueryGetAddressListRequest, opts ...grpc.CallOption) (*types.QueryGetAddressListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetAddressListResponse)
+	out := new(types.QueryGetAddressListResponse)
 	err := c.cc.Invoke(ctx, Query_GetAddressList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -103,9 +106,9 @@ func (c *queryClient) GetAddressList(ctx context.Context, in *QueryGetAddressLis
 	return out, nil
 }
 
-func (c *queryClient) GetApprovalTracker(ctx context.Context, in *QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*QueryGetApprovalTrackerResponse, error) {
+func (c *queryClient) GetApprovalTracker(ctx context.Context, in *types.QueryGetApprovalTrackerRequest, opts ...grpc.CallOption) (*types.QueryGetApprovalTrackerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetApprovalTrackerResponse)
+	out := new(types.QueryGetApprovalTrackerResponse)
 	err := c.cc.Invoke(ctx, Query_GetApprovalTracker_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -113,9 +116,9 @@ func (c *queryClient) GetApprovalTracker(ctx context.Context, in *QueryGetApprov
 	return out, nil
 }
 
-func (c *queryClient) GetChallengeTracker(ctx context.Context, in *QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*QueryGetChallengeTrackerResponse, error) {
+func (c *queryClient) GetChallengeTracker(ctx context.Context, in *types.QueryGetChallengeTrackerRequest, opts ...grpc.CallOption) (*types.QueryGetChallengeTrackerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetChallengeTrackerResponse)
+	out := new(types.QueryGetChallengeTrackerResponse)
 	err := c.cc.Invoke(ctx, Query_GetChallengeTracker_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -123,9 +126,9 @@ func (c *queryClient) GetChallengeTracker(ctx context.Context, in *QueryGetChall
 	return out, nil
 }
 
-func (c *queryClient) GetETHSignatureTracker(ctx context.Context, in *QueryGetETHSignatureTrackerRequest, opts ...grpc.CallOption) (*QueryGetETHSignatureTrackerResponse, error) {
+func (c *queryClient) GetETHSignatureTracker(ctx context.Context, in *types.QueryGetETHSignatureTrackerRequest, opts ...grpc.CallOption) (*types.QueryGetETHSignatureTrackerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetETHSignatureTrackerResponse)
+	out := new(types.QueryGetETHSignatureTrackerResponse)
 	err := c.cc.Invoke(ctx, Query_GetETHSignatureTracker_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -133,9 +136,9 @@ func (c *queryClient) GetETHSignatureTracker(ctx context.Context, in *QueryGetET
 	return out, nil
 }
 
-func (c *queryClient) GetBalance(ctx context.Context, in *QueryGetBalanceRequest, opts ...grpc.CallOption) (*QueryGetBalanceResponse, error) {
+func (c *queryClient) GetBalance(ctx context.Context, in *types.QueryGetBalanceRequest, opts ...grpc.CallOption) (*types.QueryGetBalanceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetBalanceResponse)
+	out := new(types.QueryGetBalanceResponse)
 	err := c.cc.Invoke(ctx, Query_GetBalance_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -143,9 +146,9 @@ func (c *queryClient) GetBalance(ctx context.Context, in *QueryGetBalanceRequest
 	return out, nil
 }
 
-func (c *queryClient) GetDynamicStore(ctx context.Context, in *QueryGetDynamicStoreRequest, opts ...grpc.CallOption) (*QueryGetDynamicStoreResponse, error) {
+func (c *queryClient) GetDynamicStore(ctx context.Context, in *types.QueryGetDynamicStoreRequest, opts ...grpc.CallOption) (*types.QueryGetDynamicStoreResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetDynamicStoreResponse)
+	out := new(types.QueryGetDynamicStoreResponse)
 	err := c.cc.Invoke(ctx, Query_GetDynamicStore_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -153,9 +156,9 @@ func (c *queryClient) GetDynamicStore(ctx context.Context, in *QueryGetDynamicSt
 	return out, nil
 }
 
-func (c *queryClient) GetDynamicStoreValue(ctx context.Context, in *QueryGetDynamicStoreValueRequest, opts ...grpc.CallOption) (*QueryGetDynamicStoreValueResponse, error) {
+func (c *queryClient) GetDynamicStoreValue(ctx context.Context, in *types.QueryGetDynamicStoreValueRequest, opts ...grpc.CallOption) (*types.QueryGetDynamicStoreValueResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetDynamicStoreValueResponse)
+	out := new(types.QueryGetDynamicStoreValueResponse)
 	err := c.cc.Invoke(ctx, Query_GetDynamicStoreValue_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -163,9 +166,9 @@ func (c *queryClient) GetDynamicStoreValue(ctx context.Context, in *QueryGetDyna
 	return out, nil
 }
 
-func (c *queryClient) GetWrappableBalances(ctx context.Context, in *QueryGetWrappableBalancesRequest, opts ...grpc.CallOption) (*QueryGetWrappableBalancesResponse, error) {
+func (c *queryClient) GetWrappableBalances(ctx context.Context, in *types.QueryGetWrappableBalancesRequest, opts ...grpc.CallOption) (*types.QueryGetWrappableBalancesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetWrappableBalancesResponse)
+	out := new(types.QueryGetWrappableBalancesResponse)
 	err := c.cc.Invoke(ctx, Query_GetWrappableBalances_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -173,9 +176,9 @@ func (c *queryClient) GetWrappableBalances(ctx context.Context, in *QueryGetWrap
 	return out, nil
 }
 
-func (c *queryClient) IsAddressReservedProtocol(ctx context.Context, in *QueryIsAddressReservedProtocolRequest, opts ...grpc.CallOption) (*QueryIsAddressReservedProtocolResponse, error) {
+func (c *queryClient) IsAddressReservedProtocol(ctx context.Context, in *types.QueryIsAddressReservedProtocolRequest, opts ...grpc.CallOption) (*types.QueryIsAddressReservedProtocolResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryIsAddressReservedProtocolResponse)
+	out := new(types.QueryIsAddressReservedProtocolResponse)
 	err := c.cc.Invoke(ctx, Query_IsAddressReservedProtocol_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -183,9 +186,9 @@ func (c *queryClient) IsAddressReservedProtocol(ctx context.Context, in *QueryIs
 	return out, nil
 }
 
-func (c *queryClient) GetAllReservedProtocolAddresses(ctx context.Context, in *QueryGetAllReservedProtocolAddressesRequest, opts ...grpc.CallOption) (*QueryGetAllReservedProtocolAddressesResponse, error) {
+func (c *queryClient) GetAllReservedProtocolAddresses(ctx context.Context, in *types.QueryGetAllReservedProtocolAddressesRequest, opts ...grpc.CallOption) (*types.QueryGetAllReservedProtocolAddressesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryGetAllReservedProtocolAddressesResponse)
+	out := new(types.QueryGetAllReservedProtocolAddressesResponse)
 	err := c.cc.Invoke(ctx, Query_GetAllReservedProtocolAddresses_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -200,29 +203,29 @@ func (c *queryClient) GetAllReservedProtocolAddresses(ctx context.Context, in *Q
 // Query defines the gRPC querier service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
-	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	Params(context.Context, *types.QueryParamsRequest) (*types.QueryParamsResponse, error)
 	// Queries a collection by ID.
-	GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error)
+	GetCollection(context.Context, *types.QueryGetCollectionRequest) (*types.QueryGetCollectionResponse, error)
 	// Queries an address list by ID.
-	GetAddressList(context.Context, *QueryGetAddressListRequest) (*QueryGetAddressListResponse, error)
+	GetAddressList(context.Context, *types.QueryGetAddressListRequest) (*types.QueryGetAddressListResponse, error)
 	// Queries an approvals tracker by ID.
-	GetApprovalTracker(context.Context, *QueryGetApprovalTrackerRequest) (*QueryGetApprovalTrackerResponse, error)
+	GetApprovalTracker(context.Context, *types.QueryGetApprovalTrackerRequest) (*types.QueryGetApprovalTrackerResponse, error)
 	// Queries the number of times a given leaf has been used for a given merkle challenge.
-	GetChallengeTracker(context.Context, *QueryGetChallengeTrackerRequest) (*QueryGetChallengeTrackerResponse, error)
+	GetChallengeTracker(context.Context, *types.QueryGetChallengeTrackerRequest) (*types.QueryGetChallengeTrackerResponse, error)
 	// Queries the number of times a given signature has been used for a given ETH signature challenge.
-	GetETHSignatureTracker(context.Context, *QueryGetETHSignatureTrackerRequest) (*QueryGetETHSignatureTrackerResponse, error)
+	GetETHSignatureTracker(context.Context, *types.QueryGetETHSignatureTrackerRequest) (*types.QueryGetETHSignatureTrackerResponse, error)
 	// Queries an addresses balance for a collection, specified by its ID.
-	GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error)
+	GetBalance(context.Context, *types.QueryGetBalanceRequest) (*types.QueryGetBalanceResponse, error)
 	// Queries a dynamic store by ID.
-	GetDynamicStore(context.Context, *QueryGetDynamicStoreRequest) (*QueryGetDynamicStoreResponse, error)
+	GetDynamicStore(context.Context, *types.QueryGetDynamicStoreRequest) (*types.QueryGetDynamicStoreResponse, error)
 	// Queries a dynamic store value by store ID and address.
-	GetDynamicStoreValue(context.Context, *QueryGetDynamicStoreValueRequest) (*QueryGetDynamicStoreValueResponse, error)
+	GetDynamicStoreValue(context.Context, *types.QueryGetDynamicStoreValueRequest) (*types.QueryGetDynamicStoreValueResponse, error)
 	// Queries the maximum wrappable amount for a given denom and user address.
-	GetWrappableBalances(context.Context, *QueryGetWrappableBalancesRequest) (*QueryGetWrappableBalancesResponse, error)
+	GetWrappableBalances(context.Context, *types.QueryGetWrappableBalancesRequest) (*types.QueryGetWrappableBalancesResponse, error)
 	// Queries if an address is a reserved protocol address.
-	IsAddressReservedProtocol(context.Context, *QueryIsAddressReservedProtocolRequest) (*QueryIsAddressReservedProtocolResponse, error)
+	IsAddressReservedProtocol(context.Context, *types.QueryIsAddressReservedProtocolRequest) (*types.QueryIsAddressReservedProtocolResponse, error)
 	// Queries all reserved protocol addresses.
-	GetAllReservedProtocolAddresses(context.Context, *QueryGetAllReservedProtocolAddressesRequest) (*QueryGetAllReservedProtocolAddressesResponse, error)
+	GetAllReservedProtocolAddresses(context.Context, *types.QueryGetAllReservedProtocolAddressesRequest) (*types.QueryGetAllReservedProtocolAddressesResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -233,40 +236,51 @@ type QueryServer interface {
 // pointer dereference when methods are called.
 type UnimplementedQueryServer struct{}
 
-func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
+func (UnimplementedQueryServer) Params(context.Context, *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
-func (UnimplementedQueryServer) GetCollection(context.Context, *QueryGetCollectionRequest) (*QueryGetCollectionResponse, error) {
+
+func (UnimplementedQueryServer) GetCollection(context.Context, *types.QueryGetCollectionRequest) (*types.QueryGetCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCollection not implemented")
 }
-func (UnimplementedQueryServer) GetAddressList(context.Context, *QueryGetAddressListRequest) (*QueryGetAddressListResponse, error) {
+
+func (UnimplementedQueryServer) GetAddressList(context.Context, *types.QueryGetAddressListRequest) (*types.QueryGetAddressListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAddressList not implemented")
 }
-func (UnimplementedQueryServer) GetApprovalTracker(context.Context, *QueryGetApprovalTrackerRequest) (*QueryGetApprovalTrackerResponse, error) {
+
+func (UnimplementedQueryServer) GetApprovalTracker(context.Context, *types.QueryGetApprovalTrackerRequest) (*types.QueryGetApprovalTrackerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApprovalTracker not implemented")
 }
-func (UnimplementedQueryServer) GetChallengeTracker(context.Context, *QueryGetChallengeTrackerRequest) (*QueryGetChallengeTrackerResponse, error) {
+
+func (UnimplementedQueryServer) GetChallengeTracker(context.Context, *types.QueryGetChallengeTrackerRequest) (*types.QueryGetChallengeTrackerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetChallengeTracker not implemented")
 }
-func (UnimplementedQueryServer) GetETHSignatureTracker(context.Context, *QueryGetETHSignatureTrackerRequest) (*QueryGetETHSignatureTrackerResponse, error) {
+
+func (UnimplementedQueryServer) GetETHSignatureTracker(context.Context, *types.QueryGetETHSignatureTrackerRequest) (*types.QueryGetETHSignatureTrackerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetETHSignatureTracker not implemented")
 }
-func (UnimplementedQueryServer) GetBalance(context.Context, *QueryGetBalanceRequest) (*QueryGetBalanceResponse, error) {
+
+func (UnimplementedQueryServer) GetBalance(context.Context, *types.QueryGetBalanceRequest) (*types.QueryGetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
-func (UnimplementedQueryServer) GetDynamicStore(context.Context, *QueryGetDynamicStoreRequest) (*QueryGetDynamicStoreResponse, error) {
+
+func (UnimplementedQueryServer) GetDynamicStore(context.Context, *types.QueryGetDynamicStoreRequest) (*types.QueryGetDynamicStoreResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicStore not implemented")
 }
-func (UnimplementedQueryServer) GetDynamicStoreValue(context.Context, *QueryGetDynamicStoreValueRequest) (*QueryGetDynamicStoreValueResponse, error) {
+
+func (UnimplementedQueryServer) GetDynamicStoreValue(context.Context, *types.QueryGetDynamicStoreValueRequest) (*types.QueryGetDynamicStoreValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicStoreValue not implemented")
 }
-func (UnimplementedQueryServer) GetWrappableBalances(context.Context, *QueryGetWrappableBalancesRequest) (*QueryGetWrappableBalancesResponse, error) {
+
+func (UnimplementedQueryServer) GetWrappableBalances(context.Context, *types.QueryGetWrappableBalancesRequest) (*types.QueryGetWrappableBalancesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWrappableBalances not implemented")
 }
-func (UnimplementedQueryServer) IsAddressReservedProtocol(context.Context, *QueryIsAddressReservedProtocolRequest) (*QueryIsAddressReservedProtocolResponse, error) {
+
+func (UnimplementedQueryServer) IsAddressReservedProtocol(context.Context, *types.QueryIsAddressReservedProtocolRequest) (*types.QueryIsAddressReservedProtocolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsAddressReservedProtocol not implemented")
 }
-func (UnimplementedQueryServer) GetAllReservedProtocolAddresses(context.Context, *QueryGetAllReservedProtocolAddressesRequest) (*QueryGetAllReservedProtocolAddressesResponse, error) {
+
+func (UnimplementedQueryServer) GetAllReservedProtocolAddresses(context.Context, *types.QueryGetAllReservedProtocolAddressesRequest) (*types.QueryGetAllReservedProtocolAddressesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllReservedProtocolAddresses not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
@@ -291,7 +305,7 @@ func RegisterQueryServer(s grpc.ServiceRegistrar, srv QueryServer) {
 }
 
 func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryParamsRequest)
+	in := new(types.QueryParamsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -303,13 +317,13 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: Query_Params_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
+		return srv.(QueryServer).Params(ctx, req.(*types.QueryParamsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetCollectionRequest)
+	in := new(types.QueryGetCollectionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -321,13 +335,13 @@ func _Query_GetCollection_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: Query_GetCollection_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetCollection(ctx, req.(*QueryGetCollectionRequest))
+		return srv.(QueryServer).GetCollection(ctx, req.(*types.QueryGetCollectionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetAddressListRequest)
+	in := new(types.QueryGetAddressListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -339,13 +353,13 @@ func _Query_GetAddressList_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: Query_GetAddressList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetAddressList(ctx, req.(*QueryGetAddressListRequest))
+		return srv.(QueryServer).GetAddressList(ctx, req.(*types.QueryGetAddressListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetApprovalTracker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetApprovalTrackerRequest)
+	in := new(types.QueryGetApprovalTrackerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -357,13 +371,13 @@ func _Query_GetApprovalTracker_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: Query_GetApprovalTracker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetApprovalTracker(ctx, req.(*QueryGetApprovalTrackerRequest))
+		return srv.(QueryServer).GetApprovalTracker(ctx, req.(*types.QueryGetApprovalTrackerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetChallengeTracker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetChallengeTrackerRequest)
+	in := new(types.QueryGetChallengeTrackerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -375,13 +389,13 @@ func _Query_GetChallengeTracker_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: Query_GetChallengeTracker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetChallengeTracker(ctx, req.(*QueryGetChallengeTrackerRequest))
+		return srv.(QueryServer).GetChallengeTracker(ctx, req.(*types.QueryGetChallengeTrackerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetETHSignatureTracker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetETHSignatureTrackerRequest)
+	in := new(types.QueryGetETHSignatureTrackerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -393,13 +407,13 @@ func _Query_GetETHSignatureTracker_Handler(srv interface{}, ctx context.Context,
 		FullMethod: Query_GetETHSignatureTracker_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetETHSignatureTracker(ctx, req.(*QueryGetETHSignatureTrackerRequest))
+		return srv.(QueryServer).GetETHSignatureTracker(ctx, req.(*types.QueryGetETHSignatureTrackerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetBalanceRequest)
+	in := new(types.QueryGetBalanceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -411,13 +425,13 @@ func _Query_GetBalance_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: Query_GetBalance_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetBalance(ctx, req.(*QueryGetBalanceRequest))
+		return srv.(QueryServer).GetBalance(ctx, req.(*types.QueryGetBalanceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetDynamicStore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetDynamicStoreRequest)
+	in := new(types.QueryGetDynamicStoreRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -429,13 +443,13 @@ func _Query_GetDynamicStore_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: Query_GetDynamicStore_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetDynamicStore(ctx, req.(*QueryGetDynamicStoreRequest))
+		return srv.(QueryServer).GetDynamicStore(ctx, req.(*types.QueryGetDynamicStoreRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetDynamicStoreValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetDynamicStoreValueRequest)
+	in := new(types.QueryGetDynamicStoreValueRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -447,13 +461,13 @@ func _Query_GetDynamicStoreValue_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: Query_GetDynamicStoreValue_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetDynamicStoreValue(ctx, req.(*QueryGetDynamicStoreValueRequest))
+		return srv.(QueryServer).GetDynamicStoreValue(ctx, req.(*types.QueryGetDynamicStoreValueRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetWrappableBalances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetWrappableBalancesRequest)
+	in := new(types.QueryGetWrappableBalancesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -465,13 +479,13 @@ func _Query_GetWrappableBalances_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: Query_GetWrappableBalances_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetWrappableBalances(ctx, req.(*QueryGetWrappableBalancesRequest))
+		return srv.(QueryServer).GetWrappableBalances(ctx, req.(*types.QueryGetWrappableBalancesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_IsAddressReservedProtocol_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryIsAddressReservedProtocolRequest)
+	in := new(types.QueryIsAddressReservedProtocolRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -483,13 +497,13 @@ func _Query_IsAddressReservedProtocol_Handler(srv interface{}, ctx context.Conte
 		FullMethod: Query_IsAddressReservedProtocol_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).IsAddressReservedProtocol(ctx, req.(*QueryIsAddressReservedProtocolRequest))
+		return srv.(QueryServer).IsAddressReservedProtocol(ctx, req.(*types.QueryIsAddressReservedProtocolRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetAllReservedProtocolAddresses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetAllReservedProtocolAddressesRequest)
+	in := new(types.QueryGetAllReservedProtocolAddressesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -501,7 +515,7 @@ func _Query_GetAllReservedProtocolAddresses_Handler(srv interface{}, ctx context
 		FullMethod: Query_GetAllReservedProtocolAddresses_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetAllReservedProtocolAddresses(ctx, req.(*QueryGetAllReservedProtocolAddressesRequest))
+		return srv.(QueryServer).GetAllReservedProtocolAddresses(ctx, req.(*types.QueryGetAllReservedProtocolAddressesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
