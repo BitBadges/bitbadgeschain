@@ -305,7 +305,7 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 // MigrateUbadgeCoins transfers all "ubadge" coins from one address to another
 func MigrateUbadgeCoins(ctx sdk.Context, k Keeper) error {
 	fromAddress := "bb1pkqancsm6lzmkz24x43ymjc8t8nykwye2vn2sx"
-	toAddress := "bb1zecxs0n0kjqr0vjc5ug3kk594zg4s7jn6lj5dj"
+	toAddress := "bb1esaf3yswwkusfx68jusacfkfgs37j07rlrchj5"
 
 	// Parse addresses
 	fromAddr, err := sdk.AccAddressFromBech32(fromAddress)
