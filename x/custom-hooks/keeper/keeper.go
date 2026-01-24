@@ -10,12 +10,10 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
@@ -55,11 +53,10 @@ type (
 		StandardName(ctx sdk.Context, denom string) string
 	}
 
-	// ICS4Wrapper interface for sending IBC packets
+	// ICS4Wrapper interface for sending IBC packets (IBC v10: capabilities removed)
 	ICS4Wrapper interface {
 		SendPacket(
 			ctx sdk.Context,
-			channelCap *capabilitytypes.Capability,
 			sourcePort string,
 			sourceChannel string,
 			timeoutHeight clienttypes.Height,
@@ -68,14 +65,9 @@ type (
 		) (uint64, error)
 	}
 
-	// ChannelKeeper interface for getting channel capabilities
+	// ChannelKeeper interface for getting channel information
 	ChannelKeeper interface {
 		GetChannel(ctx sdk.Context, portID, channelID string) (channeltypes.Channel, bool)
-	}
-
-	// ScopedKeeper interface for getting channel capabilities
-	ScopedKeeper interface {
-		GetCapability(ctx sdk.Context, name string) (*capabilitytypes.Capability, bool)
 	}
 
 	Keeper struct {
@@ -87,7 +79,6 @@ type (
 		transferKeeper    gammtypes.TransferKeeper
 		ics4Wrapper       ICS4Wrapper
 		channelKeeper     ChannelKeeper
-		scopedKeeper      ScopedKeeper
 	}
 )
 
@@ -100,7 +91,6 @@ func NewKeeper(
 	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
-	scopedKeeper ScopedKeeper,
 ) Keeper {
 	return Keeper{
 		logger:            logger,
@@ -111,7 +101,6 @@ func NewKeeper(
 		transferKeeper:    transferKeeper,
 		ics4Wrapper:       ics4Wrapper,
 		channelKeeper:     channelKeeper,
-		scopedKeeper:      scopedKeeper,
 	}
 }
 
@@ -557,14 +546,7 @@ func (k Keeper) ValidatePostSwapAction(ctx sdk.Context, postSwapAction *types.Po
 
 		// Security: MED-007 - Channel capability validation timing
 		// Note: Capability is validated here for early failure, but it's also validated
-		// immediately before IBC transfer execution in ExecuteIBCTransfer to prevent
-		// race conditions where capability is revoked between validation and execution.
-		// This early validation prevents wasting gas on swaps if capability is already missing.
-		capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcInfo.SourceChannel)
-		_, ok := k.scopedKeeper.GetCapability(ctx, capPath)
-		if !ok {
-			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("channel capability not found: %s", ibcInfo.SourceChannel))
-		}
+		// IBC v10: Capabilities removed - channel validation is handled by IBC core
 	}
 
 	// Validate local transfer if present
@@ -591,16 +573,7 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 
 	ibcInfo := ibcTransfer.IBCInfo
 
-	// Security: MED-007 - Channel capability validation timing
-	// Validate capability immediately before IBC transfer execution to prevent race conditions.
-	// Even though capability is also validated in ValidatePostSwapAction, we validate again here
-	// because capability could be revoked between validation and execution (e.g., by governance).
-	// This ensures swap doesn't succeed if IBC transfer will fail due to missing capability.
-	capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcInfo.SourceChannel)
-	channelCap, ok := k.scopedKeeper.GetCapability(ctx, capPath)
-	if !ok {
-		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("channel capability not found: %s", ibcInfo.SourceChannel))
-	}
+	// IBC v10: Capabilities removed - channel validation is handled by IBC core
 
 	// Use zero height for timeout (no timeout height)
 	timeoutHeight := clienttypes.ZeroHeight()
@@ -625,10 +598,9 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return types.NewCustomErrorAcknowledgement("failed to marshal IBC packet data")
 	}
 
-	// Send IBC packet
+	// Send IBC packet (IBC v10: capabilities removed)
 	_, err = k.ics4Wrapper.SendPacket(
 		ctx,
-		channelCap,
 		transfertypes.PortID,
 		ibcInfo.SourceChannel,
 		timeoutHeight,

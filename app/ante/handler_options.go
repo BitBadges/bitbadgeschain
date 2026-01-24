@@ -11,8 +11,8 @@ import (
 	txsigning "cosmossdk.io/x/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	ibcante "github.com/cosmos/ibc-go/v10/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	storetypes "cosmossdk.io/store/types"
 
@@ -20,7 +20,7 @@ import (
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	corestoretypes "cosmossdk.io/core/store"
 )
@@ -78,7 +78,7 @@ type HandlerOptions struct {
 	SigGasConsumer        func(meter storetypes.GasMeter, sig signing.SignatureV2, params authtypes.Params) error // defaults to authante.DefaultSigVerificationGasConsumer
 	TxFeeChecker          ante.TxFeeChecker
 	CircuitKeeper         *circuitkeeper.Keeper
-	WasmConfig            *wasmTypes.WasmConfig
+	WasmConfig            wasmtypes.NodeConfig
 	WasmKeeper            *wasmkeeper.Keeper
 	TXCounterStoreService corestoretypes.KVStoreService
 }
@@ -96,9 +96,7 @@ func (options HandlerOptions) Validate() error {
 	if options.CircuitKeeper == nil {
 		return sdkerrors.Wrap(types.ErrLogic, "circuit keeper is required for ante builder")
 	}
-	if options.WasmConfig == nil {
-		return sdkerrors.Wrap(types.ErrLogic, "wasm config is required for ante builder")
-	}
+	// WasmConfig is now a value type, not a pointer - validation not needed
 	if options.TXCounterStoreService == nil {
 		return sdkerrors.Wrap(types.ErrLogic, "wasm store service is required for ante builder")
 	}

@@ -5,9 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -98,10 +97,10 @@ type PoolManager interface {
 }
 
 // ICS4Wrapper defines the interface needed for sending IBC packets
+// IBC v10: capabilities removed
 type ICS4Wrapper interface {
 	SendPacket(
 		ctx sdk.Context,
-		channelCap *capabilitytypes.Capability,
 		sourcePort string,
 		sourceChannel string,
 		timeoutHeight clienttypes.Height,
@@ -115,7 +114,4 @@ type ChannelKeeper interface {
 	GetChannel(ctx sdk.Context, portID, channelID string) (channeltypes.Channel, bool)
 }
 
-// ScopedKeeper defines the interface needed for getting channel capabilities
-type ScopedKeeper interface {
-	GetCapability(ctx sdk.Context, name string) (*capabilitytypes.Capability, bool)
-}
+// ScopedKeeper removed in IBC v10 - capabilities no longer used

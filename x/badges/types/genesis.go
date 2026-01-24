@@ -2,7 +2,7 @@ package types
 
 import (
 	types "cosmossdk.io/math"
-	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
+	host "github.com/cosmos/ibc-go/v10/modules/core/24-host"
 	// this line is used by starport scaffolding # genesis/types/import
 )
 

@@ -11,10 +11,12 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
-	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
-
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
+
+// StakingKeeper interface for simulation (replaces ibctestingtypes.StakingKeeper)
+// Use the SDK staking keeper directly
+type StakingKeeper = stakingkeeper.Keeper
 
 type AppCreator = func(homepath string, legacyInvariantPeriod uint, baseappOptions ...func(*baseapp.BaseApp)) App
 
@@ -23,7 +25,7 @@ type App interface {
 	AppCodec() codec.Codec
 	GetAccountKeeper() AccountKeeper
 	GetBankKeeper() BankKeeper
-	GetStakingKeeper() ibctestingtypes.StakingKeeper
+	GetStakingKeeper() StakingKeeper
 	GetSDKStakingKeeper() stakingkeeper.Keeper
 	ModuleManager() module.Manager
 	GetPoolManagerKeeper() PoolManagerKeeper

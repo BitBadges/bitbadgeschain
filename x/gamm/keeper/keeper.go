@@ -10,9 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
 
 	sdkmath "cosmossdk.io/math"
 	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
@@ -48,7 +47,6 @@ type Keeper struct {
 	// IBC keepers (optional, for IBC transfer functionality)
 	ics4Wrapper   types.ICS4Wrapper
 	channelKeeper types.ChannelKeeper
-	scopedKeeper  types.ScopedKeeper
 }
 
 func NewKeeper(
@@ -57,7 +55,6 @@ func NewKeeper(
 	transferKeeper types.TransferKeeper,
 	ics4Wrapper types.ICS4Wrapper,
 	channelKeeper types.ChannelKeeper,
-	scopedKeeper types.ScopedKeeper,
 ) Keeper {
 	// Ensure that the module account are set.
 	moduleAddr, perms := accountKeeper.GetModuleAddressAndPermissions(types.ModuleName)
@@ -84,9 +81,8 @@ func NewKeeper(
 		badgesKeeper:        badgesKeeper,
 		sendManagerKeeper:   sendManagerKeeper,
 		transferKeeper:      transferKeeper,
-		ics4Wrapper:         ics4Wrapper,
-		channelKeeper:       channelKeeper,
-		scopedKeeper:        scopedKeeper,
+		ics4Wrapper:   ics4Wrapper,
+		channelKeeper: channelKeeper,
 	}
 }
 
@@ -109,9 +105,7 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("channel keeper not set")
 	}
 
-	if k.scopedKeeper == nil {
-		return fmt.Errorf("scoped keeper not set")
-	}
+	// IBC v10: scoped keeper removed - capabilities no longer used
 
 	// Validate channel exists
 	_, found := k.channelKeeper.GetChannel(ctx, transfertypes.PortID, ibcTransferInfo.SourceChannel)
@@ -119,12 +113,7 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("IBC channel %s does not exist", ibcTransferInfo.SourceChannel)
 	}
 
-	// Get channel capability
-	capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcTransferInfo.SourceChannel)
-	channelCap, ok := k.scopedKeeper.GetCapability(ctx, capPath)
-	if !ok {
-		return fmt.Errorf("channel capability not found for channel %s", ibcTransferInfo.SourceChannel)
-	}
+	// IBC v10: Capabilities removed - channel validation is handled by IBC core
 
 	// Use zero height for timeout (no timeout height)
 	timeoutHeight := clienttypes.ZeroHeight()
@@ -155,10 +144,9 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("failed to marshal packet data: %w", err)
 	}
 
-	// Send IBC packet
+	// Send IBC packet (IBC v10: capabilities removed)
 	_, err = k.ics4Wrapper.SendPacket(
 		ctx,
-		channelCap,
 		transfertypes.PortID,
 		ibcTransferInfo.SourceChannel,
 		timeoutHeight,

@@ -79,8 +79,7 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		ak,
 		dk,                    // DistributionKeeper
 		mockSendManagerKeeper, // SendManagerKeeper
-		nil,                   // IBCKeeperFn
-		nil,                   // CapabilityScopedFn
+		nil,                   // IBCKeeperFn (IBC v10: capabilities removed)
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

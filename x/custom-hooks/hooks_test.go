@@ -4,11 +4,10 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
@@ -42,7 +41,6 @@ func (s *HooksTestSuite) SetupTest() {
 		s.App.TransferKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,
-		s.App.ScopedIBCTransferKeeper,
 	)
 
 	// Create custom hooks
@@ -53,11 +51,12 @@ func (s *HooksTestSuite) SetupTest() {
 // mockIBCModule is a simple mock IBC module that returns success acknowledgements
 type mockIBCModule struct{}
 
-func (m *mockIBCModule) OnChanOpenInit(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, chanCap *capabilitytypes.Capability, counterparty channeltypes.Counterparty, version string) (string, error) {
+// IBC v10: capabilities removed from channel handshake
+func (m *mockIBCModule) OnChanOpenInit(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, counterparty channeltypes.Counterparty, version string) (string, error) {
 	return version, nil
 }
 
-func (m *mockIBCModule) OnChanOpenTry(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, chanCap *capabilitytypes.Capability, counterparty channeltypes.Counterparty, counterpartyVersion string) (string, error) {
+func (m *mockIBCModule) OnChanOpenTry(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, counterparty channeltypes.Counterparty, counterpartyVersion string) (string, error) {
 	return counterpartyVersion, nil
 }
 
@@ -77,16 +76,19 @@ func (m *mockIBCModule) OnChanCloseConfirm(ctx sdk.Context, portID, channelID st
 	return nil
 }
 
-func (m *mockIBCModule) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+// IBC v10: OnRecvPacket now includes channelID parameter
+func (m *mockIBCModule) OnRecvPacket(ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	// Return success acknowledgement for testing
 	return channeltypes.NewResultAcknowledgement([]byte{1})
 }
 
-func (m *mockIBCModule) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
+// IBC v10: OnAcknowledgementPacket now includes packetID parameter
+func (m *mockIBCModule) OnAcknowledgementPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
 	return nil
 }
 
-func (m *mockIBCModule) OnTimeoutPacket(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+// IBC v10: OnTimeoutPacket now includes packetID parameter
+func (m *mockIBCModule) OnTimeoutPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
 	return nil
 }
 
@@ -155,8 +157,8 @@ func (s *HooksTestSuite) TestOnRecvPacketOverride_ValidMemo() {
 	// Create mock IBC middleware
 	im := s.createMockIBCMiddleware()
 
-	// Call the override hook
-	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet, relayer)
+	// Call the override hook - IBC v10: OnRecvPacketOverride requires channelID parameter
+	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet.GetDestChannel(), packet, relayer)
 
 	// Note: The hook will fail because the pool doesn't exist in this test setup
 	// This is expected - the test verifies the hook doesn't panic and handles errors gracefully
@@ -200,7 +202,8 @@ func (s *HooksTestSuite) TestOnRecvPacketOverride_InvalidMemo() {
 	im := s.createMockIBCMiddleware()
 
 	// Call the override hook - should return error ack for invalid memo
-	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet, relayer)
+	// IBC v10: OnRecvPacketOverride requires channelID parameter
+	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet.GetDestChannel(), packet, relayer)
 
 	// With invalid memo, should return error acknowledgement
 	s.Require().False(ack.Success(), "acknowledgement should be error for invalid memo")
@@ -235,7 +238,8 @@ func (s *HooksTestSuite) TestOnRecvPacketOverride_EmptyMemo() {
 	im := s.createMockIBCMiddleware()
 
 	// Call the override hook - should handle empty memo gracefully (no hook data, return success)
-	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet, relayer)
+	// IBC v10: OnRecvPacketOverride requires channelID parameter
+	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet.GetDestChannel(), packet, relayer)
 
 	// Empty memo means no hook data, so should return success
 	s.Require().True(ack.Success(), "acknowledgement should be successful for empty memo")
@@ -262,7 +266,8 @@ func (s *HooksTestSuite) TestOnRecvPacketOverride_NonICS20Packet() {
 	im := s.createMockIBCMiddleware()
 
 	// Call the override hook - should not process non-ICS20 packets, return success
-	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet, relayer)
+	// IBC v10: OnRecvPacketOverride requires channelID parameter
+	ack := s.customHooks.OnRecvPacketOverride(im, s.Ctx, packet.GetDestChannel(), packet, relayer)
 
 	// Non-ICS20 packets should return success (not processed by hooks)
 	s.Require().True(ack.Success(), "acknowledgement should be successful for non-ICS20 packets")

@@ -43,7 +43,6 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 		app.TransferKeeper,
 		app.TransferICS4Wrapper,
 		app.IBCKeeper.ChannelKeeper,
-		app.ScopedIBCTransferKeeper,
 	)
 
 	app.PoolManagerKeeper = *poolmanager.NewKeeper(

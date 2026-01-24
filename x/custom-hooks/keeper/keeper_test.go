@@ -7,8 +7,8 @@ import (
 
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
@@ -33,6 +33,7 @@ func (s *KeeperTestSuite) SetupTest() {
 
 	// Create keeper with real app keepers
 	// Pass pointer to GammKeeper to avoid copying the keeper (which contains storeKey)
+	// IBC v10: ScopedIBCTransferKeeper removed - capabilities no longer used
 	s.keeper = keeper.NewKeeper(
 		s.App.Logger(),
 		&s.App.GammKeeper,
@@ -42,7 +43,6 @@ func (s *KeeperTestSuite) SetupTest() {
 		s.App.TransferKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,
-		s.App.ScopedIBCTransferKeeper,
 	)
 }
 

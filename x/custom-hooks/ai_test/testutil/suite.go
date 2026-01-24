@@ -3,8 +3,8 @@ package testutil
 import (
 	"testing"
 
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
@@ -35,6 +35,7 @@ func (suite *AITestSuite) SetupTest() {
 	}
 
 	// Create keeper with real app keepers (same as keeper_test.go)
+	// IBC v10: ScopedIBCTransferKeeper removed - capabilities no longer used
 	suite.Keeper = keeper.NewKeeper(
 		suite.App.Logger(),
 		&suite.App.GammKeeper,
@@ -44,7 +45,6 @@ func (suite *AITestSuite) SetupTest() {
 		suite.App.TransferKeeper,
 		suite.App.HooksICS4Wrapper,
 		suite.App.IBCKeeper.ChannelKeeper,
-		suite.App.ScopedIBCTransferKeeper,
 	)
 
 	// Initialize test addresses - TestAccs should be initialized by Reset()
