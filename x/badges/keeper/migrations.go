@@ -38,10 +38,6 @@ func (k Keeper) MigrateBadgesKeeper(ctx sdk.Context) error {
 		return err
 	}
 
-	if err := MigrateUbadgeCoins(ctx, k); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -49,13 +45,6 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 	for _, approval := range incomingApprovals {
 		if approval.ApprovalCriteria == nil {
 			continue
-		}
-
-		// Migrate DynamicStoreChallenge ownershipCheckParty to empty string (defaults to initiator)
-		for _, challenge := range approval.ApprovalCriteria.DynamicStoreChallenges {
-			if challenge != nil {
-				challenge.OwnershipCheckParty = ""
-			}
 		}
 	}
 
@@ -67,13 +56,6 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
-
-		// Migrate DynamicStoreChallenge ownershipCheckParty to empty string (defaults to initiator)
-		for _, challenge := range approval.ApprovalCriteria.DynamicStoreChallenges {
-			if challenge != nil {
-				challenge.OwnershipCheckParty = ""
-			}
-		}
 	}
 
 	return outgoingApprovals
@@ -82,25 +64,8 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*newtypes.CollectionApproval {
 	for _, approval := range collectionApprovals {
 		if approval.ApprovalCriteria == nil {
-			// For backwards compatibility, create ApprovalCriteria with allowBackedMinting and allowSpecialWrapping set to true
-			approval.ApprovalCriteria = &newtypes.ApprovalCriteria{
-				AllowBackedMinting:   true,
-				AllowSpecialWrapping: true,
-			}
 			continue
 		}
-
-		// Migrate DynamicStoreChallenge ownershipCheckParty to empty string (defaults to initiator)
-		for _, challenge := range approval.ApprovalCriteria.DynamicStoreChallenges {
-			if challenge != nil {
-				challenge.OwnershipCheckParty = ""
-			}
-		}
-
-		// For backwards compatibility, set allowBackedMinting and allowSpecialWrapping to true if not already set
-		// This ensures existing approvals continue to work as they did before
-		approval.ApprovalCriteria.AllowBackedMinting = true
-		approval.ApprovalCriteria.AllowSpecialWrapping = true
 	}
 
 	return collectionApprovals
@@ -299,44 +264,5 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		}
 	}
 
-	return nil
-}
-
-// MigrateUbadgeCoins transfers all "ubadge" coins from one address to another
-func MigrateUbadgeCoins(ctx sdk.Context, k Keeper) error {
-	fromAddress := "bb1pkqancsm6lzmkz24x43ymjc8t8nykwye2vn2sx"
-	toAddress := "bb1esaf3yswwkusfx68jusacfkfgs37j07rlrchj5"
-
-	// Parse addresses
-	fromAddr, err := sdk.AccAddressFromBech32(fromAddress)
-	if err != nil {
-		return err
-	}
-
-	toAddr, err := sdk.AccAddressFromBech32(toAddress)
-	if err != nil {
-		return err
-	}
-
-	// Get all balances for the source address
-	allBalances := k.bankKeeper.GetAllBalances(ctx, fromAddr)
-
-	// Get the "ubadge" balance amount
-	ubadgeAmount := allBalances.AmountOf("ubadge")
-
-	// If no ubadge balance found, nothing to migrate
-	if ubadgeAmount.IsZero() {
-		ctx.Logger().Info("No ubadge coins to migrate", "from", fromAddress)
-		return nil
-	}
-
-	// Transfer all ubadge coins
-	ubadgeCoin := sdk.NewCoin("ubadge", ubadgeAmount)
-	coinsToTransfer := sdk.NewCoins(ubadgeCoin)
-	if err := k.bankKeeper.SendCoins(ctx, fromAddr, toAddr, coinsToTransfer); err != nil {
-		return err
-	}
-
-	ctx.Logger().Info("Migrated ubadge coins", "from", fromAddress, "to", toAddress, "amount", ubadgeAmount.String())
 	return nil
 }
