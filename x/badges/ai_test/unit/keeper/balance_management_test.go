@@ -29,7 +29,7 @@ func (suite *BalanceManagementTestSuite) SetupTest() {
 func (suite *BalanceManagementTestSuite) TestBalanceManagement_GetBalanceOrApplyDefault() {
 	// Get balance for address that doesn't exist - should apply default
 	collection := suite.GetCollection(suite.CollectionId)
-	balance, appliedDefault := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance, appliedDefault, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 
 	suite.Require().True(appliedDefault, "default should be applied for new address")
 	suite.Require().NotNil(balance)
@@ -61,7 +61,7 @@ func (suite *BalanceManagementTestSuite) TestBalanceManagement_SetBalanceForAddr
 	suite.Require().NoError(err)
 
 	// Get balance and verify
-	balance, appliedDefault := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance, appliedDefault, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	suite.Require().False(appliedDefault, "default should not be applied for existing balance")
 	suite.Require().Equal(1, len(balance.Balances))
 	suite.Require().True(balance.Balances[0].Amount.Equal(sdkmath.NewUint(100)))
@@ -74,7 +74,7 @@ func (suite *BalanceManagementTestSuite) TestBalanceManagement_DefaultInheritanc
 
 	// Get balance for new address - should inherit defaults
 	collection := suite.GetCollection(collectionId)
-	balance, appliedDefault := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance, appliedDefault, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 
 	suite.Require().True(appliedDefault, "default should be applied")
 	suite.Require().NotNil(balance)
@@ -87,13 +87,13 @@ func (suite *BalanceManagementTestSuite) TestBalanceManagement_SpecialAddresses(
 	collection := suite.GetCollection(suite.CollectionId)
 
 	// Test Mint address
-	mintBalance, appliedDefault := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, types.MintAddress)
+	mintBalance, appliedDefault, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, types.MintAddress)
 	suite.Require().False(appliedDefault, "Mint address should not apply default")
 	suite.Require().NotNil(mintBalance)
 	suite.Require().Equal(0, len(mintBalance.Balances), "Mint address should have empty balances (unlimited)")
 
 	// Test Total address
-	totalBalance, appliedDefault := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, types.TotalAddress)
+	totalBalance, appliedDefault, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, types.TotalAddress)
 	suite.Require().False(appliedDefault, "Total address should not apply default")
 	suite.Require().NotNil(totalBalance)
 	suite.Require().Equal(0, len(totalBalance.Balances), "Total address should have empty balances (unlimited)")

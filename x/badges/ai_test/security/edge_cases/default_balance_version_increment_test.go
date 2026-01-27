@@ -62,7 +62,7 @@ func (suite *DefaultBalanceVersionIncrementTestSuite) TestDefaultBalanceVersionI
 	// First access to balance - should initialize version trackers
 	// Note: GetBalanceOrApplyDefault doesn't save the balance, but IncrementApprovalVersion
 	// does save version trackers to the store
-	balance1, appliedDefault1 := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance1, appliedDefault1, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	suite.Require().True(appliedDefault1, "default should be applied on first access")
 	suite.Require().Equal(1, len(balance1.IncomingApprovals), "should have default incoming approval")
 	suite.Require().Equal(1, len(balance1.OutgoingApprovals), "should have default outgoing approval")
@@ -76,7 +76,7 @@ func (suite *DefaultBalanceVersionIncrementTestSuite) TestDefaultBalanceVersionI
 	// Second access - version trackers should exist in store, so versions should increment
 	// (GetBalanceOrApplyDefault doesn't save the balance, so it will apply defaults again,
 	// but IncrementApprovalVersion will return the incremented version from the store)
-	balance2, appliedDefault2 := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance2, appliedDefault2, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	suite.Require().True(appliedDefault2, "default should be applied again since balance wasn't saved")
 
 	// Versions should have incremented because version trackers exist in store
@@ -122,7 +122,7 @@ func (suite *DefaultBalanceVersionIncrementTestSuite) TestDefaultBalanceVersionI
 
 	// First access initializes version trackers in the store
 	// This is the side effect documented in HIGH-006
-	balance1, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance1, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	suite.Require().Equal(1, len(balance1.IncomingApprovals), "should have default incoming approval")
 	suite.Require().Equal(1, len(balance1.OutgoingApprovals), "should have default outgoing approval")
 
@@ -134,7 +134,7 @@ func (suite *DefaultBalanceVersionIncrementTestSuite) TestDefaultBalanceVersionI
 
 	// Second access - version trackers exist in store, so versions should increment
 	// This demonstrates that the version tracker was initialized in the store
-	balance2, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance2, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	version2Incoming := balance2.IncomingApprovals[0].Version
 	version2Outgoing := balance2.OutgoingApprovals[0].Version
 	suite.Require().True(version2Incoming.GT(version1Incoming), "incoming approval version should increment because tracker exists in store")
@@ -149,7 +149,7 @@ func (suite *DefaultBalanceVersionIncrementTestSuite) TestDefaultBalanceVersionI
 
 	// Collection has no default approvals
 	// First access to balance - should not initialize any version trackers
-	balance1, appliedDefault1 := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balance1, appliedDefault1, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	suite.Require().True(appliedDefault1, "default should be applied on first access")
 	suite.Require().Equal(0, len(balance1.IncomingApprovals), "should have no incoming approvals")
 	suite.Require().Equal(0, len(balance1.OutgoingApprovals), "should have no outgoing approvals")

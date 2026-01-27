@@ -164,7 +164,10 @@ func (k msgServer) validateAddressListIdsForMint(ctx sdk.Context, collection *ty
 // Security: Each flag is checked individually and only set if not already set, preventing
 // unintended overrides of existing settings.
 func (k msgServer) setAutoApproveFlagsForPathAddress(ctx sdk.Context, collection *types.TokenCollection, pathAddress string, pathType string) error {
-	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, pathAddress)
+	currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, pathAddress)
+	if err != nil {
+		return err
+	}
 
 	// Check each flag individually and only set if not already set
 	// This prevents overriding existing settings (defense-in-depth, though path addresses
@@ -340,7 +343,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 			// Only increment version if approval is new or changed (excluding Version field)
 			if !exists || !collectionApprovalEqual(existingApproval, newApproval) {
-				newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "collection", "", newApproval.ApprovalId)
+				newVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "collection", "", newApproval.ApprovalId)
+				if err != nil {
+					return nil, err
+				}
 				newApproval.Version = newVersion
 			} else {
 				// Keep existing version if approval hasn't changed

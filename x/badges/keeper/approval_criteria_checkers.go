@@ -16,7 +16,7 @@ func (a *collectionServiceAdapter) GetCollection(ctx sdk.Context, collectionId s
 	return a.keeper.GetCollectionFromStore(ctx, collectionId)
 }
 
-func (a *collectionServiceAdapter) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool) {
+func (a *collectionServiceAdapter) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error) {
 	return a.keeper.GetBalanceOrApplyDefault(ctx, collection, userAddress)
 }
 

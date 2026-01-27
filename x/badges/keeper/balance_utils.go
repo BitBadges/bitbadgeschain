@@ -6,6 +6,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/cosmos/gogoproto/proto"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -32,10 +33,10 @@ func getDefaultBalanceStoreForCollection(collection *types.TokenCollection) *typ
 }
 
 // GetBalanceOrApplyDefault retrieves user balance or applies default balance store
-func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool) {
+func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error) {
 	// Mint has unlimited balances
 	if types.IsMintOrTotalAddress(userAddress) {
-		return &types.UserBalanceStore{}, false
+		return &types.UserBalanceStore{}, false, nil
 	}
 
 	// Special backed addresses also have unlimited balances
@@ -45,7 +46,7 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 			AutoApproveAllIncomingTransfers: true,
 			AutoApproveSelfInitiatedIncomingTransfers: true,
 			AutoApproveSelfInitiatedOutgoingTransfers: true,
-		}, false
+		}, false, nil
 	}
 
 	// We get current balances or fallback to default balances
@@ -62,10 +63,18 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 		// which is intentional to prevent replay attacks using old default approval versions.
 		// The version is incremented (not set to 0) to ensure uniqueness and prevent conflicts.
 		for _, approval := range balance.IncomingApprovals {
-			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
+			version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
+			if err != nil {
+				return nil, false, sdkerrors.Wrap(err, "failed to increment approval version")
+			}
+			approval.Version = version
 		}
 		for _, approval := range balance.OutgoingApprovals {
-			approval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
+			version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
+			if err != nil {
+				return nil, false, sdkerrors.Wrap(err, "failed to increment approval version")
+			}
+			approval.Version = version
 		}
 	}
 
@@ -73,7 +82,7 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 		balance.UserPermissions = &types.UserPermissions{}
 	}
 
-	return balance, appliedDefault
+	return balance, appliedDefault, nil
 }
 
 // SetBalanceForAddress stores a user balance for a specific address

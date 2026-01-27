@@ -224,7 +224,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_CreatorPermission_Unauthorized() {
 	
 	// Verify the approval was set (Bob can set his own incoming approvals)
 	collection := suite.GetCollection(collectionId)
-	bobBalance, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Bob)
+	bobBalance, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Bob)
 	found := false
 	for _, approval := range bobBalance.IncomingApprovals {
 		if approval.ApprovalId == "incoming1" {
@@ -278,7 +278,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_MultiMsgTransaction() {
 
 	// Verify the approval was set on collectionId2, not collectionId1
 	collection2 := suite.GetCollection(collectionId2)
-	balance2, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection2, suite.Manager)
+	balance2, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection2, suite.Manager)
 	found := false
 	for _, approval := range balance2.IncomingApprovals {
 		if approval.ApprovalId == "incoming1" {

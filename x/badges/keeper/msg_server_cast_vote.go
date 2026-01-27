@@ -46,7 +46,10 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 		}
 	} else {
 		// Check user-level approvals (incoming/outgoing)
-		balanceStore, _ := k.GetBalanceOrApplyDefault(ctx, collection, msg.ApproverAddress)
+		balanceStore, _, err := k.GetBalanceOrApplyDefault(ctx, collection, msg.ApproverAddress)
+		if err != nil {
+			return nil, err
+		}
 
 		if msg.ApprovalLevel == "incoming" {
 			for _, app := range balanceStore.IncomingApprovals {

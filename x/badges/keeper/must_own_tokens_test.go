@@ -787,7 +787,7 @@ func (suite *TestSuite) TestMustOwnTokensBb1AddressSupport() {
 	// Verify charlie owns the halt token and get the actual token ID
 	haltTokenCollection, found := suite.app.BadgesKeeper.GetCollectionFromStore(suite.ctx, haltTokenCollectionId)
 	suite.Require().True(found, "Halt token collection should exist")
-	charlieBalance, _ := suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, haltTokenCollection, charlie)
+	charlieBalance, _, _ := suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, haltTokenCollection, charlie)
 	suite.Require().True(len(charlieBalance.Balances) > 0, "Charlie should own the halt token")
 	actualTokenId := charlieBalance.Balances[0].TokenIds[0].Start // Get the actual token ID that was minted
 

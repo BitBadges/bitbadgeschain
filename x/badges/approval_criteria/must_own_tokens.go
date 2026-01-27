@@ -66,7 +66,11 @@ func (c *MustOwnTokensChecker) checkSingleRequirement(
 	partyToCheck := c.determinePartyToCheck(mustOwnToken.OwnershipCheckParty, initiatedBy, fromAddress, toAddress, collection)
 
 	// Get balances for the party
-	partyBalances, _ := c.collectionService.GetBalanceOrApplyDefault(ctx, collection, partyToCheck)
+	partyBalances, _, err := c.collectionService.GetBalanceOrApplyDefault(ctx, collection, partyToCheck)
+	if err != nil {
+		errMsg := fmt.Sprintf("token ownership requirement idx %d failed: %v", requirementIdx, err)
+		return false, errMsg
+	}
 	balances := partyBalances.Balances
 
 	// Determine ownership times to use (override with current time if needed)

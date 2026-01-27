@@ -63,11 +63,11 @@ func ExecuteAndVerifyMessage(
 			for _, toAddr := range transfer.ToAddresses {
 				if transfer.From != types.MintAddress {
 					collection, _ := k.GetCollectionFromStore(ctx, m.CollectionId)
-					bal, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+					bal, _, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
 					balancesBefore[transfer.From] = bal
 				}
 				collection, _ := k.GetCollectionFromStore(ctx, m.CollectionId)
-				bal, _ := k.GetBalanceOrApplyDefault(ctx, collection, toAddr)
+				bal, _, _ := k.GetBalanceOrApplyDefault(ctx, collection, toAddr)
 				balancesBefore[toAddr] = bal
 			}
 		}

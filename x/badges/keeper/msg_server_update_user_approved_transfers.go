@@ -44,7 +44,10 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, ErrCollectionIsArchived
 	}
 
-	userBalance, appliedDefault := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
+	userBalance, appliedDefault, err := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}
@@ -68,7 +71,10 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 
 				// Only increment version if approval is new or changed (excluding Version field)
 				if !exists || !userOutgoingApprovalEqual(existingApproval, newApproval) {
-					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, newApproval.ApprovalId)
+					newVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, newApproval.ApprovalId)
+					if err != nil {
+						return nil, err
+					}
 					newApproval.Version = newVersion
 				} else {
 					// Keep existing version if approval hasn't changed
@@ -105,7 +111,10 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 
 				// Only increment version if approval is new or changed (excluding Version field)
 				if !exists || !userIncomingApprovalEqual(existingApproval, newApproval) {
-					newVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, newApproval.ApprovalId)
+					newVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, newApproval.ApprovalId)
+					if err != nil {
+						return nil, err
+					}
 					newApproval.Version = newVersion
 				} else {
 					// Keep existing version if approval hasn't changed

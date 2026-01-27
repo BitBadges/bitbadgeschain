@@ -26,7 +26,10 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	}
 	// All collections now use Standard balances
 	// We technically want to apply versions here, but it doesn't actually set them in store (due to queries)
-	balances, _ := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+	balances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.QueryGetBalanceResponse{
 		Balance: balances,

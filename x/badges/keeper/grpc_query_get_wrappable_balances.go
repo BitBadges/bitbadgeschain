@@ -50,7 +50,10 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	}
 
 	// Get user's native balances (non-wrapped)
-	userBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+	userBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+	if err != nil {
+		return nil, err
+	}
 	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(err, "error calculating max wrappable amount")

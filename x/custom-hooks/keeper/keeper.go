@@ -39,7 +39,7 @@ type (
 	BadgesKeeper interface {
 		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error)
 		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error
-		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool)
+		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool, error)
 		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
 		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
 		SendNativeTokensViaAliasDenom(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
@@ -689,7 +689,10 @@ func (k Keeper) setAutoApproveForIntermediateAddress(ctx sdk.Context, intermedia
 	}
 
 	// Get current balance or apply default
-	currBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
+	currBalances, _, err := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
+	if err != nil {
+		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to get balance for intermediate address: %v", err))
+	}
 
 	// Check if already auto-approved (all flags)
 	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers

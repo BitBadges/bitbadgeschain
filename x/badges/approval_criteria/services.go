@@ -9,7 +9,7 @@ import (
 // CollectionService provides methods to access collection data
 type CollectionService interface {
 	GetCollection(ctx sdk.Context, collectionId sdkmath.Uint) (*types.TokenCollection, bool)
-	GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool)
+	GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error)
 }
 
 // AddressCheckService provides methods to check address types

@@ -45,7 +45,10 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 	currentTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
 	// Get current user balance to filter out approvals to purge
-	userBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, targetAddress)
+	userBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, targetAddress)
+	if err != nil {
+		return nil, err
+	}
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}

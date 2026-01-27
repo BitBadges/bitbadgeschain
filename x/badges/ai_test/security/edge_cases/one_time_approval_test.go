@@ -95,7 +95,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_UniqueIDs() {
 	pathAddress := collection.CosmosCoinWrapperPaths[0].Address
 
 	// Get initial balance to check for approvals
-	balanceBefore, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceBefore, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	initialApprovalCount := len(balanceBefore.OutgoingApprovals)
 
 	// Create a denom for the wrapper path
@@ -124,7 +124,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_UniqueIDs() {
 	suite.Require().NoError(err, "first call should succeed")
 
 	// Check that approval was cleaned up
-	balanceAfter1, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceAfter1, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	suite.Require().Equal(initialApprovalCount, len(balanceAfter1.OutgoingApprovals), "approval should be cleaned up after first call")
 
 	// Second call - should use a different approval ID
@@ -132,7 +132,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_UniqueIDs() {
 	suite.Require().NoError(err, "second call should succeed")
 
 	// Check that approval was cleaned up again
-	balanceAfter2, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceAfter2, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	suite.Require().Equal(initialApprovalCount, len(balanceAfter2.OutgoingApprovals), "approval should be cleaned up after second call")
 }
 
@@ -183,7 +183,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_CleanupOnFailure() {
 	pathAddress := collection.CosmosCoinWrapperPaths[0].Address
 
 	// Get initial balance
-	balanceBefore, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceBefore, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	initialApprovalCount := len(balanceBefore.OutgoingApprovals)
 
 	// Create a denom
@@ -211,7 +211,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_CleanupOnFailure() {
 	suite.Require().Error(err, "should fail when trying to send more than available")
 
 	// Verify approval was cleaned up even though transfer failed
-	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceAfter, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	suite.Require().Equal(initialApprovalCount, len(balanceAfter.OutgoingApprovals), "approval should be cleaned up even on failure")
 }
 
@@ -286,7 +286,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_VersionIncrement() {
 	suite.Require().NoError(err)
 
 	// Verify that the approval was cleaned up (no orphaned approvals)
-	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceAfter, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	// The approval should be cleaned up, so we shouldn't see any one-time approvals
 	for _, approval := range balanceAfter.OutgoingApprovals {
 		suite.Require().NotContains(approval.ApprovalId, "one-time-outgoing", "no one-time approvals should remain")

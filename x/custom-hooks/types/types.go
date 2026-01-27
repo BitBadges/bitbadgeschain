@@ -17,14 +17,27 @@ import (
 // The error message should be deterministic (no traces, logs, or non-deterministic values).
 // Panics if the error message contains patterns indicating stack traces or non-deterministic content.
 // Uses transient store so the value is automatically cleared at the end of the transaction.
+// SetDeterministicError stores an error message in the transient store for deterministic error handling.
+// This function validates that the error message doesn't contain non-deterministic content like stack traces.
+//
+// Limitations: This uses pattern matching to detect non-deterministic content, which may:
+//   - False-positive on legitimate content containing these patterns (e.g., ".go" in a message about Go files)
+//   - Miss some non-deterministic patterns not covered by the checks
+//
+// For production use, consider:
+//   - Using structured error types with predefined error codes
+//   - Creating an allowlist of safe error message formats
+//   - Implementing more sophisticated validation based on error source
 func SetDeterministicError(ctx sdk.Context, errorMsg string) {
 	// Validate that the error message doesn't contain stack traces or non-deterministic patterns
-	// Check for file paths (indicated by ".go")
+	
+	// Check for file paths (indicated by ".go" or file extensions)
+	// Note: This may false-positive on legitimate messages about Go files
 	if strings.Contains(errorMsg, ".go") {
 		panic(fmt.Sprintf("SetDeterministicError: error message contains '.go' (likely a stack trace), which is non-deterministic. Error message: %s", errorMsg))
 	}
 
-	// Check for goroutine IDs
+	// Check for goroutine IDs (e.g., "goroutine 123")
 	if strings.Contains(errorMsg, "goroutine") {
 		panic(fmt.Sprintf("SetDeterministicError: error message contains 'goroutine' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
 	}
@@ -40,8 +53,14 @@ func SetDeterministicError(ctx sdk.Context, errorMsg string) {
 	}
 
 	// Check for full package paths (github.com/... or similar)
-	if matched, _ := regexp.MatchString(`(github\.com|golang\.org|go\.pkg\.dev)/`, errorMsg); matched {
+	// Using regex for more precise matching of package paths
+	if matched, _ := regexp.MatchString(`(github\.com|golang\.org|go\.pkg\.dev|gopkg\.in)/`, errorMsg); matched {
 		panic(fmt.Sprintf("SetDeterministicError: error message contains package path (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+	
+	// Check for common stack trace patterns: file paths with line numbers (e.g., "file.go:123")
+	if matched, _ := regexp.MatchString(`\w+\.go:\d+`, errorMsg); matched {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains file path with line number (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
 	}
 
 	// Store in transient store - this persists across function calls even when context is passed by value

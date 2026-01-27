@@ -36,13 +36,13 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_OnlySetsIfNotAlread
 	poolAddress := suite.Alice
 
 	// First, manually set one flag to true
-	balance, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
+	balance, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
 	balance.AutoApproveAllIncomingTransfers = true
 	err := suite.Keeper.SetBalanceForAddress(suite.Ctx, collection, poolAddress, balance)
 	suite.Require().NoError(err)
 
 	// Get balance again to verify flag is set
-	balanceBefore, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
+	balanceBefore, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
 	suite.Require().True(balanceBefore.AutoApproveAllIncomingTransfers, "flag should be set before calling function")
 
 	// Call the function - it should succeed and only set flags that aren't already set
@@ -50,7 +50,7 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_OnlySetsIfNotAlread
 	suite.Require().NoError(err, "should succeed for any address")
 
 	// Verify that the already-set flag remains true
-	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
+	balanceAfter, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, poolAddress)
 	suite.Require().True(balanceAfter.AutoApproveAllIncomingTransfers, "flag that was already set should remain true")
 
 	// Verify that other flags were set
@@ -107,7 +107,7 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_IndividualFlagCheck
 	pathAddress := collection.CosmosCoinWrapperPaths[0].Address
 
 	// Get initial balance
-	balanceBefore, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceBefore, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 
 	// Set one flag manually to true
 	balanceBefore.AutoApproveSelfInitiatedOutgoingTransfers = true
@@ -119,7 +119,7 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_IndividualFlagCheck
 	suite.Require().NoError(err, "should succeed for path address")
 
 	// Verify that the already-set flag remains true
-	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceAfter, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedOutgoingTransfers, "flag that was already set should remain true")
 
 	// Verify that other flags were set
@@ -138,7 +138,7 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_WorksForRegularAddr
 	suite.Require().NoError(err, "should succeed for regular address")
 
 	// Verify that flags were set
-	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
+	balanceAfter, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice)
 	suite.Require().True(balanceAfter.AutoApproveAllIncomingTransfers, "flag should be set")
 	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedOutgoingTransfers, "flag should be set")
 	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedIncomingTransfers, "flag should be set")
@@ -191,7 +191,7 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_NoChangeIfAllFlagsS
 	pathAddress := collection.CosmosCoinWrapperPaths[0].Address
 
 	// Set all flags manually first
-	balance, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balance, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	balance.AutoApproveAllIncomingTransfers = true
 	balance.AutoApproveSelfInitiatedOutgoingTransfers = true
 	balance.AutoApproveSelfInitiatedIncomingTransfers = true
@@ -203,7 +203,7 @@ func (suite *PoolAutoApprovalTestSuite) TestPoolAutoApproval_NoChangeIfAllFlagsS
 	suite.Require().NoError(err, "should succeed even if all flags already set")
 
 	// Verify flags are still set
-	balanceAfter, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
+	balanceAfter, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, pathAddress)
 	suite.Require().True(balanceAfter.AutoApproveAllIncomingTransfers, "flag should remain set")
 	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedOutgoingTransfers, "flag should remain set")
 	suite.Require().True(balanceAfter.AutoApproveSelfInitiatedIncomingTransfers, "flag should remain set")

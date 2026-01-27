@@ -385,6 +385,12 @@ func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId s
 
 		curr = sdkmath.NewUint(currUint)
 	}
+
+	// Check for overflow before incrementing
+	if curr.Equal(sdkmath.NewUint(math.MaxUint64)) {
+		return sdkmath.NewUint(0), sdkerrors.Wrapf(types.ErrOverflow, "challenge tracker overflow: cannot increment beyond MaxUint64")
+	}
+
 	incrementedNum := curr.AddUint64(1)
 	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(incrementedNum.String()))
 	return incrementedNum, nil
@@ -564,24 +570,24 @@ func (k Keeper) DeleteApprovalTrackerFromStore(ctx sdk.Context, collectionId sdk
 
 /** -------------------------------------- VERSION TRACKERS FOR APPROVAL IDS -------------------------------------- */
 
-func (k Keeper) IncrementApprovalVersion(ctx sdk.Context, collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string) sdkmath.Uint {
+func (k Keeper) IncrementApprovalVersion(ctx sdk.Context, collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string) (sdkmath.Uint, error) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	version := store.Get(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)))
 	if version == nil {
 		store.Set(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)), []byte("0"))
-		return sdkmath.NewUint(0)
+		return sdkmath.NewUint(0), nil
 	} else {
 		versionUint, err := strconv.ParseUint(string(version), 10, 64)
 		if err != nil {
-			// Return 0 on parse error
-			return sdkmath.NewUint(0)
+			// Return error on parse failure to prevent silent data corruption
+			return sdkmath.NewUint(0), sdkerrors.Wrapf(err, "failed to parse approval version for collection %s, level %s, approver %s, approvalId %s", collectionId.String(), approvalLevel, approverAddress, approvalId)
 		}
 
 		versionUint++
 		newVersion := sdkmath.NewUint(versionUint)
 		store.Set(approvalVersionStoreKey(ConstructApprovalVersionKey(collectionId, approvalLevel, approverAddress, approvalId)), []byte(newVersion.String()))
-		return newVersion
+		return newVersion, nil
 	}
 }
 
@@ -705,15 +711,16 @@ func (k Keeper) SetNextDynamicStoreId(ctx sdk.Context, nextID sdkmath.Uint) {
 	store.Set(nextDynamicStoreIdKey(), []byte(nextID.String()))
 }
 
-func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) {
+func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) error {
 	nextID := k.GetNextDynamicStoreId(ctx)
 
 	// Check for overflow before incrementing
 	if nextID.Equal(sdkmath.NewUint(math.MaxUint64)) {
-		panic("dynamic store ID overflow: cannot increment beyond MaxUint64")
+		return sdkerrors.Wrapf(types.ErrOverflow, "dynamic store ID overflow: cannot increment beyond MaxUint64")
 	}
 
 	k.SetNextDynamicStoreId(ctx, nextID.AddUint64(1))
+	return nil
 }
 
 /****************************************DYNAMIC STORE VALUES****************************************/

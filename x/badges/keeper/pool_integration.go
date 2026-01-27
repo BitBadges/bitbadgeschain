@@ -70,7 +70,10 @@ func setAutoApprovalFlagsIfNeeded(balance *badgestypes.UserBalanceStore) bool {
 // This function follows the same pattern as setAutoApproveFlagsForPathAddress to ensure
 // consistent behavior and prevent unintended overrides of user-configured settings.
 func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
-	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address)
+	currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address)
+	if err != nil {
+		return err
+	}
 
 	// Set flags if needed (DRY helper)
 	if setAutoApprovalFlagsIfNeeded(currBalances) {
@@ -95,7 +98,10 @@ func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collectio
 //     intermediate addresses are a different type of system address
 func (k Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error {
 	// Get current balances
-	currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address)
+	currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address)
+	if err != nil {
+		return err
+	}
 
 	// Set flags if needed (DRY helper)
 	if setAutoApprovalFlagsIfNeeded(currBalances) {
@@ -168,7 +174,10 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 
 	// Security: The version must be incremented to prevent replay attacks
 	// Using version 0 would allow the approval to be reused if deletion fails
-	approvalVersion := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", fromAddress, approvalId)
+	approvalVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", fromAddress, approvalId)
+	if err != nil {
+		return err
+	}
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	badgesMsgServer := NewMsgServerImpl(k)
@@ -394,7 +403,10 @@ func (k Keeper) GetSpendableCoinAmountBadgesLPOnly(ctx sdk.Context, address sdk.
 	}
 
 	// Get user's badge balance
-	userBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
+	userBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
+	if err != nil {
+		return sdkmath.ZeroInt(), err
+	}
 	maxWrappableAmount, err := k.calculateMaxWrappableAmount(ctx, userBalances.Balances, path)
 	if err != nil {
 		return sdkmath.ZeroInt(), err

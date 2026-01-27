@@ -26,10 +26,9 @@ func (msg *MsgSetValidTokenIds) Type() string {
 }
 
 func (msg *MsgSetValidTokenIds) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		panic(err)
-	}
+	// MustAccAddressFromBech32 panics if address is invalid, which is expected
+	// since ValidateBasic() should have already validated the address
+	creator := sdk.MustAccAddressFromBech32(msg.Creator)
 	return []sdk.AccAddress{creator}
 }
 

@@ -44,8 +44,6 @@ type EventTracking struct {
 }
 
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollection, transfers []*types.Transfer, initiatedBy string) error {
-	var err error
-
 	isArchived := types.GetIsArchived(ctx, collection)
 	if isArchived {
 		return customhookstypes.WrapErr(&ctx, ErrCollectionIsArchived, "collection is currently archived (read-only)")
@@ -61,7 +59,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 	}
 
 	for _, transfer := range transfers {
-		fromUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+		fromUserBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
+		if err != nil {
+			return err
+		}
 		totalMinted := []*types.Balance{}
 
 		for _, to := range transfer.ToAddresses {
@@ -72,7 +73,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 				CoinTransfers: &coinTransfers,
 			}
 
-			toUserBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, to)
+			toUserBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, to)
+			if err != nil {
+				return err
+			}
 
 			if transfer.PrecalculateBalancesFromApproval != nil && transfer.PrecalculateBalancesFromApproval.ApprovalId != "" {
 				// Here, we precalculate balances from a specified approval
@@ -213,7 +217,10 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 		// We only need to handle the mint case here (total balances).
 		if types.IsMintAddress(transfer.From) {
 			// Get current Total and increment it
-			totalBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
+			totalBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, types.TotalAddress)
+			if err != nil {
+				return err
+			}
 			totalBalances.Balances, err = types.AddBalances(ctx, totalBalances.Balances, totalMinted)
 			if err != nil {
 				return err
@@ -261,7 +268,10 @@ func (k Keeper) HandleTransfer(
 	if isSendingFromSpecialAddress {
 		// Set up one-time outgoing approval for the special address to send tokens to the recipient
 		// Similar to gamm pools
-		currBalances, _ := k.GetBalanceOrApplyDefault(ctx, collection, from)
+		currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, from)
+		if err != nil {
+			return fromUserBalance, toUserBalance, err
+		}
 
 		// Add one-time outgoing approval
 		oneTimeApproval := &types.UserOutgoingApproval{
@@ -275,7 +285,11 @@ func (k Keeper) HandleTransfer(
 		}
 
 		// Set version for the approval
-		oneTimeApproval.Version = k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", from, oneTimeApproval.ApprovalId)
+		version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", from, oneTimeApproval.ApprovalId)
+		if err != nil {
+			return fromUserBalance, toUserBalance, err
+		}
+		oneTimeApproval.Version = version
 
 		// Add to outgoing approvals
 		currBalances.OutgoingApprovals = []*types.UserOutgoingApproval{oneTimeApproval}

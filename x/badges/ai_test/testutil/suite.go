@@ -251,7 +251,7 @@ func (suite *AITestSuite) GetCollection(collectionId sdkmath.Uint) *types.TokenC
 // GetBalance retrieves a user's balance for a collection
 func (suite *AITestSuite) GetBalance(collectionId sdkmath.Uint, address string) *types.UserBalanceStore {
 	collection := suite.GetCollection(collectionId)
-	balance, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, address)
+	balance, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, address)
 	return balance
 }
 

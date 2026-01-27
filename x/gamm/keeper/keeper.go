@@ -225,7 +225,10 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 			}
 
 			// Get the pool's current balance
-			poolBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
+			poolBalances, _, err := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
+			if err != nil {
+				return err
+			}
 
 			// Try to subtract needed balances from pool balances - will error on underflow
 			poolBalancesCopy := badgestypes.DeepCopyBalances(poolBalances.Balances)

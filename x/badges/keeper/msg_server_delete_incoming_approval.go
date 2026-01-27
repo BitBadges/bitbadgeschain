@@ -29,7 +29,10 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 		return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", collectionId.String())
 	}
 
-	userBalance, _ := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
+	userBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}

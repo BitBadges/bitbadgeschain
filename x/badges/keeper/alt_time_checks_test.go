@@ -427,7 +427,7 @@ func (suite *TestSuite) TestAltTimeChecks_IncomingApproval() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 	// Get user balance with default approvals applied (this will set versions correctly)
-	userBalance, _ := suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, bob)
+	userBalance, _, _ := suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, bob)
 
 	// Get the correct version for the approval
 	version, found := suite.app.BadgesKeeper.GetApprovalTrackerVersionFromStore(suite.ctx, keeper.ConstructApprovalVersionKey(collection.CollectionId, "incoming", bob, "test-incoming-offline"))
@@ -490,7 +490,7 @@ func (suite *TestSuite) TestAltTimeChecks_IncomingApproval() {
 	suite.ctx = suite.ctx.WithBlockTime(testTime)
 
 	// Get the balance again to ensure we have the latest version
-	userBalance, _ = suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, bob)
+	userBalance, _, _ = suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, bob)
 	version, found = suite.app.BadgesKeeper.GetApprovalTrackerVersionFromStore(suite.ctx, keeper.ConstructApprovalVersionKey(collection.CollectionId, "incoming", bob, "test-incoming-offline"))
 	if !found {
 		version = sdkmath.NewUint(0)
@@ -613,7 +613,7 @@ func (suite *TestSuite) TestAltTimeChecks_OutgoingApproval() {
 	collection, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
 
 	// Get user balance with default approvals applied (this will set versions correctly)
-	userBalance, _ := suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, alice)
+	userBalance, _, _ := suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, alice)
 
 	// Get the correct version for the approval
 	version, found := suite.app.BadgesKeeper.GetApprovalTrackerVersionFromStore(suite.ctx, keeper.ConstructApprovalVersionKey(collection.CollectionId, "outgoing", alice, "test-outgoing-offline"))
@@ -676,7 +676,7 @@ func (suite *TestSuite) TestAltTimeChecks_OutgoingApproval() {
 	suite.ctx = suite.ctx.WithBlockTime(testTime)
 
 	// Get the balance again to ensure we have the latest version
-	userBalance, _ = suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, alice)
+	userBalance, _, _ = suite.app.BadgesKeeper.GetBalanceOrApplyDefault(suite.ctx, collection, alice)
 	version, found = suite.app.BadgesKeeper.GetApprovalTrackerVersionFromStore(suite.ctx, keeper.ConstructApprovalVersionKey(collection.CollectionId, "outgoing", alice, "test-outgoing-offline"))
 	if !found {
 		version = sdkmath.NewUint(0)

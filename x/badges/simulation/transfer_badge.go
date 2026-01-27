@@ -70,7 +70,7 @@ func SimulateMsgTransferTokens(
 			fromAddress := creator.Address.String()
 
 			// Get sender's balance
-			balance, _ := k.GetBalanceOrApplyDefault(ctx, collection, fromAddress)
+			balance, _, _ := k.GetBalanceOrApplyDefault(ctx, collection, fromAddress)
 
 			// Check if sender has any balance
 			hasBalance := false
