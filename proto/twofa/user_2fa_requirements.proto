@@ -1,0 +1,20 @@
+syntax = "proto3";
+package twofa;
+
+import "gogoproto/gogo.proto";
+import "badges/approval_conditions.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/twofa/types";
+
+// User2FARequirements stores the 2FA token requirements for a user
+message User2FARequirements {
+  // List of MustOwnTokens requirements that must be satisfied for transactions from this user.
+  // If empty, 2FA requirements are disabled for this user.
+  repeated badges.MustOwnTokens mustOwnTokens = 1;
+  
+  // List of DynamicStoreChallenge requirements that must be satisfied for transactions from this user.
+  // Each challenge requires the signer to have a true value in the specified dynamic store.
+  // If empty, no dynamic store checks are performed.
+  repeated badges.DynamicStoreChallenge dynamicStoreChallenges = 2;
+}
+

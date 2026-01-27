@@ -16,6 +16,7 @@ import "badges/address_lists.proto";
 import "badges/dynamic_stores.proto";
 import "badges/approvals.proto";
 import "badges/user_balance_store.proto";
+import "badges/approval_conditions.proto";
 
 import "cosmos/base/v1beta1/coin.proto";
 
@@ -920,3 +921,4 @@ message MsgCastVote {
 }
 
 message MsgCastVoteResponse {}
+

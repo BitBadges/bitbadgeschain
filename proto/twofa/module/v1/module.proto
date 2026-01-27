@@ -1,0 +1,13 @@
+syntax = "proto3";
+package twofa.module.v1;
+
+import "cosmos/app/v1alpha1/module.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/twofa/types";
+
+// Module is the config object of the twofa module.
+message Module {
+  option (cosmos.app.v1alpha1.module) = {
+    go_import: "github.com/bitbadges/bitbadgeschain/x/twofa"
+  };
+}

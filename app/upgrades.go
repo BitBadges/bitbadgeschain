@@ -4,6 +4,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v23 "github.com/bitbadges/bitbadgeschain/app/upgrades/v23"
+	twofatypes "github.com/bitbadges/bitbadgeschain/x/twofa/types"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -36,7 +37,9 @@ func (app *App) RegisterUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v23.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{},
+			Added: []string{
+				twofatypes.StoreKey, // Add twofa store key for migration
+			},
 		}
 	}
 

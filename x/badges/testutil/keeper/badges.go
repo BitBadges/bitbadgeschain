@@ -93,6 +93,10 @@ func BadgesKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	// This matches the behavior in InitGenesis
 	k.SetNextCollectionId(ctx, math.NewUint(1))
 
+	// Initialize next dynamic store ID to 1 (first dynamic store will get ID 1)
+	// This matches the behavior in InitGenesis
+	k.SetNextDynamicStoreId(ctx, math.NewUint(1))
+
 	return k, ctx
 }
 

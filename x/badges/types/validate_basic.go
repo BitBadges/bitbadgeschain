@@ -568,53 +568,19 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
 				}
 
-				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnTokens {
-					if mustOwnTokenBalance == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnTokens balance is nil")
-					}
-
-					if err := ValidateRangesAreValid(mustOwnTokenBalance.TokenIds, false, false); err != nil {
-						return sdkerrors.Wrapf(err, "invalid token IDs")
-					}
-
-					if err := ValidateRangesAreValid(mustOwnTokenBalance.OwnershipTimes, false, false); err != nil {
-						return sdkerrors.Wrapf(err, "invalid owned times")
-					}
-
-					if err := ValidateRangesAreValid([]*UintRange{mustOwnTokenBalance.AmountRange}, true, true); err != nil {
-						return sdkerrors.Wrapf(err, "invalid transfer times")
-					}
-
-					if mustOwnTokenBalance.CollectionId.IsNil() || mustOwnTokenBalance.CollectionId.IsZero() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized")
+				// Validate MustOwnTokens using shared validation function
+				for idx, mustOwnTokenBalance := range approvalCriteria.MustOwnTokens {
+					if err := ValidateMustOwnTokens(mustOwnTokenBalance, idx); err != nil {
+						return err
 					}
 				}
 
-				// Validate dynamic store challenges
+				// Validate dynamic store challenges using shared validation function
 				if approvalCriteria.DynamicStoreChallenges == nil {
 					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
 				}
-
-				// Check for duplicate store IDs
-				storeIds := make(map[string]bool)
-				for _, challenge := range approvalCriteria.DynamicStoreChallenges {
-					if challenge == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "dynamic store challenge is nil")
-					}
-
-					if challenge.StoreId.IsNil() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is uninitialized")
-					}
-
-					if challenge.StoreId.IsZero() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is zero")
-					}
-
-					storeIdStr := challenge.StoreId.String()
-					if storeIds[storeIdStr] {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate dynamic store challenge storeId: %s", storeIdStr)
-					}
-					storeIds[storeIdStr] = true
+				if err := ValidateDynamicStoreChallengesList(approvalCriteria.DynamicStoreChallenges); err != nil {
+					return err
 				}
 
 				// Validate voting challenges

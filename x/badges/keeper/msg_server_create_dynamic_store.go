@@ -21,6 +21,8 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 	nextStoreId := k.GetNextDynamicStoreId(ctx)
 	if nextStoreId.Equal(sdkmath.NewUint(0)) {
 		nextStoreId = sdkmath.NewUint(1)
+		// Set it in the store so that IncrementNextDynamicStoreId increments from 1 to 2, not 0 to 1
+		k.SetNextDynamicStoreId(ctx, nextStoreId)
 	}
 
 	// Create the dynamic store

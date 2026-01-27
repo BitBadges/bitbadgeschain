@@ -65,6 +65,9 @@ import (
 	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 
+	_ "github.com/bitbadges/bitbadgeschain/x/twofa/module" // import for side-effects
+	twofamoduletypes "github.com/bitbadges/bitbadgeschain/x/twofa/types"
+
 	managersplittermodulev1 "github.com/bitbadges/bitbadgeschain/api/managersplitter/module"
 	_ "github.com/bitbadges/bitbadgeschain/x/managersplitter/module" // import for side-effects
 	managersplittermoduletypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
@@ -118,6 +121,7 @@ var (
 		// chain modules
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
+		twofamoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -150,6 +154,7 @@ var (
 		// chain modules
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
+		twofamoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -177,6 +182,7 @@ var (
 		// chain modules
 		anchormoduletypes.ModuleName,
 		badgesmoduletypes.ModuleName,
+		twofamoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -355,6 +361,10 @@ var (
 			{
 				Name:   managersplittermoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&managersplittermodulev1.Module{}),
+			},
+			{
+				Name:   twofamoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&twofamoduletypes.Module{}),
 			},
 			{
 				Name:   sendmanagermoduletypes.ModuleName,

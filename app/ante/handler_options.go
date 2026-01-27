@@ -2,6 +2,7 @@ package ante
 
 import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	twofakeeper "github.com/bitbadges/bitbadgeschain/x/twofa/keeper"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -57,12 +58,18 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 
+		// Custom: Global 2FA decorator (applies to ALL transaction types, not just BitBadges)
+		// This provides defense in depth by requiring badge ownership as a second factor
+		// for any transaction from users who have set 2FA requirements.
+		// Must be after signature verification to ensure signers are known.
+		twofakeeper.NewTwoFADecorator(options.TwoFAKeeper),
+
 		// Custom: IBC decorator (at the end)
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)
 }
 
-//TODO: We can play around with some more native ones
+// TODO: We can play around with some more native ones
 // circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 // ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 // ante.NewUnorderedTxDecorator(unorderedtx.DefaultMaxUnOrderedTTL, options.TxManager, options.Environment, ante.DefaultSha256Cost),
@@ -81,6 +88,7 @@ type HandlerOptions struct {
 	WasmConfig            wasmtypes.NodeConfig
 	WasmKeeper            *wasmkeeper.Keeper
 	TXCounterStoreService corestoretypes.KVStoreService
+	TwoFAKeeper           twofakeeper.Keeper
 }
 
 func (options HandlerOptions) Validate() error {

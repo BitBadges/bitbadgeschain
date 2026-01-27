@@ -89,6 +89,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	twofakeeper "github.com/bitbadges/bitbadgeschain/x/twofa/keeper"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -109,10 +110,8 @@ const (
 	Name                 = "bitbadgeschain"
 )
 
-var (
-	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome string
-)
+// DefaultNodeHome default home directories for the application daemon
+var DefaultNodeHome string
 
 var (
 	_ runtime.AppI            = (*App)(nil)
@@ -164,6 +163,7 @@ type App struct {
 
 	AnchorKeeper          anchormodulekeeper.Keeper
 	BadgesKeeper          badgesmodulekeeper.Keeper
+	TwoFAKeeper           twofakeeper.Keeper
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
 	WasmKeeper            wasmkeeper.Keeper
@@ -225,7 +225,6 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
-
 	homeDirOpt := appOpts.Get("home")
 	if homeDirOpt != nil {
 		overrideHomeDir := homeDirOpt.(string)
@@ -288,6 +287,7 @@ func New(
 		&app.MapsKeeper,
 		&app.ManagerSplitterKeeper,
 		&app.SendmanagerKeeper,
+		&app.TwoFAKeeper,
 
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
@@ -344,6 +344,9 @@ func New(
 		return nil, fmt.Errorf("failed to register badges router: %w", err)
 	}
 
+	// Note: TwoFA module is now registered via depinject/app wiring
+	// No manual registration needed
+
 	// register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		return nil, err
@@ -375,6 +378,7 @@ func New(
 		WasmConfig:            wasmConfig,
 		WasmKeeper:            &app.WasmKeeper,
 		TXCounterStoreService: storeService,
+		TwoFAKeeper:           app.TwoFAKeeper,
 	}
 
 	if err := options.Validate(); err != nil {
@@ -481,7 +485,6 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
 }
-
 
 // SimulationManager implements the SimulationApp interface.
 func (app *App) SimulationManager() *module.SimulationManager {

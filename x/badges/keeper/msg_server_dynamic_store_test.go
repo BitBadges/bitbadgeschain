@@ -77,6 +77,7 @@ func TestDynamicStoreFlow(t *testing.T) {
 	require.Contains(t, err.Error(), "dynamic store not found")
 
 	// Test that only creator can delete (create a new store first)
+	// This also verifies sequential ID assignment
 	createMsg2 := &types.MsgCreateDynamicStore{
 		Creator: creator,
 	}
@@ -84,6 +85,8 @@ func TestDynamicStoreFlow(t *testing.T) {
 	createResp2, err := suite.msgServer.CreateDynamicStore(wctx, createMsg2)
 	require.NoError(t, err)
 	require.NotNil(t, createResp2)
+	// Verify second store gets ID 2 (sequential IDs)
+	require.Equal(t, sdkmath.NewUint(2), createResp2.StoreId, "Second store should get ID 2")
 
 	deleteMsgWrongCreator := &types.MsgDeleteDynamicStore{
 		Creator: wrongCreator,

@@ -1,0 +1,44 @@
+syntax = "proto3";
+package twofa;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "twofa/user_2fa_requirements.proto";
+import "badges/approval_conditions.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/twofa/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // SetUser2FARequirements allows a user to set their 2FA token requirements for transaction authorization.
+  // This provides defense in depth against compromised private keys by requiring ownership of specific badges.
+  rpc SetUser2FARequirements(MsgSetUser2FARequirements) returns (MsgSetUser2FARequirementsResponse);
+}
+
+// MsgSetUser2FARequirements allows a user to set their 2FA token requirements for transaction authorization.
+// This provides defense in depth against compromised private keys by requiring ownership of specific badges.
+message MsgSetUser2FARequirements {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "twofa/SetUser2FARequirements";
+
+  // Address of the creator (the user setting their 2FA requirements).
+  string creator = 1;
+
+  // List of MustOwnTokens requirements that must be satisfied for transactions from this user.
+  // If empty, no badge ownership checks are performed.
+  // If set, all transactions from this user must satisfy these requirements.
+  repeated badges.MustOwnTokens mustOwnTokens = 2;
+  
+  // List of DynamicStoreChallenge requirements that must be satisfied for transactions from this user.
+  // Each challenge requires the signer to have a true value in the specified dynamic store.
+  // If empty, no dynamic store checks are performed.
+  // If set, all transactions from this user must satisfy these requirements.
+  repeated badges.DynamicStoreChallenge dynamicStoreChallenges = 3;
+}
+
+message MsgSetUser2FARequirementsResponse {}
+
