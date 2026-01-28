@@ -17,12 +17,12 @@ func TestStandardNameTestSuite(t *testing.T) {
 }
 
 func (suite *StandardNameTestSuite) TestStandardName_AliasDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	// Alias denom should return "x/tokenization"
-	name := suite.Keeper.StandardName(suite.Ctx, "tokenization:123:456")
+	name := suite.Keeper.StandardName(suite.Ctx, "badges:123:456")
 	suite.Require().Equal("x/tokenization", name)
 }
 

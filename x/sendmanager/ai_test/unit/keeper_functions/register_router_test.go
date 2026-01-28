@@ -17,13 +17,13 @@ func TestRegisterRouterTestSuite(t *testing.T) {
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_Success() {
-	router := testutil.GenerateMockRouter("tokenization:")
+	router := testutil.GenerateMockRouter("badges:")
 	
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 	
 	prefixes := suite.Keeper.GetRegisteredPrefixes()
-	suite.Require().Contains(prefixes, "tokenization:")
+	suite.Require().Contains(prefixes, "badges:")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_EmptyPrefix() {
@@ -35,67 +35,67 @@ func (suite *RegisterRouterTestSuite) TestRegisterRouter_EmptyPrefix() {
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_DuplicatePrefix() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badges:")
 	
-	err := suite.Keeper.RegisterRouter("tokenization:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().NoError(err)
 	
-	err = suite.Keeper.RegisterRouter("tokenization:", router2)
+	err = suite.Keeper.RegisterRouter("badges:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "already registered")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_OverlappingPrefixes_Prevented() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:lp:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badgeslp:")
 	
 	// Register longer prefix first
-	err := suite.Keeper.RegisterRouter("tokenization:lp:", router2)
+	err := suite.Keeper.RegisterRouter("badgeslp:", router2)
 	suite.Require().NoError(err)
 	
 	// Try to register shorter prefix that overlaps - should fail
-	// "tokenization:lp:" starts with "tokenization:", so they overlap
-	err = suite.Keeper.RegisterRouter("tokenization:", router1)
+	// "badgeslp:" starts with "badges:", so they overlap
+	err = suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_OverlappingPrefixes_ReverseOrder() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:lp:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badgeslp:")
 	
 	// Register shorter prefix first
-	err := suite.Keeper.RegisterRouter("tokenization:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().NoError(err)
 	
 	// Try to register longer prefix that overlaps - should fail
-	// "tokenization:lp:" starts with "tokenization:", so they overlap
-	err = suite.Keeper.RegisterRouter("tokenization:lp:", router2)
+	// "badgeslp:" starts with "badges:", so they overlap
+	err = suite.Keeper.RegisterRouter("badgeslp:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_LongestPrefixMatching() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:lp:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badgeslp:")
 	
 	// Register shorter prefix first
-	err := suite.Keeper.RegisterRouter("tokenization:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().NoError(err)
 	
 	// This should fail due to overlap
-	// "tokenization:lp:" starts with "tokenization:", so they overlap
-	err = suite.Keeper.RegisterRouter("tokenization:lp:", router2)
+	// "badgeslp:" starts with "badges:", so they overlap
+	err = suite.Keeper.RegisterRouter("badgeslp:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_MultipleNonOverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
+	router1 := testutil.GenerateMockRouter("badges:")
 	router2 := testutil.GenerateMockRouter("tokens:")
 	
-	err := suite.Keeper.RegisterRouter("tokenization:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().NoError(err)
 	
 	err = suite.Keeper.RegisterRouter("tokens:", router2)
@@ -103,7 +103,7 @@ func (suite *RegisterRouterTestSuite) TestRegisterRouter_MultipleNonOverlappingP
 	
 	prefixes := suite.Keeper.GetRegisteredPrefixes()
 	suite.Require().Len(prefixes, 2)
-	suite.Require().Contains(prefixes, "tokenization:")
+	suite.Require().Contains(prefixes, "badges:")
 	suite.Require().Contains(prefixes, "tokens:")
 }
 

@@ -99,7 +99,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_UniqueIDs() {
 	initialApprovalCount := len(balanceBefore.OutgoingApprovals)
 
 	// Create a denom for the wrapper path
-	denom := "tokenization:" + suite.CollectionId.String() + ":uatom"
+	denom := "badges:" + suite.CollectionId.String() + ":uatom"
 
 	// Mint some tokens to the path address using MintBadges helper
 	mintBalances := []*types.Balance{
@@ -187,7 +187,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_CleanupOnFailure() {
 	initialApprovalCount := len(balanceBefore.OutgoingApprovals)
 
 	// Create a denom
-	denom := "tokenization:" + suite.CollectionId.String() + ":uosmo"
+	denom := "badges:" + suite.CollectionId.String() + ":uosmo"
 
 	// Try to send more than available - should fail but cleanup should still happen
 	// First, mint a small amount using MintBadges helper
@@ -262,7 +262,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_VersionIncrement() {
 	pathAddress := collection.CosmosCoinWrapperPaths[0].Address
 
 	// Create a denom
-	denom := "tokenization:" + suite.CollectionId.String() + ":uion"
+	denom := "badges:" + suite.CollectionId.String() + ":uion"
 
 	// Mint tokens using MintBadges helper
 	mintBalances := []*types.Balance{

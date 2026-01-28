@@ -7,7 +7,7 @@ import (
 // FuzzDenomRouting fuzzes the denom routing logic
 func FuzzDenomRouting(f *testing.F) {
 	// Seed corpus
-	f.Add("tokenization:123:456")
+	f.Add("badges:123:456")
 	f.Add("uatom")
 	f.Add("tokens:789:012")
 	f.Add("")

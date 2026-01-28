@@ -447,7 +447,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 
 	// Get the wrapper denom
 	wrapperPath := collection.CosmosCoinWrapperPaths[0]
-	badgesDenom := "tokenization:" + collectionId.String() + ":" + wrapperPath.Denom
+	badgesDenom := "badges:" + collectionId.String() + ":" + wrapperPath.Denom
 
 	// Try to create a pool with the badges asset that has allowPoolCreation = false
 	// This should fail
@@ -519,7 +519,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 	s.Require().False(collection2.Invariants.DisablePoolCreation, "disablePoolCreation should be false")
 
 	wrapperPath2 := collection2.CosmosCoinWrapperPaths[0]
-	badgesDenom2 := "tokenization:" + collectionId2.String() + ":" + wrapperPath2.Denom
+	badgesDenom2 := "badges:" + collectionId2.String() + ":" + wrapperPath2.Denom
 
 	// Try to create a pool with the badges asset that has disablePoolCreation = false
 	// The validation should pass (disablePoolCreation is false)

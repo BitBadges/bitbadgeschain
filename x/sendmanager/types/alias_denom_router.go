@@ -6,7 +6,7 @@ import (
 )
 
 // AliasDenomRouter defines the interface that modules must implement
-// to participate in alias denom routing (e.g., tokenization: or tokenizationlp: prefixes)
+// to participate in alias denom routing (e.g., badges: or badgeslp: prefixes)
 type AliasDenomRouter interface {
 	// CheckIsAliasDenom checks if a given denom is an alias denom handled by this router
 	// Returns true if this router can handle the denom, false otherwise
@@ -33,7 +33,7 @@ type AliasDenomRouter interface {
 	SendFromAccountToModuleViaAliasDenom(ctx sdk.Context, fromAddress string, moduleAddress string, denom string, amount sdkmath.Uint) error
 
 	// GetBalanceWithAliasRouting gets the balance for a specific denom, handling alias denom routing
-	// For alias denoms (e.g., tokenizationlp:), this may use custom logic (e.g., getMaxWrappableAmount flow)
+	// For alias denoms (e.g., badgeslp:), this may use custom logic (e.g., getMaxWrappableAmount flow)
 	// Returns the coin balance for the given address and denom
 	GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error)
 }

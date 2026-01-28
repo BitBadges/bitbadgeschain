@@ -19,8 +19,8 @@ func TestPrefixMatchingValidationTestSuite(t *testing.T) {
 }
 
 func (suite *PrefixMatchingValidationTestSuite) TestGetBalanceWithAliasRouting_EmptyDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -32,8 +32,8 @@ func (suite *PrefixMatchingValidationTestSuite) TestGetBalanceWithAliasRouting_E
 }
 
 func (suite *PrefixMatchingValidationTestSuite) TestSendCoinWithAliasRouting_EmptyDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)

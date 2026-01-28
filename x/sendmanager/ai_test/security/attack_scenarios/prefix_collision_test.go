@@ -21,32 +21,32 @@ func TestPrefixCollisionTestSuite(t *testing.T) {
 // TestPrefixCollision_OverlappingPrefixes tests that overlapping prefixes are detected
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_OverlappingPrefixes() {
 	// Create mock routers
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:lp:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badgeslp:")
 
 	// Register first prefix
-	err := s.Keeper.RegisterRouter("tokenization:", router1)
+	err := s.Keeper.RegisterRouter("badges:", router1)
 	s.Require().NoError(err)
 
 	// Attempt to register overlapping prefix - should fail
-	// "tokenization:lp:" starts with "tokenization:", so they overlap
-	err = s.Keeper.RegisterRouter("tokenization:lp:", router2)
+	// "badgeslp:" starts with "badges:", so they overlap
+	err = s.Keeper.RegisterRouter("badgeslp:", router2)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "overlaps")
 }
 
 // TestPrefixCollision_SubPrefixRegistration tests sub-prefix registration
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_SubPrefixRegistration() {
-	router1 := testutil.GenerateMockRouter("tokenization:lp:")
-	router2 := testutil.GenerateMockRouter("tokenization:")
+	router1 := testutil.GenerateMockRouter("badgeslp:")
+	router2 := testutil.GenerateMockRouter("badges:")
 
 	// Register longer prefix first
-	err := s.Keeper.RegisterRouter("tokenization:lp:", router1)
+	err := s.Keeper.RegisterRouter("badgeslp:", router1)
 	s.Require().NoError(err)
 
 	// Register shorter prefix (sub-prefix) - should be prevented
-	// "tokenization:lp:" starts with "tokenization:", so they overlap
-	err = s.Keeper.RegisterRouter("tokenization:", router2)
+	// "badgeslp:" starts with "badges:", so they overlap
+	err = s.Keeper.RegisterRouter("badges:", router2)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "overlaps")
 }
@@ -62,14 +62,14 @@ func (s *PrefixCollisionTestSuite) TestPrefixCollision_EmptyPrefix() {
 
 // TestPrefixCollision_DuplicatePrefix tests duplicate prefix registration
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_DuplicatePrefix() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badges:")
 
-	err := s.Keeper.RegisterRouter("tokenization:", router1)
+	err := s.Keeper.RegisterRouter("badges:", router1)
 	s.Require().NoError(err)
 
 	// Attempt to register same prefix again
-	err = s.Keeper.RegisterRouter("tokenization:", router2)
+	err = s.Keeper.RegisterRouter("badges:", router2)
 	s.Require().Error(err, "Duplicate prefix should be rejected")
 	s.Require().Contains(err.Error(), "already registered")
 }

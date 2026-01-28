@@ -18,16 +18,16 @@ func TestGetBalanceWithAliasRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *GetBalanceWithAliasRoutingTestSuite) TestGetBalanceWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
-	balance, err := suite.Keeper.GetBalanceWithAliasRouting(suite.Ctx, aliceAddr, "tokenization:123:456")
+	balance, err := suite.Keeper.GetBalanceWithAliasRouting(suite.Ctx, aliceAddr, "badges:123:456")
 	suite.Require().NoError(err)
-	suite.Require().Equal("tokenization:123:456", balance.Denom)
+	suite.Require().Equal("badges:123:456", balance.Denom)
 }
 
 func (suite *GetBalanceWithAliasRoutingTestSuite) TestGetBalanceWithAliasRouting_BankDenom() {

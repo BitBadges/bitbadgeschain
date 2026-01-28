@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	WrappedDenomPrefix = "tokenization:"
-	AliasDenomPrefix   = "tokenizationlp:"
+	WrappedDenomPrefix = "badges:"
+	AliasDenomPrefix   = "badgeslp:"
 )
 
 type (

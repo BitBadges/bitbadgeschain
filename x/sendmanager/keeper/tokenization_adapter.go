@@ -55,7 +55,7 @@ func (r *TokenizationAliasDenomRouter) SendFromAccountToModuleViaAliasDenom(ctx 
 
 // GetBalanceWithAliasRouting implements AliasDenomRouter interface
 // Uses getMaxWrappableAmount flow via GetSpendableCoinAmountWithAliasRouting
-// This function is only called when the prefix matches, so we can assume it's a tokenizationlp: denom
+// This function is only called when the prefix matches, so we can assume it's a badgeslp: denom
 func (r *TokenizationAliasDenomRouter) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error) {
 	// Calculate from tokenization balances using getMaxWrappableAmount flow
 	amount, err := r.tokenizationKeeper.GetSpendableCoinAmountBadgesLPOnly(ctx, address, denom)

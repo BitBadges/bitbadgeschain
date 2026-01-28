@@ -17,12 +17,12 @@ func TestIsICS20CompatibleTestSuite(t *testing.T) {
 }
 
 func (suite *IsICS20CompatibleTestSuite) TestIsICS20Compatible_AliasDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	// Alias denom should not be ICS20 compatible
-	compatible := suite.Keeper.IsICS20Compatible(suite.Ctx, "tokenization:123:456")
+	compatible := suite.Keeper.IsICS20Compatible(suite.Ctx, "badges:123:456")
 	suite.Require().False(compatible)
 }
 

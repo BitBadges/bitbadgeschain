@@ -19,15 +19,15 @@ func TestSpendFromCommunityPoolTestSuite(t *testing.T) {
 }
 
 func (suite *SpendFromCommunityPoolTestSuite) TestSpendFromCommunityPoolWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
 	}
 	err = suite.Keeper.SpendFromCommunityPoolWithAliasRouting(suite.Ctx, bobAddr, coins)
 	suite.Require().NoError(err)

@@ -24,39 +24,39 @@ func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_EmptyPref
 }
 
 func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_DuplicatePrefix() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badges:")
 
-	err := suite.Keeper.RegisterRouter("tokenization:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().NoError(err)
 
-	err = suite.Keeper.RegisterRouter("tokenization:", router2)
+	err = suite.Keeper.RegisterRouter("badges:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "already registered")
 }
 
 func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_OverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("tokenization:")
-	router2 := testutil.GenerateMockRouter("tokenization:lp:")
+	router1 := testutil.GenerateMockRouter("badges:")
+	router2 := testutil.GenerateMockRouter("badgeslp:")
 
-	err := suite.Keeper.RegisterRouter("tokenization:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router1)
 	suite.Require().NoError(err)
 
-	// This should fail because "tokenization:lp:" starts with "tokenization:"
-	err = suite.Keeper.RegisterRouter("tokenization:lp:", router2)
+	// This should fail because "badgeslp:" starts with "badges:"
+	err = suite.Keeper.RegisterRouter("badgeslp:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_ReverseOverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("tokenization:lp:")
-	router2 := testutil.GenerateMockRouter("tokenization:")
+	router1 := testutil.GenerateMockRouter("badgeslp:")
+	router2 := testutil.GenerateMockRouter("badges:")
 
-	err := suite.Keeper.RegisterRouter("tokenization:lp:", router1)
+	err := suite.Keeper.RegisterRouter("badgeslp:", router1)
 	suite.Require().NoError(err)
 
-	// This should fail because "tokenization:" is a prefix of "tokenization:lp:"
-	err = suite.Keeper.RegisterRouter("tokenization:", router2)
+	// This should fail because "badges:" is a prefix of "badgeslp:"
+	err = suite.Keeper.RegisterRouter("badges:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }

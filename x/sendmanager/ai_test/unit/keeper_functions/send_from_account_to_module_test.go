@@ -19,15 +19,15 @@ func TestSendFromAccountToModuleTestSuite(t *testing.T) {
 }
 
 func (suite *SendFromAccountToModuleTestSuite) TestSendCoinsFromAccountToModuleWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
 	}
 	err = suite.Keeper.SendCoinsFromAccountToModuleWithAliasRouting(suite.Ctx, aliceAddr, "mymodule", coins)
 	suite.Require().NoError(err)

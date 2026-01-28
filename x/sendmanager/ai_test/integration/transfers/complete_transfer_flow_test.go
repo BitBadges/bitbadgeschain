@@ -21,8 +21,8 @@ func TestCompleteTransferFlowTestSuite(t *testing.T) {
 }
 
 func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_AliasDenom() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	// Recreate msg server after registering router (msgServer embeds Keeper by value)
@@ -32,7 +32,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_AliasDenom(
 		FromAddress: suite.Alice,
 		ToAddress:   suite.Bob,
 		Amount: sdk.Coins{
-			sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
+			sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
 		},
 	}
 
@@ -71,8 +71,8 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_BankDenom()
 }
 
 func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MultipleCoins() {
-	router := testutil.GenerateMockRouter("tokenization:")
-	err := suite.Keeper.RegisterRouter("tokenization:", router)
+	router := testutil.GenerateMockRouter("badges:")
+	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
 	// Recreate msg server after registering router (msgServer embeds Keeper by value)
@@ -82,7 +82,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MultipleCoi
 		FromAddress: suite.Alice,
 		ToAddress:   suite.Bob,
 		Amount: sdk.Coins{
-			sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
+			sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
 			sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 		},
 	}
