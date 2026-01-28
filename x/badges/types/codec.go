@@ -5,6 +5,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+
+	encodingcodec "github.com/bitbadges/bitbadgeschain/encoding/codec"
 )
 
 // NOTE: The miscellaneous encoding/codec registration is included here to ensure
@@ -39,6 +41,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetReservedProtocolAddress{}, "badges/SetReservedProtocolAddress", nil)
 	cdc.RegisterConcrete(&MsgCastVote{}, "badges/CastVote", nil)
 
+	encodingcodec.RegisterLegacyAminoCodec(cdc)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -72,7 +75,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCastVote{},
 	)
 	// this line is used by starport scaffolding # 3
-
+	encodingcodec.RegisterInterfaces(registry)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
