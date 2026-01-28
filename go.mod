@@ -49,10 +49,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/spf13/cast v1.10.0
 	github.com/storyicon/sigverify v1.1.0
-	github.com/tidwall/gjson v1.18.0
-	github.com/tidwall/sjson v1.2.5
 	golang.org/x/exp v0.0.0-20260112195511-716be5621a96
-	golang.org/x/text v0.33.0
 	golang.org/x/tools v0.41.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260122232226-8e98ce8d340d
 	google.golang.org/grpc v1.78.0
@@ -390,8 +387,6 @@ require (
 	github.com/tetafro/godot v1.5.0 // indirect
 	github.com/tetratelabs/wazero v1.11.0 // indirect
 	github.com/tidwall/btree v1.8.1 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/timakin/bodyclose v0.0.0-20241017074812-ed6a65f985e3 // indirect
 	github.com/timonwong/loggercheck v0.10.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.15 // indirect
@@ -447,6 +442,7 @@ require (
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260109210033-bd525da824e2 // indirect
 	golang.org/x/term v0.39.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/api v0.256.0 // indirect
 	google.golang.org/genproto v0.0.0-20251124214823-79d6a2a48846 // indirect

@@ -10,6 +10,13 @@ import (
 	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 )
 
+/**
+  IMPORTANT: Even though these are not technically supported anymore, we need to keep them for
+	legacy purposes (some accounts still have etheruem.PubKey and other dependent types).
+
+	To fully remove this, we need to handle migrations of these accounts.
+*/
+
 // RegisterLegacyAminoCodec registers Interfaces from types, crypto, and SDK std.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	ethereumcodec.RegisterCrypto(cdc)
