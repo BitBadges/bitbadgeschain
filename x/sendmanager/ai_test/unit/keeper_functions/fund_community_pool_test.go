@@ -19,15 +19,15 @@ func TestFundCommunityPoolTestSuite(t *testing.T) {
 }
 
 func (suite *FundCommunityPoolTestSuite) TestFundCommunityPoolWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 	}
 	err = suite.Keeper.FundCommunityPoolWithAliasRouting(suite.Ctx, aliceAddr, coins)
 	suite.Require().NoError(err)
@@ -59,15 +59,15 @@ func (suite *FundCommunityPoolTestSuite) TestFundCommunityPoolWithAliasRouting_E
 }
 
 func (suite *FundCommunityPoolTestSuite) TestFundCommunityPoolWithAliasRouting_MixedDenoms() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 		sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 	}
 	err = suite.Keeper.FundCommunityPoolWithAliasRouting(suite.Ctx, aliceAddr, coins)

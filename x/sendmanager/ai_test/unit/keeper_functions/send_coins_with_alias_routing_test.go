@@ -19,8 +19,8 @@ func TestSendCoinsWithAliasRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_MultipleAliasDenoms() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -29,8 +29,8 @@ func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_M
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
-		sdk.NewCoin("badges:789:012", sdkmath.NewInt(2000)),
+		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("tokenization:789:012", sdkmath.NewInt(2000)),
 	}
 	err = suite.Keeper.SendCoinsWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, coins)
 	suite.Require().NoError(err)
@@ -41,8 +41,8 @@ func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_M
 }
 
 func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_MixedDenoms() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -51,7 +51,7 @@ func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_M
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 		sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 	}
 	// Mixed denoms - processes alias denom first (succeeds), then bank denom (fails due to insufficient funds)
@@ -62,7 +62,7 @@ func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_M
 	// Verify router was called for alias denom
 	calls := router.GetSendCalls()
 	suite.Require().Len(calls, 1)
-	suite.Require().Equal("badges:123:456", calls[0].Denom)
+	suite.Require().Equal("tokenization:123:456", calls[0].Denom)
 }
 
 func (suite *SendCoinsWithAliasRoutingTestSuite) TestSendCoinsWithAliasRouting_EmptyDenom() {

@@ -19,8 +19,8 @@ func TestMixedDenomTransfersTestSuite(t *testing.T) {
 }
 
 func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_AliasAndBank() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -29,7 +29,7 @@ func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_AliasAndBank(
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 		sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 	}
 
@@ -41,14 +41,14 @@ func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_AliasAndBank(
 	// Verify router was called for alias denom (before bank denom fails)
 	calls := router.GetSendCalls()
 	suite.Require().Len(calls, 1)
-	suite.Require().Equal("badges:123:456", calls[0].Denom)
+	suite.Require().Equal("tokenization:123:456", calls[0].Denom)
 }
 
 func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_MultipleAliasDenoms() {
-	router1 := testutil.GenerateMockRouter("badges:")
+	router1 := testutil.GenerateMockRouter("tokenization:")
 	router2 := testutil.GenerateMockRouter("tokens:")
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("tokenization:", router1)
 	suite.Require().NoError(err)
 
 	err = suite.Keeper.RegisterRouter("tokens:", router2)
@@ -60,7 +60,7 @@ func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_MultipleAlias
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 		sdk.NewCoin("tokens:789:012", sdkmath.NewInt(500)),
 	}
 

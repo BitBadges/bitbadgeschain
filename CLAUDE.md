@@ -22,13 +22,13 @@ go build ./cmd/bitbadgeschaind
 ### Testing
 ```bash
 # Run all badge module tests
-go test ./x/badges/...
+go test ./x/tokenization/...
 
 # Run keeper tests specifically
-go test ./x/badges/keeper/...
+go test ./x/tokenization/keeper/...
 
 # Run specific test
-go test ./x/badges/keeper/ -run TestMsgCreateDynamicStore
+go test ./x/tokenization/keeper/ -run TestMsgCreateDynamicStore
 
 # Run integration tests
 ignite chain test
@@ -37,10 +37,10 @@ ignite chain test
 ### Linting and Formatting
 ```bash
 # Check for linting issues
-golangci-lint run ./x/badges/...
+golangci-lint run ./x/tokenization/...
 
 # Format code
-go fmt ./x/badges/...
+go fmt ./x/tokenization/...
 ```
 
 ### Development Server
@@ -58,8 +58,8 @@ ignite chain init --skip-proto
 ignite generate proto-go --yes
 
 # After generation, remove versioned API folders
-ls api/badges/
-rm -rf api/badges/v*
+ls api/tokenization/
+rm -rf api/tokenization/v*
 
 # Stage generated proto files
 git add *.pb.go *.pulsar.go
@@ -71,7 +71,7 @@ git add *.pb.go *.pulsar.go
 This is a Cosmos SDK blockchain built with Ignite CLI that implements cross-chain digital token (badges) issuance and management.
 
 ### Key Modules
-- **x/badges** - Core token functionality (collections, transfers, balances, permissions)
+- **x/tokenization** - Core token functionality (collections, transfers, balances, permissions)
 - **x/maps** - Key-value mapping functionality  
 - **x/anchor** - Anchoring and verification system
 - **x/wasmx** - Extended WASM functionality
@@ -86,7 +86,7 @@ The blockchain supports signatures from multiple chains:
 ### Directory Structure
 
 #### Core Implementation
-- `x/badges/` - Badge module implementation
+- `x/tokenization/` - Tokenization module implementation
   - `keeper/` - Business logic and state management
   - `types/` - Type definitions and validation
   - `module/` - Module initialization and routing
@@ -126,13 +126,13 @@ Follow the guide in `_docs/PROTO_ADDITION_GUIDE.md` which covers:
 
 ### Proto Generation Requirements
 - Always use `--skip-proto` flag with Ignite commands due to manual proto file corrections
-- Remove versioned API folders after generation: `rm -rf api/badges/v*`
+- Remove versioned API folders after generation: `rm -rf api/tokenization/v*`
 - Auto-stage generated files: `git add *.pb.go *.pulsar.go`
 
 ### Key Development Patterns
 
 #### Store Keys and State Management
-- Use unique byte prefixes in `x/badges/keeper/keys.go`
+- Use unique byte prefixes in `x/tokenization/keeper/keys.go`
 - Implement proper marshal/unmarshal in store methods
 - Follow incrementing ID patterns for new data types
 

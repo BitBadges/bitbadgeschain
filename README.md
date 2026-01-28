@@ -79,11 +79,11 @@ bitbadgeschain/
 go build ./cmd/bitbadgeschaind
 
 # Run module tests
-go test ./x/badges/...
-go test ./x/badges/keeper/...
+go test ./x/tokenization/...
+go test ./x/tokenization/keeper/...
 
 # Run specific test
-go test ./x/badges/keeper/ -run TestMsgCreateDynamicStore
+go test ./x/tokenization/keeper/ -run TestMsgCreateDynamicStore
 
 # Integration tests
 ignite chain test
@@ -92,8 +92,8 @@ ignite chain test
 **Linting & Formatting:**
 
 ```bash
-golangci-lint run ./x/badges/...
-go fmt ./x/badges/...
+golangci-lint run ./x/tokenization/...
+go fmt ./x/tokenization/...
 ```
 
 **Protocol Buffers:**
@@ -103,7 +103,7 @@ go fmt ./x/badges/...
 ignite generate proto-go --yes
 
 # Clean up versioned API folders (required after generation)
-rm -rf api/badges/v*
+rm -rf api/tokenization/v*
 
 # Stage generated files
 git add *.pb.go *.pulsar.go
@@ -180,13 +180,13 @@ Blockchain upgrades are coordinated through governance proposals. See `release-i
 
 ```bash
 # Run all token module tests
-go test ./x/badges/...
+go test ./x/tokenization/...
 
 # Run with coverage
-go test -cover ./x/badges/...
+go test -cover ./x/tokenization/...
 
 # Run specific keeper tests
-go test ./x/badges/keeper/ -run TestMsgCreateCollection
+go test ./x/tokenization/keeper/ -run TestMsgCreateCollection
 ```
 
 ### Integration Tests
@@ -196,12 +196,12 @@ go test ./x/badges/keeper/ -run TestMsgCreateCollection
 ignite chain test
 
 # Simulation tests
-go test ./x/badges/simulation/...
+go test ./x/tokenization/simulation/...
 ```
 
 ### Test Helpers
 
-The module includes comprehensive test helpers in `x/badges/keeper/integration_*_test.go` for setting up test scenarios.
+The module includes comprehensive test helpers in `x/tokenization/keeper/integration_*_test.go` for setting up test scenarios.
 
 ## Community
 

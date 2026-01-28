@@ -1,0 +1,67 @@
+syntax = "proto3";
+package tokenization.v22;
+
+import "gogoproto/gogo.proto";
+import "tokenization/v22/balances.proto";
+import "tokenization/v22/challenges.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v22";
+
+// ManualBalances represents a list of manual balances entered for the predetermined balances criteria. Order is calculated according to the calculation method set. 
+message ManualBalances {
+  repeated Balance balances = 1;
+}
+
+// RecurringOwnershipTimes represents a list of recurring ownership times.
+message RecurringOwnershipTimes {
+  // The original start time of the first interval.
+  string startTime = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The interval length in unix milliseconds.
+  string intervalLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Grace period length where you can charge the next interval (nextStartTime - chargePeriodLength) until (nextStartTime) = charge period
+  string chargePeriodLength = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// IncrementedBalances represents balances that are incremented by specific amounts, according to the order calculation method.
+message IncrementedBalances {
+  repeated Balance startBalances = 1;
+  // The amount by which to increment token IDs.
+  string incrementTokenIdsBy = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The amount by which to increment ownership times. Incompatible with approveStartingFromNowBy.
+  string incrementOwnershipTimesBy = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The amount of unix milliseconds to approve starting from now. Incompatible with incrementOwnershipTimesBy.
+  string durationFromTimestamp = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Whether to allow overriding the timestamp for the balances (only applicable with durationFromTimestamp set).
+  bool allowOverrideTimestamp = 5;
+  // Recurring ownership times.
+  RecurringOwnershipTimes recurringOwnershipTimes = 6;
+  // Allow override of any valid ID
+  bool allowOverrideWithAnyValidToken = 7;
+}
+
+// PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
+message PredeterminedOrderCalculationMethod {
+  // Use the overall number of transfers to calculate the order. Ex: First transfer gets the first balance, second transfer gets the second balance, etc.
+  bool useOverallNumTransfers = 1;
+  // Use the number of transfers per "to" address to calculate the order. Ex: First transfer to address A gets the first balance, second transfer to address A gets the second balance, etc.
+  bool usePerToAddressNumTransfers = 2;
+  // Use the number of transfers per "from" address to calculate the order. Ex: First transfer from address A gets the first balance, second transfer from address A gets the second balance, etc.
+  bool usePerFromAddressNumTransfers = 3;
+  // Use the number of transfers per "initiated by" address to calculate the order. Ex: First transfer initiated by address A gets the first balance, second transfer initiated by address A gets the second balance, etc.
+  bool usePerInitiatedByAddressNumTransfers = 4;
+  // Use the Merkle challenge leaf index to calculate the order. Ex: Transfer that uses leaf index 0 gets the first balance, transfer that uses leaf index 1 gets the second balance, etc.
+  bool useMerkleChallengeLeafIndex = 5;
+  // If useMerkleChallengeLeafIndex is set, then this is the ID of the challenge tracker associated with this calculation method.
+  string challengeTrackerId = 6;
+}
+
+// PredeterminedBalances represents balances with predetermined order calculation.
+message PredeterminedBalances {
+  // Manual balances that can be entered. If this is nil, then we use the incremented balances.
+  repeated ManualBalances manualBalances = 1;
+  // Balances that have a starting amount and increment. If this is nil, then we use the manual balances.
+  IncrementedBalances incrementedBalances = 2;
+  // The method to calculate the order of predetermined balances.
+  PredeterminedOrderCalculationMethod orderCalculationMethod = 3;
+}
+

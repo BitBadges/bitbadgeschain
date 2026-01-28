@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
-	badgekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
@@ -28,7 +28,7 @@ type (
 
 		ibcKeeperFn func() *ibckeeper.Keeper
 
-		badgesKeeper badgekeeper.Keeper
+		tokenizationKeeper tokenizationkeeper.Keeper
 	}
 )
 
@@ -38,16 +38,16 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	ibcKeeperFn func() *ibckeeper.Keeper,
-	badgesKeeper badgekeeper.Keeper,
+	tokenizationKeeper tokenizationkeeper.Keeper,
 
 ) Keeper {
 	return Keeper{
-		cdc:                cdc,
-		storeService:       storeService,
-		authority:          authority,
-		logger:             logger,
-		ibcKeeperFn:  ibcKeeperFn,
-		badgesKeeper: badgesKeeper,
+		cdc:                 cdc,
+		storeService:        storeService,
+		authority:           authority,
+		logger:              logger,
+		ibcKeeperFn:         ibcKeeperFn,
+		tokenizationKeeper:  tokenizationKeeper,
 	}
 }
 

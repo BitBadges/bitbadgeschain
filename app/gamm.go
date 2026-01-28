@@ -38,7 +38,7 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.DistrKeeper,
-		app.BadgesKeeper,
+		app.TokenizationKeeper,
 		&app.SendmanagerKeeper,
 		app.TransferKeeper,
 		app.TransferICS4Wrapper,

@@ -1,0 +1,78 @@
+syntax = "proto3";
+package tokenization;
+
+import "gogoproto/gogo.proto";
+import "tokenization/balances.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types";
+
+// AutoDeletionOptions defines the options for auto-deletion of approvals.
+message AutoDeletionOptions {
+  // After one use?
+  bool afterOneUse = 1;
+  // After overall max number of uses threshold is met?
+  bool afterOverallMaxNumTransfers = 2;
+  // Allow counterparty to purge this approval if they are the only initiator
+  bool allowCounterpartyPurge = 3;
+  // Allow others to call PurgeApprovals on behalf of this approval owner
+  bool allowPurgeIfExpired = 4;
+}
+
+// Time intervals to reset the trackers at.
+message ResetTimeIntervals {
+  // Original start time of the first interval.
+  string startTime = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Interval length in unix milliseconds.
+  string intervalLength = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// ApprovalAmounts defines approval amounts per unique "from," "to," and/or "initiated by" address.
+// If any of these are nil or "0", we assume unlimited approvals.
+// If they are set to a value, then the running tally of the amounts transferred for the specified token IDs and ownership times 
+// must not exceed the corresponding value.
+message ApprovalAmounts {
+  // Overall approval amount.
+  string overallApprovalAmount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Approval amount per "to" address.
+  string perToAddressApprovalAmount = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Approval amount per "from" address.
+  string perFromAddressApprovalAmount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Approval amount per "initiated by" address.
+  string perInitiatedByAddressApprovalAmount = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The ID of the amount tracker associated with this approval.
+  // We use this ID to track the number of transfers and amounts transferred.
+  string amountTrackerId = 6;
+  // Time intervals to reset the trackers at.
+  ResetTimeIntervals resetTimeIntervals = 7;
+}
+
+// MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
+// If any of these are nil or "0", we assume unlimited approvals.
+// If they are set to a value, then the running tally of the number of transfers for the specified token IDs and ownership times
+// must not exceed the corresponding value.
+message MaxNumTransfers {
+  // Overall maximum number of transfers.
+  string overallMaxNumTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Maximum number of transfers per "to" address.
+  string perToAddressMaxNumTransfers = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Maximum number of transfers per "from" address.
+  string perFromAddressMaxNumTransfers = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Maximum number of transfers per "initiated by" address.
+  string perInitiatedByAddressMaxNumTransfers = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The ID of the amount tracker associated with this approval.
+  // We use this ID to track the number of transfers and amounts transferred.
+  string amountTrackerId = 6;
+  // Time intervals to reset the trackers at.
+  ResetTimeIntervals resetTimeIntervals = 7;
+}
+
+// ApprovalTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.
+message ApprovalTracker {
+  // The number of transfers that have been processed.
+  string numTransfers = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Cumulative balances associated with the transfers that have been processed.
+  repeated Balance amounts = 2;
+  // Last updated at time.
+  string lastUpdatedAt = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+

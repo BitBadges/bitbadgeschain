@@ -9,7 +9,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*types.MsgCreateMapResponse, error) {
@@ -34,7 +34,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 	//Numeric map IDs are reserved for specific collections
 	collId, err := sdkmath.ParseUint(msg.MapId)
 	if err == nil {
-		currCollectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{
+		currCollectionRes, err := k.tokenizationKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{
 			CollectionId: collId.String(),
 		})
 		if err != nil {

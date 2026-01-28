@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 
-	badgekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
@@ -22,7 +22,7 @@ type (
 		// should be the x/gov module account.
 		authority string
 
-		badgesKeeper badgekeeper.Keeper
+		tokenizationKeeper tokenizationkeeper.Keeper
 	}
 )
 
@@ -31,14 +31,14 @@ func NewKeeper(
 	storeService store.KVStoreService,
 	logger log.Logger,
 	authority string,
-	badgesKeeper badgekeeper.Keeper,
+	tokenizationKeeper tokenizationkeeper.Keeper,
 ) Keeper {
 	return Keeper{
-		cdc:          cdc,
-		storeService: storeService,
-		authority:    authority,
-		logger:       logger,
-		badgesKeeper: badgesKeeper,
+		cdc:                  cdc,
+		storeService:         storeService,
+		authority:            authority,
+		logger:               logger,
+		tokenizationKeeper:   tokenizationKeeper,
 	}
 }
 

@@ -1,7 +1,7 @@
 package ante
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"

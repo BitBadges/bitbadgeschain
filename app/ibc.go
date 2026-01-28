@@ -37,13 +37,13 @@ import (
 	// this line is used by starport scaffolding # ibc/app/import
 	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor/module"
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
-	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
 	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
-	badgesmodule "github.com/bitbadges/bitbadgeschain/x/badges/module"
+	tokenizationmodule "github.com/bitbadges/bitbadgeschain/x/tokenization/module"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 
@@ -209,8 +209,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 	wasmxIBCModule := wasmxmodule.NewIBCModule(app.WasmxKeeper)
 	ibcRouter.AddRoute(wasmxmoduletypes.ModuleName, wasmxIBCModule)
-	badgesIBCModule := badgesmodule.NewIBCModule(app.BadgesKeeper)
-	ibcRouter.AddRoute(badgesmoduletypes.ModuleName, badgesIBCModule)
+	tokenizationIBCModule := tokenizationmodule.NewIBCModule(app.TokenizationKeeper)
+	ibcRouter.AddRoute(tokenizationmoduletypes.ModuleName, tokenizationIBCModule)
 
 	// this line is used by starport scaffolding # ibc/app/module
 
@@ -256,7 +256,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		app.Logger(),
 		&app.GammKeeper,
 		app.BankKeeper,
-		&app.BadgesKeeper,
+		&app.TokenizationKeeper,
 		&app.SendmanagerKeeper,
 		app.TransferKeeper,
 		app.TransferICS4Wrapper,

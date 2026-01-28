@@ -13,7 +13,7 @@ import (
 func FuzzSendWithAliasRouting(f *testing.F) {
 	// Seed corpus with valid inputs
 	f.Add("bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430", "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q", "uatom", int64(1000))
-	f.Add("bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430", "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q", "badges:123:456", int64(500))
+	f.Add("bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430", "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q", "tokenization:123:456", int64(500))
 
 	f.Fuzz(func(t *testing.T, fromAddr, toAddr, denom string, amount int64) {
 		// Skip invalid inputs

@@ -19,10 +19,10 @@ func TestMultiPrefixRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *MultiPrefixRoutingTestSuite) TestMultiPrefixRouting_RegisterMultiplePrefixes() {
-	router1 := testutil.GenerateMockRouter("badges:")
+	router1 := testutil.GenerateMockRouter("tokenization:")
 	router2 := testutil.GenerateMockRouter("tokens:")
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("tokenization:", router1)
 	suite.Require().NoError(err)
 
 	err = suite.Keeper.RegisterRouter("tokens:", router2)
@@ -30,15 +30,15 @@ func (suite *MultiPrefixRoutingTestSuite) TestMultiPrefixRouting_RegisterMultipl
 
 	// Verify both prefixes are registered
 	prefixes := suite.Keeper.GetRegisteredPrefixes()
-	suite.Require().Contains(prefixes, "badges:")
+	suite.Require().Contains(prefixes, "tokenization:")
 	suite.Require().Contains(prefixes, "tokens:")
 }
 
 func (suite *MultiPrefixRoutingTestSuite) TestMultiPrefixRouting_RouteToCorrectRouter() {
-	router1 := testutil.GenerateMockRouter("badges:")
+	router1 := testutil.GenerateMockRouter("tokenization:")
 	router2 := testutil.GenerateMockRouter("tokens:")
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("tokenization:", router1)
 	suite.Require().NoError(err)
 
 	err = suite.Keeper.RegisterRouter("tokens:", router2)
@@ -49,8 +49,8 @@ func (suite *MultiPrefixRoutingTestSuite) TestMultiPrefixRouting_RouteToCorrectR
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
-	// Send badges denom - should route to router1
-	coin1 := sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000))
+	// Send tokenization denom - should route to router1
+	coin1 := sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000))
 	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin1)
 	suite.Require().NoError(err)
 
@@ -62,7 +62,7 @@ func (suite *MultiPrefixRoutingTestSuite) TestMultiPrefixRouting_RouteToCorrectR
 	// Verify routers were called
 	calls1 := router1.GetSendCalls()
 	suite.Require().Len(calls1, 1)
-	suite.Require().Equal("badges:123:456", calls1[0].Denom)
+	suite.Require().Equal("tokenization:123:456", calls1[0].Denom)
 
 	calls2 := router2.GetSendCalls()
 	suite.Require().Len(calls2, 1)

@@ -1,0 +1,98 @@
+syntax = "proto3";
+package tokenization.v22;
+
+import "gogoproto/gogo.proto";
+import "tokenization/v22/balances.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v22";
+
+message CoinTransfer {
+  // The address of the recipient of the transfer.
+  string to = 1;
+  // The sdk.Coins to be transferred.
+  repeated cosmos.base.v1beta1.Coin coins = 2;
+  // By default, the from address is the initiator of the transaction.
+  // If this is set to true, we will override the from address with the approver address.
+  // Note: This is not applicable for collection approvals (since approverAddress == '').
+  bool overrideFromWithApproverAddress = 3;
+  // By default, the to address is what is specified in the coin transfer.
+  // If this is set to true, we will override the to address with the initiator of the transaction.
+  bool overrideToWithInitiator = 4;
+}
+
+/* 
+  MustOwnTokens represents a condition where a user must own specific tokens
+  to be approved to transfer.
+
+  - collectionId: The ID of the collection for the tokens that must be owned
+  - amountRange: The range of amounts the user must own (min to max)
+  - ownershipTimes: The time ranges during which the user must own the tokens.
+  - tokenIds: The token IDs the user must own.
+  - overrideWithCurrentTime: If true, auto override ownershipTimes with the current time.
+  - mustSatisfyForAllAssets: If true, the user must own all specified tokens; otherwise, owning any one for >= 1 millisecond is sufficient.
+*/
+message MustOwnTokens {
+  // The ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The range of amounts the user must own (min to max).
+  UintRange amountRange = 2;
+
+  // The time ranges during which the user must own the tokens.
+  repeated UintRange ownershipTimes = 3;
+
+  // The token IDs the user must own.
+  repeated UintRange tokenIds = 4;
+
+  // If true, override ownershipTimes with the current time.
+  bool overrideWithCurrentTime = 5;
+
+  // If true, the user must meet ownership requirements for all specified tokens; else, must meet requirements for any single token.
+  bool mustSatisfyForAllAssets = 6;
+
+  // The party to check ownership for. Options are "initiator", "sender", "recipient", or any valid bb1 address.
+  // If a valid bb1 address is provided, ownership will be checked for that specific address.
+  // This enables use cases like halt tokens where ownership is checked for an arbitrary address (e.g., halt token owner).
+  // Defaults to "initiator" if empty or if the value is not a recognized option or valid bb1 address.
+  string ownershipCheckParty = 7;
+}
+
+// DynamicStoreChallenge defines a challenge that requires the initiator to pass a dynamic store check.
+message DynamicStoreChallenge {
+  // The ID of the dynamic store to check.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// AddressChecks defines checks for address types (WASM contract, liquidity pool, etc.)
+message AddressChecks {
+  // Require the address to be a WASM contract.
+  bool mustBeWasmContract = 1;
+  // Require the address to not be a WASM contract.
+  bool mustNotBeWasmContract = 2;
+  // Require the address to be a liquidity pool.
+  bool mustBeLiquidityPool = 3;
+  // Require the address to not be a liquidity pool.
+  bool mustNotBeLiquidityPool = 4;
+}
+
+// AltTimeChecks defines alternative time-based checks for approval denial.
+// If the transfer time falls within any of the specified offline hours or days, the approval is denied.
+// Uses UTC timezone for neutral timezone approach.
+// offlineHours: ranges of hours (0-23) when transfers should be denied
+// offlineDays: ranges of days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied
+message AltTimeChecks {
+  // Hours (0-23) when transfers should be denied. Uses UTC timezone.
+  repeated UintRange offlineHours = 1;
+  // Days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied. Uses UTC timezone.
+  repeated UintRange offlineDays = 2;
+}
+
+// UserRoyalties defines the royalties for a user.
+message UserRoyalties {
+  // Percentage of the transfer amount to apply as royalties. 1 to 10000 represents basis points.
+  string percentage = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Payout address for the royalties.
+  string payoutAddress = 2;
+}
+

@@ -13,7 +13,7 @@ func (app *App) RegisterUpgradeHandlers() {
 		v23.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
-			app.BadgesKeeper,
+			app.TokenizationKeeper,
 			app.PoolManagerKeeper,
 			app.IBCRateLimitKeeper,
 		),
@@ -36,6 +36,12 @@ func (app *App) RegisterUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v23.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
+			Renamed: []storetypes.StoreRename{
+				{
+					OldKey: "badges",
+					NewKey: "tokenization",
+				},
+			},
 			Added: []string{},
 		}
 	}

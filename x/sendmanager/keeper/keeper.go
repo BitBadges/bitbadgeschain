@@ -314,7 +314,7 @@ func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
 
 // GetBalanceWithAliasRouting gets the balance for a specific denom, handling alias denom routing
 // Mirrors bankKeeper.GetBalance but routes alias denoms through their respective routers
-// For alias denoms (e.g., badgeslp:), uses the router's GetBalanceWithAliasRouting
+// For alias denoms (e.g., tokenizationlp:), uses the router's GetBalanceWithAliasRouting
 // For regular denoms, uses bankKeeper.GetBalance
 func (k Keeper) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddress, denom string) (sdk.Coin, error) {
 	// Validate denom is not empty
@@ -349,7 +349,7 @@ func (k Keeper) IsICS20Compatible(ctx sdk.Context, denom string) bool {
 }
 
 // StandardName returns the standard name for a denom type
-// For alias denoms (e.g., badgeslp:, badges:), returns "BitBadges"
+// For alias denoms (e.g., tokenizationlp:, tokenization:), returns "BitBadges"
 // For regular ICS20 denoms, returns "ICS20"
 func (k Keeper) StandardName(ctx sdk.Context, denom string) string {
 	// Validate denom is not empty
@@ -361,7 +361,7 @@ func (k Keeper) StandardName(ctx sdk.Context, denom string) string {
 	_, found := k.getRouterForDenom(denom)
 	if found {
 		// Alias denom - return "BitBadges"
-		return "x/badges"
+		return "x/tokenization"
 	}
 	// Regular ICS20 denom
 	return "x/bank"

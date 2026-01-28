@@ -84,11 +84,11 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 
-	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
-	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/tokenization/approval_criteria"
+	tokenizationmodulekeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -109,10 +109,8 @@ const (
 	Name                 = "bitbadgeschain"
 )
 
-var (
-	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome string
-)
+// DefaultNodeHome default home directories for the application daemon
+var DefaultNodeHome string
 
 var (
 	_ runtime.AppI            = (*App)(nil)
@@ -163,7 +161,7 @@ type App struct {
 	IBCRateLimitKeeper ibcratelimitkeeper.Keeper
 
 	AnchorKeeper          anchormodulekeeper.Keeper
-	BadgesKeeper          badgesmodulekeeper.Keeper
+	TokenizationKeeper    tokenizationmodulekeeper.Keeper
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
 	WasmKeeper            wasmkeeper.Keeper
@@ -225,7 +223,6 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
-
 	homeDirOpt := appOpts.Get("home")
 	if homeDirOpt != nil {
 		overrideHomeDir := homeDirOpt.(string)
@@ -284,7 +281,7 @@ func New(
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.AnchorKeeper,
-		&app.BadgesKeeper,
+		&app.TokenizationKeeper,
 		&app.MapsKeeper,
 		&app.ManagerSplitterKeeper,
 		&app.SendmanagerKeeper,
@@ -318,30 +315,30 @@ func New(
 	}
 
 	// Wire up keepers for address checks
-	app.BadgesKeeper.SetWasmViewKeeper(&app.WasmKeeper)
-	app.BadgesKeeper.SetGammKeeper(&app.GammKeeper)
+	app.TokenizationKeeper.SetWasmViewKeeper(&app.WasmKeeper)
+	app.TokenizationKeeper.SetGammKeeper(&app.GammKeeper)
 
 	// Register custom approval criteria checkers (optional)
-	app.BadgesKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+	app.TokenizationKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
 		// Add custom logic as needed here
 		return nil
 	})
 
 	// Register custom global transfer checkers (optional)
-	app.BadgesKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []badgesmodulekeeper.GlobalTransferChecker {
+	app.TokenizationKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []tokenizationmodulekeeper.GlobalTransferChecker {
 		// Add custom logic as needed here
 		return nil
 	})
 
 	// Register custom collection verifiers (optional)
 	// Example:
-	// app.BadgesKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
-	app.BadgesKeeper.RegisterCustomCollectionVerifier(&badgesmodulekeeper.NoOpCollectionVerifier{})
+	// app.TokenizationKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
+	app.TokenizationKeeper.RegisterCustomCollectionVerifier(&tokenizationmodulekeeper.NoOpCollectionVerifier{})
 
-	// Register badges router with sendmanager (deferred to avoid circular dependency)
+	// Register tokenization router with sendmanager (deferred to avoid circular dependency)
 	// This must happen after both keepers are created
 	if err := app.registerSendManagerRouters(); err != nil {
-		return nil, fmt.Errorf("failed to register badges router: %w", err)
+		return nil, fmt.Errorf("failed to register tokenization router: %w", err)
 	}
 
 	// register streaming services
@@ -481,7 +478,6 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
 }
-
 
 // SimulationManager implements the SimulationApp interface.
 func (app *App) SimulationManager() *module.SimulationManager {

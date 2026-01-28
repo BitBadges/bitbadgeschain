@@ -28,7 +28,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/maps/types"
 
 	modulev1 "github.com/bitbadges/bitbadgeschain/api/maps/module"
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
 var (
@@ -199,7 +199,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	BadgesKeeper  badgeskeeper.Keeper
+	TokenizationKeeper  tokenizationkeeper.Keeper
 
 	IBCKeeperFn func() *ibckeeper.Keeper `optional:"true"`
 }
@@ -223,7 +223,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.IBCKeeperFn,
-		in.BadgesKeeper,
+		in.TokenizationKeeper,
 	)
 	m := NewAppModule(
 		in.Cdc,

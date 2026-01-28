@@ -118,11 +118,11 @@ func (k Keeper) InitializePool(ctx sdk.Context, pool poolmanagertypes.PoolI, sen
 
 	// Auto-set the pool address as a reserved protocol address in the badges module
 	poolAddress := pool.GetAddress().String()
-	err = k.badgesKeeper.SetReservedProtocolAddressInStore(ctx, poolAddress, true)
+	err = k.tokenizationKeeper.SetReservedProtocolAddressInStore(ctx, poolAddress, true)
 	if err != nil {
 		return fmt.Errorf("failed to set pool address as reserved protocol: %w", err)
 	}
-	k.badgesKeeper.SetPoolAddressInCache(ctx, poolAddress, pool.GetId())
+	k.tokenizationKeeper.SetPoolAddressInCache(ctx, poolAddress, pool.GetId())
 
 	// N.B.: these hooks propagate to x/twap to create
 	// twap records at pool creation time.

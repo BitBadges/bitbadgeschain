@@ -1,7 +1,7 @@
 package types
 
 import (
-	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

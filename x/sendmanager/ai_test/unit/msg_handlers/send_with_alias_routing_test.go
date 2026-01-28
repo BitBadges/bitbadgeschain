@@ -21,15 +21,15 @@ func TestSendWithAliasRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_ValidMessage() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	msg := &types.MsgSendWithAliasRouting{
 		FromAddress: suite.Alice,
 		ToAddress:   suite.Bob,
 		Amount: sdk.Coins{
-			sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+			sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 		},
 	}
 
@@ -117,15 +117,15 @@ func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_BankDenom()
 }
 
 func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_MixedDenoms() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	msg := &types.MsgSendWithAliasRouting{
 		FromAddress: suite.Alice,
 		ToAddress:   suite.Bob,
 		Amount: sdk.Coins{
-			sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+			sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000)),
 			sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 		},
 	}

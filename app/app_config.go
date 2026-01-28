@@ -57,9 +57,9 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
-	badgesmodulev1 "github.com/bitbadges/bitbadgeschain/api/badges/module"
-	_ "github.com/bitbadges/bitbadgeschain/x/badges/module" // import for side-effects
-	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationmodulev1 "github.com/bitbadges/bitbadgeschain/api/tokenization/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/tokenization/module" // import for side-effects
+	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	mapsmodulev1 "github.com/bitbadges/bitbadgeschain/api/maps/module"
 	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
@@ -117,7 +117,7 @@ var (
 		circuittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
-		badgesmoduletypes.ModuleName,
+		tokenizationmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -149,7 +149,7 @@ var (
 		ibcratelimittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
-		badgesmoduletypes.ModuleName,
+		tokenizationmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -176,7 +176,7 @@ var (
 		ibcratelimittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
-		badgesmoduletypes.ModuleName,
+		tokenizationmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -202,7 +202,7 @@ var (
 		{Account: stakingtypes.BondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: stakingtypes.NotBondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: govtypes.ModuleName, Permissions: []string{authtypes.Burner}},
-		{Account: badgesmoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: tokenizationmoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
 		{Account: packetforwardtypes.ModuleName},
@@ -345,8 +345,8 @@ var (
 				Config: appconfig.WrapAny(&anchormodulev1.Module{}),
 			},
 			{
-				Name:   badgesmoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&badgesmodulev1.Module{}),
+				Name:   tokenizationmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&tokenizationmodulev1.Module{}),
 			},
 			{
 				Name:   mapsmoduletypes.ModuleName,

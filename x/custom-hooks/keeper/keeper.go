@@ -15,7 +15,7 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -35,13 +35,13 @@ type (
 		SendCoins(ctx context.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
 	}
 
-	// BadgesKeeper interface for badges module operations
-	BadgesKeeper interface {
-		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error)
-		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error
-		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool, error)
-		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
-		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
+	// TokenizationKeeper interface for badges module operations
+	TokenizationKeeper interface {
+		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*tokenizationtypes.TokenCollection, error)
+		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error
+		GetBalanceOrApplyDefault(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) (*tokenizationtypes.UserBalanceStore, bool, error)
+		SetBalanceForAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string, balance *tokenizationtypes.UserBalanceStore) error
+		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*tokenizationtypes.TokenCollection, bool)
 		SendNativeTokensViaAliasDenom(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
 		CheckIsAliasDenom(ctx sdk.Context, denom string) bool
 	}
@@ -74,7 +74,7 @@ type (
 		logger            log.Logger
 		gammKeeper        GammKeeper
 		bankKeeper        BankKeeper
-		badgesKeeper      BadgesKeeper
+		tokenizationKeeper TokenizationKeeper
 		sendManagerKeeper SendManagerKeeper
 		transferKeeper    gammtypes.TransferKeeper
 		ics4Wrapper       ICS4Wrapper
@@ -86,7 +86,7 @@ func NewKeeper(
 	logger log.Logger,
 	gammKeeper GammKeeper,
 	bankKeeper BankKeeper,
-	badgesKeeper BadgesKeeper,
+	tokenizationKeeper TokenizationKeeper,
 	sendManagerKeeper SendManagerKeeper,
 	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
@@ -96,7 +96,7 @@ func NewKeeper(
 		logger:            logger,
 		gammKeeper:        gammKeeper,
 		bankKeeper:        bankKeeper,
-		badgesKeeper:      badgesKeeper,
+		tokenizationKeeper: tokenizationKeeper,
 		sendManagerKeeper: sendManagerKeeper,
 		transferKeeper:    transferKeeper,
 		ics4Wrapper:       ics4Wrapper,
@@ -301,7 +301,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			allDenoms = append(allDenoms, operation.DenomOut)
 		}
 		for _, denom := range allDenoms {
-			if k.badgesKeeper.CheckIsAliasDenom(ctx, denom) {
+			if k.tokenizationKeeper.CheckIsAliasDenom(ctx, denom) {
 				ack := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom)
 				if !ack.Success() {
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set auto-approve for intermediate address, denom: %s", denom))
@@ -632,15 +632,15 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 
 	// Only set auto-approve flags for wrapped badges denoms
 	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
-	if k.badgesKeeper.CheckIsAliasDenom(ctx, token.Denom) {
-		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, token.Denom)
+	if k.tokenizationKeeper.CheckIsAliasDenom(ctx, token.Denom) {
+		collection, err := k.tokenizationKeeper.ParseCollectionFromDenom(ctx, token.Denom)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse collection from denom: %s", token.Denom))
 		}
 
 		// This is setting the auto-approve flags for the intermediate sender address
 		// Edge case, but this sets it in the case of default self initiated outgoing is not approved
-		err = k.badgesKeeper.SetAllAutoApprovalFlagsForIntermediateAddress(ctx, collection, sender.String())
+		err = k.tokenizationKeeper.SetAllAutoApprovalFlagsForIntermediateAddress(ctx, collection, sender.String())
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set all auto approval flags for address: %s", toAddr.String()))
 		}
@@ -683,13 +683,13 @@ func (k Keeper) setAutoApproveForIntermediateAddress(ctx sdk.Context, intermedia
 	}
 
 	// Get collection
-	collection, found := k.badgesKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
+	collection, found := k.tokenizationKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
 	if !found {
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("collection not found: %s", collectionIdStr))
 	}
 
 	// Get current balance or apply default
-	currBalances, _, err := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
+	currBalances, _, err := k.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
 	if err != nil {
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to get balance for intermediate address: %v", err))
 	}
@@ -711,7 +711,7 @@ func (k Keeper) setAutoApproveForIntermediateAddress(ctx sdk.Context, intermedia
 		currBalances.AutoApproveSelfInitiatedIncomingTransfers = true
 
 		// Save the balance
-		err = k.badgesKeeper.SetBalanceForAddress(ctx, collection, intermediateAddress, currBalances)
+		err = k.tokenizationKeeper.SetBalanceForAddress(ctx, collection, intermediateAddress, currBalances)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement("failed to set auto-approve for intermediate address")
 		}

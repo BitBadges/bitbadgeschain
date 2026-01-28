@@ -19,8 +19,8 @@ func TestSendCoinWithAliasRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *SendCoinWithAliasRoutingTestSuite) TestSendCoinWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -28,14 +28,14 @@ func (suite *SendCoinWithAliasRoutingTestSuite) TestSendCoinWithAliasRouting_Ali
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
-	coin := sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000))
+	coin := sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000))
 	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin)
 	suite.Require().NoError(err)
 
 	// Verify router was called
 	calls := router.GetSendCalls()
 	suite.Require().Len(calls, 1)
-	suite.Require().Equal("badges:123:456", calls[0].Denom)
+	suite.Require().Equal("tokenization:123:456", calls[0].Denom)
 }
 
 func (suite *SendCoinWithAliasRoutingTestSuite) TestSendCoinWithAliasRouting_BankDenom() {
@@ -69,8 +69,8 @@ func (suite *SendCoinWithAliasRoutingTestSuite) TestSendCoinWithAliasRouting_Emp
 }
 
 func (suite *SendCoinWithAliasRoutingTestSuite) TestSendCoinWithAliasRouting_MixedDenoms() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter("tokenization:")
+	err := suite.Keeper.RegisterRouter("tokenization:", router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -79,7 +79,7 @@ func (suite *SendCoinWithAliasRoutingTestSuite) TestSendCoinWithAliasRouting_Mix
 	suite.Require().NoError(err)
 
 	// Test alias denom
-	aliasCoin := sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000))
+	aliasCoin := sdk.NewCoin("tokenization:123:456", sdkmath.NewInt(1000))
 	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &aliasCoin)
 	suite.Require().NoError(err)
 
