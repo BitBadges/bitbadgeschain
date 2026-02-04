@@ -38,8 +38,8 @@ type ModuleInputs struct {
 	AuthKeeper         types.AuthKeeper
 	BankKeeper         types.BankKeeper
 	DistributionKeeper types.DistributionKeeper
-	// BadgesKeeper is not needed at initialization - router registration happens later
-	// BadgesKeeper       badgeskeeper.Keeper `optional:"true"`
+	// TokenizationKeeper is not needed at initialization - router registration happens later
+	// TokenizationKeeper       tokenizationkeeper.Keeper `optional:"true"`
 }
 
 type ModuleOutputs struct {
@@ -69,8 +69,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.DistributionKeeper,
 	)
 
-	// Note: Badges router registration is deferred to app.go after both keepers are created
-	// This avoids a circular dependency (sendmanager needs badges for router, badges needs sendmanager)
+	// Note: Tokenization router registration is deferred to app.go after both keepers are created
+	// This avoids a circular dependency (sendmanager needs tokenization for router, tokenization needs sendmanager)
 
 	m := NewAppModule(in.Cdc, k, in.AuthKeeper, in.BankKeeper)
 

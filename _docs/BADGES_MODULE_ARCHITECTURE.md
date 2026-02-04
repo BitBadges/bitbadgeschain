@@ -1,6 +1,6 @@
 # Module Architecture Overview
 
-This document provides a high-level architectural overview of the BitBadges `x/badges` module, focusing on design patterns, data flow, and integration points.
+This document provides a high-level architectural overview of the BitBadges `x/tokenization` module, focusing on design patterns, data flow, and integration points.
 
 ## Table of Contents
 

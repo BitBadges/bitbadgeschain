@@ -69,30 +69,26 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/staking" // import for side-effects
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
-	_ "github.com/cosmos/ibc-go/modules/capability" // import for side-effects
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	_ "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts" // import for side-effects
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	_ "github.com/cosmos/ibc-go/v8/modules/apps/29-fee" // import for side-effects
-	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
+	_ "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts" // import for side-effects
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
+	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"github.com/bitbadges/bitbadgeschain/app/ante"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 
-	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
-	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/tokenization/approval_criteria"
+	tokenizationmodulekeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -113,10 +109,8 @@ const (
 	Name                 = "bitbadgeschain"
 )
 
-var (
-	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome string
-)
+// DefaultNodeHome default home directories for the application daemon
+var DefaultNodeHome string
 
 var (
 	_ runtime.AppI            = (*App)(nil)
@@ -154,8 +148,6 @@ type App struct {
 
 	// IBC
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	CapabilityKeeper    *capabilitykeeper.Keeper
-	IBCFeeKeeper        ibcfeekeeper.Keeper
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
@@ -168,15 +160,8 @@ type App struct {
 	// IBC Rate Limit
 	IBCRateLimitKeeper ibcratelimitkeeper.Keeper
 
-	// Scoped IBC
-	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
-	ScopedIBCTransferKeeper   capabilitykeeper.ScopedKeeper
-	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
-	ScopedKeepers             map[string]capabilitykeeper.ScopedKeeper
-
 	AnchorKeeper          anchormodulekeeper.Keeper
-	BadgesKeeper          badgesmodulekeeper.Keeper
+	TokenizationKeeper    tokenizationmodulekeeper.Keeper
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
 	WasmKeeper            wasmkeeper.Keeper
@@ -238,7 +223,6 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
-
 	homeDirOpt := appOpts.Get("home")
 	if homeDirOpt != nil {
 		overrideHomeDir := homeDirOpt.(string)
@@ -250,7 +234,7 @@ func New(
 	// DefaultNodeHome = randomHomeDir
 
 	var (
-		app        = &App{ScopedKeepers: make(map[string]capabilitykeeper.ScopedKeeper)}
+		app        = &App{}
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
@@ -264,7 +248,6 @@ func New(
 				// Passing the getter, the app IBC Keeper will always be accessible.
 				// This needs to be removed after IBC supports App Wiring.
 				app.GetIBCKeeper,
-				app.GetCapabilityScopedKeeper,
 
 				// here alternative options can be supplied to the DI container.
 				// those options can be used f.e to override the default behavior of some modules.
@@ -298,7 +281,7 @@ func New(
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.AnchorKeeper,
-		&app.BadgesKeeper,
+		&app.TokenizationKeeper,
 		&app.MapsKeeper,
 		&app.ManagerSplitterKeeper,
 		&app.SendmanagerKeeper,
@@ -332,30 +315,30 @@ func New(
 	}
 
 	// Wire up keepers for address checks
-	app.BadgesKeeper.SetWasmViewKeeper(&app.WasmKeeper)
-	app.BadgesKeeper.SetGammKeeper(&app.GammKeeper)
+	app.TokenizationKeeper.SetWasmViewKeeper(&app.WasmKeeper)
+	app.TokenizationKeeper.SetGammKeeper(&app.GammKeeper)
 
 	// Register custom approval criteria checkers (optional)
-	app.BadgesKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+	app.TokenizationKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
 		// Add custom logic as needed here
 		return nil
 	})
 
 	// Register custom global transfer checkers (optional)
-	app.BadgesKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []badgesmodulekeeper.GlobalTransferChecker {
+	app.TokenizationKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []tokenizationmodulekeeper.GlobalTransferChecker {
 		// Add custom logic as needed here
 		return nil
 	})
 
 	// Register custom collection verifiers (optional)
 	// Example:
-	// app.BadgesKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
-	app.BadgesKeeper.RegisterCustomCollectionVerifier(&badgesmodulekeeper.NoOpCollectionVerifier{})
+	// app.TokenizationKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
+	app.TokenizationKeeper.RegisterCustomCollectionVerifier(&tokenizationmodulekeeper.NoOpCollectionVerifier{})
 
-	// Register badges router with sendmanager (deferred to avoid circular dependency)
+	// Register tokenization router with sendmanager (deferred to avoid circular dependency)
 	// This must happen after both keepers are created
 	if err := app.registerSendManagerRouters(); err != nil {
-		return nil, fmt.Errorf("failed to register badges router: %w", err)
+		return nil, fmt.Errorf("failed to register tokenization router: %w", err)
 	}
 
 	// register streaming services
@@ -373,7 +356,7 @@ func New(
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders() // use custom AnteHandler
 
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	wasmConfig, err := wasm.ReadNodeConfig(appOpts)
 	if err != nil {
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
@@ -386,7 +369,7 @@ func New(
 		SignModeHandler:       app.txConfig.SignModeHandler(),
 		SigGasConsumer:        authante.DefaultSigVerificationGasConsumer,
 		CircuitKeeper:         &app.CircuitBreakerKeeper,
-		WasmConfig:            &wasmConfig,
+		WasmConfig:            wasmConfig,
 		WasmKeeper:            &app.WasmKeeper,
 		TXCounterStoreService: storeService,
 	}
@@ -494,16 +477,6 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 // GetIBCKeeper returns the IBC keeper.
 func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
-}
-
-// GetCapabilityScopedKeeper returns the capability scoped keeper.
-func (app *App) GetCapabilityScopedKeeper(moduleName string) capabilitykeeper.ScopedKeeper {
-	sk, ok := app.ScopedKeepers[moduleName]
-	if !ok {
-		sk = app.CapabilityKeeper.ScopeToModule(moduleName)
-		app.ScopedKeepers[moduleName] = sk
-	}
-	return sk
 }
 
 // SimulationManager implements the SimulationApp interface.

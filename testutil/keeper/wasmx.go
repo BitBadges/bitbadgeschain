@@ -16,10 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	portkeeper "github.com/cosmos/ibc-go/v8/modules/core/05-port/keeper"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
@@ -38,12 +35,17 @@ func WasmxKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	registry := codectypes.NewInterfaceRegistry()
 	appCodec := codec.NewProtoCodec(registry)
-	capabilityKeeper := capabilitykeeper.NewKeeper(appCodec, storeKey, memStoreKey)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
-	scopedKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
-	portKeeper := portkeeper.NewKeeper(scopedKeeper)
-	scopeModule := capabilityKeeper.ScopeToModule(types.ModuleName)
+	// IBC v10: capabilities removed, portKeeper doesn't need scopedKeeper
+	// Create a minimal IBCKeeper for testing - PortKeeper is created internally
+	ibcK := ibckeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(storeKey),
+		NewNoopParamSubspace(), // ParamSubspace - no-op for testing
+		NewNoopUpgradeKeeper(), // UpgradeKeeper - no-op for testing
+		authority.String(),
+	)
 
 	k := keeper.NewKeeper(
 		appCodec,
@@ -51,11 +53,8 @@ func WasmxKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		log.NewNopLogger(),
 		authority.String(),
 		func() *ibckeeper.Keeper {
-			return &ibckeeper.Keeper{
-				PortKeeper: &portKeeper,
-			}
+			return ibcK
 		},
-		scopeModule,
 		wasmkeeper.Keeper{},
 	)
 

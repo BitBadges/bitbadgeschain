@@ -361,7 +361,7 @@ func (k Keeper) StandardName(ctx sdk.Context, denom string) string {
 	_, found := k.getRouterForDenom(denom)
 	if found {
 		// Alias denom - return "BitBadges"
-		return "x/badges"
+		return "x/tokenization"
 	}
 	// Regular ICS20 denom
 	return "x/bank"

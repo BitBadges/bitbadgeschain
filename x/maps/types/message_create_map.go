@@ -1,7 +1,7 @@
 package types
 
 import (
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -57,12 +57,12 @@ func (msg *MsgCreateMap) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidRequest, "map ID cannot be empty")
 	}
 
-	err = badgestypes.ValidateManager(msg.Manager)
+	err = tokenizationtypes.ValidateManager(msg.Manager)
 	if err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequest, "manager timeline cannot be invalid")
 	}
 
-	err = badgestypes.ValidateCollectionMetadata(CastMapMetadataToCollectionMetadata(msg.Metadata))
+	err = tokenizationtypes.ValidateCollectionMetadata(CastMapMetadataToCollectionMetadata(msg.Metadata))
 	if err != nil {
 		return sdkerrors.Wrap(ErrInvalidRequest, "metadata timeline cannot be invalid")
 	}

@@ -49,3 +49,6 @@ new-genesis.json
 
 # Osmosis sync directory
 .osmosis-sync/
+
+# Accidental ~/ directory (should be in home, not repo)
+~/

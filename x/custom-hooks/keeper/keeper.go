@@ -10,14 +10,12 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -37,13 +35,13 @@ type (
 		SendCoins(ctx context.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
 	}
 
-	// BadgesKeeper interface for badges module operations
-	BadgesKeeper interface {
-		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*badgestypes.TokenCollection, error)
-		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) error
-		GetBalanceOrApplyDefault(ctx sdk.Context, collection *badgestypes.TokenCollection, address string) (*badgestypes.UserBalanceStore, bool)
-		SetBalanceForAddress(ctx sdk.Context, collection *badgestypes.TokenCollection, address string, balance *badgestypes.UserBalanceStore) error
-		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*badgestypes.TokenCollection, bool)
+	// TokenizationKeeper interface for badges module operations
+	TokenizationKeeper interface {
+		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*tokenizationtypes.TokenCollection, error)
+		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error
+		GetBalanceOrApplyDefault(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) (*tokenizationtypes.UserBalanceStore, bool, error)
+		SetBalanceForAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string, balance *tokenizationtypes.UserBalanceStore) error
+		GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*tokenizationtypes.TokenCollection, bool)
 		SendNativeTokensViaAliasDenom(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error
 		CheckIsAliasDenom(ctx sdk.Context, denom string) bool
 	}
@@ -55,11 +53,10 @@ type (
 		StandardName(ctx sdk.Context, denom string) string
 	}
 
-	// ICS4Wrapper interface for sending IBC packets
+	// ICS4Wrapper interface for sending IBC packets (IBC v10: capabilities removed)
 	ICS4Wrapper interface {
 		SendPacket(
 			ctx sdk.Context,
-			channelCap *capabilitytypes.Capability,
 			sourcePort string,
 			sourceChannel string,
 			timeoutHeight clienttypes.Height,
@@ -68,26 +65,20 @@ type (
 		) (uint64, error)
 	}
 
-	// ChannelKeeper interface for getting channel capabilities
+	// ChannelKeeper interface for getting channel information
 	ChannelKeeper interface {
 		GetChannel(ctx sdk.Context, portID, channelID string) (channeltypes.Channel, bool)
-	}
-
-	// ScopedKeeper interface for getting channel capabilities
-	ScopedKeeper interface {
-		GetCapability(ctx sdk.Context, name string) (*capabilitytypes.Capability, bool)
 	}
 
 	Keeper struct {
 		logger            log.Logger
 		gammKeeper        GammKeeper
 		bankKeeper        BankKeeper
-		badgesKeeper      BadgesKeeper
+		tokenizationKeeper TokenizationKeeper
 		sendManagerKeeper SendManagerKeeper
 		transferKeeper    gammtypes.TransferKeeper
 		ics4Wrapper       ICS4Wrapper
 		channelKeeper     ChannelKeeper
-		scopedKeeper      ScopedKeeper
 	}
 )
 
@@ -95,23 +86,21 @@ func NewKeeper(
 	logger log.Logger,
 	gammKeeper GammKeeper,
 	bankKeeper BankKeeper,
-	badgesKeeper BadgesKeeper,
+	tokenizationKeeper TokenizationKeeper,
 	sendManagerKeeper SendManagerKeeper,
 	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
-	scopedKeeper ScopedKeeper,
 ) Keeper {
 	return Keeper{
 		logger:            logger,
 		gammKeeper:        gammKeeper,
 		bankKeeper:        bankKeeper,
-		badgesKeeper:      badgesKeeper,
+		tokenizationKeeper: tokenizationKeeper,
 		sendManagerKeeper: sendManagerKeeper,
 		transferKeeper:    transferKeeper,
 		ics4Wrapper:       ics4Wrapper,
 		channelKeeper:     channelKeeper,
-		scopedKeeper:      scopedKeeper,
 	}
 }
 
@@ -312,7 +301,7 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			allDenoms = append(allDenoms, operation.DenomOut)
 		}
 		for _, denom := range allDenoms {
-			if k.badgesKeeper.CheckIsAliasDenom(ctx, denom) {
+			if k.tokenizationKeeper.CheckIsAliasDenom(ctx, denom) {
 				ack := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom)
 				if !ack.Success() {
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set auto-approve for intermediate address, denom: %s", denom))
@@ -557,14 +546,7 @@ func (k Keeper) ValidatePostSwapAction(ctx sdk.Context, postSwapAction *types.Po
 
 		// Security: MED-007 - Channel capability validation timing
 		// Note: Capability is validated here for early failure, but it's also validated
-		// immediately before IBC transfer execution in ExecuteIBCTransfer to prevent
-		// race conditions where capability is revoked between validation and execution.
-		// This early validation prevents wasting gas on swaps if capability is already missing.
-		capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcInfo.SourceChannel)
-		_, ok := k.scopedKeeper.GetCapability(ctx, capPath)
-		if !ok {
-			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("channel capability not found: %s", ibcInfo.SourceChannel))
-		}
+		// IBC v10: Capabilities removed - channel validation is handled by IBC core
 	}
 
 	// Validate local transfer if present
@@ -591,16 +573,7 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 
 	ibcInfo := ibcTransfer.IBCInfo
 
-	// Security: MED-007 - Channel capability validation timing
-	// Validate capability immediately before IBC transfer execution to prevent race conditions.
-	// Even though capability is also validated in ValidatePostSwapAction, we validate again here
-	// because capability could be revoked between validation and execution (e.g., by governance).
-	// This ensures swap doesn't succeed if IBC transfer will fail due to missing capability.
-	capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcInfo.SourceChannel)
-	channelCap, ok := k.scopedKeeper.GetCapability(ctx, capPath)
-	if !ok {
-		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("channel capability not found: %s", ibcInfo.SourceChannel))
-	}
+	// IBC v10: Capabilities removed - channel validation is handled by IBC core
 
 	// Use zero height for timeout (no timeout height)
 	timeoutHeight := clienttypes.ZeroHeight()
@@ -625,10 +598,9 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return types.NewCustomErrorAcknowledgement("failed to marshal IBC packet data")
 	}
 
-	// Send IBC packet
+	// Send IBC packet (IBC v10: capabilities removed)
 	_, err = k.ics4Wrapper.SendPacket(
 		ctx,
-		channelCap,
 		transfertypes.PortID,
 		ibcInfo.SourceChannel,
 		timeoutHeight,
@@ -660,15 +632,15 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 
 	// Only set auto-approve flags for wrapped badges denoms
 	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
-	if k.badgesKeeper.CheckIsAliasDenom(ctx, token.Denom) {
-		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, token.Denom)
+	if k.tokenizationKeeper.CheckIsAliasDenom(ctx, token.Denom) {
+		collection, err := k.tokenizationKeeper.ParseCollectionFromDenom(ctx, token.Denom)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to parse collection from denom: %s", token.Denom))
 		}
 
 		// This is setting the auto-approve flags for the intermediate sender address
 		// Edge case, but this sets it in the case of default self initiated outgoing is not approved
-		err = k.badgesKeeper.SetAllAutoApprovalFlagsForIntermediateAddress(ctx, collection, sender.String())
+		err = k.tokenizationKeeper.SetAllAutoApprovalFlagsForIntermediateAddress(ctx, collection, sender.String())
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set all auto approval flags for address: %s", toAddr.String()))
 		}
@@ -711,13 +683,16 @@ func (k Keeper) setAutoApproveForIntermediateAddress(ctx sdk.Context, intermedia
 	}
 
 	// Get collection
-	collection, found := k.badgesKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
+	collection, found := k.tokenizationKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(collectionId))
 	if !found {
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("collection not found: %s", collectionIdStr))
 	}
 
 	// Get current balance or apply default
-	currBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
+	currBalances, _, err := k.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, intermediateAddress)
+	if err != nil {
+		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to get balance for intermediate address: %v", err))
+	}
 
 	// Check if already auto-approved (all flags)
 	alreadyAutoApprovedAllIncomingTransfers := currBalances.AutoApproveAllIncomingTransfers
@@ -736,7 +711,7 @@ func (k Keeper) setAutoApproveForIntermediateAddress(ctx sdk.Context, intermedia
 		currBalances.AutoApproveSelfInitiatedIncomingTransfers = true
 
 		// Save the balance
-		err = k.badgesKeeper.SetBalanceForAddress(ctx, collection, intermediateAddress, currBalances)
+		err = k.tokenizationKeeper.SetBalanceForAddress(ctx, collection, intermediateAddress, currBalances)
 		if err != nil {
 			return types.NewCustomErrorAcknowledgement("failed to set auto-approve for intermediate address")
 		}

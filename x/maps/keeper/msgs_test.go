@@ -8,8 +8,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 func GetDefaultCreateMsg() *types.MsgCreateMap {
@@ -417,7 +417,7 @@ func (suite *TestSuite) TestCollectionIdReservedMaps() {
 }
 
 func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
+	suite.app.TokenizationKeeper.SetCollectionInStore(suite.ctx, &tokenizationtypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		Manager:      alice,
 	}, true)
@@ -434,7 +434,7 @@ func (suite *TestSuite) TestCollectionIdReservedMapsWithManager() {
 }
 
 func (suite *TestSuite) TestCollectionIdReservedMapsWithManagerNotManager() {
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
+	suite.app.TokenizationKeeper.SetCollectionInStore(suite.ctx, &tokenizationtypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		Manager:      alice,
 	}, true)
@@ -459,7 +459,7 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 	createMsg.MapId = "1"
 	createMsg.Creator = alice
 
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
+	suite.app.TokenizationKeeper.SetCollectionInStore(suite.ctx, &tokenizationtypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		Manager:      alice,
 	}, true)
@@ -467,17 +467,17 @@ func (suite *TestSuite) TestCollectionIdCriteria() {
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
-	suite.app.BadgesKeeper.SetUserBalanceInStore(suite.ctx, badgeskeeper.ConstructBalanceKey(alice, sdkmath.NewUint(1)), &badgestypes.UserBalanceStore{
-		Balances: []*badgestypes.Balance{
+	suite.app.TokenizationKeeper.SetUserBalanceInStore(suite.ctx, tokenizationkeeper.ConstructBalanceKey(alice, sdkmath.NewUint(1)), &tokenizationtypes.UserBalanceStore{
+		Balances: []*tokenizationtypes.Balance{
 			{
-				TokenIds: []*badgestypes.UintRange{
+				TokenIds: []*tokenizationtypes.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(1),
 					},
 				},
 				Amount: sdkmath.NewUint(1),
-				OwnershipTimes: []*badgestypes.UintRange{
+				OwnershipTimes: []*tokenizationtypes.UintRange{
 					{
 						Start: sdkmath.NewUint(1),
 						End:   sdkmath.NewUint(math.MaxUint64),
@@ -527,7 +527,7 @@ func (suite *TestSuite) TestInheritManagerFromCollection() {
 	err := CreateMap(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating map: %s")
 
-	suite.app.BadgesKeeper.SetCollectionInStore(suite.ctx, &badgestypes.TokenCollection{
+	suite.app.TokenizationKeeper.SetCollectionInStore(suite.ctx, &tokenizationtypes.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
 		Manager:      alice,
 	}, true)

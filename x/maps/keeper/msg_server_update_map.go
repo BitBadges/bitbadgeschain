@@ -8,7 +8,7 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*types.MsgUpdateMapResponse, error) {
@@ -22,7 +22,7 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 
 	collection := &tokentypes.TokenCollection{}
 	if !currMap.InheritManagerFrom.IsNil() && !currMap.InheritManagerFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerFrom.String()})
+		collectionRes, err := k.tokenizationKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
@@ -38,7 +38,7 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 	if msg.UpdateManager {
 		oldManager := currMap.Manager
 		newManager := msg.Manager
-		if err := k.badgesKeeper.ValidateManagerUpdate(ctx, oldManager, newManager, types.CastActionPermissions(currMap.Permissions.CanUpdateManager)); err != nil {
+		if err := k.tokenizationKeeper.ValidateManagerUpdate(ctx, oldManager, newManager, types.CastActionPermissions(currMap.Permissions.CanUpdateManager)); err != nil {
 			return nil, err
 		}
 		currMap.Manager = msg.Manager
@@ -47,7 +47,7 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 	if msg.UpdateMetadata {
 		oldMetadata := types.CastMapMetadataToCollectionMetadata(currMap.Metadata)
 		newMetadata := types.CastMapMetadataToCollectionMetadata(msg.Metadata)
-		if err := k.badgesKeeper.ValidateCollectionMetadataUpdate(ctx, oldMetadata, newMetadata, types.CastActionPermissions(currMap.Permissions.CanUpdateMetadata)); err != nil {
+		if err := k.tokenizationKeeper.ValidateCollectionMetadataUpdate(ctx, oldMetadata, newMetadata, types.CastActionPermissions(currMap.Permissions.CanUpdateMetadata)); err != nil {
 			return nil, err
 		}
 		currMap.Metadata = msg.Metadata
@@ -62,15 +62,15 @@ func (k msgServer) UpdateMap(goCtx context.Context, msg *types.MsgUpdateMap) (*t
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanDeleteMap), types.CastActionPermissions(msg.Permissions.CanDeleteMap)); err != nil {
+		if err := k.tokenizationKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanDeleteMap), types.CastActionPermissions(msg.Permissions.CanDeleteMap)); err != nil {
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanUpdateManager), types.CastActionPermissions(msg.Permissions.CanUpdateManager)); err != nil {
+		if err := k.tokenizationKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanUpdateManager), types.CastActionPermissions(msg.Permissions.CanUpdateManager)); err != nil {
 			return nil, err
 		}
 
-		if err := k.badgesKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanUpdateMetadata), types.CastActionPermissions(msg.Permissions.CanUpdateMetadata)); err != nil {
+		if err := k.tokenizationKeeper.ValidateActionPermissionUpdate(ctx, types.CastActionPermissions(currMap.Permissions.CanUpdateMetadata), types.CastActionPermissions(msg.Permissions.CanUpdateMetadata)); err != nil {
 			return nil, err
 		}
 

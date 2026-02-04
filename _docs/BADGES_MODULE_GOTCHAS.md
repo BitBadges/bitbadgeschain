@@ -1,6 +1,6 @@
 # Module Development Gotchas and Common Issues
 
-This document captures common pitfalls, gotchas, and important considerations when working with the BitBadges `x/badges` module.
+This document captures common pitfalls, gotchas, and important considerations when working with the BitBadges `x/tokenization` module.
 
 ## Table of Contents
 
@@ -327,11 +327,11 @@ addresses := []string{
 # ❌ Wrong order - can cause build failures
 ignite generate proto-go --yes
 go build ./cmd/bitbadgeschaind  # May fail with versioned API imports
-rm -rf api/badges/v*
+rm -rf api/tokenization/v*
 
 # ✅ Correct order
 ignite generate proto-go --yes
-rm -rf api/badges/v*
+rm -rf api/tokenization/v*
 go build ./cmd/bitbadgeschaind
 ```
 

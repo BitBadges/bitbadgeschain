@@ -5,8 +5,8 @@ import (
 
 	anchorKeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	anchortypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
-	badgeKeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	tokenTypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationKeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenTypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	gammKeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	gammTypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	managersplitterKeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
@@ -21,13 +21,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Keeper, mk mapsKeeper.Keeper, gk gammKeeper.Keeper, msk managersplitterKeeper.Keeper) wasmKeeper.CustomQuerier {
+func PerformCustomBitBadgesModuleQuery(bk tokenizationKeeper.Keeper, ak anchorKeeper.Keeper, mk mapsKeeper.Keeper, gk gammKeeper.Keeper, msk managersplitterKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
-		isBadgeModuleQuery := false
-		var custom badgeCustomQuery
+		isTokenizationModuleQuery := false
+		var custom tokenizationCustomQuery
 		err := json.Unmarshal(request, &custom)
 		if err == nil {
-			isBadgeModuleQuery = true
+			isTokenizationModuleQuery = true
 		}
 
 		isAnchorModuleQuery := false
@@ -58,8 +58,8 @@ func PerformCustomBitBadgesModuleQuery(bk badgeKeeper.Keeper, ak anchorKeeper.Ke
 			isManagersplitterModuleQuery = true
 		}
 
-		if isBadgeModuleQuery {
-			return PerformCustomBadgeQuery(bk)(ctx, request)
+		if isTokenizationModuleQuery {
+			return PerformCustomTokenizationQuery(bk)(ctx, request)
 		} else if isAnchorModuleQuery {
 			return PerformCustomAnchorQuery(ak)(ctx, request)
 		} else if isMapsModuleQuery {
@@ -121,9 +121,9 @@ func PerformCustomAnchorQuery(ak anchorKeeper.Keeper) wasmKeeper.CustomQuerier {
 }
 
 // WASM handler for contracts calling into the tokens module
-func PerformCustomBadgeQuery(keeper badgeKeeper.Keeper) wasmKeeper.CustomQuerier {
+func PerformCustomTokenizationQuery(keeper tokenizationKeeper.Keeper) wasmKeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
-		var custom badgeCustomQuery
+		var custom tokenizationCustomQuery
 		err := json.Unmarshal(request, &custom)
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, err.Error())
@@ -295,7 +295,7 @@ func PerformCustomManagersplitterQuery(msk managersplitterKeeper.Keeper) wasmKee
 	}
 }
 
-type badgeCustomQuery struct {
+type tokenizationCustomQuery struct {
 	QueryCollection             *tokenTypes.QueryGetCollectionRequest          `json:"queryCollection,omitempty"`
 	QueryBalance                *tokenTypes.QueryGetBalanceRequest             `json:"queryBalance,omitempty"`
 	QueryAddressList            *tokenTypes.QueryGetAddressListRequest         `json:"queryAddressList,omitempty"`

@@ -36,27 +36,27 @@ func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_Duplicate
 }
 
 func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_OverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badges:lp:")
+	router1 := testutil.GenerateMockRouter("a:")
+	router2 := testutil.GenerateMockRouter("a:b:")
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("a:", router1)
 	suite.Require().NoError(err)
 
-	// This should fail because "badges:lp:" starts with "badges:"
-	err = suite.Keeper.RegisterRouter("badges:lp:", router2)
+	// This should fail because "a:b:" starts with "a:"
+	err = suite.Keeper.RegisterRouter("a:b:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_ReverseOverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("badges:lp:")
-	router2 := testutil.GenerateMockRouter("badges:")
+	router1 := testutil.GenerateMockRouter("a:b:")
+	router2 := testutil.GenerateMockRouter("a:")
 
-	err := suite.Keeper.RegisterRouter("badges:lp:", router1)
+	err := suite.Keeper.RegisterRouter("a:b:", router1)
 	suite.Require().NoError(err)
 
-	// This should fail because "badges:" is a prefix of "badges:lp:"
-	err = suite.Keeper.RegisterRouter("badges:", router2)
+	// This should fail because "a:" is a prefix of "a:b:"
+	err = suite.Keeper.RegisterRouter("a:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }

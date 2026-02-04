@@ -138,7 +138,6 @@ func (s *KeeperTestHelper) Setup() {
 // Additionally, attaches an internal gauge ID for each pool.
 // Allows the flexibility of being used from outside the Osmosis repository by providing custom project name and transmuter bytecode path.
 func (s *KeeperTestHelper) PrepareAllSupportedPoolsCustomProject(projectName, transmuterPath string) SupportedPoolAndGaugeInfo {
-
 	var (
 		// Prepare pools and their IDs
 		balancerPoolID   = s.PrepareBalancerPool()

@@ -4,11 +4,10 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/app/params"
@@ -71,12 +70,13 @@ func NewMockIBCModule() *MockIBCModule {
 	return &MockIBCModule{}
 }
 
-func (m *MockIBCModule) OnChanOpenInit(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, channelCap *capabilitytypes.Capability, counterparty channeltypes.Counterparty, version string) (string, error) {
+// IBC v10: capabilities removed from channel handshake
+func (m *MockIBCModule) OnChanOpenInit(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, counterparty channeltypes.Counterparty, version string) (string, error) {
 	m.onChanOpenInitCalled = true
 	return version, nil
 }
 
-func (m *MockIBCModule) OnChanOpenTry(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, channelCap *capabilitytypes.Capability, counterparty channeltypes.Counterparty, counterpartyVersion string) (string, error) {
+func (m *MockIBCModule) OnChanOpenTry(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, counterparty channeltypes.Counterparty, counterpartyVersion string) (string, error) {
 	return counterpartyVersion, nil
 }
 
@@ -96,16 +96,19 @@ func (m *MockIBCModule) OnChanCloseConfirm(ctx sdk.Context, portID, channelID st
 	return nil
 }
 
-func (m *MockIBCModule) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+// IBC v10: OnRecvPacket now includes packetID parameter
+func (m *MockIBCModule) OnRecvPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	m.onRecvPacketCalled = true
 	return channeltypes.NewResultAcknowledgement([]byte("success"))
 }
 
-func (m *MockIBCModule) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
+// IBC v10: OnAcknowledgementPacket now includes packetID parameter
+func (m *MockIBCModule) OnAcknowledgementPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
 	return nil
 }
 
-func (m *MockIBCModule) OnTimeoutPacket(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+// IBC v10: OnTimeoutPacket now includes packetID parameter
+func (m *MockIBCModule) OnTimeoutPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
 	return nil
 }
 
@@ -118,12 +121,14 @@ func NewMockICS4Wrapper() *MockICS4Wrapper {
 	return &MockICS4Wrapper{}
 }
 
-func (m *MockICS4Wrapper) SendPacket(ctx sdk.Context, chanCap *capabilitytypes.Capability, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
+// IBC v10: capabilities removed from SendPacket
+func (m *MockICS4Wrapper) SendPacket(ctx sdk.Context, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
 	m.SendPacketCalled = true
 	return 1, nil
 }
 
-func (m *MockICS4Wrapper) WriteAcknowledgement(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI, ack ibcexported.Acknowledgement) error {
+// IBC v10: capabilities removed from WriteAcknowledgement
+func (m *MockICS4Wrapper) WriteAcknowledgement(ctx sdk.Context, packet ibcexported.PacketI, ack ibcexported.Acknowledgement) error {
 	return nil
 }
 

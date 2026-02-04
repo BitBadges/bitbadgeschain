@@ -1,0 +1,56 @@
+syntax = "proto3";
+package tokenization;
+
+import "gogoproto/gogo.proto";
+import "tokenization/balances.proto";
+import "tokenization/permissions.proto";
+import "tokenization/approvals.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types";
+
+/*
+  UserBalanceStore is the store for the user balances for a collection.
+
+  It consists of a list of balances, a list of approved outgoing transfers, and a list of approved incoming transfers,
+  as well as the permissions for updating the approved incoming/outgoing transfers.
+
+  Upon initialization, all fields (minus the balances) are set to the defaults specified by the collection.
+
+  The outgoing transfers can be used to allow / disallow transfers which are sent from this user.
+  If a transfer has no match, then it is disallowed by default, unless from == initiatedBy (i.e. initiated by this user)
+  and autoApproveSelfInitiatedOutgoingTransfers is set to true.
+
+  The incoming transfers can be used to allow / disallow transfers which are sent to this user.
+  If a transfer has no match, then it is disallowed by default, unless to == initiatedBy (i.e. initiated by this user)
+  and autoApproveSelfInitiatedIncomingTransfers is set to true.
+
+  Note that the user approved transfers are only checked if the collection approved transfers do not specify to override
+  the user approved transfers. 
+
+  The permissions are used to determine whether the user can update the approved incoming/outgoing transfers and auto approvals.
+*/
+message UserBalanceStore {
+  // The list of balances associated with this user.
+  repeated Balance balances = 1;
+
+  // The list of approved outgoing transfers for this user.
+  repeated UserOutgoingApproval outgoingApprovals = 2;
+
+  // The list of approved incoming transfers for this user.
+  repeated UserIncomingApproval incomingApprovals = 3;
+
+  // Whether to auto-approve self-initiated outgoing transfers for this user (i.e. from == initiatedBy).
+  bool autoApproveSelfInitiatedOutgoingTransfers = 4;
+
+  // Whether to auto-approve self-initiated incoming transfers for this user (i.e. to == initiatedBy).
+  bool autoApproveSelfInitiatedIncomingTransfers = 5;
+
+  // Whether to auto-approve all incoming transfers by default. 
+  // This is just shorthand for adding an accept everything incoming approval
+  // with no restrictions.
+  bool autoApproveAllIncomingTransfers = 6;
+
+  // The permissions for this user's actions and transfers.
+  UserPermissions userPermissions = 7;
+}
+

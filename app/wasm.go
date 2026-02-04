@@ -16,12 +16,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	// this line is used by starport scaffolding # ibc/app/import
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmvmtypes "github.com/CosmWasm/wasmvm/v3/types"
 
 	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
@@ -55,18 +56,24 @@ func (app *App) registerWasmModules(appOpts servertypes.AppOptions) (store.KVSto
 	app.ParamsKeeper.Subspace(wasmtypes.ModuleName)
 
 	wasmDir := filepath.Join(DefaultNodeHome, "wasm")
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	wasmConfig, err := wasm.ReadNodeConfig(appOpts)
 	if err != nil {
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
 
 	customEncoderOptions := GetCustomMsgEncodersOptions()
-	customQueryOptions := GetCustomMsgQueryOptions(app.BadgesKeeper, app.AnchorKeeper, app.MapsKeeper, app.GammKeeper, app.ManagerSplitterKeeper)
+	customQueryOptions := GetCustomMsgQueryOptions(app.TokenizationKeeper, app.AnchorKeeper, app.MapsKeeper, app.GammKeeper, app.ManagerSplitterKeeper)
 	wasmOpts := append(customEncoderOptions, customQueryOptions...)
 	availableCapabilities := wasmkeeper.BuiltInCapabilities()
 	availableCapabilities = append(availableCapabilities, "bitbadges")
 
 	storeService := runtime.NewKVStoreService(wasmKey)
+
+	// wasmd 0.61.6 uses IBC v10 natively - no adapters needed
+	// VMConfig for wasmd - use default limits (empty struct uses defaults)
+	vmConfig := wasmtypes.VMConfig{
+		WasmLimits: wasmvmtypes.WasmLimits{},
+	}
 
 	app.WasmKeeper = wasmkeeper.NewKeeper(
 		app.appCodec,
@@ -75,15 +82,15 @@ func (app *App) registerWasmModules(appOpts servertypes.AppOptions) (store.KVSto
 		app.BankKeeper,
 		app.StakingKeeper,
 		distrkeeper.NewQuerier(app.DistrKeeper),
-		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware
-		app.IBCKeeper.ChannelKeeper,
-		app.IBCKeeper.PortKeeper,
-		app.CapabilityKeeper.ScopeToModule(wasmtypes.ModuleName),
-		app.TransferKeeper,
-		app.MsgServiceRouter(),
-		app.GRPCQueryRouter(),
+		app.IBCKeeper.ChannelKeeper,                    // ICS4Wrapper (IBC v10 native)
+		app.IBCKeeper.ChannelKeeper,                    // ChannelKeeper (IBC v10 native)
+		NewChannelKeeperV2Adapter(app.IBCKeeper.ChannelKeeper), // ChannelKeeperV2 (adapter for wasmd)
+		app.TransferKeeper,          // ICS20TransferPortSource
+		app.MsgServiceRouter(),       // MessageRouter
+		app.GRPCQueryRouter(),        // GRPCQueryRouter
 		wasmDir,
-		wasmConfig,
+		wasmConfig,                   // NodeConfig
+		vmConfig,                     // VMConfig
 		availableCapabilities,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
@@ -95,7 +102,6 @@ func (app *App) registerWasmModules(appOpts servertypes.AppOptions) (store.KVSto
 		app.Logger(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		func() *ibckeeper.Keeper { return app.IBCKeeper },
-		app.CapabilityKeeper.ScopeToModule(wasmxmoduletypes.ModuleName),
 		app.WasmKeeper,
 	)
 

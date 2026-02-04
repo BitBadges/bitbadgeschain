@@ -9,13 +9,13 @@ import (
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	log "cosmossdk.io/log"
 	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/ibc-go/v8/testing/mock"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
@@ -56,8 +56,9 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 func Setup(
 	isCheckTx bool,
 ) *App {
-	privVal := mock.NewPV()
-	pubKey, _ := privVal.GetPubKey()
+	// Create a mock validator using ed25519 (IBC v10 removed testing/mock package)
+	privKey := ed25519.GenPrivKey()
+	pubKey := privKey.PubKey()
 
 	// create validator set with single validator
 	validator := tmtypes.NewValidator(pubKey, 824639203360100)

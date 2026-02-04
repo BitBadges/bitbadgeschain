@@ -1,0 +1,922 @@
+syntax = "proto3";
+package tokenization;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "tokenization/params.proto";
+
+import "tokenization/transfers.proto";
+import "tokenization/balances.proto";
+import "tokenization/permissions.proto";
+import "tokenization/metadata.proto";
+import "tokenization/collections.proto";
+import "tokenization/address_lists.proto";
+import "tokenization/dynamic_stores.proto";
+import "tokenization/approvals.proto";
+import "tokenization/user_balance_store.proto";
+
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  rpc UniversalUpdateCollection      (MsgUniversalUpdateCollection) returns (MsgUniversalUpdateCollectionResponse);
+  rpc CreateAddressLists (MsgCreateAddressLists) returns (MsgCreateAddressListsResponse);
+  rpc TransferTokens(MsgTransferTokens) returns (MsgTransferTokensResponse);
+  rpc UpdateUserApprovals(MsgUpdateUserApprovals) returns (MsgUpdateUserApprovalsResponse);
+  rpc SetIncomingApproval(MsgSetIncomingApproval) returns (MsgSetIncomingApprovalResponse);
+  rpc DeleteIncomingApproval(MsgDeleteIncomingApproval) returns (MsgDeleteIncomingApprovalResponse);
+  rpc SetOutgoingApproval(MsgSetOutgoingApproval) returns (MsgSetOutgoingApprovalResponse);
+  rpc DeleteOutgoingApproval(MsgDeleteOutgoingApproval) returns (MsgDeleteOutgoingApprovalResponse);
+  rpc PurgeApprovals(MsgPurgeApprovals) returns (MsgPurgeApprovalsResponse);
+  rpc DeleteCollection(MsgDeleteCollection) returns (MsgDeleteCollectionResponse);
+  rpc UpdateCollection      (MsgUpdateCollection) returns (MsgUpdateCollectionResponse);
+  rpc CreateCollection      (MsgCreateCollection) returns (MsgCreateCollectionResponse);
+  rpc CreateDynamicStore    (MsgCreateDynamicStore) returns (MsgCreateDynamicStoreResponse);
+  rpc UpdateDynamicStore    (MsgUpdateDynamicStore) returns (MsgUpdateDynamicStoreResponse);
+  rpc DeleteDynamicStore    (MsgDeleteDynamicStore) returns (MsgDeleteDynamicStoreResponse);
+  rpc SetDynamicStoreValue  (MsgSetDynamicStoreValue) returns (MsgSetDynamicStoreValueResponse);
+  
+  // Helper message types for UniversalUpdateCollection subsets
+  rpc SetValidTokenIds(MsgSetValidTokenIds) returns (MsgSetValidTokenIdsResponse);
+  rpc SetManager(MsgSetManager) returns (MsgSetManagerResponse);
+  rpc SetCollectionMetadata(MsgSetCollectionMetadata) returns (MsgSetCollectionMetadataResponse);
+  rpc SetTokenMetadata(MsgSetTokenMetadata) returns (MsgSetTokenMetadataResponse);
+  rpc SetCustomData(MsgSetCustomData) returns (MsgSetCustomDataResponse);
+  rpc SetStandards(MsgSetStandards) returns (MsgSetStandardsResponse);
+  rpc SetCollectionApprovals(MsgSetCollectionApprovals) returns (MsgSetCollectionApprovalsResponse);
+  rpc SetIsArchived(MsgSetIsArchived) returns (MsgSetIsArchivedResponse);
+  rpc SetReservedProtocolAddress(MsgSetReservedProtocolAddress) returns (MsgSetReservedProtocolAddressResponse);
+  rpc CastVote(MsgCastVote) returns (MsgCastVoteResponse);
+}
+
+//Used for WASM bindings and JSON parsing
+message TokenizationCustomMsgType {
+  MsgCreateAddressLists createAddressListsMsg = 1;
+  MsgUniversalUpdateCollection universalUpdateCollectionMsg = 2;
+  MsgDeleteCollection deleteCollectionMsg = 3;
+  MsgTransferTokens transferTokensMsg = 4;
+  MsgUpdateUserApprovals updateUserApprovalsMsg = 5;
+  MsgUpdateCollection updateCollectionMsg = 6;
+  MsgCreateCollection createCollectionMsg = 7;
+  MsgCreateDynamicStore createDynamicStoreMsg = 8;
+  MsgUpdateDynamicStore updateDynamicStoreMsg = 9;
+  MsgDeleteDynamicStore deleteDynamicStoreMsg = 10;
+  MsgSetDynamicStoreValue setDynamicStoreValueMsg = 11;
+  MsgSetIncomingApproval setIncomingApprovalMsg = 14;
+  MsgDeleteIncomingApproval deleteIncomingApprovalMsg = 15;
+  MsgSetOutgoingApproval setOutgoingApprovalMsg = 16;
+  MsgDeleteOutgoingApproval deleteOutgoingApprovalMsg = 17;
+  MsgPurgeApprovals purgeApprovalsMsg = 18;
+  
+  // Helper message types for UniversalUpdateCollection subsets
+  MsgSetValidTokenIds setValidTokenIdsMsg = 19;
+  MsgSetManager setManagerMsg = 20;
+  MsgSetCollectionMetadata setCollectionMetadataMsg = 21;
+  MsgSetTokenMetadata setTokenMetadataMsg = 22;
+  MsgSetCustomData setCustomDataMsg = 23;
+  MsgSetStandards setStandardsMsg = 24;
+  MsgSetCollectionApprovals setCollectionApprovalsMsg = 25;
+  MsgSetIsArchived setIsArchivedMsg = 26;
+  MsgSetReservedProtocolAddress setReservedProtocolAddressMsg = 27;
+  MsgCastVote castVoteMsg = 28;
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "tokenization/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+message CosmosCoinWrapperPathAddObject {
+  string denom = 1;
+  ConversionWithoutDenom conversion = 2;
+  string symbol = 3;
+  repeated DenomUnit denomUnits = 4;
+  bool allowOverrideWithAnyValidToken = 5;
+  // The metadata for this wrapper path.
+  PathMetadata metadata = 6;
+}
+
+message AliasPathAddObject {
+  string denom = 1;
+  ConversionWithoutDenom conversion = 2;
+  string symbol = 3;
+  repeated DenomUnit denomUnits = 4;
+  // The metadata for this alias path.
+  PathMetadata metadata = 5;
+}
+
+message CosmosCoinBackedPathAddObject {
+  Conversion conversion = 1;
+}
+
+// InvariantsAddObject is used for adding invariants without specifying addresses.
+// Addresses are generated by the keeper and stored in the collection.
+message InvariantsAddObject {
+  // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
+  // This prevents time-based restrictions on token ownership.
+  bool noCustomOwnershipTimes = 1;
+  
+  // Maximum supply per token ID. If set, no balance can exceed this amount.
+  // This prevents any single token ID from having more than the specified supply.
+  string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
+  // Address will be generated by the keeper.
+  CosmosCoinBackedPathAddObject cosmosCoinBackedPath = 3;
+  
+  // If true, disallows any collection approvals that have overridesFromOutgoingApprovals or overridesToIncomingApprovals set to true.
+  // This prevents forceful transfers that bypass user-level approvals.
+  // This only applies to transfers where the from address does not equal "Mint".
+  bool noForcefulPostMintTransfers = 4;
+  
+  // If true, disallows pool creation with this collection's assets.
+  // When true, any attempt to create a pool with tokenization assets from this collection will fail.
+  bool disablePoolCreation = 5;
+}
+
+// MsgUniversalUpdateCollection is used to define MsgServer types for all requests and responses for Msgs of the tokens module.
+// It is a universal interface that can be used for both creating and updating collections.
+// We have it defined for legacy purposes, but it is recommended to use MsgCreateCollection and MsgUpdateCollection instead.
+message MsgUniversalUpdateCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/UniversalUpdateCollection";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection (0 for new collection).
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  //The default balances for the user
+  UserBalanceStore defaultBalances = 3;
+
+  // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateValidTokenIds = 4;
+
+  // New token IDs to add to this collection
+  repeated UintRange validTokenIds = 5; 
+
+  // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionPermissions = 6;
+  
+  // New collection permissions to set.
+  CollectionPermissions collectionPermissions = 7;
+  
+  // Indicates if the manager should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateManager = 8;
+  
+  // New manager to set.
+  string manager = 9;
+  
+  // Indicates if the collection metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionMetadata = 10;
+  
+  // New collection metadata to set.
+  CollectionMetadata collectionMetadata = 11;
+  
+  // Indicates if the token metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateTokenMetadata = 12;
+  
+  // New token metadata to set.
+  repeated TokenMetadata tokenMetadata = 13;
+  
+  
+  // Indicates if the custom data should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCustomData = 14;
+  
+  // New custom data to set.
+  string customData = 15;
+  
+  // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionApprovals = 16;
+  
+  // New collection approvals to set.
+  repeated CollectionApproval collectionApprovals = 17;
+  
+  // Indicates if the standards should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateStandards = 18;
+  
+  // New standards to set.
+  repeated string standards = 19;
+  
+  // Indicates if the isArchived should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateIsArchived = 20;
+  
+  // New isArchived to set.
+  bool isArchived = 21;
+
+  // Coins to be transferred to the mint escrow address.
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 22;
+
+  // IBC wrapper paths to add.
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 23;
+
+  // Collection-level invariants that cannot be broken.
+  // These are set upon genesis and cannot be modified.
+  // Addresses are generated by the keeper and stored in the collection.
+  InvariantsAddObject invariants = 24;
+
+  // Alias (non-wrapping) paths to add.
+  repeated AliasPathAddObject aliasPathsToAdd = 25;
+}
+
+// MsgUniversalUpdateCollectionResponse is the response to MsgUniversalUpdateCollection.
+message MsgUniversalUpdateCollectionResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgUpdateCollection is used to update a collection.
+message MsgUpdateCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/UpdateCollection";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection (0 for new collection).
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // Indicates if the valid token IDs should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateValidTokenIds = 3;
+
+  // New token IDs to add to this collection
+  repeated UintRange validTokenIds = 4;
+  
+  // Indicates if collection permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionPermissions = 5;
+  
+  // New collection permissions to set.
+  CollectionPermissions collectionPermissions = 6;
+  
+  // Indicates if the manager should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateManager = 7;
+  
+  // New manager to set.
+  string manager = 8;
+  
+  // Indicates if the collection metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionMetadata = 9;
+  
+  // New collection metadata to set.
+  CollectionMetadata collectionMetadata = 10;
+  
+  // Indicates if the token metadata should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateTokenMetadata = 11;
+  
+  // New token metadata to set.
+  repeated TokenMetadata tokenMetadata = 12;
+  
+  
+  // Indicates if the custom data should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCustomData = 13;
+  
+  // New custom data to set.
+  string customData = 14;
+  
+  // Indicates if collection approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateCollectionApprovals = 15;
+  
+  // New collection approvals to set.
+  repeated CollectionApproval collectionApprovals = 16;
+  
+  // Indicates if the standards should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateStandards = 17;
+  
+  // New standards to set.
+  repeated string standards = 18;
+  
+  // Indicates if the isArchived should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateIsArchived = 19;
+  
+  // New isArchived to set.
+  bool isArchived = 20;
+
+  // Coins to be transferred to the mint escrow address.
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 21;
+
+  // IBC wrapper paths to add.
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 22;
+
+  // Collection-level invariants that cannot be broken.
+  // These are set upon genesis and cannot be modified.
+  // Addresses are generated by the keeper and stored in the collection.
+  InvariantsAddObject invariants = 23;
+
+  // Alias (non-wrapping) paths to add.
+  repeated AliasPathAddObject aliasPathsToAdd = 24;
+}
+
+// MsgUpdateCollectionResponse is the response to MsgUpdateCollection.
+message MsgUpdateCollectionResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgCreateCollection is used to create a new collection.
+message MsgCreateCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/CreateCollection";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  //The default balances for the user
+  UserBalanceStore defaultBalances = 2;
+
+  // New token IDs to add to this collection
+  repeated UintRange validTokenIds = 3; 
+  
+  // Collection permissions.
+  CollectionPermissions collectionPermissions = 4;
+  
+  // Manager address.
+  string manager = 5;
+  
+  // Collection metadata.
+  CollectionMetadata collectionMetadata = 6;
+  
+  // Token metadata entries.
+  repeated TokenMetadata tokenMetadata = 7;
+  
+  // Custom data.
+  string customData = 8;
+  
+  // Collection approvals.
+  repeated CollectionApproval collectionApprovals = 9;
+  
+  // Standards entries.
+  repeated string standards = 10;
+  
+  // isArchived flag.
+  bool isArchived = 11;
+
+  // Coins to be transferred to the mint escrow address.
+  repeated cosmos.base.v1beta1.Coin mintEscrowCoinsToTransfer = 12;
+
+  // IBC wrapper paths to add.
+  repeated CosmosCoinWrapperPathAddObject cosmosCoinWrapperPathsToAdd = 13;
+
+  // Collection-level invariants that cannot be broken.
+  // Addresses are generated by the keeper and stored in the collection.
+  InvariantsAddObject invariants = 14;
+
+  // Alias (non-wrapping) paths to add.
+  repeated AliasPathAddObject aliasPathsToAdd = 15;
+}
+
+// MsgCreateCollectionResponse is the response to MsgCreateCollection.
+message MsgCreateCollectionResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgCreateAddressLists is used to create address lists.
+message MsgCreateAddressLists {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/CreateAddressLists";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // Address lists to create. The createdBy field will be automatically set to the creator address.
+  repeated AddressListInput addressLists = 2;
+}
+
+// MsgCreateAddressListsResponse is the response to MsgCreateAddressLists.
+message MsgCreateAddressListsResponse {}
+
+// MsgTransferTokens is used to transfer tokens.
+message MsgTransferTokens {
+  option (cosmos.msg.v1.signer) = "creator";
+    option (amino.name) = "tokenization/TransferTokens";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // Transfers to execute.
+  repeated Transfer transfers = 3;
+}
+
+// MsgTransferTokensResponse is the response to MsgTransferTokens.
+message MsgTransferTokensResponse {}
+
+// MsgDeleteCollection is used to delete a collection.
+message MsgDeleteCollection {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/DeleteCollection";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgDeleteCollectionResponse is the response to MsgDeleteCollection.
+message MsgDeleteCollectionResponse {}
+
+// MsgUpdateUserApprovals is used to update user approvals.
+message MsgUpdateUserApprovals {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/UpdateUserApprovals";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // Indicates if outgoing approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateOutgoingApprovals = 3;
+  
+  // New outgoing approvals to set. 
+  repeated UserOutgoingApproval outgoingApprovals = 4;
+  
+  // Indicates if incoming approvals should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateIncomingApprovals = 5;
+  
+  // New incoming approvals to set.
+  repeated UserIncomingApproval incomingApprovals = 6;
+  
+  // Indicates if auto-approve settings for self-initiated outgoing transfers should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateAutoApproveSelfInitiatedOutgoingTransfers = 7;
+  
+  // Auto-approve setting for self-initiated outgoing transfers.
+  bool autoApproveSelfInitiatedOutgoingTransfers = 8;
+  
+  // Indicates if auto-approve settings for self-initiated incoming transfers should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateAutoApproveSelfInitiatedIncomingTransfers = 9;
+  
+  // Auto-approve setting for self-initiated incoming transfers.
+  bool autoApproveSelfInitiatedIncomingTransfers = 10;
+
+  // Indicates if auto-approve settings for all incoming transfers should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateAutoApproveAllIncomingTransfers = 11;
+
+  // Auto-approve setting for all incoming transfers.
+  bool autoApproveAllIncomingTransfers = 12;
+
+  // Indicates if user permissions should be updated. If true, we set to value in this Msg. If false, we keep existing value.
+  bool updateUserPermissions = 13;
+  
+  // New user permissions to set.
+  UserPermissions userPermissions = 14;
+}
+
+// MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.
+message MsgUpdateUserApprovalsResponse {}
+
+// MsgSetIncomingApproval is a helper message to set a single incoming approval.
+message MsgSetIncomingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetIncomingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The incoming approval to set.
+  UserIncomingApproval approval = 3;
+}
+
+// MsgSetIncomingApprovalResponse is the response to MsgSetIncomingApproval.
+message MsgSetIncomingApprovalResponse {}
+
+// MsgDeleteIncomingApproval is a helper message to delete a single incoming approval.
+message MsgDeleteIncomingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/DeleteIncomingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The ID of the approval to delete.
+  string approvalId = 3;
+}
+
+// MsgDeleteIncomingApprovalResponse is the response to MsgDeleteIncomingApproval.
+message MsgDeleteIncomingApprovalResponse {}
+
+// MsgSetOutgoingApproval is a helper message to set a single outgoing approval.
+message MsgSetOutgoingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetOutgoingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The outgoing approval to set.
+  UserOutgoingApproval approval = 3;
+}
+
+// MsgSetOutgoingApprovalResponse is the response to MsgSetOutgoingApproval.
+message MsgSetOutgoingApprovalResponse {}
+
+// MsgDeleteOutgoingApproval is a helper message to delete a single outgoing approval.
+message MsgDeleteOutgoingApproval {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/DeleteOutgoingApproval";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The ID of the approval to delete.
+  string approvalId = 3;
+}
+
+// MsgDeleteOutgoingApprovalResponse is the response to MsgDeleteOutgoingApproval.
+message MsgDeleteOutgoingApprovalResponse {}
+
+// MsgPurgeApprovals is a helper message to purge expired approvals.
+message MsgPurgeApprovals {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/PurgeApprovals";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // Whether to purge expired approvals (approvals with no future valid transfer times).
+  bool purgeExpired = 3;
+  
+  // Address of the user whose approvals to purge. If empty, defaults to creator.
+  string approverAddress = 4;
+  
+  // Whether to purge counterparty approvals (approvals where the creator is the only initiator).
+  bool purgeCounterpartyApprovals = 5;
+  
+  // Specific approvals to purge. If empty, purges all applicable approvals based on other flags.
+  repeated ApprovalIdentifierDetails approvalsToPurge = 6;
+}
+
+// MsgPurgeApprovalsResponse is the response to MsgPurgeApprovals.
+message MsgPurgeApprovalsResponse {
+  // Number of approvals purged.
+  string numPurged = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgCreateDynamicStore is used to create a new dynamic store.
+message MsgCreateDynamicStore {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/CreateDynamicStore";
+
+  // Address of the creator.
+  string creator = 1;
+  // The default value for uninitialized addresses (true/false).
+  bool defaultValue = 2;
+  // URI for additional metadata or resources associated with this dynamic store.
+  string uri = 3;
+  // Custom data field for storing arbitrary data associated with this dynamic store.
+  string customData = 4;
+}
+
+// MsgCreateDynamicStoreResponse is the response to MsgCreateDynamicStore.
+message MsgCreateDynamicStoreResponse {
+  // ID of the dynamic store.
+  string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgUpdateDynamicStore is used to update an existing dynamic store.
+message MsgUpdateDynamicStore {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/UpdateDynamicStore";
+
+  // Address of the creator.
+  string creator = 1;
+  // ID of the dynamic store to update.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // The new default value for uninitialized addresses (true/false).
+  bool defaultValue = 3;
+  // The global kill switch state (true = enabled, false = disabled/halted).
+  // Callers should query the current value first if they want to keep it unchanged.
+  bool globalEnabled = 4;
+  // URI for additional metadata or resources associated with this dynamic store.
+  string uri = 5;
+  // Custom data field for storing arbitrary data associated with this dynamic store.
+  string customData = 6;
+}
+
+// MsgUpdateDynamicStoreResponse is the response to MsgUpdateDynamicStore.
+message MsgUpdateDynamicStoreResponse {}
+
+// MsgDeleteDynamicStore is used to delete a dynamic store.
+message MsgDeleteDynamicStore {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/DeleteDynamicStore";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the dynamic store to delete.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgDeleteDynamicStoreResponse is the response to MsgDeleteDynamicStore.
+message MsgDeleteDynamicStoreResponse {}
+
+// MsgSetDynamicStoreValue is used to set a boolean value for a specific address in a dynamic store.
+message MsgSetDynamicStoreValue {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetDynamicStoreValue";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the dynamic store.
+  string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The address for which to set the value.
+  string address = 3;
+  
+  // The boolean value to set (true/false).
+  bool value = 4;
+}
+
+// MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
+message MsgSetDynamicStoreValueResponse {}
+
+// Helper message types for UniversalUpdateCollection subsets
+// These are convenience messages that set specific subsets of the UniversalUpdateCollection message
+
+// MsgSetValidTokenIds sets the validTokenIds and canUpdateValidTokenIds permission
+message MsgSetValidTokenIds {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetValidTokenIds";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New token IDs to add to this collection
+  repeated UintRange validTokenIds = 3;
+  
+  // Permission to update valid token IDs
+  repeated TokenIdsActionPermission canUpdateValidTokenIds = 4;
+}
+
+// MsgSetValidTokenIdsResponse is the response to MsgSetValidTokenIds.
+message MsgSetValidTokenIdsResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetManager sets the manager and canUpdateManager permission
+message MsgSetManager {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetManager";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New manager to set.
+  string manager = 3;
+  
+  // Permission to update manager
+  repeated ActionPermission canUpdateManager = 4;
+}
+
+// MsgSetManagerResponse is the response to MsgSetManager.
+message MsgSetManagerResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetCollectionMetadata sets the collection metadata and canUpdateCollectionMetadata permission
+message MsgSetCollectionMetadata {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetCollectionMetadata";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New collection metadata to set.
+  CollectionMetadata collectionMetadata = 3;
+  
+  // Permission to update collection metadata
+  repeated ActionPermission canUpdateCollectionMetadata = 4;
+}
+
+// MsgSetCollectionMetadataResponse is the response to MsgSetCollectionMetadata.
+message MsgSetCollectionMetadataResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetTokenMetadata sets the token metadata and canUpdateTokenMetadata permission
+message MsgSetTokenMetadata {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetTokenMetadata";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New token metadata to set.
+  repeated TokenMetadata tokenMetadata = 3;
+  
+  // Permission to update token metadata
+  repeated TokenIdsActionPermission canUpdateTokenMetadata = 4;
+}
+
+// MsgSetTokenMetadataResponse is the response to MsgSetTokenMetadata.
+message MsgSetTokenMetadataResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetCustomData sets the custom data and canUpdateCustomData permission
+message MsgSetCustomData {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetCustomData";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New custom data to set.
+  string customData = 3;
+  
+  // Permission to update custom data
+  repeated ActionPermission canUpdateCustomData = 4;
+}
+
+// MsgSetCustomDataResponse is the response to MsgSetCustomData.
+message MsgSetCustomDataResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetStandards sets the standards and canUpdateStandards permission
+message MsgSetStandards {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetStandards";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New standards to set.
+  repeated string standards = 3;
+  
+  // Permission to update standards
+  repeated ActionPermission canUpdateStandards = 4;
+}
+
+// MsgSetStandardsResponse is the response to MsgSetStandards.
+message MsgSetStandardsResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetCollectionApprovals sets the collection approvals and canUpdateCollectionApprovals permission
+message MsgSetCollectionApprovals {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetCollectionApprovals";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New collection approvals to set.
+  repeated CollectionApproval collectionApprovals = 3;
+  
+  // Permission to update collection approvals
+  repeated CollectionApprovalPermission canUpdateCollectionApprovals = 4;
+}
+
+// MsgSetCollectionApprovalsResponse is the response to MsgSetCollectionApprovals.
+message MsgSetCollectionApprovalsResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetIsArchived sets the isArchived and canArchiveCollection permission
+message MsgSetIsArchived {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/SetIsArchived";
+
+  // Address of the creator.
+  string creator = 1;
+  
+  // ID of the collection.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // New isArchived to set.
+  bool isArchived = 3;
+  
+  // Permission to archive collection
+  repeated ActionPermission canArchiveCollection = 4;
+}
+
+// MsgSetIsArchivedResponse is the response to MsgSetIsArchived.
+message MsgSetIsArchivedResponse {
+  // ID of the collection.
+  string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// MsgSetReservedProtocolAddress sets or unsets a reserved protocol address (governance-only).
+message MsgSetReservedProtocolAddress {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "tokenization/SetReservedProtocolAddress";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // Address to set or unset as reserved protocol address.
+  string address = 2;
+
+  // Whether the address should be a reserved protocol address (true) or not (false).
+  bool isReservedProtocol = 3;
+}
+
+// MsgSetReservedProtocolAddressResponse is the response to MsgSetReservedProtocolAddress.
+message MsgSetReservedProtocolAddressResponse {}
+
+// MsgCastVote allows a voter to cast or update their vote for a voting challenge.
+message MsgCastVote {
+  option (cosmos.msg.v1.signer) = "creator";
+  option (amino.name) = "tokenization/CastVote";
+
+  // The address of the voter casting the vote.
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  
+  // The collection ID for the voting challenge.
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  
+  // The approval level ("collection", "incoming", or "outgoing").
+  string approvalLevel = 3;
+  
+  // The approver address (empty string for collection-level approvals).
+  string approverAddress = 4;
+  
+  // The approval ID.
+  string approvalId = 5;
+  
+  // The proposal ID (challenge ID) from the VotingChallenge.
+  string proposalId = 6;
+  
+  // The percentage weight (0-100) allocated to "yes" vote.
+  // The remaining percentage (100 - yesWeight) is allocated to "no" vote.
+  // Example: yesWeight=70 means 70% yes, 30% no.
+  string yesWeight = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+message MsgCastVoteResponse {}
