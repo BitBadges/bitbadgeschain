@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/snapshot"
@@ -24,6 +23,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+	bitbadgesclient "github.com/bitbadges/bitbadgeschain/client"
 )
 
 func initRootCmd(
@@ -42,12 +42,14 @@ func initRootCmd(
 	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
+	// Use custom KeyCommands wrapper that ensures eth_secp256k1 keyring options are applied
+	// This matches the Cosmos EVM reference implementation pattern
 	rootCmd.AddCommand(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(),
+		bitbadgesclient.KeyCommands(app.DefaultNodeHome, false), // false = don't default to eth keys, but support them
 	)
 }
 
