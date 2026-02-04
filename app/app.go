@@ -15,7 +15,8 @@ import (
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	_ "cosmossdk.io/x/feegrant/module" // import for side-effects
-	_ "cosmossdk.io/x/upgrade"         // import for side-effects
+	txsigning "cosmossdk.io/x/tx/signing"
+	_ "cosmossdk.io/x/upgrade" // import for side-effects
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -79,6 +80,12 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
+	precisebank "github.com/cosmos/evm/x/precisebank"
+	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
+	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
+	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+
 	"github.com/bitbadges/bitbadgeschain/app/ante"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
@@ -130,6 +137,7 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
+	PreciseBankKeeper     precisebankkeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
@@ -170,6 +178,7 @@ type App struct {
 	GammKeeper        gammkeeper.Keeper
 	PoolManagerKeeper poolmanager.Keeper
 	SendmanagerKeeper sendmanagermodulekeeper.Keeper
+	EVMKeeper         *evmkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -255,6 +264,9 @@ func New(
 				// read the depinject documentation and depinject module wiring for more information
 				// on available options and how to use them.
 			),
+			depinject.Provide(
+				ProvideEVMGetSigners,
+			),
 		)
 	)
 
@@ -299,6 +311,19 @@ func New(
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 	app.BaseApp.SetCircuitBreaker(&app.CircuitBreakerKeeper)
 
+	// Create PreciseBankKeeper after app is built
+	// PreciseBankKeeper wraps BankKeeper to support fractional balances for non-18 decimal tokens
+	precisebankKey := storetypes.NewKVStoreKey(precisebanktypes.StoreKey)
+	if err := app.RegisterStores(precisebankKey); err != nil {
+		return nil, fmt.Errorf("failed to register precisebank store: %w", err)
+	}
+	app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
+		app.appCodec,
+		precisebankKey,
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+
 	// register legacy modules
 
 	if err := app.registerIBCModules(appOpts); err != nil {
@@ -312,6 +337,22 @@ func New(
 	storeService, err := app.registerWasmModules(appOpts)
 	if err != nil {
 		return nil, err
+	}
+
+	// Register EVM modules first (PreciseBank depends on EVM keeper)
+	if err := app.registerEVMModules(appOpts); err != nil {
+		return nil, err
+	}
+
+	// Register PreciseBank module only if EVM keeper was successfully created
+	// PreciseBank's InitGenesis requires EVM keeper to be initialized
+	precisebankModule := precisebank.NewAppModule(
+		app.PreciseBankKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+	if err := app.RegisterModules(precisebankModule); err != nil {
+		return nil, fmt.Errorf("failed to register precisebank module: %w", err)
 	}
 
 	// Wire up keepers for address checks
@@ -499,6 +540,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 func (app *App) InterfaceRegistry() codectypes.InterfaceRegistry {
 	return app.interfaceRegistry
+}
+
+// ProvideEVMGetSigners provides the custom signer for EVM MsgEthereumTx
+func ProvideEVMGetSigners() txsigning.CustomGetSigner {
+	return evmtypes.MsgEthereumTxCustomGetSigner
 }
 
 // GetMaccPerms returns a copy of the module account permissions

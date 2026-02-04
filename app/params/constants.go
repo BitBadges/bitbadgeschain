@@ -1,6 +1,7 @@
 package params
 
 import (
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -38,5 +39,7 @@ func InitSDKConfigWithoutSeal() *sdk.Config {
 
 func InitSDKConfig() {
 	config := InitSDKConfigWithoutSeal()
+	config.SetCoinType(60) // Ethereum's coin type
+	config.SetPurpose(hd.CreateHDPath(60, 0, 0).Purpose)
 	config.Seal()
 }

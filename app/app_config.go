@@ -80,6 +80,9 @@ import (
 
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 
+	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
@@ -88,9 +91,6 @@ var (
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
-	// NOTE: Capability module must occur first so that it can initialize any capabilities
-	// so that other modules that want to create or claim capabilities afterwards in InitChain
-	// can do so safely.
 	genesisModuleOrder = []string{
 		// cosmos-sdk/ibc modules
 		authtypes.ModuleName,
@@ -126,7 +126,9 @@ var (
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/initGenesis
+		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
+		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -158,7 +160,9 @@ var (
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/beginBlockers
+		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
+		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
 	endBlockers = []string{
@@ -185,12 +189,15 @@ var (
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/endBlockers
+		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
+		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
 	preBlockers = []string{
 		upgradetypes.ModuleName,
 		authtypes.ModuleName, // NEW - required for v0.53.x
+		evmtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/preBlockers
 	}
 
@@ -210,6 +217,8 @@ var (
 		{Account: wasmxmoduletypes.ModuleName},
 		{Account: gammtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: poolmanagertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: precisebanktypes.ModuleName, Permissions: []string{}}, // PreciseBank module account
+		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -360,7 +369,8 @@ var (
 				Name:   sendmanagermoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&sendmanagermoduletypes.Module{}),
 			},
-// this line is used by starport scaffolding # stargate/app/moduleConfig
+			// EVM module is registered manually in app/evm.go via registerEVMModules
+			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
 	})
 )
