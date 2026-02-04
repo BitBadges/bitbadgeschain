@@ -20,33 +20,34 @@ func TestPrefixCollisionTestSuite(t *testing.T) {
 
 // TestPrefixCollision_OverlappingPrefixes tests that overlapping prefixes are detected
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_OverlappingPrefixes() {
-	// Create mock routers
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badgeslp:")
+	// Create mock routers with actually overlapping prefixes
+	// Use "a:" and "a:b:" which actually overlap (one is a prefix of the other)
+	router1 := testutil.GenerateMockRouter("a:")
+	router2 := testutil.GenerateMockRouter("a:b:")
 
 	// Register first prefix
-	err := s.Keeper.RegisterRouter("badges:", router1)
+	err := s.Keeper.RegisterRouter("a:", router1)
 	s.Require().NoError(err)
 
 	// Attempt to register overlapping prefix - should fail
-	// "badgeslp:" starts with "badges:", so they overlap
-	err = s.Keeper.RegisterRouter("badgeslp:", router2)
+	// "a:b:" starts with "a:", so they overlap
+	err = s.Keeper.RegisterRouter("a:b:", router2)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "overlaps")
 }
 
 // TestPrefixCollision_SubPrefixRegistration tests sub-prefix registration
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_SubPrefixRegistration() {
-	router1 := testutil.GenerateMockRouter("badgeslp:")
-	router2 := testutil.GenerateMockRouter("badges:")
+	router1 := testutil.GenerateMockRouter("a:b:")
+	router2 := testutil.GenerateMockRouter("a:")
 
 	// Register longer prefix first
-	err := s.Keeper.RegisterRouter("badgeslp:", router1)
+	err := s.Keeper.RegisterRouter("a:b:", router1)
 	s.Require().NoError(err)
 
 	// Register shorter prefix (sub-prefix) - should be prevented
-	// "badgeslp:" starts with "badges:", so they overlap
-	err = s.Keeper.RegisterRouter("badges:", router2)
+	// "a:b:" starts with "a:", so they overlap
+	err = s.Keeper.RegisterRouter("a:", router2)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "overlaps")
 }
@@ -54,7 +55,7 @@ func (s *PrefixCollisionTestSuite) TestPrefixCollision_SubPrefixRegistration() {
 // TestPrefixCollision_EmptyPrefix tests empty prefix handling
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_EmptyPrefix() {
 	router := testutil.GenerateMockRouter("")
-	
+
 	err := s.Keeper.RegisterRouter("", router)
 	s.Require().Error(err, "Empty prefix should be rejected")
 	s.Require().Contains(err.Error(), "cannot be empty")
@@ -78,14 +79,13 @@ func (s *PrefixCollisionTestSuite) TestPrefixCollision_DuplicatePrefix() {
 func (s *PrefixCollisionTestSuite) TestPrefixCollision_EmptyDenomRouting() {
 	// Test that empty denom is rejected (validation prevents empty denoms)
 	denom := ""
-	
+
 	// Create a test address directly instead of parsing Bech32 to avoid prefix issues
 	// Use a simple address for testing
 	testAddr := sdk.AccAddress("test-address-123456")
-	
+
 	// Empty denom should be rejected by validation
 	_, err := s.Keeper.GetBalanceWithAliasRouting(s.Ctx, testAddr, denom)
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "cannot be empty")
 }
-

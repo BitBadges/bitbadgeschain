@@ -8,8 +8,8 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "managersplitter/permissions.proto";
 import "managersplitter/params.proto";
-import "badges/tx.proto";
-import "badges/permissions.proto";
+import "tokenization/tx.proto";
+import "tokenization/permissions.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/managersplitter/types";
 
@@ -121,7 +121,7 @@ message MsgExecuteUniversalUpdateCollection {
   string managerSplitterAddress = 2;
 
   // The UniversalUpdateCollection message to execute.
-  badges.MsgUniversalUpdateCollection universalUpdateCollectionMsg = 3;
+  tokenization.MsgUniversalUpdateCollection universalUpdateCollectionMsg = 3;
 }
 
 // MsgExecuteUniversalUpdateCollectionResponse is the response to MsgExecuteUniversalUpdateCollection.

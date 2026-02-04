@@ -1,5 +1,5 @@
 syntax = "proto3";
-package badges.v22;  
+package tokenization.v22;  
 
 import "gogoproto/gogo.proto";
 import "tokenization/v22/params.proto";

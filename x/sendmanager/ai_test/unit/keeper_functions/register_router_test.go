@@ -47,46 +47,46 @@ func (suite *RegisterRouterTestSuite) TestRegisterRouter_DuplicatePrefix() {
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_OverlappingPrefixes_Prevented() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badgeslp:")
+	router1 := testutil.GenerateMockRouter("a:")
+	router2 := testutil.GenerateMockRouter("a:b:")
 	
 	// Register longer prefix first
-	err := suite.Keeper.RegisterRouter("badgeslp:", router2)
+	err := suite.Keeper.RegisterRouter("a:b:", router2)
 	suite.Require().NoError(err)
 	
 	// Try to register shorter prefix that overlaps - should fail
-	// "badgeslp:" starts with "badges:", so they overlap
-	err = suite.Keeper.RegisterRouter("badges:", router1)
+	// "a:b:" starts with "a:", so they overlap
+	err = suite.Keeper.RegisterRouter("a:", router1)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_OverlappingPrefixes_ReverseOrder() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badgeslp:")
+	router1 := testutil.GenerateMockRouter("a:")
+	router2 := testutil.GenerateMockRouter("a:b:")
 	
 	// Register shorter prefix first
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("a:", router1)
 	suite.Require().NoError(err)
 	
 	// Try to register longer prefix that overlaps - should fail
-	// "badgeslp:" starts with "badges:", so they overlap
-	err = suite.Keeper.RegisterRouter("badgeslp:", router2)
+	// "a:b:" starts with "a:", so they overlap
+	err = suite.Keeper.RegisterRouter("a:b:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }
 
 func (suite *RegisterRouterTestSuite) TestRegisterRouter_LongestPrefixMatching() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badgeslp:")
+	router1 := testutil.GenerateMockRouter("a:")
+	router2 := testutil.GenerateMockRouter("a:b:")
 	
 	// Register shorter prefix first
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("a:", router1)
 	suite.Require().NoError(err)
 	
 	// This should fail due to overlap
-	// "badgeslp:" starts with "badges:", so they overlap
-	err = suite.Keeper.RegisterRouter("badgeslp:", router2)
+	// "a:b:" starts with "a:", so they overlap
+	err = suite.Keeper.RegisterRouter("a:b:", router2)
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "overlaps")
 }

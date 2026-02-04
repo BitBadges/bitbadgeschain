@@ -29,7 +29,7 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 		reader := bytes.NewReader(jsonData)
 
 		isTokenizationModuleMsg := false
-		var tokenizationCustomMsg tokenTypes.BadgeCustomMsgType
+		var tokenizationCustomMsg tokenTypes.TokenizationCustomMsgType
 		err = jsonpb.Unmarshal(reader, &tokenizationCustomMsg)
 		if err == nil {
 			isTokenizationModuleMsg = true
@@ -72,7 +72,7 @@ func EncodeBitBadgesModuleMessage() wasmKeeper.CustomEncoder {
 
 		if isTokenizationModuleMsg {
 			reader = bytes.NewReader(jsonData)
-			var tokenizationCustomMsg tokenTypes.BadgeCustomMsgType
+			var tokenizationCustomMsg tokenTypes.TokenizationCustomMsgType
 			err = jsonpb.Unmarshal(reader, &tokenizationCustomMsg)
 			if err != nil {
 				return nil, sdkerrors.Wrap(err, err.Error())
