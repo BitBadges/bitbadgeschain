@@ -27,7 +27,7 @@ const (
 	GasSetOutgoingApproval = 30_000
 
 	// Gas costs for queries (lower since they're read-only)
-	GasGetCollection              = 5_000
+	GasGetCollection             = 5_000
 	GasGetBalance                = 5_000
 	GasGetAddressList            = 5_000
 	GasGetApprovalTracker        = 5_000
@@ -35,7 +35,7 @@ const (
 	GasGetETHSignatureTracker    = 5_000
 	GasGetDynamicStore           = 5_000
 	GasGetDynamicStoreValue      = 5_000
-	GasGetWrappableBalances       = 5_000
+	GasGetWrappableBalances      = 5_000
 	GasIsAddressReservedProtocol = 2_000
 	GasGetAllReservedProtocol    = 5_000
 	GasGetVote                   = 5_000
@@ -215,23 +215,23 @@ func (Precompile) IsTransaction(method *abi.Method) bool {
 
 // Method name constants
 const (
-	TransferTokensMethod      = "transferTokens"
-	SetIncomingApprovalMethod = "setIncomingApproval"
-	SetOutgoingApprovalMethod = "setOutgoingApproval"
-	GetCollectionMethod       = "getCollection"
-	GetBalanceMethod          = "getBalance"
-	GetAddressListMethod      = "getAddressList"
-	GetApprovalTrackerMethod  = "getApprovalTracker"
-	GetChallengeTrackerMethod = "getChallengeTracker"
-	GetETHSignatureTrackerMethod = "getETHSignatureTracker"
-	GetDynamicStoreMethod     = "getDynamicStore"
-	GetDynamicStoreValueMethod = "getDynamicStoreValue"
-	GetWrappableBalancesMethod = "getWrappableBalances"
-	IsAddressReservedProtocolMethod = "isAddressReservedProtocol"
+	TransferTokensMethod                  = "transferTokens"
+	SetIncomingApprovalMethod             = "setIncomingApproval"
+	SetOutgoingApprovalMethod             = "setOutgoingApproval"
+	GetCollectionMethod                   = "getCollection"
+	GetBalanceMethod                      = "getBalance"
+	GetAddressListMethod                  = "getAddressList"
+	GetApprovalTrackerMethod              = "getApprovalTracker"
+	GetChallengeTrackerMethod             = "getChallengeTracker"
+	GetETHSignatureTrackerMethod          = "getETHSignatureTracker"
+	GetDynamicStoreMethod                 = "getDynamicStore"
+	GetDynamicStoreValueMethod            = "getDynamicStoreValue"
+	GetWrappableBalancesMethod            = "getWrappableBalances"
+	IsAddressReservedProtocolMethod       = "isAddressReservedProtocol"
 	GetAllReservedProtocolAddressesMethod = "getAllReservedProtocolAddresses"
-	GetVoteMethod             = "getVote"
-	GetVotesMethod            = "getVotes"
-	ParamsMethod              = "params"
+	GetVoteMethod                         = "getVote"
+	GetVotesMethod                        = "getVotes"
+	ParamsMethod                          = "params"
 )
 
 // TransferTokens executes a token transfer via the tokenization module
@@ -345,9 +345,9 @@ func (p Precompile) SetIncomingApproval(ctx sdk.Context, method *abi.Method, arg
 	}
 
 	approvalStruct, ok := args[1].(struct {
-		ApprovalId        string   `json:"approvalId"`
-		FromListId        string   `json:"fromListId"`
-		InitiatedByListId string   `json:"initiatedByListId"`
+		ApprovalId        string `json:"approvalId"`
+		FromListId        string `json:"fromListId"`
+		InitiatedByListId string `json:"initiatedByListId"`
 		TransferTimes     []struct {
 			Start *big.Int `json:"start"`
 			End   *big.Int `json:"end"`
@@ -445,9 +445,9 @@ func (p Precompile) SetOutgoingApproval(ctx sdk.Context, method *abi.Method, arg
 	}
 
 	approvalStruct, ok := args[1].(struct {
-		ApprovalId        string   `json:"approvalId"`
-		ToListId          string   `json:"toListId"`
-		InitiatedByListId string   `json:"initiatedByListId"`
+		ApprovalId        string `json:"approvalId"`
+		ToListId          string `json:"toListId"`
+		InitiatedByListId string `json:"initiatedByListId"`
 		TransferTimes     []struct {
 			Start *big.Int `json:"start"`
 			End   *big.Int `json:"end"`
@@ -671,13 +671,13 @@ func (p Precompile) GetApprovalTracker(ctx sdk.Context, method *abi.Method, args
 
 	// Query the approval tracker
 	req := &tokenizationtypes.QueryGetApprovalTrackerRequest{
-		CollectionId:     collectionId.String(),
-		ApprovalLevel:     approvalLevel,
-		ApproverAddress:   approverCosmosAddr,
-		AmountTrackerId:   amountTrackerId,
-		TrackerType:       trackerType,
-		ApprovedAddress:   approvedCosmosAddr,
-		ApprovalId:        approvalId,
+		CollectionId:    collectionId.String(),
+		ApprovalLevel:   approvalLevel,
+		ApproverAddress: approverCosmosAddr,
+		AmountTrackerId: amountTrackerId,
+		TrackerType:     trackerType,
+		ApprovedAddress: approvedCosmosAddr,
+		ApprovalId:      approvalId,
 	}
 	resp, err := p.tokenizationKeeper.GetApprovalTracker(ctx, req)
 	if err != nil {
@@ -730,12 +730,12 @@ func (p Precompile) GetChallengeTracker(ctx sdk.Context, method *abi.Method, arg
 
 	// Query the challenge tracker
 	req := &tokenizationtypes.QueryGetChallengeTrackerRequest{
-		CollectionId:      collectionId.String(),
-		ApprovalLevel:     approvalLevel,
-		ApproverAddress:   approverCosmosAddr,
+		CollectionId:       collectionId.String(),
+		ApprovalLevel:      approvalLevel,
+		ApproverAddress:    approverCosmosAddr,
 		ChallengeTrackerId: challengeTrackerId,
-		LeafIndex:         leafIndex.String(),
-		ApprovalId:        approvalId,
+		LeafIndex:          leafIndex.String(),
+		ApprovalId:         approvalId,
 	}
 	resp, err := p.tokenizationKeeper.GetChallengeTracker(ctx, req)
 	if err != nil {
@@ -784,12 +784,12 @@ func (p Precompile) GetETHSignatureTracker(ctx sdk.Context, method *abi.Method, 
 
 	// Query the ETH signature tracker
 	req := &tokenizationtypes.QueryGetETHSignatureTrackerRequest{
-		CollectionId:      collectionId.String(),
-		ApprovalLevel:     approvalLevel,
-		ApproverAddress:   approverCosmosAddr,
-		ApprovalId:        approvalId,
+		CollectionId:       collectionId.String(),
+		ApprovalLevel:      approvalLevel,
+		ApproverAddress:    approverCosmosAddr,
+		ApprovalId:         approvalId,
 		ChallengeTrackerId: challengeTrackerId,
-		Signature:         signature,
+		Signature:          signature,
 	}
 	resp, err := p.tokenizationKeeper.GetETHSignatureTracker(ctx, req)
 	if err != nil {
@@ -853,8 +853,8 @@ func (p Precompile) GetDynamicStoreValue(ctx sdk.Context, method *abi.Method, ar
 
 	// Query the dynamic store value
 	req := &tokenizationtypes.QueryGetDynamicStoreValueRequest{
-		StoreId:  storeId.String(),
-		Address:  userCosmosAddr,
+		StoreId: storeId.String(),
+		Address: userCosmosAddr,
 	}
 	resp, err := p.tokenizationKeeper.GetDynamicStoreValue(ctx, req)
 	if err != nil {
@@ -889,8 +889,8 @@ func (p Precompile) GetWrappableBalances(ctx sdk.Context, method *abi.Method, ar
 
 	// Query wrappable balances
 	req := &tokenizationtypes.QueryGetWrappableBalancesRequest{
-		Denom:    denom,
-		Address:  userCosmosAddr,
+		Denom:   denom,
+		Address: userCosmosAddr,
 	}
 	resp, err := p.tokenizationKeeper.GetWrappableBalances(ctx, req)
 	if err != nil {
