@@ -58,6 +58,9 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 func Setup(
 	isCheckTx bool,
 ) *App {
+	// Reset EVM config for testing - required when running parallel tests
+	// because the EVM module uses global state that persists between test runs
+	evmtypes.NewEVMConfigurator().ResetTestConfig()
 	// Create a mock validator using ed25519 (IBC v10 removed testing/mock package)
 	privKey := ed25519.GenPrivKey()
 	pubKey := privKey.PubKey()

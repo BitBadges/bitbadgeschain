@@ -5,33 +5,13 @@
   "abi": [
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "collectionId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address[]",
-          "name": "toAddresses",
-          "type": "address[]"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        },
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "address[]", "name": "toAddresses", "type": "address[]"},
+        {"internalType": "uint256", "name": "amount", "type": "uint256"},
         {
           "components": [
-            {
-              "internalType": "uint256",
-              "name": "start",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "end",
-              "type": "uint256"
-            }
+            {"internalType": "uint256", "name": "start", "type": "uint256"},
+            {"internalType": "uint256", "name": "end", "type": "uint256"}
           ],
           "internalType": "struct UintRange[]",
           "name": "tokenIds",
@@ -39,16 +19,8 @@
         },
         {
           "components": [
-            {
-              "internalType": "uint256",
-              "name": "start",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "end",
-              "type": "uint256"
-            }
+            {"internalType": "uint256", "name": "start", "type": "uint256"},
+            {"internalType": "uint256", "name": "end", "type": "uint256"}
           ],
           "internalType": "struct UintRange[]",
           "name": "ownershipTimes",
@@ -56,14 +28,246 @@
         }
       ],
       "name": "transferTokens",
-      "outputs": [
+      "outputs": [{"internalType": "bool", "name": "success", "type": "bool"}],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
         {
-          "internalType": "bool",
-          "name": "success",
-          "type": "bool"
+          "components": [
+            {"internalType": "string", "name": "approvalId", "type": "string"},
+            {"internalType": "string", "name": "fromListId", "type": "string"},
+            {"internalType": "string", "name": "initiatedByListId", "type": "string"},
+            {
+              "components": [
+                {"internalType": "uint256", "name": "start", "type": "uint256"},
+                {"internalType": "uint256", "name": "end", "type": "uint256"}
+              ],
+              "internalType": "struct UintRange[]",
+              "name": "transferTimes",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {"internalType": "uint256", "name": "start", "type": "uint256"},
+                {"internalType": "uint256", "name": "end", "type": "uint256"}
+              ],
+              "internalType": "struct UintRange[]",
+              "name": "tokenIds",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {"internalType": "uint256", "name": "start", "type": "uint256"},
+                {"internalType": "uint256", "name": "end", "type": "uint256"}
+              ],
+              "internalType": "struct UintRange[]",
+              "name": "ownershipTimes",
+              "type": "tuple[]"
+            },
+            {"internalType": "string", "name": "uri", "type": "string"},
+            {"internalType": "string", "name": "customData", "type": "string"}
+          ],
+          "internalType": "struct UserIncomingApproval",
+          "name": "approval",
+          "type": "tuple"
         }
       ],
+      "name": "setIncomingApproval",
+      "outputs": [{"internalType": "bool", "name": "success", "type": "bool"}],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "string", "name": "approvalId", "type": "string"},
+            {"internalType": "string", "name": "toListId", "type": "string"},
+            {"internalType": "string", "name": "initiatedByListId", "type": "string"},
+            {
+              "components": [
+                {"internalType": "uint256", "name": "start", "type": "uint256"},
+                {"internalType": "uint256", "name": "end", "type": "uint256"}
+              ],
+              "internalType": "struct UintRange[]",
+              "name": "transferTimes",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {"internalType": "uint256", "name": "start", "type": "uint256"},
+                {"internalType": "uint256", "name": "end", "type": "uint256"}
+              ],
+              "internalType": "struct UintRange[]",
+              "name": "tokenIds",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {"internalType": "uint256", "name": "start", "type": "uint256"},
+                {"internalType": "uint256", "name": "end", "type": "uint256"}
+              ],
+              "internalType": "struct UintRange[]",
+              "name": "ownershipTimes",
+              "type": "tuple[]"
+            },
+            {"internalType": "string", "name": "uri", "type": "string"},
+            {"internalType": "string", "name": "customData", "type": "string"}
+          ],
+          "internalType": "struct UserOutgoingApproval",
+          "name": "approval",
+          "type": "tuple"
+        }
+      ],
+      "name": "setOutgoingApproval",
+      "outputs": [{"internalType": "bool", "name": "success", "type": "bool"}],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{"internalType": "uint256", "name": "collectionId", "type": "uint256"}],
+      "name": "getCollection",
+      "outputs": [{"internalType": "bytes", "name": "collection", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "address", "name": "userAddress", "type": "address"}
+      ],
+      "name": "getBalance",
+      "outputs": [{"internalType": "bytes", "name": "balance", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"internalType": "string", "name": "listId", "type": "string"}],
+      "name": "getAddressList",
+      "outputs": [{"internalType": "bytes", "name": "list", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "string", "name": "approvalLevel", "type": "string"},
+        {"internalType": "address", "name": "approverAddress", "type": "address"},
+        {"internalType": "string", "name": "amountTrackerId", "type": "string"},
+        {"internalType": "string", "name": "trackerType", "type": "string"},
+        {"internalType": "address", "name": "approvedAddress", "type": "address"},
+        {"internalType": "string", "name": "approvalId", "type": "string"}
+      ],
+      "name": "getApprovalTracker",
+      "outputs": [{"internalType": "bytes", "name": "tracker", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "string", "name": "approvalLevel", "type": "string"},
+        {"internalType": "address", "name": "approverAddress", "type": "address"},
+        {"internalType": "string", "name": "challengeTrackerId", "type": "string"},
+        {"internalType": "uint256", "name": "leafIndex", "type": "uint256"},
+        {"internalType": "string", "name": "approvalId", "type": "string"}
+      ],
+      "name": "getChallengeTracker",
+      "outputs": [{"internalType": "uint256", "name": "numUsed", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "string", "name": "approvalLevel", "type": "string"},
+        {"internalType": "address", "name": "approverAddress", "type": "address"},
+        {"internalType": "string", "name": "approvalId", "type": "string"},
+        {"internalType": "string", "name": "challengeTrackerId", "type": "string"},
+        {"internalType": "string", "name": "signature", "type": "string"}
+      ],
+      "name": "getETHSignatureTracker",
+      "outputs": [{"internalType": "uint256", "name": "numUsed", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"internalType": "uint256", "name": "storeId", "type": "uint256"}],
+      "name": "getDynamicStore",
+      "outputs": [{"internalType": "bytes", "name": "store", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "storeId", "type": "uint256"},
+        {"internalType": "address", "name": "userAddress", "type": "address"}
+      ],
+      "name": "getDynamicStoreValue",
+      "outputs": [{"internalType": "bytes", "name": "value", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "string", "name": "denom", "type": "string"},
+        {"internalType": "address", "name": "userAddress", "type": "address"}
+      ],
+      "name": "getWrappableBalances",
+      "outputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"internalType": "address", "name": "addr", "type": "address"}],
+      "name": "isAddressReservedProtocol",
+      "outputs": [{"internalType": "bool", "name": "isReserved", "type": "bool"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllReservedProtocolAddresses",
+      "outputs": [{"internalType": "address[]", "name": "addresses", "type": "address[]"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "string", "name": "approvalLevel", "type": "string"},
+        {"internalType": "address", "name": "approverAddress", "type": "address"},
+        {"internalType": "string", "name": "approvalId", "type": "string"},
+        {"internalType": "string", "name": "proposalId", "type": "string"},
+        {"internalType": "address", "name": "voterAddress", "type": "address"}
+      ],
+      "name": "getVote",
+      "outputs": [{"internalType": "bytes", "name": "vote", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "string", "name": "approvalLevel", "type": "string"},
+        {"internalType": "address", "name": "approverAddress", "type": "address"},
+        {"internalType": "string", "name": "approvalId", "type": "string"},
+        {"internalType": "string", "name": "proposalId", "type": "string"}
+      ],
+      "name": "getVotes",
+      "outputs": [{"internalType": "bytes", "name": "votes", "type": "bytes"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "params",
+      "outputs": [{"internalType": "bytes", "name": "params", "type": "bytes"}],
+      "stateMutability": "view",
       "type": "function"
     }
   ]

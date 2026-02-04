@@ -3,6 +3,9 @@ package app
 import (
 	"github.com/ethereum/go-ethereum/common"
 
+	feemarket "github.com/cosmos/evm/x/feemarket"
+	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
+	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	evmmodule "github.com/cosmos/evm/x/vm"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
@@ -16,13 +19,39 @@ import (
 	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 )
 
-// registerEVMModules registers the EVM module and tokenization precompile
+// registerEVMModules registers the FeeMarket and EVM modules with tokenization precompile
 func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
-	// Use evmtypes.StoreKey to match what the EVM keeper expects
-	evmKey := storetypes.NewKVStoreKey(evmtypes.StoreKey)
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
-	// Register store key
-	if err := app.RegisterStores(evmKey); err != nil {
+	// Create FeeMarket store keys
+	feemarketKey := storetypes.NewKVStoreKey(feemarkettypes.StoreKey)
+	feemarketTransientKey := storetypes.NewTransientStoreKey(feemarkettypes.TransientKey)
+
+	// Register feemarket store keys
+	if err := app.RegisterStores(feemarketKey, feemarketTransientKey); err != nil {
+		return err
+	}
+
+	// Create FeeMarket keeper
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+		app.appCodec,
+		authority,
+		feemarketKey,
+		feemarketTransientKey,
+	)
+
+	// Register FeeMarket module
+	feemarketModule := feemarket.NewAppModule(app.FeeMarketKeeper)
+	if err := app.RegisterModules(feemarketModule); err != nil {
+		return err
+	}
+
+	// Create EVM store keys
+	evmKey := storetypes.NewKVStoreKey(evmtypes.StoreKey)
+	evmTransientKey := storetypes.NewTransientStoreKey(evmtypes.TransientKey)
+
+	// Register EVM store keys
+	if err := app.RegisterStores(evmKey, evmTransientKey); err != nil {
 		return err
 	}
 
@@ -31,31 +60,25 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	// SetChainConfig only allows overwriting if the existing chain ID equals DefaultEVMChainID
 	// If you use a custom chain ID, SetChainConfig will panic on the second call in parallel tests
 	evmChainID := evmtypes.DefaultEVMChainID
-	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
 	storeKeys := make(map[string]*storetypes.KVStoreKey)
 	storeKeys[evmtypes.StoreKey] = evmKey
 
-	app.EVMKeeper = evmkeeper.NewKeeper(
+	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
 		app.appCodec,
 		evmKey,
-		storetypes.NewTransientStoreKey(evmtypes.TransientKey),
+		evmTransientKey,
 		storeKeys,
 		authority,
 		app.AccountKeeper,
 		app.PreciseBankKeeper, // Use PreciseBankKeeper for fractional balance support
 		app.StakingKeeper,
-		nil, // FeeMarketKeeper - can be nil for basic setup
+		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
 		nil, // ERC20Keeper - can be nil for basic setup
 		evmChainID,
 		"", // tracer - empty for now
-	).WithDefaultEvmCoinInfo(evmtypes.EvmCoinInfo{
-		Denom:         "ubadge",
-		ExtendedDenom: "ubadge",
-		DisplayDenom:  "BADGE",
-		Decimals:      9,
-	})
+	))
 
 	// Register tokenization precompile
 	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)
