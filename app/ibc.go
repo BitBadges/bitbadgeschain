@@ -341,5 +341,9 @@ func RegisterIBC(registry cdctypes.InterfaceRegistry) map[string]appmodule.AppMo
 		module.CoreAppModuleBasicAdaptor(name, m).RegisterInterfaces(registry)
 	}
 
+	// Register legacy localhost v2 types for backward compatibility
+	// when importing genesis from IBC v8 chains
+	RegisterLegacyLocalhostInterfaces(registry)
+
 	return modules
 }

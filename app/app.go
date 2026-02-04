@@ -291,6 +291,10 @@ func New(
 		panic(err)
 	}
 
+	// Register legacy IBC types for backward compatibility during genesis import
+	// from chains that were running IBC v8
+	RegisterLegacyLocalhostInterfaces(app.interfaceRegistry)
+
 	// add to default baseapp options
 	// enable optimistic execution
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
