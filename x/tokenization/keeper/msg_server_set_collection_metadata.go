@@ -56,7 +56,7 @@ func (k msgServer) SetCollectionMetadata(goCtx context.Context, msg *types.MsgSe
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_collection_metadata"),
 		sdk.NewAttribute("msg", msgStr),

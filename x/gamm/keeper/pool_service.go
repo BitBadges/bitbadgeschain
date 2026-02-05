@@ -116,7 +116,7 @@ func (k Keeper) InitializePool(ctx sdk.Context, pool poolmanagertypes.PoolI, sen
 		return err
 	}
 
-	// Auto-set the pool address as a reserved protocol address in the badges module
+	// Auto-set the pool address as a reserved protocol address in the tokenization module
 	poolAddress := pool.GetAddress().String()
 	err = k.tokenizationKeeper.SetReservedProtocolAddressInStore(ctx, poolAddress, true)
 	if err != nil {

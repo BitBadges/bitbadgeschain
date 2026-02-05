@@ -101,7 +101,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_UniqueIDs() {
 	// Create a denom for the wrapper path
 	denom := "badges:" + suite.CollectionId.String() + ":uatom"
 
-	// Mint some tokens to the path address using MintBadges helper
+	// Mint some tokens to the path address using MintTokens helper
 	mintBalances := []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(100),
@@ -113,7 +113,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_UniqueIDs() {
 			},
 		},
 	}
-	suite.MintBadges(suite.CollectionId, pathAddress, mintBalances)
+	suite.MintTokens(suite.CollectionId, pathAddress, mintBalances)
 
 	// Call sendNativeTokensFromAddressWithPoolApprovals twice
 	// Each call should use a unique approval ID
@@ -190,7 +190,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_CleanupOnFailure() {
 	denom := "badges:" + suite.CollectionId.String() + ":uosmo"
 
 	// Try to send more than available - should fail but cleanup should still happen
-	// First, mint a small amount using MintBadges helper
+	// First, mint a small amount using MintTokens helper
 	mintBalances := []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(5),
@@ -202,7 +202,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_CleanupOnFailure() {
 			},
 		},
 	}
-	suite.MintBadges(suite.CollectionId, pathAddress, mintBalances)
+	suite.MintTokens(suite.CollectionId, pathAddress, mintBalances)
 
 	// Try to send more than available - this should fail
 	// But the approval should still be cleaned up
@@ -264,7 +264,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_VersionIncrement() {
 	// Create a denom
 	denom := "badges:" + suite.CollectionId.String() + ":uion"
 
-	// Mint tokens using MintBadges helper
+	// Mint tokens using MintTokens helper
 	mintBalances := []*types.Balance{
 		{
 			Amount: sdkmath.NewUint(100),
@@ -276,7 +276,7 @@ func (suite *OneTimeApprovalTestSuite) TestOneTimeApproval_VersionIncrement() {
 			},
 		},
 	}
-	suite.MintBadges(suite.CollectionId, pathAddress, mintBalances)
+	suite.MintTokens(suite.CollectionId, pathAddress, mintBalances)
 
 	// Each call should increment the version for the unique approval ID
 	// Since each approval ID is unique, each should start at version 0

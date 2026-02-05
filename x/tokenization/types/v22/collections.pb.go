@@ -213,11 +213,11 @@ func (m *TokenCollection) GetAliasPaths() []*AliasPath {
 	return nil
 }
 
-// Conversion defines a bidirectional conversion between a cosmos coin (with denom) and badge balances.
+// Conversion defines a bidirectional conversion between a cosmos coin (with denom) and token balances.
 type Conversion struct {
 	// Side A: The cosmos coin side of the conversion (amount + denom).
 	SideA *ConversionSideAWithDenom `protobuf:"bytes,1,opt,name=sideA,proto3" json:"sideA,omitempty"`
-	// Side B: The badge balances side of the conversion.
+	// Side B: The token balances side of the conversion.
 	SideB []*Balance `protobuf:"bytes,2,rep,name=sideB,proto3" json:"sideB,omitempty"`
 }
 
@@ -316,12 +316,12 @@ func (m *ConversionSideAWithDenom) GetDenom() string {
 	return ""
 }
 
-// ConversionWithoutDenom defines a bidirectional conversion between a cosmos coin amount (without denom) and badge balances.
+// ConversionWithoutDenom defines a bidirectional conversion between a cosmos coin amount (without denom) and token balances.
 // The denom is stored at the base level (e.g., in AliasPath or CosmosCoinWrapperPath).
 type ConversionWithoutDenom struct {
 	// Side A: The cosmos coin amount side of the conversion (amount only, denom stored separately).
 	SideA *ConversionSideA `protobuf:"bytes,1,opt,name=sideA,proto3" json:"sideA,omitempty"`
-	// Side B: The badge balances side of the conversion.
+	// Side B: The token balances side of the conversion.
 	SideB []*Balance `protobuf:"bytes,2,rep,name=sideB,proto3" json:"sideB,omitempty"`
 }
 
@@ -416,7 +416,7 @@ type CosmosCoinWrapperPath struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	// The denomination (denom) to be used for the wrapped coin or the alias denom.
 	Denom string `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
-	// The conversion between cosmos coin and badge balances.
+	// The conversion between cosmos coin and token balances.
 	Conversion *ConversionWithoutDenom `protobuf:"bytes,3,opt,name=conversion,proto3" json:"conversion,omitempty"`
 	// The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
 	Symbol string `protobuf:"bytes,4,opt,name=symbol,proto3" json:"symbol,omitempty"`
@@ -514,7 +514,7 @@ func (m *CosmosCoinWrapperPath) GetMetadata() *PathMetadata {
 type AliasPath struct {
 	// The denomination (denom) to be used for the alias.
 	Denom string `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
-	// The conversion between cosmos coin and badge balances.
+	// The conversion between cosmos coin and token balances.
 	Conversion *ConversionWithoutDenom `protobuf:"bytes,2,opt,name=conversion,proto3" json:"conversion,omitempty"`
 	// The symbol for the alias (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
 	Symbol string `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
@@ -595,7 +595,7 @@ func (m *AliasPath) GetMetadata() *PathMetadata {
 type CosmosCoinBackedPath struct {
 	// The address associated with this backed path. Used for routing and escrowing IBC tokens.
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	// The conversion between IBC cosmos coin and badge balances.
+	// The conversion between IBC cosmos coin and token balances.
 	Conversion *Conversion `protobuf:"bytes,2,opt,name=conversion,proto3" json:"conversion,omitempty"`
 }
 

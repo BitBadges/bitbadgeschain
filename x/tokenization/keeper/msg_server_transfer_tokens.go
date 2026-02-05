@@ -37,7 +37,7 @@ func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferT
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "transfer_tokens"),
 		sdk.NewAttribute("msg", msgStr),

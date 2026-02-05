@@ -1,6 +1,6 @@
-# Attack Vector Analysis - Badges Module
+# Attack Vector Analysis - Tokenization Module
 
-This document provides a comprehensive analysis of potential attack vectors against the x/badges module.
+This document provides a comprehensive analysis of potential attack vectors against the x/tokenization module.
 
 ## Attack Categories
 

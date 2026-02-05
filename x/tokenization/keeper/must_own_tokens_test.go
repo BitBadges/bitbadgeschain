@@ -367,7 +367,7 @@ func (suite *TestSuite) TestMustOwnTokensMustOwnOne2() {
 	suite.Require().Error(err, "Error transferring token: %s")
 }
 
-func (suite *TestSuite) TestMustOwnTokensDoesntOwnBadges() {
+func (suite *TestSuite) TestMustOwnTokensDoesntOwnTokens() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	err := *new(error)
 

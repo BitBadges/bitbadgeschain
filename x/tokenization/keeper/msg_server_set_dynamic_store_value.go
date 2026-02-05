@@ -43,7 +43,7 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 		valueStr = "true"
 	}
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_dynamic_store_value"),
 		sdk.NewAttribute("store_id", msg.StoreId.String()),

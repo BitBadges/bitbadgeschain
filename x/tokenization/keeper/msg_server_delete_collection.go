@@ -44,7 +44,7 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "delete_collection"),
 		sdk.NewAttribute("msg", msgStr),

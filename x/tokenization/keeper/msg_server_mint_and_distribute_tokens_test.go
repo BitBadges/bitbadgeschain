@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *TestSuite) TestNewBadges() {
+func (suite *TestSuite) TestNewTokens() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -56,7 +56,7 @@ func (suite *TestSuite) TestNewBadges() {
 	suite.Require().Nil(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewBadgesNotManager() {
+func (suite *TestSuite) TestNewTokensNotManager() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -91,7 +91,7 @@ func (suite *TestSuite) TestNewBadgesNotManager() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
+func (suite *TestSuite) TestMintAndDistributeTokenNotExists() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -131,7 +131,7 @@ func (suite *TestSuite) TestNewBadgeBadgeNotExists() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewBadgesNotAllowed() {
+func (suite *TestSuite) TestNewTokensNotAllowed() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
@@ -180,7 +180,7 @@ func (suite *TestSuite) TestNewBadgesNotAllowed() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestNewBadgesPermissionIsApproved() {
+func (suite *TestSuite) TestNewTokensPermissionIsApproved() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)

@@ -51,7 +51,7 @@ var (
 	ErrInvalidSignerGeneral                        = sdkerrors.Register(ModuleName, 1538, "invalid signer")
 	ErrLogic                                       = sdkerrors.Register(ModuleName, 1539, "logic")
 	ErrNotFound                                    = sdkerrors.Register(ModuleName, 1540, "not found")
-	ErrInvalidInheritedBadgeLength                 = sdkerrors.Register(ModuleName, 1541, "invalid inherited balances length. num parent tokens must == 1 or equal num child tokens")
+	ErrInvalidInheritedTokenLength                 = sdkerrors.Register(ModuleName, 1541, "invalid inherited balances length. num parent tokens must == 1 or equal num child tokens")
 	ErrNoTimelineTimeSpecified                     = sdkerrors.Register(ModuleName, 1542, "no timeline times specified (len 0 for Times)")
 	ErrSenderAndReceiverSame                       = sdkerrors.Register(ModuleName, 1543, "sender and receiver cannot be the same")
 	ErrInvalidTransfers                            = sdkerrors.Register(ModuleName, 1544, "invalid transfers")

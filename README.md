@@ -58,7 +58,7 @@ ignite chain serve --skip-proto
 ```
 bitbadgeschain/
 ├── x/                          # Blockchain modules
-│   ├── badges/                 # Core token functionality
+│   ├── tokenization/                 # Core token functionality
 │   ├── maps/                   # Key-value mappings
 │   ├── anchor/                 # Data anchoring
 │   └── wasmx/                  # WASM extensions
@@ -115,7 +115,7 @@ For detailed development guides, see:
 
 -   [Adding New Message Types](_docs/ADDING_NEW_MSG_TYPES.md)
 -   [Proto Addition Guide](_docs/PROTO_ADDITION_GUIDE.md)
--   [Module Architecture](_docs/BADGES_MODULE_ARCHITECTURE.md)
+-   [Module Architecture](_docs/TOKENIZATION_MODULE_ARCHITECTURE.md)
 
 ## Configuration
 

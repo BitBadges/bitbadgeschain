@@ -121,7 +121,7 @@ func (suite *TestSuite) TestVotingChallenge_ValidVotes() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -147,7 +147,7 @@ func (suite *TestSuite) TestVotingChallenge_ValidVotes() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes - alice votes 100% yes, bob votes 100% yes
 	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
@@ -233,7 +233,7 @@ func (suite *TestSuite) TestVotingChallenge_NoVotes() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -259,7 +259,7 @@ func (suite *TestSuite) TestVotingChallenge_NoVotes() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Try to transfer without casting votes - should fail
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -331,7 +331,7 @@ func (suite *TestSuite) TestVotingChallenge_InsufficientVotes() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -357,7 +357,7 @@ func (suite *TestSuite) TestVotingChallenge_InsufficientVotes() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast vote - only alice votes 100% yes
 	// Total weight: 200, yes weight: 100, percentage: 50% (exactly threshold, should pass)
@@ -457,7 +457,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightedVotes() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -483,7 +483,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightedVotes() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Test 50/50 split - should meet 50% threshold
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(50))
@@ -510,7 +510,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightedVotes() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed with 50/50 vote")
 
-	// Mint more badges to bob for the second test
+	// Mint more tokens to bob for the second test
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -536,7 +536,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightedVotes() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Test 70/30 split - should meet 50% threshold
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(70))
@@ -653,7 +653,7 @@ func (suite *TestSuite) TestVotingChallenge_MultipleVoters() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -679,7 +679,7 @@ func (suite *TestSuite) TestVotingChallenge_MultipleVoters() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes from all three voters
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
@@ -779,7 +779,7 @@ func (suite *TestSuite) TestVotingChallenge_ZeroThreshold() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -805,7 +805,7 @@ func (suite *TestSuite) TestVotingChallenge_ZeroThreshold() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Transfer should succeed even with no votes (0% threshold)
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -877,7 +877,7 @@ func (suite *TestSuite) TestVotingChallenge_HundredPercentThreshold() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -903,7 +903,7 @@ func (suite *TestSuite) TestVotingChallenge_HundredPercentThreshold() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Only alice votes 100% yes - should fail (need both)
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
@@ -1169,7 +1169,7 @@ func (suite *TestSuite) TestVotingChallenge_MultipleChallenges() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1195,7 +1195,7 @@ func (suite *TestSuite) TestVotingChallenge_MultipleChallenges() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes for proposal-1: alice 100%, bob 100% = 100% >= 50% ✓
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
@@ -1237,7 +1237,7 @@ func (suite *TestSuite) TestVotingChallenge_MultipleChallenges() {
 	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-2", sdkmath.NewUint(50))
 	suite.Require().NoError(err)
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1263,7 +1263,7 @@ func (suite *TestSuite) TestVotingChallenge_MultipleChallenges() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Transfer should fail - proposal-2 threshold not met
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -1318,7 +1318,7 @@ func (suite *TestSuite) TestVotingChallenge_IncomingApprovalLevel() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1344,7 +1344,7 @@ func (suite *TestSuite) TestVotingChallenge_IncomingApprovalLevel() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Set incoming approval with voting challenge for alice
 	votingChallenge := createVotingChallenge(
@@ -1440,7 +1440,7 @@ func (suite *TestSuite) TestVotingChallenge_OutgoingApprovalLevel() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1466,7 +1466,7 @@ func (suite *TestSuite) TestVotingChallenge_OutgoingApprovalLevel() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Set outgoing approval with voting challenge for bob
 	votingChallenge := createVotingChallenge(
@@ -1575,7 +1575,7 @@ func (suite *TestSuite) TestVotingChallenge_UnequalWeights() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1601,7 +1601,7 @@ func (suite *TestSuite) TestVotingChallenge_UnequalWeights() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Test: alice (100 weight, 100% yes) = 100 yes weight
 	// Total possible: 200, yes: 100 = 50% (exactly threshold)
@@ -1629,7 +1629,7 @@ func (suite *TestSuite) TestVotingChallenge_UnequalWeights() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed with alice's vote meeting threshold")
 
-	// Mint more badges
+	// Mint more tokens
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1655,7 +1655,7 @@ func (suite *TestSuite) TestVotingChallenge_UnequalWeights() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Test: alice 50%, bob 100%, charlie 0%
 	// alice: 100 * 50% = 50, bob: 50 * 100% = 50, charlie: 50 * 0% = 0
@@ -1737,7 +1737,7 @@ func (suite *TestSuite) TestVotingChallenge_ExactlyAtThreshold() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1763,7 +1763,7 @@ func (suite *TestSuite) TestVotingChallenge_ExactlyAtThreshold() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Exactly 50%: alice 100% yes = 100/200 = 50%
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
@@ -1790,7 +1790,7 @@ func (suite *TestSuite) TestVotingChallenge_ExactlyAtThreshold() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed when exactly at threshold")
 
-	// Mint more badges
+	// Mint more tokens
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1816,7 +1816,7 @@ func (suite *TestSuite) TestVotingChallenge_ExactlyAtThreshold() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Just below 50%: alice 99% yes = 99/200 = 49.5% < 50%
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(99))
@@ -1892,7 +1892,7 @@ func (suite *TestSuite) TestVotingChallenge_ZeroYesWeight() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1918,7 +1918,7 @@ func (suite *TestSuite) TestVotingChallenge_ZeroYesWeight() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// alice votes 0% yes (all no), bob votes 100% yes
 	// Total yes: 0 + 100 = 100, total possible: 200, percentage: 50% (exactly threshold)
@@ -2065,7 +2065,7 @@ func (suite *TestSuite) TestVotingChallenge_VotePersistence() {
 
 	// Perform multiple transfers - votes should persist
 	for i := 0; i < 3; i++ {
-		// Mint badges to bob
+		// Mint tokens to bob
 		err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 			Creator:      bob,
 			CollectionId: sdkmath.NewUint(1),
@@ -2091,7 +2091,7 @@ func (suite *TestSuite) TestVotingChallenge_VotePersistence() {
 				},
 			},
 		})
-		suite.Require().NoError(err, "Error minting badges to bob")
+		suite.Require().NoError(err, "Error minting tokens to bob")
 
 		// Transfer should succeed using same votes
 		err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -2195,7 +2195,7 @@ func (suite *TestSuite) TestVotingChallenge_WithOtherCriteria() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2221,7 +2221,7 @@ func (suite *TestSuite) TestVotingChallenge_WithOtherCriteria() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
@@ -2338,7 +2338,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2364,7 +2364,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes from voter set A: alice and bob both vote 100% yes
 	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
@@ -2405,7 +2405,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
 	suite.Require().True(found, "Bob's vote should still be in store")
 	suite.Require().Equal(sdkmath.NewUint(100), bobVote.YesWeight)
 
-	// Mint more badges to bob for next transfer
+	// Mint more tokens to bob for next transfer
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2431,7 +2431,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Update voter set to completely different set B: charlie and signer
 	// Same proposalId, same threshold 50%
@@ -2554,7 +2554,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
 	err = castVoteAndExecute(suite, wctx, signer, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
 	suite.Require().NoError(err, "Signer should be able to cast vote")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2580,7 +2580,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetCompleteChange() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Transfer should now succeed with new voter set votes
 	// Verify the approval in the collection has correct list IDs before transfer
@@ -2695,7 +2695,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2721,7 +2721,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes from voter set A: alice and bob both vote 100% yes
 	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
@@ -2752,7 +2752,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2778,7 +2778,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Update voter set to B: alice (weight 50), charlie (weight 150)
 	// Same proposalId, same threshold 50%
@@ -2850,7 +2850,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
 	err = castVoteAndExecute(suite, wctx, charlie, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
 	suite.Require().NoError(err, "Charlie should be able to cast vote")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2876,7 +2876,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetPartialOverlap() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Transfer should now succeed
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -2947,7 +2947,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -2973,7 +2973,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast vote from alice: 100% yes
 	// Total weight: 100, yes weight: 100, percentage: 100% >= 50% threshold
@@ -3001,7 +3001,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed with initial vote meeting threshold")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3027,7 +3027,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Update voter set to B: alice (weight 100), bob (weight 100), charlie (weight 100)
 	// Same proposalId, same threshold 50%
@@ -3097,7 +3097,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
 	err = castVoteAndExecute(suite, wctx, bob, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
 	suite.Require().NoError(err, "Bob should be able to cast vote")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3123,7 +3123,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetExpands() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Transfer should now succeed
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -3196,7 +3196,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetShrinks() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3222,7 +3222,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetShrinks() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes from alice and bob: both vote 100% yes
 	// Total weight: 300, yes weight: 200, percentage: 66.67% >= 50% threshold
@@ -3253,7 +3253,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetShrinks() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3279,7 +3279,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetShrinks() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Update voter set to B: alice (weight 100), bob (weight 100) - charlie removed
 	// Same proposalId, same threshold 50%
@@ -3394,7 +3394,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightChangesSameVoters() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3420,7 +3420,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightChangesSameVoters() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes: alice 100% yes, bob 50% yes
 	// alice: 100 * 100% = 100, bob: 100 * 50% = 50
@@ -3452,7 +3452,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightChangesSameVoters() {
 	})
 	suite.Require().NoError(err, "Transfer should succeed with initial votes meeting threshold")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3478,7 +3478,7 @@ func (suite *TestSuite) TestVotingChallenge_WeightChangesSameVoters() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Update voter set to B: alice (weight 200), bob (weight 50)
 	// Same proposalId, same threshold 50%
@@ -3592,7 +3592,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterRemovedAfterVoting() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3618,7 +3618,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterRemovedAfterVoting() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes from alice and bob: both vote 100% yes
 	// Total weight: 200, yes weight: 200, percentage: 100% >= 50% threshold
@@ -3655,7 +3655,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterRemovedAfterVoting() {
 	suite.Require().True(found, "Bob's vote should be in store")
 	suite.Require().Equal(sdkmath.NewUint(100), bobVote.YesWeight)
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3681,7 +3681,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterRemovedAfterVoting() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Update voter set to B: alice (weight 100) - bob removed
 	// Same proposalId, same threshold 50%
@@ -3799,7 +3799,7 @@ func (suite *TestSuite) TestVotingChallenge_VotePersistenceAfterVoterSetChange()
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3825,7 +3825,7 @@ func (suite *TestSuite) TestVotingChallenge_VotePersistenceAfterVoterSetChange()
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Cast votes from all three voters
 	err = castVoteAndExecute(suite, wctx, alice, sdkmath.NewUint(1), "collection", "", "test", "proposal-1", sdkmath.NewUint(100))
@@ -3901,7 +3901,7 @@ func (suite *TestSuite) TestVotingChallenge_VotePersistenceAfterVoterSetChange()
 	suite.Require().True(found, "Charlie's vote should still be in store after voter set change")
 	suite.Require().Equal(sdkmath.NewUint(100), charlieVote.YesWeight, "Charlie's vote should be unchanged")
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -3927,7 +3927,7 @@ func (suite *TestSuite) TestVotingChallenge_VotePersistenceAfterVoterSetChange()
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Transfer should succeed because only alice's vote counts (bob and charlie's votes are ignored)
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -3982,7 +3982,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetUpdateMultipleApprovalLevels
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob
+	// Mint tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -4008,7 +4008,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetUpdateMultipleApprovalLevels
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Test 1: Collection-level approval with voter set update
 	collectionVotingChallenge := createVotingChallenge(
@@ -4274,7 +4274,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetUpdateMultipleApprovalLevels
 	})
 	suite.Require().NoError(err, "Error updating outgoing approval voter set")
 
-	// Mint more badges to bob
+	// Mint more tokens to bob
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -4300,7 +4300,7 @@ func (suite *TestSuite) TestVotingChallenge_VoterSetUpdateMultipleApprovalLevels
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting more badges to bob")
+	suite.Require().NoError(err, "Error minting more tokens to bob")
 
 	// Transfer should fail - alice's vote uses new weight 50, bob's vote doesn't count, charlie hasn't voted
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{

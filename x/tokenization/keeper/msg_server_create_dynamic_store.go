@@ -45,7 +45,7 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 
 	// Emit event
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_dynamic_store"),
 		sdk.NewAttribute("store_id", nextStoreId.String()),

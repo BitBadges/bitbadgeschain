@@ -56,7 +56,7 @@ func (k msgServer) SetManager(goCtx context.Context, msg *types.MsgSetManager) (
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_manager"),
 		sdk.NewAttribute("msg", msgStr),

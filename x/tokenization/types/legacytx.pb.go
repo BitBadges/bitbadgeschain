@@ -404,7 +404,7 @@ func (m *MsgNewCollectionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgNewCollectionResponse proto.InternalMessageInfo
 
-// This handles both minting more of existing badges and creating new tokens.
+// This handles both minting more of existing tokens and creating new tokens.
 type MsgMintAndDistributeTokens struct {
 	Creator                    string                        `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId               Uint                          `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -635,7 +635,7 @@ func (m *MsgUniversalUpdateCollectionApprovalsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUniversalUpdateCollectionApprovalsResponse proto.InternalMessageInfo
 
-// Update badge Uris with new URI object, if permitted.
+// Update token Uris with new URI object, if permitted.
 type MsgUpdateMetadata struct {
 	Creator                    string                        `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId               Uint                          `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`
@@ -757,7 +757,7 @@ func (m *MsgUpdateMetadataResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateMetadataResponse proto.InternalMessageInfo
 
-// Update badge permissions with new permissions, if permitted.
+// Update token permissions with new permissions, if permitted.
 type MsgUniversalUpdateCollectionPermissions struct {
 	Creator      string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	CollectionId Uint                   `protobuf:"bytes,2,opt,name=collectionId,proto3,customtype=Uint" json:"collectionId"`

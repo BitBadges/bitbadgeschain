@@ -80,11 +80,11 @@ message TokenCollection {
   repeated AliasPath aliasPaths = 16;
 }
 
-// Conversion defines a bidirectional conversion between a cosmos coin (with denom) and badge balances.
+// Conversion defines a bidirectional conversion between a cosmos coin (with denom) and token balances.
 message Conversion {
   // Side A: The cosmos coin side of the conversion (amount + denom).
   ConversionSideAWithDenom sideA = 1;
-  // Side B: The badge balances side of the conversion.
+  // Side B: The token balances side of the conversion.
   repeated Balance sideB = 2;
 }
 
@@ -96,12 +96,12 @@ message ConversionSideAWithDenom {
   string denom = 2;
 }
 
-// ConversionWithoutDenom defines a bidirectional conversion between a cosmos coin amount (without denom) and badge balances.
+// ConversionWithoutDenom defines a bidirectional conversion between a cosmos coin amount (without denom) and token balances.
 // The denom is stored at the base level (e.g., in AliasPath or CosmosCoinWrapperPath).
 message ConversionWithoutDenom {
   // Side A: The cosmos coin amount side of the conversion (amount only, denom stored separately).
   ConversionSideA sideA = 1;
-  // Side B: The badge balances side of the conversion.
+  // Side B: The token balances side of the conversion.
   repeated Balance sideB = 2;
 }
 
@@ -116,7 +116,7 @@ message CosmosCoinWrapperPath {
   string address = 1;
   // The denomination (denom) to be used for the wrapped coin or the alias denom.
   string denom = 2;
-  // The conversion between cosmos coin and badge balances.
+  // The conversion between cosmos coin and token balances.
   ConversionWithoutDenom conversion = 3;
   // The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 4;
@@ -132,7 +132,7 @@ message CosmosCoinWrapperPath {
 message AliasPath {
   // The denomination (denom) to be used for the alias.
   string denom = 1;
-  // The conversion between cosmos coin and badge balances.
+  // The conversion between cosmos coin and token balances.
   ConversionWithoutDenom conversion = 2;
   // The symbol for the alias (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 3;
@@ -145,7 +145,7 @@ message AliasPath {
 message CosmosCoinBackedPath {
   // The address associated with this backed path. Used for routing and escrowing IBC tokens.
   string address = 1;
-  // The conversion between IBC cosmos coin and badge balances.
+  // The conversion between IBC cosmos coin and token balances.
   Conversion conversion = 2;
 }
 

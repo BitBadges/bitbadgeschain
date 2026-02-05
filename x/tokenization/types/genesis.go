@@ -23,7 +23,7 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 
-// IMPORTANT: We assume badges are well-formed and validated here
+// IMPORTANT: We assume tokens are well-formed and validated here
 func (gs GenesisState) Validate() error {
 	if err := host.PortIdentifierValidator(gs.PortId); err != nil {
 		return err

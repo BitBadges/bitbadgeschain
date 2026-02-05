@@ -4003,7 +4003,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_ValidSignature() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
-	// Add mint approval so we can mint badges to bob
+	// Add mint approval so we can mint tokens to bob
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 		ToListId:          "AllWithoutMint",
 		FromListId:        "Mint",
@@ -4029,7 +4029,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_ValidSignature() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob so he can transfer them
+	// Mint tokens to bob so he can transfer them
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -4055,7 +4055,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_ValidSignature() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Generate valid signature
 	nonce := "test-nonce-123"
@@ -4358,7 +4358,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_SignatureReuse() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
-	// Add mint approval so we can mint badges to bob
+	// Add mint approval so we can mint tokens to bob
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 		ToListId:          "AllWithoutMint",
 		FromListId:        "Mint",
@@ -4384,7 +4384,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_SignatureReuse() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob so he can transfer them
+	// Mint tokens to bob so he can transfer them
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -4410,7 +4410,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_SignatureReuse() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Generate valid signature
 	nonce := "test-nonce-123"
@@ -4821,7 +4821,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_MultipleChallenges() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
-	// Add mint approval so we can mint badges to bob
+	// Add mint approval so we can mint tokens to bob
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 		ToListId:          "AllWithoutMint",
 		FromListId:        "Mint",
@@ -4847,7 +4847,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_MultipleChallenges() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob so he can transfer them
+	// Mint tokens to bob so he can transfer them
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -4873,7 +4873,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_MultipleChallenges() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 
@@ -5167,7 +5167,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_WithOtherCriteria() {
 		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 		collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
-		// Add mint approval so we can mint badges to bob
+		// Add mint approval so we can mint tokens to bob
 		collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 			ToListId:          "AllWithoutMint",
 			FromListId:        "Mint",
@@ -5193,7 +5193,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_WithOtherCriteria() {
 		err = CreateCollections(suite, wctx, collectionsToCreate)
 		suite.Require().NoError(err)
 
-		// Mint badges to bob so he can transfer them
+		// Mint tokens to bob so he can transfer them
 		err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 			Creator:      bob,
 			CollectionId: sdkmath.NewUint(1),
@@ -5219,7 +5219,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_WithOtherCriteria() {
 				},
 			},
 		})
-		suite.Require().NoError(err, "Error minting badges to bob")
+		suite.Require().NoError(err, "Error minting tokens to bob")
 
 		privateKeyHex := "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 		nonce := "test-nonce-combined"
@@ -5291,7 +5291,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_TrackerQuery() {
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesToIncomingApprovals = true
 	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria.OverridesFromOutgoingApprovals = true
 
-	// Add mint approval so we can mint badges to bob
+	// Add mint approval so we can mint tokens to bob
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
 		ToListId:          "AllWithoutMint",
 		FromListId:        "Mint",
@@ -5317,7 +5317,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_TrackerQuery() {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
-	// Mint badges to bob so he can transfer them
+	// Mint tokens to bob so he can transfer them
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -5343,7 +5343,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_TrackerQuery() {
 			},
 		},
 	})
-	suite.Require().NoError(err, "Error minting badges to bob")
+	suite.Require().NoError(err, "Error minting tokens to bob")
 
 	// Generate and use signature
 	nonce := "test-nonce-query"

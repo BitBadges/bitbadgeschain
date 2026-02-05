@@ -3,12 +3,11 @@ package keeper
 import (
 	"context"
 
-	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetTokenMetadata) (*types.MsgSetTokenMetadataResponse, error) {
+func (k msgServer) SetValidTokenIds(goCtx context.Context, msg *types.MsgSetValidTokenIds) (*types.MsgSetValidTokenIdsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Validate the message
@@ -19,26 +18,26 @@ func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetToke
 	// Get existing collection to fetch current permissions
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
-		return nil, errorsmod.Wrapf(ErrCollectionNotExists, "collection ID %s not found", msg.CollectionId.String())
+		return nil, ErrCollectionNotExists
 	}
 
 	// Construct the full UniversalUpdateCollection message
 	universalMsg := &types.MsgUniversalUpdateCollection{
 		Creator:                     msg.Creator,
 		CollectionId:                msg.CollectionId,
-		UpdateTokenMetadata:         true,
-		TokenMetadata:               msg.TokenMetadata,
+		UpdateValidTokenIds:         true,
+		ValidTokenIds:               msg.ValidTokenIds,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions: &types.CollectionPermissions{
-			CanUpdateTokenMetadata: msg.CanUpdateTokenMetadata,
+			CanUpdateValidTokenIds: msg.CanUpdateValidTokenIds,
 			// Copy existing permissions for other fields
 			CanDeleteCollection:              collection.CollectionPermissions.CanDeleteCollection,
 			CanArchiveCollection:             collection.CollectionPermissions.CanArchiveCollection,
 			CanUpdateStandards:               collection.CollectionPermissions.CanUpdateStandards,
 			CanUpdateCustomData:              collection.CollectionPermissions.CanUpdateCustomData,
 			CanUpdateManager:                 collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidTokenIds:           collection.CollectionPermissions.CanUpdateValidTokenIds,
 			CanUpdateCollectionMetadata:      collection.CollectionPermissions.CanUpdateCollectionMetadata,
+			CanUpdateTokenMetadata:           collection.CollectionPermissions.CanUpdateTokenMetadata,
 			CanUpdateCollectionApprovals:     collection.CollectionPermissions.CanUpdateCollectionApprovals,
 			CanAddMoreAliasPaths:             collection.CollectionPermissions.CanAddMoreAliasPaths,
 			CanAddMoreCosmosCoinWrapperPaths: collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths,
@@ -57,13 +56,13 @@ func (k msgServer) SetTokenMetadata(goCtx context.Context, msg *types.MsgSetToke
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
-		sdk.NewAttribute("msg_type", "set_token_metadata"),
+		sdk.NewAttribute("msg_type", "set_valid_token_ids"),
 		sdk.NewAttribute("msg", msgStr),
 	)
 
-	return &types.MsgSetTokenMetadataResponse{
+	return &types.MsgSetValidTokenIdsResponse{
 		CollectionId: response.CollectionId,
 	}, nil
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgNewBadge_ValidateBasic(t *testing.T) {
+func TestMsgNewCollection_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
 		msg  types.MsgUniversalUpdateCollection

@@ -1003,10 +1003,10 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 	suite.Require().Nil(err, "Transfer with invalid token ID should be allowed when override is enabled")
 }
 
-// ==================== GAMM KEEPER BADGES TESTS ====================
+// ==================== GAMM KEEPER TOKENIZATION TESTS ====================
 
-// TestGammKeeperBadgesIntegration tests the integration between gamm keeper and tokenization
-func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
+// TestGammKeeperTokenizationIntegration tests the integration between gamm keeper and tokenization
+func (suite *TestSuite) TestGammKeeperTokenizationIntegration() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	// Create a collection with cosmos coin wrapper paths
@@ -1057,7 +1057,7 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 	suite.testDenomParsingAndValidation(wrapperDenom, collection)
 
 	// Test 2: Test community pool funding with tokens
-	suite.testCommunityPoolFundingWithBadges(bob, wrapperDenom)
+	suite.testCommunityPoolFundingWithTokens(bob, wrapperDenom)
 
 	// Test 3: Test balance calculations
 	suite.testBalanceCalculations(collection, wrapperDenom)
@@ -1065,8 +1065,8 @@ func (suite *TestSuite) TestGammKeeperBadgesIntegration() {
 	suite.T().Logf("✅ Gamm keeper tokenization integration test completed successfully")
 }
 
-// testGammKeeperBadgesFunctionality tests the core gamm keeper tokenization functionality
-func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddress, wrapperDenom string, wrapperPathAddress string) {
+// testGammKeeperTokenizationFunctionality tests the core gamm keeper tokenization functionality
+func (suite *TestSuite) testGammKeeperTokenizationFunctionality(userAddr sdk.AccAddress, wrapperDenom string, wrapperPathAddress string) {
 	ctx := suite.ctx
 
 	// Test 1: SendNativeTokensToPool - wrapping tokens to pool
@@ -1105,7 +1105,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	suite.Require().Nil(err, "Error getting bob's balance")
 	suite.T().Logf("Bob's balance: %s", bobBalance.Balances[0].Amount.String())
 
-	// First, transfer tokens from bob to the wrapper path address so it has badges to work with
+	// First, transfer tokens from bob to the wrapper path address so it has tokens to work with
 	// Transfer only 1 token, leave the rest with bob
 	transferAmount := sdkmath.NewUint(1)
 	collection, err := GetCollection(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1))
@@ -1130,7 +1130,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	})
 	suite.Require().Nil(err, "Error transferring tokens to wrapper path")
 
-	// Verify wrapper path now has badges
+	// Verify wrapper path now has tokens
 	wrapperPathBalanceAfter, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), wrapperPathAddress)
 	suite.Require().Nil(err, "Error getting wrapper path balance after transfer")
 	suite.Require().Equal(sdkmath.NewUint(1), wrapperPathBalanceAfter.Balances[0].Amount, "Wrapper path should have 1 token")
@@ -1140,7 +1140,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, sdk.AccAddress(bob), sdk.AccAddress(poolAddress), sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(1))})
 	suite.Require().Nil(err, "Error sending native tokens to pool")
 
-	// Verify badges were transferred to pool
+	// Verify tokens were transferred to pool
 	poolBalances, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), poolAddress)
 	suite.Require().Nil(err, "Error getting pool balance")
 	suite.Require().Equal(sdkmath.NewUint(1), poolBalances.Balances[0].Amount, "Pool should have 1 token")
@@ -1154,7 +1154,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, sdk.AccAddress(userAddr), coinsToUnwrap)
 	suite.Require().Nil(err, "Error sending coins from pool with unwrapping")
 
-	// Verify badges were transferred back to user
+	// Verify tokens were transferred back to user
 	userTokenBalanceAfter, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), userAddr.String())
 	suite.Require().Nil(err, "Error getting user balance after unwrap")
 	suite.Require().Equal(sdkmath.NewUint(1), userTokenBalanceAfter.Balances[0].Amount, "User should have 1 token after unwrap")
@@ -1162,7 +1162,7 @@ func (suite *TestSuite) testGammKeeperBadgesFunctionality(userAddr sdk.AccAddres
 	// Verify pool balance decreased
 	poolBalancesAfter, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), poolAddress)
 	suite.Require().Nil(err, "Error getting pool balance after")
-	suite.Require().Equal(sdkmath.NewUint(0), poolBalancesAfter.Balances[0].Amount, "Pool should have 0 badges remaining")
+	suite.Require().Equal(sdkmath.NewUint(0), poolBalancesAfter.Balances[0].Amount, "Pool should have 0 tokens remaining")
 
 	// Verify pool coin balance decreased
 	poolCoinBalanceAfter := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, wrapperDenom)
@@ -1218,7 +1218,7 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
 	// Test community pool funding with tokens
-	suite.testCommunityPoolFundingWithBadges(bob, wrapperDenom)
+	suite.testCommunityPoolFundingWithTokens(bob, wrapperDenom)
 
 	suite.T().Logf("✅ Community pool test completed successfully")
 }
@@ -1864,7 +1864,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 	suite.testDenomParsingAndValidation(wrapperDenom, collection)
 
 	// Test 2: Test community pool funding with tokens
-	suite.testCommunityPoolFundingWithBadges(bob, wrapperDenom)
+	suite.testCommunityPoolFundingWithTokens(bob, wrapperDenom)
 
 	// Test 3: Test balance calculations
 	suite.testBalanceCalculations(collection, wrapperDenom)
@@ -1890,11 +1890,11 @@ func (suite *TestSuite) testDenomParsingAndValidation(wrapperDenom string, colle
 	suite.T().Logf("✅ Denom parsing and validation successful")
 }
 
-// testCommunityPoolFundingWithBadges tests community pool funding with tokens
-func (suite *TestSuite) testCommunityPoolFundingWithBadges(userAddr string, wrapperDenom string) {
+// testCommunityPoolFundingWithTokens tests community pool funding with tokens
+func (suite *TestSuite) testCommunityPoolFundingWithTokens(userAddr string, wrapperDenom string) {
 	ctx := suite.ctx
 
-	// Create a pool account to simulate having badges
+	// Create a pool account to simulate having tokens
 	poolAccAddr := sdk.AccAddress([]byte("pool123456789012345678901234567890123456789012345678901234567890"))
 	poolAcc := suite.app.AccountKeeper.NewAccountWithAddress(ctx, poolAccAddr)
 	suite.app.AccountKeeper.SetAccount(ctx, poolAcc)
@@ -2230,8 +2230,8 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 	suite.T().Logf("✅ Comprehensive pool operations test completed successfully")
 }
 
-// testCreatePoolWithBadges tests creating a pool with tokens and ubadge assets
-func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom string, wrapperPathAddress string) {
+// testCreatePoolWithTokens tests creating a pool with tokens and ubadge assets
+func (suite *TestSuite) testCreatePoolWithTokens(userAddr string, wrapperDenom string, wrapperPathAddress string) {
 	ctx := suite.ctx
 
 	// Create pool account
@@ -2244,8 +2244,8 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 	suite.Require().Nil(err, "Error getting user balance")
 	suite.T().Logf("User balance: %s", userBalance.Balances[0].Amount.String())
 
-	// Transfer some badges to wrapper path address for pool creation (use user's actual balance)
-	transferAmount := userBalance.Balances[0].Amount // Transfer all user's badges to wrapper path
+	// Transfer some tokens to wrapper path address for pool creation (use user's actual balance)
+	transferAmount := userBalance.Balances[0].Amount // Transfer all user's tokens to wrapper path
 	collection, err := GetCollection(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	err = TransferTokens(suite, sdk.WrapSDKContext(ctx), &types.MsgTransferTokens{
@@ -2268,10 +2268,10 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 	})
 	suite.Require().Nil(err, "Error transferring tokens to wrapper path")
 
-	// Verify wrapper path has badges
+	// Verify wrapper path has tokens
 	wrapperPathBalance, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), wrapperPathAddress)
 	suite.Require().Nil(err, "Error getting wrapper path balance")
-	suite.Require().Equal(transferAmount, wrapperPathBalance.Balances[0].Amount, "Wrapper path should have transferred badges")
+	suite.Require().Equal(transferAmount, wrapperPathBalance.Balances[0].Amount, "Wrapper path should have transferred tokens")
 
 	// Fund user with ubadge for pool creation
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
@@ -2284,7 +2284,7 @@ func (suite *TestSuite) testCreatePoolWithBadges(userAddr string, wrapperDenom s
 	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool with wrapping")
 
-	// Verify badges were transferred to pool
+	// Verify tokens were transferred to pool
 	poolBalances, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), poolAccAddr.String())
 	suite.Require().Nil(err, "Error getting pool balance")
 	suite.Require().Equal(sdkmath.NewUint(1), poolBalances.Balances[0].Amount, "Pool should have 1 token")
@@ -2330,12 +2330,12 @@ func (suite *TestSuite) testJoinPool(userAddr string, wrapperDenom string, wrapp
 	// Verify pool balances increased
 	poolBalances, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), poolAccAddr.String())
 	suite.Require().Nil(err, "Error getting pool balance")
-	suite.Require().Equal(sdkmath.NewUint(15), poolBalances.Balances[0].Amount, "Pool should have 15 badges after join")
+	suite.Require().Equal(sdkmath.NewUint(15), poolBalances.Balances[0].Amount, "Pool should have 15 tokens after join")
 
 	poolUtokenBalance := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, "ubadge")
 	suite.Require().Equal(sdkmath.NewInt(15), poolUtokenBalance.Amount, "Pool should have 15 ubadge after join")
 
-	suite.T().Logf("✅ Pool join successful - pool now has 15 badges and 15 ubadge")
+	suite.T().Logf("✅ Pool join successful - pool now has 15 tokens and 15 ubadge")
 }
 
 // testExitPool tests exiting a pool with tokens
@@ -2363,12 +2363,12 @@ func (suite *TestSuite) testExitPool(userAddr string, wrapperDenom string, wrapp
 	// Verify pool balances decreased
 	poolBalances, err := GetUserBalance(suite, sdk.WrapSDKContext(ctx), sdkmath.NewUint(1), poolAccAddr.String())
 	suite.Require().Nil(err, "Error getting pool balance")
-	suite.Require().Equal(sdkmath.NewUint(12), poolBalances.Balances[0].Amount, "Pool should have 12 badges after exit")
+	suite.Require().Equal(sdkmath.NewUint(12), poolBalances.Balances[0].Amount, "Pool should have 12 tokens after exit")
 
 	poolUtokenBalance := suite.app.BankKeeper.GetBalance(ctx, poolAccAddr, "ubadge")
 	suite.Require().Equal(sdkmath.NewInt(12), poolUtokenBalance.Amount, "Pool should have 12 ubadge after exit")
 
-	suite.T().Logf("✅ Pool exit successful - pool now has 12 badges and 12 ubadge")
+	suite.T().Logf("✅ Pool exit successful - pool now has 12 tokens and 12 ubadge")
 }
 
 // testSwapOperations tests swap operations with tokens
@@ -2383,7 +2383,7 @@ func (suite *TestSuite) testSwapOperations(userAddr string, wrapperDenom string,
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
-	// Test swap: badges -> ubadge
+	// Test swap: tokens -> ubadge
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(10))}
 	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for swap")
@@ -2393,12 +2393,12 @@ func (suite *TestSuite) testSwapOperations(userAddr string, wrapperDenom string,
 	err = suite.app.BankKeeper.SendCoins(ctx, poolAccAddr, userAccAddr, ubadgeCoins)
 	suite.Require().Nil(err, "Error sending ubadge to user for swap")
 
-	// Test swap: ubadge -> badges
+	// Test swap: ubadge -> tokens
 	ubadgeCoinsToPool := sdk.Coins{sdk.NewCoin("ubadge", sdkmath.NewInt(5))}
 	err = suite.app.BankKeeper.SendCoins(ctx, userAccAddr, poolAccAddr, ubadgeCoinsToPool)
 	suite.Require().Nil(err, "Error sending ubadge to pool for swap")
 
-	// Send badges back to user (simulating swap)
+	// Send tokens back to user (simulating swap)
 	tokenCoinsFromPool := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(5))}
 	err = suite.app.GammKeeper.SendCoinsFromPoolWithAliasRouting(ctx, poolAccAddr, userAccAddr, tokenCoinsFromPool)
 	suite.Require().Nil(err, "Error sending tokens to user for swap")
@@ -2418,7 +2418,7 @@ func (suite *TestSuite) testSwapWithTakerFees(userAddr string, wrapperDenom stri
 	userAccAddr, err := sdk.AccAddressFromBech32(userAddr)
 	suite.Require().Nil(err, "Error getting user address")
 
-	// Test swap with taker fee: badges -> ubadge
+	// Test swap with taker fee: tokens -> ubadge
 	tokenCoins := sdk.Coins{sdk.NewCoin(wrapperDenom, sdkmath.NewInt(20))}
 	err = suite.app.GammKeeper.SendCoinsToPoolWithAliasRouting(ctx, userAccAddr, poolAccAddr, tokenCoins)
 	suite.Require().Nil(err, "Error sending tokens to pool for swap with fee")

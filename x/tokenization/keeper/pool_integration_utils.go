@@ -19,7 +19,7 @@ func CheckStartsWithWrappedOrAliasDenom(denom string) bool {
 	return strings.HasPrefix(denom, WrappedDenomPrefix) || strings.HasPrefix(denom, AliasDenomPrefix)
 }
 
-// GetPartsFromDenom parses a badges denom into its parts
+// GetPartsFromDenom parses a tokenization denom into its parts
 func GetPartsFromDenom(denom string) ([]string, error) {
 	if !CheckStartsWithWrappedOrAliasDenom(denom) {
 		return nil, errorsmod.Wrapf(ErrInvalidDenomFormat, "denom: %s", denom)
@@ -32,7 +32,7 @@ func GetPartsFromDenom(denom string) ([]string, error) {
 	return parts, nil
 }
 
-// ParseDenomCollectionId extracts the collection ID from a badges denom
+// ParseDenomCollectionId extracts the collection ID from a tokenization denom
 func ParseDenomCollectionId(denom string) (uint64, error) {
 	parts, err := GetPartsFromDenom(denom)
 	if err != nil {
@@ -43,7 +43,7 @@ func ParseDenomCollectionId(denom string) (uint64, error) {
 	return strconv.ParseUint(parts[1], 10, 64)
 }
 
-// ParseDenomPath extracts the path from a badges denom
+// ParseDenomPath extracts the path from a tokenization denom
 func ParseDenomPath(denom string) (string, error) {
 	parts, err := GetPartsFromDenom(denom)
 	if err != nil {
@@ -69,7 +69,7 @@ func GetCorrespondingAliasPath(collection *tokenizationtypes.TokenCollection, de
 	return nil, errorsmod.Wrapf(ErrAliasPathNotFound, "denom: %s", denom)
 }
 
-// CheckIsAliasDenom checks if a denom is a wrapped badges denom
+// CheckIsAliasDenom checks if a denom is a wrapped tokenization denom
 func (k Keeper) CheckIsAliasDenom(ctx sdk.Context, denom string) bool {
 	if !CheckStartsWithWrappedOrAliasDenom(denom) {
 		return false
@@ -84,7 +84,7 @@ func (k Keeper) CheckIsAliasDenom(ctx sdk.Context, denom string) bool {
 	return err == nil
 }
 
-// ParseCollectionFromDenom parses a collection from a badges denom
+// ParseCollectionFromDenom parses a collection from a tokenization denom
 func (k Keeper) ParseCollectionFromDenom(ctx sdk.Context, denom string) (*tokenizationtypes.TokenCollection, error) {
 	collectionId, err := ParseDenomCollectionId(denom)
 	if err != nil {

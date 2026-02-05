@@ -332,7 +332,7 @@ func EmitUsedApprovalDetailsEvent(ctx sdk.Context, collectionId sdkmath.Uint, fr
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent("usedApprovalDetails",
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 			sdk.NewAttribute("from", from),
 			sdk.NewAttribute("to", to),
@@ -363,7 +363,7 @@ func EmitApprovalEvent(
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			"approval"+fmt.Sprint(collectionId)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalId)+fmt.Sprint(amountsTrackerId)+fmt.Sprint(approvalLevel)+fmt.Sprint(trackerType)+fmt.Sprint(address),
-			sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+			sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 			sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 			sdk.NewAttribute("approvalId", fmt.Sprint(approvalId)),
 			sdk.NewAttribute("approverAddress", fmt.Sprint(approverAddress)),

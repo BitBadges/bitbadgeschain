@@ -179,7 +179,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "update_user_approvals"),
 		sdk.NewAttribute("msg", msgStr),

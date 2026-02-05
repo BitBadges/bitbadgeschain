@@ -67,7 +67,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnau
 	suite.Require().NoError(err, "should set params")
 
 	// Mint badges to Bob
-	suite.MintBadges(collectionId, suite.Bob, []*tokenizationtypes.Balance{
+	suite.MintTokens(collectionId, suite.Bob, []*tokenizationtypes.Balance{
 		{
 			Amount:         sdkmath.NewUint(1),
 			TokenIds:       []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
@@ -178,7 +178,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 	suite.Require().NoError(err, "should set params")
 
 	// Mint badges to Bob
-	suite.MintBadges(collectionId, suite.Bob, []*tokenizationtypes.Balance{
+	suite.MintTokens(collectionId, suite.Bob, []*tokenizationtypes.Balance{
 		{
 			Amount:         sdkmath.NewUint(1),
 			TokenIds:       []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},

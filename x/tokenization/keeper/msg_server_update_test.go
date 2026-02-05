@@ -201,7 +201,7 @@ package keeper_test
 // 	err = UpdateURIs(suite, wctx, bob, sdkmath.NewUint(1), "", []*types.TokenMetadata{}, "https://balance.com/{id}")
 // 	suite.Require().Nil(err, "Error updating uris")
 // 	badge, _ := GetCollection(suite, wctx, sdkmath.NewUint(1))
-// 	suite.Require().Equal("https://balance.com/{id}", badge.OffChainBalancesMetadata)
+// 	suite.Require().Equal("https://balance.com/{id}", token.OffChainBalancesMetadata)
 // 	// suite.Require().Equal("https://example.com/{id}", badge.TokenMetadata)
 // }
 

@@ -208,9 +208,9 @@ func (suite *AITestSuite) SetupMintApproval(collectionId sdkmath.Uint) {
 	suite.Require().True(found, "mint approval should be saved in collection")
 }
 
-// MintBadges mints badges to an address
+// MintTokens mints tokens to an address
 // Automatically sets up mint approval if needed
-func (suite *AITestSuite) MintBadges(collectionId sdkmath.Uint, to string, balances []*types.Balance) {
+func (suite *AITestSuite) MintTokens(collectionId sdkmath.Uint, to string, balances []*types.Balance) {
 	// Ensure minting is allowed by setting up a collection approval for Mint
 	suite.SetupMintApproval(collectionId)
 

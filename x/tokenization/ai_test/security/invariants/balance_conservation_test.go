@@ -41,7 +41,7 @@ func (suite *BalanceConservationTestSuite) TestBalanceConservation_Transfer() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set approvals
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -122,8 +122,8 @@ func (suite *BalanceConservationTestSuite) TestBalanceConservation_MultiTransfer
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
-	suite.MintBadges(suite.CollectionId, suite.Bob, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Bob, mintBalances)
 
 	// Set approvals for all
 	for _, addr := range []string{suite.Alice, suite.Bob, suite.Charlie} {

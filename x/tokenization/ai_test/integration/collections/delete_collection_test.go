@@ -47,8 +47,8 @@ func (suite *DeleteCollectionTestSuite) TestDeleteCollection_PurgesAllState() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(collectionId, suite.Alice, mintBalances)
-	suite.MintBadges(collectionId, suite.Bob, mintBalances)
+	suite.MintTokens(collectionId, suite.Alice, mintBalances)
+	suite.MintTokens(collectionId, suite.Bob, mintBalances)
 
 	// Set user approvals to create approval trackers
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -121,7 +121,7 @@ func (suite *DeleteCollectionTestSuite) TestDeleteCollection_NoOrphanedState() {
 		mintBalances := []*types.Balance{
 			testutil.GenerateSimpleBalance(10, uint64(i+1)),
 		}
-		suite.MintBadges(collectionId, suite.Alice, mintBalances)
+		suite.MintTokens(collectionId, suite.Alice, mintBalances)
 	}
 
 	// Add approvals

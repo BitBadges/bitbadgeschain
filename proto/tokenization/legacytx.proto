@@ -69,10 +69,10 @@ message MsgNewCollection {
 
 message MsgNewCollectionResponse {
   string collectionId = 1  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false
-  ]; //ID of created badge collecon
+  ]; //ID of created token collection
 }
 
-//This handles both minting more of existing badges and creating new tokens.
+//This handles both minting more of existing tokens and creating new tokens.
 message MsgMintAndDistributeTokens {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -99,7 +99,7 @@ message MsgUniversalUpdateCollectionApprovals {
 message MsgUniversalUpdateCollectionApprovalsResponse {}
 
 
-//Update badge Uris with new URI object, if permitted.
+//Update token Uris with new URI object, if permitted.
 message MsgUpdateMetadata {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
@@ -112,7 +112,7 @@ message MsgUpdateMetadata {
 
 message MsgUpdateMetadataResponse {}
 
-//Update badge permissions with new permissions, if permitted.
+//Update token permissions with new permissions, if permitted.
 message MsgUniversalUpdateCollectionPermissions {
   string creator = 1;
   string collectionId = 2  [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
