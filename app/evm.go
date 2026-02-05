@@ -1,8 +1,13 @@
 package app
 
 import (
+	"strconv"
+
 	"github.com/ethereum/go-ethereum/common"
 
+	erc20 "github.com/cosmos/evm/x/erc20"
+	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
+	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarket "github.com/cosmos/evm/x/feemarket"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
@@ -16,10 +21,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 )
 
-// registerEVMModules registers the FeeMarket and EVM modules with tokenization precompile
+// registerEVMModules registers the FeeMarket, ERC20, and EVM modules with tokenization precompile
 func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
@@ -46,6 +52,14 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
+	// Create ERC20 store keys
+	erc20Key := storetypes.NewKVStoreKey(erc20types.StoreKey)
+
+	// Register ERC20 store keys
+	if err := app.RegisterStores(erc20Key); err != nil {
+		return err
+	}
+
 	// Create EVM store keys
 	evmKey := storetypes.NewKVStoreKey(evmtypes.StoreKey)
 	evmTransientKey := storetypes.NewTransientStoreKey(evmtypes.TransientKey)
@@ -56,14 +70,16 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	}
 
 	// Create EVM keeper
-	// Note: Use DefaultEVMChainID to allow SetChainConfig to work correctly in parallel tests
-	// SetChainConfig only allows overwriting if the existing chain ID equals DefaultEVMChainID
-	// If you use a custom chain ID, SetChainConfig will panic on the second call in parallel tests
-	evmChainID := evmtypes.DefaultEVMChainID
+	evmChainID := appparams.EVMChainID
+	evmChainIDUint64, err := strconv.ParseUint(evmChainID, 10, 64)
+	if err != nil {
+		return err
+	}
 
 	storeKeys := make(map[string]*storetypes.KVStoreKey)
 	storeKeys[evmtypes.StoreKey] = evmKey
 
+	// Create EVM keeper first (ERC20 keeper will be set after creation due to circular dependency)
 	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
 		app.appCodec,
 		evmKey,
@@ -75,10 +91,47 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
-		nil, // ERC20Keeper - can be nil for basic setup
-		evmChainID,
+		nil, // ERC20Keeper - will be set after ERC20 keeper creation
+		evmChainIDUint64,
 		"", // tracer - empty for now
 	))
+
+	// Create ERC20 keeper (requires EVM keeper, which we just created)
+	// Note: Transfer keeper is optional (can be nil) - we're using IBC transfer from ibc-go, not cosmos/evm
+	app.ERC20Keeper = erc20keeper.NewKeeper(
+		erc20Key,
+		app.appCodec,
+		authority,
+		app.AccountKeeper,
+		app.PreciseBankKeeper, // Use PreciseBankKeeper for bank operations
+		app.EVMKeeper,
+		app.StakingKeeper,
+		nil, // TransferKeeper - nil since we use IBC transfer from ibc-go, not cosmos/evm
+	)
+
+	// Recreate EVM keeper with ERC20 keeper to resolve circular dependency
+	// The EVM keeper needs the ERC20 keeper for ERC20 precompiles
+	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
+		app.appCodec,
+		evmKey,
+		evmTransientKey,
+		storeKeys,
+		authority,
+		app.AccountKeeper,
+		app.PreciseBankKeeper, // Use PreciseBankKeeper for fractional balance support
+		app.StakingKeeper,
+		app.FeeMarketKeeper, // Use FeeMarket keeper
+		app.ConsensusParamsKeeper,
+		app.ERC20Keeper, // Use ERC20 keeper
+		evmChainIDUint64,
+		"", // tracer - empty for now
+	))
+
+	// Register ERC20 module
+	erc20Module := erc20.NewAppModule(app.ERC20Keeper, app.AccountKeeper)
+	if err := app.RegisterModules(erc20Module); err != nil {
+		return err
+	}
 
 	// Register tokenization precompile
 	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)

@@ -8,6 +8,12 @@ import (
 const (
 	BaseCoinUnit         = "ubadge"
 	AccountAddressPrefix = "bb"
+	
+	// EVMChainID is the custom EVM chain ID for BitBadges chain
+	// This should match the chain_id in genesis under app_state.evm.params.chain_config.chain_id
+	// For production, set this to a unique chain ID (e.g., 9001, 13337, etc.)
+	// Default value of 9000 is used for testing compatibility
+	EVMChainID = "90123" // TODO: change this to a unique chain ID and set genesis
 )
 
 func SetAddressPrefixes() {

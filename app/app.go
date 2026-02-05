@@ -80,10 +80,11 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
+	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
+	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	precisebank "github.com/cosmos/evm/x/precisebank"
 	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
 	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
-	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
@@ -180,6 +181,7 @@ type App struct {
 	PoolManagerKeeper poolmanager.Keeper
 	SendmanagerKeeper sendmanagermodulekeeper.Keeper
 	FeeMarketKeeper   feemarketkeeper.Keeper
+	ERC20Keeper       erc20keeper.Keeper
 	EVMKeeper         *evmkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 

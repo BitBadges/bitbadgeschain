@@ -13,9 +13,9 @@ import (
 // that happen before PreBlock initializes the store-based config.
 func configureEVMKeeper(keeper *evmkeeper.Keeper) *evmkeeper.Keeper {
 	return keeper.WithDefaultEvmCoinInfo(evmtypes.EvmCoinInfo{
-		Denom:         "ubadge",
-		ExtendedDenom: "ubadge",
+		Denom:         "ubadge", // Base 9-decimal denomination
+		ExtendedDenom: "abadge", // Extended 18-decimal denomination for EVM (via precisebank)
 		DisplayDenom:  "BADGE",
-		Decimals:      9,
+		Decimals:      9, // Base decimals - precisebank extends to 18 for EVM
 	})
 }
