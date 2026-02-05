@@ -245,8 +245,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
-	// First, mint more badges to bob so he has enough to wrap
-	// The collection only mints 1 badge initially, so we need to mint more
+	// First, mint more tokens to bob so he has enough to wrap
+	// The collection only mints 1 token initially, so we need to mint more
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -272,20 +272,20 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error minting additional badges to bob")
+	suite.Require().Nil(err, "Error minting additional tokens to bob")
 
 	// For badgeslp: denoms, we can't wrap by transferring to wrapper path (AllowCosmosWrapping=false)
 	// badgeslp: denoms are just bank tokens, but the wrapped approach uses token balances
-	// Verify bob has badges (needed for the wrapped approach to work)
+	// Verify bob has tokens (needed for the wrapped approach to work)
 	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting bob's badge balance")
+	suite.Require().Nil(err, "Error getting bob's token balance")
 	suite.Require().True(len(bobBalanceBefore.Balances) > 0, "Bob should have badges")
 
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 
 	// For badgeslp: denoms, mint the wrapped coins to bob's bank account
-	// These are just bank tokens, but transfers will check badge balances
+	// These are just bank tokens, but transfers will check token balances
 	wrappedCoins := sdk.NewCoins(sdk.NewCoin(wrapperDenom, sdkmath.NewInt(4)))
 	err = suite.app.BankKeeper.MintCoins(suite.ctx, "mint", wrappedCoins)
 	suite.Require().Nil(err, "Error minting wrapped coins")
@@ -298,8 +298,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 
 	// Verify bob has badges (needed for the wrapped approach)
 	bobBalanceAfterMint, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting bob's badge balance")
-	suite.Require().True(len(bobBalanceAfterMint.Balances) > 0, "Bob should have badges for wrapped approach")
+	suite.Require().Nil(err, "Error getting bob's token balance")
+	suite.Require().True(len(bobBalanceAfterMint.Balances) > 0, "Bob should have tokens for wrapped approach")
 
 	// Add wrapped denom to allowed denoms
 	params := suite.app.TokenizationKeeper.GetParams(suite.ctx)
@@ -337,8 +337,8 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 	// Test coin transfer with wrapped denom and royalties
 	// For badgeslp: denoms, we check token balances, not bank balances
 	bobBalanceBeforeTransfer, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "error getting bob's badge balance before transfer")
-	suite.Require().NotNil(bobBalanceBeforeTransfer, "Bob should have badges before transfer")
+	suite.Require().Nil(err, "error getting bob's token balance before transfer")
+	suite.Require().NotNil(bobBalanceBeforeTransfer, "Bob should have tokens before transfer")
 
 	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
 		Creator:                 bob,
@@ -411,28 +411,28 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 	suite.Require().Nil(err, "Error executing transfer with wrapped denom coin transfer")
 
 	// For badgeslp: denoms, the wrapped approach transfers underlying tokens via sendNativeTokensToAddressWithPoolApprovals
-	// Verify alice received the underlying badges
+	// Verify alice received the underlying tokens
 	aliceBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
-	suite.Require().Nil(err, "Error getting alice's badge balance after transfer")
-	suite.Require().NotNil(aliceBalanceAfter, "Alice should have received badges")
-	suite.Require().True(len(aliceBalanceAfter.Balances) > 0, "Alice should have received at least some badges")
+	suite.Require().Nil(err, "Error getting alice's token balance after transfer")
+	suite.Require().NotNil(aliceBalanceAfter, "Alice should have received tokens")
+	suite.Require().True(len(aliceBalanceAfter.Balances) > 0, "Alice should have received at least some tokens")
 
 	// Verify charlie received the royalty (10% of 2 = 0.2, rounded down to 0 or up to 1)
 	// For badgeslp: denoms, royalties are also transferred as underlying tokens
 	charlieBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), charlie)
-	suite.Require().Nil(err, "Error getting charlie's badge balance after transfer")
-	// Charlie should have received badges as royalty (wrapped approach transfers badges)
-	suite.Require().NotNil(charlieBalanceAfter, "Charlie should have received badges as royalty")
+	suite.Require().Nil(err, "Error getting charlie's token balance after transfer")
+	// Charlie should have received tokens as royalty (wrapped approach transfers tokens)
+	suite.Require().NotNil(charlieBalanceAfter, "Charlie should have received tokens as royalty")
 
-	// Verify bob's badge balance decreased (wrapped approach transfers underlying badges)
+	// Verify bob's token balance decreased (wrapped approach transfers underlying tokens)
 	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting bob's badge balance after transfer")
+	suite.Require().Nil(err, "Error getting bob's token balance after transfer")
 	suite.Require().NotNil(bobBalanceAfter, "Bob should still have a balance")
 
-	// Bob's badge balance should have decreased because the wrapped approach transfers underlying badges
+	// Bob's token balance should have decreased because the wrapped approach transfers underlying tokens
 	diffInBalances, err := types.SubtractBalances(suite.ctx, bobBalanceAfter.Balances, bobBalanceBeforeTransfer.Balances)
 	suite.Require().Nil(err, "Error subtracting balances")
-	// Bob should have lost some badges (the wrapped approach transfers underlying badges)
+	// Bob should have lost some tokens (the wrapped approach transfers underlying tokens)
 	// Check if any balance shows a decrease (negative amount means loss)
 	hasDecrease := false
 	for _, balance := range diffInBalances {
@@ -441,7 +441,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 			break
 		}
 	}
-	suite.Require().True(hasDecrease || len(diffInBalances) > 0, "Bob should have lost badges from the wrapped approach transfer")
+	suite.Require().True(hasDecrease || len(diffInBalances) > 0, "Bob should have lost tokens from the wrapped approach transfer")
 }
 
 // TestCoinTransfersWithWrappedDenomsInsufficientBalance tests that insufficient balance is detected for badgeslp: wrapped denoms
@@ -494,12 +494,12 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 	// For badgeslp: denoms, we need to check token balances, not bank balances
 	// First, verify bob has badges
 	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting bob's badge balance")
+	suite.Require().Nil(err, "Error getting bob's token balance")
 	suite.Require().True(len(bobBalanceBefore.Balances) > 0, "Bob should have badges")
 
 	// For badgeslp: denoms, the wrapped approach calculates from token balances
-	// We need bob to have enough badges to wrap 2 coins
-	// Mint more badges to bob if needed
+	// We need bob to have enough tokens to wrap 2 coins
+	// Mint more tokens to bob if needed
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -525,7 +525,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error minting additional badges to bob")
+	suite.Require().Nil(err, "Error minting additional tokens to bob")
 
 	// Verify bob has 2 badges now
 	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
@@ -533,7 +533,7 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() 
 	suite.Require().True(len(bobBalanceAfter.Balances) > 0, "Bob should have badges")
 
 	// For badgeslp: denoms, mint some wrapped coins to bob's bank account
-	// The wrapped approach will check badge balances when transferring
+	// The wrapped approach will check token balances when transferring
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 	wrappedCoins := sdk.NewCoins(sdk.NewCoin(wrapperDenom, sdkmath.NewInt(2)))
@@ -667,7 +667,7 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
 
-	// First, mint more badges to bob so he has enough
+	// First, mint more tokens to bob so he has enough
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -693,15 +693,15 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error minting additional badges to bob")
+	suite.Require().Nil(err, "Error minting additional tokens to bob")
 
 	// Verify bob has badges (needed for the wrapped approach)
 	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting bob's badge balance")
+	suite.Require().Nil(err, "Error getting bob's token balance")
 	suite.Require().True(len(bobBalance.Balances) > 0, "Bob should have badges")
 
 	// For badgeslp: denoms, mint wrapped coins to bob's bank account
-	// These are just bank tokens, but transfers will check badge balances
+	// These are just bank tokens, but transfers will check token balances
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
 	wrappedCoins := sdk.NewCoins(sdk.NewCoin(wrapperDenom, sdkmath.NewInt(2)))
@@ -805,10 +805,10 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	// For badgeslp: denoms, the wrapped approach transfers underlying tokens
 	// Verify alice received the underlying badges
 	aliceBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
-	suite.Require().Nil(err, "Error getting alice's badge balance after transfer")
+	suite.Require().Nil(err, "Error getting alice's token balance after transfer")
 	suite.Require().NotNil(aliceBalanceAfter, "Alice should have received badges from the wrapped approach")
 
 	// Note: For badgeslp: denoms, the wrapped coins in bank are just representations
-	// The actual transfer uses sendNativeTokensToAddressWithPoolApprovals which transfers underlying badges
-	// So we check badge balances, not bank balances for the wrapped coins
+	// The actual transfer uses sendNativeTokensToAddressWithPoolApprovals which transfers underlying tokens
+	// So we check token balances, not bank balances for the wrapped coins
 }

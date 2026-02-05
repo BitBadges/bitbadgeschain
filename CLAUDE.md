@@ -21,7 +21,7 @@ go build ./cmd/bitbadgeschaind
 
 ### Testing
 ```bash
-# Run all badge module tests
+# Run all tokenization module tests
 go test ./x/tokenization/...
 
 # Run keeper tests specifically
@@ -68,7 +68,7 @@ git add *.pb.go *.pulsar.go
 ## Architecture Overview
 
 ### Core Structure
-This is a Cosmos SDK blockchain built with Ignite CLI that implements cross-chain digital token (badges) issuance and management.
+This is a Cosmos SDK blockchain built with Ignite CLI that implements cross-chain digital token issuance and management.
 
 ### Key Modules
 - **x/tokenization** - Core token functionality (collections, transfers, balances, permissions)

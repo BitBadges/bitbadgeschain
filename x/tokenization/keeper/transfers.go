@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -136,7 +136,7 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 				amountsStr := string(amountsJsonData)
 
 				EmitMessageAndIndexerEvents(ctx,
-					sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+					sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 					sdk.NewAttribute("creator", initiatedBy),
 					sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
 					sdk.NewAttribute("transfer", amountsStr),

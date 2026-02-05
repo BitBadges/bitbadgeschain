@@ -3,7 +3,7 @@ package tokenization.v22;
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v22";
 
-message BadgesPacketData {
+message TokenizationPacketData {
     oneof packet {
         NoData noData = 1;
     }

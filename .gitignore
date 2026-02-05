@@ -17,6 +17,7 @@ release/
 .DS_Store
 
 x/badges/keeper/coverage*
+x/tokenization/keeper/coverage*
 
 # Ignore all files starting with cover.
 cover.*

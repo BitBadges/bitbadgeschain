@@ -53,7 +53,7 @@ func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_MultiRecipi
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set up approvals
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -158,7 +158,7 @@ func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_MultipleTra
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set up approvals
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -265,7 +265,7 @@ func (suite *BalanceRaceConditionTestSuite) TestBalanceRaceCondition_Insufficien
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(20, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set up approvals
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")

@@ -50,7 +50,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_WithExistingCollection() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(collectionId, suite.Alice, mintBalances)
+	suite.MintTokens(collectionId, suite.Alice, mintBalances)
 
 	// Set approvals
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -123,7 +123,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_CreatorPermission_Manager() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(collectionId, suite.Manager, mintBalances)
+	suite.MintTokens(collectionId, suite.Manager, mintBalances)
 
 	// Set up outgoing approval for manager
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -189,7 +189,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_CreatorPermission_OriginalCreator()
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(collectionId, creator, mintBalances)
+	suite.MintTokens(collectionId, creator, mintBalances)
 
 	// Original creator should be able to use auto-prev even though they're not the manager
 	setIncomingMsg := &types.MsgSetIncomingApproval{
@@ -255,7 +255,7 @@ func (suite *AutoPrevTestSuite) TestAutoPrev_MultiMsgTransaction() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(collectionId1, suite.Alice, mintBalances)
+	suite.MintTokens(collectionId1, suite.Alice, mintBalances)
 
 	// Create second collection (simulating second message in multi-msg transaction)
 	_ = suite.CreateTestCollection(suite.Manager) // collectionId2 - we'll get it from next collection ID

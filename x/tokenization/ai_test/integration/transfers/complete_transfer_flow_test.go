@@ -41,7 +41,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_AllThreeApp
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set outgoing approval for Alice
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -93,7 +93,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingColl
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set only user approvals (missing collection approval)
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -146,7 +146,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingOutg
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set only incoming approval (missing outgoing approval)
 	incomingApproval := testutil.GenerateUserIncomingApproval("incoming1", "All")
@@ -190,7 +190,7 @@ func (suite *CompleteTransferFlowTestSuite) TestCompleteTransferFlow_MissingInco
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set only outgoing approval (missing incoming approval)
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")

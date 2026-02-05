@@ -13,12 +13,12 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	badgessimulation "github.com/bitbadges/bitbadgeschain/x/tokenization/simulation"
+	tokenizationsimulation "github.com/bitbadges/bitbadgeschain/x/tokenization/simulation"
 )
 
 // avoid unused import issue
 var (
-	_ = badgessimulation.FindAccount
+	_ = tokenizationsimulation.FindAccount
 	_ = rand.Rand{}
 	_ = sample.AccAddress
 	_ = sdk.AccAddress{}
@@ -56,7 +56,7 @@ func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	for i, acc := range simState.Accounts {
 		accs[i] = acc.Address.String()
 	}
-	badgesGenesis := types.DefaultGenesis()
+	tokenizationGenesis := types.DefaultGenesis()
 
 	// Pre-create collections, dynamic stores, and balances for better simulation starting state
 	// This ensures simulation operations have valid state to work with from the start
@@ -81,7 +81,7 @@ func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		// This ensures simulation starts with a clean state but operations can create resources
 
 		// Pre-create some dynamic stores in genesis state
-		for i := 0; i < badgessimulation.DefaultSimDynamicStoreCount && i < len(simAccounts); i++ {
+		for i := 0; i < tokenizationsimulation.DefaultSimDynamicStoreCount && i < len(simAccounts); i++ {
 			creator := simAccounts[i].Address.String()
 			defaultValue := r.Intn(2) == 0
 
@@ -92,18 +92,18 @@ func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 				DefaultValue:  defaultValue,
 				GlobalEnabled: true,
 			}
-			badgesGenesis.DynamicStores = append(badgesGenesis.DynamicStores, dynamicStore)
+			tokenizationGenesis.DynamicStores = append(tokenizationGenesis.DynamicStores, dynamicStore)
 		}
 
 		// Update next IDs to reflect pre-created resources
-		if len(badgesGenesis.DynamicStores) > 0 {
-			badgesGenesis.NextDynamicStoreId = sdkmath.NewUint(uint64(len(badgesGenesis.DynamicStores) + 1))
+		if len(tokenizationGenesis.DynamicStores) > 0 {
+			tokenizationGenesis.NextDynamicStoreId = sdkmath.NewUint(uint64(len(tokenizationGenesis.DynamicStores) + 1))
 		}
 	}
 
 	// Use default genesis which already initializes NextCollectionId to 1
 	// this line is used by starport scaffolding # simapp/module/genesisState
-	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(badgesGenesis)
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(tokenizationGenesis)
 }
 
 // RegisterStoreDecoder registers a decoder.
@@ -121,9 +121,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCreateCollection,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgCreateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgCreateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -135,9 +135,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgUniversalUpdateCollection,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgUniversalUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgUniversalUpdateCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -149,9 +149,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgDeleteCollection,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgDeleteCollection(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -163,9 +163,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgTransferTokens,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgTransferTokens(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgTransferTokens(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -177,9 +177,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgUpdateUserApprovals,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgUpdateUserApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgUpdateUserApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -191,9 +191,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSetIncomingApproval,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgSetIncomingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgSetIncomingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -205,9 +205,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSetOutgoingApproval,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgSetOutgoingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgSetOutgoingApproval(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -219,9 +219,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgPurgeApprovals,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgPurgeApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgPurgeApprovals(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -233,9 +233,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCreateAddressLists,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgCreateAddressLists(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgCreateAddressLists(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 
@@ -247,9 +247,9 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSetDynamicStoreValue,
-		badgessimulation.MultiRunOperation(
-			badgessimulation.SimulateMsgSetDynamicStoreValue(am.accountKeeper, am.bankKeeper, am.keeper),
-			badgessimulation.DefaultMultiRunAttempts,
+		tokenizationsimulation.MultiRunOperation(
+			tokenizationsimulation.SimulateMsgSetDynamicStoreValue(am.accountKeeper, am.bankKeeper, am.keeper),
+			tokenizationsimulation.DefaultMultiRunAttempts,
 		),
 	))
 

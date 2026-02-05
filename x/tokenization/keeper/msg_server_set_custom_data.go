@@ -56,7 +56,7 @@ func (k msgServer) SetCustomData(goCtx context.Context, msg *types.MsgSetCustomD
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_custom_data"),
 		sdk.NewAttribute("msg", msgStr),

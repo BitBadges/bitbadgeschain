@@ -39,7 +39,7 @@ type ApprovalCriteria struct {
 	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
 	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
-	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
+	// royalties) that must be executed alongside the token transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
 	// If true, only transfers where the recipient matches the initiator are allowed.
@@ -322,7 +322,7 @@ type OutgoingApprovalCriteria struct {
 	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
 	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
-	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
+	// royalties) that must be executed alongside the token transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "to" address to be equal to the "initiated by" address for approval.
 	// If true, only transfers where the recipient matches the initiator are allowed.
@@ -522,7 +522,7 @@ type IncomingApprovalCriteria struct {
 	// and enforces the limit to prevent exceeding the allowed number of uses.
 	MaxNumTransfers *MaxNumTransfers `protobuf:"bytes,4,opt,name=maxNumTransfers,proto3" json:"maxNumTransfers,omitempty"`
 	// The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
-	// royalties) that must be executed alongside the badge transfer for the approval to be valid.
+	// royalties) that must be executed alongside the token transfer for the approval to be valid.
 	CoinTransfers []*CoinTransfer `protobuf:"bytes,5,rep,name=coinTransfers,proto3" json:"coinTransfers,omitempty"`
 	// Require the "from" address to be equal to the "initiated by" address for approval.
 	// If true, only transfers where the sender matches the initiator are allowed.

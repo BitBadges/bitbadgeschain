@@ -116,7 +116,7 @@ func (suite *BalanceManagementTestSuite) TestBalanceManagement_BalanceUpdate() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(100, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set approvals
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")

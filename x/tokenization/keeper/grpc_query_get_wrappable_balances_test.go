@@ -67,7 +67,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	err = CreateCollections(suite, wctx, collectionsToCreate)
 	require.NoError(t, err, "error creating collection for wrappable balances test")
 
-	// Execute the transfers to actually give badges to the users
+	// Execute the transfers to actually give tokens to the users
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	require.NoError(t, err, "error getting collection")
 
@@ -97,7 +97,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 			},
 		},
 	})
-	require.NoError(t, err, "error minting and distributing badges")
+	require.NoError(t, err, "error minting and distributing tokens")
 
 	// Test with valid denom but no wrapper path found
 	_, err = suite.app.TokenizationKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
@@ -115,7 +115,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, response)
 
-	// Bob should have tokens, and since 1 native badge = 1 wrapped token,
+	// Bob should have tokens, and since 1 native token = 1 wrapped token,
 	// the max wrappable amount should match the number of tokens he has
 	// (The exact amount depends on collection setup, but with 1:1 conversion it should match his balance)
 	require.GreaterOrEqual(t, response.Amount.Uint64(), uint64(1), "Bob should be able to wrap at least 1 token")
@@ -146,7 +146,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	err = CreateCollections(suite, wctx, collectionsToCreate2)
 	require.NoError(t, err, "error creating second collection for wrappable balances test")
 
-	// Execute the transfers to actually give badges to charlie
+	// Execute the transfers to actually give tokens to charlie
 	collection2, err := GetCollection(suite, wctx, sdkmath.NewUint(2))
 	require.NoError(t, err, "error getting collection 2")
 
@@ -176,9 +176,9 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 			},
 		},
 	})
-	require.NoError(t, err, "error minting and distributing badges to charlie")
+	require.NoError(t, err, "error minting and distributing tokens to charlie")
 
-	// Charlie should have 1 token, and since 1 native badge = 1 wrapped token,
+	// Charlie should have 1 token, and since 1 native token = 1 wrapped token,
 	// the max wrappable amount should be 1 (1 token / 1 = 1)
 	response2, err := suite.app.TokenizationKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
 		Denom:   keeper.WrappedDenomPrefix + "2:testcoin-two",
@@ -188,7 +188,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	require.NotNil(t, response2)
 	require.GreaterOrEqual(t, response2.Amount.Uint64(), uint64(1), "Charlie should be able to wrap at least 1 token")
 
-	// Test with alias path amount > 1 to ensure conversion math works (e.g., 2 badges -> 2 coins when user has 4)
+	// Test with alias path amount > 1 to ensure conversion math works (e.g., 2 tokens -> 2 coins when user has 4)
 	nextId := suite.app.TokenizationKeeper.GetNextCollectionId(suite.ctx)
 	collectionsToCreate4 := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate4[0].AliasPathsToAdd = []*types.AliasPathAddObject{
@@ -222,7 +222,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 		CollectionId: nextId,
 		TokensToCreate: []*types.Balance{
 			{
-				Amount:         sdkmath.NewUint(4), // give bob 4 badges
+				Amount:         sdkmath.NewUint(4), // give bob 4 tokens
 				TokenIds:       GetOneUintRange(),
 				OwnershipTimes: GetFullUintRanges(),
 			},
@@ -243,7 +243,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 			},
 		},
 	})
-	require.NoError(t, err, "error minting and distributing badges to bob for amount>1 test")
+	require.NoError(t, err, "error minting and distributing tokens to bob for amount>1 test")
 
 	respAmount, err := suite.app.TokenizationKeeper.GetWrappableBalances(wctx, &types.QueryGetWrappableBalancesRequest{
 		Denom:   keeper.AliasDenomPrefix + nextId.String() + ":twox",
@@ -251,10 +251,10 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, respAmount)
-	// Bob has 5 badges total (collection creation minted 1 + we minted 4 more).
-	// Path: Amount=2 means 2 wrapped units per conversion, and each conversion requires 1 badge.
-	// So: 5 badges / 1 badge per conversion = 5 conversions, and 5 conversions * 2 wrapped units = 10 wrapped units.
-	require.Equal(t, uint64(10), respAmount.Amount.Uint64(), "Bob should be able to wrap 10 units (5 badges * 2 wrapped units per badge)")
+	// Bob has 5 tokens total (collection creation minted 1 + we minted 4 more).
+	// Path: Amount=2 means 2 wrapped units per conversion, and each conversion requires 1 token.
+	// So: 5 tokens / 1 token per conversion = 5 conversions, and 5 conversions * 2 wrapped units = 10 wrapped units.
+	require.Equal(t, uint64(10), respAmount.Amount.Uint64(), "Bob should be able to wrap 10 units (5 tokens * 2 wrapped units per token)")
 
 	// Test with a wrapper path that doesn't allow cosmos wrapping
 	// This should now work and return 0 since the user has 1 token but wrapper needs 1 token
@@ -283,7 +283,7 @@ func TestKeeper_GetWrappableBalances(t *testing.T) {
 	err = CreateCollections(suite, wctx, collectionsToCreate3)
 	require.NoError(t, err, "error creating collection for no-wrap test")
 
-	// Execute the transfers to actually give badges to alice
+	// Execute the transfers to actually give tokens to alice
 	collection3, err := GetCollection(suite, wctx, nextIdNoWrap)
 	require.NoError(t, err, "error getting collection for no-wrap test")
 
@@ -358,7 +358,7 @@ func TestKeeper_GetWrappableBalances_AdvancedLogic(t *testing.T) {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	require.NoError(t, err, "error creating collection for advanced test")
 
-	// Test with user who has exactly enough badges for 1 wrapped token
+	// Test with user who has exactly enough tokens for 1 wrapped token
 	// User has: 1 of token ID 1
 	// Wrapper needs: 1 of token ID 1 for 1 wrapped token
 	// So max wrappable should be 1 (1 >= 1)
@@ -430,7 +430,7 @@ func TestKeeper_GetWrappableBalances_Comprehensive(t *testing.T) {
 			pathBalanceAmount: sdkmath.NewUint(1),
 			userBalanceAmount: sdkmath.NewUint(1),
 			expectedResult:    sdkmath.NewUint(1),
-			description:       "1 badge -> 1 wrapped unit, user has 1 badge",
+			description:       "1 token -> 1 wrapped unit, user has 1 token",
 		},
 		{
 			name:              "1:1 conversion with excess",
@@ -445,24 +445,24 @@ func TestKeeper_GetWrappableBalances_Comprehensive(t *testing.T) {
 			pathAmount:        sdkmath.NewUint(2),
 			pathBalanceAmount: sdkmath.NewUint(1),
 			userBalanceAmount: sdkmath.NewUint(3),
-			expectedResult:    sdkmath.NewUint(6), // 3 badges * 2 wrapped units
-			description:       "1 badge -> 2 wrapped units, user has 3 badges",
+			expectedResult:    sdkmath.NewUint(6), // 3 tokens * 2 wrapped units
+			description:       "1 token -> 2 wrapped units, user has 3 tokens",
 		},
 		{
-			name:              "1:2 conversion (1 wrapped unit per 2 badges)",
+			name:              "1:2 conversion (1 wrapped unit per 2 tokens)",
 			pathAmount:        sdkmath.NewUint(1),
 			pathBalanceAmount: sdkmath.NewUint(2),
 			userBalanceAmount: sdkmath.NewUint(6),
-			expectedResult:    sdkmath.NewUint(3), // 6 badges / 2 = 3 conversions * 1 wrapped unit
-			description:       "2 badges -> 1 wrapped unit, user has 6 badges",
+			expectedResult:    sdkmath.NewUint(3), // 6 tokens / 2 = 3 conversions * 1 wrapped unit
+			description:       "2 tokens -> 1 wrapped unit, user has 6 tokens",
 		},
 		{
 			name:              "3:5 conversion",
 			pathAmount:        sdkmath.NewUint(3),
 			pathBalanceAmount: sdkmath.NewUint(5),
 			userBalanceAmount: sdkmath.NewUint(10),
-			expectedResult:    sdkmath.NewUint(6), // 10 badges / 5 = 2 conversions * 3 wrapped units
-			description:       "5 badges -> 3 wrapped units, user has 10 badges",
+			expectedResult:    sdkmath.NewUint(6), // 10 tokens / 5 = 2 conversions * 3 wrapped units
+			description:       "5 tokens -> 3 wrapped units, user has 10 tokens",
 		},
 		{
 			name:              "Large amounts",
@@ -470,15 +470,15 @@ func TestKeeper_GetWrappableBalances_Comprehensive(t *testing.T) {
 			pathBalanceAmount: sdkmath.NewUint(50),
 			userBalanceAmount: sdkmath.NewUint(250),
 			expectedResult:    sdkmath.NewUint(500), // 250 / 50 = 5 conversions * 100 wrapped units
-			description:       "50 badges -> 100 wrapped units, user has 250 badges",
+			description:       "50 tokens -> 100 wrapped units, user has 250 tokens",
 		},
 		{
 			name:              "User has less than required",
 			pathAmount:        sdkmath.NewUint(1),
 			pathBalanceAmount: sdkmath.NewUint(10),
 			userBalanceAmount: sdkmath.NewUint(5),
-			expectedResult:    sdkmath.NewUint(0), // 5 badges < 10 required, so 0 conversions
-			description:       "10 badges -> 1 wrapped unit, user has only 5 badges",
+			expectedResult:    sdkmath.NewUint(0), // 5 tokens < 10 required, so 0 conversions
+			description:       "10 tokens -> 1 wrapped unit, user has only 5 tokens",
 		},
 		{
 			name:              "User has exactly required amount",
@@ -486,7 +486,7 @@ func TestKeeper_GetWrappableBalances_Comprehensive(t *testing.T) {
 			pathBalanceAmount: sdkmath.NewUint(7),
 			userBalanceAmount: sdkmath.NewUint(7),
 			expectedResult:    sdkmath.NewUint(1), // Exactly 1 conversion possible
-			description:       "7 badges -> 1 wrapped unit, user has exactly 7 badges",
+			description:       "7 tokens -> 1 wrapped unit, user has exactly 7 tokens",
 		},
 	}
 

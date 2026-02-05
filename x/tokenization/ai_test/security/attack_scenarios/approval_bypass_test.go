@@ -30,7 +30,7 @@ func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutCollection
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(10, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set only outgoing approval (missing collection approval)
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")
@@ -84,7 +84,7 @@ func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutOutgoingAp
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(10, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set only incoming approval (missing outgoing approval)
 	incomingApproval := testutil.GenerateUserIncomingApproval("incoming1", "All")
@@ -128,7 +128,7 @@ func (suite *ApprovalBypassAttackTestSuite) TestApprovalBypass_WithoutIncomingAp
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(10, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set only outgoing approval (missing incoming approval)
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")

@@ -25,7 +25,7 @@ message ApprovalCriteria {
   // and enforces the limit to prevent exceeding the allowed number of uses.
   MaxNumTransfers maxNumTransfers = 4;
   // The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
-  // royalties) that must be executed alongside the badge transfer for the approval to be valid.
+  // royalties) that must be executed alongside the token transfer for the approval to be valid.
   repeated CoinTransfer coinTransfers = 5;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
@@ -104,7 +104,7 @@ message OutgoingApprovalCriteria {
   // and enforces the limit to prevent exceeding the allowed number of uses.
   MaxNumTransfers maxNumTransfers = 4;
   // The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
-  // royalties) that must be executed alongside the badge transfer for the approval to be valid.
+  // royalties) that must be executed alongside the token transfer for the approval to be valid.
   repeated CoinTransfer coinTransfers = 5;
 
   // Require the "to" address to be equal to the "initiated by" address for approval.
@@ -162,7 +162,7 @@ message IncomingApprovalCriteria {
   // and enforces the limit to prevent exceeding the allowed number of uses.
   MaxNumTransfers maxNumTransfers = 4;
   // The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
-  // royalties) that must be executed alongside the badge transfer for the approval to be valid.
+  // royalties) that must be executed alongside the token transfer for the approval to be valid.
   repeated CoinTransfer coinTransfers = 5;
 
   // Require the "from" address to be equal to the "initiated by" address for approval.

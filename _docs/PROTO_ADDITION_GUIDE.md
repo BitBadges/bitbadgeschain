@@ -89,8 +89,8 @@ This pattern:
 If your new field uses types from other proto files, ensure proper imports:
 
 ```protobuf
-import "badges/transfers.proto";
-import "badges/balances.proto";
+import "tokenization/transfers.proto";
+import "tokenization/balances.proto";
 import "cosmos/base/v1beta1/coin.proto";
 ```
 

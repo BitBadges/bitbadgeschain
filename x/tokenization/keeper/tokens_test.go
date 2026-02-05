@@ -222,7 +222,7 @@ func (suite *TestSuite) TestCreateTokensIdGreaterThanMax() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
-func (suite *TestSuite) TestDuplicateBadgeIDs() {
+func (suite *TestSuite) TestDuplicateTokenIDs() {
 	// wctx := sdk.WrapSDKContext(suite.ctx)
 
 	currBalances := []*types.Balance{

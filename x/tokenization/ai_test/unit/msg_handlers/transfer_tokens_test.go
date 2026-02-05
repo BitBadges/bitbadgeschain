@@ -44,7 +44,7 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_ValidTransfer() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(10, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Create a collection approval that allows transfers from All to All
 	approval := testutil.GenerateCollectionApproval("approval1", "AllWithoutMint", "All")
@@ -120,7 +120,7 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_WithoutApprovals() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(10, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Try to transfer without approvals - should fail
 	transferMsg := &types.MsgTransferTokens{
@@ -184,7 +184,7 @@ func (suite *TransferTokensTestSuite) TestTransferTokens_MultiRecipient() {
 	mintBalances := []*types.Balance{
 		testutil.GenerateSimpleBalance(20, 1),
 	}
-	suite.MintBadges(suite.CollectionId, suite.Alice, mintBalances)
+	suite.MintTokens(suite.CollectionId, suite.Alice, mintBalances)
 
 	// Set approvals for all parties
 	outgoingApproval := testutil.GenerateUserOutgoingApproval("outgoing1", "All")

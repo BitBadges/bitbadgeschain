@@ -22,24 +22,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type BadgesPacketData struct {
+type TokenizationPacketData struct {
 	// Types that are valid to be assigned to Packet:
-	//	*BadgesPacketData_NoData
-	Packet isBadgesPacketData_Packet `protobuf_oneof:"packet"`
+	//	*TokenizationPacketData_NoData
+	Packet isTokenizationPacketData_Packet `protobuf_oneof:"packet"`
 }
 
-func (m *BadgesPacketData) Reset()         { *m = BadgesPacketData{} }
-func (m *BadgesPacketData) String() string { return proto.CompactTextString(m) }
-func (*BadgesPacketData) ProtoMessage()    {}
-func (*BadgesPacketData) Descriptor() ([]byte, []int) {
+func (m *TokenizationPacketData) Reset()         { *m = TokenizationPacketData{} }
+func (m *TokenizationPacketData) String() string { return proto.CompactTextString(m) }
+func (*TokenizationPacketData) ProtoMessage()    {}
+func (*TokenizationPacketData) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2b5396e7e5778748, []int{0}
 }
-func (m *BadgesPacketData) XXX_Unmarshal(b []byte) error {
+func (m *TokenizationPacketData) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BadgesPacketData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TokenizationPacketData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BadgesPacketData.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TokenizationPacketData.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -49,48 +49,48 @@ func (m *BadgesPacketData) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *BadgesPacketData) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BadgesPacketData.Merge(m, src)
+func (m *TokenizationPacketData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TokenizationPacketData.Merge(m, src)
 }
-func (m *BadgesPacketData) XXX_Size() int {
+func (m *TokenizationPacketData) XXX_Size() int {
 	return m.Size()
 }
-func (m *BadgesPacketData) XXX_DiscardUnknown() {
-	xxx_messageInfo_BadgesPacketData.DiscardUnknown(m)
+func (m *TokenizationPacketData) XXX_DiscardUnknown() {
+	xxx_messageInfo_TokenizationPacketData.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BadgesPacketData proto.InternalMessageInfo
+var xxx_messageInfo_TokenizationPacketData proto.InternalMessageInfo
 
-type isBadgesPacketData_Packet interface {
-	isBadgesPacketData_Packet()
+type isTokenizationPacketData_Packet interface {
+	isTokenizationPacketData_Packet()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type BadgesPacketData_NoData struct {
+type TokenizationPacketData_NoData struct {
 	NoData *NoData `protobuf:"bytes,1,opt,name=noData,proto3,oneof" json:"noData,omitempty"`
 }
 
-func (*BadgesPacketData_NoData) isBadgesPacketData_Packet() {}
+func (*TokenizationPacketData_NoData) isTokenizationPacketData_Packet() {}
 
-func (m *BadgesPacketData) GetPacket() isBadgesPacketData_Packet {
+func (m *TokenizationPacketData) GetPacket() isTokenizationPacketData_Packet {
 	if m != nil {
 		return m.Packet
 	}
 	return nil
 }
 
-func (m *BadgesPacketData) GetNoData() *NoData {
-	if x, ok := m.GetPacket().(*BadgesPacketData_NoData); ok {
+func (m *TokenizationPacketData) GetNoData() *NoData {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_NoData); ok {
 		return x.NoData
 	}
 	return nil
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*BadgesPacketData) XXX_OneofWrappers() []interface{} {
+func (*TokenizationPacketData) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*BadgesPacketData_NoData)(nil),
+		(*TokenizationPacketData_NoData)(nil),
 	}
 }
 
@@ -131,7 +131,7 @@ func (m *NoData) XXX_DiscardUnknown() {
 var xxx_messageInfo_NoData proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*BadgesPacketData)(nil), "tokenization.v21.BadgesPacketData")
+	proto.RegisterType((*TokenizationPacketData)(nil), "tokenization.v21.TokenizationPacketData")
 	proto.RegisterType((*NoData)(nil), "tokenization.v21.NoData")
 }
 
@@ -142,18 +142,18 @@ var fileDescriptor_2b5396e7e5778748 = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2d, 0xc9, 0xcf, 0x4e,
 	0xcd, 0xcb, 0xac, 0x4a, 0x2c, 0xc9, 0xcc, 0xcf, 0xd3, 0x2f, 0x33, 0x32, 0xd4, 0x2f, 0x48, 0x4c,
 	0xce, 0x4e, 0x2d, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x40, 0x96, 0xd6, 0x2b, 0x33,
-	0x32, 0x54, 0x0a, 0xe0, 0x12, 0x70, 0x4a, 0x4c, 0x49, 0x4f, 0x2d, 0x0e, 0x00, 0xab, 0x73, 0x49,
-	0x2c, 0x49, 0x14, 0x32, 0xe2, 0x62, 0xcb, 0xcb, 0x07, 0xb1, 0x24, 0x18, 0x15, 0x18, 0x35, 0xb8,
-	0x8d, 0x24, 0xf4, 0xd0, 0xb5, 0xe9, 0xf9, 0x81, 0xe5, 0x3d, 0x18, 0x82, 0xa0, 0x2a, 0x9d, 0x38,
-	0xb8, 0xd8, 0x20, 0x36, 0x29, 0x71, 0x70, 0xb1, 0x41, 0x64, 0x9d, 0xc2, 0x4e, 0x3c, 0x92, 0x63,
-	0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96,
-	0x63, 0xb8, 0xf1, 0x58, 0x8e, 0x21, 0xca, 0x26, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49, 0x2f, 0x39,
-	0x3f, 0x57, 0x3f, 0x29, 0xb3, 0x24, 0x09, 0xec, 0x02, 0x04, 0x2b, 0x39, 0x23, 0x31, 0x33, 0x4f,
-	0xbf, 0x42, 0x1f, 0xc5, 0x33, 0x25, 0x95, 0x05, 0xa9, 0xc5, 0x20, 0x2f, 0x25, 0xb1, 0x81, 0x3d,
-	0x63, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x85, 0x8a, 0xb9, 0xd3, 0xed, 0x00, 0x00, 0x00,
+	0x32, 0x54, 0x0a, 0xe3, 0x12, 0x0b, 0x41, 0x12, 0x0b, 0x00, 0xab, 0x76, 0x49, 0x2c, 0x49, 0x14,
+	0x32, 0xe2, 0x62, 0xcb, 0xcb, 0x07, 0xb1, 0x24, 0x18, 0x15, 0x18, 0x35, 0xb8, 0x8d, 0x24, 0xf4,
+	0xd0, 0x35, 0xeb, 0xf9, 0x81, 0xe5, 0x3d, 0x18, 0x82, 0xa0, 0x2a, 0x9d, 0x38, 0xb8, 0xd8, 0x20,
+	0xf6, 0x29, 0x71, 0x70, 0xb1, 0x41, 0x64, 0x9d, 0xc2, 0x4e, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48,
+	0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96, 0x63, 0xb8, 0xf1,
+	0x58, 0x8e, 0x21, 0xca, 0x26, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49, 0x2f, 0x39, 0x3f, 0x57, 0x3f,
+	0x29, 0xb3, 0x24, 0x29, 0x31, 0x25, 0x3d, 0xb5, 0x18, 0xc1, 0x4a, 0xce, 0x48, 0xcc, 0xcc, 0xd3,
+	0xaf, 0xd0, 0x47, 0xf1, 0x52, 0x49, 0x65, 0x41, 0x6a, 0x31, 0xc8, 0x63, 0x49, 0x6c, 0x60, 0x2f,
+	0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xaa, 0x90, 0x9b, 0xc7, 0xf3, 0x00, 0x00, 0x00,
 }
 
-func (m *BadgesPacketData) Marshal() (dAtA []byte, err error) {
+func (m *TokenizationPacketData) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -163,12 +163,12 @@ func (m *BadgesPacketData) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BadgesPacketData) MarshalTo(dAtA []byte) (int, error) {
+func (m *TokenizationPacketData) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BadgesPacketData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TokenizationPacketData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -185,12 +185,12 @@ func (m *BadgesPacketData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *BadgesPacketData_NoData) MarshalTo(dAtA []byte) (int, error) {
+func (m *TokenizationPacketData_NoData) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BadgesPacketData_NoData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TokenizationPacketData_NoData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.NoData != nil {
 		{
@@ -240,7 +240,7 @@ func encodeVarintPacket(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *BadgesPacketData) Size() (n int) {
+func (m *TokenizationPacketData) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -252,7 +252,7 @@ func (m *BadgesPacketData) Size() (n int) {
 	return n
 }
 
-func (m *BadgesPacketData_NoData) Size() (n int) {
+func (m *TokenizationPacketData_NoData) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -279,7 +279,7 @@ func sovPacket(x uint64) (n int) {
 func sozPacket(x uint64) (n int) {
 	return sovPacket(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *BadgesPacketData) Unmarshal(dAtA []byte) error {
+func (m *TokenizationPacketData) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -302,10 +302,10 @@ func (m *BadgesPacketData) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BadgesPacketData: wiretype end group for non-group")
+			return fmt.Errorf("proto: TokenizationPacketData: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BadgesPacketData: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TokenizationPacketData: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -341,7 +341,7 @@ func (m *BadgesPacketData) Unmarshal(dAtA []byte) error {
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Packet = &BadgesPacketData_NoData{v}
+			m.Packet = &TokenizationPacketData_NoData{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

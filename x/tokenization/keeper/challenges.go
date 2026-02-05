@@ -187,7 +187,7 @@ func (k Keeper) HandleMerkleChallenges(
 						// Currently added for indexer, but note that it is planned to be deprecated
 						ctx.EventManager().EmitEvent(
 							sdk.NewEvent("challenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(leafIndex)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
-								sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+								sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 								sdk.NewAttribute("creator", creatorAddress),
 								sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 								sdk.NewAttribute("challengeTrackerId", fmt.Sprint(challengeId)),
@@ -282,7 +282,7 @@ func (k Keeper) HandleETHSignatureChallenges(
 			// Currently added for indexer, but note that it is planned to be deprecated
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent("ethSignatureChallenge"+fmt.Sprint(approval.ApprovalId)+fmt.Sprint(challengeId)+fmt.Sprint(proof.Signature)+fmt.Sprint(approverAddress)+fmt.Sprint(approvalLevel)+fmt.Sprint(newNumUsed),
-					sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+					sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 					sdk.NewAttribute("creator", initiatorAddress),
 					sdk.NewAttribute("initiator", initiatorAddress),
 					sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),

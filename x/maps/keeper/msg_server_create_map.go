@@ -41,7 +41,7 @@ func (k msgServer) CreateMap(goCtx context.Context, msg *types.MsgCreateMap) (*t
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Map ID must be a valid collection ID. Could not find collection in store")
 		}
 
-		//Check if user is manager of collection in x/badges
+		//Check if user is manager of collection in x/tokenization
 		currManager := tokentypes.GetCurrentManager(ctx, currCollectionRes.Collection)
 		if currManager != msg.Creator {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Numeric map IDs are reserved for specific collections. To create a map for this collection, you must be the manager of the collection")

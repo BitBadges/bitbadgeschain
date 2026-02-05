@@ -1,11 +1,11 @@
-# Test Coverage Report - Badges Module AI Test Suite
+# Test Coverage Report - Tokenization Module AI Test Suite
 
 ## Executive Summary
 
-This report documents the test coverage achieved by the AI-generated test suite for the x/badges module.
+This report documents the test coverage achieved by the AI-generated test suite for the x/tokenization module.
 
 **Report Date**: 2024
-**Test Suite Location**: `x/badges/ai_test/`
+**Test Suite Location**: `x/tokenization/ai_test/`
 **Total Test Files**: 10+
 **Total Test Cases**: 30+
 
@@ -238,16 +238,16 @@ This report documents the test coverage achieved by the AI-generated test suite 
 
 ```bash
 # Run all AI tests
-go test ./x/badges/ai_test/...
+go test ./x/tokenization/ai_test/...
 
 # Run specific test suite
-go test ./x/badges/ai_test/unit/msg_handlers/...
+go test ./x/tokenization/ai_test/unit/msg_handlers/...
 
 # Run with coverage
-go test -cover ./x/badges/ai_test/...
+go test -cover ./x/tokenization/ai_test/...
 
 # Run with verbose output
-go test -v ./x/badges/ai_test/...
+go test -v ./x/tokenization/ai_test/...
 ```
 
 ### Test Performance
@@ -334,7 +334,7 @@ go test -v ./x/badges/ai_test/...
 
 ## Conclusion
 
-The AI-generated test suite provides a solid foundation for testing the x/badges module. Good coverage has been achieved for:
+The AI-generated test suite provides a solid foundation for testing the x/tokenization module. Good coverage has been achieved for:
 
 -   Critical security scenarios
 -   Basic transfer flows

@@ -35,7 +35,7 @@ type (
 		SendCoins(ctx context.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
 	}
 
-	// TokenizationKeeper interface for badges module operations
+	// TokenizationKeeper interface for tokenization module operations
 	TokenizationKeeper interface {
 		ParseCollectionFromDenom(ctx sdk.Context, denom string) (*tokenizationtypes.TokenCollection, error)
 		SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error
@@ -630,7 +630,7 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid transfer.to_address: %s", transfer.ToAddress))
 	}
 
-	// Only set auto-approve flags for wrapped badges denoms
+	// Only set auto-approve flags for wrapped tokenization denoms
 	// For regular denoms, SendCoinsFromIntermediateAddress will handle them via bank keeper
 	if k.tokenizationKeeper.CheckIsAliasDenom(ctx, token.Denom) {
 		collection, err := k.tokenizationKeeper.ParseCollectionFromDenom(ctx, token.Denom)

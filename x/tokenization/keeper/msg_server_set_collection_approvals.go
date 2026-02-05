@@ -56,7 +56,7 @@ func (k msgServer) SetCollectionApprovals(goCtx context.Context, msg *types.MsgS
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_collection_approvals"),
 		sdk.NewAttribute("msg", msgStr),

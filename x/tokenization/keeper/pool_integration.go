@@ -114,7 +114,7 @@ func (k Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, c
 	return nil
 }
 
-// sendNativeTokensToAddressWithPoolApprovals sends native badges tokens to an address
+// sendNativeTokensToAddressWithPoolApprovals sends native tokens to an address
 func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, poolAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
@@ -132,7 +132,7 @@ func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, pool
 	}
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
-	badgesMsgServer := NewMsgServerImpl(k)
+	tokenizationMsgServer := NewMsgServerImpl(k)
 
 	// Important: We should only allow auto-scanned approvals here
 	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
@@ -148,11 +148,11 @@ func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, pool
 		},
 	}
 
-	_, err = badgesMsgServer.TransferTokens(ctx, msg)
+	_, err = tokenizationMsgServer.TransferTokens(ctx, msg)
 	return err
 }
 
-// SendNativeTokensFromAddressWithPoolApprovals sends native badges tokens from an address
+// SendNativeTokensFromAddressWithPoolApprovals sends native tokenization tokens from an address
 // Security: Uses unique approval IDs and ensures cleanup even on failure to prevent approval reuse.
 // This function is exported for testing purposes to verify security properties.
 func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
@@ -180,7 +180,7 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 	}
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
-	badgesMsgServer := NewMsgServerImpl(k)
+	tokenizationMsgServer := NewMsgServerImpl(k)
 
 	// Helper function to delete the one-time approval
 	deleteOneTimeApproval := func() error {
@@ -190,7 +190,7 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 			UpdateOutgoingApprovals: true,
 			OutgoingApprovals:       []*tokenizationtypes.UserOutgoingApproval{},
 		}
-		_, err := badgesMsgServer.UpdateUserApprovals(ctx, cleanupMsg)
+		_, err := tokenizationMsgServer.UpdateUserApprovals(ctx, cleanupMsg)
 		return err
 	}
 
@@ -222,7 +222,7 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 			},
 		},
 	}
-	_, err = badgesMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
+	_, err = tokenizationMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
 	if err != nil {
 		return sdkerrors.Wrapf(err, "failed to create one-time approval: %s", approvalId)
 	}
@@ -251,7 +251,7 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 		},
 	}
 
-	_, err = badgesMsgServer.TransferTokens(ctx, msg)
+	_, err = tokenizationMsgServer.TransferTokens(ctx, msg)
 	if err != nil {
 		// Transfer failed - clean up the approval before returning
 		cleanupErr := deleteOneTimeApproval()
@@ -274,7 +274,7 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 	return nil
 }
 
-// sendNativeTokensToAddressWithPoolApprovals sends native badges tokens to an address
+// sendNativeTokensToAddressWithPoolApprovals sends native tokens to an address
 func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
@@ -287,7 +287,7 @@ func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress 
 	}
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
-	badgesMsgServer := NewMsgServerImpl(k)
+	tokenizationMsgServer := NewMsgServerImpl(k)
 
 	// Important: We should only allow auto-scanned approvals here
 	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
@@ -303,7 +303,7 @@ func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress 
 		},
 	}
 
-	_, err = badgesMsgServer.TransferTokens(ctx, msg)
+	_, err = tokenizationMsgServer.TransferTokens(ctx, msg)
 	return err
 }
 
@@ -345,11 +345,11 @@ func (k Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress
 
 // TODO: For both of these, I'd love to DRY more with sendManager. I just need to handle the pre/post approvals (and also the prioritized correctly which isn't supported natively)
 
-// SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping badges denoms if needed.
+// SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping tokenization denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
-// bankKeeper is required for sending non-badges coins
+// bankKeeper is required for sending non-tokenization coins
 func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// if denom is a badges denom, wrap it
+	// if denom is a tokenization denom, wrap it
 	for _, coin := range coins {
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			err := k.sendNativeTokensToAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
@@ -367,11 +367,11 @@ func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAdd
 	return nil
 }
 
-// SendCoinsFromPoolWithAliasRouting sends coins from a pool, unwrapping badges denoms if needed.
+// SendCoinsFromPoolWithAliasRouting sends coins from a pool, unwrapping tokenization denoms if needed.
 // IMPORTANT: Should ONLY be called when from address is a pool address
-// bankKeeper is required for sending non-badges coins
+// bankKeeper is required for sending non-tokenization coins
 func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	// if denom is a badges denom, unwrap it
+	// if denom is a tokenization denom, unwrap it
 	for _, coin := range coins {
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			err := k.SendNativeTokensFromAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
@@ -390,7 +390,7 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 	return nil
 }
 
-func (k Keeper) GetSpendableCoinAmountBadgesLPOnly(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
+func (k Keeper) GetSpendableCoinAmountTokenizationLPOnly(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return sdkmath.ZeroInt(), err
@@ -402,7 +402,7 @@ func (k Keeper) GetSpendableCoinAmountBadgesLPOnly(ctx sdk.Context, address sdk.
 		return sdkmath.ZeroInt(), err
 	}
 
-	// Get user's badge balance
+	// Get user's token balance
 	userBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
 	if err != nil {
 		return sdkmath.ZeroInt(), err

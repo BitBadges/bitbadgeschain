@@ -32,7 +32,7 @@ func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreat
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_address_lists"),
 		sdk.NewAttribute("msg", msgStr),

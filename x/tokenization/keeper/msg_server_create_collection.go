@@ -65,7 +65,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	}
 
 	EmitMessageAndIndexerEvents(ctx,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "badges"),
+		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_collection"),
 		sdk.NewAttribute("msg", msgStr),
