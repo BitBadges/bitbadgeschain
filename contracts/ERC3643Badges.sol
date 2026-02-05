@@ -28,6 +28,12 @@ contract ERC3643Badges is IERC3643 {
     IBadgesPrecompile private constant badgesPrecompile = IBadgesPrecompile(BADGES_PRECOMPILE_ADDRESS);
     
     /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to another (`to`).
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    
+    /**
      * @dev Constructor sets the collection ID
      * @param _collectionId The collection ID to use for transfers
      */
@@ -72,28 +78,72 @@ contract ERC3643Badges is IERC3643 {
         bool result = abi.decode(returnData, (bool));
         require(result, "ERC3643: transfer returned false");
         
+        // Emit Transfer event
+        emit Transfer(msg.sender, to, amount);
+        
         return true;
     }
     
     /**
      * @dev Get balance of an account
      * @param account The account to query
-     * @return balance The balance (placeholder - would need query precompile)
+     * @return balance The balance for the account
      */
-    function balanceOf(address account) external pure override returns (uint256) {
-        // TODO: Implement with query precompile when available
-        // For now, return 0 as placeholder
-        return 0;
+    function balanceOf(address account) external view override returns (uint256) {
+        require(account != address(0), "ERC3643: balance query for zero address");
+        
+        // Create arrays from constants for the precompile call
+        UintRange[] memory tokenIds = new UintRange[](1);
+        tokenIds[0] = TOKEN_IDS;
+        
+        UintRange[] memory ownershipTimes = new UintRange[](1);
+        ownershipTimes[0] = OWNERSHIP_TIMES;
+        
+        // Call badges precompile to get balance amount
+        (bool success, bytes memory returnData) = BADGES_PRECOMPILE_ADDRESS.staticcall(
+            abi.encodeWithSelector(
+                IBadgesPrecompile.getBalanceAmount.selector,
+                collectionId,
+                account,
+                tokenIds,
+                ownershipTimes
+            )
+        );
+        
+        require(success, "ERC3643: balance query failed");
+        
+        // Decode return value
+        uint256 balance = abi.decode(returnData, (uint256));
+        return balance;
     }
     
     /**
      * @dev Get total supply
-     * @return supply The total supply (placeholder - would need query precompile)
+     * @return supply The total supply
      */
-    function totalSupply() external pure override returns (uint256) {
-        // TODO: Implement with query precompile when available
-        // For now, return 0 as placeholder
-        return 0;
+    function totalSupply() external view override returns (uint256) {
+        // Create arrays from constants for the precompile call
+        UintRange[] memory tokenIds = new UintRange[](1);
+        tokenIds[0] = TOKEN_IDS;
+        
+        UintRange[] memory ownershipTimes = new UintRange[](1);
+        ownershipTimes[0] = OWNERSHIP_TIMES;
+        
+        // Call badges precompile to get total supply
+        (bool success, bytes memory returnData) = BADGES_PRECOMPILE_ADDRESS.staticcall(
+            abi.encodeWithSelector(
+                IBadgesPrecompile.getTotalSupply.selector,
+                collectionId,
+                tokenIds,
+                ownershipTimes
+            )
+        );
+        
+        require(success, "ERC3643: total supply query failed");
+        
+        // Decode return value
+        uint256 supply = abi.decode(returnData, (uint256));
+        return supply;
     }
 }
 

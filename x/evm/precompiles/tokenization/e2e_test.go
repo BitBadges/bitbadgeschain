@@ -485,6 +485,7 @@ func (suite *E2ETestSuite) TestPrecompile_ErrorCases() {
 		name        string
 		setup       func() []byte
 		expectError bool
+		description string
 	}{
 		{
 			name: "invalid_collection_id",
@@ -506,6 +507,95 @@ func (suite *E2ETestSuite) TestPrecompile_ErrorCases() {
 				return append(method.ID, packed...)
 			},
 			expectError: true,
+			description: "Non-existent collection should fail",
+		},
+		{
+			name: "zero_address_recipient",
+			setup: func() []byte {
+				method := suite.Precompile.ABI.Methods["transferTokens"]
+				packed, _ := method.Inputs.Pack(
+					collectionId.BigInt(),
+					[]common.Address{common.Address{}}, // Zero address
+					big.NewInt(1),
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
+				)
+				return append(method.ID, packed...)
+			},
+			expectError: true,
+			description: "Zero address recipient should fail validation",
+		},
+		{
+			name: "empty_recipients",
+			setup: func() []byte {
+				method := suite.Precompile.ABI.Methods["transferTokens"]
+				packed, _ := method.Inputs.Pack(
+					collectionId.BigInt(),
+					[]common.Address{}, // Empty array
+					big.NewInt(1),
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
+				)
+				return append(method.ID, packed...)
+			},
+			expectError: true,
+			description: "Empty recipients array should fail validation",
+		},
+		{
+			name: "zero_amount",
+			setup: func() []byte {
+				method := suite.Precompile.ABI.Methods["transferTokens"]
+				packed, _ := method.Inputs.Pack(
+					collectionId.BigInt(),
+					[]common.Address{suite.BobEVM},
+					big.NewInt(0), // Zero amount
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
+				)
+				return append(method.ID, packed...)
+			},
+			expectError: true,
+			description: "Zero amount should fail validation",
+		},
+		{
+			name: "invalid_range_start_greater_than_end",
+			setup: func() []byte {
+				method := suite.Precompile.ABI.Methods["transferTokens"]
+				packed, _ := method.Inputs.Pack(
+					collectionId.BigInt(),
+					[]common.Address{suite.BobEVM},
+					big.NewInt(1),
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(10), End: big.NewInt(5)}}, // Invalid: start > end
+					[]struct {
+						Start *big.Int `json:"start"`
+						End   *big.Int `json:"end"`
+					}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
+				)
+				return append(method.ID, packed...)
+			},
+			expectError: true,
+			description: "Invalid range (start > end) should fail validation",
 		},
 		{
 			name: "insufficient_balance",
@@ -674,7 +764,7 @@ func (suite *E2ETestSuite) TestPrecompile_RequiredGas_Comprehensive() {
 
 	// Test with valid method ID
 	gas := suite.Precompile.RequiredGas(methodID[:])
-	suite.Require().Equal(uint64(GasTransferTokens), gas)
+	suite.Require().Equal(uint64(GasTransferTokensBase), gas)
 
 	// Test with invalid input (too short)
 	gas = suite.Precompile.RequiredGas([]byte{0x12, 0x34})
@@ -820,8 +910,8 @@ func (suite *E2ETestSuite) TestPrecompile_EdgeCases() {
 				)
 				return append(method.ID, packed...), err != nil
 			},
-			expectError: false, // Empty addresses might be handled gracefully or validated elsewhere
-			description: "Empty to addresses - behavior depends on transfer handler validation",
+			expectError: true, // Empty addresses are now explicitly rejected by validation
+			description: "Empty to addresses should be rejected by validation",
 		},
 	}
 

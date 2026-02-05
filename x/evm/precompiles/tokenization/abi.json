@@ -269,6 +269,61 @@
       "outputs": [{"internalType": "bytes", "name": "params", "type": "bytes"}],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {"internalType": "address", "name": "userAddress", "type": "address"},
+        {
+          "components": [
+            {"internalType": "uint256", "name": "start", "type": "uint256"},
+            {"internalType": "uint256", "name": "end", "type": "uint256"}
+          ],
+          "internalType": "struct UintRange[]",
+          "name": "tokenIds",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {"internalType": "uint256", "name": "start", "type": "uint256"},
+            {"internalType": "uint256", "name": "end", "type": "uint256"}
+          ],
+          "internalType": "struct UintRange[]",
+          "name": "ownershipTimes",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "getBalanceAmount",
+      "outputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "collectionId", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "uint256", "name": "start", "type": "uint256"},
+            {"internalType": "uint256", "name": "end", "type": "uint256"}
+          ],
+          "internalType": "struct UintRange[]",
+          "name": "tokenIds",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {"internalType": "uint256", "name": "start", "type": "uint256"},
+            {"internalType": "uint256", "name": "end", "type": "uint256"}
+          ],
+          "internalType": "struct UintRange[]",
+          "name": "ownershipTimes",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "getTotalSupply",
+      "outputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
 }

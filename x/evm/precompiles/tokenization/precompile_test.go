@@ -14,7 +14,7 @@ func TestPrecompile_RequiredGas(t *testing.T) {
 	// Test with valid method ID - get the method selector manually
 	methodID := precompile.ABI.Methods["transferTokens"].ID
 	gas := precompile.RequiredGas(methodID[:])
-	require.Equal(t, uint64(GasTransferTokens), gas)
+	require.Equal(t, uint64(GasTransferTokensBase), gas)
 
 	// Test with invalid input (too short)
 	gas = precompile.RequiredGas([]byte{0x12, 0x34})

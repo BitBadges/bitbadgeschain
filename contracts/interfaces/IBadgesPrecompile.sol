@@ -122,4 +122,17 @@ interface IBadgesPrecompile {
     
     function params(
     ) external view returns (bytes memory);
+    
+    function getBalanceAmount(
+        uint256 collectionId,
+        address userAddress,
+        UintRange[] calldata tokenIds,
+        UintRange[] calldata ownershipTimes
+    ) external view returns (uint256);
+    
+    function getTotalSupply(
+        uint256 collectionId,
+        UintRange[] calldata tokenIds,
+        UintRange[] calldata ownershipTimes
+    ) external view returns (uint256);
 }
