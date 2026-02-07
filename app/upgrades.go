@@ -16,6 +16,8 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.TokenizationKeeper,
 			app.PoolManagerKeeper,
 			app.IBCRateLimitKeeper,
+			app.EVMKeeper,
+			app.BankKeeper,
 		),
 	)
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
+	precompiletypes "github.com/cosmos/evm/precompiles/types"
 	erc20 "github.com/cosmos/evm/x/erc20"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
@@ -79,7 +80,9 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	storeKeys := make(map[string]*storetypes.KVStoreKey)
 	storeKeys[evmtypes.StoreKey] = evmKey
 
-	// Create EVM keeper first (ERC20 keeper will be set after creation due to circular dependency)
+	// Create EVM keeper first with pointer to ERC20 keeper (ERC20 keeper not yet initialized)
+	// This follows the EVMD pattern: we pass &app.ERC20Keeper even though it's not initialized yet
+	// The EVM keeper will hold a reference to the ERC20 keeper, which will be initialized below
 	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
 		app.appCodec,
 		evmKey,
@@ -91,13 +94,26 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
-		nil, // ERC20Keeper - will be set after ERC20 keeper creation
+		&app.ERC20Keeper, // Pass pointer to ERC20 keeper (not yet initialized, but that's ok)
 		evmChainIDUint64,
 		"", // tracer - empty for now
+	).WithStaticPrecompiles(
+		precompiletypes.DefaultStaticPrecompiles(
+			*app.StakingKeeper,
+			app.DistrKeeper,
+			app.PreciseBankKeeper,
+			&app.ERC20Keeper,
+			&app.TransferKeeper, // Cosmos/evm transfer keeper (wraps ibc-go, adds ERC20 support for IBC v2/eureka)
+			app.IBCKeeper.ChannelKeeper,
+			*app.GovKeeper,
+			app.SlashingKeeper,
+			app.appCodec,
+		),
 	))
 
-	// Create ERC20 keeper (requires EVM keeper, which we just created)
-	// Note: Transfer keeper is optional (can be nil) - we're using IBC transfer from ibc-go, not cosmos/evm
+	// Create ERC20 keeper with pointer to transfer keeper
+	// The transfer keeper is created in registerIBCModules (which is called before registerEVMModules)
+	// but it holds a pointer to &app.ERC20Keeper, so we can pass &app.TransferKeeper here
 	app.ERC20Keeper = erc20keeper.NewKeeper(
 		erc20Key,
 		app.appCodec,
@@ -106,26 +122,8 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.PreciseBankKeeper, // Use PreciseBankKeeper for bank operations
 		app.EVMKeeper,
 		app.StakingKeeper,
-		nil, // TransferKeeper - nil since we use IBC transfer from ibc-go, not cosmos/evm
+		&app.TransferKeeper, // Cosmos/evm transfer keeper (created in registerIBCModules with pointer to this ERC20 keeper)
 	)
-
-	// Recreate EVM keeper with ERC20 keeper to resolve circular dependency
-	// The EVM keeper needs the ERC20 keeper for ERC20 precompiles
-	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
-		app.appCodec,
-		evmKey,
-		evmTransientKey,
-		storeKeys,
-		authority,
-		app.AccountKeeper,
-		app.PreciseBankKeeper, // Use PreciseBankKeeper for fractional balance support
-		app.StakingKeeper,
-		app.FeeMarketKeeper, // Use FeeMarket keeper
-		app.ConsensusParamsKeeper,
-		app.ERC20Keeper, // Use ERC20 keeper
-		evmChainIDUint64,
-		"", // tracer - empty for now
-	))
 
 	// Register ERC20 module
 	erc20Module := erc20.NewAppModule(app.ERC20Keeper, app.AccountKeeper)

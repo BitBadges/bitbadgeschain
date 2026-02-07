@@ -86,6 +86,23 @@ genesis:
             constant_fee:
                 denom: ubadge
                 amount: '10000000000'
+        bank:
+            denom_metadata:
+                - description: The native token of BitBadges Chain
+                  denom_units:
+                    - denom: ubadge
+                      exponent: 0
+                    - denom: badge
+                      exponent: 9
+                  base: ubadge
+                  display: badge
+                  name: Badge
+                  symbol: BADGE
+        evm:
+            params:
+                evm_denom: ubadge
+                extended_denom_options:
+                    extended_denom: abadge
 validators:
     - name: alice
       bonded: 1000000000000000ustake

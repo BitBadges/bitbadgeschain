@@ -1,8 +1,14 @@
 package cmd
 
 import (
+	"strconv"
+
 	cmtcfg "github.com/cometbft/cometbft/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+	cosmosevmserverconfig "github.com/cosmos/evm/server/config"
+
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -20,11 +26,6 @@ func initCometBFTConfig() *cmtcfg.Config {
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	// The following code snippet is just for reference.
-	type CustomAppConfig struct {
-		serverconfig.Config `mapstructure:",squash"`
-	}
-
 	// Optionally allow the chain developer to overwrite the SDK's default
 	// server config.
 	srvCfg := serverconfig.DefaultConfig()
@@ -39,24 +40,35 @@ func initAppConfig() (string, interface{}) {
 	// - if you set srvCfg.MinGasPrices non-empty, validators CAN tweak their
 	//   own app.toml to override, or use this default value.
 	//
-	// In tests, we set the min gas prices to 0.
-	// srvCfg.MinGasPrices = "0stake"
-	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
+	// In this application, we set the min gas prices to 0.
+	srvCfg.MinGasPrices = "0" + appparams.BaseCoinUnit
 
-	customAppConfig := CustomAppConfig{
-		Config: *srvCfg,
+	// Parse EVM chain ID from string to uint64
+	evmChainID, err := strconv.ParseUint(appparams.EVMChainID, 10, 64)
+	if err != nil {
+		// Fallback to default if parsing fails
+		evmChainID = evmtypes.DefaultEVMChainID
 	}
 
-	customAppTemplate := serverconfig.DefaultConfigTemplate
-	// Edit the default template file
-	//
-	// customAppTemplate := serverconfig.DefaultConfigTemplate + `
-	// [wasm]
-	// # This is the maximum sdk gas (wasm and storage) that we allow for any x/wasm "smart" queries
-	// query_gas_limit = 300000
-	// # This is the number of wasm vm instances we keep cached in memory for speed-up
-	// # Warning: this is currently unstable and may lead to crashes, best to keep for 0 unless testing locally
-	// lru_size = 0`
+	evmCfg := cosmosevmserverconfig.DefaultEVMConfig()
+	evmCfg.EVMChainID = evmChainID
 
-	return customAppTemplate, customAppConfig
+	customAppConfig := EVMAppConfig{
+		Config:  *srvCfg,
+		EVM:     *evmCfg,
+		JSONRPC: *cosmosevmserverconfig.DefaultJSONRPCConfig(),
+		TLS:     *cosmosevmserverconfig.DefaultTLSConfig(),
+	}
+
+	return EVMAppTemplate, customAppConfig
 }
+
+type EVMAppConfig struct {
+	serverconfig.Config
+
+	EVM     cosmosevmserverconfig.EVMConfig
+	JSONRPC cosmosevmserverconfig.JSONRPCConfig
+	TLS     cosmosevmserverconfig.TLSConfig
+}
+
+const EVMAppTemplate = serverconfig.DefaultConfigTemplate + cosmosevmserverconfig.DefaultEVMConfigTemplate

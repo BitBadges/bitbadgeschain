@@ -34,7 +34,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
@@ -76,19 +75,23 @@ import (
 	_ "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts" // import for side-effects
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
 	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
+	sdkmempool "github.com/cosmos/cosmos-sdk/types/mempool"
+	evmante "github.com/cosmos/evm/ante"
+	antetypes "github.com/cosmos/evm/ante/types"
+	evmmempool "github.com/cosmos/evm/mempool"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
+	evmtransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
 	precisebank "github.com/cosmos/evm/x/precisebank"
 	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
 	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
+	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/bitbadges/bitbadgeschain/app/ante"
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
@@ -99,7 +102,6 @@ import (
 	tokenizationmodulekeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
 
@@ -160,7 +162,7 @@ type App struct {
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
-	TransferKeeper      ibctransferkeeper.Keeper
+	TransferKeeper      evmtransferkeeper.Keeper // Cosmos/evm transfer keeper (wraps ibc-go, adds ERC20 support)
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 
 	// IBC Hooks
@@ -184,6 +186,10 @@ type App struct {
 	ERC20Keeper       erc20keeper.Keeper
 	EVMKeeper         *evmkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+
+	// EVM mempool and pending tx listeners for JSON-RPC support
+	EVMMempool         *evmmempool.ExperimentalEVMMempool
+	pendingTxListeners []evmante.PendingTxListener
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -342,8 +348,7 @@ func New(
 		return nil, err
 	}
 
-	storeService, err := app.registerWasmModules(appOpts)
-	if err != nil {
+	if _, err := app.registerWasmModules(appOpts); err != nil {
 		return nil, err
 	}
 
@@ -405,29 +410,46 @@ func New(
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders() // use custom AnteHandler
 
-	wasmConfig, err := wasm.ReadNodeConfig(appOpts)
-	if err != nil {
-		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	// Use EVM ante handler for proper EVM transaction support (signature verification, nonce management, gas pricing)
+	// This is required for MsgEthereumTx transactions to work correctly
+	// Get max gas wanted from app options (defaults to 0 if not set)
+	maxGasWanted := uint64(0)
+	if val := appOpts.Get("evm.max-tx-gas-wanted"); val != nil {
+		if i, ok := val.(uint64); ok {
+			maxGasWanted = i
+		} else if i, ok := val.(int); ok && i > 0 {
+			maxGasWanted = uint64(i)
+		}
 	}
 
-	options := ante.HandlerOptions{
-		AccountKeeper:         app.AccountKeeper,
-		BankKeeper:            app.BankKeeper,
-		FeegrantKeeper:        app.FeeGrantKeeper,
-		IBCKeeper:             app.IBCKeeper,
-		SignModeHandler:       app.txConfig.SignModeHandler(),
-		SigGasConsumer:        authante.DefaultSigVerificationGasConsumer,
-		CircuitKeeper:         &app.CircuitBreakerKeeper,
-		WasmConfig:            wasmConfig,
-		WasmKeeper:            &app.WasmKeeper,
-		TXCounterStoreService: storeService,
+	evmAnteOptions := evmante.HandlerOptions{
+		Cdc:                    app.appCodec,
+		AccountKeeper:          app.AccountKeeper,
+		BankKeeper:             app.BankKeeper,
+		ExtensionOptionChecker: antetypes.HasDynamicFeeExtensionOption,
+		EvmKeeper:              app.EVMKeeper,
+		FeegrantKeeper:         app.FeeGrantKeeper,
+		IBCKeeper:              app.IBCKeeper,
+		FeeMarketKeeper:        app.FeeMarketKeeper,
+		SignModeHandler:        app.txConfig.SignModeHandler(),
+		SigGasConsumer:         evmante.SigVerificationGasConsumer,
+		MaxTxGasWanted:         maxGasWanted,
+		DynamicFeeChecker:      true,
+		PendingTxListener:      app.onPendingTx,
 	}
-
-	if err := options.Validate(); err != nil {
-		panic(err)
+	if err := evmAnteOptions.Validate(); err != nil {
+		panic(fmt.Sprintf("failed to validate EVM ante handler options: %s", err))
 	}
+	app.SetAnteHandler(evmante.NewAnteHandler(evmAnteOptions))
 
-	app.SetAnteHandler(ante.NewAnteHandler(options))
+	// Configure EVM mempool for JSON-RPC support (advanced feature, optional)
+	// Only create if JSON-RPC is enabled - otherwise GetMempool() will return nil
+	if app.EVMKeeper != nil {
+		if err := app.configureEVMMempool(appOpts, logger); err != nil {
+			logger.Error("failed to configure EVM mempool", "error", err)
+			// Don't panic - mempool is optional unless JSON-RPC is enabled
+		}
+	}
 
 	// A custom InitChainer sets if extra pre-init-genesis logic is required.
 	// This is necessary for manually registered modules that do not support app wiring.
@@ -438,7 +460,20 @@ func New(
 			return nil, err
 		}
 
-		return app.App.InitChainer(ctx, req)
+		// Call the default InitChainer which runs all module InitGenesis
+		res, err := app.App.InitChainer(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+
+		// Initialize EVM coin info after all modules are initialized
+		// This ensures denom metadata and EVM params are set up correctly
+		// This is needed for local dev (ignite serve) where upgrade handlers don't run
+		if err := app.initializeEVMCoinInfo(ctx); err != nil {
+			return nil, err
+		}
+
+		return res, nil
 	})
 
 	// Register upgrade handlers
@@ -548,6 +583,37 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 func (app *App) InterfaceRegistry() codectypes.InterfaceRegistry {
 	return app.interfaceRegistry
+}
+
+// GetMempool returns the EVM mempool for JSON-RPC support
+func (app *App) GetMempool() sdkmempool.ExtMempool {
+	return app.EVMMempool
+}
+
+// onPendingTx notifies all registered listeners about pending transactions
+func (app *App) onPendingTx(hash common.Hash) {
+	for _, listener := range app.pendingTxListeners {
+		listener(hash)
+	}
+}
+
+// RegisterPendingTxListener registers a listener for pending transaction notifications
+// This is used by the JSON-RPC server to listen to pending transactions
+func (app *App) RegisterPendingTxListener(listener func(common.Hash)) {
+	app.pendingTxListeners = append(app.pendingTxListeners, listener)
+}
+
+// SetClientCtx sets the client context on the EVM mempool
+// This is required by the cosmosevmserver.Application interface
+// The client context is used by the mempool for querying state
+func (app *App) SetClientCtx(clientCtx client.Context) {
+	if app.EVMMempool != nil {
+		// The mempool implements SetClientCtx - use type assertion to call it
+		// This satisfies the cosmosevmserver.Application interface requirement
+		if mempoolWithCtx, ok := interface{}(app.EVMMempool).(interface{ SetClientCtx(client.Context) }); ok {
+			mempoolWithCtx.SetClientCtx(clientCtx)
+		}
+	}
 }
 
 // ProvideEVMGetSigners provides the custom signer for EVM MsgEthereumTx

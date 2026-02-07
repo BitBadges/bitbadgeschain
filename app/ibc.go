@@ -11,6 +11,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	evmtransfermodule "github.com/cosmos/evm/x/ibc/transfer"
+	evmtransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
 	icamodule "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
@@ -21,7 +23,6 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 	ibccallbacks "github.com/cosmos/ibc-go/v10/modules/apps/callbacks"
 	ibctransfer "github.com/cosmos/ibc-go/v10/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,9 +38,9 @@ import (
 	// this line is used by starport scaffolding # ibc/app/import
 	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor/module"
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
-	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
+	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
 	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
@@ -143,16 +144,18 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler)
 
-	// Create IBC transfer keeper (IBC v10 - updated API)
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+	// Create cosmos/evm transfer keeper (wraps ibc-go transfer, adds ERC20 support)
+	// We pass &app.ERC20Keeper even though it's not initialized yet (ERC20 keeper is created in registerEVMModules)
+	// The cosmos/evm transfer keeper will hold a reference to the ERC20 keeper
+	app.TransferKeeper = evmtransferkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(ibctransfertypes.StoreKey)),
-		app.GetSubspace(ibctransfertypes.ModuleName),
 		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
-		app.MsgServiceRouter(),
+		app.MsgServiceRouter(),      // MessageRouter
 		app.AccountKeeper,
 		app.BankKeeper,
+		&app.ERC20Keeper, // Pass pointer to ERC20 keeper (not yet initialized, but that's ok)
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -233,7 +236,9 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Create Transfer Stack (IBC v10 - callbacks wraps transfer, packetforward wraps callbacks)
 	var transferStack porttypes.IBCModule
-	transferStack = ibctransfer.NewIBCModule(app.TransferKeeper)
+	// Create IBC module for transfer using cosmos/evm transfer module
+	// The cosmos/evm transfer module wraps ibc-go transfer and adds ERC20 support
+	transferStack = evmtransfermodule.NewIBCModule(app.TransferKeeper)
 	// callbacks wraps the transfer stack as its base app, and uses PacketForwardKeeper as the ICS4Wrapper
 	// i.e. packet-forward-middleware is higher on the stack and sits between callbacks and the ibc channel keeper
 	// Since this is the lowest level middleware of the transfer stack, it should be the first entrypoint for transfer keeper's
@@ -308,9 +313,10 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// register IBC modules (IBC v10 - no capability or fee modules)
+	// Use cosmos/evm transfer module which wraps ibc-go transfer and adds ERC20 support
 	if err := app.RegisterModules(
 		ibc.NewAppModule(app.IBCKeeper),
-		ibctransfer.NewAppModule(app.TransferKeeper),
+		evmtransfermodule.NewAppModule(app.TransferKeeper),
 		icamodule.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		ibctm.NewAppModule(ibctm.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
 		solomachine.NewAppModule(solomachine.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
