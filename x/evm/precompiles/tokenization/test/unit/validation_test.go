@@ -1,4 +1,4 @@
-package tokenization
+package tokenization_test
 
 import (
 	"math/big"
@@ -6,6 +6,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
+
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 )
 
 // TestValidateAddress tests the ValidateAddress function
@@ -32,7 +34,7 @@ func TestValidateAddress(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateAddress(tt.address, tt.fieldName)
+			err := tokenization.ValidateAddress(tt.address, tt.fieldName)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -69,7 +71,7 @@ func TestValidateAddresses(t *testing.T) {
 			name: "contains zero address",
 			addresses: []common.Address{
 				common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"),
-				common.Address{},
+				{},
 			},
 			fieldName: "toAddresses",
 			wantErr:   true,
@@ -77,7 +79,7 @@ func TestValidateAddresses(t *testing.T) {
 		{
 			name: "too many addresses",
 			addresses: func() []common.Address {
-				addrs := make([]common.Address, MaxRecipients+1)
+				addrs := make([]common.Address, tokenization.MaxRecipients+1)
 				for i := range addrs {
 					addrs[i] = common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
 				}
@@ -90,7 +92,7 @@ func TestValidateAddresses(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateAddresses(tt.addresses, tt.fieldName)
+			err := tokenization.ValidateAddresses(tt.addresses, tt.fieldName)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -103,40 +105,40 @@ func TestValidateAddresses(t *testing.T) {
 // TestValidateCollectionId tests the ValidateCollectionId function
 func TestValidateCollectionId(t *testing.T) {
 	tests := []struct {
-		name        string
+		name         string
 		collectionId *big.Int
-		wantErr     bool
+		wantErr      bool
 	}{
 		{
-			name:        "valid collection ID",
+			name:         "valid collection ID",
 			collectionId: big.NewInt(1),
-			wantErr:     false,
+			wantErr:      false,
 		},
 		{
-			name:        "zero collection ID",
+			name:         "zero collection ID",
 			collectionId: big.NewInt(0),
-			wantErr:     false, // 0 is valid (used for creating new collections)
+			wantErr:      true, // 0 is invalid for queries (only valid when creating new collections)
 		},
 		{
-			name:        "negative collection ID",
+			name:         "negative collection ID",
 			collectionId: big.NewInt(-1),
-			wantErr:     true,
+			wantErr:      true,
 		},
 		{
-			name:        "nil collection ID",
+			name:         "nil collection ID",
 			collectionId: nil,
-			wantErr:     true,
+			wantErr:      true,
 		},
 		{
-			name:        "large collection ID",
+			name:         "large collection ID",
 			collectionId: new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil),
-			wantErr:     false,
+			wantErr:      false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateCollectionId(tt.collectionId)
+			err := tokenization.ValidateCollectionId(tt.collectionId)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -188,7 +190,7 @@ func TestValidateAmount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateAmount(tt.amount, tt.fieldName)
+			err := tokenization.ValidateAmount(tt.amount, tt.fieldName)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -201,8 +203,8 @@ func TestValidateAmount(t *testing.T) {
 // TestValidateBigIntRanges tests the ValidateBigIntRanges function
 func TestValidateBigIntRanges(t *testing.T) {
 	tests := []struct {
-		name      string
-		ranges    []struct {
+		name   string
+		ranges []struct {
 			Start *big.Int `json:"start"`
 			End   *big.Int `json:"end"`
 		}
@@ -222,8 +224,8 @@ func TestValidateBigIntRanges(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name:      "empty ranges",
-			ranges:    []struct {
+			name: "empty ranges",
+			ranges: []struct {
 				Start *big.Int `json:"start"`
 				End   *big.Int `json:"end"`
 			}{},
@@ -289,7 +291,7 @@ func TestValidateBigIntRanges(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateBigIntRanges(tt.ranges, tt.fieldName)
+			err := tokenization.ValidateBigIntRanges(tt.ranges, tt.fieldName)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -329,7 +331,7 @@ func TestValidateString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateString(tt.str, tt.fieldName)
+			err := tokenization.ValidateString(tt.str, tt.fieldName)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -373,15 +375,21 @@ func TestCheckOverflow(t *testing.T) {
 		},
 		{
 			name:      "large value",
-			value:     new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil),
+			value:     new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), // 2^256 (exceeds max by 1)
 			fieldName: "amount",
-			wantErr:   false,
+			wantErr:   true, // Should error - exceeds uint256 max (2^256-1)
+		},
+		{
+			name:      "max uint256",
+			value:     new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1)), // 2^256 - 1 (max)
+			fieldName: "amount",
+			wantErr:   false, // Should not error - this is the max value
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := CheckOverflow(tt.value, tt.fieldName)
+			err := tokenization.CheckOverflow(tt.value, tt.fieldName)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -412,7 +420,7 @@ func TestVerifyCaller(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := VerifyCaller(tt.caller)
+			err := tokenization.VerifyCaller(tt.caller)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -421,4 +429,3 @@ func TestVerifyCaller(t *testing.T) {
 		})
 	}
 }
-

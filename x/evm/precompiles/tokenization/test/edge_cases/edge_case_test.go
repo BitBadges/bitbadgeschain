@@ -1,4 +1,4 @@
-package tokenization
+package tokenization_test
 
 import (
 	"math"
@@ -11,6 +11,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -24,7 +25,7 @@ type EdgeCaseTestSuite struct {
 	suite.Suite
 	TokenizationKeeper tokenizationkeeper.Keeper
 	Ctx                sdk.Context
-	Precompile         *Precompile
+	Precompile         *tokenization.Precompile
 
 	// Test addresses
 	AliceEVM  common.Address
@@ -47,7 +48,7 @@ func (suite *EdgeCaseTestSuite) SetupTest() {
 	keeper, ctx := keepertest.TokenizationKeeper(suite.T())
 	suite.TokenizationKeeper = keeper
 	suite.Ctx = ctx
-	suite.Precompile = NewPrecompile(keeper)
+	suite.Precompile = tokenization.NewPrecompile(keeper)
 
 	// Create test addresses
 	suite.AliceEVM = common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
@@ -180,7 +181,7 @@ func (suite *EdgeCaseTestSuite) TestBoundaryConditions() {
 
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
-			err := ValidateCollectionId(tt.collectionId)
+			err := tokenization.ValidateCollectionId(tt.collectionId)
 			if tt.expectError {
 				suite.Require().Error(err)
 			} else {
@@ -194,21 +195,21 @@ func (suite *EdgeCaseTestSuite) TestBoundaryConditions() {
 // TestMaximumArraySizes tests arrays at exactly the limits and one over
 func (suite *EdgeCaseTestSuite) TestMaximumArraySizes() {
 	// Create addresses for testing
-	addresses := make([]common.Address, MaxRecipients)
-	for i := 0; i < MaxRecipients; i++ {
+	addresses := make([]common.Address, tokenization.MaxRecipients)
+	for i := 0; i < tokenization.MaxRecipients; i++ {
 		addresses[i] = common.BigToAddress(big.NewInt(int64(i + 1)))
 	}
 
 	// Test exactly at MaxRecipients
 	suite.Run("exactly_max_recipients", func() {
-		err := ValidateAddresses(addresses, "toAddresses")
+		err := tokenization.ValidateAddresses(addresses, "toAddresses")
 		suite.Require().NoError(err)
 	})
 
 	// Test one over MaxRecipients
 	suite.Run("one_over_max_recipients", func() {
 		tooManyAddresses := append(addresses, common.BigToAddress(big.NewInt(101)))
-		err := ValidateAddresses(tooManyAddresses, "toAddresses")
+		err := tokenization.ValidateAddresses(tooManyAddresses, "toAddresses")
 		suite.Require().Error(err)
 		suite.Contains(err.Error(), "exceeds maximum")
 	})
@@ -218,8 +219,8 @@ func (suite *EdgeCaseTestSuite) TestMaximumArraySizes() {
 		ranges := make([]struct {
 			Start *big.Int `json:"start"`
 			End   *big.Int `json:"end"`
-		}, MaxTokenIdRanges)
-		for i := 0; i < MaxTokenIdRanges; i++ {
+		}, tokenization.MaxTokenIdRanges)
+		for i := 0; i < tokenization.MaxTokenIdRanges; i++ {
 			ranges[i] = struct {
 				Start *big.Int `json:"start"`
 				End   *big.Int `json:"end"`
@@ -228,7 +229,7 @@ func (suite *EdgeCaseTestSuite) TestMaximumArraySizes() {
 				End:   big.NewInt(int64(i + 1)),
 			}
 		}
-		err := ValidateBigIntRanges(ranges, "tokenIds")
+		err := tokenization.ValidateBigIntRanges(ranges, "tokenIds")
 		suite.Require().NoError(err)
 	})
 
@@ -237,8 +238,8 @@ func (suite *EdgeCaseTestSuite) TestMaximumArraySizes() {
 		ranges := make([]struct {
 			Start *big.Int `json:"start"`
 			End   *big.Int `json:"end"`
-		}, MaxTokenIdRanges+1)
-		for i := 0; i < MaxTokenIdRanges+1; i++ {
+		}, tokenization.MaxTokenIdRanges+1)
+		for i := 0; i < tokenization.MaxTokenIdRanges+1; i++ {
 			ranges[i] = struct {
 				Start *big.Int `json:"start"`
 				End   *big.Int `json:"end"`
@@ -247,7 +248,7 @@ func (suite *EdgeCaseTestSuite) TestMaximumArraySizes() {
 				End:   big.NewInt(int64(i + 1)),
 			}
 		}
-		err := ValidateArraySize(len(ranges), MaxTokenIdRanges, "tokenIds")
+		err := tokenization.ValidateArraySize(len(ranges), tokenization.MaxTokenIdRanges, "tokenIds")
 		suite.Require().Error(err)
 		suite.Contains(err.Error(), "exceeds maximum")
 	})
@@ -326,7 +327,7 @@ func (suite *EdgeCaseTestSuite) TestRangeOverlap() {
 
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
-			err := ValidateBigIntRanges(tt.ranges, "testRanges")
+			err := tokenization.ValidateBigIntRanges(tt.ranges, "testRanges")
 			if tt.expectError {
 				suite.Require().Error(err, tt.description)
 			} else {
@@ -344,26 +345,26 @@ func (suite *EdgeCaseTestSuite) TestLargeValueTransfers() {
 
 	// Test maximum amount
 	suite.Run("maximum_uint256_amount", func() {
-		err := ValidateAmount(maxUint256, "amount")
+		err := tokenization.ValidateAmount(maxUint256, "amount")
 		suite.Require().NoError(err)
 	})
 
 	// Test amount of 1 (minimum valid)
 	suite.Run("minimum_valid_amount", func() {
-		err := ValidateAmount(big.NewInt(1), "amount")
+		err := tokenization.ValidateAmount(big.NewInt(1), "amount")
 		suite.Require().NoError(err)
 	})
 
 	// Test amount of 0 (should fail)
 	suite.Run("zero_amount", func() {
-		err := ValidateAmount(big.NewInt(0), "amount")
+		err := tokenization.ValidateAmount(big.NewInt(0), "amount")
 		suite.Require().Error(err)
 		suite.Contains(err.Error(), "must be greater than zero")
 	})
 
 	// Test negative amount (should fail)
 	suite.Run("negative_amount", func() {
-		err := ValidateAmount(big.NewInt(-1), "amount")
+		err := tokenization.ValidateAmount(big.NewInt(-1), "amount")
 		suite.Require().Error(err)
 		suite.Contains(err.Error(), "must be greater than zero")
 	})
@@ -456,7 +457,7 @@ func (suite *EdgeCaseTestSuite) TestConcurrentCalls() {
 			go func(idx int) {
 				defer wg.Done()
 				addresses := []common.Address{suite.BobEVM}
-				err := ValidateAddresses(addresses, "toAddresses")
+				err := tokenization.ValidateAddresses(addresses, "toAddresses")
 				errors[idx] = err
 			}(i)
 		}
@@ -502,7 +503,7 @@ func (suite *EdgeCaseTestSuite) TestVeryLargeRangeSpans() {
 
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
-			err := ValidateBigIntRange(tt.start, tt.end, "testRange")
+			err := tokenization.ValidateBigIntRange(tt.start, tt.end, "testRange")
 			if tt.expectError {
 				suite.Require().Error(err)
 			} else {
@@ -516,19 +517,19 @@ func (suite *EdgeCaseTestSuite) TestVeryLargeRangeSpans() {
 func (suite *EdgeCaseTestSuite) TestMinimumValidValues() {
 	// Test minimum collection ID (1)
 	suite.Run("minimum_collection_id", func() {
-		err := ValidateCollectionId(big.NewInt(1))
+		err := tokenization.ValidateCollectionId(big.NewInt(1))
 		suite.Require().NoError(err)
 	})
 
 	// Test minimum amount (1)
 	suite.Run("minimum_amount", func() {
-		err := ValidateAmount(big.NewInt(1), "amount")
+		err := tokenization.ValidateAmount(big.NewInt(1), "amount")
 		suite.Require().NoError(err)
 	})
 
 	// Test minimum range (start = end = 1)
 	suite.Run("minimum_range", func() {
-		err := ValidateBigIntRange(big.NewInt(1), big.NewInt(1), "testRange")
+		err := tokenization.ValidateBigIntRange(big.NewInt(1), big.NewInt(1), "testRange")
 		suite.Require().NoError(err)
 	})
 }

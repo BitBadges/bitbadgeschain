@@ -1,4 +1,4 @@
-package tokenization
+package tokenization_test
 
 import (
 	"math"
@@ -9,6 +9,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -24,13 +25,13 @@ type EVMIntegrationTestSuite struct {
 	suite.Suite
 	TokenizationKeeper tokenizationkeeper.Keeper
 	Ctx                sdk.Context
-	Precompile         *Precompile
+	Precompile         *tokenization.Precompile
 
 	// Test addresses
-	AliceEVM  common.Address
-	BobEVM    common.Address
-	Alice     sdk.AccAddress
-	Bob       sdk.AccAddress
+	AliceEVM common.Address
+	BobEVM   common.Address
+	Alice    sdk.AccAddress
+	Bob      sdk.AccAddress
 
 	// Test data
 	CollectionId sdkmath.Uint
@@ -45,7 +46,7 @@ func (suite *EVMIntegrationTestSuite) SetupTest() {
 	keeper, ctx := keepertest.TokenizationKeeper(suite.T())
 	suite.TokenizationKeeper = keeper
 	suite.Ctx = ctx
-	suite.Precompile = NewPrecompile(keeper)
+	suite.Precompile = tokenization.NewPrecompile(keeper)
 
 	// Create test addresses
 	suite.AliceEVM = common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
@@ -126,7 +127,7 @@ func (suite *EVMIntegrationTestSuite) createTestCollection() sdkmath.Uint {
 // TestPrecompileRegistration tests that the precompile is properly registered
 func (suite *EVMIntegrationTestSuite) TestPrecompileRegistration() {
 	// Verify precompile address
-	suite.Equal(TokenizationPrecompileAddress, suite.Precompile.ContractAddress.Hex())
+	suite.Equal(tokenization.TokenizationPrecompileAddress, suite.Precompile.ContractAddress.Hex())
 
 	// Verify ABI is loaded
 	suite.NotNil(suite.Precompile.ABI)
@@ -156,7 +157,7 @@ func (suite *EVMIntegrationTestSuite) TestPrecompileRequiredGas() {
 
 	// Test with valid method ID
 	gas := suite.Precompile.RequiredGas(method.ID[:])
-	suite.Equal(uint64(GasTransferTokensBase), gas)
+	suite.Equal(uint64(tokenization.GasTransferTokensBase), gas)
 
 	// Test with invalid input (too short)
 	gas = suite.Precompile.RequiredGas([]byte{0x12, 0x34})
@@ -193,4 +194,3 @@ func (suite *EVMIntegrationTestSuite) TestPrecompileExecuteDirectly() {
 // 3. Contract deployment and interaction
 // 4. Event verification through EVM
 // These tests are placeholders that can be expanded when full app integration is available
-

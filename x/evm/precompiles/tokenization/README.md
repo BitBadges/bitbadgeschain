@@ -27,9 +27,9 @@ This package implements a precompiled contract for the BitBadges tokenization mo
 ### In Solidity
 
 ```solidity
-import "./interfaces/IBadgesPrecompile.sol";
+import "./interfaces/ITokenizationPrecompile.sol";
 
-IBadgesPrecompile precompile = IBadgesPrecompile(0x0000000000000000000000000000000000001001);
+ITokenizationPrecompile precompile = ITokenizationPrecompile(0x0000000000000000000000000000000000001001);
 
 // Transfer tokens
 address[] memory recipients = new address[](1);
@@ -47,6 +47,37 @@ bool success = precompile.transferTokens(
     ownershipTimes
 );
 ```
+
+## ABI Notes
+
+### Return Type Simplifications
+
+Due to the complexity of nested structures in the tokenization types, some fields are returned as empty arrays in Solidity struct representations:
+
+- **TokenCollection**: `approvalCriteria` (in collectionApprovals), `invariants.cosmosCoinBackedPath`, `userPermissions` (in defaultBalances)
+- **UserBalanceStore**: `approvalCriteria` (in outgoing/incomingApprovals)
+- **CollectionApproval**: `approvalCriteria`
+
+For full access to these fields, use the raw bytes returned from query methods and decode with protobuf.
+
+### Known Limitations
+
+1. **Invariants and Paths**: Cannot be set through the precompile. Use native Cosmos SDK interface.
+2. **Nested Conversion Errors**: Some deeply nested structures may silently skip invalid items to maintain backward compatibility.
+3. **ABI Load Failure**: If `abi.json` is corrupted, the precompile will be disabled but the chain will still start.
+
+### DoS Protection Limits
+
+| Field | Max Size |
+|-------|----------|
+| Recipients | 100 |
+| Token ID Ranges | 100 |
+| Ownership Time Ranges | 100 |
+| Approval Ranges | 100 |
+| Denom Units | 50 |
+| Merkle Challenges | 20 |
+| Coin Transfers | 50 |
+| Metadata Length | 10,000 chars |
 
 ## Development
 

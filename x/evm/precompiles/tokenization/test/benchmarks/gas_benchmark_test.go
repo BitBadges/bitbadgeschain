@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
 
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
 )
 
@@ -63,7 +64,7 @@ func BenchmarkTransferGas(b *testing.B) {
 
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				gas := CalculateTransferGas(toAddresses, tokenIdsRanges, ownershipTimesRanges)
+				gas := tokenization.CalculateTransferGas(toAddresses, tokenIdsRanges, ownershipTimesRanges)
 				require.Greater(b, gas, uint64(0))
 			}
 		})
@@ -85,16 +86,16 @@ func TestGasCalculationAccuracy(t *testing.T) {
 			recipients:     1,
 			tokenRanges:    1,
 			timeRanges:     1,
-			expectedMinGas: GasTransferTokensBase,
-			expectedMaxGas: GasTransferTokensBase + 10_000, // Allow some overhead
+			expectedMinGas: tokenization.GasTransferTokensBase,
+			expectedMaxGas: tokenization.GasTransferTokensBase + 10_000, // Allow some overhead
 		},
 		{
 			name:           "moderate_transfer",
 			recipients:     5,
 			tokenRanges:    5,
 			timeRanges:     5,
-			expectedMinGas: GasTransferTokensBase + 25_000, // 5*5000 + 5*1000 + 5*1000
-			expectedMaxGas: GasTransferTokensBase + 50_000,
+			expectedMinGas: tokenization.GasTransferTokensBase + 25_000, // 5*5000 + 5*1000 + 5*1000
+			expectedMaxGas: tokenization.GasTransferTokensBase + 50_000,
 		},
 	}
 
@@ -133,7 +134,7 @@ func TestGasCalculationAccuracy(t *testing.T) {
 				}
 			}
 
-			gas := CalculateTransferGas(toAddresses, tokenIdsRanges, ownershipTimesRanges)
+			gas := tokenization.CalculateTransferGas(toAddresses, tokenIdsRanges, ownershipTimesRanges)
 			require.GreaterOrEqual(t, gas, tt.expectedMinGas, "Gas should be at least the minimum")
 			require.LessOrEqual(t, gas, tt.expectedMaxGas, "Gas should not exceed the maximum")
 		})

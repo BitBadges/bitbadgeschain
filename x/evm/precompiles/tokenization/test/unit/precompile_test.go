@@ -1,10 +1,11 @@
-package tokenization
+package tokenization_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
 )
 
@@ -14,7 +15,7 @@ func TestPrecompile_RequiredGas(t *testing.T) {
 	// Test with valid method ID - get the method selector manually
 	methodID := precompile.ABI.Methods["transferTokens"].ID
 	gas := precompile.RequiredGas(methodID[:])
-	require.Equal(t, uint64(GasTransferTokensBase), gas)
+	require.Equal(t, uint64(tokenization.GasTransferTokensBase), gas)
 
 	// Test with invalid input (too short)
 	gas = precompile.RequiredGas([]byte{0x12, 0x34})
@@ -23,13 +24,13 @@ func TestPrecompile_RequiredGas(t *testing.T) {
 
 func TestPrecompile_TransferTokens_Structure(t *testing.T) {
 	tokenizationKeeper, _ := keepertest.TokenizationKeeper(t)
-	precompile := NewPrecompile(tokenizationKeeper)
+	precompile := tokenization.NewPrecompile(tokenizationKeeper)
 
 	// Verify precompile is created correctly
 	require.NotNil(t, precompile)
 	require.NotNil(t, precompile.ABI)
-	require.NotNil(t, precompile.tokenizationKeeper)
-	require.Equal(t, TokenizationPrecompileAddress, precompile.ContractAddress.Hex())
+	// Note: tokenizationKeeper is unexported, so we can't check it directly in tokenization_test package
+	require.Equal(t, tokenization.TokenizationPrecompileAddress, precompile.ContractAddress.Hex())
 
 	// Verify the transferTokens method exists
 	method, found := precompile.ABI.Methods["transferTokens"]
@@ -41,7 +42,7 @@ func TestPrecompile_TransferTokens_Structure(t *testing.T) {
 	require.Equal(t, 1, len(method.Outputs)) // success bool
 }
 
-func createTestPrecompile(t *testing.T) *Precompile {
+func createTestPrecompile(t *testing.T) *tokenization.Precompile {
 	tokenizationKeeper, _ := keepertest.TokenizationKeeper(t)
-	return NewPrecompile(tokenizationKeeper)
+	return tokenization.NewPrecompile(tokenizationKeeper)
 }

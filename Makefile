@@ -62,3 +62,30 @@ lint-ci:
 		echo "  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
 		exit 1 \
 	)
+
+.PHONY: compile-contracts
+compile-contracts:
+	@echo "Compiling Solidity contracts..."
+	@if command -v solcjs >/dev/null 2>&1; then \
+		echo "Using solcjs..."; \
+		cd contracts && \
+		solcjs --bin --abi --base-path . --include-path . --output-dir test \
+			types/TokenizationTypes.sol \
+			interfaces/ITokenizationPrecompile.sol \
+			test/MinimalTestContract.sol && \
+		echo "Contracts compiled successfully"; \
+	elif command -v solc >/dev/null 2>&1; then \
+		echo "Using solc..."; \
+		cd contracts && \
+		solc --combined-json bin,abi --allow-paths . \
+			types/TokenizationTypes.sol \
+			interfaces/ITokenizationPrecompile.sol \
+			test/MinimalTestContract.sol > test/MinimalTestContract.json && \
+		echo "Contracts compiled successfully"; \
+	else \
+		echo "Error: Neither solcjs nor solc found. Please install one:"; \
+		echo "  npm install -g solc@0.8.24"; \
+		echo "  or"; \
+		echo "  Install solc via your package manager"; \
+		exit 1; \
+	fi

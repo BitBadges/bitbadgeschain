@@ -12,6 +12,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
+	"github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -30,7 +31,7 @@ type ERC3643ComplianceTestSuite struct {
 	suite.Suite
 	TokenizationKeeper tokenizationkeeper.Keeper
 	Ctx                sdk.Context
-	Precompile         *Precompile
+	Precompile         *tokenization.Precompile
 
 	// Test addresses
 	AliceEVM common.Address
@@ -51,7 +52,7 @@ func (suite *ERC3643ComplianceTestSuite) SetupTest() {
 	keeper, ctx := keepertest.TokenizationKeeper(suite.T())
 	suite.TokenizationKeeper = keeper
 	suite.Ctx = ctx
-	suite.Precompile = NewPrecompile(keeper)
+	suite.Precompile = tokenization.NewPrecompile(keeper)
 
 	// Create test addresses
 	suite.AliceEVM = common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
@@ -230,7 +231,7 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_Transfer() {
 		}
 
 		// Create proper vm.Contract for testing
-		precompileAddr := common.HexToAddress(TokenizationPrecompileAddress)
+		precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 		valueUint256, _ := uint256.FromBig(big.NewInt(0))
 		contract := vm.NewContract(suite.AliceEVM, precompileAddr, valueUint256, 1000000, nil)
 
@@ -263,7 +264,7 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_Transfer() {
 			}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
 		}
 
-		precompileAddr := common.HexToAddress(TokenizationPrecompileAddress)
+		precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 		valueUint256, _ := uint256.FromBig(big.NewInt(0))
 		contract := vm.NewContract(suite.AliceEVM, precompileAddr, valueUint256, 1000000, nil)
 		_, err := suite.Precompile.TransferTokens(suite.Ctx, &method, args, contract)
@@ -287,7 +288,7 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_Transfer() {
 			}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
 		}
 
-		precompileAddr := common.HexToAddress(TokenizationPrecompileAddress)
+		precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 		valueUint256, _ := uint256.FromBig(big.NewInt(0))
 		contract := vm.NewContract(suite.AliceEVM, precompileAddr, valueUint256, 1000000, nil)
 		_, err := suite.Precompile.TransferTokens(suite.Ctx, &method, args, contract)
@@ -418,7 +419,7 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_TransferEvent() {
 		}{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
 	}
 
-	precompileAddr := common.HexToAddress(TokenizationPrecompileAddress)
+	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 	valueUint256, _ := uint256.FromBig(big.NewInt(0))
 	contract := vm.NewContract(suite.AliceEVM, precompileAddr, valueUint256, 1000000, nil)
 	_, err := suite.Precompile.TransferTokens(suite.Ctx, &method, args, contract)

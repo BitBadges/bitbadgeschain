@@ -1,4 +1,4 @@
-package tokenization
+package tokenization_test
 
 import (
 	"math"
@@ -12,6 +12,7 @@ import (
 	uint256 "github.com/holiman/uint256"
 	"github.com/stretchr/testify/suite"
 
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -20,7 +21,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// E2ETestSuite provides comprehensive end-to-end testing for the badges precompile
+// E2ETestSuite provides comprehensive end-to-end testing for the tokenization precompile
 type E2ETestSuite struct {
 	suite.Suite
 
@@ -29,7 +30,7 @@ type E2ETestSuite struct {
 	Ctx                sdk.Context
 
 	// Precompile instance
-	Precompile *Precompile
+	Precompile *tokenization.Precompile
 
 	// Test addresses (Cosmos format)
 	Alice   sdk.AccAddress
@@ -53,7 +54,7 @@ func (suite *E2ETestSuite) SetupTest() {
 	suite.Ctx = ctx
 
 	// Create precompile instance
-	suite.Precompile = NewPrecompile(keeper)
+	suite.Precompile = tokenization.NewPrecompile(keeper)
 
 	// Create test addresses - use EVM addresses first, then convert to Cosmos
 	// This ensures the addresses match when converting back and forth
@@ -295,7 +296,7 @@ func (suite *E2ETestSuite) callPrecompile(caller common.Address, input []byte, v
 
 	// Create contract with proper initialization
 	// vm.NewContract takes: caller Address, address Address, value *uint256.Int, gas uint64, jumpdests *runtime.JumpDestCache
-	precompileAddr := common.HexToAddress(TokenizationPrecompileAddress)
+	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 
 	// Convert value to uint256
 	valueUint256, _ := uint256.FromBig(value)
@@ -515,7 +516,7 @@ func (suite *E2ETestSuite) TestPrecompile_ErrorCases() {
 				method := suite.Precompile.ABI.Methods["transferTokens"]
 				packed, _ := method.Inputs.Pack(
 					collectionId.BigInt(),
-					[]common.Address{common.Address{}}, // Zero address
+					[]common.Address{{}}, // Zero address
 					big.NewInt(1),
 					[]struct {
 						Start *big.Int `json:"start"`
@@ -764,7 +765,7 @@ func (suite *E2ETestSuite) TestPrecompile_RequiredGas_Comprehensive() {
 
 	// Test with valid method ID
 	gas := suite.Precompile.RequiredGas(methodID[:])
-	suite.Require().Equal(uint64(GasTransferTokensBase), gas)
+	suite.Require().Equal(uint64(tokenization.GasTransferTokensBase), gas)
 
 	// Test with invalid input (too short)
 	gas = suite.Precompile.RequiredGas([]byte{0x12, 0x34})
@@ -1023,7 +1024,7 @@ func (suite *E2ETestSuite) callERC3643WrapperTransfer(
 	amount *big.Int,
 	collectionId sdkmath.Uint,
 ) ([]byte, error) {
-	// ERC3643 contract parameters (as defined in ERC3643Badges.sol)
+	// ERC3643 contract parameters (as defined in ERC3643Tokenization.sol)
 	tokenIds := []struct {
 		Start *big.Int `json:"start"`
 		End   *big.Int `json:"end"`

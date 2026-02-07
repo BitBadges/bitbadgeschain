@@ -1,409 +1,469 @@
-# Tokenization Precompile API Reference
+# BitBadges EVM Precompile API Documentation
 
 ## Overview
 
-The Tokenization Precompile provides a Solidity interface to interact with the BitBadges tokenization module from EVM-compatible smart contracts. The precompile is available at address `0x0000000000000000000000000000000000001001`.
+The BitBadges EVM precompile provides a comprehensive interface for interacting with the tokenization module from Solidity smart contracts. The precompile is available at address `0x0000000000000000000000000000000000001001`.
 
-## Precompile Address
+## Table of Contents
 
-```
-0x0000000000000000000000000000000000001001
-```
+- [Security](#security)
+- [Type System](#type-system)
+- [Transaction Methods](#transaction-methods)
+- [Query Methods](#query-methods)
+- [Examples](#examples)
+- [Error Codes](#error-codes)
 
-## Data Types
+## Security
 
-### UintRange
+### Creator Field Security
 
-A range structure used for token IDs, ownership times, and transfer times:
+**CRITICAL**: The `creator` field in all transaction methods is **automatically** set from `msg.sender`. This field is **NOT** exposed in the ABI and cannot be specified by calling contracts. This prevents impersonation attacks.
 
-```solidity
-struct UintRange {
-    uint256 start;
-    uint256 end;
-}
-```
+All transaction methods use `contract.Caller()` which returns the EVM `msg.sender` - the address that directly called the current contract. This cannot be spoofed.
 
-**Constraints:**
-- `start` must be <= `end`
-- Both `start` and `end` must be non-negative
-- Maximum array size: 100 ranges
+### Best Practices
 
-### UserIncomingApproval
+1. **Never trust `creator` parameters** - They don't exist in the ABI
+2. **Always validate inputs** - Use the helper library validation functions
+3. **Check return values** - All methods return success indicators
+4. **Handle errors** - Use structured error codes for debugging
 
-Structure for incoming approval settings:
+## Type System
 
-```solidity
-struct UserIncomingApproval {
-    string approvalId;
-    string fromListId;
-    string initiatedByListId;
-    UintRange[] transferTimes;
-    UintRange[] tokenIds;
-    UintRange[] ownershipTimes;
-    string uri;
-    string customData;
-}
-```
+All types are defined in `BadgesTypes.sol` and mirror the proto message definitions 1:1. Use `BadgesHelpers.sol` for constructing and validating types.
 
-### UserOutgoingApproval
+### Core Types
 
-Structure for outgoing approval settings:
+- `UintRange`: Range of IDs (start, end inclusive)
+- `Balance`: Token balance with amount, ownership times, and token IDs
+- `CollectionMetadata`: Collection-level metadata
+- `TokenMetadata`: Token-level metadata
+- `UserBalanceStore`: Complete user balance and approval state
+- `CollectionPermissions`: Collection-level permissions
+- `UserPermissions`: User-level permissions
 
-```solidity
-struct UserOutgoingApproval {
-    string approvalId;
-    string toListId;
-    string initiatedByListId;
-    UintRange[] transferTimes;
-    UintRange[] tokenIds;
-    UintRange[] ownershipTimes;
-    string uri;
-    string customData;
-}
-```
+See `contracts/types/BadgesTypes.sol` for complete type definitions.
 
 ## Transaction Methods
 
-### transferTokens
+### Collection Management
 
-Transfers tokens from the caller (`msg.sender`) to one or more recipient addresses.
+#### `createCollection`
+Creates a new token collection.
 
-**Signature:**
+```solidity
+function createCollection(
+    BadgesTypes.MsgCreateCollection calldata msg_
+) external returns (uint256 collectionId);
+```
+
+**Parameters:**
+- `msg_.defaultBalances`: Initial user balance store (can be empty)
+- `msg_.validTokenIds`: Array of valid token ID ranges
+- `msg_.collectionPermissions`: Collection permissions
+- `msg_.manager`: Manager address
+- `msg_.collectionMetadata`: Collection metadata
+- `msg_.tokenMetadata`: Array of token metadata entries
+- `msg_.customData`: Custom data string
+- `msg_.collectionApprovals`: Array of collection approvals
+- `msg_.standards`: Array of standard strings
+- `msg_.isArchived`: Whether collection is archived
+
+**Returns:** `uint256` - The created collection ID
+
+**Example:**
+```solidity
+import {BadgesTypes} from "./types/BadgesTypes.sol";
+import {BadgesHelpers} from "./libraries/BadgesHelpers.sol";
+
+BadgesTypes.MsgCreateCollection memory msg_;
+msg_.validTokenIds = BadgesHelpers.createUintRangeArray(
+    new uint256[](1),
+    new uint256[](1)
+);
+msg_.validTokenIds[0] = BadgesHelpers.createUintRange(1, 100);
+msg_.collectionMetadata = BadgesHelpers.createCollectionMetadata("", "");
+msg_.collectionPermissions = BadgesHelpers.createEmptyCollectionPermissions();
+msg_.manager = address(0x123...);
+msg_.isArchived = false;
+
+uint256 collectionId = badgesPrecompile.createCollection(msg_);
+```
+
+#### `updateCollection`
+Updates an existing collection with update flags.
+
+```solidity
+function updateCollection(
+    BadgesTypes.MsgUpdateCollection calldata msg_
+) external returns (uint256 collectionId);
+```
+
+#### `deleteCollection`
+Deletes a collection (only creator can delete).
+
+```solidity
+function deleteCollection(uint256 collectionId) external returns (bool);
+```
+
+#### `setManager`
+Sets the manager address for a collection.
+
+```solidity
+function setManager(
+    uint256 collectionId,
+    string calldata manager
+) external returns (uint256 collectionId);
+```
+
+#### `setCollectionMetadata`
+Sets collection-level metadata.
+
+```solidity
+function setCollectionMetadata(
+    uint256 collectionId,
+    string calldata uri,
+    string calldata customData
+) external returns (uint256 collectionId);
+```
+
+#### `setStandards`
+Sets standards for a collection.
+
+```solidity
+function setStandards(
+    uint256 collectionId,
+    string[] calldata standards
+) external returns (uint256 collectionId);
+```
+
+#### `setCustomData`
+Sets custom data for a collection.
+
+```solidity
+function setCustomData(
+    uint256 collectionId,
+    string calldata customData
+) external returns (uint256 collectionId);
+```
+
+#### `setIsArchived`
+Sets the archived status of a collection.
+
+```solidity
+function setIsArchived(
+    uint256 collectionId,
+    bool isArchived
+) external returns (uint256 collectionId);
+```
+
+### Token Management
+
+#### `setValidTokenIds`
+Sets valid token IDs for a collection.
+
+```solidity
+function setValidTokenIds(
+    uint256 collectionId,
+    BadgesTypes.UintRange[] calldata validTokenIds,
+    BadgesTypes.TokenIdsActionPermission[] calldata canUpdateValidTokenIds
+) external returns (uint256 collectionId);
+```
+
+#### `setTokenMetadata`
+Sets metadata for specific token IDs.
+
+```solidity
+function setTokenMetadata(
+    uint256 collectionId,
+    BadgesTypes.TokenMetadata[] calldata tokenMetadata,
+    BadgesTypes.TokenIdsActionPermission[] calldata canUpdateTokenMetadata
+) external returns (uint256 collectionId);
+```
+
+### Transfers
+
+#### `transferTokens`
+Transfers tokens from the caller to one or more recipients.
+
 ```solidity
 function transferTokens(
     uint256 collectionId,
     address[] calldata toAddresses,
     uint256 amount,
-    UintRange[] calldata tokenIds,
-    UintRange[] calldata ownershipTimes
+    BadgesTypes.UintRange[] calldata tokenIds,
+    BadgesTypes.UintRange[] calldata ownershipTimes
 ) external returns (bool);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID to transfer from
-- `toAddresses` (address[]): Array of recipient EVM addresses (max 100 addresses)
-- `amount` (uint256): Amount to transfer to each recipient (must be > 0)
-- `tokenIds` (UintRange[]): Array of token ID ranges to transfer (max 100 ranges)
-- `ownershipTimes` (UintRange[]): Array of ownership time ranges to transfer (max 100 ranges)
-
-**Returns:**
-- `bool`: `true` if transfer succeeded
-
-**Gas Cost:**
-- Base: 30,000 gas
-- Per recipient: 5,000 gas
-- Per token ID range: 1,000 gas
-- Per ownership time range: 1,000 gas
-
 **Example:**
 ```solidity
-IBadgesPrecompile precompile = IBadgesPrecompile(0x0000000000000000000000000000000000001001);
+address[] memory recipients = new address[](2);
+recipients[0] = address(0xABC...);
+recipients[1] = address(0xDEF...);
 
-UintRange[] memory tokenIds = new UintRange[](1);
-tokenIds[0] = UintRange({start: 1, end: 10});
+BadgesTypes.UintRange[] memory tokenIds = new BadgesTypes.UintRange[](1);
+tokenIds[0] = BadgesHelpers.createUintRange(1, 10);
 
-UintRange[] memory ownershipTimes = new UintRange[](1);
-ownershipTimes[0] = UintRange({start: 0, end: type(uint256).max});
+BadgesTypes.UintRange[] memory ownershipTimes = new BadgesTypes.UintRange[](1);
+ownershipTimes[0] = BadgesHelpers.createFullOwnershipTimeRange();
 
-address[] memory recipients = new address[](1);
-recipients[0] = 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0;
-
-bool success = precompile.transferTokens(
+bool success = badgesPrecompile.transferTokens(
     collectionId,
     recipients,
-    10,
+    100,
     tokenIds,
     ownershipTimes
 );
-require(success, "Transfer failed");
 ```
 
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters (zero addresses, invalid ranges, etc.)
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `4` (ErrorCodeTransferFailed): Transfer operation failed (insufficient balance, approval issues, etc.)
+### Approvals
 
----
+#### `setOutgoingApproval`
+Sets an outgoing approval for the caller.
 
-### setIncomingApproval
-
-Sets an incoming approval for the caller, allowing specified addresses to transfer tokens to the caller.
-
-**Signature:**
-```solidity
-function setIncomingApproval(
-    uint256 collectionId,
-    UserIncomingApproval calldata approval
-) external returns (bool);
-```
-
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approval` (UserIncomingApproval): Approval configuration struct
-
-**Returns:**
-- `bool`: `true` if approval was set successfully
-
-**Gas Cost:**
-- Base: 20,000 gas
-- Dynamic: Based on number of ranges in approval struct
-
-**Example:**
-```solidity
-UserIncomingApproval memory approval = UserIncomingApproval({
-    approvalId: "my_incoming_approval",
-    fromListId: "All",
-    initiatedByListId: "All",
-    transferTimes: new UintRange[](0), // Empty means all times
-    tokenIds: new UintRange[](0), // Empty means all token IDs
-    ownershipTimes: new UintRange[](0), // Empty means all ownership times
-    uri: "",
-    customData: ""
-});
-
-bool success = precompile.setIncomingApproval(collectionId, approval);
-require(success, "Set incoming approval failed");
-```
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `5` (ErrorCodeApprovalFailed): Approval operation failed
-
----
-
-### setOutgoingApproval
-
-Sets an outgoing approval for the caller, allowing the caller to transfer tokens to specified addresses.
-
-**Signature:**
 ```solidity
 function setOutgoingApproval(
     uint256 collectionId,
-    UserOutgoingApproval calldata approval
+    BadgesTypes.UserOutgoingApproval calldata approval
 ) external returns (bool);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approval` (UserOutgoingApproval): Approval configuration struct
+#### `setIncomingApproval`
+Sets an incoming approval for the caller.
 
-**Returns:**
-- `bool`: `true` if approval was set successfully
-
-**Gas Cost:**
-- Base: 20,000 gas
-- Dynamic: Based on number of ranges in approval struct
-
-**Example:**
 ```solidity
-UserOutgoingApproval memory approval = UserOutgoingApproval({
-    approvalId: "my_outgoing_approval",
-    toListId: "All",
-    initiatedByListId: "All",
-    transferTimes: new UintRange[](0),
-    tokenIds: new UintRange[](0),
-    ownershipTimes: new UintRange[](0),
-    uri: "",
-    customData: ""
-});
-
-bool success = precompile.setOutgoingApproval(collectionId, approval);
-require(success, "Set outgoing approval failed");
+function setIncomingApproval(
+    uint256 collectionId,
+    BadgesTypes.UserIncomingApproval calldata approval
+) external returns (bool);
 ```
 
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `5` (ErrorCodeApprovalFailed): Approval operation failed
+#### `deleteOutgoingApproval`
+Deletes an outgoing approval.
 
----
+```solidity
+function deleteOutgoingApproval(
+    uint256 collectionId,
+    string calldata approvalId
+) external returns (bool);
+```
+
+#### `deleteIncomingApproval`
+Deletes an incoming approval.
+
+```solidity
+function deleteIncomingApproval(
+    uint256 collectionId,
+    string calldata approvalId
+) external returns (bool);
+```
+
+#### `updateUserApprovals`
+Updates user approvals with update flags.
+
+```solidity
+function updateUserApprovals(
+    BadgesTypes.MsgUpdateUserApprovals calldata msg_
+) external returns (bool);
+```
+
+#### `setCollectionApprovals`
+Sets collection-level approvals.
+
+```solidity
+function setCollectionApprovals(
+    uint256 collectionId,
+    BadgesTypes.CollectionApproval[] calldata collectionApprovals,
+    BadgesTypes.CollectionApprovalPermission[] calldata canUpdateCollectionApprovals
+) external returns (uint256 collectionId);
+```
+
+#### `purgeApprovals`
+Purges expired or specified approvals.
+
+```solidity
+function purgeApprovals(
+    uint256 collectionId,
+    bool purgeExpired,
+    string calldata approverAddress,
+    bool purgeCounterpartyApprovals,
+    BadgesTypes.ApprovalIdentifierDetails[] calldata approvalsToPurge
+) external returns (uint256 numPurged);
+```
+
+### Dynamic Stores
+
+#### `createDynamicStore`
+Creates a dynamic key-value store.
+
+```solidity
+function createDynamicStore(
+    bool defaultValue,
+    string calldata uri,
+    string calldata customData
+) external returns (uint256 storeId);
+```
+
+#### `updateDynamicStore`
+Updates a dynamic store.
+
+```solidity
+function updateDynamicStore(
+    uint256 storeId,
+    bool defaultValue,
+    bool globalEnabled,
+    string calldata uri,
+    string calldata customData
+) external returns (bool);
+```
+
+#### `deleteDynamicStore`
+Deletes a dynamic store.
+
+```solidity
+function deleteDynamicStore(uint256 storeId) external returns (bool);
+```
+
+#### `setDynamicStoreValue`
+Sets a value in a dynamic store for an address.
+
+```solidity
+function setDynamicStoreValue(
+    uint256 storeId,
+    address address_,
+    bool value
+) external returns (bool);
+```
+
+### Address Lists
+
+#### `createAddressLists`
+Creates one or more address lists.
+
+```solidity
+function createAddressLists(
+    BadgesTypes.AddressListInput[] calldata addressLists
+) external returns (bool);
+```
+
+### Voting
+
+#### `castVote`
+Casts a vote on a proposal.
+
+```solidity
+function castVote(
+    uint256 collectionId,
+    string calldata approvalLevel,
+    string calldata approverAddress,
+    string calldata approvalId,
+    string calldata proposalId,
+    uint256 yesWeight
+) external returns (bool);
+```
 
 ## Query Methods
 
-### getCollection
+### Collections
 
-Queries collection data by ID. Returns protobuf-encoded collection data.
+#### `getCollection`
+Queries a collection by ID. Returns structured `TokenCollection` type.
 
-**Signature:**
 ```solidity
-function getCollection(uint256 collectionId) external view returns (bytes);
+function getCollection(
+    uint256 collectionId
+) external view returns (BadgesTypes.TokenCollection memory);
 ```
-
-**Parameters:**
-- `collectionId` (uint256): The collection ID to query
-
-**Returns:**
-- `bytes`: Protobuf-encoded collection data
-
-**Gas Cost:** 3,000 gas
 
 **Example:**
 ```solidity
-bytes memory collectionData = precompile.getCollection(collectionId);
-// Decode using protobuf library in Solidity
+BadgesTypes.TokenCollection memory collection = badgesPrecompile.getCollection(collectionId);
+require(collection.collectionId == collectionId, "Collection not found");
+string memory uri = collection.collectionMetadata.uri;
 ```
 
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid collection ID
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `6` (ErrorCodeQueryFailed): Query operation failed
+### Balances
 
----
+#### `getBalance`
+Queries a user's balance store. Returns structured `UserBalanceStore` type.
 
-### getBalance
-
-Queries balance data for a user address. Returns protobuf-encoded balance data.
-
-**Signature:**
 ```solidity
 function getBalance(
     uint256 collectionId,
     address userAddress
-) external view returns (bytes);
+) external view returns (BadgesTypes.UserBalanceStore memory);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `userAddress` (address): The user address to query (cannot be zero address)
+**Example:**
+```solidity
+BadgesTypes.UserBalanceStore memory balance = badgesPrecompile.getBalance(collectionId, userAddress);
+uint256 numBalances = balance.balances.length;
+if (numBalances > 0) {
+    uint256 amount = balance.balances[0].amount;
+}
+```
 
-**Returns:**
-- `bytes`: Protobuf-encoded balance data
+#### `getBalanceAmount`
+Queries the total balance amount for specific token IDs and ownership times.
 
-**Gas Cost:** 3,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getBalanceAmount
-
-Gets the balance amount for a user with specific token IDs and ownership times. Returns a uint256 value directly (no protobuf decoding needed).
-
-**Signature:**
 ```solidity
 function getBalanceAmount(
     uint256 collectionId,
     address userAddress,
-    UintRange[] calldata tokenIds,
-    UintRange[] calldata ownershipTimes
+    BadgesTypes.UintRange[] calldata tokenIds,
+    BadgesTypes.UintRange[] calldata ownershipTimes
 ) external view returns (uint256);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `userAddress` (address): The user address to query
-- `tokenIds` (UintRange[]): Array of token ID ranges to query
-- `ownershipTimes` (UintRange[]): Array of ownership time ranges to query
+#### `getTotalSupply`
+Queries the total supply for specific token IDs and ownership times.
 
-**Returns:**
-- `uint256`: Total balance amount matching the specified ranges
-
-**Gas Cost:**
-- Base: 3,000 gas
-- Per range: 500 gas
-
-**Example:**
-```solidity
-UintRange[] memory tokenIds = new UintRange[](1);
-tokenIds[0] = UintRange({start: 1, end: 10});
-
-UintRange[] memory ownershipTimes = new UintRange[](1);
-ownershipTimes[0] = UintRange({start: 0, end: type(uint256).max});
-
-uint256 balance = precompile.getBalanceAmount(
-    collectionId,
-    userAddress,
-    tokenIds,
-    ownershipTimes
-);
-```
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getTotalSupply
-
-Gets the total supply for a collection with specific token IDs and ownership times. Returns a uint256 value directly.
-
-**Signature:**
 ```solidity
 function getTotalSupply(
     uint256 collectionId,
-    UintRange[] calldata tokenIds,
-    UintRange[] calldata ownershipTimes
+    BadgesTypes.UintRange[] calldata tokenIds,
+    BadgesTypes.UintRange[] calldata ownershipTimes
 ) external view returns (uint256);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `tokenIds` (UintRange[]): Array of token ID ranges to query
-- `ownershipTimes` (UintRange[]): Array of ownership time ranges to query
+### Address Lists
 
-**Returns:**
-- `uint256`: Total supply matching the specified ranges
+#### `getAddressList`
+Queries an address list by ID. Returns structured `AddressList` type.
 
-**Gas Cost:**
-- Base: 3,000 gas
-- Per range: 500 gas
-
-**Example:**
 ```solidity
-UintRange[] memory tokenIds = new UintRange[](1);
-tokenIds[0] = UintRange({start: 1, end: 100});
-
-UintRange[] memory ownershipTimes = new UintRange[](1);
-ownershipTimes[0] = UintRange({start: 0, end: type(uint256).max});
-
-uint256 totalSupply = precompile.getTotalSupply(
-    collectionId,
-    tokenIds,
-    ownershipTimes
-);
+function getAddressList(
+    string calldata listId
+) external view returns (BadgesTypes.AddressList memory);
 ```
 
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `2` (ErrorCodeCollectionNotFound): Collection does not exist
-- `6` (ErrorCodeQueryFailed): Query operation failed
+### Dynamic Stores
 
----
+#### `getDynamicStore`
+Queries a dynamic store by ID.
 
-### getAddressList
-
-Queries an address list by ID. Returns protobuf-encoded address list data.
-
-**Signature:**
 ```solidity
-function getAddressList(string calldata listId) external view returns (bytes);
+function getDynamicStore(
+    uint256 storeId
+) external view returns (bytes memory);
 ```
 
-**Parameters:**
-- `listId` (string): The address list ID
+#### `getDynamicStoreValue`
+Queries a dynamic store value for an address.
 
-**Returns:**
-- `bytes`: Protobuf-encoded address list data
+```solidity
+function getDynamicStoreValue(
+    uint256 storeId,
+    address userAddress
+) external view returns (bytes memory);
+```
 
-**Gas Cost:** 5,000 gas
+### Approvals and Trackers
 
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid list ID (empty string)
-- `6` (ErrorCodeQueryFailed): Address list not found
+#### `getApprovalTracker`
+Queries an approval tracker.
 
----
-
-### getApprovalTracker
-
-Queries an approval tracker. Returns protobuf-encoded tracker data.
-
-**Signature:**
 ```solidity
 function getApprovalTracker(
     uint256 collectionId,
@@ -413,34 +473,12 @@ function getApprovalTracker(
     string calldata trackerType,
     address approvedAddress,
     string calldata approvalId
-) external view returns (bytes);
+) external view returns (bytes memory);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approvalLevel` (string): Approval level (e.g., "collection", "user")
-- `approverAddress` (address): Address of the approver
-- `amountTrackerId` (string): Amount tracker ID
-- `trackerType` (string): Tracker type (e.g., "overall", "perFromAddress")
-- `approvedAddress` (address): Address that was approved
-- `approvalId` (string): Approval ID
+#### `getChallengeTracker`
+Queries a challenge tracker.
 
-**Returns:**
-- `bytes`: Protobuf-encoded approval tracker data
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getChallengeTracker
-
-Queries a challenge tracker. Returns the number of times the challenge has been used as uint256.
-
-**Signature:**
 ```solidity
 function getChallengeTracker(
     uint256 collectionId,
@@ -449,33 +487,12 @@ function getChallengeTracker(
     string calldata challengeTrackerId,
     uint256 leafIndex,
     string calldata approvalId
-) external view returns (uint256);
+) external view returns (bytes memory);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approvalLevel` (string): Approval level
-- `approverAddress` (address): Address of the approver
-- `challengeTrackerId` (string): Challenge tracker ID
-- `leafIndex` (uint256): Leaf index in the merkle tree
-- `approvalId` (string): Approval ID
+#### `getETHSignatureTracker`
+Queries an ETH signature tracker.
 
-**Returns:**
-- `uint256`: Number of times the challenge has been used
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters (negative leafIndex, etc.)
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getETHSignatureTracker
-
-Queries an ETH signature tracker. Returns the number of times the signature has been used as uint256.
-
-**Signature:**
 ```solidity
 function getETHSignatureTracker(
     uint256 collectionId,
@@ -484,153 +501,14 @@ function getETHSignatureTracker(
     string calldata approvalId,
     string calldata challengeTrackerId,
     string calldata signature
-) external view returns (uint256);
+) external view returns (bytes memory);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approvalLevel` (string): Approval level
-- `approverAddress` (address): Address of the approver
-- `approvalId` (string): Approval ID
-- `challengeTrackerId` (string): Challenge tracker ID
-- `signature` (string): The signature to check
+### Voting
 
-**Returns:**
-- `uint256`: Number of times the signature has been used
+#### `getVote`
+Queries a single vote.
 
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getDynamicStore
-
-Queries a dynamic store by ID. Returns protobuf-encoded store data.
-
-**Signature:**
-```solidity
-function getDynamicStore(uint256 storeId) external view returns (bytes);
-```
-
-**Parameters:**
-- `storeId` (uint256): The dynamic store ID
-
-**Returns:**
-- `bytes`: Protobuf-encoded dynamic store data
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid store ID
-- `6` (ErrorCodeQueryFailed): Dynamic store not found
-
----
-
-### getDynamicStoreValue
-
-Queries a dynamic store value for a specific user address. Returns protobuf-encoded value data.
-
-**Signature:**
-```solidity
-function getDynamicStoreValue(
-    uint256 storeId,
-    address userAddress
-) external view returns (bytes);
-```
-
-**Parameters:**
-- `storeId` (uint256): The dynamic store ID
-- `userAddress` (address): The user address to query
-
-**Returns:**
-- `bytes`: Protobuf-encoded store value data
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getWrappableBalances
-
-Gets wrappable balances for a user address and denom. Returns the amount as uint256.
-
-**Signature:**
-```solidity
-function getWrappableBalances(
-    string calldata denom,
-    address userAddress
-) external view returns (uint256);
-```
-
-**Parameters:**
-- `denom` (string): The denomination (e.g., "stake")
-- `userAddress` (address): The user address to query
-
-**Returns:**
-- `uint256`: Wrappable balance amount
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid user address
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### isAddressReservedProtocol
-
-Checks if an address is reserved for protocol use. Returns a boolean.
-
-**Signature:**
-```solidity
-function isAddressReservedProtocol(address addr) external view returns (bool);
-```
-
-**Parameters:**
-- `addr` (address): The address to check
-
-**Returns:**
-- `bool`: `true` if the address is reserved protocol, `false` otherwise
-
-**Gas Cost:** 2,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid address (zero address)
-
----
-
-### getAllReservedProtocolAddresses
-
-Gets all reserved protocol addresses. Returns an array of addresses.
-
-**Signature:**
-```solidity
-function getAllReservedProtocolAddresses() external view returns (address[]);
-```
-
-**Parameters:** None
-
-**Returns:**
-- `address[]`: Array of all reserved protocol addresses
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getVote
-
-Queries a vote for a specific proposal. Returns protobuf-encoded vote data.
-
-**Signature:**
 ```solidity
 function getVote(
     uint256 collectionId,
@@ -639,33 +517,12 @@ function getVote(
     string calldata approvalId,
     string calldata proposalId,
     address voterAddress
-) external view returns (bytes);
+) external view returns (bytes memory);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approvalLevel` (string): Approval level
-- `approverAddress` (address): Address of the approver
-- `approvalId` (string): Approval ID
-- `proposalId` (string): Proposal ID
-- `voterAddress` (address): Address of the voter
+#### `getVotes`
+Queries all votes for a proposal.
 
-**Returns:**
-- `bytes`: Protobuf-encoded vote data
-
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### getVotes
-
-Queries all votes for a proposal. Returns protobuf-encoded votes data.
-
-**Signature:**
 ```solidity
 function getVotes(
     uint256 collectionId,
@@ -673,190 +530,176 @@ function getVotes(
     address approverAddress,
     string calldata approvalId,
     string calldata proposalId
-) external view returns (bytes);
+) external view returns (bytes memory);
 ```
 
-**Parameters:**
-- `collectionId` (uint256): The collection ID
-- `approvalLevel` (string): Approval level
-- `approverAddress` (address): Address of the approver
-- `approvalId` (string): Approval ID
-- `proposalId` (string): Proposal ID
+### Other Queries
 
-**Returns:**
-- `bytes`: Protobuf-encoded votes data
+#### `getWrappableBalances`
+Queries wrappable balances for a denom and address.
 
-**Gas Cost:** 5,000 gas
-
-**Error Codes:**
-- `1` (ErrorCodeInvalidInput): Invalid input parameters
-- `6` (ErrorCodeQueryFailed): Query operation failed
-
----
-
-### params
-
-Queries the module parameters. Returns protobuf-encoded parameters data.
-
-**Signature:**
 ```solidity
-function params() external view returns (bytes);
+function getWrappableBalances(
+    string calldata denom,
+    address userAddress
+) external view returns (uint256);
 ```
 
-**Parameters:** None
+#### `isAddressReservedProtocol`
+Checks if an address is a reserved protocol address.
 
-**Returns:**
-- `bytes`: Protobuf-encoded module parameters
+```solidity
+function isAddressReservedProtocol(address addr) external view returns (bool);
+```
 
-**Gas Cost:** 2,000 gas
+#### `getAllReservedProtocolAddresses`
+Gets all reserved protocol addresses.
 
-**Error Codes:**
-- `6` (ErrorCodeQueryFailed): Query operation failed
+```solidity
+function getAllReservedProtocolAddresses() external view returns (address[] memory);
+```
 
----
+#### `params`
+Queries module parameters.
 
-## Error Codes
+```solidity
+function params() external view returns (bytes memory);
+```
 
-All methods return structured errors with the following error codes:
+## Examples
 
-| Code | Name | Description |
-|------|------|-------------|
-| 1 | ErrorCodeInvalidInput | Invalid input parameters (zero addresses, invalid ranges, negative values, etc.) |
-| 2 | ErrorCodeCollectionNotFound | Collection does not exist |
-| 3 | ErrorCodeBalanceNotFound | Balance not found |
-| 4 | ErrorCodeTransferFailed | Transfer operation failed (insufficient balance, approval issues, etc.) |
-| 5 | ErrorCodeApprovalFailed | Approval operation failed |
-| 6 | ErrorCodeQueryFailed | Query operation failed |
-| 7 | ErrorCodeInternalError | Internal error (marshaling, etc.) |
-| 8 | ErrorCodeUnauthorized | Unauthorized operation |
-| 9 | ErrorCodeCollectionArchived | Collection is archived (read-only) |
-
-## Input Validation
-
-All methods perform rigorous input validation:
-
-- **Addresses**: Cannot be zero addresses
-- **Collection IDs**: Must be non-negative (0 is valid for new collections)
-- **Amounts**: Must be greater than zero
-- **Ranges**: `start` must be <= `end`, both must be non-negative
-- **Array Sizes**: 
-  - Maximum 100 recipients per transfer
-  - Maximum 100 token ID ranges
-  - Maximum 100 ownership time ranges
-- **Strings**: Cannot be empty where required
-
-## Gas Costs Summary
-
-### Transaction Methods
-- `transferTokens`: 30,000 base + 5,000 per recipient + 1,000 per token ID range + 1,000 per ownership time range
-- `setIncomingApproval`: 20,000 base + dynamic
-- `setOutgoingApproval`: 20,000 base + dynamic
-
-### Query Methods
-- `getCollection`: 3,000 gas
-- `getBalance`: 3,000 gas
-- `getBalanceAmount`: 3,000 base + 500 per range
-- `getTotalSupply`: 3,000 base + 500 per range
-- `getAddressList`: 5,000 gas
-- `getApprovalTracker`: 5,000 gas
-- `getChallengeTracker`: 5,000 gas
-- `getETHSignatureTracker`: 5,000 gas
-- `getDynamicStore`: 5,000 gas
-- `getDynamicStoreValue`: 5,000 gas
-- `getWrappableBalances`: 5,000 gas
-- `isAddressReservedProtocol`: 2,000 gas
-- `getAllReservedProtocolAddresses`: 5,000 gas
-- `getVote`: 5,000 gas
-- `getVotes`: 5,000 gas
-- `params`: 2,000 gas
-
-## Protobuf Decoding
-
-Most query methods return protobuf-encoded bytes. To decode these in Solidity, you'll need a protobuf decoding library. The following methods return direct values (no decoding needed):
-
-- `getBalanceAmount`: Returns `uint256`
-- `getTotalSupply`: Returns `uint256`
-- `getChallengeTracker`: Returns `uint256`
-- `getETHSignatureTracker`: Returns `uint256`
-- `getWrappableBalances`: Returns `uint256`
-- `isAddressReservedProtocol`: Returns `bool`
-- `getAllReservedProtocolAddresses`: Returns `address[]`
-
-## Best Practices
-
-1. **Always check return values**: Transaction methods return `bool` indicating success
-2. **Validate inputs before calling**: Check addresses, amounts, and ranges in your contract
-3. **Handle errors gracefully**: Use try-catch blocks where appropriate
-4. **Use direct return methods when possible**: Prefer `getBalanceAmount` and `getTotalSupply` over protobuf-encoded methods when you only need the amount
-5. **Respect array size limits**: Keep recipient and range arrays under 100 elements
-6. **Check collection existence**: Verify collection exists before attempting transfers
-
-## Example: Complete Transfer Flow
+### Complete Collection Creation Example
 
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IBadgesPrecompile {
-    struct UintRange {
-        uint256 start;
-        uint256 end;
+import "./interfaces/IBadgesPrecompile.sol";
+import "./types/BadgesTypes.sol";
+import "./libraries/BadgesHelpers.sol";
+
+contract MyBadgesContract {
+    IBadgesPrecompile constant badges = IBadgesPrecompile(0x0000000000000000000000000000000000001001);
+    
+    function createMyCollection() external returns (uint256) {
+        BadgesTypes.MsgCreateCollection memory msg_;
+        
+        // Set valid token IDs (1-1000)
+        msg_.validTokenIds = new BadgesTypes.UintRange[](1);
+        msg_.validTokenIds[0] = BadgesHelpers.createUintRange(1, 1000);
+        
+        // Set collection metadata
+        msg_.collectionMetadata = BadgesHelpers.createCollectionMetadata(
+            "https://example.com/metadata",
+            "My custom data"
+        );
+        
+        // Set empty permissions (anyone can manage)
+        msg_.collectionPermissions = BadgesHelpers.createEmptyCollectionPermissions();
+        
+        // Set manager to this contract
+        msg_.manager = address(this);
+        
+        // Set token metadata for tokens 1-100
+        msg_.tokenMetadata = new BadgesTypes.TokenMetadata[](1);
+        msg_.tokenMetadata[0] = BadgesHelpers.createTokenMetadata(
+            "https://example.com/token",
+            "",
+            BadgesHelpers.createUintRangeArray(
+                new uint256[](1),
+                new uint256[](1)
+            )
+        );
+        msg_.tokenMetadata[0].tokenIds[0] = BadgesHelpers.createUintRange(1, 100);
+        
+        // Set standards
+        msg_.standards = new string[](1);
+        msg_.standards[0] = "ERC721";
+        
+        // Create collection
+        return badges.createCollection(msg_);
     }
     
-    function transferTokens(
+    function transferMyTokens(
         uint256 collectionId,
-        address[] calldata toAddresses,
-        uint256 amount,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
-    ) external returns (bool);
-    
-    function getBalanceAmount(
-        uint256 collectionId,
-        address userAddress,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
-    ) external view returns (uint256);
-}
-
-contract MyTokenContract {
-    IBadgesPrecompile constant BADGES_PRECOMPILE = IBadgesPrecompile(0x0000000000000000000000000000000000001001);
-    
-    uint256 public collectionId;
-    
-    function transfer(uint256 amount, address to) external returns (bool) {
-        IBadgesPrecompile.UintRange[] memory tokenIds = new IBadgesPrecompile.UintRange[](1);
-        tokenIds[0] = IBadgesPrecompile.UintRange({start: 1, end: 100});
-        
-        IBadgesPrecompile.UintRange[] memory ownershipTimes = new IBadgesPrecompile.UintRange[](1);
-        ownershipTimes[0] = IBadgesPrecompile.UintRange({start: 0, end: type(uint256).max});
-        
+        address to,
+        uint256 amount
+    ) external {
         address[] memory recipients = new address[](1);
         recipients[0] = to;
         
-        return BADGES_PRECOMPILE.transferTokens(
-            collectionId,
-            recipients,
-            amount,
-            tokenIds,
-            ownershipTimes
-        );
-    }
-    
-    function balanceOf(address user) external view returns (uint256) {
-        IBadgesPrecompile.UintRange[] memory tokenIds = new IBadgesPrecompile.UintRange[](1);
-        tokenIds[0] = IBadgesPrecompile.UintRange({start: 1, end: 100});
+        BadgesTypes.UintRange[] memory tokenIds = new BadgesTypes.UintRange[](1);
+        tokenIds[0] = BadgesHelpers.createUintRange(1, amount);
         
-        IBadgesPrecompile.UintRange[] memory ownershipTimes = new IBadgesPrecompile.UintRange[](1);
-        ownershipTimes[0] = IBadgesPrecompile.UintRange({start: 0, end: type(uint256).max});
+        BadgesTypes.UintRange[] memory ownershipTimes = new BadgesTypes.UintRange[](1);
+        ownershipTimes[0] = BadgesHelpers.createFullOwnershipTimeRange();
         
-        return BADGES_PRECOMPILE.getBalanceAmount(
-            collectionId,
-            user,
-            tokenIds,
-            ownershipTimes
-        );
+        badges.transferTokens(collectionId, recipients, amount, tokenIds, ownershipTimes);
     }
 }
 ```
 
+## Error Codes
+
+The precompile uses structured error codes for consistent error handling:
+
+- `ErrorCodeInvalidInput (1)`: Invalid input parameters
+- `ErrorCodeCollectionNotFound (2)`: Collection not found
+- `ErrorCodeBalanceNotFound (3)`: Balance not found
+- `ErrorCodeTransferFailed (4)`: Transfer operation failed
+- `ErrorCodeApprovalFailed (5)`: Approval operation failed
+- `ErrorCodeQueryFailed (6)`: Query operation failed
+- `ErrorCodeInternalError (7)`: Internal error
+
+Errors are returned as `bytes` that can be decoded using the error code and message.
+
+## Gas Costs
+
+All methods have defined gas costs:
+- Simple operations: 20,000 - 30,000 gas
+- Complex operations (createCollection, updateCollection): 40,000 - 50,000 gas
+- Query operations: 5,000 - 10,000 gas
+
+Gas costs are automatically calculated by the precompile based on operation complexity.
+
+## Helper Library
+
+Use `BadgesHelpers.sol` for:
+- Creating structs with validation
+- Building default values
+- Validating inputs
+- Common range operations
+
+**Example:**
+```solidity
+// Create a UintRange
+BadgesTypes.UintRange memory range = BadgesHelpers.createUintRange(1, 100);
+
+// Create full ownership time range
+BadgesTypes.UintRange memory fullTime = BadgesHelpers.createFullOwnershipTimeRange();
+
+// Create empty permissions
+BadgesTypes.CollectionPermissions memory perms = BadgesHelpers.createEmptyCollectionPermissions();
+
+// Validate a range
+require(BadgesHelpers.validateUintRange(range), "Invalid range");
+```
+
+## Migration Notes
+
+### Return Type Changes
+
+Query methods now return structured Solidity types instead of protobuf-encoded bytes:
+- `getCollection`: Returns `TokenCollection` struct
+- `getBalance`: Returns `UserBalanceStore` struct  
+- `getAddressList`: Returns `AddressList` struct
+
+This provides better type safety and IDE support. If you need the old bytes format, you can marshal the structs yourself.
+
+## Support
+
+For issues or questions:
+- Check the type definitions in `BadgesTypes.sol`
+- Use `BadgesHelpers.sol` for common operations
+- Review examples in this documentation
+- See the implementation in `x/evm/precompiles/tokenization/`

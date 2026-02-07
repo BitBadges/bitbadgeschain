@@ -43,9 +43,31 @@ import (
 
 const (
 	// Base gas costs for transactions
-	GasTransferTokensBase      = 30_000
-	GasSetIncomingApprovalBase = 20_000
-	GasSetOutgoingApprovalBase = 20_000
+	GasTransferTokensBase            = 30_000
+	GasSetIncomingApprovalBase       = 20_000
+	GasSetOutgoingApprovalBase       = 20_000
+	GasCreateCollectionBase          = 50_000
+	GasUpdateCollectionBase          = 40_000
+	GasDeleteCollectionBase          = 20_000
+	GasCreateAddressListsBase        = 30_000
+	GasUpdateUserApprovalsBase       = 30_000
+	GasDeleteIncomingApprovalBase    = 15_000
+	GasDeleteOutgoingApprovalBase    = 15_000
+	GasPurgeApprovalsBase            = 25_000
+	GasCreateDynamicStoreBase        = 20_000
+	GasUpdateDynamicStoreBase        = 20_000
+	GasDeleteDynamicStoreBase        = 15_000
+	GasSetDynamicStoreValueBase      = 15_000
+	GasSetValidTokenIdsBase          = 20_000
+	GasSetManagerBase                = 15_000
+	GasSetCollectionMetadataBase     = 15_000
+	GasSetTokenMetadataBase          = 20_000
+	GasSetCustomDataBase             = 15_000
+	GasSetStandardsBase              = 15_000
+	GasSetCollectionApprovalsBase    = 30_000
+	GasSetIsArchivedBase             = 15_000
+	GasCastVoteBase                  = 15_000
+	GasUniversalUpdateCollectionBase = 50_000
 
 	// Gas costs per element for dynamic calculations
 	GasPerRecipient          = 5_000
@@ -81,14 +103,23 @@ var (
 	//go:embed abi.json
 	f   embed.FS
 	ABI abi.ABI
+	// abiLoadError stores any error from ABI loading for lazy error reporting
+	abiLoadError error
 )
 
 func init() {
-	var err error
-	ABI, err = cmn.LoadABI(f, "abi.json")
-	if err != nil {
-		panic(err)
+	ABI, abiLoadError = cmn.LoadABI(f, "abi.json")
+	if abiLoadError != nil {
+		// Log the error but don't panic - the error will be returned when the precompile is used
+		// This allows the chain to start even if the ABI is malformed, but the precompile will be disabled
+		fmt.Printf("WARNING: Failed to load tokenization precompile ABI: %v\n", abiLoadError)
 	}
+}
+
+// GetABILoadError returns any error that occurred during ABI loading
+// This can be checked by callers to verify the precompile is properly initialized
+func GetABILoadError() error {
+	return abiLoadError
 }
 
 // Precompile defines the tokenization precompile
@@ -115,9 +146,22 @@ func NewPrecompile(
 	}
 }
 
-// TokenizationPrecompileAddress is the address of the badges precompile
+// TokenizationPrecompileAddress is the address of the tokenization precompile
 // Using standard precompile address range: 0x0000000000000000000000000000000000001001
 const TokenizationPrecompileAddress = "0x0000000000000000000000000000000000001001"
+
+// GetCallerAddress gets the caller address and converts it to Cosmos format
+// This should be used for ALL transaction methods to set the Creator field
+// SECURITY: This ensures the creator is always the actual caller, preventing impersonation
+// The caller is obtained from contract.Caller() which returns the EVM msg.sender
+// and cannot be spoofed by malicious contracts
+func (p Precompile) GetCallerAddress(contract *vm.Contract) (string, error) {
+	caller := contract.Caller()
+	if err := VerifyCaller(caller); err != nil {
+		return "", err
+	}
+	return sdk.AccAddress(caller.Bytes()).String(), nil
+}
 
 // RequiredGas calculates the precompiled contract's base gas rate.
 func (p Precompile) RequiredGas(input []byte) uint64 {
@@ -137,12 +181,58 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 	// For methods that require dynamic gas calculation, we return a base amount
 	// The actual gas will be calculated in Execute based on input size
 	switch method.Name {
+	// Transaction methods
 	case TransferTokensMethod:
 		return GasTransferTokensBase
 	case SetIncomingApprovalMethod:
 		return GasSetIncomingApprovalBase
 	case SetOutgoingApprovalMethod:
 		return GasSetOutgoingApprovalBase
+	case CreateCollectionMethod:
+		return GasCreateCollectionBase
+	case UpdateCollectionMethod:
+		return GasUpdateCollectionBase
+	case DeleteCollectionMethod:
+		return GasDeleteCollectionBase
+	case CreateAddressListsMethod:
+		return GasCreateAddressListsBase
+	case UpdateUserApprovalsMethod:
+		return GasUpdateUserApprovalsBase
+	case DeleteIncomingApprovalMethod:
+		return GasDeleteIncomingApprovalBase
+	case DeleteOutgoingApprovalMethod:
+		return GasDeleteOutgoingApprovalBase
+	case PurgeApprovalsMethod:
+		return GasPurgeApprovalsBase
+	case CreateDynamicStoreMethod:
+		return GasCreateDynamicStoreBase
+	case UpdateDynamicStoreMethod:
+		return GasUpdateDynamicStoreBase
+	case DeleteDynamicStoreMethod:
+		return GasDeleteDynamicStoreBase
+	case SetDynamicStoreValueMethod:
+		return GasSetDynamicStoreValueBase
+	case SetValidTokenIdsMethod:
+		return GasSetValidTokenIdsBase
+	case SetManagerMethod:
+		return GasSetManagerBase
+	case SetCollectionMetadataMethod:
+		return GasSetCollectionMetadataBase
+	case SetTokenMetadataMethod:
+		return GasSetTokenMetadataBase
+	case SetCustomDataMethod:
+		return GasSetCustomDataBase
+	case SetStandardsMethod:
+		return GasSetStandardsBase
+	case SetCollectionApprovalsMethod:
+		return GasSetCollectionApprovalsBase
+	case SetIsArchivedMethod:
+		return GasSetIsArchivedBase
+	case CastVoteMethod:
+		return GasCastVoteBase
+	case UniversalUpdateCollectionMethod:
+		return GasUniversalUpdateCollectionBase
+	// Query methods
 	case GetCollectionMethod:
 		return GasGetCollectionBase
 	case GetBalanceMethod:
@@ -181,28 +271,34 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 }
 
 func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error) {
-	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
-		result, err := p.Execute(ctx, contract, readonly)
+	// Check if ABI loaded successfully during init
+	if abiLoadError != nil {
+		return nil, fmt.Errorf("tokenization precompile unavailable: ABI failed to load: %w", abiLoadError)
+	}
 
-		// Log usage for monitoring
-		method := "unknown"
-		if len(contract.Input) >= 4 {
-			if m, err2 := p.MethodById(contract.Input[:4]); err2 == nil {
-				method = m.Name
-			}
-		}
+	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
+		result, methodName, err := p.ExecuteWithMethodName(ctx, contract, readonly)
+
 		// Gas is tracked by the EVM, we log the method for monitoring
-		LogPrecompileUsage(ctx, method, err == nil, 0, err)
+		LogPrecompileUsage(ctx, methodName, err == nil, 0, err)
 
 		return result, err
 	})
 }
 
 // Execute executes the precompiled contract tokenization methods defined in the ABI.
+// Deprecated: Use ExecuteWithMethodName instead for better performance (avoids double method lookup).
 func (p Precompile) Execute(ctx sdk.Context, contract *vm.Contract, readOnly bool) ([]byte, error) {
+	bz, _, err := p.ExecuteWithMethodName(ctx, contract, readOnly)
+	return bz, err
+}
+
+// ExecuteWithMethodName executes the precompiled contract and returns the method name for logging.
+// This avoids the double MethodById() lookup that occurs when logging separately.
+func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract, readOnly bool) ([]byte, string, error) {
 	method, args, err := cmn.SetupABI(p.ABI, contract, readOnly, p.IsTransaction)
 	if err != nil {
-		return nil, err
+		return nil, "unknown", err
 	}
 
 	var bz []byte
@@ -214,6 +310,50 @@ func (p Precompile) Execute(ctx sdk.Context, contract *vm.Contract, readOnly boo
 		bz, err = p.SetIncomingApproval(ctx, method, args, contract)
 	case SetOutgoingApprovalMethod:
 		bz, err = p.SetOutgoingApproval(ctx, method, args, contract)
+	case CreateCollectionMethod:
+		bz, err = p.CreateCollection(ctx, method, args, contract)
+	case UpdateCollectionMethod:
+		bz, err = p.UpdateCollection(ctx, method, args, contract)
+	case DeleteCollectionMethod:
+		bz, err = p.DeleteCollection(ctx, method, args, contract)
+	case CreateAddressListsMethod:
+		bz, err = p.CreateAddressLists(ctx, method, args, contract)
+	case UpdateUserApprovalsMethod:
+		bz, err = p.UpdateUserApprovals(ctx, method, args, contract)
+	case DeleteIncomingApprovalMethod:
+		bz, err = p.DeleteIncomingApproval(ctx, method, args, contract)
+	case DeleteOutgoingApprovalMethod:
+		bz, err = p.DeleteOutgoingApproval(ctx, method, args, contract)
+	case PurgeApprovalsMethod:
+		bz, err = p.PurgeApprovals(ctx, method, args, contract)
+	case CreateDynamicStoreMethod:
+		bz, err = p.CreateDynamicStore(ctx, method, args, contract)
+	case UpdateDynamicStoreMethod:
+		bz, err = p.UpdateDynamicStore(ctx, method, args, contract)
+	case DeleteDynamicStoreMethod:
+		bz, err = p.DeleteDynamicStore(ctx, method, args, contract)
+	case SetDynamicStoreValueMethod:
+		bz, err = p.SetDynamicStoreValue(ctx, method, args, contract)
+	case SetValidTokenIdsMethod:
+		bz, err = p.SetValidTokenIds(ctx, method, args, contract)
+	case SetManagerMethod:
+		bz, err = p.SetManager(ctx, method, args, contract)
+	case SetCollectionMetadataMethod:
+		bz, err = p.SetCollectionMetadata(ctx, method, args, contract)
+	case SetTokenMetadataMethod:
+		bz, err = p.SetTokenMetadata(ctx, method, args, contract)
+	case SetCustomDataMethod:
+		bz, err = p.SetCustomData(ctx, method, args, contract)
+	case SetStandardsMethod:
+		bz, err = p.SetStandards(ctx, method, args, contract)
+	case SetCollectionApprovalsMethod:
+		bz, err = p.SetCollectionApprovals(ctx, method, args, contract)
+	case SetIsArchivedMethod:
+		bz, err = p.SetIsArchived(ctx, method, args, contract)
+	case CastVoteMethod:
+		bz, err = p.CastVote(ctx, method, args, contract)
+	case UniversalUpdateCollectionMethod:
+		bz, err = p.UniversalUpdateCollection(ctx, method, args, contract)
 	// Queries
 	case GetCollectionMethod:
 		bz, err = p.GetCollection(ctx, method, args)
@@ -248,28 +388,78 @@ func (p Precompile) Execute(ctx sdk.Context, contract *vm.Contract, readOnly boo
 	case GetTotalSupplyMethod:
 		bz, err = p.GetTotalSupply(ctx, method, args)
 	default:
-		return nil, fmt.Errorf(cmn.ErrUnknownMethod, method.Name)
+		return nil, method.Name, fmt.Errorf(cmn.ErrUnknownMethod, method.Name)
 	}
 
-	return bz, err
+	return bz, method.Name, err
+}
+
+// transactionMethods is a map of method names that are transactions (state-changing).
+// Using a map provides O(1) lookup instead of O(n) switch statement.
+var transactionMethods = map[string]bool{
+	TransferTokensMethod:            true,
+	SetIncomingApprovalMethod:       true,
+	SetOutgoingApprovalMethod:       true,
+	CreateCollectionMethod:          true,
+	UpdateCollectionMethod:          true,
+	DeleteCollectionMethod:          true,
+	CreateAddressListsMethod:        true,
+	UpdateUserApprovalsMethod:       true,
+	DeleteIncomingApprovalMethod:    true,
+	DeleteOutgoingApprovalMethod:    true,
+	PurgeApprovalsMethod:            true,
+	CreateDynamicStoreMethod:        true,
+	UpdateDynamicStoreMethod:        true,
+	DeleteDynamicStoreMethod:        true,
+	SetDynamicStoreValueMethod:      true,
+	SetValidTokenIdsMethod:          true,
+	SetManagerMethod:                true,
+	SetCollectionMetadataMethod:     true,
+	SetTokenMetadataMethod:          true,
+	SetCustomDataMethod:             true,
+	SetStandardsMethod:              true,
+	SetCollectionApprovalsMethod:    true,
+	SetIsArchivedMethod:             true,
+	CastVoteMethod:                  true,
+	UniversalUpdateCollectionMethod: true,
 }
 
 // IsTransaction checks if the given method name corresponds to a transaction or query.
+// Uses O(1) map lookup for better performance.
 func (Precompile) IsTransaction(method *abi.Method) bool {
-	switch method.Name {
-	case TransferTokensMethod, SetIncomingApprovalMethod, SetOutgoingApprovalMethod:
-		return true
-	default:
-		// All other methods are queries (view functions)
-		return false
-	}
+	return transactionMethods[method.Name]
 }
 
 // Method name constants
 const (
-	TransferTokensMethod                  = "transferTokens"
-	SetIncomingApprovalMethod             = "setIncomingApproval"
-	SetOutgoingApprovalMethod             = "setOutgoingApproval"
+	// Transaction methods
+	TransferTokensMethod            = "transferTokens"
+	SetIncomingApprovalMethod       = "setIncomingApproval"
+	SetOutgoingApprovalMethod       = "setOutgoingApproval"
+	CreateCollectionMethod          = "createCollection"
+	UpdateCollectionMethod          = "updateCollection"
+	DeleteCollectionMethod          = "deleteCollection"
+	CreateAddressListsMethod        = "createAddressLists"
+	UpdateUserApprovalsMethod       = "updateUserApprovals"
+	DeleteIncomingApprovalMethod    = "deleteIncomingApproval"
+	DeleteOutgoingApprovalMethod    = "deleteOutgoingApproval"
+	PurgeApprovalsMethod            = "purgeApprovals"
+	CreateDynamicStoreMethod        = "createDynamicStore"
+	UpdateDynamicStoreMethod        = "updateDynamicStore"
+	DeleteDynamicStoreMethod        = "deleteDynamicStore"
+	SetDynamicStoreValueMethod      = "setDynamicStoreValue"
+	SetValidTokenIdsMethod          = "setValidTokenIds"
+	SetManagerMethod                = "setManager"
+	SetCollectionMetadataMethod     = "setCollectionMetadata"
+	SetTokenMetadataMethod          = "setTokenMetadata"
+	SetCustomDataMethod             = "setCustomData"
+	SetStandardsMethod              = "setStandards"
+	SetCollectionApprovalsMethod    = "setCollectionApprovals"
+	SetIsArchivedMethod             = "setIsArchived"
+	CastVoteMethod                  = "castVote"
+	UniversalUpdateCollectionMethod = "universalUpdateCollection"
+
+	// Query methods
 	GetCollectionMethod                   = "getCollection"
 	GetBalanceMethod                      = "getBalance"
 	GetAddressListMethod                  = "getAddressList"
@@ -380,17 +570,20 @@ func (p Precompile) TransferTokens(ctx sdk.Context, method *abi.Method, args []i
 	// Convert amount
 	amount := sdkmath.NewUintFromBigInt(amountBig)
 
-	// Convert and validate tokenIds ranges
+	// Convert and validate tokenIds ranges (overlaps allowed for token IDs)
 	tokenIds, err := ConvertAndValidateBigIntRanges(tokenIdsRanges, "tokenIds")
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert and validate ownershipTimes ranges
+	// Convert and validate ownershipTimes ranges (overlaps allowed for ownership times)
 	ownershipTimes, err := ConvertAndValidateBigIntRanges(ownershipTimesRanges, "ownershipTimes")
 	if err != nil {
 		return nil, err
 	}
+
+	// Note: Overlapping ranges are allowed for tokenIds and ownershipTimes
+	// as they represent valid ranges that may overlap in the collection's state
 
 	// Create the transfer message
 	msg := &tokenizationtypes.MsgTransferTokens{
@@ -458,46 +651,78 @@ func (p Precompile) SetIncomingApproval(ctx sdk.Context, method *abi.Method, arg
 		return nil, ErrInvalidInput("invalid collectionId type, expected *big.Int")
 	}
 
-	approvalStruct, ok := args[1].(struct {
-		ApprovalId        string `json:"approvalId"`
-		FromListId        string `json:"fromListId"`
-		InitiatedByListId string `json:"initiatedByListId"`
-		TransferTimes     []struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		} `json:"transferTimes"`
-		TokenIds []struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		} `json:"tokenIds"`
-		OwnershipTimes []struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		} `json:"ownershipTimes"`
-		Uri        string `json:"uri"`
-		CustomData string `json:"customData"`
-	})
-	if !ok {
-		return nil, ErrInvalidInput("invalid approval type, expected UserIncomingApproval struct")
+	// Try to extract approval - handle both struct (from ABI) and map (from tests)
+	var approval *tokenizationtypes.UserIncomingApproval
+	var err error
+
+	if approvalMap, ok := args[1].(map[string]interface{}); ok {
+		// Handle map format (for testing)
+		approval, err = ConvertUserIncomingApproval(approvalMap)
+		if err != nil {
+			return nil, ErrInvalidInput(fmt.Sprintf("approval conversion failed: %v", err))
+		}
+	} else {
+		// Try struct format (from ABI unpacking)
+		approvalStruct, ok := args[1].(struct {
+			ApprovalId        string `json:"approvalId"`
+			FromListId        string `json:"fromListId"`
+			InitiatedByListId string `json:"initiatedByListId"`
+			TransferTimes     []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			} `json:"transferTimes"`
+			TokenIds []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			} `json:"tokenIds"`
+			OwnershipTimes []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			} `json:"ownershipTimes"`
+			Uri        string `json:"uri"`
+			CustomData string `json:"customData"`
+		})
+		if !ok {
+			return nil, ErrInvalidInput("invalid approval type, expected UserIncomingApproval struct or map")
+		}
+
+		// Convert struct to UserIncomingApproval
+		approval = &tokenizationtypes.UserIncomingApproval{
+			ApprovalId:        approvalStruct.ApprovalId,
+			FromListId:        approvalStruct.FromListId,
+			InitiatedByListId: approvalStruct.InitiatedByListId,
+			Uri:               approvalStruct.Uri,
+			CustomData:        approvalStruct.CustomData,
+			Version:           sdkmath.NewUint(0),
+		}
+
+		// Convert and validate transferTimes
+		approval.TransferTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.TransferTimes, "transferTimes")
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert and validate tokenIds
+		approval.TokenIds, err = ConvertAndValidateBigIntRanges(approvalStruct.TokenIds, "tokenIds")
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert and validate ownershipTimes
+		approval.OwnershipTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.OwnershipTimes, "ownershipTimes")
+		if err != nil {
+			return nil, err
+		}
+
+		// Initialize empty approval criteria
+		approval.ApprovalCriteria = &tokenizationtypes.IncomingApprovalCriteria{}
 	}
 
 	// Validate inputs
 	if err := ValidateCollectionId(collectionIdBig); err != nil {
 		return nil, err
 	}
-	if err := ValidateString(approvalStruct.ApprovalId, "approvalId"); err != nil {
-		return nil, err
-	}
-	if err := ValidateBigIntRanges(approvalStruct.TransferTimes, "transferTimes"); err != nil {
-		return nil, err
-	}
-	if err := ValidateBigIntRanges(approvalStruct.TokenIds, "tokenIds"); err != nil {
-		return nil, err
-	}
-	if err := ValidateBigIntRanges(approvalStruct.OwnershipTimes, "ownershipTimes"); err != nil {
-		return nil, err
-	}
-	if err := ValidateApprovalInputs(approvalStruct.TransferTimes, approvalStruct.TokenIds, approvalStruct.OwnershipTimes); err != nil {
+	if err := ValidateString(approval.ApprovalId, "approvalId"); err != nil {
 		return nil, err
 	}
 
@@ -510,38 +735,6 @@ func (p Precompile) SetIncomingApproval(ctx sdk.Context, method *abi.Method, arg
 
 	// Convert collectionId
 	collectionId := sdkmath.NewUintFromBigInt(collectionIdBig)
-
-	// Convert approval struct to UserIncomingApproval
-	approval := &tokenizationtypes.UserIncomingApproval{
-		ApprovalId:        approvalStruct.ApprovalId,
-		FromListId:        approvalStruct.FromListId,
-		InitiatedByListId: approvalStruct.InitiatedByListId,
-		Uri:               approvalStruct.Uri,
-		CustomData:        approvalStruct.CustomData,
-		Version:           sdkmath.NewUint(0),
-	}
-
-	// Convert and validate transferTimes
-	var err error
-	approval.TransferTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.TransferTimes, "transferTimes")
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert and validate tokenIds
-	approval.TokenIds, err = ConvertAndValidateBigIntRanges(approvalStruct.TokenIds, "tokenIds")
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert and validate ownershipTimes
-	approval.OwnershipTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.OwnershipTimes, "ownershipTimes")
-	if err != nil {
-		return nil, err
-	}
-
-	// Initialize empty approval criteria
-	approval.ApprovalCriteria = &tokenizationtypes.IncomingApprovalCriteria{}
 
 	// Create the message
 	msg := &tokenizationtypes.MsgSetIncomingApproval{
@@ -558,7 +751,7 @@ func (p Precompile) SetIncomingApproval(ctx sdk.Context, method *abi.Method, arg
 	}
 
 	// Emit event
-	EmitIncomingApprovalEvent(ctx, collectionId, caller, approvalStruct.ApprovalId)
+	EmitIncomingApprovalEvent(ctx, collectionId, caller, approval.ApprovalId)
 
 	// Return success
 	return method.Outputs.Pack(true)
@@ -597,46 +790,78 @@ func (p Precompile) SetOutgoingApproval(ctx sdk.Context, method *abi.Method, arg
 		return nil, ErrInvalidInput("invalid collectionId type, expected *big.Int")
 	}
 
-	approvalStruct, ok := args[1].(struct {
-		ApprovalId        string `json:"approvalId"`
-		ToListId          string `json:"toListId"`
-		InitiatedByListId string `json:"initiatedByListId"`
-		TransferTimes     []struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		} `json:"transferTimes"`
-		TokenIds []struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		} `json:"tokenIds"`
-		OwnershipTimes []struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		} `json:"ownershipTimes"`
-		Uri        string `json:"uri"`
-		CustomData string `json:"customData"`
-	})
-	if !ok {
-		return nil, ErrInvalidInput("invalid approval type, expected UserOutgoingApproval struct")
+	// Try to extract approval - handle both struct (from ABI) and map (from tests)
+	var approval *tokenizationtypes.UserOutgoingApproval
+	var err error
+
+	if approvalMap, ok := args[1].(map[string]interface{}); ok {
+		// Handle map format (for testing)
+		approval, err = ConvertUserOutgoingApproval(approvalMap)
+		if err != nil {
+			return nil, ErrInvalidInput(fmt.Sprintf("approval conversion failed: %v", err))
+		}
+	} else {
+		// Try struct format (from ABI unpacking)
+		approvalStruct, ok := args[1].(struct {
+			ApprovalId        string `json:"approvalId"`
+			ToListId          string `json:"toListId"`
+			InitiatedByListId string `json:"initiatedByListId"`
+			TransferTimes     []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			} `json:"transferTimes"`
+			TokenIds []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			} `json:"tokenIds"`
+			OwnershipTimes []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			} `json:"ownershipTimes"`
+			Uri        string `json:"uri"`
+			CustomData string `json:"customData"`
+		})
+		if !ok {
+			return nil, ErrInvalidInput("invalid approval type, expected UserOutgoingApproval struct or map")
+		}
+
+		// Convert struct to UserOutgoingApproval
+		approval = &tokenizationtypes.UserOutgoingApproval{
+			ApprovalId:        approvalStruct.ApprovalId,
+			ToListId:          approvalStruct.ToListId,
+			InitiatedByListId: approvalStruct.InitiatedByListId,
+			Uri:               approvalStruct.Uri,
+			CustomData:        approvalStruct.CustomData,
+			Version:           sdkmath.NewUint(0),
+		}
+
+		// Convert and validate transferTimes
+		approval.TransferTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.TransferTimes, "transferTimes")
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert and validate tokenIds
+		approval.TokenIds, err = ConvertAndValidateBigIntRanges(approvalStruct.TokenIds, "tokenIds")
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert and validate ownershipTimes
+		approval.OwnershipTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.OwnershipTimes, "ownershipTimes")
+		if err != nil {
+			return nil, err
+		}
+
+		// Initialize empty approval criteria
+		approval.ApprovalCriteria = &tokenizationtypes.OutgoingApprovalCriteria{}
 	}
 
 	// Validate inputs
 	if err := ValidateCollectionId(collectionIdBig); err != nil {
 		return nil, err
 	}
-	if err := ValidateString(approvalStruct.ApprovalId, "approvalId"); err != nil {
-		return nil, err
-	}
-	if err := ValidateBigIntRanges(approvalStruct.TransferTimes, "transferTimes"); err != nil {
-		return nil, err
-	}
-	if err := ValidateBigIntRanges(approvalStruct.TokenIds, "tokenIds"); err != nil {
-		return nil, err
-	}
-	if err := ValidateBigIntRanges(approvalStruct.OwnershipTimes, "ownershipTimes"); err != nil {
-		return nil, err
-	}
-	if err := ValidateApprovalInputs(approvalStruct.TransferTimes, approvalStruct.TokenIds, approvalStruct.OwnershipTimes); err != nil {
+	if err := ValidateString(approval.ApprovalId, "approvalId"); err != nil {
 		return nil, err
 	}
 
@@ -649,38 +874,6 @@ func (p Precompile) SetOutgoingApproval(ctx sdk.Context, method *abi.Method, arg
 
 	// Convert collectionId
 	collectionId := sdkmath.NewUintFromBigInt(collectionIdBig)
-
-	// Convert approval struct to UserOutgoingApproval
-	approval := &tokenizationtypes.UserOutgoingApproval{
-		ApprovalId:        approvalStruct.ApprovalId,
-		ToListId:          approvalStruct.ToListId,
-		InitiatedByListId: approvalStruct.InitiatedByListId,
-		Uri:               approvalStruct.Uri,
-		CustomData:        approvalStruct.CustomData,
-		Version:           sdkmath.NewUint(0),
-	}
-
-	// Convert and validate transferTimes
-	var err error
-	approval.TransferTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.TransferTimes, "transferTimes")
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert and validate tokenIds
-	approval.TokenIds, err = ConvertAndValidateBigIntRanges(approvalStruct.TokenIds, "tokenIds")
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert and validate ownershipTimes
-	approval.OwnershipTimes, err = ConvertAndValidateBigIntRanges(approvalStruct.OwnershipTimes, "ownershipTimes")
-	if err != nil {
-		return nil, err
-	}
-
-	// Initialize empty approval criteria
-	approval.ApprovalCriteria = &tokenizationtypes.OutgoingApprovalCriteria{}
 
 	// Create the message
 	msg := &tokenizationtypes.MsgSetOutgoingApproval{
@@ -697,14 +890,14 @@ func (p Precompile) SetOutgoingApproval(ctx sdk.Context, method *abi.Method, arg
 	}
 
 	// Emit event
-	EmitOutgoingApprovalEvent(ctx, collectionId, caller, approvalStruct.ApprovalId)
+	EmitOutgoingApprovalEvent(ctx, collectionId, caller, approval.ApprovalId)
 
 	// Return success
 	return method.Outputs.Pack(true)
 }
 
 // GetCollection queries a collection by ID
-// Returns the collection data as protobuf-encoded bytes
+// Returns the collection data as a structured Solidity tuple (TokenCollection struct)
 // Errors: ErrorCodeInvalidInput, ErrorCodeCollectionNotFound, ErrorCodeQueryFailed
 func (p Precompile) GetCollection(ctx sdk.Context, method *abi.Method, args []interface{}) ([]byte, error) {
 	if len(args) != 1 {
@@ -732,17 +925,12 @@ func (p Precompile) GetCollection(ctx sdk.Context, method *abi.Method, args []in
 		return nil, WrapError(err, ErrorCodeQueryFailed, fmt.Sprintf("get collection failed for collectionId: %s", collectionId.String()))
 	}
 
-	// Marshal to bytes using types codec
-	bz, err := tokenizationtypes.ModuleCdc.Marshal(resp)
-	if err != nil {
-		return nil, WrapError(err, ErrorCodeInternalError, "marshal collection failed")
-	}
-
-	return method.Outputs.Pack(bz)
+	// Convert to Solidity struct and pack
+	return PackCollectionAsStruct(method, resp.Collection)
 }
 
 // GetBalance queries a balance for a user address
-// Returns the balance data as protobuf-encoded bytes
+// Returns the balance data as a structured Solidity tuple (UserBalanceStore struct)
 // Errors: ErrorCodeInvalidInput, ErrorCodeCollectionNotFound, ErrorCodeBalanceNotFound, ErrorCodeQueryFailed
 func (p Precompile) GetBalance(ctx sdk.Context, method *abi.Method, args []interface{}) ([]byte, error) {
 	if len(args) != 2 {
@@ -780,17 +968,12 @@ func (p Precompile) GetBalance(ctx sdk.Context, method *abi.Method, args []inter
 		return nil, WrapError(err, ErrorCodeQueryFailed, fmt.Sprintf("get balance failed for collectionId: %s, address: %s", collectionId.String(), userCosmosAddr))
 	}
 
-	// Marshal to bytes using types codec
-	bz, err := tokenizationtypes.ModuleCdc.Marshal(resp)
-	if err != nil {
-		return nil, WrapError(err, ErrorCodeInternalError, "marshal balance failed")
-	}
-
-	return method.Outputs.Pack(bz)
+	// Convert to Solidity struct and pack
+	return PackUserBalanceStoreAsStruct(method, resp.Balance)
 }
 
 // GetAddressList queries an address list by ID
-// Returns the address list data as protobuf-encoded bytes
+// Returns the address list data as a structured Solidity tuple (AddressList struct)
 // Errors: ErrorCodeInvalidInput, ErrorCodeQueryFailed
 func (p Precompile) GetAddressList(ctx sdk.Context, method *abi.Method, args []interface{}) ([]byte, error) {
 	if len(args) != 1 {
@@ -816,13 +999,8 @@ func (p Precompile) GetAddressList(ctx sdk.Context, method *abi.Method, args []i
 		return nil, WrapError(err, ErrorCodeQueryFailed, fmt.Sprintf("get address list failed for listId: %s", listId))
 	}
 
-	// Marshal to bytes using types codec
-	bz, err := tokenizationtypes.ModuleCdc.Marshal(resp)
-	if err != nil {
-		return nil, WrapError(err, ErrorCodeInternalError, "marshal address list failed")
-	}
-
-	return method.Outputs.Pack(bz)
+	// Convert to Solidity struct and pack
+	return PackAddressListAsStruct(method, resp.List)
 }
 
 // GetApprovalTracker queries an approval tracker

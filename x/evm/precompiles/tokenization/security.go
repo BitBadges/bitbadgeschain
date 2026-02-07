@@ -77,7 +77,7 @@ import (
 // This is a security check to ensure valid callers
 func VerifyCaller(caller common.Address) error {
 	if caller == (common.Address{}) {
-		return fmt.Errorf("caller cannot be zero address")
+		return ErrUnauthorized("caller cannot be zero address")
 	}
 	return nil
 }
@@ -87,13 +87,20 @@ func VerifyCaller(caller common.Address) error {
 // This function validates that the value is non-negative
 func CheckOverflow(value *big.Int, fieldName string) error {
 	if value == nil {
-		return fmt.Errorf("%s cannot be nil", fieldName)
+		return ErrInvalidInput(fmt.Sprintf("%s cannot be nil", fieldName))
 	}
 	if value.Sign() < 0 {
-		return fmt.Errorf("%s cannot be negative", fieldName)
+		return ErrInvalidInput(fmt.Sprintf("%s cannot be negative", fieldName))
 	}
-	// sdkmath.Uint uses the same underlying representation as big.Int for values up to 2^256-1
-	// So we don't need to check for overflow beyond checking for negative values
+	// sdkmath.Uint uses uint256 internally, which can hold values up to 2^256-1
+	// Check if value exceeds uint256 max (2^256 - 1)
+	maxUint256 := new(big.Int)
+	maxUint256.Lsh(big.NewInt(1), 256)        // 2^256
+	maxUint256.Sub(maxUint256, big.NewInt(1)) // 2^256 - 1
+
+	if value.Cmp(maxUint256) > 0 {
+		return ErrInvalidInput(fmt.Sprintf("%s overflow: value %s exceeds maximum uint256 value (2^256-1)", fieldName, value.String()))
+	}
 	return nil
 }
 
@@ -101,21 +108,63 @@ func CheckOverflow(value *big.Int, fieldName string) error {
 // This helps prevent DoS attacks through extremely large arrays
 func ValidateArraySize(size int, maxSize int, fieldName string) error {
 	if size == 0 {
-		return fmt.Errorf("%s cannot be empty", fieldName)
+		return ErrInvalidInput(fmt.Sprintf("%s cannot be empty", fieldName))
 	}
 	if size > maxSize {
-		return fmt.Errorf("%s size (%d) exceeds maximum allowed size (%d)", fieldName, size, maxSize)
+		return ErrInvalidInput(fmt.Sprintf("%s size (%d) exceeds maximum allowed size (%d)", fieldName, size, maxSize))
 	}
 	return nil
 }
 
 // Maximum allowed sizes for arrays (DoS protection)
 const (
-	MaxRecipients        = 100
-	MaxTokenIdRanges     = 100
+	MaxRecipients          = 100
+	MaxTokenIdRanges       = 100
 	MaxOwnershipTimeRanges = 100
-	MaxApprovalRanges    = 100
+	MaxApprovalRanges      = 100
+	// Additional DoS limits for nested structures
+	MaxDenomUnits          = 50  // Maximum denom units per path
+	MaxMerkleChallenges    = 20  // Maximum merkle challenges per approval
+	MaxCoinTransfers       = 50  // Maximum coin transfers per approval
+	MaxDynamicStoreChallenges = 20 // Maximum dynamic store challenges
+	MaxETHSignatureChallenges = 20 // Maximum ETH signature challenges
+	MaxVotingChallenges    = 20  // Maximum voting challenges
+	MaxMustOwnTokens       = 50  // Maximum must own token rules
+	MaxAddressListEntries  = 1000 // Maximum addresses per address list
+	MaxMetadataLength      = 10000 // Maximum length for metadata strings (URI, customData)
 )
+
+// ValidateDenomUnitsSize validates that denomUnits array size is within limits
+func ValidateDenomUnitsSize(size int) error {
+	if size > MaxDenomUnits {
+		return ErrInvalidInput(fmt.Sprintf("denomUnits size (%d) exceeds maximum allowed size (%d)", size, MaxDenomUnits))
+	}
+	return nil
+}
+
+// ValidateMerkleChallengesSize validates that merkle challenges array size is within limits
+func ValidateMerkleChallengesSize(size int) error {
+	if size > MaxMerkleChallenges {
+		return ErrInvalidInput(fmt.Sprintf("merkleChallenges size (%d) exceeds maximum allowed size (%d)", size, MaxMerkleChallenges))
+	}
+	return nil
+}
+
+// ValidateCoinTransfersSize validates that coin transfers array size is within limits
+func ValidateCoinTransfersSize(size int) error {
+	if size > MaxCoinTransfers {
+		return ErrInvalidInput(fmt.Sprintf("coinTransfers size (%d) exceeds maximum allowed size (%d)", size, MaxCoinTransfers))
+	}
+	return nil
+}
+
+// ValidateMetadataLength validates that metadata strings are within size limits
+func ValidateMetadataLength(s string, fieldName string) error {
+	if len(s) > MaxMetadataLength {
+		return ErrInvalidInput(fmt.Sprintf("%s length (%d) exceeds maximum allowed length (%d)", fieldName, len(s), MaxMetadataLength))
+	}
+	return nil
+}
 
 // ValidateTransferInputs performs comprehensive security validation for transfer inputs
 func ValidateTransferInputs(

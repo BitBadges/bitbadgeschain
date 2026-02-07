@@ -2,6 +2,7 @@ package tokenization
 
 import (
 	"fmt"
+	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
 
@@ -59,13 +60,84 @@ func NewPrecompileError(code ErrorCode, message string, details string) *Precomp
 
 // sanitizeErrorDetails removes sensitive information from error details
 func sanitizeErrorDetails(details string) string {
-	// Remove potential sensitive paths or internal details
-	// This is a basic implementation - can be enhanced
 	if details == "" {
 		return ""
 	}
-	// For now, we keep details but could filter out sensitive info
-	return details
+
+	// Remove potential sensitive paths and internal details
+	sanitized := details
+
+	// List of sensitive patterns to remove or redact
+	sensitivePatterns := []struct {
+		pattern     string
+		replacement string
+	}{
+		// File paths (Unix-style)
+		{"/home/", "[path]/"},
+		{"/root/", "[path]/"},
+		{"/usr/", "[path]/"},
+		{"/var/", "[path]/"},
+		{"/etc/", "[path]/"},
+		{"/tmp/", "[path]/"},
+		// File paths (Windows-style)
+		{"C:\\", "[path]\\"},
+		{"D:\\", "[path]\\"},
+		// Go-specific internals
+		{".go:", "[file]:"},
+		// Stack trace indicators
+		{"goroutine ", "[goroutine] "},
+		{"panic:", "[panic]:"},
+		{"runtime.", "[runtime]."},
+		// Module paths
+		{"github.com/bitbadges/", "[module]/"},
+		{"github.com/cosmos/", "[module]/"},
+		// IP addresses (simple pattern)
+		{"127.0.0.1", "[localhost]"},
+		{"0.0.0.0", "[anyaddr]"},
+	}
+
+	// Use strings.ReplaceAll for better performance
+	for _, sp := range sensitivePatterns {
+		sanitized = strings.ReplaceAll(sanitized, sp.pattern, sp.replacement)
+	}
+
+	// Truncate very long error messages that might contain stack traces
+	const maxLength = 500
+	if len(sanitized) > maxLength {
+		sanitized = sanitized[:maxLength] + "... [truncated]"
+	}
+
+	return sanitized
+}
+
+// contains checks if a string contains a substring
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && findSubstring(s, substr) >= 0
+}
+
+// findSubstring returns the index of the first occurrence of substr in s, or -1 if not found
+func findSubstring(s, substr string) int {
+	if len(substr) == 0 {
+		return 0
+	}
+	if len(s) < len(substr) {
+		return -1
+	}
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return i
+		}
+	}
+	return -1
+}
+
+// replaceFirst replaces the first occurrence of old with new in s
+func replaceFirst(s, old, new string) string {
+	idx := findSubstring(s, old)
+	if idx == -1 {
+		return s
+	}
+	return s[:idx] + new + s[idx+len(old):]
 }
 
 // MapCosmosErrorToPrecompileError maps Cosmos SDK errors to appropriate precompile error codes

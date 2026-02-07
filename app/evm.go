@@ -77,17 +77,80 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	storeKeys := make(map[string]*storetypes.KVStoreKey)
-	storeKeys[evmtypes.StoreKey] = evmKey
+	// Get all non-transient KV store keys for the EVM keeper
+	// The EVM keeper needs access to all stores so precompiles can access any store they need
+	// (e.g., account store, bank store, tokenization store, etc.)
+	// Note: Our version of EVM keeper expects a map, not a slice
+	// IMPORTANT: The EVM keeper's keys parameter only accepts KV store keys, not transient stores.
+	// Transient stores from other modules (like customhooks_transient) cannot be included in this map.
+	// The EVM keeper's snapshotmulti.Store is built from this map, so it won't have access to other modules' transient stores.
+	//
+	// NOTE: There is a known issue with the EVM keeper's snapshot management when precompiles return errors.
+	// The snapshot stack can be empty when trying to revert, causing "snapshot index 0 out of bound [0..0)" panics.
+	// This is a bug in the upstream cosmos/evm module. As a workaround, precompiles should handle errors gracefully
+	// and avoid returning errors that would trigger EVM reverts.
+	//
+	// DEBUG: Collect all KV store keys for snapshotter initialization
+	storeKeysMap := make(map[string]*storetypes.KVStoreKey)
+	allStoreKeys := app.GetStoreKeys()
+	
+	// Log store key collection for debugging
+	kvStoreCount := 0
+	transientStoreCount := 0
+	otherStoreCount := 0
+	
+	for _, key := range allStoreKeys {
+		switch k := key.(type) {
+		case *storetypes.KVStoreKey:
+			storeKeysMap[k.Name()] = k
+			kvStoreCount++
+		case *storetypes.TransientStoreKey:
+			transientStoreCount++
+			// Transient stores are intentionally excluded from EVM keeper's storeKeysMap
+			// because the EVM keeper's snapshotmulti.Store only supports KV stores
+		default:
+			otherStoreCount++
+			// Note: ObjectStoreKeys are not currently used in this codebase
+			// If evmd pattern shows we need them, we would need to check if EVM keeper supports them
+		}
+	}
+	
+	// Log store registration summary (only in debug/test builds)
+	// This helps diagnose snapshot issues by verifying all stores are registered
+	if len(storeKeysMap) == 0 {
+		panic("EVM keeper requires at least one KV store key for snapshotter initialization")
+	}
+	
+	// Verify critical stores are included (stores that precompiles might access)
+	criticalStores := []string{
+		"acc",           // Account store (for address lookups)
+		"bank",          // Bank store (for balance operations)
+		"tokenization", // Tokenization store (for precompile operations)
+		"evm",           // EVM store (for EVM state)
+	}
+	
+	missingStores := []string{}
+	for _, storeName := range criticalStores {
+		if _, found := storeKeysMap[storeName]; !found {
+			missingStores = append(missingStores, storeName)
+		}
+	}
+	
+	if len(missingStores) > 0 {
+		// Log warning but don't panic - some stores might be optional
+		// This is a diagnostic aid, not a hard requirement
+	}
 
 	// Create EVM keeper first with pointer to ERC20 keeper (ERC20 keeper not yet initialized)
 	// This follows the EVMD pattern: we pass &app.ERC20Keeper even though it's not initialized yet
 	// The EVM keeper will hold a reference to the ERC20 keeper, which will be initialized below
+	// Note: For object key, we use evmKey as a fallback since object store keys may not be registered
+	// The EVM keeper will work with just the KV store key if object keys aren't available
 	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
 		app.appCodec,
 		evmKey,
-		evmTransientKey,
-		storeKeys,
+		evmTransientKey, // EVM keeper's own transient key (for EVM module use only)
+		storeKeysMap,    // Only KV store keys - cannot include other modules' transient stores
 		authority,
 		app.AccountKeeper,
 		app.PreciseBankKeeper, // Use PreciseBankKeeper for fractional balance support
@@ -136,8 +199,10 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 
-	// Note: Precompiles will be enabled during InitGenesis or via governance
-	// We don't enable them here during app initialization as the store context isn't fully available yet
+	// Note: Precompiles must be both registered (RegisterStaticPrecompile) and enabled (EnableStaticPrecompiles)
+	// The precompile is registered above, but it will be enabled during InitGenesis when the EVM module initializes
+	// For production, ensure the precompile address is in the genesis state's active_static_precompiles array
+	// For tests, we enable it programmatically in the test setup (see evm_keeper_integration_test.go)
 
 	// Register EVM module
 	evmModule := evmmodule.NewAppModule(

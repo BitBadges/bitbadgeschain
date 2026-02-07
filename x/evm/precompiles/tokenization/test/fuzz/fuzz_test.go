@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+
+	tokenization "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
 )
 
 // FuzzValidateAddress fuzzes the ValidateAddress function
@@ -21,7 +23,7 @@ func FuzzValidateAddress(f *testing.F) {
 		}
 
 		addr := common.BytesToAddress(addrBytes)
-		err := ValidateAddress(addr, "testAddress")
+		err := tokenization.ValidateAddress(addr, "testAddress")
 
 		// If it's a zero address, we expect an error
 		if addr == (common.Address{}) {
@@ -47,16 +49,23 @@ func FuzzValidateCollectionId(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, id int64) {
 		collectionId := big.NewInt(id)
-		err := ValidateCollectionId(collectionId)
+		err := tokenization.ValidateCollectionId(collectionId)
 
-		// Negative IDs should fail, but 0 and positive are allowed
+		// Negative IDs should fail
 		if id < 0 {
 			if err == nil {
 				t.Errorf("expected error for negative collectionId %d, got nil", id)
 			}
 			return
 		}
-		// Zero and positive IDs should pass (0 is used for creating new collections)
+		// Zero should fail (only valid when creating new collections, not for queries)
+		if id == 0 {
+			if err == nil {
+				t.Errorf("expected error for collectionId 0, got nil")
+			}
+			return
+		}
+		// Positive IDs should pass
 		if err != nil {
 			t.Errorf("unexpected error for valid collectionId %d: %v", id, err)
 		}
@@ -73,7 +82,7 @@ func FuzzValidateAmount(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, amount int64) {
 		amountBig := big.NewInt(amount)
-		err := ValidateAmount(amountBig, "testAmount")
+		err := tokenization.ValidateAmount(amountBig, "testAmount")
 
 		// Zero or negative amounts should fail
 		if amount <= 0 {
@@ -106,7 +115,7 @@ func FuzzValidateBigIntRanges(f *testing.F) {
 			{Start: big.NewInt(start), End: big.NewInt(end)},
 		}
 
-		err := ValidateBigIntRanges(ranges, "testRanges")
+		err := tokenization.ValidateBigIntRanges(ranges, "testRanges")
 
 		// Negative values or start > end should fail
 		if start < 0 || end < 0 || start > end {
