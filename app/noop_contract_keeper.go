@@ -8,64 +8,35 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 )
 
-// noopContractKeeper is a no-op implementation of ContractKeeper for IBC callbacks
-// This is used when callbacks are not needed (e.g., when WasmKeeper doesn't implement ContractKeeper)
-type noopContractKeeper struct{}
+// NoopContractKeeper is a no-op implementation of ibccallbackstypes.ContractKeeper
+// This is used for IBC callbacks middleware (no contract callbacks are executed)
+type NoopContractKeeper struct{}
 
-var _ ibccallbackstypes.ContractKeeper = (*noopContractKeeper)(nil)
-
-// NewNoopContractKeeper creates a new no-op ContractKeeper
-func NewNoopContractKeeper() ibccallbackstypes.ContractKeeper {
-	return &noopContractKeeper{}
+// NewNoopContractKeeper creates a new no-op contract keeper
+func NewNoopContractKeeper() *NoopContractKeeper {
+	return &NoopContractKeeper{}
 }
 
 // IBCSendPacketCallback implements ibccallbackstypes.ContractKeeper
-func (n *noopContractKeeper) IBCSendPacketCallback(
-	cachedCtx sdk.Context,
-	sourcePort string,
-	sourceChannel string,
-	timeoutHeight clienttypes.Height,
-	timeoutTimestamp uint64,
-	packetData []byte,
-	contractAddress string,
-	packetSenderAddress string,
-	version string,
-) error {
+func (k *NoopContractKeeper) IBCSendPacketCallback(ctx sdk.Context, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, packetData []byte, contractAddress string, callbackGasLimit string, sourceChannelID string) error {
 	return nil
 }
 
 // IBCOnAcknowledgementPacketCallback implements ibccallbackstypes.ContractKeeper
-func (n *noopContractKeeper) IBCOnAcknowledgementPacketCallback(
-	cachedCtx sdk.Context,
-	packet channeltypes.Packet,
-	acknowledgement []byte,
-	relayer sdk.AccAddress,
-	contractAddress string,
-	packetSenderAddress string,
-	version string,
-) error {
+func (k *NoopContractKeeper) IBCOnAcknowledgementPacketCallback(ctx sdk.Context, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress, contractAddress string, callbackGasLimit string, sourcePort string) error {
 	return nil
 }
 
 // IBCOnTimeoutPacketCallback implements ibccallbackstypes.ContractKeeper
-func (n *noopContractKeeper) IBCOnTimeoutPacketCallback(
-	cachedCtx sdk.Context,
-	packet channeltypes.Packet,
-	relayer sdk.AccAddress,
-	contractAddress string,
-	packetSenderAddress string,
-	version string,
-) error {
+func (k *NoopContractKeeper) IBCOnTimeoutPacketCallback(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress, contractAddress string, callbackGasLimit string, sourcePort string) error {
 	return nil
 }
 
 // IBCReceivePacketCallback implements ibccallbackstypes.ContractKeeper
-func (n *noopContractKeeper) IBCReceivePacketCallback(
-	cachedCtx sdk.Context,
-	packet ibcexported.PacketI,
-	ack ibcexported.Acknowledgement,
-	contractAddress string,
-	version string,
-) error {
+func (k *NoopContractKeeper) IBCReceivePacketCallback(ctx sdk.Context, packet ibcexported.PacketI, acknowledgement ibcexported.Acknowledgement, contractAddress string, callbackGasLimit string) error {
 	return nil
 }
+
+// Ensure NoopContractKeeper implements ibccallbackstypes.ContractKeeper
+var _ ibccallbackstypes.ContractKeeper = (*NoopContractKeeper)(nil)
+

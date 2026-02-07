@@ -3,7 +3,6 @@ package app
 import (
 	"cosmossdk.io/core/appmodule"
 	storetypes "cosmossdk.io/store/types"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -41,12 +40,8 @@ import (
 	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	wasmxmodule "github.com/bitbadges/bitbadgeschain/x/wasmx/module"
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
 
 	tokenizationmodule "github.com/bitbadges/bitbadgeschain/x/tokenization/module"
-
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
 
 	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
 	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/keeper"
@@ -210,27 +205,21 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
 	mapsIBCModule := mapsmodule.NewIBCModule(app.MapsKeeper)
 	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
-	wasmxIBCModule := wasmxmodule.NewIBCModule(app.WasmxKeeper)
-	ibcRouter.AddRoute(wasmxmoduletypes.ModuleName, wasmxIBCModule)
 	tokenizationIBCModule := tokenizationmodule.NewIBCModule(app.TokenizationKeeper)
 	ibcRouter.AddRoute(tokenizationmoduletypes.ModuleName, tokenizationIBCModule)
 
 	// this line is used by starport scaffolding # ibc/app/module
-
-	// wasmd 0.61.6 uses IBC v10 natively - NewIBCHandler needs IBCContractKeeper, ChannelKeeper, ICS20TransferPortSource, and appVersionGetter
-	// Create appVersionGetter adapter
-	appVersionGetter := &appVersionGetterAdapter{app: app}
-	wasmStack := wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.TransferKeeper, appVersionGetter)
-	ibcRouter.AddRoute(wasmtypes.ModuleName, wasmStack)
 
 	// Create Interchain Accounts Stack (IBC v10 - no fee middleware, no noAuthzModule)
 	// SendPacket, since it is originating from the application to core IBC:
 	// icaAuthModuleKeeper.SendTx -> icaController.SendPacket -> channel.SendPacket
 	var icaControllerStack porttypes.IBCModule
 	icaControllerStack = icacontroller.NewIBCMiddleware(app.ICAControllerKeeper)
-	// IBC callbacks: wasmd 0.61.6 doesn't fully implement ContractKeeper - use no-op implementation
+	// IBC callbacks: use no-op implementation for ContractKeeper
 	// If callbacks are needed in the future, we'll need to create a ContractKeeper adapter
-	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCKeeper.ChannelKeeper, NewNoopContractKeeper(), wasm.DefaultMaxIBCCallbackGas)
+	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
+	// Using a reasonable default: 1,000,000 gas units
+	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCKeeper.ChannelKeeper, NewNoopContractKeeper(), 1_000_000)
 	icaICS4Wrapper := icaControllerStack.(porttypes.ICS4Wrapper)
 	app.ICAControllerKeeper.WithICS4Wrapper(icaICS4Wrapper)
 
@@ -243,9 +232,11 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// i.e. packet-forward-middleware is higher on the stack and sits between callbacks and the ibc channel keeper
 	// Since this is the lowest level middleware of the transfer stack, it should be the first entrypoint for transfer keeper's
 	// WriteAcknowledgement.
-	// IBC callbacks: wasmd 0.61.6 doesn't fully implement ContractKeeper - use no-op implementation
+	// IBC callbacks: use no-op implementation for ContractKeeper
 	// If callbacks are needed in the future, we'll need to create a ContractKeeper adapter
-	cbStack := ibccallbacks.NewIBCMiddleware(transferStack, app.PacketForwardKeeper, NewNoopContractKeeper(), wasm.DefaultMaxIBCCallbackGas)
+	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
+	// Using a reasonable default: 1,000,000 gas units
+	cbStack := ibccallbacks.NewIBCMiddleware(transferStack, app.PacketForwardKeeper, NewNoopContractKeeper(), 1_000_000)
 	transferStack = packetforward.NewIBCMiddleware(
 		cbStack,
 		app.PacketForwardKeeper,

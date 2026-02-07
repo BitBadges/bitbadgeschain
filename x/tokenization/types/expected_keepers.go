@@ -3,8 +3,8 @@ package types
 import (
 	"context"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/common"
 
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
@@ -38,15 +38,14 @@ type ParamSubspace interface {
 	Set(context.Context, []byte, interface{})
 }
 
-// WasmViewKeeper defines the expected interface for checking WASM contracts.
-type WasmViewKeeper interface {
-	HasContractInfo(ctx context.Context, contractAddr sdk.AccAddress) bool
-	GetContractInfo(ctx context.Context, contractAddr sdk.AccAddress) *wasmtypes.ContractInfo
-}
-
 // GammKeeper defines the expected interface for checking liquidity pools.
 type GammKeeper interface {
 	GetPool(ctx sdk.Context, poolId uint64) (poolmanagertypes.PoolI, error)
+}
+
+// EVMKeeper defines the expected interface for checking EVM contracts.
+type EVMKeeper interface {
+	IsContract(ctx sdk.Context, addr common.Address) bool
 }
 
 // SendManagerKeeper defines the expected interface for the SendManager module.

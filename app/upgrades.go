@@ -44,6 +44,10 @@ func (app *App) RegisterUpgradeHandlers() {
 					NewKey: "tokenization",
 				},
 			},
+			Deleted: []string{
+				"wasm-store",  // Remove WASM store
+				"wasmx-store", // Remove WASMX store
+			},
 			Added: []string{},
 		}
 	}

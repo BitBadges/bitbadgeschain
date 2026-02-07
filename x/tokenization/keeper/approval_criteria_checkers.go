@@ -25,8 +25,8 @@ type addressCheckServiceAdapter struct {
 	keeper *Keeper
 }
 
-func (a *addressCheckServiceAdapter) IsWasmContract(ctx sdk.Context, address string) (bool, error) {
-	return a.keeper.IsWasmContract(ctx, address)
+func (a *addressCheckServiceAdapter) IsEVMContract(ctx sdk.Context, address string) (bool, error) {
+	return a.keeper.IsEVMContract(ctx, address)
 }
 
 func (a *addressCheckServiceAdapter) IsLiquidityPool(ctx sdk.Context, address string) (bool, error) {

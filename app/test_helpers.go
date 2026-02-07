@@ -82,7 +82,6 @@ func Setup(
 		panic(err)
 	}
 
-	// wasmvm2 puts a lock on directory, so running parallel tests on same directory will fail
 	randomHomeDir := origDefault + "/test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()

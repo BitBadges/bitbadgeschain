@@ -49,25 +49,25 @@ func (c *AddressChecksChecker) Check(ctx sdk.Context, approval *types.Collection
 		return "", errorsmod.Wrapf(types.ErrInvalidCheckType, "checkType: %s", c.checkType)
 	}
 
-	// Check WASM contract requirements
-	if c.addressChecks.MustBeWasmContract {
-		detErrMsg := fmt.Sprintf("address %s must be a WASM contract", addressToCheck)
-		isWasm, err := c.addressCheckService.IsWasmContract(ctx, addressToCheck)
+	// Check EVM contract requirements
+	if c.addressChecks.MustBeEvmContract {
+		detErrMsg := fmt.Sprintf("address %s must be an EVM contract", addressToCheck)
+		isEvmContract, err := c.addressCheckService.IsEVMContract(ctx, addressToCheck)
 		if err != nil {
 			return detErrMsg, err
 		}
-		if !isWasm {
+		if !isEvmContract {
 			return detErrMsg, errorsmod.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}
 
-	if c.addressChecks.MustNotBeWasmContract {
-		detErrMsg := fmt.Sprintf("address %s must not be a WASM contract", addressToCheck)
-		isWasm, err := c.addressCheckService.IsWasmContract(ctx, addressToCheck)
+	if c.addressChecks.MustNotBeEvmContract {
+		detErrMsg := fmt.Sprintf("address %s must not be an EVM contract", addressToCheck)
+		isEvmContract, err := c.addressCheckService.IsEVMContract(ctx, addressToCheck)
 		if err != nil {
 			return detErrMsg, err
 		}
-		if isWasm {
+		if isEvmContract {
 			return detErrMsg, errorsmod.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 	}

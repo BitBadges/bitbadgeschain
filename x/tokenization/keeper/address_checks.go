@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"github.com/ethereum/go-ethereum/common"
+
 	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/tokenization/approval_criteria"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,21 +40,26 @@ func (k Keeper) CheckAddressChecks(ctx sdk.Context, addressChecks *types.Address
 	return "", nil
 }
 
-// IsWasmContract checks if an address is a WASM contract
-func (k Keeper) IsWasmContract(ctx sdk.Context, address string) (bool, error) {
-	if k.wasmViewKeeper == nil {
-		// If WasmViewKeeper is not set, we can't check - return false
-		// This allows the feature to work even if WASM module is not available
+// IsEVMContract checks if an address is an EVM contract (has code)
+func (k Keeper) IsEVMContract(ctx sdk.Context, address string) (bool, error) {
+	if k.evmKeeper == nil {
+		// If EVMKeeper is not set, we can't check - return false
+		// This allows the feature to work even if EVM module is not available
 		return false, nil
 	}
 
-	addr, err := sdk.AccAddressFromBech32(address)
+	// Convert bech32 address to Ethereum address
+	// First try to parse as bech32 address
+	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return false, err
 	}
 
-	// Check if contract info exists for this address
-	return k.wasmViewKeeper.HasContractInfo(ctx, addr), nil
+	// Convert Cosmos address to Ethereum address (20 bytes)
+	ethAddr := common.BytesToAddress(accAddr.Bytes())
+
+	// Check if the address has code (is a contract)
+	return k.evmKeeper.IsContract(ctx, ethAddr), nil
 }
 
 // IsLiquidityPool checks if an address is a liquidity pool

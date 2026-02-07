@@ -45,11 +45,93 @@ func (k Keeper) MigrateTokenizationKeeper(ctx sdk.Context) error {
 	return nil
 }
 
+// migrateIncomingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
+// Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
+// so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
+// New EVM contract check fields (mustBeEvmContract, mustNotBeEvmContract) default to false if not present.
+func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApprovalCriteria) {
+	if approvalCriteria == nil {
+		return
+	}
+	// WASM contract check fields (mustBeWasmContract, mustNotBeWasmContract) have been removed from proto.
+	// The JSON unmarshal during migration will automatically drop these fields since they no longer exist
+	// in the new AddressChecks struct. No explicit clearing is needed.
+
+	// Ensure EVM contract check fields default to false if not present in migrated data
+	if approvalCriteria.SenderChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.SenderChecks.MustBeEvmContract = false
+		approvalCriteria.SenderChecks.MustNotBeEvmContract = false
+	}
+	if approvalCriteria.InitiatorChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.InitiatorChecks.MustBeEvmContract = false
+		approvalCriteria.InitiatorChecks.MustNotBeEvmContract = false
+	}
+}
+
+// migrateOutgoingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
+// Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
+// so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
+// New EVM contract check fields (mustBeEvmContract, mustNotBeEvmContract) default to false if not present.
+func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApprovalCriteria) {
+	if approvalCriteria == nil {
+		return
+	}
+	// WASM contract check fields (mustBeWasmContract, mustNotBeWasmContract) have been removed from proto.
+	// The JSON unmarshal during migration will automatically drop these fields since they no longer exist
+	// in the new AddressChecks struct. No explicit clearing is needed.
+
+	// Ensure EVM contract check fields default to false if not present in migrated data
+	if approvalCriteria.RecipientChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.RecipientChecks.MustBeEvmContract = false
+		approvalCriteria.RecipientChecks.MustNotBeEvmContract = false
+	}
+	if approvalCriteria.InitiatorChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.InitiatorChecks.MustBeEvmContract = false
+		approvalCriteria.InitiatorChecks.MustNotBeEvmContract = false
+	}
+}
+
+// migrateApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
+// Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
+// so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
+// New EVM contract check fields (mustBeEvmContract, mustNotBeEvmContract) default to false if not present.
+func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
+	if approvalCriteria == nil {
+		return
+	}
+	// WASM contract check fields (mustBeWasmContract, mustNotBeWasmContract) have been removed from proto.
+	// The JSON unmarshal during migration will automatically drop these fields since they no longer exist
+	// in the new AddressChecks struct. No explicit clearing is needed.
+
+	// Ensure EVM contract check fields default to false if not present in migrated data
+	if approvalCriteria.SenderChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.SenderChecks.MustBeEvmContract = false
+		approvalCriteria.SenderChecks.MustNotBeEvmContract = false
+	}
+	if approvalCriteria.RecipientChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.RecipientChecks.MustBeEvmContract = false
+		approvalCriteria.RecipientChecks.MustNotBeEvmContract = false
+	}
+	if approvalCriteria.InitiatorChecks != nil {
+		// Explicitly set EVM contract check fields to false for migrated data
+		approvalCriteria.InitiatorChecks.MustBeEvmContract = false
+		approvalCriteria.InitiatorChecks.MustNotBeEvmContract = false
+	}
+}
+
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
 	for _, approval := range incomingApprovals {
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
+		// Clear WASM contract checks (fields removed from proto)
+		migrateIncomingApprovalCriteria(approval.ApprovalCriteria)
 	}
 
 	return incomingApprovals
@@ -60,6 +142,8 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
+		// Clear WASM contract checks (fields removed from proto)
+		migrateOutgoingApprovalCriteria(approval.ApprovalCriteria)
 	}
 
 	return outgoingApprovals
@@ -70,6 +154,8 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
+		// Clear deprecated WASM contract checks
+		migrateApprovalCriteria(approval.ApprovalCriteria)
 	}
 
 	return collectionApprovals

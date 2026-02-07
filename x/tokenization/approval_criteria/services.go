@@ -14,7 +14,7 @@ type CollectionService interface {
 
 // AddressCheckService provides methods to check address types
 type AddressCheckService interface {
-	IsWasmContract(ctx sdk.Context, address string) (bool, error)
+	IsEVMContract(ctx sdk.Context, address string) (bool, error)
 	IsLiquidityPool(ctx sdk.Context, address string) (bool, error)
 	IsAddressReservedProtocol(ctx sdk.Context, address string) bool
 }

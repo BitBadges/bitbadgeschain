@@ -20,7 +20,6 @@ import (
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -102,9 +101,6 @@ import (
 	tokenizationmodulekeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
-
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
@@ -176,8 +172,6 @@ type App struct {
 	TokenizationKeeper    tokenizationmodulekeeper.Keeper
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
-	WasmKeeper            wasmkeeper.Keeper
-	WasmxKeeper           wasmxmodulekeeper.Keeper
 
 	GammKeeper        gammkeeper.Keeper
 	PoolManagerKeeper poolmanager.Keeper
@@ -348,10 +342,6 @@ func New(
 		return nil, err
 	}
 
-	if _, err := app.registerWasmModules(appOpts); err != nil {
-		return nil, err
-	}
-
 	// Register EVM modules first (PreciseBank depends on EVM keeper)
 	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
@@ -369,8 +359,10 @@ func New(
 	}
 
 	// Wire up keepers for address checks
-	app.TokenizationKeeper.SetWasmViewKeeper(&app.WasmKeeper)
 	app.TokenizationKeeper.SetGammKeeper(&app.GammKeeper)
+	if app.EVMKeeper != nil {
+		app.TokenizationKeeper.SetEVMKeeper(app.EVMKeeper)
+	}
 
 	// Register custom approval criteria checkers (optional)
 	app.TokenizationKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
@@ -481,25 +473,6 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		return nil, err
-	}
-
-	// must be before Loading version
-	// requires the snapshot store to be created and registered as a BaseAppOption
-	if manager := app.SnapshotManager(); manager != nil {
-		err := manager.RegisterExtensions(
-			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
-		)
-		if err != nil {
-			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
-		}
-	}
-
-	if loadLatest {
-		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-		// Initialize pinned codes in wasmvm as they are not persisted there
-		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
-			panic(fmt.Sprintf("failed initialize pinned codes %s", err))
-		}
 	}
 
 	return app, nil

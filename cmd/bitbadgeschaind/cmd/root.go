@@ -93,12 +93,6 @@ func NewRootCmd() *cobra.Command {
 		},
 	}
 
-	wasmModules := app.RegisterWasm(clientCtx.InterfaceRegistry)
-	for name, mod := range wasmModules {
-		moduleBasicManager[name] = module.CoreAppModuleBasicAdaptor(name, mod)
-		autoCliOpts.Modules[name] = mod
-	}
-
 	// Since the IBC modules don't support dependency injection, we need to
 	// manually register the modules on the client side.
 	// This needs to be removed after IBC supports App Wiring.

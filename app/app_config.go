@@ -73,11 +73,6 @@ import (
 
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
-	_ "github.com/bitbadges/bitbadgeschain/x/wasmx/module" // import for side-effects
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
-
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 
 	erc20types "github.com/cosmos/evm/x/erc20/types"
@@ -123,8 +118,6 @@ var (
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
@@ -159,8 +152,6 @@ var (
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
@@ -190,8 +181,6 @@ var (
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
@@ -221,8 +210,6 @@ var (
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
 		{Account: packetforwardtypes.ModuleName},
-		{Account: wasmtypes.ModuleName},
-		{Account: wasmxmoduletypes.ModuleName},
 		{Account: gammtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: poolmanagertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: precisebanktypes.ModuleName, Permissions: []string{}},                             // PreciseBank module account

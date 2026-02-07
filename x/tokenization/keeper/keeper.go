@@ -35,8 +35,8 @@ type (
 		distributionKeeper types.DistributionKeeper
 
 		// Optional keepers for address checks
-		wasmViewKeeper types.WasmViewKeeper
-		gammKeeper     types.GammKeeper
+		gammKeeper types.GammKeeper
+		evmKeeper  types.EVMKeeper
 
 		// SendManager keeper for alias denom routing
 		sendManagerKeeper types.SendManagerKeeper
@@ -90,14 +90,14 @@ func NewKeeper(
 	}
 }
 
-// SetWasmViewKeeper sets the WASM view keeper (optional)
-func (k *Keeper) SetWasmViewKeeper(wasmViewKeeper types.WasmViewKeeper) {
-	k.wasmViewKeeper = wasmViewKeeper
-}
-
 // SetGammKeeper sets the gamm keeper (optional)
 func (k *Keeper) SetGammKeeper(gammKeeper types.GammKeeper) {
 	k.gammKeeper = gammKeeper
+}
+
+// SetEVMKeeper sets the EVM keeper (optional)
+func (k *Keeper) SetEVMKeeper(evmKeeper types.EVMKeeper) {
+	k.evmKeeper = evmKeeper
 }
 
 // RegisterCustomApprovalCriteriaChecker registers a custom checker provider function.
