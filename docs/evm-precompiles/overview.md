@@ -75,10 +75,12 @@ See [Security](tokenization-precompile/security.md) for security best practices.
 
 ## Getting Started
 
-1. **Install Dependencies**: Import the precompile interface in your Solidity contract
-2. **Initialize Precompile**: Get the precompile instance at its fixed address
-3. **Call Methods**: Use transaction or query methods as needed
+1. **Read the Developer Guide**: **Essential first step** - Understand transaction signing, address conversion, and limitations
+2. **Install Dependencies**: Import the precompile interface in your Solidity contract
+3. **Initialize Precompile**: Get the precompile instance at its fixed address
+4. **Call Methods**: Use transaction or query methods as needed
 
+See the [Developer Guide](developer-guide.md) for essential information about transaction signing and address handling.  
 See the [Getting Started Guide](getting-started.md) for a step-by-step tutorial.
 
 ## Architecture

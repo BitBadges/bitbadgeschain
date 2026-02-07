@@ -5,6 +5,7 @@ Welcome to the BitBadges Chain EVM Precompiles documentation. This documentation
 ## Quick Links
 
 - [Overview](overview.md) - Introduction to EVM precompiles
+- [Developer Guide](developer-guide.md) - **Essential guide for app developers** - Transaction signing, address conversion, and limitations
 - [Getting Started](getting-started.md) - Quick start guide
 - [Architecture](architecture.md) - System architecture
 - [Tokenization Precompile](tokenization-precompile/README.md) - Tokenization precompile documentation
@@ -40,6 +41,7 @@ Full access to the BitBadges tokenization module:
 docs/evm-precompiles/
 ├── SUMMARY.md              # GitBook table of contents
 ├── overview.md             # Introduction to precompiles
+├── developer-guide.md      # Essential guide: signing, addresses, limitations
 ├── getting-started.md      # Quick start guide
 ├── architecture.md         # System architecture
 ├── tokenization-precompile/
@@ -63,9 +65,10 @@ docs/evm-precompiles/
 ## Getting Started
 
 1. **Read the Overview**: Understand what precompiles are and how they work
-2. **Follow the Getting Started Guide**: Set up your first precompile interaction
-3. **Explore the Tokenization Precompile**: Learn about available methods
-4. **Check Examples**: See real-world usage patterns
+2. **Read the Developer Guide**: **Essential reading** - Learn about transaction signing, address conversion, and limitations
+3. **Follow the Getting Started Guide**: Set up your first precompile interaction
+4. **Explore the Tokenization Precompile**: Learn about available methods
+5. **Check Examples**: See real-world usage patterns
 
 ## Resources
 
