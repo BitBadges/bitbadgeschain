@@ -23,7 +23,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
-	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/evm/precompiles/tokenization"
+	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 )
 
 // registerEVMModules registers the FeeMarket, ERC20, and EVM modules with tokenization precompile
