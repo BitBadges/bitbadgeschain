@@ -51,7 +51,6 @@ func NewRootCmd() *cobra.Command {
 	); err != nil {
 		panic(err)
 	}
-
 	// Apply keyring options to the initial client context BEFORE creating root command
 	// This ensures keyring options are available when keys.Commands() is called in initRootCmd
 	// Use Cosmos EVM's keyring option directly

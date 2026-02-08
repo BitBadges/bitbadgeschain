@@ -70,11 +70,10 @@ func initRootCmd(
 	if cometCmd, _, err := rootCmd.Find([]string{"comet"}); err == nil {
 		cometCmd.Aliases = append(cometCmd.Aliases, "tendermint")
 	}
-
 	// Add Cosmos EVM key commands (for eth_secp256k1 key management)
 	// This provides EVM-specific key commands that work with eth_secp256k1 keys
 	rootCmd.AddCommand(
-		cosmosevmcmd.KeyCommands(app.DefaultNodeHome, true),
+		cosmosevmcmd.KeyCommands(app.DefaultNodeHome, false),
 	)
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
