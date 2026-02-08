@@ -1,0 +1,313 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IGammPrecompile",
+  "sourceName": "solidity/precompiles/gamm/IGammPrecompile.sol",
+  "abi": [
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+        {"internalType": "uint256", "name": "shareOutAmount", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokenInMaxs",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "joinPool",
+      "outputs": [
+        {"internalType": "uint256", "name": "shareOutAmount", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokenIn",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+        {"internalType": "uint256", "name": "shareInAmount", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokenOutMins",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "exitPool",
+      "outputs": [
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokenOut",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+            {"internalType": "string", "name": "tokenOutDenom", "type": "string"}
+          ],
+          "internalType": "struct SwapAmountInRoute[]",
+          "name": "routes",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin",
+          "name": "tokenIn",
+          "type": "tuple"
+        },
+        {"internalType": "uint256", "name": "tokenOutMinAmount", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "address", "name": "address", "type": "address"},
+            {"internalType": "uint256", "name": "basisPointsFee", "type": "uint256"}
+          ],
+          "internalType": "struct Affiliate[]",
+          "name": "affiliates",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "swapExactAmountIn",
+      "outputs": [
+        {"internalType": "uint256", "name": "tokenOutAmount", "type": "uint256"}
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+            {"internalType": "string", "name": "tokenOutDenom", "type": "string"}
+          ],
+          "internalType": "struct SwapAmountInRoute[]",
+          "name": "routes",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin",
+          "name": "tokenIn",
+          "type": "tuple"
+        },
+        {"internalType": "uint256", "name": "tokenOutMinAmount", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "string", "name": "sourceChannel", "type": "string"},
+            {"internalType": "string", "name": "receiver", "type": "string"},
+            {"internalType": "string", "name": "memo", "type": "string"},
+            {"internalType": "uint64", "name": "timeoutTimestamp", "type": "uint64"}
+          ],
+          "internalType": "struct IBCTransferInfo",
+          "name": "ibcTransferInfo",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {"internalType": "address", "name": "address", "type": "address"},
+            {"internalType": "uint256", "name": "basisPointsFee", "type": "uint256"}
+          ],
+          "internalType": "struct Affiliate[]",
+          "name": "affiliates",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "swapExactAmountInWithIBCTransfer",
+      "outputs": [
+        {"internalType": "uint256", "name": "tokenOutAmount", "type": "uint256"}
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"}
+      ],
+      "name": "getPool",
+      "outputs": [
+        {"internalType": "bytes", "name": "pool", "type": "bytes"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint256", "name": "offset", "type": "uint256"},
+        {"internalType": "uint256", "name": "limit", "type": "uint256"}
+      ],
+      "name": "getPools",
+      "outputs": [
+        {"internalType": "bytes", "name": "pools", "type": "bytes"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"}
+      ],
+      "name": "getPoolType",
+      "outputs": [
+        {"internalType": "string", "name": "poolType", "type": "string"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokensIn",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "calcJoinPoolNoSwapShares",
+      "outputs": [
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokensOut",
+          "type": "tuple[]"
+        },
+        {"internalType": "uint256", "name": "sharesOut", "type": "uint256"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+        {"internalType": "uint256", "name": "shareInAmount", "type": "uint256"}
+      ],
+      "name": "calcExitPoolCoinsFromShares",
+      "outputs": [
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokensOut",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"},
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokensIn",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "calcJoinPoolShares",
+      "outputs": [
+        {"internalType": "uint256", "name": "shareOutAmount", "type": "uint256"},
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "tokensOut",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"}
+      ],
+      "name": "getPoolParams",
+      "outputs": [
+        {"internalType": "bytes", "name": "params", "type": "bytes"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {"internalType": "uint64", "name": "poolId", "type": "uint64"}
+      ],
+      "name": "getTotalShares",
+      "outputs": [
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin",
+          "name": "totalShares",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTotalLiquidity",
+      "outputs": [
+        {
+          "components": [
+            {"internalType": "string", "name": "denom", "type": "string"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "internalType": "struct Coin[]",
+          "name": "liquidity",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}
+

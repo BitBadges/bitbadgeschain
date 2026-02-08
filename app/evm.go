@@ -24,6 +24,7 @@ import (
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
+	gammprecompile "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
 )
 
 // registerEVMModules registers the FeeMarket, ERC20, and EVM modules with tokenization precompile
@@ -198,6 +199,11 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
+
+	// Register gamm precompile
+	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper)
+	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
+	app.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 
 	// Note: Precompiles must be both registered (RegisterStaticPrecompile) and enabled (EnableStaticPrecompiles)
 	// The precompile is registered above, but it will be enabled during InitGenesis when the EVM module initializes
