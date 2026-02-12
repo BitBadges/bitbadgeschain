@@ -123,6 +123,7 @@ genesis:
                     extended_denom: abadge
                 active_static_precompiles:
                     - "0x0000000000000000000000000000000000001001"  # Tokenization precompile
+                    - "0x0000000000000000000000000000000000001002"  # Gamm precompile
 validators:
     - name: alice
       bonded: 1000000000000000ustake

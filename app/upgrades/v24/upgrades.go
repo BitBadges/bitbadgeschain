@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	gammprecompile "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
 	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	poolmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
@@ -90,6 +91,17 @@ func CustomUpgradeHandlerLogic(
 		// Log error but don't fail the upgrade if precompile is already enabled
 		// This allows the migration to be idempotent
 		sdkCtx.Logger().Info("Tokenization precompile enable attempt", "error", err, "address", tokenizationPrecompileAddr.Hex())
+	}
+
+	// Enable gamm precompile in active_static_precompiles
+	// The precompile is registered during app initialization, but must be enabled
+	// via EnableStaticPrecompiles to be callable. This ensures the precompile
+	// is available for existing chains that upgrade to this version.
+	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
+	if err := evmKeeper.EnableStaticPrecompiles(sdkCtx, gammPrecompileAddr); err != nil {
+		// Log error but don't fail the upgrade if precompile is already enabled
+		// This allows the migration to be idempotent
+		sdkCtx.Logger().Info("Gamm precompile enable attempt", "error", err, "address", gammPrecompileAddr.Hex())
 	}
 
 	return nil
