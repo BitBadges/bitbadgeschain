@@ -426,7 +426,7 @@ func New(
 		SignModeHandler:        app.txConfig.SignModeHandler(),
 		SigGasConsumer:         evmante.SigVerificationGasConsumer,
 		MaxTxGasWanted:         maxGasWanted,
-		DynamicFeeChecker:      true,
+		DynamicFeeChecker:      false,
 		PendingTxListener:      app.onPendingTx,
 	}
 	if err := evmAnteOptions.Validate(); err != nil {
