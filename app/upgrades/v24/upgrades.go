@@ -3,10 +3,13 @@ package v24
 import (
 	"context"
 
+	"github.com/ethereum/go-ethereum/common"
+
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	poolmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -76,6 +79,17 @@ func CustomUpgradeHandlerLogic(
 	// so migrating nodes would otherwise see an empty EvmCoinInfo on upgrade.
 	if err := evmKeeper.InitEvmCoinInfo(sdkCtx); err != nil {
 		return err
+	}
+
+	// Enable tokenization precompile in active_static_precompiles
+	// The precompile is registered during app initialization, but must be enabled
+	// via EnableStaticPrecompiles to be callable. This ensures the precompile
+	// is available for existing chains that upgrade to this version.
+	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
+	if err := evmKeeper.EnableStaticPrecompiles(sdkCtx, tokenizationPrecompileAddr); err != nil {
+		// Log error but don't fail the upgrade if precompile is already enabled
+		// This allows the migration to be idempotent
+		sdkCtx.Logger().Info("Tokenization precompile enable attempt", "error", err, "address", tokenizationPrecompileAddr.Hex())
 	}
 
 	return nil

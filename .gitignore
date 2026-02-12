@@ -53,3 +53,5 @@ new-genesis.json
 
 # Accidental ~/ directory (should be in home, not repo)
 ~/
+
+node_modules/

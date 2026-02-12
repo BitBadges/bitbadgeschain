@@ -17,8 +17,21 @@ accounts:
     #TODO: Remove alice?
     - name: alice
       coins:
-          - 1ubadge
+          - 99999999999999996ubadge
           - 1000000000000000ustake
+          - 100000000000ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349
+          - 100000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518
+          - 100000000000ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701
+          - 1000000000000000badges:49:chaosnet
+    - name: alice2
+      address: bb1kj9kt5y64n5a8677fhjqnmcc24ht2vy9atmdls
+      coins:  
+          - 99999999999999996ubadge
+          - 1000000000000000ustake
+          - 100000000000ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349
+          - 100000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518
+          - 100000000000ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701
+          - 1000000000000000badges:49:chaosnet
     - name: bob
       coins:
           - 99999999999999996ubadge
@@ -49,6 +62,11 @@ accounts:
           - 100000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518
           - 100000000000ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701
           - 1000000000000000badges:49:chaosnet
+    - name: test-evm-account
+      address: bb15ndklrxs6putds43tk9v3p4s0dp9g748anctay
+      coins:
+          - 99999999999999996ubadge
+          - 1000000000000000ustake
 client:
     typescript:
         path: ts-client
@@ -59,7 +77,7 @@ genesis:
     consensus_params:
         block:
             max_bytes: '22020096'
-            max_gas: '40000000'
+            max_gas: '100000000'
             time_iota_ms: '5000'
     app_state:
         gov:
@@ -103,6 +121,8 @@ genesis:
                 evm_denom: ubadge
                 extended_denom_options:
                     extended_denom: abadge
+                active_static_precompiles:
+                    - "0x0000000000000000000000000000000000001001"  # Tokenization precompile
 validators:
     - name: alice
       bonded: 1000000000000000ustake
