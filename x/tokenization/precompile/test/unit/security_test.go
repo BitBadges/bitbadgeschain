@@ -77,39 +77,36 @@ func (suite *SecurityTestSuite) TestVerifyCaller_ZeroAddress() {
 func (suite *SecurityTestSuite) TestCreateCollection_CreatorIsCaller() {
 	// Create a collection and verify creator is set from caller, not from input
 	caller := suite.TestSuite.AliceEVM
-	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
-	valueUint256, _ := uint256.FromBig(big.NewInt(0))
-	contract := vm.NewContract(caller, precompileAddr, valueUint256, 1000000, nil)
-
-	// Create collection via handler
-	validTokenIds := []interface{}{
-		map[string]interface{}{
-			"start": big.NewInt(1),
-			"end":   big.NewInt(100),
-		},
-	}
-
-	args := []interface{}{
-		nil, // defaultBalances
-		validTokenIds,
-		map[string]interface{}{},         // collectionPermissions
-		suite.TestSuite.Manager.String(), // manager
-		map[string]interface{}{"uri": "https://example.com", "customData": ""}, // collectionMetadata
-		[]interface{}{},          // tokenMetadata
-		"",                       // customData
-		[]interface{}{},          // collectionApprovals
-		[]string{},               // standards
-		false,                    // isArchived
-		[]interface{}{},          // mintEscrowCoinsToTransfer
-		[]interface{}{},          // cosmosCoinWrapperPathsToAdd
-		map[string]interface{}{}, // invariants
-		[]interface{}{},          // aliasPathsToAdd
-	}
 
 	method := suite.Precompile.ABI.Methods["createCollection"]
 	require.NotNil(suite.T(), method)
 
-	result, err := suite.Precompile.CreateCollection(suite.TestSuite.Ctx, &method, args, contract)
+	// Build JSON message
+	msg := map[string]interface{}{
+		"defaultBalances":            nil,
+		"validTokenIds":              []map[string]interface{}{{"start": "1", "end": "100"}},
+		"collectionPermissions":     map[string]interface{}{},
+		"manager":                    suite.TestSuite.Manager.String(),
+		"collectionMetadata":         map[string]interface{}{"uri": "https://example.com", "customData": ""},
+		"tokenMetadata":              []interface{}{},
+		"customData":                 "",
+		"collectionApprovals":        []interface{}{},
+		"standards":                  []string{},
+		"isArchived":                 false,
+		"mintEscrowCoinsToTransfer":  []interface{}{},
+		"cosmosCoinWrapperPathsToAdd": []interface{}{},
+		"invariants":                 map[string]interface{}{},
+		"aliasPathsToAdd":            []interface{}{},
+	}
+
+	jsonMsg, err := helpers.BuildCreateCollectionJSON(suite.TestSuite.Alice.String(), msg)
+	suite.NoError(err)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.NoError(err)
+
+	contract := suite.TestSuite.CreateMockContract(caller, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
@@ -162,26 +159,28 @@ func (suite *SecurityTestSuite) TestTransferTokens_CreatorIsCaller() {
 
 	// Transfer tokens - caller should be Alice
 	caller := suite.TestSuite.AliceEVM
-	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
-	valueUint256, _ := uint256.FromBig(big.NewInt(0))
-	contract := vm.NewContract(caller, precompileAddr, valueUint256, 1000000, nil)
-
-	args := []interface{}{
-		collectionId.BigInt(),
-		[]common.Address{suite.TestSuite.BobEVM},
-		big.NewInt(100),
-		[]struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		}{{Start: big.NewInt(1), End: big.NewInt(10)}},
-		[]struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		}{{Start: big.NewInt(1), End: big.NewInt(1000)}},
-	}
 
 	method := suite.Precompile.ABI.Methods["transferTokens"]
-	result, err := suite.Precompile.TransferTokens(suite.TestSuite.Ctx, &method, args, contract)
+	
+	// Convert EVM addresses to Cosmos addresses
+	toCosmos := suite.TestSuite.Bob.String()
+
+	// Build JSON message
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
+		collectionId.BigInt(),
+		suite.TestSuite.Alice.String(),
+		[]string{toCosmos},
+		big.NewInt(100),
+		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(10)}},
+		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1000)}},
+	)
+	suite.NoError(err)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.NoError(err)
+
+	contract := suite.TestSuite.CreateMockContract(caller, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
@@ -207,43 +206,42 @@ func (suite *SecurityTestSuite) TestSetIncomingApproval_CreatorIsCaller() {
 	suite.NoError(err)
 
 	caller := suite.TestSuite.AliceEVM
-	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
-	valueUint256, _ := uint256.FromBig(big.NewInt(0))
-	contract := vm.NewContract(caller, precompileAddr, valueUint256, 1000000, nil)
 
-	approvalMap := map[string]interface{}{
+	// Build approval object
+	approval := map[string]interface{}{
 		"approvalId":        "test-approval",
 		"fromListId":        "All", // Use built-in list instead of custom one
 		"initiatedByListId": "All",
 		"uri":               "https://example.com",
 		"customData":        "data",
-		"transferTimes": []interface{}{
-			map[string]interface{}{
-				"start": big.NewInt(1),
-				"end":   big.NewInt(1000),
-			},
+		"transferTimes": []map[string]interface{}{
+			{"start": "1", "end": "1000"},
 		},
-		"tokenIds": []interface{}{
-			map[string]interface{}{
-				"start": big.NewInt(1),
-				"end":   big.NewInt(10),
-			},
+		"tokenIds": []map[string]interface{}{
+			{"start": "1", "end": "10"},
 		},
-		"ownershipTimes": []interface{}{
-			map[string]interface{}{
-				"start": big.NewInt(1),
-				"end":   big.NewInt(1000),
-			},
+		"ownershipTimes": []map[string]interface{}{
+			{"start": "1", "end": "1000"},
 		},
+		"approvalCriteria": map[string]interface{}{}, // Empty criteria
 	}
 
-	args := []interface{}{
-		collectionId.BigInt(),
-		approvalMap,
+	// Build JSON message
+	msg := map[string]interface{}{
+		"creator":      suite.TestSuite.Alice.String(),
+		"collectionId": collectionId.BigInt().String(),
+		"approval":     approval,
 	}
+
+	jsonMsg, err := helpers.BuildQueryJSON(msg)
+	suite.NoError(err)
 
 	method := suite.Precompile.ABI.Methods["setIncomingApproval"]
-	result, err := suite.Precompile.SetIncomingApproval(suite.TestSuite.Ctx, &method, args, contract)
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.NoError(err)
+
+	contract := suite.TestSuite.CreateMockContract(caller, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 

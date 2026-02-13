@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"math/big"
@@ -16,8 +17,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/app/params"
-	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
@@ -100,6 +101,8 @@ func (ts *TestSuite) CreateMockContract(caller common.Address, input []byte) *vm
 	valueUint256, _ := uint256.FromBig(big.NewInt(0))
 	contract := vm.NewContract(caller, precompileAddr, valueUint256, 1000000, nil)
 	if len(input) > 0 {
+		// SetupABI reads from contract.Input, so we need to set it explicitly
+		contract.Input = input
 		contract.SetCallCode(common.Hash{}, input)
 	}
 	return contract
@@ -268,4 +271,200 @@ func CreateMockBoolOutput() abi.Arguments {
 	return abi.Arguments{
 		{Type: boolType, Name: "success"},
 	}
+}
+
+// BuildTransferTokensJSON builds a JSON string for transferTokens method
+// Note: creator field is automatically set from msg.sender, so it's not included
+func BuildTransferTokensJSON(collectionId *big.Int, from string, toAddresses []string, amount *big.Int, tokenIds, ownershipTimes []struct{ Start, End *big.Int }) (string, error) {
+	// Convert tokenIds to JSON format
+	tokenIdsJSON := make([]map[string]string, len(tokenIds))
+	for i, r := range tokenIds {
+		tokenIdsJSON[i] = map[string]string{
+			"start": r.Start.String(),
+			"end":   r.End.String(),
+		}
+	}
+
+	// Convert ownershipTimes to JSON format
+	ownershipTimesJSON := make([]map[string]string, len(ownershipTimes))
+	for i, r := range ownershipTimes {
+		ownershipTimesJSON[i] = map[string]string{
+			"start": r.Start.String(),
+			"end":   r.End.String(),
+		}
+	}
+
+	msg := map[string]interface{}{
+		"collectionId": collectionId.String(),
+		"transfers": []map[string]interface{}{
+			{
+				"from":        from,
+				"toAddresses": toAddresses,
+				"balances": []map[string]interface{}{
+					{
+						"amount":         amount.String(),
+						"tokenIds":       tokenIdsJSON,
+						"ownershipTimes": ownershipTimesJSON,
+					},
+				},
+			},
+		},
+	}
+
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildGetCollectionQueryJSON builds a JSON string for getCollection query
+func BuildGetCollectionQueryJSON(collectionId *big.Int) (string, error) {
+	query := map[string]interface{}{
+		"collectionId": collectionId.String(),
+	}
+	jsonBytes, err := json.Marshal(query)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildGetBalanceQueryJSON builds a JSON string for getBalance query
+func BuildGetBalanceQueryJSON(collectionId *big.Int, address string) (string, error) {
+	query := map[string]interface{}{
+		"collectionId": collectionId.String(),
+		"address":      address,
+	}
+	jsonBytes, err := json.Marshal(query)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// PackMethodWithJSON packs a method call with a JSON string argument
+func PackMethodWithJSON(method *abi.Method, jsonStr string) ([]byte, error) {
+	args := []interface{}{jsonStr}
+	packed, err := method.Inputs.Pack(args...)
+	if err != nil {
+		return nil, err
+	}
+	return append(method.ID, packed...), nil
+}
+
+// BuildGetAddressListQueryJSON builds a JSON string for getAddressList query
+func BuildGetAddressListQueryJSON(listId string) (string, error) {
+	query := map[string]interface{}{
+		"listId": listId,
+	}
+	jsonBytes, err := json.Marshal(query)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildQueryJSON is a generic helper to build JSON for any query request
+// queryData should be a map[string]interface{} with the query fields
+func BuildQueryJSON(queryData map[string]interface{}) (string, error) {
+	jsonBytes, err := json.Marshal(queryData)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildCreateCollectionJSON builds a JSON string for createCollection transaction
+func BuildCreateCollectionJSON(creator string, msg map[string]interface{}) (string, error) {
+	// Ensure creator is set
+	msg["creator"] = creator
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildDeleteCollectionJSON builds a JSON string for deleteCollection transaction
+func BuildDeleteCollectionJSON(creator string, collectionId *big.Int) (string, error) {
+	msg := map[string]interface{}{
+		"creator":      creator,
+		"collectionId": collectionId.String(),
+	}
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildSetManagerJSON builds a JSON string for setManager transaction
+func BuildSetManagerJSON(creator string, collectionId *big.Int, manager string) (string, error) {
+	msg := map[string]interface{}{
+		"creator":      creator,
+		"collectionId": collectionId.String(),
+		"manager":      manager,
+	}
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildSetCollectionMetadataJSON builds a JSON string for setCollectionMetadata transaction
+func BuildSetCollectionMetadataJSON(creator string, collectionId *big.Int, metadata map[string]interface{}) (string, error) {
+	msg := map[string]interface{}{
+		"creator":           creator,
+		"collectionId":      collectionId.String(),
+		"collectionMetadata": metadata,
+	}
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildSetValidTokenIdsJSON builds a JSON string for setValidTokenIds transaction
+func BuildSetValidTokenIdsJSON(creator string, collectionId *big.Int, validTokenIds []map[string]interface{}) (string, error) {
+	msg := map[string]interface{}{
+		"creator":       creator,
+		"collectionId":  collectionId.String(),
+		"validTokenIds": validTokenIds,
+	}
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildCreateDynamicStoreJSON builds a JSON string for createDynamicStore transaction
+func BuildCreateDynamicStoreJSON(creator string, defaultValue bool, uri, customData string) (string, error) {
+	msg := map[string]interface{}{
+		"creator":      creator,
+		"defaultValue": defaultValue,
+		"uri":          uri,
+		"customData":   customData,
+	}
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildCreateAddressListsJSON builds a JSON string for createAddressLists transaction
+func BuildCreateAddressListsJSON(creator string, addressLists []map[string]interface{}) (string, error) {
+	msg := map[string]interface{}{
+		"creator":       creator,
+		"addressLists": addressLists,
+	}
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
 }

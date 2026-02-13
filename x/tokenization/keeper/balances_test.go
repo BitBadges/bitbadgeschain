@@ -314,9 +314,11 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 
 func (suite *TestSuite) TestDefaultBalances() {
 	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
-		CollectionId: sdkmath.NewUint(0),
-		Creator:      alice,
-		Manager:      "",
+		CollectionId:        sdkmath.NewUint(0),
+		Creator:             alice,
+		Manager:             "",
+		UpdateValidTokenIds: true,
+		ValidTokenIds:       GetFullUintRanges(),
 		DefaultBalances: &types.UserBalanceStore{
 			Balances: []*types.Balance{
 				{
@@ -366,8 +368,9 @@ func (suite *TestSuite) TestWeirdJSSDKThing() {
 		CollectionApprovals: []*types.CollectionApproval{
 			GetBobApproval(),
 		},
-
-		DefaultBalances: &types.UserBalanceStore{},
+		UpdateValidTokenIds: true,
+		ValidTokenIds:       GetFullUintRanges(),
+		DefaultBalances:     &types.UserBalanceStore{},
 	})
 	suite.Require().Nil(err, "Error updating collection: %s")
 	suite.Require().NotNil(collectionRes, "Error updating collection: %s")
@@ -599,7 +602,9 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 		CollectionApprovals: []*types.CollectionApproval{
 			GetBobApproval(),
 		},
-		DefaultBalances: &types.UserBalanceStore{},
+		DefaultBalances:       &types.UserBalanceStore{},
+		UpdateValidTokenIds:   true,
+		ValidTokenIds:         []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(100)}},
 	})
 	suite.Require().Nil(err, "Error updating collection: %s")
 

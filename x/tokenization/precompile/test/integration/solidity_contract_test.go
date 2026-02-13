@@ -26,6 +26,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+	gammprecompile "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
@@ -165,16 +166,22 @@ func (suite *SolidityContractTestSuite) setupAppWithEVM() {
 	suite.BankKeeper = suite.App.BankKeeper
 	suite.TokenizationKeeper = suite.App.TokenizationKeeper
 
-	// Create precompile instance
+	// Create precompile instances
 	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper)
-	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
+	tokenizationPrecompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 
 	// Register and ENABLE the precompile - both steps are required!
-	suite.EVMKeeper.RegisterStaticPrecompile(precompileAddr, suite.Precompile)
-	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, precompileAddr)
+	suite.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, suite.Precompile)
+	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, tokenizationPrecompileAddr)
 	require.NoError(suite.T(), err, "Failed to enable tokenization precompile")
-
 	require.Equal(suite.T(), tokenization.TokenizationPrecompileAddress, suite.Precompile.ContractAddress.Hex())
+
+	// Also register and enable gamm precompile for consistency
+	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper)
+	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
+	suite.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
+	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, gammPrecompileAddr)
+	require.NoError(suite.T(), err, "Failed to enable gamm precompile")
 }
 
 // createTestValidator creates a validator manually for testing

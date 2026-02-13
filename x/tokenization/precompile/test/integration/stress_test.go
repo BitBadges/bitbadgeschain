@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkmath "cosmossdk.io/math"
 
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
@@ -43,17 +44,27 @@ func (suite *StressTestSuite) TestStress_MaxRecipients() {
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	// Convert EVM addresses to Cosmos addresses
+	fromCosmos := suite.Alice.String()
+	toCosmosAddrs := make([]string, len(recipients))
+	for i, recipient := range recipients {
+		toCosmosAddrs[i] = sdk.AccAddress(recipient.Bytes()).String()
+	}
+
+	// Build JSON message
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
-		recipients,
+		fromCosmos,
+		toCosmosAddrs,
 		big.NewInt(1),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(
@@ -100,17 +111,24 @@ func (suite *StressTestSuite) TestStress_MaxRanges() {
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	// Convert EVM addresses to Cosmos addresses
+	fromCosmos := suite.Alice.String()
+	toCosmos := suite.Bob.String()
+
+	// Build JSON message
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		fromCosmos,
+		[]string{toCosmos},
 		big.NewInt(1),
 		ranges,
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(

@@ -1,7 +1,6 @@
 package gamm_test
 
 import (
-	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -12,6 +11,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	gamm "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/precompile/test/helpers"
 )
 
 // GasAccuracyTestSuite provides tests for gas cost accuracy
@@ -144,24 +144,30 @@ func (suite *GasAccuracyTestSuite) TestGasAccuracy_QueryMethods() {
 			method, found := suite.Precompile.ABI.Methods[methodName]
 			suite.True(found, "Method %s should exist", methodName)
 
-			// Pack simple query (just poolId for most)
-			var input []byte
+			// Build JSON query and pack with JSON string
+			var queryJson string
+			var err error
 			if methodName == "getPools" {
 				// getPools takes pagination
-				packed, err := method.Inputs.Pack(big.NewInt(0), big.NewInt(10))
-				if err != nil {
-					suite.T().Skipf("Skipping %s due to packing error", methodName)
-					return
-				}
-				input = append(method.ID, packed...)
+			queryJson, err = helpers.BuildQueryJSON(map[string]interface{}{
+				"pagination": map[string]interface{}{
+					"offset": uint64(0),
+					"limit":  uint64(10),
+				},
+			})
 			} else {
 				// Other queries take poolId
-				packed, err := method.Inputs.Pack(suite.PoolId)
-				if err != nil {
-					suite.T().Skipf("Skipping %s due to packing error", methodName)
-					return
-				}
-				input = append(method.ID, packed...)
+				queryJson, err = helpers.BuildGetPoolQueryJSON(suite.PoolId)
+			}
+			if err != nil {
+				suite.T().Skipf("Skipping %s due to JSON build error: %v", methodName, err)
+				return
+			}
+
+			input, err := helpers.PackMethodWithJSON(&method, queryJson)
+			if err != nil {
+				suite.T().Skipf("Skipping %s due to packing error: %v", methodName, err)
+				return
 			}
 
 			gas := suite.Precompile.RequiredGas(input)

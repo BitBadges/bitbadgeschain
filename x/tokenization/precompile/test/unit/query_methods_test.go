@@ -4,9 +4,6 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/holiman/uint256"
 	"github.com/stretchr/testify/suite"
 
 	sdkmath "cosmossdk.io/math"
@@ -46,39 +43,60 @@ func (suite *QueryMethodsTestSuite) SetupTest() {
 
 func (suite *QueryMethodsTestSuite) TestGetCollection_Valid() {
 	method := suite.Precompile.ABI.Methods["getCollection"]
-	args := []interface{}{
-		suite.TestSuite.CollectionId.BigInt(),
-	}
+	
+	// Build JSON query
+	queryJson, err := helpers.BuildGetCollectionQueryJSON(suite.TestSuite.CollectionId.BigInt())
+	suite.NoError(err)
 
-	result, err := suite.Precompile.GetCollection(suite.TestSuite.Ctx, &method, args)
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
-	// Verify result can be unpacked (should be structured type now)
-	// Note: ABI still shows bytes, but actual return is structured
-	// This will be updated when ABI is updated
+	// Verify result can be unpacked
 	suite.Greater(len(result), 0)
 }
 
 func (suite *QueryMethodsTestSuite) TestGetCollection_NonExistent() {
 	method := suite.Precompile.ABI.Methods["getCollection"]
-	args := []interface{}{
-		big.NewInt(99999), // Non-existent collection
-	}
+	
+	// Build JSON query for non-existent collection
+	queryJson, err := helpers.BuildGetCollectionQueryJSON(big.NewInt(99999))
+	suite.NoError(err)
 
-	result, err := suite.Precompile.GetCollection(suite.TestSuite.Ctx, &method, args)
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.Error(err)
 	suite.Nil(result)
 }
 
 func (suite *QueryMethodsTestSuite) TestGetBalance_Valid() {
 	method := suite.Precompile.ABI.Methods["getBalance"]
-	args := []interface{}{
-		suite.TestSuite.CollectionId.BigInt(),
-		suite.TestSuite.AliceEVM,
-	}
+	
+	// Convert EVM address to Cosmos address
+	aliceCosmos := suite.TestSuite.Alice.String()
 
-	result, err := suite.Precompile.GetBalance(suite.TestSuite.Ctx, &method, args)
+	// Build JSON query
+	queryJson, err := helpers.BuildGetBalanceQueryJSON(suite.TestSuite.CollectionId.BigInt(), aliceCosmos)
+	suite.NoError(err)
+
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
@@ -88,12 +106,21 @@ func (suite *QueryMethodsTestSuite) TestGetBalance_Valid() {
 
 func (suite *QueryMethodsTestSuite) TestGetBalance_NonExistentUser() {
 	method := suite.Precompile.ABI.Methods["getBalance"]
-	args := []interface{}{
-		suite.TestSuite.CollectionId.BigInt(),
-		suite.TestSuite.CharlieEVM, // User with no balance
-	}
+	
+	// Convert EVM address to Cosmos address
+	charlieCosmos := suite.TestSuite.Charlie.String()
 
-	result, err := suite.Precompile.GetBalance(suite.TestSuite.Ctx, &method, args)
+	// Build JSON query
+	queryJson, err := helpers.BuildGetBalanceQueryJSON(suite.TestSuite.CollectionId.BigInt(), charlieCosmos)
+	suite.NoError(err)
+
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	// Should succeed but return empty balance
 	suite.NoError(err)
 	suite.NotNil(result)
@@ -101,20 +128,30 @@ func (suite *QueryMethodsTestSuite) TestGetBalance_NonExistentUser() {
 
 func (suite *QueryMethodsTestSuite) TestGetBalanceAmount_Valid() {
 	method := suite.Precompile.ABI.Methods["getBalanceAmount"]
-	args := []interface{}{
-		suite.TestSuite.CollectionId.BigInt(),
-		suite.TestSuite.AliceEVM,
-		[]struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		}{{Start: big.NewInt(1), End: big.NewInt(10)}},
-		[]struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		}{{Start: big.NewInt(1), End: big.NewInt(1000)}},
-	}
+	
+	// Convert EVM address to Cosmos address
+	aliceCosmos := suite.TestSuite.Alice.String()
 
-	result, err := suite.Precompile.GetBalanceAmount(suite.TestSuite.Ctx, &method, args)
+	// Build JSON query
+	queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
+		"collectionId": suite.TestSuite.CollectionId.BigInt().String(),
+		"address":       aliceCosmos,
+		"tokenIds": []map[string]interface{}{
+			{"start": "1", "end": "10"},
+		},
+		"ownershipTimes": []map[string]interface{}{
+			{"start": "1", "end": "1000"},
+		},
+	})
+	suite.NoError(err)
+
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
@@ -130,19 +167,26 @@ func (suite *QueryMethodsTestSuite) TestGetBalanceAmount_Valid() {
 
 func (suite *QueryMethodsTestSuite) TestGetTotalSupply_Valid() {
 	method := suite.Precompile.ABI.Methods["getTotalSupply"]
-	args := []interface{}{
-		suite.TestSuite.CollectionId.BigInt(),
-		[]struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		}{{Start: big.NewInt(1), End: big.NewInt(10)}},
-		[]struct {
-			Start *big.Int `json:"start"`
-			End   *big.Int `json:"end"`
-		}{{Start: big.NewInt(1), End: big.NewInt(1000)}},
-	}
+	
+	// Build JSON query
+	queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
+		"collectionId": suite.TestSuite.CollectionId.BigInt().String(),
+		"tokenIds": []map[string]interface{}{
+			{"start": "1", "end": "10"},
+		},
+		"ownershipTimes": []map[string]interface{}{
+			{"start": "1", "end": "1000"},
+		},
+	})
+	suite.NoError(err)
 
-	result, err := suite.Precompile.GetTotalSupply(suite.TestSuite.Ctx, &method, args)
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
@@ -158,11 +202,8 @@ func (suite *QueryMethodsTestSuite) TestGetTotalSupply_Valid() {
 }
 
 func (suite *QueryMethodsTestSuite) TestGetAddressList_Valid() {
-	// Create address list first
+	// Create address list first using JSON
 	caller := suite.TestSuite.AliceEVM
-	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
-	valueUint256, _ := uint256.FromBig(big.NewInt(0))
-	contract := vm.NewContract(caller, precompileAddr, valueUint256, 1000000, nil)
 
 	addressListInput := map[string]interface{}{
 		"listId":     "testlist", // Use alphanumeric only (no hyphens)
@@ -172,25 +213,41 @@ func (suite *QueryMethodsTestSuite) TestGetAddressList_Valid() {
 		"customData": "data",
 	}
 
-	createArgs := []interface{}{
-		[]interface{}{addressListInput},
+	createMsg := map[string]interface{}{
+		"creator":       suite.TestSuite.Alice.String(),
+		"addressLists": []interface{}{addressListInput},
 	}
+
+	createJson, err := helpers.BuildQueryJSON(createMsg)
+	suite.NoError(err)
 
 	createMethod, found := suite.Precompile.ABI.Methods["createAddressLists"]
 	if !found {
-		// Create mock method if not in ABI (workaround for missing ABI entries)
-		createMethod = helpers.CreateMockMethod("createAddressLists", nil, helpers.CreateMockBoolOutput())
+		suite.T().Skip("createAddressLists method not found in ABI")
+		return
 	}
-	_, err := suite.Precompile.CreateAddressLists(suite.TestSuite.Ctx, &createMethod, createArgs, contract)
+
+	createInput, err := helpers.PackMethodWithJSON(&createMethod, createJson)
+	suite.NoError(err)
+
+	createContract := suite.TestSuite.CreateMockContract(caller, createInput)
+	_, err = suite.Precompile.Execute(suite.TestSuite.Ctx, createContract, false)
 	suite.NoError(err)
 
 	// Query the address list
 	method := suite.Precompile.ABI.Methods["getAddressList"]
-	args := []interface{}{
-		"testlist",
-	}
+	
+	// Build JSON query
+	queryJson, err := helpers.BuildGetAddressListQueryJSON("testlist")
+	suite.NoError(err)
 
-	result, err := suite.Precompile.GetAddressList(suite.TestSuite.Ctx, &method, args)
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	queryContract := suite.TestSuite.CreateMockContract(caller, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, queryContract, false)
 	suite.NoError(err)
 	suite.NotNil(result)
 
@@ -200,11 +257,18 @@ func (suite *QueryMethodsTestSuite) TestGetAddressList_Valid() {
 
 func (suite *QueryMethodsTestSuite) TestGetAddressList_NonExistent() {
 	method := suite.Precompile.ABI.Methods["getAddressList"]
-	args := []interface{}{
-		"nonexistentlist", // Use alphanumeric only (no hyphens)
-	}
+	
+	// Build JSON query
+	queryJson, err := helpers.BuildGetAddressListQueryJSON("nonexistentlist")
+	suite.NoError(err)
 
-	result, err := suite.Precompile.GetAddressList(suite.TestSuite.Ctx, &method, args)
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.NoError(err)
+
+	// Call precompile via Execute
+	contract := suite.TestSuite.CreateMockContract(suite.TestSuite.AliceEVM, input)
+	result, err := suite.Precompile.Execute(suite.TestSuite.Ctx, contract, false)
 	suite.Error(err)
 	suite.Nil(result)
 }

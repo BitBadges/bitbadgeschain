@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"math/big"
 	"testing"
 	"time"
@@ -198,5 +199,33 @@ func BigIntToInt(bi *big.Int) sdkmath.Int {
 // IntToBigInt converts sdkmath.Int to *big.Int
 func IntToBigInt(i sdkmath.Int) *big.Int {
 	return i.BigInt()
+}
+
+// PackMethodWithJSON packs a method call with a JSON string argument
+func PackMethodWithJSON(method *abi.Method, jsonStr string) ([]byte, error) {
+	args := []interface{}{jsonStr}
+	packed, err := method.Inputs.Pack(args...)
+	if err != nil {
+		return nil, err
+	}
+	return append(method.ID, packed...), nil
+}
+
+// BuildQueryJSON is a generic helper to build JSON for any query request
+// queryData should be a map[string]interface{} with the query fields
+func BuildQueryJSON(queryData map[string]interface{}) (string, error) {
+	jsonBytes, err := json.Marshal(queryData)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
+}
+
+// BuildGetPoolQueryJSON builds a JSON string for getPool query
+func BuildGetPoolQueryJSON(poolId uint64) (string, error) {
+	query := map[string]interface{}{
+		"pool_id": poolId,
+	}
+	return BuildQueryJSON(query)
 }
 

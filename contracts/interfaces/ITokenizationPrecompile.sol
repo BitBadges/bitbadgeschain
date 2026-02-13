@@ -5,8 +5,10 @@ import "../types/TokenizationTypes.sol";
 
 /// @title ITokenizationPrecompile
 /// @notice Interface for the BitBadges tokenization precompile
-/// @dev Precompile address: 0x0000000000000000000000000000000000000800
-///      All types are imported from TokenizationTypes for full proto compatibility
+/// @dev Precompile address: 0x0000000000000000000000000000000000001001
+///      All methods use JSON string parameters matching protobuf JSON format.
+///      The caller address (creator/sender) is automatically set from msg.sender.
+///      Use helper libraries to construct JSON strings from Solidity types.
 interface ITokenizationPrecompile {
     // ============ Events ============
 
@@ -95,442 +97,311 @@ interface ITokenizationPrecompile {
     );
 
     // ============ Transactions ============
+    // NOTE: All methods now use a JSON string parameter (msgJson) instead of individual parameters.
+    // The JSON must match the protobuf JSON format for the corresponding Msg type.
+    // Use helper libraries or construct JSON manually. The caller address is automatically set from msg.sender.
 
     /// @notice Transfer tokens from the caller to specified addresses
-    /// @param collectionId The collection ID
-    /// @param toAddresses The recipient addresses
-    /// @param amount The amount to transfer to each recipient
-    /// @param tokenIds The token ID ranges to transfer
-    /// @param ownershipTimes The ownership time ranges
+    /// @param msgJson JSON string matching MsgTransferTokens protobuf format
     /// @return success True if transfer succeeded
     function transferTokens(
-        uint256 collectionId,
-        address[] calldata toAddresses,
-        uint256 amount,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Set an incoming approval for the caller
-    /// @param collectionId The collection ID
-    /// @param approval The incoming approval with full criteria support
+    /// @param msgJson JSON string matching MsgSetIncomingApproval protobuf format
     /// @return success True if approval was set
     function setIncomingApproval(
-        uint256 collectionId,
-        UserIncomingApproval calldata approval
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Set an outgoing approval for the caller
-    /// @param collectionId The collection ID
-    /// @param approval The outgoing approval with full criteria support
+    /// @param msgJson JSON string matching MsgSetOutgoingApproval protobuf format
     /// @return success True if approval was set
     function setOutgoingApproval(
-        uint256 collectionId,
-        UserOutgoingApproval calldata approval
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Delete a collection (creator only)
-    /// @param collectionId The collection ID to delete
+    /// @param msgJson JSON string matching MsgDeleteCollection protobuf format
     /// @return success True if deletion succeeded
     function deleteCollection(
-        uint256 collectionId
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Delete an incoming approval
-    /// @param collectionId The collection ID
-    /// @param approvalId The approval ID to delete
+    /// @param msgJson JSON string matching MsgDeleteIncomingApproval protobuf format
     /// @return success True if deletion succeeded
     function deleteIncomingApproval(
-        uint256 collectionId,
-        string calldata approvalId
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Delete an outgoing approval
-    /// @param collectionId The collection ID
-    /// @param approvalId The approval ID to delete
+    /// @param msgJson JSON string matching MsgDeleteOutgoingApproval protobuf format
     /// @return success True if deletion succeeded
     function deleteOutgoingApproval(
-        uint256 collectionId,
-        string calldata approvalId
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Create a new dynamic store
-    /// @param defaultValue The default boolean value
-    /// @param uri Optional URI for metadata
-    /// @param customData Optional custom data
+    /// @param msgJson JSON string matching MsgCreateDynamicStore protobuf format
     /// @return storeId The newly created store ID
     function createDynamicStore(
-        bool defaultValue,
-        string calldata uri,
-        string calldata customData
+        string calldata msgJson
     ) external returns (uint256 storeId);
 
     /// @notice Update an existing dynamic store
-    /// @param storeId The store ID to update
-    /// @param defaultValue The new default value
-    /// @param globalEnabled Whether the store is globally enabled
-    /// @param uri New URI for metadata
-    /// @param customData New custom data
+    /// @param msgJson JSON string matching MsgUpdateDynamicStore protobuf format
     /// @return success True if update succeeded
     function updateDynamicStore(
-        uint256 storeId,
-        bool defaultValue,
-        bool globalEnabled,
-        string calldata uri,
-        string calldata customData
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Delete a dynamic store (creator only)
-    /// @param storeId The store ID to delete
+    /// @param msgJson JSON string matching MsgDeleteDynamicStore protobuf format
     /// @return success True if deletion succeeded
     function deleteDynamicStore(
-        uint256 storeId
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Set a value in a dynamic store for an address
-    /// @param storeId The store ID
-    /// @param address_ The address to set the value for
-    /// @param value The boolean value to set
+    /// @param msgJson JSON string matching MsgSetDynamicStoreValue protobuf format
     /// @return success True if value was set
     function setDynamicStoreValue(
-        uint256 storeId,
-        address address_,
-        bool value
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Set custom data for a collection
-    /// @param collectionId The collection ID
-    /// @param customData The new custom data
+    /// @param msgJson JSON string matching MsgSetCustomData protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setCustomData(
-        uint256 collectionId,
-        string calldata customData
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Set whether a collection is archived
-    /// @param collectionId The collection ID
-    /// @param isArchived Whether the collection is archived
+    /// @param msgJson JSON string matching MsgSetIsArchived protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setIsArchived(
-        uint256 collectionId,
-        bool isArchived
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Set the manager of a collection
-    /// @param collectionId The collection ID
-    /// @param manager The new manager address (as Cosmos address string)
+    /// @param msgJson JSON string matching MsgSetManager protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setManager(
-        uint256 collectionId,
-        string calldata manager
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Set collection metadata
-    /// @param collectionId The collection ID
-    /// @param uri The new metadata URI
-    /// @param customData Additional custom data
+    /// @param msgJson JSON string matching MsgSetCollectionMetadata protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setCollectionMetadata(
-        uint256 collectionId,
-        string calldata uri,
-        string calldata customData
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Set the standards for a collection
-    /// @param collectionId The collection ID
-    /// @param standards Array of standard identifiers (e.g., "ERC721", "ERC1155")
+    /// @param msgJson JSON string matching MsgSetStandards protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setStandards(
-        uint256 collectionId,
-        string[] calldata standards
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Cast a vote for a proposal in a voting challenge
-    /// @param collectionId The collection ID
-    /// @param approvalLevel The approval level ("collection", "incoming", "outgoing")
-    /// @param approverAddress The approver address
-    /// @param approvalId The approval ID containing the voting challenge
-    /// @param proposalId The proposal ID to vote on
-    /// @param yesWeight The weight of the yes vote
+    /// @param msgJson JSON string matching MsgCastVote protobuf format
     /// @return success True if vote was cast
     function castVote(
-        uint256 collectionId,
-        string calldata approvalLevel,
-        string calldata approverAddress,
-        string calldata approvalId,
-        string calldata proposalId,
-        uint256 yesWeight
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Create a new token collection
-    /// @param msg_ The collection creation parameters
+    /// @param msgJson JSON string matching MsgCreateCollection protobuf format
     /// @return newCollectionId The newly created collection ID
     function createCollection(
-        MsgCreateCollection calldata msg_
+        string calldata msgJson
     ) external returns (uint256 newCollectionId);
 
     /// @notice Update an existing collection
-    /// @param msg_ The collection update parameters
+    /// @param msgJson JSON string matching MsgUpdateCollection protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function updateCollection(
-        MsgUpdateCollection calldata msg_
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Update user approvals and permissions
-    /// @param msg_ The user approval update parameters
+    /// @param msgJson JSON string matching MsgUpdateUserApprovals protobuf format
     /// @return success True if update succeeded
     function updateUserApprovals(
-        MsgUpdateUserApprovals calldata msg_
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Create one or more address lists
-    /// @param addressLists Array of address list definitions
+    /// @param msgJson JSON string matching MsgCreateAddressLists protobuf format
     /// @return success True if lists were created
     function createAddressLists(
-        AddressListInput[] calldata addressLists
+        string calldata msgJson
     ) external returns (bool success);
 
     /// @notice Purge expired or specified approvals
-    /// @param collectionId The collection ID
-    /// @param purgeExpired Whether to purge expired approvals
-    /// @param approverAddress The approver address context
-    /// @param purgeCounterpartyApprovals Whether to purge counterparty approvals
-    /// @param approvalsToPurge Specific approvals to purge
+    /// @param msgJson JSON string matching MsgPurgeApprovals protobuf format
     /// @return numPurged Number of approvals purged
     function purgeApprovals(
-        uint256 collectionId,
-        bool purgeExpired,
-        string calldata approverAddress,
-        bool purgeCounterpartyApprovals,
-        ApprovalIdentifierDetails[] calldata approvalsToPurge
+        string calldata msgJson
     ) external returns (uint256 numPurged);
 
     /// @notice Set valid token IDs for a collection
-    /// @param collectionId The collection ID
-    /// @param validTokenIds The valid token ID ranges
-    /// @param canUpdateValidTokenIds Permissions for future updates
+    /// @param msgJson JSON string matching MsgSetValidTokenIds protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setValidTokenIds(
-        uint256 collectionId,
-        UintRange[] calldata validTokenIds,
-        TokenIdsActionPermission[] calldata canUpdateValidTokenIds
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Set token metadata for specific token IDs
-    /// @param collectionId The collection ID
-    /// @param tokenMetadata Array of token metadata entries
-    /// @param canUpdateTokenMetadata Permissions for future updates
+    /// @param msgJson JSON string matching MsgSetTokenMetadata protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setTokenMetadata(
-        uint256 collectionId,
-        TokenMetadata[] calldata tokenMetadata,
-        TokenIdsActionPermission[] calldata canUpdateTokenMetadata
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Set collection-level approvals
-    /// @param collectionId The collection ID
-    /// @param collectionApprovals Array of collection approvals
-    /// @param canUpdateCollectionApprovals Permissions for future updates
+    /// @param msgJson JSON string matching MsgSetCollectionApprovals protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function setCollectionApprovals(
-        uint256 collectionId,
-        CollectionApproval[] calldata collectionApprovals,
-        CollectionApprovalPermission[] calldata canUpdateCollectionApprovals
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
 
     /// @notice Universal update for all collection properties
     /// @dev Combines all update operations into a single call
-    /// @param msg_ The universal update parameters
+    /// @param msgJson JSON string matching MsgUniversalUpdateCollection protobuf format
     /// @return resultCollectionId The collection ID (unchanged)
     function universalUpdateCollection(
-        MsgUniversalUpdateCollection calldata msg_
+        string calldata msgJson
     ) external returns (uint256 resultCollectionId);
     
     // ============ Queries ============
+    // NOTE: All query methods now use a JSON string parameter (msgJson) instead of individual parameters.
+    // The JSON must match the protobuf JSON format for the corresponding QueryRequest type.
 
     /// @notice Get collection details by ID
     /// @dev Returns protobuf-encoded TokenCollection. Decode using appropriate codec.
-    /// @param collectionId The collection ID to query
+    /// @param msgJson JSON string matching QueryCollectionRequest protobuf format
     /// @return collection Protobuf-encoded TokenCollection bytes
     function getCollection(
-        uint256 collectionId
+        string calldata msgJson
     ) external view returns (bytes memory collection);
 
     /// @notice Get user balance for a collection
     /// @dev Returns protobuf-encoded UserBalanceStore. Decode using appropriate codec.
-    /// @param collectionId The collection ID
-    /// @param userAddress The user address to query
+    /// @param msgJson JSON string matching QueryBalanceRequest protobuf format
     /// @return balance Protobuf-encoded UserBalanceStore bytes
     function getBalance(
-        uint256 collectionId,
-        address userAddress
+        string calldata msgJson
     ) external view returns (bytes memory balance);
 
     /// @notice Get an address list by ID
     /// @dev Returns protobuf-encoded AddressList. Decode using appropriate codec.
-    /// @param listId The list ID to query
+    /// @param msgJson JSON string matching QueryAddressListRequest protobuf format
     /// @return list Protobuf-encoded AddressList bytes
     function getAddressList(
-        string calldata listId
+        string calldata msgJson
     ) external view returns (bytes memory list);
     
     /// @notice Get approval tracker for amount/transfer tracking
     /// @dev Returns protobuf-encoded ApprovalTracker
-    /// @param collectionId The collection ID
-    /// @param approvalLevel The approval level ("collection", "incoming", "outgoing")
-    /// @param approverAddress The approver address
-    /// @param amountTrackerId The amount tracker ID
-    /// @param trackerType The tracker type ("amounts" or "numTransfers")
-    /// @param approvedAddress The approved address being tracked
-    /// @param approvalId The approval ID
+    /// @param msgJson JSON string matching QueryApprovalTrackerRequest protobuf format
     /// @return Protobuf-encoded ApprovalTracker bytes
     function getApprovalTracker(
-        uint256 collectionId,
-        string calldata approvalLevel,
-        address approverAddress,
-        string calldata amountTrackerId,
-        string calldata trackerType,
-        address approvedAddress,
-        string calldata approvalId
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get challenge tracker for Merkle challenges
     /// @dev Returns protobuf-encoded challenge tracker data
-    /// @param collectionId The collection ID
-    /// @param approvalLevel The approval level
-    /// @param approverAddress The approver address
-    /// @param challengeTrackerId The challenge tracker ID
-    /// @param leafIndex The leaf index in the Merkle tree
-    /// @param approvalId The approval ID
+    /// @param msgJson JSON string matching QueryChallengeTrackerRequest protobuf format
     /// @return Protobuf-encoded challenge tracker bytes
     function getChallengeTracker(
-        uint256 collectionId,
-        string calldata approvalLevel,
-        address approverAddress,
-        string calldata challengeTrackerId,
-        uint256 leafIndex,
-        string calldata approvalId
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get ETH signature tracker
     /// @dev Returns protobuf-encoded signature tracker data
-    /// @param collectionId The collection ID
-    /// @param approvalLevel The approval level
-    /// @param approverAddress The approver address
-    /// @param approvalId The approval ID
-    /// @param challengeTrackerId The challenge tracker ID
-    /// @param signature The signature being tracked
+    /// @param msgJson JSON string matching QueryETHSignatureTrackerRequest protobuf format
     /// @return Protobuf-encoded signature tracker bytes
     function getETHSignatureTracker(
-        uint256 collectionId,
-        string calldata approvalLevel,
-        address approverAddress,
-        string calldata approvalId,
-        string calldata challengeTrackerId,
-        string calldata signature
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get a dynamic store by ID
     /// @dev Returns protobuf-encoded DynamicStore
-    /// @param storeId The store ID
+    /// @param msgJson JSON string matching QueryDynamicStoreRequest protobuf format
     /// @return Protobuf-encoded DynamicStore bytes
     function getDynamicStore(
-        uint256 storeId
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get a dynamic store value for a specific address
     /// @dev Returns protobuf-encoded DynamicStoreValue
-    /// @param storeId The store ID
-    /// @param userAddress The address to query
+    /// @param msgJson JSON string matching QueryDynamicStoreValueRequest protobuf format
     /// @return Protobuf-encoded DynamicStoreValue bytes
     function getDynamicStoreValue(
-        uint256 storeId,
-        address userAddress
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get wrappable balances for a denomination
-    /// @param denom The denomination to query
-    /// @param userAddress The user address
+    /// @param msgJson JSON string matching QueryWrappableBalancesRequest protobuf format
     /// @return The wrappable balance amount
     function getWrappableBalances(
-        string calldata denom,
-        address userAddress
+        string calldata msgJson
     ) external view returns (uint256);
 
     /// @notice Check if an address is a reserved protocol address
-    /// @param addr The address to check
+    /// @param msgJson JSON string matching QueryIsAddressReservedProtocolRequest protobuf format
     /// @return True if the address is reserved for protocol use
     function isAddressReservedProtocol(
-        address addr
+        string calldata msgJson
     ) external view returns (bool);
 
     /// @notice Get all reserved protocol addresses
+    /// @param msgJson JSON string (can be empty "{}" as no parameters needed)
     /// @return Array of reserved protocol addresses
     function getAllReservedProtocolAddresses(
+        string calldata msgJson
     ) external view returns (address[] memory);
 
     /// @notice Get a specific vote in a voting challenge
     /// @dev Returns protobuf-encoded VoteProof
-    /// @param collectionId The collection ID
-    /// @param approvalLevel The approval level
-    /// @param approverAddress The approver address
-    /// @param approvalId The approval ID
-    /// @param proposalId The proposal ID
-    /// @param voterAddress The voter address
+    /// @param msgJson JSON string matching QueryVoteRequest protobuf format
     /// @return Protobuf-encoded VoteProof bytes
     function getVote(
-        uint256 collectionId,
-        string calldata approvalLevel,
-        address approverAddress,
-        string calldata approvalId,
-        string calldata proposalId,
-        address voterAddress
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get all votes for a proposal
     /// @dev Returns protobuf-encoded array of VoteProof
-    /// @param collectionId The collection ID
-    /// @param approvalLevel The approval level
-    /// @param approverAddress The approver address
-    /// @param approvalId The approval ID
-    /// @param proposalId The proposal ID
+    /// @param msgJson JSON string matching QueryVotesRequest protobuf format
     /// @return Protobuf-encoded VoteProof array bytes
     function getVotes(
-        uint256 collectionId,
-        string calldata approvalLevel,
-        address approverAddress,
-        string calldata approvalId,
-        string calldata proposalId
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get module parameters
     /// @dev Returns protobuf-encoded Params
+    /// @param msgJson JSON string (can be empty "{}" as no parameters needed)
     /// @return Protobuf-encoded module parameters bytes
     function params(
+        string calldata msgJson
     ) external view returns (bytes memory);
 
     /// @notice Get the balance amount for specific token/ownership ranges
-    /// @param collectionId The collection ID
-    /// @param userAddress The user address
-    /// @param tokenIds The token ID ranges to query
-    /// @param ownershipTimes The ownership time ranges
+    /// @param msgJson JSON string matching QueryBalanceAmountRequest protobuf format
     /// @return The total balance amount
     function getBalanceAmount(
-        uint256 collectionId,
-        address userAddress,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
+        string calldata msgJson
     ) external view returns (uint256);
 
     /// @notice Get the total supply for specific token/ownership ranges
-    /// @param collectionId The collection ID
-    /// @param tokenIds The token ID ranges to query
-    /// @param ownershipTimes The ownership time ranges
+    /// @param msgJson JSON string matching QueryTotalSupplyRequest protobuf format
     /// @return The total supply amount
     function getTotalSupply(
-        uint256 collectionId,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
+        string calldata msgJson
     ) external view returns (uint256);
 }
 

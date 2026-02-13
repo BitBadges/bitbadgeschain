@@ -46,6 +46,9 @@ func TestDynamicStoreOwnershipCheckParty_Initiator(t *testing.T) {
 	// Create a collection with an approval that uses this dynamic store (default/empty ownershipCheckParty)
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",
@@ -129,6 +132,9 @@ func TestDynamicStoreOwnershipCheckParty_Sender(t *testing.T) {
 	// Create a collection with an approval that checks sender
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",
@@ -211,6 +217,9 @@ func TestDynamicStoreOwnershipCheckParty_Recipient(t *testing.T) {
 	// Create a collection with an approval that checks recipient
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",
@@ -294,6 +303,9 @@ func TestDynamicStoreOwnershipCheckParty_HardcodedAddress(t *testing.T) {
 	// Create a collection with an approval that checks hardcoded address
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",
@@ -376,6 +388,9 @@ func TestDynamicStoreOwnershipCheckParty_InvalidAddressFallsBackToInitiator(t *t
 	// Create a collection with an approval that uses an invalid address (should fall back to initiator)
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",

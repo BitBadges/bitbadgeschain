@@ -37,8 +37,8 @@ func TestPrecompile_TransferTokens_Structure(t *testing.T) {
 	require.True(t, found)
 	require.NotNil(t, method)
 
-	// Verify method signature
-	require.Equal(t, 5, len(method.Inputs))  // collectionId, toAddresses, amount, tokenIds, ownershipTimes
+	// Verify method signature (now takes single JSON string parameter)
+	require.Equal(t, 1, len(method.Inputs))  // msgJson (string)
 	require.Equal(t, 1, len(method.Outputs)) // success bool
 }
 

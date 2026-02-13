@@ -218,5 +218,142 @@ library TokenizationHelpers {
     ) internal pure returns (TokenizationTypes.UintRange memory range) {
         return createUintRange(startTokenId, endTokenId);
     }
+
+    /**
+     * @notice Creates an ownership time range from current time to a future time
+     * @param startTime The start time (typically block.timestamp)
+     * @param duration The duration in seconds
+     * @return range The ownership time range
+     */
+    function createOwnershipTimeRange(
+        uint256 startTime,
+        uint256 duration
+    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+        return createUintRange(startTime, startTime + duration);
+    }
+
+    /**
+     * @notice Creates an ownership time range from current time to expiration
+     * @param expirationTime The expiration timestamp
+     * @return range The ownership time range from now to expiration
+     */
+    function createOwnershipTimeRangeToExpiration(
+        uint256 expirationTime
+    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+        return createUintRange(block.timestamp, expirationTime);
+    }
+
+    /**
+     * @notice Creates a time range for a specific time point (single timestamp)
+     * @param timestamp The timestamp (both start and end)
+     * @return range The UintRange for the single timestamp
+     */
+    function createTimePoint(
+        uint256 timestamp
+    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+        return createUintRange(timestamp, timestamp);
+    }
+
+    /**
+     * @notice Creates a time range for current time (single point)
+     * @return range The UintRange for current block timestamp
+     */
+    function createCurrentTimePoint() internal view returns (TokenizationTypes.UintRange memory range) {
+        return createTimePoint(block.timestamp);
+    }
+
+    /**
+     * @notice Creates an empty ActionPermission (no restrictions)
+     * @return permission An ActionPermission with empty arrays
+     */
+    function createEmptyActionPermission() internal pure returns (TokenizationTypes.ActionPermission memory permission) {
+        return TokenizationTypes.ActionPermission({
+            permanentlyPermittedTimes: new TokenizationTypes.UintRange[](0),
+            permanentlyForbiddenTimes: new TokenizationTypes.UintRange[](0)
+        });
+    }
+
+    /**
+     * @notice Creates an ActionPermission that is always permitted
+     * @return permission An ActionPermission with full time range permitted
+     */
+    function createAlwaysPermittedActionPermission() internal pure returns (TokenizationTypes.ActionPermission memory permission) {
+        TokenizationTypes.UintRange[] memory permittedTimes = new TokenizationTypes.UintRange[](1);
+        permittedTimes[0] = createFullOwnershipTimeRange();
+        return TokenizationTypes.ActionPermission({
+            permanentlyPermittedTimes: permittedTimes,
+            permanentlyForbiddenTimes: new TokenizationTypes.UintRange[](0)
+        });
+    }
+
+    /**
+     * @notice Creates a Balance with full ownership time range
+     * @param amount The amount of tokens
+     * @param tokenIds Array of token ID ranges
+     * @return balance The constructed Balance with full ownership time
+     */
+    function createBalanceWithFullOwnership(
+        uint256 amount,
+        TokenizationTypes.UintRange[] memory tokenIds
+    ) internal pure returns (TokenizationTypes.Balance memory balance) {
+        TokenizationTypes.UintRange[] memory ownershipTimes = new TokenizationTypes.UintRange[](1);
+        ownershipTimes[0] = createFullOwnershipTimeRange();
+        return createBalance(amount, ownershipTimes, tokenIds);
+    }
+
+    /**
+     * @notice Creates a Balance for a single token ID with full ownership
+     * @param amount The amount of tokens
+     * @param tokenId The token ID
+     * @return balance The constructed Balance
+     */
+    function createBalanceForSingleToken(
+        uint256 amount,
+        uint256 tokenId
+    ) internal pure returns (TokenizationTypes.Balance memory balance) {
+        TokenizationTypes.UintRange[] memory tokenIds = new TokenizationTypes.UintRange[](1);
+        tokenIds[0] = createSingleTokenIdRange(tokenId);
+        return createBalanceWithFullOwnership(amount, tokenIds);
+    }
+
+    /**
+     * @notice Converts an address to a Cosmos address string (hex format with 0x prefix)
+     * @param addr The EVM address
+     * @return cosmosAddr The address as a hex string (for use in manager fields, etc.)
+     */
+    function addressToCosmosString(address addr) internal pure returns (string memory cosmosAddr) {
+        bytes memory data = abi.encodePacked(addr);
+        bytes memory alphabet = "0123456789abcdef";
+        bytes memory str = new bytes(2 + data.length * 2);
+        str[0] = "0";
+        str[1] = "x";
+        for (uint256 i = 0; i < data.length; i++) {
+            str[2 + i * 2] = alphabet[uint8(data[i] >> 4)];
+            str[3 + i * 2] = alphabet[uint8(data[i] & 0x0f)];
+        }
+        return string(str);
+    }
+
+    /**
+     * @notice Creates a simple CollectionMetadata with only URI
+     * @param uri The metadata URI
+     * @return metadata The constructed CollectionMetadata
+     */
+    function createCollectionMetadataFromURI(string memory uri) internal pure returns (TokenizationTypes.CollectionMetadata memory metadata) {
+        return createCollectionMetadata(uri, "");
+    }
+
+    /**
+     * @notice Creates a simple TokenMetadata with only URI
+     * @param uri The metadata URI
+     * @param tokenIds Array of token ID ranges
+     * @return metadata The constructed TokenMetadata
+     */
+    function createTokenMetadataFromURI(
+        string memory uri,
+        TokenizationTypes.UintRange[] memory tokenIds
+    ) internal pure returns (TokenizationTypes.TokenMetadata memory metadata) {
+        return createTokenMetadata(uri, "", tokenIds);
+    }
 }
 

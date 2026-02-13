@@ -26,27 +26,53 @@ This package implements a precompiled contract for the BitBadges tokenization mo
 
 ### In Solidity
 
+All precompile methods now use a JSON string parameter that matches the protobuf JSON format. Use the helper library to construct JSON strings:
+
 ```solidity
 import "./interfaces/ITokenizationPrecompile.sol";
+import "./libraries/TokenizationJSONHelpers.sol";
 
 ITokenizationPrecompile precompile = ITokenizationPrecompile(0x0000000000000000000000000000000000001001);
 
-// Transfer tokens
+// Transfer tokens using JSON helper
 address[] memory recipients = new address[](1);
 recipients[0] = recipient;
-UintRange[] memory tokenIds = new UintRange[](1);
-tokenIds[0] = UintRange({start: 1, end: 1});
-UintRange[] memory ownershipTimes = new UintRange[](1);
-ownershipTimes[0] = UintRange({start: 1, end: type(uint256).max});
 
-bool success = precompile.transferTokens(
+string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+
+string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
     collectionId,
     recipients,
     amount,
-    tokenIds,
-    ownershipTimes
+    tokenIdsJson,
+    ownershipTimesJson
 );
+
+bool success = precompile.transferTokens(transferJson);
 ```
+
+### Direct JSON Usage
+
+You can also construct JSON strings manually:
+
+```solidity
+// Simple query example
+string memory queryJson = string(abi.encodePacked(
+    '{"collectionId":"', uintToString(collectionId), '"}'
+));
+bytes memory collection = precompile.getCollection(queryJson);
+```
+
+### Helper Library
+
+The `TokenizationJSONHelpers` library provides convenient functions for common operations:
+- `transferTokensJSON()` - Construct transfer JSON
+- `getCollectionJSON()` - Construct collection query JSON
+- `getBalanceJSON()` - Construct balance query JSON
+- `getBalanceAmountJSON()` - Construct balance amount query JSON
+- `uintRangeArrayToJson()` - Convert UintRange arrays to JSON
+- `uintRangeToJson()` - Convert single UintRange to JSON
 
 ## ABI Notes
 

@@ -16,6 +16,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	gamm "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/precompile/test/helpers"
 )
 
 // ConcurrencyTestSuite provides tests for parallel execution safety
@@ -82,12 +83,19 @@ func (suite *ConcurrencyTestSuite) TestConcurrency_ParallelQueries() {
 					return
 				}
 
-				packed, err := method.Inputs.Pack(suite.PoolId)
+				// Build JSON query
+				queryJson, err := helpers.BuildGetPoolQueryJSON(suite.PoolId)
 				if err != nil {
 					errors <- err
 					continue
 				}
-				input := append(method.ID, packed...)
+
+				// Pack method with JSON string
+				input, err := helpers.PackMethodWithJSON(&method, queryJson)
+				if err != nil {
+					errors <- err
+					continue
+				}
 
 				// Verify method exists (this is safe for concurrent access)
 				gas := suite.Precompile.RequiredGas(input)

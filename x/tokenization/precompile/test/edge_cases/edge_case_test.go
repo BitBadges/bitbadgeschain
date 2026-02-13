@@ -7,12 +7,15 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/holiman/uint256"
 	"github.com/stretchr/testify/suite"
 
 	sdkmath "cosmossdk.io/math"
 
-	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
@@ -61,6 +64,19 @@ func (suite *EdgeCaseTestSuite) SetupTest() {
 
 	// Set up test collection
 	suite.CollectionId = suite.createTestCollection()
+}
+
+// CreateMockContract creates a mock EVM contract for testing
+func (suite *EdgeCaseTestSuite) CreateMockContract(caller common.Address, input []byte) *vm.Contract {
+	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
+	valueUint256, _ := uint256.FromBig(big.NewInt(0))
+	contract := vm.NewContract(caller, precompileAddr, valueUint256, 1000000, nil)
+	if len(input) > 0 {
+		// SetupABI reads from contract.Input, so we need to set it explicitly
+		contract.Input = input
+		contract.SetCallCode(common.Hash{}, input)
+	}
+	return contract
 }
 
 // createTestCollection creates a test collection with balances
@@ -376,8 +392,17 @@ func (suite *EdgeCaseTestSuite) TestEmptyResults() {
 
 	// Test query on non-existent collection (empty result)
 	suite.Run("non_existent_collection", func() {
-		args := []interface{}{big.NewInt(999999)}
-		result, err := suite.Precompile.GetCollection(suite.Ctx, &method, args)
+		// Build JSON query
+		queryJson, err := helpers.BuildGetCollectionQueryJSON(big.NewInt(999999))
+		suite.Require().NoError(err)
+
+		// Pack method with JSON string
+		input, err := helpers.PackMethodWithJSON(&method, queryJson)
+		suite.Require().NoError(err)
+
+		// Call precompile via Execute
+		contract := suite.CreateMockContract(suite.AliceEVM, input)
+		result, err := suite.Precompile.Execute(suite.Ctx, contract, false)
 		suite.Require().Error(err) // Should return error for non-existent collection
 		suite.Nil(result)
 	})
@@ -385,23 +410,29 @@ func (suite *EdgeCaseTestSuite) TestEmptyResults() {
 	// Test query with ranges that match no tokens
 	methodBalance := suite.Precompile.ABI.Methods["getBalanceAmount"]
 	suite.Run("ranges_matching_no_tokens", func() {
-		args := []interface{}{
-			suite.CollectionId.BigInt(),
-			suite.AliceEVM,
-			[]struct {
-				Start *big.Int `json:"start"`
-				End   *big.Int `json:"end"`
-			}{
-				{Start: big.NewInt(9999), End: big.NewInt(10000)}, // No tokens in this range
+		// Convert EVM address to Cosmos address
+		aliceCosmos := suite.Alice.String()
+
+		// Build JSON query
+		queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
+			"collectionId": suite.CollectionId.BigInt().String(),
+			"address":       aliceCosmos,
+			"tokenIds": []map[string]interface{}{
+				{"start": "9999", "end": "10000"}, // No tokens in this range
 			},
-			[]struct {
-				Start *big.Int `json:"start"`
-				End   *big.Int `json:"end"`
-			}{
-				{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)},
+			"ownershipTimes": []map[string]interface{}{
+				{"start": "1", "end": new(big.Int).SetUint64(math.MaxUint64).String()},
 			},
-		}
-		result, err := suite.Precompile.GetBalanceAmount(suite.Ctx, &methodBalance, args)
+		})
+		suite.Require().NoError(err)
+
+		// Pack method with JSON string
+		input, err := helpers.PackMethodWithJSON(&methodBalance, queryJson)
+		suite.Require().NoError(err)
+
+		// Call precompile via Execute
+		contract := suite.CreateMockContract(suite.AliceEVM, input)
+		result, err := suite.Precompile.Execute(suite.Ctx, contract, false)
 		// Should succeed but return 0
 		if err == nil {
 			unpacked, err := methodBalance.Outputs.Unpack(result)
@@ -430,8 +461,23 @@ func (suite *EdgeCaseTestSuite) TestConcurrentCalls() {
 			wg.Add(1)
 			go func(idx int) {
 				defer wg.Done()
-				args := []interface{}{collectionId}
-				_, err := suite.Precompile.GetCollection(suite.Ctx, &method, args)
+				// Build JSON query
+				queryJson, err := helpers.BuildGetCollectionQueryJSON(collectionId)
+				if err != nil {
+					errors[idx] = err
+					return
+				}
+
+				// Pack method with JSON string
+				input, err := helpers.PackMethodWithJSON(&method, queryJson)
+				if err != nil {
+					errors[idx] = err
+					return
+				}
+
+				// Call precompile via Execute
+				contract := suite.CreateMockContract(suite.AliceEVM, input)
+				_, err = suite.Precompile.Execute(suite.Ctx, contract, false)
 				errors[idx] = err
 			}(i)
 		}

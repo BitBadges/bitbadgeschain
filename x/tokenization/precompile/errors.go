@@ -205,6 +205,59 @@ func MapCosmosErrorToPrecompileError(err error) (ErrorCode, bool) {
 	return 0, false
 }
 
+// FieldPathBuilder helps build field paths for nested structures
+// Example: Field("defaultBalances").Field("balances").Index(0).Field("amount") -> "defaultBalances.balances[0].amount"
+type FieldPathBuilder struct {
+	path []string
+}
+
+// NewFieldPathBuilder creates a new FieldPathBuilder
+func NewFieldPathBuilder() *FieldPathBuilder {
+	return &FieldPathBuilder{path: make([]string, 0)}
+}
+
+// Field adds a field name to the path
+func (b *FieldPathBuilder) Field(name string) *FieldPathBuilder {
+	b.path = append(b.path, name)
+	return b
+}
+
+// Index adds an array index to the path
+func (b *FieldPathBuilder) Index(i int) *FieldPathBuilder {
+	b.path = append(b.path, fmt.Sprintf("[%d]", i))
+	return b
+}
+
+// Key adds a map key to the path
+func (b *FieldPathBuilder) Key(key string) *FieldPathBuilder {
+	b.path = append(b.path, fmt.Sprintf("[%q]", key))
+	return b
+}
+
+// String returns the complete field path as a string
+func (b *FieldPathBuilder) String() string {
+	if len(b.path) == 0 {
+		return ""
+	}
+	result := b.path[0]
+	for i := 1; i < len(b.path); i++ {
+		// If the current segment starts with '[', it's an index/key, so don't add a dot
+		if len(b.path[i]) > 0 && b.path[i][0] == '[' {
+			result += b.path[i]
+		} else {
+			result += "." + b.path[i]
+		}
+	}
+	return result
+}
+
+// Clone creates a copy of the FieldPathBuilder
+func (b *FieldPathBuilder) Clone() *FieldPathBuilder {
+	newPath := make([]string, len(b.path))
+	copy(newPath, b.path)
+	return &FieldPathBuilder{path: newPath}
+}
+
 // WrapError wraps a standard error into a PrecompileError with appropriate code
 // It first attempts to map Cosmos SDK errors to specific error codes
 // If no mapping is found, it uses the provided default code
@@ -212,6 +265,25 @@ func WrapError(err error, defaultCode ErrorCode, message string) *PrecompileErro
 	details := ""
 	if err != nil {
 		details = err.Error()
+	}
+
+	// Try to map Cosmos SDK error to precompile error code
+	if mappedCode, found := MapCosmosErrorToPrecompileError(err); found {
+		return NewPrecompileError(mappedCode, message, details)
+	}
+
+	// Fall back to provided default code
+	return NewPrecompileError(defaultCode, message, details)
+}
+
+// WrapErrorWithContext wraps an error with additional context about where it occurred
+func WrapErrorWithContext(err error, defaultCode ErrorCode, message string, context string) *PrecompileError {
+	details := ""
+	if err != nil {
+		details = err.Error()
+	}
+	if context != "" {
+		details = fmt.Sprintf("[%s] %s", context, details)
 	}
 
 	// Try to map Cosmos SDK error to precompile error code
@@ -260,3 +332,35 @@ func ErrCollectionArchived(collectionId string) *PrecompileError {
 	return NewPrecompileError(ErrorCodeCollectionArchived, "collection is archived (read-only)", fmt.Sprintf("collectionId: %s", collectionId))
 }
 
+// Enhanced error helpers with field path support
+
+// ErrInvalidField creates an error with field path
+func ErrInvalidField(fieldPath string, reason string, expected string) *PrecompileError {
+	details := fmt.Sprintf("field '%s': %s", fieldPath, reason)
+	if expected != "" {
+		details += fmt.Sprintf(" (expected: %s)", expected)
+	}
+	return NewPrecompileError(ErrorCodeInvalidInput, "invalid input parameters", details)
+}
+
+// ErrInvalidFieldValue creates an error for invalid field values
+func ErrInvalidFieldValue(fieldPath string, value interface{}, reason string) *PrecompileError {
+	details := fmt.Sprintf("field '%s': invalid value '%v' - %s", fieldPath, value, reason)
+	return NewPrecompileError(ErrorCodeInvalidInput, "invalid input parameters", details)
+}
+
+// ErrMissingRequiredField creates an error for missing required fields
+func ErrMissingRequiredField(fieldPath string) *PrecompileError {
+	details := fmt.Sprintf("field '%s': required field is missing or empty", fieldPath)
+	return NewPrecompileError(ErrorCodeInvalidInput, "invalid input parameters", details)
+}
+
+// ErrFieldTypeMismatch creates an error for type mismatches
+func ErrFieldTypeMismatch(fieldPath string, got interface{}, expected string) *PrecompileError {
+	gotType := "unknown"
+	if got != nil {
+		gotType = fmt.Sprintf("%T", got)
+	}
+	details := fmt.Sprintf("field '%s': type mismatch - got %s, expected %s", fieldPath, gotType, expected)
+	return NewPrecompileError(ErrorCodeInvalidInput, "invalid input parameters", details)
+}

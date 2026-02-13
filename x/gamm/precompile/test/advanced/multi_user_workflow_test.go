@@ -13,6 +13,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	gamm "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/precompile/test/helpers"
 )
 
 // MultiUserWorkflowTestSuite provides tests for multi-user workflow scenarios
@@ -105,10 +106,11 @@ func (suite *MultiUserWorkflowTestSuite) TestMultiUser_SequentialPoolOperations(
 	sharesBefore1 := pool1Before.GetTotalShares()
 
 	// Verify Alice can query pool 1
-	method := suite.Precompile.ABI.Methods["getPool"]
-	packed, err := method.Inputs.Pack(suite.PoolId1)
+	queryJson1, err := helpers.BuildGetPoolQueryJSON(suite.PoolId1)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+	method := suite.Precompile.ABI.Methods["getPool"]
+	input, err := helpers.PackMethodWithJSON(&method, queryJson1)
+	suite.Require().NoError(err)
 
 	// Verify method exists and is accessible
 	suite.NotNil(method)
@@ -120,9 +122,10 @@ func (suite *MultiUserWorkflowTestSuite) TestMultiUser_SequentialPoolOperations(
 	sharesBefore2 := pool2Before.GetTotalShares()
 
 	// Verify Bob can query pool 2
-	packed, err = method.Inputs.Pack(suite.PoolId2)
+	queryJson2, err := helpers.BuildGetPoolQueryJSON(suite.PoolId2)
 	suite.Require().NoError(err)
-	input = append(method.ID, packed...)
+	input, err = helpers.PackMethodWithJSON(&method, queryJson2)
+	suite.Require().NoError(err)
 	suite.NotNil(method)
 
 	// Step 3: Charlie queries both pools
@@ -144,23 +147,22 @@ func (suite *MultiUserWorkflowTestSuite) TestMultiUser_SequentialPoolOperations(
 func (suite *MultiUserWorkflowTestSuite) TestMultiUser_ConcurrentQueries() {
 	// All users query the same pool concurrently
 	method := suite.Precompile.ABI.Methods["getPool"]
+	queryJson, err := helpers.BuildGetPoolQueryJSON(suite.PoolId1)
+	suite.Require().NoError(err)
 
 	// Alice queries pool 1
-	packed1, err := method.Inputs.Pack(suite.PoolId1)
+	input1, err := helpers.PackMethodWithJSON(&method, queryJson)
 	suite.Require().NoError(err)
-	input1 := append(method.ID, packed1...)
 	suite.NotNil(input1)
 
 	// Bob queries pool 1
-	packed2, err := method.Inputs.Pack(suite.PoolId1)
+	input2, err := helpers.PackMethodWithJSON(&method, queryJson)
 	suite.Require().NoError(err)
-	input2 := append(method.ID, packed2...)
 	suite.NotNil(input2)
 
 	// Charlie queries pool 1
-	packed3, err := method.Inputs.Pack(suite.PoolId1)
+	input3, err := helpers.PackMethodWithJSON(&method, queryJson)
 	suite.Require().NoError(err)
-	input3 := append(method.ID, packed3...)
 	suite.NotNil(input3)
 
 	// All queries should be valid

@@ -2,9 +2,21 @@
 
 These example contracts demonstrate how to build compliant security tokens using the BitBadges tokenization precompile. Each example follows the ERC-3643 standard while leveraging BitBadges' native features for enhanced functionality.
 
+## Documentation
+
+For comprehensive documentation, see the [docs](../docs/) directory:
+
+- **[Getting Started](../docs/GETTING_STARTED.md)** - Quick start guide and basic examples
+- **[API Reference](../docs/API_REFERENCE.md)** - Complete API documentation
+- **[Common Patterns](../docs/PATTERNS.md)** - Common patterns and use cases
+- **[Extended Examples](../docs/EXAMPLES.md)** - More detailed examples
+- **[Troubleshooting](../docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Best Practices](../docs/BEST_PRACTICES.md)** - Security and optimization tips
+- **[Gas Optimization](../docs/GAS_OPTIMIZATION.md)** - Gas optimization strategies
+
 ## Overview
 
-The Tokenization precompile is available at address `0x0000000000000000000000000000000000000808` and provides:
+The Tokenization precompile is available at address `0x0000000000000000000000000000000000001001` and provides:
 
 - **Collections**: Token issuance and management
 - **Dynamic Stores**: On-chain boolean registries (perfect for KYC/compliance)
@@ -26,15 +38,30 @@ The Tokenization precompile is available at address `0x0000000000000000000000000
 
 **Tokenization Features Used**:
 ```solidity
+import "./libraries/TokenizationJSONHelpers.sol";
+
 // Issue time-limited 2FA token
-UintRange[] memory ownershipTimes = new UintRange[](1);
-ownershipTimes[0] = UintRange(block.timestamp, block.timestamp + 24 hours);
-TOKENIZATION.transferTokens(twoFactorCollectionId, [user], 1, tokenIds, ownershipTimes);
+string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+    block.timestamp, 
+    block.timestamp + 24 hours
+);
+address[] memory recipients = new address[](1);
+recipients[0] = user;
+string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+    twoFactorCollectionId, recipients, 1, tokenIdsJson, ownershipTimesJson
+);
+TOKENIZATION.transferTokens(transferJson);
 
 // Check 2FA ownership at CURRENT TIME
-UintRange[] memory checkTime = new UintRange[](1);
-checkTime[0] = UintRange(block.timestamp, block.timestamp);
-uint256 balance = TOKENIZATION.getBalanceAmount(twoFactorCollectionId, user, tokenIds, checkTime);
+string memory checkTimeJson = TokenizationJSONHelpers.uintRangeToJson(
+    block.timestamp, 
+    block.timestamp
+);
+string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
+    twoFactorCollectionId, user, tokenIdsJson, checkTimeJson
+);
+uint256 balance = TOKENIZATION.getBalanceAmount(balanceJson);
 bool hasValid2FA = balance > 0;
 ```
 
@@ -58,15 +85,30 @@ bool hasValid2FA = balance > 0;
 
 **Tokenization Features Used**:
 ```solidity
+import "./libraries/TokenizationJSONHelpers.sol";
+
 // KYC verification using Dynamic Stores
-kycRegistryId = TOKENIZATION.createDynamicStore(false, "ipfs://...", "...");
-TOKENIZATION.setDynamicStoreValue(kycRegistryId, investor, true);
+string memory createStoreJson = TokenizationJSONHelpers.createDynamicStoreJSON(
+    false, "ipfs://...", "..."
+);
+kycRegistryId = TOKENIZATION.createDynamicStore(createStoreJson);
+
+string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+    kycRegistryId, investor, true
+);
+TOKENIZATION.setDynamicStoreValue(setValueJson);
 
 // Token transfers with compliance checks
-TOKENIZATION.transferTokens(collectionId, recipients, amount, tokenIds, ownershipTimes);
+string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+    collectionId, recipients, amount, tokenIdsJson, ownershipTimesJson
+);
+TOKENIZATION.transferTokens(transferJson);
 
 // Balance queries
-TOKENIZATION.getBalanceAmount(collectionId, account, tokenIds, ownershipTimes);
+string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
+    collectionId, account, tokenIdsJson, ownershipTimesJson
+);
+TOKENIZATION.getBalanceAmount(balanceJson);
 ```
 
 ### 3. CarbonCreditToken.sol
@@ -81,14 +123,25 @@ TOKENIZATION.getBalanceAmount(collectionId, account, tokenIds, ownershipTimes);
 
 **Tokenization Features Used**:
 ```solidity
+import "./libraries/TokenizationJSONHelpers.sol";
+
 // Vintage years as token IDs
-validTokenIds = UintRange(2020, 2100);
+string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(2020, 2100);
 
 // Expiring ownership
-ownershipTimes = UintRange(block.timestamp, vintages[vintage].expirationTime);
+string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+    block.timestamp, 
+    vintages[vintage].expirationTime
+);
 
 // Retirement via transfer to sink
-TOKENIZATION.transferTokens(collectionId, [RETIREMENT_SINK], amount, tokenIds, ownershipTimes);
+address[] memory sinkRecipients = new address[](1);
+sinkRecipients[0] = RETIREMENT_SINK;
+string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
+string memory retireJson = TokenizationJSONHelpers.transferTokensJSON(
+    collectionId, sinkRecipients, amount, tokenIdsJson, ownershipTimesJson
+);
+TOKENIZATION.transferTokens(retireJson);
 ```
 
 ### 4. PrivateEquityToken.sol
@@ -104,13 +157,21 @@ TOKENIZATION.transferTokens(collectionId, [RETIREMENT_SINK], amount, tokenIds, o
 
 **Tokenization Features Used**:
 ```solidity
+import "./libraries/TokenizationJSONHelpers.sol";
+
 // Lock-up via Dynamic Store
-lockUpRegistryId = TOKENIZATION.createDynamicStore(true, "...", "..."); // Default: locked
+string memory createStoreJson = TokenizationJSONHelpers.createDynamicStoreJSON(
+    true, "...", "..."  // Default: locked
+);
+lockUpRegistryId = TOKENIZATION.createDynamicStore(createStoreJson);
 
 // Ownership time aligned with fund lifecycle
-ownershipTimes = UintRange(block.timestamp, fundTermination);
+string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+    block.timestamp, 
+    fundTermination
+);
 
-// No auto-approval for controlled transfers
+// No auto-approval for controlled transfers (set in createCollection JSON)
 defaultBalances.autoApproveSelfInitiatedOutgoingTransfers = false;
 ```
 
@@ -136,27 +197,52 @@ defaultBalances.autoApproveSelfInitiatedOutgoingTransfers = false;
 
 ### Compliance Check Before Transfer
 ```solidity
+import "./libraries/TokenizationJSONHelpers.sol";
+
 function transfer(address to, uint256 amount) external returns (bool) {
     require(canTransfer(msg.sender, to, amount), "Transfer not compliant");
-    return TOKENIZATION.transferTokens(collectionId, ...);
+    
+    address[] memory recipients = new address[](1);
+    recipients[0] = to;
+    string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+    string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+    string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+        collectionId, recipients, amount, tokenIdsJson, ownershipTimesJson
+    );
+    return TOKENIZATION.transferTokens(transferJson);
 }
 ```
 
 ### Dynamic Store for Boolean Registry
 ```solidity
+import "./libraries/TokenizationJSONHelpers.sol";
+
 // Create
-uint256 registryId = TOKENIZATION.createDynamicStore(defaultValue, uri, customData);
+string memory createJson = TokenizationJSONHelpers.createDynamicStoreJSON(
+    defaultValue, uri, customData
+);
+uint256 registryId = TOKENIZATION.createDynamicStore(createJson);
 
 // Set value
-TOKENIZATION.setDynamicStoreValue(registryId, address, true/false);
+string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+    registryId, address, true
+);
+TOKENIZATION.setDynamicStoreValue(setValueJson);
 
 // Read value
-bytes memory result = TOKENIZATION.getDynamicStoreValue(registryId, address);
+string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+    registryId, address
+);
+bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
 bool value = abi.decode(result, (bool));
 ```
 
 ### Time-Bound Ownership
 ```solidity
-UintRange[] memory ownershipTimes = new UintRange[](1);
-ownershipTimes[0] = UintRange(startTime, expirationTime);
+import "./libraries/TokenizationJSONHelpers.sol";
+
+string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+    startTime, 
+    expirationTime
+);
 ```

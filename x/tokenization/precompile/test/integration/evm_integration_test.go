@@ -10,6 +10,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -170,13 +171,13 @@ func (suite *EVMIntegrationTestSuite) TestPrecompileExecuteDirectly() {
 	method := suite.Precompile.ABI.Methods["getCollection"]
 	suite.Require().NotNil(method)
 
-	// Pack arguments
-	args := []interface{}{suite.CollectionId.BigInt()}
-	packed, err := method.Inputs.Pack(args...)
+	// Build JSON query
+	queryJson, err := helpers.BuildGetCollectionQueryJSON(suite.CollectionId.BigInt())
 	suite.Require().NoError(err)
 
-	// Create input with method ID
-	input := append(method.ID, packed...)
+	// Pack method with JSON string
+	input, err := helpers.PackMethodWithJSON(&method, queryJson)
+	suite.Require().NoError(err)
 
 	// Note: Full EVM integration would require:
 	// 1. Setting up app with EVM keeper

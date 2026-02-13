@@ -9,7 +9,7 @@ import (
 // Metrics tracks usage statistics for the precompile
 type Metrics struct {
 	// Transaction counts
-	TransferCount      uint64
+	TransferCount         uint64
 	IncomingApprovalCount uint64
 	OutgoingApprovalCount uint64
 
@@ -71,20 +71,27 @@ func GetMetrics(ctx sdk.Context) *Metrics {
 // LogPrecompileUsage logs precompile usage for monitoring
 func LogPrecompileUsage(ctx sdk.Context, method string, success bool, gasUsed uint64, err error) {
 	logger := ctx.Logger()
-	
+
 	if err != nil {
+		errMsg := err.Error()
+
 		// Extract error code if it's a PrecompileError
 		if precompileErr, ok := err.(*PrecompileError); ok {
-			logger.Error("precompile error",
+			logFields := []interface{}{
 				"method", method,
 				"error_code", precompileErr.Code,
 				"error_message", precompileErr.Message,
 				"gas_used", gasUsed,
-			)
+			}
+			// Include details if present (contains field path information)
+			if precompileErr.Details != "" {
+				logFields = append(logFields, "error_details", precompileErr.Details)
+			}
+			logger.Error("precompile error", logFields...)
 		} else {
 			logger.Error("precompile error",
 				"method", method,
-				"error", err.Error(),
+				"error", errMsg,
 				"gas_used", gasUsed,
 			)
 		}
@@ -108,4 +115,3 @@ func EmitMetricsEvent(ctx sdk.Context, method string, success bool, gasUsed uint
 		),
 	)
 }
-

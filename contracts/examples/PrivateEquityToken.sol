@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
+import "../libraries/TokenizationJSONHelpers.sol";
 
 /**
  * @title PrivateEquityToken
@@ -14,7 +15,7 @@ import "../interfaces/ITokenizationPrecompile.sol";
  * - Dividend distribution tracking
  */
 contract PrivateEquityToken {
-    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000000808);
+    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000001001);
 
     // ============ State Variables ============
 
@@ -140,29 +141,33 @@ contract PrivateEquityToken {
         _tokenIds[0] = UintRange(1, 1);
 
         // Create compliance registries
-        qualifiedPurchaserRegistryId = TOKENIZATION.createDynamicStore(
+        string memory qpJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://qp-registry",
             "{\"type\":\"qualified-purchaser\",\"threshold\":5000000}"
         );
+        qualifiedPurchaserRegistryId = TOKENIZATION.createDynamicStore(qpJson);
 
-        accreditedInvestorRegistryId = TOKENIZATION.createDynamicStore(
+        string memory accreditedJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://accredited-registry",
             "{\"type\":\"accredited-investor\"}"
         );
+        accreditedInvestorRegistryId = TOKENIZATION.createDynamicStore(accreditedJson);
 
-        blacklistRegistryId = TOKENIZATION.createDynamicStore(
+        string memory blacklistJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://blacklist-registry",
             "{\"type\":\"prohibited-persons\"}"
         );
+        blacklistRegistryId = TOKENIZATION.createDynamicStore(blacklistJson);
 
-        lockUpRegistryId = TOKENIZATION.createDynamicStore(
+        string memory lockupJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             true,  // Default: in lock-up
             "ipfs://lockup-registry",
             "{\"type\":\"lock-up-status\"}"
         );
+        lockUpRegistryId = TOKENIZATION.createDynamicStore(lockupJson);
     }
 
     /**
@@ -171,43 +176,51 @@ contract PrivateEquityToken {
     function initializeCollection() external onlyGP {
         require(collectionId == 0, "Already initialized");
 
-        // Ownership times based on fund lifecycle
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, fundTermination);
-
-        TokenizationTypes.Balance[] memory initialBalances = new TokenizationTypes.Balance[](1);
-        initialBalances[0] = TokenizationTypes.Balance({
-            amount: fundSize / 1000,  // 1 token = $1000 of commitment
-            ownershipTimes: ownershipTimes,
-            tokenIds: _tokenIds
-        });
-
-        TokenizationTypes.UserBalanceStore memory defaultBalances;
-        defaultBalances.balances = initialBalances;
-        // Require explicit approvals for all transfers
-        defaultBalances.autoApproveSelfInitiatedOutgoingTransfers = false;
-        defaultBalances.autoApproveSelfInitiatedIncomingTransfers = false;
-
-        TokenizationTypes.MsgCreateCollection memory createMsg;
-        createMsg.defaultBalances = defaultBalances;
-        createMsg.validTokenIds = _tokenIds;
-        createMsg.manager = _addressToString(address(this));
-        createMsg.collectionMetadata = TokenizationTypes.CollectionMetadata({
-            uri: "ipfs://pe-fund-metadata",
-            customData: string(abi.encodePacked(
+        // Build initial balance JSON (for minting initial tokens to creator)
+        uint256 initialAmount = fundSize / 1000;  // 1 token = $1000 of commitment
+        string memory balanceJson = string(abi.encodePacked(
+            '[{"amount":"', TokenizationJSONHelpers.uintToString(initialAmount),
+            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(block.timestamp, fundTermination),
+            ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
+        ));
+        
+        // Build defaultBalances JSON with initial balances (no auto-approval)
+        string memory defaultBalancesJson = string(abi.encodePacked(
+            '{"balances":', balanceJson,
+            ',"autoApproveSelfInitiatedOutgoingTransfers":false',
+            ',"autoApproveSelfInitiatedIncomingTransfers":false',
+            ',"autoApproveAllIncomingTransfers":false',
+            ',"outgoingApprovals":[],"incomingApprovals":[],"userPermissions":{}}'
+        ));
+        
+        string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory collectionMetadataJson = TokenizationJSONHelpers.collectionMetadataToJson(
+            "ipfs://pe-fund-metadata",
+            string(abi.encodePacked(
                 "{\"name\":\"", name,
                 "\",\"fundType\":\"", fundType,
                 "\",\"compliance\":\"ERC-3643\",\"reg\":\"Reg D 506(c)\"}"
             ))
-        });
-
+        );
+        
         string[] memory standards = new string[](3);
         standards[0] = "ERC-3643";
         standards[1] = "Private Equity";
         standards[2] = "Reg D 506(c)";
-        createMsg.standards = standards;
-
-        collectionId = TOKENIZATION.createCollection(createMsg);
+        string memory standardsJson = TokenizationJSONHelpers.stringArrayToJson(standards);
+        
+        string memory createJson = TokenizationJSONHelpers.createCollectionJSON(
+            validTokenIdsJson,
+            _addressToString(address(this)),
+            collectionMetadataJson,
+            defaultBalancesJson,
+            "{}",
+            standardsJson,
+            "",
+            false
+        );
+        
+        collectionId = TOKENIZATION.createCollection(createJson);
     }
 
     // ============ Investor Onboarding ============
@@ -249,7 +262,12 @@ contract PrivateEquityToken {
         investorList.push(investor);
 
         // Mark as in lock-up
-        TOKENIZATION.setDynamicStoreValue(lockUpRegistryId, investor, true);
+        string memory setLockupJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            lockUpRegistryId,
+            investor,
+            true
+        );
+        TOKENIZATION.setDynamicStoreValue(setLockupJson);
 
         emit InvestorOnboarded(investor, commitmentAmount, investorClass);
     }
@@ -274,13 +292,23 @@ contract PrivateEquityToken {
         // Issue tokens proportional to paid-in capital
         uint256 tokensToIssue = amount / 1000;  // 1 token = $1000
 
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, fundTermination);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp,
+            fundTermination
+        );
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
 
         address[] memory recipients = new address[](1);
         recipients[0] = investor;
 
-        TOKENIZATION.transferTokens(collectionId, recipients, tokensToIssue, _tokenIds, ownershipTimes);
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            collectionId,
+            recipients,
+            tokensToIssue,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        TOKENIZATION.transferTokens(transferJson);
     }
 
     // ============ Transfer Functions with Approval Workflow ============
@@ -308,10 +336,10 @@ contract PrivateEquityToken {
         // Check ownership limits for recipient
         uint256 recipientBalance = this.balanceOf(to);
         uint256 totalAfterTransfer = recipientBalance + amount;
-        uint256 totalSupply = this.totalSupply();
+        uint256 currentTotalSupply = this.totalSupply();
 
-        if (totalSupply > 0) {
-            uint256 newOwnershipBps = (totalAfterTransfer * 10000) / totalSupply;
+        if (currentTotalSupply > 0) {
+            uint256 newOwnershipBps = (totalAfterTransfer * 10000) / currentTotalSupply;
             if (newOwnershipBps > maxOwnershipBps) {
                 return (false, "Would exceed ownership limit");
             }
@@ -331,13 +359,23 @@ contract PrivateEquityToken {
         (bool eligible, string memory reason) = canTransfer(msg.sender, to, amount);
         require(eligible, reason);
 
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, fundTermination);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp,
+            fundTermination
+        );
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
 
         address[] memory recipients = new address[](1);
         recipients[0] = to;
 
-        bool success = TOKENIZATION.transferTokens(collectionId, recipients, amount, _tokenIds, ownershipTimes);
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            collectionId,
+            recipients,
+            amount,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        bool success = TOKENIZATION.transferTokens(transferJson);
 
         if (success) {
             // Update investor records
@@ -350,7 +388,12 @@ contract PrivateEquityToken {
                     investorClass: "Secondary"
                 });
                 investorList.push(to);
-                TOKENIZATION.setDynamicStoreValue(lockUpRegistryId, to, true);
+                string memory setLockupJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+                    lockUpRegistryId,
+                    to,
+                    true
+                );
+                TOKENIZATION.setDynamicStoreValue(setLockupJson);
             }
 
             emit TransferExecuted(msg.sender, to, amount);
@@ -367,7 +410,12 @@ contract PrivateEquityToken {
         require(investors[investor].isLP, "Not an LP");
         require(block.timestamp >= investors[investor].lockUpEnd, "Lock-up not expired");
 
-        TOKENIZATION.setDynamicStoreValue(lockUpRegistryId, investor, false);
+        string memory setLockupJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            lockUpRegistryId,
+            investor,
+            false
+        );
+        TOKENIZATION.setDynamicStoreValue(setLockupJson);
     }
 
     /**
@@ -377,7 +425,12 @@ contract PrivateEquityToken {
         require(newLockUpEnd > investors[investor].lockUpEnd, "Must extend");
 
         investors[investor].lockUpEnd = newLockUpEnd;
-        TOKENIZATION.setDynamicStoreValue(lockUpRegistryId, investor, true);
+        string memory setLockupJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            lockUpRegistryId,
+            investor,
+            true
+        );
+        TOKENIZATION.setDynamicStoreValue(setLockupJson);
 
         emit LockUpExtended(investor, newLockUpEnd);
     }
@@ -389,7 +442,11 @@ contract PrivateEquityToken {
         // Check both time-based and manual lock-up
         if (block.timestamp < investors[investor].lockUpEnd) return true;
 
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(lockUpRegistryId, investor);
+        string memory getLockupJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            lockUpRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getLockupJson);
         if (result.length == 0) return true;  // Default: locked
         return abi.decode(result, (bool));
     }
@@ -397,31 +454,58 @@ contract PrivateEquityToken {
     // ============ Compliance Registry Functions ============
 
     function setQualifiedPurchaser(address investor, bool status) external onlyAdmin {
-        TOKENIZATION.setDynamicStoreValue(qualifiedPurchaserRegistryId, investor, status);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            qualifiedPurchaserRegistryId,
+            investor,
+            status
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
     }
 
     function setAccreditedInvestor(address investor, bool status) external onlyAdmin {
-        TOKENIZATION.setDynamicStoreValue(accreditedInvestorRegistryId, investor, status);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            accreditedInvestorRegistryId,
+            investor,
+            status
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
     }
 
     function setBlacklisted(address investor, bool status) external onlyAdmin {
-        TOKENIZATION.setDynamicStoreValue(blacklistRegistryId, investor, status);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            blacklistRegistryId,
+            investor,
+            status
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
     }
 
     function isQualifiedPurchaser(address investor) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(qualifiedPurchaserRegistryId, investor);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            qualifiedPurchaserRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
 
     function isAccreditedInvestor(address investor) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(accreditedInvestorRegistryId, investor);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            accreditedInvestorRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
 
     function isBlacklisted(address investor) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(blacklistRegistryId, investor);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            blacklistRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -429,15 +513,28 @@ contract PrivateEquityToken {
     // ============ View Functions ============
 
     function balanceOf(address account) external view returns (uint256) {
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(1, type(uint256).max);
-        return TOKENIZATION.getBalanceAmount(collectionId, account, _tokenIds, ownershipTimes);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
+            collectionId,
+            account,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        return TOKENIZATION.getBalanceAmount(balanceJson);
     }
 
     function totalSupply() external view returns (uint256) {
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(1, type(uint256).max);
-        return TOKENIZATION.getTotalSupply(collectionId, _tokenIds, ownershipTimes);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
+            collectionId,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        return TOKENIZATION.getTotalSupply(supplyJson);
     }
 
     function getInvestorInfo(address investor) external view returns (

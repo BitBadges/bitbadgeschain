@@ -132,6 +132,9 @@ func TestGlobalKillSwitch_BlocksApprovalsWhenDisabled(t *testing.T) {
 	// Create a collection with an approval that uses this dynamic store
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",
@@ -210,6 +213,9 @@ func TestGlobalKillSwitch_AllowsApprovalsWhenEnabled(t *testing.T) {
 	// Create a collection with an approval that uses this dynamic store
 	collection := &types.TokenCollection{
 		CollectionId: sdkmath.NewUint(1),
+		ValidTokenIds: []*types.UintRange{
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
+		},
 		CollectionApprovals: []*types.CollectionApproval{
 			{
 				ApprovalId: "1",

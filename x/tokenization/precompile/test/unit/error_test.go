@@ -1,6 +1,7 @@
 package tokenization_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"testing"
@@ -12,7 +13,10 @@ import (
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // TestPrecompile_ErrorScenarios tests various error conditions
@@ -20,30 +24,32 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 	tokenizationKeeper, _ := keepertest.TokenizationKeeper(t)
 	precompile := tokenization.NewPrecompile(tokenizationKeeper)
 
+	// Test address for building JSON
+	testAddr := common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
+	testAddrCosmos := sdk.AccAddress(testAddr.Bytes()).String()
+
 	tests := []struct {
 		name        string
 		method      string
-		setup       func() []interface{}
+		setup       func() string // Returns JSON string
 		expectError bool
 		errorCode   tokenization.ErrorCode
 	}{
 		{
 			name:   "invalid_collection_id_negative",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
-				return []interface{}{
-					big.NewInt(-1), // Negative collection ID
-					[]common.Address{common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")},
-					big.NewInt(1),
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+			setup: func() string {
+				// Negative collection ID - JSON will accept it as string, but validation should catch it
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "-1", // Negative (will be caught in validation)
+					"toAddresses":    []string{testAddrCosmos},
+					"amount":         "1",
+					"tokenIds":       []map[string]interface{}{{"start": "1", "end": "1"}},
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -51,20 +57,17 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 		{
 			name:   "zero_address_recipient",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
-				return []interface{}{
-					big.NewInt(1),
-					[]common.Address{{}}, // Zero address
-					big.NewInt(1),
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+			setup: func() string {
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "1",
+					"toAddresses":    []string{""}, // Zero address (empty string)
+					"amount":         "1",
+					"tokenIds":       []map[string]interface{}{{"start": "1", "end": "1"}},
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -72,20 +75,17 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 		{
 			name:   "empty_recipients",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
-				return []interface{}{
-					big.NewInt(1),
-					[]common.Address{}, // Empty array
-					big.NewInt(1),
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+			setup: func() string {
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "1",
+					"toAddresses":    []string{}, // Empty array
+					"amount":         "1",
+					"tokenIds":       []map[string]interface{}{{"start": "1", "end": "1"}},
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -93,20 +93,17 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 		{
 			name:   "zero_amount",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
-				return []interface{}{
-					big.NewInt(1),
-					[]common.Address{common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")},
-					big.NewInt(0), // Zero amount
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+			setup: func() string {
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "1",
+					"toAddresses":    []string{testAddrCosmos},
+					"amount":         "0", // Zero amount
+					"tokenIds":       []map[string]interface{}{{"start": "1", "end": "1"}},
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -114,20 +111,17 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 		{
 			name:   "invalid_range_start_greater_than_end",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
-				return []interface{}{
-					big.NewInt(1),
-					[]common.Address{common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")},
-					big.NewInt(1),
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(10), End: big.NewInt(5)}}, // Invalid: start > end
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+			setup: func() string {
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "1",
+					"toAddresses":    []string{testAddrCosmos},
+					"amount":         "1",
+					"tokenIds":       []map[string]interface{}{{"start": "10", "end": "5"}}, // Invalid: start > end
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -135,20 +129,17 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 		{
 			name:   "empty_token_ids",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
-				return []interface{}{
-					big.NewInt(1),
-					[]common.Address{common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")},
-					big.NewInt(1),
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{}, // Empty array
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+			setup: func() string {
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "1",
+					"toAddresses":    []string{testAddrCosmos},
+					"amount":         "1",
+					"tokenIds":       []map[string]interface{}{}, // Empty array
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -156,25 +147,23 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 		{
 			name:   "too_many_recipients",
 			method: tokenization.TransferTokensMethod,
-			setup: func() []interface{} {
+			setup: func() string {
 				// Create array with more than MaxRecipients
-				addresses := make([]common.Address, tokenization.MaxRecipients+1)
+				addresses := make([]string, tokenization.MaxRecipients+1)
 				for i := range addresses {
-					addresses[i] = common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
+					addr := common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")
+					addresses[i] = sdk.AccAddress(addr.Bytes()).String()
 				}
-				return []interface{}{
-					big.NewInt(1),
-					addresses,
-					big.NewInt(1),
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(1)}},
-					[]struct {
-						Start *big.Int `json:"start"`
-						End   *big.Int `json:"end"`
-					}{{Start: big.NewInt(1), End: big.NewInt(100)}},
+				msg := map[string]interface{}{
+					"creator":        testAddrCosmos,
+					"collectionId":   "1",
+					"toAddresses":    addresses,
+					"amount":         "1",
+					"tokenIds":       []map[string]interface{}{{"start": "1", "end": "1"}},
+					"ownershipTimes": []map[string]interface{}{{"start": "1", "end": "100"}},
 				}
+				jsonBytes, _ := json.Marshal(msg)
+				return string(jsonBytes)
 			},
 			expectError: true,
 			errorCode:   tokenization.ErrorCodeInvalidInput,
@@ -183,17 +172,19 @@ func TestPrecompile_ErrorScenarios(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			args := tt.setup()
+			jsonStr := tt.setup()
 			method := precompile.ABI.Methods[tt.method]
-			packed, err := method.Inputs.Pack(args...)
 
-			// For negative values, ABI packing will fail before validation
+			// Pack method with JSON string
+			packed, err := helpers.PackMethodWithJSON(&method, jsonStr)
+
+			// For negative values, JSON will be valid but validation should catch it
 			if tt.name == "invalid_collection_id_negative" {
-				require.Error(t, err, "Packing negative value into uint should fail")
-				return
+				// JSON packing should succeed, but execution will fail
+				require.NoError(t, err, "Packing JSON should succeed")
+			} else {
+				require.NoError(t, err, "Packing should succeed")
 			}
-
-			require.NoError(t, err, "Packing should succeed")
 
 			input := append(method.ID, packed...)
 
@@ -404,87 +395,87 @@ func TestWrapErrorWithMapping(t *testing.T) {
 // TestErrorSanitization tests that error sanitization removes sensitive information
 func TestErrorSanitization(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    string
-		expected string // What should NOT appear in output
+		name        string
+		input       string
+		expected    string // What should NOT appear in output
 		mustContain string // What should appear in output
 	}{
 		{
-			name:     "removes_unix_paths",
-			input:    "error at /home/user/file.go:123",
-			expected: "/home/",
+			name:        "removes_unix_paths",
+			input:       "error at /home/user/file.go:123",
+			expected:    "/home/",
 			mustContain: "[path]/",
 		},
 		{
-			name:     "removes_windows_paths",
-			input:    "error at C:\\Users\\file.go:123",
-			expected: "C:\\",
+			name:        "removes_windows_paths",
+			input:       "error at C:\\Users\\file.go:123",
+			expected:    "C:\\",
 			mustContain: "[path]\\",
 		},
 		{
-			name:     "removes_go_file_references",
-			input:    "error in handlers.go:456",
-			expected: ".go:",
+			name:        "removes_go_file_references",
+			input:       "error in handlers.go:456",
+			expected:    ".go:",
 			mustContain: "[file]:",
 		},
 		{
-			name:     "removes_goroutine_info",
-			input:    "goroutine 1 [running]:",
-			expected: "goroutine ",
+			name:        "removes_goroutine_info",
+			input:       "goroutine 1 [running]:",
+			expected:    "goroutine ",
 			mustContain: "[goroutine] ",
 		},
 		{
-			name:     "removes_panic_info",
-			input:    "panic: runtime error",
-			expected: "panic:",
+			name:        "removes_panic_info",
+			input:       "panic: runtime error",
+			expected:    "panic:",
 			mustContain: "[panic]:",
 		},
 		{
-			name:     "removes_runtime_info",
-			input:    "runtime.throw(...)",
-			expected: "runtime.",
+			name:        "removes_runtime_info",
+			input:       "runtime.throw(...)",
+			expected:    "runtime.",
 			mustContain: "[runtime].",
 		},
 		{
-			name:     "removes_module_paths",
-			input:    "github.com/bitbadges/bitbadgeschain/x/tokenization/handlers.go:123",
-			expected: "github.com/bitbadges/",
+			name:        "removes_module_paths",
+			input:       "github.com/bitbadges/bitbadgeschain/x/tokenization/handlers.go:123",
+			expected:    "github.com/bitbadges/",
 			mustContain: "[module]/",
 		},
 		{
-			name:     "removes_cosmos_module_paths",
-			input:    "github.com/cosmos/cosmos-sdk/types/errors.go:456",
-			expected: "github.com/cosmos/",
+			name:        "removes_cosmos_module_paths",
+			input:       "github.com/cosmos/cosmos-sdk/types/errors.go:456",
+			expected:    "github.com/cosmos/",
 			mustContain: "[module]/",
 		},
 		{
-			name:     "removes_localhost_ip",
-			input:    "connection to 127.0.0.1 failed",
-			expected: "127.0.0.1",
+			name:        "removes_localhost_ip",
+			input:       "connection to 127.0.0.1 failed",
+			expected:    "127.0.0.1",
 			mustContain: "[localhost]",
 		},
 		{
-			name:     "truncates_long_messages",
-			input:    string(make([]byte, 1000)), // 1000 bytes
-			expected: "", // Should be truncated
+			name:        "truncates_long_messages",
+			input:       string(make([]byte, 1000)), // 1000 bytes
+			expected:    "",                         // Should be truncated
 			mustContain: "[truncated]",
 		},
 		{
-			name:     "preserves_safe_messages",
-			input:    "collection not found: 123",
-			expected: "", // Should not be modified
+			name:        "preserves_safe_messages",
+			input:       "collection not found: 123",
+			expected:    "", // Should not be modified
 			mustContain: "collection not found: 123",
 		},
 		{
-			name:     "handles_empty_string",
-			input:    "",
-			expected: "",
+			name:        "handles_empty_string",
+			input:       "",
+			expected:    "",
 			mustContain: "",
 		},
 		{
-			name:     "handles_multiple_patterns",
-			input:    "error at /home/user/github.com/bitbadges/handlers.go:123 goroutine 1",
-			expected: "/home/",
+			name:        "handles_multiple_patterns",
+			input:       "error at /home/user/github.com/bitbadges/handlers.go:123 goroutine 1",
+			expected:    "/home/",
 			mustContain: "[path]/",
 		},
 	}
@@ -493,17 +484,17 @@ func TestErrorSanitization(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create an error with the test input
 			err := tokenization.NewPrecompileError(tokenization.ErrorCodeInternalError, "test", tt.input)
-			
+
 			// Check that sanitized details don't contain sensitive info
 			if tt.expected != "" {
 				require.NotContains(t, err.Details, tt.expected, "sensitive information should be removed")
 			}
-			
+
 			// Check that sanitized details contain safe replacement
 			if tt.mustContain != "" {
 				require.Contains(t, err.Details, tt.mustContain, "should contain sanitized replacement")
 			}
-			
+
 			// For truncation test, verify length
 			if tt.name == "truncates_long_messages" {
 				require.LessOrEqual(t, len(err.Details), 500+len("... [truncated]"), "should be truncated to max length")
@@ -517,15 +508,15 @@ func TestErrorSanitizationIntegration(t *testing.T) {
 	// Test with wrapped errors that contain paths
 	err := fmt.Errorf("error in /home/user/project/handlers.go:123: collection not found")
 	wrapped := tokenization.WrapError(err, tokenization.ErrorCodeCollectionNotFound, "test operation failed")
-	
+
 	// Verify sensitive path is removed
 	require.NotContains(t, wrapped.Details, "/home/", "should remove file paths")
 	require.Contains(t, wrapped.Details, "[path]/", "should replace with sanitized version")
-	
+
 	// Test with stack trace-like error
 	stackTrace := "goroutine 1 [running]:\n    github.com/bitbadges/bitbadgeschain/x/tokenization/handlers.go:123\n    runtime.panic(...)"
 	wrapped2 := tokenization.WrapError(fmt.Errorf("%s", stackTrace), tokenization.ErrorCodeInternalError, "internal error")
-	
+
 	require.NotContains(t, wrapped2.Details, "goroutine ", "should remove goroutine info")
 	require.NotContains(t, wrapped2.Details, "github.com/bitbadges/", "should remove module paths")
 }

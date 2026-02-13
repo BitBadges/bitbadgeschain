@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
+import "../libraries/TokenizationJSONHelpers.sol";
 
 /**
  * @title CarbonCreditToken
@@ -15,7 +16,7 @@ import "../interfaces/ITokenizationPrecompile.sol";
  * - Retirement tracking via burning to a sink address
  */
 contract CarbonCreditToken {
-    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000000808);
+    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000001001);
 
     // ============ State Variables ============
 
@@ -100,23 +101,26 @@ contract CarbonCreditToken {
         projectId = _projectId;
 
         // Create verification registries
-        verifiedBuyersRegistryId = TOKENIZATION.createDynamicStore(
+        string memory buyersJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://carbon-buyers-registry",
             "{\"type\":\"verified-buyers\"}"
         );
+        verifiedBuyersRegistryId = TOKENIZATION.createDynamicStore(buyersJson);
 
-        verifiedSellersRegistryId = TOKENIZATION.createDynamicStore(
+        string memory sellersJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://carbon-sellers-registry",
             "{\"type\":\"verified-sellers\"}"
         );
+        verifiedSellersRegistryId = TOKENIZATION.createDynamicStore(sellersJson);
 
-        retiredCreditsRegistryId = TOKENIZATION.createDynamicStore(
+        string memory retiredJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://retired-credits-tracker",
             "{\"type\":\"retirement-tracker\"}"
         );
+        retiredCreditsRegistryId = TOKENIZATION.createDynamicStore(retiredJson);
     }
 
     /**
@@ -125,36 +129,43 @@ contract CarbonCreditToken {
     function initializeCollection() external onlyOperator {
         require(collectionId == 0, "Already initialized");
 
-        // Create empty collection - vintages will be added dynamically
-        TokenizationTypes.UserBalanceStore memory defaultBalances;
-        defaultBalances.autoApproveSelfInitiatedOutgoingTransfers = true;
-        defaultBalances.autoApproveSelfInitiatedIncomingTransfers = true;
-
-        // Allow token IDs 2020-2100 for vintages
-        UintRange[] memory validTokenIds = new UintRange[](1);
-        validTokenIds[0] = UintRange(2020, 2100);
-
-        TokenizationTypes.MsgCreateCollection memory createMsg;
-        createMsg.defaultBalances = defaultBalances;
-        createMsg.validTokenIds = validTokenIds;
-        createMsg.manager = _addressToString(address(this));
-        createMsg.collectionMetadata = TokenizationTypes.CollectionMetadata({
-            uri: "ipfs://carbon-credit-collection",
-            customData: string(abi.encodePacked(
+        // Build JSON components for collection creation
+        string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(2020, 2100);
+        
+        string memory defaultBalancesJson = TokenizationJSONHelpers.simpleUserBalanceStoreToJson(
+            true,  // autoApproveSelfInitiatedOutgoingTransfers
+            true,  // autoApproveSelfInitiatedIncomingTransfers
+            false  // autoApproveAllIncomingTransfers
+        );
+        
+        string memory collectionMetadataJson = TokenizationJSONHelpers.collectionMetadataToJson(
+            "ipfs://carbon-credit-collection",
+            string(abi.encodePacked(
                 "{\"name\":\"", name,
                 "\",\"standard\":\"", standard,
                 "\",\"projectId\":\"", projectId,
                 "\",\"compliance\":\"ERC-3643\"}"
             ))
-        });
-
+        );
+        
         string[] memory standards = new string[](3);
         standards[0] = "ERC-3643";
         standards[1] = "Carbon Credit";
         standards[2] = standard;
-        createMsg.standards = standards;
-
-        collectionId = TOKENIZATION.createCollection(createMsg);
+        string memory standardsJson = TokenizationJSONHelpers.stringArrayToJson(standards);
+        
+        string memory createJson = TokenizationJSONHelpers.createCollectionJSON(
+            validTokenIdsJson,
+            _addressToString(address(this)),  // manager
+            collectionMetadataJson,
+            defaultBalancesJson,
+            "{}",  // collectionPermissions (empty)
+            standardsJson,
+            "",    // customData (already in metadata)
+            false  // isArchived
+        );
+        
+        collectionId = TOKENIZATION.createCollection(createJson);
     }
 
     // ============ Vintage Management ============
@@ -203,17 +214,24 @@ contract CarbonCreditToken {
         vintages[vintage].totalIssued += amount;
 
         // Build token ID and ownership time ranges
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = UintRange(vintage, vintage);
-
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, vintages[vintage].expirationTime);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp, 
+            vintages[vintage].expirationTime
+        );
 
         address[] memory recipients = new address[](1);
         recipients[0] = to;
 
         // Transfer from mint escrow (collection manager)
-        TOKENIZATION.transferTokens(collectionId, recipients, amount, tokenIds, ownershipTimes);
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            collectionId,
+            recipients,
+            amount,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        TOKENIZATION.transferTokens(transferJson);
 
         emit CreditIssued(vintage, to, amount);
     }
@@ -254,16 +272,23 @@ contract CarbonCreditToken {
     ) external returns (bool) {
         require(canTransfer(msg.sender, to, vintage), "Transfer not compliant");
 
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = UintRange(vintage, vintage);
-
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, vintages[vintage].expirationTime);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp, 
+            vintages[vintage].expirationTime
+        );
 
         address[] memory recipients = new address[](1);
         recipients[0] = to;
 
-        bool success = TOKENIZATION.transferTokens(collectionId, recipients, amount, tokenIds, ownershipTimes);
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            collectionId,
+            recipients,
+            amount,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        bool success = TOKENIZATION.transferTokens(transferJson);
 
         if (success) {
             emit CreditTransferred(msg.sender, to, vintage, amount);
@@ -287,17 +312,24 @@ contract CarbonCreditToken {
         require(vintages[vintage].year != 0, "Invalid vintage");
         require(block.timestamp < vintages[vintage].expirationTime, "Credits expired");
 
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = UintRange(vintage, vintage);
-
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, vintages[vintage].expirationTime);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp, 
+            vintages[vintage].expirationTime
+        );
 
         // Transfer to retirement sink (effectively burning)
         address[] memory recipients = new address[](1);
         recipients[0] = RETIREMENT_SINK;
 
-        bool success = TOKENIZATION.transferTokens(collectionId, recipients, amount, tokenIds, ownershipTimes);
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            collectionId,
+            recipients,
+            amount,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        bool success = TOKENIZATION.transferTokens(transferJson);
 
         if (success) {
             vintages[vintage].totalRetired += amount;
@@ -315,7 +347,12 @@ contract CarbonCreditToken {
      * @notice Verify a buyer
      */
     function verifyBuyer(address buyer) external onlyVerifier {
-        TOKENIZATION.setDynamicStoreValue(verifiedBuyersRegistryId, buyer, true);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            verifiedBuyersRegistryId,
+            buyer,
+            true
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         emit BuyerVerified(buyer);
     }
 
@@ -323,7 +360,12 @@ contract CarbonCreditToken {
      * @notice Verify a seller/project developer
      */
     function verifySeller(address seller) external onlyVerifier {
-        TOKENIZATION.setDynamicStoreValue(verifiedSellersRegistryId, seller, true);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            verifiedSellersRegistryId,
+            seller,
+            true
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         emit SellerVerified(seller);
     }
 
@@ -331,7 +373,11 @@ contract CarbonCreditToken {
      * @notice Check if address is verified buyer
      */
     function isVerifiedBuyer(address account) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(verifiedBuyersRegistryId, account);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            verifiedBuyersRegistryId,
+            account
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -340,7 +386,11 @@ contract CarbonCreditToken {
      * @notice Check if address is verified seller
      */
     function isVerifiedSeller(address account) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(verifiedSellersRegistryId, account);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            verifiedSellersRegistryId,
+            account
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -351,13 +401,16 @@ contract CarbonCreditToken {
      * @notice Get balance for a specific vintage
      */
     function balanceOf(address account, uint256 vintage) external view returns (uint256) {
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = UintRange(vintage, vintage);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
 
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(1, type(uint256).max);
-
-        return TOKENIZATION.getBalanceAmount(collectionId, account, tokenIds, ownershipTimes);
+        string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
+            collectionId,
+            account,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        return TOKENIZATION.getBalanceAmount(balanceJson);
     }
 
     /**

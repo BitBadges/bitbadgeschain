@@ -10,7 +10,7 @@ package gamm_test
 
 import (
 	"crypto/ecdsa"
-	"math/big"
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -28,6 +28,8 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gamm "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/precompile/test/helpers"
+	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 )
 
 // EVMKeeperIntegrationTestSuite is a test suite for full EVM keeper integration tests
@@ -66,24 +68,32 @@ func (suite *EVMKeeperIntegrationTestSuite) SetupTest() {
 	// Get keepers
 	suite.EVMKeeper = suite.App.EVMKeeper
 
-	// Create precompile instance
+	// Create precompile instances
 	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
-	precompileAddr := common.HexToAddress(gamm.GammPrecompileAddress)
+	gammPrecompileAddr := common.HexToAddress(gamm.GammPrecompileAddress)
 
 	// Register and ENABLE the precompile - both steps are required!
 	// Note: Precompile may already be registered from app setup, so we check first
 	// Re-register to ensure it's available (workaround for test environment)
-	suite.EVMKeeper.RegisterStaticPrecompile(precompileAddr, suite.Precompile)
+	suite.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, suite.Precompile)
 
 	// CRITICAL: Enable the precompile - this is what was missing!
 	// Precompiles must be both registered AND enabled to be callable
-	err := suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, precompileAddr)
+	err := suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, gammPrecompileAddr)
 	// If already enabled, that's fine - just continue
 	if err != nil && !strings.Contains(err.Error(), "already") {
 		suite.Require().NoError(err, "Failed to enable gamm precompile")
 	}
-
 	require.Equal(suite.T(), gamm.GammPrecompileAddress, suite.Precompile.ContractAddress.Hex())
+
+	// Also register and enable tokenization precompile for consistency
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(suite.App.TokenizationKeeper)
+	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
+	suite.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
+	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, tokenizationPrecompileAddr)
+	if err != nil && !strings.Contains(err.Error(), "already") {
+		suite.Require().NoError(err, "Failed to enable tokenization precompile")
+	}
 
 	// Create test accounts with private keys
 	suite.AliceKey, _ = crypto.GenerateKey()
@@ -178,19 +188,27 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_TransactionMethods_Str
 func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_GasAccounting() {
 	// Test gas calculation for different methods
 	method, _ := suite.Precompile.ABI.Methods["joinPool"]
-	packed, err := method.Inputs.Pack(
-		suite.PoolId,
-		big.NewInt(1000000),
-		[]struct {
-			Denom  string
-			Amount *big.Int
-		}{
-			{Denom: "uatom", Amount: big.NewInt(1000000)},
-			{Denom: "uosmo", Amount: big.NewInt(1000000)},
+	
+	// Build JSON message
+	jsonMsg := map[string]interface{}{
+		"poolId":     suite.PoolId,
+		"shareOutMin": "1000000",
+		"tokenInMaxs": []map[string]interface{}{
+			{
+				"denom":  "uatom",
+				"amount": "1000000",
+			},
+			{
+				"denom":  "uosmo",
+				"amount": "1000000",
+			},
 		},
-	)
+	}
+	jsonBytes, err := json.Marshal(jsonMsg)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+	
+	input, err := helpers.PackMethodWithJSON(&method, string(jsonBytes))
+	suite.Require().NoError(err)
 
 	gas := suite.Precompile.RequiredGas(input)
 	suite.Greater(gas, uint64(0), "Join pool should require gas")

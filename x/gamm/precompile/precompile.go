@@ -32,11 +32,14 @@ import (
 
 	cmn "github.com/cosmos/evm/precompiles/common"
 
+	"github.com/cosmos/gogoproto/proto"
+
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
+	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
@@ -150,8 +153,8 @@ func (p Precompile) GetCallerAddress(contract *vm.Contract) (string, error) {
 }
 
 // RequiredGas calculates the precompiled contract's base gas rate.
-// For methods with dynamic inputs (arrays), it attempts to parse the input
-// to calculate accurate gas costs. If parsing fails, it falls back to base gas.
+// For methods that use JSON string arguments, we return base gas since
+// parsing JSON for gas calculation is complex and not worth the overhead.
 func (p Precompile) RequiredGas(input []byte) uint64 {
 	// NOTE: This check avoid panicking when trying to decode the method ID
 	if len(input) < 4 {
@@ -166,17 +169,9 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		return 0
 	}
 
-	// Try to unpack arguments to calculate dynamic gas
-	// If unpacking fails, fall back to base gas
-	argsData := input[4:]
-	args, err := method.Inputs.Unpack(argsData)
-	if err != nil {
-		// Parsing failed, return base gas as fallback
-		return p.getBaseGas(method.Name)
-	}
-
-	// Calculate dynamic gas based on method and arguments
-	return p.calculateDynamicGas(method.Name, args)
+	// All methods now use JSON string arguments, so return base gas
+	// Dynamic gas calculation would require parsing JSON which is not worth the overhead
+	return p.getBaseGas(method.Name)
 }
 
 // getBaseGas returns the base gas cost for a method
@@ -214,90 +209,6 @@ func (p Precompile) getBaseGas(methodName string) uint64 {
 	return 0
 }
 
-// calculateDynamicGas calculates gas based on method name and unpacked arguments
-func (p Precompile) calculateDynamicGas(methodName string, args []interface{}) uint64 {
-	baseGas := p.getBaseGas(methodName)
-	if baseGas == 0 {
-		return 0
-	}
-
-	switch methodName {
-	case JoinPoolMethod:
-		// args: poolId, shareOutAmount, tokenInMaxs[]
-		if len(args) >= 3 {
-			if tokenInMaxs, ok := args[2].([]interface{}); ok {
-				return CalculateDynamicGas(baseGas, 0, len(tokenInMaxs), 0)
-			}
-		}
-		return baseGas
-
-	case ExitPoolMethod:
-		// args: poolId, shareInAmount, tokenOutMins[]
-		if len(args) >= 3 {
-			if tokenOutMins, ok := args[2].([]interface{}); ok {
-				return CalculateDynamicGas(baseGas, 0, len(tokenOutMins), 0)
-			}
-		}
-		return baseGas
-
-	case SwapExactAmountInMethod:
-		// args: routes[], tokenIn, tokenOutMinAmount, affiliates[]
-		numRoutes := 0
-		numAffiliates := 0
-		if len(args) >= 1 {
-			if routes, ok := args[0].([]interface{}); ok {
-				numRoutes = len(routes)
-			}
-		}
-		if len(args) >= 4 {
-			if affiliates, ok := args[3].([]interface{}); ok {
-				numAffiliates = len(affiliates)
-			}
-		}
-		return CalculateDynamicGas(baseGas, numRoutes, 0, numAffiliates)
-
-	case SwapExactAmountInWithIBCTransferMethod:
-		// args: routes[], tokenIn, tokenOutMinAmount, ibcTransferInfo, affiliates[]
-		numRoutes := 0
-		numAffiliates := 0
-		memoLength := 0
-		if len(args) >= 1 {
-			if routes, ok := args[0].([]interface{}); ok {
-				numRoutes = len(routes)
-			}
-		}
-		if len(args) >= 3 {
-			if ibcInfo, ok := args[3].(map[string]interface{}); ok {
-				if memo, ok := ibcInfo["memo"].(string); ok {
-					memoLength = len(memo)
-				}
-			}
-		}
-		if len(args) >= 5 {
-			if affiliates, ok := args[4].([]interface{}); ok {
-				numAffiliates = len(affiliates)
-			}
-		}
-		gas := CalculateDynamicGas(baseGas, numRoutes, 0, numAffiliates)
-		// Add gas for memo bytes
-		gas += uint64(memoLength) * GasPerMemoByte
-		return gas
-
-	case CalcJoinPoolNoSwapSharesMethod, CalcJoinPoolSharesMethod:
-		// args: poolId, tokensIn[]
-		if len(args) >= 2 {
-			if tokensIn, ok := args[1].([]interface{}); ok {
-				return CalculateDynamicGas(baseGas, 0, len(tokensIn), 0)
-			}
-		}
-		return baseGas
-
-	default:
-		// For other methods, return base gas
-		return baseGas
-	}
-}
-
 func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error) {
 	// Check if ABI loaded successfully during init
 	if abiLoadError != nil {
@@ -329,41 +240,182 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 		return nil, "unknown", err
 	}
 
+	// Extract JSON string from args
+	if len(args) != 1 {
+		return nil, method.Name, ErrInvalidInput(fmt.Sprintf("expected 1 argument (JSON string), got %d", len(args)))
+	}
+
+	jsonStr, ok := args[0].(string)
+	if !ok {
+		return nil, method.Name, ErrInvalidInput("expected JSON string as first argument")
+	}
+
+	// Route to transaction or query handler
 	var bz []byte
-	switch method.Name {
-	// Transactions
-	case JoinPoolMethod:
-		bz, err = p.JoinPool(ctx, method, args, contract)
-	case ExitPoolMethod:
-		bz, err = p.ExitPool(ctx, method, args, contract)
-	case SwapExactAmountInMethod:
-		bz, err = p.SwapExactAmountIn(ctx, method, args, contract)
-	case SwapExactAmountInWithIBCTransferMethod:
-		bz, err = p.SwapExactAmountInWithIBCTransfer(ctx, method, args, contract)
-	// Queries
-	case GetPoolMethod:
-		bz, err = p.GetPool(ctx, method, args)
-	case GetPoolsMethod:
-		bz, err = p.GetPools(ctx, method, args)
-	case GetPoolTypeMethod:
-		bz, err = p.GetPoolType(ctx, method, args)
-	case CalcJoinPoolNoSwapSharesMethod:
-		bz, err = p.CalcJoinPoolNoSwapShares(ctx, method, args)
-	case CalcExitPoolCoinsFromSharesMethod:
-		bz, err = p.CalcExitPoolCoinsFromShares(ctx, method, args)
-	case CalcJoinPoolSharesMethod:
-		bz, err = p.CalcJoinPoolShares(ctx, method, args)
-	case GetPoolParamsMethod:
-		bz, err = p.GetPoolParams(ctx, method, args)
-	case GetTotalSharesMethod:
-		bz, err = p.GetTotalShares(ctx, method, args)
-	case GetTotalLiquidityMethod:
-		bz, err = p.GetTotalLiquidity(ctx, method, args)
-	default:
-		return nil, method.Name, fmt.Errorf(cmn.ErrUnknownMethod, method.Name)
+	if p.IsTransaction(method) {
+		bz, err = p.HandleTransaction(ctx, method, jsonStr, contract)
+	} else {
+		bz, err = p.HandleQuery(ctx, method, jsonStr)
 	}
 
 	return bz, method.Name, err
+}
+
+// HandleTransaction handles a transaction by unmarshaling JSON and executing via keeper
+func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonStr string, contract *vm.Contract) ([]byte, error) {
+	// Unmarshal JSON to Msg
+	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute message via keeper
+	msgServer := gammkeeper.NewMsgServerImpl(&p.gammKeeper)
+
+	// Route to appropriate handler based on message type
+	var resp interface{}
+	switch m := msg.(type) {
+	case *gammtypes.MsgJoinPool:
+		resp, err = msgServer.JoinPool(ctx, m)
+	case *gammtypes.MsgExitPool:
+		resp, err = msgServer.ExitPool(ctx, m)
+	case *gammtypes.MsgSwapExactAmountIn:
+		resp, err = msgServer.SwapExactAmountIn(ctx, m)
+	case *gammtypes.MsgSwapExactAmountInWithIBCTransfer:
+		resp, err = msgServer.SwapExactAmountInWithIBCTransfer(ctx, m)
+	default:
+		return nil, ErrInvalidInput(fmt.Sprintf("unsupported message type for method: %s", method.Name))
+	}
+
+	if err != nil {
+		return nil, WrapError(err, ErrorCodeSwapFailed, fmt.Sprintf("transaction failed: %v", err))
+	}
+
+	// Pack response based on method output type
+	switch method.Name {
+	case JoinPoolMethod:
+		if joinResp, ok := resp.(*gammtypes.MsgJoinPoolResponse); ok {
+			return method.Outputs.Pack(joinResp.ShareOutAmount.BigInt(), ConvertCoinsToEVM(joinResp.TokenIn))
+		}
+		return nil, WrapError(fmt.Errorf("invalid response type for joinPool"), ErrorCodeInternalError, "expected MsgJoinPoolResponse")
+	case ExitPoolMethod:
+		if exitResp, ok := resp.(*gammtypes.MsgExitPoolResponse); ok {
+			return method.Outputs.Pack(ConvertCoinsToEVM(exitResp.TokenOut))
+		}
+		return nil, WrapError(fmt.Errorf("invalid response type for exitPool"), ErrorCodeInternalError, "expected MsgExitPoolResponse")
+	case SwapExactAmountInMethod, SwapExactAmountInWithIBCTransferMethod:
+		if swapResp, ok := resp.(*gammtypes.MsgSwapExactAmountInResponse); ok {
+			return method.Outputs.Pack(swapResp.TokenOutAmount.BigInt())
+		}
+		return nil, WrapError(fmt.Errorf("invalid response type for swapExactAmountIn"), ErrorCodeInternalError, "expected MsgSwapExactAmountInResponse")
+	default:
+		return nil, WrapError(fmt.Errorf("unsupported transaction method: %s", method.Name), ErrorCodeInternalError, "method not handled in response packing")
+	}
+}
+
+// HandleQuery handles a query by unmarshaling JSON and executing via keeper
+func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
+	// Unmarshal JSON to QueryRequest
+	queryReq, err := p.unmarshalQueryFromJSON(method.Name, jsonStr)
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute query via keeper querier
+	querier := gammkeeper.NewQuerier(p.gammKeeper)
+	var resp interface{}
+
+	switch req := queryReq.(type) {
+	case *gammtypes.QueryPoolRequest:
+		resp, err = querier.Pool(ctx, req)
+	case *gammtypes.QueryPoolsRequest:
+		resp, err = querier.Pools(ctx, req)
+	case *gammtypes.QueryPoolTypeRequest:
+		resp, err = querier.PoolType(ctx, req)
+	case *gammtypes.QueryCalcJoinPoolNoSwapSharesRequest:
+		resp, err = querier.CalcJoinPoolNoSwapShares(ctx, req)
+	case *gammtypes.QueryCalcExitPoolCoinsFromSharesRequest:
+		resp, err = querier.CalcExitPoolCoinsFromShares(ctx, req)
+	case *gammtypes.QueryCalcJoinPoolSharesRequest:
+		resp, err = querier.CalcJoinPoolShares(ctx, req)
+	case *gammtypes.QueryPoolParamsRequest:
+		resp, err = querier.PoolParams(ctx, req)
+	case *gammtypes.QueryTotalSharesRequest:
+		resp, err = querier.TotalShares(ctx, req)
+	case *gammtypes.QueryTotalLiquidityRequest:
+		resp, err = querier.TotalLiquidity(ctx, req)
+	default:
+		return nil, ErrInvalidInput(fmt.Sprintf("unsupported query type for method: %s", method.Name))
+	}
+
+	if err != nil {
+		return nil, WrapError(err, ErrorCodeQueryFailed, fmt.Sprintf("query failed: %v", err))
+	}
+
+	// Handle different return types
+	switch method.Name {
+	case GetPoolTypeMethod:
+		if poolTypeResp, ok := resp.(*gammtypes.QueryPoolTypeResponse); ok {
+			return method.Outputs.Pack(poolTypeResp.PoolType)
+		}
+	case GetTotalSharesMethod:
+		// ABI expects struct Coin (tuple), not bytes
+		if totalSharesResp, ok := resp.(*gammtypes.QueryTotalSharesResponse); ok {
+			coinStruct := ConvertCoinToEVM(totalSharesResp.TotalShares)
+			return method.Outputs.Pack(coinStruct)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryTotalSharesResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetTotalLiquidityMethod:
+		// ABI expects struct Coin[] (tuple[]), not bytes
+		if totalLiquidityResp, ok := resp.(*gammtypes.QueryTotalLiquidityResponse); ok {
+			coinsStruct := ConvertCoinsToEVM(totalLiquidityResp.Liquidity)
+			return method.Outputs.Pack(coinsStruct)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryTotalLiquidityResponse"), ErrorCodeInternalError, "invalid response type")
+	case CalcJoinPoolNoSwapSharesMethod:
+		// ABI expects (tokensOut tuple[], sharesOut uint256), not bytes
+		if calcResp, ok := resp.(*gammtypes.QueryCalcJoinPoolNoSwapSharesResponse); ok {
+			tokensOutStruct := ConvertCoinsToEVM(calcResp.TokensOut)
+			sharesOutBigInt := calcResp.SharesOut.BigInt()
+			return method.Outputs.Pack(tokensOutStruct, sharesOutBigInt)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryCalcJoinPoolNoSwapSharesResponse"), ErrorCodeInternalError, "invalid response type")
+	case CalcExitPoolCoinsFromSharesMethod:
+		// ABI expects tokensOut tuple[], not bytes
+		if calcResp, ok := resp.(*gammtypes.QueryCalcExitPoolCoinsFromSharesResponse); ok {
+			tokensOutStruct := ConvertCoinsToEVM(calcResp.TokensOut)
+			return method.Outputs.Pack(tokensOutStruct)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryCalcExitPoolCoinsFromSharesResponse"), ErrorCodeInternalError, "invalid response type")
+	case CalcJoinPoolSharesMethod:
+		// ABI expects (shareOutAmount uint256, tokensOut tuple[]), not bytes
+		if calcResp, ok := resp.(*gammtypes.QueryCalcJoinPoolSharesResponse); ok {
+			shareOutBigInt := calcResp.ShareOutAmount.BigInt()
+			tokensOutStruct := ConvertCoinsToEVM(calcResp.TokensOut)
+			return method.Outputs.Pack(shareOutBigInt, tokensOutStruct)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryCalcJoinPoolSharesResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetPoolMethod, GetPoolsMethod, GetPoolParamsMethod:
+		// Marshal response to bytes (protobuf)
+		if protoMsg, ok := resp.(proto.Message); ok {
+			bz, err := proto.Marshal(protoMsg)
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "failed to marshal query response")
+			}
+			return method.Outputs.Pack(bz)
+		}
+		return nil, WrapError(fmt.Errorf("response is not a proto.Message"), ErrorCodeInternalError, "invalid response type")
+	}
+
+	// Default: marshal to bytes
+	if protoMsg, ok := resp.(proto.Message); ok {
+		bz, err := proto.Marshal(protoMsg)
+		if err != nil {
+			return nil, WrapError(err, ErrorCodeInternalError, "failed to marshal query response")
+		}
+		return method.Outputs.Pack(bz)
+	}
+	return nil, WrapError(fmt.Errorf("response is not a proto.Message"), ErrorCodeInternalError, "invalid response type")
 }
 
 // transactionMethods is a map of method names that are transactions (state-changing).

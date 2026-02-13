@@ -44,15 +44,12 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_UniversalUpdateCollection
 	method := suite.Precompile.ABI.Methods["setManager"]
 	suite.Require().NotNil(method, "setManager method should exist")
 
-	// Prepare arguments for setManager (much simpler - just collectionId and manager)
-	args := []interface{}{
-		suite.CollectionId.BigInt(), // collectionId (use existing collection from SetupTest)
-		suite.Bob.String(),          // manager
-	}
+	// Build JSON for setManager
+	jsonMsg, err := helpers.BuildSetManagerJSON(suite.Alice.String(), suite.CollectionId.BigInt(), suite.Bob.String())
+	suite.Require().NoError(err, "Failed to build JSON")
 
-	packed, err := method.Inputs.Pack(args...)
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
 	suite.Require().NoError(err, "Failed to pack arguments")
-	input := append(method.ID, packed...)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(
@@ -172,17 +169,19 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_TransferTokens() {
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(10),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(10)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(
@@ -241,30 +240,19 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_TransferTokens() {
 	suite.T().Logf("Found %d indexer events", len(indexerEvents))
 	suite.Require().NotEmpty(indexerEvents, "At least one indexer event should be emitted")
 
-	// Verify we have indexer events for both the transfer_tokens message and the precompile_transfer_tokens event
+	// Verify we have indexer events for the transfer_tokens message
+	// Precompile-specific events are no longer emitted (events come from underlying message handlers)
 	foundTransferIndexerEvent := false
-	foundPrecompileIndexerEvent := false
 
 	for _, event := range indexerEvents {
 		for _, attr := range event.Attributes {
 			if attr.Key == "msg_type" && attr.Value == "transfer_tokens" {
 				foundTransferIndexerEvent = true
 				suite.T().Logf("Found indexer event for transfer_tokens message")
-			}
-			// Check if this is the precompile event (it would have module=evm_precompile)
-			if attr.Key == sdk.AttributeKeyModule && attr.Value == "evm_precompile" {
-				// Check if it's the transfer event by looking for collection_id
-				for _, a := range event.Attributes {
-					if a.Key == "collection_id" {
-						foundPrecompileIndexerEvent = true
-						suite.T().Logf("Found indexer event for precompile_transfer_tokens")
-						break
-					}
-				}
+				break
 			}
 		}
 	}
 
 	suite.Require().True(foundTransferIndexerEvent, "Indexer event for transfer_tokens message should be emitted")
-	suite.Require().True(foundPrecompileIndexerEvent, "Indexer event for precompile_transfer_tokens should be emitted")
 }

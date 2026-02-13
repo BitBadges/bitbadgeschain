@@ -33,17 +33,19 @@ func (suite *GasAccuracyTestSuite) TestGasAccuracy_TransferTokens_EstimateVsActu
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(10),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(10)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	// Estimate gas
 	estimatedGas := suite.Precompile.RequiredGas(input)
@@ -107,36 +109,55 @@ func (suite *GasAccuracyTestSuite) TestGasAccuracy_AllMethods_WithinTolerance() 
 			continue
 		}
 
-		// Build minimal args for each method
-		var testArgs []interface{}
+		// Build JSON for each method
+		var input []byte
+		var err error
 		switch methodName {
 		case "transferTokens":
-			testArgs = []interface{}{
+			toAddressesStr := []string{suite.Bob.String()}
+			jsonMsg, jsonErr := helpers.BuildTransferTokensJSON(
 				suite.CollectionId.BigInt(),
-				[]common.Address{suite.BobEVM},
+				suite.Alice.String(),
+				toAddressesStr,
 				big.NewInt(1),
 				[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 				[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-			}
-		case "getCollection", "getBalance", "getTotalSupply":
-			testArgs = []interface{}{suite.CollectionId.BigInt()}
-		}
-
-		if len(testArgs) > 0 {
-			packed, err := method.Inputs.Pack(testArgs...)
-			if err != nil {
-				suite.T().Logf("Failed to pack args for %s: %v", methodName, err)
+			)
+			if jsonErr != nil {
+				suite.T().Logf("Failed to build JSON for %s: %v", methodName, jsonErr)
 				continue
 			}
-			input := append(method.ID, packed...)
-
-			estimatedGas := suite.Precompile.RequiredGas(input)
-			suite.T().Logf("%s - Estimated gas: %d", methodName, estimatedGas)
-
-			// Verify estimate is reasonable (not zero, not extremely large)
-			suite.Require().Greater(estimatedGas, uint64(0), "Gas estimate should be greater than 0")
-			suite.Require().Less(estimatedGas, uint64(10000000), "Gas estimate should be reasonable")
+			input, err = helpers.PackMethodWithJSON(&method, jsonMsg)
+		case "getCollection":
+			queryJson, jsonErr := helpers.BuildGetCollectionQueryJSON(suite.CollectionId.BigInt())
+			if jsonErr != nil {
+				suite.T().Logf("Failed to build JSON for %s: %v", methodName, jsonErr)
+				continue
+			}
+			input, err = helpers.PackMethodWithJSON(&method, queryJson)
+		case "getBalance":
+			queryJson, jsonErr := helpers.BuildGetBalanceQueryJSON(suite.CollectionId.BigInt(), suite.Alice.String())
+			if jsonErr != nil {
+				suite.T().Logf("Failed to build JSON for %s: %v", methodName, jsonErr)
+				continue
+			}
+			input, err = helpers.PackMethodWithJSON(&method, queryJson)
+		default:
+			suite.T().Logf("Method %s not handled in gas test, skipping", methodName)
+			continue
 		}
+
+		if err != nil {
+			suite.T().Logf("Failed to pack args for %s: %v", methodName, err)
+			continue
+		}
+
+		estimatedGas := suite.Precompile.RequiredGas(input)
+		suite.T().Logf("%s - Estimated gas: %d", methodName, estimatedGas)
+
+		// Verify estimate is reasonable (not zero, not extremely large)
+		suite.Require().Greater(estimatedGas, uint64(0), "Gas estimate should be greater than 0")
+		suite.Require().Less(estimatedGas, uint64(10000000), "Gas estimate should be reasonable")
 	}
 }
 
@@ -147,17 +168,19 @@ func (suite *GasAccuracyTestSuite) TestGasLimits_Enforced() {
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(1),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	// Execute with very low gas limit
 	nonce := suite.getNonce(suite.AliceEVM)
@@ -183,4 +206,3 @@ func (suite *GasAccuracyTestSuite) TestGasLimits_Enforced() {
 		}
 	}
 }
-

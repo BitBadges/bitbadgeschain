@@ -143,15 +143,15 @@ func (suite *MultiUserWorkflowTestSuite) TestMultiUser_ConcurrentCollectionManag
 	setMetadataMethod := suite.Precompile.ABI.Methods["setCollectionMetadata"]
 	suite.Require().NotNil(setMetadataMethod)
 
-	aliceArgs := []interface{}{
-		suite.CollectionId.BigInt(),
-		"https://alice-update.com",
-		"Alice's update",
+	metadata := map[string]interface{}{
+		"uri":        "https://alice-update.com",
+		"customData": "Alice's update",
 	}
-
-	packed, err := setMetadataMethod.Inputs.Pack(aliceArgs...)
+	jsonMsg, err := helpers.BuildSetCollectionMetadataJSON(suite.Alice.String(), suite.CollectionId.BigInt(), metadata)
 	suite.Require().NoError(err)
-	input := append(setMetadataMethod.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&setMetadataMethod, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(

@@ -13,9 +13,9 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
-	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
@@ -56,17 +56,19 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_MerkleChallenge_Tra
 	suite.Require().NotNil(method)
 
 	// Build transfer with merkle proof (empty proof for single leaf)
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		collectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(1),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(
@@ -116,17 +118,19 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_PredeterminedBalanc
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		collectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(1),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(
@@ -179,17 +183,19 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_ETHSignature_Transf
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		collectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(1),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(
@@ -232,17 +238,19 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_ComplexWorkflow() {
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
-	args := []interface{}{
+	toAddressesStr := []string{suite.Bob.String()}
+	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		collectionId.BigInt(),
-		[]common.Address{suite.BobEVM},
+		suite.Alice.String(),
+		toAddressesStr,
 		big.NewInt(1),
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(1)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
-	}
-
-	packed, err := method.Inputs.Pack(args...)
+	)
 	suite.Require().NoError(err)
-	input := append(method.ID, packed...)
+
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
 
 	nonce := suite.getNonce(suite.AliceEVM)
 	tx, err := helpers.BuildEVMTransaction(

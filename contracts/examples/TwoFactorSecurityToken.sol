@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
+import "../libraries/TokenizationJSONHelpers.sol";
 
 /**
  * @title TwoFactorSecurityToken
@@ -20,7 +21,7 @@ import "../interfaces/ITokenizationPrecompile.sol";
  * - Time-boxed trading sessions
  */
 contract TwoFactorSecurityToken {
-    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000000808);
+    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000001001);
 
     // ============ State Variables ============
 
@@ -118,11 +119,12 @@ contract TwoFactorSecurityToken {
         _perpetualOwnership[0] = UintRange(1, type(uint256).max);
 
         // Create KYC registry
-        kycRegistryId = TOKENIZATION.createDynamicStore(
+        string memory kycJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,
             "ipfs://kyc-registry",
             "{\"type\":\"kyc-verified\"}"
         );
+        kycRegistryId = TOKENIZATION.createDynamicStore(kycJson);
     }
 
     /**
@@ -133,62 +135,82 @@ contract TwoFactorSecurityToken {
         require(securityTokenCollectionId == 0, "Already initialized");
 
         // ===== Create Security Token Collection =====
-        TokenizationTypes.Balance[] memory initialBalances = new TokenizationTypes.Balance[](1);
-        initialBalances[0] = TokenizationTypes.Balance({
-            amount: totalSupply,
-            ownershipTimes: _perpetualOwnership,
-            tokenIds: _securityTokenIds
-        });
-
-        TokenizationTypes.UserBalanceStore memory defaultBalances;
-        defaultBalances.balances = initialBalances;
-        defaultBalances.autoApproveSelfInitiatedOutgoingTransfers = true;
-        defaultBalances.autoApproveSelfInitiatedIncomingTransfers = true;
-
-        TokenizationTypes.MsgCreateCollection memory securityMsg;
-        securityMsg.defaultBalances = defaultBalances;
-        securityMsg.validTokenIds = _securityTokenIds;
-        securityMsg.manager = _addressToString(address(this));
-        securityMsg.collectionMetadata = TokenizationTypes.CollectionMetadata({
-            uri: "ipfs://2fa-security-token",
-            customData: string(abi.encodePacked(
+        // Build initial balance JSON (for minting totalSupply to creator)
+        string memory balanceJson = string(abi.encodePacked(
+            '[{"amount":"', TokenizationJSONHelpers.uintToString(totalSupply),
+            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max),
+            ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
+        ));
+        
+        // Build defaultBalances JSON with initial balances
+        string memory defaultBalancesJson = string(abi.encodePacked(
+            '{"balances":', balanceJson,
+            ',"autoApproveSelfInitiatedOutgoingTransfers":true',
+            ',"autoApproveSelfInitiatedIncomingTransfers":true',
+            ',"autoApproveAllIncomingTransfers":false',
+            ',"outgoingApprovals":[],"incomingApprovals":[],"userPermissions":{}}'
+        ));
+        
+        string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory collectionMetadataJson = TokenizationJSONHelpers.collectionMetadataToJson(
+            "ipfs://2fa-security-token",
+            string(abi.encodePacked(
                 "{\"name\":\"", name,
                 "\",\"symbol\":\"", symbol,
                 "\",\"requires2FA\":true}"
             ))
-        });
-
+        );
+        
         string[] memory standards = new string[](2);
         standards[0] = "ERC-3643";
         standards[1] = "2FA-Protected";
-        securityMsg.standards = standards;
-
-        securityTokenCollectionId = TOKENIZATION.createCollection(securityMsg);
+        string memory standardsJson = TokenizationJSONHelpers.stringArrayToJson(standards);
+        
+        string memory createJson = TokenizationJSONHelpers.createCollectionJSON(
+            validTokenIdsJson,
+            _addressToString(address(this)),
+            collectionMetadataJson,
+            defaultBalancesJson,
+            "{}",
+            standardsJson,
+            "",
+            false
+        );
+        
+        securityTokenCollectionId = TOKENIZATION.createCollection(createJson);
 
         // ===== Create 2FA Token Collection =====
         // 2FA tokens use incrementing token IDs (nonce-based)
-        UintRange[] memory twoFactorTokenIds = new UintRange[](1);
-        twoFactorTokenIds[0] = UintRange(1, type(uint256).max);
-
-        TokenizationTypes.UserBalanceStore memory twoFactorDefaults;
+        string memory twoFactorTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
         // 2FA tokens should not be transferable
-        twoFactorDefaults.autoApproveSelfInitiatedOutgoingTransfers = false;
-        twoFactorDefaults.autoApproveSelfInitiatedIncomingTransfers = true;
-
-        TokenizationTypes.MsgCreateCollection memory twoFactorMsg;
-        twoFactorMsg.defaultBalances = twoFactorDefaults;
-        twoFactorMsg.validTokenIds = twoFactorTokenIds;
-        twoFactorMsg.manager = _addressToString(address(this));
-        twoFactorMsg.collectionMetadata = TokenizationTypes.CollectionMetadata({
-            uri: "ipfs://2fa-tokens",
-            customData: "{\"type\":\"2FA\",\"transferable\":false}"
-        });
-
+        string memory twoFactorDefaultsJson = TokenizationJSONHelpers.simpleUserBalanceStoreToJson(
+            false,  // autoApproveSelfInitiatedOutgoingTransfers
+            true,   // autoApproveSelfInitiatedIncomingTransfers
+            false   // autoApproveAllIncomingTransfers
+        );
+        
+        string memory twoFactorMetadataJson = TokenizationJSONHelpers.collectionMetadataToJson(
+            "ipfs://2fa-tokens",
+            "{\"type\":\"2FA\",\"transferable\":false}"
+        );
+        
         string[] memory twoFactorStandards = new string[](1);
         twoFactorStandards[0] = "2FA-Token";
-        twoFactorMsg.standards = twoFactorStandards;
-
-        twoFactorCollectionId = TOKENIZATION.createCollection(twoFactorMsg);
+        string memory twoFactorStandardsJson = TokenizationJSONHelpers.stringArrayToJson(twoFactorStandards);
+        
+        string memory twoFactorCreateJson = TokenizationJSONHelpers.createCollectionJSON(
+            twoFactorTokenIdsJson,
+            _addressToString(address(this)),
+            twoFactorMetadataJson,
+            twoFactorDefaultsJson,
+            "{}",
+            twoFactorStandardsJson,
+            "",
+            false
+        );
+        
+        twoFactorCollectionId = TOKENIZATION.createCollection(twoFactorCreateJson);
     }
 
     // ============ 2FA Token Management ============
@@ -209,17 +231,24 @@ contract TwoFactorSecurityToken {
         uint256 validUntil = block.timestamp + twoFactorValidityPeriod;
 
         // Create time-limited ownership
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = UintRange(nonce, nonce);  // Unique token ID per session
-
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, validUntil);  // Time-limited!
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(nonce, nonce);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp, 
+            validUntil
+        );
 
         address[] memory recipients = new address[](1);
         recipients[0] = user;
 
         // Issue the 2FA token (1 token with time-limited ownership)
-        TOKENIZATION.transferTokens(twoFactorCollectionId, recipients, 1, tokenIds, ownershipTimes);
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            twoFactorCollectionId,
+            recipients,
+            1,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        TOKENIZATION.transferTokens(transferJson);
 
         lastTwoFactorIssued[user] = block.timestamp;
 
@@ -242,16 +271,23 @@ contract TwoFactorSecurityToken {
             uint256 nonce = ++twoFactorNonce[user];
             uint256 validUntil = block.timestamp + twoFactorValidityPeriod;
 
-            UintRange[] memory tokenIds = new UintRange[](1);
-            tokenIds[0] = UintRange(nonce, nonce);
-
-            UintRange[] memory ownershipTimes = new UintRange[](1);
-            ownershipTimes[0] = UintRange(block.timestamp, validUntil);
+            string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(nonce, nonce);
+            string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+                block.timestamp,
+                validUntil
+            );
 
             address[] memory recipients = new address[](1);
             recipients[0] = user;
 
-            TOKENIZATION.transferTokens(twoFactorCollectionId, recipients, 1, tokenIds, ownershipTimes);
+            string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+                twoFactorCollectionId,
+                recipients,
+                1,
+                tokenIdsJson,
+                ownershipTimesJson
+            );
+            TOKENIZATION.transferTokens(transferJson);
 
             lastTwoFactorIssued[user] = block.timestamp;
 
@@ -269,19 +305,19 @@ contract TwoFactorSecurityToken {
         if (currentNonce == 0) return false;
 
         // Check ownership of the current nonce token at the CURRENT TIME
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = UintRange(currentNonce, currentNonce);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(currentNonce, currentNonce);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
+            block.timestamp,
+            block.timestamp
+        );
 
-        // Query ownership at current block timestamp
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = UintRange(block.timestamp, block.timestamp);
-
-        uint256 balance = TOKENIZATION.getBalanceAmount(
+        string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             twoFactorCollectionId,
             user,
-            tokenIds,
-            ownershipTimes
+            tokenIdsJson,
+            ownershipTimesJson
         );
+        uint256 balance = TOKENIZATION.getBalanceAmount(balanceJson);
 
         return balance > 0;
     }
@@ -314,13 +350,17 @@ contract TwoFactorSecurityToken {
         address[] memory recipients = new address[](1);
         recipients[0] = to;
 
-        bool success = TOKENIZATION.transferTokens(
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             securityTokenCollectionId,
             recipients,
             amount,
-            _securityTokenIds,
-            _perpetualOwnership
+            tokenIdsJson,
+            ownershipTimesJson
         );
+        bool success = TOKENIZATION.transferTokens(transferJson);
 
         if (success) {
             emit TransferWithTwoFactor(msg.sender, to, amount);
@@ -346,13 +386,17 @@ contract TwoFactorSecurityToken {
         address[] memory recipients = new address[](1);
         recipients[0] = to;
 
-        bool success = TOKENIZATION.transferTokens(
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             securityTokenCollectionId,
             recipients,
             amount,
-            _securityTokenIds,
-            _perpetualOwnership
+            tokenIdsJson,
+            ownershipTimesJson
         );
+        bool success = TOKENIZATION.transferTokens(transferJson);
 
         if (success) {
             emit TransferWithTwoFactor(msg.sender, to, amount);
@@ -364,11 +408,20 @@ contract TwoFactorSecurityToken {
     // ============ KYC Management ============
 
     function setKYCStatus(address user, bool verified) external onlyIssuer {
-        TOKENIZATION.setDynamicStoreValue(kycRegistryId, user, verified);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            kycRegistryId,
+            user,
+            verified
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
     }
 
     function isKYCVerified(address user) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(kycRegistryId, user);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            kycRegistryId,
+            user
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -405,20 +458,28 @@ contract TwoFactorSecurityToken {
     // ============ View Functions ============
 
     function balanceOf(address account) external view returns (uint256) {
-        return TOKENIZATION.getBalanceAmount(
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             securityTokenCollectionId,
             account,
-            _securityTokenIds,
-            _perpetualOwnership
+            tokenIdsJson,
+            ownershipTimesJson
         );
+        return TOKENIZATION.getBalanceAmount(balanceJson);
     }
 
     function totalSupply() external view returns (uint256) {
-        return TOKENIZATION.getTotalSupply(
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             securityTokenCollectionId,
-            _securityTokenIds,
-            _perpetualOwnership
+            tokenIdsJson,
+            ownershipTimesJson
         );
+        return TOKENIZATION.getTotalSupply(supplyJson);
     }
 
     /**

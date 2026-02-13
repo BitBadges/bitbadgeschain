@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
+import "../libraries/TokenizationJSONHelpers.sol";
 
 /**
  * @title RealEstateSecurityToken
@@ -16,7 +17,7 @@ import "../interfaces/ITokenizationPrecompile.sol";
  */
 contract RealEstateSecurityToken {
     // Precompile address for BitBadges tokenization module
-    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000000808);
+    ITokenizationPrecompile constant TOKENIZATION = ITokenizationPrecompile(0x0000000000000000000000000000000000001001);
 
     // ============ State Variables ============
 
@@ -104,25 +105,28 @@ contract RealEstateSecurityToken {
 
         // Create Dynamic Stores for compliance registries
         // KYC Registry: default false (not KYC'd), set to true when verified
-        kycRegistryId = TOKENIZATION.createDynamicStore(
+        string memory kycJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,  // defaultValue: not KYC'd by default
             "ipfs://kyc-registry-metadata",
-            "{\"type\":\"kyc\",\"property\":\""
+            string(abi.encodePacked("{\"type\":\"kyc\",\"property\":\"", propertyAddress, "\"}"))
         );
+        kycRegistryId = TOKENIZATION.createDynamicStore(kycJson);
 
         // Accredited Investor Registry
-        accreditedRegistryId = TOKENIZATION.createDynamicStore(
+        string memory accreditedJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,  // defaultValue: not accredited by default
             "ipfs://accredited-registry-metadata",
             "{\"type\":\"accredited\"}"
         );
+        accreditedRegistryId = TOKENIZATION.createDynamicStore(accreditedJson);
 
         // Frozen Address Registry
-        frozenRegistryId = TOKENIZATION.createDynamicStore(
+        string memory frozenJson = TokenizationJSONHelpers.createDynamicStoreJSON(
             false,  // defaultValue: not frozen by default
             "ipfs://frozen-registry-metadata",
             "{\"type\":\"frozen\"}"
         );
+        frozenRegistryId = TOKENIZATION.createDynamicStore(frozenJson);
     }
 
     /**
@@ -133,39 +137,50 @@ contract RealEstateSecurityToken {
     function initializeCollection(uint256 totalSupply) external onlyIssuer {
         require(collectionId == 0, "Already initialized");
 
-        // Create the collection with tokens owned by issuer
-        TokenizationTypes.Balance[] memory initialBalances = new TokenizationTypes.Balance[](1);
-        initialBalances[0] = TokenizationTypes.Balance({
-            amount: totalSupply,
-            ownershipTimes: _ownershipTimes,
-            tokenIds: _tokenIds
-        });
-
-        TokenizationTypes.UserBalanceStore memory defaultBalances;
-        defaultBalances.balances = initialBalances;
-        defaultBalances.autoApproveSelfInitiatedOutgoingTransfers = true;
-        defaultBalances.autoApproveSelfInitiatedIncomingTransfers = true;
-
-        TokenizationTypes.MsgCreateCollection memory createMsg;
-        createMsg.defaultBalances = defaultBalances;
-        createMsg.validTokenIds = _tokenIds;
-        createMsg.manager = _addressToString(address(this));
-        createMsg.collectionMetadata = TokenizationTypes.CollectionMetadata({
-            uri: "ipfs://real-estate-token-metadata",
-            customData: string(abi.encodePacked(
+        // Build initial balance JSON (for minting totalSupply to creator)
+        string memory balanceJson = string(abi.encodePacked(
+            '[{"amount":"', TokenizationJSONHelpers.uintToString(totalSupply),
+            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max),
+            ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
+        ));
+        
+        // Build defaultBalances JSON with initial balances
+        string memory defaultBalancesJson = string(abi.encodePacked(
+            '{"balances":', balanceJson,
+            ',"autoApproveSelfInitiatedOutgoingTransfers":true',
+            ',"autoApproveSelfInitiatedIncomingTransfers":true',
+            ',"autoApproveAllIncomingTransfers":false',
+            ',"outgoingApprovals":[],"incomingApprovals":[],"userPermissions":{}}'
+        ));
+        
+        string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory collectionMetadataJson = TokenizationJSONHelpers.collectionMetadataToJson(
+            "ipfs://real-estate-token-metadata",
+            string(abi.encodePacked(
                 "{\"name\":\"", name,
                 "\",\"symbol\":\"", symbol,
                 "\",\"propertyAddress\":\"", propertyAddress,
                 "\",\"standard\":\"ERC-3643\"}"
             ))
-        });
-
+        );
+        
         string[] memory standards = new string[](2);
         standards[0] = "ERC-3643";
         standards[1] = "Security Token";
-        createMsg.standards = standards;
-
-        collectionId = TOKENIZATION.createCollection(createMsg);
+        string memory standardsJson = TokenizationJSONHelpers.stringArrayToJson(standards);
+        
+        string memory createJson = TokenizationJSONHelpers.createCollectionJSON(
+            validTokenIdsJson,
+            _addressToString(address(this)),
+            collectionMetadataJson,
+            defaultBalancesJson,
+            "{}",
+            standardsJson,
+            "",
+            false
+        );
+        
+        collectionId = TOKENIZATION.createCollection(createJson);
     }
 
     // ============ ERC-3643 Identity Registry Functions ============
@@ -175,7 +190,12 @@ contract RealEstateSecurityToken {
      * @param investor Address of the investor
      */
     function registerIdentity(address investor) external onlyComplianceAgent {
-        TOKENIZATION.setDynamicStoreValue(kycRegistryId, investor, true);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            kycRegistryId,
+            investor,
+            true
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         emit IdentityRegistered(investor, 0);
     }
 
@@ -184,7 +204,12 @@ contract RealEstateSecurityToken {
      * @param investor Address of the investor
      */
     function removeIdentity(address investor) external onlyComplianceAgent {
-        TOKENIZATION.setDynamicStoreValue(kycRegistryId, investor, false);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            kycRegistryId,
+            investor,
+            false
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         emit IdentityRemoved(investor);
     }
 
@@ -194,7 +219,12 @@ contract RealEstateSecurityToken {
      * @param isAccredited Whether the investor is accredited
      */
     function setAccreditedStatus(address investor, bool isAccredited) external onlyComplianceAgent {
-        TOKENIZATION.setDynamicStoreValue(accreditedRegistryId, investor, isAccredited);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            accreditedRegistryId,
+            investor,
+            isAccredited
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         if (isAccredited) {
             emit ComplianceAdded(investor);
         } else {
@@ -208,7 +238,11 @@ contract RealEstateSecurityToken {
      * @return bool True if KYC verified
      */
     function isVerified(address investor) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(kycRegistryId, investor);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            kycRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -219,7 +253,11 @@ contract RealEstateSecurityToken {
      * @return bool True if accredited
      */
     function isAccredited(address investor) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(accreditedRegistryId, investor);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            accreditedRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -231,7 +269,12 @@ contract RealEstateSecurityToken {
      * @param investor Address to freeze
      */
     function freezeAddress(address investor) external onlyComplianceAgent {
-        TOKENIZATION.setDynamicStoreValue(frozenRegistryId, investor, true);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            frozenRegistryId,
+            investor,
+            true
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         emit AddressFrozen(investor, true);
     }
 
@@ -240,7 +283,12 @@ contract RealEstateSecurityToken {
      * @param investor Address to unfreeze
      */
     function unfreezeAddress(address investor) external onlyComplianceAgent {
-        TOKENIZATION.setDynamicStoreValue(frozenRegistryId, investor, false);
+        string memory setValueJson = TokenizationJSONHelpers.setDynamicStoreValueJSON(
+            frozenRegistryId,
+            investor,
+            false
+        );
+        TOKENIZATION.setDynamicStoreValue(setValueJson);
         emit AddressFrozen(investor, false);
     }
 
@@ -250,7 +298,11 @@ contract RealEstateSecurityToken {
      * @return bool True if frozen
      */
     function isFrozen(address investor) public view returns (bool) {
-        bytes memory result = TOKENIZATION.getDynamicStoreValue(frozenRegistryId, investor);
+        string memory getValueJson = TokenizationJSONHelpers.getDynamicStoreValueJSON(
+            frozenRegistryId,
+            investor
+        );
+        bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
         return abi.decode(result, (bool));
     }
@@ -300,13 +352,17 @@ contract RealEstateSecurityToken {
         address[] memory recipients = new address[](1);
         recipients[0] = to;
 
-        bool success = TOKENIZATION.transferTokens(
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
             recipients,
             amount,
-            _tokenIds,
-            _ownershipTimes
+            tokenIdsJson,
+            ownershipTimesJson
         );
+        bool success = TOKENIZATION.transferTokens(transferJson);
 
         if (success) {
             emit Transfer(msg.sender, to, amount);
@@ -342,7 +398,16 @@ contract RealEstateSecurityToken {
      * @return uint256 Token balance
      */
     function balanceOf(address account) external view returns (uint256) {
-        return TOKENIZATION.getBalanceAmount(collectionId, account, _tokenIds, _ownershipTimes);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
+            collectionId,
+            account,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        return TOKENIZATION.getBalanceAmount(balanceJson);
     }
 
     /**
@@ -350,7 +415,15 @@ contract RealEstateSecurityToken {
      * @return uint256 Total token supply
      */
     function totalSupply() external view returns (uint256) {
-        return TOKENIZATION.getTotalSupply(collectionId, _tokenIds, _ownershipTimes);
+        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        
+        string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
+            collectionId,
+            tokenIdsJson,
+            ownershipTimesJson
+        );
+        return TOKENIZATION.getTotalSupply(supplyJson);
     }
 
     // ============ Internal Helpers ============
