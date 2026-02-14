@@ -3,19 +3,21 @@ package app
 import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	v23 "github.com/bitbadges/bitbadgeschain/app/upgrades/v23"
+	v24 "github.com/bitbadges/bitbadgeschain/app/upgrades/v24"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v23.UpgradeName,
-		v23.CreateUpgradeHandler(
+		v24.UpgradeName,
+		v24.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
-			app.BadgesKeeper,
+			app.TokenizationKeeper,
 			app.PoolManagerKeeper,
 			app.IBCRateLimitKeeper,
+			app.EVMKeeper,
+			app.BankKeeper,
 		),
 	)
 
@@ -34,9 +36,24 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v23.UpgradeName:
+	case v24.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{},
+			Renamed: []storetypes.StoreRename{
+				{
+					OldKey: "badges",
+					NewKey: "tokenization",
+				},
+			},
+			Deleted: []string{
+				"wasm-store",  // Remove WASM store
+				"wasmx-store", // Remove WASMX store
+			},
+			Added: []string{
+				"erc20",       // Add ERC20 store (new keeper)
+				"evm",         // Add EVM store (new keeper)
+				"feemarket",   // Add FeeMarket store (new keeper)
+				"precisebank", // Add PreciseBank store (new keeper)
+			},
 		}
 	}
 

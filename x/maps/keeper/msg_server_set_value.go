@@ -9,7 +9,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	tokentypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokentypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*types.MsgSetValueResponse, error) {
@@ -21,7 +21,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 	//Check the overwrite options
 	if msg.Options.UseMostRecentCollectionId {
-		nextCollectionId := k.badgesKeeper.GetNextCollectionId(ctx)
+		nextCollectionId := k.tokenizationKeeper.GetNextCollectionId(ctx)
 		value = nextCollectionId.Sub(sdkmath.NewUint(1)).BigInt().String()
 	}
 
@@ -66,7 +66,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 	collection := &tokentypes.TokenCollection{}
 	if !currMap.InheritManagerFrom.IsNil() && !currMap.InheritManagerFrom.IsZero() {
-		collectionRes, err := k.badgesKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerFrom.String()})
+		collectionRes, err := k.tokenizationKeeper.GetCollection(ctx, &tokentypes.QueryGetCollectionRequest{CollectionId: currMap.InheritManagerFrom.String()})
 		if err != nil {
 			return nil, sdkerrors.Wrap(ErrInvalidMapId, "Could not find collection in store")
 		}
@@ -83,7 +83,7 @@ func (k msgServer) SetValue(goCtx context.Context, msg *types.MsgSetValue) (*typ
 
 	if !currMap.UpdateCriteria.CollectionId.IsNil() && currMap.UpdateCriteria.CollectionId.GT(sdkmath.NewUint(0)) {
 		tokenId := sdkmath.NewUintFromString(key)
-		balancesRes, err := k.badgesKeeper.GetBalance(ctx, &tokentypes.QueryGetBalanceRequest{
+		balancesRes, err := k.tokenizationKeeper.GetBalance(ctx, &tokentypes.QueryGetBalanceRequest{
 			CollectionId: currMap.UpdateCriteria.CollectionId.String(),
 			Address:      msg.Creator,
 		})

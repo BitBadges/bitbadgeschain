@@ -17,8 +17,21 @@ accounts:
     #TODO: Remove alice?
     - name: alice
       coins:
-          - 1ubadge
+          - 99999999999999996ubadge
           - 1000000000000000ustake
+          - 100000000000ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349
+          - 100000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518
+          - 100000000000ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701
+          - 1000000000000000badges:49:chaosnet
+    - name: alice2
+      address: bb1kj9kt5y64n5a8677fhjqnmcc24ht2vy9atmdls
+      coins:  
+          - 99999999999999996ubadge
+          - 1000000000000000ustake
+          - 100000000000ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349
+          - 100000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518
+          - 100000000000ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701
+          - 1000000000000000badges:49:chaosnet
     - name: bob
       coins:
           - 99999999999999996ubadge
@@ -49,6 +62,11 @@ accounts:
           - 100000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518
           - 100000000000ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701
           - 1000000000000000badges:49:chaosnet
+    - name: test-evm-account
+      address: bb15ndklrxs6putds43tk9v3p4s0dp9g748anctay
+      coins:
+          - 99999999999999996ubadge
+          - 1000000000000000ustake
 client:
     typescript:
         path: ts-client
@@ -59,7 +77,7 @@ genesis:
     consensus_params:
         block:
             max_bytes: '22020096'
-            max_gas: '40000000'
+            max_gas: '100000000'
             time_iota_ms: '5000'
     app_state:
         gov:
@@ -86,6 +104,44 @@ genesis:
             constant_fee:
                 denom: ubadge
                 amount: '10000000000'
+        bank:
+            denom_metadata:
+                - description: The native token of BitBadges Chain
+                  denom_units:
+                    - denom: ubadge
+                      exponent: 0
+                    - denom: badge
+                      exponent: 9
+                  base: ubadge
+                  display: badge
+                  name: Badge
+                  symbol: BADGE
+        evm:
+            params:
+                evm_denom: ubadge
+                extended_denom_options:
+                    extended_denom: abadge
+                # Note: chain_config.chain_id is set via build flags
+                # Mainnet: 50024, Testnet: 50025, Local dev: 90123
+                active_static_precompiles:
+                    # Default Cosmos precompiles (registered via DefaultStaticPrecompiles in app/evm.go)
+                    # These are automatically registered but must be enabled here
+                    # Addresses from cosmos/evm/x/vm/types/precompiles.go (0x0800-0x0806)
+                    - "0x0000000000000000000000000000000000000800"  # Staking precompile
+                    - "0x0000000000000000000000000000000000000801"  # Distribution precompile
+                    - "0x0000000000000000000000000000000000000802"  # ICS20 (IBC) precompile
+                    - "0x0000000000000000000000000000000000000803"  # Vesting precompile
+                    - "0x0000000000000000000000000000000000000804"  # Bank precompile
+                    - "0x0000000000000000000000000000000000000805"  # Governance precompile
+                    - "0x0000000000000000000000000000000000000806"  # Slashing precompile
+                    
+                    # Custom BitBadges precompiles (registered in app/evm.go:registerCustomPrecompiles)
+                    # Addresses: 0x1001+ (custom BitBadges precompiles)
+                    - "0x0000000000000000000000000000000000001001"  # Tokenization precompile
+                    - "0x0000000000000000000000000000000000001002"  # Gamm precompile
+                    - "0x0000000000000000000000000000000000001003"  # SendManager precompile
+                    # Future precompiles should use addresses 0x1004, 0x1005, etc. to avoid collisions
+                    # Note: Bank functionality is provided by Cosmos default bank precompile at 0x0804 (enabled above)
 validators:
     - name: alice
       bonded: 1000000000000000ustake

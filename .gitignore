@@ -17,6 +17,7 @@ release/
 .DS_Store
 
 x/badges/keeper/coverage*
+x/tokenization/keeper/coverage*
 
 # Ignore all files starting with cover.
 cover.*
@@ -49,3 +50,8 @@ new-genesis.json
 
 # Osmosis sync directory
 .osmosis-sync/
+
+# Accidental ~/ directory (should be in home, not repo)
+~/
+
+node_modules/

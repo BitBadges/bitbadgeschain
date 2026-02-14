@@ -127,22 +127,22 @@ func (suite *TestSuite) TestDeleteManagerSplitter() {
 }
 
 func (suite *TestSuite) TestExecuteUniversalUpdateCollection_Admin() {
-	// Skip this test for now - requires full badges module setup
+	// Skip this test for now - requires full tokenization module setup
 	// This test would verify that admin can execute UniversalUpdateCollection
-	suite.T().Skip("Skipping - requires full badges module integration")
+	suite.T().Skip("Skipping - requires full tokenization module integration")
 }
 
 func (suite *TestSuite) TestExecuteUniversalUpdateCollection_ApprovedAddress() {
-	// Skip this test for now - requires full badges module setup
-	suite.T().Skip("Skipping - requires full badges module integration")
+		// Skip this test for now - requires full tokenization module setup
+		suite.T().Skip("Skipping - requires full tokenization module integration")
 }
 
 func (suite *TestSuite) TestExecuteUniversalUpdateCollection_Unauthorized() {
-	// Skip this test for now - requires full badges module setup
-	suite.T().Skip("Skipping - requires full badges module integration")
+		// Skip this test for now - requires full tokenization module setup
+		suite.T().Skip("Skipping - requires full tokenization module integration")
 }
 
 func (suite *TestSuite) TestExecuteUniversalUpdateCollection_MultiplePermissions() {
-	// Skip this test for now - requires full badges module setup
-	suite.T().Skip("Skipping - requires full badges module integration")
+		// Skip this test for now - requires full tokenization module setup
+		suite.T().Skip("Skipping - requires full tokenization module integration")
 }

@@ -10,14 +10,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
 
 	sdkmath "cosmossdk.io/math"
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 func permContains(perms []string, perm string) bool {
@@ -41,23 +40,21 @@ type Keeper struct {
 	bankKeeper          types.BankKeeper
 	communityPoolKeeper types.CommunityPoolKeeper
 	poolManager         types.PoolManager
-	badgesKeeper        badgeskeeper.Keeper
+	tokenizationKeeper  tokenizationkeeper.Keeper
 	sendManagerKeeper   types.SendManagerKeeper
 	transferKeeper      types.TransferKeeper
 
 	// IBC keepers (optional, for IBC transfer functionality)
 	ics4Wrapper   types.ICS4Wrapper
 	channelKeeper types.ChannelKeeper
-	scopedKeeper  types.ScopedKeeper
 }
 
 func NewKeeper(
-	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, badgesKeeper badgeskeeper.Keeper,
+	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, tokenizationKeeper tokenizationkeeper.Keeper,
 	sendManagerKeeper types.SendManagerKeeper,
 	transferKeeper types.TransferKeeper,
 	ics4Wrapper types.ICS4Wrapper,
 	channelKeeper types.ChannelKeeper,
-	scopedKeeper types.ScopedKeeper,
 ) Keeper {
 	// Ensure that the module account are set.
 	moduleAddr, perms := accountKeeper.GetModuleAddressAndPermissions(types.ModuleName)
@@ -81,12 +78,11 @@ func NewKeeper(
 		accountKeeper:       accountKeeper,
 		bankKeeper:          bankKeeper,
 		communityPoolKeeper: communityPoolKeeper,
-		badgesKeeper:        badgesKeeper,
+		tokenizationKeeper:  tokenizationKeeper,
 		sendManagerKeeper:   sendManagerKeeper,
 		transferKeeper:      transferKeeper,
-		ics4Wrapper:         ics4Wrapper,
-		channelKeeper:       channelKeeper,
-		scopedKeeper:        scopedKeeper,
+		ics4Wrapper:   ics4Wrapper,
+		channelKeeper: channelKeeper,
 	}
 }
 
@@ -109,9 +105,7 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("channel keeper not set")
 	}
 
-	if k.scopedKeeper == nil {
-		return fmt.Errorf("scoped keeper not set")
-	}
+	// IBC v10: scoped keeper removed - capabilities no longer used
 
 	// Validate channel exists
 	_, found := k.channelKeeper.GetChannel(ctx, transfertypes.PortID, ibcTransferInfo.SourceChannel)
@@ -119,12 +113,7 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("IBC channel %s does not exist", ibcTransferInfo.SourceChannel)
 	}
 
-	// Get channel capability
-	capPath := host.ChannelCapabilityPath(transfertypes.PortID, ibcTransferInfo.SourceChannel)
-	channelCap, ok := k.scopedKeeper.GetCapability(ctx, capPath)
-	if !ok {
-		return fmt.Errorf("channel capability not found for channel %s", ibcTransferInfo.SourceChannel)
-	}
+	// IBC v10: Capabilities removed - channel validation is handled by IBC core
 
 	// Use zero height for timeout (no timeout height)
 	timeoutHeight := clienttypes.ZeroHeight()
@@ -155,10 +144,9 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		return fmt.Errorf("failed to marshal packet data: %w", err)
 	}
 
-	// Send IBC packet
+	// Send IBC packet (IBC v10: capabilities removed)
 	_, err = k.ics4Wrapper.SendPacket(
 		ctx,
-		channelCap,
 		transfertypes.PortID,
 		ibcTransferInfo.SourceChannel,
 		timeoutHeight,
@@ -193,13 +181,13 @@ func (k Keeper) SetParam(ctx sdk.Context, key []byte, value interface{}) {
 // SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
 func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	return k.badgesKeeper.SendCoinsToPoolWithAliasRouting(ctx, from, to, coins)
+	return k.tokenizationKeeper.SendCoinsToPoolWithAliasRouting(ctx, from, to, coins)
 }
 
 // SendCoinsFromPoolWithAliasRouting sends coins from a pool, unwrapping badges denoms if needed.
 // IMPORTANT: Should ONLY be called when from address is a pool address
 func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
-	return k.badgesKeeper.SendCoinsFromPoolWithAliasRouting(ctx, from, to, coins)
+	return k.tokenizationKeeper.SendCoinsFromPoolWithAliasRouting(ctx, from, to, coins)
 }
 
 // FundCommunityPoolWithAliasRouting funds the community pool, wrapping badges denoms if needed.
@@ -224,24 +212,27 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 	// Iterate over all denoms in the pool's liquidity
 	for _, coin := range poolLiquidity {
 		// Check if this is a wrapped badges denom
-		if k.badgesKeeper.CheckIsAliasDenom(ctx, coin.Denom) {
-			collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, coin.Denom)
+		if k.tokenizationKeeper.CheckIsAliasDenom(ctx, coin.Denom) {
+			collection, err := k.tokenizationKeeper.ParseCollectionFromDenom(ctx, coin.Denom)
 			if err != nil {
 				return fmt.Errorf("failed to parse collection from denom: %s: %w", coin.Denom, err)
 			}
 
 			// Get the balances that would be needed for the recorded amount
-			balancesNeeded, err := badgeskeeper.GetBalancesToTransferWithAlias(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
+			balancesNeeded, err := tokenizationkeeper.GetBalancesToTransferWithAlias(collection, coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
 				return fmt.Errorf("failed to get balances to transfer for denom: %s: %w", coin.Denom, err)
 			}
 
 			// Get the pool's current balance
-			poolBalances, _ := k.badgesKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
+			poolBalances, _, err := k.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
+			if err != nil {
+				return err
+			}
 
 			// Try to subtract needed balances from pool balances - will error on underflow
-			poolBalancesCopy := badgestypes.DeepCopyBalances(poolBalances.Balances)
-			_, err = badgestypes.SubtractBalances(ctx, balancesNeeded, poolBalancesCopy)
+			poolBalancesCopy := tokenizationtypes.DeepCopyBalances(poolBalances.Balances)
+			_, err = tokenizationtypes.SubtractBalances(ctx, balancesNeeded, poolBalancesCopy)
 			if err != nil {
 				return fmt.Errorf("pool address %s has insufficient badges liquidity for denom %s",
 					poolAddress.String(), coin.Denom)
@@ -266,12 +257,12 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 func (k Keeper) ValidatePoolCreationAllowed(ctx sdk.Context, coins sdk.Coins) error {
 	for _, coin := range coins {
 		// Check if this is a badges denom
-		if !badgeskeeper.CheckStartsWithWrappedOrAliasDenom(coin.Denom) {
+		if !tokenizationkeeper.CheckStartsWithWrappedOrAliasDenom(coin.Denom) {
 			continue
 		}
 
 		// Parse collection from denom
-		collection, err := k.badgesKeeper.ParseCollectionFromDenom(ctx, coin.Denom)
+		collection, err := k.tokenizationKeeper.ParseCollectionFromDenom(ctx, coin.Denom)
 		if err != nil {
 			continue
 		}

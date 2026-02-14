@@ -8,8 +8,8 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 )
 
 // SetDeterministicError sets a deterministic error message in the transient store.
@@ -17,14 +17,27 @@ import (
 // The error message should be deterministic (no traces, logs, or non-deterministic values).
 // Panics if the error message contains patterns indicating stack traces or non-deterministic content.
 // Uses transient store so the value is automatically cleared at the end of the transaction.
+// SetDeterministicError stores an error message in the transient store for deterministic error handling.
+// This function validates that the error message doesn't contain non-deterministic content like stack traces.
+//
+// Limitations: This uses pattern matching to detect non-deterministic content, which may:
+//   - False-positive on legitimate content containing these patterns (e.g., ".go" in a message about Go files)
+//   - Miss some non-deterministic patterns not covered by the checks
+//
+// For production use, consider:
+//   - Using structured error types with predefined error codes
+//   - Creating an allowlist of safe error message formats
+//   - Implementing more sophisticated validation based on error source
 func SetDeterministicError(ctx sdk.Context, errorMsg string) {
 	// Validate that the error message doesn't contain stack traces or non-deterministic patterns
-	// Check for file paths (indicated by ".go")
+
+	// Check for file paths (indicated by ".go" or file extensions)
+	// Note: This may false-positive on legitimate messages about Go files
 	if strings.Contains(errorMsg, ".go") {
 		panic(fmt.Sprintf("SetDeterministicError: error message contains '.go' (likely a stack trace), which is non-deterministic. Error message: %s", errorMsg))
 	}
 
-	// Check for goroutine IDs
+	// Check for goroutine IDs (e.g., "goroutine 123")
 	if strings.Contains(errorMsg, "goroutine") {
 		panic(fmt.Sprintf("SetDeterministicError: error message contains 'goroutine' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
 	}
@@ -40,21 +53,46 @@ func SetDeterministicError(ctx sdk.Context, errorMsg string) {
 	}
 
 	// Check for full package paths (github.com/... or similar)
-	if matched, _ := regexp.MatchString(`(github\.com|golang\.org|go\.pkg\.dev)/`, errorMsg); matched {
+	// Using regex for more precise matching of package paths
+	if matched, _ := regexp.MatchString(`(github\.com|golang\.org|go\.pkg\.dev|gopkg\.in)/`, errorMsg); matched {
 		panic(fmt.Sprintf("SetDeterministicError: error message contains package path (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
+	}
+
+	// Check for common stack trace patterns: file paths with line numbers (e.g., "file.go:123")
+	if matched, _ := regexp.MatchString(`\w+\.go:\d+`, errorMsg); matched {
+		panic(fmt.Sprintf("SetDeterministicError: error message contains file path with line number (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
 	}
 
 	// Store in transient store - this persists across function calls even when context is passed by value
 	// Transient stores are automatically cleared at the end of each transaction
-	store := ctx.TransientStore(TransientStoreKey)
-	store.Set(DeterministicErrorKey, []byte(errorMsg))
+	// Gracefully handle cases where transient store is not available (e.g., when called through EVM precompile)
+	// Deterministic errors are only needed for IBC hooks, so we can skip storing them if the store isn't available
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				// Transient store not available - this is OK when called through EVM precompile
+				// Deterministic errors are only needed for IBC hooks, not for EVM transactions
+			}
+		}()
+		store := ctx.TransientStore(TransientStoreKey)
+		store.Set(DeterministicErrorKey, []byte(errorMsg))
+	}()
 }
 
 // GetDeterministicError retrieves the deterministic error message from the transient store, if any.
 // Returns the error message and true if found, empty string and false otherwise.
+// Gracefully handles cases where transient store is not available (e.g., when called through EVM precompile).
 func GetDeterministicError(ctx sdk.Context) (string, bool) {
-	store := ctx.TransientStore(TransientStoreKey)
-	value := store.Get(DeterministicErrorKey)
+	var value []byte
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				// Transient store not available - return empty result
+			}
+		}()
+		store := ctx.TransientStore(TransientStoreKey)
+		value = store.Get(DeterministicErrorKey)
+	}()
 	if len(value) == 0 {
 		return "", false
 	}
@@ -63,9 +101,17 @@ func GetDeterministicError(ctx sdk.Context) (string, bool) {
 
 // ClearDeterministicError clears any deterministic error message from the transient store.
 // This should be called before starting a new operation to avoid using stale error messages.
+// Gracefully handles cases where transient store is not available (e.g., when called through EVM precompile).
 func ClearDeterministicError(ctx sdk.Context) {
-	store := ctx.TransientStore(TransientStoreKey)
-	store.Delete(DeterministicErrorKey)
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				// Transient store not available - nothing to clear, this is OK
+			}
+		}()
+		store := ctx.TransientStore(TransientStoreKey)
+		store.Delete(DeterministicErrorKey)
+	}()
 }
 
 // WrapErr sets a deterministic error in transient store and returns a wrapped error.

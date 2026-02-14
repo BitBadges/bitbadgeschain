@@ -9,7 +9,7 @@ import (
 
 	_ "cosmossdk.io/api/amino"
 	_ "cosmossdk.io/api/cosmos/msg/v1"
-	badges "github.com/bitbadges/bitbadgeschain/api/badges"
+	tokenization "github.com/bitbadges/bitbadgeschain/api/tokenization"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
@@ -4305,7 +4305,7 @@ func (x *fastReflection_MsgExecuteUniversalUpdateCollection) Set(fd protoreflect
 	case "managersplitter.MsgExecuteUniversalUpdateCollection.managerSplitterAddress":
 		x.ManagerSplitterAddress = value.Interface().(string)
 	case "managersplitter.MsgExecuteUniversalUpdateCollection.universalUpdateCollectionMsg":
-		x.UniversalUpdateCollectionMsg = value.Message().Interface().(*badges.MsgUniversalUpdateCollection)
+		x.UniversalUpdateCollectionMsg = value.Message().Interface().(*tokenization.MsgUniversalUpdateCollection)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: managersplitter.MsgExecuteUniversalUpdateCollection"))
@@ -4328,7 +4328,7 @@ func (x *fastReflection_MsgExecuteUniversalUpdateCollection) Mutable(fd protoref
 	switch fd.FullName() {
 	case "managersplitter.MsgExecuteUniversalUpdateCollection.universalUpdateCollectionMsg":
 		if x.UniversalUpdateCollectionMsg == nil {
-			x.UniversalUpdateCollectionMsg = new(badges.MsgUniversalUpdateCollection)
+			x.UniversalUpdateCollectionMsg = new(tokenization.MsgUniversalUpdateCollection)
 		}
 		return protoreflect.ValueOfMessage(x.UniversalUpdateCollectionMsg.ProtoReflect())
 	case "managersplitter.MsgExecuteUniversalUpdateCollection.executor":
@@ -4353,7 +4353,7 @@ func (x *fastReflection_MsgExecuteUniversalUpdateCollection) NewField(fd protore
 	case "managersplitter.MsgExecuteUniversalUpdateCollection.managerSplitterAddress":
 		return protoreflect.ValueOfString("")
 	case "managersplitter.MsgExecuteUniversalUpdateCollection.universalUpdateCollectionMsg":
-		m := new(badges.MsgUniversalUpdateCollection)
+		m := new(tokenization.MsgUniversalUpdateCollection)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -4636,7 +4636,7 @@ func (x *fastReflection_MsgExecuteUniversalUpdateCollection) ProtoMethods() *pro
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.UniversalUpdateCollectionMsg == nil {
-					x.UniversalUpdateCollectionMsg = &badges.MsgUniversalUpdateCollection{}
+					x.UniversalUpdateCollectionMsg = &tokenization.MsgUniversalUpdateCollection{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.UniversalUpdateCollectionMsg); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -5491,7 +5491,7 @@ type MsgExecuteUniversalUpdateCollection struct {
 	// Address of the manager splitter to execute through.
 	ManagerSplitterAddress string `protobuf:"bytes,2,opt,name=managerSplitterAddress,proto3" json:"managerSplitterAddress,omitempty"`
 	// The UniversalUpdateCollection message to execute.
-	UniversalUpdateCollectionMsg *badges.MsgUniversalUpdateCollection `protobuf:"bytes,3,opt,name=universalUpdateCollectionMsg,proto3" json:"universalUpdateCollectionMsg,omitempty"`
+	UniversalUpdateCollectionMsg *tokenization.MsgUniversalUpdateCollection `protobuf:"bytes,3,opt,name=universalUpdateCollectionMsg,proto3" json:"universalUpdateCollectionMsg,omitempty"`
 }
 
 func (x *MsgExecuteUniversalUpdateCollection) Reset() {
@@ -5528,7 +5528,7 @@ func (x *MsgExecuteUniversalUpdateCollection) GetManagerSplitterAddress() string
 	return ""
 }
 
-func (x *MsgExecuteUniversalUpdateCollection) GetUniversalUpdateCollectionMsg() *badges.MsgUniversalUpdateCollection {
+func (x *MsgExecuteUniversalUpdateCollection) GetUniversalUpdateCollectionMsg() *tokenization.MsgUniversalUpdateCollection {
 	if x != nil {
 		return x.UniversalUpdateCollectionMsg
 	}
@@ -5757,14 +5757,14 @@ var file_managersplitter_tx_proto_goTypes = []interface{}{
 	(*MsgExecuteUniversalUpdateCollectionResponse)(nil), // 10: managersplitter.MsgExecuteUniversalUpdateCollectionResponse
 	(*Params)(nil),                                      // 11: managersplitter.Params
 	(*ManagerSplitterPermissions)(nil),                  // 12: managersplitter.ManagerSplitterPermissions
-	(*badges.MsgUniversalUpdateCollection)(nil),         // 13: badges.MsgUniversalUpdateCollection
+	(*tokenization.MsgUniversalUpdateCollection)(nil),         // 13: tokenization.MsgUniversalUpdateCollection
 }
 var file_managersplitter_tx_proto_depIdxs = []int32{
 	11, // 0: managersplitter.MsgUpdateParams.params:type_name -> managersplitter.Params
 	12, // 1: managersplitter.ManagerSplitter.permissions:type_name -> managersplitter.ManagerSplitterPermissions
 	12, // 2: managersplitter.MsgCreateManagerSplitter.permissions:type_name -> managersplitter.ManagerSplitterPermissions
 	12, // 3: managersplitter.MsgUpdateManagerSplitter.permissions:type_name -> managersplitter.ManagerSplitterPermissions
-	13, // 4: managersplitter.MsgExecuteUniversalUpdateCollection.universalUpdateCollectionMsg:type_name -> badges.MsgUniversalUpdateCollection
+	13, // 4: managersplitter.MsgExecuteUniversalUpdateCollection.universalUpdateCollectionMsg:type_name -> tokenization.MsgUniversalUpdateCollection
 	0,  // 5: managersplitter.Msg.UpdateParams:input_type -> managersplitter.MsgUpdateParams
 	3,  // 6: managersplitter.Msg.CreateManagerSplitter:input_type -> managersplitter.MsgCreateManagerSplitter
 	5,  // 7: managersplitter.Msg.UpdateManagerSplitter:input_type -> managersplitter.MsgUpdateManagerSplitter

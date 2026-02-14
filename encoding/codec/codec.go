@@ -8,11 +8,24 @@ import (
 	ethereumcodec "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/codec"
 	ethereum "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/utils"
 	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
+
+	// EVM module types - required for JSON-RPC tx decoding
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+	erc20types "github.com/cosmos/evm/x/erc20/types"
+	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 )
+
+/**
+  IMPORTANT: Even though these are not technically supported anymore, we need to keep them for
+	legacy purposes (some accounts still have etheruem.PubKey and other dependent types).
+
+	To fully remove this, we need to handle migrations of these accounts.
+*/
 
 // RegisterLegacyAminoCodec registers Interfaces from types, crypto, and SDK std.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	ethereumcodec.RegisterCrypto(cdc)
+	// Note: evmtypes amino registration is handled by the EVM module itself
 }
 
 // RegisterInterfaces registers Interfaces from types, crypto, and SDK std.
@@ -21,4 +34,9 @@ func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 	ethereum.RegisterInterfaces(interfaceRegistry)
 	solana.RegisterInterfaces(interfaceRegistry)
 	bitcoin.RegisterInterfaces(interfaceRegistry)
+
+	// EVM module types - required for JSON-RPC tx decoding (MsgEthereumTx, etc.)
+	evmtypes.RegisterInterfaces(interfaceRegistry)
+	erc20types.RegisterInterfaces(interfaceRegistry)
+	feemarkettypes.RegisterInterfaces(interfaceRegistry)
 }

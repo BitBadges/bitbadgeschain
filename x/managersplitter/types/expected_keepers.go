@@ -19,8 +19,8 @@ type BankKeeper interface {
 	// Methods imported from bank should be defined here
 }
 
-// BadgesKeeper defines the expected interface for the Badges module.
-type BadgesKeeper interface {
+// TokenizationKeeper defines the expected interface for the Tokenization module.
+type TokenizationKeeper interface {
 	// GetNextCollectionId gets the next collection ID
 	GetNextCollectionId(ctx sdk.Context) sdkmath.Uint
 	// Keeper methods needed for UniversalUpdateCollection

@@ -7,6 +7,7 @@ import (
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
+	txsigning "cosmossdk.io/x/tx/signing"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -17,6 +18,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+
+	evmhd "github.com/cosmos/evm/crypto/hd"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -38,6 +42,7 @@ func NewRootCmd() *cobra.Command {
 			),
 			depinject.Provide(
 				ProvideClientContext,
+				ProvideEVMGetSigners,
 			),
 		),
 		&autoCliOpts,
@@ -46,6 +51,10 @@ func NewRootCmd() *cobra.Command {
 	); err != nil {
 		panic(err)
 	}
+	// Apply keyring options to the initial client context BEFORE creating root command
+	// This ensures keyring options are available when keys.Commands() is called in initRootCmd
+	// Use Cosmos EVM's keyring option directly
+	clientCtx = clientCtx.WithKeyringOptions(evmhd.EthSecp256k1Option())
 
 	rootCmd := &cobra.Command{
 		Use:           app.Name + "d",
@@ -67,6 +76,11 @@ func NewRootCmd() *cobra.Command {
 				return err
 			}
 
+			// Apply keyring options to support eth_secp256k1
+			// This must be done after ReadFromClientConfig to ensure they're not overwritten
+			// Use Cosmos EVM's keyring option directly
+			clientCtx = clientCtx.WithKeyringOptions(evmhd.EthSecp256k1Option())
+
 			if err := client.SetCmdClientContextHandler(clientCtx, cmd); err != nil {
 				return err
 			}
@@ -76,12 +90,6 @@ func NewRootCmd() *cobra.Command {
 
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
 		},
-	}
-
-	wasmModules := app.RegisterWasm(clientCtx.InterfaceRegistry)
-	for name, mod := range wasmModules {
-		moduleBasicManager[name] = module.CoreAppModuleBasicAdaptor(name, mod)
-		autoCliOpts.Modules[name] = mod
 	}
 
 	// Since the IBC modules don't support dependency injection, we need to
@@ -129,12 +137,20 @@ func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
 	}
 }
 
+// ProvideEVMGetSigners provides the custom signer for EVM MsgEthereumTx
+func ProvideEVMGetSigners() txsigning.CustomGetSigner {
+	return evmtypes.MsgEthereumTxCustomGetSigner
+}
+
 func ProvideClientContext(
 	appCodec codec.Codec,
 	interfaceRegistry codectypes.InterfaceRegistry,
 	txConfigOpts tx.ConfigOptions,
 	legacyAmino *codec.LegacyAmino,
 ) client.Context {
+	// Create client context with keyring options set BEFORE ReadFromClientConfig
+	// This matches the Cosmos EVM reference implementation pattern
+	// Reference: https://github.com/cosmos/evm/blob/f1f4c2aee76243f0ffe0dd444e05b9cb2ef9898b/evmd/cmd/evmd/cmd/root.go#L85
 	clientCtx := client.Context{}.
 		WithCodec(appCodec).
 		WithInterfaceRegistry(interfaceRegistry).
@@ -142,9 +158,11 @@ func ProvideClientContext(
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(app.DefaultNodeHome).
-		WithViper(app.Name) // env variable prefix
+		WithViper(app.Name).                           // env variable prefix
+		WithKeyringOptions(evmhd.EthSecp256k1Option()) // Set keyring options BEFORE ReadFromClientConfig
 
 	// Read the config again to overwrite the default values with the values from the config file
+	// Note: ReadFromClientConfig should preserve keyring options
 	clientCtx, _ = config.ReadFromClientConfig(clientCtx)
 
 	// textual is enabled by default, we need to re-create the tx config grpc instead of bank keeper.

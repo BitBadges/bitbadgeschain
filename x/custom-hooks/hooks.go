@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
@@ -34,7 +34,7 @@ func NewCustomHooks(keeper keeper.Keeper, bech32PrefixAccAddr string) *CustomHoo
 // OnRecvPacketOverride implements OnRecvPacketOverrideHooks interface
 // This allows us to control the acknowledgement and fail the packet if the hook fails
 // Both IBC transfer and hook execution are wrapped in a cached context to ensure atomicity
-func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	h.keeper.Logger(ctx).Info("custom-hooks: OnRecvPacketOverride", "packet", packet)
 
 	// Check if this is an ICS20 packet and parse hook data before executing IBC transfer
@@ -53,7 +53,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 
 	// If no hook data, execute IBC transfer normally (no atomicity needed)
 	if !isIcs20 || hookData == nil {
-		return im.App.OnRecvPacket(ctx, packet, relayer)
+		return im.App.OnRecvPacket(ctx, channelID, packet, relayer)
 	}
 
 	// We have hook data - need atomicity between IBC transfer and hook execution
@@ -61,7 +61,7 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	cacheCtx, writeCache := ctx.CacheContext()
 
 	// Execute IBC transfer in cached context
-	ack := im.App.OnRecvPacket(cacheCtx, packet, relayer)
+	ack := im.App.OnRecvPacket(cacheCtx, channelID, packet, relayer)
 
 	// If the IBC transfer itself failed, discard cache and return error
 	if !ack.Success() {
@@ -170,7 +170,7 @@ func extractDenomFromPacketOnRecv(packet channeltypes.Packet) (string, error) {
 		// The denomination used to send the coins is either the native denom or the hash of the path
 		// if the denomination is not native.
 		denomTrace := transfertypes.ParseDenomTrace(unprefixedDenom)
-		if denomTrace.Path != "" {
+		if denomTrace.Path() != "" {
 			denom = denomTrace.IBCDenom()
 		} else {
 			denom = unprefixedDenom

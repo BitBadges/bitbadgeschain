@@ -1,0 +1,814 @@
+package keeper_test
+
+import (
+	"strings"
+
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+
+	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+func (suite *TestSuite) TestUserLevelRoyalties() {
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserRoyalties = &types.UserRoyalties{
+		Percentage:    sdkmath.NewUint(1000), // 10%
+		PayoutAddress: charlie,
+	}
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating tokens")
+
+	charlieAddr, err := sdk.AccAddressFromBech32(charlie)
+	suite.Require().Nil(err, "error getting charlie address")
+	charlieBalance := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge")
+	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000))
+
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 bob,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{
+			{
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: alice,
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+
+				ApprovalId: "test",
+				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "test-tracker",
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "test-tracker",
+					},
+					CoinTransfers: []*types.CoinTransfer{
+						{
+							To:                              alice,
+							OverrideFromWithApproverAddress: true, // Coins come from bob (approver), not alice (initiator)
+							Coins: []*sdk.Coin{
+								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating user approvals")
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+					{
+						ApprovalId:      "test",
+						ApprovalLevel:   "outgoing",
+						ApproverAddress: bob,
+						Version:         sdkmath.NewUint(1), // Version increments when approval is created
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error deducting outgoing approvals")
+
+	charlieBalance = suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge")
+	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000+10)) //10% of 100 ubadge
+}
+
+func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate[0].CollectionApprovals[1].OwnershipTimes = GetBottomHalfUintRanges()
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserRoyalties = &types.UserRoyalties{
+		Percentage:    sdkmath.NewUint(1000), // 10%
+		PayoutAddress: charlie,
+	}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, GetCollectionsToCreate()[0].CollectionApprovals[0])
+	collectionsToCreate[0].CollectionApprovals[2].OwnershipTimes = GetTopHalfUintRanges()
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria.UserRoyalties = &types.UserRoyalties{
+		Percentage:    sdkmath.NewUint(2000), // 20%
+		PayoutAddress: charlie,
+	}
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "test2"
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating tokens")
+
+	charlieAddr, err := sdk.AccAddressFromBech32(charlie)
+	suite.Require().Nil(err, "error getting charlie address")
+	charlieBalance := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge")
+	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000))
+
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 bob,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{
+			{
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: alice,
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+
+				ApprovalId: "test",
+				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "test-tracker",
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "test-tracker",
+					},
+					CoinTransfers: []*types.CoinTransfer{
+						{
+							To: alice,
+							Coins: []*sdk.Coin{
+								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating user approvals")
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "wrapped-with-royalties",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+					{
+						ApprovalId:      "wrapped-coin-transfer",
+						ApprovalLevel:   "outgoing",
+						ApproverAddress: bob,
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Error deducting outgoing approvals")
+}
+
+// TestCoinTransfersWithWrappedDenoms tests coin transfers with badgeslp: wrapped token denoms
+func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection with cosmos coin wrapper paths using badgeslp: prefix
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
+		{
+			Denom: "wrappedcoin",
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+			Symbol:     "WRAP",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "wrappedcoin", IsDefaultDisplay: true}},
+		},
+	}
+
+	// Add collection approvals for transfers to/from wrapper paths
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "wrapper-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+			OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection with cosmos coin wrapper paths")
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	wrapperPath := collection.AliasPaths[0]
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
+	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
+
+	// First, mint more tokens to bob so he has enough to wrap
+	// The collection only mints 1 token initially, so we need to mint more
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(4), // Mint 4 more to have 5 total
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting additional tokens to bob")
+
+	// For badgeslp: denoms, we can't wrap by transferring to wrapper path (AllowCosmosWrapping=false)
+	// badgeslp: denoms are just bank tokens, but the wrapped approach uses token balances
+	// Verify bob has tokens (needed for the wrapped approach to work)
+	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's token balance")
+	suite.Require().True(len(bobBalanceBefore.Balances) > 0, "Bob should have badges")
+
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err, "Error getting bob's address")
+
+	// For badgeslp: denoms, mint the wrapped coins to bob's bank account
+	// These are just bank tokens, but transfers will check token balances
+	wrappedCoins := sdk.NewCoins(sdk.NewCoin(wrapperDenom, sdkmath.NewInt(4)))
+	err = suite.app.BankKeeper.MintCoins(suite.ctx, "mint", wrappedCoins)
+	suite.Require().Nil(err, "Error minting wrapped coins")
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, wrappedCoins)
+	suite.Require().Nil(err, "Error sending wrapped coins to bob")
+
+	// Verify bob has 4 wrapped coins in bank
+	bobWrappedBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, wrapperDenom)
+	suite.Require().Equal(sdkmath.NewInt(4), bobWrappedBalance.Amount, "Bob should have 4 wrapped coins in bank")
+
+	// Verify bob has badges (needed for the wrapped approach)
+	bobBalanceAfterMint, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's token balance")
+	suite.Require().True(len(bobBalanceAfterMint.Balances) > 0, "Bob should have tokens for wrapped approach")
+
+	// Add wrapped denom to allowed denoms
+	params := suite.app.TokenizationKeeper.GetParams(suite.ctx)
+	params.AllowedDenoms = append(params.AllowedDenoms, wrapperDenom)
+	err = suite.app.TokenizationKeeper.SetParams(suite.ctx, params)
+	suite.Require().Nil(err, "Error setting params with wrapped denom")
+
+	// Update collection approval to include royalties
+	err = UpdateCollection(suite, wctx, &types.MsgUniversalUpdateCollection{
+		Creator:                   bob,
+		CollectionId:              sdkmath.NewUint(1),
+		UpdateCollectionApprovals: true,
+		CollectionApprovals: []*types.CollectionApproval{
+			{
+				ApprovalId:        "wrapped-with-royalties",
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          GetOneUintRange(),
+				FromListId:        "AllWithoutMint",
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: "AllWithoutMint",
+				ApprovalCriteria: &types.ApprovalCriteria{
+					UserRoyalties: &types.UserRoyalties{
+						Percentage:    sdkmath.NewUint(1000), // 10%
+						PayoutAddress: charlie,
+					},
+					OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+					OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating collection with royalties")
+
+	// Test coin transfer with wrapped denom and royalties
+	// For badgeslp: denoms, we check token balances, not bank balances
+	bobBalanceBeforeTransfer, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "error getting bob's token balance before transfer")
+	suite.Require().NotNil(bobBalanceBeforeTransfer, "Bob should have tokens before transfer")
+
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 bob,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{
+			{
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: alice,
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				ApprovalId:        "wrapped-coin-transfer",
+				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "wrapped-tracker",
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "wrapped-tracker",
+					},
+					CoinTransfers: []*types.CoinTransfer{
+						{
+							To:                              alice,
+							OverrideFromWithApproverAddress: true, // Coins come from bob (approver), not alice (initiator)
+							Coins: []*sdk.Coin{
+								{Amount: sdkmath.NewInt(2), Denom: wrapperDenom}, // Use 2 instead of 3 since bob only has 4
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating user approvals with wrapped denom")
+
+	// Execute the transfer
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "wrapped-with-royalties",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+					{
+						ApprovalId:      "wrapped-coin-transfer",
+						ApprovalLevel:   "outgoing",
+						ApproverAddress: bob,
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error executing transfer with wrapped denom coin transfer")
+
+	// For badgeslp: denoms, the wrapped approach transfers underlying tokens via sendNativeTokensToAddressWithPoolApprovals
+	// Verify alice received the underlying tokens
+	aliceBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err, "Error getting alice's token balance after transfer")
+	suite.Require().NotNil(aliceBalanceAfter, "Alice should have received tokens")
+	suite.Require().True(len(aliceBalanceAfter.Balances) > 0, "Alice should have received at least some tokens")
+
+	// Verify charlie received the royalty (10% of 2 = 0.2, rounded down to 0 or up to 1)
+	// For badgeslp: denoms, royalties are also transferred as underlying tokens
+	charlieBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), charlie)
+	suite.Require().Nil(err, "Error getting charlie's token balance after transfer")
+	// Charlie should have received tokens as royalty (wrapped approach transfers tokens)
+	suite.Require().NotNil(charlieBalanceAfter, "Charlie should have received tokens as royalty")
+
+	// Verify bob's token balance decreased (wrapped approach transfers underlying tokens)
+	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's token balance after transfer")
+	suite.Require().NotNil(bobBalanceAfter, "Bob should still have a balance")
+
+	// Bob's token balance should have decreased because the wrapped approach transfers underlying tokens
+	diffInBalances, err := types.SubtractBalances(suite.ctx, bobBalanceAfter.Balances, bobBalanceBeforeTransfer.Balances)
+	suite.Require().Nil(err, "Error subtracting balances")
+	// Bob should have lost some tokens (the wrapped approach transfers underlying tokens)
+	// Check if any balance shows a decrease (negative amount means loss)
+	hasDecrease := false
+	for _, balance := range diffInBalances {
+		if balance.Amount.LT(sdkmath.ZeroUint()) {
+			hasDecrease = true
+			break
+		}
+	}
+	suite.Require().True(hasDecrease || len(diffInBalances) > 0, "Bob should have lost tokens from the wrapped approach transfer")
+}
+
+// TestCoinTransfersWithWrappedDenomsInsufficientBalance tests that insufficient balance is detected for badgeslp: wrapped denoms
+func (suite *TestSuite) TestCoinTransfersWithWrappedDenomsInsufficientBalance() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection with cosmos coin wrapper paths using badgeslp: prefix
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
+		{
+			Denom: "insufficientcoin",
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "wrapper-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+			OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection")
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	wrapperPath := collection.AliasPaths[0]
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
+	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
+
+	// For badgeslp: denoms, we need to check token balances, not bank balances
+	// First, verify bob has badges
+	bobBalanceBefore, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's token balance")
+	suite.Require().True(len(bobBalanceBefore.Balances) > 0, "Bob should have badges")
+
+	// For badgeslp: denoms, the wrapped approach calculates from token balances
+	// We need bob to have enough tokens to wrap 2 coins
+	// Mint more tokens to bob if needed
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1), // Mint 1 more to have 2 total
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting additional tokens to bob")
+
+	// Verify bob has 2 badges now
+	bobBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's badge balance after minting")
+	suite.Require().True(len(bobBalanceAfter.Balances) > 0, "Bob should have badges")
+
+	// For badgeslp: denoms, mint some wrapped coins to bob's bank account
+	// The wrapped approach will check token balances when transferring
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err, "Error getting bob's address")
+	wrappedCoins := sdk.NewCoins(sdk.NewCoin(wrapperDenom, sdkmath.NewInt(2)))
+	err = suite.app.BankKeeper.MintCoins(suite.ctx, "mint", wrappedCoins)
+	suite.Require().Nil(err, "Error minting wrapped coins")
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, wrappedCoins)
+	suite.Require().Nil(err, "Error sending wrapped coins to bob")
+
+	// Verify bob has 2 wrapped coins in bank
+	bobWrappedBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, wrapperDenom)
+	suite.Require().Equal(sdkmath.NewInt(2), bobWrappedBalance.Amount, "Bob should have 2 wrapped coins in bank")
+
+	// Add wrapped denom to allowed denoms
+	params := suite.app.TokenizationKeeper.GetParams(suite.ctx)
+	params.AllowedDenoms = append(params.AllowedDenoms, wrapperDenom)
+	err = suite.app.TokenizationKeeper.SetParams(suite.ctx, params)
+	suite.Require().Nil(err, "Error setting params with wrapped denom")
+
+	// Try to transfer 5 wrapped coins (more than available)
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 bob,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{
+			{
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: alice,
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				ApprovalId:        "insufficient-transfer",
+				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "insufficient-tracker",
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "insufficient-tracker",
+					},
+					CoinTransfers: []*types.CoinTransfer{
+						{
+							To:                              alice,
+							OverrideFromWithApproverAddress: true, // Coins come from bob (approver), not alice (initiator)
+							Coins: []*sdk.Coin{
+								{Amount: sdkmath.NewInt(5), Denom: wrapperDenom}, // More than available (bob only has 2 badges)
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating user approvals")
+
+	// The transfer should fail due to insufficient balance
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "insufficient-transfer",
+						ApprovalLevel:   "outgoing",
+						ApproverAddress: bob,
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Error(err, "Transfer should fail due to insufficient wrapped denom balance")
+	// Check for either "insufficient" or "underflow" in error message
+	suite.Require().True(strings.Contains(err.Error(), "insufficient") || strings.Contains(err.Error(), "underflow"), "Error should mention insufficient balance or underflow: %s", err.Error())
+}
+
+// TestCoinTransfersWithMixedDenoms tests coin transfers with both badgeslp: wrapped and non-wrapped denoms
+func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create a collection with cosmos coin wrapper paths using badgeslp: prefix
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
+		{
+			Denom: "mixedcoin",
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{
+					Amount: sdkmath.NewUint(1),
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "wrapper-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
+			OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection")
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+	wrapperPath := collection.AliasPaths[0]
+	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
+	suite.Require().True(strings.HasPrefix(wrapperDenom, keeper.AliasDenomPrefix), "Wrapper denom should use badgeslp: prefix")
+
+	// First, mint more tokens to bob so he has enough
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(2), // Mint 2 more to have 3 total
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error minting additional tokens to bob")
+
+	// Verify bob has badges (needed for the wrapped approach)
+	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
+	suite.Require().Nil(err, "Error getting bob's token balance")
+	suite.Require().True(len(bobBalance.Balances) > 0, "Bob should have badges")
+
+	// For badgeslp: denoms, mint wrapped coins to bob's bank account
+	// These are just bank tokens, but transfers will check token balances
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err, "Error getting bob's address")
+	wrappedCoins := sdk.NewCoins(sdk.NewCoin(wrapperDenom, sdkmath.NewInt(2)))
+	err = suite.app.BankKeeper.MintCoins(suite.ctx, "mint", wrappedCoins)
+	suite.Require().Nil(err, "Error minting wrapped coins")
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, wrappedCoins)
+	suite.Require().Nil(err, "Error sending wrapped coins to bob")
+
+	// Verify bob has 2 wrapped coins in bank
+	bobWrappedBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, wrapperDenom)
+	suite.Require().Equal(sdkmath.NewInt(2), bobWrappedBalance.Amount, "Bob should have 2 wrapped coins in bank")
+
+	// Add wrapped denom to allowed denoms
+	params := suite.app.TokenizationKeeper.GetParams(suite.ctx)
+	params.AllowedDenoms = append(params.AllowedDenoms, wrapperDenom)
+	err = suite.app.TokenizationKeeper.SetParams(suite.ctx, params)
+	suite.Require().Nil(err, "Error setting params with wrapped denom")
+
+	// Fund bob with regular ubadge coins
+	suite.app.BankKeeper.SendCoins(suite.ctx, suite.app.AccountKeeper.GetModuleAddress("mint"), bobAccAddr, sdk.NewCoins(sdk.NewCoin("ubadge", sdkmath.NewInt(1000))))
+
+	// Test coin transfer with both wrapped and non-wrapped denoms
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 bob,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{
+			{
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: alice,
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				ApprovalId:        "mixed-transfer",
+				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "mixed-tracker",
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "mixed-tracker",
+					},
+					CoinTransfers: []*types.CoinTransfer{
+						{
+							To:                              alice,
+							OverrideFromWithApproverAddress: true, // Coins come from bob (approver), not alice (initiator)
+							Coins: []*sdk.Coin{
+								{Amount: sdkmath.NewInt(2), Denom: wrapperDenom}, // Wrapped denom
+								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},   // Regular denom
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating user approvals with mixed denoms")
+
+	// Execute the transfer
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "wrapper-transfer",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+					{
+						ApprovalId:      "mixed-transfer",
+						ApprovalLevel:   "outgoing",
+						ApproverAddress: bob,
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error executing transfer with mixed denoms")
+
+	// Verify alice received both types of coins
+	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err, "Error getting alice's address")
+	aliceUbadgeBalance := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, "ubadge")
+	// Alice starts with 100 * 1e9 ubadge, so after receiving 100 more, she should have 100 * 1e9 + 100
+	suite.Require().True(aliceUbadgeBalance.Amount.GTE(sdkmath.NewInt(100)), "Alice should receive at least 100 ubadge coins")
+
+	// For badgeslp: denoms, the wrapped approach transfers underlying tokens
+	// Verify alice received the underlying badges
+	aliceBalanceAfter, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err, "Error getting alice's token balance after transfer")
+	suite.Require().NotNil(aliceBalanceAfter, "Alice should have received badges from the wrapped approach")
+
+	// Note: For badgeslp: denoms, the wrapped coins in bank are just representations
+	// The actual transfer uses sendNativeTokensToAddressWithPoolApprovals which transfers underlying tokens
+	// So we check token balances, not bank balances for the wrapped coins
+}

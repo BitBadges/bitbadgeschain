@@ -9,11 +9,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	stableswap "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 // TestCreatePool tests that all possible pools are created correctly.
@@ -393,7 +393,7 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 	s.Setup()
 
 	ctx := s.Ctx
-	badgesKeeper := s.App.BadgesKeeper
+	tokenizationKeeper := s.App.TokenizationKeeper
 	poolmanagerKeeper := s.App.PoolManagerKeeper
 	gammKeeper := s.App.GammKeeper
 
@@ -402,45 +402,45 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 	creatorStr := creator.String()
 
 	// Create collection with wrapper path and allowPoolCreation = false
-	createCollectionMsg := &badgestypes.MsgCreateCollection{
+	createCollectionMsg := &tokenizationtypes.MsgCreateCollection{
 		Creator: creatorStr,
-		ValidTokenIds: []*badgestypes.UintRange{
+		ValidTokenIds: []*tokenizationtypes.UintRange{
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
-		CollectionPermissions: &badgestypes.CollectionPermissions{},
+		CollectionPermissions: &tokenizationtypes.CollectionPermissions{},
 		Manager:               creatorStr,
-		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
+		CosmosCoinWrapperPathsToAdd: []*tokenizationtypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadge",
-				Conversion: &badgestypes.ConversionWithoutDenom{
-					SideA: &badgestypes.ConversionSideA{
+				Conversion: &tokenizationtypes.ConversionWithoutDenom{
+					SideA: &tokenizationtypes.ConversionSideA{
 						Amount: sdkmath.NewUint(1),
 					},
-					SideB: []*badgestypes.Balance{
+					SideB: []*tokenizationtypes.Balance{
 						{
 							Amount:         sdkmath.NewUint(1),
-							OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-							TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+							OwnershipTimes: []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+							TokenIds:       []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						},
 					},
 				},
 				Symbol:     "TEST",
-				DenomUnits: []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
+				DenomUnits: []*tokenizationtypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadge", IsDefaultDisplay: true}},
 			},
 		},
-		Invariants: &badgestypes.InvariantsAddObject{
+		Invariants: &tokenizationtypes.InvariantsAddObject{
 			DisablePoolCreation: true, // Set to true to block pool creation
 		},
 	}
 
 	// Create the collection
-	badgesMsgServer := badgeskeeper.NewMsgServerImpl(badgesKeeper)
-	createCollectionResp, err := badgesMsgServer.CreateCollection(ctx, createCollectionMsg)
+	tokenizationMsgServer := tokenizationkeeper.NewMsgServerImpl(tokenizationKeeper)
+	createCollectionResp, err := tokenizationMsgServer.CreateCollection(ctx, createCollectionMsg)
 	s.Require().NoError(err)
 	collectionId := createCollectionResp.CollectionId
 
 	// Get the collection to find the wrapper denom
-	collection, found := badgesKeeper.GetCollectionFromStore(ctx, collectionId)
+	collection, found := tokenizationKeeper.GetCollectionFromStore(ctx, collectionId)
 	s.Require().True(found)
 	s.Require().NotNil(collection.Invariants)
 	s.Require().True(collection.Invariants.DisablePoolCreation, "disablePoolCreation should be true")
@@ -478,42 +478,42 @@ func (s *KeeperTestSuite) TestCreatePoolWithBadgesDisablePoolCreationInvariant()
 
 	// Now test that pool creation validation passes when disablePoolCreation is false
 	// Create another collection with disablePoolCreation = false
-	createCollectionMsg2 := &badgestypes.MsgCreateCollection{
+	createCollectionMsg2 := &tokenizationtypes.MsgCreateCollection{
 		Creator: creatorStr,
-		ValidTokenIds: []*badgestypes.UintRange{
+		ValidTokenIds: []*tokenizationtypes.UintRange{
 			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)},
 		},
-		CollectionPermissions: &badgestypes.CollectionPermissions{},
+		CollectionPermissions: &tokenizationtypes.CollectionPermissions{},
 		Manager:               creatorStr,
-		CosmosCoinWrapperPathsToAdd: []*badgestypes.CosmosCoinWrapperPathAddObject{
+		CosmosCoinWrapperPathsToAdd: []*tokenizationtypes.CosmosCoinWrapperPathAddObject{
 			{
 				Denom: "testbadgeallowed",
-				Conversion: &badgestypes.ConversionWithoutDenom{
-					SideA: &badgestypes.ConversionSideA{
+				Conversion: &tokenizationtypes.ConversionWithoutDenom{
+					SideA: &tokenizationtypes.ConversionSideA{
 						Amount: sdkmath.NewUint(1),
 					},
-					SideB: []*badgestypes.Balance{
+					SideB: []*tokenizationtypes.Balance{
 						{
 							Amount:         sdkmath.NewUint(1),
-							OwnershipTimes: []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-							TokenIds:       []*badgestypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+							OwnershipTimes: []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+							TokenIds:       []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 						},
 					},
 				},
 				Symbol:     "TESTALLOWED",
-				DenomUnits: []*badgestypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
+				DenomUnits: []*tokenizationtypes.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: "testbadgeallowed", IsDefaultDisplay: true}},
 			},
 		},
-		Invariants: &badgestypes.InvariantsAddObject{
+		Invariants: &tokenizationtypes.InvariantsAddObject{
 			DisablePoolCreation: false, // Set to false to allow pool creation
 		},
 	}
 
-	createCollectionResp2, err := badgesMsgServer.CreateCollection(ctx, createCollectionMsg2)
+	createCollectionResp2, err := tokenizationMsgServer.CreateCollection(ctx, createCollectionMsg2)
 	s.Require().NoError(err)
 	collectionId2 := createCollectionResp2.CollectionId
 
-	collection2, found := badgesKeeper.GetCollectionFromStore(ctx, collectionId2)
+	collection2, found := tokenizationKeeper.GetCollectionFromStore(ctx, collectionId2)
 	s.Require().True(found)
 	s.Require().NotNil(collection2.Invariants)
 	s.Require().False(collection2.Invariants.DisablePoolCreation, "disablePoolCreation should be false")

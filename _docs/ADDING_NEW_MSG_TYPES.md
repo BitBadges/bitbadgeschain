@@ -1,4 +1,4 @@
-# Adding New Message Types to x/badges
+# Adding New Message Types to x/tokenization
 
 This guide documents the process for adding new message types to the tokens module, including all necessary steps, gotchas, and commands.
 
@@ -10,7 +10,7 @@ When adding new message types to the tokens module, you need to follow a specifi
 
 ### 1. Add Proto Definitions
 
-**Location**: `proto/badges/`
+**Location**: `proto/tokenization/`
 
 **Files to modify**:
 
@@ -37,13 +37,13 @@ ignite generate proto-go
 
 ### 2. Update Genesis Files
 
-**Location**: `proto/badges/` and `x/badges/`
+**Location**: `proto/tokenization/` and `x/tokenization/`
 
 **Files to modify**:
 
--   `proto/badges/genesis.proto` - Add new fields for state persistence
--   `x/badges/types/genesis.go` - Update default genesis state
--   `x/badges/module/genesis.go` - Add initialization and export logic
+-   `proto/tokenization/genesis.proto` - Add new fields for state persistence
+-   `x/tokenization/types/genesis.go` - Update default genesis state
+-   `x/tokenization/module/genesis.go` - Add initialization and export logic
 
 **Commands**:
 
@@ -62,7 +62,7 @@ ignite generate proto-go
 
 ### 3. Update Badges Custom Message Types
 
-**Location**: `x/badges/types/`
+**Location**: `x/tokenization/types/`
 
 **Files to modify**:
 
@@ -88,7 +88,7 @@ ignite generate proto-go
 
 ### 6. Add CLI Commands
 
-**Location**: `x/badges/client/cli/`
+**Location**: `x/tokenization/client/cli/`
 
 **Files to create/modify**:
 
@@ -110,7 +110,7 @@ make install
 
 ### 7. Add Integration Test Helpers
 
-**Location**: `x/badges/keeper/integration_msg_helpers_test.go`
+**Location**: `x/tokenization/keeper/integration_msg_helpers_test.go`
 
 **Purpose**: Provide helper functions for testing the new message types
 
@@ -122,7 +122,7 @@ make install
 
 ### 8. Implement Core Functionality
 
-**Location**: `x/badges/keeper/`
+**Location**: `x/tokenization/keeper/`
 
 **Files to create/modify**:
 
@@ -135,7 +135,7 @@ make install
 
 ```bash
 # Run tests
-go test ./x/badges/keeper/...
+go test ./x/tokenization/keeper/...
 ```
 
 **Gotchas**:
@@ -147,7 +147,7 @@ go test ./x/badges/keeper/...
 
 ### 9. Add Simulation Support
 
-**Location**: `x/badges/simulation/`
+**Location**: `x/tokenization/simulation/`
 
 **Files to create/modify**:
 
@@ -184,12 +184,12 @@ func SimulateMsgUpdateDynamicStore(
 
 ```bash
 # Run simulation tests
-go test ./x/badges/simulation/...
+go test ./x/tokenization/simulation/...
 ```
 
 ### 11. Register in Codec
 
-**Location**: `x/badges/types/codec.go`
+**Location**: `x/tokenization/types/codec.go`
 
 **Purpose**: Register new message types with the Cosmos SDK codec
 
@@ -201,7 +201,7 @@ go test ./x/badges/simulation/...
 
 ### 12. Ensure GetSignBytes Uses AminoCdc
 
-**Location**: `x/badges/types/`
+**Location**: `x/tokenization/types/`
 
 **Purpose**: Ensure proper signature generation for transactions
 
@@ -264,8 +264,8 @@ See the implementation of existing message types like `MsgTransferTokens`, `MsgC
 ignite generate proto-go --yes
 
 # Clean up versioned API folders (IMPORTANT!)
-ls api/badges/
-rm -rf api/badges/v*
+ls api/tokenization/
+rm -rf api/tokenization/v*
 
 # Build binary
 make install
@@ -277,16 +277,16 @@ go build ./cmd/bitbadgeschaind
 git add *.pb.go *.pulsar.go
 
 # Run tests
-go test ./x/badges/keeper/...
+go test ./x/tokenization/keeper/...
 
 # Run specific test
-go test ./x/badges/keeper/ -run TestMsgCreateDynamicStore
+go test ./x/tokenization/keeper/ -run TestMsgCreateDynamicStore
 
 # Check for linting issues
-golangci-lint run ./x/badges/...
+golangci-lint run ./x/tokenization/...
 
 # Format code
-go fmt ./x/badges/...
+go fmt ./x/tokenization/...
 ```
 
 ## Implementation Status for Dynamic Store Messages
@@ -336,8 +336,8 @@ After completing all steps:
 
 If you modify an existing message type (add, remove, or change fields), you MUST update:
 
-1. ✅ **CLI commands** (`x/badges/client/cli/tx_*.go`) - Update argument parsing
-2. ✅ **Simulation files** (`x/badges/simulation/*.go`) - Update simulation functions
+1. ✅ **CLI commands** (`x/tokenization/client/cli/tx_*.go`) - Update argument parsing
+2. ✅ **Simulation files** (`x/tokenization/simulation/*.go`) - Update simulation functions
 3. ✅ **Tests** - Update existing tests and add new ones for new fields
 4. ✅ **Documentation** - Update relevant docs in `_docs/` folder
 

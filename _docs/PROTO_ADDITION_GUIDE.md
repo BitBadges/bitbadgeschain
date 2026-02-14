@@ -8,7 +8,7 @@ When adding new fields to proto definitions, you need to follow a systematic app
 
 1. **Update proto definitions** in `./proto` directory
 2. **Generate Go code** using `ignite generate proto-go --yes`
-3. **Handle business logic** in `x/badges` module (if required)
+3. **Handle business logic** in `x/tokenization` module (if required)
 
 ## Step 1: Update Proto Definitions
 
@@ -16,7 +16,7 @@ When adding new fields to proto definitions, you need to follow a systematic app
 
 Proto definitions are located in the `./proto` directory, organized by module:
 
--   `./proto/badges/` - Token-related definitions
+-   `./proto/tokenization/` - Token-related definitions
 -   `./proto/maps/` - Map-related definitions
 -   `./proto/anchor/` - Anchor-related definitions
 
@@ -24,15 +24,15 @@ Proto definitions are located in the `./proto` directory, organized by module:
 
 For token-related changes, the main files are:
 
--   `./proto/badges/tx.proto` - Transaction messages
--   `./proto/badges/query.proto` - Query messages
--   `./proto/badges/transfers.proto` - Transfer-related types
--   `./proto/badges/balances.proto` - Balance-related types
--   `./proto/badges/permissions.proto` - Permission-related types
--   `./proto/badges/collections.proto` - Collection-related types
--   `./proto/badges/metadata.proto` - Metadata-related types
--   `./proto/badges/timelines.proto` - Timeline-related types
--   `./proto/badges/address_lists.proto` - Address list types
+-   `./proto/tokenization/tx.proto` - Transaction messages
+-   `./proto/tokenization/query.proto` - Query messages
+-   `./proto/tokenization/transfers.proto` - Transfer-related types
+-   `./proto/tokenization/balances.proto` - Balance-related types
+-   `./proto/tokenization/permissions.proto` - Permission-related types
+-   `./proto/tokenization/collections.proto` - Collection-related types
+-   `./proto/tokenization/metadata.proto` - Metadata-related types
+-   `./proto/tokenization/timelines.proto` - Timeline-related types
+-   `./proto/tokenization/address_lists.proto` - Address list types
 
 ### Adding New Fields
 
@@ -89,8 +89,8 @@ This pattern:
 If your new field uses types from other proto files, ensure proper imports:
 
 ```protobuf
-import "badges/transfers.proto";
-import "badges/balances.proto";
+import "tokenization/transfers.proto";
+import "tokenization/balances.proto";
 import "cosmos/base/v1beta1/coin.proto";
 ```
 
@@ -115,26 +115,26 @@ This command will:
 
 The generated code appears in:
 
--   `api/badges/` - Generated Go types for tokens module
+-   `api/tokenization/` - Generated Go types for tokens module
 -   `api/maps/` - Generated Go types for maps module
 -   `api/anchor/` - Generated Go types for anchor module
--   `x/badges/types/` - Additional type definitions
+-   `x/tokenization/types/` - Additional type definitions
 
 ### API Directory Cleanup
 
 **Important**: After generation, remove all versioned folders from the API directory:
 
 ```bash
-# First, list what's in the api/badges/ directory to see the v* folders
-ls api/badges/
+# First, list what's in the api/tokenization/ directory to see the v* folders
+ls api/tokenization/
 
 # Then explicitly remove the versioned directories (e.g., v6, v7, etc.)
-rm -rf api/badges/v6
-rm -rf api/badges/v7
+rm -rf api/tokenization/v6
+rm -rf api/tokenization/v7
 # ... remove any other v* directories you see
 
 # Or if you're sure about the pattern, you can use:
-# rm -rf api/badges/v*
+# rm -rf api/tokenization/v*
 ```
 
 **Rationale**: We use v6 types for migration handling, but we shouldn't include them in the API. The versioned folders are only needed for internal migration logic, not for external API consumption.
@@ -168,8 +168,8 @@ After successful generation and build verification, automatically stage the gene
 git add *.pb.go *.pulsar.go
 
 # Or stage specific directories if needed
-git add api/badges/*.pulsar.go
-git add x/badges/types/*.pb.go
+git add api/tokenization/*.pulsar.go
+git add x/tokenization/types/*.pb.go
 ```
 
 **Note**: This automatically stages all generated protobuf files (_.pb.go and _.pulsar.go) so you don't have to manually track which files were generated. This is especially useful since these files are auto-generated and should always be committed together with proto changes.
@@ -182,7 +182,7 @@ Simulation files are used for Cosmos SDK stress testing and fuzzing. When you mo
 
 ### Location
 
-Simulation files are located in `x/badges/simulation/`
+Simulation files are located in `x/tokenization/simulation/`
 
 ### When to Update
 
@@ -192,8 +192,8 @@ Simulation files are located in `x/badges/simulation/`
 
 ### Files to Modify
 
--   `x/badges/simulation/<action>.go` - Update or create simulation function
--   `x/badges/simulation/simulation_test.go` - Add/update test case
+-   `x/tokenization/simulation/<action>.go` - Update or create simulation function
+-   `x/tokenization/simulation/simulation_test.go` - Add/update test case
 
 ### Example: Updating Simulation for Modified Message
 
@@ -228,24 +228,24 @@ msg := types.NewMsgUpdateDynamicStoreWithGlobalEnabled(
 
 ```bash
 # Run simulation tests
-go test ./x/badges/simulation/...
+go test ./x/tokenization/simulation/...
 ```
 
 ## Step 4: Handle Business Logic
 
 ### Location
 
-Business logic is implemented in the `x/badges` module:
+Business logic is implemented in the `x/tokenization` module:
 
--   `x/badges/keeper/` - Core business logic
--   `x/badges/types/` - Type definitions and validation
--   `x/badges/module/` - Module initialization and routing
+-   `x/tokenization/keeper/` - Core business logic
+-   `x/tokenization/types/` - Type definitions and validation
+-   `x/tokenization/module/` - Module initialization and routing
 
 ### Common Updates Needed
 
 #### 1. Message Handler Updates
 
-If you added a new message type, implement the handler in `x/badges/keeper/msg_server.go`:
+If you added a new message type, implement the handler in `x/tokenization/keeper/msg_server.go`:
 
 ```go
 func (k msgServer) NewMessageType(goCtx context.Context, msg *types.MsgNewMessageType) (*types.MsgNewMessageTypeResponse, error) {
@@ -259,7 +259,7 @@ func (k msgServer) NewMessageType(goCtx context.Context, msg *types.MsgNewMessag
 
 #### 2. Validation Logic
 
-Add validation for new fields in `x/badges/types/` files:
+Add validation for new fields in `x/tokenization/types/` files:
 
 ```go
 func (msg *MsgNewMessageType) ValidateBasic() error {
@@ -296,7 +296,7 @@ func (k Keeper) GetNewField(ctx sdk.Context, collectionId string) string {
 
 #### 4. Query Handlers
 
-If new fields are queryable, add query handlers in `x/badges/keeper/query.go`:
+If new fields are queryable, add query handlers in `x/tokenization/keeper/query.go`:
 
 ```go
 func (k Keeper) NewField(goCtx context.Context, req *types.QueryNewFieldRequest) (*types.QueryNewFieldResponse, error) {
@@ -332,7 +332,7 @@ This step is necessary when you add:
 
 ##### 1. Update Genesis Proto
 
-Add new fields to `proto/badges/genesis.proto`:
+Add new fields to `proto/tokenization/genesis.proto`:
 
 ```protobuf
 message GenesisState {
@@ -356,7 +356,7 @@ message GenesisState {
 
 ##### 2. Update Genesis Types
 
-Add default values in `x/badges/types/genesis.go`:
+Add default values in `x/tokenization/types/genesis.go`:
 
 ```go
 func DefaultGenesis() *GenesisState {
@@ -372,7 +372,7 @@ func DefaultGenesis() *GenesisState {
 
 ##### 3. Update Genesis Module
 
-Add initialization and export logic in `x/badges/module/genesis.go`:
+Add initialization and export logic in `x/tokenization/module/genesis.go`:
 
 ```go
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
@@ -413,7 +413,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 ##### 4. Add Store Methods
 
-Implement storage methods in `x/badges/keeper/store.go`:
+Implement storage methods in `x/tokenization/keeper/store.go`:
 
 ```go
 // Set new data type in store
@@ -474,7 +474,7 @@ func (k Keeper) GetAllNewDataTypeValuesFromStore(ctx sdk.Context) (newDataTypeVa
 
 ##### 5. Add Store Keys
 
-Add key definitions in `x/badges/keeper/keys.go`:
+Add key definitions in `x/tokenization/keeper/keys.go`:
 
 ```go
 var (
@@ -507,8 +507,8 @@ After updating genesis.proto:
 ```bash
 ignite generate proto-go --yes
 # Remove versioned API folders
-ls api/badges/
-rm -rf api/badges/v*
+ls api/tokenization/
+rm -rf api/tokenization/v*
 # Build verification
 go build ./cmd/bitbadgeschaind
 # Auto-stage generated files
@@ -521,13 +521,13 @@ Test that genesis state works correctly:
 
 ```bash
 # Test genesis module
-go test ./x/badges/module/... -v
+go test ./x/tokenization/module/... -v
 
 # Test types
-go test ./x/badges/types/... -v
+go test ./x/tokenization/types/... -v
 
 # Test keeper (if you have tests)
-go test ./x/badges/keeper/... -v
+go test ./x/tokenization/keeper/... -v
 ```
 
 #### Common Patterns
@@ -542,11 +542,11 @@ go test ./x/badges/keeper/... -v
 
 See the implementation of dynamic stores for a complete example:
 
--   `proto/badges/dynamic_stores.proto` - Data structure definition
--   `proto/badges/genesis.proto` - Genesis state fields
--   `x/badges/keeper/store.go` - Storage methods
--   `x/badges/keeper/keys.go` - Key definitions
--   `x/badges/module/genesis.go` - Genesis integration
+-   `proto/tokenization/dynamic_stores.proto` - Data structure definition
+-   `proto/tokenization/genesis.proto` - Genesis state fields
+-   `x/tokenization/keeper/store.go` - Storage methods
+-   `x/tokenization/keeper/keys.go` - Key definitions
+-   `x/tokenization/module/genesis.go` - Genesis integration
 
 **Note**: Dynamic stores now include a `globalEnabled` field that acts as a global kill switch. When `globalEnabled = false`, all approvals using that store via `DynamicStoreChallenge` will fail immediately, regardless of per-address values. This enables quick halting of approvals (e.g., when a 2FA protocol is compromised). The field defaults to `true` on creation and can be toggled via `MsgUpdateDynamicStore`.
 
@@ -561,7 +561,7 @@ go build ./...
 ### 2. Unit Tests
 
 ```bash
-go test ./x/badges/...
+go test ./x/tokenization/...
 ```
 
 ### 3. Integration Tests
@@ -595,7 +595,7 @@ ignite chain test
 ### 5. Forgetting API Cleanup
 
 -   **Problem**: Versioned API folders are included in builds
--   **Solution**: Always remove `api/badges/v*` folders after generation
+-   **Solution**: Always remove `api/tokenization/v*` folders after generation
 
 ## Example: Complete Field Addition
 
@@ -604,7 +604,7 @@ Here's a complete example of adding a new `description` field to `MsgCreateColle
 ### 1. Update Proto
 
 ```protobuf
-// In proto/badges/tx.proto
+// In proto/tokenization/tx.proto
 message MsgCreateCollection {
   string creator = 1;
   string collectionId = 2;
@@ -617,11 +617,11 @@ message MsgCreateCollection {
 
 ```bash
 ignite generate proto-go --yes
-# First, list what's in the api/badges/ directory to see the v* folders
-ls api/badges/
+# First, list what's in the api/tokenization/ directory to see the v* folders
+ls api/tokenization/
 # Then explicitly remove the versioned directories (e.g., v6, v7, etc.)
-rm -rf api/badges/v6
-rm -rf api/badges/v7
+rm -rf api/tokenization/v6
+rm -rf api/tokenization/v7
 # ... remove any other v* directories you see
 
 # Build verification
@@ -634,10 +634,10 @@ git add *.pb.go *.pulsar.go
 ### 3. Update Business Logic
 
 ```go
-// In x/badges/types/tx.pb.go (generated)
+// In x/tokenization/types/tx.pb.go (generated)
 // The field will be automatically added to the struct
 
-// In x/badges/types/message_create_collection.go
+// In x/tokenization/types/message_create_collection.go
 func (msg *MsgCreateCollection) ValidateBasic() error {
     if msg.Creator == "" {
         return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "creator cannot be empty")

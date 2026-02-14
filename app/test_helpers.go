@@ -9,19 +9,21 @@ import (
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	log "cosmossdk.io/log"
 	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/ibc-go/v8/testing/mock"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	sdkmath "cosmossdk.io/math"
 )
@@ -56,8 +58,12 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 func Setup(
 	isCheckTx bool,
 ) *App {
-	privVal := mock.NewPV()
-	pubKey, _ := privVal.GetPubKey()
+	// Reset EVM config for testing - required when running parallel tests
+	// because the EVM module uses global state that persists between test runs
+	evmtypes.NewEVMConfigurator().ResetTestConfig()
+	// Create a mock validator using ed25519 (IBC v10 removed testing/mock package)
+	privKey := ed25519.GenPrivKey()
+	pubKey := privKey.PubKey()
 
 	// create validator set with single validator
 	validator := tmtypes.NewValidator(pubKey, 824639203360100)
@@ -76,12 +82,10 @@ func Setup(
 		panic(err)
 	}
 
-	//wasmvm2 puts a lock on directory, so running parallel tests on same directory will fail
 	randomHomeDir := origDefault + "/test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
 	app, err := New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
-
 	if err != nil {
 		panic(err)
 	}
@@ -118,6 +122,55 @@ func GenesisStateWithValSet(app *App, genesisState GenesisState,
 	// set genesis accounts
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
+
+	// Ensure bank module has metadata for "ubadge" so EVM module can find it
+	// The EVM module's InitEvmCoinInfo looks up denom metadata from the bank module
+	if bankGenesisBytes, ok := genesisState[banktypes.ModuleName]; ok {
+		var bankGenesis banktypes.GenesisState
+		app.AppCodec().MustUnmarshalJSON(bankGenesisBytes, &bankGenesis)
+
+		// Check if ubadge metadata already exists
+		hasUbadgeMetadata := false
+		for _, metadata := range bankGenesis.DenomMetadata {
+			if metadata.Base == "ubadge" {
+				hasUbadgeMetadata = true
+				break
+			}
+		}
+
+		// Add ubadge metadata if it doesn't exist
+		if !hasUbadgeMetadata {
+			ubadgeMetadata := banktypes.Metadata{
+				Description: "The native token of BitBadges Chain",
+				DenomUnits: []*banktypes.DenomUnit{
+					{
+						Denom:    "ubadge",
+						Exponent: 0,
+					},
+					{
+						Denom:    "badge",
+						Exponent: 9,
+					},
+				},
+				Base:    "ubadge",
+				Display: "badge",
+				Name:    "Badge",
+				Symbol:  "BADGE",
+			}
+			bankGenesis.DenomMetadata = append(bankGenesis.DenomMetadata, ubadgeMetadata)
+			genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(&bankGenesis)
+		}
+	}
+
+	// Override EVM genesis params to use "ubadge" instead of default "aatom"
+	// The EVM module's InitEvmCoinInfo uses params.EvmDenom to look up metadata
+	if evmGenesisBytes, ok := genesisState["evm"]; ok {
+		var evmGenesis evmtypes.GenesisState
+		app.AppCodec().MustUnmarshalJSON(evmGenesisBytes, &evmGenesis)
+		// Set EvmDenom to "ubadge" in params
+		evmGenesis.Params.EvmDenom = "ubadge"
+		genesisState["evm"] = app.AppCodec().MustMarshalJSON(&evmGenesis)
+	}
 
 	validators := make([]stakingtypes.Validator, 0, len(valSet.Validators))
 	// delegations := make([]stakingtypes.Delegation, 0, len(valSet.Validators))

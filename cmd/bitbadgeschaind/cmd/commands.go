@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"cosmossdk.io/log"
@@ -10,7 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/snapshot"
@@ -20,10 +20,13 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	cosmosevmcmd "github.com/cosmos/evm/client"
+	cosmosevmserver "github.com/cosmos/evm/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+	bitbadgesclient "github.com/bitbadges/bitbadgeschain/client"
 )
 
 func initRootCmd(
@@ -39,15 +42,49 @@ func initRootCmd(
 		snapshot.Cmd(newApp),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	// Use cosmos/evm server commands which include EVM-specific flags (JSON-RPC, EVM config, etc.)
+	// The cosmos/evm server expects an AppCreator that returns cosmosevmserver.Application
+	// which extends types.Application with AppWithPendingTxStream and GetMempool()
+	// We wrap newApp to match the expected signature
+	evmAppCreator := func(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) cosmosevmserver.Application {
+		appInterface := newApp(logger, db, traceStore, appOpts)
+		// Use type assertion to verify *app.App implements cosmosevmserver.Application
+		// This should work since we've implemented GetMempool(), RegisterPendingTxListener(), and SetClientCtx()
+		evmApp, ok := appInterface.(cosmosevmserver.Application)
+		if !ok {
+			// If this fails, it means the methods aren't being recognized
+			// Verify that GetMempool(), RegisterPendingTxListener(), and SetClientCtx() are properly implemented
+			panic(fmt.Sprintf("*app.App does not implement cosmosevmserver.Application - got type %T", appInterface))
+		}
+		return evmApp
+	}
+	cosmosevmserver.AddCommands(
+		rootCmd,
+		cosmosevmserver.NewDefaultStartOptions(evmAppCreator, app.DefaultNodeHome),
+		appExport,
+		addModuleInitFlags,
+	)
+
+	// Add "tendermint" alias to "comet" command for Ignite CLI compatibility
+	// Ignite CLI still uses the old "tendermint" command name
+	if cometCmd, _, err := rootCmd.Find([]string{"comet"}); err == nil {
+		cometCmd.Aliases = append(cometCmd.Aliases, "tendermint")
+	}
+	// Add Cosmos EVM key commands (for eth_secp256k1 key management)
+	// This provides EVM-specific key commands that work with eth_secp256k1 keys
+	rootCmd.AddCommand(
+		cosmosevmcmd.KeyCommands(app.DefaultNodeHome, false),
+	)
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
+	// Use custom KeyCommands wrapper that ensures eth_secp256k1 keyring options are applied
+	// This matches the Cosmos EVM reference implementation pattern
 	rootCmd.AddCommand(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(),
+		bitbadgesclient.KeyCommands(app.DefaultNodeHome, false), // false = don't default to eth keys, but support them
 	)
 }
 

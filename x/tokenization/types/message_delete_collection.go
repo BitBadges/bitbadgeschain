@@ -1,0 +1,51 @@
+package types
+
+import (
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+const TypeMsgDeleteCollection = "delete_collection"
+
+var _ sdk.Msg = &MsgDeleteCollection{}
+
+func NewMsgDeleteCollection(creator string, collectionId sdkmath.Uint) *MsgDeleteCollection {
+	return &MsgDeleteCollection{
+		Creator:      creator,
+		CollectionId: collectionId,
+	}
+}
+
+func (msg *MsgDeleteCollection) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgDeleteCollection) Type() string {
+	return TypeMsgDeleteCollection
+}
+
+func (msg *MsgDeleteCollection) GetSigners() []sdk.AccAddress {
+	// MustAccAddressFromBech32 panics if address is invalid, which is expected
+	// since ValidateBasic() should have already validated the address
+	creator := sdk.MustAccAddressFromBech32(msg.Creator)
+	return []sdk.AccAddress{creator}
+}
+
+func (msg *MsgDeleteCollection) GetSignBytes() []byte {
+	bz := AminoCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgDeleteCollection) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
+	}
+
+	return nil
+}

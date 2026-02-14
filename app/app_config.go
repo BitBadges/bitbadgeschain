@@ -53,15 +53,13 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	ibcfeetypes "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
-	badgesmodulev1 "github.com/bitbadges/bitbadgeschain/api/badges/module"
-	_ "github.com/bitbadges/bitbadgeschain/x/badges/module" // import for side-effects
-	badgesmoduletypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationmodulev1 "github.com/bitbadges/bitbadgeschain/api/tokenization/module"
+	_ "github.com/bitbadges/bitbadgeschain/x/tokenization/module" // import for side-effects
+	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	mapsmodulev1 "github.com/bitbadges/bitbadgeschain/api/maps/module"
 	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
@@ -73,14 +71,14 @@ import (
 
 	// import for side-effects
 
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
-
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
-	_ "github.com/bitbadges/bitbadgeschain/x/wasmx/module" // import for side-effects
-	wasmxmoduletypes "github.com/bitbadges/bitbadgeschain/x/wasmx/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
 
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
+
+	erc20types "github.com/cosmos/evm/x/erc20/types"
+	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
+	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -90,12 +88,8 @@ var (
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
-	// NOTE: Capability module must occur first so that it can initialize any capabilities
-	// so that other modules that want to create or claim capabilities afterwards in InitChain
-	// can do so safely.
 	genesisModuleOrder = []string{
 		// cosmos-sdk/ibc modules
-		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -110,7 +104,6 @@ var (
 		authz.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
 		ibcratelimittypes.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
@@ -121,23 +114,24 @@ var (
 		circuittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
-		badgesmoduletypes.ModuleName,
+		tokenizationmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/initGenesis
+		feemarkettypes.ModuleName, // FeeMarket must come before EVM
+		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
+		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
+		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
-	// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 	beginBlockers = []string{
 		// cosmos sdk modules
 		minttypes.ModuleName,
@@ -148,24 +142,24 @@ var (
 		authz.ModuleName,
 		genutiltypes.ModuleName,
 		// ibc modules
-		capabilitytypes.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
 		ibcratelimittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
-		badgesmoduletypes.ModuleName,
+		tokenizationmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/beginBlockers
+		feemarkettypes.ModuleName, // FeeMarket must come before EVM
+		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
+		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
+		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
 	endBlockers = []string{
@@ -179,27 +173,28 @@ var (
 		// ibc modules
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
-		capabilitytypes.ModuleName,
 		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
 		ibcratelimittypes.ModuleName,
 		// chain modules
 		anchormoduletypes.ModuleName,
-		badgesmoduletypes.ModuleName,
+		tokenizationmoduletypes.ModuleName,
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
-		wasmtypes.ModuleName,
-		wasmxmoduletypes.ModuleName,
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/endBlockers
+		feemarkettypes.ModuleName, // FeeMarket must come before EVM
+		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
+		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
+		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
 	preBlockers = []string{
 		upgradetypes.ModuleName,
 		authtypes.ModuleName, // NEW - required for v0.53.x
+		evmtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/preBlockers
 	}
 
@@ -211,15 +206,16 @@ var (
 		{Account: stakingtypes.BondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: stakingtypes.NotBondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: govtypes.ModuleName, Permissions: []string{authtypes.Burner}},
-		{Account: badgesmoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: tokenizationmoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
-		{Account: ibcfeetypes.ModuleName},
 		{Account: icatypes.ModuleName},
 		{Account: packetforwardtypes.ModuleName},
-		{Account: wasmtypes.ModuleName},
-		{Account: wasmxmoduletypes.ModuleName},
 		{Account: gammtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: poolmanagertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: precisebanktypes.ModuleName, Permissions: []string{}},                             // PreciseBank module account
+		{Account: feemarkettypes.ModuleName, Permissions: []string{}},                               // FeeMarket module account
+		{Account: erc20types.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}}, // ERC20 module account
+		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -355,8 +351,8 @@ var (
 				Config: appconfig.WrapAny(&anchormodulev1.Module{}),
 			},
 			{
-				Name:   badgesmoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&badgesmodulev1.Module{}),
+				Name:   tokenizationmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&tokenizationmodulev1.Module{}),
 			},
 			{
 				Name:   mapsmoduletypes.ModuleName,
@@ -370,7 +366,8 @@ var (
 				Name:   sendmanagermoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&sendmanagermoduletypes.Module{}),
 			},
-// this line is used by starport scaffolding # stargate/app/moduleConfig
+			// EVM module is registered manually in app/evm.go via registerEVMModules
+			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
 	})
 )

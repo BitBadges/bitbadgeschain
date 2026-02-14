@@ -15,11 +15,11 @@ import (
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	_ "cosmossdk.io/x/feegrant/module" // import for side-effects
-	_ "cosmossdk.io/x/upgrade"         // import for side-effects
+	txsigning "cosmossdk.io/x/tx/signing"
+	_ "cosmossdk.io/x/upgrade" // import for side-effects
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -33,7 +33,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
@@ -69,34 +68,38 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/staking" // import for side-effects
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
-	_ "github.com/cosmos/ibc-go/modules/capability" // import for side-effects
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	_ "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts" // import for side-effects
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	_ "github.com/cosmos/ibc-go/v8/modules/apps/29-fee" // import for side-effects
-	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
+	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
+	_ "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts" // import for side-effects
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
+	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
-	"github.com/bitbadges/bitbadgeschain/app/ante"
+	sdkmempool "github.com/cosmos/cosmos-sdk/types/mempool"
+	evmante "github.com/cosmos/evm/ante"
+	antetypes "github.com/cosmos/evm/ante/types"
+	evmmempool "github.com/cosmos/evm/mempool"
+	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
+	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
+	evmtransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
+	precisebank "github.com/cosmos/evm/x/precisebank"
+	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
+	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
+	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+	"github.com/ethereum/go-ethereum/common"
+
 	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 
-	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/badges/approval_criteria"
-	badgesmodulekeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
-
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmxmodulekeeper "github.com/bitbadges/bitbadgeschain/x/wasmx/keeper"
+	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/tokenization/approval_criteria"
+	tokenizationmodulekeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 
@@ -113,10 +116,8 @@ const (
 	Name                 = "bitbadgeschain"
 )
 
-var (
-	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome string
-)
+// DefaultNodeHome default home directories for the application daemon
+var DefaultNodeHome string
 
 var (
 	_ runtime.AppI            = (*App)(nil)
@@ -136,6 +137,7 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
+	PreciseBankKeeper     precisebankkeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
@@ -154,11 +156,9 @@ type App struct {
 
 	// IBC
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	CapabilityKeeper    *capabilitykeeper.Keeper
-	IBCFeeKeeper        ibcfeekeeper.Keeper
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
-	TransferKeeper      ibctransferkeeper.Keeper
+	TransferKeeper      evmtransferkeeper.Keeper // Cosmos/evm transfer keeper (wraps ibc-go, adds ERC20 support)
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 
 	// IBC Hooks
@@ -168,24 +168,22 @@ type App struct {
 	// IBC Rate Limit
 	IBCRateLimitKeeper ibcratelimitkeeper.Keeper
 
-	// Scoped IBC
-	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
-	ScopedIBCTransferKeeper   capabilitykeeper.ScopedKeeper
-	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
-	ScopedKeepers             map[string]capabilitykeeper.ScopedKeeper
-
 	AnchorKeeper          anchormodulekeeper.Keeper
-	BadgesKeeper          badgesmodulekeeper.Keeper
+	TokenizationKeeper    tokenizationmodulekeeper.Keeper
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
-	WasmKeeper            wasmkeeper.Keeper
-	WasmxKeeper           wasmxmodulekeeper.Keeper
 
 	GammKeeper        gammkeeper.Keeper
 	PoolManagerKeeper poolmanager.Keeper
 	SendmanagerKeeper sendmanagermodulekeeper.Keeper
+	FeeMarketKeeper   feemarketkeeper.Keeper
+	ERC20Keeper       erc20keeper.Keeper
+	EVMKeeper         *evmkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+
+	// EVM mempool and pending tx listeners for JSON-RPC support
+	EVMMempool         *evmmempool.ExperimentalEVMMempool
+	pendingTxListeners []evmante.PendingTxListener
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -238,7 +236,6 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
-
 	homeDirOpt := appOpts.Get("home")
 	if homeDirOpt != nil {
 		overrideHomeDir := homeDirOpt.(string)
@@ -250,7 +247,7 @@ func New(
 	// DefaultNodeHome = randomHomeDir
 
 	var (
-		app        = &App{ScopedKeepers: make(map[string]capabilitykeeper.ScopedKeeper)}
+		app        = &App{}
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
@@ -264,13 +261,15 @@ func New(
 				// Passing the getter, the app IBC Keeper will always be accessible.
 				// This needs to be removed after IBC supports App Wiring.
 				app.GetIBCKeeper,
-				app.GetCapabilityScopedKeeper,
 
 				// here alternative options can be supplied to the DI container.
 				// those options can be used f.e to override the default behavior of some modules.
 				// for instance supplying a custom address codec for not using bech32 addresses.
 				// read the depinject documentation and depinject module wiring for more information
 				// on available options and how to use them.
+			),
+			depinject.Provide(
+				ProvideEVMGetSigners,
 			),
 		)
 	)
@@ -298,7 +297,7 @@ func New(
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.AnchorKeeper,
-		&app.BadgesKeeper,
+		&app.TokenizationKeeper,
 		&app.MapsKeeper,
 		&app.ManagerSplitterKeeper,
 		&app.SendmanagerKeeper,
@@ -308,6 +307,10 @@ func New(
 		panic(err)
 	}
 
+	// Register legacy IBC types for backward compatibility during genesis import
+	// from chains that were running IBC v8
+	RegisterLegacyLocalhostInterfaces(app.interfaceRegistry)
+
 	// add to default baseapp options
 	// enable optimistic execution
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
@@ -315,6 +318,19 @@ func New(
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 	app.BaseApp.SetCircuitBreaker(&app.CircuitBreakerKeeper)
+
+	// Create PreciseBankKeeper after app is built
+	// PreciseBankKeeper wraps BankKeeper to support fractional balances for non-18 decimal tokens
+	precisebankKey := storetypes.NewKVStoreKey(precisebanktypes.StoreKey)
+	if err := app.RegisterStores(precisebankKey); err != nil {
+		return nil, fmt.Errorf("failed to register precisebank store: %w", err)
+	}
+	app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
+		app.appCodec,
+		precisebankKey,
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
 
 	// register legacy modules
 
@@ -326,36 +342,49 @@ func New(
 		return nil, err
 	}
 
-	storeService, err := app.registerWasmModules(appOpts)
-	if err != nil {
+	// Register EVM modules first (PreciseBank depends on EVM keeper)
+	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
 	}
 
+	// Register PreciseBank module only if EVM keeper was successfully created
+	// PreciseBank's InitGenesis requires EVM keeper to be initialized
+	precisebankModule := precisebank.NewAppModule(
+		app.PreciseBankKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+	if err := app.RegisterModules(precisebankModule); err != nil {
+		return nil, fmt.Errorf("failed to register precisebank module: %w", err)
+	}
+
 	// Wire up keepers for address checks
-	app.BadgesKeeper.SetWasmViewKeeper(&app.WasmKeeper)
-	app.BadgesKeeper.SetGammKeeper(&app.GammKeeper)
+	app.TokenizationKeeper.SetGammKeeper(&app.GammKeeper)
+	if app.EVMKeeper != nil {
+		app.TokenizationKeeper.SetEVMKeeper(app.EVMKeeper)
+	}
 
 	// Register custom approval criteria checkers (optional)
-	app.BadgesKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+	app.TokenizationKeeper.RegisterCustomApprovalCriteriaChecker(func(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
 		// Add custom logic as needed here
 		return nil
 	})
 
 	// Register custom global transfer checkers (optional)
-	app.BadgesKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []badgesmodulekeeper.GlobalTransferChecker {
+	app.TokenizationKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []tokenizationmodulekeeper.GlobalTransferChecker {
 		// Add custom logic as needed here
 		return nil
 	})
 
 	// Register custom collection verifiers (optional)
 	// Example:
-	// app.BadgesKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
-	app.BadgesKeeper.RegisterCustomCollectionVerifier(&badgesmodulekeeper.NoOpCollectionVerifier{})
+	// app.TokenizationKeeper.RegisterCustomCollectionVerifier(&MyCollectionVerifier{})
+	app.TokenizationKeeper.RegisterCustomCollectionVerifier(&tokenizationmodulekeeper.NoOpCollectionVerifier{})
 
-	// Register badges router with sendmanager (deferred to avoid circular dependency)
+	// Register tokenization router with sendmanager (deferred to avoid circular dependency)
 	// This must happen after both keepers are created
 	if err := app.registerSendManagerRouters(); err != nil {
-		return nil, fmt.Errorf("failed to register badges router: %w", err)
+		return nil, fmt.Errorf("failed to register tokenization router: %w", err)
 	}
 
 	// register streaming services
@@ -373,29 +402,46 @@ func New(
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders() // use custom AnteHandler
 
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
-	if err != nil {
-		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	// Use EVM ante handler for proper EVM transaction support (signature verification, nonce management, gas pricing)
+	// This is required for MsgEthereumTx transactions to work correctly
+	// Get max gas wanted from app options (defaults to 0 if not set)
+	maxGasWanted := uint64(0)
+	if val := appOpts.Get("evm.max-tx-gas-wanted"); val != nil {
+		if i, ok := val.(uint64); ok {
+			maxGasWanted = i
+		} else if i, ok := val.(int); ok && i > 0 {
+			maxGasWanted = uint64(i)
+		}
 	}
 
-	options := ante.HandlerOptions{
-		AccountKeeper:         app.AccountKeeper,
-		BankKeeper:            app.BankKeeper,
-		FeegrantKeeper:        app.FeeGrantKeeper,
-		IBCKeeper:             app.IBCKeeper,
-		SignModeHandler:       app.txConfig.SignModeHandler(),
-		SigGasConsumer:        authante.DefaultSigVerificationGasConsumer,
-		CircuitKeeper:         &app.CircuitBreakerKeeper,
-		WasmConfig:            &wasmConfig,
-		WasmKeeper:            &app.WasmKeeper,
-		TXCounterStoreService: storeService,
+	evmAnteOptions := evmante.HandlerOptions{
+		Cdc:                    app.appCodec,
+		AccountKeeper:          app.AccountKeeper,
+		BankKeeper:             app.BankKeeper,
+		ExtensionOptionChecker: antetypes.HasDynamicFeeExtensionOption,
+		EvmKeeper:              app.EVMKeeper,
+		FeegrantKeeper:         app.FeeGrantKeeper,
+		IBCKeeper:              app.IBCKeeper,
+		FeeMarketKeeper:        app.FeeMarketKeeper,
+		SignModeHandler:        app.txConfig.SignModeHandler(),
+		SigGasConsumer:         evmante.SigVerificationGasConsumer,
+		MaxTxGasWanted:         maxGasWanted,
+		DynamicFeeChecker:      false,
+		PendingTxListener:      app.onPendingTx,
 	}
-
-	if err := options.Validate(); err != nil {
-		panic(err)
+	if err := evmAnteOptions.Validate(); err != nil {
+		panic(fmt.Sprintf("failed to validate EVM ante handler options: %s", err))
 	}
+	app.SetAnteHandler(evmante.NewAnteHandler(evmAnteOptions))
 
-	app.SetAnteHandler(ante.NewAnteHandler(options))
+	// Configure EVM mempool for JSON-RPC support (advanced feature, optional)
+	// Only create if JSON-RPC is enabled - otherwise GetMempool() will return nil
+	if app.EVMKeeper != nil {
+		if err := app.configureEVMMempool(appOpts, logger); err != nil {
+			logger.Error("failed to configure EVM mempool", "error", err)
+			// Don't panic - mempool is optional unless JSON-RPC is enabled
+		}
+	}
 
 	// A custom InitChainer sets if extra pre-init-genesis logic is required.
 	// This is necessary for manually registered modules that do not support app wiring.
@@ -406,7 +452,20 @@ func New(
 			return nil, err
 		}
 
-		return app.App.InitChainer(ctx, req)
+		// Call the default InitChainer which runs all module InitGenesis
+		res, err := app.App.InitChainer(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+
+		// Initialize EVM coin info after all modules are initialized
+		// This ensures denom metadata and EVM params are set up correctly
+		// This is needed for local dev (ignite serve) where upgrade handlers don't run
+		if err := app.initializeEVMCoinInfo(ctx); err != nil {
+			return nil, err
+		}
+
+		return res, nil
 	})
 
 	// Register upgrade handlers
@@ -414,25 +473,6 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		return nil, err
-	}
-
-	// must be before Loading version
-	// requires the snapshot store to be created and registered as a BaseAppOption
-	if manager := app.SnapshotManager(); manager != nil {
-		err := manager.RegisterExtensions(
-			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
-		)
-		if err != nil {
-			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
-		}
-	}
-
-	if loadLatest {
-		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-		// Initialize pinned codes in wasmvm as they are not persisted there
-		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
-			panic(fmt.Sprintf("failed initialize pinned codes %s", err))
-		}
 	}
 
 	return app, nil
@@ -496,16 +536,6 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
 }
 
-// GetCapabilityScopedKeeper returns the capability scoped keeper.
-func (app *App) GetCapabilityScopedKeeper(moduleName string) capabilitykeeper.ScopedKeeper {
-	sk, ok := app.ScopedKeepers[moduleName]
-	if !ok {
-		sk = app.CapabilityKeeper.ScopeToModule(moduleName)
-		app.ScopedKeepers[moduleName] = sk
-	}
-	return sk
-}
-
 // SimulationManager implements the SimulationApp interface.
 func (app *App) SimulationManager() *module.SimulationManager {
 	return app.sm
@@ -526,6 +556,42 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 func (app *App) InterfaceRegistry() codectypes.InterfaceRegistry {
 	return app.interfaceRegistry
+}
+
+// GetMempool returns the EVM mempool for JSON-RPC support
+func (app *App) GetMempool() sdkmempool.ExtMempool {
+	return app.EVMMempool
+}
+
+// onPendingTx notifies all registered listeners about pending transactions
+func (app *App) onPendingTx(hash common.Hash) {
+	for _, listener := range app.pendingTxListeners {
+		listener(hash)
+	}
+}
+
+// RegisterPendingTxListener registers a listener for pending transaction notifications
+// This is used by the JSON-RPC server to listen to pending transactions
+func (app *App) RegisterPendingTxListener(listener func(common.Hash)) {
+	app.pendingTxListeners = append(app.pendingTxListeners, listener)
+}
+
+// SetClientCtx sets the client context on the EVM mempool
+// This is required by the cosmosevmserver.Application interface
+// The client context is used by the mempool for querying state
+func (app *App) SetClientCtx(clientCtx client.Context) {
+	if app.EVMMempool != nil {
+		// The mempool implements SetClientCtx - use type assertion to call it
+		// This satisfies the cosmosevmserver.Application interface requirement
+		if mempoolWithCtx, ok := interface{}(app.EVMMempool).(interface{ SetClientCtx(client.Context) }); ok {
+			mempoolWithCtx.SetClientCtx(clientCtx)
+		}
+	}
+}
+
+// ProvideEVMGetSigners provides the custom signer for EVM MsgEthereumTx
+func ProvideEVMGetSigners() txsigning.CustomGetSigner {
+	return evmtypes.MsgEthereumTxCustomGetSigner
 }
 
 // GetMaccPerms returns a copy of the module account permissions

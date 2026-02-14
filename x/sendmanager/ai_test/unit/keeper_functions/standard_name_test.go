@@ -21,9 +21,9 @@ func (suite *StandardNameTestSuite) TestStandardName_AliasDenom() {
 	err := suite.Keeper.RegisterRouter("badges:", router)
 	suite.Require().NoError(err)
 
-	// Alias denom should return "x/badges"
+	// Alias denom should return "x/tokenization"
 	name := suite.Keeper.StandardName(suite.Ctx, "badges:123:456")
-	suite.Require().Equal("x/badges", name)
+	suite.Require().Equal("x/tokenization", name)
 }
 
 func (suite *StandardNameTestSuite) TestStandardName_BankDenom() {

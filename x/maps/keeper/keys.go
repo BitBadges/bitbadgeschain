@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bitbadges/bitbadgeschain/x/badges/types"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 var (

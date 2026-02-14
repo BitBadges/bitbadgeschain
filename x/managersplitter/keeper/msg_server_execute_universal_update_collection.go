@@ -4,8 +4,8 @@ import (
 	"context"
 	"slices"
 
-	badgeskeeper "github.com/bitbadges/bitbadgeschain/x/badges/keeper"
-	badgestypes "github.com/bitbadges/bitbadgeschain/x/badges/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -87,7 +87,7 @@ func (k Keeper) checkPermission(ctx sdk.Context, executor string, managerSplitte
 }
 
 // checkAllPermissions checks all permissions that would be used by the UniversalUpdateCollection message
-func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSplitter *types.ManagerSplitter, msg *badgestypes.MsgUniversalUpdateCollection) error {
+func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSplitter *types.ManagerSplitter, msg *tokenizationtypes.MsgUniversalUpdateCollection) error {
 	// Check permissions based on which fields are being updated
 	if msg.UpdateValidTokenIds {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateValidTokenIds"); err != nil {
@@ -185,14 +185,14 @@ func (k msgServer) ExecuteUniversalUpdateCollection(goCtx context.Context, msg *
 	}
 
 	// Create a new message with the manager splitter address as the creator
-	// This ensures the badges module sees the manager splitter as the manager
-	badgesMsg := *msg.UniversalUpdateCollectionMsg
-	badgesMsg.Creator = managerSplitter.Address
+	// This ensures the tokenization module sees the manager splitter as the manager
+	tokenizationMsg := *msg.UniversalUpdateCollectionMsg
+	tokenizationMsg.Creator = managerSplitter.Address
 
-	// Call the badges module's UniversalUpdateCollection through msgServer
+	// Call the tokenization module's UniversalUpdateCollection through msgServer
 	// We need to create a msgServer instance to call the method
-	badgesMsgServer := badgeskeeper.NewMsgServerImpl(k.badgesKeeper)
-	response, err := badgesMsgServer.UniversalUpdateCollection(goCtx, &badgesMsg)
+	tokenizationMsgServer := tokenizationkeeper.NewMsgServerImpl(k.tokenizationKeeper)
+	response, err := tokenizationMsgServer.UniversalUpdateCollection(goCtx, &tokenizationMsg)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "failed to execute UniversalUpdateCollection")
 	}

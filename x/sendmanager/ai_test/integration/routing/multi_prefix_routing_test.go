@@ -49,7 +49,7 @@ func (suite *MultiPrefixRoutingTestSuite) TestMultiPrefixRouting_RouteToCorrectR
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
-	// Send badges denom - should route to router1
+	// Send tokenization denom - should route to router1
 	coin1 := sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000))
 	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin1)
 	suite.Require().NoError(err)

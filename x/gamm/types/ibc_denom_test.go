@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	"github.com/stretchr/testify/require"
 )
 
 type mockTransferKeeper struct {
-	traces map[string]transfertypes.DenomTrace
+	// Map from hash to full denom path (e.g., "transfer/channel-3/uatom")
+	traces map[string]string
 }
 
 func (m mockTransferKeeper) DenomPathFromHash(_ sdk.Context, denom string) (string, error) {
@@ -22,31 +22,29 @@ func (m mockTransferKeeper) DenomPathFromHash(_ sdk.Context, denom string) (stri
 	}
 
 	hexHash := denom[len(hashedPrefix):]
-	trace, found := m.traces[hexHash]
+	path, found := m.traces[hexHash]
 	if !found {
 		return "", fmt.Errorf("trace not found for hash: %s", hexHash)
 	}
 
-	return trace.GetFullDenomPath(), nil
+	return path, nil
 }
 
 func TestExpandIBCDenomToFullPath_WithStoredTrace(t *testing.T) {
 	ctx := sdk.Context{} // empty context is fine for this helper
 	hash := "A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701"
-	trace := transfertypes.DenomTrace{
-		Path:      "transfer/channel-3",
-		BaseDenom: "uatom",
-	}
+	// Full path format: "transfer/channel-3/uatom"
+	fullPath := "transfer/channel-3/uatom"
 
 	keeper := mockTransferKeeper{
-		traces: map[string]transfertypes.DenomTrace{
-			hash: trace,
+		traces: map[string]string{
+			hash: fullPath,
 		},
 	}
 
 	full, err := ExpandIBCDenomToFullPath(ctx, "ibc/"+hash, keeper)
 	require.NoError(t, err)
-	require.Equal(t, trace.GetFullDenomPath(), full)
+	require.Equal(t, fullPath, full)
 }
 
 func TestExpandIBCDenomToFullPath_NoStoredTrace(t *testing.T) {
@@ -54,10 +52,10 @@ func TestExpandIBCDenomToFullPath_NoStoredTrace(t *testing.T) {
 	hash := "ABCDEF1234"
 
 	keeper := mockTransferKeeper{
-		traces: map[string]transfertypes.DenomTrace{},
+		traces: map[string]string{},
 	}
 
-	// Fallback ParseDenomTrace should return base denom when no path
+	// DenomPathFromHash should return error when trace not found
 	full, err := ExpandIBCDenomToFullPath(ctx, "ibc/"+hash, keeper)
 	require.Error(t, err)
 	require.Empty(t, full)

@@ -6,11 +6,10 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
@@ -31,7 +30,7 @@ func NewRateLimitHooks(keeper keeper.Keeper) *RateLimitHooks {
 
 // OnRecvPacketBeforeHook implements OnRecvPacketBeforeHooks
 // This is called before processing an incoming IBC packet
-func (h *RateLimitHooks) OnRecvPacketBeforeHook(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) {
+func (h *RateLimitHooks) OnRecvPacketBeforeHook(ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) {
 	// Parse ICS20 packet
 	var data transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &data); err != nil {
@@ -46,10 +45,8 @@ func (h *RateLimitHooks) OnRecvPacketBeforeHook(ctx sdk.Context, packet channelt
 		return
 	}
 
-	// Get channel ID
-	channelID := packet.GetDestChannel()
-
 	// Extract denom (convert to local denom)
+	// channelID is already provided as a parameter
 	denom := extractDenomFromPacketOnRecv(packet, data.Denom)
 
 	// Extract sender address
@@ -65,7 +62,7 @@ func (h *RateLimitHooks) OnRecvPacketBeforeHook(ctx sdk.Context, packet channelt
 
 // SendPacketBeforeHook implements SendPacketBeforeHooks
 // This is called before sending an IBC packet
-func (h *RateLimitHooks) SendPacketBeforeHook(ctx sdk.Context, chanCap *capabilitytypes.Capability, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) {
+func (h *RateLimitHooks) SendPacketBeforeHook(ctx sdk.Context, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) {
 	// Parse ICS20 packet
 	var packetData transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(data, &packetData); err != nil {
@@ -91,7 +88,7 @@ func (h *RateLimitHooks) SendPacketBeforeHook(ctx sdk.Context, chanCap *capabili
 			denom = denom[len(voucherPrefix):]
 		}
 		denomTrace := transfertypes.ParseDenomTrace(denom)
-		if denomTrace.Path != "" {
+		if denomTrace.Path() != "" {
 			denom = denomTrace.IBCDenom()
 		}
 	}
@@ -119,23 +116,20 @@ func NewRateLimitOverrideHooks(keeper keeper.Keeper) *RateLimitOverrideHooks {
 }
 
 // OnRecvPacketOverride implements OnRecvPacketOverrideHooks
-func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	// Parse ICS20 packet
 	var data transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &data); err != nil {
 		// Not an ICS20 packet, pass through
-		return im.App.OnRecvPacket(ctx, packet, relayer)
+		return im.App.OnRecvPacket(ctx, channelID, packet, relayer)
 	}
 
 	// Extract amount
 	amount, ok := sdkmath.NewIntFromString(data.Amount)
 	if !ok {
 		// Invalid amount, pass through (will fail later)
-		return im.App.OnRecvPacket(ctx, packet, relayer)
+		return im.App.OnRecvPacket(ctx, channelID, packet, relayer)
 	}
-
-	// Get channel ID
-	channelID := packet.GetDestChannel()
 
 	// Extract denom
 	denom := extractDenomFromPacketOnRecv(packet, data.Denom)
@@ -158,7 +152,7 @@ func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware,
 	}
 
 	// Rate limit check passed, process packet
-	ack := im.App.OnRecvPacket(ctx, packet, relayer)
+	ack := im.App.OnRecvPacket(ctx, channelID, packet, relayer)
 
 	// If packet was successful, update all tracking
 	if ack.Success() {
@@ -169,19 +163,19 @@ func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware,
 }
 
 // SendPacketOverride implements SendPacketOverrideHooks
-func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk.Context, chanCap *capabilitytypes.Capability, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
+func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk.Context, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
 	// Parse ICS20 packet
 	var packetData transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(data, &packetData); err != nil {
 		// Not an ICS20 packet, pass through
-		return i.SendPacket(ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
 	// Extract amount
 	amount, ok := sdkmath.NewIntFromString(packetData.Amount)
 	if !ok {
 		// Invalid amount, pass through (will fail later)
-		return i.SendPacket(ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
 	// Extract denom
@@ -192,7 +186,7 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 			denom = denom[len(voucherPrefix):]
 		}
 		denomTrace := transfertypes.ParseDenomTrace(denom)
-		if denomTrace.Path != "" {
+		if denomTrace.Path() != "" {
 			denom = denomTrace.IBCDenom()
 		}
 	}
@@ -222,7 +216,7 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	}
 
 	// Rate limit check passed, send packet
-	seq, err := i.SendPacket(ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+	seq, err := i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	if err == nil {
 		// Update all tracking (negative for outflow)
 		h.updateTrackingAfterTransfer(ctx, sourceChannel, denom, amount.Neg(), false, senderAddr)
@@ -288,7 +282,7 @@ func extractDenomFromPacketOnRecv(packet channeltypes.Packet, packetDenom string
 		// The denomination used to send the coins is either the native denom or the hash of the path
 		// if the denomination is not native.
 		denomTrace := transfertypes.ParseDenomTrace(unprefixedDenom)
-		if denomTrace.Path != "" {
+		if denomTrace.Path() != "" {
 			denom = denomTrace.IBCDenom()
 		} else {
 			denom = unprefixedDenom

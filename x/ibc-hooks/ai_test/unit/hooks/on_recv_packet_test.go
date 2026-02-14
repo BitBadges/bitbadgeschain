@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/ibc-hooks/ai_test/testutil"
@@ -27,7 +27,8 @@ func (suite *OnRecvPacketTestSuite) TestOnRecvPacket_NoHooks() {
 	relayer, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
-	ack := suite.IBCMiddleware.OnRecvPacket(suite.Ctx, packet, relayer)
+	// IBC v10: OnRecvPacket uses channelID (not packetID) in ibc-hooks wrapper
+	ack := suite.IBCMiddleware.OnRecvPacket(suite.Ctx, packet.GetDestChannel(), packet, relayer)
 	suite.Require().NotNil(ack)
 	suite.Require().True(ack.Success(), "should succeed when no hooks")
 }
@@ -47,7 +48,8 @@ func (suite *OnRecvPacketTestSuite) TestOnRecvPacket_OverrideHook() {
 	relayer, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
-	ack := suite.IBCMiddleware.OnRecvPacket(suite.Ctx, packet, relayer)
+	// IBC v10: OnRecvPacket uses channelID (not packetID) in ibc-hooks wrapper
+	ack := suite.IBCMiddleware.OnRecvPacket(suite.Ctx, packet.GetDestChannel(), packet, relayer)
 	suite.Require().NotNil(ack)
 	suite.Require().True(ack.Success(), "override hook should control the result")
 	suite.Require().True(mockHook.wasCalled, "override hook should be called")
@@ -59,7 +61,8 @@ type MockOnRecvPacketOverrideHook struct {
 	wasCalled     bool
 }
 
-func (m *MockOnRecvPacketOverrideHook) OnRecvPacketOverride(im ibc_hooks.IBCMiddleware, ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+// IBC v10: OnRecvPacketOverride requires channelID parameter
+func (m *MockOnRecvPacketOverrideHook) OnRecvPacketOverride(im ibc_hooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	m.wasCalled = true
 	if m.shouldSucceed {
 		return channeltypes.NewResultAcknowledgement([]byte("success"))

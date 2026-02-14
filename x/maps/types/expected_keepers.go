@@ -25,7 +25,7 @@ type ParamSubspace interface {
 	Set(context.Context, []byte, interface{})
 }
 
-type BadgesKeeper interface {
+type TokenizationKeeper interface {
 	// Methods imported from badges should be defined here
 	GetNextCollectionId(ctx sdk.Context) sdkmath.Uint
 }
