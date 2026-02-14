@@ -27,9 +27,9 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/app"
 	gammprecompile "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
-	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
@@ -87,7 +87,7 @@ func (suite *SolidityContractTestSuite) SetupTest() {
 	// Create test collection
 	suite.CollectionId = suite.createTestCollection()
 
-	// Set chain ID
+	// Set chain ID (using testnet chain ID for testing)
 	suite.ChainID = big.NewInt(90123)
 
 	// Try to load compiled contract bytecode and ABI
@@ -357,7 +357,6 @@ func (suite *SolidityContractTestSuite) TestSolidity_DeployContract() {
 		suite.ContractBytecode,
 		suite.ChainID,
 	)
-	
 	// Handle deployment errors gracefully
 	// If deployment failed but we got a response, check if it's a revert
 	if err != nil {

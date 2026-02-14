@@ -6,6 +6,13 @@ A Cosmos SDK blockchain for digital token issuance and management, enabling adva
 
 BitBadges blockchain is built on the Cosmos SDK and Tendermint consensus, providing a robust infrastructure for digital token issuance and management with advanced permission systems, multi-tier approval controls, and IBC compatibility.
 
+**Key Features:**
+- ✅ **Cosmos EVM Integration** - Full Ethereum Virtual Machine (EVM) compatibility via `cosmos/evm` module
+- ✅ **ERC20 Support** - Native Cosmos coins can be wrapped as ERC20 tokens
+- ✅ **Custom Precompiles** - Direct access to tokenization, Gamm, and SendManager modules from Solidity
+- ✅ **Dual Wallet Support** - Same address works for both Cosmos and EVM transactions
+- ✅ **JSON-RPC API** - Standard Ethereum JSON-RPC endpoints for Web3 compatibility
+
 For detailed implementation documentation, architecture details, and feature explanations, see [docs.bitbadges.io](https://docs.bitbadges.io/).
 
 ## Quick Start
@@ -58,14 +65,25 @@ ignite chain serve --skip-proto
 ```
 bitbadgeschain/
 ├── x/                          # Blockchain modules
-│   ├── tokenization/                 # Core token functionality
+│   ├── tokenization/           # Core token functionality
+│   │   └── precompile/         # Tokenization EVM precompile
+│   ├── gamm/                   # AMM liquidity pools
+│   │   └── precompile/         # Gamm EVM precompile
+│   ├── sendmanager/            # Native coin transfers
+│   │   └── precompile/         # SendManager EVM precompile
 │   ├── maps/                   # Key-value mappings
 │   ├── anchor/                 # Data anchoring
 │   └── wasmx/                  # WASM extensions
+├── app/                        # Application configuration
+│   ├── evm.go                  # EVM module registration
+│   └── PRECOMPILE_MANAGEMENT.md # Precompile documentation
+├── contracts/                  # Solidity contracts and interfaces
+│   ├── docs/                   # EVM integration guides
+│   ├── interfaces/             # Precompile interfaces
+│   └── libraries/              # Helper libraries
 ├── proto/                      # Protocol buffer definitions
 ├── api/                        # Generated Go types
 ├── ts-client/                  # TypeScript client
-├── app/                        # Application configuration
 ├── cmd/                        # CLI commands
 └── _docs/                      # Development documentation
 ```
@@ -119,6 +137,19 @@ For detailed development guides, see:
 
 ## Configuration
 
+### EVM Configuration
+
+The EVM module is configured in `app/evm.go` and requires:
+- **EVM Chain IDs**: Set in `app/params/constants.go`
+  - **Mainnet**: `50024` (BitBadges Mainnet)
+  - **Testnet**: `50025` (BitBadges Testnet)
+- **Precompile Enablement**: Configured in genesis `active_static_precompiles` array
+- **JSON-RPC**: Optional, can be enabled for Web3 compatibility
+
+For precompile management, see `app/PRECOMPILE_MANAGEMENT.md`.
+
+**Note**: These chain IDs are registered in the [ethereum-lists/chains](https://github.com/ethereum-lists/chains) registry. See `_docs/CHAIN_ID_REGISTRATION.md` for details on chain ID registration.
+
 ### Local Development
 
 Configure your development environment with `config.yml`:
@@ -153,6 +184,72 @@ The blockchain exposes a REST API for querying collections, balances, and approv
 ### TypeScript Client
 
 Generated TypeScript client available in `ts-client/` for easy integration with web applications.
+
+### EVM Integration
+
+BitBadges chain includes full EVM compatibility, enabling Ethereum developers to deploy and interact with Solidity smart contracts.
+
+#### EVM Chain IDs
+
+**Mainnet:**
+- **Chain ID**: `50024` (BitBadges Mainnet)
+- **Network Name**: BitBadges
+- **Native Currency**: BADGE (ubadge base unit)
+- **Registry**: To be registered in [ethereum-lists/chains](https://github.com/ethereum-lists/chains)
+
+**Testnet:**
+- **Chain ID**: `50025` (BitBadges Testnet)
+- **Network Name**: BitBadges Testnet
+- **Native Currency**: BADGE (ubadge base unit)
+- **Registry**: To be registered in [ethereum-lists/chains](https://github.com/ethereum-lists/chains)
+
+**Local Development:**
+- **Chain ID**: `90123` (defaults to local dev chain ID)
+- Configured in `app/params/constants.go`
+
+#### JSON-RPC Endpoints
+
+The chain exposes standard Ethereum JSON-RPC endpoints:
+- `http://localhost:8545` - EVM JSON-RPC (if enabled)
+- `http://localhost:26657` - Tendermint RPC (also supports some EVM queries)
+
+#### Precompiles
+
+Precompiles provide direct access to Cosmos modules from Solidity:
+
+**Default Cosmos Precompiles** (0x0800-0x0806):
+- `0x0800` - Staking precompile
+- `0x0801` - Distribution precompile
+- `0x0802` - ICS20 (IBC) precompile
+- `0x0803` - Vesting precompile
+- `0x0804` - Bank precompile (read-only queries)
+- `0x0805` - Governance precompile
+- `0x0806` - Slashing precompile
+
+**Custom BitBadges Precompiles** (0x1001+):
+- `0x1001` - **Tokenization precompile** - Create collections, transfer tokens, manage approvals
+- `0x1002` - **Gamm precompile** - AMM liquidity pool operations
+- `0x1003` - **SendManager precompile** - Send native Cosmos coins from EVM
+
+See `contracts/docs/` for detailed precompile documentation:
+- [Tokenization Precompile Guide](contracts/docs/GETTING_STARTED.md)
+- [Gamm Precompile Guide](contracts/docs/GAMM_PRECOMPILE.md)
+- [SendManager Precompile Guide](contracts/docs/SENDMANAGER_PRECOMPILE.md)
+- [EVM Send Options](contracts/docs/EVM_SEND_OPTIONS.md)
+
+#### ERC20 Wrapper
+
+Native Cosmos coins can be wrapped as ERC20 tokens for use in standard Ethereum tooling:
+- Each native denom has a corresponding ERC20 contract address
+- Wrap/unwrap operations via ERC20 keeper
+- Supports IBC transfers with ERC20 compatibility
+
+#### Development Tools
+
+- **MetaMask**: Connect using Chain ID `50024` (mainnet) or `50025` (testnet)
+- **Hardhat/Truffle**: Use standard Ethereum development tools
+- **Web3.js/Ethers.js**: Full compatibility with standard libraries
+- **Example dApp**: See `counter-dapp/` for a complete Next.js + MetaMask example
 
 ### WASM Bindings
 

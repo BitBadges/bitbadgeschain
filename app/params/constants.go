@@ -8,13 +8,44 @@ import (
 const (
 	BaseCoinUnit         = "ubadge"
 	AccountAddressPrefix = "bb"
-	
-	// EVMChainID is the custom EVM chain ID for BitBadges chain
+
+	// EVMChainIDMainnet is the EVM chain ID for BitBadges mainnet
+	// Chain ID: 50024 (to be claimed in ethereum-lists/chains registry)
 	// This should match the chain_id in genesis under app_state.evm.params.chain_config.chain_id
-	// For production, set this to a unique chain ID (e.g., 9001, 13337, etc.)
-	// Default value of 9000 is used for testing compatibility
-	EVMChainID = "90123" // TODO: change this to a unique chain ID and set genesis
+	EVMChainIDMainnet = "50024"
+
+	// EVMChainIDTestnet is the EVM chain ID for BitBadges testnet
+	// Chain ID: 50025 (to be claimed in ethereum-lists/chains registry)
+	// This should match the chain_id in genesis under app_state.evm.params.chain_config.chain_id
+	EVMChainIDTestnet = "50025"
+	
+	// EVMChainIDLocalDev is the EVM chain ID for local development
+	// Chain ID: 90123 (for local development only)
+	EVMChainIDLocalDev = "90123"
+	
+	// CosmosChainIDMainnet is the Cosmos chain ID for BitBadges mainnet
+	CosmosChainIDMainnet = "bitbadges-1"
+
+	// CosmosChainIDTestnet is the Cosmos chain ID for BitBadges testnet
+	CosmosChainIDTestnet = "bitbadges-2"
 )
+
+// Build-time EVM Chain ID set via ldflags
+// This allows different binaries to have different chain IDs compiled in
+// If not set at build time, defaults to local dev chain ID (90123)
+var BuildTimeEVMChainID string
+
+// GetEVMChainID returns the EVM chain ID to use.
+// Uses build-time chain ID if set via ldflags, otherwise defaults to local dev (90123)
+func GetEVMChainID() string {
+	// If build-time chain ID is set, use it (for separate mainnet/testnet binaries)
+	if BuildTimeEVMChainID != "" {
+		return BuildTimeEVMChainID
+	}
+	
+	// Default to local dev chain ID for local development
+	return EVMChainIDLocalDev
+}
 
 func SetAddressPrefixes() {
 	InitSDKConfigWithoutSeal()

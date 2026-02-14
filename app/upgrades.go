@@ -48,7 +48,12 @@ func (app *App) RegisterUpgradeHandlers() {
 				"wasm-store",  // Remove WASM store
 				"wasmx-store", // Remove WASMX store
 			},
-			Added: []string{},
+			Added: []string{
+				"erc20",       // Add ERC20 store (new keeper)
+				"evm",         // Add EVM store (new keeper)
+				"feemarket",   // Add FeeMarket store (new keeper)
+				"precisebank", // Add PreciseBank store (new keeper)
+			},
 		}
 	}
 

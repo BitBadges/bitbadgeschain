@@ -121,9 +121,27 @@ genesis:
                 evm_denom: ubadge
                 extended_denom_options:
                     extended_denom: abadge
+                # Note: chain_config.chain_id is set via build flags
+                # Mainnet: 50024, Testnet: 50025, Local dev: 90123
                 active_static_precompiles:
+                    # Default Cosmos precompiles (registered via DefaultStaticPrecompiles in app/evm.go)
+                    # These are automatically registered but must be enabled here
+                    # Addresses from cosmos/evm/x/vm/types/precompiles.go (0x0800-0x0806)
+                    - "0x0000000000000000000000000000000000000800"  # Staking precompile
+                    - "0x0000000000000000000000000000000000000801"  # Distribution precompile
+                    - "0x0000000000000000000000000000000000000802"  # ICS20 (IBC) precompile
+                    - "0x0000000000000000000000000000000000000803"  # Vesting precompile
+                    - "0x0000000000000000000000000000000000000804"  # Bank precompile
+                    - "0x0000000000000000000000000000000000000805"  # Governance precompile
+                    - "0x0000000000000000000000000000000000000806"  # Slashing precompile
+                    
+                    # Custom BitBadges precompiles (registered in app/evm.go:registerCustomPrecompiles)
+                    # Addresses: 0x1001+ (custom BitBadges precompiles)
                     - "0x0000000000000000000000000000000000001001"  # Tokenization precompile
                     - "0x0000000000000000000000000000000000001002"  # Gamm precompile
+                    - "0x0000000000000000000000000000000000001003"  # SendManager precompile
+                    # Future precompiles should use addresses 0x1004, 0x1005, etc. to avoid collisions
+                    # Note: Bank functionality is provided by Cosmos default bank precompile at 0x0804 (enabled above)
 validators:
     - name: alice
       bonded: 1000000000000000ustake

@@ -8,18 +8,83 @@ LDFLAGS := -X github.com/cosmos/cosmos-sdk/version.Name=bitbadgeschain \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown") \
 	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(shell go list -f '{{.BuildTags}}' ./... 2>/dev/null | head -1 | tr ' ' ',' | sed 's/,$$//' || echo "")"
 
+# EVM Chain ID ldflags
+# Mainnet: 50024
+LDFLAGS_MAINNET := $(LDFLAGS) \
+	-X github.com/bitbadges/bitbadgeschain/app/params.BuildTimeEVMChainID=50024
+
+# Testnet: 50025
+LDFLAGS_TESTNET := $(LDFLAGS) \
+	-X github.com/bitbadges/bitbadgeschain/app/params.BuildTimeEVMChainID=50025
+
+# Generic build (no chain ID set - defaults to 90123 for local development)
 build-linux/amd64:
+	@echo "Building binary (EVM Chain ID: 90123 - local dev) for linux/amd64..."
+	@mkdir -p ./build
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-linux-amd64"
 
 build-linux/arm64:
+	@echo "Building binary (EVM Chain ID: 90123 - local dev) for linux/arm64..."
+	@mkdir -p ./build
 	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
 
 build-darwin:
+	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
+	@mkdir -p ./build
 	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
+
+# Mainnet builds (with EVM Chain ID 50024 compiled in)
+build-mainnet-linux/amd64:
+	@echo "Building mainnet binary (EVM Chain ID: 50024) for linux/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-linux-amd64"
+
+build-mainnet-linux/arm64:
+	@echo "Building mainnet binary (EVM Chain ID: 50024) for linux/arm64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
+
+build-mainnet-darwin:
+	@echo "Building mainnet binary (EVM Chain ID: 50024) for darwin/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
+
+# Testnet builds (with EVM Chain ID 50025 compiled in)
+build-testnet-linux/amd64:
+	@echo "Building testnet binary (EVM Chain ID: 50025) for linux/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-testnet-linux-amd64"
+
+build-testnet-linux/arm64:
+	@echo "Building testnet binary (EVM Chain ID: 50025) for linux/arm64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-arm64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-testnet-linux-arm64"
+
+build-testnet-darwin:
+	@echo "Building testnet binary (EVM Chain ID: 50025) for darwin/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-testnet-darwin-amd64"
 
 build-all: 
 	make build-linux/amd64
 	make build-linux/arm64
+
+build-all-mainnet:
+	make build-mainnet-linux/amd64
+	make build-mainnet-linux/arm64
+
+build-all-testnet:
+	make build-testnet-linux/amd64
+	make build-testnet-linux/arm64
 
 do-checksum:
 	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 > bitbadgeschain_checksum

@@ -137,3 +137,13 @@ function joinPoolWithBuilder(uint64 poolId, uint256 shareOutAmount) external {
 - Check out [Best Practices](GAMM_BEST_PRACTICES.md) for security and optimization tips
 - See [Examples](GAMM_EXAMPLES.md) for more complex use cases
 
+
+
+
+
+
+
+
+
+
+

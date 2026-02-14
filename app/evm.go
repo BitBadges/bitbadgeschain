@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -19,12 +20,14 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
-	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	gammprecompile "github.com/bitbadges/bitbadgeschain/x/gamm/precompile"
+	sendmanagerprecompile "github.com/bitbadges/bitbadgeschain/x/sendmanager/precompile"
+	tokenizationprecompile "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 )
 
 // registerEVMModules registers the FeeMarket, ERC20, and EVM modules with tokenization precompile
@@ -71,9 +74,10 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// Create EVM keeper
-	evmChainID := appparams.EVMChainID
-	evmChainIDUint64, err := strconv.ParseUint(evmChainID, 10, 64)
+	// Get EVM chain ID from build-time flag (set via ldflags)
+	// Defaults to 90123 (local dev) if not set at build time
+	evmChainIDStr := appparams.GetEVMChainID()
+	evmChainIDUint64, err := strconv.ParseUint(evmChainIDStr, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -94,12 +98,12 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	// DEBUG: Collect all KV store keys for snapshotter initialization
 	storeKeysMap := make(map[string]*storetypes.KVStoreKey)
 	allStoreKeys := app.GetStoreKeys()
-	
+
 	// Log store key collection for debugging
 	kvStoreCount := 0
 	transientStoreCount := 0
 	otherStoreCount := 0
-	
+
 	for _, key := range allStoreKeys {
 		switch k := key.(type) {
 		case *storetypes.KVStoreKey:
@@ -115,28 +119,28 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 			// If evmd pattern shows we need them, we would need to check if EVM keeper supports them
 		}
 	}
-	
+
 	// Log store registration summary (only in debug/test builds)
 	// This helps diagnose snapshot issues by verifying all stores are registered
 	if len(storeKeysMap) == 0 {
 		panic("EVM keeper requires at least one KV store key for snapshotter initialization")
 	}
-	
+
 	// Verify critical stores are included (stores that precompiles might access)
 	criticalStores := []string{
-		"acc",           // Account store (for address lookups)
-		"bank",          // Bank store (for balance operations)
+		"acc",          // Account store (for address lookups)
+		"bank",         // Bank store (for balance operations)
 		"tokenization", // Tokenization store (for precompile operations)
-		"evm",           // EVM store (for EVM state)
+		"evm",          // EVM store (for EVM state)
 	}
-	
+
 	missingStores := []string{}
 	for _, storeName := range criticalStores {
 		if _, found := storeKeysMap[storeName]; !found {
 			missingStores = append(missingStores, storeName)
 		}
 	}
-	
+
 	if len(missingStores) > 0 {
 		// Log warning but don't panic - some stores might be optional
 		// This is a diagnostic aid, not a hard requirement
@@ -195,20 +199,20 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// Register tokenization precompile
-	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)
-	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
-	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
+	// Register all custom precompiles
+	// Note: DefaultStaticPrecompiles are already registered via WithStaticPrecompiles above
+	app.registerCustomPrecompiles()
 
-	// Register gamm precompile
-	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper)
-	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
-	app.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
+	// Validate no address collisions between custom precompiles
+	// This helps catch bugs early if addresses are accidentally duplicated
+	if err := ValidateNoAddressCollisions(); err != nil {
+		panic(fmt.Sprintf("precompile address collision detected: %v", err))
+	}
 
 	// Note: Precompiles must be both registered (RegisterStaticPrecompile) and enabled (EnableStaticPrecompiles)
-	// The precompile is registered above, but it will be enabled during InitGenesis when the EVM module initializes
-	// For production, ensure the precompile address is in the genesis state's active_static_precompiles array
-	// For tests, we enable it programmatically in the test setup (see evm_keeper_integration_test.go)
+	// The precompiles are registered above, but they will be enabled during InitGenesis when the EVM module initializes
+	// For production, ensure all precompile addresses are in the genesis state's active_static_precompiles array
+	// For tests, we enable them programmatically in the test setup (see evm_keeper_integration_test.go)
 
 	// Register EVM module
 	evmModule := evmmodule.NewAppModule(
@@ -220,6 +224,78 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 
 	if err := app.RegisterModules(evmModule); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// registerCustomPrecompiles registers all custom BitBadges precompiles
+// This ensures all custom precompiles are registered and prevents address collisions
+func (app *App) registerCustomPrecompiles() {
+	// Register tokenization precompile
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)
+	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
+	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
+
+	// Register gamm precompile
+	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper)
+	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
+	app.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
+
+	// Register sendmanager precompile
+	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper)
+	sendManagerPrecompileAddr := common.HexToAddress(sendmanagerprecompile.SendManagerPrecompileAddress)
+	app.EVMKeeper.RegisterStaticPrecompile(sendManagerPrecompileAddr, sendManagerPrecompile)
+
+	// Add additional custom precompiles here as needed
+	// Next available address: 0x0000000000000000000000000000000000001004
+}
+
+// GetDefaultCosmosPrecompileAddresses returns all default Cosmos precompile addresses
+// These are the standard precompiles provided by cosmos/evm (staking, distribution, bank, etc.)
+// Addresses from cosmos/evm/x/vm/types/precompiles.go
+func GetDefaultCosmosPrecompileAddresses() []common.Address {
+	// Default Cosmos precompiles from cosmos/evm/x/vm/types/precompiles.go
+	// These are the actual addresses used by the cosmos/evm module
+	return []common.Address{
+		common.HexToAddress("0x0000000000000000000000000000000000000800"), // Staking precompile
+		common.HexToAddress("0x0000000000000000000000000000000000000801"), // Distribution precompile
+		common.HexToAddress("0x0000000000000000000000000000000000000802"), // ICS20 (IBC) precompile
+		common.HexToAddress("0x0000000000000000000000000000000000000803"), // Vesting precompile
+		common.HexToAddress("0x0000000000000000000000000000000000000804"), // Bank precompile
+		common.HexToAddress("0x0000000000000000000000000000000000000805"), // Governance precompile
+		common.HexToAddress("0x0000000000000000000000000000000000000806"), // Slashing precompile
+	}
+}
+
+// GetAllPrecompileAddresses returns all precompile addresses (both default Cosmos and custom BitBadges)
+// This is used for enabling precompiles in genesis, upgrades, and tests
+func (app *App) GetAllPrecompileAddresses() []common.Address {
+	var addresses []common.Address
+
+	// Add default Cosmos precompile addresses
+	addresses = append(addresses, GetDefaultCosmosPrecompileAddresses()...)
+
+	// Add custom BitBadges precompile addresses
+	addresses = append(addresses, common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)) // 0x1001
+	addresses = append(addresses, common.HexToAddress(gammprecompile.GammPrecompileAddress))                 // 0x1002
+	// Note: Use Cosmos default bank precompile at 0x0804 (already included in default precompiles)
+
+	return addresses
+}
+
+// EnableAllPrecompiles enables all registered precompiles (both default Cosmos and custom BitBadges)
+// This should be called during genesis initialization or upgrade handlers
+// It's safe to call multiple times (idempotent)
+func (app *App) EnableAllPrecompiles(ctx sdk.Context) error {
+	// Enable all precompiles (both default Cosmos and custom BitBadges)
+	allAddresses := app.GetAllPrecompileAddresses()
+	for _, addr := range allAddresses {
+		if err := app.EVMKeeper.EnableStaticPrecompiles(ctx, addr); err != nil {
+			// Log error but don't fail if precompile is already enabled (idempotent)
+			// This allows the function to be called multiple times safely
+			ctx.Logger().Info("Precompile enable attempt", "error", err, "address", addr.Hex())
+		}
 	}
 
 	return nil

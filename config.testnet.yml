@@ -60,6 +60,26 @@ genesis:
             constant_fee:
                 denom: ubadge
                 amount: '10000000000'
+        evm:
+            params:
+                evm_denom: ubadge
+                extended_denom_options:
+                    extended_denom: abadge
+                # Note: chain_config.chain_id is set via build flags
+                # Mainnet: 50024, Testnet: 50025, Local dev: 90123
+                active_static_precompiles:
+                    # Default Cosmos precompiles
+                    - "0x0000000000000000000000000000000000000800"  # Staking precompile
+                    - "0x0000000000000000000000000000000000000801"  # Distribution precompile
+                    - "0x0000000000000000000000000000000000000802"  # ICS20 (IBC) precompile
+                    - "0x0000000000000000000000000000000000000803"  # Vesting precompile
+                    - "0x0000000000000000000000000000000000000804"  # Bank precompile
+                    - "0x0000000000000000000000000000000000000805"  # Governance precompile
+                    - "0x0000000000000000000000000000000000000806"  # Slashing precompile
+                    # Custom BitBadges precompiles
+                    - "0x0000000000000000000000000000000000001001"  # Tokenization precompile
+                    - "0x0000000000000000000000000000000000001002"  # Gamm precompile
+                    - "0x0000000000000000000000000000000000001003"  # SendManager precompile
 validators:
     - name: alice
       bonded: 1000000000000000ustake

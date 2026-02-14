@@ -25,6 +25,7 @@ package gamm
 import (
 	"embed"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -38,6 +39,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
@@ -100,6 +102,7 @@ func ValidatePrecompileEnabled() error {
 		JoinPoolMethod,
 		ExitPoolMethod,
 		SwapExactAmountInMethod,
+		CreatePoolMethod,
 		GetPoolMethod,
 	}
 	for _, methodName := range requiredMethods {
@@ -186,6 +189,8 @@ func (p Precompile) getBaseGas(methodName string) uint64 {
 		return GasSwapExactAmountInBase
 	case SwapExactAmountInWithIBCTransferMethod:
 		return GasSwapExactAmountInWithIBCTransferBase
+	case CreatePoolMethod:
+		return GasCreatePoolBase
 	// Query methods
 	case GetPoolMethod:
 		return GasGetPoolBase
@@ -283,12 +288,16 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 		resp, err = msgServer.SwapExactAmountIn(ctx, m)
 	case *gammtypes.MsgSwapExactAmountInWithIBCTransfer:
 		resp, err = msgServer.SwapExactAmountInWithIBCTransfer(ctx, m)
+	case *balancer.MsgCreateBalancerPool:
+		// Use balancer msg server for pool creation
+		balancerMsgServer := gammkeeper.NewBalancerMsgServerImpl(&p.gammKeeper)
+		resp, err = balancerMsgServer.CreateBalancerPool(ctx, m)
 	default:
 		return nil, ErrInvalidInput(fmt.Sprintf("unsupported message type for method: %s", method.Name))
 	}
 
 	if err != nil {
-		return nil, WrapError(err, ErrorCodeSwapFailed, fmt.Sprintf("transaction failed: %v", err))
+		return nil, WrapError(err, ErrorCodeSwapFailed, "transaction failed")
 	}
 
 	// Pack response based on method output type
@@ -308,6 +317,13 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 			return method.Outputs.Pack(swapResp.TokenOutAmount.BigInt())
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for swapExactAmountIn"), ErrorCodeInternalError, "expected MsgSwapExactAmountInResponse")
+	case CreatePoolMethod:
+		if createResp, ok := resp.(*balancer.MsgCreateBalancerPoolResponse); ok {
+			// Convert uint64 to *big.Int for ABI packing
+			poolIdBigInt := big.NewInt(0).SetUint64(createResp.PoolID)
+			return method.Outputs.Pack(poolIdBigInt)
+		}
+		return nil, WrapError(fmt.Errorf("invalid response type for createPool"), ErrorCodeInternalError, "expected MsgCreateBalancerPoolResponse")
 	default:
 		return nil, WrapError(fmt.Errorf("unsupported transaction method: %s", method.Name), ErrorCodeInternalError, "method not handled in response packing")
 	}
@@ -349,7 +365,7 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 	}
 
 	if err != nil {
-		return nil, WrapError(err, ErrorCodeQueryFailed, fmt.Sprintf("query failed: %v", err))
+		return nil, WrapError(err, ErrorCodeQueryFailed, "query failed")
 	}
 
 	// Handle different return types
@@ -425,6 +441,7 @@ var transactionMethods = map[string]bool{
 	ExitPoolMethod:                         true,
 	SwapExactAmountInMethod:                true,
 	SwapExactAmountInWithIBCTransferMethod: true,
+	CreatePoolMethod:                       true,
 }
 
 // IsTransaction checks if the given method name corresponds to a transaction or query.
@@ -440,6 +457,7 @@ const (
 	ExitPoolMethod                         = "exitPool"
 	SwapExactAmountInMethod                = "swapExactAmountIn"
 	SwapExactAmountInWithIBCTransferMethod = "swapExactAmountInWithIBCTransfer"
+	CreatePoolMethod                       = "createPool"
 
 	// Query methods
 	GetPoolMethod                     = "getPool"

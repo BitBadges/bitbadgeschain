@@ -43,6 +43,13 @@ interface IGammPrecompile {
         external
         returns (uint256 tokenOutAmount);
 
+    /// @notice Create a balancer liquidity pool
+    /// @param msgJson JSON string matching MsgCreateBalancerPool protobuf JSON format
+    /// @return poolId The ID of the newly created pool
+    function createPool(string memory msgJson)
+        external
+        returns (uint256 poolId);
+
     // ============ Queries ============
 
     /// @notice Get pool data by ID

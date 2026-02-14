@@ -5,6 +5,7 @@ const (
 	GasJoinPoolBase                      = 40_000
 	GasExitPoolBase                      = 40_000
 	GasSwapExactAmountInBase             = 50_000
+	GasCreatePoolBase                    = 60_000 // Higher gas for pool creation due to complexity
 	GasSwapExactAmountInWithIBCTransferBase = 60_000
 
 	// Gas costs per element for dynamic calculations

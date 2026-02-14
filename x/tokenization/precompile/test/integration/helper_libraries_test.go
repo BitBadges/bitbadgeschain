@@ -90,7 +90,7 @@ func (suite *HelperLibrariesTestSuite) SetupTest() {
 	// Create test collection
 	suite.CollectionId = suite.createTestCollection()
 
-	// Set chain ID
+	// Set chain ID (using testnet chain ID for testing)
 	suite.ChainID = big.NewInt(90123)
 
 	// Load compiled contract

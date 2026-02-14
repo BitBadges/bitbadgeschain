@@ -90,10 +90,25 @@ func (app *App) configureEVMMempool(appOpts servertypes.AppOptions, logger log.L
 // Note: server helper functions (GetLegacyPoolConfig, etc.) are not exported in v0.5.1,
 // so we use simple defaults. These can be configured via app.toml in the future.
 func (app *App) createMempoolConfig(appOpts servertypes.AppOptions, logger log.Logger) (*evmmempool.EVMMempoolConfig, error) {
+	// Get block gas limit from app options (defaults to 100M if not set, matching config.yml max_gas)
+	// This allows configuration via app.toml: [evm.mempool] block-gas-limit = 100000000
+	blockGasLimit := uint64(100_000_000) // Default: 100M gas (matches config.yml max_gas)
+	if val := appOpts.Get("evm.mempool.block-gas-limit"); val != nil {
+		if i, ok := val.(uint64); ok && i > 0 {
+			blockGasLimit = i
+		} else if i, ok := val.(int); ok && i > 0 {
+			blockGasLimit = uint64(i)
+		} else if i, ok := val.(int64); ok && i > 0 {
+			blockGasLimit = uint64(i)
+		}
+	}
+	
+	logger.Info("EVM mempool block gas limit configured", "block_gas_limit", blockGasLimit)
+
 	return &evmmempool.EVMMempoolConfig{
 		AnteHandler:      app.BaseApp.AnteHandler(),
 		LegacyPoolConfig: nil, // Default to nil - can be configured via app.toml
-		BlockGasLimit:    0,   // Will use default from genesis
+		BlockGasLimit:    blockGasLimit,
 		MinTip:           nil, // Default to nil - can be configured via app.toml
 	}, nil
 }

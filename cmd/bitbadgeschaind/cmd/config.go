@@ -43,8 +43,13 @@ func initAppConfig() (string, interface{}) {
 	// In this application, we set the min gas prices to 0.
 	srvCfg.MinGasPrices = "0" + appparams.BaseCoinUnit
 
-	// Parse EVM chain ID from string to uint64
-	evmChainID, err := strconv.ParseUint(appparams.EVMChainID, 10, 64)
+	// Default to local dev EVM chain ID (90123) for the app.toml configuration.
+	// The actual EVM chain ID used at runtime is set via build flags (ldflags):
+	//   - Mainnet: 50024 (set via LDFLAGS_MAINNET)
+	//   - Testnet: 50025 (set via LDFLAGS_TESTNET)
+	//   - Local dev: 90123 (default if no build flag is set)
+	// See app/evm.go (keeper initialization) and app/params/constants.go for details.
+	evmChainID, err := strconv.ParseUint(appparams.EVMChainIDLocalDev, 10, 64)
 	if err != nil {
 		// Fallback to default if parsing fails
 		evmChainID = evmtypes.DefaultEVMChainID

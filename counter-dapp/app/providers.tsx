@@ -11,7 +11,7 @@ import { defineChain } from "viem";
 // Create a custom chain config for BitBadges
 // ubadge is the base unit - if it has 18 decimals in EVM context
 const bitbadgesChain = defineChain({
-  id: 90123, // EVM Chain ID from your constants
+  id: 90125, // BitBadges Testnet EVM Chain ID (for local development)
   name: "BitBadges",
   nativeCurrency: {
     decimals: 18,

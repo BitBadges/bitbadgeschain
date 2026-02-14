@@ -6,35 +6,27 @@ import (
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
-// initializeEVMCoinInfo initializes EVM coin info for local development.
-// This ensures that denom metadata exists and EVM params are configured correctly
-// so that InitEvmCoinInfo can succeed. This is needed for local dev (ignite serve)
-// where upgrade handlers don't run automatically.
+// initializeEVMCoinInfo initializes EVM coin info during InitChain.
+// This ensures denom metadata exists and EVM params are configured correctly
+// so that InitEvmCoinInfo can succeed. Needed for local dev (ignite serve)
+// where upgrade handlers don't run.
+//
+// Note: EVM chain ID is set in evm.go during keeper initialization on every
+// app startup based on the Cosmos chain ID from appOpts.
 func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
-	// Check if denom metadata for "ubadge" exists
-	_, found := app.BankKeeper.GetDenomMetaData(ctx, "ubadge")
-	if !found {
-		// Set denom metadata if it doesn't exist
-		denomMetadata := banktypes.Metadata{
+	// Set denom metadata if it doesn't exist
+	if _, found := app.BankKeeper.GetDenomMetaData(ctx, "ubadge"); !found {
+		app.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
 			Description: "The native token of BitBadges Chain",
 			DenomUnits: []*banktypes.DenomUnit{
-				{
-					Denom:    "ubadge",
-					Exponent: 0,
-					Aliases:  nil,
-				},
-				{
-					Denom:    "badge",
-					Exponent: 9,
-					Aliases:  nil,
-				},
+				{Denom: "ubadge", Exponent: 0},
+				{Denom: "badge", Exponent: 9},
 			},
 			Base:    "ubadge",
 			Display: "badge",
 			Name:    "Badge",
 			Symbol:  "BADGE",
-		}
-		app.BankKeeper.SetDenomMetaData(ctx, denomMetadata)
+		})
 	}
 
 	// Ensure EVM params are configured correctly
@@ -49,11 +41,14 @@ func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
 		return err
 	}
 
-	// Initialize EvmCoinInfo if it hasn't been initialized yet
-	// This will only succeed if denom metadata exists and params are set correctly
-	if err := app.EVMKeeper.InitEvmCoinInfo(ctx); err != nil {
-		// Log the error but don't fail - this might already be initialized
-		ctx.Logger().Info("EVM coin info initialization skipped (may already be initialized)", "error", err)
+	// Initialize EvmCoinInfo (may already be initialized)
+	if err := app.EVMKeeper.SetEvmCoinInfo(ctx, evmtypes.EvmCoinInfo{
+		Denom:         "ubadge",
+		ExtendedDenom: "abadge",
+		DisplayDenom:  "BADGE",
+		Decimals:      9,
+	}); err != nil {
+		ctx.Logger().Info("EVM coin info initialization skipped", "error", err)
 	}
 
 	return nil

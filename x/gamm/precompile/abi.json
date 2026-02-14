@@ -116,6 +116,25 @@
           "type": "string"
         }
       ],
+      "name": "createPool",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "poolId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
       "name": "getPool",
       "outputs": [
         {

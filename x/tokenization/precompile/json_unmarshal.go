@@ -12,6 +12,49 @@ import (
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
+// messageTypeToMethodMap maps message type strings to method names
+// This allows dynamic routing of messages by type string
+var messageTypeToMethodMap = map[string]string{
+	"transferTokens":            TransferTokensMethod,
+	"setIncomingApproval":       SetIncomingApprovalMethod,
+	"setOutgoingApproval":       SetOutgoingApprovalMethod,
+	"createCollection":          CreateCollectionMethod,
+	"updateCollection":          UpdateCollectionMethod,
+	"deleteCollection":          DeleteCollectionMethod,
+	"createAddressLists":        CreateAddressListsMethod,
+	"updateUserApprovals":       UpdateUserApprovalsMethod,
+	"deleteIncomingApproval":    DeleteIncomingApprovalMethod,
+	"deleteOutgoingApproval":    DeleteOutgoingApprovalMethod,
+	"purgeApprovals":            PurgeApprovalsMethod,
+	"createDynamicStore":        CreateDynamicStoreMethod,
+	"updateDynamicStore":        UpdateDynamicStoreMethod,
+	"deleteDynamicStore":        DeleteDynamicStoreMethod,
+	"setDynamicStoreValue":      SetDynamicStoreValueMethod,
+	"setValidTokenIds":          SetValidTokenIdsMethod,
+	"setManager":                SetManagerMethod,
+	"setCollectionMetadata":     SetCollectionMetadataMethod,
+	"setTokenMetadata":          SetTokenMetadataMethod,
+	"setCustomData":             SetCustomDataMethod,
+	"setStandards":              SetStandardsMethod,
+	"setCollectionApprovals":    SetCollectionApprovalsMethod,
+	"setIsArchived":             SetIsArchivedMethod,
+	"castVote":                  CastVoteMethod,
+	"universalUpdateCollection": UniversalUpdateCollectionMethod,
+}
+
+// routeMessageByType routes a message by its type string and unmarshals it
+// Returns the unmarshaled sdk.Msg ready for execution
+func (p Precompile) routeMessageByType(messageType string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
+	// Look up method name from message type
+	methodName, ok := messageTypeToMethodMap[messageType]
+	if !ok {
+		return nil, ErrInvalidInput(fmt.Sprintf("unknown message type: %s", messageType))
+	}
+
+	// Use existing unmarshal function which handles all the validation and creator setting
+	return p.unmarshalMsgFromJSON(methodName, jsonStr, contract)
+}
+
 // convertEVMAddressToBech32 converts an EVM address (0x...) to bech32 format if needed
 // If the address is already in bech32 format, it returns it unchanged
 // If it's an EVM address, it converts it to bech32

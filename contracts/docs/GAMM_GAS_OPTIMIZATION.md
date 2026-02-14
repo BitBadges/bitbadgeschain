@@ -220,3 +220,8 @@ Approximate gas costs for common operations:
 6. **Batch operations** when possible to reduce overhead
 7. **Use memory** for temporary data instead of storage
 
+
+
+
+
+

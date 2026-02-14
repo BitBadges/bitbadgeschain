@@ -320,3 +320,13 @@ try TOKENIZATION.createCollection(json) returns (uint256 collectionId) {
 4. Review example contracts in `contracts/examples/`
 5. Check precompile implementation in `x/tokenization/precompile/`
 
+
+
+
+
+
+
+
+
+
+

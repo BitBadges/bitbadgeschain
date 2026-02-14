@@ -10,6 +10,13 @@ import "../types/TokenizationTypes.sol";
 ///      The caller address (creator/sender) is automatically set from msg.sender.
 ///      Use helper libraries to construct JSON strings from Solidity types.
 interface ITokenizationPrecompile {
+    // ============ Types ============
+    
+    /// @notice Input structure for multi-message execution
+    struct MessageInput {
+        string messageType;  // e.g., "createCollection", "transferTokens"
+        string msgJson;      // JSON matching the protobuf format
+    }
     // ============ Events ============
 
     /// @notice Emitted when tokens are transferred
@@ -276,6 +283,17 @@ interface ITokenizationPrecompile {
     function universalUpdateCollection(
         string calldata msgJson
     ) external returns (uint256 resultCollectionId);
+
+    /// @notice Execute multiple messages sequentially in a single atomic transaction
+    /// @dev All messages execute in order. If any message fails, the entire transaction is rolled back.
+    ///      Each message's creator field is automatically set from msg.sender.
+    ///      Results are returned as bytes array - decode based on message type.
+    /// @param messages Array of MessageInput structs with messageType and msgJson
+    /// @return success True if all messages executed successfully
+    /// @return results Array of result bytes (decode based on message type)
+    function executeMultiple(
+        MessageInput[] calldata messages
+    ) external returns (bool success, bytes[] memory results);
     
     // ============ Queries ============
     // NOTE: All query methods now use a JSON string parameter (msgJson) instead of individual parameters.

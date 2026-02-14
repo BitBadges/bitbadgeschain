@@ -34,8 +34,25 @@ var (
 
 // CreateBalancerPool is a create balancer pool message.
 func (server msgServer) CreateBalancerPool(goCtx context.Context, msg *balancer.MsgCreateBalancerPool) (*balancer.MsgCreateBalancerPoolResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	poolId, err := server.CreatePool(goCtx, msg)
-	return &balancer.MsgCreateBalancerPoolResponse{PoolID: poolId}, err
+	if err != nil {
+		return nil, err
+	}
+
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "create_balancer_pool"),
+		sdk.NewAttribute("msg", msgStr),
+	)
+
+	return &balancer.MsgCreateBalancerPoolResponse{PoolID: poolId}, nil
 }
 
 // CreatePool attempts to create a pool returning the newly created pool ID or an error upon failure.
@@ -77,6 +94,18 @@ func (server msgServer) JoinPool(goCtx context.Context, msg *types.MsgJoinPool) 
 		return nil, err
 	}
 
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "join_pool"),
+		sdk.NewAttribute("msg", msgStr),
+	)
+
 	return &types.MsgJoinPoolResponse{
 		ShareOutAmount: sharesOut,
 		TokenIn:        neededLp,
@@ -95,6 +124,18 @@ func (server msgServer) ExitPool(goCtx context.Context, msg *types.MsgExitPool) 
 	if err != nil {
 		return nil, err
 	}
+
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "exit_pool"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgExitPoolResponse{
 		TokenOut: exitCoins,
@@ -126,7 +167,17 @@ func (server msgServer) SwapExactAmountIn(goCtx context.Context, msg *types.MsgS
 		return nil, err
 	}
 
-	// Swap event is handled elsewhere
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "swap_exact_amount_in"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgSwapExactAmountInResponse{TokenOutAmount: tokenOutAmount}, nil
 }
@@ -172,6 +223,18 @@ func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, 
 		return nil, err
 	}
 
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "swap_exact_amount_in_with_ibc_transfer"),
+		sdk.NewAttribute("msg", msgStr),
+	)
+
 	return &types.MsgSwapExactAmountInWithIBCTransferResponse{TokenOutAmount: tokenOutAmount}, nil
 }
 
@@ -188,7 +251,17 @@ func (server msgServer) SwapExactAmountOut(goCtx context.Context, msg *types.Msg
 		return nil, err
 	}
 
-	// Swap event is handled elsewhere
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "swap_exact_amount_out"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgSwapExactAmountOutResponse{TokenInAmount: tokenInAmount}, nil
 }
@@ -211,7 +284,17 @@ func (server msgServer) JoinSwapExternAmountIn(goCtx context.Context, msg *types
 		return nil, err
 	}
 
-	// Swap and LP events are handled elsewhere
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "join_swap_extern_amount_in"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgJoinSwapExternAmountInResponse{ShareOutAmount: shareOutAmount}, nil
 }
@@ -229,7 +312,17 @@ func (server msgServer) JoinSwapShareAmountOut(goCtx context.Context, msg *types
 		return nil, err
 	}
 
-	// Swap and LP events are handled elsewhere
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "join_swap_share_amount_out"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgJoinSwapShareAmountOutResponse{TokenInAmount: tokenInAmount}, nil
 }
@@ -247,7 +340,17 @@ func (server msgServer) ExitSwapExternAmountOut(goCtx context.Context, msg *type
 		return nil, err
 	}
 
-	// Swap and LP events are handled elsewhere
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "exit_swap_extern_amount_out"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgExitSwapExternAmountOutResponse{ShareInAmount: shareInAmount}, nil
 }
@@ -265,7 +368,17 @@ func (server msgServer) ExitSwapShareAmountIn(goCtx context.Context, msg *types.
 		return nil, err
 	}
 
-	// Swap and LP events are handled elsewhere
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	EmitMessageAndIndexerEvents(ctx,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "gamm"),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+		sdk.NewAttribute("msg_type", "exit_swap_share_amount_in"),
+		sdk.NewAttribute("msg", msgStr),
+	)
 
 	return &types.MsgExitSwapShareAmountInResponse{TokenOutAmount: tokenOutAmount}, nil
 }

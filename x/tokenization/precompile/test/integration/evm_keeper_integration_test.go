@@ -373,9 +373,9 @@ func (suite *EVMKeeperIntegrationTestSuite) createTestCollection() sdkmath.Uint 
 // getChainID gets the chain ID from EVM keeper params
 // Uses a default chain ID for testing (can be overridden via params if needed)
 func (suite *EVMKeeperIntegrationTestSuite) getChainID() *big.Int {
-	// For testing, use a default chain ID
+	// For testing, use testnet chain ID
 	// In production, this would come from EVM keeper params
-	return big.NewInt(90123) // Default test chain ID
+	return big.NewInt(90123) // BitBadges Testnet chain ID
 }
 
 // getNonce gets the nonce for an address

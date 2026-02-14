@@ -155,7 +155,7 @@ func (suite *GammHelperLibrariesTestSuite) SetupTest() {
 	// Create test pool
 	suite.PoolId = suite.createTestPool()
 
-	// Set chain ID
+	// Set chain ID (using testnet chain ID for testing)
 	suite.ChainID = big.NewInt(90123)
 
 	// Load compiled contract - must use gamm-specific contract (no fallback)

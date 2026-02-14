@@ -8,6 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 
@@ -32,6 +33,8 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		msg = &gammtypes.MsgSwapExactAmountIn{}
 	case SwapExactAmountInWithIBCTransferMethod:
 		msg = &gammtypes.MsgSwapExactAmountInWithIBCTransfer{}
+	case CreatePoolMethod:
+		msg = &balancer.MsgCreateBalancerPool{}
 	default:
 		return nil, ErrInvalidInput(fmt.Sprintf("unknown method: %s", methodName))
 	}
@@ -58,6 +61,8 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 	case *gammtypes.MsgSwapExactAmountIn:
 		m.Sender = senderCosmosAddr
 	case *gammtypes.MsgSwapExactAmountInWithIBCTransfer:
+		m.Sender = senderCosmosAddr
+	case *balancer.MsgCreateBalancerPool:
 		m.Sender = senderCosmosAddr
 	}
 
