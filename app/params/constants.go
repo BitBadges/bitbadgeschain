@@ -18,11 +18,11 @@ const (
 	// Chain ID: 50025 (to be claimed in ethereum-lists/chains registry)
 	// This should match the chain_id in genesis under app_state.evm.params.chain_config.chain_id
 	EVMChainIDTestnet = "50025"
-	
+
 	// EVMChainIDLocalDev is the EVM chain ID for local development
 	// Chain ID: 90123 (for local development only)
 	EVMChainIDLocalDev = "90123"
-	
+
 	// CosmosChainIDMainnet is the Cosmos chain ID for BitBadges mainnet
 	CosmosChainIDMainnet = "bitbadges-1"
 
@@ -42,7 +42,7 @@ func GetEVMChainID() string {
 	if BuildTimeEVMChainID != "" {
 		return BuildTimeEVMChainID
 	}
-	
+
 	// Default to local dev chain ID for local development
 	return EVMChainIDLocalDev
 }

@@ -1,17 +1,16 @@
 "use client";
 
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { http, createConfig } from "wagmi";
-import { WagmiProvider } from "wagmi";
 import { defineChain } from "viem";
+import { createConfig, http, WagmiProvider } from "wagmi";
 
 // Create a custom chain config for BitBadges
 // ubadge is the base unit - if it has 18 decimals in EVM context
 const bitbadgesChain = defineChain({
-  id: 90125, // BitBadges Testnet EVM Chain ID (for local development)
+  id: 50025, // BitBadges Testnet EVM Chain ID (for local development)
   name: "BitBadges",
   nativeCurrency: {
     decimals: 18,

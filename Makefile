@@ -74,9 +74,14 @@ build-testnet-darwin:
 	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-testnet-darwin-amd64"
 
+# build-all builds all 4 production binaries:
+# - 2 mainnet binaries (bitbadgeschain-linux-amd64, bitbadgeschain-linux-arm64) with chain ID 50024
+# - 2 testnet binaries (bitbadgeschain-testnet-linux-amd64, bitbadgeschain-testnet-linux-arm64) with chain ID 50025
 build-all: 
-	make build-linux/amd64
-	make build-linux/arm64
+	make build-mainnet-linux/amd64
+	make build-mainnet-linux/arm64
+	make build-testnet-linux/amd64
+	make build-testnet-linux/arm64
 
 build-all-mainnet:
 	make build-mainnet-linux/amd64
@@ -86,8 +91,15 @@ build-all-testnet:
 	make build-testnet-linux/amd64
 	make build-testnet-linux/arm64
 
+do-checksum-testnet:
+	cd build && sha256sum bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 > bitbadgeschain-testnet_checksum
+
+do-checksum-mainnet:
+	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 > bitbadgeschain-mainnet_checksum
+
+# Checksum for all 4 binaries
 do-checksum:
-	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 > bitbadgeschain_checksum
+	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 > bitbadgeschain_checksum
 
 build-with-checksum: build-all do-checksum
 
