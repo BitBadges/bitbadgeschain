@@ -144,7 +144,20 @@ func CreateUpgradeHandler(
 		fromVM[erc20types.ModuleName] = 1
 		fromVM[precisebanktypes.ModuleName] = 1
 
-		// Run module migrations (EVM modules skipped)
+		// Handle badges -> tokenization module rename
+		// Transfer the version from the old module name to the new module name
+		// This prevents InitGenesis from being called which would reset:
+		// - nextCollectionId
+		// - nextAddressListId
+		// - nextDynamicStoreId
+		// The store data is already migrated via StoreUpgrades.Renamed in app/upgrades.go
+		if badgesVersion, ok := fromVM["badges"]; ok {
+			fromVM["tokenization"] = badgesVersion
+			delete(fromVM, "badges")
+			sdkCtx.Logger().Info("Migrated module version from badges to tokenization", "version", badgesVersion)
+		}
+
+		// Run module migrations (EVM modules skipped, tokenization version preserved)
 		vm, err := mm.RunMigrations(ctx, configurator, fromVM)
 		if err != nil {
 			return nil, err

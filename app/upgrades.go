@@ -5,6 +5,7 @@ import (
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v24 "github.com/bitbadges/bitbadgeschain/app/upgrades/v24"
 	v24_patch "github.com/bitbadges/bitbadgeschain/app/upgrades/v24_patch"
+	v24_patch2 "github.com/bitbadges/bitbadgeschain/app/upgrades/v24_patch2"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -33,6 +34,17 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.Configurator(),
 			app.EVMKeeper,
 			app.BankKeeper,
+		),
+	)
+
+	// v24-patch2: Fix nextCollectionId on testnets that already ran v24
+	// The badges->tokenization rename caused InitGenesis to be called, resetting nextCollectionId to 1
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v24_patch2.UpgradeName,
+		v24_patch2.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.Configurator(),
+			app.TokenizationKeeper,
 		),
 	)
 
@@ -73,6 +85,9 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v24_patch.UpgradeName:
 		// No store changes needed - this is a patch to fix EVM configuration
 		// All stores were already added in v24
+		storeUpgrades = nil
+	case v24_patch2.UpgradeName:
+		// No store changes needed - this is a patch to fix nextCollectionId
 		storeUpgrades = nil
 	}
 
