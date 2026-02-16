@@ -113,8 +113,8 @@ func (p Precompile) GetCallerAddress(contract *vm.Contract) (string, error) {
 }
 
 // RequiredGas calculates the precompiled contract's base gas rate.
-// For methods that use JSON string arguments, we return base gas since
-// parsing JSON for gas calculation is complex and not worth the overhead.
+// Returns a conservative estimate that accounts for Cosmos SDK operations to help
+// estimateGas converge on a working value.
 func (p Precompile) RequiredGas(input []byte) uint64 {
 	// NOTE: This check avoid panicking when trying to decode the method ID
 	if len(input) < 4 {
@@ -129,9 +129,15 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		return 0
 	}
 
-	// All methods now use JSON string arguments, so return base gas
-	// Dynamic gas calculation would require parsing JSON which is not worth the overhead
-	return p.getBaseGas(method.Name)
+	// Get base gas and add buffer for Cosmos SDK operations
+	// Send operations involve bank transfers which need significant gas
+	baseGas := p.getBaseGas(method.Name)
+	if baseGas == 0 {
+		return 0
+	}
+
+	// Add buffer for Cosmos SDK state operations (bank transfers, etc.)
+	return baseGas + 150_000
 }
 
 // getBaseGas returns the base gas cost for a method

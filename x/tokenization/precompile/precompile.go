@@ -174,6 +174,8 @@ func (p Precompile) GetCallerAddress(contract *vm.Contract) (string, error) {
 }
 
 // RequiredGas calculates the precompiled contract's base gas rate.
+// Returns a conservative estimate that accounts for Cosmos SDK operations to help
+// estimateGas converge on a working value.
 func (p Precompile) RequiredGas(input []byte) uint64 {
 	// NOTE: This check avoid panicking when trying to decode the method ID
 	if len(input) < 4 {
@@ -188,98 +190,137 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		return 0
 	}
 
+	// Get base gas for the method
+	var baseGas uint64
+	var isTransaction bool
+
 	// For methods that require dynamic gas calculation, we return a base amount
 	// The actual gas will be calculated in Execute based on input size
 	switch method.Name {
 	// Transaction methods
 	case TransferTokensMethod:
-		return GasTransferTokensBase
+		baseGas = GasTransferTokensBase
+		isTransaction = true
 	case SetIncomingApprovalMethod:
-		return GasSetIncomingApprovalBase
+		baseGas = GasSetIncomingApprovalBase
+		isTransaction = true
 	case SetOutgoingApprovalMethod:
-		return GasSetOutgoingApprovalBase
+		baseGas = GasSetOutgoingApprovalBase
+		isTransaction = true
 	case CreateCollectionMethod:
-		return GasCreateCollectionBase
+		baseGas = GasCreateCollectionBase
+		isTransaction = true
 	case UpdateCollectionMethod:
-		return GasUpdateCollectionBase
+		baseGas = GasUpdateCollectionBase
+		isTransaction = true
 	case DeleteCollectionMethod:
-		return GasDeleteCollectionBase
+		baseGas = GasDeleteCollectionBase
+		isTransaction = true
 	case CreateAddressListsMethod:
-		return GasCreateAddressListsBase
+		baseGas = GasCreateAddressListsBase
+		isTransaction = true
 	case UpdateUserApprovalsMethod:
-		return GasUpdateUserApprovalsBase
+		baseGas = GasUpdateUserApprovalsBase
+		isTransaction = true
 	case DeleteIncomingApprovalMethod:
-		return GasDeleteIncomingApprovalBase
+		baseGas = GasDeleteIncomingApprovalBase
+		isTransaction = true
 	case DeleteOutgoingApprovalMethod:
-		return GasDeleteOutgoingApprovalBase
+		baseGas = GasDeleteOutgoingApprovalBase
+		isTransaction = true
 	case PurgeApprovalsMethod:
-		return GasPurgeApprovalsBase
+		baseGas = GasPurgeApprovalsBase
+		isTransaction = true
 	case CreateDynamicStoreMethod:
-		return GasCreateDynamicStoreBase
+		baseGas = GasCreateDynamicStoreBase
+		isTransaction = true
 	case UpdateDynamicStoreMethod:
-		return GasUpdateDynamicStoreBase
+		baseGas = GasUpdateDynamicStoreBase
+		isTransaction = true
 	case DeleteDynamicStoreMethod:
-		return GasDeleteDynamicStoreBase
+		baseGas = GasDeleteDynamicStoreBase
+		isTransaction = true
 	case SetDynamicStoreValueMethod:
-		return GasSetDynamicStoreValueBase
+		baseGas = GasSetDynamicStoreValueBase
+		isTransaction = true
 	case SetValidTokenIdsMethod:
-		return GasSetValidTokenIdsBase
+		baseGas = GasSetValidTokenIdsBase
+		isTransaction = true
 	case SetManagerMethod:
-		return GasSetManagerBase
+		baseGas = GasSetManagerBase
+		isTransaction = true
 	case SetCollectionMetadataMethod:
-		return GasSetCollectionMetadataBase
+		baseGas = GasSetCollectionMetadataBase
+		isTransaction = true
 	case SetTokenMetadataMethod:
-		return GasSetTokenMetadataBase
+		baseGas = GasSetTokenMetadataBase
+		isTransaction = true
 	case SetCustomDataMethod:
-		return GasSetCustomDataBase
+		baseGas = GasSetCustomDataBase
+		isTransaction = true
 	case SetStandardsMethod:
-		return GasSetStandardsBase
+		baseGas = GasSetStandardsBase
+		isTransaction = true
 	case SetCollectionApprovalsMethod:
-		return GasSetCollectionApprovalsBase
+		baseGas = GasSetCollectionApprovalsBase
+		isTransaction = true
 	case SetIsArchivedMethod:
-		return GasSetIsArchivedBase
+		baseGas = GasSetIsArchivedBase
+		isTransaction = true
 	case CastVoteMethod:
-		return GasCastVoteBase
+		baseGas = GasCastVoteBase
+		isTransaction = true
 	case UniversalUpdateCollectionMethod:
-		return GasUniversalUpdateCollectionBase
+		baseGas = GasUniversalUpdateCollectionBase
+		isTransaction = true
+	case ExecuteMultipleMethod:
+		baseGas = GasExecuteMultipleBase
+		isTransaction = true
 	// Query methods
 	case GetCollectionMethod:
-		return GasGetCollectionBase
+		baseGas = GasGetCollectionBase
 	case GetBalanceMethod:
-		return GasGetBalanceBase
+		baseGas = GasGetBalanceBase
 	case GetAddressListMethod:
-		return GasGetAddressList
+		baseGas = GasGetAddressList
 	case GetApprovalTrackerMethod:
-		return GasGetApprovalTracker
+		baseGas = GasGetApprovalTracker
 	case GetChallengeTrackerMethod:
-		return GasGetChallengeTracker
+		baseGas = GasGetChallengeTracker
 	case GetETHSignatureTrackerMethod:
-		return GasGetETHSignatureTracker
+		baseGas = GasGetETHSignatureTracker
 	case GetDynamicStoreMethod:
-		return GasGetDynamicStore
+		baseGas = GasGetDynamicStore
 	case GetDynamicStoreValueMethod:
-		return GasGetDynamicStoreValue
+		baseGas = GasGetDynamicStoreValue
 	case GetWrappableBalancesMethod:
-		return GasGetWrappableBalances
+		baseGas = GasGetWrappableBalances
 	case IsAddressReservedProtocolMethod:
-		return GasIsAddressReservedProtocol
+		baseGas = GasIsAddressReservedProtocol
 	case GetAllReservedProtocolAddressesMethod:
-		return GasGetAllReservedProtocol
+		baseGas = GasGetAllReservedProtocol
 	case GetVoteMethod:
-		return GasGetVote
+		baseGas = GasGetVote
 	case GetVotesMethod:
-		return GasGetVotes
+		baseGas = GasGetVotes
 	case ParamsMethod:
-		return GasParams
+		baseGas = GasParams
 	case GetBalanceAmountMethod:
-		return GasGetBalanceAmountBase
+		baseGas = GasGetBalanceAmountBase
 	case GetTotalSupplyMethod:
-		return GasGetTotalSupplyBase
-	case ExecuteMultipleMethod:
-		return GasExecuteMultipleBase
+		baseGas = GasGetTotalSupplyBase
+	default:
+		return 0
 	}
 
-	return 0
+	// Add buffer for Cosmos SDK operations to help estimateGas converge
+	// Transactions need more buffer due to state writes, bank transfers, etc.
+	if isTransaction {
+		return baseGas + 200_000
+	}
+
+	// Queries need less buffer but still need some for state reads
+	return baseGas + 50_000
 }
 
 func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error) {
