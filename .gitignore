@@ -44,6 +44,9 @@ export-genesis.json
 bitbadgeschaind
 
 genesis-test.json
+
+# Binary cache directory
+.cache/
 scripts-dev/
 
 new-genesis.json

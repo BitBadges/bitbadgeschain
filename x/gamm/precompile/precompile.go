@@ -39,8 +39,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
 
@@ -478,12 +478,17 @@ func LogPrecompileUsage(ctx sdk.Context, method string, success bool, gasUsed ui
 	if err != nil {
 		// Extract error code if it's a PrecompileError
 		if precompileErr, ok := err.(*PrecompileError); ok {
-			logger.Error("precompile error",
+			logFields := []interface{}{
 				"method", method,
 				"error_code", precompileErr.Code,
 				"error_message", precompileErr.Message,
 				"gas_used", gasUsed,
-			)
+			}
+			// Include error details if available (contains underlying error)
+			if precompileErr.Details != "" {
+				logFields = append(logFields, "error_details", precompileErr.Details)
+			}
+			logger.Error("precompile error", logFields...)
 		} else {
 			logger.Error("precompile error",
 				"method", method,

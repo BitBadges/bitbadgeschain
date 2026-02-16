@@ -4,6 +4,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	v24 "github.com/bitbadges/bitbadgeschain/app/upgrades/v24"
+	v24_patch "github.com/bitbadges/bitbadgeschain/app/upgrades/v24_patch"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -16,6 +17,20 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.TokenizationKeeper,
 			app.PoolManagerKeeper,
 			app.IBCRateLimitKeeper,
+			app.EVMKeeper,
+			app.BankKeeper,
+			app.FeeMarketKeeper,
+			app.ERC20Keeper,
+		),
+	)
+
+	// v24-patch: Fix EVM configuration on testnets that already ran v24
+	// This fixes the aatom -> ubadge denom issue and enables all precompiles
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v24_patch.UpgradeName,
+		v24_patch.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.Configurator(),
 			app.EVMKeeper,
 			app.BankKeeper,
 		),
@@ -55,6 +70,10 @@ func (app *App) RegisterUpgradeHandlers() {
 				"precisebank", // Add PreciseBank store (new keeper)
 			},
 		}
+	case v24_patch.UpgradeName:
+		// No store changes needed - this is a patch to fix EVM configuration
+		// All stores were already added in v24
+		storeUpgrades = nil
 	}
 
 	if storeUpgrades != nil {

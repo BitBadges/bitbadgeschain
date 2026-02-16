@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
@@ -42,15 +44,56 @@ func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
 	}
 
 	// Initialize EvmCoinInfo (may already be initialized)
-	if err := app.EVMKeeper.SetEvmCoinInfo(ctx, evmtypes.EvmCoinInfo{
+	// CRITICAL: This must be set correctly or the ante handler will reject transactions with ubadge fees
+	coinInfo := evmtypes.EvmCoinInfo{
 		Denom:         "ubadge",
 		ExtendedDenom: "abadge",
 		DisplayDenom:  "BADGE",
 		Decimals:      9,
-	}); err != nil {
+	}
+	if err := app.EVMKeeper.SetEvmCoinInfo(ctx, coinInfo); err != nil {
 		ctx.Logger().Info("EVM coin info initialization skipped", "error", err)
+	}
+
+	// CRITICAL: Verify coin info is set correctly - if it's still "aatom", force set it
+	// This is a safeguard to ensure coin info is always "ubadge" even if something resets it
+	currentCoinInfo := app.EVMKeeper.GetEvmCoinInfo(ctx)
+	if currentCoinInfo.Denom != "ubadge" {
+		ctx.Logger().Warn("CRITICAL: EVM coin info denom is not ubadge, fixing",
+			"current", currentCoinInfo.Denom,
+			"expected", "ubadge",
+			"evmParamsDenom", evmParams.EvmDenom)
+		// Force set it - this is critical for transaction fees to work
+		// Try multiple times to ensure it sticks
+		for i := 0; i < 3; i++ {
+			if err := app.EVMKeeper.SetEvmCoinInfo(ctx, coinInfo); err != nil {
+				ctx.Logger().Error("CRITICAL: Failed to fix EVM coin info denom",
+					"error", err,
+					"attempt", i+1,
+					"evmParamsDenom", evmParams.EvmDenom)
+				if i == 2 {
+					// Last attempt failed - this is critical
+					return fmt.Errorf("CRITICAL: failed to set EVM coin info to ubadge after 3 attempts: current denom is %s, params denom is %s, error: %w",
+						currentCoinInfo.Denom, evmParams.EvmDenom, err)
+				}
+				// Re-read params in case they changed
+				evmParams = app.EVMKeeper.GetParams(ctx)
+				continue
+			}
+			// Verify it was set
+			currentCoinInfo = app.EVMKeeper.GetEvmCoinInfo(ctx)
+			if currentCoinInfo.Denom == "ubadge" {
+				ctx.Logger().Info("CRITICAL: EVM coin info denom fixed to ubadge", "attempt", i+1)
+				break
+			}
+			if i == 2 {
+				return fmt.Errorf("CRITICAL: EVM coin info still incorrect after 3 set attempts: got %s, expected ubadge, params denom is %s",
+					currentCoinInfo.Denom, evmParams.EvmDenom)
+			}
+		}
+	} else {
+		ctx.Logger().Info("EVM coin info verified correctly", "denom", currentCoinInfo.Denom)
 	}
 
 	return nil
 }
-

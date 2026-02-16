@@ -311,6 +311,14 @@ func New(
 	// from chains that were running IBC v8
 	RegisterLegacyLocalhostInterfaces(app.interfaceRegistry)
 
+	// Register legacy WASM types for backward compatibility during genesis export
+	// Old governance proposals may reference WASM message types that no longer exist
+	RegisterLegacyWasmInterfaces(app.interfaceRegistry)
+
+	// Register legacy badges types for backward compatibility during genesis export
+	// Old governance proposals may reference badges.MsgUpdateParams (now tokenization module)
+	RegisterLegacyBadgesInterfaces(app.interfaceRegistry)
+
 	// add to default baseapp options
 	// enable optimistic execution
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())

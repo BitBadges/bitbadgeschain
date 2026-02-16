@@ -33,6 +33,16 @@ func (app *App) ExportAppStateAndValidators(forZeroHeight bool, jailAllowedAddrs
 		return servertypes.ExportedApp{}, err
 	}
 
+	// Filter out cosmwasm/wasm modules from genesis state since they've been removed
+	// This prevents "no concrete type registered" errors during export
+	cosmwasmKeys := []string{
+		"wasm",    // cosmwasm.wasm.v1 module
+		"wasmx",   // wasmx module (if it exists)
+	}
+	for _, key := range cosmwasmKeys {
+		delete(genState, key)
+	}
+
 	appState, err := json.MarshalIndent(genState, "", "  ")
 	if err != nil {
 		return servertypes.ExportedApp{}, err
