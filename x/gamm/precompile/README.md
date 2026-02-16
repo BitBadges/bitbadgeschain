@@ -322,15 +322,11 @@ The gamm precompile must be **enabled** in the genesis state for it to be callab
 3. Verify ABI matches the precompile implementation
 4. Check application logs for ABI loading warnings
 
-#### Snapshot Errors (Upstream Issue)
+#### Snapshot Errors (Fixed)
 
 **Symptoms**: Panics with "snapshot index 0 out of bound [0..0)" when precompile returns errors.
 
-**Solutions**:
-1. This is a known upstream issue in `cosmos/evm` module
-2. Monitor for upstream fixes in `cosmos/evm` repository
-3. Workaround: Focus on successful operations; error handling will be fixed upstream
-4. The precompile logic itself is correct; the issue is in EVM error handling
+**Status**: This issue has been fixed in `pkg/evmcompat/atomic.go`. The fix detects EVM context and uses native `Snapshot()`/`RevertToSnapshot()` instead of `CacheContext()`, which prevents the snapshot stack corruption. See `docs/security/SNAPSHOT_CORRUPTION_REPORT.md` for technical details.
 
 #### Gas Estimation Issues
 
@@ -360,7 +356,7 @@ The gamm precompile must be **enabled** in the genesis state for it to be callab
 
 3. **ABI Load Failure**: If `abi.json` is corrupted, the precompile will be disabled but the chain will still start. The error can be checked via `gamm.GetABILoadError()`.
 
-4. **EVM Snapshot Bug (Upstream)**: The `cosmos/evm` module has a known issue in snapshot management for precompiles. When a precompile returns an error and the EVM tries to revert, the snapshot stack can be empty, causing `"snapshot index 0 out of bound [0..0)"` panics. This affects error handling paths but not successful operations. The precompile logic itself is correct; the issue is in the upstream EVM module's error handling. Monitor the `cosmos/evm` repository for fixes.
+4. **EVM Snapshot Bug (Fixed)**: The `cosmos/evm` module's snapshot stack corruption issue has been fixed locally in `pkg/evmcompat/atomic.go`. The fix detects EVM context and uses native `Snapshot()`/`RevertToSnapshot()` instead of `CacheContext()`. See `docs/security/SNAPSHOT_CORRUPTION_REPORT.md` for details.
 
 5. **Dynamic Gas Estimation**: While dynamic gas calculation is implemented, if ABI parsing fails during `RequiredGas()`, the method falls back to base gas. This may result in underestimation for complex operations. The EVM will still charge actual gas used during execution.
 
@@ -374,10 +370,9 @@ Before deploying to production:
 - [ ] All required methods are accessible (test queries)
 - [ ] Monitoring is set up for precompile events and errors
 - [ ] Gas costs are calibrated based on testnet usage
-- [ ] Error handling is tested (with awareness of upstream snapshot bug)
+- [ ] Error handling is tested
 - [ ] Documentation is reviewed and up-to-date
 - [ ] Known limitations are documented and understood
-- [ ] Team is aware of upstream EVM snapshot bug and workarounds
 
 ## Development
 
@@ -439,9 +434,7 @@ go test -tags=test -fuzz=. ./x/gamm/precompile/test/fuzz/...
 
 #### Known Limitations
 
-1. **EVM Snapshot Management**: The `cosmos/evm` module has a known issue in snapshot management for precompiles. When a precompile returns an error and the EVM tries to revert, the snapshot stack can be empty, causing panics. This affects tests that expect the precompile to return errors. Workaround: Focus on successful operations and unit tests.
-
-2. **E2E ABI Packing**: Some E2E tests have complex ABI tuple packing issues for arrays of structs. The core functionality is fully tested through unit, integration, and advanced test suites. E2E ABI packing improvements can be addressed when better ABI handling tooling is available.
+1. **E2E ABI Packing**: Some E2E tests have complex ABI tuple packing issues for arrays of structs. The core functionality is fully tested through unit, integration, and advanced test suites. E2E ABI packing improvements can be addressed when better ABI handling tooling is available.
 
 ## Error Codes
 

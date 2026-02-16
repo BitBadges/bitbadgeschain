@@ -13,9 +13,11 @@ func TestPrecompile_RequiredGas(t *testing.T) {
 	precompile := createTestPrecompile(t)
 
 	// Test with valid method ID - get the method selector manually
+	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
+	const txBuffer = 200_000
 	methodID := precompile.ABI.Methods["transferTokens"].ID
 	gas := precompile.RequiredGas(methodID[:])
-	require.Equal(t, uint64(tokenization.GasTransferTokensBase), gas)
+	require.Equal(t, uint64(tokenization.GasTransferTokensBase+txBuffer), gas)
 
 	// Test with invalid input (too short)
 	gas = precompile.RequiredGas([]byte{0x12, 0x34})

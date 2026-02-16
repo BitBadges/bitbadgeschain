@@ -815,8 +815,10 @@ func (suite *E2ETestSuite) TestPrecompile_RequiredGas_Comprehensive() {
 	methodID := suite.Precompile.ABI.Methods["transferTokens"].ID
 
 	// Test with valid method ID
+	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
+	const txBuffer = 200_000
 	gas := suite.Precompile.RequiredGas(methodID[:])
-	suite.Require().Equal(uint64(tokenization.GasTransferTokensBase), gas)
+	suite.Require().Equal(uint64(tokenization.GasTransferTokensBase+txBuffer), gas)
 
 	// Test with invalid input (too short)
 	gas = suite.Precompile.RequiredGas([]byte{0x12, 0x34})

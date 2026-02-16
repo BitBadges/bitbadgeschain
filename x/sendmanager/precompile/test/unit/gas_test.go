@@ -40,8 +40,10 @@ func (suite *GasTestSuite) TestRequiredGas_SendMethod() {
 	input, err := helpers.PackMethodCall(&method, jsonMsg)
 	suite.NoError(err)
 
+	// RequiredGas adds a 150k buffer to base gas for Cosmos SDK operations (bank transfers)
+	const txBuffer = 150_000
 	gas := suite.Precompile.RequiredGas(input)
-	suite.Equal(uint64(sendmanager.GasSendBase), gas, "Gas should equal GasSendBase for send method")
+	suite.Equal(uint64(sendmanager.GasSendBase+txBuffer), gas, "Gas should equal GasSendBase + buffer for send method")
 }
 
 func (suite *GasTestSuite) TestRequiredGas_InvalidInput() {
@@ -74,8 +76,10 @@ func (suite *GasTestSuite) TestGetBaseGas_SendMethod() {
 	input, err := helpers.PackMethodCall(&method, jsonMsg)
 	suite.NoError(err)
 
+	// RequiredGas adds a 150k buffer to base gas for Cosmos SDK operations
+	const txBuffer = 150_000
 	gas := suite.Precompile.RequiredGas(input)
-	suite.Equal(uint64(sendmanager.GasSendBase), gas)
+	suite.Equal(uint64(sendmanager.GasSendBase+txBuffer), gas)
 }
 
 func (suite *GasTestSuite) TestGetBaseGas_UnknownMethod() {

@@ -4,7 +4,6 @@ import (
 	"crypto/ecdsa"
 	"math"
 	"math/big"
-	"strings"
 	"testing"
 	"time"
 
@@ -378,7 +377,7 @@ func (suite *SolidityContractTestSuite) TestSolidity_DeployContract() {
 	suite.Require().NotNil(response)
 
 	// Check if transaction succeeded
-	if response.VmError != "" && !strings.Contains(response.VmError, "snapshot revert error") {
+	if response.VmError != "" {
 		suite.T().Logf("WARNING: Contract deployment had VM error: %s", response.VmError)
 		// Don't fail immediately - check if contract was still deployed
 	}
@@ -499,7 +498,7 @@ func (suite *SolidityContractTestSuite) TestSolidity_TransferTokens_ThroughContr
 
 	// Check if transfer succeeded based on return data
 	transferSucceeded := false
-	if response.VmError == "" || strings.Contains(response.VmError, "snapshot revert error") {
+	if response.VmError == "" {
 		// Check return data for success - only trust explicit success return
 		if len(returnData) > 0 {
 			unpacked, err := method.Outputs.Unpack(returnData)

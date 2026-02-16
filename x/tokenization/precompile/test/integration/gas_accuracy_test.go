@@ -66,15 +66,6 @@ func (suite *GasAccuracyTestSuite) TestGasAccuracy_TransferTokens_EstimateVsActu
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 

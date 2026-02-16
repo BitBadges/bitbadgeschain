@@ -3,7 +3,6 @@ package tokenization_test
 import (
 	"math"
 	"math/big"
-	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -57,7 +56,7 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_UniversalUpdateCollection
 		&precompileAddr,
 		input,
 		big.NewInt(0),
-		500000,
+		1000000,
 		big.NewInt(0),
 		nonce,
 		chainID,
@@ -72,15 +71,6 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_UniversalUpdateCollection
 	// Execute transaction
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
 
-	// Handle snapshot errors gracefully
-	if err != nil && strings.Contains(err.Error(), "snapshot index") {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && strings.Contains(response.VmError, "snapshot revert error") {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 
 	suite.Require().NoError(err, "Transaction should execute successfully")
 	suite.Require().NotNil(response, "Response should not be nil")
@@ -189,7 +179,7 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_TransferTokens() {
 		&precompileAddr,
 		input,
 		big.NewInt(0),
-		500000,
+		1000000,
 		big.NewInt(0),
 		nonce,
 		chainID,
@@ -203,15 +193,6 @@ func (suite *IndexerEventsTestSuite) TestIndexerEvents_TransferTokens() {
 	// Execute transaction
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
 
-	// Handle snapshot errors gracefully
-	if err != nil && strings.Contains(err.Error(), "snapshot index") {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && strings.Contains(response.VmError, "snapshot revert error") {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)

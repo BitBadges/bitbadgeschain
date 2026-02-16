@@ -1,12 +1,9 @@
 package tokenization_test
 
-// KNOWN ISSUE: EVM Keeper Snapshot Management
-// The cosmos/evm module has a bug in its snapshot management for precompiles.
-// When a precompile returns an error and the EVM tries to revert, the snapshot
-// stack can be empty, causing "snapshot index 0 out of bound [0..0)" panics.
-// This affects tests that expect the precompile to return errors.
-// Workaround: Focus on unit tests and Solidity contract tests instead of EVM keeper integration tests.
-// The precompile logic itself works correctly; the issue is in the upstream EVM module's error handling.
+// EVM Keeper Integration Tests
+// These tests verify the tokenization precompile works correctly when called through the EVM keeper.
+// The precompile uses the evmcompat package to handle atomic operations correctly in both
+// EVM and normal Cosmos contexts.
 
 import (
 	"crypto/ecdsa"
@@ -367,6 +364,45 @@ func (suite *EVMKeeperIntegrationTestSuite) createTestCollection() sdkmath.Uint 
 	err = suite.TokenizationKeeper.SetBalanceForAddress(suite.Ctx, collection, suite.Alice.String(), store)
 	suite.Require().NoError(err)
 
+	// Set up user-level approvals for transfers
+	// Alice needs outgoing approval
+	outgoingApproval := &tokenizationtypes.UserOutgoingApproval{
+		ApprovalId:        "alice_outgoing",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TransferTimes:     getFullUintRanges(),
+		TokenIds:          getFullUintRanges(),
+		OwnershipTimes:    getFullUintRanges(),
+		ApprovalCriteria:  &tokenizationtypes.OutgoingApprovalCriteria{},
+		Version:           sdkmath.NewUint(0),
+	}
+	setOutgoingMsg := &tokenizationtypes.MsgSetOutgoingApproval{
+		Creator:      suite.Alice.String(),
+		CollectionId: collectionId,
+		Approval:     outgoingApproval,
+	}
+	_, err = msgServer.SetOutgoingApproval(suite.Ctx, setOutgoingMsg)
+	suite.Require().NoError(err)
+
+	// Bob needs incoming approval to receive tokens
+	incomingApproval := &tokenizationtypes.UserIncomingApproval{
+		ApprovalId:        "bob_incoming",
+		FromListId:        "All",
+		InitiatedByListId: "All",
+		TransferTimes:     getFullUintRanges(),
+		TokenIds:          getFullUintRanges(),
+		OwnershipTimes:    getFullUintRanges(),
+		ApprovalCriteria:  &tokenizationtypes.IncomingApprovalCriteria{},
+		Version:           sdkmath.NewUint(0),
+	}
+	setIncomingMsg := &tokenizationtypes.MsgSetIncomingApproval{
+		Creator:      suite.Bob.String(),
+		CollectionId: collectionId,
+		Approval:     incomingApproval,
+	}
+	_, err = msgServer.SetIncomingApproval(suite.Ctx, setIncomingMsg)
+	suite.Require().NoError(err)
+
 	return collectionId
 }
 
@@ -455,12 +491,13 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_TransferTokens_Through
 	toAddressesStr := []string{suite.Bob.String()}
 
 	// Build JSON message
+	// Transfer from all token IDs (1-50) to keep balance as single entry for simpler assertion
 	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
 		suite.Alice.String(), // from address
 		toAddressesStr,
 		big.NewInt(10),
-		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(10)}},
+		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(50)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
 	)
 	suite.Require().NoError(err, "Failed to build JSON message")
@@ -490,7 +527,7 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_TransferTokens_Through
 		&precompileAddr,
 		input,
 		big.NewInt(0),
-		500000,        // Increased gas limit to avoid "out of gas" errors during precompile execution
+		1000000,       // Increased gas limit to avoid "out of gas" errors during precompile execution
 		big.NewInt(0), // Zero gas price for testing to avoid fee collector refund issues
 		nonce,
 		chainID,
@@ -523,22 +560,7 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_TransferTokens_Through
 	}
 
 	// Check for VM errors
-	// Note: "execution reverted" with "out of gas" in return data indicates the precompile
-	// executed but ran out of gas during execution. This is different from a routing failure.
-	// Also handle snapshot errors (known upstream bug) gracefully.
 	if response.VmError != "" {
-		// Check if this is a snapshot error (known upstream bug)
-		if strings.Contains(response.VmError, "snapshot revert error") {
-			suite.T().Logf("WARNING: Snapshot error occurred (known upstream bug): %s", response.VmError)
-			suite.T().Logf("The precompile likely executed and returned an error, but revert failed due to empty snapshot stack")
-			// For snapshot errors, we can't verify the transaction result
-			// but we know the precompile was called (which is progress)
-			suite.T().Logf("NOTE: This is a known issue in cosmos/evm - precompile execution succeeded but revert failed")
-			// Don't fail the test - this is an upstream bug, not our code
-			suite.T().Skip("Skipping test due to snapshot error (known upstream bug in cosmos/evm)")
-			return
-		}
-
 		suite.T().Logf("EVM transaction returned error: %s", response.VmError)
 		// If we have return data, it means the precompile was called (good!)
 		// The error might be recoverable (e.g., out of gas) or a business logic error
@@ -795,15 +817,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_AllTransactionMethods_
 				continue
 			}
 			response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-			// Handle snapshot errors gracefully
-			if err != nil && suite.containsSnapshotError(err.Error()) {
-				suite.T().Logf("Method %s hit snapshot error (known upstream bug), skipping", methodName)
-				continue
-			}
-			if response != nil && suite.containsSnapshotError(response.VmError) {
-				suite.T().Logf("Method %s hit snapshot error in response (known upstream bug), skipping", methodName)
-				continue
-			}
 			// Some methods might fail due to missing setup, that's ok for this test
 			if err != nil {
 				suite.T().Logf("Method %s execution failed (expected for some): %v", methodName, err)
@@ -902,15 +915,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_QueryMethods_ThroughEV
 
 	suite.T().Logf("DEBUG: Executing query transaction...")
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	// Handle snapshot errors gracefully
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 
@@ -951,14 +955,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_QueryMethods_ThroughEV
 	suite.Require().NoError(err)
 
 	response, err = helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	if response.VmError == "" && len(response.Ret) > 0 {
@@ -995,14 +991,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_QueryMethods_ThroughEV
 	suite.Require().NoError(err)
 
 	response, err = helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 
@@ -1076,16 +1064,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_GasAccounting() {
 
 	// Get gas after
 	gasAfter := suite.BankKeeper.GetBalance(suite.Ctx, suite.Alice, "ustake")
-
-	// Handle snapshot errors gracefully
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 
 	// Verify gas was used (balance decreased)
 	// Note: With zero gas price, there may be no deduction, so we check if gas was actually used
@@ -1184,11 +1162,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_ErrorHandling() {
 	suite.Require().Error(err, "packing invalid args should fail")
 }
 
-// containsSnapshotError is a helper to check if an error is a snapshot error
-func (suite *EVMKeeperIntegrationTestSuite) containsSnapshotError(errStr string) bool {
-	return strings.Contains(errStr, "snapshot index") && strings.Contains(errStr, "out of bound")
-}
-
 // TestEVMKeeper_ReentrancyProtection tests that reentrancy attacks are prevented
 // NOTE: The EVM itself prevents reentrancy through its call stack mechanism
 func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_ReentrancyProtection() {
@@ -1228,16 +1201,8 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_ReentrancyProtection()
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
+	suite.Require().NoError(err)
+	suite.Require().NotNil(response)
 
 	suite.T().Log("✓ Reentrancy protection verified (EVM call stack prevents reentrancy)")
 }
@@ -1281,17 +1246,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_GasAccuracy() {
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 
@@ -1367,17 +1321,6 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_ErrorRecovery() {
 	suite.Require().NoError(err)
 
 	response, err = helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	suite.T().Log("✓ Error recovery test passed - system recovered from error")
@@ -1400,13 +1343,15 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_EventEmission_Transfer
 	method := suite.Precompile.ABI.Methods["transferTokens"]
 	suite.Require().NotNil(method)
 
+	// Use the same transfer pattern as TestEVMKeeper_TransferTokens_ThroughEVM
+	// Transfer token IDs 1-50 to avoid balance structure issues
 	toAddressesStr := []string{suite.Bob.String()}
 	jsonMsg, err := helpers.BuildTransferTokensJSON(
 		suite.CollectionId.BigInt(),
 		suite.Alice.String(),
 		toAddressesStr,
 		big.NewInt(10),
-		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(10)}},
+		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(50)}},
 		[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
 	)
 	suite.Require().NoError(err)
@@ -1421,7 +1366,7 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_EventEmission_Transfer
 		&precompileAddr,
 		input,
 		big.NewInt(0),
-		500000,
+		1000000, // Increased gas limit
 		big.NewInt(0),
 		nonce,
 		chainID,
@@ -1430,21 +1375,9 @@ func (suite *EVMKeeperIntegrationTestSuite) TestEVMKeeper_EventEmission_Transfer
 
 	// Execute transaction
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-
-	// Handle snapshot errors gracefully
-	if err != nil && strings.Contains(err.Error(), "snapshot index") {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
-
-	// Check for snapshot errors in response
-	if response.VmError != "" && strings.Contains(response.VmError, "snapshot revert error") {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
+	suite.Require().Empty(response.VmError, "Transaction should not have VM error: %s", response.VmError)
 
 	// Events are emitted by the underlying message handlers, no need to check precompile-specific events here
 }

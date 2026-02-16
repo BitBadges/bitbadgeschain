@@ -49,15 +49,18 @@ func TestGasConstants(t *testing.T) {
 func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
 
+	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
+	const txBuffer = 200_000
+
 	testCases := []struct {
 		name     string
 		method   string
 		expected uint64
 	}{
-		{"joinPool", "joinPool", gamm.GasJoinPoolBase},
-		{"exitPool", "exitPool", gamm.GasExitPoolBase},
-		{"swapExactAmountIn", "swapExactAmountIn", gamm.GasSwapExactAmountInBase},
-		{"swapExactAmountInWithIBCTransfer", "swapExactAmountInWithIBCTransfer", gamm.GasSwapExactAmountInWithIBCTransferBase},
+		{"joinPool", "joinPool", gamm.GasJoinPoolBase + txBuffer},
+		{"exitPool", "exitPool", gamm.GasExitPoolBase + txBuffer},
+		{"swapExactAmountIn", "swapExactAmountIn", gamm.GasSwapExactAmountInBase + txBuffer},
+		{"swapExactAmountInWithIBCTransfer", "swapExactAmountInWithIBCTransfer", gamm.GasSwapExactAmountInWithIBCTransferBase + txBuffer},
 	}
 
 	for _, tc := range testCases {
@@ -78,20 +81,23 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
 	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
 
+	// Query methods add a 50k buffer to base gas for state reads
+	const queryBuffer = 50_000
+
 	testCases := []struct {
 		name     string
 		method   string
 		expected uint64
 	}{
-		{"getPool", "getPool", gamm.GasGetPoolBase},
-		{"getPools", "getPools", gamm.GasGetPoolsBase},
-		{"getPoolType", "getPoolType", gamm.GasGetPoolTypeBase},
-		{"calcJoinPoolNoSwapShares", "calcJoinPoolNoSwapShares", gamm.GasCalcJoinPoolNoSwapSharesBase},
-		{"calcExitPoolCoinsFromShares", "calcExitPoolCoinsFromShares", gamm.GasCalcExitPoolCoinsFromSharesBase},
-		{"calcJoinPoolShares", "calcJoinPoolShares", gamm.GasCalcJoinPoolSharesBase},
-		{"getPoolParams", "getPoolParams", gamm.GasGetPoolParamsBase},
-		{"getTotalShares", "getTotalShares", gamm.GasGetTotalSharesBase},
-		{"getTotalLiquidity", "getTotalLiquidity", gamm.GasGetTotalLiquidityBase},
+		{"getPool", "getPool", gamm.GasGetPoolBase + queryBuffer},
+		{"getPools", "getPools", gamm.GasGetPoolsBase + queryBuffer},
+		{"getPoolType", "getPoolType", gamm.GasGetPoolTypeBase + queryBuffer},
+		{"calcJoinPoolNoSwapShares", "calcJoinPoolNoSwapShares", gamm.GasCalcJoinPoolNoSwapSharesBase + queryBuffer},
+		{"calcExitPoolCoinsFromShares", "calcExitPoolCoinsFromShares", gamm.GasCalcExitPoolCoinsFromSharesBase + queryBuffer},
+		{"calcJoinPoolShares", "calcJoinPoolShares", gamm.GasCalcJoinPoolSharesBase + queryBuffer},
+		{"getPoolParams", "getPoolParams", gamm.GasGetPoolParamsBase + queryBuffer},
+		{"getTotalShares", "getTotalShares", gamm.GasGetTotalSharesBase + queryBuffer},
+		{"getTotalLiquidity", "getTotalLiquidity", gamm.GasGetTotalLiquidityBase + queryBuffer},
 	}
 
 	for _, tc := range testCases {
@@ -102,7 +108,7 @@ func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
 			gas := precompile.RequiredGas(method.ID[:])
 			suite.Equal(tc.expected, gas, "Gas cost for %s should match expected", tc.name)
 
-			// Query methods should have lower gas costs
+			// Query methods should have reasonable gas costs (base + 50k buffer)
 			suite.Less(gas, uint64(100000), "Query gas should be less than 100K for %s", tc.name)
 		})
 	}

@@ -27,9 +27,11 @@ func (suite *PrecompileTestSuite) TestPrecompile_RequiredGas() {
 	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
 
 	// Test with valid method ID - get the method selector manually
+	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
+	const txBuffer = 200_000
 	methodID := precompile.ABI.Methods["joinPool"].ID
 	gas := precompile.RequiredGas(methodID[:])
-	suite.Equal(uint64(gamm.GasJoinPoolBase), gas)
+	suite.Equal(uint64(gamm.GasJoinPoolBase+txBuffer), gas)
 
 	// Test with invalid input (too short)
 	gas = precompile.RequiredGas([]byte{0x12, 0x34})

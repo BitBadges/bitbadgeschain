@@ -65,15 +65,6 @@ func (suite *ReentrancyTestSuite) TestReentrancy_TransferReentrancy() {
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	// EVM call stack depth limits prevent deep reentrancy attacks
@@ -134,14 +125,6 @@ func (suite *ReentrancyTestSuite) TestReentrancy_ApprovalReentrancy() {
 	}
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
 
 	// Note: Approval operations may fail for various reasons (e.g., insufficient permissions)
 	// The test verifies that the precompile handles the request, not necessarily that it succeeds

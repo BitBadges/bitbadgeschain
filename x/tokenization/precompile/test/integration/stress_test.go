@@ -80,15 +80,6 @@ func (suite *StressTestSuite) TestStress_MaxRecipients() {
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.T().Logf("Transfer to %d recipients completed", maxRecipients)
 	if err == nil && response != nil {
 		suite.T().Logf("Gas used: %d", response.GasUsed)
@@ -144,15 +135,6 @@ func (suite *StressTestSuite) TestStress_MaxRanges() {
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
 	suite.T().Logf("Transfer with %d token ID ranges completed", maxRanges)
 	if err == nil && response != nil {
 		suite.T().Logf("Gas used: %d", response.GasUsed)

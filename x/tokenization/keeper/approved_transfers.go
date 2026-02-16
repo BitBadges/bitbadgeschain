@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -183,8 +184,14 @@ func (k Keeper) DeductAndGetUserApprovals(
 			addToUserApprovalsToCheck(toAddress, allBalancesForIdsAndTimes, false, userRoyalties)
 			markApprovalAsUsed(approval)
 		} else {
-			// Create a cached context - we'll perform all operations on this and only commit if everything succeeds
-			cachedCtx, writeCache := ctx.CacheContext()
+			// Use AtomicContext for state management with rollback support.
+			// This handles both EVM precompile contexts (using native snapshots) and
+			// normal Cosmos contexts (using CacheContext) transparently.
+			// See pkg/evmcompat for details on why ctx.CacheContext() cannot be used in EVM context.
+			atomic := evmcompat.NewAtomicContext(ctx)
+			cachedCtx := atomic.Ctx()
+			writeCache := atomic.Commit
+			rollbackOnFailure := atomic.Rollback
 
 			// Run all applicable checkers dynamically (includes basic validation and approval criteria)
 			checkers := k.GetApprovalCriteriaCheckers(approval)
@@ -203,6 +210,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				}
 			}
 			if checkerFailed {
+				rollbackOnFailure()
 				continue
 			}
 
@@ -215,6 +223,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			transferBalancesToCheck = types.FilterZeroBalances(transferBalancesToCheck)
 			if len(transferBalancesToCheck) == 0 {
 				addPotentialError(isExplicitlyPrioritized, idx, "no balances to check")
+				rollbackOnFailure()
 				continue
 			}
 
@@ -226,6 +235,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				} else {
 					addPotentialError(isExplicitlyPrioritized, idx, "coin transfer error")
 				}
+				rollbackOnFailure()
 				continue
 			}
 
@@ -244,6 +254,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				} else {
 					addPotentialError(isExplicitlyPrioritized, idx, "merkle challenge error")
 				}
+				rollbackOnFailure()
 				continue
 			}
 
@@ -261,6 +272,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				} else {
 					addPotentialError(isExplicitlyPrioritized, idx, "eth signature challenge error")
 				}
+				rollbackOnFailure()
 				continue
 			}
 
@@ -337,12 +349,14 @@ func (k Keeper) DeductAndGetUserApprovals(
 				}
 			}
 			if failed {
+				rollbackOnFailure()
 				continue
 			}
 
 			transferBalancesToCheck = types.FilterZeroBalances(transferBalancesToCheck)
 			if len(transferBalancesToCheck) == 0 {
 				addPotentialError(isExplicitlyPrioritized, idx, "no balances found for approval")
+				rollbackOnFailure()
 				continue
 			}
 
@@ -364,6 +378,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 				}
 			}
 			if failed {
+				rollbackOnFailure()
 				continue
 			}
 
@@ -372,6 +387,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			remainingBalances, err = types.SubtractBalances(cachedCtx, transferBalancesToCheck, remainingBalances)
 			if err != nil {
 				addPotentialError(isExplicitlyPrioritized, idx, "error subtracting balances")
+				rollbackOnFailure()
 				continue
 			}
 

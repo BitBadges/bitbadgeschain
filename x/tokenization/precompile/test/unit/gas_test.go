@@ -40,6 +40,9 @@ func (suite *GasTestSuite) createContract(caller common.Address) *vm.Contract {
 
 // TestGasCosts_TransactionMethods tests gas costs for transaction methods
 func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
+	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
+	const txBuffer = 200_000
+
 	testCases := []struct {
 		name     string
 		method   string
@@ -68,7 +71,7 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 				map[string]interface{}{},
 				[]interface{}{},
 			},
-			expected: tokenization.GasCreateCollectionBase,
+			expected: tokenization.GasCreateCollectionBase + txBuffer,
 		},
 		{
 			name:   "transferTokens",
@@ -96,7 +99,7 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 					}{{Start: big.NewInt(1), End: big.NewInt(1000)}},
 				}
 			}(),
-			expected: tokenization.GasTransferTokensBase,
+			expected: tokenization.GasTransferTokensBase + txBuffer,
 		},
 		{
 			name:   "setManager",
@@ -108,7 +111,7 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 					suite.TestSuite.Bob.String(),
 				}
 			}(),
-			expected: tokenization.GasSetManagerBase,
+			expected: tokenization.GasSetManagerBase + txBuffer,
 		},
 		{
 			name:   "setCollectionMetadata",
@@ -121,7 +124,7 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 					"data",
 				}
 			}(),
-			expected: tokenization.GasSetCollectionMetadataBase,
+			expected: tokenization.GasSetCollectionMetadataBase + txBuffer,
 		},
 		{
 			name:   "createDynamicStore",
@@ -131,7 +134,7 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 				"https://example.com",
 				"data",
 			},
-			expected: tokenization.GasCreateDynamicStoreBase,
+			expected: tokenization.GasCreateDynamicStoreBase + txBuffer,
 		},
 	}
 
@@ -153,6 +156,9 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 
 // TestGasCosts_QueryMethods tests gas costs for query methods
 func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
+	// Query methods add a 50k buffer to base gas for state reads
+	const queryBuffer = 50_000
+
 	testCases := []struct {
 		name     string
 		method   string
@@ -161,27 +167,27 @@ func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
 		{
 			name:     "getCollection",
 			method:   "getCollection",
-			expected: tokenization.GasGetCollectionBase,
+			expected: tokenization.GasGetCollectionBase + queryBuffer,
 		},
 		{
 			name:     "getBalance",
 			method:   "getBalance",
-			expected: tokenization.GasGetBalanceBase,
-		},	
+			expected: tokenization.GasGetBalanceBase + queryBuffer,
+		},
 		{
 			name:     "getAddressList",
 			method:   "getAddressList",
-			expected: tokenization.GasGetAddressList,
+			expected: tokenization.GasGetAddressList + queryBuffer,
 		},
 		{
 			name:     "getBalanceAmount",
 			method:   "getBalanceAmount",
-			expected: tokenization.GasGetBalanceAmountBase,
+			expected: tokenization.GasGetBalanceAmountBase + queryBuffer,
 		},
 		{
 			name:     "getTotalSupply",
 			method:   "getTotalSupply",
-			expected: tokenization.GasGetTotalSupplyBase,
+			expected: tokenization.GasGetTotalSupplyBase + queryBuffer,
 		},
 	}
 
@@ -194,7 +200,7 @@ func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
 			gas := suite.Precompile.RequiredGas(method.ID[:])
 			suite.Equal(tc.expected, gas, "Gas cost for %s should match expected", tc.name)
 
-			// Query methods should have lower gas costs
+			// Query methods should have reasonable gas costs (base + 50k buffer)
 			suite.Less(gas, uint64(100000), "Query gas should be less than 100K for %s", tc.name)
 		})
 	}

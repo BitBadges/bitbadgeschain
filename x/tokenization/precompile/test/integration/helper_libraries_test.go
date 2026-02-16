@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"strings"
 	"testing"
 	"time"
 
@@ -394,7 +393,7 @@ func (suite *HelperLibrariesTestSuite) TestWrappers_TransferTokens() {
 	// Verify JSON was constructed correctly by checking the call succeeded
 	// Note: The transfer may fail if the contract is the caller (not Alice)
 	// but we can still verify the JSON was constructed and the precompile was called
-	if response.VmError == "" || strings.Contains(response.VmError, "snapshot revert error") {
+	if response.VmError == "" {
 		if len(returnData) > 0 {
 			unpacked, err := method.Outputs.Unpack(returnData)
 			if err == nil && len(unpacked) > 0 {

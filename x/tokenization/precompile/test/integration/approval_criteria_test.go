@@ -84,15 +84,7 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_MerkleChallenge_Tra
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
+	
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	
@@ -146,15 +138,7 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_PredeterminedBalanc
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
+	
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	// Note: Predetermined balance transfers may require specific conditions
@@ -211,15 +195,7 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_ETHSignature_Transf
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
+	
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	// Note: ETH signature verification would happen in the keeper layer
@@ -266,15 +242,7 @@ func (suite *ApprovalCriteriaTestSuite) TestApprovalCriteria_ComplexWorkflow() {
 	suite.Require().NoError(err)
 
 	response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
-	if err != nil && suite.containsSnapshotError(err.Error()) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-	if response != nil && suite.containsSnapshotError(response.VmError) {
-		suite.T().Skip("Skipping test due to snapshot error (known upstream bug)")
-		return
-	}
-
+	
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	// Complex criteria may require multiple conditions to be met

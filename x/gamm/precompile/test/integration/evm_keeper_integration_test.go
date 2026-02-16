@@ -1,12 +1,9 @@
 package gamm_test
 
-// NOTE: EVM Keeper Snapshot Management
-// The cosmos/evm module has a known issue in snapshot management for precompiles.
-// When a precompile returns an error and the EVM tries to revert, the snapshot
-// stack can be empty, causing "snapshot index 0 out of bound [0..0)" panics.
-// This affects tests that expect the precompile to return errors.
-// Workaround: Focus on successful operations and unit tests.
-// The precompile logic itself works correctly; the issue is in the upstream EVM module's error handling.
+// NOTE: EVM Keeper Integration Tests
+// These tests verify that the GAMM precompile works correctly through the EVM.
+// The snapshot stack corruption issue has been fixed in pkg/evmcompat/atomic.go
+// by detecting EVM context and using native Snapshot()/RevertToSnapshot() instead of CacheContext().
 
 import (
 	"crypto/ecdsa"
