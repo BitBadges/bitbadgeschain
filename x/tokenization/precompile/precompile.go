@@ -47,66 +47,62 @@ import (
 
 const (
 	// Base gas costs for transactions
-	// IMPORTANT: These values must account for:
-	//   - UniversalRemoveOverlaps = 500 gas per call (can be many during permission checks)
-	//   - Bank module operations (transfers, balance checks)
-	//   - State reads/writes (KV store operations)
-	//   - Permission validation loops
-	//
-	// If these values are too low, gas estimation will succeed but actual execution
-	// may fail with "out of gas" errors that produce missing revert data.
-	GasTransferTokensBase            = 150_000 // Transfers involve permission checks, balance updates, multiple state writes
-	GasSetIncomingApprovalBase       = 100_000
-	GasSetOutgoingApprovalBase       = 100_000
-	GasCreateCollectionBase          = 200_000 // Collection creation is complex with multiple state writes
-	GasUpdateCollectionBase          = 150_000
-	GasDeleteCollectionBase          = 80_000
-	GasCreateAddressListsBase        = 100_000
-	GasUpdateUserApprovalsBase       = 100_000
-	GasDeleteIncomingApprovalBase    = 60_000
-	GasDeleteOutgoingApprovalBase    = 60_000
-	GasPurgeApprovalsBase            = 100_000
-	GasCreateDynamicStoreBase        = 80_000
-	GasUpdateDynamicStoreBase        = 80_000
-	GasDeleteDynamicStoreBase        = 60_000
-	GasSetDynamicStoreValueBase      = 60_000
-	GasSetValidTokenIdsBase          = 80_000
-	GasSetManagerBase                = 60_000
-	GasSetCollectionMetadataBase     = 60_000
-	GasSetTokenMetadataBase          = 80_000
-	GasSetCustomDataBase             = 60_000
-	GasSetStandardsBase              = 60_000
-	GasSetCollectionApprovalsBase    = 100_000
-	GasSetIsArchivedBase             = 60_000
-	GasCastVoteBase                  = 60_000
-	GasUniversalUpdateCollectionBase = 200_000 // Universal update can modify many fields
+	// IMPORTANT: These values are DEDUCTED from the transaction gas before the precompile runs.
+	// The actual execution gas comes from the remaining gas (contract.Gas after deduction).
+	// Setting these too high causes "out of gas" errors because there's not enough remaining
+	// gas for the Cosmos SDK operations. Keep these as minimal entry fees.
+	GasTransferTokensBase            = 30_000
+	GasSetIncomingApprovalBase       = 20_000
+	GasSetOutgoingApprovalBase       = 20_000
+	GasCreateCollectionBase          = 50_000
+	GasUpdateCollectionBase          = 40_000
+	GasDeleteCollectionBase          = 20_000
+	GasCreateAddressListsBase        = 30_000
+	GasUpdateUserApprovalsBase       = 30_000
+	GasDeleteIncomingApprovalBase    = 15_000
+	GasDeleteOutgoingApprovalBase    = 15_000
+	GasPurgeApprovalsBase            = 25_000
+	GasCreateDynamicStoreBase        = 20_000
+	GasUpdateDynamicStoreBase        = 20_000
+	GasDeleteDynamicStoreBase        = 15_000
+	GasSetDynamicStoreValueBase      = 15_000
+	GasSetValidTokenIdsBase          = 20_000
+	GasSetManagerBase                = 15_000
+	GasSetCollectionMetadataBase     = 15_000
+	GasSetTokenMetadataBase          = 20_000
+	GasSetCustomDataBase             = 15_000
+	GasSetStandardsBase              = 15_000
+	GasSetCollectionApprovalsBase    = 30_000
+	GasSetIsArchivedBase             = 15_000
+	GasCastVoteBase                  = 15_000
+	GasUniversalUpdateCollectionBase = 50_000
 
 	// Gas costs per element for dynamic calculations
-	GasPerRecipient          = 20_000 // Each recipient involves permission checks
-	GasPerTokenIdRange       = 5_000
-	GasPerOwnershipTimeRange = 5_000
-	GasPerApprovalField      = 2_000
+	GasPerRecipient          = 5_000
+	GasPerTokenIdRange       = 1_000
+	GasPerOwnershipTimeRange = 1_000
+	GasPerApprovalField      = 500
 
-	// Gas costs for queries (read-only operations are cheaper)
-	GasGetCollectionBase         = 10_000
-	GasGetBalanceBase            = 10_000
-	GasGetAddressList            = 15_000
-	GasGetApprovalTracker        = 15_000
-	GasGetChallengeTracker       = 15_000
-	GasGetETHSignatureTracker    = 15_000
-	GasGetDynamicStore           = 15_000
-	GasGetDynamicStoreValue      = 15_000
-	GasGetWrappableBalances      = 15_000
-	GasIsAddressReservedProtocol = 8_000
-	GasGetAllReservedProtocol    = 15_000
-	GasGetVote                   = 15_000
-	GasGetVotes                  = 15_000
-	GasParams                    = 8_000
-	GasGetBalanceAmountBase      = 10_000
-	GasGetTotalSupplyBase        = 10_000
-	GasPerQueryRange             = 2_000
-	GasExecuteMultipleBase       = 50_000
-	GasPerMessageInBatch         = 5_000
+	// Gas costs for queries (lower since they're read-only)
+	GasGetCollectionBase         = 3_000
+	GasGetBalanceBase            = 3_000
+	GasGetAddressList            = 5_000
+	GasGetApprovalTracker        = 5_000
+	GasGetChallengeTracker       = 5_000
+	GasGetETHSignatureTracker    = 5_000
+	GasGetDynamicStore           = 5_000
+	GasGetDynamicStoreValue      = 5_000
+	GasGetWrappableBalances      = 5_000
+	GasIsAddressReservedProtocol = 2_000
+	GasGetAllReservedProtocol    = 5_000
+	GasGetVote                   = 5_000
+	GasGetVotes                  = 5_000
+	GasParams                    = 2_000
+	GasGetBalanceAmountBase      = 3_000
+	GasGetTotalSupplyBase        = 3_000
+	GasPerQueryRange             = 500
+	GasExecuteMultipleBase       = 10_000
+	GasPerMessageInBatch         = 1_000
 )
 
 var _ vm.PrecompiledContract = &Precompile{}

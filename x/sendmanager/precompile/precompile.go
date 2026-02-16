@@ -32,13 +32,13 @@ import (
 
 const (
 	// Base gas costs for transactions
-	// IMPORTANT: These values must account for bank module operations and state changes.
-	// If these values are too low, gas estimation will succeed but actual execution
-	// may fail with "out of gas" errors that produce missing revert data.
-	GasSendBase = 100_000 // Send involves balance checks, transfers, and state updates
+	// IMPORTANT: These values are DEDUCTED from the transaction gas before the precompile runs.
+	// The actual execution gas comes from the remaining gas (contract.Gas after deduction).
+	// Setting these too high causes "out of gas" errors. Keep these as minimal entry fees.
+	GasSendBase = 30_000
 
 	// Gas costs per element for dynamic calculations
-	GasPerCoin = 10_000 // Each coin involves balance lookup and transfer
+	GasPerCoin = 2_000
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
