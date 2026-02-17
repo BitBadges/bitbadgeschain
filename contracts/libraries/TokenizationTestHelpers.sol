@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../types/TokenizationTypes.sol";
+import "../types/sol";
 import "./TokenizationHelpers.sol";
 
 /**
@@ -20,9 +20,9 @@ import "./TokenizationHelpers.sol";
  *     uint256 amount = 100;
  *     
  *     // Generate test data
- *     TokenizationTypes.UintRange[] memory tokenIds = 
+ *     UintRange[] memory tokenIds = 
  *         TokenizationTestHelpers.generateTokenIdRanges(1, 10);
- *     TokenizationTypes.UintRange[] memory ownershipTimes = 
+ *     UintRange[] memory ownershipTimes = 
  *         TokenizationTestHelpers.generateFullOwnershipTimes();
  *     
  *     // Perform transfer
@@ -44,12 +44,12 @@ library TokenizationTestHelpers {
         uint256 startTokenId,
         uint256 endTokenId,
         uint256 rangeSize
-    ) internal pure returns (TokenizationTypes.UintRange[] memory ranges) {
+    ) internal pure returns (UintRange[] memory ranges) {
         require(startTokenId <= endTokenId, "TokenizationTestHelpers: startTokenId must be <= endTokenId");
         require(rangeSize > 0, "TokenizationTestHelpers: rangeSize must be > 0");
         
         uint256 numRanges = (endTokenId - startTokenId + rangeSize) / rangeSize;
-        ranges = new TokenizationTypes.UintRange[](numRanges);
+        ranges = new UintRange[](numRanges);
         
         uint256 currentStart = startTokenId;
         for (uint256 i = 0; i < numRanges; i++) {
@@ -75,8 +75,8 @@ library TokenizationTestHelpers {
     function generateSingleTokenIdRange(
         uint256 startTokenId,
         uint256 endTokenId
-    ) internal pure returns (TokenizationTypes.UintRange[] memory range) {
-        range = new TokenizationTypes.UintRange[](1);
+    ) internal pure returns (UintRange[] memory range) {
+        range = new UintRange[](1);
         range[0] = TokenizationHelpers.createUintRange(startTokenId, endTokenId);
         return range;
     }
@@ -85,8 +85,8 @@ library TokenizationTestHelpers {
      * @notice Generate ownership time ranges with full ownership (1 to max)
      * @return ranges Array with a single full ownership time range
      */
-    function generateFullOwnershipTimes() internal pure returns (TokenizationTypes.UintRange[] memory ranges) {
-        ranges = new TokenizationTypes.UintRange[](1);
+    function generateFullOwnershipTimes() internal pure returns (UintRange[] memory ranges) {
+        ranges = new UintRange[](1);
         ranges[0] = TokenizationHelpers.createFullOwnershipTimeRange();
         return ranges;
     }
@@ -98,8 +98,8 @@ library TokenizationTestHelpers {
      */
     function generateOwnershipTimesFromNow(
         uint256 duration
-    ) internal view returns (TokenizationTypes.UintRange[] memory ranges) {
-        ranges = new TokenizationTypes.UintRange[](1);
+    ) internal view returns (UintRange[] memory ranges) {
+        ranges = new UintRange[](1);
         ranges[0] = TokenizationHelpers.createOwnershipTimeRange(block.timestamp, duration);
         return ranges;
     }
@@ -113,8 +113,8 @@ library TokenizationTestHelpers {
     function generateOwnershipTimes(
         uint256 startTime,
         uint256 endTime
-    ) internal pure returns (TokenizationTypes.UintRange[] memory ranges) {
-        ranges = new TokenizationTypes.UintRange[](1);
+    ) internal pure returns (UintRange[] memory ranges) {
+        ranges = new UintRange[](1);
         ranges[0] = TokenizationHelpers.createUintRange(startTime, endTime);
         return ranges;
     }
@@ -126,7 +126,7 @@ library TokenizationTestHelpers {
      */
     function generateCollectionMetadata(
         string memory name
-    ) internal pure returns (TokenizationTypes.CollectionMetadata memory metadata) {
+    ) internal pure returns (CollectionMetadata memory metadata) {
         string memory uri = string(abi.encodePacked("https://example.com/collections/", name));
         string memory customData = string(abi.encodePacked('{"name":"', name, '","test":true}'));
         return TokenizationHelpers.createCollectionMetadata(uri, customData);
@@ -139,10 +139,10 @@ library TokenizationTestHelpers {
      */
     function generateTokenMetadata(
         uint256 tokenId
-    ) internal pure returns (TokenizationTypes.TokenMetadata memory metadata) {
+    ) internal pure returns (TokenMetadata memory metadata) {
         string memory uri = string(abi.encodePacked("https://example.com/tokens/", uintToString(tokenId)));
         string memory customData = string(abi.encodePacked('{"tokenId":', uintToString(tokenId), '}'));
-        TokenizationTypes.UintRange[] memory tokenIds = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory tokenIds = new UintRange[](1);
         tokenIds[0] = TokenizationHelpers.createSingleTokenIdRange(tokenId);
         return TokenizationHelpers.createTokenMetadata(uri, customData, tokenIds);
     }
@@ -165,7 +165,7 @@ library TokenizationTestHelpers {
      * @notice Generate a test user balance store with default values
      * @return store A UserBalanceStore with default test values
      */
-    function generateTestUserBalanceStore() internal pure returns (TokenizationTypes.UserBalanceStore memory store) {
+    function generateTestUserBalanceStore() internal pure returns (UserBalanceStore memory store) {
         return TokenizationHelpers.createEmptyUserBalanceStore();
     }
 
@@ -178,7 +178,7 @@ library TokenizationTestHelpers {
     function generateTestUserBalanceStoreWithFlags(
         bool autoApproveOutgoing,
         bool autoApproveIncoming
-    ) internal pure returns (TokenizationTypes.UserBalanceStore memory store) {
+    ) internal pure returns (UserBalanceStore memory store) {
         store = TokenizationHelpers.createEmptyUserBalanceStore();
         store.autoApproveSelfInitiatedOutgoingTransfers = autoApproveOutgoing;
         store.autoApproveSelfInitiatedIncomingTransfers = autoApproveIncoming;
@@ -199,9 +199,9 @@ library TokenizationTestHelpers {
         uint256 tokenIdStart,
         uint256 tokenIdEnd
     ) internal pure returns (
-        TokenizationTypes.UintRange[] memory validTokenIds,
-        TokenizationTypes.CollectionMetadata memory metadata,
-        TokenizationTypes.UserBalanceStore memory defaultBalances
+        UintRange[] memory validTokenIds,
+        CollectionMetadata memory metadata,
+        UserBalanceStore memory defaultBalances
     ) {
         validTokenIds = generateSingleTokenIdRange(tokenIdStart, tokenIdEnd);
         metadata = generateCollectionMetadata("TestCollection");
@@ -216,7 +216,7 @@ library TokenizationTestHelpers {
      * @param message Custom error message
      */
     function assertValidRange(
-        TokenizationTypes.UintRange memory range,
+        UintRange memory range,
         string memory message
     ) internal pure {
         require(

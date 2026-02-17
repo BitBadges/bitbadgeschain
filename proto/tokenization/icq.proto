@@ -1,0 +1,98 @@
+syntax = "proto3";
+package tokenization;
+
+import "gogoproto/gogo.proto";
+import "tokenization/balances.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types";
+
+// OwnershipQueryPacket is sent from a querying chain to BitBadges to verify token ownership.
+// The querying chain provides the address and token criteria, and BitBadges responds with
+// ownership status and optional cryptographic proof.
+message OwnershipQueryPacket {
+  // Unique identifier for correlating request and response
+  string query_id = 1;
+
+  // Address to check ownership for (bech32 or EVM hex format)
+  string address = 2;
+
+  // Collection ID to query (uint as string for cross-chain compatibility)
+  string collection_id = 3;
+
+  // Token ID to check ownership for (uint as string)
+  string token_id = 4;
+
+  // Ownership time to check (uint as string, typically current time in milliseconds)
+  string ownership_time = 5;
+}
+
+// OwnershipQueryResponsePacket is sent from BitBadges back to the querying chain
+// with the ownership verification result.
+message OwnershipQueryResponsePacket {
+  // Correlation ID from the original request
+  string query_id = 1;
+
+  // True if the address owns any of the specified tokens (total_amount > 0)
+  bool owns_tokens = 2;
+
+  // Total amount owned for the specified token IDs and ownership times
+  string total_amount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // IAVL Merkle proof of the balance (for trustless verification)
+  bytes balance_proof = 4;
+
+  // Block height at which the proof was generated
+  uint64 proof_height = 5;
+
+  // Error message if the query failed (empty on success)
+  string error = 6;
+}
+
+// BulkOwnershipQueryPacket allows querying multiple addresses/collections in a single IBC packet.
+// This is more efficient than sending multiple individual queries.
+message BulkOwnershipQueryPacket {
+  // Unique identifier for the bulk query
+  string query_id = 1;
+
+  // Individual queries to process (max 100 recommended)
+  repeated OwnershipQueryPacket queries = 2;
+}
+
+// BulkOwnershipQueryResponsePacket contains responses for all queries in a bulk request.
+message BulkOwnershipQueryResponsePacket {
+  // Correlation ID from the original bulk request
+  string query_id = 1;
+
+  // Responses in the same order as the original queries
+  repeated OwnershipQueryResponsePacket responses = 2;
+}
+
+// FullBalanceQueryPacket is sent from a querying chain to BitBadges to retrieve
+// the complete balance store for a user (balances, approvals, permissions).
+message FullBalanceQueryPacket {
+  // Unique identifier for correlating request and response
+  string query_id = 1;
+
+  // Address to get balance for (bech32 or EVM hex format)
+  string address = 2;
+
+  // Collection ID to query (uint as string for cross-chain compatibility)
+  string collection_id = 3;
+}
+
+// FullBalanceQueryResponsePacket is sent from BitBadges back to the querying chain
+// with the complete balance store (serialized as bytes for cross-chain compatibility).
+message FullBalanceQueryResponsePacket {
+  // Correlation ID from the original request
+  string query_id = 1;
+
+  // The serialized UserBalanceStore (protobuf bytes)
+  // Contains balances, incoming/outgoing approvals, auto-approve settings, and permissions
+  bytes balance_store = 2;
+
+  // Block height at which the response was generated
+  uint64 proof_height = 3;
+
+  // Error message if the query failed (empty on success)
+  string error = 4;
+}

@@ -1436,19 +1436,15 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 }
 
 // HandleGetBalanceAmount handles getBalanceAmount query with custom logic
+// This returns the exact balance amount for a single (tokenId, ownershipTime) combination.
+// Uses the same logic as the SDK's getBalanceForIdAndTime function.
 func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
-	// Parse JSON request
+	// Parse JSON request - single token ID and ownership time
 	var req struct {
-		CollectionId string `json:"collectionId"`
-		Address      string `json:"address"`
-		TokenIds     []struct {
-			Start string `json:"start"`
-			End   string `json:"end"`
-		} `json:"tokenIds"`
-		OwnershipTimes []struct {
-			Start string `json:"start"`
-			End   string `json:"end"`
-		} `json:"ownershipTimes"`
+		CollectionId  string `json:"collectionId"`
+		Address       string `json:"address"`
+		TokenId       string `json:"tokenId"`
+		OwnershipTime string `json:"ownershipTime"`
 	}
 	if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
 		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %v", err))
@@ -1458,6 +1454,18 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 	collectionId, err := sdkmath.ParseUint(req.CollectionId)
 	if err != nil {
 		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %v", err))
+	}
+
+	// Parse tokenId
+	tokenId, err := sdkmath.ParseUint(req.TokenId)
+	if err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId: %v", err))
+	}
+
+	// Parse ownershipTime
+	ownershipTime, err := sdkmath.ParseUint(req.OwnershipTime)
+	if err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime: %v", err))
 	}
 
 	// Get collection
@@ -1467,78 +1475,71 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 	}
 
 	// Get user balance store
-	// Enforce maximum array size to prevent DoS attacks
-	if len(req.TokenIds) > MaxQueryArraySize {
-		return nil, ErrInvalidInput(fmt.Sprintf("tokenIds array exceeds maximum size: %d > %d", len(req.TokenIds), MaxQueryArraySize))
-	}
-	if len(req.OwnershipTimes) > MaxQueryArraySize {
-		return nil, ErrInvalidInput(fmt.Sprintf("ownershipTimes array exceeds maximum size: %d > %d", len(req.OwnershipTimes), MaxQueryArraySize))
-	}
-
 	userBalanceStore, _, err := p.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, req.Address)
 	if err != nil {
 		return nil, WrapError(err, ErrorCodeQueryFailed, "failed to get balance")
 	}
 
-	// Convert tokenIds and ownershipTimes
-	tokenIds := make([]*tokenizationtypes.UintRange, len(req.TokenIds))
-	for i, r := range req.TokenIds {
-		start, err := sdkmath.ParseUint(r.Start)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId start: %v", err))
-		}
-		end, err := sdkmath.ParseUint(r.End)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId end: %v", err))
-		}
-		tokenIds[i] = &tokenizationtypes.UintRange{Start: start, End: end}
-	}
-
-	ownershipTimes := make([]*tokenizationtypes.UintRange, len(req.OwnershipTimes))
-	for i, r := range req.OwnershipTimes {
-		start, err := sdkmath.ParseUint(r.Start)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime start: %v", err))
-		}
-		end, err := sdkmath.ParseUint(r.End)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime end: %v", err))
-		}
-		ownershipTimes[i] = &tokenizationtypes.UintRange{Start: start, End: end}
-	}
-
-	// Get balances for specific token IDs and ownership times
-	fetchedBalances, err := tokenizationtypes.GetBalancesForIds(ctx, tokenIds, ownershipTimes, userBalanceStore.Balances)
-	if err != nil {
-		return nil, WrapError(err, ErrorCodeQueryFailed, "failed to get balances for ids")
-	}
-
-	// Sum up all balance amounts
-	totalAmount := sdkmath.NewUint(0)
-	for _, balance := range fetchedBalances {
-		totalAmount = totalAmount.Add(balance.Amount)
-	}
+	// Get the balance amount for this specific token ID and ownership time
+	// This mirrors the SDK's getBalanceForIdAndTime function
+	totalAmount := getBalanceForIdAndTime(userBalanceStore.Balances, tokenId, ownershipTime)
 
 	// Emit event
-	EmitGetBalanceAmountEvent(ctx, collectionId, req.Address, tokenIds, ownershipTimes, totalAmount)
+	EmitGetBalanceAmountEventSingle(ctx, collectionId, req.Address, tokenId, ownershipTime, totalAmount)
 
 	// Return uint256
 	return method.Outputs.Pack(totalAmount.BigInt())
 }
 
+// getBalanceForIdAndTime returns the balance amount for a specific token ID and ownership time.
+// This mirrors the SDK's getBalanceForIdAndTime function - it sums all matching balance amounts
+// since the same (id, time) could appear in multiple overlapping Balance objects.
+func getBalanceForIdAndTime(balances []*tokenizationtypes.Balance, tokenId sdkmath.Uint, ownershipTime sdkmath.Uint) sdkmath.Uint {
+	amount := sdkmath.ZeroUint()
+
+	for _, balance := range balances {
+		if balance == nil {
+			continue
+		}
+
+		// Check if tokenId is in this balance's token ID ranges
+		foundTokenId := false
+		for _, tokenRange := range balance.TokenIds {
+			if tokenRange != nil && tokenId.GTE(tokenRange.Start) && tokenId.LTE(tokenRange.End) {
+				foundTokenId = true
+				break
+			}
+		}
+
+		if !foundTokenId {
+			continue
+		}
+
+		// Check if ownershipTime is in this balance's ownership time ranges
+		foundTime := false
+		for _, timeRange := range balance.OwnershipTimes {
+			if timeRange != nil && ownershipTime.GTE(timeRange.Start) && ownershipTime.LTE(timeRange.End) {
+				foundTime = true
+				break
+			}
+		}
+
+		if foundTime {
+			amount = amount.Add(balance.Amount)
+		}
+	}
+
+	return amount
+}
+
 // HandleGetTotalSupply handles getTotalSupply query with custom logic
+// This returns the exact total supply for a single (tokenId, ownershipTime) combination.
 func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
-	// Parse JSON request
+	// Parse JSON request - single token ID and ownership time
 	var req struct {
-		CollectionId string `json:"collectionId"`
-		TokenIds     []struct {
-			Start string `json:"start"`
-			End   string `json:"end"`
-		} `json:"tokenIds"`
-		OwnershipTimes []struct {
-			Start string `json:"start"`
-			End   string `json:"end"`
-		} `json:"ownershipTimes"`
+		CollectionId  string `json:"collectionId"`
+		TokenId       string `json:"tokenId"`
+		OwnershipTime string `json:"ownershipTime"`
 	}
 	if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
 		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %v", err))
@@ -1550,45 +1551,22 @@ func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, js
 		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %v", err))
 	}
 
-	// Enforce maximum array size to prevent DoS attacks
-	if len(req.TokenIds) > MaxQueryArraySize {
-		return nil, ErrInvalidInput(fmt.Sprintf("tokenIds array exceeds maximum size: %d > %d", len(req.TokenIds), MaxQueryArraySize))
+	// Parse tokenId
+	tokenId, err := sdkmath.ParseUint(req.TokenId)
+	if err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId: %v", err))
 	}
-	if len(req.OwnershipTimes) > MaxQueryArraySize {
-		return nil, ErrInvalidInput(fmt.Sprintf("ownershipTimes array exceeds maximum size: %d > %d", len(req.OwnershipTimes), MaxQueryArraySize))
+
+	// Parse ownershipTime
+	ownershipTime, err := sdkmath.ParseUint(req.OwnershipTime)
+	if err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime: %v", err))
 	}
 
 	// Get collection (validate it exists)
 	_, found := p.tokenizationKeeper.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return nil, ErrCollectionNotFound(req.CollectionId)
-	}
-
-	// Convert tokenIds and ownershipTimes
-	tokenIds := make([]*tokenizationtypes.UintRange, len(req.TokenIds))
-	for i, r := range req.TokenIds {
-		start, err := sdkmath.ParseUint(r.Start)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId start: %v", err))
-		}
-		end, err := sdkmath.ParseUint(r.End)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId end: %v", err))
-		}
-		tokenIds[i] = &tokenizationtypes.UintRange{Start: start, End: end}
-	}
-
-	ownershipTimes := make([]*tokenizationtypes.UintRange, len(req.OwnershipTimes))
-	for i, r := range req.OwnershipTimes {
-		start, err := sdkmath.ParseUint(r.Start)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime start: %v", err))
-		}
-		end, err := sdkmath.ParseUint(r.End)
-		if err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime end: %v", err))
-		}
-		ownershipTimes[i] = &tokenizationtypes.UintRange{Start: start, End: end}
 	}
 
 	// Get all balances for the collection (from Total address)
@@ -1602,20 +1580,11 @@ func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, js
 		userBalanceStore = &tokenizationtypes.UserBalanceStore{Balances: []*tokenizationtypes.Balance{}}
 	}
 
-	// Get balances for specific token IDs and ownership times
-	fetchedBalances, err := tokenizationtypes.GetBalancesForIds(ctx, tokenIds, ownershipTimes, userBalanceStore.Balances)
-	if err != nil {
-		return nil, WrapError(err, ErrorCodeQueryFailed, "failed to get balances for ids")
-	}
-
-	// Sum up all balance amounts
-	totalAmount := sdkmath.NewUint(0)
-	for _, balance := range fetchedBalances {
-		totalAmount = totalAmount.Add(balance.Amount)
-	}
+	// Get the total supply for this specific token ID and ownership time
+	totalAmount := getBalanceForIdAndTime(userBalanceStore.Balances, tokenId, ownershipTime)
 
 	// Emit event
-	EmitGetTotalSupplyEvent(ctx, collectionId, tokenIds, ownershipTimes, totalAmount)
+	EmitGetTotalSupplyEventSingle(ctx, collectionId, tokenId, ownershipTime, totalAmount)
 
 	// Return uint256
 	return method.Outputs.Pack(totalAmount.BigInt())

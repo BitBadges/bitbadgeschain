@@ -510,26 +510,21 @@ contract HelperLibrariesTestContract {
     }
     
     /**
-     * @notice Test JSON construction for getBalanceAmount
+     * @notice Test JSON construction for getBalanceAmount (single tokenId and ownershipTime)
      */
     function testGetBalanceAmountJSON(
         uint256 collectionId,
         address userAddress,
-        uint256[] memory tokenIdStarts,
-        uint256[] memory tokenIdEnds,
-        uint256[] memory ownershipStarts,
-        uint256[] memory ownershipEnds
+        uint256 tokenId,
+        uint256 ownershipTime
     ) external pure returns (string memory) {
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeArrayToJson(tokenIdStarts, tokenIdEnds);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeArrayToJson(ownershipStarts, ownershipEnds);
-        
         string memory json = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
             userAddress,
-            tokenIdsJson,
-            ownershipTimesJson
+            tokenId,
+            ownershipTime
         );
-        
+
         emit JSONConstructed("getBalanceAmountJSON", json);
         return json;
     }
@@ -641,6 +636,9 @@ contract HelperLibrariesTestContract {
         return true;
     }
 }
+
+
+
 
 
 

@@ -401,14 +401,11 @@ contract CarbonCreditToken {
      * @notice Get balance for a specific vintage
      */
     function balanceOf(address account, uint256 vintage) external view returns (uint256) {
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
-
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
             account,
-            tokenIdsJson,
-            ownershipTimesJson
+            vintage,                  // Vintage as token ID
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return TOKENIZATION.getBalanceAmount(balanceJson);
     }

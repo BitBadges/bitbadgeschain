@@ -86,49 +86,43 @@ func EmitOutgoingApprovalEvent(
 	)
 }
 
-// EmitGetBalanceAmountEvent emits an event for a getBalanceAmount query via precompile
-func EmitGetBalanceAmountEvent(
+// EmitGetBalanceAmountEventSingle emits an event for a getBalanceAmount query via precompile (single ID/time)
+func EmitGetBalanceAmountEventSingle(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
 	userAddress string,
-	tokenIds []*tokenizationtypes.UintRange,
-	ownershipTimes []*tokenizationtypes.UintRange,
+	tokenId sdkmath.Uint,
+	ownershipTime sdkmath.Uint,
 	totalAmount sdkmath.Uint,
 ) {
-	tokenIdsStr := formatUintRanges(tokenIds)
-	ownershipTimesStr := formatUintRanges(ownershipTimes)
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			"precompile_get_balance_amount",
 			sdk.NewAttribute(sdk.AttributeKeyModule, "evm_precompile"),
 			sdk.NewAttribute("collection_id", collectionId.String()),
 			sdk.NewAttribute("user_address", userAddress),
-			sdk.NewAttribute("token_ids", tokenIdsStr),
-			sdk.NewAttribute("ownership_times", ownershipTimesStr),
+			sdk.NewAttribute("token_id", tokenId.String()),
+			sdk.NewAttribute("ownership_time", ownershipTime.String()),
 			sdk.NewAttribute("total_amount", totalAmount.String()),
 		),
 	)
 }
 
-// EmitGetTotalSupplyEvent emits an event for a getTotalSupply query via precompile
-func EmitGetTotalSupplyEvent(
+// EmitGetTotalSupplyEventSingle emits an event for a getTotalSupply query via precompile (single ID/time)
+func EmitGetTotalSupplyEventSingle(
 	ctx sdk.Context,
 	collectionId sdkmath.Uint,
-	tokenIds []*tokenizationtypes.UintRange,
-	ownershipTimes []*tokenizationtypes.UintRange,
+	tokenId sdkmath.Uint,
+	ownershipTime sdkmath.Uint,
 	totalAmount sdkmath.Uint,
 ) {
-	tokenIdsStr := formatUintRanges(tokenIds)
-	ownershipTimesStr := formatUintRanges(ownershipTimes)
-
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			"precompile_get_total_supply",
 			sdk.NewAttribute(sdk.AttributeKeyModule, "evm_precompile"),
 			sdk.NewAttribute("collection_id", collectionId.String()),
-			sdk.NewAttribute("token_ids", tokenIdsStr),
-			sdk.NewAttribute("ownership_times", ownershipTimesStr),
+			sdk.NewAttribute("token_id", tokenId.String()),
+			sdk.NewAttribute("ownership_time", ownershipTime.String()),
 			sdk.NewAttribute("total_amount", totalAmount.String()),
 		),
 	)

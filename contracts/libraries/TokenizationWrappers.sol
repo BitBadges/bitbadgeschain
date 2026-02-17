@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
-import "../types/TokenizationTypes.sol";
+import "../types/sol";
 import "./TokenizationJSONHelpers.sol";
 import "./TokenizationHelpers.sol";
 
@@ -56,8 +56,8 @@ library TokenizationWrappers {
         uint256 collectionId,
         address[] memory toAddresses,
         uint256 amount,
-        TokenizationTypes.UintRange[] memory tokenIds,
-        TokenizationTypes.UintRange[] memory ownershipTimes
+        UintRange[] memory tokenIds,
+        UintRange[] memory ownershipTimes
     ) internal returns (bool success) {
         string memory tokenIdsJson = _uintRangeArrayToJson(tokenIds);
         string memory ownershipTimesJson = _uintRangeArrayToJson(ownershipTimes);
@@ -89,9 +89,9 @@ library TokenizationWrappers {
     ) internal returns (bool success) {
         address[] memory recipients = new address[](1);
         recipients[0] = to;
-        TokenizationTypes.UintRange[] memory tokenIds = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory tokenIds = new UintRange[](1);
         tokenIds[0] = TokenizationHelpers.createSingleTokenIdRange(tokenId);
-        TokenizationTypes.UintRange[] memory ownershipTimes = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory ownershipTimes = new UintRange[](1);
         ownershipTimes[0] = TokenizationHelpers.createFullOwnershipTimeRange();
         return transferTokens(precompile, collectionId, recipients, amount, tokenIds, ownershipTimes);
     }
@@ -110,9 +110,9 @@ library TokenizationWrappers {
         uint256 collectionId,
         address[] memory toAddresses,
         uint256 amount,
-        TokenizationTypes.UintRange[] memory tokenIds
+        UintRange[] memory tokenIds
     ) internal returns (bool success) {
-        TokenizationTypes.UintRange[] memory ownershipTimes = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory ownershipTimes = new UintRange[](1);
         ownershipTimes[0] = TokenizationHelpers.createFullOwnershipTimeRange();
         return transferTokens(precompile, collectionId, toAddresses, amount, tokenIds, ownershipTimes);
     }
@@ -329,48 +329,44 @@ library TokenizationWrappers {
      * @param precompile The precompile interface instance
      * @param collectionId The collection ID
      * @param userAddress The user address
-     * @param tokenIds Array of token ID ranges
-     * @param ownershipTimes Array of ownership time ranges
-     * @return amount The total balance amount
+     * @param tokenId Single token ID to query
+     * @param ownershipTime Single ownership time to query (typically ms timestamp)
+     * @return amount The exact balance amount for the specified (tokenId, ownershipTime)
      */
     function getBalanceAmount(
         ITokenizationPrecompile precompile,
         uint256 collectionId,
         address userAddress,
-        TokenizationTypes.UintRange[] memory tokenIds,
-        TokenizationTypes.UintRange[] memory ownershipTimes
+        uint256 tokenId,
+        uint256 ownershipTime
     ) internal view returns (uint256 amount) {
-        string memory tokenIdsJson = _uintRangeArrayToJson(tokenIds);
-        string memory ownershipTimesJson = _uintRangeArrayToJson(ownershipTimes);
         string memory json = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
             userAddress,
-            tokenIdsJson,
-            ownershipTimesJson
+            tokenId,
+            ownershipTime
         );
         return precompile.getBalanceAmount(json);
     }
 
     /**
-     * @notice Get total supply for specific token/ownership ranges
+     * @notice Get total supply for a specific (tokenId, ownershipTime) combination
      * @param precompile The precompile interface instance
      * @param collectionId The collection ID
-     * @param tokenIds Array of token ID ranges
-     * @param ownershipTimes Array of ownership time ranges
-     * @return amount The total supply amount
+     * @param tokenId Single token ID to query
+     * @param ownershipTime Single ownership time to query (typically ms timestamp)
+     * @return amount The exact total supply for the specified (tokenId, ownershipTime)
      */
     function getTotalSupply(
         ITokenizationPrecompile precompile,
         uint256 collectionId,
-        TokenizationTypes.UintRange[] memory tokenIds,
-        TokenizationTypes.UintRange[] memory ownershipTimes
+        uint256 tokenId,
+        uint256 ownershipTime
     ) internal view returns (uint256 amount) {
-        string memory tokenIdsJson = _uintRangeArrayToJson(tokenIds);
-        string memory ownershipTimesJson = _uintRangeArrayToJson(ownershipTimes);
         string memory json = TokenizationJSONHelpers.getTotalSupplyJSON(
             collectionId,
-            tokenIdsJson,
-            ownershipTimesJson
+            tokenId,
+            ownershipTime
         );
         return precompile.getTotalSupply(json);
     }
@@ -472,7 +468,7 @@ library TokenizationWrappers {
      * @return json JSON string representation
      */
     function _uintRangeArrayToJson(
-        TokenizationTypes.UintRange[] memory ranges
+        UintRange[] memory ranges
     ) private pure returns (string memory json) {
         if (ranges.length == 0) {
             return "[]";

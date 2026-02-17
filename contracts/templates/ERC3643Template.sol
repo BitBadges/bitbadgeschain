@@ -63,13 +63,10 @@ contract ERC3643Template is IERC3643 {
     /// @notice Compliance agents (can manage investor identities)
     mapping(address => bool) public isComplianceAgent;
 
-    // ============ Events ============
+    // ============ Implementation-Specific Events ============
+    // Note: Transfer, IdentityRegistered, IdentityRemoved, AddressFrozen, AddressUnfrozen
+    // are inherited from IERC3643 interface
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event IdentityRegistered(address indexed investor, bool accredited);
-    event IdentityRemoved(address indexed investor);
-    event AddressFrozen(address indexed investor);
-    event AddressUnfrozen(address indexed investor);
     event CollectionInitialized(uint256 indexed collectionId);
     event ComplianceAgentAdded(address indexed agent);
     event ComplianceAgentRemoved(address indexed agent);
@@ -241,8 +238,8 @@ contract ERC3643Template is IERC3643 {
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
             account,
-            _tokenIdsJson(),
-            _ownershipTimesJson()
+            1,                        // Single token ID (fungible tokens use ID 1)
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return PRECOMPILE.getBalanceAmount(balanceJson);
     }
@@ -256,8 +253,8 @@ contract ERC3643Template is IERC3643 {
 
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             collectionId,
-            _tokenIdsJson(),
-            _ownershipTimesJson()
+            1,                        // Single token ID (fungible tokens use ID 1)
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return PRECOMPILE.getTotalSupply(supplyJson);
     }

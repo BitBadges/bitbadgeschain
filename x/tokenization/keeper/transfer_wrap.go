@@ -123,7 +123,10 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
 
 	if isSendingToSpecialAddress {
-		userAddressAcc := sdk.MustAccAddressFromBech32(from)
+		userAddressAcc, err := sdk.AccAddressFromBech32(from)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid from address: %s", from)
+		}
 		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
@@ -134,7 +137,10 @@ func (k Keeper) HandleSpecialAddressWrapping(
 			return err
 		}
 	} else if isSendingFromSpecialAddress {
-		userAddressAcc := sdk.MustAccAddressFromBech32(to)
+		userAddressAcc, err := sdk.AccAddressFromBech32(to)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid to address: %s", to)
+		}
 		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, userAddressAcc, types.ModuleName, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
@@ -204,15 +210,27 @@ func (k Keeper) HandleSpecialAddressBacking(
 	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
 
 	if isSendingToSpecialAddress {
-		userAddressAcc := sdk.MustAccAddressFromBech32(from)
-		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
+		userAddressAcc, err := sdk.AccAddressFromBech32(from)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid from address: %s", from)
+		}
+		specialAddressAcc, err := sdk.AccAddressFromBech32(denomInfo.Address)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid special address: %s", denomInfo.Address)
+		}
 		err = k.bankKeeper.SendCoins(ctx, specialAddressAcc, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
 		}
 	} else if isSendingFromSpecialAddress {
-		userAddressAcc := sdk.MustAccAddressFromBech32(to)
-		specialAddressAcc := sdk.MustAccAddressFromBech32(denomInfo.Address)
+		userAddressAcc, err := sdk.AccAddressFromBech32(to)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid to address: %s", to)
+		}
+		specialAddressAcc, err := sdk.AccAddressFromBech32(denomInfo.Address)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid special address: %s", denomInfo.Address)
+		}
 		err = k.bankKeeper.SendCoins(ctx, userAddressAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err

@@ -341,66 +341,32 @@ contract PrecompileTestContract {
         return precompile.getBalance(queryJson);
     }
     
-    /// @notice Wrapper for getBalanceAmount
+    /// @notice Wrapper for getBalanceAmount (single tokenId and ownershipTime)
     function testGetBalanceAmount(
         uint256 collectionId,
         address address_,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
+        uint256 tokenId,
+        uint256 ownershipTime
     ) external view returns (uint256) {
-        // Convert UintRange arrays to JSON
-        uint256[] memory tokenIdStarts = new uint256[](tokenIds.length);
-        uint256[] memory tokenIdEnds = new uint256[](tokenIds.length);
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            tokenIdStarts[i] = tokenIds[i].start;
-            tokenIdEnds[i] = tokenIds[i].end;
-        }
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeArrayToJson(tokenIdStarts, tokenIdEnds);
-        
-        uint256[] memory ownershipStarts = new uint256[](ownershipTimes.length);
-        uint256[] memory ownershipEnds = new uint256[](ownershipTimes.length);
-        for (uint256 i = 0; i < ownershipTimes.length; i++) {
-            ownershipStarts[i] = ownershipTimes[i].start;
-            ownershipEnds[i] = ownershipTimes[i].end;
-        }
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeArrayToJson(ownershipStarts, ownershipEnds);
-        
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
             address_,
-            tokenIdsJson,
-            ownershipTimesJson
+            tokenId,
+            ownershipTime
         );
         return precompile.getBalanceAmount(balanceJson);
     }
-    
-    /// @notice Wrapper for getTotalSupply
+
+    /// @notice Wrapper for getTotalSupply (single tokenId and ownershipTime)
     function testGetTotalSupply(
         uint256 collectionId,
-        UintRange[] calldata tokenIds,
-        UintRange[] calldata ownershipTimes
+        uint256 tokenId,
+        uint256 ownershipTime
     ) external view returns (uint256) {
-        // Convert UintRange arrays to JSON
-        uint256[] memory tokenIdStarts = new uint256[](tokenIds.length);
-        uint256[] memory tokenIdEnds = new uint256[](tokenIds.length);
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            tokenIdStarts[i] = tokenIds[i].start;
-            tokenIdEnds[i] = tokenIds[i].end;
-        }
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeArrayToJson(tokenIdStarts, tokenIdEnds);
-        
-        uint256[] memory ownershipStarts = new uint256[](ownershipTimes.length);
-        uint256[] memory ownershipEnds = new uint256[](ownershipTimes.length);
-        for (uint256 i = 0; i < ownershipTimes.length; i++) {
-            ownershipStarts[i] = ownershipTimes[i].start;
-            ownershipEnds[i] = ownershipTimes[i].end;
-        }
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeArrayToJson(ownershipStarts, ownershipEnds);
-        
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             collectionId,
-            tokenIdsJson,
-            ownershipTimesJson
+            tokenId,
+            ownershipTime
         );
         return precompile.getTotalSupply(supplyJson);
     }

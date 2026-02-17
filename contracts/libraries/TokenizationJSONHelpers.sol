@@ -66,35 +66,44 @@ library TokenizationJSONHelpers {
 
     /**
      * @notice Construct JSON for getBalanceAmount
+     * @dev Queries exact balance for a single (tokenId, ownershipTime) combination
+     * @param collectionId The collection ID
+     * @param userAddress The user's address
+     * @param tokenId Single token ID to query
+     * @param ownershipTime Single ownership time to query (typically ms timestamp)
      */
     function getBalanceAmountJSON(
         uint256 collectionId,
         address userAddress,
-        string memory tokenIdsJson,
-        string memory ownershipTimesJson
+        uint256 tokenId,
+        uint256 ownershipTime
     ) internal pure returns (string memory) {
         return string(abi.encodePacked(
             '{"collectionId":"', _uintToString(collectionId),
-            '","userAddress":"', _addressToString(userAddress),
-            '","tokenIds":', tokenIdsJson,
-            ',"ownershipTimes":', ownershipTimesJson,
-            '}'
+            '","address":"', _addressToString(userAddress),
+            '","tokenId":"', _uintToString(tokenId),
+            '","ownershipTime":"', _uintToString(ownershipTime),
+            '"}'
         ));
     }
 
     /**
      * @notice Construct JSON for getTotalSupply
+     * @dev Queries total supply for a single (tokenId, ownershipTime) combination
+     * @param collectionId The collection ID
+     * @param tokenId Single token ID to query
+     * @param ownershipTime Single ownership time to query (typically ms timestamp)
      */
     function getTotalSupplyJSON(
         uint256 collectionId,
-        string memory tokenIdsJson,
-        string memory ownershipTimesJson
+        uint256 tokenId,
+        uint256 ownershipTime
     ) internal pure returns (string memory) {
         return string(abi.encodePacked(
             '{"collectionId":"', _uintToString(collectionId),
-            '","tokenIds":', tokenIdsJson,
-            ',"ownershipTimes":', ownershipTimesJson,
-            '}'
+            '","tokenId":"', _uintToString(tokenId),
+            '","ownershipTime":"', _uintToString(ownershipTime),
+            '"}'
         ));
     }
 

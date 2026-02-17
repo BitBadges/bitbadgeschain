@@ -18,6 +18,13 @@ const (
 
 	// PortID is the default port id that module binds to
 	PortID = "tokenization"
+
+	// ICQ (Interchain Query) constants for cross-chain token ownership verification
+	// ICQVersion defines the version for ICQ channels
+	ICQVersion = "icq-tokenization-1"
+
+	// ICQMaxProofSize is the maximum size of balance proofs in bytes
+	ICQMaxProofSize = 10240 // 10KB
 )
 
 var ParamsKey = []byte("p_tokenization")

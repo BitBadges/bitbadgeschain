@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../types/TokenizationTypes.sol";
+import "../types/sol";
 import "./TokenizationJSONHelpers.sol";
 import "./TokenizationHelpers.sol";
 
@@ -32,14 +32,14 @@ library TokenizationBuilders {
      * @dev All fields are optional except validTokenIds
      */
     struct CollectionBuilder {
-        TokenizationTypes.UintRange[] validTokenIds;
+        UintRange[] validTokenIds;
         string manager;
-        TokenizationTypes.CollectionMetadata metadata;
-        TokenizationTypes.UserBalanceStore defaultBalances;
-        TokenizationTypes.CollectionPermissions collectionPermissions;
-        TokenizationTypes.TokenMetadata[] tokenMetadata;
+        CollectionMetadata metadata;
+        UserBalanceStore defaultBalances;
+        CollectionPermissions collectionPermissions;
+        TokenMetadata[] tokenMetadata;
         string customData;
-        TokenizationTypes.CollectionApproval[] collectionApprovals;
+        CollectionApproval[] collectionApprovals;
         string[] standards;
         bool isArchived;
         bool hasValidTokenIds;
@@ -71,7 +71,7 @@ library TokenizationBuilders {
      */
     function withValidTokenIds(
         CollectionBuilder memory builder,
-        TokenizationTypes.UintRange[] memory tokenIds
+        UintRange[] memory tokenIds
     ) internal pure returns (CollectionBuilder memory) {
         builder.validTokenIds = tokenIds;
         builder.hasValidTokenIds = true;
@@ -107,7 +107,7 @@ library TokenizationBuilders {
         uint256 start,
         uint256 end
     ) internal pure returns (CollectionBuilder memory) {
-        TokenizationTypes.UintRange[] memory tokenIds = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory tokenIds = new UintRange[](1);
         tokenIds[0] = TokenizationHelpers.createUintRange(start, end);
         builder.validTokenIds = tokenIds;
         builder.hasValidTokenIds = true;
@@ -137,7 +137,7 @@ library TokenizationBuilders {
      */
     function withMetadata(
         CollectionBuilder memory builder,
-        TokenizationTypes.CollectionMetadata memory metadata
+        CollectionMetadata memory metadata
     ) internal pure returns (CollectionBuilder memory) {
         builder.metadata = metadata;
         builder.hasMetadata = true;
@@ -169,7 +169,7 @@ library TokenizationBuilders {
      */
     function withDefaultBalances(
         CollectionBuilder memory builder,
-        TokenizationTypes.UserBalanceStore memory defaultBalances
+        UserBalanceStore memory defaultBalances
     ) internal pure returns (CollectionBuilder memory) {
         builder.defaultBalances = defaultBalances;
         builder.hasDefaultBalances = true;
@@ -206,7 +206,7 @@ library TokenizationBuilders {
      */
     function withCollectionPermissions(
         CollectionBuilder memory builder,
-        TokenizationTypes.CollectionPermissions memory permissions
+        CollectionPermissions memory permissions
     ) internal pure returns (CollectionBuilder memory) {
         builder.collectionPermissions = permissions;
         builder.hasCollectionPermissions = true;
@@ -221,7 +221,7 @@ library TokenizationBuilders {
      */
     function withTokenMetadata(
         CollectionBuilder memory builder,
-        TokenizationTypes.TokenMetadata[] memory tokenMetadata
+        TokenMetadata[] memory tokenMetadata
     ) internal pure returns (CollectionBuilder memory) {
         builder.tokenMetadata = tokenMetadata;
         builder.hasTokenMetadata = true;
@@ -251,7 +251,7 @@ library TokenizationBuilders {
      */
     function withCollectionApprovals(
         CollectionBuilder memory builder,
-        TokenizationTypes.CollectionApproval[] memory approvals
+        CollectionApproval[] memory approvals
     ) internal pure returns (CollectionBuilder memory) {
         builder.collectionApprovals = approvals;
         builder.hasCollectionApprovals = true;
@@ -351,8 +351,8 @@ library TokenizationBuilders {
     struct TransferBuilder {
         address[] toAddresses;
         uint256 amount;
-        TokenizationTypes.UintRange[] tokenIds;
-        TokenizationTypes.UintRange[] ownershipTimes;
+        UintRange[] tokenIds;
+        UintRange[] ownershipTimes;
     }
 
     /**
@@ -415,7 +415,7 @@ library TokenizationBuilders {
      */
     function withTokenIds(
         TransferBuilder memory builder,
-        TokenizationTypes.UintRange[] memory tokenIds
+        UintRange[] memory tokenIds
     ) internal pure returns (TransferBuilder memory) {
         builder.tokenIds = tokenIds;
         return builder;
@@ -431,7 +431,7 @@ library TokenizationBuilders {
         TransferBuilder memory builder,
         uint256 tokenId
     ) internal pure returns (TransferBuilder memory) {
-        TokenizationTypes.UintRange[] memory tokenIds = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory tokenIds = new UintRange[](1);
         tokenIds[0] = TokenizationHelpers.createSingleTokenIdRange(tokenId);
         builder.tokenIds = tokenIds;
         return builder;
@@ -445,7 +445,7 @@ library TokenizationBuilders {
      */
     function withOwnershipTimes(
         TransferBuilder memory builder,
-        TokenizationTypes.UintRange[] memory ownershipTimes
+        UintRange[] memory ownershipTimes
     ) internal pure returns (TransferBuilder memory) {
         builder.ownershipTimes = ownershipTimes;
         return builder;
@@ -459,7 +459,7 @@ library TokenizationBuilders {
     function withFullOwnershipTime(
         TransferBuilder memory builder
     ) internal pure returns (TransferBuilder memory) {
-        TokenizationTypes.UintRange[] memory ownershipTimes = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory ownershipTimes = new UintRange[](1);
         ownershipTimes[0] = TokenizationHelpers.createFullOwnershipTimeRange();
         builder.ownershipTimes = ownershipTimes;
         return builder;
@@ -505,6 +505,9 @@ library TokenizationBuilders {
         );
     }
 }
+
+
+
 
 
 

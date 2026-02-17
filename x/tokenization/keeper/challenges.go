@@ -15,6 +15,9 @@ import (
 )
 
 const (
+	// MaxMerkleProofLength limits the maximum depth of Merkle proofs to prevent DoS attacks.
+	// A tree with depth 20 can support up to 2^20 = ~1 million leaves, which is sufficient
+	// for most use cases while preventing excessive computation from maliciously deep proofs.
 	MaxMerkleProofLength = 20
 )
 
@@ -308,6 +311,21 @@ func (k Keeper) HandleETHSignatureChallenges(
 	return "", nil
 }
 
+// CheckMerklePath verifies a Merkle proof for a given leaf value against an expected root.
+//
+// SECURITY NOTE - Second-Preimage Attack Mitigation:
+// This implementation uses SHA256 for both leaf nodes (sha256(leaf)) and internal nodes
+// (sha256(left || right)) without explicit domain separation between node types.
+// This is a known pattern that could be vulnerable to second-preimage attacks where an
+// attacker constructs a fake proof by interpreting internal nodes as leaves or vice versa.
+//
+// MITIGATION: The ExpectedProofLength enforcement in HandleMerkleChallenges (line 92)
+// ensures that proof length must exactly match the expected depth. This prevents attackers
+// from constructing shorter proofs that would be necessary to exploit the lack of domain
+// separation. With strict proof length enforcement, an attacker cannot truncate or extend
+// a valid proof to create a collision.
+//
+// The caller MUST enforce ExpectedProofLength before calling this function.
 func CheckMerklePath(leaf string, expectedRoot string, aunts []*types.MerklePathItem) error {
 	hashedMsgLeaf := sha256.Sum256([]byte(leaf))
 	currHash := hashedMsgLeaf[:]

@@ -400,8 +400,14 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if len(msg.MintEscrowCoinsToTransfer) > 0 {
-		from := sdk.MustAccAddressFromBech32(msg.Creator)
-		to := sdk.MustAccAddressFromBech32(collection.MintEscrowAddress)
+		from, err := sdk.AccAddressFromBech32(msg.Creator)
+		if err != nil {
+			return nil, errorsmod.Wrapf(err, "invalid creator address: %s", msg.Creator)
+		}
+		to, err := sdk.AccAddressFromBech32(collection.MintEscrowAddress)
+		if err != nil {
+			return nil, errorsmod.Wrapf(err, "invalid mint escrow address: %s", collection.MintEscrowAddress)
+		}
 
 		for _, coin := range msg.MintEscrowCoinsToTransfer {
 			allowedDenoms := k.GetParams(ctx).AllowedDenoms

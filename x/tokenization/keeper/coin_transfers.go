@@ -105,8 +105,16 @@ func (k Keeper) ExecuteCoinTransfers(
 			to = initiatedBy
 		}
 
-		toAddressAcc := sdk.MustAccAddressFromBech32(to)
-		fromAddressAcc := sdk.MustAccAddressFromBech32(initiatedBy)
+		toAddressAcc, err := sdk.AccAddressFromBech32(to)
+		if err != nil {
+			detErrMsg := fmt.Sprintf("invalid to address: %s", to)
+			return detErrMsg, sdkerrors.Wrapf(err, "invalid to address: %s", to)
+		}
+		fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
+		if err != nil {
+			detErrMsg := fmt.Sprintf("invalid initiatedBy address: %s", initiatedBy)
+			return detErrMsg, sdkerrors.Wrapf(err, "invalid initiatedBy address: %s", initiatedBy)
+		}
 		if coinTransfer.OverrideFromWithApproverAddress {
 			// collection-level
 			if approverAddress == "" && approvalLevel == "collection" {
@@ -118,7 +126,11 @@ func (k Keeper) ExecuteCoinTransfers(
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidAddress, detErrMsg)
 			}
 
-			fromAddressAcc = sdk.MustAccAddressFromBech32(approverAddress)
+			fromAddressAcc, err = sdk.AccAddressFromBech32(approverAddress)
+			if err != nil {
+				detErrMsg := fmt.Sprintf("invalid approver address: %s", approverAddress)
+				return detErrMsg, sdkerrors.Wrapf(err, "invalid approver address: %s", approverAddress)
+			}
 		}
 
 		for _, coin := range coinsToTransfer {
@@ -166,10 +178,13 @@ func (k Keeper) sendCoinWithRoyalty(
 ) error {
 	// Send royalty to payout address
 	if !royaltyAmountInt.IsZero() {
-		payoutAddressAcc := sdk.MustAccAddressFromBech32(royaltyPayoutAddress)
+		payoutAddressAcc, err := sdk.AccAddressFromBech32(royaltyPayoutAddress)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid royalty payout address: %s", royaltyPayoutAddress)
+		}
 		royaltyCoin := sdk.NewCoin(coin.Denom, royaltyAmountInt)
 
-		err := k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, fromAddressAcc, payoutAddressAcc, &royaltyCoin)
+		err = k.sendManagerKeeper.SendCoinWithAliasRouting(ctx, fromAddressAcc, payoutAddressAcc, &royaltyCoin)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "error sending royalty to payout address")
 		}

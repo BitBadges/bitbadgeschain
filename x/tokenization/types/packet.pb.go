@@ -22,9 +22,17 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// TokenizationPacketData defines the packet data for the tokenization module.
+// It uses a oneof to support multiple packet types over the same IBC channel.
 type TokenizationPacketData struct {
 	// Types that are valid to be assigned to Packet:
 	//	*TokenizationPacketData_NoData
+	//	*TokenizationPacketData_OwnershipQuery
+	//	*TokenizationPacketData_OwnershipQueryResponse
+	//	*TokenizationPacketData_BulkOwnershipQuery
+	//	*TokenizationPacketData_BulkOwnershipQueryResponse
+	//	*TokenizationPacketData_FullBalanceQuery
+	//	*TokenizationPacketData_FullBalanceQueryResponse
 	Packet isTokenizationPacketData_Packet `protobuf_oneof:"packet"`
 }
 
@@ -70,8 +78,32 @@ type isTokenizationPacketData_Packet interface {
 type TokenizationPacketData_NoData struct {
 	NoData *NoData `protobuf:"bytes,1,opt,name=noData,proto3,oneof" json:"noData,omitempty"`
 }
+type TokenizationPacketData_OwnershipQuery struct {
+	OwnershipQuery *OwnershipQueryPacket `protobuf:"bytes,2,opt,name=ownershipQuery,proto3,oneof" json:"ownershipQuery,omitempty"`
+}
+type TokenizationPacketData_OwnershipQueryResponse struct {
+	OwnershipQueryResponse *OwnershipQueryResponsePacket `protobuf:"bytes,3,opt,name=ownershipQueryResponse,proto3,oneof" json:"ownershipQueryResponse,omitempty"`
+}
+type TokenizationPacketData_BulkOwnershipQuery struct {
+	BulkOwnershipQuery *BulkOwnershipQueryPacket `protobuf:"bytes,4,opt,name=bulkOwnershipQuery,proto3,oneof" json:"bulkOwnershipQuery,omitempty"`
+}
+type TokenizationPacketData_BulkOwnershipQueryResponse struct {
+	BulkOwnershipQueryResponse *BulkOwnershipQueryResponsePacket `protobuf:"bytes,5,opt,name=bulkOwnershipQueryResponse,proto3,oneof" json:"bulkOwnershipQueryResponse,omitempty"`
+}
+type TokenizationPacketData_FullBalanceQuery struct {
+	FullBalanceQuery *FullBalanceQueryPacket `protobuf:"bytes,6,opt,name=fullBalanceQuery,proto3,oneof" json:"fullBalanceQuery,omitempty"`
+}
+type TokenizationPacketData_FullBalanceQueryResponse struct {
+	FullBalanceQueryResponse *FullBalanceQueryResponsePacket `protobuf:"bytes,7,opt,name=fullBalanceQueryResponse,proto3,oneof" json:"fullBalanceQueryResponse,omitempty"`
+}
 
-func (*TokenizationPacketData_NoData) isTokenizationPacketData_Packet() {}
+func (*TokenizationPacketData_NoData) isTokenizationPacketData_Packet()                     {}
+func (*TokenizationPacketData_OwnershipQuery) isTokenizationPacketData_Packet()             {}
+func (*TokenizationPacketData_OwnershipQueryResponse) isTokenizationPacketData_Packet()     {}
+func (*TokenizationPacketData_BulkOwnershipQuery) isTokenizationPacketData_Packet()         {}
+func (*TokenizationPacketData_BulkOwnershipQueryResponse) isTokenizationPacketData_Packet() {}
+func (*TokenizationPacketData_FullBalanceQuery) isTokenizationPacketData_Packet()           {}
+func (*TokenizationPacketData_FullBalanceQueryResponse) isTokenizationPacketData_Packet()   {}
 
 func (m *TokenizationPacketData) GetPacket() isTokenizationPacketData_Packet {
 	if m != nil {
@@ -87,13 +119,62 @@ func (m *TokenizationPacketData) GetNoData() *NoData {
 	return nil
 }
 
+func (m *TokenizationPacketData) GetOwnershipQuery() *OwnershipQueryPacket {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_OwnershipQuery); ok {
+		return x.OwnershipQuery
+	}
+	return nil
+}
+
+func (m *TokenizationPacketData) GetOwnershipQueryResponse() *OwnershipQueryResponsePacket {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_OwnershipQueryResponse); ok {
+		return x.OwnershipQueryResponse
+	}
+	return nil
+}
+
+func (m *TokenizationPacketData) GetBulkOwnershipQuery() *BulkOwnershipQueryPacket {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_BulkOwnershipQuery); ok {
+		return x.BulkOwnershipQuery
+	}
+	return nil
+}
+
+func (m *TokenizationPacketData) GetBulkOwnershipQueryResponse() *BulkOwnershipQueryResponsePacket {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_BulkOwnershipQueryResponse); ok {
+		return x.BulkOwnershipQueryResponse
+	}
+	return nil
+}
+
+func (m *TokenizationPacketData) GetFullBalanceQuery() *FullBalanceQueryPacket {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_FullBalanceQuery); ok {
+		return x.FullBalanceQuery
+	}
+	return nil
+}
+
+func (m *TokenizationPacketData) GetFullBalanceQueryResponse() *FullBalanceQueryResponsePacket {
+	if x, ok := m.GetPacket().(*TokenizationPacketData_FullBalanceQueryResponse); ok {
+		return x.FullBalanceQueryResponse
+	}
+	return nil
+}
+
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*TokenizationPacketData) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
 		(*TokenizationPacketData_NoData)(nil),
+		(*TokenizationPacketData_OwnershipQuery)(nil),
+		(*TokenizationPacketData_OwnershipQueryResponse)(nil),
+		(*TokenizationPacketData_BulkOwnershipQuery)(nil),
+		(*TokenizationPacketData_BulkOwnershipQueryResponse)(nil),
+		(*TokenizationPacketData_FullBalanceQuery)(nil),
+		(*TokenizationPacketData_FullBalanceQueryResponse)(nil),
 	}
 }
 
+// NoData is a placeholder packet type (legacy scaffold).
 type NoData struct {
 }
 
@@ -138,19 +219,29 @@ func init() {
 func init() { proto.RegisterFile("tokenization/packet.proto", fileDescriptor_8accffa8424d4aac) }
 
 var fileDescriptor_8accffa8424d4aac = []byte{
-	// 181 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2c, 0xc9, 0xcf, 0x4e,
-	0xcd, 0xcb, 0xac, 0x4a, 0x2c, 0xc9, 0xcc, 0xcf, 0xd3, 0x2f, 0x48, 0x4c, 0xce, 0x4e, 0x2d, 0xd1,
-	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x41, 0x96, 0x52, 0x0a, 0xe2, 0x12, 0x0b, 0x41, 0xe2,
-	0x07, 0x80, 0x55, 0xba, 0x24, 0x96, 0x24, 0x0a, 0xe9, 0x71, 0xb1, 0xe5, 0xe5, 0x83, 0x58, 0x12,
-	0x8c, 0x0a, 0x8c, 0x1a, 0xdc, 0x46, 0x22, 0x7a, 0xc8, 0x1a, 0xf5, 0xfc, 0xc0, 0x72, 0x1e, 0x0c,
-	0x41, 0x50, 0x55, 0x4e, 0x1c, 0x5c, 0x6c, 0x10, 0x7b, 0x94, 0x38, 0xb8, 0xd8, 0x20, 0xb2, 0x4e,
-	0x41, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x84, 0xc7,
-	0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0x65, 0x91, 0x9e, 0x59, 0x92,
-	0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x9f, 0x94, 0x59, 0x92, 0x94, 0x98, 0x92, 0x9e, 0x5a,
-	0x8c, 0x60, 0x25, 0x67, 0x24, 0x66, 0xe6, 0xe9, 0x57, 0xe8, 0xa3, 0x78, 0xa3, 0xa4, 0xb2, 0x20,
-	0xb5, 0x38, 0x89, 0x0d, 0xec, 0x0d, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x81, 0x90, 0x7c,
-	0x51, 0xe3, 0x00, 0x00, 0x00,
+	// 346 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0x4f, 0x4b, 0xc3, 0x30,
+	0x18, 0xc6, 0x5b, 0x75, 0x75, 0x44, 0x11, 0x09, 0x32, 0xea, 0x0e, 0x41, 0x86, 0x88, 0x88, 0xa4,
+	0xa0, 0x17, 0xcf, 0x45, 0x64, 0x07, 0xf1, 0x4f, 0xf1, 0x20, 0xde, 0xd2, 0x2e, 0x6e, 0x71, 0x35,
+	0x89, 0x6b, 0x8a, 0xce, 0x4f, 0x21, 0x7e, 0x2a, 0x8f, 0x3b, 0x7a, 0x94, 0xed, 0x8b, 0x88, 0xa9,
+	0xd6, 0xa6, 0x75, 0xf5, 0xf6, 0xf2, 0xbe, 0xcf, 0xf3, 0x7b, 0x78, 0xe0, 0x05, 0x9b, 0x4a, 0x0c,
+	0x29, 0x67, 0xcf, 0x44, 0x31, 0xc1, 0x3d, 0x49, 0xa2, 0x21, 0x55, 0x58, 0x8e, 0x84, 0x12, 0x70,
+	0xb5, 0x78, 0x6a, 0xb7, 0x0c, 0x21, 0x8b, 0x1e, 0x32, 0x55, 0xe7, 0xb5, 0x01, 0x5a, 0x57, 0x85,
+	0xd3, 0x85, 0x46, 0x1c, 0x13, 0x45, 0x20, 0x06, 0x0e, 0x17, 0x5f, 0x93, 0x6b, 0x6f, 0xd9, 0xbb,
+	0x2b, 0x07, 0x1b, 0xb8, 0xc8, 0xc0, 0x67, 0xfa, 0xd6, 0xb5, 0x82, 0x6f, 0x15, 0x3c, 0x05, 0x6b,
+	0xe2, 0x91, 0xd3, 0x51, 0x32, 0x60, 0xf2, 0x32, 0xa5, 0xa3, 0xb1, 0xbb, 0xa0, 0x7d, 0x1d, 0xd3,
+	0x77, 0x6e, 0x68, 0xb2, 0xbc, 0xae, 0x15, 0x94, 0xbc, 0xb0, 0x07, 0x5a, 0xe6, 0x26, 0xa0, 0x89,
+	0x14, 0x3c, 0xa1, 0xee, 0xa2, 0xa6, 0xee, 0xd5, 0x51, 0x7f, 0xb4, 0x39, 0x7d, 0x0e, 0x0b, 0x5e,
+	0x03, 0x18, 0xa6, 0xf1, 0xd0, 0x74, 0xbb, 0x4b, 0x3a, 0x61, 0xc7, 0x4c, 0xf0, 0x2b, 0xba, 0x9c,
+	0xfe, 0x07, 0x03, 0x4a, 0xd0, 0xae, 0x6e, 0xf3, 0x0e, 0x0d, 0x9d, 0x80, 0xff, 0x4b, 0xa8, 0xf4,
+	0xa8, 0x61, 0xc2, 0x00, 0xac, 0xdf, 0xa6, 0x71, 0xec, 0x93, 0x98, 0xf0, 0x88, 0x66, 0x4d, 0x1c,
+	0x9d, 0xb3, 0x6d, 0xe6, 0x9c, 0x94, 0x54, 0x39, 0xbd, 0xe2, 0x87, 0x77, 0xc0, 0x2d, 0xef, 0xf2,
+	0x0e, 0xcb, 0x9a, 0xbd, 0x5f, 0xcf, 0xae, 0x34, 0x98, 0xcb, 0xf3, 0x9b, 0xc0, 0xc9, 0x1e, 0xb8,
+	0xd3, 0x04, 0x4e, 0xf6, 0x5d, 0x7e, 0xf0, 0x36, 0x45, 0xf6, 0x64, 0x8a, 0xec, 0x8f, 0x29, 0xb2,
+	0x5f, 0x66, 0xc8, 0x9a, 0xcc, 0x90, 0xf5, 0x3e, 0x43, 0xd6, 0xcd, 0x51, 0x9f, 0xa9, 0x41, 0x1a,
+	0xe2, 0x48, 0xdc, 0x7b, 0x21, 0x53, 0x21, 0xe9, 0xf5, 0x69, 0xf2, 0x3b, 0x45, 0x03, 0xc2, 0xb8,
+	0xf7, 0xe4, 0x19, 0x6f, 0xaf, 0xc6, 0x92, 0x26, 0xa1, 0xa3, 0x3f, 0xff, 0xf0, 0x33, 0x00, 0x00,
+	0xff, 0xff, 0xa1, 0x03, 0x59, 0x3b, 0x3c, 0x03, 0x00, 0x00,
 }
 
 func (m *TokenizationPacketData) Marshal() (dAtA []byte, err error) {
@@ -203,6 +294,132 @@ func (m *TokenizationPacketData_NoData) MarshalToSizedBuffer(dAtA []byte) (int, 
 		}
 		i--
 		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TokenizationPacketData_OwnershipQuery) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TokenizationPacketData_OwnershipQuery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.OwnershipQuery != nil {
+		{
+			size, err := m.OwnershipQuery.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TokenizationPacketData_OwnershipQueryResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TokenizationPacketData_OwnershipQueryResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.OwnershipQueryResponse != nil {
+		{
+			size, err := m.OwnershipQueryResponse.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TokenizationPacketData_BulkOwnershipQuery) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TokenizationPacketData_BulkOwnershipQuery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.BulkOwnershipQuery != nil {
+		{
+			size, err := m.BulkOwnershipQuery.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TokenizationPacketData_BulkOwnershipQueryResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TokenizationPacketData_BulkOwnershipQueryResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.BulkOwnershipQueryResponse != nil {
+		{
+			size, err := m.BulkOwnershipQueryResponse.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TokenizationPacketData_FullBalanceQuery) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TokenizationPacketData_FullBalanceQuery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.FullBalanceQuery != nil {
+		{
+			size, err := m.FullBalanceQuery.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TokenizationPacketData_FullBalanceQueryResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TokenizationPacketData_FullBalanceQueryResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.FullBalanceQueryResponse != nil {
+		{
+			size, err := m.FullBalanceQueryResponse.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPacket(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
 	}
 	return len(dAtA) - i, nil
 }
@@ -260,6 +477,78 @@ func (m *TokenizationPacketData_NoData) Size() (n int) {
 	_ = l
 	if m.NoData != nil {
 		l = m.NoData.Size()
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	return n
+}
+func (m *TokenizationPacketData_OwnershipQuery) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.OwnershipQuery != nil {
+		l = m.OwnershipQuery.Size()
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	return n
+}
+func (m *TokenizationPacketData_OwnershipQueryResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.OwnershipQueryResponse != nil {
+		l = m.OwnershipQueryResponse.Size()
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	return n
+}
+func (m *TokenizationPacketData_BulkOwnershipQuery) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BulkOwnershipQuery != nil {
+		l = m.BulkOwnershipQuery.Size()
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	return n
+}
+func (m *TokenizationPacketData_BulkOwnershipQueryResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BulkOwnershipQueryResponse != nil {
+		l = m.BulkOwnershipQueryResponse.Size()
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	return n
+}
+func (m *TokenizationPacketData_FullBalanceQuery) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.FullBalanceQuery != nil {
+		l = m.FullBalanceQuery.Size()
+		n += 1 + l + sovPacket(uint64(l))
+	}
+	return n
+}
+func (m *TokenizationPacketData_FullBalanceQueryResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.FullBalanceQueryResponse != nil {
+		l = m.FullBalanceQueryResponse.Size()
 		n += 1 + l + sovPacket(uint64(l))
 	}
 	return n
@@ -342,6 +631,216 @@ func (m *TokenizationPacketData) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			m.Packet = &TokenizationPacketData_NoData{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnershipQuery", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &OwnershipQueryPacket{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Packet = &TokenizationPacketData_OwnershipQuery{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnershipQueryResponse", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &OwnershipQueryResponsePacket{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Packet = &TokenizationPacketData_OwnershipQueryResponse{v}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BulkOwnershipQuery", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &BulkOwnershipQueryPacket{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Packet = &TokenizationPacketData_BulkOwnershipQuery{v}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BulkOwnershipQueryResponse", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &BulkOwnershipQueryResponsePacket{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Packet = &TokenizationPacketData_BulkOwnershipQueryResponse{v}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FullBalanceQuery", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &FullBalanceQueryPacket{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Packet = &TokenizationPacketData_FullBalanceQuery{v}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FullBalanceQueryResponse", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPacket
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPacket
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPacket
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &FullBalanceQueryResponsePacket{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Packet = &TokenizationPacketData_FullBalanceQueryResponse{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

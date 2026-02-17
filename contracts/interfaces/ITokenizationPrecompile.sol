@@ -408,16 +408,18 @@ interface ITokenizationPrecompile {
         string calldata msgJson
     ) external view returns (bytes memory);
 
-    /// @notice Get the balance amount for specific token/ownership ranges
-    /// @param msgJson JSON string matching QueryBalanceAmountRequest protobuf format
-    /// @return The total balance amount
+    /// @notice Get the balance amount for a specific (tokenId, ownershipTime) combination
+    /// @dev JSON format: {"collectionId": "1", "address": "bb1...", "tokenId": "1", "ownershipTime": "1609459200000"}
+    /// @param msgJson JSON string with collectionId, address, tokenId (single), ownershipTime (single)
+    /// @return The exact balance amount for the specified token ID and ownership time
     function getBalanceAmount(
         string calldata msgJson
     ) external view returns (uint256);
 
-    /// @notice Get the total supply for specific token/ownership ranges
-    /// @param msgJson JSON string matching QueryTotalSupplyRequest protobuf format
-    /// @return The total supply amount
+    /// @notice Get the total supply for a specific (tokenId, ownershipTime) combination
+    /// @dev JSON format: {"collectionId": "1", "tokenId": "1", "ownershipTime": "1609459200000"}
+    /// @param msgJson JSON string with collectionId, tokenId (single), ownershipTime (single)
+    /// @return The exact total supply for the specified token ID and ownership time
     function getTotalSupply(
         string calldata msgJson
     ) external view returns (uint256);

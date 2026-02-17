@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../types/TokenizationTypes.sol";
+import "../types/sol";
 
 /**
  * @title TokenizationHelpers
@@ -21,9 +21,9 @@ library TokenizationHelpers {
      * @param end The end value (inclusive)
      * @return range The constructed UintRange
      */
-    function createUintRange(uint256 start, uint256 end) internal pure returns (TokenizationTypes.UintRange memory range) {
+    function createUintRange(uint256 start, uint256 end) internal pure returns (UintRange memory range) {
         require(start <= end, "TokenizationHelpers: start must be <= end");
-        return TokenizationTypes.UintRange({start: start, end: end});
+        return UintRange({start: start, end: end});
     }
 
     /**
@@ -35,9 +35,9 @@ library TokenizationHelpers {
     function createUintRangeArray(
         uint256[] memory starts,
         uint256[] memory ends
-    ) internal pure returns (TokenizationTypes.UintRange[] memory ranges) {
+    ) internal pure returns (UintRange[] memory ranges) {
         require(starts.length == ends.length, "TokenizationHelpers: starts and ends arrays must have same length");
-        ranges = new TokenizationTypes.UintRange[](starts.length);
+        ranges = new UintRange[](starts.length);
         for (uint256 i = 0; i < starts.length; i++) {
             ranges[i] = createUintRange(starts[i], ends[i]);
         }
@@ -52,10 +52,10 @@ library TokenizationHelpers {
      */
     function createBalance(
         uint256 amount,
-        TokenizationTypes.UintRange[] memory ownershipTimes,
-        TokenizationTypes.UintRange[] memory tokenIds
-    ) internal pure returns (TokenizationTypes.Balance memory balance) {
-        return TokenizationTypes.Balance({
+        UintRange[] memory ownershipTimes,
+        UintRange[] memory tokenIds
+    ) internal pure returns (Balance memory balance) {
+        return Balance({
             amount: amount,
             ownershipTimes: ownershipTimes,
             tokenIds: tokenIds
@@ -71,8 +71,8 @@ library TokenizationHelpers {
     function createCollectionMetadata(
         string memory uri,
         string memory customData
-    ) internal pure returns (TokenizationTypes.CollectionMetadata memory metadata) {
-        return TokenizationTypes.CollectionMetadata({
+    ) internal pure returns (CollectionMetadata memory metadata) {
+        return CollectionMetadata({
             uri: uri,
             customData: customData
         });
@@ -88,9 +88,9 @@ library TokenizationHelpers {
     function createTokenMetadata(
         string memory uri,
         string memory customData,
-        TokenizationTypes.UintRange[] memory tokenIds
-    ) internal pure returns (TokenizationTypes.TokenMetadata memory metadata) {
-        return TokenizationTypes.TokenMetadata({
+        UintRange[] memory tokenIds
+    ) internal pure returns (TokenMetadata memory metadata) {
+        return TokenMetadata({
             uri: uri,
             customData: customData,
             tokenIds: tokenIds
@@ -104,10 +104,10 @@ library TokenizationHelpers {
      * @return permission The constructed ActionPermission
      */
     function createActionPermission(
-        TokenizationTypes.UintRange[] memory permittedTimes,
-        TokenizationTypes.UintRange[] memory forbiddenTimes
-    ) internal pure returns (TokenizationTypes.ActionPermission memory permission) {
-        return TokenizationTypes.ActionPermission({
+        UintRange[] memory permittedTimes,
+        UintRange[] memory forbiddenTimes
+    ) internal pure returns (ActionPermission memory permission) {
+        return ActionPermission({
             permanentlyPermittedTimes: permittedTimes,
             permanentlyForbiddenTimes: forbiddenTimes
         });
@@ -117,11 +117,11 @@ library TokenizationHelpers {
      * @notice Creates an empty UserBalanceStore with default values
      * @return store The constructed UserBalanceStore with empty arrays and false booleans
      */
-    function createEmptyUserBalanceStore() internal pure returns (TokenizationTypes.UserBalanceStore memory store) {
-        return TokenizationTypes.UserBalanceStore({
-            balances: new TokenizationTypes.Balance[](0),
-            outgoingApprovals: new TokenizationTypes.UserOutgoingApproval[](0),
-            incomingApprovals: new TokenizationTypes.UserIncomingApproval[](0),
+    function createEmptyUserBalanceStore() internal pure returns (UserBalanceStore memory store) {
+        return UserBalanceStore({
+            balances: new Balance[](0),
+            outgoingApprovals: new UserOutgoingApproval[](0),
+            incomingApprovals: new UserIncomingApproval[](0),
             autoApproveSelfInitiatedOutgoingTransfers: false,
             autoApproveSelfInitiatedIncomingTransfers: false,
             autoApproveAllIncomingTransfers: false,
@@ -133,13 +133,13 @@ library TokenizationHelpers {
      * @notice Creates an empty UserPermissions struct
      * @return permissions The constructed UserPermissions with empty arrays
      */
-    function createEmptyUserPermissions() internal pure returns (TokenizationTypes.UserPermissions memory permissions) {
-        return TokenizationTypes.UserPermissions({
-            canUpdateOutgoingApprovals: new TokenizationTypes.UserOutgoingApprovalPermission[](0),
-            canUpdateIncomingApprovals: new TokenizationTypes.UserIncomingApprovalPermission[](0),
-            canUpdateAutoApproveSelfInitiatedOutgoingTransfers: new TokenizationTypes.ActionPermission[](0),
-            canUpdateAutoApproveSelfInitiatedIncomingTransfers: new TokenizationTypes.ActionPermission[](0),
-            canUpdateAutoApproveAllIncomingTransfers: new TokenizationTypes.ActionPermission[](0)
+    function createEmptyUserPermissions() internal pure returns (UserPermissions memory permissions) {
+        return UserPermissions({
+            canUpdateOutgoingApprovals: new UserOutgoingApprovalPermission[](0),
+            canUpdateIncomingApprovals: new UserIncomingApprovalPermission[](0),
+            canUpdateAutoApproveSelfInitiatedOutgoingTransfers: new ActionPermission[](0),
+            canUpdateAutoApproveSelfInitiatedIncomingTransfers: new ActionPermission[](0),
+            canUpdateAutoApproveAllIncomingTransfers: new ActionPermission[](0)
         });
     }
 
@@ -147,19 +147,19 @@ library TokenizationHelpers {
      * @notice Creates an empty CollectionPermissions struct
      * @return permissions The constructed CollectionPermissions with empty arrays
      */
-    function createEmptyCollectionPermissions() internal pure returns (TokenizationTypes.CollectionPermissions memory permissions) {
-        return TokenizationTypes.CollectionPermissions({
-            canDeleteCollection: new TokenizationTypes.ActionPermission[](0),
-            canArchiveCollection: new TokenizationTypes.ActionPermission[](0),
-            canUpdateStandards: new TokenizationTypes.ActionPermission[](0),
-            canUpdateCustomData: new TokenizationTypes.ActionPermission[](0),
-            canUpdateManager: new TokenizationTypes.ActionPermission[](0),
-            canUpdateCollectionMetadata: new TokenizationTypes.ActionPermission[](0),
-            canUpdateValidTokenIds: new TokenizationTypes.TokenIdsActionPermission[](0),
-            canUpdateTokenMetadata: new TokenizationTypes.TokenIdsActionPermission[](0),
-            canUpdateCollectionApprovals: new TokenizationTypes.CollectionApprovalPermission[](0),
-            canAddMoreAliasPaths: new TokenizationTypes.ActionPermission[](0),
-            canAddMoreCosmosCoinWrapperPaths: new TokenizationTypes.ActionPermission[](0)
+    function createEmptyCollectionPermissions() internal pure returns (CollectionPermissions memory permissions) {
+        return CollectionPermissions({
+            canDeleteCollection: new ActionPermission[](0),
+            canArchiveCollection: new ActionPermission[](0),
+            canUpdateStandards: new ActionPermission[](0),
+            canUpdateCustomData: new ActionPermission[](0),
+            canUpdateManager: new ActionPermission[](0),
+            canUpdateCollectionMetadata: new ActionPermission[](0),
+            canUpdateValidTokenIds: new TokenIdsActionPermission[](0),
+            canUpdateTokenMetadata: new TokenIdsActionPermission[](0),
+            canUpdateCollectionApprovals: new CollectionApprovalPermission[](0),
+            canAddMoreAliasPaths: new ActionPermission[](0),
+            canAddMoreCosmosCoinWrapperPaths: new ActionPermission[](0)
         });
     }
 
@@ -168,7 +168,7 @@ library TokenizationHelpers {
      * @param range The UintRange to validate
      * @return valid True if the range is valid
      */
-    function validateUintRange(TokenizationTypes.UintRange memory range) internal pure returns (bool valid) {
+    function validateUintRange(UintRange memory range) internal pure returns (bool valid) {
         return range.start <= range.end;
     }
 
@@ -177,7 +177,7 @@ library TokenizationHelpers {
      * @param ranges Array of UintRanges to validate
      * @return valid True if all ranges are valid
      */
-    function validateUintRangeArray(TokenizationTypes.UintRange[] memory ranges) internal pure returns (bool valid) {
+    function validateUintRangeArray(UintRange[] memory ranges) internal pure returns (bool valid) {
         for (uint256 i = 0; i < ranges.length; i++) {
             if (!validateUintRange(ranges[i])) {
                 return false;
@@ -191,7 +191,7 @@ library TokenizationHelpers {
      * @param balance The Balance to validate
      * @return valid True if the balance is valid
      */
-    function validateBalance(TokenizationTypes.Balance memory balance) internal pure returns (bool valid) {
+    function validateBalance(Balance memory balance) internal pure returns (bool valid) {
         return validateUintRangeArray(balance.ownershipTimes) && validateUintRangeArray(balance.tokenIds);
     }
 
@@ -200,7 +200,7 @@ library TokenizationHelpers {
      * @dev Uses uint64 max because BitBadges internally uses uint64 for timestamps
      * @return range The full ownership time range
      */
-    function createFullOwnershipTimeRange() internal pure returns (TokenizationTypes.UintRange memory range) {
+    function createFullOwnershipTimeRange() internal pure returns (UintRange memory range) {
         return createUintRange(1, MAX_UINT64);
     }
 
@@ -209,7 +209,7 @@ library TokenizationHelpers {
      * @param tokenId The token ID (both start and end will be this value)
      * @return range The UintRange for the single token ID
      */
-    function createSingleTokenIdRange(uint256 tokenId) internal pure returns (TokenizationTypes.UintRange memory range) {
+    function createSingleTokenIdRange(uint256 tokenId) internal pure returns (UintRange memory range) {
         return createUintRange(tokenId, tokenId);
     }
 
@@ -222,7 +222,7 @@ library TokenizationHelpers {
     function createTokenIdSequence(
         uint256 startTokenId,
         uint256 endTokenId
-    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+    ) internal pure returns (UintRange memory range) {
         return createUintRange(startTokenId, endTokenId);
     }
 
@@ -235,7 +235,7 @@ library TokenizationHelpers {
     function createOwnershipTimeRange(
         uint256 startTime,
         uint256 duration
-    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+    ) internal pure returns (UintRange memory range) {
         return createUintRange(startTime, startTime + duration);
     }
 
@@ -246,7 +246,7 @@ library TokenizationHelpers {
      */
     function createOwnershipTimeRangeToExpiration(
         uint256 expirationTime
-    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+    ) internal pure returns (UintRange memory range) {
         return createUintRange(block.timestamp, expirationTime);
     }
 
@@ -257,7 +257,7 @@ library TokenizationHelpers {
      */
     function createTimePoint(
         uint256 timestamp
-    ) internal pure returns (TokenizationTypes.UintRange memory range) {
+    ) internal pure returns (UintRange memory range) {
         return createUintRange(timestamp, timestamp);
     }
 
@@ -265,7 +265,7 @@ library TokenizationHelpers {
      * @notice Creates a time range for current time (single point)
      * @return range The UintRange for current block timestamp
      */
-    function createCurrentTimePoint() internal view returns (TokenizationTypes.UintRange memory range) {
+    function createCurrentTimePoint() internal view returns (UintRange memory range) {
         return createTimePoint(block.timestamp);
     }
 
@@ -273,10 +273,10 @@ library TokenizationHelpers {
      * @notice Creates an empty ActionPermission (no restrictions)
      * @return permission An ActionPermission with empty arrays
      */
-    function createEmptyActionPermission() internal pure returns (TokenizationTypes.ActionPermission memory permission) {
-        return TokenizationTypes.ActionPermission({
-            permanentlyPermittedTimes: new TokenizationTypes.UintRange[](0),
-            permanentlyForbiddenTimes: new TokenizationTypes.UintRange[](0)
+    function createEmptyActionPermission() internal pure returns (ActionPermission memory permission) {
+        return ActionPermission({
+            permanentlyPermittedTimes: new UintRange[](0),
+            permanentlyForbiddenTimes: new UintRange[](0)
         });
     }
 
@@ -284,12 +284,12 @@ library TokenizationHelpers {
      * @notice Creates an ActionPermission that is always permitted
      * @return permission An ActionPermission with full time range permitted
      */
-    function createAlwaysPermittedActionPermission() internal pure returns (TokenizationTypes.ActionPermission memory permission) {
-        TokenizationTypes.UintRange[] memory permittedTimes = new TokenizationTypes.UintRange[](1);
+    function createAlwaysPermittedActionPermission() internal pure returns (ActionPermission memory permission) {
+        UintRange[] memory permittedTimes = new UintRange[](1);
         permittedTimes[0] = createFullOwnershipTimeRange();
-        return TokenizationTypes.ActionPermission({
+        return ActionPermission({
             permanentlyPermittedTimes: permittedTimes,
-            permanentlyForbiddenTimes: new TokenizationTypes.UintRange[](0)
+            permanentlyForbiddenTimes: new UintRange[](0)
         });
     }
 
@@ -301,9 +301,9 @@ library TokenizationHelpers {
      */
     function createBalanceWithFullOwnership(
         uint256 amount,
-        TokenizationTypes.UintRange[] memory tokenIds
-    ) internal pure returns (TokenizationTypes.Balance memory balance) {
-        TokenizationTypes.UintRange[] memory ownershipTimes = new TokenizationTypes.UintRange[](1);
+        UintRange[] memory tokenIds
+    ) internal pure returns (Balance memory balance) {
+        UintRange[] memory ownershipTimes = new UintRange[](1);
         ownershipTimes[0] = createFullOwnershipTimeRange();
         return createBalance(amount, ownershipTimes, tokenIds);
     }
@@ -317,8 +317,8 @@ library TokenizationHelpers {
     function createBalanceForSingleToken(
         uint256 amount,
         uint256 tokenId
-    ) internal pure returns (TokenizationTypes.Balance memory balance) {
-        TokenizationTypes.UintRange[] memory tokenIds = new TokenizationTypes.UintRange[](1);
+    ) internal pure returns (Balance memory balance) {
+        UintRange[] memory tokenIds = new UintRange[](1);
         tokenIds[0] = createSingleTokenIdRange(tokenId);
         return createBalanceWithFullOwnership(amount, tokenIds);
     }
@@ -346,7 +346,7 @@ library TokenizationHelpers {
      * @param uri The metadata URI
      * @return metadata The constructed CollectionMetadata
      */
-    function createCollectionMetadataFromURI(string memory uri) internal pure returns (TokenizationTypes.CollectionMetadata memory metadata) {
+    function createCollectionMetadataFromURI(string memory uri) internal pure returns (CollectionMetadata memory metadata) {
         return createCollectionMetadata(uri, "");
     }
 
@@ -358,8 +358,8 @@ library TokenizationHelpers {
      */
     function createTokenMetadataFromURI(
         string memory uri,
-        TokenizationTypes.UintRange[] memory tokenIds
-    ) internal pure returns (TokenizationTypes.TokenMetadata memory metadata) {
+        UintRange[] memory tokenIds
+    ) internal pure returns (TokenMetadata memory metadata) {
         return createTokenMetadata(uri, "", tokenIds);
     }
 }

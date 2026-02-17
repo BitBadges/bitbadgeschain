@@ -50,33 +50,29 @@ contract TwoFactorSecurityToken {
     mapping(address => uint256) public lastTwoFactorIssued;
     mapping(address => uint256) public twoFactorNonce;  // Increments with each 2FA token
 
-    // Token ranges
-    UintRange[] private _securityTokenIds;
-    UintRange[] private _perpetualOwnership;
-
     // ============ Events ============
 
     event TwoFactorIssued(address indexed user, uint256 validUntil, uint256 nonce);
     event TwoFactorRevoked(address indexed user, uint256 nonce);
     event TransferWithTwoFactor(address indexed from, address indexed to, uint256 amount);
-    event TwoFactorRequired(address indexed user, string operation);
+    event TwoFactorRequestedEvent(address indexed user, string operation);
 
     // ============ Errors ============
 
-    error TwoFactorRequired();
-    error TwoFactorExpired();
-    error TwoFactorCooldownActive();
-    error NotAuthorized();
+    error TwoFactorRequiredError();
+    error TwoFactorExpiredError();
+    error TwoFactorCooldownActiveError();
+    error NotAuthorizedError();
 
     // ============ Modifiers ============
 
     modifier onlyIssuer() {
-        if (msg.sender != issuer) revert NotAuthorized();
+        if (msg.sender != issuer) revert NotAuthorizedError();
         _;
     }
 
     modifier onlyTwoFactorAuthority() {
-        if (msg.sender != twoFactorAuthority && msg.sender != issuer) revert NotAuthorized();
+        if (msg.sender != twoFactorAuthority && msg.sender != issuer) revert NotAuthorizedError();
         _;
     }
 
@@ -86,8 +82,8 @@ contract TwoFactorSecurityToken {
      */
     modifier requiresTwoFactor() {
         if (!hasValidTwoFactor(msg.sender)) {
-            emit TwoFactorRequired(msg.sender, "operation");
-            revert TwoFactorRequired();
+            emit TwoFactorRequestedEvent(msg.sender, "operation");
+            revert TwoFactorRequiredError();
         }
         _;
     }
@@ -109,14 +105,6 @@ contract TwoFactorSecurityToken {
         twoFactorAuthority = _twoFactorAuthority;
         name = _name;
         symbol = _symbol;
-
-        // Security token uses token ID 1
-        _securityTokenIds = new UintRange[](1);
-        _securityTokenIds[0] = UintRange(1, 1);
-
-        // Perpetual ownership for security tokens
-        _perpetualOwnership = new UintRange[](1);
-        _perpetualOwnership[0] = UintRange(1, type(uint64).max);
 
         // Create KYC registry
         string memory kycJson = TokenizationJSONHelpers.createDynamicStoreJSON(
@@ -223,7 +211,7 @@ contract TwoFactorSecurityToken {
     function issueTwoFactor(address user) external onlyTwoFactorAuthority {
         // Check cooldown
         if (block.timestamp < lastTwoFactorIssued[user] + twoFactorCooldown) {
-            revert TwoFactorCooldownActive();
+            revert TwoFactorCooldownActiveError();
         }
 
         // Increment nonce for this user (each 2FA session gets unique token ID)
@@ -305,17 +293,11 @@ contract TwoFactorSecurityToken {
         if (currentNonce == 0) return false;
 
         // Check ownership of the current nonce token at the CURRENT TIME
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(currentNonce, currentNonce);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp,
-            block.timestamp
-        );
-
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             twoFactorCollectionId,
             user,
-            tokenIdsJson,
-            ownershipTimesJson
+            currentNonce,             // Nonce as token ID
+            block.timestamp * 1000    // Current time in milliseconds
         );
         uint256 balance = TOKENIZATION.getBalanceAmount(balanceJson);
 
@@ -458,26 +440,20 @@ contract TwoFactorSecurityToken {
     // ============ View Functions ============
 
     function balanceOf(address account) external view returns (uint256) {
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
-        
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             securityTokenCollectionId,
             account,
-            tokenIdsJson,
-            ownershipTimesJson
+            1,                        // Single token ID
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return TOKENIZATION.getBalanceAmount(balanceJson);
     }
 
     function totalSupply() external view returns (uint256) {
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
-        
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             securityTokenCollectionId,
-            tokenIdsJson,
-            ownershipTimesJson
+            1,                        // Single token ID
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return TOKENIZATION.getTotalSupply(supplyJson);
     }

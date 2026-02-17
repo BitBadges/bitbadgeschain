@@ -1,19 +1,55 @@
 # BitBadges Blockchain
 
-A Cosmos SDK blockchain for digital token issuance and management, enabling advanced permission systems and transferability controls.
+**The most feature-rich tokenization standard ever built — exclusively available as a Cosmos SDK module.**
 
-## Overview
+Enterprise-grade tokenization with 20+ compliance primitives, protocol-level enforcement, and full EVM compatibility. No smart contracts required. No code required. No per-project audits.
 
-BitBadges blockchain is built on the Cosmos SDK and Tendermint consensus, providing a robust infrastructure for digital token issuance and management with advanced permission systems, multi-tier approval controls, and IBC compatibility.
+## Why BitBadges?
 
-**Key Features:**
-- ✅ **Cosmos EVM Integration** - Full Ethereum Virtual Machine (EVM) compatibility via `cosmos/evm` module
-- ✅ **ERC20 Support** - Native Cosmos coins can be wrapped as ERC20 tokens
-- ✅ **Custom Precompiles** - Direct access to tokenization, Gamm, and SendManager modules from Solidity
-- ✅ **Dual Wallet Support** - Same address works for both Cosmos and EVM transactions
-- ✅ **JSON-RPC API** - Standard Ethereum JSON-RPC endpoints for Web3 compatibility
+BitBadges provides a **no-code, plug-and-play tokenization module** designed for RWAs, compliant assets, custom stablecoins, and any use case requiring advanced transferability controls. Unlike existing standards (ERC-20, ERC-3643, ICS20), compliance is checked on **every transfer, everywhere** — in DEXs, liquidity pools, IBC transfers — automatically and at the protocol level.
 
-For detailed implementation documentation, architecture details, and feature explanations, see [docs.bitbadges.io](https://docs.bitbadges.io/).
+**Key Capabilities:**
+- ✅ **20+ Compliance Primitives** — Time-gating, KYC requirements, spend limits, freeze/revoke, multi-sig, royalties
+- ✅ **Four Levels of Control** — Chain-level, issuer-level, sender-level, recipient-level rules
+- ✅ **Full EVM Compatibility** — Solidity contracts call module via precompile; works with ERC-3643, DeFi protocols
+- ✅ **Time-Dependent Balances** — Native vesting, auto-expiring subscriptions, time-locked ownership
+- ✅ **IBC Interoperability** — Wrap to ICS20, tap into any IBC liquidity, cross-chain settlement
+- ✅ **No-Code Deployment** — Full features without smart contracts or audits
+- ✅ **7000+ Off-Chain Integrations** — Gate transfers by Discord, email, KYC providers, custom APIs
+
+For detailed documentation, see [docs.bitbadges.io](https://docs.bitbadges.io/).
+
+---
+
+## The Paradigm Shift: Smart Tokens
+
+Traditional tokens are simple balances with permissionless transferability. **Smart tokens** are different — they have programmable rules, custom transferability, compliance checks, and ownership controls built directly into the token standard itself, enforced on every transfer, everywhere, automatically.
+
+| Traditional Tokens | Smart Tokens (BitBadges) |
+|--------------------|--------------------------|
+| Simple mint/transfer/burn | Programmable rules on every transfer |
+| Compliance in app layer (bypassable) | Compliance in protocol layer (enforced) |
+| Custom contracts per use case | No-code, composable primitives |
+| Per-project audits | Single audited module, reused |
+| Limited control (1-2 levels) | Four levels (chain, issuer, sender, recipient) |
+| Static balances | Time-dependent balances (vesting, expiry) |
+
+This represents a fundamental shift: instead of fragmented, vulnerable contracts on the app layer, we now have an abstracted tokenization layer that is self-contained, programmable, composable, and reusable across thousands of deployments.
+
+**The issuer has full control over the entire lifecycle** — transferability, compliance, ownership, revocability, freezability — all configured through composable building blocks, not custom code.
+
+---
+
+## Technical Overview
+
+BitBadges blockchain is built on the Cosmos SDK and CometBFT consensus, providing robust infrastructure for enterprise-grade tokenization.
+
+**Infrastructure Features:**
+- ✅ **Cosmos EVM Integration** — Full Ethereum Virtual Machine (EVM) compatibility via `cosmos/evm` module
+- ✅ **ERC20 Support** — Native Cosmos coins can be wrapped as ERC20 tokens
+- ✅ **Custom Precompiles** — Direct access to tokenization, Gamm, and SendManager modules from Solidity
+- ✅ **Dual Wallet Support** — Same address works for both Cosmos and EVM transactions
+- ✅ **JSON-RPC API** — Standard Ethereum JSON-RPC endpoints for Web3 compatibility
 
 ## Quick Start
 
@@ -323,6 +359,7 @@ The module includes comprehensive test helpers in `x/tokenization/keeper/integra
 -   [BitBadges Website](https://bitbadges.io)
 -   [Cosmos SDK Documentation](https://docs.cosmos.network)
 -   [Ignite CLI Documentation](https://docs.ignite.com)
+-   **Email**: trevor@bitbadges.io
 
 ## Acknowledgments
 

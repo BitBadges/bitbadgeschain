@@ -137,13 +137,30 @@ func (im IBCModule) OnRecvPacket(
 
 	// Dispatch packet
 	switch packet := modulePacketData.Packet.(type) {
+	// ICQ: Ownership Query - verify token ownership for cross-chain queries (single tokenId/time)
+	case *types.TokenizationPacketData_OwnershipQuery:
+		return im.handleOwnershipQuery(ctx, modulePacket, packet.OwnershipQuery)
+
+	// ICQ: Bulk Ownership Query - handle multiple ownership queries in one packet
+	case *types.TokenizationPacketData_BulkOwnershipQuery:
+		return im.handleBulkOwnershipQuery(ctx, modulePacket, packet.BulkOwnershipQuery)
+
+	// ICQ: Full Balance Query - return complete UserBalanceStore
+	case *types.TokenizationPacketData_FullBalanceQuery:
+		return im.handleFullBalanceQuery(ctx, modulePacket, packet.FullBalanceQuery)
+
+	// ICQ: Response packets should not be received here (they are sent as acknowledgements)
+	case *types.TokenizationPacketData_OwnershipQueryResponse,
+		*types.TokenizationPacketData_BulkOwnershipQueryResponse,
+		*types.TokenizationPacketData_FullBalanceQueryResponse:
+		err := errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "response packets should be handled via acknowledgement flow")
+		return channeltypes.NewErrorAcknowledgement(err)
+
 	// this line is used by starport scaffolding # ibc/packet/module/recv
 	default:
 		err := errorsmod.Wrapf(types.ErrUnrecognizedPacketType, "packet type: %T", packet)
 		return channeltypes.NewErrorAcknowledgement(err)
 	}
-
-	// NOTE: acknowledgement will be written synchronously during IBC handler execution.
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface
@@ -195,6 +212,88 @@ func (im IBCModule) OnAcknowledgementPacket(
 	// }
 
 	// return nil
+}
+
+// handleOwnershipQuery processes an ICQ ownership query and returns the response as an acknowledgement
+func (im IBCModule) handleOwnershipQuery(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	query *types.OwnershipQueryPacket,
+) ibcexported.Acknowledgement {
+	// Emit event for the incoming query
+	im.keeper.EmitICQRequestEvent(ctx, query)
+
+	// Process the ownership query
+	response := im.keeper.ProcessOwnershipQuery(ctx, query)
+
+	// Emit event for the response
+	im.keeper.EmitICQResponseEvent(ctx, response)
+
+	// Marshal the response as acknowledgement data
+	ackData, err := types.ModuleCdc.MarshalJSON(response)
+	if err != nil {
+		return channeltypes.NewErrorAcknowledgement(
+			errorsmod.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal ICQ response: %s", err.Error()),
+		)
+	}
+
+	return channeltypes.NewResultAcknowledgement(ackData)
+}
+
+// handleBulkOwnershipQuery processes a bulk ICQ ownership query and returns responses as an acknowledgement
+func (im IBCModule) handleBulkOwnershipQuery(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	bulk *types.BulkOwnershipQueryPacket,
+) ibcexported.Acknowledgement {
+	// Emit event for each query in the bulk request
+	for _, query := range bulk.Queries {
+		im.keeper.EmitICQRequestEvent(ctx, query)
+	}
+
+	// Process the bulk ownership query
+	response := im.keeper.ProcessBulkOwnershipQuery(ctx, bulk)
+
+	// Emit events for each response
+	for _, resp := range response.Responses {
+		im.keeper.EmitICQResponseEvent(ctx, resp)
+	}
+
+	// Marshal the response as acknowledgement data
+	ackData, err := types.ModuleCdc.MarshalJSON(response)
+	if err != nil {
+		return channeltypes.NewErrorAcknowledgement(
+			errorsmod.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal bulk ICQ response: %s", err.Error()),
+		)
+	}
+
+	return channeltypes.NewResultAcknowledgement(ackData)
+}
+
+// handleFullBalanceQuery processes an ICQ full balance query and returns the complete UserBalanceStore
+func (im IBCModule) handleFullBalanceQuery(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	query *types.FullBalanceQueryPacket,
+) ibcexported.Acknowledgement {
+	// Emit event for the incoming query
+	im.keeper.EmitFullBalanceQueryRequestEvent(ctx, query)
+
+	// Process the full balance query
+	response := im.keeper.ProcessFullBalanceQuery(ctx, query)
+
+	// Emit event for the response
+	im.keeper.EmitFullBalanceQueryResponseEvent(ctx, response)
+
+	// Marshal the response as acknowledgement data
+	ackData, err := types.ModuleCdc.MarshalJSON(response)
+	if err != nil {
+		return channeltypes.NewErrorAcknowledgement(
+			errorsmod.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal full balance ICQ response: %s", err.Error()),
+		)
+	}
+
+	return channeltypes.NewResultAcknowledgement(ackData)
 }
 
 // OnTimeoutPacket implements the IBCModule interface

@@ -128,20 +128,16 @@ func (suite *QueryMethodsTestSuite) TestGetBalance_NonExistentUser() {
 
 func (suite *QueryMethodsTestSuite) TestGetBalanceAmount_Valid() {
 	method := suite.Precompile.ABI.Methods["getBalanceAmount"]
-	
+
 	// Convert EVM address to Cosmos address
 	aliceCosmos := suite.TestSuite.Alice.String()
 
-	// Build JSON query
+	// Build JSON query - single tokenId and ownershipTime
 	queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
-		"collectionId": suite.TestSuite.CollectionId.BigInt().String(),
+		"collectionId":  suite.TestSuite.CollectionId.BigInt().String(),
 		"address":       aliceCosmos,
-		"tokenIds": []map[string]interface{}{
-			{"start": "1", "end": "10"},
-		},
-		"ownershipTimes": []map[string]interface{}{
-			{"start": "1", "end": "1000"},
-		},
+		"tokenId":       "1",    // Single token ID
+		"ownershipTime": "100",  // Single ownership time
 	})
 	suite.NoError(err)
 
@@ -167,16 +163,12 @@ func (suite *QueryMethodsTestSuite) TestGetBalanceAmount_Valid() {
 
 func (suite *QueryMethodsTestSuite) TestGetTotalSupply_Valid() {
 	method := suite.Precompile.ABI.Methods["getTotalSupply"]
-	
-	// Build JSON query
+
+	// Build JSON query - single tokenId and ownershipTime
 	queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
-		"collectionId": suite.TestSuite.CollectionId.BigInt().String(),
-		"tokenIds": []map[string]interface{}{
-			{"start": "1", "end": "10"},
-		},
-		"ownershipTimes": []map[string]interface{}{
-			{"start": "1", "end": "1000"},
-		},
+		"collectionId":  suite.TestSuite.CollectionId.BigInt().String(),
+		"tokenId":       "1",    // Single token ID
+		"ownershipTime": "100",  // Single ownership time
 	})
 	suite.NoError(err)
 

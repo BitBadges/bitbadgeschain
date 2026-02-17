@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../types/TokenizationTypes.sol";
+import "../types/sol";
 
 /**
  * @title TokenizationDecoders
@@ -34,7 +34,7 @@ library TokenizationDecoders {
      *      Consider using the TypeScript SDK for full decoding.
      */
     function decodeCollection(bytes memory data) 
-        internal pure returns (TokenizationTypes.TokenCollection memory collection) 
+        internal pure returns (TokenCollection memory collection) 
     {
         // Protobuf decoding in Solidity is extremely complex and gas-intensive
         // For production use, decode off-chain using the TypeScript SDK
@@ -49,7 +49,7 @@ library TokenizationDecoders {
      *      This is a placeholder that will revert. Use off-chain decoding tools.
      */
     function decodeBalance(bytes memory data) 
-        internal pure returns (TokenizationTypes.UserBalanceStore memory balance) 
+        internal pure returns (UserBalanceStore memory balance) 
     {
         revert("TokenizationDecoders: Full protobuf decoding not supported in Solidity. Use off-chain tools.");
     }
@@ -62,7 +62,7 @@ library TokenizationDecoders {
      *      This is a placeholder that will revert. Use off-chain decoding tools.
      */
     function decodeAddressList(bytes memory data) 
-        internal pure returns (TokenizationTypes.AddressList memory list) 
+        internal pure returns (AddressList memory list) 
     {
         revert("TokenizationDecoders: Full protobuf decoding not supported in Solidity. Use off-chain tools.");
     }
@@ -75,7 +75,7 @@ library TokenizationDecoders {
      *      This is a placeholder that will revert. Use off-chain decoding tools.
      */
     function decodeDynamicStore(bytes memory data) 
-        internal pure returns (TokenizationTypes.DynamicStore memory store) 
+        internal pure returns (DynamicStore memory store) 
     {
         revert("TokenizationDecoders: Full protobuf decoding not supported in Solidity. Use off-chain tools.");
     }

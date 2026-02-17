@@ -53,13 +53,12 @@ string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
 );
 TOKENIZATION.transferTokens(transferJson);
 
-// Check 2FA ownership at CURRENT TIME
-string memory checkTimeJson = TokenizationJSONHelpers.uintRangeToJson(
-    block.timestamp, 
-    block.timestamp
-);
+// Check 2FA ownership at CURRENT TIME (single tokenId/ownershipTime)
 string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
-    twoFactorCollectionId, user, tokenIdsJson, checkTimeJson
+    twoFactorCollectionId,
+    user,
+    currentNonce,             // Nonce as token ID
+    block.timestamp * 1000    // Current time in milliseconds
 );
 uint256 balance = TOKENIZATION.getBalanceAmount(balanceJson);
 bool hasValid2FA = balance > 0;
@@ -104,9 +103,12 @@ string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
 );
 TOKENIZATION.transferTokens(transferJson);
 
-// Balance queries
+// Balance queries (single tokenId/ownershipTime)
 string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
-    collectionId, account, tokenIdsJson, ownershipTimesJson
+    collectionId,
+    account,
+    1,                        // Single token ID
+    block.timestamp * 1000    // Current time in milliseconds
 );
 TOKENIZATION.getBalanceAmount(balanceJson);
 ```

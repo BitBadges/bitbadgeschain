@@ -1,10 +1,12 @@
 package tokenization
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -333,16 +335,12 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_BalanceOf() {
 		// Convert EVM address to Cosmos address
 		aliceCosmos := suite.Alice.String()
 
-		// Build JSON query
+		// Build JSON query with single tokenId and ownershipTime (new API format)
 		queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
-			"collectionId": suite.CollectionId.BigInt().String(),
-			"address":      aliceCosmos,
-			"tokenIds": []map[string]interface{}{
-				{"start": "1", "end": "100"},
-			},
-			"ownershipTimes": []map[string]interface{}{
-				{"start": "1", "end": new(big.Int).SetUint64(math.MaxUint64).String()},
-			},
+			"collectionId":  suite.CollectionId.BigInt().String(),
+			"address":       aliceCosmos,
+			"tokenId":       "1",
+			"ownershipTime": fmt.Sprintf("%d", time.Now().UnixMilli()),
 		})
 		suite.Require().NoError(err)
 
@@ -374,16 +372,12 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_BalanceOf() {
 		// Convert EVM address to Cosmos address
 		bobCosmos := suite.Bob.String()
 
-		// Build JSON query
+		// Build JSON query with single tokenId and ownershipTime (new API format)
 		queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
-			"collectionId": suite.CollectionId.BigInt().String(),
-			"address":      bobCosmos, // Bob has no balance initially
-			"tokenIds": []map[string]interface{}{
-				{"start": "1", "end": "100"},
-			},
-			"ownershipTimes": []map[string]interface{}{
-				{"start": "1", "end": new(big.Int).SetUint64(math.MaxUint64).String()},
-			},
+			"collectionId":  suite.CollectionId.BigInt().String(),
+			"address":       bobCosmos, // Bob has no balance initially
+			"tokenId":       "1",
+			"ownershipTime": fmt.Sprintf("%d", time.Now().UnixMilli()),
 		})
 		suite.Require().NoError(err)
 
@@ -419,15 +413,11 @@ func (suite *ERC3643ComplianceTestSuite) TestERC3643_TotalSupply() {
 
 	// Test: totalSupply should return correct supply
 	suite.Run("totalSupply_returns_correct_supply", func() {
-		// Build JSON query
+		// Build JSON query with single tokenId and ownershipTime (new API format)
 		queryJson, err := helpers.BuildQueryJSON(map[string]interface{}{
-			"collectionId": suite.CollectionId.BigInt().String(),
-			"tokenIds": []map[string]interface{}{
-				{"start": "1", "end": "100"},
-			},
-			"ownershipTimes": []map[string]interface{}{
-				{"start": "1", "end": new(big.Int).SetUint64(math.MaxUint64).String()},
-			},
+			"collectionId":  suite.CollectionId.BigInt().String(),
+			"tokenId":       "1",
+			"ownershipTime": fmt.Sprintf("%d", time.Now().UnixMilli()),
 		})
 		suite.Require().NoError(err)
 

@@ -63,9 +63,6 @@ contract PrivateEquityToken {
     uint256 public totalDistributed;
     mapping(address => uint256) public claimedDistributions;
 
-    // Token ID structure
-    UintRange[] private _tokenIds;
-
     // ============ Events ============
 
     event InvestorOnboarded(address indexed investor, uint256 commitment, string investorClass);
@@ -135,10 +132,6 @@ contract PrivateEquityToken {
         // Default fund periods (can be updated)
         fundingPeriodEnd = block.timestamp + 365 days;
         fundTermination = block.timestamp + 10 * 365 days;
-
-        // Token ID 1 for LP interests
-        _tokenIds = new UintRange[](1);
-        _tokenIds[0] = UintRange(1, 1);
 
         // Create compliance registries
         string memory qpJson = TokenizationJSONHelpers.createDynamicStoreJSON(
@@ -513,26 +506,20 @@ contract PrivateEquityToken {
     // ============ View Functions ============
 
     function balanceOf(address account) external view returns (uint256) {
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
-        
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
             account,
-            tokenIdsJson,
-            ownershipTimesJson
+            1,                        // Single token ID
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return TOKENIZATION.getBalanceAmount(balanceJson);
     }
 
     function totalSupply() external view returns (uint256) {
-        string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
-        
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             collectionId,
-            tokenIdsJson,
-            ownershipTimesJson
+            1,                        // Single token ID
+            block.timestamp * 1000    // Current time in milliseconds
         );
         return TOKENIZATION.getTotalSupply(supplyJson);
     }
