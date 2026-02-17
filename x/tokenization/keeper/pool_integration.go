@@ -69,6 +69,11 @@ func setAutoApprovalFlagsIfNeeded(balance *tokenizationtypes.UserBalanceStore) b
 
 // This function follows the same pattern as setAutoApproveFlagsForPathAddress to ensure
 // consistent behavior and prevent unintended overrides of user-configured settings.
+//
+// SECURITY NOTE: This function bypasses CanUpdateAutoApproveAllIncomingTransfers permission checks
+// by calling SetBalanceForAddress directly. This is intentional for pool/path addresses which are
+// system addresses that require auto-approval to function correctly. This function should only be
+// called from properly gated pool integration entry points (e.g., GAMM swap handlers).
 func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error {
 	currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address)
 	if err != nil {

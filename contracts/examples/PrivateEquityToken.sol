@@ -514,7 +514,7 @@ contract PrivateEquityToken {
 
     function balanceOf(address account) external view returns (uint256) {
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
@@ -527,7 +527,7 @@ contract PrivateEquityToken {
 
     function totalSupply() external view returns (uint256) {
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             collectionId,

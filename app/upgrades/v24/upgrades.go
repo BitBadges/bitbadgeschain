@@ -155,6 +155,14 @@ func CreateUpgradeHandler(
 			fromVM["tokenization"] = badgesVersion
 			delete(fromVM, "badges")
 			sdkCtx.Logger().Info("Migrated module version from badges to tokenization", "version", badgesVersion)
+		} else if tokenizationVersion, ok := fromVM["tokenization"]; ok {
+			// Fallback: If "badges" key is missing but "tokenization" already exists,
+			// preserve the existing version to prevent InitGenesis from resetting nextCollectionId
+			sdkCtx.Logger().Info("Tokenization module version already exists, preserving", "version", tokenizationVersion)
+		} else {
+			// If neither key exists, this is a fresh chain or the module was never initialized
+			// In this case, InitGenesis will run which is correct behavior for a new chain
+			sdkCtx.Logger().Info("No existing badges or tokenization module version found, InitGenesis will run")
 		}
 
 		// Run module migrations (EVM modules skipped, tokenization version preserved)

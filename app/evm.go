@@ -279,6 +279,7 @@ func (app *App) GetAllPrecompileAddresses() []common.Address {
 	// Add custom BitBadges precompile addresses
 	addresses = append(addresses, common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)) // 0x1001
 	addresses = append(addresses, common.HexToAddress(gammprecompile.GammPrecompileAddress))                 // 0x1002
+	addresses = append(addresses, common.HexToAddress(sendmanagerprecompile.SendManagerPrecompileAddress))   // 0x1003
 	// Note: Use Cosmos default bank precompile at 0x0804 (already included in default precompiles)
 
 	return addresses

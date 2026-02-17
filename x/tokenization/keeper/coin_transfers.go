@@ -51,6 +51,14 @@ func (k Keeper) ExecuteCoinTransfers(
 
 	royaltyPercentage := royalties.Percentage
 	royaltyPayoutAddress := royalties.PayoutAddress
+	
+	// Validate royalty percentage doesn't exceed 100% (RoyaltyDivisor = 10000)
+	// This prevents panic when royaltyAmount > coin.Amount in the subtraction below
+	if royaltyPercentage.GT(sdkmath.NewUint(RoyaltyDivisor)) {
+		detErrMsg := fmt.Sprintf("royalty percentage cannot exceed %d (100%%), got %s", RoyaltyDivisor, royaltyPercentage.String())
+		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+	}
+	
 	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
 		if royaltyPayoutAddress == "" {
 			detErrMsg := "payout address is required when royalty percentage is greater than 0"

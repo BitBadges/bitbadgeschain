@@ -424,6 +424,13 @@ library TokenizationJSONHelpers {
     }
 
     /**
+     * @notice Convert address to string (public helper)
+     */
+    function addressToString(address addr) internal pure returns (string memory) {
+        return _addressToString(addr);
+    }
+
+    /**
      * @notice Convert uint256 to string
      */
     function _uintToString(uint256 value) private pure returns (string memory) {

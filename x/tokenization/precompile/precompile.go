@@ -103,6 +103,8 @@ const (
 	GasPerQueryRange             = 500
 	GasExecuteMultipleBase       = 10_000
 	GasPerMessageInBatch         = 1_000
+	MaxMessagesPerBatch          = 50   // Maximum number of messages allowed in executeMultiple batch
+	MaxQueryArraySize            = 1000 // Maximum size for tokenIds and ownershipTimes arrays in queries
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
@@ -274,7 +276,42 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasUniversalUpdateCollectionBase
 		isTransaction = true
 	case ExecuteMultipleMethod:
-		baseGas = GasExecuteMultipleBase
+		// For executeMultiple, we need to parse the input to count messages for dynamic gas calculation
+		// The input format is: methodID (4 bytes) + ABI-encoded tuple array
+		if len(input) >= 4 {
+			// Try to unpack the messages array to count messages
+			// This is a best-effort calculation - if parsing fails, we use base gas
+			method, err := p.MethodById(input[:4])
+			if err == nil && method.Name == ExecuteMultipleMethod {
+				unpacked, err := method.Inputs.Unpack(input[4:])
+				if err == nil && len(unpacked) == 1 {
+					// Count messages in the array
+					msgCount := uint64(0)
+					if msgs, ok := unpacked[0].([]interface{}); ok {
+						msgCount = uint64(len(msgs))
+					} else {
+						// Try reflection for struct slice
+						val := reflect.ValueOf(unpacked[0])
+						if val.Kind() == reflect.Slice {
+							msgCount = uint64(val.Len())
+						}
+					}
+					// Enforce max batch size in gas calculation
+					if msgCount > MaxMessagesPerBatch {
+						msgCount = MaxMessagesPerBatch
+					}
+					// Calculate dynamic gas: base + (message count * per-message gas)
+					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch)
+				} else {
+					// If parsing fails, use base gas (will be adjusted during execution)
+					baseGas = GasExecuteMultipleBase
+				}
+			} else {
+				baseGas = GasExecuteMultipleBase
+			}
+		} else {
+			baseGas = GasExecuteMultipleBase
+		}
 		isTransaction = true
 	// Query methods
 	case GetCollectionMethod:
@@ -387,7 +424,7 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 
 		// ABI unpacks tuple arrays - handle different formats
 		var messages []interface{}
-		
+
 		// Case 1: []interface{} (most common)
 		if msgs, ok := unpacked[0].([]interface{}); ok {
 			messages = msgs
@@ -403,7 +440,7 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 						// Extract MessageType and MsgJson fields
 						msgTypeField := elem.FieldByName("MessageType")
 						msgJsonField := elem.FieldByName("MsgJson")
-						
+
 						if msgTypeField.IsValid() && msgJsonField.IsValid() {
 							// Convert to []interface{} format [messageType, msgJson]
 							messages[i] = []interface{}{
@@ -671,6 +708,11 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, messages []interface{}, contract *vm.Contract) ([]byte, error) {
 	if len(messages) == 0 {
 		return nil, ErrInvalidInput("messages array cannot be empty")
+	}
+
+	// Enforce maximum batch size to prevent gas exhaustion attacks
+	if len(messages) > MaxMessagesPerBatch {
+		return nil, ErrInvalidInput(fmt.Sprintf("messages array exceeds maximum batch size: %d > %d", len(messages), MaxMessagesPerBatch))
 	}
 
 	msgServer := tokenizationkeeper.NewMsgServerImpl(p.tokenizationKeeper)
@@ -997,12 +1039,13 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 			// Determine result type and pack accordingly
 			switch r := result.(type) {
 			case bool:
-				// Pack bool as bytes (1 byte: 0x00 or 0x01)
+				// Pack bool as ABI-encoded uint256 (32 bytes: 0x00...00 or 0x00...01)
+				// ABI encoding requires booleans to be 32 bytes
+				resultBytes = make([]byte, 32)
 				if r {
-					resultBytes = []byte{0x01}
-				} else {
-					resultBytes = []byte{0x00}
+					resultBytes[31] = 0x01
 				}
+				// else: all bytes remain 0x00
 			case *big.Int:
 				// Pack uint256 as bytes (32 bytes)
 				resultBytes = r.Bytes()
@@ -1424,6 +1467,14 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 	}
 
 	// Get user balance store
+	// Enforce maximum array size to prevent DoS attacks
+	if len(req.TokenIds) > MaxQueryArraySize {
+		return nil, ErrInvalidInput(fmt.Sprintf("tokenIds array exceeds maximum size: %d > %d", len(req.TokenIds), MaxQueryArraySize))
+	}
+	if len(req.OwnershipTimes) > MaxQueryArraySize {
+		return nil, ErrInvalidInput(fmt.Sprintf("ownershipTimes array exceeds maximum size: %d > %d", len(req.OwnershipTimes), MaxQueryArraySize))
+	}
+
 	userBalanceStore, _, err := p.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, req.Address)
 	if err != nil {
 		return nil, WrapError(err, ErrorCodeQueryFailed, "failed to get balance")
@@ -1497,6 +1548,14 @@ func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, js
 	collectionId, err := sdkmath.ParseUint(req.CollectionId)
 	if err != nil {
 		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %v", err))
+	}
+
+	// Enforce maximum array size to prevent DoS attacks
+	if len(req.TokenIds) > MaxQueryArraySize {
+		return nil, ErrInvalidInput(fmt.Sprintf("tokenIds array exceeds maximum size: %d > %d", len(req.TokenIds), MaxQueryArraySize))
+	}
+	if len(req.OwnershipTimes) > MaxQueryArraySize {
+		return nil, ErrInvalidInput(fmt.Sprintf("ownershipTimes array exceeds maximum size: %d > %d", len(req.OwnershipTimes), MaxQueryArraySize))
 	}
 
 	// Get collection (validate it exists)

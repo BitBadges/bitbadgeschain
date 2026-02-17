@@ -550,6 +550,97 @@ See the implementation of dynamic stores for a complete example:
 
 **Note**: Dynamic stores now include a `globalEnabled` field that acts as a global kill switch. When `globalEnabled = false`, all approvals using that store via `DynamicStoreChallenge` will fail immediately, regardless of per-address values. This enables quick halting of approvals (e.g., when a 2FA protocol is compromised). The field defaults to `true` on creation and can be toggled via `MsgUpdateDynamicStore`.
 
+## Step 5: Update Precompile (if EVM-callable)
+
+### When This Applies
+
+This step is necessary when your new proto fields:
+- Are part of a message type that should be callable from EVM/Solidity
+- Add new query responses that should be accessible from Solidity
+- Change existing method signatures
+
+### Location
+
+Precompile code is located in:
+- `x/tokenization/precompile/` - Tokenization precompile
+- `x/gamm/precompile/` - Gamm precompile
+- `x/sendmanager/precompile/` - SendManager precompile
+
+Solidity interfaces and helpers:
+- `contracts/interfaces/` - Interface definitions
+- `contracts/libraries/` - Helper libraries
+
+### Files to Modify
+
+1. **`x/tokenization/precompile/abi.json`** - Update method signatures if parameters changed
+2. **`x/tokenization/precompile/precompile.go`** - Update handler to use new fields
+3. **`contracts/interfaces/ITokenizationPrecompile.sol`** - Update Solidity interface
+4. **`contracts/libraries/TokenizationJSONHelpers.sol`** - Update JSON builders
+5. **`contracts/libraries/TokenizationWrappers.sol`** - Update wrapper functions
+
+### Example: Adding New Field to Existing Method
+
+If you add a `newField` to `MsgTransferTokens`:
+
+1. **Update JSON handling in `precompile.go`**:
+   The precompile uses JSON input matching protobuf structure, so new fields are automatically included if the JSON parser handles them.
+
+2. **Update Solidity helpers** if you want type-safe builders:
+   ```solidity
+   function transferTokensJSON(
+       uint256 collectionId,
+       address[] memory recipients,
+       uint256 amount,
+       string memory tokenIdsJson,
+       string memory ownershipTimesJson,
+       string memory newField  // NEW PARAMETER
+   ) internal pure returns (string memory)
+   ```
+
+3. **Update tests** in `x/tokenization/precompile/test/`
+
+### Reference Documentation
+
+- `x/tokenization/precompile/README.md` - Precompile implementation details
+- `app/PRECOMPILE_MANAGEMENT.md` - Registration and enablement
+- `contracts/docs/GETTING_STARTED.md` - Solidity usage guide
+
+## Step 6: Update SDK Precompile Support (if EVM-callable)
+
+### When This Applies
+
+This step is necessary when you've updated the chain precompile and need TypeScript/JavaScript applications to use the new functionality.
+
+### Location
+
+SDK precompile code is located in:
+- `../bitbadgesjs/packages/bitbadgesjs-sdk/src/transactions/precompile/`
+
+### Files to Modify
+
+1. **`abi.json`** - Must match chain's `x/tokenization/precompile/abi.json`
+2. **`function-mapper.ts`** - Map SDK message types to precompile functions
+3. **`type-detector.ts`** - Add type detection for new messages (if needed)
+4. **`data-converter.ts`** - Add data conversion logic (if needed)
+
+### Sync ABI from Chain
+
+```bash
+# Copy ABI from chain to SDK
+cp x/tokenization/precompile/abi.json \
+   ../bitbadgesjs/packages/bitbadgesjs-sdk/src/transactions/precompile/abi.json
+
+# Rebuild SDK
+cd ../bitbadgesjs/packages/bitbadgesjs-sdk
+bun run build
+```
+
+### Important Notes
+
+- ABI must be **identical** between chain and SDK
+- After SDK changes, rebuild for symlinked projects to pick up updates
+- Test precompile calls from SDK after updates
+
 ## Testing Your Changes
 
 ### 1. Compilation Test
@@ -568,6 +659,19 @@ go test ./x/tokenization/...
 
 ```bash
 ignite chain test
+```
+
+### 4. Precompile Tests (if applicable)
+
+```bash
+go test ./x/tokenization/precompile/...
+```
+
+### 5. SDK Precompile Tests (if applicable)
+
+```bash
+cd ../bitbadgesjs/packages/bitbadgesjs-sdk
+bun run test
 ```
 
 ## Common Pitfalls
@@ -596,6 +700,21 @@ ignite chain test
 
 -   **Problem**: Versioned API folders are included in builds
 -   **Solution**: Always remove `api/tokenization/v*` folders after generation
+
+### 6. Forgetting Precompile Updates
+
+-   **Problem**: New fields not accessible from EVM/Solidity contracts
+-   **Solution**: Update `abi.json`, precompile handlers, and Solidity interfaces when modifying EVM-callable messages
+
+### 7. Precompile ABI Mismatch
+
+-   **Problem**: Solidity interface doesn't match precompile implementation
+-   **Solution**: Keep `abi.json`, `ITokenizationPrecompile.sol`, and `precompile.go` in sync
+
+### 8. SDK Precompile Out of Sync
+
+-   **Problem**: SDK precompile calls fail because ABI doesn't match chain
+-   **Solution**: Copy `abi.json` from chain to SDK and rebuild: `cp x/tokenization/precompile/abi.json ../bitbadgesjs/packages/bitbadgesjs-sdk/src/transactions/precompile/abi.json`
 
 ## Example: Complete Field Addition
 
@@ -660,5 +779,7 @@ Following this systematic approach ensures that new fields are properly integrat
 -   Generated code provides type safety
 -   Business logic handles validation and state management
 -   API cleanup prevents versioned folders from being included
+-   Precompile updates ensure EVM/Solidity compatibility (when applicable)
+-   SDK precompile sync ensures TypeScript/JavaScript applications can use new features
 
 Always test thoroughly after making changes to ensure proper functionality.

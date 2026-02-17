@@ -91,7 +91,8 @@ func (suite *DeleteCollectionTestSuite) TestDeleteCollection_PurgesAllState() {
 	suite.Require().False(found, "collection should not exist after deletion")
 
 	// Verify balances are purged - check that no balances remain for this collection
-	allBalances, _, allCollectionIds := suite.Keeper.GetUserBalancesFromStore(suite.Ctx)
+	allBalances, _, allCollectionIds, err := suite.Keeper.GetUserBalancesFromStore(suite.Ctx)
+	suite.Require().NoError(err)
 	for i, id := range allCollectionIds {
 		suite.Require().NotEqual(collectionId, id, "No balances should remain for deleted collection. Found balance at index %d", i)
 		_ = allBalances[i] // Use the balance to avoid unused variable
@@ -144,7 +145,8 @@ func (suite *DeleteCollectionTestSuite) TestDeleteCollection_NoOrphanedState() {
 
 	// Verify no balances remain for this collection
 	// Iterate all balances and ensure none belong to deleted collection
-	allBalances, allAddresses, allCollectionIds := suite.Keeper.GetUserBalancesFromStore(suite.Ctx)
+	allBalances, allAddresses, allCollectionIds, err := suite.Keeper.GetUserBalancesFromStore(suite.Ctx)
+	suite.Require().NoError(err)
 	for i, id := range allCollectionIds {
 		if id.Equal(collectionId) {
 			suite.T().Errorf("Found orphaned balance for deleted collection %s at address %s", collectionId, allAddresses[i])

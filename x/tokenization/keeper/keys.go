@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strconv"
 	"strings"
@@ -172,11 +173,14 @@ func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 
 // Prefixer functions
 
-// collectionStoreKey returns the byte representation of the collection key ([]byte{0x01} + collectionId)
+// collectionStoreKey returns the byte representation of the collection key ([]byte{0x01} + collectionId as 8-byte big-endian)
+// Uses fixed-width binary encoding to prevent key collisions from decimal string truncation
 func collectionStoreKey(collectionId sdkmath.Uint) []byte {
 	key := make([]byte, len(CollectionKey)+IDLength)
 	copy(key, CollectionKey)
-	copy(key[len(CollectionKey):], []byte(collectionId.String()))
+	// Use fixed-width binary encoding (8 bytes big-endian) instead of decimal string
+	// This prevents truncation when collectionId >= 100,000,000 (9+ digits)
+	binary.BigEndian.PutUint64(key[len(CollectionKey):], collectionId.Uint64())
 	return key
 }
 
@@ -228,7 +232,9 @@ func approvalVersionStoreKey(approvalVersionKey string) []byte {
 func dynamicStoreStoreKey(storeId sdkmath.Uint) []byte {
 	key := make([]byte, len(DynamicStoreKey)+IDLength)
 	copy(key, DynamicStoreKey)
-	copy(key[len(DynamicStoreKey):], []byte(storeId.String()))
+	// Use fixed-width binary encoding (8 bytes big-endian) instead of decimal string
+	// This prevents truncation when storeId >= 100,000,000 (9+ digits)
+	binary.BigEndian.PutUint64(key[len(DynamicStoreKey):], storeId.Uint64())
 	return key
 }
 
@@ -239,7 +245,9 @@ func nextDynamicStoreIdKey() []byte {
 func dynamicStoreValueStoreKey(storeId sdkmath.Uint, address string) []byte {
 	key := make([]byte, len(DynamicStoreValueKey)+IDLength+len(address))
 	copy(key, DynamicStoreValueKey)
-	copy(key[len(DynamicStoreValueKey):], []byte(storeId.String()))
+	// Use fixed-width binary encoding (8 bytes big-endian) instead of decimal string
+	// This prevents truncation when storeId >= 100,000,000 (9+ digits)
+	binary.BigEndian.PutUint64(key[len(DynamicStoreValueKey):], storeId.Uint64())
 	copy(key[len(DynamicStoreValueKey)+IDLength:], []byte(address))
 	return key
 }

@@ -144,21 +144,60 @@ lint-ci:
 compile-contracts:
 	@echo "Compiling Solidity contracts..."
 	@if command -v solcjs >/dev/null 2>&1; then \
-		echo "Using solcjs..."; \
+		echo "Using solcjs with optimizer..."; \
 		cd contracts && \
-		solcjs --bin --abi --base-path . --include-path . --output-dir test \
+		echo "Compiling PrecompileTransferTestContract..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
 			types/TokenizationTypes.sol \
 			interfaces/ITokenizationPrecompile.sol \
-			test/MinimalTestContract.sol && \
-		echo "Contracts compiled successfully"; \
+			libraries/TokenizationJSONHelpers.sol \
+			test/PrecompileTransferTestContract.sol && \
+		echo "Compiling PrecompileCollectionTestContract..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
+			types/TokenizationTypes.sol \
+			interfaces/ITokenizationPrecompile.sol \
+			libraries/TokenizationJSONHelpers.sol \
+			test/PrecompileCollectionTestContract.sol && \
+		echo "Compiling PrecompileDynamicStoreTestContract..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
+			types/TokenizationTypes.sol \
+			interfaces/ITokenizationPrecompile.sol \
+			libraries/TokenizationJSONHelpers.sol \
+			test/PrecompileDynamicStoreTestContract.sol && \
+		echo "Compiling GammHelperLibrariesTestContract..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
+			types/GammTypes.sol \
+			interfaces/IGammPrecompile.sol \
+			libraries/GammWrappers.sol \
+			libraries/GammBuilders.sol \
+			libraries/GammHelpers.sol \
+			libraries/GammJSONHelpers.sol \
+			libraries/GammErrors.sol \
+			test/GammHelperLibrariesTestContract.sol && \
+		echo "All contracts compiled successfully"; \
+		echo "Note: MinimalTestContract and HelperLibrariesTestContract use pre-compiled artifacts."; \
+		echo "      If you need to recompile them, use solc with --via-ir flag."; \
 	elif command -v solc >/dev/null 2>&1; then \
-		echo "Using solc..."; \
+		echo "Using solc with --via-ir for complex contracts..."; \
 		cd contracts && \
-		solc --combined-json bin,abi --allow-paths . \
+		echo "Compiling test contracts..." && \
+		solc --via-ir --optimize --combined-json bin,abi --allow-paths . \
 			types/TokenizationTypes.sol \
 			interfaces/ITokenizationPrecompile.sol \
-			test/MinimalTestContract.sol > test/MinimalTestContract.json && \
-		echo "Contracts compiled successfully"; \
+			libraries/TokenizationJSONHelpers.sol \
+			test/PrecompileTransferTestContract.sol \
+			test/PrecompileCollectionTestContract.sol \
+			test/PrecompileDynamicStoreTestContract.sol > test/precompile_split_contracts.json && \
+		solc --via-ir --optimize --combined-json bin,abi --allow-paths . \
+			types/GammTypes.sol \
+			interfaces/IGammPrecompile.sol \
+			libraries/GammWrappers.sol \
+			libraries/GammBuilders.sol \
+			libraries/GammHelpers.sol \
+			libraries/GammJSONHelpers.sol \
+			libraries/GammErrors.sol \
+			test/GammHelperLibrariesTestContract.sol > test/GammHelperLibrariesTestContract.json && \
+		echo "All contracts compiled successfully"; \
 	else \
 		echo "Error: Neither solcjs nor solc found. Please install one:"; \
 		echo "  npm install -g solc@0.8.24"; \

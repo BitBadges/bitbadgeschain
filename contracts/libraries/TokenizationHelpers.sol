@@ -10,6 +10,12 @@ import "../types/TokenizationTypes.sol";
  */
 library TokenizationHelpers {
     /**
+     * @notice Maximum uint64 value - used for "forever" ownership times
+     * @dev BitBadges uses uint64 internally for timestamps and IDs. Using uint256.max will cause errors.
+     */
+    uint64 public constant MAX_UINT64 = type(uint64).max;  // 18446744073709551615
+
+    /**
      * @notice Creates a UintRange struct
      * @param start The start value (inclusive)
      * @param end The end value (inclusive)
@@ -190,11 +196,12 @@ library TokenizationHelpers {
     }
 
     /**
-     * @notice Creates a full ownership time range (from 1 to max uint256)
+     * @notice Creates a full ownership time range (from 1 to max uint64)
+     * @dev Uses uint64 max because BitBadges internally uses uint64 for timestamps
      * @return range The full ownership time range
      */
     function createFullOwnershipTimeRange() internal pure returns (TokenizationTypes.UintRange memory range) {
-        return createUintRange(1, type(uint256).max);
+        return createUintRange(1, MAX_UINT64);
     }
 
     /**

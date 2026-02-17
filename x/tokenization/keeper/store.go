@@ -248,7 +248,8 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (*ty
 }
 
 // GetUserBalancesFromStore defines a method for returning all user balances information by key.
-func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []sdkmath.Uint) {
+// Returns error if any balance key cannot be parsed to prevent slice desynchronization.
+func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.UserBalanceStore, addresses []string, ids []sdkmath.Uint, err error) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	iterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
@@ -260,15 +261,16 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 	for ; iterator.Valid(); iterator.Next() {
 		var UserBalance types.UserBalanceStore
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
-		balances = append(balances, &UserBalance)
 
 		balanceKeyDetails, err := GetDetailsFromBalanceKey(string(iterator.Key()[1:]))
 		if err != nil {
-			// Log error and continue processing other keys
-			// This could indicate data corruption, but we continue to avoid breaking the entire operation
-			k.logger.Error("failed to parse balance key", "key", string(iterator.Key()), "error", err)
-			continue
+			// Return error immediately on parse failure to prevent slice desynchronization
+			// This ensures balances, ids, and addresses arrays remain in sync
+			return nil, nil, nil, sdkerrors.Wrapf(err, "failed to parse balance key: %s", string(iterator.Key()))
 		}
+
+		// Append to all three slices atomically to maintain synchronization
+		balances = append(balances, &UserBalance)
 		ids = append(ids, balanceKeyDetails.collectionId)
 		addresses = append(addresses, balanceKeyDetails.address)
 	}
@@ -770,7 +772,12 @@ func (k Keeper) GetDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmath.U
 func (k Keeper) GetDynamicStoreValuesFromStore(ctx sdk.Context, storeId sdkmath.Uint) (dynamicStoreValues []*types.DynamicStoreValue) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-	iterator := storetypes.KVStorePrefixIterator(store, append(DynamicStoreValueKey, []byte(storeId.String())...))
+	// Use fixed-width binary encoding to prevent prefix collisions
+	// Decimal string "1" would match "10", "11", etc., causing incorrect iteration
+	prefix := make([]byte, len(DynamicStoreValueKey)+IDLength)
+	copy(prefix, DynamicStoreValueKey)
+	binary.BigEndian.PutUint64(prefix[len(DynamicStoreValueKey):], storeId.Uint64())
+	iterator := storetypes.KVStorePrefixIterator(store, prefix)
 	defer func() {
 		if err := iterator.Close(); err != nil {
 			k.Logger().Error("failed to close dynamic store value iterator", "error", err)

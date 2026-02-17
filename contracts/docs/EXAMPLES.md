@@ -56,7 +56,8 @@ contract ERC3643Token {
         TokenizationBuilders.CollectionBuilder memory builder = 
             TokenizationBuilders.newCollection();
         
-        builder = builder.withValidTokenIdRange(1, type(uint256).max);
+        // Note: Use uint64.max for ownership times/token IDs (BitBadges internal limit)
+        builder = builder.withValidTokenIdRange(1, type(uint64).max);
         builder = builder.withManager(TokenizationHelpers.addressToCosmosString(msg.sender));
         
         TokenizationTypes.CollectionMetadata memory metadata = 
@@ -417,6 +418,7 @@ contract SubscriptionToken {
 
 - Review [Patterns](./PATTERNS.md) for more common patterns
 - Check [Best Practices](./BEST_PRACTICES.md) for security considerations
+
 
 
 

@@ -19,9 +19,10 @@ contract ERC3643Tokenization is IERC3643 {
     UintRange private constant TOKEN_IDS = UintRange({start: 1, end: 1});
     
     // Ownership times "All" = 1 to MaxUint64
+    // Note: BitBadges uses uint64 internally, so we must use type(uint64).max, not uint256
     UintRange private constant OWNERSHIP_TIMES = UintRange({
         start: 1,
-        end: type(uint256).max
+        end: type(uint64).max
     });
     
     // Reference to the tokenization precompile

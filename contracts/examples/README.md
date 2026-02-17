@@ -205,7 +205,8 @@ function transfer(address to, uint256 amount) external returns (bool) {
     address[] memory recipients = new address[](1);
     recipients[0] = to;
     string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-    string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+    // Note: Use uint64.max for ownership times (BitBadges internal limit)
+    string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
     string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
         collectionId, recipients, amount, tokenIdsJson, ownershipTimesJson
     );

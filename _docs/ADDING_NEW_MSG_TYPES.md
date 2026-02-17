@@ -210,6 +210,109 @@ go test ./x/tokenization/simulation/...
 -   Verify that `AminoCdc` is used for signing
 -   Test signature verification
 
+### 13. Update Precompile (if EVM-callable)
+
+**Location**: `x/tokenization/precompile/`
+
+**Purpose**: Enable Solidity smart contracts to call the new message type
+
+**When Required**: If the new message type should be callable from EVM/Solidity contracts
+
+**Files to modify**:
+
+-   `x/tokenization/precompile/abi.json` - Add method signature
+-   `x/tokenization/precompile/precompile.go` - Add method constant, gas cost, handler
+-   `contracts/interfaces/ITokenizationPrecompile.sol` - Add Solidity interface
+-   `contracts/libraries/TokenizationJSONHelpers.sol` - Add JSON builder helper (if needed)
+-   `contracts/libraries/TokenizationWrappers.sol` - Add wrapper function (if needed)
+
+**Steps**:
+
+1. **Add to `abi.json`**:
+   ```json
+   {
+     "name": "newMethodName",
+     "type": "function",
+     "inputs": [{"name": "jsonInput", "type": "string"}],
+     "outputs": [{"name": "success", "type": "bool"}]
+   }
+   ```
+
+2. **Add method constant to `precompile.go`**:
+   ```go
+   const (
+       // ... existing methods ...
+       MethodNewMethodName = "newMethodName"
+   )
+   ```
+
+3. **Add gas cost constant**:
+   ```go
+   const (
+       GasNewMethodName = 50000 // Adjust based on complexity
+   )
+   ```
+
+4. **Add case to `RequiredGas` switch**
+
+5. **Add case to `Execute` switch**
+
+6. **Implement method handler** with proper validation
+
+7. **Update Solidity interface** in `contracts/interfaces/ITokenizationPrecompile.sol`
+
+8. **Add tests** in `x/tokenization/precompile/test/`
+
+**Gotchas**:
+
+-   Use JSON input format matching protobuf structure
+-   Implement proper gas estimation
+-   Add DoS protection limits for arrays/strings
+-   Update both unit and integration tests
+
+**Reference**: See `x/tokenization/precompile/README.md` and `app/PRECOMPILE_MANAGEMENT.md` for detailed guidance
+
+### 14. Update SDK Precompile Support (if EVM-callable)
+
+**Location**: `../bitbadgesjs/packages/bitbadgesjs-sdk/src/transactions/precompile/`
+
+**Purpose**: Enable TypeScript/JavaScript applications to call the new precompile method
+
+**Files to modify**:
+
+-   `abi.json` - Copy updated ABI from chain (must match `x/tokenization/precompile/abi.json`)
+-   `function-mapper.ts` - Add mapping from SDK message type to precompile function
+-   `type-detector.ts` - Add type detection for new message (if needed)
+-   `data-converter.ts` - Add data conversion logic (if needed)
+
+**Steps**:
+
+1. **Copy ABI from chain**:
+   ```bash
+   cp ../bitbadgeschain/x/tokenization/precompile/abi.json \
+      ../bitbadgesjs/packages/bitbadgesjs-sdk/src/transactions/precompile/abi.json
+   ```
+
+2. **Update `function-mapper.ts`** to map new message type:
+   ```typescript
+   case 'MsgNewAction':
+     return PrecompileFunction.NEW_ACTION;
+   ```
+
+3. **Update `type-detector.ts`** if adding new message type detection
+
+4. **Rebuild SDK**:
+   ```bash
+   cd ../bitbadgesjs/packages/bitbadgesjs-sdk
+   bun run build
+   ```
+
+**Gotchas**:
+
+-   ABI must be identical between chain and SDK
+-   Function names in SDK must match ABI method names exactly
+-   Rebuild SDK after changes for symlink to pick up updates
+
 ## Testing Checklist
 
 -   [ ] Unit tests for message handlers
@@ -220,6 +323,8 @@ go test ./x/tokenization/simulation/...
 -   [ ] Edge case handling
 -   [ ] Genesis state tests
 -   [ ] **Simulation tests** (if adding new message or modifying existing message fields)
+-   [ ] **Precompile tests** (if message is EVM-callable)
+-   [ ] **SDK precompile tests** (if message is EVM-callable and SDK support added)
 
 ## Common Issues and Solutions
 
@@ -340,5 +445,7 @@ If you modify an existing message type (add, remove, or change fields), you MUST
 2. ✅ **Simulation files** (`x/tokenization/simulation/*.go`) - Update simulation functions
 3. ✅ **Tests** - Update existing tests and add new ones for new fields
 4. ✅ **Documentation** - Update relevant docs in `_docs/` folder
+5. ✅ **Precompile** (if EVM-callable) - Update `abi.json`, handlers, and Solidity interfaces in `x/tokenization/precompile/` and `contracts/`
+6. ✅ **SDK Precompile** (if EVM-callable) - Copy updated `abi.json` and update function mappers in `bitbadgesjs-sdk/src/transactions/precompile/`
 
 These are often forgotten but critical for maintaining a complete and tested codebase.

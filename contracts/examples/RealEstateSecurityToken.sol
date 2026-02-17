@@ -101,7 +101,7 @@ contract RealEstateSecurityToken {
         _tokenIds = new UintRange[](1);
         _tokenIds[0] = UintRange(1, 1);
         _ownershipTimes = new UintRange[](1);
-        _ownershipTimes[0] = UintRange(1, type(uint256).max);
+        _ownershipTimes[0] = UintRange(1, type(uint64).max);
 
         // Create Dynamic Stores for compliance registries
         // KYC Registry: default false (not KYC'd), set to true when verified
@@ -140,7 +140,7 @@ contract RealEstateSecurityToken {
         // Build initial balance JSON (for minting totalSupply to creator)
         string memory balanceJson = string(abi.encodePacked(
             '[{"amount":"', TokenizationJSONHelpers.uintToString(totalSupply),
-            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max),
+            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max),
             ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
         ));
         
@@ -353,7 +353,7 @@ contract RealEstateSecurityToken {
         recipients[0] = to;
 
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
@@ -399,7 +399,7 @@ contract RealEstateSecurityToken {
      */
     function balanceOf(address account) external view returns (uint256) {
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             collectionId,
@@ -416,7 +416,7 @@ contract RealEstateSecurityToken {
      */
     function totalSupply() external view returns (uint256) {
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             collectionId,

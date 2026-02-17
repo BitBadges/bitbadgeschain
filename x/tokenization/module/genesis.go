@@ -1,6 +1,8 @@
 package tokenization
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
@@ -116,7 +118,13 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Collections = k.GetCollectionsFromStore(ctx)
 	var addresses []string
 	var balanceIds []sdkmath.Uint
-	genesis.Balances, addresses, balanceIds = k.GetUserBalancesFromStore(ctx)
+	var err error
+	genesis.Balances, addresses, balanceIds, err = k.GetUserBalancesFromStore(ctx)
+	if err != nil {
+		// Panic on genesis export errors to prevent corrupted state export
+		// This ensures balances, ids, and addresses arrays remain synchronized
+		panic(fmt.Errorf("failed to export user balances: %w", err))
+	}
 
 	for i, address := range addresses {
 		genesis.BalanceStoreKeys = append(genesis.BalanceStoreKeys, keeper.ConstructBalanceKey(address, balanceIds[i]))

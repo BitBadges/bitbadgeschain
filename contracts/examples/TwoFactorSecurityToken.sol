@@ -116,7 +116,7 @@ contract TwoFactorSecurityToken {
 
         // Perpetual ownership for security tokens
         _perpetualOwnership = new UintRange[](1);
-        _perpetualOwnership[0] = UintRange(1, type(uint256).max);
+        _perpetualOwnership[0] = UintRange(1, type(uint64).max);
 
         // Create KYC registry
         string memory kycJson = TokenizationJSONHelpers.createDynamicStoreJSON(
@@ -138,7 +138,7 @@ contract TwoFactorSecurityToken {
         // Build initial balance JSON (for minting totalSupply to creator)
         string memory balanceJson = string(abi.encodePacked(
             '[{"amount":"', TokenizationJSONHelpers.uintToString(totalSupply),
-            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max),
+            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max),
             ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
         ));
         
@@ -181,7 +181,7 @@ contract TwoFactorSecurityToken {
 
         // ===== Create 2FA Token Collection =====
         // 2FA tokens use incrementing token IDs (nonce-based)
-        string memory twoFactorTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory twoFactorTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         // 2FA tokens should not be transferable
         string memory twoFactorDefaultsJson = TokenizationJSONHelpers.simpleUserBalanceStoreToJson(
@@ -351,7 +351,7 @@ contract TwoFactorSecurityToken {
         recipients[0] = to;
 
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             securityTokenCollectionId,
@@ -387,7 +387,7 @@ contract TwoFactorSecurityToken {
         recipients[0] = to;
 
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             securityTokenCollectionId,
@@ -459,7 +459,7 @@ contract TwoFactorSecurityToken {
 
     function balanceOf(address account) external view returns (uint256) {
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory balanceJson = TokenizationJSONHelpers.getBalanceAmountJSON(
             securityTokenCollectionId,
@@ -472,7 +472,7 @@ contract TwoFactorSecurityToken {
 
     function totalSupply() external view returns (uint256) {
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
-        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint256).max);
+        string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max);
         
         string memory supplyJson = TokenizationJSONHelpers.getTotalSupplyJSON(
             securityTokenCollectionId,

@@ -432,7 +432,7 @@ contract HelperLibrariesTestContract {
         
         // Test createFullOwnershipTimeRange
         TokenizationTypes.UintRange memory fullRange = TokenizationHelpers.createFullOwnershipTimeRange();
-        require(fullRange.start == 1 && fullRange.end == type(uint256).max, "createFullOwnershipTimeRange failed");
+        require(fullRange.start == 1 && fullRange.end == type(uint64).max, "createFullOwnershipTimeRange failed");
         
         // Test createSingleTokenIdRange
         TokenizationTypes.UintRange memory singleRange = TokenizationHelpers.createSingleTokenIdRange(5);
@@ -641,6 +641,7 @@ contract HelperLibrariesTestContract {
         return true;
     }
 }
+
 
 
 

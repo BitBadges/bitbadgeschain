@@ -215,8 +215,14 @@ func (pubKey PubKey) VerifySignature(msg, sig []byte) bool {
 // Verifies the signature as an EIP-712 signature by first converting the message payload
 // to EIP-712 object bytes, then performing ECDSA verification on the hash. This is to support
 // signing a Cosmos payload using EIP-712.
+//
+// DEPRECATED: This legacy handler is deprecated. Use cosmos/evm key types instead.
+// Returns false instead of panicking to prevent node crashes.
 func (pubKey PubKey) verifySignatureAsEIP712(msg, sig []byte) bool {
-	panic("Not implemented")
+	// Legacy handler: EIP-712 verification not implemented
+	// Return false instead of panicking to prevent node crashes
+	// Users should migrate to cosmos/evm key types for EIP-712 support
+	return false
 }
 
 // Perform standard ECDSA signature verification for the given raw bytes and signature.
