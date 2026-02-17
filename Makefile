@@ -18,17 +18,29 @@ LDFLAGS_TESTNET := $(LDFLAGS) \
 	-X github.com/bitbadges/bitbadgeschain/app/params.BuildTimeEVMChainID=50025
 
 # Generic build (no chain ID set - defaults to 90123 for local development)
-build-linux/amd64:
+# Alias to mainnet builds for production use
+build-linux/amd64: build-mainnet-linux/amd64
+
+build-linux/arm64: build-mainnet-linux/arm64
+
+# Local development builds (with EVM Chain ID 90123 for local dev)
+build-local-linux/amd64:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for linux/amd64..."
 	@mkdir -p ./build
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-amd64"
 
-build-linux/arm64:
+build-local-linux/arm64:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for linux/arm64..."
 	@mkdir -p ./build
 	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
+
+build-local-darwin:
+	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
 
 build-darwin:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
@@ -90,6 +102,10 @@ build-all-mainnet:
 build-all-testnet:
 	make build-testnet-linux/amd64
 	make build-testnet-linux/arm64
+
+build-all-local:
+	make build-local-linux/amd64
+	make build-local-linux/arm64
 
 do-checksum-testnet:
 	cd build && sha256sum bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 > bitbadgeschain-testnet_checksum
