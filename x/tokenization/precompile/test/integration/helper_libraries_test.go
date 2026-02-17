@@ -92,15 +92,16 @@ func (suite *HelperLibrariesTestSuite) SetupTest() {
 	// Set chain ID (using testnet chain ID for testing)
 	suite.ChainID = big.NewInt(90123)
 
-	// Load compiled contract
-	contractBytecode, err := helpers.GetContractBytecode()
+	// Load compiled HelperLibrariesTestContract
+	// This contract has all the wrapper/builder/helper methods needed for testing
+	contractBytecode, err := helpers.GetContractBytecodeByType(helpers.ContractTypeHelperLibraries)
 	if err != nil {
 		suite.T().Skipf("Skipping test - could not load contract bytecode: %v. Run 'make compile-contracts' first.", err)
 		return
 	}
 	suite.ContractBytecode = contractBytecode
 
-	contractABI, err := helpers.GetContractABI()
+	contractABI, err := helpers.GetContractABIByType(helpers.ContractTypeHelperLibraries)
 	if err != nil {
 		suite.T().Skipf("Skipping test - could not load contract ABI: %v. Run 'make compile-contracts' first.", err)
 		return
