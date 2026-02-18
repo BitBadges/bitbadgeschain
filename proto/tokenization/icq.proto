@@ -38,14 +38,11 @@ message OwnershipQueryResponsePacket {
   // Total amount owned for the specified token IDs and ownership times
   string total_amount = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
-  // IAVL Merkle proof of the balance (for trustless verification)
-  bytes balance_proof = 4;
-
-  // Block height at which the proof was generated
-  uint64 proof_height = 5;
+  // Block height at which the response was generated
+  uint64 proof_height = 4;
 
   // Error message if the query failed (empty on success)
-  string error = 6;
+  string error = 5;
 }
 
 // BulkOwnershipQueryPacket allows querying multiple addresses/collections in a single IBC packet.

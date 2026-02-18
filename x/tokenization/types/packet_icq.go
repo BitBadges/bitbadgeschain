@@ -85,17 +85,15 @@ func NewOwnershipQueryResponsePacket(
 	queryId string,
 	ownsTokens bool,
 	totalAmount sdkmath.Uint,
-	balanceProof []byte,
 	proofHeight uint64,
 	errorMsg string,
 ) *OwnershipQueryResponsePacket {
 	return &OwnershipQueryResponsePacket{
-		QueryId:      queryId,
-		OwnsTokens:   ownsTokens,
-		TotalAmount:  Uint(totalAmount),
-		BalanceProof: balanceProof,
-		ProofHeight:  proofHeight,
-		Error:        errorMsg,
+		QueryId:     queryId,
+		OwnsTokens:  ownsTokens,
+		TotalAmount: Uint(totalAmount),
+		ProofHeight: proofHeight,
+		Error:       errorMsg,
 	}
 }
 

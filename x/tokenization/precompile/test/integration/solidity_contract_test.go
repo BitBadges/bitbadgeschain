@@ -596,38 +596,6 @@ func (suite *SolidityContractTestSuite) TestSolidity_AllMethods_ThroughContract(
 	suite.T().Log("Testing all methods through contract - implementation pending contract ABI")
 }
 
-// TestSolidity_ReentrancyProtection tests reentrancy protection
-func (suite *SolidityContractTestSuite) TestSolidity_ReentrancyProtection() {
-	// Deploy contract first if not already deployed
-	if suite.TestContractAddr == (common.Address{}) {
-		if len(suite.ContractBytecode) == 0 {
-			suite.ContractBytecode = []byte{
-				0x60, 0x80, 0x60, 0x40, 0x52, 0x34, 0x80, 0x15, 0x60, 0x0f, 0x57, 0x60, 0x00, 0xfd, 0x5b,
-				0x50, 0x60, 0x3f, 0x80, 0x60, 0x1d, 0x60, 0x00, 0x39, 0x60, 0x00, 0xf3, 0xfe,
-			}
-		}
-		contractAddr, response, deployErr := helpers.DeployContract(
-			suite.Ctx,
-			suite.EVMKeeper,
-			suite.DeployerKey,
-			suite.ContractBytecode,
-			suite.ChainID,
-		)
-		if deployErr != nil {
-			if response != nil && response.GasUsed > 0 {
-				suite.T().Skip("Skipping test - contract deployment reverted.")
-				return
-			}
-			suite.Require().NoError(deployErr)
-		}
-		suite.TestContractAddr = contractAddr
-	}
-
-	// TODO: Create malicious contract that attempts reentrancy
-	// TODO: Verify protection works
-	suite.T().Log("Reentrancy protection test - implementation pending")
-}
-
 // TestSolidity_ErrorHandling tests error handling
 func (suite *SolidityContractTestSuite) TestSolidity_ErrorHandling() {
 	// Deploy contract first if not already deployed

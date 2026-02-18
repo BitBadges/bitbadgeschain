@@ -348,8 +348,6 @@ func (k Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress
 	return k.SendNativeTokensViaAliasDenom(ctx, fromAddress, toAddress, denom, amount)
 }
 
-// TODO: For both of these, I'd love to DRY more with sendManager. I just need to handle the pre/post approvals (and also the prioritized correctly which isn't supported natively)
-
 // SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping tokenization denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
 // bankKeeper is required for sending non-tokenization coins

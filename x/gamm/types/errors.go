@@ -108,4 +108,5 @@ var (
 	ErrHitMinScaledAssets         = errorsmod.Register(ModuleName, 66, "post-scaled pool assets can not be less than 1")
 	ErrNoGaugeToRedirect          = errorsmod.Register(ModuleName, 67, "could not find gauge to redirect")
 	ErrMustHaveTwoDenoms          = errorsmod.Register(ModuleName, 68, "can only have 2 denoms in CL pool")
+	ErrWeightOverflow             = errorsmod.Register(ModuleName, 69, "weight calculation overflow - asset weights too large")
 )

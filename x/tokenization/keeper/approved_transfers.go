@@ -513,7 +513,7 @@ func (k Keeper) GetMaxPossible(
 	// Get approval tracker details
 	// Check if ApprovalAmounts is nil before accessing
 	if approval.ApprovalCriteria.ApprovalAmounts == nil {
-		panic("ApprovalAmounts is nil")
+		return "", nil, types.ErrApprovalAmountsIsNil
 	}
 	amountsTrackerId := approval.ApprovalCriteria.ApprovalAmounts.AmountTrackerId
 
@@ -943,7 +943,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 
 		// Check if MaxNumTransfers is nil before accessing
 		if approvalCriteria.MaxNumTransfers == nil {
-			panic("MaxNumTransfers is nil")
+			return nil, types.ErrMaxNumTransfersIsNil
 		}
 		maxNumTransfersTrackerId := approvalCriteria.MaxNumTransfers.AmountTrackerId
 

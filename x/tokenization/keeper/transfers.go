@@ -128,7 +128,6 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 					return err
 				}
 
-				// TODO: Deprecate this in favor of actually calculating the balances in indexer
 				amountsJsonData, err := json.Marshal(transfer)
 				if err != nil {
 					return err

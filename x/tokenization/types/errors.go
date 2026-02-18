@@ -77,4 +77,6 @@ var (
 	ErrAmountNilInArbitraryValue                   = sdkerrors.Register(ModuleName, 1609, "amount is nil in ArbitraryValue")
 	ErrInvalidCheckType                            = sdkerrors.Register(ModuleName, 1610, "invalid checkType")
 	ErrUnrecognizedPacketType                      = sdkerrors.Register(ModuleName, 1611, "unrecognized packet type")
+	ErrApprovalAmountsIsNil                        = sdkerrors.Register(ModuleName, 1612, "approval amounts is nil - internal state error")
+	ErrMaxNumTransfersIsNil                        = sdkerrors.Register(ModuleName, 1613, "max num transfers is nil - internal state error")
 )

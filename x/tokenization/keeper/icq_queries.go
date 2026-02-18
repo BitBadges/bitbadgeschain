@@ -46,7 +46,6 @@ func (k Keeper) ProcessOwnershipQuery(
 			query.QueryId,
 			false,
 			sdkmath.ZeroUint(),
-			nil,
 			uint64(ctx.BlockHeight()),
 			"",
 		)
@@ -74,7 +73,6 @@ func (k Keeper) ProcessOwnershipQuery(
 		query.QueryId,
 		ownsTokens,
 		totalAmount,
-		nil, // balance_proof - not implemented yet
 		uint64(ctx.BlockHeight()),
 		"",
 	)

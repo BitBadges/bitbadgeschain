@@ -318,7 +318,6 @@ func (suite *ICQTestSuite) TestOwnershipQueryResponsePacket_GetBytes() {
 		"query-1",
 		true,
 		sdkmath.NewUint(100),
-		nil,
 		12345,
 		"",
 	)
@@ -353,7 +352,7 @@ func (suite *ICQTestSuite) TestGetICQPacketType() {
 	suite.Require().Equal(types.ICQPacketTypeOwnershipQuery, types.GetICQPacketType(packetData))
 
 	// Test OwnershipQueryResponse
-	response := types.NewOwnershipQueryResponsePacket("q1", true, sdkmath.NewUint(1), nil, 0, "")
+	response := types.NewOwnershipQueryResponsePacket("q1", true, sdkmath.NewUint(1), 0, "")
 	packetData = &types.TokenizationPacketData{
 		Packet: &types.TokenizationPacketData_OwnershipQueryResponse{
 			OwnershipQueryResponse: response,
