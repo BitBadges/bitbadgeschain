@@ -34,20 +34,3 @@ func MarshalMessageForEvent(msg interface{}) (string, error) {
 
 	return string(msgBytes), nil
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

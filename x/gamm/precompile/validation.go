@@ -106,7 +106,7 @@ func ValidateRoutes(routes []struct {
 	}
 	for i, route := range routes {
 		if err := ValidatePoolId(route.PoolId); err != nil {
-			return ErrInvalidInput(fmt.Sprintf("%s[%d].poolId: %v", fieldName, i, err))
+			return ErrInvalidInput(fmt.Sprintf("%s[%d].poolId: %s", fieldName, i, err))
 		}
 		if route.TokenOutDenom == "" {
 			return ErrInvalidInput(fmt.Sprintf("%s[%d].tokenOutDenom cannot be empty", fieldName, i))

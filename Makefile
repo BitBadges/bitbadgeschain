@@ -27,63 +27,63 @@ build-linux/arm64: build-mainnet-linux/arm64
 build-local-linux/amd64:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for linux/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-amd64"
 
 build-local-linux/arm64:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for linux/arm64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
 
 build-local-darwin:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
 
 build-darwin:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
 
 # Mainnet builds (with EVM Chain ID 50024 compiled in)
 build-mainnet-linux/amd64:
 	@echo "Building mainnet binary (EVM Chain ID: 50024) for linux/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-amd64"
 
 build-mainnet-linux/arm64:
 	@echo "Building mainnet binary (EVM Chain ID: 50024) for linux/arm64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
 
 build-mainnet-darwin:
 	@echo "Building mainnet binary (EVM Chain ID: 50024) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
 
 # Testnet builds (with EVM Chain ID 50025 compiled in)
 build-testnet-linux/amd64:
 	@echo "Building testnet binary (EVM Chain ID: 50025) for linux/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-testnet-linux-amd64"
 
 build-testnet-linux/arm64:
 	@echo "Building testnet binary (EVM Chain ID: 50025) for linux/arm64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-arm64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-testnet-linux-arm64"
 
 build-testnet-darwin:
 	@echo "Building testnet binary (EVM Chain ID: 50025) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-testnet-darwin-amd64"
 
 # build-all builds all 4 production binaries:

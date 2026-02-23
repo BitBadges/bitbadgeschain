@@ -1191,7 +1191,7 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		}
 		collectionId, err := sdkmath.ParseUint(req.CollectionId)
 		if err != nil {
-			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %v", err))
+			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %s", err))
 		}
 		if collectionId.IsZero() {
 			return ErrInvalidInput("collection ID cannot be zero")
@@ -1203,7 +1203,7 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		}
 		collectionId, err := sdkmath.ParseUint(req.CollectionId)
 		if err != nil {
-			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %v", err))
+			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %s", err))
 		}
 		if collectionId.IsZero() {
 			return ErrInvalidInput("collection ID cannot be zero")
@@ -1242,7 +1242,7 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		}
 		storeId, err := sdkmath.ParseUint(req.StoreId)
 		if err != nil {
-			return ErrInvalidInput(fmt.Sprintf("invalid store ID: %v", err))
+			return ErrInvalidInput(fmt.Sprintf("invalid store ID: %s", err))
 		}
 		if storeId.IsZero() {
 			return ErrInvalidInput("store ID cannot be zero")
@@ -1254,7 +1254,7 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		}
 		storeId, err := sdkmath.ParseUint(req.StoreId)
 		if err != nil {
-			return ErrInvalidInput(fmt.Sprintf("invalid store ID: %v", err))
+			return ErrInvalidInput(fmt.Sprintf("invalid store ID: %s", err))
 		}
 		if storeId.IsZero() {
 			return ErrInvalidInput("store ID cannot be zero")
@@ -1291,7 +1291,7 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		}
 		collectionId, err := sdkmath.ParseUint(req.CollectionId)
 		if err != nil {
-			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %v", err))
+			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %s", err))
 		}
 		if collectionId.IsZero() {
 			return ErrInvalidInput("collection ID cannot be zero")
@@ -1421,7 +1421,7 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		if req.LeafIndex != "" {
 			leafIndex, err := sdkmath.ParseUint(req.LeafIndex)
 			if err != nil {
-				return ErrInvalidInput(fmt.Sprintf("invalid leaf index: %v", err))
+				return ErrInvalidInput(fmt.Sprintf("invalid leaf index: %s", err))
 			}
 			// Leaf index can be 0, so we just validate it's a valid uint
 			_ = leafIndex
@@ -1447,25 +1447,25 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 		OwnershipTime string `json:"ownershipTime"`
 	}
 	if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %s", err))
 	}
 
 	// Convert collectionId
 	collectionId, err := sdkmath.ParseUint(req.CollectionId)
 	if err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %s", err))
 	}
 
 	// Parse tokenId
 	tokenId, err := sdkmath.ParseUint(req.TokenId)
 	if err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId: %s", err))
 	}
 
 	// Parse ownershipTime
 	ownershipTime, err := sdkmath.ParseUint(req.OwnershipTime)
 	if err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime: %s", err))
 	}
 
 	// Get collection
@@ -1542,25 +1542,25 @@ func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, js
 		OwnershipTime string `json:"ownershipTime"`
 	}
 	if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %s", err))
 	}
 
 	// Convert collectionId
 	collectionId, err := sdkmath.ParseUint(req.CollectionId)
 	if err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid collectionId: %s", err))
 	}
 
 	// Parse tokenId
 	tokenId, err := sdkmath.ParseUint(req.TokenId)
 	if err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid tokenId: %s", err))
 	}
 
 	// Parse ownershipTime
 	ownershipTime, err := sdkmath.ParseUint(req.OwnershipTime)
 	if err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid ownershipTime: %s", err))
 	}
 
 	// Get collection (validate it exists)
@@ -1596,7 +1596,7 @@ func (p Precompile) HandleGetAllReservedProtocolAddresses(ctx sdk.Context, metho
 	var req struct{}
 	if jsonStr != "" && jsonStr != "{}" {
 		if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %v", err))
+			return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %s", err))
 		}
 	}
 
@@ -1631,7 +1631,7 @@ func (p Precompile) HandleIsAddressReservedProtocol(ctx sdk.Context, method *abi
 	// Parse JSON request
 	var req tokenizationtypes.QueryIsAddressReservedProtocolRequest
 	if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %s", err))
 	}
 
 	// Validate address - cannot be empty or zero

@@ -417,18 +417,18 @@ func PackCollectionAsStruct(method *abi.Method, collection *tokenizationtypes.To
 		// Legacy: marshal to bytes
 		bz, err := tokenizationtypes.ModuleCdc.Marshal(collection)
 		if err != nil {
-			return nil, ErrInternalError(fmt.Sprintf("marshal collection failed: %v", err))
+			return nil, ErrInternalError(fmt.Sprintf("marshal collection failed: %s", err))
 		}
 		return bz, nil
 	}
 	// New: pack as struct tuple
 	structData, err := ConvertCollectionToSolidityStruct(collection)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("convert collection failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("convert collection failed: %s", err))
 	}
 	packed, err := method.Outputs.Pack(structData...)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("pack collection failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("pack collection failed: %s", err))
 	}
 	return packed, nil
 }
@@ -437,11 +437,11 @@ func PackCollectionAsStruct(method *abi.Method, collection *tokenizationtypes.To
 func PackBalanceAsStruct(method *abi.Method, balance *tokenizationtypes.Balance) ([]byte, error) {
 	structData, err := ConvertBalanceToSolidityStruct(balance)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("convert balance failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("convert balance failed: %s", err))
 	}
 	packed, err := method.Outputs.Pack(structData...)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("pack balance failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("pack balance failed: %s", err))
 	}
 	return packed, nil
 }
@@ -454,18 +454,18 @@ func PackUserBalanceStoreAsStruct(method *abi.Method, store *tokenizationtypes.U
 		// Legacy: marshal to bytes
 		bz, err := tokenizationtypes.ModuleCdc.Marshal(store)
 		if err != nil {
-			return nil, ErrInternalError(fmt.Sprintf("marshal user balance store failed: %v", err))
+			return nil, ErrInternalError(fmt.Sprintf("marshal user balance store failed: %s", err))
 		}
 		return bz, nil
 	}
 	// New: pack as struct tuple
 	structData, err := ConvertUserBalanceStoreToSolidityStruct(store)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("convert user balance store failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("convert user balance store failed: %s", err))
 	}
 	packed, err := method.Outputs.Pack(structData...)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("pack user balance store failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("pack user balance store failed: %s", err))
 	}
 	return packed, nil
 }
@@ -509,18 +509,18 @@ func PackAddressListAsStruct(method *abi.Method, list *tokenizationtypes.Address
 		// Legacy: marshal to bytes
 		bz, err := tokenizationtypes.ModuleCdc.Marshal(list)
 		if err != nil {
-			return nil, ErrInternalError(fmt.Sprintf("marshal address list failed: %v", err))
+			return nil, ErrInternalError(fmt.Sprintf("marshal address list failed: %s", err))
 		}
 		return bz, nil
 	}
 	// New: pack as struct tuple
 	structData, err := ConvertAddressListToSolidityStruct(list)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("convert address list failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("convert address list failed: %s", err))
 	}
 	packed, err := method.Outputs.Pack(structData...)
 	if err != nil {
-		return nil, ErrInternalError(fmt.Sprintf("pack address list failed: %v", err))
+		return nil, ErrInternalError(fmt.Sprintf("pack address list failed: %s", err))
 	}
 	return packed, nil
 }

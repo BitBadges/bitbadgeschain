@@ -152,11 +152,11 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		var jsonMap map[string]interface{}
 		if jsonErr := json.Unmarshal([]byte(jsonStr), &jsonMap); jsonErr != nil {
 			// JSON syntax is invalid
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %v", jsonErr))
+			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
 		}
 		// JSON syntax is valid but protobuf unmarshaling failed
 		// Provide more detailed error information
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %v. JSON was: %s", msg, err, jsonStr))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s. JSON was: %s", msg, err, jsonStr))
 	}
 
 	// Set Creator field from contract caller (security: override any value in JSON)
@@ -283,13 +283,13 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 				if r := recover(); r != nil {
 					// Convert panic to error - this handles cases where ValidateBasic panics on nil fields
 					// This is a safety measure for production readiness
-					validationErr = fmt.Errorf("validation panic: %v", r)
+					validationErr = fmt.Errorf("validation panic: %s", r)
 				}
 			}()
 			validationErr = validator.ValidateBasic()
 		}()
 		if validationErr != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("message validation failed: %v", validationErr))
+			return nil, ErrInvalidInput(fmt.Sprintf("message validation failed: %s", validationErr))
 		}
 	}
 
@@ -397,7 +397,7 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 
 	// Unmarshal JSON into the query request
 	if err := json.Unmarshal([]byte(jsonStr), queryReq); err != nil {
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal query JSON: %v", err))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal query JSON: %s", err))
 	}
 
 	// Validate query request using ValidateBasic if available
@@ -408,13 +408,13 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 			defer func() {
 				if r := recover(); r != nil {
 					// Convert panic to error - this handles cases where ValidateBasic panics on nil fields
-					validationErr = fmt.Errorf("validation panic: %v", r)
+					validationErr = fmt.Errorf("validation panic: %s", r)
 				}
 			}()
 			validationErr = validator.ValidateBasic()
 		}()
 		if validationErr != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("query validation failed: %v", validationErr))
+			return nil, ErrInvalidInput(fmt.Sprintf("query validation failed: %s", validationErr))
 		}
 	}
 

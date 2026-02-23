@@ -46,10 +46,10 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		var jsonMap map[string]interface{}
 		if jsonErr := json.Unmarshal([]byte(jsonStr), &jsonMap); jsonErr != nil {
 			// JSON syntax is invalid
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %v", jsonErr))
+			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
 		}
 		// JSON syntax is valid but protobuf unmarshaling failed
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %v. JSON was: %s", msg, err, jsonStr))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s. JSON was: %s", msg, err, jsonStr))
 	}
 
 	// Set from_address field from contract caller (security: override any value in JSON)
@@ -67,13 +67,13 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 				if r := recover(); r != nil {
 					// Convert panic to error - this handles cases where ValidateBasic panics on nil fields
 					// This is a safety measure for production readiness
-					validationErr = fmt.Errorf("validation panic: %v", r)
+					validationErr = fmt.Errorf("validation panic: %s", r)
 				}
 			}()
 			validationErr = validator.ValidateBasic()
 		}()
 		if validationErr != nil {
-			return nil, ErrInvalidInput(fmt.Sprintf("message validation failed: %v", validationErr))
+			return nil, ErrInvalidInput(fmt.Sprintf("message validation failed: %s", validationErr))
 		}
 	}
 

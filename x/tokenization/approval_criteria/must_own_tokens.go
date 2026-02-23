@@ -68,7 +68,7 @@ func (c *MustOwnTokensChecker) checkSingleRequirement(
 	// Get balances for the party
 	partyBalances, _, err := c.collectionService.GetBalanceOrApplyDefault(ctx, collection, partyToCheck)
 	if err != nil {
-		errMsg := fmt.Sprintf("token ownership requirement idx %d failed: %v", requirementIdx, err)
+		errMsg := fmt.Sprintf("token ownership requirement idx %d failed: %s", requirementIdx, err)
 		return false, errMsg
 	}
 	balances := partyBalances.Balances
