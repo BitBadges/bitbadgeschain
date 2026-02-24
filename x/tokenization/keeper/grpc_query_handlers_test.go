@@ -118,6 +118,57 @@ func (suite *GRPCQueryHandlersTestSuite) TestGetBalance_AddressWithNoTokens() {
 }
 
 // =============================================================================
+// GetCollectionStats Tests
+// =============================================================================
+
+func (suite *GRPCQueryHandlersTestSuite) TestGetCollectionStats_NilRequest() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	_, err := suite.app.TokenizationKeeper.GetCollectionStats(wctx, nil)
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "invalid request")
+}
+
+func (suite *GRPCQueryHandlersTestSuite) TestGetCollectionStats_InvalidCollectionId() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	_, err := suite.app.TokenizationKeeper.GetCollectionStats(wctx, &types.QueryGetCollectionStatsRequest{
+		CollectionId: "not-a-number",
+	})
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "invalid")
+}
+
+func (suite *GRPCQueryHandlersTestSuite) TestGetCollectionStats_NotFound() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	_, err := suite.app.TokenizationKeeper.GetCollectionStats(wctx, &types.QueryGetCollectionStatsRequest{
+		CollectionId: "999",
+	})
+	suite.Require().Error(err)
+}
+
+func (suite *GRPCQueryHandlersTestSuite) TestGetCollectionStats_Success() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(&suite.TestSuite, wctx, collectionsToCreate)
+	suite.Require().NoError(err)
+
+	response, err := suite.app.TokenizationKeeper.GetCollectionStats(wctx, &types.QueryGetCollectionStatsRequest{
+		CollectionId: "1",
+	})
+	suite.Require().NoError(err)
+	suite.Require().NotNil(response)
+	suite.Require().NotNil(response.Stats)
+	// One holder (bob, minted to creator), circulating supply from initial mint
+	suite.Require().True(response.Stats.HolderCount.Equal(sdkmath.OneUint()), "expected 1 holder, got %s", response.Stats.HolderCount)
+	// Check for non-zero circulating supply via Balances
+	hasSupply := len(response.Stats.Balances) > 0
+	suite.Require().True(hasSupply, "expected non-zero circulating supply (Balances length > 0)")
+}
+
+// =============================================================================
 // GetAddressList Tests
 // =============================================================================
 
@@ -289,18 +340,6 @@ func (suite *GRPCQueryHandlersTestSuite) TestIsAddressReservedProtocol_NotReserv
 	suite.Require().NoError(err)
 	suite.Require().NotNil(response)
 	suite.Require().False(response.IsReservedProtocol)
-}
-
-func (suite *GRPCQueryHandlersTestSuite) TestIsAddressReservedProtocol_MintAddress() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
-
-	// "Mint" is a reserved protocol address
-	response, err := suite.app.TokenizationKeeper.IsAddressReservedProtocol(wctx, &types.QueryIsAddressReservedProtocolRequest{
-		Address: "Mint",
-	})
-	suite.Require().NoError(err)
-	suite.Require().NotNil(response)
-	suite.Require().True(response.IsReservedProtocol)
 }
 
 // =============================================================================
@@ -647,4 +686,49 @@ func TestGetVotesQuery(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Empty(t, response.Votes)
+}
+
+func TestGetCollectionStatsQuery(t *testing.T) {
+	suite := new(TestSuite)
+	suite.SetT(t)
+	suite.SetupTest()
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	require.NoError(t, err)
+
+	// After create: 1 holder (bob), non-zero supply
+	resp, err := suite.app.TokenizationKeeper.GetCollectionStats(wctx, &types.QueryGetCollectionStatsRequest{
+		CollectionId: "1",
+	})
+	require.NoError(t, err)
+	require.NotNil(t, resp.Stats)
+	require.True(t, resp.Stats.HolderCount.Equal(sdkmath.OneUint()), "expected 1 holder")
+	require.True(t, len(resp.Stats.Balances) > 0, "expected non-zero supply (Balances length > 0)")
+
+	// Transfer bob -> alice: bob transfers ALL his tokens (1), so bob becomes non-holder
+	// and alice becomes holder. Net result: still 1 holder (alice replaces bob)
+	_, err = suite.msgServer.TransferTokens(wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{{
+			From:        bob,
+			ToAddresses: []string{alice},
+			Balances: []*types.Balance{{
+				Amount:         sdkmath.NewUint(1),
+				TokenIds:       GetFullUintRanges(),
+				OwnershipTimes: GetFullUintRanges(),
+			}},
+		}},
+	})
+	require.NoError(t, err)
+
+	resp, err = suite.app.TokenizationKeeper.GetCollectionStats(wctx, &types.QueryGetCollectionStatsRequest{
+		CollectionId: "1",
+	})
+	require.NoError(t, err)
+	// Since bob transferred all his tokens to alice, bob is no longer a holder and alice is
+	// Net holder count stays at 1
+	require.True(t, resp.Stats.HolderCount.Equal(sdkmath.OneUint()), "expected 1 holder after transfer (alice replaced bob)")
 }

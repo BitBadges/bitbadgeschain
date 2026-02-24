@@ -12,7 +12,7 @@ import (
 	keepertest "github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/keeper"
 )
 
-func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {
+func setupMsgServer(t testing.TB) (*keeper.Keeper, types.MsgServer, context.Context) {
 	k, ctx := keepertest.TokenizationKeeper(t)
 	return k, keeper.NewMsgServerImpl(k), ctx
 }

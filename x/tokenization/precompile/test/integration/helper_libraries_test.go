@@ -43,7 +43,7 @@ type HelperLibrariesTestSuite struct {
 	EVMKeeper          *evmkeeper.Keeper
 	Precompile         *tokenization.Precompile
 	BankKeeper         bankkeeper.Keeper
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 
 	// Contract deployment
 	TestContractAddr common.Address

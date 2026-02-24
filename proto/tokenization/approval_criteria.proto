@@ -93,6 +93,9 @@ message ApprovalCriteria {
   // When false, this approval cannot be used for transfers involving wrapping addresses.
   // This prevents accidental allowances when toListIds is "All".
   bool allowSpecialWrapping = 24;
+  // EVM query challenges that must pass for approval. Read-only contract queries
+  // that verify external EVM state (e.g., token ownership in another contract).
+  repeated EVMQueryChallenge evmQueryChallenges = 25;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -151,6 +154,9 @@ message OutgoingApprovalCriteria {
   // Voting challenges that must be satisfied for approval. The initiator must provide
   // valid votes that meet the quorum threshold for all specified challenges.
   repeated VotingChallenge votingChallenges = 16;
+  // EVM query challenges that must pass for approval. Read-only contract queries
+  // that verify external EVM state (e.g., token ownership in another contract).
+  repeated EVMQueryChallenge evmQueryChallenges = 17;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -209,5 +215,8 @@ message IncomingApprovalCriteria {
   // Voting challenges that must be satisfied for approval. The initiator must provide
   // valid votes that meet the quorum threshold for all specified challenges.
   repeated VotingChallenge votingChallenges = 16;
+  // EVM query challenges that must pass for approval. Read-only contract queries
+  // that verify external EVM state (e.g., token ownership in another contract).
+  repeated EVMQueryChallenge evmQueryChallenges = 17;
 }
 

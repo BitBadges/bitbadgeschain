@@ -12,22 +12,34 @@ import (
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
-// IMPORTANT: Return Type Simplifications
-//
-// Due to the complexity of nested structures in the tokenization types,
-// some fields are returned as empty arrays in the Solidity struct representations.
-// This is an intentional simplification for the EVM interface.
-//
-// Affected Fields (returned as empty arrays):
-// - TokenCollection: approvalCriteria (in collectionApprovals), invariants.cosmosCoinBackedPath,
-//   userPermissions (in defaultBalances)
-// - UserBalanceStore: approvalCriteria (in outgoing/incomingApprovals)
-// - CollectionApproval: approvalCriteria
-//
-// For full access to these fields, clients should:
-// 1. Use the raw bytes returned from query methods
-// 2. Decode using the appropriate protobuf codec
-// 3. Or query the chain directly via gRPC/REST
+// convertEVMQueryChallengesToSolidity converts EvmQueryChallenges to the format expected by the Solidity CollectionInvariants struct.
+// Each challenge is output as a 7-tuple: contractAddress, calldata, expectedResult, comparisonOperator, gasLimit, uri, customData.
+// uri and customData are always included (empty string when not set) so invariants and approval criteria have full metadata.
+func convertEVMQueryChallengesToSolidity(challenges []*tokenizationtypes.EVMQueryChallenge) []interface{} {
+	if len(challenges) == 0 {
+		return make([]interface{}, 0)
+	}
+	out := make([]interface{}, 0, len(challenges))
+	for _, c := range challenges {
+		if c == nil {
+			continue
+		}
+		gasLimit := big.NewInt(0)
+		if !c.GasLimit.IsNil() {
+			gasLimit = c.GasLimit.BigInt()
+		}
+		out = append(out, []interface{}{
+			c.ContractAddress,
+			c.Calldata,
+			c.ExpectedResult,
+			c.ComparisonOperator,
+			gasLimit,
+			c.Uri,
+			c.CustomData,
+		})
+	}
+	return out
+}
 
 // ConvertCollectionToSolidityStruct converts a proto TokenCollection to Solidity struct format
 // Returns values that can be packed into ABI tuple
@@ -73,8 +85,7 @@ func ConvertCollectionToSolidityStruct(collection *tokenizationtypes.TokenCollec
 		}
 	}
 
-	// Convert collection approvals
-	// NOTE: approvalCriteria is simplified to empty array - see package docs for details
+	// Convert collection approvals (full approvalCriteria)
 	collectionApprovals := make([]interface{}, len(collection.CollectionApprovals))
 	for i, app := range collection.CollectionApprovals {
 		transferTimes := make([]interface{}, len(app.TransferTimes))
@@ -89,6 +100,10 @@ func ConvertCollectionToSolidityStruct(collection *tokenizationtypes.TokenCollec
 		for j, ot := range app.OwnershipTimes {
 			ownershipTimes[j] = []interface{}{ot.Start.BigInt(), ot.End.BigInt()}
 		}
+		version := big.NewInt(0)
+		if !app.Version.IsNil() {
+			version = app.Version.BigInt()
+		}
 		collectionApprovals[i] = []interface{}{
 			app.FromListId,
 			app.ToListId,
@@ -99,8 +114,8 @@ func ConvertCollectionToSolidityStruct(collection *tokenizationtypes.TokenCollec
 			app.Uri,
 			app.CustomData,
 			app.ApprovalId,
-			[]interface{}{}, // approvalCriteria - simplified
-			app.Version.BigInt(),
+			approvalCriteriaToSolidity(app.ApprovalCriteria),
+			version,
 		}
 	}
 
@@ -125,56 +140,28 @@ func ConvertCollectionToSolidityStruct(collection *tokenizationtypes.TokenCollec
 		}
 		defaultBalances = []interface{}{
 			balances,
-			[]interface{}{}, // outgoingApprovals - simplified
-			[]interface{}{}, // incomingApprovals - simplified
+			userOutgoingApprovalsToSolidity(collection.DefaultBalances.OutgoingApprovals),
+			userIncomingApprovalsToSolidity(collection.DefaultBalances.IncomingApprovals),
 			collection.DefaultBalances.AutoApproveSelfInitiatedOutgoingTransfers,
 			collection.DefaultBalances.AutoApproveSelfInitiatedIncomingTransfers,
 			collection.DefaultBalances.AutoApproveAllIncomingTransfers,
-			[]interface{}{}, // userPermissions - simplified
+			userPermissionsToSolidity(collection.DefaultBalances.UserPermissions),
 		}
 	} else {
+		emptySlice := make([]interface{}, 0)
 		defaultBalances = []interface{}{
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
+			emptySlice, // balances
+			emptySlice, // outgoingApprovals
+			emptySlice, // incomingApprovals
 			false,
 			false,
 			false,
-			[]interface{}{},
+			userPermissionsToSolidity(nil),
 		}
 	}
 
-	// Convert collection permissions (simplified)
-	var collectionPermissions []interface{}
-	if collection.CollectionPermissions != nil {
-		collectionPermissions = []interface{}{
-			[]interface{}{}, // canDeleteCollection - simplified
-			[]interface{}{}, // canArchiveCollection - simplified
-			[]interface{}{}, // canUpdateStandards - simplified
-			[]interface{}{}, // canUpdateCustomData - simplified
-			[]interface{}{}, // canUpdateManager - simplified
-			[]interface{}{}, // canUpdateCollectionMetadata - simplified
-			[]interface{}{}, // canUpdateValidTokenIds - simplified
-			[]interface{}{}, // canUpdateTokenMetadata - simplified
-			[]interface{}{}, // canUpdateCollectionApprovals - simplified
-			[]interface{}{}, // canAddMoreAliasPaths - simplified
-			[]interface{}{}, // canAddMoreCosmosCoinWrapperPaths - simplified
-		}
-	} else {
-		collectionPermissions = []interface{}{
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-			[]interface{}{},
-		}
-	}
+	// Convert collection permissions
+	collectionPermissions := collectionPermissionsToSolidity(collection.CollectionPermissions)
 
 	// Convert cosmos coin wrapper paths (simplified)
 	cosmosCoinWrapperPaths := make([]interface{}, len(collection.CosmosCoinWrapperPaths))
@@ -202,7 +189,7 @@ func ConvertCollectionToSolidityStruct(collection *tokenizationtypes.TokenCollec
 		}
 		cosmosCoinWrapperPaths[i] = []interface{}{
 			path.Denom,
-			[]interface{}{}, // conversion - simplified
+			conversionWithoutDenomToSolidity(path.Conversion),
 			path.Symbol,
 			denomUnits,
 			path.AllowOverrideWithAnyValidToken,
@@ -236,30 +223,38 @@ func ConvertCollectionToSolidityStruct(collection *tokenizationtypes.TokenCollec
 		}
 		aliasPaths[i] = []interface{}{
 			path.Denom,
-			[]interface{}{}, // conversion - simplified
+			conversionWithoutDenomToSolidity(path.Conversion),
 			path.Symbol,
 			denomUnits,
 			pathMetadata,
 		}
 	}
 
-	// Convert invariants (simplified)
+	// Convert invariants
 	var invariants []interface{}
 	if collection.Invariants != nil {
+		// Get maxSupplyPerId from CollectionInvariants
+		maxSupplyPerId := big.NewInt(0)
+		if !collection.Invariants.MaxSupplyPerId.IsNil() {
+			maxSupplyPerId = collection.Invariants.MaxSupplyPerId.BigInt()
+		}
+		evmQueryChallenges := convertEVMQueryChallengesToSolidity(collection.Invariants.EvmQueryChallenges)
 		invariants = []interface{}{
 			collection.Invariants.NoCustomOwnershipTimes,
-			collection.Invariants.MaxSupplyPerId.BigInt(),
-			[]interface{}{}, // cosmosCoinBackedPath - simplified
+			maxSupplyPerId,
+			cosmosCoinBackedPathToSolidity(collection.Invariants.CosmosCoinBackedPath),
 			collection.Invariants.NoForcefulPostMintTransfers,
 			collection.Invariants.DisablePoolCreation,
+			evmQueryChallenges,
 		}
 	} else {
 		invariants = []interface{}{
 			false,
 			big.NewInt(0),
-			[]interface{}{},
+			cosmosCoinBackedPathToSolidity(nil),
 			false,
 			false,
+			convertEVMQueryChallengesToSolidity(nil),
 		}
 	}
 
@@ -328,75 +323,14 @@ func ConvertUserBalanceStoreToSolidityStruct(store *tokenizationtypes.UserBalanc
 		balances[i] = converted
 	}
 
-	// Convert outgoing approvals (simplified)
-	outgoingApprovals := make([]interface{}, len(store.OutgoingApprovals))
-	for i, app := range store.OutgoingApprovals {
-		transferTimes := make([]interface{}, len(app.TransferTimes))
-		for j, tt := range app.TransferTimes {
-			transferTimes[j] = []interface{}{tt.Start.BigInt(), tt.End.BigInt()}
-		}
-		tokenIds := make([]interface{}, len(app.TokenIds))
-		for j, tid := range app.TokenIds {
-			tokenIds[j] = []interface{}{tid.Start.BigInt(), tid.End.BigInt()}
-		}
-		ownershipTimes := make([]interface{}, len(app.OwnershipTimes))
-		for j, ot := range app.OwnershipTimes {
-			ownershipTimes[j] = []interface{}{ot.Start.BigInt(), ot.End.BigInt()}
-		}
-		outgoingApprovals[i] = []interface{}{
-			app.ApprovalId,
-			app.ToListId,
-			app.InitiatedByListId,
-			transferTimes,
-			tokenIds,
-			ownershipTimes,
-			app.Uri,
-			app.CustomData,
-		}
-	}
+	// Convert outgoing approvals (full 10-element tuple with approvalCriteria and version)
+	outgoingApprovals := userOutgoingApprovalsToSolidity(store.OutgoingApprovals)
 
-	// Convert incoming approvals (simplified)
-	incomingApprovals := make([]interface{}, len(store.IncomingApprovals))
-	for i, app := range store.IncomingApprovals {
-		transferTimes := make([]interface{}, len(app.TransferTimes))
-		for j, tt := range app.TransferTimes {
-			transferTimes[j] = []interface{}{tt.Start.BigInt(), tt.End.BigInt()}
-		}
-		tokenIds := make([]interface{}, len(app.TokenIds))
-		for j, tid := range app.TokenIds {
-			tokenIds[j] = []interface{}{tid.Start.BigInt(), tid.End.BigInt()}
-		}
-		ownershipTimes := make([]interface{}, len(app.OwnershipTimes))
-		for j, ot := range app.OwnershipTimes {
-			ownershipTimes[j] = []interface{}{ot.Start.BigInt(), ot.End.BigInt()}
-		}
-		incomingApprovals[i] = []interface{}{
-			app.ApprovalId,
-			app.FromListId,
-			app.InitiatedByListId,
-			transferTimes,
-			tokenIds,
-			ownershipTimes,
-			app.Uri,
-			app.CustomData,
-		}
-	}
+	// Convert incoming approvals (full 10-element tuple with approvalCriteria and version)
+	incomingApprovals := userIncomingApprovalsToSolidity(store.IncomingApprovals)
 
-	// Convert user permissions (simplified)
-	var userPermissions []interface{}
-	if store.UserPermissions != nil {
-		userPermissions = []interface{}{
-			[]interface{}{}, // canUpdateOutgoingApprovals - simplified
-			[]interface{}{}, // canUpdateIncomingApprovals - simplified
-			[]interface{}{}, // canUpdateAutoApproveSelfInitiatedOutgoingTransfers - simplified
-			[]interface{}{}, // canUpdateAutoApproveSelfInitiatedIncomingTransfers - simplified
-			[]interface{}{}, // canUpdateAutoApproveAllIncomingTransfers - simplified
-		}
-	} else {
-		userPermissions = []interface{}{
-			[]interface{}{}, []interface{}{}, []interface{}{}, []interface{}{}, []interface{}{},
-		}
-	}
+	// Convert user permissions
+	userPermissions := userPermissionsToSolidity(store.UserPermissions)
 
 	return []interface{}{
 		balances,
@@ -409,19 +343,8 @@ func ConvertUserBalanceStoreToSolidityStruct(store *tokenizationtypes.UserBalanc
 	}, nil
 }
 
-// PackCollectionAsStruct packs a collection response as a Solidity struct tuple
-// If ABI expects bytes, marshal to bytes. Otherwise pack as struct tuple.
+// PackCollectionAsStruct packs a collection response as a Solidity struct tuple.
 func PackCollectionAsStruct(method *abi.Method, collection *tokenizationtypes.TokenCollection) ([]byte, error) {
-	// Check if ABI expects bytes (legacy) or struct tuple
-	if len(method.Outputs) == 1 && method.Outputs[0].Type.T == abi.BytesTy {
-		// Legacy: marshal to bytes
-		bz, err := tokenizationtypes.ModuleCdc.Marshal(collection)
-		if err != nil {
-			return nil, ErrInternalError(fmt.Sprintf("marshal collection failed: %s", err))
-		}
-		return bz, nil
-	}
-	// New: pack as struct tuple
 	structData, err := ConvertCollectionToSolidityStruct(collection)
 	if err != nil {
 		return nil, ErrInternalError(fmt.Sprintf("convert collection failed: %s", err))
@@ -446,19 +369,8 @@ func PackBalanceAsStruct(method *abi.Method, balance *tokenizationtypes.Balance)
 	return packed, nil
 }
 
-// PackUserBalanceStoreAsStruct packs a UserBalanceStore response as a Solidity struct tuple
-// If ABI expects bytes, marshal to bytes. Otherwise pack as struct tuple.
+// PackUserBalanceStoreAsStruct packs a UserBalanceStore response as a Solidity struct tuple.
 func PackUserBalanceStoreAsStruct(method *abi.Method, store *tokenizationtypes.UserBalanceStore) ([]byte, error) {
-	// Check if ABI expects bytes (legacy) or struct tuple
-	if len(method.Outputs) == 1 && method.Outputs[0].Type.T == abi.BytesTy {
-		// Legacy: marshal to bytes
-		bz, err := tokenizationtypes.ModuleCdc.Marshal(store)
-		if err != nil {
-			return nil, ErrInternalError(fmt.Sprintf("marshal user balance store failed: %s", err))
-		}
-		return bz, nil
-	}
-	// New: pack as struct tuple
 	structData, err := ConvertUserBalanceStoreToSolidityStruct(store)
 	if err != nil {
 		return nil, ErrInternalError(fmt.Sprintf("convert user balance store failed: %s", err))
@@ -501,19 +413,73 @@ func ConvertAddressListToSolidityStruct(list *tokenizationtypes.AddressList) ([]
 	}, nil
 }
 
-// PackAddressListAsStruct packs an AddressList response as a Solidity struct tuple
-// If ABI expects bytes, marshal to bytes. Otherwise pack as struct tuple.
-func PackAddressListAsStruct(method *abi.Method, list *tokenizationtypes.AddressList) ([]byte, error) {
-	// Check if ABI expects bytes (legacy) or struct tuple
-	if len(method.Outputs) == 1 && method.Outputs[0].Type.T == abi.BytesTy {
-		// Legacy: marshal to bytes
-		bz, err := tokenizationtypes.ModuleCdc.Marshal(list)
-		if err != nil {
-			return nil, ErrInternalError(fmt.Sprintf("marshal address list failed: %s", err))
-		}
-		return bz, nil
+// PackApprovalTrackerAsStruct packs an ApprovalTracker response as a Solidity struct tuple.
+func PackApprovalTrackerAsStruct(method *abi.Method, tracker *tokenizationtypes.ApprovalTracker) ([]byte, error) {
+	structData, err := ConvertApprovalTrackerToSolidityStruct(tracker)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("convert approval tracker failed: %s", err))
 	}
-	// New: pack as struct tuple
+	packed, err := method.Outputs.Pack(structData...)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("pack approval tracker failed: %s", err))
+	}
+	return packed, nil
+}
+
+// PackDynamicStoreAsStruct packs a DynamicStore response as a Solidity struct tuple.
+func PackDynamicStoreAsStruct(method *abi.Method, store *tokenizationtypes.DynamicStore) ([]byte, error) {
+	structData, err := ConvertDynamicStoreToSolidityStruct(store)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("convert dynamic store failed: %s", err))
+	}
+	packed, err := method.Outputs.Pack(structData...)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("pack dynamic store failed: %s", err))
+	}
+	return packed, nil
+}
+
+// PackDynamicStoreValueAsStruct packs a DynamicStoreValue response as a Solidity struct tuple.
+func PackDynamicStoreValueAsStruct(method *abi.Method, value *tokenizationtypes.DynamicStoreValue) ([]byte, error) {
+	structData, err := ConvertDynamicStoreValueToSolidityStruct(value)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("convert dynamic store value failed: %s", err))
+	}
+	packed, err := method.Outputs.Pack(structData...)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("pack dynamic store value failed: %s", err))
+	}
+	return packed, nil
+}
+
+// PackVoteProofAsStruct packs a VoteProof response as a Solidity struct tuple.
+func PackVoteProofAsStruct(method *abi.Method, proof *tokenizationtypes.VoteProof) ([]byte, error) {
+	structData, err := ConvertVoteProofToSolidityStruct(proof)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("convert vote proof failed: %s", err))
+	}
+	packed, err := method.Outputs.Pack(structData...)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("pack vote proof failed: %s", err))
+	}
+	return packed, nil
+}
+
+// PackParamsAsStruct packs Params response as a Solidity struct tuple.
+func PackParamsAsStruct(method *abi.Method, params *tokenizationtypes.Params) ([]byte, error) {
+	structData, err := ConvertParamsToSolidityStruct(params)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("convert params failed: %s", err))
+	}
+	packed, err := method.Outputs.Pack(structData...)
+	if err != nil {
+		return nil, ErrInternalError(fmt.Sprintf("pack params failed: %s", err))
+	}
+	return packed, nil
+}
+
+// PackAddressListAsStruct packs an AddressList response as a Solidity struct tuple.
+func PackAddressListAsStruct(method *abi.Method, list *tokenizationtypes.AddressList) ([]byte, error) {
 	structData, err := ConvertAddressListToSolidityStruct(list)
 	if err != nil {
 		return nil, ErrInternalError(fmt.Sprintf("convert address list failed: %s", err))

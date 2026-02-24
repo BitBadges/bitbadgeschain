@@ -23,7 +23,7 @@ import (
 func RegisterAndEnableAllPrecompiles(
 	ctx sdk.Context,
 	evmKeeper *evmkeeper.Keeper,
-	tokenizationKeeper tokenizationkeeper.Keeper,
+	tokenizationKeeper *tokenizationkeeper.Keeper,
 	gammKeeper gammkeeper.Keeper,
 	sendManagerKeeper sendmanagerkeeper.Keeper,
 ) error {

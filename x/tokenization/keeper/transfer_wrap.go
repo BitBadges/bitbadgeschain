@@ -222,6 +222,10 @@ func (k Keeper) HandleSpecialAddressBacking(
 		if err != nil {
 			return err
 		}
+		// Backing: decrease circulating supply
+		if err := k.UpdateCirculatingSupplyOnBacking(ctx, collection.CollectionId, transferBalances, true); err != nil {
+			return err
+		}
 	} else if isSendingFromSpecialAddress {
 		userAddressAcc, err := sdk.AccAddressFromBech32(to)
 		if err != nil {
@@ -233,6 +237,10 @@ func (k Keeper) HandleSpecialAddressBacking(
 		}
 		err = k.bankKeeper.SendCoins(ctx, userAddressAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
+			return err
+		}
+		// Unbacking: increase circulating supply
+		if err := k.UpdateCirculatingSupplyOnBacking(ctx, collection.CollectionId, transferBalances, false); err != nil {
 			return err
 		}
 	}

@@ -249,6 +249,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 				MaxSupplyPerId:              msg.Invariants.MaxSupplyPerId,
 				NoForcefulPostMintTransfers: msg.Invariants.NoForcefulPostMintTransfers,
 				DisablePoolCreation:         msg.Invariants.DisablePoolCreation,
+				EvmQueryChallenges:          msg.Invariants.EvmQueryChallenges,
 			}
 
 			// Handle cosmos coin backed path - generate address
@@ -321,6 +322,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			tempCollection.Invariants.NoCustomOwnershipTimes = msg.Invariants.NoCustomOwnershipTimes
 			tempCollection.Invariants.MaxSupplyPerId = msg.Invariants.MaxSupplyPerId
 			tempCollection.Invariants.NoForcefulPostMintTransfers = msg.Invariants.NoForcefulPostMintTransfers
+			tempCollection.Invariants.EvmQueryChallenges = msg.Invariants.EvmQueryChallenges
 			// Note: CosmosCoinBackedPath requires address generation, so we skip it here
 			// It will be validated separately in validateCollectionBeforeStore
 		}
@@ -485,11 +487,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			collection.Invariants = &types.CollectionInvariants{}
 		}
 
-		// Set basic invariant fields
+		// Set invariant fields
 		collection.Invariants.NoCustomOwnershipTimes = msg.Invariants.NoCustomOwnershipTimes
 		collection.Invariants.MaxSupplyPerId = msg.Invariants.MaxSupplyPerId
 		collection.Invariants.NoForcefulPostMintTransfers = msg.Invariants.NoForcefulPostMintTransfers
 		collection.Invariants.DisablePoolCreation = msg.Invariants.DisablePoolCreation
+		collection.Invariants.EvmQueryChallenges = msg.Invariants.EvmQueryChallenges
 
 		// Handle cosmos coin backed path - generate address
 		if msg.Invariants.CosmosCoinBackedPath != nil {

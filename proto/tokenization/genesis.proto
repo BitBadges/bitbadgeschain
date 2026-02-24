@@ -37,5 +37,7 @@ message GenesisState {
   repeated string ethSignatureTrackerStoreKeys = 18;
   repeated VoteProof votingTrackers = 19;
   repeated string votingTrackerStoreKeys = 20;
+  repeated CollectionStats collectionStats = 21;
+  repeated string collectionStatsIds = 22 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

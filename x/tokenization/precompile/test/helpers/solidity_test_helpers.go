@@ -35,6 +35,10 @@ const (
 	ContractTypePrecompileCollection ContractType = "PrecompileCollectionTestContract"
 	// PrecompileDynamicStoreTestContract - dynamic store methods
 	ContractTypePrecompileDynamicStore ContractType = "PrecompileDynamicStoreTestContract"
+	// MinBankBalanceChecker - EVM query approval challenge (min x/bank balance)
+	ContractTypeMinBankBalanceChecker ContractType = "MinBankBalanceChecker"
+	// MaxUniqueHoldersChecker - EVM query invariant (maxUniqueHolders via collection stats)
+	ContractTypeMaxUniqueHoldersChecker ContractType = "MaxUniqueHoldersChecker"
 )
 
 // Contract compilation paths
@@ -71,6 +75,12 @@ func getContractPaths(contractType ContractType) (bytecodePath, abiPath string) 
 	case ContractTypePrecompileDynamicStore:
 		return "contracts/test/test_PrecompileDynamicStoreTestContract_sol_PrecompileDynamicStoreTestContract.bin",
 			"contracts/test/test_PrecompileDynamicStoreTestContract_sol_PrecompileDynamicStoreTestContract.abi"
+	case ContractTypeMinBankBalanceChecker:
+		return "contracts/test/test_MinBankBalanceChecker_sol_MinBankBalanceChecker.bin",
+			"contracts/test/test_MinBankBalanceChecker_sol_MinBankBalanceChecker.abi"
+	case ContractTypeMaxUniqueHoldersChecker:
+		return "contracts/test/test_MaxUniqueHoldersChecker_sol_MaxUniqueHoldersChecker.bin",
+			"contracts/test/test_MaxUniqueHoldersChecker_sol_MaxUniqueHoldersChecker.abi"
 	case ContractTypeMinimal:
 		fallthrough
 	default:

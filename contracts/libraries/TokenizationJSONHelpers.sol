@@ -495,6 +495,184 @@ library TokenizationJSONHelpers {
         return result;
     }
 
+    // ============ Invariants JSON Helpers (v25) ============
+
+    /**
+     * @notice Convert EVMQueryChallenge to JSON
+     * @dev Used for building invariants with EVM query challenges
+     * @param contractAddress The EVM contract address (hex string with 0x prefix)
+     * @param callData The calldata for the static call (hex string)
+     * @param expectedResult The expected result (hex string)
+     * @param comparisonOperator The comparison operator ("eq", "ne", "gt", "gte", "lt", "lte")
+     * @param gasLimit Gas limit for the call
+     * @param uri Optional metadata URI
+     * @param customData Optional custom data
+     */
+    function evmQueryChallengeToJson(
+        string memory contractAddress,
+        string memory callData,
+        string memory expectedResult,
+        string memory comparisonOperator,
+        uint256 gasLimit,
+        string memory uri,
+        string memory customData
+    ) internal pure returns (string memory) {
+        string memory result = string(abi.encodePacked(
+            '{"contractAddress":"', _escapeJsonString(contractAddress),
+            '","calldata":"', _escapeJsonString(callData),
+            '","expectedResult":"', _escapeJsonString(expectedResult),
+            '","comparisonOperator":"', _escapeJsonString(comparisonOperator),
+            '","gasLimit":"', _uintToString(gasLimit), '"'
+        ));
+
+        if (bytes(uri).length > 0) {
+            result = string(abi.encodePacked(result, ',"uri":"', _escapeJsonString(uri), '"'));
+        }
+        if (bytes(customData).length > 0) {
+            result = string(abi.encodePacked(result, ',"customData":"', _escapeJsonString(customData), '"'));
+        }
+
+        return string(abi.encodePacked(result, '}'));
+    }
+
+    /**
+     * @notice Convert EVMQueryChallenge array to JSON array
+     * @dev Accepts parallel arrays matching EVMQueryChallenge fields
+     */
+    function evmQueryChallengeArrayToJson(
+        string[] memory contractAddresses,
+        string[] memory callDatas,
+        string[] memory expectedResults,
+        string[] memory comparisonOperators,
+        uint256[] memory gasLimits
+    ) internal pure returns (string memory) {
+        require(
+            contractAddresses.length == callDatas.length &&
+            callDatas.length == expectedResults.length &&
+            expectedResults.length == comparisonOperators.length &&
+            comparisonOperators.length == gasLimits.length,
+            "Array lengths must match"
+        );
+
+        if (contractAddresses.length == 0) {
+            return "[]";
+        }
+
+        string memory result = "[";
+        for (uint256 i = 0; i < contractAddresses.length; i++) {
+            if (i > 0) {
+                result = string(abi.encodePacked(result, ","));
+            }
+            result = string(abi.encodePacked(
+                result,
+                evmQueryChallengeToJson(
+                    contractAddresses[i],
+                    callDatas[i],
+                    expectedResults[i],
+                    comparisonOperators[i],
+                    gasLimits[i],
+                    "",
+                    ""
+                )
+            ));
+        }
+        return string(abi.encodePacked(result, "]"));
+    }
+
+    /**
+     * @notice Convert CollectionInvariants to JSON
+     * @dev Used for collection creation/update with invariants
+     * @param noCustomOwnershipTimes Disallow custom ownership times
+     * @param maxSupplyPerId Maximum supply per token ID (0 for unlimited)
+     * @param noForcefulPostMintTransfers Prevent forceful transfers after minting
+     * @param disablePoolCreation Disable liquidity pool creation
+     * @param evmQueryChallengesJson Pre-constructed JSON array of EVM query challenges
+     */
+    function collectionInvariantsToJson(
+        bool noCustomOwnershipTimes,
+        uint256 maxSupplyPerId,
+        bool noForcefulPostMintTransfers,
+        bool disablePoolCreation,
+        string memory evmQueryChallengesJson
+    ) internal pure returns (string memory) {
+        string memory result = "{";
+
+        result = string(abi.encodePacked(
+            result,
+            '"noCustomOwnershipTimes":', noCustomOwnershipTimes ? 'true' : 'false',
+            ',"noForcefulPostMintTransfers":', noForcefulPostMintTransfers ? 'true' : 'false',
+            ',"disablePoolCreation":', disablePoolCreation ? 'true' : 'false'
+        ));
+
+        if (maxSupplyPerId > 0) {
+            result = string(abi.encodePacked(result, ',"maxSupplyPerId":"', _uintToString(maxSupplyPerId), '"'));
+        }
+
+        if (bytes(evmQueryChallengesJson).length > 0 && keccak256(bytes(evmQueryChallengesJson)) != keccak256(bytes("[]"))) {
+            result = string(abi.encodePacked(result, ',"evmQueryChallenges":', evmQueryChallengesJson));
+        }
+
+        return string(abi.encodePacked(result, '}'));
+    }
+
+    /**
+     * @notice Construct JSON for createCollection with invariants (v25 extended version)
+     * @dev Extends createCollectionJSON with invariants support
+     */
+    function createCollectionWithInvariantsJSON(
+        string memory validTokenIdsJson,
+        string memory manager,
+        string memory collectionMetadataJson,
+        string memory defaultBalancesJson,
+        string memory collectionPermissionsJson,
+        string memory standardsJson,
+        string memory customData,
+        bool isArchived,
+        string memory invariantsJson
+    ) internal pure returns (string memory) {
+        string memory result = "{";
+
+        // validTokenIds
+        result = string(abi.encodePacked(result, '"validTokenIds":', validTokenIdsJson));
+
+        // manager
+        result = string(abi.encodePacked(result, ',"manager":"', _escapeJsonString(manager), '"'));
+
+        // collectionMetadata
+        result = string(abi.encodePacked(result, ',"collectionMetadata":', collectionMetadataJson));
+
+        // defaultBalances (optional)
+        if (bytes(defaultBalancesJson).length > 0 && keccak256(bytes(defaultBalancesJson)) != keccak256(bytes("{}"))) {
+            result = string(abi.encodePacked(result, ',"defaultBalances":', defaultBalancesJson));
+        }
+
+        // collectionPermissions (optional)
+        if (bytes(collectionPermissionsJson).length > 0 && keccak256(bytes(collectionPermissionsJson)) != keccak256(bytes("{}"))) {
+            result = string(abi.encodePacked(result, ',"collectionPermissions":', collectionPermissionsJson));
+        }
+
+        // standards
+        result = string(abi.encodePacked(result, ',"standards":', standardsJson));
+
+        // customData
+        if (bytes(customData).length > 0) {
+            result = string(abi.encodePacked(result, ',"customData":"', _escapeJsonString(customData), '"'));
+        }
+
+        // isArchived
+        result = string(abi.encodePacked(result, ',"isArchived":', isArchived ? 'true' : 'false'));
+
+        // invariants (v25)
+        if (bytes(invariantsJson).length > 0 && keccak256(bytes(invariantsJson)) != keccak256(bytes("{}"))) {
+            result = string(abi.encodePacked(result, ',"invariants":', invariantsJson));
+        }
+
+        result = string(abi.encodePacked(result, "}"));
+        return result;
+    }
+
+    // ============ Internal Helpers ============
+
     /**
      * @notice Escape JSON string (escape quotes, backslashes, newlines, etc.)
      * @dev Basic escaping for JSON strings - escapes quotes, backslashes, and control characters

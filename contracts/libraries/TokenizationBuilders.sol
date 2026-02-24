@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../types/sol";
+import "../types/TokenizationTypes.sol";
 import "./TokenizationJSONHelpers.sol";
 import "./TokenizationHelpers.sol";
 
@@ -30,6 +30,7 @@ library TokenizationBuilders {
     /**
      * @notice Builder struct for creating collections
      * @dev All fields are optional except validTokenIds
+     *      v25: Added invariants field for EVM query challenges and other invariants
      */
     struct CollectionBuilder {
         UintRange[] validTokenIds;
@@ -42,6 +43,7 @@ library TokenizationBuilders {
         CollectionApproval[] collectionApprovals;
         string[] standards;
         bool isArchived;
+        CollectionInvariants invariants;
         bool hasValidTokenIds;
         bool hasManager;
         bool hasMetadata;
@@ -52,6 +54,7 @@ library TokenizationBuilders {
         bool hasCollectionApprovals;
         bool hasStandards;
         bool hasIsArchived;
+        bool hasInvariants;
     }
 
     /**
@@ -288,11 +291,103 @@ library TokenizationBuilders {
         return builder;
     }
 
+    // ============ Invariants Builder Methods (v25) ============
+
+    /**
+     * @notice Set collection invariants
+     * @param builder The builder instance
+     * @param invariants The collection invariants
+     * @return The builder with invariants set
+     * @dev Invariants are enforced on every transfer. EVM query challenges
+     *      in invariants are executed post-transfer and revert if they fail.
+     *
+     * Example:
+     * ```solidity
+     * CollectionInvariants memory inv = TokenizationHelpers.createInvariantsWithEVMChallenges(challenges);
+     * builder = builder.withInvariants(inv);
+     * ```
+     */
+    function withInvariants(
+        CollectionBuilder memory builder,
+        CollectionInvariants memory invariants
+    ) internal pure returns (CollectionBuilder memory) {
+        builder.invariants = invariants;
+        builder.hasInvariants = true;
+        return builder;
+    }
+
+    /**
+     * @notice Set invariants with EVM query challenges
+     * @param builder The builder instance
+     * @param evmQueryChallenges Array of EVM query challenges
+     * @return The builder with invariants set
+     * @dev Convenience method that creates invariants with only EVM query challenges.
+     *      Use for post-transfer validation like max holder checks.
+     *
+     * Example - Max 100 unique holders:
+     * ```solidity
+     * EVMQueryChallenge[] memory challenges = new EVMQueryChallenge[](1);
+     * challenges[0] = TokenizationHelpers.createEVMQueryChallenge(
+     *     checkerAddress, calldata, expectedPass, "eq", 200000
+     * );
+     * builder = builder.withEVMQueryChallengeInvariants(challenges);
+     * ```
+     */
+    function withEVMQueryChallengeInvariants(
+        CollectionBuilder memory builder,
+        EVMQueryChallenge[] memory evmQueryChallenges
+    ) internal pure returns (CollectionBuilder memory) {
+        builder.invariants = TokenizationHelpers.createInvariantsWithEVMChallenges(evmQueryChallenges);
+        builder.hasInvariants = true;
+        return builder;
+    }
+
+    /**
+     * @notice Set invariants with max supply per token ID
+     * @param builder The builder instance
+     * @param maxSupplyPerId Maximum supply allowed per token ID
+     * @return The builder with invariants set
+     */
+    function withMaxSupplyInvariant(
+        CollectionBuilder memory builder,
+        uint256 maxSupplyPerId
+    ) internal pure returns (CollectionBuilder memory) {
+        builder.invariants = TokenizationHelpers.createInvariantsWithMaxSupply(maxSupplyPerId);
+        builder.hasInvariants = true;
+        return builder;
+    }
+
+    /**
+     * @notice Set simple invariant flags
+     * @param builder The builder instance
+     * @param noCustomOwnershipTimes Disallow custom ownership times
+     * @param noForcefulPostMintTransfers Prevent forceful transfers after minting
+     * @param disablePoolCreation Disable liquidity pool creation
+     * @return The builder with invariants set
+     */
+    function withSimpleInvariants(
+        CollectionBuilder memory builder,
+        bool noCustomOwnershipTimes,
+        bool noForcefulPostMintTransfers,
+        bool disablePoolCreation
+    ) internal pure returns (CollectionBuilder memory) {
+        builder.invariants = TokenizationHelpers.createCollectionInvariants(
+            noCustomOwnershipTimes,
+            0, // no max supply
+            noForcefulPostMintTransfers,
+            disablePoolCreation,
+            new EVMQueryChallenge[](0)
+        );
+        builder.hasInvariants = true;
+        return builder;
+    }
+
     /**
      * @notice Build the JSON string for collection creation
      * @param builder The builder instance
      * @return json The JSON string ready for createCollection
-     * @dev Requires validTokenIds to be set
+     * @dev Requires validTokenIds to be set.
+     *      v25: Now includes invariants support for EVM query challenges.
      */
     function build(CollectionBuilder memory builder) internal pure returns (string memory json) {
         require(builder.hasValidTokenIds, "TokenizationBuilders: validTokenIds is required");
@@ -330,8 +425,26 @@ library TokenizationBuilders {
             ? TokenizationJSONHelpers.stringArrayToJson(builder.standards)
             : "[]";
 
-        // Build the final JSON
-        return TokenizationJSONHelpers.createCollectionJSON(
+        // Convert invariants to JSON (v25)
+        string memory invariantsJson = "{}";
+        if (builder.hasInvariants) {
+            // Build EVM query challenges JSON
+            string memory evmChallengesJson = "[]";
+            if (builder.invariants.evmQueryChallenges.length > 0) {
+                evmChallengesJson = _evmQueryChallengesToJson(builder.invariants.evmQueryChallenges);
+            }
+
+            invariantsJson = TokenizationJSONHelpers.collectionInvariantsToJson(
+                builder.invariants.noCustomOwnershipTimes,
+                builder.invariants.maxSupplyPerId,
+                builder.invariants.noForcefulPostMintTransfers,
+                builder.invariants.disablePoolCreation,
+                evmChallengesJson
+            );
+        }
+
+        // Build the final JSON with invariants support
+        return TokenizationJSONHelpers.createCollectionWithInvariantsJSON(
             validTokenIdsJson,
             builder.hasManager ? builder.manager : "",
             collectionMetadataJson,
@@ -339,8 +452,41 @@ library TokenizationBuilders {
             collectionPermissionsJson,
             standardsJson,
             builder.hasCustomData ? builder.customData : "",
-            builder.hasIsArchived ? builder.isArchived : false
+            builder.hasIsArchived ? builder.isArchived : false,
+            invariantsJson
         );
+    }
+
+    /**
+     * @notice Convert EVMQueryChallenge array to JSON
+     * @dev Internal helper for build()
+     */
+    function _evmQueryChallengesToJson(
+        EVMQueryChallenge[] memory challenges
+    ) private pure returns (string memory) {
+        if (challenges.length == 0) {
+            return "[]";
+        }
+
+        string memory result = "[";
+        for (uint256 i = 0; i < challenges.length; i++) {
+            if (i > 0) {
+                result = string(abi.encodePacked(result, ","));
+            }
+            result = string(abi.encodePacked(
+                result,
+                TokenizationJSONHelpers.evmQueryChallengeToJson(
+                    challenges[i].contractAddress,
+                    challenges[i].callData,
+                    challenges[i].expectedResult,
+                    challenges[i].comparisonOperator,
+                    challenges[i].gasLimit,
+                    challenges[i].uri,
+                    challenges[i].customData
+                )
+            ));
+        }
+        return string(abi.encodePacked(result, "]"));
     }
 
     // ============ Transfer Builder ============

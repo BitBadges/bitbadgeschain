@@ -169,7 +169,7 @@ type App struct {
 	IBCRateLimitKeeper ibcratelimitkeeper.Keeper
 
 	AnchorKeeper          anchormodulekeeper.Keeper
-	TokenizationKeeper    tokenizationmodulekeeper.Keeper
+	TokenizationKeeper    *tokenizationmodulekeeper.Keeper
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
 

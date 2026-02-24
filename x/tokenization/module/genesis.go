@@ -104,6 +104,17 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(err)
 		}
 	}
+
+	// Initialize collection stats
+	if len(genState.CollectionStats) != len(genState.CollectionStatsIds) {
+		panic(fmt.Errorf("genesis collection stats and collection stats ids length mismatch: %d vs %d",
+			len(genState.CollectionStats), len(genState.CollectionStatsIds)))
+	}
+	for idx, stats := range genState.CollectionStats {
+		if err := k.SetCollectionStatsInStore(ctx, genState.CollectionStatsIds[idx], stats); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -148,6 +159,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	// Export voting trackers
 	genesis.VotingTrackers, genesis.VotingTrackerStoreKeys = k.GetVotesFromStore(ctx)
+
+	// Export collection stats
+	stats, ids := k.GetAllCollectionStatsFromStore(ctx)
+	genesis.CollectionStats = stats
+	genesis.CollectionStatsIds = make([]types.Uint, len(ids))
+	copy(genesis.CollectionStatsIds, ids)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

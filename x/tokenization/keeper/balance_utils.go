@@ -85,8 +85,18 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 	return balance, appliedDefault, nil
 }
 
-// SetBalanceForAddress stores a user balance for a specific address
+// SetBalanceForAddress stores a user balance for a specific address.
+// Updates holder count for the collection when balance crosses zero.
 func (k Keeper) SetBalanceForAddress(ctx sdk.Context, collection *types.TokenCollection, userAddress string, balance *types.UserBalanceStore) error {
 	balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
+
+	// Get old balance for holder count tracking
+	oldBalance, _ := k.GetUserBalanceFromStore(ctx, balanceKey)
+
+	// Update holder count BEFORE setting new balance
+	if err := k.UpdateHolderCount(ctx, collection, userAddress, oldBalance, balance); err != nil {
+		return err
+	}
+
 	return k.SetUserBalanceInStore(ctx, balanceKey, balance, false)
 }

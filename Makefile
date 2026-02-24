@@ -117,7 +117,18 @@ do-checksum-mainnet:
 do-checksum:
 	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 > bitbadgeschain_checksum
 
-build-with-checksum: build-all do-checksum
+# Run all tests. Requires -tags=test for EVM/cosmos-evm test helpers (ResetTestConfig).
+test:
+	@echo "Running all tests (with -tags=test for EVM test config)..."
+	@go test ./... -count=1 -tags=test
+
+# Run tokenization module tests only
+test-tokenization:
+	@go test ./x/tokenization/... -count=1 -tags=test
+
+# Run keeper tests only
+test-keeper:
+	@go test ./x/tokenization/keeper/... -count=1 -tags=test
 
 lint:
 	@echo "Running golangci-lint (excluding test files, ai_test, pb.go, and simulation files)..."
@@ -180,6 +191,13 @@ compile-contracts:
 			interfaces/ITokenizationPrecompile.sol \
 			libraries/TokenizationJSONHelpers.sol \
 			test/PrecompileDynamicStoreTestContract.sol && \
+		echo "Compiling MinBankBalanceChecker..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
+			test/MinBankBalanceChecker.sol && \
+		echo "Compiling MaxUniqueHoldersChecker..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
+			interfaces/ITokenizationPrecompile.sol \
+			test/MaxUniqueHoldersChecker.sol && \
 		echo "Compiling GammHelperLibrariesTestContract..." && \
 		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
 			types/GammTypes.sol \

@@ -16,7 +16,7 @@ import (
 // Returns true if execution was successful, false otherwise
 func ExecuteAndVerifyMessage(
 	ctx sdk.Context,
-	k keeper.Keeper,
+	k *keeper.Keeper,
 	msg sdk.Msg,
 ) (bool, error) {
 	msgServer := keeper.NewMsgServerImpl(k)

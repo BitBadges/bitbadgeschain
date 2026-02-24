@@ -19,14 +19,14 @@ func TestCollectionInvariants_MaxSupplyPerId(t *testing.T) {
 	require.True(t, invariants.NoCustomOwnershipTimes)
 	require.Equal(t, sdkmath.NewUint(1000), invariants.MaxSupplyPerId)
 
-	// Test that we can create CollectionInvariants without maxSupplyPerId
+	// Test that we can create CollectionInvariants without maxSupplyPerId (defaults to nil = unlimited)
 	invariants2 := &types.CollectionInvariants{
 		NoCustomOwnershipTimes: false,
-		MaxSupplyPerId:         sdkmath.NewUint(0),
 	}
 
 	require.False(t, invariants2.NoCustomOwnershipTimes)
-	require.True(t, invariants2.MaxSupplyPerId.IsZero())
+	// When not set, MaxSupplyPerId is nil (which means unlimited)
+	require.True(t, invariants2.MaxSupplyPerId.IsNil())
 }
 
 func TestCollectionInvariants_MaxSupplyPerId_GreaterThanZero(t *testing.T) {
@@ -39,7 +39,7 @@ func TestCollectionInvariants_MaxSupplyPerId_GreaterThanZero(t *testing.T) {
 	require.True(t, invariants.NoCustomOwnershipTimes)
 	require.Equal(t, sdkmath.NewUint(1000), invariants.MaxSupplyPerId)
 
-	// Test that we can create CollectionInvariants without maxSupplyPerId
+	// Test that we can create CollectionInvariants with maxSupplyPerId = 2
 	invariants2 := &types.CollectionInvariants{
 		NoCustomOwnershipTimes: false,
 		MaxSupplyPerId:         sdkmath.NewUint(2),

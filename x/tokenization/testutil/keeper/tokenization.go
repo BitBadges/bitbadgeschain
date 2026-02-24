@@ -28,7 +28,7 @@ import (
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 )
 
-func TokenizationKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
+func TokenizationKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 	// Add transient store for custom-hooks module (needed for deterministic error handling)
@@ -93,7 +93,7 @@ func TokenizationKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	// This matches the behavior in InitGenesis
 	k.SetNextCollectionId(ctx, math.NewUint(1))
 
-	return k, ctx
+	return &k, ctx
 }
 
 // mockSendManagerKeeper is a minimal mock implementation of SendManagerKeeper for testing

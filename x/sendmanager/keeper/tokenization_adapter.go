@@ -9,11 +9,11 @@ import (
 
 // TokenizationAliasDenomRouter is an adapter that makes tokenization keeper implement AliasDenomRouter
 type TokenizationAliasDenomRouter struct {
-	tokenizationKeeper tokenizationkeeper.Keeper
+	tokenizationKeeper *tokenizationkeeper.Keeper
 }
 
 // NewTokenizationAliasDenomRouter creates a new adapter for tokenization keeper
-func NewTokenizationAliasDenomRouter(tokenizationKeeper tokenizationkeeper.Keeper) *TokenizationAliasDenomRouter {
+func NewTokenizationAliasDenomRouter(tokenizationKeeper *tokenizationkeeper.Keeper) *TokenizationAliasDenomRouter {
 	return &TokenizationAliasDenomRouter{
 		tokenizationKeeper: tokenizationKeeper,
 	}

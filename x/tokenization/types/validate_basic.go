@@ -559,6 +559,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				return sdkerrors.Wrapf(err, "invalid challenges")
 			}
 
+			if err := ValidateEVMQueryChallenges(approvalCriteria.EvmQueryChallenges); err != nil {
+				return sdkerrors.Wrapf(err, "invalid EVM query challenges")
+			}
+
 			if canChangeValues {
 				if approvalCriteria.MustOwnTokens == nil {
 					approvalCriteria.MustOwnTokens = []*MustOwnTokens{}
@@ -1243,5 +1247,145 @@ func (vp *VoteProof) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100, got %s", vp.YesWeight.String())
 	}
 
+	return nil
+}
+
+// ValidateEVMQueryChallenges validates a slice of EVMQueryChallenges.
+// Used for both approval criteria and collection invariants (post-transfer).
+// Format-only checks (address format, hex calldata/expectedResult, selector length) are done here.
+// Context-dependent checks (e.g. that contract address has code) must be done in the keeper.
+func ValidateEVMQueryChallenges(challenges []*EVMQueryChallenge) error {
+	if len(challenges) > 10 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "too many EVM query challenges (max 10, got %d)", len(challenges))
+	}
+
+	for i, challenge := range challenges {
+		if challenge == nil {
+			continue
+		}
+
+		if challenge.ContractAddress == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM query challenge %d: contract address required", i)
+		}
+
+		if err := ValidateEVMContractAddressFormat(challenge.ContractAddress); err != nil {
+			return sdkerrors.Wrapf(err, "EVM query challenge %d: invalid contract address format", i)
+		}
+
+		if challenge.Calldata == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM query challenge %d: calldata required", i)
+		}
+
+		if err := ValidateEVMQueryCalldata(challenge.Calldata); err != nil {
+			return sdkerrors.Wrapf(err, "EVM query challenge %d: invalid calldata", i)
+		}
+
+		if challenge.ExpectedResult != "" {
+			if err := ValidateEVMQueryExpectedResult(challenge.ExpectedResult); err != nil {
+				return sdkerrors.Wrapf(err, "EVM query challenge %d: invalid expected result", i)
+			}
+		}
+
+		// Validate operator
+		op := challenge.ComparisonOperator
+		if op != "" && op != "eq" && op != "ne" && op != "gt" && op != "gte" && op != "lt" && op != "lte" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM query challenge %d: invalid comparison operator %s", i, op)
+		}
+
+		// Validate gas limit
+		if !challenge.GasLimit.IsZero() && challenge.GasLimit.GT(sdkmath.NewUint(500000)) {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM query challenge %d: gas limit exceeds maximum (500000)", i)
+		}
+	}
+
+	return nil
+}
+
+// ValidateEVMContractAddressFormat checks that the address is either a valid EVM hex address (0x + 40 hex chars)
+// or a valid bech32 address (e.g. bb1...). Used for EVM query challenge contract addresses.
+func ValidateEVMContractAddressFormat(address string) error {
+	if address == "" {
+		return sdkerrors.Wrap(ErrInvalidRequest, "contract address cannot be empty")
+	}
+	addr := strings.TrimSpace(address)
+	if len(addr) >= 2 && strings.ToLower(addr[:2]) == "0x" {
+		hexPart := addr[2:]
+		if len(hexPart) != 40 {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM contract address must be 0x followed by 40 hex characters, got %d", len(hexPart))
+		}
+		for _, c := range hexPart {
+			if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
+				continue
+			}
+			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM contract address contains non-hex character")
+		}
+		return nil
+	}
+	_, err := sdk.AccAddressFromBech32(addr)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "contract address is not valid EVM (0x + 40 hex) or bech32: %s", err)
+	}
+	return nil
+}
+
+// evmQueryPlaceholders are the allowed calldata placeholders (replaced at runtime).
+// Address placeholders become 40 hex chars; $collectionId becomes 64 hex chars (uint256); $recipients becomes 64+ hex.
+var (
+	evmQueryPlaceholderAddress   = "0000000000000000000000000000000000000000" // 40 hex
+	evmQueryPlaceholderUint256   = "0000000000000000000000000000000000000000000000000000000000000000" // 64 hex
+	evmQueryPlaceholdersOrder    = []string{"$collectionId", "$recipients", "$initiator", "$sender", "$recipient"}
+	evmQueryPlaceholderReplacements = map[string]string{
+		"$initiator":    evmQueryPlaceholderAddress,
+		"$sender":       evmQueryPlaceholderAddress,
+		"$recipient":    evmQueryPlaceholderAddress,
+		"$collectionId": evmQueryPlaceholderUint256,
+		"$recipients":   evmQueryPlaceholderUint256, // min length for validation; runtime can be longer
+	}
+)
+
+// ValidateEVMQueryCalldata checks that calldata is valid hex (after placeholder substitution) and
+// has at least 4 bytes (function selector). Placeholders $initiator, $sender, $recipient, $collectionId, $recipients are allowed.
+func ValidateEVMQueryCalldata(calldata string) error {
+	replaced := calldata
+	for _, p := range evmQueryPlaceholdersOrder {
+		if sub, ok := evmQueryPlaceholderReplacements[p]; ok {
+			replaced = strings.ReplaceAll(replaced, p, sub)
+		}
+	}
+	hexStr := strings.TrimPrefix(strings.TrimSpace(replaced), "0x")
+	if hexStr == "" {
+		return sdkerrors.Wrap(ErrInvalidRequest, "calldata is empty or only placeholders")
+	}
+	if len(hexStr)%2 != 0 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "calldata must have even hex length (got %d)", len(hexStr))
+	}
+	for _, c := range hexStr {
+		if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
+			continue
+		}
+		return sdkerrors.Wrapf(ErrInvalidRequest, "calldata contains non-hex character (only 0-9, a-f, A-F and placeholders $initiator, $sender, $recipient, $collectionId, $recipients are allowed)")
+	}
+	if len(hexStr) < 8 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "calldata must be at least 4 bytes (8 hex chars) for function selector, got %d bytes", len(hexStr)/2)
+	}
+	return nil
+}
+
+// ValidateEVMQueryExpectedResult checks that expectedResult is valid hex with even length when non-empty.
+func ValidateEVMQueryExpectedResult(expectedResult string) error {
+	s := strings.TrimSpace(expectedResult)
+	if s == "" {
+		return nil
+	}
+	hexStr := strings.TrimPrefix(s, "0x")
+	if len(hexStr)%2 != 0 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "expected result must have even hex length (got %d)", len(hexStr))
+	}
+	for _, c := range hexStr {
+		if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
+			continue
+		}
+		return sdkerrors.Wrapf(ErrInvalidRequest, "expected result contains non-hex character")
+	}
 	return nil
 }

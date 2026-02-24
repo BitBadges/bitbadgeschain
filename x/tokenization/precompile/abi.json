@@ -87,6 +87,25 @@
           "type": "string"
         }
       ],
+      "name": "getCollectionStats",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "stats",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
       "name": "getBalance",
       "outputs": [
         {

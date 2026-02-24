@@ -27,7 +27,7 @@ type E2ETestSuite struct {
 	suite.Suite
 
 	// Keepers and context
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 	Ctx                sdk.Context
 
 	// Precompile instance
@@ -808,6 +808,69 @@ func (suite *E2ETestSuite) verifyBalanceContains(
 
 	// Verify the amount
 	suite.Require().True(total.GTE(expectedAmount), "Expected at least %s, got %s", expectedAmount.String(), total.String())
+}
+
+// TestPrecompile_EndToEnd_CreateCollection_WithInvariantsEvmQueryChallenges tests that createCollection
+// via precompile accepts invariants.evmQueryChallenges and persists them on the collection.
+func (suite *E2ETestSuite) TestPrecompile_EndToEnd_CreateCollection_WithInvariantsEvmQueryChallenges() {
+	// Build createCollection JSON with invariants containing evmQueryChallenges
+	evmChallenge := map[string]interface{}{
+		"contractAddress":     "0x1234567890123456789012345678901234567890",
+		"calldata":           "70a082310000000000000000000000000000000000000000000000000000000000000001",
+		"expectedResult":     "",
+		"comparisonOperator": "eq",
+		"gasLimit":           "100000",
+		"uri":                "https://example.com/evm-challenge",
+		"customData":         `{"description":"balance check"}`,
+	}
+	msg := map[string]interface{}{
+		"defaultBalances":            nil,
+		"validTokenIds":              []map[string]interface{}{{"start": "1", "end": "100"}},
+		"collectionPermissions":      map[string]interface{}{},
+		"manager":                    suite.Alice.String(),
+		"collectionMetadata":         map[string]interface{}{"uri": "https://example.com", "customData": ""},
+		"tokenMetadata":              []interface{}{},
+		"customData":                 "",
+		"collectionApprovals":        []interface{}{},
+		"standards":                  []string{},
+		"isArchived":                 false,
+		"mintEscrowCoinsToTransfer":  []interface{}{},
+		"cosmosCoinWrapperPathsToAdd": []interface{}{},
+		"invariants": map[string]interface{}{
+			"evmQueryChallenges": []interface{}{evmChallenge},
+		},
+		"aliasPathsToAdd": []interface{}{},
+	}
+
+	jsonMsg, err := helpers.BuildCreateCollectionJSON(suite.Alice.String(), msg)
+	suite.Require().NoError(err)
+
+	method := suite.Precompile.ABI.Methods["createCollection"]
+	input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+	suite.Require().NoError(err)
+
+	result, err := suite.callPrecompile(suite.AliceEVM, input, big.NewInt(0))
+	suite.Require().NoError(err, "createCollection with invariants.evmQueryChallenges should succeed")
+	suite.Require().NotNil(result)
+
+	unpacked, err := method.Outputs.Unpack(result)
+	suite.Require().NoError(err)
+	suite.Require().Len(unpacked, 1)
+	collectionIdBig, ok := unpacked[0].(*big.Int)
+	suite.Require().True(ok)
+	suite.Require().Greater(collectionIdBig.Uint64(), uint64(0))
+
+	// Verify collection was stored with invariants.evmQueryChallenges
+	collectionId := sdkmath.NewUintFromBigInt(collectionIdBig)
+	collection, found := suite.TokenizationKeeper.GetCollectionFromStore(suite.Ctx, collectionId)
+	suite.Require().True(found)
+
+	suite.Require().NotNil(collection.Invariants, "collection invariants should be set")
+	suite.Require().Len(collection.Invariants.EvmQueryChallenges, 1, "evmQueryChallenges should be persisted")
+	suite.Require().Equal("0x1234567890123456789012345678901234567890", collection.Invariants.EvmQueryChallenges[0].ContractAddress)
+	suite.Require().Equal("70a082310000000000000000000000000000000000000000000000000000000000000001", collection.Invariants.EvmQueryChallenges[0].Calldata)
+	suite.Require().Equal("https://example.com/evm-challenge", collection.Invariants.EvmQueryChallenges[0].Uri, "uri should be persisted")
+	suite.Require().Equal(`{"description":"balance check"}`, collection.Invariants.EvmQueryChallenges[0].CustomData, "customData should be persisted")
 }
 
 // TestPrecompile_RequiredGas_Comprehensive tests gas estimation for various inputs

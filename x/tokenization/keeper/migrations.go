@@ -2,15 +2,12 @@ package keeper
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/json"
 
-	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -45,6 +42,110 @@ func (k Keeper) MigrateTokenizationKeeper(ctx sdk.Context) error {
 	return nil
 }
 
+// MigrateCollectionStats computes and stores holder count and circulating supply for all existing collections.
+// Used by the v24->v25 module migration.
+func (k Keeper) MigrateCollectionStats(ctx sdk.Context) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+
+	collectionIterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
+	defer func() {
+		if err := collectionIterator.Close(); err != nil {
+			k.Logger().Error("failed to close collection stats migration iterator", "error", err)
+		}
+	}()
+
+	for ; collectionIterator.Valid(); collectionIterator.Next() {
+		var collection newtypes.TokenCollection
+		k.cdc.MustUnmarshal(collectionIterator.Value(), &collection)
+
+		holderCount := sdkmath.ZeroUint()
+		circulatingSupply := sdkmath.ZeroUint()
+
+		// Count holders by iterating balances for this collection
+		balanceIterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
+		for ; balanceIterator.Valid(); balanceIterator.Next() {
+			balanceKey := string(balanceIterator.Key()[len(UserBalanceKey):])
+			details, err := GetDetailsFromBalanceKey(balanceKey)
+			if err != nil || !details.collectionId.Equal(collection.CollectionId) {
+				continue
+			}
+
+			// Skip excluded addresses
+			if newtypes.IsMintOrTotalAddress(details.address) {
+				continue
+			}
+			if k.IsBackingPathAddress(ctx, &collection, details.address) {
+				continue
+			}
+			if k.IsWrappingPathAddress(ctx, &collection, details.address) {
+				continue
+			}
+
+			var balance newtypes.UserBalanceStore
+			k.cdc.MustUnmarshal(balanceIterator.Value(), &balance)
+
+			if hasNonZeroBalance(&balance) {
+				holderCount = holderCount.Add(sdkmath.OneUint())
+			}
+		}
+		balanceIterator.Close()
+
+		// Get Total balance for circulating supply - use Balance[] for proper range handling
+		var circulatingBalances []*newtypes.Balance
+		totalKey := ConstructBalanceKey(newtypes.TotalAddress, collection.CollectionId)
+		totalBalance, found := k.GetUserBalanceFromStore(ctx, totalKey)
+		if found {
+			circulatingBalances = newtypes.DeepCopyBalances(totalBalance.Balances)
+		}
+
+		// Subtract backed address balance using proper balance subtraction
+		if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+			backedKey := ConstructBalanceKey(collection.Invariants.CosmosCoinBackedPath.Address, collection.CollectionId)
+			backedBalance, found := k.GetUserBalanceFromStore(ctx, backedKey)
+			if found && len(backedBalance.Balances) > 0 {
+				var err error
+				circulatingBalances, err = newtypes.SubtractBalancesWithZeroForUnderflows(ctx, backedBalance.Balances, circulatingBalances)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// Store stats with Balance[]
+		stats := &newtypes.CollectionStats{
+			HolderCount: holderCount,
+			Balances:    circulatingBalances,
+		}
+		if err := k.SetCollectionStatsInStore(ctx, collection.CollectionId, stats); err != nil {
+			return err
+		}
+
+		// Calculate total for logging
+		for _, bal := range circulatingBalances {
+			circulatingSupply = circulatingSupply.Add(bal.Amount)
+		}
+
+		ctx.Logger().Info("Migrated collection stats",
+			"collectionId", collection.CollectionId,
+			"holderCount", holderCount,
+			"circulatingSupply", circulatingSupply)
+	}
+
+	return nil
+}
+
+// migrateInvariants handles migration of CollectionInvariants fields.
+// MaxSupplyPerId and EvmQueryChallenges are now at the base CollectionInvariants level.
+// The JSON marshal/unmarshal handles field mapping automatically, so no manual migration is needed.
+// This function is kept for potential future migrations.
+func migrateInvariants(newCollection *newtypes.TokenCollection, oldCollection *oldtypes.TokenCollection) error {
+	// v23 already has MaxSupplyPerId at base level, and the new version keeps it there.
+	// EvmQueryChallenges is a new field that will default to nil/empty if not present.
+	// JSON marshal/unmarshal handles all of this automatically.
+	return nil
+}
+
 // migrateIncomingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
 // Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
 // so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
@@ -52,21 +153,6 @@ func (k Keeper) MigrateTokenizationKeeper(ctx sdk.Context) error {
 func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
-	}
-	// WASM contract check fields (mustBeWasmContract, mustNotBeWasmContract) have been removed from proto.
-	// The JSON unmarshal during migration will automatically drop these fields since they no longer exist
-	// in the new AddressChecks struct. No explicit clearing is needed.
-
-	// Ensure EVM contract check fields default to false if not present in migrated data
-	if approvalCriteria.SenderChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.SenderChecks.MustBeEvmContract = false
-		approvalCriteria.SenderChecks.MustNotBeEvmContract = false
-	}
-	if approvalCriteria.InitiatorChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.InitiatorChecks.MustBeEvmContract = false
-		approvalCriteria.InitiatorChecks.MustNotBeEvmContract = false
 	}
 }
 
@@ -78,21 +164,6 @@ func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApproval
 	if approvalCriteria == nil {
 		return
 	}
-	// WASM contract check fields (mustBeWasmContract, mustNotBeWasmContract) have been removed from proto.
-	// The JSON unmarshal during migration will automatically drop these fields since they no longer exist
-	// in the new AddressChecks struct. No explicit clearing is needed.
-
-	// Ensure EVM contract check fields default to false if not present in migrated data
-	if approvalCriteria.RecipientChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.RecipientChecks.MustBeEvmContract = false
-		approvalCriteria.RecipientChecks.MustNotBeEvmContract = false
-	}
-	if approvalCriteria.InitiatorChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.InitiatorChecks.MustBeEvmContract = false
-		approvalCriteria.InitiatorChecks.MustNotBeEvmContract = false
-	}
 }
 
 // migrateApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -103,26 +174,6 @@ func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
-	// WASM contract check fields (mustBeWasmContract, mustNotBeWasmContract) have been removed from proto.
-	// The JSON unmarshal during migration will automatically drop these fields since they no longer exist
-	// in the new AddressChecks struct. No explicit clearing is needed.
-
-	// Ensure EVM contract check fields default to false if not present in migrated data
-	if approvalCriteria.SenderChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.SenderChecks.MustBeEvmContract = false
-		approvalCriteria.SenderChecks.MustNotBeEvmContract = false
-	}
-	if approvalCriteria.RecipientChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.RecipientChecks.MustBeEvmContract = false
-		approvalCriteria.RecipientChecks.MustNotBeEvmContract = false
-	}
-	if approvalCriteria.InitiatorChecks != nil {
-		// Explicitly set EVM contract check fields to false for migrated data
-		approvalCriteria.InitiatorChecks.MustBeEvmContract = false
-		approvalCriteria.InitiatorChecks.MustNotBeEvmContract = false
-	}
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
@@ -130,7 +181,6 @@ func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
-		// Clear WASM contract checks (fields removed from proto)
 		migrateIncomingApprovalCriteria(approval.ApprovalCriteria)
 	}
 
@@ -142,7 +192,6 @@ func MigrateOutgoingApprovals(outgoingApprovals []*newtypes.UserOutgoingApproval
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
-		// Clear WASM contract checks (fields removed from proto)
 		migrateOutgoingApprovalCriteria(approval.ApprovalCriteria)
 	}
 
@@ -154,50 +203,10 @@ func MigrateApprovals(collectionApprovals []*newtypes.CollectionApproval) []*new
 		if approval.ApprovalCriteria == nil {
 			continue
 		}
-		// Clear deprecated WASM contract checks
 		migrateApprovalCriteria(approval.ApprovalCriteria)
 	}
 
 	return collectionApprovals
-}
-
-// generateMintEscrowAddressWithModuleName generates mint escrow address with specified module name
-func generateMintEscrowAddressWithModuleName(moduleName string, collectionId sdkmath.Uint) (sdk.AccAddress, error) {
-	derivationKey := make([]byte, 8) // DerivationKeyLength = 8
-	binary.BigEndian.PutUint64(derivationKey, collectionId.Uint64())
-	ac, err := authtypes.NewModuleCredential(moduleName, AccountGenerationPrefix, derivationKey)
-	if err != nil {
-		return nil, err
-	}
-	return sdk.AccAddress(ac.Address()), nil
-}
-
-// generatePathAddressWithModuleName generates path address with specified module name
-func generatePathAddressWithModuleName(moduleName string, pathString string, prefix []byte) (sdk.AccAddress, error) {
-	fullPathBytes := []byte(pathString)
-	ac, err := authtypes.NewModuleCredential(moduleName, prefix, fullPathBytes)
-	if err != nil {
-		return nil, err
-	}
-	return sdk.AccAddress(ac.Address()), nil
-}
-
-// migrateBankBalances migrates all bank balances from old address to new address
-func (k Keeper) migrateBankBalances(ctx sdk.Context, oldAddress, newAddress string) error {
-	oldAddr := sdk.MustAccAddressFromBech32(oldAddress)
-	newAddr := sdk.MustAccAddressFromBech32(newAddress)
-
-	// Get all balances from old address
-	balances := k.bankKeeper.GetAllBalances(ctx, oldAddr)
-
-	if !balances.IsZero() {
-		// Transfer all balances to new address
-		if err := k.bankKeeper.SendCoins(ctx, oldAddr, newAddr, balances); err != nil {
-			return errorsmod.Wrapf(err, "failed to migrate balances from %s to %s", oldAddress, newAddress)
-		}
-	}
-
-	return nil
 }
 
 func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) error {
@@ -232,109 +241,9 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
 
-		// Track address mappings for reserved protocol address updates
-		addressMappings := make(map[string]string) // old -> new
-
-		// 1. Migrate MintEscrowAddress
-		if newCollection.MintEscrowAddress != "" {
-			oldMintAddr, err := generateMintEscrowAddressWithModuleName(oldModuleName, newCollection.CollectionId)
-			if err != nil {
-				return errorsmod.Wrapf(err, "failed to generate old mint address for collection %s", newCollection.CollectionId)
-			}
-
-			newMintAddr, err := generateMintEscrowAddressWithModuleName(newModuleName, newCollection.CollectionId)
-			if err != nil {
-				return errorsmod.Wrapf(err, "failed to generate new mint address for collection %s", newCollection.CollectionId)
-			}
-
-			oldMintAddrStr := oldMintAddr.String()
-			newMintAddrStr := newMintAddr.String()
-
-			// Only migrate if addresses are different
-			if oldMintAddrStr != newMintAddrStr {
-				// Migrate bank balances
-				if err := k.migrateBankBalances(ctx, oldMintAddrStr, newMintAddrStr); err != nil {
-					return errorsmod.Wrapf(err, "failed to migrate mint escrow balances for collection %s", newCollection.CollectionId)
-				}
-
-				// Update collection
-				newCollection.MintEscrowAddress = newMintAddrStr
-				addressMappings[oldMintAddrStr] = newMintAddrStr
-			}
-		}
-
-		// 2. Migrate CosmosCoinBackedPath address
-		if newCollection.Invariants != nil && newCollection.Invariants.CosmosCoinBackedPath != nil {
-			backedPath := newCollection.Invariants.CosmosCoinBackedPath
-			if backedPath.Conversion != nil && backedPath.Conversion.SideA != nil {
-				denom := backedPath.Conversion.SideA.Denom
-
-				oldBackedAddr, err := generatePathAddressWithModuleName(oldModuleName, denom, BackedPathGenerationPrefix)
-				if err != nil {
-					return errorsmod.Wrapf(err, "failed to generate old backed path address for denom %s", denom)
-				}
-
-				newBackedAddr, err := generatePathAddressWithModuleName(newModuleName, denom, BackedPathGenerationPrefix)
-				if err != nil {
-					return errorsmod.Wrapf(err, "failed to generate new backed path address for denom %s", denom)
-				}
-
-				oldBackedAddrStr := oldBackedAddr.String()
-				newBackedAddrStr := newBackedAddr.String()
-
-				if oldBackedAddrStr != newBackedAddrStr {
-					// Migrate bank balances
-					if err := k.migrateBankBalances(ctx, oldBackedAddrStr, newBackedAddrStr); err != nil {
-						return errorsmod.Wrapf(err, "failed to migrate backed path balances for denom %s", denom)
-					}
-
-					// Update collection
-					backedPath.Address = newBackedAddrStr
-					addressMappings[oldBackedAddrStr] = newBackedAddrStr
-				}
-			}
-		}
-
-		// 3. Migrate CosmosCoinWrapperPath addresses
-		for i, wrapperPath := range newCollection.CosmosCoinWrapperPaths {
-			if wrapperPath.Denom != "" {
-				oldWrapperAddr, err := generatePathAddressWithModuleName(oldModuleName, wrapperPath.Denom, WrapperPathGenerationPrefix)
-				if err != nil {
-					return errorsmod.Wrapf(err, "failed to generate old wrapper path address for denom %s", wrapperPath.Denom)
-				}
-
-				newWrapperAddr, err := generatePathAddressWithModuleName(newModuleName, wrapperPath.Denom, WrapperPathGenerationPrefix)
-				if err != nil {
-					return errorsmod.Wrapf(err, "failed to generate new wrapper path address for denom %s", wrapperPath.Denom)
-				}
-
-				oldWrapperAddrStr := oldWrapperAddr.String()
-				newWrapperAddrStr := newWrapperAddr.String()
-
-				if oldWrapperAddrStr != newWrapperAddrStr {
-					// Migrate bank balances
-					if err := k.migrateBankBalances(ctx, oldWrapperAddrStr, newWrapperAddrStr); err != nil {
-						return errorsmod.Wrapf(err, "failed to migrate wrapper path balances for denom %s", wrapperPath.Denom)
-					}
-
-					// Update collection
-					newCollection.CosmosCoinWrapperPaths[i].Address = newWrapperAddrStr
-					addressMappings[oldWrapperAddrStr] = newWrapperAddrStr
-				}
-			}
-		}
-
-		// 4. Update reserved protocol addresses
-		for oldAddr, newAddr := range addressMappings {
-			// Unset old address
-			if err := k.SetReservedProtocolAddressInStore(ctx, oldAddr, false); err != nil {
-				return errorsmod.Wrapf(err, "failed to unset old reserved protocol address %s", oldAddr)
-			}
-
-			// Set new address
-			if err := k.SetReservedProtocolAddressInStore(ctx, newAddr, true); err != nil {
-				return errorsmod.Wrapf(err, "failed to set new reserved protocol address %s", newAddr)
-			}
+		// Migrate invariants (now a no-op since maxSupplyPerId stays at base level)
+		if err := migrateInvariants(&newCollection, &oldCollection); err != nil {
+			return err
 		}
 
 		// Save the updated collection (with migrated addresses)

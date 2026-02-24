@@ -71,9 +71,20 @@ func (a *votingServiceAdapter) GetVoteFromStore(ctx sdk.Context, key string) (*t
 	return vote, true
 }
 
+// evmQueryServiceAdapter adapts the Keeper to the EVMQueryService interface
+type evmQueryServiceAdapter struct {
+	keeper *Keeper
+}
+
+func (a *evmQueryServiceAdapter) ExecuteEVMQuery(ctx sdk.Context, callerAddress string, contractAddress string, calldata []byte, gasLimit uint64) ([]byte, error) {
+	return a.keeper.ExecuteEVMQueryWithCaller(ctx, callerAddress, contractAddress, calldata, gasLimit)
+}
+
 // GetApprovalCriteriaCheckers returns all applicable checkers for the given approval
 // This includes basic validation checkers (address matching, transfer times) and approval criteria checkers
-func (k Keeper) GetApprovalCriteriaCheckers(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
+// NOTE: This method uses a pointer receiver to ensure adapters reference the actual keeper
+// (with evmKeeper, gammKeeper set) rather than a copy.
+func (k *Keeper) GetApprovalCriteriaCheckers(approval *types.CollectionApproval) []approvalcriteria.ApprovalCriteriaChecker {
 	checkers := []approvalcriteria.ApprovalCriteriaChecker{}
 
 	if approval.ApprovalCriteria == nil {
@@ -84,25 +95,25 @@ func (k Keeper) GetApprovalCriteriaCheckers(approval *types.CollectionApproval) 
 
 	// MustOwnTokens checker
 	if len(approvalCriteria.MustOwnTokens) > 0 {
-		collectionService := &collectionServiceAdapter{keeper: &k}
+		collectionService := &collectionServiceAdapter{keeper: k}
 		checkers = append(checkers, approvalcriteria.NewMustOwnTokensChecker(collectionService))
 	}
 
 	// Address checks for sender
 	if approvalCriteria.SenderChecks != nil {
-		addressCheckService := &addressCheckServiceAdapter{keeper: &k}
+		addressCheckService := &addressCheckServiceAdapter{keeper: k}
 		checkers = append(checkers, approvalcriteria.NewAddressChecksChecker(addressCheckService, approvalCriteria.SenderChecks, "sender"))
 	}
 
 	// Address checks for recipient
 	if approvalCriteria.RecipientChecks != nil {
-		addressCheckService := &addressCheckServiceAdapter{keeper: &k}
+		addressCheckService := &addressCheckServiceAdapter{keeper: k}
 		checkers = append(checkers, approvalcriteria.NewAddressChecksChecker(addressCheckService, approvalCriteria.RecipientChecks, "recipient"))
 	}
 
 	// Address checks for initiator
 	if approvalCriteria.InitiatorChecks != nil {
-		addressCheckService := &addressCheckServiceAdapter{keeper: &k}
+		addressCheckService := &addressCheckServiceAdapter{keeper: k}
 		checkers = append(checkers, approvalcriteria.NewAddressChecksChecker(addressCheckService, approvalCriteria.InitiatorChecks, "initiator"))
 	}
 
@@ -130,21 +141,27 @@ func (k Keeper) GetApprovalCriteriaCheckers(approval *types.CollectionApproval) 
 
 	// DynamicStoreChallenges checker
 	if len(approvalCriteria.DynamicStoreChallenges) > 0 {
-		dynamicStoreService := &dynamicStoreServiceAdapter{keeper: &k}
+		dynamicStoreService := &dynamicStoreServiceAdapter{keeper: k}
 		checkers = append(checkers, approvalcriteria.NewDynamicStoreChallengesChecker(dynamicStoreService))
 	}
 
 	// VotingChallenges checker
 	if len(approvalCriteria.VotingChallenges) > 0 {
-		votingService := &votingServiceAdapter{keeper: &k}
+		votingService := &votingServiceAdapter{keeper: k}
 		checkers = append(checkers, approvalcriteria.NewVotingChallengesChecker(votingService))
+	}
+
+	// EVMQueryChallenges checker
+	if len(approvalCriteria.EvmQueryChallenges) > 0 {
+		evmQueryService := &evmQueryServiceAdapter{keeper: k}
+		checkers = append(checkers, approvalcriteria.NewEVMQueryChallengesChecker(evmQueryService))
 	}
 
 	// NoForcefulPostMintTransfers checker (always added, will check if invariant is enabled in Check method)
 	checkers = append(checkers, approvalcriteria.NewNoForcefulPostMintTransfersChecker())
 
 	// ReservedProtocolAddress checker (always added, will check conditions in Check method)
-	addressCheckService := &addressCheckServiceAdapter{keeper: &k}
+	addressCheckService := &addressCheckServiceAdapter{keeper: k}
 	checkers = append(checkers, approvalcriteria.NewReservedProtocolAddressChecker(addressCheckService))
 
 	// Append custom checkers registered by developers

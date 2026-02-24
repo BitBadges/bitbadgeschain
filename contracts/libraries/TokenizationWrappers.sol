@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
-import "../types/sol";
+import "../types/TokenizationTypes.sol";
 import "./TokenizationJSONHelpers.sol";
 import "./TokenizationHelpers.sol";
 

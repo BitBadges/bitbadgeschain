@@ -90,6 +90,11 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/tokenization/get_votes/{collectionId}/{approvalLevel}/{approverAddress}/{approvalId}/{proposalId}";
 	}
 
+  // Queries collection stats (holder count and circulating supply) by collection ID.
+  rpc GetCollectionStats(QueryGetCollectionStatsRequest) returns (QueryGetCollectionStatsResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/tokenization/get_collection_stats/{collectionId}";
+  }
+
   // this line is used by starport scaffolding # 2
 }
 
@@ -230,6 +235,14 @@ message QueryGetVotesRequest {
 
 message QueryGetVotesResponse {
   repeated VoteProof votes = 1;
+}
+
+message QueryGetCollectionStatsRequest {
+  string collectionId = 1;
+}
+
+message QueryGetCollectionStatsResponse {
+  CollectionStats stats = 1;
 }
 
 // this line is used by starport scaffolding # 3

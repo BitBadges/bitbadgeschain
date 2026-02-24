@@ -47,7 +47,7 @@ type EVMKeeperIntegrationTestSuite struct {
 	EVMKeeper          *evmkeeper.Keeper
 	Precompile         *tokenization.Precompile
 	BankKeeper         bankkeeper.Keeper
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 
 	// Test accounts with private keys
 	AliceKey *ecdsa.PrivateKey

@@ -307,6 +307,14 @@ interface ITokenizationPrecompile {
         string calldata msgJson
     ) external view returns (bytes memory collection);
 
+    /// @notice Get collection stats (e.g. holder count) by ID
+    /// @dev Returns protobuf-encoded QueryGetCollectionStatsResponse (stats field = CollectionStats with holderCount).
+    /// @param msgJson JSON string matching QueryGetCollectionStatsRequest, e.g. {"collectionId":"1"}
+    /// @return stats Protobuf-encoded CollectionStats bytes
+    function getCollectionStats(
+        string calldata msgJson
+    ) external view returns (bytes memory stats);
+
     /// @notice Get user balance for a collection
     /// @dev Returns protobuf-encoded UserBalanceStore. Decode using appropriate codec.
     /// @param msgJson JSON string matching QueryBalanceRequest protobuf format

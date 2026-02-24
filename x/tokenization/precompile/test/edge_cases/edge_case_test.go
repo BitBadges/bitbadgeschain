@@ -26,7 +26,7 @@ import (
 // EdgeCaseTestSuite is a test suite for edge cases and boundary conditions
 type EdgeCaseTestSuite struct {
 	suite.Suite
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 	Ctx                sdk.Context
 	Precompile         *tokenization.Precompile
 

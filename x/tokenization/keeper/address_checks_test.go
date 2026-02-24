@@ -2,10 +2,12 @@ package keeper_test
 
 import (
 	"math"
+	"math/big"
 	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
@@ -490,6 +492,11 @@ func (m *mockEVMKeeper) IsContract(ctx sdk.Context, addr common.Address) bool {
 	accAddr := sdk.AccAddress(addr.Bytes())
 	addrStr := accAddr.String()
 	return m.contracts[addrStr]
+}
+
+func (m *mockEVMKeeper) CallEVMWithData(ctx sdk.Context, from common.Address, contract *common.Address, data []byte, commit bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error) {
+	// Mock implementation - return empty response
+	return &evmtypes.MsgEthereumTxResponse{}, nil
 }
 
 type mockGammKeeper struct {

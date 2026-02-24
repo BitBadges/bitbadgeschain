@@ -33,7 +33,7 @@ import (
 // - Transfer event emission
 type ERC3643ComplianceTestSuite struct {
 	suite.Suite
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 	Ctx                sdk.Context
 	Precompile         *tokenization.Precompile
 

@@ -29,3 +29,11 @@ type DynamicStoreService interface {
 type AddressListService interface {
 	CheckAddresses(ctx sdk.Context, addressListId string, addressToCheck string) (bool, error)
 }
+
+// EVMQueryService provides methods to execute read-only EVM queries
+type EVMQueryService interface {
+	// ExecuteEVMQuery performs a read-only call to an EVM contract.
+	// callerAddress is the address to use as the EVM caller (msg.sender in the contract); if empty, the implementation may use the zero address.
+	// Returns the raw return data or an error.
+	ExecuteEVMQuery(ctx sdk.Context, callerAddress string, contractAddress string, calldata []byte, gasLimit uint64) ([]byte, error)
+}

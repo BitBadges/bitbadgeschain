@@ -283,7 +283,7 @@ func GetRandomCollectionPermissions(r *rand.Rand, accs []simtypes.Account) *type
 }
 
 // GetRandomCollectionId returns a random existing collection ID, or zero if none exist
-func GetRandomCollectionId(r *rand.Rand, ctx sdk.Context, k keeper.Keeper) (sdkmath.Uint, bool) {
+func GetRandomCollectionId(r *rand.Rand, ctx sdk.Context, k *keeper.Keeper) (sdkmath.Uint, bool) {
 	nextId := k.GetNextCollectionId(ctx)
 	if nextId.LTE(sdkmath.NewUint(1)) {
 		// No collections exist yet (nextId is 1 means no collections created)
@@ -468,7 +468,7 @@ func EnsureAccountExists(r *rand.Rand, accs []simtypes.Account) simtypes.Account
 
 // GetKnownGoodCollectionId returns a collection ID that's guaranteed to exist
 // Falls back to creating one if needed (via SetupSimulationState)
-func GetKnownGoodCollectionId(ctx sdk.Context, k keeper.Keeper) (sdkmath.Uint, bool) {
+func GetKnownGoodCollectionId(ctx sdk.Context, k *keeper.Keeper) (sdkmath.Uint, bool) {
 	nextId := k.GetNextCollectionId(ctx)
 	if nextId.LTE(sdkmath.NewUint(1)) {
 		// No collections exist yet
@@ -480,7 +480,7 @@ func GetKnownGoodCollectionId(ctx sdk.Context, k keeper.Keeper) (sdkmath.Uint, b
 
 // GetKnownGoodDynamicStoreId returns a dynamic store ID that's guaranteed to exist
 // Falls back to creating one if needed
-func GetKnownGoodDynamicStoreId(ctx sdk.Context, k keeper.Keeper) (sdkmath.Uint, bool) {
+func GetKnownGoodDynamicStoreId(ctx sdk.Context, k *keeper.Keeper) (sdkmath.Uint, bool) {
 	nextStoreId := k.GetNextDynamicStoreId(ctx)
 	if nextStoreId.LTE(sdkmath.NewUint(1)) {
 		// No dynamic stores exist yet
@@ -492,7 +492,7 @@ func GetKnownGoodDynamicStoreId(ctx sdk.Context, k keeper.Keeper) (sdkmath.Uint,
 
 // GetOrCreateCollection ensures at least one collection exists
 // Returns the first collection ID, or creates a minimal valid collection if none exist
-func GetOrCreateCollection(ctx sdk.Context, k keeper.Keeper, creator string, r *rand.Rand, accs []simtypes.Account) (sdkmath.Uint, error) {
+func GetOrCreateCollection(ctx sdk.Context, k *keeper.Keeper, creator string, r *rand.Rand, accs []simtypes.Account) (sdkmath.Uint, error) {
 	collectionId, found := GetKnownGoodCollectionId(ctx, k)
 	if found {
 		return collectionId, nil
@@ -534,7 +534,7 @@ func GetOrCreateCollection(ctx sdk.Context, k keeper.Keeper, creator string, r *
 
 // SetupSimulationState pre-creates collections, dynamic stores, and balances for better simulation
 // This ensures that simulation operations have valid state to work with
-func SetupSimulationState(ctx sdk.Context, k keeper.Keeper, accs []simtypes.Account, r *rand.Rand) error {
+func SetupSimulationState(ctx sdk.Context, k *keeper.Keeper, accs []simtypes.Account, r *rand.Rand) error {
 	if len(accs) == 0 {
 		return nil // Can't setup state without accounts
 	}

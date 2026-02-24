@@ -30,6 +30,7 @@ var (
 	ReservedProtocolAddressKey = []byte{0x11}
 	PoolAddressCacheKey        = []byte{0x13}
 	VotingTrackerKey           = []byte{0x14}
+	CollectionStatsKey        = []byte{0x15}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 	BackedPathGenerationPrefix  = []byte{0x12}
@@ -277,5 +278,13 @@ func poolAddressCacheStoreKey(address string) []byte {
 	key := make([]byte, len(PoolAddressCacheKey)+len(address))
 	copy(key, PoolAddressCacheKey)
 	copy(key[len(PoolAddressCacheKey):], []byte(address))
+	return key
+}
+
+// collectionStatsStoreKey returns the byte representation of the collection stats key ([]byte{0x15} + collectionId as 8-byte big-endian)
+func collectionStatsStoreKey(collectionId sdkmath.Uint) []byte {
+	key := make([]byte, len(CollectionStatsKey)+IDLength)
+	copy(key, CollectionStatsKey)
+	binary.BigEndian.PutUint64(key[len(CollectionStatsKey):], collectionId.Uint64())
 	return key
 }

@@ -388,6 +388,8 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 		queryReq = &tokenizationtypes.QueryGetVoteRequest{}
 	case GetVotesMethod:
 		queryReq = &tokenizationtypes.QueryGetVotesRequest{}
+	case GetCollectionStatsMethod:
+		queryReq = &tokenizationtypes.QueryGetCollectionStatsRequest{}
 	case ParamsMethod:
 		queryReq = &tokenizationtypes.QueryParamsRequest{}
 	// Note: GetBalanceAmount and GetTotalSupply are handled separately as they don't use standard query requests

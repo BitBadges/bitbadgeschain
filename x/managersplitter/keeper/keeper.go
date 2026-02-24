@@ -22,7 +22,7 @@ type (
 		// should be the x/gov module account.
 		authority string
 
-		tokenizationKeeper tokenizationkeeper.Keeper
+		tokenizationKeeper *tokenizationkeeper.Keeper
 	}
 )
 
@@ -31,7 +31,7 @@ func NewKeeper(
 	storeService store.KVStoreService,
 	logger log.Logger,
 	authority string,
-	tokenizationKeeper tokenizationkeeper.Keeper,
+	tokenizationKeeper *tokenizationkeeper.Keeper,
 ) Keeper {
 	return Keeper{
 		cdc:                  cdc,

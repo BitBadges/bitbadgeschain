@@ -34,7 +34,7 @@ func init() {
 
 // TestSuite provides common test utilities and fixtures
 type TestSuite struct {
-	Keeper      tokenizationkeeper.Keeper
+	Keeper      *tokenizationkeeper.Keeper
 	Ctx         sdk.Context
 	Precompile  *tokenization.Precompile
 	MsgServer   tokenizationtypes.MsgServer

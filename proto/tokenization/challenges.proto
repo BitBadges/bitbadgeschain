@@ -137,13 +137,49 @@ message Voter {
 message VoteProof {
   // The proposal ID this vote is for.
   string proposalId = 1;
-  
+
   // The address of the voter casting the vote.
   string voter = 2;
-  
+
   // The percentage weight (0-100) allocated to "yes" vote.
   // The remaining percentage (100 - yesWeight) is allocated to "no" vote.
   // Example: yesWeight=70 means 70% yes, 30% no.
   string yesWeight = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+/*
+  EVMQueryChallenge defines a rule for approval via read-only EVM contract query.
+
+  The challenge executes a staticcall to the specified contract with the given calldata.
+  The result is compared against the expected result (if provided) or checked for non-zero return.
+
+  IMPORTANT: This is read-only and cannot modify state. The query is executed with a gas limit
+  to prevent DoS attacks. All results are deterministic since EVM state is consistent within a block.
+*/
+message EVMQueryChallenge {
+  // The EVM contract address to query (0x format or bb1 format)
+  string contractAddress = 1;
+
+  // ABI-encoded function selector + arguments (hex string without 0x prefix)
+  // Example: "70a08231000000000000000000000000{address}" for balanceOf(address)
+  // Can use placeholders: $initiator, $sender, $recipient (replaced at runtime)
+  string calldata = 2;
+
+  // Expected return value (hex string without 0x prefix). If empty, any non-error result passes.
+  // For boolean checks, use "0000...0001" for true.
+  string expectedResult = 3;
+
+  // Comparison operator: "eq" (equals), "ne" (not equals), "gt" (greater than), "gte", "lt", "lte"
+  // Only "eq" and "ne" work for non-numeric types. Default is "eq".
+  string comparisonOperator = 4;
+
+  // Gas limit for the query (default 100000, max 500000)
+  string gasLimit = 5 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // The URI associated with this challenge (metadata)
+  string uri = 6;
+
+  // Arbitrary custom data
+  string customData = 7;
 }
 

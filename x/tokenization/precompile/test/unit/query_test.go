@@ -23,7 +23,7 @@ import (
 // QueryTestSuite is a test suite for query methods
 type QueryTestSuite struct {
 	suite.Suite
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 	Ctx                sdk.Context
 	Precompile         *tokenization.Precompile
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../types/sol";
+import "../types/TokenizationTypes.sol";
 
 /**
  * @title TokenizationHelpers
@@ -362,5 +362,235 @@ library TokenizationHelpers {
     ) internal pure returns (TokenMetadata memory metadata) {
         return createTokenMetadata(uri, "", tokenIds);
     }
+
+    // ============ EVM Query Challenge Helpers (v25) ============
+
+    /**
+     * @notice Creates an EVMQueryChallenge struct
+     * @param contractAddress The EVM contract address to call (hex string with 0x prefix)
+     * @param callData The calldata for the static call (hex string)
+     * @param expectedResult The expected result to compare against (hex string)
+     * @param comparisonOperator The comparison operator ("eq", "ne", "gt", "gte", "lt", "lte")
+     * @param gasLimit Gas limit for the call (default 100000, max 500000)
+     * @return challenge The constructed EVMQueryChallenge
+     * @dev Use this for building EVM query challenges in approvals or invariants.
+     *      Placeholders available in callData: $initiator, $sender, $recipient, $collectionId
+     *
+     * Example:
+     * ```solidity
+     * // Check that a contract returns true for the sender
+     * EVMQueryChallenge memory challenge = TokenizationHelpers.createEVMQueryChallenge(
+     *     "0x1234...",           // contract address
+     *     "0x70a08231...",       // balanceOf(address) calldata with $sender placeholder
+     *     "0x0000...0001",       // expected: at least 1
+     *     "gte",                 // greater than or equal
+     *     100000                 // gas limit
+     * );
+     * ```
+     */
+    function createEVMQueryChallenge(
+        string memory contractAddress,
+        string memory callData,
+        string memory expectedResult,
+        string memory comparisonOperator,
+        uint256 gasLimit
+    ) internal pure returns (EVMQueryChallenge memory challenge) {
+        return EVMQueryChallenge({
+            contractAddress: contractAddress,
+            callData: callData,
+            expectedResult: expectedResult,
+            comparisonOperator: comparisonOperator,
+            gasLimit: gasLimit,
+            uri: "",
+            customData: ""
+        });
+    }
+
+    /**
+     * @notice Creates an EVMQueryChallenge with metadata
+     * @param contractAddress The EVM contract address to call
+     * @param callData The calldata for the static call
+     * @param expectedResult The expected result to compare against
+     * @param comparisonOperator The comparison operator
+     * @param gasLimit Gas limit for the call
+     * @param uri Metadata URI for the challenge
+     * @param customData Custom data for the challenge
+     * @return challenge The constructed EVMQueryChallenge
+     */
+    function createEVMQueryChallengeWithMetadata(
+        string memory contractAddress,
+        string memory callData,
+        string memory expectedResult,
+        string memory comparisonOperator,
+        uint256 gasLimit,
+        string memory uri,
+        string memory customData
+    ) internal pure returns (EVMQueryChallenge memory challenge) {
+        return EVMQueryChallenge({
+            contractAddress: contractAddress,
+            callData: callData,
+            expectedResult: expectedResult,
+            comparisonOperator: comparisonOperator,
+            gasLimit: gasLimit,
+            uri: uri,
+            customData: customData
+        });
+    }
+
+    /**
+     * @notice Creates an equality check EVM query challenge
+     * @param contractAddress The EVM contract address to call
+     * @param callData The calldata for the static call
+     * @param expectedResult The expected result (must equal)
+     * @return challenge The constructed EVMQueryChallenge with "eq" operator
+     */
+    function createEVMQueryChallengeEq(
+        string memory contractAddress,
+        string memory callData,
+        string memory expectedResult
+    ) internal pure returns (EVMQueryChallenge memory challenge) {
+        return createEVMQueryChallenge(contractAddress, callData, expectedResult, "eq", 100000);
+    }
+
+    /**
+     * @notice Creates a greater-than-or-equal check EVM query challenge
+     * @param contractAddress The EVM contract address to call
+     * @param callData The calldata for the static call
+     * @param minValue The minimum expected result
+     * @return challenge The constructed EVMQueryChallenge with "gte" operator
+     */
+    function createEVMQueryChallengeGte(
+        string memory contractAddress,
+        string memory callData,
+        string memory minValue
+    ) internal pure returns (EVMQueryChallenge memory challenge) {
+        return createEVMQueryChallenge(contractAddress, callData, minValue, "gte", 100000);
+    }
+
+    /**
+     * @notice Creates a less-than-or-equal check EVM query challenge
+     * @param contractAddress The EVM contract address to call
+     * @param callData The calldata for the static call
+     * @param maxValue The maximum expected result
+     * @return challenge The constructed EVMQueryChallenge with "lte" operator
+     */
+    function createEVMQueryChallengeLte(
+        string memory contractAddress,
+        string memory callData,
+        string memory maxValue
+    ) internal pure returns (EVMQueryChallenge memory challenge) {
+        return createEVMQueryChallenge(contractAddress, callData, maxValue, "lte", 100000);
+    }
+
+    // ============ Collection Invariants Helpers (v25) ============
+
+    /**
+     * @notice Creates an empty CollectionInvariants struct
+     * @return invariants CollectionInvariants with all fields set to defaults
+     */
+    function createEmptyCollectionInvariants() internal pure returns (CollectionInvariants memory invariants) {
+        return CollectionInvariants({
+            noCustomOwnershipTimes: false,
+            maxSupplyPerId: 0,
+            cosmosCoinBackedPath: CosmosCoinBackedPath({
+                addr: "",
+                conversion: Conversion({
+                    sideA: ConversionSideAWithDenom({amount: 0, denom: ""}),
+                    sideB: new Balance[](0)
+                })
+            }),
+            noForcefulPostMintTransfers: false,
+            disablePoolCreation: false,
+            evmQueryChallenges: new EVMQueryChallenge[](0)
+        });
+    }
+
+    /**
+     * @notice Creates CollectionInvariants with EVM query challenges
+     * @param evmQueryChallenges Array of EVM query challenges to enforce post-transfer
+     * @return invariants CollectionInvariants with the specified EVM query challenges
+     * @dev EVM query challenges in invariants are executed after every transfer.
+     *      If any challenge fails, the transfer is reverted.
+     *
+     * Example - Max holder count invariant:
+     * ```solidity
+     * EVMQueryChallenge[] memory challenges = new EVMQueryChallenge[](1);
+     * challenges[0] = TokenizationHelpers.createEVMQueryChallenge(
+     *     maxHoldersCheckerAddress,
+     *     abi.encodeWithSignature("checkMaxHolders(uint256,uint256)", collectionId, 100),
+     *     bytes32(uint256(1)),  // expect pass (1)
+     *     "eq",
+     *     200000
+     * );
+     * CollectionInvariants memory invariants = TokenizationHelpers.createInvariantsWithEVMChallenges(challenges);
+     * ```
+     */
+    function createInvariantsWithEVMChallenges(
+        EVMQueryChallenge[] memory evmQueryChallenges
+    ) internal pure returns (CollectionInvariants memory invariants) {
+        invariants = createEmptyCollectionInvariants();
+        invariants.evmQueryChallenges = evmQueryChallenges;
+        return invariants;
+    }
+
+    /**
+     * @notice Creates CollectionInvariants with max supply per token ID
+     * @param maxSupplyPerId Maximum supply allowed per token ID
+     * @return invariants CollectionInvariants with max supply set
+     */
+    function createInvariantsWithMaxSupply(
+        uint256 maxSupplyPerId
+    ) internal pure returns (CollectionInvariants memory invariants) {
+        invariants = createEmptyCollectionInvariants();
+        invariants.maxSupplyPerId = maxSupplyPerId;
+        return invariants;
+    }
+
+    /**
+     * @notice Creates CollectionInvariants with multiple settings
+     * @param noCustomOwnershipTimes Disallow custom ownership times
+     * @param maxSupplyPerId Maximum supply per token ID (0 for unlimited)
+     * @param noForcefulPostMintTransfers Prevent forceful transfers after minting
+     * @param disablePoolCreation Disable liquidity pool creation
+     * @param evmQueryChallenges Array of EVM query challenges
+     * @return invariants The configured CollectionInvariants
+     */
+    function createCollectionInvariants(
+        bool noCustomOwnershipTimes,
+        uint256 maxSupplyPerId,
+        bool noForcefulPostMintTransfers,
+        bool disablePoolCreation,
+        EVMQueryChallenge[] memory evmQueryChallenges
+    ) internal pure returns (CollectionInvariants memory invariants) {
+        return CollectionInvariants({
+            noCustomOwnershipTimes: noCustomOwnershipTimes,
+            maxSupplyPerId: maxSupplyPerId,
+            cosmosCoinBackedPath: CosmosCoinBackedPath({
+                addr: "",
+                conversion: Conversion({
+                    sideA: ConversionSideAWithDenom({amount: 0, denom: ""}),
+                    sideB: new Balance[](0)
+                })
+            }),
+            noForcefulPostMintTransfers: noForcefulPostMintTransfers,
+            disablePoolCreation: disablePoolCreation,
+            evmQueryChallenges: evmQueryChallenges
+        });
+    }
+
+    // ============ Calldata Placeholder Helpers ============
+
+    /**
+     * @notice Placeholder constants for EVM query challenge calldata
+     * @dev These are replaced at runtime with actual values:
+     *      $initiator - The address that initiated the transfer
+     *      $sender - The sender (from) address
+     *      $recipient - The recipient (to) address
+     *      $collectionId - The collection ID (as uint256)
+     */
+    string constant PLACEHOLDER_INITIATOR = "$initiator";
+    string constant PLACEHOLDER_SENDER = "$sender";
+    string constant PLACEHOLDER_RECIPIENT = "$recipient";
+    string constant PLACEHOLDER_COLLECTION_ID = "$collectionId";
 }
 

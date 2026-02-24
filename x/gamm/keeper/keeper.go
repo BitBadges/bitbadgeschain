@@ -40,7 +40,7 @@ type Keeper struct {
 	bankKeeper          types.BankKeeper
 	communityPoolKeeper types.CommunityPoolKeeper
 	poolManager         types.PoolManager
-	tokenizationKeeper  tokenizationkeeper.Keeper
+	tokenizationKeeper  *tokenizationkeeper.Keeper
 	sendManagerKeeper   types.SendManagerKeeper
 	transferKeeper      types.TransferKeeper
 
@@ -50,7 +50,7 @@ type Keeper struct {
 }
 
 func NewKeeper(
-	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, tokenizationKeeper tokenizationkeeper.Keeper,
+	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, tokenizationKeeper *tokenizationkeeper.Keeper,
 	sendManagerKeeper types.SendManagerKeeper,
 	transferKeeper types.TransferKeeper,
 	ics4Wrapper types.ICS4Wrapper,

@@ -20,8 +20,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/maps/types"
-
-	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
 func MapsKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -56,7 +54,7 @@ func MapsKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		func() *ibckeeper.Keeper {
 			return ibcK
 		},
-		tokenizationkeeper.Keeper{},
+		nil, // tokenizationKeeper not needed for maps keeper tests
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

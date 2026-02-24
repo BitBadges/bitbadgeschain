@@ -252,7 +252,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		app.Logger(),
 		&app.GammKeeper,
 		app.BankKeeper,
-		&app.TokenizationKeeper,
+		app.TokenizationKeeper,
 		&app.SendmanagerKeeper,
 		app.TransferKeeper,
 		app.TransferICS4Wrapper,

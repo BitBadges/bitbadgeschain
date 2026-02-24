@@ -336,6 +336,19 @@ struct DynamicStoreChallenge {
 }
 
 /**
+ * @notice EVM query challenge - read-only contract call for approval or post-transfer invariant
+ */
+struct EVMQueryChallenge {
+    string contractAddress;
+    string callData;  // hex-encoded calldata for the EVM staticcall (avoid reserved word "calldata")
+    string expectedResult;
+    string comparisonOperator;
+    uint256 gasLimit;
+    string uri;
+    string customData;
+}
+
+/**
  * @notice Address checks
  */
 struct AddressChecks {
@@ -642,6 +655,7 @@ struct CollectionInvariants {
     CosmosCoinBackedPath cosmosCoinBackedPath;
     bool noForcefulPostMintTransfers;
     bool disablePoolCreation;
+    EVMQueryChallenge[] evmQueryChallenges;
 }
 
 /**
@@ -1473,6 +1487,7 @@ struct InvariantsAddObject {
     CosmosCoinBackedPath cosmosCoinBackedPath;
     bool noForcefulPostMintTransfers;
     bool disablePoolCreation;
+    EVMQueryChallenge[] evmQueryChallenges;
 }
 
 /**

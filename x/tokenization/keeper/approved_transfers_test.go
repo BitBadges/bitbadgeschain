@@ -223,7 +223,7 @@ func (suite *TestSuite) TestMaxOneTransfer() {
 
 // Legacy helper
 // Now that we switched to disallowing auto scan for truthy approval criteria, we need to specify the prioritized approvals manually
-func GetDefaultPrioritizedApprovals(ctx sdk.Context, k keeper.Keeper, collectionId sdkmath.Uint) []*types.ApprovalIdentifierDetails {
+func GetDefaultPrioritizedApprovals(ctx sdk.Context, k *keeper.Keeper, collectionId sdkmath.Uint) []*types.ApprovalIdentifierDetails {
 	prioritizedApprovals := []*types.ApprovalIdentifierDetails{
 		{
 			ApprovalLevel:   "collection",
@@ -308,7 +308,7 @@ func GetDefaultPrioritizedApprovals(ctx sdk.Context, k keeper.Keeper, collection
 
 // GetPrioritizedApprovalsFromCollection gets all collection approvals as prioritized approvals
 // This is useful for tests involving special addresses where OnlyCheckPrioritizedCollectionApprovals is set
-func GetPrioritizedApprovalsFromCollection(ctx sdk.Context, k keeper.Keeper, collection *types.TokenCollection) []*types.ApprovalIdentifierDetails {
+func GetPrioritizedApprovalsFromCollection(ctx sdk.Context, k *keeper.Keeper, collection *types.TokenCollection) []*types.ApprovalIdentifierDetails {
 	prioritizedApprovals := []*types.ApprovalIdentifierDetails{}
 	for _, approval := range collection.CollectionApprovals {
 		version, found := k.GetApprovalTrackerVersionFromStore(

@@ -2,8 +2,10 @@ package types
 
 import (
 	"context"
+	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -11,7 +13,9 @@ import (
 
 // AccountKeeper defines the expected interface for the Account module.
 type AccountKeeper interface {
-	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI // only used for simulation
+	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI
+	NewAccountWithAddress(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
+	SetAccount(ctx context.Context, acc sdk.AccountI)
 	// Methods imported from account should be defined here
 }
 
@@ -46,6 +50,10 @@ type GammKeeper interface {
 // EVMKeeper defines the expected interface for checking EVM contracts.
 type EVMKeeper interface {
 	IsContract(ctx sdk.Context, addr common.Address) bool
+	// CallEVMWithData executes a contract call with raw calldata.
+	// Set commit=false for read-only calls (staticcall).
+	// gasCap limits the gas for the call (nil for no limit).
+	CallEVMWithData(ctx sdk.Context, from common.Address, contract *common.Address, data []byte, commit bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error)
 }
 
 // SendManagerKeeper defines the expected interface for the SendManager module.

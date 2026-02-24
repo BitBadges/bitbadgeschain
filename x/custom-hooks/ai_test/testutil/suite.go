@@ -40,7 +40,7 @@ func (suite *AITestSuite) SetupTest() {
 		suite.App.Logger(),
 		&suite.App.GammKeeper,
 		suite.App.BankKeeper,
-		&suite.App.TokenizationKeeper,
+		suite.App.TokenizationKeeper,
 		&suite.App.SendmanagerKeeper,
 		suite.App.TransferKeeper,
 		suite.App.HooksICS4Wrapper,

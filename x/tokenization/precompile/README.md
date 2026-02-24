@@ -76,15 +76,9 @@ The `TokenizationJSONHelpers` library provides convenient functions for common o
 
 ## ABI Notes
 
-### Return Type Simplifications
+### Return Types (Go to Solidity)
 
-Due to the complexity of nested structures in the tokenization types, some fields are returned as empty arrays in Solidity struct representations:
-
-- **TokenCollection**: `approvalCriteria` (in collectionApprovals), `invariants.cosmosCoinBackedPath`, `userPermissions` (in defaultBalances)
-- **UserBalanceStore**: `approvalCriteria` (in outgoing/incomingApprovals)
-- **CollectionApproval**: `approvalCriteria`
-
-For full access to these fields, use the raw bytes returned from query methods and decode with protobuf.
+Struct output from the precompile is converted end-to-end to match the Solidity type definitions in `TokenizationTypes.sol`. All nested fields (approvalCriteria, cosmosCoinBackedPath, collectionPermissions, userPermissions, Conversion, etc.) are fully converted when the ABI returns a struct tuple. The `Pack*AsStruct` helpers only support struct/tuple outputs; there is no legacy bytes mode. The main query path (HandleQuery) currently returns marshalled proto bytes for all getters; to return struct tuples instead, the ABI would need to declare struct return types and the handler would need to use the Pack*AsStruct helpers.
 
 ### Known Limitations
 

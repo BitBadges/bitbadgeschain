@@ -129,6 +129,7 @@ const (
 	MaxDynamicStoreChallenges = 20 // Maximum dynamic store challenges
 	MaxETHSignatureChallenges = 20 // Maximum ETH signature challenges
 	MaxVotingChallenges    = 20  // Maximum voting challenges
+	MaxEVMQueryChallenges  = 10  // Maximum EVM query challenges
 	MaxMustOwnTokens       = 50  // Maximum must own token rules
 	MaxAddressListEntries  = 1000 // Maximum addresses per address list
 	MaxMetadataLength      = 10000 // Maximum length for metadata strings (URI, customData)

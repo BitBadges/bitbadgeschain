@@ -28,7 +28,7 @@ type (
 
 		ibcKeeperFn func() *ibckeeper.Keeper
 
-		tokenizationKeeper tokenizationkeeper.Keeper
+		tokenizationKeeper *tokenizationkeeper.Keeper
 	}
 )
 
@@ -38,7 +38,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	ibcKeeperFn func() *ibckeeper.Keeper,
-	tokenizationKeeper tokenizationkeeper.Keeper,
+	tokenizationKeeper *tokenizationkeeper.Keeper,
 
 ) Keeper {
 	return Keeper{

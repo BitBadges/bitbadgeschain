@@ -97,6 +97,7 @@ const (
 	GasGetAllReservedProtocol    = 5_000
 	GasGetVote                   = 5_000
 	GasGetVotes                  = 5_000
+	GasGetCollectionStats        = 3_000
 	GasParams                    = 2_000
 	GasGetBalanceAmountBase      = 3_000
 	GasGetTotalSupplyBase        = 3_000
@@ -139,13 +140,13 @@ type Precompile struct {
 	cmn.Precompile
 
 	abi.ABI
-	tokenizationKeeper tokenizationkeeper.Keeper
+	tokenizationKeeper *tokenizationkeeper.Keeper
 }
 
 // NewPrecompile creates a new tokenization Precompile instance implementing the
 // PrecompiledContract interface.
 func NewPrecompile(
-	tokenizationKeeper tokenizationkeeper.Keeper,
+	tokenizationKeeper *tokenizationkeeper.Keeper,
 ) *Precompile {
 	return &Precompile{
 		Precompile: cmn.Precompile{
@@ -340,6 +341,8 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasGetVote
 	case GetVotesMethod:
 		baseGas = GasGetVotes
+	case GetCollectionStatsMethod:
+		baseGas = GasGetCollectionStats
 	case ParamsMethod:
 		baseGas = GasParams
 	case GetBalanceAmountMethod:
@@ -1128,6 +1131,8 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		resp, err = p.tokenizationKeeper.GetVote(ctx, req)
 	case *tokenizationtypes.QueryGetVotesRequest:
 		resp, err = p.tokenizationKeeper.GetVotes(ctx, req)
+	case *tokenizationtypes.QueryGetCollectionStatsRequest:
+		resp, err = p.tokenizationKeeper.GetCollectionStats(ctx, req)
 	case *tokenizationtypes.QueryParamsRequest:
 		resp, err = p.tokenizationKeeper.Params(ctx, req)
 	default:
@@ -1430,6 +1435,17 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 		// Validate list ID
 		if req.ListId == "" {
 			return ErrInvalidInput("list ID cannot be empty")
+		}
+	case *tokenizationtypes.QueryGetCollectionStatsRequest:
+		if req.CollectionId == "" {
+			return ErrInvalidInput("collection ID cannot be empty")
+		}
+		collectionId, err := sdkmath.ParseUint(req.CollectionId)
+		if err != nil {
+			return ErrInvalidInput(fmt.Sprintf("invalid collection ID: %s", err))
+		}
+		if collectionId.IsZero() {
+			return ErrInvalidInput("collection ID cannot be zero")
 		}
 	}
 	return nil
@@ -1750,6 +1766,7 @@ const (
 	GetAllReservedProtocolAddressesMethod = "getAllReservedProtocolAddresses"
 	GetVoteMethod                         = "getVote"
 	GetVotesMethod                        = "getVotes"
+	GetCollectionStatsMethod              = "getCollectionStats"
 	ParamsMethod                          = "params"
 	GetBalanceAmountMethod                = "getBalanceAmount"
 	GetTotalSupplyMethod                  = "getTotalSupply"

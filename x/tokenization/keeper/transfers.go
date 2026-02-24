@@ -228,6 +228,19 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 			if err := k.SetBalanceForAddress(ctx, collection, types.TotalAddress, totalBalances); err != nil {
 				return err
 			}
+
+			// Increment circulating supply for minted tokens
+			if err := k.IncrementCirculatingSupplyOnMint(ctx, collection.CollectionId, totalMinted); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Check post-transfer invariants ONCE after ALL transfers and balance updates complete
+	// This runs once per message, not per transfer or per recipient
+	for _, transfer := range transfers {
+		if err := k.CheckPostTransferInvariants(ctx, collection, transfer.From, transfer.ToAddresses, initiatedBy); err != nil {
+			return err
 		}
 	}
 

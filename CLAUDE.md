@@ -21,14 +21,18 @@ go build ./cmd/bitbadgeschaind
 
 ### Testing
 ```bash
+# Run all tests (required: -tags=test for EVM/cosmos-evm test helpers)
+make test
+# or: go test ./... -count=1 -tags=test
+
 # Run all tokenization module tests
-go test ./x/tokenization/...
+go test ./x/tokenization/... -tags=test
 
 # Run keeper tests specifically
-go test ./x/tokenization/keeper/...
+go test ./x/tokenization/keeper/... -tags=test
 
 # Run specific test
-go test ./x/tokenization/keeper/ -run TestMsgCreateDynamicStore
+go test ./x/tokenization/keeper/ -run TestMsgCreateDynamicStore -tags=test
 
 # Run integration tests
 ignite chain test

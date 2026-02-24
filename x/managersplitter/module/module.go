@@ -192,7 +192,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	TokenizationKeeper  tokenizationkeeper.Keeper
+	TokenizationKeeper  *tokenizationkeeper.Keeper
 }
 
 type ModuleOutputs struct {

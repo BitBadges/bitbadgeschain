@@ -279,10 +279,20 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 
 // ValidateCollectionApprovalsWithInvariants validates collection approvals with invariants using keeper context
 // This allows proper checking of address lists (e.g., whether FromListId includes "Mint")
+// and that EVM query challenge contract addresses are actual contracts.
 func (k Keeper) ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, collectionApprovals []*types.CollectionApproval, canChangeValues bool, collection *types.TokenCollection) error {
 	// First validate the basic collection approvals
 	if err := types.ValidateCollectionApprovals(ctx, collectionApprovals, canChangeValues); err != nil {
 		return err
+	}
+
+	// Validate that EVM query challenge contract addresses are contracts (has code)
+	for _, approval := range collectionApprovals {
+		if approval.ApprovalCriteria != nil && len(approval.ApprovalCriteria.EvmQueryChallenges) > 0 {
+			if err := k.ValidateEVMQueryChallengesAreContracts(ctx, approval.ApprovalCriteria.EvmQueryChallenges); err != nil {
+				return sdkerrors.Wrapf(err, "approval %s: %s", approval.ApprovalId, err.Error())
+			}
+		}
 	}
 
 	// Check invariants if collection is provided

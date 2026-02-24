@@ -199,7 +199,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	TokenizationKeeper  tokenizationkeeper.Keeper
+	TokenizationKeeper  *tokenizationkeeper.Keeper
 
 	IBCKeeperFn func() *ibckeeper.Keeper `optional:"true"`
 }

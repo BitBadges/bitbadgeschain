@@ -74,7 +74,7 @@ func setAutoApprovalFlagsIfNeeded(balance *tokenizationtypes.UserBalanceStore) b
 // by calling SetBalanceForAddress directly. This is intentional for pool/path addresses which are
 // system addresses that require auto-approval to function correctly. This function should only be
 // called from properly gated pool integration entry points (e.g., GAMM swap handlers).
-func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error {
+func (k *Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error {
 	currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address)
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func (k Keeper) SetAllAutoApprovalFlagsForPoolAddress(ctx sdk.Context, collectio
 //   - Each flag is checked individually before setting
 //   - This function does not validate that the address is a pool/path address since
 //     intermediate addresses are a different type of system address
-func (k Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error {
+func (k *Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, collection *tokenizationtypes.TokenCollection, address string) error {
 	// Get current balances
 	currBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address)
 	if err != nil {
@@ -120,7 +120,7 @@ func (k Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, c
 }
 
 // sendNativeTokensToAddressWithPoolApprovals sends native tokens to an address
-func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, poolAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+func (k *Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, poolAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -160,7 +160,7 @@ func (k Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, pool
 // SendNativeTokensFromAddressWithPoolApprovals sends native tokenization tokens from an address
 // Security: Uses unique approval IDs and ensures cleanup even on failure to prevent approval reuse.
 // This function is exported for testing purposes to verify security properties.
-func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
+func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fromAddress string, recipientAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -280,7 +280,7 @@ func (k Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, fr
 }
 
 // sendNativeTokensToAddressWithPoolApprovals sends native tokens to an address
-func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+func (k *Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -314,7 +314,7 @@ func (k Keeper) SendNativeTokensViaAliasDenom(ctx sdk.Context, recipientAddress 
 
 // FundCommunityPoolViaAliasDenom funds the community pool using alias denom routing
 // This handles the alias denom-specific logic (e.g., setting auto-approvals for the module address)
-func (k Keeper) FundCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+func (k *Keeper) FundCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -332,7 +332,7 @@ func (k Keeper) FundCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress stri
 
 // SpendFromCommunityPoolViaAliasDenom spends from the community pool using alias denom routing
 // This handles the alias denom-specific logic (e.g., setting auto-approvals for the recipient address)
-func (k Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+func (k *Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -351,7 +351,7 @@ func (k Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddress
 // SendCoinsToPoolWithAliasRouting sends coins to a pool, wrapping tokenization denoms if needed.
 // IMPORTANT: Should ONLY be called when to address is a pool address
 // bankKeeper is required for sending non-tokenization coins
-func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+func (k *Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a tokenization denom, wrap it
 	for _, coin := range coins {
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
@@ -373,7 +373,7 @@ func (k Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAdd
 // SendCoinsFromPoolWithAliasRouting sends coins from a pool, unwrapping tokenization denoms if needed.
 // IMPORTANT: Should ONLY be called when from address is a pool address
 // bankKeeper is required for sending non-tokenization coins
-func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
+func (k *Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a tokenization denom, unwrap it
 	for _, coin := range coins {
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
@@ -393,7 +393,7 @@ func (k Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccA
 	return nil
 }
 
-func (k Keeper) GetSpendableCoinAmountTokenizationLPOnly(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
+func (k *Keeper) GetSpendableCoinAmountTokenizationLPOnly(ctx sdk.Context, address sdk.AccAddress, denom string) (sdkmath.Int, error) {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return sdkmath.ZeroInt(), err

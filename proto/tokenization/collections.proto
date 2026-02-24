@@ -8,6 +8,7 @@ import "tokenization/permissions.proto";
 import "tokenization/metadata.proto";
 import "tokenization/approvals.proto";
 import "tokenization/user_balance_store.proto";
+import "tokenization/challenges.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types";
@@ -166,20 +167,32 @@ message CollectionInvariants {
   // If true, all ownership times must be full ranges [{ start: 1, end: GoMaxUInt64 }].
   // This prevents time-based restrictions on token ownership.
   bool noCustomOwnershipTimes = 1;
-  
-  // Maximum supply per token ID. If set, no balance can exceed this amount.
-  // This prevents any single token ID from having more than the specified supply.
+
+  // Maximum supply per token ID. Checked against Total address balances after transfers complete.
+  // A value of 0 means no limit (unlimited).
   string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
+
   // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
   CosmosCoinBackedPath cosmosCoinBackedPath = 3;
-  
+
   // If true, disallows any collection approvals that have overridesFromOutgoingApprovals or overridesToIncomingApprovals set to true.
   // This prevents forceful transfers that bypass user-level approvals.
   // This only applies to transfers where the from address does not equal "Mint".
   bool noForcefulPostMintTransfers = 4;
-  
+
   // If true, disallows pool creation with this collection's assets.
   // When true, any attempt to create a pool with tokenization assets from this collection will fail.
   bool disablePoolCreation = 5;
+
+  // EVM query invariants that must pass after all transfers complete.
+  // These are checked once per message after all balance updates, with access to ALL recipient addresses.
+  // Placeholders: $sender, $recipients (comma-separated), $initiator, $collectionId, $recipient
+  repeated EVMQueryChallenge evmQueryChallenges = 6;
+}
+
+// CollectionStats tracks aggregated statistics for a collection.
+message CollectionStats {
+  string holderCount = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // Tracks circulating supply as Balance[] for proper range handling
+  repeated Balance balances = 2;
 }

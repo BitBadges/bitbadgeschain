@@ -32,6 +32,14 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 		if err := k.ValidateCollectionApprovalsWithInvariants(ctx, collection.CollectionApprovals, false, collection); err != nil {
 			return sdkerrors.Wrap(err, "collection approval validation failed")
 		}
+
+		// Validate EVM query challenges in invariants (format + that each contract address has code)
+		if err := types.ValidateEVMQueryChallenges(collection.Invariants.EvmQueryChallenges); err != nil {
+			return sdkerrors.Wrap(err, "collection invariants validation failed")
+		}
+		if err := k.ValidateEVMQueryChallengesAreContracts(ctx, collection.Invariants.EvmQueryChallenges); err != nil {
+			return sdkerrors.Wrap(err, "collection invariants EVM query challenges")
+		}
 	}
 
 	// If cosmosCoinBackedPath is set, collection approvals cannot include the Mint address
@@ -165,21 +173,8 @@ func (k Keeper) validateUserBalanceBeforeStore(ctx sdk.Context, balanceKey strin
 			}
 		}
 
-		// Check maxSupplyPerId invariant if we're setting Total address balances
-		if !collection.Invariants.MaxSupplyPerId.IsNil() && !collection.Invariants.MaxSupplyPerId.IsZero() {
-			balanceKeyDetails, err := GetDetailsFromBalanceKey(balanceKey)
-			if err != nil {
-				return sdkerrors.Wrapf(err, "invalid balance key format")
-			}
-			if types.IsTotalAddress(balanceKeyDetails.address) {
-				// Validate that no balance amount exceeds maxSupplyPerId
-				for _, balance := range userBalance.Balances {
-					if balance.Amount.GT(collection.Invariants.MaxSupplyPerId) {
-						return sdkerrors.Wrapf(types.ErrInvalidRequest, "maxSupplyPerId invariant violation: balance amount %s exceeds maximum supply per ID %s", balance.Amount.String(), collection.Invariants.MaxSupplyPerId.String())
-					}
-				}
-			}
-		}
+		// Note: maxSupplyPerId check has been moved to post-transfer invariants
+		// and is checked in CheckPostTransferInvariants() after all transfers complete
 	}
 	return nil
 }
@@ -1015,4 +1010,59 @@ func (k Keeper) GetAllReservedProtocolAddressesFromStore(ctx sdk.Context) []stri
 		addresses = append(addresses, address)
 	}
 	return addresses
+}
+
+/****************************************COLLECTION STATS****************************************/
+
+// SetCollectionStatsInStore stores collection stats by collection ID.
+func (k Keeper) SetCollectionStatsInStore(ctx sdk.Context, collectionId sdkmath.Uint, stats *types.CollectionStats) error {
+	marshaled, err := k.cdc.Marshal(stats)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.CollectionStats failed")
+	}
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(collectionStatsStoreKey(collectionId), marshaled)
+	return nil
+}
+
+// GetCollectionStatsFromStore returns collection stats by collection ID.
+// When not found, returns default zero stats and false.
+func (k Keeper) GetCollectionStatsFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.CollectionStats, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled := store.Get(collectionStatsStoreKey(collectionId))
+
+	if len(marshaled) == 0 {
+		return &types.CollectionStats{
+			HolderCount: sdkmath.ZeroUint(),
+			Balances:    []*types.Balance{},
+		}, false
+	}
+
+	var stats types.CollectionStats
+	k.cdc.MustUnmarshal(marshaled, &stats)
+	return &stats, true
+}
+
+// GetAllCollectionStatsFromStore returns all collection stats and their collection IDs.
+func (k Keeper) GetAllCollectionStatsFromStore(ctx sdk.Context) (stats []*types.CollectionStats, ids []sdkmath.Uint) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, CollectionStatsKey)
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close collection stats iterator", "error", err)
+		}
+	}()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var stat types.CollectionStats
+		k.cdc.MustUnmarshal(iterator.Value(), &stat)
+		stats = append(stats, &stat)
+		keyBytes := iterator.Key()[len(CollectionStatsKey):]
+		collectionId := binary.BigEndian.Uint64(keyBytes)
+		ids = append(ids, sdkmath.NewUint(collectionId))
+	}
+	return stats, ids
 }

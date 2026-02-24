@@ -24,7 +24,7 @@ import (
 // This is a placeholder structure that can be expanded when full app setup is available
 type EVMIntegrationTestSuite struct {
 	suite.Suite
-	TokenizationKeeper tokenizationkeeper.Keeper
+	TokenizationKeeper *tokenizationkeeper.Keeper
 	Ctx                sdk.Context
 	Precompile         *tokenization.Precompile
 

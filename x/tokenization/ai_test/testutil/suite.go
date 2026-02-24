@@ -18,7 +18,7 @@ import (
 type AITestSuite struct {
 	suite.Suite
 
-	Keeper      keeper.Keeper
+	Keeper      *keeper.Keeper
 	Ctx         sdk.Context
 	MsgServer   types.MsgServer
 	QueryClient types.QueryClient
