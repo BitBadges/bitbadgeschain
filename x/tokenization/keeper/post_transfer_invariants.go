@@ -210,8 +210,15 @@ func encodePostTransferAddressArray(addresses []string) (string, error) {
 }
 
 // postTransferAddressToHexPadded converts an address to 32-byte padded hex for ABI encoding.
-// Address must be valid bech32 or 0x + 40 hex chars; otherwise returns an error.
+// Accepts valid bech32, 0x + 40 hex chars, or protocol addresses (Mint, Total) which get a canonical encoding.
 func postTransferAddressToHexPadded(address string) (string, error) {
+	// Protocol addresses: use canonical 32-byte hex so EVM calldata is valid
+	if types.IsMintAddress(address) {
+		return strings.Repeat("0", 64), nil
+	}
+	if types.IsTotalAddress(address) {
+		return strings.Repeat("0", 63) + "1", nil
+	}
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		hexAddr := strings.TrimSpace(strings.TrimPrefix(address, "0x"))

@@ -15,8 +15,10 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 )
 
-var _ ibchooks.OnRecvPacketBeforeHooks = &RateLimitHooks{}
-var _ ibchooks.SendPacketBeforeHooks = &RateLimitHooks{}
+var (
+	_ ibchooks.OnRecvPacketBeforeHooks = &RateLimitHooks{}
+	_ ibchooks.SendPacketBeforeHooks   = &RateLimitHooks{}
+)
 
 type RateLimitHooks struct {
 	keeper keeper.Keeper
@@ -77,21 +79,8 @@ func (h *RateLimitHooks) SendPacketBeforeHook(ctx sdk.Context, sourcePort string
 		return
 	}
 
-	// Extract denom (for sends, denom is already in local format or needs parsing)
-	denom := packetData.Denom
-	// If it's an IBC denom, we need to parse it
-	if transfertypes.ReceiverChainIsSource(sourcePort, sourceChannel, denom) {
-		// This is a native token being sent out
-		// Remove the IBC prefix if present
-		voucherPrefix := transfertypes.GetDenomPrefix(sourcePort, sourceChannel)
-		if len(denom) > len(voucherPrefix) && denom[:len(voucherPrefix)] == voucherPrefix {
-			denom = denom[len(voucherPrefix):]
-		}
-		denomTrace := transfertypes.ParseDenomTrace(denom)
-		if denomTrace.Path() != "" {
-			denom = denomTrace.IBCDenom()
-		}
-	}
+	// Extract denom using unified function (security fix: MEDIUM-4)
+	denom := extractDenomFromPacketOnSend(sourcePort, sourceChannel, packetData.Denom)
 
 	// Extract sender address
 	senderAddr := packetData.Sender
@@ -178,18 +167,8 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
-	// Extract denom
-	denom := packetData.Denom
-	if transfertypes.ReceiverChainIsSource(sourcePort, sourceChannel, denom) {
-		voucherPrefix := transfertypes.GetDenomPrefix(sourcePort, sourceChannel)
-		if len(denom) > len(voucherPrefix) && denom[:len(voucherPrefix)] == voucherPrefix {
-			denom = denom[len(voucherPrefix):]
-		}
-		denomTrace := transfertypes.ParseDenomTrace(denom)
-		if denomTrace.Path() != "" {
-			denom = denomTrace.IBCDenom()
-		}
-	}
+	// Extract denom using unified function (security fix: MEDIUM-4)
+	denom := extractDenomFromPacketOnSend(sourcePort, sourceChannel, packetData.Denom)
 
 	// Extract sender address (from packet data)
 	senderAddr := packetData.Sender
@@ -292,5 +271,25 @@ func extractDenomFromPacketOnRecv(packet channeltypes.Packet, packetDenom string
 		denomTrace := transfertypes.ParseDenomTrace(denom)
 		denom = denomTrace.IBCDenom()
 	}
+	return denom
+}
+
+// extractDenomFromPacketOnSend extracts the local denom for a sent packet
+// This is the unified version that replaces duplicated inline logic
+// (security fix: MEDIUM-4 - consistent denom extraction between send/receive paths)
+func extractDenomFromPacketOnSend(sourcePort, sourceChannel, packetDenom string) string {
+	denom := packetDenom
+	if transfertypes.ReceiverChainIsSource(sourcePort, sourceChannel, denom) {
+		// This is a native token being sent out - remove the IBC prefix if present
+		voucherPrefix := transfertypes.GetDenomPrefix(sourcePort, sourceChannel)
+		if len(denom) > len(voucherPrefix) && denom[:len(voucherPrefix)] == voucherPrefix {
+			denom = denom[len(voucherPrefix):]
+		}
+		denomTrace := transfertypes.ParseDenomTrace(denom)
+		if denomTrace.Path() != "" {
+			denom = denomTrace.IBCDenom()
+		}
+	}
+	// For non-source chains, denom is already in local format
 	return denom
 }

@@ -37,4 +37,13 @@ RUN mv /go/bin/bitbadgeschaind  ${LOCAL}/bin/bitbadgeschaind
 
 EXPOSE 26656 26657 26660 6060 9090 1317
 
+# Security fix: Create non-root user for running the daemon
+# This prevents privilege escalation if the process is compromised
+RUN groupadd -r bitbadges && useradd -r -g bitbadges bitbadges
+RUN mkdir -p /home/bitbadges/.bitbadgeschain && chown -R bitbadges:bitbadges /home/bitbadges
+
+# Switch to non-root user
+USER bitbadges
+ENV DAEMON_HOME=/home/bitbadges/.bitbadgeschain
+
 ENTRYPOINT [ "bitbadgeschaind" ]

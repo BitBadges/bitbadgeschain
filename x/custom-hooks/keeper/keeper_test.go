@@ -1353,7 +1353,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateBasisPointsExceeds10
 		},
 		Affiliates: []customhookstypes.Affiliate{
 			{
-				BasisPointsFee: "10001", // Exceeds 100%
+				BasisPointsFee: "5001", // Exceeds 50% per-affiliate cap
 				Address:        affiliate.String(),
 			},
 		},
@@ -1363,7 +1363,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_AffiliateBasisPointsExceeds10
 
 	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
 	s.Require().False(ack.Success())
-	s.Require().Contains(getAckError(ack), "cannot exceed 10000")
+	s.Require().Contains(getAckError(ack), "cannot exceed 5000 (50%)")
 }
 
 // TestExecuteSwapAndAction_TotalAffiliateBasisPointsExceeds10000 tests validation when total basis points exceed 100%
@@ -1407,11 +1407,11 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_TotalAffiliateBasisPointsExce
 		},
 		Affiliates: []customhookstypes.Affiliate{
 			{
-				BasisPointsFee: "8000", // 80%
+				BasisPointsFee: "3000", // 30% - passes per-affiliate cap
 				Address:        affiliate1.String(),
 			},
 			{
-				BasisPointsFee: "2001", // 20.01% - total exceeds 100%
+				BasisPointsFee: "2001", // 20.01% - passes per-affiliate cap but total exceeds 50%
 				Address:        affiliate2.String(),
 			},
 		},
@@ -1421,7 +1421,7 @@ func (s *KeeperTestSuite) TestExecuteSwapAndAction_TotalAffiliateBasisPointsExce
 
 	ack := s.keeper.ExecuteSwapAndAction(s.Ctx, sender, swapAndAction, tokenIn, sender.String())
 	s.Require().False(ack.Success())
-	s.Require().Contains(getAckError(ack), "total affiliate basis_points_fee cannot exceed 10000")
+	s.Require().Contains(getAckError(ack), "total affiliate basis_points_fee cannot exceed 5000 (50%)")
 }
 
 // TestExecuteSwapAndAction_MissingAffiliateAddress tests validation of missing affiliate address

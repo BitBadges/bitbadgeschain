@@ -104,6 +104,7 @@ const (
 	GasPerQueryRange             = 500
 	GasExecuteMultipleBase       = 10_000
 	GasPerMessageInBatch         = 1_000
+	GasPerInputChunk             = 100  // Gas per 32-byte chunk of input for JSON parsing cost (security fix)
 	MaxMessagesPerBatch          = 50   // Maximum number of messages allowed in executeMultiple batch
 	MaxQueryArraySize            = 1000 // Maximum size for tokenIds and ownershipTimes arrays in queries
 )
@@ -301,8 +302,10 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 					if msgCount > MaxMessagesPerBatch {
 						msgCount = MaxMessagesPerBatch
 					}
-					// Calculate dynamic gas: base + (message count * per-message gas)
-					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch)
+					// Calculate dynamic gas: base + (message count * per-message gas) + (input size gas)
+					// Input size gas accounts for JSON parsing complexity (security fix: prevents gas griefing)
+					inputSizeGas := uint64(len(input) / 32) * GasPerInputChunk
+					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch) + inputSizeGas
 				} else {
 					// If parsing fails, use base gas (will be adjusted during execution)
 					baseGas = GasExecuteMultipleBase
@@ -378,6 +381,11 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		// Add panic recovery to catch any unexpected panics
 		defer func() {
 			if r := recover(); r != nil {
+				// Security fix: Log panic for observability before re-panicking
+				ctx.Logger().Error("precompile panic recovered",
+					"panic", fmt.Sprintf("%v", r),
+					"caller", contract.Caller().Hex(),
+				)
 				// Re-panic so it's properly handled by the EVM
 				panic(r)
 			}

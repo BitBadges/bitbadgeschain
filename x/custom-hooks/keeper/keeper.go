@@ -270,17 +270,21 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid affiliate basis_points_fee for affiliate_%d: %s", i, affiliate.BasisPointsFee))
 				}
 
-				// Validate individual basis points don't exceed 10000
-				if basisPoints > 10000 {
-					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("affiliate basis_points_fee cannot exceed 10000 for affiliate_%d", i))
+				// Security fix: Cap individual affiliate fees at 5000 basis points (50%)
+			// This ensures no single affiliate can take an unreasonable share
+			const maxAffiliateBasisPoints = uint64(5000)
+			if basisPoints > maxAffiliateBasisPoints {
+					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("affiliate basis_points_fee cannot exceed %d (50%%) for affiliate_%d", maxAffiliateBasisPoints, i))
 				}
 
 				totalBasisPoints += basisPoints
 			}
 
-			// Validate total basis points don't exceed 10000
-			if totalBasisPoints > 10000 {
-				return types.NewCustomErrorAcknowledgement("total affiliate basis_points_fee cannot exceed 10000")
+			// Security fix: Cap total affiliate fees at 5000 basis points (50%)
+			// This ensures at least 50% of swapped tokens go to the intended recipient
+			const maxTotalAffiliateBasisPoints = uint64(5000)
+			if totalBasisPoints > maxTotalAffiliateBasisPoints {
+				return types.NewCustomErrorAcknowledgement(fmt.Sprintf("total affiliate basis_points_fee cannot exceed %d (50%%)", maxTotalAffiliateBasisPoints))
 			}
 
 			// Convert to poolmanager types
@@ -293,6 +297,11 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			}
 		}
 
+		// Execute swap in a cached context so we can rollback if it fails
+		// This includes auto-approval flag setting to ensure atomicity - if swap fails,
+		// auto-approval flags are also rolled back (security fix: prevents state leakage)
+		swapCacheCtx, writeSwapCache := ctx.CacheContext()
+
 		// Set up auto-approve for intermediate address if dealing with wrapped denoms
 		// This must be done before the swap call to ensure tokens can be received
 		// Check all denoms in the route (input and all intermediate/output denoms)
@@ -301,16 +310,13 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 			allDenoms = append(allDenoms, operation.DenomOut)
 		}
 		for _, denom := range allDenoms {
-			if k.tokenizationKeeper.CheckIsAliasDenom(ctx, denom) {
-				ack := k.setAutoApproveForIntermediateAddress(ctx, sender.String(), denom)
+			if k.tokenizationKeeper.CheckIsAliasDenom(swapCacheCtx, denom) {
+				ack := k.setAutoApproveForIntermediateAddress(swapCacheCtx, sender.String(), denom)
 				if !ack.Success() {
 					return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to set auto-approve for intermediate address, denom: %s", denom))
 				}
 			}
 		}
-
-		// Execute swap in a cached context so we can rollback if it fails
-		swapCacheCtx, writeSwapCache := ctx.CacheContext()
 
 		// Clear any previous deterministic errors before starting the swap
 		types.ClearDeterministicError(swapCacheCtx)
