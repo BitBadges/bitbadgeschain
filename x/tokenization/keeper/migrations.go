@@ -60,7 +60,6 @@ func (k Keeper) MigrateCollectionStats(ctx sdk.Context) error {
 		k.cdc.MustUnmarshal(collectionIterator.Value(), &collection)
 
 		holderCount := sdkmath.ZeroUint()
-		circulatingSupply := sdkmath.ZeroUint()
 
 		// Count holders by iterating balances for this collection
 		balanceIterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
@@ -121,15 +120,9 @@ func (k Keeper) MigrateCollectionStats(ctx sdk.Context) error {
 			return err
 		}
 
-		// Calculate total for logging
-		for _, bal := range circulatingBalances {
-			circulatingSupply = circulatingSupply.Add(bal.Amount)
-		}
-
 		ctx.Logger().Info("Migrated collection stats",
 			"collectionId", collection.CollectionId,
-			"holderCount", holderCount,
-			"circulatingSupply", circulatingSupply)
+			"holderCount", holderCount)
 	}
 
 	return nil

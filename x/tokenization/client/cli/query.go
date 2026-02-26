@@ -26,6 +26,7 @@ func GetQueryCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdGetBalance())
 	cmd.AddCommand(CmdGetCollection())
+	cmd.AddCommand(CmdGetCollectionStats())
 	cmd.AddCommand(CmdQueryParams())
 	cmd.AddCommand(CmdGetAddressList())
 	cmd.AddCommand(CmdGetApprovalTrackers())

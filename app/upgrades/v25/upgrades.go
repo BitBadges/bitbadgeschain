@@ -23,6 +23,11 @@ func CustomUpgradeHandlerLogic(ctx context.Context, tokenizationKeeper tokenizat
 		return err
 	}
 
+	// Populate CollectionStats for all existing collections (backwards compatible: runs once on upgrade)
+	if err := tokenizationKeeper.MigrateCollectionStats(sdk.UnwrapSDKContext(ctx)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
