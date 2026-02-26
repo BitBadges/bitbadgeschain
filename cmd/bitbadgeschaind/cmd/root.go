@@ -148,11 +148,26 @@ func ProvideClientContext(
 	txConfigOpts tx.ConfigOptions,
 	legacyAmino *codec.LegacyAmino,
 ) client.Context {
+	// Register legacy types for CLI backward compatibility.
+	// These are needed so CLI queries (like gov proposals) can resolve old type URLs
+	// from renamed/removed modules. Without this, queries fail with "unable to resolve type URL".
+	// The same registration happens in app.go for the full node, but the CLI doesn't
+	// initialize the full app for queries.
+	//
+	// IMPORTANT: We must register these BEFORE creating the codec, and then create
+	// a new codec from the augmented interface registry. The appCodec parameter
+	// was created by depinject before we had a chance to register our legacy types.
+	app.RegisterLegacyWasmInterfaces(interfaceRegistry)
+	app.RegisterLegacyBadgesInterfaces(interfaceRegistry)
+
+	// Create a new codec that includes the legacy types we just registered
+	cdc := codec.NewProtoCodec(interfaceRegistry)
+
 	// Create client context with keyring options set BEFORE ReadFromClientConfig
 	// This matches the Cosmos EVM reference implementation pattern
 	// Reference: https://github.com/cosmos/evm/blob/f1f4c2aee76243f0ffe0dd444e05b9cb2ef9898b/evmd/cmd/evmd/cmd/root.go#L85
 	clientCtx := client.Context{}.
-		WithCodec(appCodec).
+		WithCodec(cdc).
 		WithInterfaceRegistry(interfaceRegistry).
 		WithLegacyAmino(legacyAmino).
 		WithInput(os.Stdin).
