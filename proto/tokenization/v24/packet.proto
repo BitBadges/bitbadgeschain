@@ -1,0 +1,29 @@
+syntax = "proto3";
+package tokenization.v24;
+
+import "tokenization/v24/icq.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v24";
+
+// TokenizationPacketData defines the packet data for the tokenization module.
+// It uses a oneof to support multiple packet types over the same IBC channel.
+message TokenizationPacketData {
+    oneof packet {
+        NoData noData = 1;
+
+        // ICQ (Interchain Query) packet types for cross-chain token ownership verification
+        // OwnershipQuery: Query for a single token ID and ownership time -> returns amount
+        OwnershipQueryPacket ownershipQuery = 2;
+        OwnershipQueryResponsePacket ownershipQueryResponse = 3;
+        BulkOwnershipQueryPacket bulkOwnershipQuery = 4;
+        BulkOwnershipQueryResponsePacket bulkOwnershipQueryResponse = 5;
+
+        // FullBalanceQuery: Query for complete balance store -> returns full UserBalanceStore
+        FullBalanceQueryPacket fullBalanceQuery = 6;
+        FullBalanceQueryResponsePacket fullBalanceQueryResponse = 7;
+    }
+}
+
+// NoData is a placeholder packet type (legacy scaffold).
+message NoData {
+}

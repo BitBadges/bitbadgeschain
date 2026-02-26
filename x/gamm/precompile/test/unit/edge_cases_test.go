@@ -266,14 +266,13 @@ func (suite *EdgeCasesTestSuite) TestEdgeCases_StringLength() {
 
 // TestEdgeCases_EmptyArrays tests with empty arrays (where allowed)
 func (suite *EdgeCasesTestSuite) TestEdgeCases_EmptyArrays() {
-	// Empty coins array is currently rejected by ValidateArraySize
-	// This is the current behavior - empty arrays are not allowed
+	// Empty coins array should be rejected by ValidateCoins (required)
 	emptyCoins := []struct {
 		Denom  string   `json:"denom"`
 		Amount *big.Int `json:"amount"`
 	}{}
 	err := gamm.ValidateCoins(emptyCoins, "coins")
-	suite.Error(err, "Empty coins array is currently rejected by ValidateArraySize")
+	suite.Error(err, "Empty coins array should be rejected by ValidateCoins")
 	suite.Contains(err.Error(), "cannot be empty", "Error should mention empty array")
 
 	// Empty routes array should be invalid (required)
@@ -284,5 +283,9 @@ func (suite *EdgeCasesTestSuite) TestEdgeCases_EmptyArrays() {
 	err = gamm.ValidateRoutes(emptyRoutes, "routes")
 	suite.Error(err, "Empty routes array should be invalid")
 	suite.Contains(err.Error(), "cannot be empty", "Error should mention empty array")
+
+	// Empty coins array should be allowed by ValidateCoinsAllowZero (optional minimums)
+	err = gamm.ValidateCoinsAllowZero(emptyCoins, "tokenOutMins")
+	suite.NoError(err, "Empty coins array should be allowed for tokenOutMins (no minimums)")
 }
 

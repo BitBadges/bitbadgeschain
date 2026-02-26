@@ -176,7 +176,7 @@ func (suite *EdgeCaseTestSuite) TestBoundaryConditions() {
 		{
 			name:        "maximum_uint256_collection_id",
 			collectionId: maxUint256,
-			expectError: false, // Should be valid, even if collection doesn't exist
+			expectError: false, // Should be valid (max uint256 is allowed)
 		},
 		{
 			name:        "minimum_valid_collection_id",
@@ -186,12 +186,17 @@ func (suite *EdgeCaseTestSuite) TestBoundaryConditions() {
 		{
 			name:        "zero_collection_id",
 			collectionId: big.NewInt(0),
-			expectError: false, // 0 is valid for new collections
+			expectError: true, // 0 is invalid (zero check)
 		},
 		{
 			name:        "one_over_max_uint256",
 			collectionId: new(big.Int).Add(maxUint256, big.NewInt(1)),
-			expectError: false, // ValidateCollectionId only checks for negative, not overflow
+			expectError: true, // Now errors - values > uint256 are rejected for EVM compatibility
+		},
+		{
+			name:        "negative_collection_id",
+			collectionId: big.NewInt(-1),
+			expectError: true, // Negative values are rejected
 		},
 	}
 
@@ -199,10 +204,9 @@ func (suite *EdgeCaseTestSuite) TestBoundaryConditions() {
 		suite.Run(tt.name, func() {
 			err := tokenization.ValidateCollectionId(tt.collectionId)
 			if tt.expectError {
-				suite.Require().Error(err)
+				suite.Require().Error(err, "expected error for test case: %s", tt.name)
 			} else {
-				// May or may not error depending on validation logic
-				_ = err
+				suite.Require().NoError(err, "expected no error for test case: %s", tt.name)
 			}
 		})
 	}

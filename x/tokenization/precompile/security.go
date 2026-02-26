@@ -82,9 +82,15 @@ func VerifyCaller(caller common.Address) error {
 	return nil
 }
 
-// CheckOverflow checks if a big.Int value would overflow when converted to sdkmath.Uint
-// sdkmath.Uint can handle values up to 2^256-1, same as big.Int
-// This function validates that the value is non-negative
+// CheckOverflow checks if a big.Int value would overflow when converted to Solidity uint256.
+// While sdkmath.Uint (cosmos.Uint) supports arbitrary precision via big.Int internally,
+// Solidity's uint256 is capped at 2^256-1. This function MUST be called before any
+// conversion to ensure EVM compatibility and prevent silent data truncation.
+//
+// Returns error if:
+// - value is nil
+// - value is negative
+// - value exceeds 2^256-1 (MaxUint256)
 func CheckOverflow(value *big.Int, fieldName string) error {
 	if value == nil {
 		return ErrInvalidInput(fmt.Sprintf("%s cannot be nil", fieldName))
@@ -92,14 +98,8 @@ func CheckOverflow(value *big.Int, fieldName string) error {
 	if value.Sign() < 0 {
 		return ErrInvalidInput(fmt.Sprintf("%s cannot be negative", fieldName))
 	}
-	// sdkmath.Uint uses uint256 internally, which can hold values up to 2^256-1
-	// Check if value exceeds uint256 max (2^256 - 1)
-	maxUint256 := new(big.Int)
-	maxUint256.Lsh(big.NewInt(1), 256)        // 2^256
-	maxUint256.Sub(maxUint256, big.NewInt(1)) // 2^256 - 1
-
-	if value.Cmp(maxUint256) > 0 {
-		return ErrInvalidInput(fmt.Sprintf("%s overflow: value %s exceeds maximum uint256 value (2^256-1)", fieldName, value.String()))
+	if value.Cmp(MaxUint256) > 0 {
+		return ErrInvalidInput(fmt.Sprintf("%s overflow: value exceeds maximum uint256 (2^256-1)", fieldName))
 	}
 	return nil
 }
@@ -134,6 +134,17 @@ const (
 	MaxAddressListEntries  = 1000 // Maximum addresses per address list
 	MaxMetadataLength      = 10000 // Maximum length for metadata strings (URI, customData)
 )
+
+// MaxUint256 is the maximum value for Solidity uint256 (2^256 - 1)
+// Pre-computed once for efficiency and reused across all overflow checks.
+// This is critical for EVM compatibility - values exceeding this cannot be
+// represented in Solidity and must be rejected to prevent silent truncation.
+var MaxUint256 = func() *big.Int {
+	max := new(big.Int)
+	max.Lsh(big.NewInt(1), 256)        // 2^256
+	max.Sub(max, big.NewInt(1))        // 2^256 - 1
+	return max
+}()
 
 // ValidateDenomUnitsSize validates that denomUnits array size is within limits
 func ValidateDenomUnitsSize(size int) error {

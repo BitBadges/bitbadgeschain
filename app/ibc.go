@@ -132,6 +132,14 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	// Register light client modules with the client keeper's router (required for IBC v9+)
+	// This must be done before any client operations (updates, queries, etc.) can work
+	storeProvider := ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey)))
+	tmLightClientModule := ibctm.NewLightClientModule(app.appCodec, storeProvider)
+	smLightClientModule := solomachine.NewLightClientModule(app.appCodec, storeProvider)
+	app.IBCKeeper.ClientKeeper.AddRoute(ibctm.ModuleName, &tmLightClientModule)
+	app.IBCKeeper.ClientKeeper.AddRoute(solomachine.ModuleName, &smLightClientModule)
+
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.

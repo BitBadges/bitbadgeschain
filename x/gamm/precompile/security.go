@@ -64,9 +64,15 @@ func VerifyCaller(caller common.Address) error {
 	return nil
 }
 
-// CheckOverflow checks if a big.Int value would overflow when converted to sdkmath.Int
-// sdkmath.Int can handle values up to 2^256-1, same as big.Int
-// This function validates that the value is non-negative
+// CheckOverflow checks if a big.Int value would overflow when converted to sdkmath.Int.
+// sdkmath.Int uses int256 internally (signed), which can hold values up to 2^255-1.
+// This function MUST be called before any conversion to ensure EVM compatibility
+// and prevent silent data truncation.
+//
+// Returns error if:
+// - value is nil
+// - value is negative
+// - value exceeds 2^255-1 (MaxInt256)
 func CheckOverflow(value *big.Int, fieldName string) error {
 	if value == nil {
 		return ErrInvalidInput(fmt.Sprintf("%s cannot be nil", fieldName))
@@ -74,14 +80,29 @@ func CheckOverflow(value *big.Int, fieldName string) error {
 	if value.Sign() < 0 {
 		return ErrInvalidInput(fmt.Sprintf("%s cannot be negative", fieldName))
 	}
-	// sdkmath.Int uses int256 internally, which can hold values up to 2^255-1
-	// Check if value exceeds int256 max (2^255 - 1)
-	maxInt256 := new(big.Int)
-	maxInt256.Lsh(big.NewInt(1), 255)        // 2^255
-	maxInt256.Sub(maxInt256, big.NewInt(1))   // 2^255 - 1
+	if value.Cmp(MaxInt256) > 0 {
+		return ErrInvalidInput(fmt.Sprintf("%s overflow: value exceeds maximum int256 (2^255-1)", fieldName))
+	}
+	return nil
+}
 
-	if value.Cmp(maxInt256) > 0 {
-		return ErrInvalidInput(fmt.Sprintf("%s overflow: value %s exceeds maximum int256 value (2^255-1)", fieldName, value.String()))
+// CheckUint256Overflow checks if a big.Int value would overflow Solidity uint256.
+// This is used for unsigned values that will be returned to EVM contracts.
+// While sdkmath.Int uses int256 internally, some return values are packed as uint256.
+//
+// Returns error if:
+// - value is nil
+// - value is negative
+// - value exceeds 2^256-1 (MaxUint256)
+func CheckUint256Overflow(value *big.Int, fieldName string) error {
+	if value == nil {
+		return ErrInvalidInput(fmt.Sprintf("%s cannot be nil", fieldName))
+	}
+	if value.Sign() < 0 {
+		return ErrInvalidInput(fmt.Sprintf("%s cannot be negative", fieldName))
+	}
+	if value.Cmp(MaxUint256) > 0 {
+		return ErrInvalidInput(fmt.Sprintf("%s overflow: value exceeds maximum uint256 (2^256-1)", fieldName))
 	}
 	return nil
 }
@@ -98,6 +119,15 @@ func ValidateArraySize(size int, maxSize int, fieldName string) error {
 	return nil
 }
 
+// ValidateArraySizeAllowEmpty validates array size but allows empty arrays
+// Use this for optional arrays (e.g., tokenOutMins where empty means no minimum)
+func ValidateArraySizeAllowEmpty(size int, maxSize int, fieldName string) error {
+	if size > maxSize {
+		return ErrInvalidInput(fmt.Sprintf("%s size (%d) exceeds maximum allowed size (%d)", fieldName, size, maxSize))
+	}
+	return nil
+}
+
 // Maximum allowed sizes for arrays (DoS protection)
 const (
 	MaxRoutes          = 10  // Maximum swap routes
@@ -107,6 +137,27 @@ const (
 	MaxMemoLength      = 256  // Maximum length for IBC transfer memo
 	MaxPaginationLimit = 100 // Maximum limit for pagination queries
 )
+
+// MaxInt256 is the maximum value for Solidity int256 (2^255 - 1)
+// Pre-computed once for efficiency and reused across all overflow checks.
+// GAMM uses sdkmath.Int (signed) so we check against int256 max, not uint256.
+// This is critical for EVM compatibility - values exceeding this cannot be
+// represented in Solidity and must be rejected to prevent silent truncation.
+var MaxInt256 = func() *big.Int {
+	max := new(big.Int)
+	max.Lsh(big.NewInt(1), 255)        // 2^255
+	max.Sub(max, big.NewInt(1))        // 2^255 - 1
+	return max
+}()
+
+// MaxUint256 is the maximum value for Solidity uint256 (2^256 - 1)
+// Used for unsigned values like pool shares and token amounts.
+var MaxUint256 = func() *big.Int {
+	max := new(big.Int)
+	max.Lsh(big.NewInt(1), 256)        // 2^256
+	max.Sub(max, big.NewInt(1))        // 2^256 - 1
+	return max
+}()
 
 // ValidateStringLength validates that strings are within size limits
 func ValidateStringLength(s string, fieldName string) error {

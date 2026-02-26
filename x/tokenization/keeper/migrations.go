@@ -11,7 +11,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v23"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v24"
 )
 
 // MigrateTokenizationKeeper migrates the tokenization keeper from v21 to current version
@@ -135,17 +135,6 @@ func (k Keeper) MigrateCollectionStats(ctx sdk.Context) error {
 	return nil
 }
 
-// migrateInvariants handles migration of CollectionInvariants fields.
-// MaxSupplyPerId and EvmQueryChallenges are now at the base CollectionInvariants level.
-// The JSON marshal/unmarshal handles field mapping automatically, so no manual migration is needed.
-// This function is kept for potential future migrations.
-func migrateInvariants(newCollection *newtypes.TokenCollection, oldCollection *oldtypes.TokenCollection) error {
-	// v23 already has MaxSupplyPerId at base level, and the new version keeps it there.
-	// EvmQueryChallenges is a new field that will default to nil/empty if not present.
-	// JSON marshal/unmarshal handles all of this automatically.
-	return nil
-}
-
 // migrateIncomingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
 // Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
 // so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
@@ -240,11 +229,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
-
-		// Migrate invariants (now a no-op since maxSupplyPerId stays at base level)
-		if err := migrateInvariants(&newCollection, &oldCollection); err != nil {
-			return err
-		}
 
 		// Save the updated collection (with migrated addresses)
 		if err := k.SetCollectionInStore(ctx, &newCollection, true); err != nil {

@@ -64,12 +64,17 @@ func ValidateCoins(coins []struct {
 
 // ValidateCoinsAllowZero validates that a coins array is valid, allowing zero amounts
 // This is used for tokenOutMins in exit pool where zero means no minimum
+// Empty arrays are allowed since no minimums means any output is acceptable
 func ValidateCoinsAllowZero(coins []struct {
 	Denom  string   `json:"denom"`
 	Amount *big.Int `json:"amount"`
 }, fieldName string) error {
-	if err := ValidateArraySize(len(coins), MaxCoins, fieldName); err != nil {
+	if err := ValidateArraySizeAllowEmpty(len(coins), MaxCoins, fieldName); err != nil {
 		return err
+	}
+	// If empty, that's valid - means no minimum constraints
+	if len(coins) == 0 {
+		return nil
 	}
 	for i, coin := range coins {
 		if coin.Denom == "" {

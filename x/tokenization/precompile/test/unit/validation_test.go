@@ -130,9 +130,14 @@ func TestValidateCollectionId(t *testing.T) {
 			wantErr:      true,
 		},
 		{
-			name:         "large collection ID",
-			collectionId: new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil),
+			name:         "max_uint256_collection_id",
+			collectionId: new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1)), // 2^256-1 (max)
 			wantErr:      false,
+		},
+		{
+			name:         "overflow_collection_id",
+			collectionId: new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), // 2^256 (exceeds max)
+			wantErr:      true, // Should error - exceeds uint256 max for EVM compatibility
 		},
 	}
 
@@ -181,10 +186,16 @@ func TestValidateAmount(t *testing.T) {
 			wantErr:   true,
 		},
 		{
-			name:      "large amount",
-			amount:    new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil),
+			name:      "max_uint256_amount",
+			amount:    new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1)), // 2^256-1 (max)
 			fieldName: "amount",
 			wantErr:   false,
+		},
+		{
+			name:      "overflow_amount",
+			amount:    new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), // 2^256 (exceeds max)
+			fieldName: "amount",
+			wantErr:   true, // Should error - exceeds uint256 max for EVM compatibility
 		},
 	}
 
@@ -286,6 +297,28 @@ func TestValidateBigIntRanges(t *testing.T) {
 			},
 			fieldName: "tokenIds",
 			wantErr:   true,
+		},
+		{
+			name: "overflow_start",
+			ranges: []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			}{
+				{Start: new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), End: new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil)}, // 2^256 exceeds max
+			},
+			fieldName: "tokenIds",
+			wantErr:   true, // Should error - exceeds uint256 max for EVM compatibility
+		},
+		{
+			name: "max_uint256_values",
+			ranges: []struct {
+				Start *big.Int `json:"start"`
+				End   *big.Int `json:"end"`
+			}{
+				{Start: big.NewInt(1), End: new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1))}, // 2^256-1 (max)
+			},
+			fieldName: "tokenIds",
+			wantErr:   false, // Max uint256 is valid
 		},
 	}
 

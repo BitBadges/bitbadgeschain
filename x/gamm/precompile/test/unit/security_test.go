@@ -106,6 +106,24 @@ func TestValidateArraySize_InvalidSizes(t *testing.T) {
 	}
 }
 
+func TestValidateArraySizeAllowEmpty(t *testing.T) {
+	// Empty array should be allowed
+	err := gamm.ValidateArraySizeAllowEmpty(0, 10, "testField")
+	require.NoError(t, err, "Empty array should be allowed by ValidateArraySizeAllowEmpty")
+
+	// Non-empty array within bounds should be allowed
+	err = gamm.ValidateArraySizeAllowEmpty(5, 10, "testField")
+	require.NoError(t, err, "Array within bounds should be allowed")
+
+	// Array at max should be allowed
+	err = gamm.ValidateArraySizeAllowEmpty(10, 10, "testField")
+	require.NoError(t, err, "Array at max should be allowed")
+
+	// Array exceeding max should be rejected
+	err = gamm.ValidateArraySizeAllowEmpty(11, 10, "testField")
+	require.Error(t, err, "Array exceeding max should be rejected")
+}
+
 func TestGetCallerAddress_ValidCaller(t *testing.T) {
 	caller := common.HexToAddress("0x1111111111111111111111111111111111111111")
 

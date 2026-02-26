@@ -1058,6 +1058,23 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 				}
 				// else: all bytes remain 0x00
 			case *big.Int:
+				// Validate uint256 bounds before packing - never truncate silently
+				if r.Cmp(MaxUint256) > 0 {
+					return nil, WrapErrorWithContext(
+						fmt.Errorf("value exceeds uint256 maximum (2^256-1)"),
+						ErrorCodeInternalError,
+						"result overflow: cannot pack value larger than uint256",
+						fmt.Sprintf("message index %d", i),
+					)
+				}
+				if r.Sign() < 0 {
+					return nil, WrapErrorWithContext(
+						fmt.Errorf("negative value cannot be packed as uint256"),
+						ErrorCodeInternalError,
+						"result underflow: negative values not allowed",
+						fmt.Sprintf("message index %d", i),
+					)
+				}
 				// Pack uint256 as bytes (32 bytes)
 				resultBytes = r.Bytes()
 				// Pad to 32 bytes if needed
@@ -1065,9 +1082,6 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 					padded := make([]byte, 32)
 					copy(padded[32-len(resultBytes):], resultBytes)
 					resultBytes = padded
-				} else if len(resultBytes) > 32 {
-					// Truncate if too long (shouldn't happen for uint256)
-					resultBytes = resultBytes[len(resultBytes)-32:]
 				}
 			default:
 				// For other types, try to marshal as JSON then convert to bytes
@@ -1511,8 +1525,14 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 	// Emit event
 	EmitGetBalanceAmountEventSingle(ctx, collectionId, req.Address, tokenId, ownershipTime, totalAmount)
 
+	// Validate uint256 bounds before returning to EVM
+	bigIntResult := totalAmount.BigInt()
+	if err := CheckOverflow(bigIntResult, "balanceAmount"); err != nil {
+		return nil, WrapError(err, ErrorCodeInternalError, "balance exceeds uint256 maximum")
+	}
+
 	// Return uint256
-	return method.Outputs.Pack(totalAmount.BigInt())
+	return method.Outputs.Pack(bigIntResult)
 }
 
 // getBalanceForIdAndTime returns the balance amount for a specific token ID and ownership time.
@@ -1610,8 +1630,14 @@ func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, js
 	// Emit event
 	EmitGetTotalSupplyEventSingle(ctx, collectionId, tokenId, ownershipTime, totalAmount)
 
+	// Validate uint256 bounds before returning to EVM
+	bigIntResult := totalAmount.BigInt()
+	if err := CheckOverflow(bigIntResult, "totalSupply"); err != nil {
+		return nil, WrapError(err, ErrorCodeInternalError, "total supply exceeds uint256 maximum")
+	}
+
 	// Return uint256
-	return method.Outputs.Pack(totalAmount.BigInt())
+	return method.Outputs.Pack(bigIntResult)
 }
 
 // HandleGetAllReservedProtocolAddresses handles getAllReservedProtocolAddresses query with custom logic

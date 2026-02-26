@@ -59,20 +59,27 @@ func ValidateUintRanges(ranges []*tokenizationtypes.UintRange, fieldName string)
 	return nil
 }
 
-// ValidateBigIntRange validates that a big.Int range is valid (start <= end, both non-negative)
+// ValidateBigIntRange validates that a big.Int range is valid:
+// - Both start and end are non-nil
+// - Both are non-negative
+// - Both are within uint256 bounds (for EVM compatibility)
+// - start <= end
 func ValidateBigIntRange(start, end *big.Int, fieldName string) error {
+	// Check for nil
 	if start == nil {
 		return ErrInvalidInput(fmt.Sprintf("%s.start cannot be nil", fieldName))
 	}
 	if end == nil {
 		return ErrInvalidInput(fmt.Sprintf("%s.end cannot be nil", fieldName))
 	}
-	if start.Sign() < 0 {
-		return ErrInvalidInput(fmt.Sprintf("%s.start cannot be negative, got %s", fieldName, start.String()))
+	// Check overflow (includes negative check)
+	if err := CheckOverflow(start, fmt.Sprintf("%s.start", fieldName)); err != nil {
+		return err
 	}
-	if end.Sign() < 0 {
-		return ErrInvalidInput(fmt.Sprintf("%s.end cannot be negative, got %s", fieldName, end.String()))
+	if err := CheckOverflow(end, fmt.Sprintf("%s.end", fieldName)); err != nil {
+		return err
 	}
+	// Check start <= end
 	if start.Cmp(end) > 0 {
 		return ErrInvalidInput(fmt.Sprintf("%s: start (%s) cannot be greater than end (%s)", fieldName, start.String(), end.String()))
 	}
@@ -96,13 +103,20 @@ func ValidateBigIntRanges(ranges []struct {
 	return nil
 }
 
-// ValidateAmount validates that an amount is greater than zero
+// ValidateAmount validates that an amount is valid:
+// - Non-nil
+// - Greater than zero
+// - Within uint256 bounds (for EVM compatibility)
 func ValidateAmount(amount *big.Int, fieldName string) error {
 	if amount == nil {
 		return ErrInvalidInput(fmt.Sprintf("%s cannot be nil", fieldName))
 	}
 	if amount.Sign() <= 0 {
 		return ErrInvalidInput(fmt.Sprintf("%s must be greater than zero, got %s", fieldName, amount.String()))
+	}
+	// Check uint256 overflow
+	if err := CheckOverflow(amount, fieldName); err != nil {
+		return err
 	}
 	return nil
 }
@@ -153,13 +167,18 @@ func ValidateRangesWithOverlapCheck(ranges []struct {
 	return nil
 }
 
-// ValidateCollectionId validates that a collection ID is valid
+// ValidateCollectionId validates that a collection ID is valid:
+// - Non-nil
+// - Non-negative
+// - Non-zero (except for new collection creation where 0 means "assign new ID")
+// - Within uint256 bounds (for EVM compatibility)
 func ValidateCollectionId(collectionId *big.Int) error {
 	if collectionId == nil {
 		return ErrInvalidInput("collectionId cannot be nil")
 	}
-	if collectionId.Sign() < 0 {
-		return ErrInvalidInput(fmt.Sprintf("collectionId cannot be negative, got %s", collectionId.String()))
+	// Check uint256 overflow (includes negative check)
+	if err := CheckOverflow(collectionId, "collectionId"); err != nil {
+		return err
 	}
 	if collectionId.Sign() == 0 {
 		return ErrInvalidInput("collectionId cannot be zero")
@@ -181,25 +200,27 @@ func ValidateStringOptional(s, fieldName string) error {
 	return nil
 }
 
-// ConvertAndValidateBigIntRanges converts big.Int ranges to UintRange and validates them
-// Requires non-empty array - use ConvertAndValidateBigIntRangesAllowEmpty for optional arrays
+// ConvertAndValidateBigIntRanges converts big.Int ranges to UintRange and validates them.
+// Validates that all values are within uint256 bounds before conversion to ensure EVM compatibility.
+// Requires non-empty array - use ConvertAndValidateBigIntRangesAllowEmpty for optional arrays.
 func ConvertAndValidateBigIntRanges(ranges []struct {
 	Start *big.Int `json:"start"`
 	End   *big.Int `json:"end"`
 }, fieldName string,
 ) ([]*tokenizationtypes.UintRange, error) {
+	// ValidateBigIntRanges calls ValidateBigIntRange which includes CheckOverflow
 	if err := ValidateBigIntRanges(ranges, fieldName); err != nil {
 		return nil, err
 	}
 
+	// Safe to convert - overflow has been checked
 	uintRanges := make([]*tokenizationtypes.UintRange, len(ranges))
 	for i, r := range ranges {
-		// Check for overflow - Uint can handle up to 2^256-1, but we should validate reasonable bounds
 		uintRanges[i] = &tokenizationtypes.UintRange{
 			Start: sdkmath.NewUintFromBigInt(r.Start),
 			End:   sdkmath.NewUintFromBigInt(r.End),
 		}
-		// Validate the converted range
+		// Validate the converted range (start <= end check on sdkmath.Uint)
 		if err := ValidateUintRange(uintRanges[i], fmt.Sprintf("%s[%d]", fieldName, i)); err != nil {
 			return nil, err
 		}
@@ -208,8 +229,9 @@ func ConvertAndValidateBigIntRanges(ranges []struct {
 	return uintRanges, nil
 }
 
-// ConvertAndValidateBigIntRangesAllowEmpty converts big.Int ranges to UintRange and validates them
-// Allows empty arrays (returns empty slice), validates individual entries if present
+// ConvertAndValidateBigIntRangesAllowEmpty converts big.Int ranges to UintRange and validates them.
+// Validates that all values are within uint256 bounds before conversion to ensure EVM compatibility.
+// Allows empty arrays (returns empty slice), validates individual entries if present.
 func ConvertAndValidateBigIntRangesAllowEmpty(ranges []struct {
 	Start *big.Int `json:"start"`
 	End   *big.Int `json:"end"`
@@ -221,9 +243,11 @@ func ConvertAndValidateBigIntRangesAllowEmpty(ranges []struct {
 
 	uintRanges := make([]*tokenizationtypes.UintRange, len(ranges))
 	for i, r := range ranges {
+		// ValidateBigIntRange includes CheckOverflow for uint256 bounds
 		if err := ValidateBigIntRange(r.Start, r.End, fmt.Sprintf("%s[%d]", fieldName, i)); err != nil {
 			return nil, err
 		}
+		// Safe to convert - overflow has been checked
 		uintRanges[i] = &tokenizationtypes.UintRange{
 			Start: sdkmath.NewUintFromBigInt(r.Start),
 			End:   sdkmath.NewUintFromBigInt(r.End),

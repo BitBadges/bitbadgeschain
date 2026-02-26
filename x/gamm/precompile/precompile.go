@@ -309,29 +309,69 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 	}
 
 	if err != nil {
-		return nil, WrapError(err, ErrorCodeSwapFailed, "transaction failed")
+		// Use operation-specific error codes for better error handling
+		var errorCode ErrorCode
+		var errorMsg string
+		switch msg.(type) {
+		case *gammtypes.MsgJoinPool:
+			errorCode = ErrorCodeJoinPoolFailed
+			errorMsg = "join pool failed"
+		case *gammtypes.MsgExitPool:
+			errorCode = ErrorCodeExitPoolFailed
+			errorMsg = "exit pool failed"
+		case *gammtypes.MsgSwapExactAmountIn:
+			errorCode = ErrorCodeSwapFailed
+			errorMsg = "swap failed"
+		case *gammtypes.MsgSwapExactAmountInWithIBCTransfer:
+			errorCode = ErrorCodeSwapFailed
+			errorMsg = "swap with IBC transfer failed"
+		case *balancer.MsgCreateBalancerPool:
+			errorCode = ErrorCodeInternalError
+			errorMsg = "create pool failed"
+		default:
+			errorCode = ErrorCodeInternalError
+			errorMsg = "transaction failed"
+		}
+		return nil, WrapError(err, errorCode, errorMsg)
 	}
 
 	// Pack response based on method output type
+	// All BigInt values are checked for overflow before packing to prevent silent truncation
 	switch method.Name {
 	case JoinPoolMethod:
 		if joinResp, ok := resp.(*gammtypes.MsgJoinPoolResponse); ok {
-			return method.Outputs.Pack(joinResp.ShareOutAmount.BigInt(), ConvertCoinsToEVM(joinResp.TokenIn))
+			shareOut := joinResp.ShareOutAmount.BigInt()
+			if err := CheckUint256Overflow(shareOut, "shareOutAmount"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "share amount exceeds uint256 maximum")
+			}
+			tokensIn, err := ConvertCoinsToEVMSafe(joinResp.TokenIn, "tokenIn")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(shareOut, tokensIn)
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for joinPool"), ErrorCodeInternalError, "expected MsgJoinPoolResponse")
 	case ExitPoolMethod:
 		if exitResp, ok := resp.(*gammtypes.MsgExitPoolResponse); ok {
-			return method.Outputs.Pack(ConvertCoinsToEVM(exitResp.TokenOut))
+			tokensOut, err := ConvertCoinsToEVMSafe(exitResp.TokenOut, "tokenOut")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(tokensOut)
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for exitPool"), ErrorCodeInternalError, "expected MsgExitPoolResponse")
 	case SwapExactAmountInMethod, SwapExactAmountInWithIBCTransferMethod:
 		if swapResp, ok := resp.(*gammtypes.MsgSwapExactAmountInResponse); ok {
-			return method.Outputs.Pack(swapResp.TokenOutAmount.BigInt())
+			tokenOut := swapResp.TokenOutAmount.BigInt()
+			if err := CheckUint256Overflow(tokenOut, "tokenOutAmount"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(tokenOut)
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for swapExactAmountIn"), ErrorCodeInternalError, "expected MsgSwapExactAmountInResponse")
 	case CreatePoolMethod:
 		if createResp, ok := resp.(*balancer.MsgCreateBalancerPoolResponse); ok {
-			// Convert uint64 to *big.Int for ABI packing
+			// Convert uint64 to *big.Int for ABI packing (uint64 always fits in uint256)
 			poolIdBigInt := big.NewInt(0).SetUint64(createResp.PoolID)
 			return method.Outputs.Pack(poolIdBigInt)
 		}
@@ -381,6 +421,7 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 	}
 
 	// Handle different return types
+	// All BigInt values are checked for overflow before packing to prevent silent truncation
 	switch method.Name {
 	case GetPoolTypeMethod:
 		if poolTypeResp, ok := resp.(*gammtypes.QueryPoolTypeResponse); ok {
@@ -389,29 +430,44 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 	case GetTotalSharesMethod:
 		// ABI expects struct Coin (tuple), not bytes
 		if totalSharesResp, ok := resp.(*gammtypes.QueryTotalSharesResponse); ok {
-			coinStruct := ConvertCoinToEVM(totalSharesResp.TotalShares)
+			coinStruct, err := ConvertCoinToEVMSafe(totalSharesResp.TotalShares, "totalShares")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "share amount exceeds uint256 maximum")
+			}
 			return method.Outputs.Pack(coinStruct)
 		}
 		return nil, WrapError(fmt.Errorf("response is not QueryTotalSharesResponse"), ErrorCodeInternalError, "invalid response type")
 	case GetTotalLiquidityMethod:
 		// ABI expects struct Coin[] (tuple[]), not bytes
 		if totalLiquidityResp, ok := resp.(*gammtypes.QueryTotalLiquidityResponse); ok {
-			coinsStruct := ConvertCoinsToEVM(totalLiquidityResp.Liquidity)
+			coinsStruct, err := ConvertCoinsToEVMSafe(totalLiquidityResp.Liquidity, "liquidity")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "liquidity amount exceeds uint256 maximum")
+			}
 			return method.Outputs.Pack(coinsStruct)
 		}
 		return nil, WrapError(fmt.Errorf("response is not QueryTotalLiquidityResponse"), ErrorCodeInternalError, "invalid response type")
 	case CalcJoinPoolNoSwapSharesMethod:
 		// ABI expects (tokensOut tuple[], sharesOut uint256), not bytes
 		if calcResp, ok := resp.(*gammtypes.QueryCalcJoinPoolNoSwapSharesResponse); ok {
-			tokensOutStruct := ConvertCoinsToEVM(calcResp.TokensOut)
+			tokensOutStruct, err := ConvertCoinsToEVMSafe(calcResp.TokensOut, "tokensOut")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
 			sharesOutBigInt := calcResp.SharesOut.BigInt()
+			if err := CheckUint256Overflow(sharesOutBigInt, "sharesOut"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "shares amount exceeds uint256 maximum")
+			}
 			return method.Outputs.Pack(tokensOutStruct, sharesOutBigInt)
 		}
 		return nil, WrapError(fmt.Errorf("response is not QueryCalcJoinPoolNoSwapSharesResponse"), ErrorCodeInternalError, "invalid response type")
 	case CalcExitPoolCoinsFromSharesMethod:
 		// ABI expects tokensOut tuple[], not bytes
 		if calcResp, ok := resp.(*gammtypes.QueryCalcExitPoolCoinsFromSharesResponse); ok {
-			tokensOutStruct := ConvertCoinsToEVM(calcResp.TokensOut)
+			tokensOutStruct, err := ConvertCoinsToEVMSafe(calcResp.TokensOut, "tokensOut")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
 			return method.Outputs.Pack(tokensOutStruct)
 		}
 		return nil, WrapError(fmt.Errorf("response is not QueryCalcExitPoolCoinsFromSharesResponse"), ErrorCodeInternalError, "invalid response type")
@@ -419,7 +475,13 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		// ABI expects (shareOutAmount uint256, tokensOut tuple[]), not bytes
 		if calcResp, ok := resp.(*gammtypes.QueryCalcJoinPoolSharesResponse); ok {
 			shareOutBigInt := calcResp.ShareOutAmount.BigInt()
-			tokensOutStruct := ConvertCoinsToEVM(calcResp.TokensOut)
+			if err := CheckUint256Overflow(shareOutBigInt, "shareOutAmount"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "share amount exceeds uint256 maximum")
+			}
+			tokensOutStruct, err := ConvertCoinsToEVMSafe(calcResp.TokensOut, "tokensOut")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
 			return method.Outputs.Pack(shareOutBigInt, tokensOutStruct)
 		}
 		return nil, WrapError(fmt.Errorf("response is not QueryCalcJoinPoolSharesResponse"), ErrorCodeInternalError, "invalid response type")
