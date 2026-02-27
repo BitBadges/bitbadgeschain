@@ -318,7 +318,9 @@ func (suite *ReturnTypesTestSuite) TestConvertDynamicStoreToSolidityStruct_Valid
 	suite.NotNil(structData)
 	suite.Len(structData, 6)
 	suite.Equal(big.NewInt(1), structData[0].(*big.Int))
-	suite.Equal("bb1xxx", structData[1].(string))
+	// CreatedBy is now converted to EVM address format (common.Address)
+	_, ok := structData[1].(common.Address)
+	suite.True(ok, "CreatedBy should be common.Address type")
 	suite.True(structData[2].(bool))
 	suite.True(structData[3].(bool))
 }
@@ -339,7 +341,9 @@ func (suite *ReturnTypesTestSuite) TestConvertDynamicStoreValueToSolidityStruct_
 	suite.NotNil(structData)
 	suite.Len(structData, 3)
 	suite.Equal(big.NewInt(1), structData[0].(*big.Int))
-	suite.Equal("bb1xxx", structData[1].(string))
+	// Address is now converted to EVM address format (common.Address)
+	_, ok := structData[1].(common.Address)
+	suite.True(ok, "Address should be common.Address type")
 	suite.True(structData[2].(bool))
 }
 
@@ -359,7 +363,9 @@ func (suite *ReturnTypesTestSuite) TestConvertVoteProofToSolidityStruct_Valid() 
 	suite.NotNil(structData)
 	suite.Len(structData, 3)
 	suite.Equal("prop-1", structData[0].(string))
-	suite.Equal("bb1xxx", structData[1].(string))
+	// Voter is now converted to EVM address format (common.Address)
+	_, ok := structData[1].(common.Address)
+	suite.True(ok, "Voter should be common.Address type")
 	suite.Equal(big.NewInt(70), structData[2].(*big.Int))
 }
 
@@ -450,7 +456,9 @@ func (suite *ReturnTypesTestSuite) TestConvertCollection_InvariantsCosmosCoinBac
 	path, ok := invariants[2].([]interface{})
 	suite.True(ok)
 	suite.Len(path, 2)
-	suite.Equal("bb1backed", path[0].(string))
+	// Address is now converted to EVM address format (common.Address)
+	_, addrOk := path[0].(common.Address)
+	suite.True(addrOk, "cosmosCoinBackedPath.Address should be common.Address type")
 }
 
 func (suite *ReturnTypesTestSuite) TestConvertCollection_InvariantsEvmQueryChallengesUriAndCustomData() {
