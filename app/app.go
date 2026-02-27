@@ -460,6 +460,11 @@ func New(
 			return nil, err
 		}
 
+		// CRITICAL: Set bank denom metadata BEFORE module InitGenesis runs.
+		// The EVM module's InitGenesis requires bank denom metadata for the EVM denom.
+		// This is necessary for ibc-go testing which creates empty bank metadata.
+		app.ensureBankDenomMetadata(ctx)
+
 		// Call the default InitChainer which runs all module InitGenesis
 		res, err := app.App.InitChainer(ctx, req)
 		if err != nil {
@@ -626,4 +631,16 @@ func BlockedAddresses() map[string]bool {
 		}
 	}
 	return result
+}
+
+// GetBaseApp returns the underlying BaseApp. It implements ibctesting.TestingApp
+// and is used by IBC integration tests.
+func (app *App) GetBaseApp() *baseapp.BaseApp {
+	return app.BaseApp
+}
+
+// GetTxConfig returns the app's TxConfig. It implements ibctesting.TestingApp
+// and is used by IBC integration tests.
+func (app *App) GetTxConfig() client.TxConfig {
+	return app.txConfig
 }

@@ -194,3 +194,14 @@ func GenerateTokenMetadata(tokenIds []*types.UintRange, uri, customData string) 
 		CustomData: customData,
 	}
 }
+
+// GeneratePrioritizedApproval generates a prioritized approval identifier for collection-level approvals
+// Approvals with merkle challenges, ETH signatures, or other non-auto-scannable criteria must be prioritized
+func GeneratePrioritizedApproval(approvalId string) *types.ApprovalIdentifierDetails {
+	return &types.ApprovalIdentifierDetails{
+		ApprovalId:      approvalId,
+		ApprovalLevel:   "collection",
+		ApproverAddress: "",
+		Version:         sdkmath.NewUint(0),
+	}
+}

@@ -239,3 +239,104 @@ compile-contracts:
 		echo "  Install solc via your package manager"; \
 		exit 1; \
 	fi
+
+# Quint formal specification targets (approval system)
+.PHONY: quint-check quint-run quint-verify quint-run-all
+
+# Type-check all Quint specs
+quint-check:
+	@echo "Type-checking Quint specifications..."
+	@quint typecheck specs/quint/tokenization/approval_hierarchy.qnt
+	@quint typecheck specs/quint/tokenization/amount_limits.qnt
+	@quint typecheck specs/quint/tokenization/replay_protection.qnt
+	@echo "All specs type-check successfully"
+
+# Run simulation on approval hierarchy (quick check)
+quint-run:
+	@echo "Running Quint simulation (approval hierarchy)..."
+	@quint run specs/quint/tokenization/approval_hierarchy.qnt \
+		--invariant=inv_all \
+		--max-steps=50
+
+# Run all approval system invariant simulations
+quint-run-all:
+	@echo "Running all Quint simulations..."
+	@echo "=== Approval Hierarchy ===" && \
+	quint run specs/quint/tokenization/approval_hierarchy.qnt \
+		--invariant=inv_all --max-steps=30
+	@echo "=== Amount Limits ===" && \
+	quint run specs/quint/tokenization/amount_limits.qnt \
+		--invariant=inv_all --max-steps=30
+	@echo "=== Replay Protection ===" && \
+	quint run specs/quint/tokenization/replay_protection.qnt \
+		--invariant=inv_all --max-steps=30
+	@echo "All simulations passed"
+
+# Full verification (requires JDK 17+)
+quint-verify:
+	@echo "Verifying Quint specifications..."
+	@quint verify specs/quint/tokenization/approval_hierarchy.qnt \
+		--invariant=inv_all
+
+# IBC E2E Testing targets
+# Run all IBC E2E tests
+test-ibc-e2e:
+	@echo "Running all IBC E2E tests..."
+	@go test ./testing/ibc/e2e/... -count=1 -tags=test -v
+
+# Run IBC transfer tests only
+test-ibc-transfer:
+	@echo "Running IBC transfer tests..."
+	@go test ./testing/ibc/e2e/... -run "Transfer" -count=1 -tags=test -v
+
+# Run IBC hooks tests only
+test-ibc-hooks:
+	@echo "Running IBC hooks tests..."
+	@go test ./testing/ibc/e2e/... -run "Hooks" -count=1 -tags=test -v
+
+# Run IBC rate limit tests only
+test-ibc-rate-limit:
+	@echo "Running IBC rate limit tests..."
+	@go test ./testing/ibc/e2e/... -run "RateLimit" -count=1 -tags=test -v
+
+# Verify IBC TestingApp interface compliance (build check)
+verify-ibc-testing-app:
+	@echo "Verifying TestingApp interface compliance..."
+	@go build -tags=test ./app/...
+	@echo "TestingApp interface compliance verified"
+
+.PHONY: test-ibc-e2e test-ibc-transfer test-ibc-hooks test-ibc-rate-limit verify-ibc-testing-app
+
+# CLI Message Testing targets
+# Run CLI message marshal/unmarshal tests
+test-cli:
+	@echo "Running CLI message tests..."
+	@go test ./testing/cli/... -count=1 -tags=test -v
+
+# Cross-Module E2E Testing targets
+# Run all cross-module E2E tests
+test-cross-module:
+	@echo "Running all cross-module E2E tests..."
+	@go test ./testing/cross_module/e2e/... -count=1 -tags=test -v
+
+# Run pool tests only
+test-cross-module-pool:
+	@echo "Running cross-module pool tests..."
+	@go test ./testing/cross_module/e2e/... -run "Pool" -count=1 -tags=test -v
+
+# Run collection tests only
+test-cross-module-collection:
+	@echo "Running cross-module collection tests..."
+	@go test ./testing/cross_module/e2e/... -run "Collection" -count=1 -tags=test -v
+
+# Run combined cross-module tests only
+test-cross-module-combined:
+	@echo "Running combined cross-module tests..."
+	@go test ./testing/cross_module/e2e/... -run "Combined" -count=1 -tags=test -v
+
+# Run all E2E tests (IBC + cross-module)
+test-e2e-all:
+	@echo "Running all E2E tests..."
+	@go test ./testing/... -count=1 -tags=test -v
+
+.PHONY: test-cli test-cross-module test-cross-module-pool test-cross-module-collection test-cross-module-combined test-e2e-all

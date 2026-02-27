@@ -8,6 +8,31 @@ import (
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
+// ensureBankDenomMetadata sets the ubadge denom metadata in the bank keeper.
+// This MUST be called BEFORE module InitGenesis runs because the EVM module's
+// InitGenesis requires bank denom metadata to be present.
+//
+// This is critical for ibc-go testing which creates bank genesis with empty metadata.
+func (app *App) ensureBankDenomMetadata(ctx sdk.Context) {
+	// Check if metadata already exists
+	if _, found := app.BankKeeper.GetDenomMetaData(ctx, "ubadge"); found {
+		return
+	}
+
+	// Set the ubadge denom metadata
+	app.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
+		Description: "The native token of BitBadges Chain",
+		DenomUnits: []*banktypes.DenomUnit{
+			{Denom: "ubadge", Exponent: 0},
+			{Denom: "badge", Exponent: 9},
+		},
+		Base:    "ubadge",
+		Display: "badge",
+		Name:    "Badge",
+		Symbol:  "BADGE",
+	})
+}
+
 // initializeEVMCoinInfo initializes EVM coin info during InitChain.
 // This ensures denom metadata exists and EVM params are configured correctly
 // so that InitEvmCoinInfo can succeed. Needed for local dev (ignite serve)
