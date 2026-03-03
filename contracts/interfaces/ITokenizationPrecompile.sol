@@ -150,14 +150,24 @@ interface ITokenizationPrecompile {
         string calldata msgJson
     ) external returns (bool success);
 
-    /// @notice Create a new dynamic store
+    // ============ Dynamic Store (Boolean Address Flags) ============
+    // NOTE: Despite the name "Dynamic Store", this is a BOOLEAN store per address.
+    // It does NOT support arbitrary key-value pairs.
+    // - Each store maps addresses to true/false
+    // - defaultValue: returned for addresses not explicitly set
+    // - globalEnabled: kill switch (false = all lookups return false)
+
+    /// @notice Create a new dynamic store (boolean address flag store)
+    /// @dev Creates a store that maps addresses to boolean values. Use setDynamicStoreValue to set values.
     /// @param msgJson JSON string matching MsgCreateDynamicStore protobuf format
+    ///        Required fields: defaultValue (bool), uri (string), customData (string)
     /// @return storeId The newly created store ID
     function createDynamicStore(
         string calldata msgJson
     ) external returns (uint256 storeId);
 
-    /// @notice Update an existing dynamic store
+    /// @notice Update an existing dynamic store's settings
+    /// @dev Can update defaultValue, globalEnabled, uri, and customData
     /// @param msgJson JSON string matching MsgUpdateDynamicStore protobuf format
     /// @return success True if update succeeded
     function updateDynamicStore(
@@ -171,8 +181,11 @@ interface ITokenizationPrecompile {
         string calldata msgJson
     ) external returns (bool success);
 
-    /// @notice Set a value in a dynamic store for an address
+    /// @notice Set a boolean value for an address in a dynamic store
+    /// @dev Sets whether the specified address has a true/false value in the store.
+    ///      Address can be either EVM (0x...) or bech32 (bb1...) format - auto-converted.
     /// @param msgJson JSON string matching MsgSetDynamicStoreValue protobuf format
+    ///        Required fields: storeId (string), address (string), value (bool)
     /// @return success True if value was set
     function setDynamicStoreValue(
         string calldata msgJson
@@ -340,32 +353,34 @@ interface ITokenizationPrecompile {
     ) external view returns (bytes memory);
 
     /// @notice Get challenge tracker for Merkle challenges
-    /// @dev Returns protobuf-encoded challenge tracker data
+    /// @dev Returns the number of times a challenge has been used
     /// @param msgJson JSON string matching QueryChallengeTrackerRequest protobuf format
-    /// @return Protobuf-encoded challenge tracker bytes
+    /// @return numUsed The number of times the challenge has been used
     function getChallengeTracker(
         string calldata msgJson
-    ) external view returns (bytes memory);
+    ) external view returns (uint256 numUsed);
 
     /// @notice Get ETH signature tracker
-    /// @dev Returns protobuf-encoded signature tracker data
+    /// @dev Returns the number of times a signature has been used
     /// @param msgJson JSON string matching QueryETHSignatureTrackerRequest protobuf format
-    /// @return Protobuf-encoded signature tracker bytes
+    /// @return numUsed The number of times the signature has been used
     function getETHSignatureTracker(
         string calldata msgJson
-    ) external view returns (bytes memory);
+    ) external view returns (uint256 numUsed);
 
-    /// @notice Get a dynamic store by ID
-    /// @dev Returns protobuf-encoded DynamicStore
+    /// @notice Get a dynamic store (boolean address flag store) configuration by ID
+    /// @dev Returns protobuf-encoded DynamicStore containing settings like defaultValue, globalEnabled
     /// @param msgJson JSON string matching QueryDynamicStoreRequest protobuf format
+    ///        Required fields: storeId (string)
     /// @return Protobuf-encoded DynamicStore bytes
     function getDynamicStore(
         string calldata msgJson
     ) external view returns (bytes memory);
 
-    /// @notice Get a dynamic store value for a specific address
-    /// @dev Returns protobuf-encoded DynamicStoreValue
+    /// @notice Get the boolean value for an address in a dynamic store
+    /// @dev Returns protobuf-encoded DynamicStoreValue. Address can be EVM or bech32 format.
     /// @param msgJson JSON string matching QueryDynamicStoreValueRequest protobuf format
+    ///        Required fields: storeId (string), address (string)
     /// @return Protobuf-encoded DynamicStoreValue bytes
     function getDynamicStoreValue(
         string calldata msgJson
@@ -431,5 +446,55 @@ interface ITokenizationPrecompile {
     function getTotalSupply(
         string calldata msgJson
     ) external view returns (uint256);
+
+    // ============ Address Conversion Utilities ============
+
+    /// @notice Convert EVM address (0x) to BitBadges bech32 (bb1)
+    /// @dev Zero address (0x0000...0000) converts to valid bb1 address (bb1qqqqq...)
+    ///      This allows consistent round-trip conversion for all addresses.
+    /// @param evmAddress The EVM address to convert
+    /// @return bech32Address The corresponding bech32 address (bb1...)
+    function convertEvmAddressToBech32(address evmAddress) external pure returns (string memory bech32Address);
+
+    /// @notice Convert bech32 address (bb1) to EVM address (0x)
+    /// @param bech32Address The bech32 address to convert
+    /// @return evmAddress The corresponding EVM address (0x...)
+    function convertBech32ToEvmAddress(string calldata bech32Address) external pure returns (address evmAddress);
+
+    // ============ Utility Helper Methods ============
+
+    /// @notice Check if a value is within a range (inclusive)
+    /// @param start The start of the range
+    /// @param end The end of the range
+    /// @param value The value to check
+    /// @return contains True if value >= start && value <= end
+    function rangeContains(uint256 start, uint256 end, uint256 value) external pure returns (bool contains);
+
+    /// @notice Check if two ranges overlap
+    /// @param start1 The start of the first range
+    /// @param end1 The end of the first range
+    /// @param start2 The start of the second range
+    /// @param end2 The end of the second range
+    /// @return overlap True if the ranges overlap
+    function rangesOverlap(uint256 start1, uint256 end1, uint256 start2, uint256 end2) external pure returns (bool overlap);
+
+    /// @notice Search if a value exists in any range in a JSON-encoded array
+    /// @param rangesJson JSON array of ranges, e.g. '[{"start":"1","end":"100"}]'
+    /// @param value The value to search for
+    /// @return found True if the value is found in any range
+    function searchInRanges(string calldata rangesJson, uint256 value) external pure returns (bool found);
+
+    /// @notice Get the balance amount for a specific token ID and time from a JSON-encoded balances array
+    /// @param balancesJson JSON array of balances with badgeIds and ownershipTimes
+    /// @param tokenId The token ID to search for
+    /// @param time The ownership time to search for
+    /// @return amount The balance amount (0 if not found)
+    function getBalanceForIdAndTime(string calldata balancesJson, uint256 tokenId, uint256 time) external pure returns (uint256 amount);
+
+    /// @notice Get the reserved list ID for a specific address
+    /// @dev Returns the bech32 address as the list ID
+    /// @param addr The address to get the reserved list ID for
+    /// @return listId The reserved list ID
+    function getReservedListId(address addr) external pure returns (string memory listId);
 }
 

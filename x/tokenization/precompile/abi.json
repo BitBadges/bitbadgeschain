@@ -836,6 +836,179 @@
       ],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "evmAddress",
+          "type": "address"
+        }
+      ],
+      "name": "convertEvmAddressToBech32",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "bech32Address",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "bech32Address",
+          "type": "string"
+        }
+      ],
+      "name": "convertBech32ToEvmAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "evmAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "end",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "rangeContains",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "contains",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "start1",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "end1",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "start2",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "end2",
+          "type": "uint256"
+        }
+      ],
+      "name": "rangesOverlap",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "overlap",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "rangesJson",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "searchInRanges",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "found",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "balancesJson",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "time",
+          "type": "uint256"
+        }
+      ],
+      "name": "getBalanceForIdAndTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "getReservedListId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "listId",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
     }
   ]
 }

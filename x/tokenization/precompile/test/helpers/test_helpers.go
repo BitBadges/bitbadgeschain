@@ -108,6 +108,19 @@ func (ts *TestSuite) CreateMockContract(caller common.Address, input []byte) *vm
 	return contract
 }
 
+// CallPrecompile executes the precompile with the given input using the SDK context
+// This is the preferred method for testing as it properly initializes the context
+func (ts *TestSuite) CallPrecompile(caller common.Address, input []byte) ([]byte, error) {
+	contract := ts.CreateMockContract(caller, input)
+	return ts.Precompile.Execute(ts.Ctx, contract, false)
+}
+
+// CallPrecompileReadOnly executes the precompile in read-only mode (for view/pure functions)
+func (ts *TestSuite) CallPrecompileReadOnly(caller common.Address, input []byte) ([]byte, error) {
+	contract := ts.CreateMockContract(caller, input)
+	return ts.Precompile.Execute(ts.Ctx, contract, true)
+}
+
 // CreateTestCollection creates a basic test collection with transfer approvals
 func (ts *TestSuite) CreateTestCollection(creator string) (sdkmath.Uint, error) {
 	validTokenIds := []*tokenizationtypes.UintRange{

@@ -102,6 +102,12 @@ const (
 	GasGetBalanceAmountBase      = 3_000
 	GasGetTotalSupplyBase        = 3_000
 	GasPerQueryRange             = 500
+	GasConvertAddress            = 500  // Pure address conversion (no state access)
+	GasRangeContains             = 200  // Simple range check
+	GasRangesOverlap             = 200  // Two range overlap check
+	GasSearchInRanges            = 500  // Search in JSON ranges array
+	GasGetBalanceForIdAndTime    = 500  // Parse JSON and search balances
+	GasGetReservedListId         = 300  // Reserved list ID generation
 	GasExecuteMultipleBase       = 10_000
 	GasPerMessageInBatch         = 1_000
 	GasPerInputChunk             = 100  // Gas per 32-byte chunk of input for JSON parsing cost (security fix)
@@ -352,6 +358,20 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasGetBalanceAmountBase
 	case GetTotalSupplyMethod:
 		baseGas = GasGetTotalSupplyBase
+	// Pure address converter methods
+	case ConvertEvmAddressToBech32Method, ConvertBech32ToEvmAddressMethod:
+		baseGas = GasConvertAddress
+	// Utility helper methods (pure, no state access)
+	case RangeContainsMethod:
+		baseGas = GasRangeContains
+	case RangesOverlapMethod:
+		baseGas = GasRangesOverlap
+	case SearchInRangesMethod:
+		baseGas = GasSearchInRanges
+	case GetBalanceForIdAndTimeMethod:
+		baseGas = GasGetBalanceForIdAndTime
+	case GetReservedListIdMethod:
+		baseGas = GasGetReservedListId
 	default:
 		return 0
 	}
@@ -477,6 +497,38 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 		}
 
 		bz, err := p.HandleExecuteMultiple(ctx, method, messages, contract)
+		return bz, method.Name, err
+	}
+
+	// Handle pure address converter methods (no state access, no JSON)
+	if method.Name == ConvertEvmAddressToBech32Method {
+		bz, err := p.HandleConvertEvmAddressToBech32(method, args)
+		return bz, method.Name, err
+	}
+	if method.Name == ConvertBech32ToEvmAddressMethod {
+		bz, err := p.HandleConvertBech32ToEvmAddress(method, args)
+		return bz, method.Name, err
+	}
+
+	// Handle pure utility helper methods (no state access)
+	if method.Name == RangeContainsMethod {
+		bz, err := p.HandleRangeContains(method, args)
+		return bz, method.Name, err
+	}
+	if method.Name == RangesOverlapMethod {
+		bz, err := p.HandleRangesOverlap(method, args)
+		return bz, method.Name, err
+	}
+	if method.Name == SearchInRangesMethod {
+		bz, err := p.HandleSearchInRanges(method, args)
+		return bz, method.Name, err
+	}
+	if method.Name == GetBalanceForIdAndTimeMethod {
+		bz, err := p.HandleGetBalanceForIdAndTime(method, args)
+		return bz, method.Name, err
+	}
+	if method.Name == GetReservedListIdMethod {
+		bz, err := p.HandleGetReservedListId(method, args)
 		return bz, method.Name, err
 	}
 
@@ -1719,6 +1771,251 @@ func (p Precompile) HandleIsAddressReservedProtocol(ctx sdk.Context, method *abi
 	return method.Outputs.Pack(resp.IsReservedProtocol)
 }
 
+// HandleConvertEvmAddressToBech32 converts an EVM address (0x) to BitBadges bech32 (bb1)
+// This is a pure function - no state access required
+func (p Precompile) HandleConvertEvmAddressToBech32(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 1 {
+		return nil, ErrInvalidInput("expected 1 argument (address)")
+	}
+
+	evmAddr, ok := args[0].(common.Address)
+	if !ok {
+		return nil, ErrInvalidInput("expected address type for first argument")
+	}
+
+	// Zero address (0x0000...0000) converts to valid bb1 address (bb1qqqqq...)
+	// This allows consistent round-trip conversion
+	bech32Addr := sdk.AccAddress(evmAddr.Bytes()).String()
+
+	return method.Outputs.Pack(bech32Addr)
+}
+
+// HandleConvertBech32ToEvmAddress converts a bech32 address (bb1) to EVM address (0x)
+// This is a pure function - no state access required
+func (p Precompile) HandleConvertBech32ToEvmAddress(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 1 {
+		return nil, ErrInvalidInput("expected 1 argument (string)")
+	}
+
+	bech32Str, ok := args[0].(string)
+	if !ok {
+		return nil, ErrInvalidInput("expected string type for first argument")
+	}
+
+	accAddr, err := sdk.AccAddressFromBech32(bech32Str)
+	if err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid bech32 address: %s", err))
+	}
+
+	evmAddr := common.BytesToAddress(accAddr.Bytes())
+
+	return method.Outputs.Pack(evmAddr)
+}
+
+// HandleRangeContains checks if a value is within a range (inclusive)
+// This is a pure function - no state access required
+func (p Precompile) HandleRangeContains(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 3 {
+		return nil, ErrInvalidInput("expected 3 arguments (start, end, value)")
+	}
+
+	start, ok := args[0].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for start")
+	}
+	end, ok := args[1].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for end")
+	}
+	value, ok := args[2].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for value")
+	}
+
+	// Check if value >= start && value <= end
+	result := value.Cmp(start) >= 0 && value.Cmp(end) <= 0
+
+	return method.Outputs.Pack(result)
+}
+
+// HandleRangesOverlap checks if two ranges overlap
+// This is a pure function - no state access required
+func (p Precompile) HandleRangesOverlap(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 4 {
+		return nil, ErrInvalidInput("expected 4 arguments (start1, end1, start2, end2)")
+	}
+
+	start1, ok := args[0].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for start1")
+	}
+	end1, ok := args[1].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for end1")
+	}
+	start2, ok := args[2].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for start2")
+	}
+	end2, ok := args[3].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for end2")
+	}
+
+	// Ranges overlap if: start1 <= end2 && start2 <= end1
+	result := start1.Cmp(end2) <= 0 && start2.Cmp(end1) <= 0
+
+	return method.Outputs.Pack(result)
+}
+
+// HandleSearchInRanges searches if a value exists in any range in a JSON-encoded array
+// This is a pure function - no state access required
+func (p Precompile) HandleSearchInRanges(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 2 {
+		return nil, ErrInvalidInput("expected 2 arguments (rangesJson, value)")
+	}
+
+	rangesJson, ok := args[0].(string)
+	if !ok {
+		return nil, ErrInvalidInput("expected string for rangesJson")
+	}
+	value, ok := args[1].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for value")
+	}
+
+	// Parse JSON array of ranges
+	var ranges []struct {
+		Start string `json:"start"`
+		End   string `json:"end"`
+	}
+
+	if err := json.Unmarshal([]byte(rangesJson), &ranges); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid ranges JSON: %s", err))
+	}
+
+	// Search through ranges
+	for _, r := range ranges {
+		start, startOk := new(big.Int).SetString(r.Start, 10)
+		end, endOk := new(big.Int).SetString(r.End, 10)
+		if !startOk || !endOk {
+			continue // Skip invalid ranges
+		}
+
+		if value.Cmp(start) >= 0 && value.Cmp(end) <= 0 {
+			return method.Outputs.Pack(true)
+		}
+	}
+
+	return method.Outputs.Pack(false)
+}
+
+// HandleGetBalanceForIdAndTime gets the balance amount for a specific token ID and time from a JSON-encoded balances array
+// This is a pure function - no state access required
+func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 3 {
+		return nil, ErrInvalidInput("expected 3 arguments (balancesJson, tokenId, time)")
+	}
+
+	balancesJson, ok := args[0].(string)
+	if !ok {
+		return nil, ErrInvalidInput("expected string for balancesJson")
+	}
+	tokenId, ok := args[1].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for tokenId")
+	}
+	time, ok := args[2].(*big.Int)
+	if !ok {
+		return nil, ErrInvalidInput("expected uint256 for time")
+	}
+
+	// Parse JSON array of balances
+	var balances []struct {
+		Amount         string `json:"amount"`
+		BadgeIds       []struct {
+			Start string `json:"start"`
+			End   string `json:"end"`
+		} `json:"badgeIds"`
+		OwnershipTimes []struct {
+			Start string `json:"start"`
+			End   string `json:"end"`
+		} `json:"ownershipTimes"`
+	}
+
+	if err := json.Unmarshal([]byte(balancesJson), &balances); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid balances JSON: %s", err))
+	}
+
+	// Search through balances
+	for _, b := range balances {
+		// Check if tokenId is in badgeIds ranges
+		tokenMatch := false
+		for _, r := range b.BadgeIds {
+			start, startOk := new(big.Int).SetString(r.Start, 10)
+			end, endOk := new(big.Int).SetString(r.End, 10)
+			if !startOk || !endOk {
+				continue
+			}
+			if tokenId.Cmp(start) >= 0 && tokenId.Cmp(end) <= 0 {
+				tokenMatch = true
+				break
+			}
+		}
+		if !tokenMatch {
+			continue
+		}
+
+		// Check if time is in ownershipTimes ranges
+		timeMatch := false
+		for _, r := range b.OwnershipTimes {
+			start, startOk := new(big.Int).SetString(r.Start, 10)
+			end, endOk := new(big.Int).SetString(r.End, 10)
+			if !startOk || !endOk {
+				continue
+			}
+			if time.Cmp(start) >= 0 && time.Cmp(end) <= 0 {
+				timeMatch = true
+				break
+			}
+		}
+		if !timeMatch {
+			continue
+		}
+
+		// Found matching balance
+		amount, amountOk := new(big.Int).SetString(b.Amount, 10)
+		if !amountOk {
+			amount = big.NewInt(0)
+		}
+		return method.Outputs.Pack(amount)
+	}
+
+	// No matching balance found
+	return method.Outputs.Pack(big.NewInt(0))
+}
+
+// HandleGetReservedListId returns the reserved list ID for a specific address
+// This is a pure function - no state access required
+func (p Precompile) HandleGetReservedListId(method *abi.Method, args []interface{}) ([]byte, error) {
+	if len(args) != 1 {
+		return nil, ErrInvalidInput("expected 1 argument (address)")
+	}
+
+	addr, ok := args[0].(common.Address)
+	if !ok {
+		return nil, ErrInvalidInput("expected address type")
+	}
+
+	// Convert to bech32 format
+	bech32Addr := sdk.AccAddress(addr.Bytes()).String()
+
+	// Reserved list ID format is the bech32 address itself
+	listId := bech32Addr
+
+	return method.Outputs.Pack(listId)
+}
+
 // transactionMethods is a map of method names that are transactions (state-changing).
 // Using a map provides O(1) lookup instead of O(n) switch statement.
 var transactionMethods = map[string]bool{
@@ -1804,4 +2101,15 @@ const (
 	ParamsMethod                          = "params"
 	GetBalanceAmountMethod                = "getBalanceAmount"
 	GetTotalSupplyMethod                  = "getTotalSupply"
+
+	// Address converter methods (pure, no state access)
+	ConvertEvmAddressToBech32Method = "convertEvmAddressToBech32"
+	ConvertBech32ToEvmAddressMethod = "convertBech32ToEvmAddress"
+
+	// Utility helper methods (pure, no state access)
+	RangeContainsMethod          = "rangeContains"
+	RangesOverlapMethod          = "rangesOverlap"
+	SearchInRangesMethod         = "searchInRanges"
+	GetBalanceForIdAndTimeMethod = "getBalanceForIdAndTime"
+	GetReservedListIdMethod      = "getReservedListId"
 )

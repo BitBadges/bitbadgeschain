@@ -7,7 +7,9 @@ import "../types/GammTypes.sol";
  * @title GammJSONHelpers
  * @notice Helper library for constructing JSON strings for the gamm precompile
  * @dev All methods return JSON strings that match the protobuf JSON format
- * 
+ *
+ * IMPORTANT: Pool IDs and many amounts use uint64 internally.
+ *
  * Usage example:
  * ```solidity
  * string memory coinsJson = GammJSONHelpers.coinsToJson(tokenInMaxs);
@@ -16,6 +18,13 @@ import "../types/GammTypes.sol";
  * ```
  */
 library GammJSONHelpers {
+    // ============ Critical Constants ============
+    /// @notice Maximum valid uint64 value
+    uint64 public constant MAX_UINT64 = type(uint64).max;  // 18446744073709551615
+
+    /// @notice Maximum pool ID value
+    uint64 public constant MAX_POOL_ID = type(uint64).max;
+
     // ============ Transaction JSON Constructors ============
 
     /**
