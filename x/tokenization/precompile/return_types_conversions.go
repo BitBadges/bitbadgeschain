@@ -4,8 +4,25 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
+
+// convertBech32ToEVMAddress converts a bech32 address to EVM address for Solidity returns
+// Returns zero address for empty or invalid addresses
+func convertBech32ToEVMAddress(addr string) common.Address {
+	if addr == "" {
+		return common.Address{}
+	}
+	accAddr, err := sdk.AccAddressFromBech32(addr)
+	if err != nil {
+		return common.Address{} // Invalid address returns zero
+	}
+	return common.BytesToAddress(accAddr.Bytes())
+}
 
 // uintRangesToSolidity converts []*UintRange to Solidity UintRange[] format (each element is [start, end]).
 func uintRangesToSolidity(ranges []*tokenizationtypes.UintRange) []interface{} {
@@ -101,12 +118,13 @@ func conversionToSolidity(c *tokenizationtypes.Conversion) []interface{} {
 }
 
 // cosmosCoinBackedPathToSolidity converts CosmosCoinBackedPath to Solidity struct format.
-// Solidity: string addr, Conversion conversion.
+// Solidity: address addr, Conversion conversion.
 func cosmosCoinBackedPathToSolidity(p *tokenizationtypes.CosmosCoinBackedPath) []interface{} {
 	if p == nil {
-		return []interface{}{"", conversionToSolidity(nil)}
+		return []interface{}{common.Address{}, conversionToSolidity(nil)}
 	}
-	addr := p.Address
+	// Convert Address to EVM format for Solidity
+	addr := convertBech32ToEVMAddress(p.Address)
 	return []interface{}{addr, conversionToSolidity(p.Conversion)}
 }
 
@@ -324,9 +342,11 @@ func ConvertDynamicStoreToSolidityStruct(d *tokenizationtypes.DynamicStore) ([]i
 	if !d.StoreId.IsNil() {
 		storeId = d.StoreId.BigInt()
 	}
+	// Convert CreatedBy address to EVM format for Solidity
+	createdByAddr := convertBech32ToEVMAddress(d.CreatedBy)
 	return []interface{}{
 		storeId,
-		d.CreatedBy,
+		createdByAddr,
 		d.DefaultValue,
 		d.GlobalEnabled,
 		d.Uri,
@@ -343,7 +363,9 @@ func ConvertDynamicStoreValueToSolidityStruct(v *tokenizationtypes.DynamicStoreV
 	if !v.StoreId.IsNil() {
 		storeId = v.StoreId.BigInt()
 	}
-	return []interface{}{storeId, v.Address, v.Value}, nil
+	// Convert Address to EVM format for Solidity
+	evmAddr := convertBech32ToEVMAddress(v.Address)
+	return []interface{}{storeId, evmAddr, v.Value}, nil
 }
 
 // ConvertVoteProofToSolidityStruct converts VoteProof to Solidity struct format.
@@ -355,7 +377,9 @@ func ConvertVoteProofToSolidityStruct(v *tokenizationtypes.VoteProof) ([]interfa
 	if !v.YesWeight.IsNil() {
 		yesWeight = v.YesWeight.BigInt()
 	}
-	return []interface{}{v.ProposalId, v.Voter, yesWeight}, nil
+	// Convert Voter address to EVM format for Solidity
+	voterAddr := convertBech32ToEVMAddress(v.Voter)
+	return []interface{}{v.ProposalId, voterAddr, yesWeight}, nil
 }
 
 // ConvertParamsToSolidityStruct converts Params to Solidity struct format.

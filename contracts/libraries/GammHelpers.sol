@@ -8,8 +8,18 @@ import "../types/GammTypes.sol";
  * @notice Convenience functions for creating common gamm types
  * @dev Provides helper functions to create Coin, SwapAmountInRoute, Affiliate, and other types
  *      with sensible defaults and common patterns.
+ *
+ * IMPORTANT: BitBadges uses uint64 internally for pool IDs and amounts in some contexts.
  */
 library GammHelpers {
+    // ============ Critical Constants ============
+    // IMPORTANT: BitBadges/Cosmos uses uint64 internally in many places.
+
+    /// @notice Maximum valid uint64 value
+    uint64 public constant MAX_UINT64 = type(uint64).max;  // 18446744073709551615
+
+    /// @notice Maximum pool ID value
+    uint64 public constant MAX_POOL_ID = type(uint64).max;
     /**
      * @notice Create a Coin struct
      * @param denom The denomination (e.g., "uatom", "uosmo")

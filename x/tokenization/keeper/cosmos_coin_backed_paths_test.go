@@ -992,3 +992,442 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 	suite.Require().Nil(err)
 	suite.Require().Equal(sdkmath.NewUint(0), fetchedBobBalances[0].Amount, "Bob should have 0 tokens after backing")
 }
+
+// TestCosmosCoinBackedPathsUnbackOnBehalfOf tests unbacking (deposit) on behalf of another user.
+// Initiator (bob) pays IBC coins, tokens go to alice.
+func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackOnBehalfOf() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+	filteredApprovals := []*types.CollectionApproval{}
+	for _, approval := range collectionsToCreate[0].CollectionApprovals {
+		if approval.FromListId != "Mint" {
+			filteredApprovals = append(filteredApprovals, approval)
+		}
+	}
+	collectionsToCreate[0].CollectionApprovals = filteredApprovals
+	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
+		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/onbehalf-unback",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "backed-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection")
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err)
+	backedPath := collection.Invariants.CosmosCoinBackedPath
+
+	// Fund bob (the initiator) with IBC coins
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err)
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+
+	// Bob (Creator/initiator) unbacks tokens FROM backing address TO alice
+	// Bob pays the IBC coins, alice receives the tokens
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        backedPath.Address,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.TokenizationKeeper, collection),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error unbacking on behalf of alice")
+
+	// Verify alice has 1 token
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err)
+	suite.Require().Equal(sdkmath.NewUint(1), aliceBalance.Balances[0].Amount, "Alice should have 1 token")
+
+	// Verify bob's IBC coins were debited (not alice's)
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.Conversion.SideA.Denom)
+	suite.Require().Equal(sdkmath.NewInt(0), bobIbcBalance.Amount, "Bob should have 0 IBC coins after paying for unbacking")
+
+	// Verify alice has no IBC coins (she didn't pay)
+	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err)
+	aliceIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, backedPath.Conversion.SideA.Denom)
+	suite.Require().Equal(sdkmath.NewInt(0), aliceIbcBalance.Amount, "Alice should have 0 IBC coins (she didn't pay)")
+}
+
+// TestCosmosCoinBackedPathsBackOnBehalfOf tests backing (withdraw) on behalf of another user.
+// Alice has tokens, bob (initiator) initiates backing alice's tokens, bob receives IBC coins.
+func (suite *TestSuite) TestCosmosCoinBackedPathsBackOnBehalfOf() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+	filteredApprovals := []*types.CollectionApproval{}
+	for _, approval := range collectionsToCreate[0].CollectionApprovals {
+		if approval.FromListId != "Mint" {
+			filteredApprovals = append(filteredApprovals, approval)
+		}
+	}
+	collectionsToCreate[0].CollectionApprovals = filteredApprovals
+	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
+		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/onbehalf-back",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "backed-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection")
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err)
+	backedPath := collection.Invariants.CosmosCoinBackedPath
+
+	// First, give alice some tokens via unbacking (alice pays her own IBC coins)
+	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err)
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", aliceAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        backedPath.Address,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.TokenizationKeeper, collection),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error giving alice tokens")
+
+	// Verify alice has 1 token
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err)
+	suite.Require().Equal(sdkmath.NewUint(1), aliceBalance.Balances[0].Amount)
+
+	// Alice sets outgoing approval for bob to transfer her tokens
+	err = SetOutgoingApproval(suite, wctx, &types.MsgSetOutgoingApproval{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Approval: &types.UserOutgoingApproval{
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: bob,
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			ApprovalId:        "bob-can-back",
+		},
+	})
+	suite.Require().Nil(err, "Error setting outgoing approval")
+
+	// Fund special address with IBC coins for backing
+	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
+	suite.Require().Nil(err)
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+
+	// Bob (initiator) backs alice's tokens TO backing address
+	// Alice's tokens get backed, bob receives the IBC coins
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        alice,
+				ToAddresses: []string{backedPath.Address},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.TokenizationKeeper, collection),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error backing on behalf of alice")
+
+	// Verify alice has 0 tokens
+	aliceBalance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err)
+	suite.Require().Equal(0, len(aliceBalance.Balances), "Alice should have 0 tokens after backing")
+
+	// Verify bob received the IBC coins (not alice)
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err)
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.Conversion.SideA.Denom)
+	suite.Require().Equal(sdkmath.NewInt(1), bobIbcBalance.Amount, "Bob should have 1 IBC coin after backing")
+
+	// Verify alice has no IBC coins (she didn't receive them)
+	aliceIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, backedPath.Conversion.SideA.Denom)
+	suite.Require().Equal(sdkmath.NewInt(0), aliceIbcBalance.Amount, "Alice should have 0 IBC coins")
+}
+
+// TestCosmosCoinBackedPathsBackOnBehalfOfNoApproval tests that backing on behalf fails without outgoing approval.
+func (suite *TestSuite) TestCosmosCoinBackedPathsBackOnBehalfOfNoApproval() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+	filteredApprovals := []*types.CollectionApproval{}
+	for _, approval := range collectionsToCreate[0].CollectionApprovals {
+		if approval.FromListId != "Mint" {
+			filteredApprovals = append(filteredApprovals, approval)
+		}
+	}
+	collectionsToCreate[0].CollectionApprovals = filteredApprovals
+	// Clear default outgoing approvals so alice must explicitly approve bob
+	collectionsToCreate[0].DefaultOutgoingApprovals = []*types.UserOutgoingApproval{}
+	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
+		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(1),
+					Denom:  "ibc/noapproval-back",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "backed-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err)
+	backedPath := collection.Invariants.CosmosCoinBackedPath
+
+	// Give alice tokens
+	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err)
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", aliceAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        backedPath.Address,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.TokenizationKeeper, collection),
+			},
+		},
+	})
+	suite.Require().Nil(err)
+
+	// Fund special address
+	backedPathAccAddr, err := sdk.AccAddressFromBech32(backedPath.Address)
+	suite.Require().Nil(err)
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", backedPathAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
+
+	// Bob tries to back alice's tokens WITHOUT alice's outgoing approval - should fail
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        alice,
+				ToAddresses: []string{backedPath.Address},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.TokenizationKeeper, collection),
+			},
+		},
+	})
+	suite.Require().Error(err, "Should fail without outgoing approval from alice")
+}
+
+// TestCosmosCoinBackedPathsUnbackOnBehalfOfConversionRate tests on-behalf unbacking with conversion rates.
+func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackOnBehalfOfConversionRate() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+	filteredApprovals := []*types.CollectionApproval{}
+	for _, approval := range collectionsToCreate[0].CollectionApprovals {
+		if approval.FromListId != "Mint" {
+			filteredApprovals = append(filteredApprovals, approval)
+		}
+	}
+	collectionsToCreate[0].CollectionApprovals = filteredApprovals
+	collectionsToCreate[0].Invariants = &types.InvariantsAddObject{
+		CosmosCoinBackedPath: &types.CosmosCoinBackedPathAddObject{
+			Conversion: &types.Conversion{
+				SideA: &types.ConversionSideAWithDenom{
+					Amount: sdkmath.NewUint(10), // 10 IBC coins per token
+					Denom:  "ibc/onbehalf-conversion",
+				},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+		},
+	}
+
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "backed-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+		},
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err)
+	backedPath := collection.Invariants.CosmosCoinBackedPath
+
+	// Fund bob (initiator) with 10 IBC coins
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err)
+	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(10))})
+	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(10))})
+
+	// Bob unbacks 1 token on behalf of alice (bob pays 10 IBC coins)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        backedPath.Address,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: GetPrioritizedApprovalsFromCollection(suite.ctx, suite.app.TokenizationKeeper, collection),
+			},
+		},
+	})
+	suite.Require().Nil(err, "Error unbacking on behalf with conversion rate")
+
+	// Verify alice has 1 token
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().Nil(err)
+	suite.Require().Equal(sdkmath.NewUint(1), aliceBalance.Balances[0].Amount)
+
+	// Verify bob paid 10 IBC coins
+	bobIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, backedPath.Conversion.SideA.Denom)
+	suite.Require().Equal(sdkmath.NewInt(0), bobIbcBalance.Amount, "Bob should have 0 IBC coins after paying 10")
+
+	// Verify alice didn't pay anything
+	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err)
+	aliceIbcBalance := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, backedPath.Conversion.SideA.Denom)
+	suite.Require().Equal(sdkmath.NewInt(0), aliceIbcBalance.Amount, "Alice should have 0 IBC coins")
+}

@@ -9,11 +9,42 @@ import "../types/TokenizationTypes.sol";
  * @dev Provides utility functions for creating structs, validating inputs, and building default values
  */
 library TokenizationHelpers {
+    // ============ Critical Constants ============
+    // IMPORTANT: BitBadges uses uint64 internally for timestamps and IDs.
+    // Using type(uint256).max will cause "range overflow" errors!
+    // Always use these constants for "forever" or "all" ranges.
+
     /**
      * @notice Maximum uint64 value - used for "forever" ownership times
      * @dev BitBadges uses uint64 internally for timestamps and IDs. Using uint256.max will cause errors.
      */
     uint64 public constant MAX_UINT64 = type(uint64).max;  // 18446744073709551615
+
+    /**
+     * @notice Use for ownership times that never expire
+     * @dev Alias for MAX_UINT64 - more readable in code
+     * @custom:example ownershipTimes: [{ start: 1, end: FOREVER }]
+     */
+    uint64 public constant FOREVER = type(uint64).max;
+
+    /**
+     * @notice Maximum valid time value for BitBadges
+     * @dev Alias for MAX_UINT64 - use in time ranges
+     */
+    uint64 public constant MAX_TIME = type(uint64).max;
+
+    /**
+     * @notice Maximum valid token ID value for BitBadges
+     * @dev Alias for MAX_UINT64 - use in token ID ranges
+     * @custom:example tokenIds: [{ start: 1, end: MAX_ID }] // All token IDs
+     */
+    uint64 public constant MAX_ID = type(uint64).max;
+
+    /**
+     * @notice Minimum valid time/ID value (typically 1, not 0)
+     * @dev Most BitBadges ranges start from 1, not 0
+     */
+    uint64 public constant MIN_ID = 1;
 
     /**
      * @notice Creates a UintRange struct

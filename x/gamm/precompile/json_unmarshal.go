@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,6 +12,29 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
+
+// convertEVMAddressToBech32 converts an EVM address (0x...) to bech32 format if needed
+// If the address is already in bech32 format, it returns it unchanged
+// If it's an EVM address, it converts it to bech32
+// Note: Invalid addresses are passed through for validation by ValidateBasic() which
+// provides more comprehensive error messages. This function only handles format conversion.
+func convertEVMAddressToBech32(addr string) string {
+	if addr == "" {
+		return addr // Empty is allowed (optional field)
+	}
+	// Check if it's already a bech32 address
+	if _, err := sdk.AccAddressFromBech32(addr); err == nil {
+		// Already valid bech32, return as-is
+		return addr
+	}
+	// Check if it's an EVM address (0x...)
+	if common.IsHexAddress(addr) {
+		evmAddr := common.HexToAddress(addr)
+		return sdk.AccAddress(evmAddr.Bytes()).String()
+	}
+	// Invalid format - return as-is for ValidateBasic() to catch with proper error context
+	return addr
+}
 
 // unmarshalMsgFromJSON unmarshals a JSON string into the appropriate Msg type based on method name
 // and sets the Sender field from the contract caller for security.
@@ -53,6 +77,7 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 	}
 
 	// Set Sender field from contract caller (security: override any value in JSON)
+	// Also convert affiliate addresses from EVM to bech32 format if needed
 	switch m := msg.(type) {
 	case *gammtypes.MsgJoinPool:
 		m.Sender = senderCosmosAddr
@@ -60,8 +85,21 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		m.Sender = senderCosmosAddr
 	case *gammtypes.MsgSwapExactAmountIn:
 		m.Sender = senderCosmosAddr
+		// Convert affiliate addresses from EVM to bech32 format
+		for i := range m.Affiliates {
+			if m.Affiliates[i].Address != "" {
+				m.Affiliates[i].Address = convertEVMAddressToBech32(m.Affiliates[i].Address)
+			}
+		}
 	case *gammtypes.MsgSwapExactAmountInWithIBCTransfer:
 		m.Sender = senderCosmosAddr
+		// Convert affiliate addresses from EVM to bech32 format
+		// NOTE: Do NOT convert IbcTransferInfo.Receiver - it's an IBC receiver on another chain
+		for i := range m.Affiliates {
+			if m.Affiliates[i].Address != "" {
+				m.Affiliates[i].Address = convertEVMAddressToBech32(m.Affiliates[i].Address)
+			}
+		}
 	case *balancer.MsgCreateBalancerPool:
 		m.Sender = senderCosmosAddr
 	}

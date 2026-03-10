@@ -3,8 +3,26 @@ package tokenization
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
+
+// convertBech32ToEVMAddressForCriteria converts a bech32 address to EVM address for Solidity returns
+// Returns zero address for empty or invalid addresses
+// Note: This is a duplicate of the function in return_types_conversions.go to avoid circular imports
+func convertBech32ToEVMAddressForCriteria(addr string) common.Address {
+	if addr == "" {
+		return common.Address{}
+	}
+	accAddr, err := sdk.AccAddressFromBech32(addr)
+	if err != nil {
+		return common.Address{} // Invalid address returns zero
+	}
+	return common.BytesToAddress(accAddr.Bytes())
+}
 
 // autoDeletionOptionsToSolidity converts AutoDeletionOptions to Solidity struct format.
 func autoDeletionOptionsToSolidity(o *tokenizationtypes.AutoDeletionOptions) []interface{} {
@@ -82,7 +100,7 @@ func bigIntFromUint(u tokenizationtypes.Uint) *big.Int {
 // Coins (sdk.Coin) are flattened to coinDenoms []string and coinAmounts []*big.Int.
 func coinTransferToSolidity(c *tokenizationtypes.CoinTransfer) []interface{} {
 	if c == nil {
-		return []interface{}{"", make([]interface{}, 0), make([]interface{}, 0), false, false}
+		return []interface{}{common.Address{}, make([]interface{}, 0), make([]interface{}, 0), false, false}
 	}
 	var denoms []interface{}
 	var amounts []interface{}
@@ -97,8 +115,10 @@ func coinTransferToSolidity(c *tokenizationtypes.CoinTransfer) []interface{} {
 		}
 		amounts = append(amounts, amt)
 	}
+	// Convert To address to EVM format for Solidity
+	toAddr := convertBech32ToEVMAddressForCriteria(c.To)
 	return []interface{}{
-		c.To,
+		toAddr,
 		denoms,
 		amounts,
 		c.OverrideFromWithApproverAddress,
@@ -167,11 +187,13 @@ func altTimeChecksToSolidity(a *tokenizationtypes.AltTimeChecks) []interface{} {
 // userRoyaltiesToSolidity converts UserRoyalties to Solidity struct format.
 func userRoyaltiesToSolidity(u *tokenizationtypes.UserRoyalties) []interface{} {
 	if u == nil {
-		return []interface{}{big.NewInt(0), ""}
+		return []interface{}{big.NewInt(0), common.Address{}}
 	}
+	// Convert PayoutAddress to EVM format for Solidity
+	payoutAddr := convertBech32ToEVMAddressForCriteria(u.PayoutAddress)
 	return []interface{}{
 		bigIntFromUint(u.Percentage),
-		u.PayoutAddress,
+		payoutAddr,
 	}
 }
 
@@ -197,17 +219,21 @@ func merkleChallengeToSolidity(m *tokenizationtypes.MerkleChallenge) []interface
 // ethSignatureChallengeToSolidity converts ETHSignatureChallenge to Solidity struct format.
 func ethSignatureChallengeToSolidity(e *tokenizationtypes.ETHSignatureChallenge) []interface{} {
 	if e == nil {
-		return []interface{}{"", "", "", ""}
+		return []interface{}{common.Address{}, "", "", ""}
 	}
-	return []interface{}{e.Signer, e.ChallengeTrackerId, e.Uri, e.CustomData}
+	// Convert Signer address to EVM format for Solidity
+	signerAddr := convertBech32ToEVMAddressForCriteria(e.Signer)
+	return []interface{}{signerAddr, e.ChallengeTrackerId, e.Uri, e.CustomData}
 }
 
 // voterToSolidity converts Voter to Solidity struct format.
 func voterToSolidity(v *tokenizationtypes.Voter) []interface{} {
 	if v == nil {
-		return []interface{}{"", big.NewInt(0)}
+		return []interface{}{common.Address{}, big.NewInt(0)}
 	}
-	return []interface{}{v.Address, bigIntFromUint(v.Weight)}
+	// Convert Address to EVM format for Solidity
+	evmAddr := convertBech32ToEVMAddressForCriteria(v.Address)
+	return []interface{}{evmAddr, bigIntFromUint(v.Weight)}
 }
 
 // votingChallengeToSolidity converts VotingChallenge to Solidity struct format.

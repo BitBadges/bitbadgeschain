@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/evm/x/vm/statedb"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
@@ -53,7 +54,8 @@ type EVMKeeper interface {
 	// CallEVMWithData executes a contract call with raw calldata.
 	// Set commit=false for read-only calls (staticcall).
 	// gasCap limits the gas for the call (nil for no limit).
-	CallEVMWithData(ctx sdk.Context, from common.Address, contract *common.Address, data []byte, commit bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error)
+	// v0.6.0: requires stateDB and callFromPrecompile parameters.
+	CallEVMWithData(ctx sdk.Context, stateDB *statedb.StateDB, from common.Address, contract *common.Address, data []byte, commit bool, callFromPrecompile bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error)
 }
 
 // SendManagerKeeper defines the expected interface for the SendManager module.

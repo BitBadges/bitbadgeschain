@@ -235,6 +235,10 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		m.Creator = creatorCosmosAddr
 	case *tokenizationtypes.MsgPurgeApprovals:
 		m.Creator = creatorCosmosAddr
+		// Convert ApproverAddress from EVM to bech32 format
+		if m.ApproverAddress != "" {
+			m.ApproverAddress = convertEVMAddressToBech32(m.ApproverAddress)
+		}
 	case *tokenizationtypes.MsgCreateDynamicStore:
 		m.Creator = creatorCosmosAddr
 	case *tokenizationtypes.MsgUpdateDynamicStore:
@@ -243,6 +247,10 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		m.Creator = creatorCosmosAddr
 	case *tokenizationtypes.MsgSetDynamicStoreValue:
 		m.Creator = creatorCosmosAddr
+		// Convert Address field from EVM to bech32 format
+		if m.Address != "" {
+			m.Address = convertEVMAddressToBech32(m.Address)
+		}
 	case *tokenizationtypes.MsgSetValidTokenIds:
 		m.Creator = creatorCosmosAddr
 	case *tokenizationtypes.MsgSetManager:
@@ -267,6 +275,10 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		m.Creator = creatorCosmosAddr
 	case *tokenizationtypes.MsgCastVote:
 		m.Creator = creatorCosmosAddr
+		// Convert ApproverAddress from EVM to bech32 format
+		if m.ApproverAddress != "" {
+			m.ApproverAddress = convertEVMAddressToBech32(m.ApproverAddress)
+		}
 	case *tokenizationtypes.MsgUniversalUpdateCollection:
 		m.Creator = creatorCosmosAddr
 		// Convert Manager if present
@@ -403,6 +415,73 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 	// Unmarshal JSON into the query request
 	if err := json.Unmarshal([]byte(jsonStr), queryReq); err != nil {
 		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal query JSON: %s", err))
+	}
+
+	// Convert EVM addresses to bech32 format in query requests
+	// Also check for userAddress alias (for Solidity compatibility) and map to address
+	switch q := queryReq.(type) {
+	case *tokenizationtypes.QueryGetBalanceRequest:
+		// Check for userAddress alias
+		if q.Address == "" {
+			var temp struct {
+				UserAddress string `json:"userAddress"`
+			}
+			json.Unmarshal([]byte(jsonStr), &temp)
+			if temp.UserAddress != "" {
+				q.Address = temp.UserAddress
+			}
+		}
+		if q.Address != "" {
+			q.Address = convertEVMAddressToBech32(q.Address)
+		}
+	case *tokenizationtypes.QueryGetDynamicStoreValueRequest:
+		// Check for userAddress alias
+		if q.Address == "" {
+			var temp struct {
+				UserAddress string `json:"userAddress"`
+			}
+			json.Unmarshal([]byte(jsonStr), &temp)
+			if temp.UserAddress != "" {
+				q.Address = temp.UserAddress
+			}
+		}
+		if q.Address != "" {
+			q.Address = convertEVMAddressToBech32(q.Address)
+		}
+	case *tokenizationtypes.QueryGetWrappableBalancesRequest:
+		if q.Address != "" {
+			q.Address = convertEVMAddressToBech32(q.Address)
+		}
+	case *tokenizationtypes.QueryIsAddressReservedProtocolRequest:
+		if q.Address != "" {
+			q.Address = convertEVMAddressToBech32(q.Address)
+		}
+	case *tokenizationtypes.QueryGetApprovalTrackerRequest:
+		if q.ApproverAddress != "" {
+			q.ApproverAddress = convertEVMAddressToBech32(q.ApproverAddress)
+		}
+		if q.ApprovedAddress != "" {
+			q.ApprovedAddress = convertEVMAddressToBech32(q.ApprovedAddress)
+		}
+	case *tokenizationtypes.QueryGetChallengeTrackerRequest:
+		if q.ApproverAddress != "" {
+			q.ApproverAddress = convertEVMAddressToBech32(q.ApproverAddress)
+		}
+	case *tokenizationtypes.QueryGetETHSignatureTrackerRequest:
+		if q.ApproverAddress != "" {
+			q.ApproverAddress = convertEVMAddressToBech32(q.ApproverAddress)
+		}
+	case *tokenizationtypes.QueryGetVoteRequest:
+		if q.ApproverAddress != "" {
+			q.ApproverAddress = convertEVMAddressToBech32(q.ApproverAddress)
+		}
+		if q.VoterAddress != "" {
+			q.VoterAddress = convertEVMAddressToBech32(q.VoterAddress)
+		}
+	case *tokenizationtypes.QueryGetVotesRequest:
+		if q.ApproverAddress != "" {
+			q.ApproverAddress = convertEVMAddressToBech32(q.ApproverAddress)
+		}
 	}
 
 	// Validate query request using ValidateBasic if available

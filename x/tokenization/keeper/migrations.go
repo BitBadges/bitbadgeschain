@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -42,92 +41,6 @@ func (k Keeper) MigrateTokenizationKeeper(ctx sdk.Context) error {
 	return nil
 }
 
-// MigrateCollectionStats computes and stores holder count and circulating supply for all existing collections.
-// Used by the v24->v25 module migration.
-func (k Keeper) MigrateCollectionStats(ctx sdk.Context) error {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
-
-	collectionIterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
-	defer func() {
-		if err := collectionIterator.Close(); err != nil {
-			k.Logger().Error("failed to close collection stats migration iterator", "error", err)
-		}
-	}()
-
-	for ; collectionIterator.Valid(); collectionIterator.Next() {
-		var collection newtypes.TokenCollection
-		k.cdc.MustUnmarshal(collectionIterator.Value(), &collection)
-
-		holderCount := sdkmath.ZeroUint()
-
-		// Count holders by iterating balances for this collection
-		balanceIterator := storetypes.KVStorePrefixIterator(store, UserBalanceKey)
-		for ; balanceIterator.Valid(); balanceIterator.Next() {
-			balanceKey := string(balanceIterator.Key()[len(UserBalanceKey):])
-			details, err := GetDetailsFromBalanceKey(balanceKey)
-			if err != nil || !details.collectionId.Equal(collection.CollectionId) {
-				continue
-			}
-
-			// Skip excluded addresses
-			if newtypes.IsMintOrTotalAddress(details.address) {
-				continue
-			}
-			if k.IsBackingPathAddress(ctx, &collection, details.address) {
-				continue
-			}
-			if k.IsWrappingPathAddress(ctx, &collection, details.address) {
-				continue
-			}
-
-			var balance newtypes.UserBalanceStore
-			k.cdc.MustUnmarshal(balanceIterator.Value(), &balance)
-
-			if hasNonZeroBalance(&balance) {
-				holderCount = holderCount.Add(sdkmath.OneUint())
-			}
-		}
-		balanceIterator.Close()
-
-		// Get Total balance for circulating supply - use Balance[] for proper range handling
-		var circulatingBalances []*newtypes.Balance
-		totalKey := ConstructBalanceKey(newtypes.TotalAddress, collection.CollectionId)
-		totalBalance, found := k.GetUserBalanceFromStore(ctx, totalKey)
-		if found {
-			circulatingBalances = newtypes.DeepCopyBalances(totalBalance.Balances)
-		}
-
-		// Subtract backed address balance using proper balance subtraction
-		if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
-			backedKey := ConstructBalanceKey(collection.Invariants.CosmosCoinBackedPath.Address, collection.CollectionId)
-			backedBalance, found := k.GetUserBalanceFromStore(ctx, backedKey)
-			if found && len(backedBalance.Balances) > 0 {
-				var err error
-				circulatingBalances, err = newtypes.SubtractBalancesWithZeroForUnderflows(ctx, backedBalance.Balances, circulatingBalances)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		// Store stats with Balance[]
-		stats := &newtypes.CollectionStats{
-			HolderCount: holderCount,
-			Balances:    circulatingBalances,
-		}
-		if err := k.SetCollectionStatsInStore(ctx, collection.CollectionId, stats); err != nil {
-			return err
-		}
-
-		ctx.Logger().Info("Migrated collection stats",
-			"collectionId", collection.CollectionId,
-			"holderCount", holderCount)
-	}
-
-	return nil
-}
-
 // migrateIncomingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
 // Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
 // so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
@@ -136,6 +49,7 @@ func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApproval
 	if approvalCriteria == nil {
 		return
 	}
+	newtypes.EnforceMustPrioritizeForIncoming(approvalCriteria)
 }
 
 // migrateOutgoingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -146,6 +60,7 @@ func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApproval
 	if approvalCriteria == nil {
 		return
 	}
+	newtypes.EnforceMustPrioritizeForOutgoing(approvalCriteria)
 }
 
 // migrateApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -156,6 +71,7 @@ func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
+	newtypes.EnforceMustPrioritizeForNonAutoScannable(approvalCriteria)
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
@@ -199,9 +115,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			k.Logger().Error("failed to close collection migration iterator", "error", err)
 		}
 	}()
-
-	const oldModuleName = "badges"
-	const newModuleName = newtypes.ModuleName // "tokenization"
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldCollection oldtypes.TokenCollection

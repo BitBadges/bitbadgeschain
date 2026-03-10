@@ -7,6 +7,7 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/evm/x/vm/statedb"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
@@ -494,7 +495,7 @@ func (m *mockEVMKeeper) IsContract(ctx sdk.Context, addr common.Address) bool {
 	return m.contracts[addrStr]
 }
 
-func (m *mockEVMKeeper) CallEVMWithData(ctx sdk.Context, from common.Address, contract *common.Address, data []byte, commit bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error) {
+func (m *mockEVMKeeper) CallEVMWithData(ctx sdk.Context, stateDB *statedb.StateDB, from common.Address, contract *common.Address, data []byte, commit bool, callFromPrecompile bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error) {
 	// Mock implementation - return empty response
 	return &evmtypes.MsgEthereumTxResponse{}, nil
 }

@@ -53,6 +53,11 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	}
 
 	if msg.UpdateOutgoingApprovals {
+		// Enforce mustPrioritize=true for non-auto-scannable approvals
+		for _, approval := range msg.OutgoingApprovals {
+			types.EnforceMustPrioritizeForOutgoing(approval.ApprovalCriteria)
+		}
+
 		if err := k.ValidateUserOutgoingApprovalsUpdate(ctx, collection, userBalance.OutgoingApprovals, msg.OutgoingApprovals, userBalance.UserPermissions.CanUpdateOutgoingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}
@@ -93,6 +98,11 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	}
 
 	if msg.UpdateIncomingApprovals {
+		// Enforce mustPrioritize=true for non-auto-scannable approvals
+		for _, approval := range msg.IncomingApprovals {
+			types.EnforceMustPrioritizeForIncoming(approval.ApprovalCriteria)
+		}
+
 		if err := k.ValidateUserIncomingApprovalsUpdate(ctx, collection, userBalance.IncomingApprovals, msg.IncomingApprovals, userBalance.UserPermissions.CanUpdateIncomingApprovals, msg.Creator); err != nil {
 			return nil, err
 		}

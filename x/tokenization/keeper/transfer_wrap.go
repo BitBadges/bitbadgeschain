@@ -54,6 +54,14 @@ func (k Keeper) HandleSpecialAddressWrapping(
 		return err
 	}
 
+	// Wrapping requires initiator == sender/recipient (no on-behalf-of for wrapping)
+	if isSendingToSpecialAddress && initiatedBy != from {
+		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the sender when wrapping")
+	}
+	if isSendingFromSpecialAddress && initiatedBy != to {
+		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the recipient when unwrapping")
+	}
+
 	firstTokenId := transferBalances[0].TokenIds[0].Start
 
 	// Check if the denom contains the {id} placeholder and dynamic replace if so
@@ -209,16 +217,21 @@ func (k Keeper) HandleSpecialAddressBacking(
 
 	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
 
+	// Bank transfers always debit/credit the initiator (the tx signer).
+	// This enables "on behalf of" flows where the initiator pays/receives IBC coins
+	// while tokens move to/from a different user. The approval system handles authorization.
+	initiatorAcc, err := sdk.AccAddressFromBech32(initiatedBy)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "invalid initiator address: %s", initiatedBy)
+	}
+	specialAddressAcc, err := sdk.AccAddressFromBech32(denomInfo.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "invalid special address: %s", denomInfo.Address)
+	}
+
 	if isSendingToSpecialAddress {
-		userAddressAcc, err := sdk.AccAddressFromBech32(from)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid from address: %s", from)
-		}
-		specialAddressAcc, err := sdk.AccAddressFromBech32(denomInfo.Address)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid special address: %s", denomInfo.Address)
-		}
-		err = k.bankKeeper.SendCoins(ctx, specialAddressAcc, userAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+		// Backing: tokens go TO special address, IBC coins go FROM special address TO initiator
+		err = k.bankKeeper.SendCoins(ctx, specialAddressAcc, initiatorAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
 		}
@@ -227,15 +240,8 @@ func (k Keeper) HandleSpecialAddressBacking(
 			return err
 		}
 	} else if isSendingFromSpecialAddress {
-		userAddressAcc, err := sdk.AccAddressFromBech32(to)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid to address: %s", to)
-		}
-		specialAddressAcc, err := sdk.AccAddressFromBech32(denomInfo.Address)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid special address: %s", denomInfo.Address)
-		}
-		err = k.bankKeeper.SendCoins(ctx, userAddressAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
+		// Unbacking: tokens go FROM special address, IBC coins go FROM initiator TO special address
+		err = k.bankKeeper.SendCoins(ctx, initiatorAcc, specialAddressAcc, sdk.Coins{sdk.NewCoin(ibcDenom, sdkmath.NewIntFromBigInt(amountInt))})
 		if err != nil {
 			return err
 		}

@@ -67,14 +67,6 @@ func validateSpecialAddressTransfer(
 		return sdkerrors.Wrapf(ErrNotImplemented, "cannot send to and from special addresses at the same time")
 	}
 
-	if isSendingToSpecialAddress && initiatedBy != from {
-		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the sender when sending to special addresses")
-	}
-
-	if isSendingFromSpecialAddress && initiatedBy != to {
-		return sdkerrors.Wrapf(ErrNotImplemented, "initiator must be the same as the recipient when sending from special addresses")
-	}
-
 	if isSendingToSpecialAddress && types.IsMintAddress(from) {
 		return sdkerrors.Wrapf(ErrNotImplemented, "the Mint address cannot perform wrap / unwrap actions")
 	}

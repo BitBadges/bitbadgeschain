@@ -447,6 +447,44 @@ func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool 
 	return true
 }
 
+// EnforceMustPrioritizeForNonAutoScannable sets MustPrioritize=true on non-auto-scannable
+// ApprovalCriteria. Non-auto-scannable approvals already require explicit prioritization
+// in the transfer logic, so this normalizes the stored value to reflect actual behavior.
+func EnforceMustPrioritizeForNonAutoScannable(ac *ApprovalCriteria) {
+	if ac == nil {
+		return
+	}
+	origVal := ac.MustPrioritize
+	ac.MustPrioritize = false
+	if !CollectionApprovalIsAutoScannable(ac) {
+		ac.MustPrioritize = true
+	} else {
+		ac.MustPrioritize = origVal
+	}
+}
+
+// EnforceMustPrioritizeForIncoming sets MustPrioritize=true on non-auto-scannable
+// IncomingApprovalCriteria by casting to collection criteria and checking.
+func EnforceMustPrioritizeForIncoming(ac *IncomingApprovalCriteria) {
+	if ac == nil {
+		return
+	}
+	casted := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(ac)
+	EnforceMustPrioritizeForNonAutoScannable(casted)
+	ac.MustPrioritize = casted.MustPrioritize
+}
+
+// EnforceMustPrioritizeForOutgoing sets MustPrioritize=true on non-auto-scannable
+// OutgoingApprovalCriteria by casting to collection criteria and checking.
+func EnforceMustPrioritizeForOutgoing(ac *OutgoingApprovalCriteria) {
+	if ac == nil {
+		return
+	}
+	casted := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(ac)
+	EnforceMustPrioritizeForNonAutoScannable(casted)
+	ac.MustPrioritize = casted.MustPrioritize
+}
+
 func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool) error {
 	for i := 0; i < len(collectionApprovals); i++ {
 		if collectionApprovals[i].ApprovalId == "" {
@@ -485,8 +523,16 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidAddress, "to list id is uninitialized")
 		}
 
+		if collectionApproval.ToListId == "Mint" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "to list id cannot be Mint")
+		}
+
 		if collectionApproval.InitiatedByListId == "" {
 			return sdkerrors.Wrapf(ErrInvalidAddress, "initiated by list id is uninitialized")
+		}
+
+		if collectionApproval.InitiatedByListId == "Mint" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "initiated by list id cannot be Mint")
 		}
 
 		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, false); err != nil {

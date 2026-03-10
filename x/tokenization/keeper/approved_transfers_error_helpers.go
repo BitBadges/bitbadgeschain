@@ -75,12 +75,13 @@ func getApprovalIdByIndex(approvals []*types.CollectionApproval, idx int) string
 }
 
 // buildPotentialErrorsString builds the potential errors string based on whether there are prioritized errors
-// or auto-scan errors
+// or auto-scan errors. unfilteredApprovals is the full list before priority/auto-scan filtering.
 func buildPotentialErrorsString(
 	potentialErrors []string,
 	approvalIdxsChecked []int,
 	errorsWithIdx []ErrorWithIdx,
 	approvals []*types.CollectionApproval,
+	unfilteredApprovals []*types.CollectionApproval,
 ) string {
 	if len(potentialErrors) > 0 {
 		// Build error string with index prefixes for prioritized approvals
@@ -130,6 +131,14 @@ func buildPotentialErrorsString(
 		potentialErrorsStr += ", idxs: " + strings.Join(approvalIdxsCheckedStr, ", ")
 	}
 	potentialErrorsStr += ")"
+
+	if len(approvalIdxsChecked) == 0 && len(unfilteredApprovals) > 0 {
+		skippedIds := []string{}
+		for _, a := range unfilteredApprovals {
+			skippedIds = append(skippedIds, fmt.Sprintf("%q", a.ApprovalId))
+		}
+		potentialErrorsStr += fmt.Sprintf(". Approvals not checked (require prioritization): [%s]", strings.Join(skippedIds, ", "))
+	}
 
 	// Try to be smart about error logs. If we only checked one approval via auto-scan, we can just log the errors for that approval
 	if len(approvalIdxsChecked) == 1 {
