@@ -171,7 +171,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 			app.DistrKeeper,
 			app.PreciseBankKeeper,
 			&app.ERC20Keeper,
-			&app.TransferKeeper, // Cosmos/evm transfer keeper (wraps ibc-go, adds ERC20 support for IBC v2/eureka)
+			&app.TransferKeeper,
 			app.IBCKeeper.ChannelKeeper,
 			*app.GovKeeper,
 			app.SlashingKeeper,
@@ -179,9 +179,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		),
 	))
 
-	// Create ERC20 keeper with pointer to transfer keeper
-	// The transfer keeper is created in registerIBCModules (which is called before registerEVMModules)
-	// but it holds a pointer to &app.ERC20Keeper, so we can pass &app.TransferKeeper here
+	// Create ERC20 keeper (v0.6.0: now uses ibc-go transfer keeper directly)
 	app.ERC20Keeper = erc20keeper.NewKeeper(
 		erc20Key,
 		app.appCodec,
@@ -190,7 +188,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.PreciseBankKeeper, // Use PreciseBankKeeper for bank operations
 		app.EVMKeeper,
 		app.StakingKeeper,
-		&app.TransferKeeper, // Cosmos/evm transfer keeper (created in registerIBCModules with pointer to this ERC20 keeper)
+		&app.TransferKeeper, // ibc-go transfer keeper (v0.6.0)
 	)
 
 	// Register ERC20 module

@@ -7,6 +7,8 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/evm/x/vm/statedb"
+	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -101,7 +103,13 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 	}
 
 	gasCap := new(big.Int).SetUint64(gasLimit)
-	response, err := k.evmKeeper.CallEVMWithData(ctx, callerAddr, &contractAddr, calldata, false, gasCap)
+	// v0.6.0: Create stateDB for non-precompile context
+	// Type-assert to real EVM keeper for stateDB creation; nil stateDB for mock keepers in tests
+	var sdb *statedb.StateDB
+	if realKeeper, ok := k.evmKeeper.(*evmkeeper.Keeper); ok {
+		sdb = statedb.New(ctx, realKeeper, statedb.NewEmptyTxConfig())
+	}
+	response, err := k.evmKeeper.CallEVMWithData(ctx, sdb, callerAddr, &contractAddr, calldata, false, false, gasCap)
 	if err != nil {
 		return nil, fmt.Errorf("EVM call failed: %w", err)
 	}

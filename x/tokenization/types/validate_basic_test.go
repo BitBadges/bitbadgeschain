@@ -375,3 +375,114 @@ func TestValidateAltTimeChecks(t *testing.T) {
 		})
 	}
 }
+
+func TestEnforceMustPrioritizeForNonAutoScannable(t *testing.T) {
+	tests := []struct {
+		name     string
+		criteria *ApprovalCriteria
+		expected bool
+	}{
+		{
+			name:     "nil criteria - no panic",
+			criteria: nil,
+			expected: false, // not checked
+		},
+		{
+			name:     "auto-scannable + mustPrioritize false - stays false",
+			criteria: &ApprovalCriteria{MustPrioritize: false},
+			expected: false,
+		},
+		{
+			name:     "auto-scannable + mustPrioritize true - stays true",
+			criteria: &ApprovalCriteria{MustPrioritize: true},
+			expected: true,
+		},
+		{
+			name: "non-auto-scannable (coinTransfers) + mustPrioritize false - forced true",
+			criteria: &ApprovalCriteria{
+				MustPrioritize: false,
+				CoinTransfers:  []*CoinTransfer{{}},
+			},
+			expected: true,
+		},
+		{
+			name: "non-auto-scannable (merkleChallenges) + mustPrioritize false - forced true",
+			criteria: &ApprovalCriteria{
+				MustPrioritize:  false,
+				MerkleChallenges: []*MerkleChallenge{{}},
+			},
+			expected: true,
+		},
+		{
+			name: "non-auto-scannable (ethSignatureChallenges) + mustPrioritize false - forced true",
+			criteria: &ApprovalCriteria{
+				MustPrioritize:         false,
+				EthSignatureChallenges: []*ETHSignatureChallenge{{}},
+			},
+			expected: true,
+		},
+		{
+			name: "non-auto-scannable (predeterminedBalances) + mustPrioritize false - forced true",
+			criteria: &ApprovalCriteria{
+				MustPrioritize: false,
+				PredeterminedBalances: &PredeterminedBalances{
+					ManualBalances: []*ManualBalances{{}},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "non-auto-scannable + mustPrioritize true - stays true",
+			criteria: &ApprovalCriteria{
+				MustPrioritize: true,
+				CoinTransfers:  []*CoinTransfer{{}},
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			EnforceMustPrioritizeForNonAutoScannable(tt.criteria)
+			if tt.criteria != nil {
+				require.Equal(t, tt.expected, tt.criteria.MustPrioritize)
+			}
+		})
+	}
+}
+
+func TestEnforceMustPrioritizeForIncoming(t *testing.T) {
+	// auto-scannable - stays false
+	ac := &IncomingApprovalCriteria{MustPrioritize: false}
+	EnforceMustPrioritizeForIncoming(ac)
+	require.False(t, ac.MustPrioritize)
+
+	// non-auto-scannable (coinTransfers) - forced true
+	ac2 := &IncomingApprovalCriteria{
+		MustPrioritize: false,
+		CoinTransfers:  []*CoinTransfer{{}},
+	}
+	EnforceMustPrioritizeForIncoming(ac2)
+	require.True(t, ac2.MustPrioritize)
+
+	// nil - no panic
+	EnforceMustPrioritizeForIncoming(nil)
+}
+
+func TestEnforceMustPrioritizeForOutgoing(t *testing.T) {
+	// auto-scannable - stays false
+	ac := &OutgoingApprovalCriteria{MustPrioritize: false}
+	EnforceMustPrioritizeForOutgoing(ac)
+	require.False(t, ac.MustPrioritize)
+
+	// non-auto-scannable (merkleChallenges) - forced true
+	ac2 := &OutgoingApprovalCriteria{
+		MustPrioritize:  false,
+		MerkleChallenges: []*MerkleChallenge{{}},
+	}
+	EnforceMustPrioritizeForOutgoing(ac2)
+	require.True(t, ac2.MustPrioritize)
+
+	// nil - no panic
+	EnforceMustPrioritizeForOutgoing(nil)
+}

@@ -83,7 +83,7 @@ import (
 	evmmempool "github.com/cosmos/evm/mempool"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
-	evmtransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
+	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	precisebank "github.com/cosmos/evm/x/precisebank"
 	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
 	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
@@ -158,7 +158,7 @@ type App struct {
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
-	TransferKeeper      evmtransferkeeper.Keeper // Cosmos/evm transfer keeper (wraps ibc-go, adds ERC20 support)
+	TransferKeeper      transferkeeper.Keeper // IBC-Go transfer keeper (v0.6.0: ERC20 conversions handled by ICS20 precompile)
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 
 	// IBC Hooks

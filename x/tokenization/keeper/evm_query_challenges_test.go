@@ -6,6 +6,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/evm/x/vm/statedb"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
@@ -24,7 +25,7 @@ func (m *mockEVMKeeperForQuery) IsContract(ctx sdk.Context, addr common.Address)
 	return m.contracts[accAddr.String()]
 }
 
-func (m *mockEVMKeeperForQuery) CallEVMWithData(ctx sdk.Context, from common.Address, contract *common.Address, data []byte, commit bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error) {
+func (m *mockEVMKeeperForQuery) CallEVMWithData(ctx sdk.Context, stateDB *statedb.StateDB, from common.Address, contract *common.Address, data []byte, commit bool, callFromPrecompile bool, gasCap *big.Int) (*evmtypes.MsgEthereumTxResponse, error) {
 	if m.returnError != nil {
 		return nil, m.returnError
 	}

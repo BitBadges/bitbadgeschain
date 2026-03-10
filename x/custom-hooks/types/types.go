@@ -158,7 +158,87 @@ func Err(ctx *sdk.Context, detMsg string, args ...interface{}) error {
 
 // HookData represents the data that can be executed via IBC hooks
 type HookData struct {
-	SwapAndAction *SwapAndAction `json:"swap_and_action,omitempty"`
+	SwapAndAction  *SwapAndAction        `json:"swap_and_action,omitempty"`
+	TransferTokens *TransferTokensAction `json:"transfer_tokens,omitempty"`
+}
+
+// TransferTokensAction represents an IBC hook that triggers a MsgTransferTokens on receive.
+// Use case: send IBC tokens with a memo to mint/transfer BitBadges tokens in one cross-chain tx.
+type TransferTokensAction struct {
+	CollectionId   string                    `json:"collection_id"`
+	Transfers      []TransferTokensTransfer  `json:"transfers"`
+	FailOnError    bool                      `json:"fail_on_error"`
+	RecoverAddress string                    `json:"recover_address,omitempty"`
+}
+
+// TransferTokensTransfer mirrors the protobuf Transfer type with JSON-friendly string numerics.
+type TransferTokensTransfer struct {
+	From                                      string                          `json:"from"`
+	ToAddresses                               []string                        `json:"to_addresses"`
+	Balances                                  []TransferTokensBalance         `json:"balances"`
+	PrecalculateBalancesFromApproval          *TransferTokensPrecalcDetails   `json:"precalculate_balances_from_approval,omitempty"`
+	MerkleProofs                              []TransferTokensMerkleProof     `json:"merkle_proofs"`
+	EthSignatureProofs                        []TransferTokensETHSignatureProof `json:"eth_signature_proofs"`
+	Memo                                      string                          `json:"memo,omitempty"`
+	PrioritizedApprovals                      []TransferTokensApprovalIdentifier `json:"prioritized_approvals"`
+	OnlyCheckPrioritizedCollectionApprovals   bool                            `json:"only_check_prioritized_collection_approvals"`
+	OnlyCheckPrioritizedIncomingApprovals     bool                            `json:"only_check_prioritized_incoming_approvals"`
+	OnlyCheckPrioritizedOutgoingApprovals     bool                            `json:"only_check_prioritized_outgoing_approvals"`
+}
+
+// TransferTokensBalance mirrors the protobuf Balance type with string-based amount.
+type TransferTokensBalance struct {
+	Amount         string                      `json:"amount"`
+	OwnershipTimes []TransferTokensUintRange   `json:"ownership_times"`
+	TokenIds       []TransferTokensUintRange   `json:"token_ids"`
+}
+
+// TransferTokensUintRange mirrors the protobuf UintRange type with string-based start/end.
+type TransferTokensUintRange struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
+
+// TransferTokensMerkleProof mirrors the protobuf MerkleProof type.
+type TransferTokensMerkleProof struct {
+	Leaf          string                          `json:"leaf"`
+	Aunts         []TransferTokensMerklePathItem  `json:"aunts"`
+	LeafSignature string                          `json:"leaf_signature,omitempty"`
+}
+
+// TransferTokensMerklePathItem mirrors the protobuf MerklePathItem type.
+type TransferTokensMerklePathItem struct {
+	Aunt    string `json:"aunt"`
+	OnRight bool   `json:"on_right"`
+}
+
+// TransferTokensETHSignatureProof mirrors the protobuf ETHSignatureProof type.
+type TransferTokensETHSignatureProof struct {
+	Nonce     string `json:"nonce"`
+	Signature string `json:"signature"`
+}
+
+// TransferTokensApprovalIdentifier mirrors the protobuf ApprovalIdentifierDetails type.
+type TransferTokensApprovalIdentifier struct {
+	ApprovalId      string `json:"approval_id"`
+	ApprovalLevel   string `json:"approval_level"`
+	ApproverAddress string `json:"approver_address,omitempty"`
+	Version         string `json:"version"`
+}
+
+// TransferTokensPrecalcDetails mirrors PrecalculateBalancesFromApprovalDetails with string numerics.
+type TransferTokensPrecalcDetails struct {
+	ApprovalId            string                         `json:"approval_id"`
+	ApprovalLevel         string                         `json:"approval_level"`
+	ApproverAddress       string                         `json:"approver_address,omitempty"`
+	Version               string                         `json:"version"`
+	PrecalculationOptions *TransferTokensPrecalcOptions  `json:"precalculation_options,omitempty"`
+}
+
+// TransferTokensPrecalcOptions mirrors PrecalculationOptions with string numerics.
+type TransferTokensPrecalcOptions struct {
+	OverrideTimestamp string                      `json:"override_timestamp,omitempty"`
+	TokenIdsOverride  []TransferTokensUintRange   `json:"token_ids_override,omitempty"`
 }
 
 // SwapAndAction represents the Skip-style format for swap and action

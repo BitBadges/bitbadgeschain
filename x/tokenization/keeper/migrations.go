@@ -49,6 +49,7 @@ func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApproval
 	if approvalCriteria == nil {
 		return
 	}
+	newtypes.EnforceMustPrioritizeForIncoming(approvalCriteria)
 }
 
 // migrateOutgoingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -59,6 +60,7 @@ func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApproval
 	if approvalCriteria == nil {
 		return
 	}
+	newtypes.EnforceMustPrioritizeForOutgoing(approvalCriteria)
 }
 
 // migrateApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -69,6 +71,7 @@ func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
+	newtypes.EnforceMustPrioritizeForNonAutoScannable(approvalCriteria)
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
@@ -112,9 +115,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			k.Logger().Error("failed to close collection migration iterator", "error", err)
 		}
 	}()
-
-	const oldModuleName = "badges"
-	const newModuleName = newtypes.ModuleName // "tokenization"
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldCollection oldtypes.TokenCollection
