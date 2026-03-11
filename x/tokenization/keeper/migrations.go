@@ -10,7 +10,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v24"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v25"
 )
 
 // MigrateTokenizationKeeper migrates the tokenization keeper from v21 to current version

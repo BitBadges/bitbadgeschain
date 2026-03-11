@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
 // AITestSuite provides a comprehensive test suite for AI-generated tests
@@ -45,6 +46,7 @@ func (suite *AITestSuite) SetupTest() {
 		suite.App.TransferKeeper,
 		suite.App.HooksICS4Wrapper,
 		suite.App.IBCKeeper.ChannelKeeper,
+		tokenizationkeeper.NewMsgServerImpl(suite.App.TokenizationKeeper),
 	)
 
 	// Initialize test addresses - TestAccs should be initialized by Reset()

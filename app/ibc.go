@@ -40,6 +40,7 @@ import (
 	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationmodule "github.com/bitbadges/bitbadgeschain/x/tokenization/module"
 
 	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
@@ -251,6 +252,8 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
 	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	// Create tokenization msg server for transfer_tokens IBC hook
+	tokenizationMsgServer := tokenizationkeeper.NewMsgServerImpl(app.TokenizationKeeper)
 	// Pass pointer to GammKeeper to avoid copying the keeper (which contains storeKey)
 	customHooksKeeper := customhookskeeper.NewKeeper(
 		app.Logger(),
@@ -261,6 +264,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		app.TransferKeeper,
 		app.TransferICS4Wrapper,
 		app.IBCKeeper.ChannelKeeper,
+		tokenizationMsgServer,
 	)
 
 	// Setup Custom Hooks (standalone)

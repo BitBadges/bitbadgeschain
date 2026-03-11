@@ -70,15 +70,21 @@ type (
 		GetChannel(ctx sdk.Context, portID, channelID string) (channeltypes.Channel, bool)
 	}
 
+	// TokenizationMsgServer interface for executing tokenization messages
+	TokenizationMsgServer interface {
+		TransferTokens(ctx context.Context, msg *tokenizationtypes.MsgTransferTokens) (*tokenizationtypes.MsgTransferTokensResponse, error)
+	}
+
 	Keeper struct {
-		logger            log.Logger
-		gammKeeper        GammKeeper
-		bankKeeper        BankKeeper
-		tokenizationKeeper TokenizationKeeper
-		sendManagerKeeper SendManagerKeeper
-		transferKeeper    gammtypes.TransferKeeper
-		ics4Wrapper       ICS4Wrapper
-		channelKeeper     ChannelKeeper
+		logger                 log.Logger
+		gammKeeper             GammKeeper
+		bankKeeper             BankKeeper
+		tokenizationKeeper     TokenizationKeeper
+		sendManagerKeeper      SendManagerKeeper
+		transferKeeper         gammtypes.TransferKeeper
+		ics4Wrapper            ICS4Wrapper
+		channelKeeper          ChannelKeeper
+		tokenizationMsgServer  TokenizationMsgServer
 	}
 )
 
@@ -91,16 +97,18 @@ func NewKeeper(
 	transferKeeper gammtypes.TransferKeeper,
 	ics4Wrapper ICS4Wrapper,
 	channelKeeper ChannelKeeper,
+	tokenizationMsgServer TokenizationMsgServer,
 ) Keeper {
 	return Keeper{
-		logger:            logger,
-		gammKeeper:        gammKeeper,
-		bankKeeper:        bankKeeper,
-		tokenizationKeeper: tokenizationKeeper,
-		sendManagerKeeper: sendManagerKeeper,
-		transferKeeper:    transferKeeper,
-		ics4Wrapper:       ics4Wrapper,
-		channelKeeper:     channelKeeper,
+		logger:                 logger,
+		gammKeeper:             gammKeeper,
+		bankKeeper:             bankKeeper,
+		tokenizationKeeper:     tokenizationKeeper,
+		sendManagerKeeper:      sendManagerKeeper,
+		transferKeeper:         transferKeeper,
+		ics4Wrapper:            ics4Wrapper,
+		channelKeeper:          channelKeeper,
+		tokenizationMsgServer:  tokenizationMsgServer,
 	}
 }
 
@@ -123,6 +131,11 @@ func (k Keeper) ExecuteHook(ctx sdk.Context, sender sdk.AccAddress, hookData *ty
 	// Execute SwapAndAction
 	if hookData.SwapAndAction != nil {
 		return k.ExecuteSwapAndAction(ctx, sender, hookData.SwapAndAction, tokenIn, originalSender)
+	}
+
+	// Execute TransferTokens
+	if hookData.TransferTokens != nil {
+		return k.ExecuteTransferTokens(ctx, sender, hookData.TransferTokens, tokenIn, originalSender)
 	}
 
 	return types.NewSuccessAcknowledgement()
@@ -343,62 +356,18 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 
 			// Swap failed - check if we have a destination recover address
 			if swapAndAction.DestinationRecoverAddress != "" {
-				// Cache context is automatically discarded - swap never happened
-				// Log the fallback action
-				k.Logger(ctx).Info("custom-hooks: swap failed, using destination recover address",
-					"error", err,
-					"sender", sender.String(),
-					"original_sender", originalSender,
-					"destination_recover_address", swapAndAction.DestinationRecoverAddress,
-					"original_token", originalTokenIn.String())
-
-				// Execute fallback transfer in a cache context to ensure atomicity
-				// If fallback transfer fails, we want to roll back the IBC transfer
-				fallbackCacheCtx, writeFallbackCache := ctx.CacheContext()
-				types.ClearDeterministicError(fallbackCacheCtx)
-				ack := k.ExecuteLocalTransfer(fallbackCacheCtx, sender, &types.TransferInfo{ToAddress: swapAndAction.DestinationRecoverAddress}, originalTokenIn)
-				if !ack.Success() {
-					// Fallback transfer failed - cache is automatically discarded
-					// Combine ack error message with deterministic error from context
-					ackErrMsg, _ := types.GetAckError(ack)
-					combinedMsg := "failed to send tokens to destination recover address: swap failed and fallback transfer failed"
-					if ackErrMsg != "" {
-						combinedMsg = fmt.Sprintf("%s: %s", combinedMsg, ackErrMsg)
-					}
-					if detErrMsg, found := types.GetDeterministicError(fallbackCacheCtx); found {
-						combinedMsg = fmt.Sprintf("%s: %s", combinedMsg, detErrMsg)
-					}
-					return types.NewCustomErrorAcknowledgement(combinedMsg)
-				}
-
-				// Fallback transfer succeeded - commit the fallback state
-				writeFallbackCache()
-
-				// Emit event for fallback path
-				event := sdk.NewEvent(
-					"swap_and_action_fallback",
-					sdk.NewAttribute("module", "custom-hooks"),
-					sdk.NewAttribute("sender", sender.String()),
-					sdk.NewAttribute("swap_error", swapErrMsg),
-					sdk.NewAttribute("original_sender", originalSender),
-					sdk.NewAttribute("destination_recover_address", swapAndAction.DestinationRecoverAddress),
-					sdk.NewAttribute("original_token", originalTokenIn.String()),
+				// Build swap-specific extra attributes for the fallback event
+				extraAttrs := []sdk.Attribute{
 					sdk.NewAttribute("num_operations", strconv.Itoa(len(operations))),
-				)
-
-				// Add operation details for debugging
+				}
 				for i, op := range operations {
-					event = event.AppendAttributes(
+					extraAttrs = append(extraAttrs,
 						sdk.NewAttribute(fmt.Sprintf("operation_%d_pool", i), op.Pool),
 						sdk.NewAttribute(fmt.Sprintf("operation_%d_denom_in", i), op.DenomIn),
 						sdk.NewAttribute(fmt.Sprintf("operation_%d_denom_out", i), op.DenomOut),
 					)
 				}
-				ctx.EventManager().EmitEvent(event)
-
-				// Successfully handled fallback - return success to allow IBC transfer to succeed
-				// The swap cache context was automatically discarded, fallback cache was committed
-				return types.NewSuccessAcknowledgement()
+				return k.ExecuteFallbackToRecoverAddress(ctx, sender, swapAndAction.DestinationRecoverAddress, originalTokenIn, originalSender, swapErrMsg, "swap_and_action_fallback", extraAttrs)
 			}
 
 			// No fallback address - cache context is automatically discarded
@@ -657,6 +626,62 @@ func (k Keeper) ExecuteLocalTransfer(ctx sdk.Context, sender sdk.AccAddress, tra
 	if !ack.Success() {
 		return ack
 	}
+
+	return types.NewSuccessAcknowledgement()
+}
+
+// ExecuteFallbackToRecoverAddress sends IBC tokens to a recover address when the primary
+// hook action fails and fail_on_error is false. Used by both swap_and_action and transfer_tokens.
+// Returns a success ack if fallback succeeds, or an error ack if fallback also fails.
+// eventType is the event name (e.g. "swap_and_action_fallback"), extraAttrs are hook-specific attributes.
+func (k Keeper) ExecuteFallbackToRecoverAddress(
+	ctx sdk.Context,
+	sender sdk.AccAddress,
+	recoverAddress string,
+	tokenIn sdk.Coin,
+	originalSender string,
+	primaryErrMsg string,
+	eventType string,
+	extraAttrs []sdk.Attribute,
+) ibcexported.Acknowledgement {
+	k.Logger(ctx).Info(fmt.Sprintf("custom-hooks: %s, sending to recover address", eventType),
+		"sender", sender.String(),
+		"original_sender", originalSender,
+		"recover_address", recoverAddress,
+		"token_in", tokenIn.String(),
+	)
+
+	fallbackCacheCtx, writeFallbackCache := ctx.CacheContext()
+	types.ClearDeterministicError(fallbackCacheCtx)
+	ack := k.ExecuteLocalTransfer(fallbackCacheCtx, sender, &types.TransferInfo{ToAddress: recoverAddress}, tokenIn)
+	if !ack.Success() {
+		ackErrMsg, _ := types.GetAckError(ack)
+		combinedMsg := fmt.Sprintf("%s: fallback to recover_address also failed", primaryErrMsg)
+		if ackErrMsg != "" {
+			combinedMsg = fmt.Sprintf("%s: %s", combinedMsg, ackErrMsg)
+		}
+		if detErrMsg, found := types.GetDeterministicError(fallbackCacheCtx); found {
+			combinedMsg = fmt.Sprintf("%s: %s", combinedMsg, detErrMsg)
+		}
+		return types.NewCustomErrorAcknowledgement(combinedMsg)
+	}
+
+	writeFallbackCache()
+
+	// Emit fallback event with common + hook-specific attributes
+	event := sdk.NewEvent(
+		eventType,
+		sdk.NewAttribute("module", "custom-hooks"),
+		sdk.NewAttribute("sender", sender.String()),
+		sdk.NewAttribute("original_sender", originalSender),
+		sdk.NewAttribute("recover_address", recoverAddress),
+		sdk.NewAttribute("token_in", tokenIn.String()),
+		sdk.NewAttribute("error", primaryErrMsg),
+	)
+	if len(extraAttrs) > 0 {
+		event = event.AppendAttributes(extraAttrs...)
+	}
+	ctx.EventManager().EmitEvent(event)
 
 	return types.NewSuccessAcknowledgement()
 }

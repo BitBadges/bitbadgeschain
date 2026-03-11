@@ -16,6 +16,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
 type KeeperTestSuite struct {
@@ -43,6 +44,7 @@ func (s *KeeperTestSuite) SetupTest() {
 		s.App.TransferKeeper,
 		s.App.HooksICS4Wrapper,
 		s.App.IBCKeeper.ChannelKeeper,
+		tokenizationkeeper.NewMsgServerImpl(s.App.TokenizationKeeper),
 	)
 }
 
