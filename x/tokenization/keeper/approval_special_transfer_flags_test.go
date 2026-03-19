@@ -92,11 +92,11 @@ func (suite *TestSuite) TestCollectionApprovalAllowBackedMintingFalse() {
 }
 
 // TestCollectionApprovalAllowBackedMintingTrue tests that collection approvals with allowBackedMinting=true
-// allow backing transfers
+// allow backing transfers when the guardrails are satisfied.
 func (suite *TestSuite) TestCollectionApprovalAllowBackedMintingTrue() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	// Create a collection with cosmos coin backed paths
+	// Create a collection with cosmos coin backed paths (no allowBackedMinting approval yet)
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].Transfers = []*types.Transfer{}
 	filteredApprovals := []*types.CollectionApproval{}
@@ -124,20 +124,6 @@ func (suite *TestSuite) TestCollectionApprovalAllowBackedMintingTrue() {
 		},
 	}
 
-	// Add collection approval with allowBackedMinting=true
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Explicitly set to true
-		},
-	})
-
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection")
 
@@ -145,13 +131,40 @@ func (suite *TestSuite) TestCollectionApprovalAllowBackedMintingTrue() {
 	suite.Require().Nil(err, "Error getting collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
+	// Now update approvals with the backing address as fromListId (satisfying guardrails)
+	approvals := collection.CollectionApprovals
+	approvals = append(approvals, &types.CollectionApproval{
+		ApprovalId:        "backed-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        backedPath.Address, // Exactly the backing address
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+			MustPrioritize:     true,
+		},
+	})
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: approvals,
+	})
+	suite.Require().Nil(err, "error updating collection approvals")
+
+	// Re-fetch collection to get updated versions
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
+
 	// Fund bob with IBC coins
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err)
 	suite.app.BankKeeper.MintCoins(suite.ctx, "mint", sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, sdk.Coins{sdk.NewCoin(backedPath.Conversion.SideA.Denom, sdkmath.NewInt(1))})
 
-	// Try to unback - should succeed because allowBackedMinting=true
+	// Try to unback - should succeed because allowBackedMinting=true with proper guardrails
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -461,10 +474,11 @@ func (suite *TestSuite) TestCollectionApprovalAllowSpecialWrappingTrue() {
 }
 
 // TestBidirectionalBackingTransfer tests that backing transfers work in both directions
+// with the new guardrails requiring the backing address as an exact list ID.
 func (suite *TestSuite) TestBidirectionalBackingTransfer() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	// Create a collection with cosmos coin backed paths
+	// Create a collection with cosmos coin backed paths (without backed minting approval)
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].Transfers = []*types.Transfer{}
 	filteredApprovals := []*types.CollectionApproval{}
@@ -492,26 +506,54 @@ func (suite *TestSuite) TestBidirectionalBackingTransfer() {
 		},
 	}
 
-	// Add collection approval with allowBackedMinting=true
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true,
-		},
-	})
-
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection")
 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
+
+	// Update approvals with two backed minting approvals: one for each direction
+	approvals := collection.CollectionApprovals
+	// Approval for unbacking (from backing address to users)
+	approvals = append(approvals, &types.CollectionApproval{
+		ApprovalId:        "backed-unback",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        backedPath.Address,
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+			MustPrioritize:     true,
+		},
+	})
+	// Approval for backing (from users to backing address)
+	approvals = append(approvals, &types.CollectionApproval{
+		ApprovalId:        "backed-back",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          backedPath.Address,
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+			MustPrioritize:     true,
+		},
+	})
+
+	err = UpdateCollectionApprovals(suite, wctx, &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: approvals,
+	})
+	suite.Require().Nil(err, "error updating collection approvals")
+
+	// Re-fetch collection to get updated versions
+	collection, err = GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err, "Error getting collection")
 
 	// Test direction 1: from special address to user (unbacking)
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)

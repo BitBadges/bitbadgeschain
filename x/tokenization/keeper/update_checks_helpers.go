@@ -295,6 +295,36 @@ func (k Keeper) ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, colle
 		}
 	}
 
+	// Validate allowBackedMinting guardrails
+	for _, collectionApproval := range collectionApprovals {
+		if collectionApproval.ApprovalCriteria == nil || !collectionApproval.ApprovalCriteria.AllowBackedMinting {
+			continue
+		}
+
+		// Rule 4: Reject if collection has no cosmosCoinBackedPath
+		if collection == nil || collection.Invariants == nil || collection.Invariants.CosmosCoinBackedPath == nil {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but collection has no cosmosCoinBackedPath in invariants", collectionApproval.ApprovalId)
+		}
+
+		backingAddr := collection.Invariants.CosmosCoinBackedPath.Address
+
+		// Rule 1-2: Exactly one of fromListId/toListId must be exactly the backing address
+		fromIsBackingAddr := k.isExactlyAddress(ctx, collectionApproval.FromListId, backingAddr)
+		toIsBackingAddr := k.isExactlyAddress(ctx, collectionApproval.ToListId, backingAddr)
+
+		if fromIsBackingAddr && toIsBackingAddr {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but both fromListId and toListId match the backing address; exactly one must match", collectionApproval.ApprovalId)
+		}
+		if !fromIsBackingAddr && !toIsBackingAddr {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but neither fromListId nor toListId is exactly the backing address", collectionApproval.ApprovalId)
+		}
+
+		// Rule 3: mustPrioritize must be true
+		if !collectionApproval.ApprovalCriteria.MustPrioritize {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but mustPrioritize is not set to true", collectionApproval.ApprovalId)
+		}
+	}
+
 	// Check invariants if collection is provided
 	if collection != nil && collection.Invariants != nil {
 		if collection.Invariants.NoCustomOwnershipTimes {
@@ -339,6 +369,19 @@ func isOnlyMint(addressList *types.AddressList) bool {
 		addressList.Whitelist &&
 		len(addressList.Addresses) == 1 &&
 		addressList.Addresses[0] == types.MintAddress
+}
+
+// isExactlyAddress checks if a list ID resolves to an address list that contains
+// exactly the given address and nothing else (whitelist with a single entry).
+// This prevents broader lists like "All" or multi-address lists from matching.
+func (k Keeper) isExactlyAddress(ctx sdk.Context, listId string, address string) bool {
+	addressList, err := k.GetAddressListById(ctx, listId)
+	if err != nil {
+		return false
+	}
+	return addressList.Whitelist &&
+		len(addressList.Addresses) == 1 &&
+		addressList.Addresses[0] == address
 }
 
 func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval, CanUpdateCollectionApprovals []*types.CollectionApprovalPermission) error {
