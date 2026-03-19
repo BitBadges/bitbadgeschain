@@ -95,8 +95,6 @@ type ManagerSplitterPermissions struct {
 	CanAddMoreAliasPaths *PermissionCriteria `protobuf:"bytes,10,opt,name=canAddMoreAliasPaths,proto3" json:"canAddMoreAliasPaths,omitempty"`
 	// Permissions related to adding more cosmos coin wrapper paths to the collection.
 	CanAddMoreCosmosCoinWrapperPaths *PermissionCriteria `protobuf:"bytes,11,opt,name=canAddMoreCosmosCoinWrapperPaths,proto3" json:"canAddMoreCosmosCoinWrapperPaths,omitempty"`
-	// Permissions related to updating the collection's permissions.
-	CanUpdateCollectionPermissions *PermissionCriteria `protobuf:"bytes,12,opt,name=canUpdateCollectionPermissions,proto3" json:"canUpdateCollectionPermissions,omitempty"`
 }
 
 func (m *ManagerSplitterPermissions) Reset()         { *m = ManagerSplitterPermissions{} }
@@ -209,13 +207,6 @@ func (m *ManagerSplitterPermissions) GetCanAddMoreCosmosCoinWrapperPaths() *Perm
 	return nil
 }
 
-func (m *ManagerSplitterPermissions) GetCanUpdateCollectionPermissions() *PermissionCriteria {
-	if m != nil {
-		return m.CanUpdateCollectionPermissions
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*PermissionCriteria)(nil), "managersplitter.PermissionCriteria")
 	proto.RegisterType((*ManagerSplitterPermissions)(nil), "managersplitter.ManagerSplitterPermissions")
@@ -307,18 +298,6 @@ func (m *ManagerSplitterPermissions) MarshalToSizedBuffer(dAtA []byte) (int, err
 	_ = i
 	var l int
 	_ = l
-	if m.CanUpdateCollectionPermissions != nil {
-		{
-			size, err := m.CanUpdateCollectionPermissions.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPermissions(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x62
-	}
 	if m.CanAddMoreCosmosCoinWrapperPaths != nil {
 		{
 			size, err := m.CanAddMoreCosmosCoinWrapperPaths.MarshalToSizedBuffer(dAtA[:i])
@@ -528,10 +507,6 @@ func (m *ManagerSplitterPermissions) Size() (n int) {
 	}
 	if m.CanAddMoreCosmosCoinWrapperPaths != nil {
 		l = m.CanAddMoreCosmosCoinWrapperPaths.Size()
-		n += 1 + l + sovPermissions(uint64(l))
-	}
-	if m.CanUpdateCollectionPermissions != nil {
-		l = m.CanUpdateCollectionPermissions.Size()
 		n += 1 + l + sovPermissions(uint64(l))
 	}
 	return n
@@ -1047,42 +1022,6 @@ func (m *ManagerSplitterPermissions) Unmarshal(dAtA []byte) error {
 				m.CanAddMoreCosmosCoinWrapperPaths = &PermissionCriteria{}
 			}
 			if err := m.CanAddMoreCosmosCoinWrapperPaths.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CanUpdateCollectionPermissions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPermissions
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPermissions
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CanUpdateCollectionPermissions == nil {
-				m.CanUpdateCollectionPermissions = &PermissionCriteria{}
-			}
-			if err := m.CanUpdateCollectionPermissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

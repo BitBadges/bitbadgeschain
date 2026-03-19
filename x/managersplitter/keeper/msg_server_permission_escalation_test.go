@@ -8,16 +8,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// TestPermissionEscalation_ApprovalsCannotUpdatePermissions verifies that an executor
-// with ONLY canUpdateCollectionApprovals CANNOT set UpdateCollectionPermissions = true.
-// This is the core fix for the permission escalation vulnerability (backlog #27).
-func (suite *TestSuite) TestPermissionEscalation_ApprovalsCannotUpdatePermissions() {
+// TestPermissionEscalation_NonAdminCannotUpdatePermissions verifies that a non-admin
+// executor CANNOT set UpdateCollectionPermissions = true, even if they have
+// canUpdateCollectionApprovals. Only admin can update collection permissions.
+func (suite *TestSuite) TestPermissionEscalation_NonAdminCannotUpdatePermissions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	// Create a manager splitter where alice can update approvals but NOT permissions
+	// Create a manager splitter where alice can update approvals
 	perms := GetDefaultPermissions()
 	perms.CanUpdateCollectionApprovals.ApprovedAddresses = []string{alice}
-	// canUpdateCollectionPermissions has NO approved addresses (empty list)
 
 	createMsg := &types.MsgCreateManagerSplitter{
 		Admin:       bob,
@@ -27,12 +26,11 @@ func (suite *TestSuite) TestPermissionEscalation_ApprovalsCannotUpdatePermission
 	res, err := CreateManagerSplitter(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating manager splitter")
 
-	// Alice tries to update collection permissions via the manager splitter.
-	// She has canUpdateCollectionApprovals but NOT canUpdateCollectionPermissions.
-	// This MUST be denied.
+	// Alice tries to update collection permissions.
+	// Even though she has canUpdateCollectionApprovals, only admin can update permissions.
 	execMsg := &types.MsgExecuteUniversalUpdateCollection{
-		Executor:                alice,
-		ManagerSplitterAddress:  res.Address,
+		Executor:               alice,
+		ManagerSplitterAddress: res.Address,
 		UniversalUpdateCollectionMsg: &tokenizationtypes.MsgUniversalUpdateCollection{
 			Creator:                    alice,
 			CollectionId:               sdkmath.NewUint(1),
@@ -42,20 +40,17 @@ func (suite *TestSuite) TestPermissionEscalation_ApprovalsCannotUpdatePermission
 	}
 
 	_, err = ExecuteUniversalUpdateCollection(suite, wctx, execMsg)
-	suite.Require().Error(err, "Should deny: alice has canUpdateCollectionApprovals but not canUpdateCollectionPermissions")
-	suite.Require().Contains(err.Error(), "canUpdateCollectionPermissions",
-		"Error should reference the correct permission name")
+	suite.Require().Error(err, "Should deny: only admin can update collection permissions")
+	suite.Require().Contains(err.Error(), "only admin",
+		"Error should indicate admin-only restriction")
 }
 
-// TestPermissionEscalation_CanUpdatePermissionsWithCorrectPerm verifies that an executor
-// with canUpdateCollectionPermissions CAN set UpdateCollectionPermissions = true
-// (though it may fail later at the tokenization module level, the permission check itself passes).
-func (suite *TestSuite) TestPermissionEscalation_CanUpdatePermissionsWithCorrectPerm() {
+// TestPermissionEscalation_AdminCanUpdatePermissions verifies that admin can
+// update collection permissions (bypasses all checks).
+func (suite *TestSuite) TestPermissionEscalation_AdminCanUpdatePermissions() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	// Create a manager splitter where alice can update collection permissions
 	perms := GetDefaultPermissions()
-	perms.CanUpdateCollectionPermissions.ApprovedAddresses = []string{alice}
 
 	createMsg := &types.MsgCreateManagerSplitter{
 		Admin:       bob,
@@ -65,50 +60,10 @@ func (suite *TestSuite) TestPermissionEscalation_CanUpdatePermissionsWithCorrect
 	res, err := CreateManagerSplitter(suite, wctx, createMsg)
 	suite.Require().Nil(err, "Error creating manager splitter")
 
-	// Alice tries to update collection permissions. She has the correct permission.
-	// The permission check should pass (but it may fail later in tokenization module).
+	// Admin (bob) tries to update collection permissions. Should pass permission check.
 	execMsg := &types.MsgExecuteUniversalUpdateCollection{
-		Executor:                alice,
-		ManagerSplitterAddress:  res.Address,
-		UniversalUpdateCollectionMsg: &tokenizationtypes.MsgUniversalUpdateCollection{
-			Creator:                    alice,
-			CollectionId:               sdkmath.NewUint(1),
-			UpdateCollectionPermissions: true,
-			CollectionPermissions:      &tokenizationtypes.CollectionPermissions{},
-		},
-	}
-
-	_, err = ExecuteUniversalUpdateCollection(suite, wctx, execMsg)
-	// If it errors, it should NOT be a permission denied error for canUpdateCollectionPermissions.
-	// It may error for other reasons (e.g., collection not found in tokenization module).
-	if err != nil {
-		suite.Require().NotContains(err.Error(), "not approved for canUpdateCollectionPermissions",
-			"Permission check should pass for executor with canUpdateCollectionPermissions")
-	}
-}
-
-// TestPermissionEscalation_AdminBypassesCheck verifies that admin always bypasses
-// all permission checks including canUpdateCollectionPermissions.
-func (suite *TestSuite) TestPermissionEscalation_AdminBypassesCheck() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
-
-	// Create a manager splitter with no approved addresses for any permission
-	perms := GetDefaultPermissions()
-	// All permissions have empty approved addresses
-
-	createMsg := &types.MsgCreateManagerSplitter{
-		Admin:       bob,
-		Permissions: perms,
-	}
-
-	res, err := CreateManagerSplitter(suite, wctx, createMsg)
-	suite.Require().Nil(err, "Error creating manager splitter")
-
-	// Admin (bob) tries to update collection permissions.
-	// Admin should always bypass permission checks.
-	execMsg := &types.MsgExecuteUniversalUpdateCollection{
-		Executor:                bob,
-		ManagerSplitterAddress:  res.Address,
+		Executor:               bob,
+		ManagerSplitterAddress: res.Address,
 		UniversalUpdateCollectionMsg: &tokenizationtypes.MsgUniversalUpdateCollection{
 			Creator:                    bob,
 			CollectionId:               sdkmath.NewUint(1),
@@ -120,20 +75,17 @@ func (suite *TestSuite) TestPermissionEscalation_AdminBypassesCheck() {
 	_, err = ExecuteUniversalUpdateCollection(suite, wctx, execMsg)
 	// If it errors, it should NOT be a permission denied error.
 	if err != nil {
-		suite.Require().NotContains(err.Error(), "permission denied",
-			"Admin should bypass all permission checks")
+		suite.Require().NotContains(err.Error(), "only admin",
+			"Admin should bypass permission check")
 	}
 }
 
 // TestPermissionEscalation_ApprovalsStillWorkForApprovals verifies that
-// canUpdateCollectionApprovals still correctly controls UpdateCollectionApprovals
-// (i.e., we didn't break existing functionality).
+// canUpdateCollectionApprovals still correctly controls UpdateCollectionApprovals.
 func (suite *TestSuite) TestPermissionEscalation_ApprovalsStillWorkForApprovals() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
-	// Create a manager splitter where charlie has NO approval permissions
 	perms := GetDefaultPermissions()
-	// All permissions have empty approved addresses
 
 	createMsg := &types.MsgCreateManagerSplitter{
 		Admin:       bob,
@@ -145,8 +97,8 @@ func (suite *TestSuite) TestPermissionEscalation_ApprovalsStillWorkForApprovals(
 
 	// Charlie tries to update collection approvals without permission
 	execMsg := &types.MsgExecuteUniversalUpdateCollection{
-		Executor:                charlie,
-		ManagerSplitterAddress:  res.Address,
+		Executor:               charlie,
+		ManagerSplitterAddress: res.Address,
 		UniversalUpdateCollectionMsg: &tokenizationtypes.MsgUniversalUpdateCollection{
 			Creator:                  charlie,
 			CollectionId:             sdkmath.NewUint(1),
