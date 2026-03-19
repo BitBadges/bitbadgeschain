@@ -71,6 +71,10 @@ func (k Keeper) checkPermission(ctx sdk.Context, executor string, managerSplitte
 		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanAddMoreCosmosCoinWrapperPaths != nil {
 			criteria = managerSplitter.Permissions.CanAddMoreCosmosCoinWrapperPaths
 		}
+	case "canUpdateCollectionPermissions":
+		if managerSplitter.Permissions != nil && managerSplitter.Permissions.CanUpdateCollectionPermissions != nil {
+			criteria = managerSplitter.Permissions.CanUpdateCollectionPermissions
+		}
 	}
 
 	// If no criteria set, deny by default (except admin)
@@ -96,10 +100,7 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 	}
 
 	if msg.UpdateCollectionPermissions {
-		// Updating permissions requires checking all permission types
-		// For simplicity, we'll check canUpdateCollectionApprovals as a proxy
-		// In a more sophisticated implementation, we might want to check each permission individually
-		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCollectionApprovals"); err != nil {
+		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCollectionPermissions"); err != nil {
 			return err
 		}
 	}

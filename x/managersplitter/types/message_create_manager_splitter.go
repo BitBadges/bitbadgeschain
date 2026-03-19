@@ -49,6 +49,7 @@ func validatePermissions(perms *ManagerSplitterPermissions) error {
 		{"canUpdateValidTokenIds", perms.CanUpdateValidTokenIds},
 		{"canUpdateTokenMetadata", perms.CanUpdateTokenMetadata},
 		{"canUpdateCollectionApprovals", perms.CanUpdateCollectionApprovals},
+		{"canUpdateCollectionPermissions", perms.CanUpdateCollectionPermissions},
 	}
 
 	for _, field := range permissionFields {

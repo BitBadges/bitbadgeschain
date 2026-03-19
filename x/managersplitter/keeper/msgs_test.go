@@ -35,6 +35,9 @@ func GetDefaultPermissions() *types.ManagerSplitterPermissions {
 		CanUpdateCollectionApprovals: &types.PermissionCriteria{
 			ApprovedAddresses: []string{},
 		},
+		CanUpdateCollectionPermissions: &types.PermissionCriteria{
+			ApprovedAddresses: []string{},
+		},
 	}
 }
 

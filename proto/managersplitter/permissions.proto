@@ -47,5 +47,8 @@ message ManagerSplitterPermissions {
 
   // Permissions related to adding more cosmos coin wrapper paths to the collection.
   PermissionCriteria canAddMoreCosmosCoinWrapperPaths = 11;
+
+  // Permissions related to updating the collection's permissions.
+  PermissionCriteria canUpdateCollectionPermissions = 12;
 }
 
