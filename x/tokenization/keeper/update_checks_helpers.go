@@ -313,15 +313,15 @@ func (k Keeper) ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, colle
 		toIsBackingAddr := k.isExactlyAddress(ctx, collectionApproval.ToListId, backingAddr)
 
 		if fromIsBackingAddr && toIsBackingAddr {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but both fromListId and toListId match the backing address; exactly one must match", collectionApproval.ApprovalId)
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but both fromListId and toListId match the backing address (%s); exactly one must match", collectionApproval.ApprovalId, backingAddr)
 		}
 		if !fromIsBackingAddr && !toIsBackingAddr {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but neither fromListId nor toListId is exactly the backing address", collectionApproval.ApprovalId)
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but neither fromListId nor toListId is exactly the backing address (%s); set one side to this address", collectionApproval.ApprovalId, backingAddr)
 		}
 
 		// Rule 3: mustPrioritize must be true
 		if !collectionApproval.ApprovalCriteria.MustPrioritize {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but mustPrioritize is not set to true", collectionApproval.ApprovalId)
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but mustPrioritize is not set to true (backing address: %s)", collectionApproval.ApprovalId, backingAddr)
 		}
 	}
 
