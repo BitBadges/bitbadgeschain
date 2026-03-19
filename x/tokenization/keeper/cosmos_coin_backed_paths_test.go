@@ -7,6 +7,70 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// createBackedCollectionAndAddApproval creates a backed collection, then adds the backed minting
+// approval with the proper backing address as list ID. Returns the collection with the approval.
+// The approvalId parameter is used as the approval ID for the backed minting approval.
+func (suite *TestSuite) createBackedCollectionAndAddApproval(
+	wctx sdk.Context,
+	collectionsToCreate []*types.MsgNewCollection,
+	approvalId string,
+) (*types.TokenCollection, error) {
+	err := CreateCollections(suite, sdk.WrapSDKContext(wctx), collectionsToCreate)
+	if err != nil {
+		return nil, err
+	}
+
+	collection, err := GetCollection(suite, sdk.WrapSDKContext(wctx), sdkmath.NewUint(1))
+	if err != nil {
+		return nil, err
+	}
+
+	backingAddr := collection.Invariants.CosmosCoinBackedPath.Address
+
+	// Add backed minting approval with proper backing address
+	approvals := collection.CollectionApprovals
+	approvals = append(approvals, &types.CollectionApproval{
+		ApprovalId:        approvalId,
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        backingAddr,
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+			MustPrioritize:     true,
+		},
+	})
+	// Also add approval for backing direction (to backing address)
+	approvals = append(approvals, &types.CollectionApproval{
+		ApprovalId:        approvalId + "-back",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          backingAddr,
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			AllowBackedMinting: true,
+			MustPrioritize:     true,
+		},
+	})
+
+	err = UpdateCollectionApprovals(suite, sdk.WrapSDKContext(wctx), &types.MsgUniversalUpdateCollectionApprovals{
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		CollectionApprovals: approvals,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Re-fetch to get updated versions
+	collection, err = GetCollection(suite, sdk.WrapSDKContext(wctx), sdkmath.NewUint(1))
+	return collection, err
+}
+
 // TestCosmosCoinBackedPathsBasic tests the basic functionality of cosmos coin backed paths
 // by creating a collection with backed paths and transferring tokens to the special alias address
 func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
@@ -41,26 +105,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBasic() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating collection")
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err, "Error getting collection")
-	suite.Require().NotNil(collection.Invariants)
-	suite.Require().NotNil(collection.Invariants.CosmosCoinBackedPath)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "backed-transfer")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Verify initial balance is zero
@@ -172,24 +218,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnback() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "unback-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "unback-transfer")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Fund bob with IBC coins
@@ -308,24 +338,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsTransferToOtherUser() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "transfer-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "transfer-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Fund bob with IBC coins
@@ -449,24 +463,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsErrors() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "error-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "error-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Test backing without tokens - should fail
@@ -521,24 +519,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsMultipleDenoms() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "multi-denom-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "multi-denom-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath1 := collection.Invariants.CosmosCoinBackedPath
 
 	// Fund bob with IBC coins
@@ -631,24 +613,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsInadequateBalance() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "balance-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "balance-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Try to back without tokens - should fail
@@ -705,24 +671,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackInadequateBalance() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "unback-balance-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "unback-balance-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Try to unback without IBC coins - should fail
@@ -779,24 +729,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsConversionRate() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "conversion-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "conversion-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Fund bob with IBC coins (5 tokens = 1 IBC coin)
@@ -899,24 +833,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsIbcAmount() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "ibcamount-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true, // Required for backing transfers
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "ibcamount-test")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 	suite.Require().Equal(sdkmath.NewUint(10), backedPath.Conversion.SideA.Amount, "IbcAmount should be 10")
 
@@ -1025,24 +943,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackOnBehalfOf() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true,
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating collection")
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "backed-transfer")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Fund bob (the initiator) with IBC coins
@@ -1121,24 +1023,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBackOnBehalfOf() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true,
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "error creating collection")
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "backed-transfer")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// First, give alice some tokens via unbacking (alice pays her own IBC coins)
@@ -1264,24 +1150,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsBackOnBehalfOfNoApproval() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true,
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "backed-transfer")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Give alice tokens
@@ -1369,24 +1239,8 @@ func (suite *TestSuite) TestCosmosCoinBackedPathsUnbackOnBehalfOfConversionRate(
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "backed-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowBackedMinting: true,
-		},
-	})
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err)
-
-	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
-	suite.Require().Nil(err)
+	collection, err := suite.createBackedCollectionAndAddApproval(suite.ctx, collectionsToCreate, "backed-transfer")
+	suite.Require().Nil(err, "error creating backed collection")
 	backedPath := collection.Invariants.CosmosCoinBackedPath
 
 	// Fund bob (initiator) with 10 IBC coins
