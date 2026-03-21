@@ -1,17 +1,23 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 	"github.com/stretchr/testify/require"
 )
 
 type mockTransferKeeper struct {
 	// Map from hash to full denom path (e.g., "transfer/channel-3/uatom")
 	traces map[string]string
+}
+
+func (m mockTransferKeeper) Transfer(_ context.Context, _ *transfertypes.MsgTransfer) (*transfertypes.MsgTransferResponse, error) {
+	return &transfertypes.MsgTransferResponse{}, nil
 }
 
 func (m mockTransferKeeper) DenomPathFromHash(_ sdk.Context, denom string) (string, error) {
