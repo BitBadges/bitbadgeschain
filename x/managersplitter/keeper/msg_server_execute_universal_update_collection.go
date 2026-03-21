@@ -96,11 +96,8 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 	}
 
 	if msg.UpdateCollectionPermissions {
-		// Updating permissions requires checking all permission types
-		// For simplicity, we'll check canUpdateCollectionApprovals as a proxy
-		// In a more sophisticated implementation, we might want to check each permission individually
-		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateCollectionApprovals"); err != nil {
-			return err
+		if executor != managerSplitter.Admin {
+			return sdkerrors.Wrap(types.ErrPermissionDenied, "only admin can update collection permissions")
 		}
 	}
 
