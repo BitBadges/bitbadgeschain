@@ -540,7 +540,9 @@ func (k Keeper) ValidatePostSwapAction(ctx sdk.Context, postSwapAction *types.Po
 	return types.NewSuccessAcknowledgement()
 }
 
-// ExecuteIBCTransfer executes an IBC transfer
+// ExecuteIBCTransfer executes an IBC transfer by delegating to the IBC
+// transfer module, which correctly escrows native tokens or burns IBC
+// vouchers before sending the packet.
 func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTransfer *types.IBCTransferInfo, token sdk.Coin, timeoutTimestamp uint64) ibcexported.Acknowledgement {
 	if ibcTransfer == nil || ibcTransfer.IBCInfo == nil {
 		return types.NewSuccessAcknowledgement()
@@ -548,42 +550,21 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 
 	ibcInfo := ibcTransfer.IBCInfo
 
-	// IBC v10: Capabilities removed - channel validation is handled by IBC core
-
-	// Use zero height for timeout (no timeout height)
-	timeoutHeight := clienttypes.ZeroHeight()
-
-	// Create transfer packet data
-	denom, err := gammtypes.ExpandIBCDenomToFullPath(ctx, token.Denom, k.transferKeeper)
-	if err != nil {
-		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to expand IBC denom: %v", err))
+	// Delegate to the IBC transfer module which handles escrow/burn + SendPacket
+	msg := &transfertypes.MsgTransfer{
+		SourcePort:       transfertypes.PortID,
+		SourceChannel:    ibcInfo.SourceChannel,
+		Token:            token,
+		Sender:           sender.String(),
+		Receiver:         ibcInfo.Receiver,
+		TimeoutHeight:    clienttypes.ZeroHeight(),
+		TimeoutTimestamp: timeoutTimestamp,
+		Memo:             ibcInfo.Memo,
 	}
 
-	packetData := transfertypes.FungibleTokenPacketData{
-		Denom:    denom,
-		Amount:   token.Amount.String(),
-		Sender:   sender.String(),
-		Receiver: ibcInfo.Receiver,
-		Memo:     ibcInfo.Memo,
-	}
-
-	// Marshal packet data
-	data, err := transfertypes.ModuleCdc.MarshalJSON(&packetData)
+	_, err := k.transferKeeper.Transfer(ctx, msg)
 	if err != nil {
-		return types.NewCustomErrorAcknowledgement("failed to marshal IBC packet data")
-	}
-
-	// Send IBC packet (IBC v10: capabilities removed)
-	_, err = k.ics4Wrapper.SendPacket(
-		ctx,
-		transfertypes.PortID,
-		ibcInfo.SourceChannel,
-		timeoutHeight,
-		timeoutTimestamp,
-		data,
-	)
-	if err != nil {
-		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to send IBC packet: channel=%s, denom=%s, amount=%s", ibcInfo.SourceChannel, token.Denom, token.Amount.String()))
+		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to execute IBC transfer: channel=%s, denom=%s, amount=%s", ibcInfo.SourceChannel, token.Denom, token.Amount.String()))
 	}
 
 	return types.NewSuccessAcknowledgement()

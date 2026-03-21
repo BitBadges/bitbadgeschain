@@ -90,33 +90,17 @@ func (k *Keeper) SetPoolManager(poolManager types.PoolManager) {
 	k.poolManager = poolManager
 }
 
-// ExecuteIBCTransfer executes an IBC transfer
-// This method is similar to the custom hooks keeper's ExecuteIBCTransfer
+// ExecuteIBCTransfer executes an IBC transfer by delegating to the IBC
+// transfer module, which correctly escrows native tokens or burns IBC
+// vouchers before sending the packet.
 func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTransferInfo *types.IBCTransferInfo, token sdk.Coin) error {
 	if ibcTransferInfo == nil {
 		return fmt.Errorf("ibc_transfer_info cannot be nil")
 	}
 
-	if k.ics4Wrapper == nil {
-		return fmt.Errorf("ICS4 wrapper not set")
+	if k.transferKeeper == nil {
+		return fmt.Errorf("transfer keeper not set")
 	}
-
-	if k.channelKeeper == nil {
-		return fmt.Errorf("channel keeper not set")
-	}
-
-	// IBC v10: scoped keeper removed - capabilities no longer used
-
-	// Validate channel exists
-	_, found := k.channelKeeper.GetChannel(ctx, transfertypes.PortID, ibcTransferInfo.SourceChannel)
-	if !found {
-		return fmt.Errorf("IBC channel %s does not exist", ibcTransferInfo.SourceChannel)
-	}
-
-	// IBC v10: Capabilities removed - channel validation is handled by IBC core
-
-	// Use zero height for timeout (no timeout height)
-	timeoutHeight := clienttypes.ZeroHeight()
 
 	// Use timeout_timestamp from message, or default to current time + 5 minutes
 	timeoutTimestamp := ibcTransferInfo.TimeoutTimestamp
@@ -124,37 +108,21 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		timeoutTimestamp = uint64(ctx.BlockTime().UnixNano()) + uint64(5*60*1e9)
 	}
 
-	// Create transfer packet data
-	denom, err := types.ExpandIBCDenomToFullPath(ctx, token.Denom, k.transferKeeper)
-	if err != nil {
-		return fmt.Errorf("failed to expand IBC denom: %w", err)
+	// Delegate to the IBC transfer module which handles escrow/burn + SendPacket
+	msg := &transfertypes.MsgTransfer{
+		SourcePort:       transfertypes.PortID,
+		SourceChannel:    ibcTransferInfo.SourceChannel,
+		Token:            token,
+		Sender:           sender.String(),
+		Receiver:         ibcTransferInfo.Receiver,
+		TimeoutHeight:    clienttypes.ZeroHeight(),
+		TimeoutTimestamp: timeoutTimestamp,
+		Memo:             ibcTransferInfo.Memo,
 	}
 
-	packetData := transfertypes.FungibleTokenPacketData{
-		Denom:    denom,
-		Amount:   token.Amount.String(),
-		Sender:   sender.String(),
-		Receiver: ibcTransferInfo.Receiver,
-		Memo:     ibcTransferInfo.Memo,
-	}
-
-	// Marshal packet data
-	data, err := transfertypes.ModuleCdc.MarshalJSON(&packetData)
+	_, err := k.transferKeeper.Transfer(ctx, msg)
 	if err != nil {
-		return fmt.Errorf("failed to marshal packet data: %w", err)
-	}
-
-	// Send IBC packet (IBC v10: capabilities removed)
-	_, err = k.ics4Wrapper.SendPacket(
-		ctx,
-		transfertypes.PortID,
-		ibcTransferInfo.SourceChannel,
-		timeoutHeight,
-		timeoutTimestamp,
-		data,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to send IBC packet: %w", err)
+		return fmt.Errorf("failed to execute IBC transfer")
 	}
 
 	return nil

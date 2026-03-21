@@ -1,15 +1,18 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 )
 
-// TransferKeeper is the minimal interface we need from the IBC transfer keeper.
+// TransferKeeper is the interface we need from the IBC transfer keeper.
 type TransferKeeper interface {
 	DenomPathFromHash(ctx sdk.Context, denom string) (string, error)
+	Transfer(ctx context.Context, msg *transfertypes.MsgTransfer) (*transfertypes.MsgTransferResponse, error)
 }
 
 // ExpandIBCDenomToFullPath converts a local ibc/<hash> denom to its full
