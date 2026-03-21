@@ -361,9 +361,8 @@ func (suite *MaxSupplyPerIdTestSuite) TestMaxSupplyPerId_LargeMaxSupply() {
 	suite.Require().NoError(err, "minting within large maxSupply should succeed")
 }
 
-// TestMaxSupplyPerId_InvariantCanBeUpdated tests that maxSupplyPerId can be changed after creation
-// Note: Invariants in BitBadges are not immutable - they can be changed via MsgUniversalUpdateCollection
-func (suite *MaxSupplyPerIdTestSuite) TestMaxSupplyPerId_InvariantCanBeUpdated() {
+// TestMaxSupplyPerId_InvariantCannotBeUpdated tests that maxSupplyPerId is immutable after creation
+func (suite *MaxSupplyPerIdTestSuite) TestMaxSupplyPerId_InvariantCannotBeUpdated() {
 	maxSupply := uint64(100)
 	collectionId := suite.createCollectionWithMaxSupply(maxSupply)
 
@@ -372,7 +371,7 @@ func (suite *MaxSupplyPerIdTestSuite) TestMaxSupplyPerId_InvariantCanBeUpdated()
 	suite.Require().NotNil(collection.Invariants)
 	suite.Require().Equal(sdkmath.NewUint(maxSupply), collection.Invariants.MaxSupplyPerId)
 
-	// Update maxSupplyPerId to a higher value - this should succeed as invariants are not immutable
+	// Try to update maxSupplyPerId - this should be REJECTED (invariants are immutable)
 	newMaxSupply := uint64(1000)
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:      suite.Manager,
@@ -383,13 +382,14 @@ func (suite *MaxSupplyPerIdTestSuite) TestMaxSupplyPerId_InvariantCanBeUpdated()
 	}
 
 	_, err := suite.MsgServer.UniversalUpdateCollection(sdk.WrapSDKContext(suite.Ctx), updateMsg)
-	suite.Require().NoError(err, "updating maxSupplyPerId should succeed")
+	suite.Require().Error(err, "updating maxSupplyPerId after creation should be rejected")
+	suite.Require().Contains(err.Error(), "invariants are immutable after collection creation")
 
-	// Verify the invariant was updated
+	// Verify the invariant was NOT changed
 	collection = suite.GetCollection(collectionId)
 	suite.Require().NotNil(collection.Invariants)
-	suite.Require().Equal(sdkmath.NewUint(newMaxSupply), collection.Invariants.MaxSupplyPerId,
-		"maxSupplyPerId should be updated to new value")
+	suite.Require().Equal(sdkmath.NewUint(maxSupply), collection.Invariants.MaxSupplyPerId,
+		"maxSupplyPerId should remain unchanged")
 }
 
 // TestMaxSupplyPerId_MultipleRecipientsSameTokenWithinCap tests minting to multiple recipients within cap

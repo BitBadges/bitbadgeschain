@@ -34,8 +34,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 		IsArchived:                  msg.IsArchived,
 		MintEscrowCoinsToTransfer:   msg.MintEscrowCoinsToTransfer,
 		CosmosCoinWrapperPathsToAdd: msg.CosmosCoinWrapperPathsToAdd,
-		Invariants:                  msg.Invariants,
-		AliasPathsToAdd:             msg.AliasPathsToAdd,
+		// Invariants intentionally omitted — they are immutable (creation-only)
+		AliasPathsToAdd: msg.AliasPathsToAdd,
 	}
 	res, err := k.UniversalUpdateCollection(ctx, &newMsg)
 	if err != nil {

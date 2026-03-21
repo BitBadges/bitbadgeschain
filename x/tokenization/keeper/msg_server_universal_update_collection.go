@@ -488,6 +488,11 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 
 	// Handle invariants - convert InvariantsAddObject to CollectionInvariants
 	if msg.Invariants != nil {
+		// Invariants are set once at creation and cannot be modified afterward
+		if !msg.CollectionId.Equal(sdkmath.NewUint(NewCollectionId)) {
+			return nil, errorsmod.Wrap(ErrInvariantsImmutable, "invariants cannot be modified after collection creation")
+		}
+
 		if collection.Invariants == nil {
 			collection.Invariants = &types.CollectionInvariants{}
 		}

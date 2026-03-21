@@ -58,4 +58,5 @@ var (
 	ErrMultipleDefaultDisplayDenomUnits         = sdkerrors.Register(types.ModuleName, 109, "only one denom unit per path can have isDefaultDisplay set to true")
 	ErrInvalidDenomFormat                       = sdkerrors.Register(types.ModuleName, 110, "invalid denom format")
 	ErrAliasPathNotFound                        = sdkerrors.Register(types.ModuleName, 111, "alias path not found for denom")
+	ErrInvariantsImmutable                      = sdkerrors.Register(types.ModuleName, 112, "invariants are immutable after collection creation")
 )

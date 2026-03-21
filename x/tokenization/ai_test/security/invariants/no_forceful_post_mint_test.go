@@ -396,9 +396,8 @@ func (suite *NoForcefulPostMintTestSuite) TestNoForcefulPostMint_NoOverridesAllo
 	suite.Require().NoError(err, "approval without overrides should succeed")
 }
 
-// TestNoForcefulPostMint_InvariantCanBeUpdated tests that the invariant can be updated after creation
-// Note: Invariants in BitBadges are not immutable - they can be changed via MsgUniversalUpdateCollection
-func (suite *NoForcefulPostMintTestSuite) TestNoForcefulPostMint_InvariantCanBeUpdated() {
+// TestNoForcefulPostMint_InvariantCannotBeUpdated tests that invariants are immutable after creation
+func (suite *NoForcefulPostMintTestSuite) TestNoForcefulPostMint_InvariantCannotBeUpdated() {
 	// Create collection with invariant enabled
 	collectionId := suite.createCollectionWithInvariant(true)
 
@@ -407,21 +406,22 @@ func (suite *NoForcefulPostMintTestSuite) TestNoForcefulPostMint_InvariantCanBeU
 	suite.Require().NotNil(collection.Invariants)
 	suite.Require().True(collection.Invariants.NoForcefulPostMintTransfers)
 
-	// Try to disable the invariant - this should succeed as invariants are not immutable
+	// Try to disable the invariant - this should be REJECTED (invariants are immutable)
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:      suite.Manager,
 		CollectionId: collectionId,
 		Invariants: &types.InvariantsAddObject{
-			NoForcefulPostMintTransfers: false, // Disable the invariant
+			NoForcefulPostMintTransfers: false, // Attempt to disable the invariant
 		},
 	}
 
 	_, err := suite.MsgServer.UniversalUpdateCollection(sdk.WrapSDKContext(suite.Ctx), updateMsg)
-	suite.Require().NoError(err, "updating invariants should succeed")
+	suite.Require().Error(err, "updating invariants after creation should be rejected")
+	suite.Require().Contains(err.Error(), "invariants are immutable after collection creation")
 
-	// Verify invariant was updated
+	// Verify invariant was NOT changed
 	collection = suite.GetCollection(collectionId)
 	suite.Require().NotNil(collection.Invariants)
-	suite.Require().False(collection.Invariants.NoForcefulPostMintTransfers,
-		"noForcefulPostMintTransfers should be disabled after update")
+	suite.Require().True(collection.Invariants.NoForcefulPostMintTransfers,
+		"noForcefulPostMintTransfers should remain unchanged")
 }

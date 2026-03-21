@@ -135,9 +135,8 @@ func (suite *DisablePoolCreationTestSuite) TestDisablePoolCreation_InvariantDisa
 	}
 }
 
-// TestDisablePoolCreation_InvariantCanBeUpdated tests that the invariant can be changed after creation
-// Note: Invariants in BitBadges are not immutable - they can be changed via MsgUniversalUpdateCollection
-func (suite *DisablePoolCreationTestSuite) TestDisablePoolCreation_InvariantCanBeUpdated() {
+// TestDisablePoolCreation_InvariantCannotBeUpdated tests that invariants are immutable after creation
+func (suite *DisablePoolCreationTestSuite) TestDisablePoolCreation_InvariantCannotBeUpdated() {
 	// Create collection with invariant enabled
 	collectionId := suite.createCollectionWithInvariant(true)
 
@@ -146,23 +145,24 @@ func (suite *DisablePoolCreationTestSuite) TestDisablePoolCreation_InvariantCanB
 	suite.Require().NotNil(collection.Invariants)
 	suite.Require().True(collection.Invariants.DisablePoolCreation)
 
-	// Try to disable the invariant - this should succeed as invariants are not immutable
+	// Try to disable the invariant - this should be REJECTED (invariants are immutable)
 	updateMsg := &types.MsgUniversalUpdateCollection{
 		Creator:      suite.Manager,
 		CollectionId: collectionId,
 		Invariants: &types.InvariantsAddObject{
-			DisablePoolCreation: false, // Disable the invariant
+			DisablePoolCreation: false, // Attempt to disable the invariant
 		},
 	}
 
 	_, err := suite.MsgServer.UniversalUpdateCollection(sdk.WrapSDKContext(suite.Ctx), updateMsg)
-	suite.Require().NoError(err, "updating invariants should succeed")
+	suite.Require().Error(err, "updating invariants after creation should be rejected")
+	suite.Require().Contains(err.Error(), "invariants are immutable after collection creation")
 
-	// Verify the invariant was updated
+	// Verify the invariant was NOT changed
 	collection = suite.GetCollection(collectionId)
 	suite.Require().NotNil(collection.Invariants)
-	suite.Require().False(collection.Invariants.DisablePoolCreation,
-		"disablePoolCreation should be disabled after update")
+	suite.Require().True(collection.Invariants.DisablePoolCreation,
+		"disablePoolCreation should remain unchanged")
 }
 
 // TestDisablePoolCreation_CollectionWithAliasPathAndInvariant tests collection with both alias path and invariant
