@@ -10,7 +10,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v25"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v26"
 )
 
 // MigrateTokenizationKeeper migrates the tokenization keeper from v21 to current version
@@ -49,7 +49,6 @@ func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApproval
 	if approvalCriteria == nil {
 		return
 	}
-	newtypes.EnforceMustPrioritizeForIncoming(approvalCriteria)
 }
 
 // migrateOutgoingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -60,7 +59,6 @@ func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApproval
 	if approvalCriteria == nil {
 		return
 	}
-	newtypes.EnforceMustPrioritizeForOutgoing(approvalCriteria)
 }
 
 // migrateApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
@@ -71,7 +69,6 @@ func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
-	newtypes.EnforceMustPrioritizeForNonAutoScannable(approvalCriteria)
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
