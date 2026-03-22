@@ -100,9 +100,17 @@ func (k Keeper) ExecuteTransferTokens(ctx sdk.Context, sender sdk.AccAddress, ac
 	}
 
 	// 8. Transfer succeeded — commit cache
+	//
+	// tokenIn disposition: the IBC coins (tokenIn) are intentionally retained at
+	// the intermediate sender address as payment for this hook operation. They are
+	// NOT forwarded or burned here. On the failure path, ExecuteFallbackToRecoverAddress
+	// handles recovery by sending them on to RecoverAddress instead. For non-payment
+	// use cases where no fee is required, callers should send a trivial (1uatom) amount.
 	writeCache()
 
-	// Emit success event
+	// Emit success event. token_in_denom and token_in_amount are emitted as
+	// separate attributes (in addition to the combined token_in string) so that
+	// indexers can filter/aggregate by denom or amount independently.
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		"transfer_tokens_success",
 		sdk.NewAttribute("module", "custom-hooks"),
@@ -111,6 +119,8 @@ func (k Keeper) ExecuteTransferTokens(ctx sdk.Context, sender sdk.AccAddress, ac
 		sdk.NewAttribute("collection_id", action.CollectionId),
 		sdk.NewAttribute("num_transfers", strconv.Itoa(len(protoTransfers))),
 		sdk.NewAttribute("token_in", tokenIn.String()),
+		sdk.NewAttribute("token_in_denom", tokenIn.Denom),
+		sdk.NewAttribute("token_in_amount", tokenIn.Amount.String()),
 	))
 
 	return types.NewSuccessAcknowledgement()
