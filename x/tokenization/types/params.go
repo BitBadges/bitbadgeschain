@@ -20,7 +20,12 @@ func NewParams() Params {
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
 	return Params{
-		AllowedDenoms:       []string{"ubadge", "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349"},
+		AllowedDenoms: []string{
+			"ubadge",
+			"ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349",
+			"ibc/A4DB47A9D3CF9A068D454513891B526702455D3EF08FB9EB558C561F9DC2B701",
+			"ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518",
+		},
 		AffiliatePercentage: sdkmath.NewUint(500),
 	}
 }
