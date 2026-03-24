@@ -325,6 +325,41 @@ func (k Keeper) ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, colle
 		}
 	}
 
+	// Validate allowSpecialWrapping guardrails (parity with allowBackedMinting above)
+	// Note: We do NOT reject if CosmosCoinWrapperPaths is empty — the user may add paths
+	// in the same or a subsequent transaction. We only enforce structural requirements.
+	for _, collectionApproval := range collectionApprovals {
+		if collectionApproval.ApprovalCriteria == nil || !collectionApproval.ApprovalCriteria.AllowSpecialWrapping {
+			continue
+		}
+
+		// Rule 1: If wrapper paths exist, exactly one of fromListId/toListId must be exactly a wrapper path address
+		if collection != nil && len(collection.CosmosCoinWrapperPaths) > 0 {
+			fromIsWrapperAddr := false
+			toIsWrapperAddr := false
+			for _, path := range collection.CosmosCoinWrapperPaths {
+				if k.isExactlyAddress(ctx, collectionApproval.FromListId, path.Address) {
+					fromIsWrapperAddr = true
+				}
+				if k.isExactlyAddress(ctx, collectionApproval.ToListId, path.Address) {
+					toIsWrapperAddr = true
+				}
+			}
+
+			if fromIsWrapperAddr && toIsWrapperAddr {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowSpecialWrapping=true but both fromListId and toListId match a wrapper path address; exactly one must match", collectionApproval.ApprovalId)
+			}
+			if !fromIsWrapperAddr && !toIsWrapperAddr {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowSpecialWrapping=true but neither fromListId nor toListId is exactly a wrapper path address; set one side to the wrapper address", collectionApproval.ApprovalId)
+			}
+		}
+
+		// Rule 2: mustPrioritize must be true
+		if !collectionApproval.ApprovalCriteria.MustPrioritize {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowSpecialWrapping=true but mustPrioritize is not set to true", collectionApproval.ApprovalId)
+		}
+	}
+
 	// Check invariants if collection is provided
 	if collection != nil && collection.Invariants != nil {
 		if collection.Invariants.NoCustomOwnershipTimes {
