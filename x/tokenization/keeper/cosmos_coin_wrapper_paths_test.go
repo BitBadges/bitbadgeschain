@@ -54,6 +54,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -150,6 +151,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -253,6 +255,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -359,6 +362,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -484,6 +488,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -582,6 +587,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -661,6 +667,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -740,6 +747,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -823,6 +831,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -944,6 +953,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1041,6 +1051,7 @@ func (suite *TestSuite) TestGammKeeperTokenizationIntegration() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1205,6 +1216,7 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1259,6 +1271,7 @@ func (suite *TestSuite) TestGammKeeperPoolWithAliasRouting() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1429,6 +1442,7 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1484,6 +1498,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1793,6 +1808,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -1848,6 +1864,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsSimple() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -2064,6 +2081,7 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 
@@ -2211,6 +2229,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 

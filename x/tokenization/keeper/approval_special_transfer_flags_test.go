@@ -406,6 +406,7 @@ func (suite *TestSuite) TestCollectionApprovalAllowSpecialWrappingTrue() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Explicitly set to true
+			MustPrioritize:       true,
 		},
 	})
 
