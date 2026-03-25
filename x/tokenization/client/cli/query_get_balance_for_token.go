@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdGetBalanceForToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-balance-for-token [collection-id] [address] [token-id] [time]",
+		Use:   "balance-for-token [collection-id] [address] [token-id] [time]",
 		Short: "Query the balance amount for a specific token ID at a specific time",
 		Long: `Query the balance amount for a specific token ID at a specific time.
 The time parameter is optional and defaults to the current block time.
