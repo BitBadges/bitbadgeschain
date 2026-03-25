@@ -56,10 +56,13 @@ func (k Keeper) GetBalanceForToken(goCtx context.Context, req *types.QueryGetBal
 		return nil, err
 	}
 
-	// Sum up the amounts from fetched balances (should typically be one entry)
+	if len(fetchedBalances) > 1 {
+		return nil, status.Error(codes.Internal, "unexpected: GetBalancesForIds returned more than one entry for a single tokenId and time")
+	}
+
 	amount := sdkmath.NewUint(0)
-	for _, bal := range fetchedBalances {
-		amount = amount.Add(bal.Amount)
+	if len(fetchedBalances) == 1 {
+		amount = fetchedBalances[0].Amount
 	}
 
 	return &types.QueryGetBalanceForTokenResponse{
