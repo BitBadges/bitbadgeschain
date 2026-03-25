@@ -39,6 +39,7 @@ func GetQueryCmd() *cobra.Command {
 	cmd.AddCommand(CmdGetAllReservedProtocolAddresses())
 	cmd.AddCommand(CmdGetVote())
 	cmd.AddCommand(CmdGetVotes())
+	cmd.AddCommand(CmdGetBalanceForToken())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

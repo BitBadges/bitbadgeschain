@@ -95,6 +95,11 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/tokenization/get_collection_stats/{collectionId}";
   }
 
+  // Queries the balance amount for a specific token ID at a specific time.
+  rpc GetBalanceForToken(QueryGetBalanceForTokenRequest) returns (QueryGetBalanceForTokenResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/tokenization/get_balance_for_token/{collectionId}/{address}/{tokenId}";
+  }
+
   // this line is used by starport scaffolding # 2
 }
 
@@ -243,6 +248,17 @@ message QueryGetCollectionStatsRequest {
 
 message QueryGetCollectionStatsResponse {
   CollectionStats stats = 1;
+}
+
+message QueryGetBalanceForTokenRequest {
+  string collectionId = 1;
+  string address = 2;
+  string tokenId = 3;
+  string time = 4; // Optional - milliseconds since epoch, defaults to current block time
+}
+
+message QueryGetBalanceForTokenResponse {
+  string balance = 1;
 }
 
 // this line is used by starport scaffolding # 3
