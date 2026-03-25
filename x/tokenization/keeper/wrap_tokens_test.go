@@ -39,6 +39,7 @@ func (suite *TestSuite) TestWrapTokens() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -164,6 +165,7 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -277,6 +279,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 		InitiatedByListId: "AllWithoutMint",
 		ApprovalCriteria: &types.ApprovalCriteria{
 			AllowSpecialWrapping: true, // Required for wrapping transfers
+			MustPrioritize:       true,
 		},
 	})
 	err := CreateCollections(suite, wctx, collectionsToCreate)
