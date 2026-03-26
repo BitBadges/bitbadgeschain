@@ -28,17 +28,19 @@ import (
 // validateCollectionBeforeStore validates a collection before storing it
 func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types.TokenCollection) error {
 	// Validate collection approvals with invariants (using keeper method for proper address list checking)
-	if collection.Invariants != nil {
+	if collection.Invariants != nil || len(collection.CosmosCoinWrapperPaths) > 0 {
 		if err := k.ValidateCollectionApprovalsWithInvariants(ctx, collection.CollectionApprovals, false, collection); err != nil {
 			return sdkerrors.Wrap(err, "collection approval validation failed")
 		}
 
 		// Validate EVM query challenges in invariants (format + that each contract address has code)
-		if err := types.ValidateEVMQueryChallenges(collection.Invariants.EvmQueryChallenges); err != nil {
-			return sdkerrors.Wrap(err, "collection invariants validation failed")
-		}
-		if err := k.ValidateEVMQueryChallengesAreContracts(ctx, collection.Invariants.EvmQueryChallenges); err != nil {
-			return sdkerrors.Wrap(err, "collection invariants EVM query challenges")
+		if collection.Invariants != nil {
+			if err := types.ValidateEVMQueryChallenges(collection.Invariants.EvmQueryChallenges); err != nil {
+				return sdkerrors.Wrap(err, "collection invariants validation failed")
+			}
+			if err := k.ValidateEVMQueryChallengesAreContracts(ctx, collection.Invariants.EvmQueryChallenges); err != nil {
+				return sdkerrors.Wrap(err, "collection invariants EVM query challenges")
+			}
 		}
 	}
 

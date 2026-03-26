@@ -22,7 +22,7 @@ func TestPathAddressGenerationTestSuite(t *testing.T) {
 
 // TestPathAddressGeneration_EmptyDenom tests that empty denom is rejected
 func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_EmptyDenom() {
-	_, err := keeper.GenerateAliasPathAddress("")
+	_, err := keeper.GenerateWrapperPathAddress("")
 	suite.Require().Error(err, "empty denom should be rejected")
 	suite.Require().Contains(err.Error(), "path string cannot be empty", "error should indicate empty path string")
 }
@@ -35,7 +35,7 @@ func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_LongDenom
 		longDenom[i] = 'a'
 	}
 	
-	_, err := keeper.GenerateAliasPathAddress(string(longDenom))
+	_, err := keeper.GenerateWrapperPathAddress(string(longDenom))
 	suite.Require().Error(err, "denom exceeding 1024 bytes should be rejected")
 	suite.Require().Contains(err.Error(), "exceeds maximum length", "error should indicate length limit")
 }
@@ -43,7 +43,7 @@ func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_LongDenom
 // TestPathAddressGeneration_ValidDenom tests that valid denoms generate addresses correctly
 func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_ValidDenom() {
 	denom := "uatom"
-	addr, err := keeper.GenerateAliasPathAddress(denom)
+	addr, err := keeper.GenerateWrapperPathAddress(denom)
 	suite.Require().NoError(err, "valid denom should generate address")
 	suite.Require().NotEmpty(addr, "generated address should not be empty")
 	
@@ -55,8 +55,8 @@ func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_ValidDeno
 // TestPathAddressGeneration_Deterministic tests that same denom generates same address
 func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_Deterministic() {
 	denom := "uatom"
-	addr1, err1 := keeper.GenerateAliasPathAddress(denom)
-	addr2, err2 := keeper.GenerateAliasPathAddress(denom)
+	addr1, err1 := keeper.GenerateWrapperPathAddress(denom)
+	addr2, err2 := keeper.GenerateWrapperPathAddress(denom)
 	
 	suite.Require().NoError(err1)
 	suite.Require().NoError(err2)
@@ -107,7 +107,7 @@ func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_ReservedP
 	suite.Require().NoError(err, "should be able to add wrapper path")
 	
 	// Verify the generated address is marked as reserved
-	generatedAddr, err := keeper.GenerateAliasPathAddress("uatom")
+	generatedAddr, err := keeper.GenerateWrapperPathAddress("uatom")
 	suite.Require().NoError(err)
 	
 	isReserved := suite.Keeper.IsAddressReservedProtocolInStore(suite.Ctx, generatedAddr)
@@ -116,8 +116,8 @@ func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_ReservedP
 
 // TestPathAddressGeneration_DifferentDenomsDifferentAddresses tests that different denoms generate different addresses
 func (suite *PathAddressGenerationTestSuite) TestPathAddressGeneration_DifferentDenomsDifferentAddresses() {
-	addr1, err1 := keeper.GenerateAliasPathAddress("uatom")
-	addr2, err2 := keeper.GenerateAliasPathAddress("uosmo")
+	addr1, err1 := keeper.GenerateWrapperPathAddress("uatom")
+	addr2, err2 := keeper.GenerateWrapperPathAddress("uosmo")
 	
 	suite.Require().NoError(err1)
 	suite.Require().NoError(err2)

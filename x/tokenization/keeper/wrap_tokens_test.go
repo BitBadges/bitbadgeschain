@@ -1,11 +1,45 @@
 package keeper_test
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+// wrapperApprovals returns two approvals for wrapping/unwrapping with the pre-generated wrapper address.
+func wrapperApprovals(denom string) []*types.CollectionApproval {
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress(denom)
+	return []*types.CollectionApproval{
+		{
+			ApprovalId:        "wrap-approval",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+		{
+			ApprovalId:        "unwrap-approval",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	}
+}
 
 func (suite *TestSuite) TestWrapTokens() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -29,19 +63,7 @@ func (suite *TestSuite) TestWrapTokens() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "asadsdas",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
-		},
-	})
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, wrapperApprovals("test-coin")...)
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")
 
@@ -155,19 +177,7 @@ func (suite *TestSuite) TestWrapTokensErrors() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "asadsdas",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
-		},
-	})
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, wrapperApprovals("test-coin")...)
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")
 
@@ -269,19 +279,7 @@ func (suite *TestSuite) TestWrapTokensInadequateBalanceOnTheUnwrap() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "asadsdas",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
-		},
-	})
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, wrapperApprovals("test-coin")...)
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")
 

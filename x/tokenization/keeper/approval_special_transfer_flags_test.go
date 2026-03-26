@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -395,20 +396,36 @@ func (suite *TestSuite) TestCollectionApprovalAllowSpecialWrappingTrue() {
 		},
 	}
 
-	// Add collection approval with allowSpecialWrapping=true
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "wrapper-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Explicitly set to true
-			MustPrioritize:       true,
+	// Add collection approvals with allowSpecialWrapping=true (one per direction)
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("wrapped")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "wrapper-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "wrapper-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection")

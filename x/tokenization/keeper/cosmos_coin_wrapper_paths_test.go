@@ -44,19 +44,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsBasic() {
 	}
 
 	// Add collection approvals for transfers to/from wrapper paths
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "wrapper-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("testcoin")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "wrapper-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "wrapper-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with cosmos coin wrapper paths")
@@ -141,19 +157,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsUnwrap() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "unwrap-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("unwraptest")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "unwrap-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "unwrap-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection")
@@ -245,19 +277,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsTransferToOtherUser() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "transfer-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("transfertest")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "transfer-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "transfer-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection")
@@ -352,19 +400,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsErrors() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "error-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("errortest")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "error-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "error-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection")
@@ -478,19 +542,62 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsMultipleDenoms() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "multi-denom-test",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr1 := keeper.MustGenerateWrapperPathAddress("coin-one")
+	wrapperAddr2 := keeper.MustGenerateWrapperPathAddress("coin-two")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "multi-denom-wrap-1",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr1,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "multi-denom-unwrap-1",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr1,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+		&types.CollectionApproval{
+			ApprovalId:        "multi-denom-wrap-2",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr2,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+		&types.CollectionApproval{
+			ApprovalId:        "multi-denom-unwrap-2",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr2,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with multiple cosmos coin wrapper paths")
@@ -577,19 +684,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "disabled-wrapper-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("disabledcoin")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "disabled-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "disabled-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with disabled cosmos wrapping")
@@ -597,7 +720,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowCosmosWrappingDisabled() 
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	// Verify AllowCosmosWrapping is false
 
@@ -657,19 +780,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "override-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetFullUintRanges(), // Allow any token ID
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("overridecoin")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "override-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "override-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with override enabled")
@@ -737,19 +876,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholder() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "id-placeholder-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetFullUintRanges(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("badge_{id}_coin")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "id-placeholder-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "id-placeholder-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with {id} placeholder")
@@ -821,19 +976,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsIdPlaceholderErrors() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "id-placeholder-error-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetFullUintRanges(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("badge_{id}_coin")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "id-placeholder-error-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "id-placeholder-error-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with {id} placeholder")
@@ -943,19 +1114,35 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 
 	// Note: ValidTokenIds will be set after collection creation
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "validation-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetFullUintRanges(), // Allow all token IDs in approval
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("validationcoin")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "validation-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "validation-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection with override validation")
@@ -1041,19 +1228,35 @@ func (suite *TestSuite) TestGammKeeperTokenizationIntegration() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "integration-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("integrationtest")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "integration-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "integration-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection for gamm integration")
@@ -1206,19 +1409,35 @@ func (suite *TestSuite) TestGammKeeperCommunityPool() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "community-pool-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("communitytest")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "community-pool-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "community-pool-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection for community pool test")
@@ -1261,19 +1480,35 @@ func (suite *TestSuite) TestGammKeeperPoolWithAliasRouting() {
 		},
 	}
 
-	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
-		ApprovalId:        "pool-wrapping-transfer",
-		TransferTimes:     GetFullUintRanges(),
-		OwnershipTimes:    GetFullUintRanges(),
-		TokenIds:          GetOneUintRange(),
-		FromListId:        "AllWithoutMint",
-		ToListId:          "AllWithoutMint",
-		InitiatedByListId: "AllWithoutMint",
-		ApprovalCriteria: &types.ApprovalCriteria{
-			AllowSpecialWrapping: true, // Required for wrapping transfers
-			MustPrioritize:       true,
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("pooltest")
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
+		&types.CollectionApproval{
+			ApprovalId:        "pool-wrapping-wrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        "AllWithoutMint",
+			ToListId:          wrapperAddr,
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
 		},
-	})
+		&types.CollectionApproval{
+			ApprovalId:        "pool-wrapping-unwrap",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetOneUintRange(),
+			FromListId:        wrapperAddr,
+			ToListId:          "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			ApprovalCriteria: &types.ApprovalCriteria{
+				AllowSpecialWrapping: true,
+				MustPrioritize:       true,
+			},
+		},
+	)
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating collection for pool wrapping test")
@@ -1281,7 +1516,7 @@ func (suite *TestSuite) TestGammKeeperPoolWithAliasRouting() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
@@ -1323,7 +1558,7 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
@@ -1345,7 +1580,7 @@ func (suite *TestSuite) TestGammKeeperDenomParsing() {
 	// Test GetCorrespondingPath
 	correspondingPath, err := keeper.GetCorrespondingAliasPath(collection, wrapperDenom)
 	suite.Require().Nil(err, "Error getting corresponding path")
-	correspondingAliasAddress := keeper.MustGenerateAliasPathAddress(correspondingPath.Denom)
+	correspondingAliasAddress := keeper.MustGenerateWrapperPathAddress(correspondingPath.Denom)
 	suite.Require().Equal(aliasAddress, correspondingAliasAddress, "Addresses should match")
 	suite.Require().Equal(wrapperPath.Denom, correspondingPath.Denom, "Denoms should match")
 
@@ -1452,7 +1687,7 @@ func (suite *TestSuite) TestGammKeeperSimpleIntegration() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
@@ -1508,7 +1743,7 @@ func (suite *TestSuite) TestGammKeeperBasicFunctionality() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	// Create accounts
 	wrapperPathAccAddr, err := sdk.AccAddressFromBech32(aliasAddress)
@@ -1818,7 +2053,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperations() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
@@ -2091,7 +2326,7 @@ func (suite *TestSuite) TestGammKeeperAllFunctions() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
@@ -2239,7 +2474,7 @@ func (suite *TestSuite) TestGammKeeperPoolOperationsComprehensive() {
 	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
 	suite.Require().Nil(err, "Error getting collection")
 	wrapperPath := collection.AliasPaths[0]
-	aliasAddress := keeper.MustGenerateAliasPathAddress(wrapperPath.Denom)
+	aliasAddress := keeper.MustGenerateWrapperPathAddress(wrapperPath.Denom)
 
 	wrapperDenom := generateAliasWrapperDenom(collection.CollectionId, wrapperPath)
 
