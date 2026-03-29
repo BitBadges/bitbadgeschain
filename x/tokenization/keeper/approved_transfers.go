@@ -228,7 +228,18 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// Handle coin transfers on cached context
-			detErrMsg, err := k.ExecuteCoinTransfers(cachedCtx, approvalCriteria.CoinTransfers, transferMetadata, eventTracking.CoinTransfers, collection, royalties)
+			// Build dynamic options from approval criteria extensions (if any).
+			// TODO: Wire these from the approval criteria once proto fields are added.
+			// For now, the DynamicCoinTransferOptions are nil unless set programmatically,
+			// which preserves existing behavior for all current approvals.
+			var dynamicOpts *DynamicCoinTransferOptions
+			// Pass token transfer balances so dynamic fees / metered balances can use them
+			if len(transferBalancesToCheck) > 0 {
+				dynamicOpts = &DynamicCoinTransferOptions{
+					TokenTransferBalances: transferBalancesToCheck,
+				}
+			}
+			detErrMsg, err := k.ExecuteCoinTransfersWithDynamicOptions(cachedCtx, approvalCriteria.CoinTransfers, transferMetadata, eventTracking.CoinTransfers, collection, royalties, dynamicOpts)
 			if err != nil {
 				if detErrMsg != "" {
 					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
