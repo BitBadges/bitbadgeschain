@@ -105,6 +105,9 @@ type ApprovalCriteria struct {
 	// EVM query challenges that must pass for approval. Read-only contract queries
 	// that verify external EVM state (e.g., token ownership in another contract).
 	EvmQueryChallenges []*EVMQueryChallenge `protobuf:"bytes,25,rep,name=evmQueryChallenges,proto3" json:"evmQueryChallenges,omitempty"`
+	// Human-readable message shown when this approval's criteria are not met.
+	// Included in the error output when a transfer is rejected by this approval.
+	RejectionMessage string `protobuf:"bytes,26,opt,name=rejectionMessage,proto3" json:"rejectionMessage,omitempty"`
 }
 
 func (m *ApprovalCriteria) Reset()         { *m = ApprovalCriteria{} }
@@ -315,6 +318,13 @@ func (m *ApprovalCriteria) GetEvmQueryChallenges() []*EVMQueryChallenge {
 	return nil
 }
 
+func (m *ApprovalCriteria) GetRejectionMessage() string {
+	if m != nil {
+		return m.RejectionMessage
+	}
+	return ""
+}
+
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
 // This is used for user-level outgoing approvals and only includes fields relevant to outgoing transfers.
 // All criteria must be satisfied for the approval to be considered valid.
@@ -371,6 +381,9 @@ type OutgoingApprovalCriteria struct {
 	// EVM query challenges that must pass for approval. Read-only contract queries
 	// that verify external EVM state (e.g., token ownership in another contract).
 	EvmQueryChallenges []*EVMQueryChallenge `protobuf:"bytes,17,rep,name=evmQueryChallenges,proto3" json:"evmQueryChallenges,omitempty"`
+	// Human-readable message shown when this approval's criteria are not met.
+	// Included in the error output when a transfer is rejected by this approval.
+	RejectionMessage string `protobuf:"bytes,18,opt,name=rejectionMessage,proto3" json:"rejectionMessage,omitempty"`
 }
 
 func (m *OutgoingApprovalCriteria) Reset()         { *m = OutgoingApprovalCriteria{} }
@@ -525,6 +538,13 @@ func (m *OutgoingApprovalCriteria) GetEvmQueryChallenges() []*EVMQueryChallenge 
 	return nil
 }
 
+func (m *OutgoingApprovalCriteria) GetRejectionMessage() string {
+	if m != nil {
+		return m.RejectionMessage
+	}
+	return ""
+}
+
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
 // This is used for user-level incoming approvals and only includes fields relevant to incoming transfers.
 // All criteria must be satisfied for the approval to be considered valid.
@@ -581,6 +601,9 @@ type IncomingApprovalCriteria struct {
 	// EVM query challenges that must pass for approval. Read-only contract queries
 	// that verify external EVM state (e.g., token ownership in another contract).
 	EvmQueryChallenges []*EVMQueryChallenge `protobuf:"bytes,17,rep,name=evmQueryChallenges,proto3" json:"evmQueryChallenges,omitempty"`
+	// Human-readable message shown when this approval's criteria are not met.
+	// Included in the error output when a transfer is rejected by this approval.
+	RejectionMessage string `protobuf:"bytes,18,opt,name=rejectionMessage,proto3" json:"rejectionMessage,omitempty"`
 }
 
 func (m *IncomingApprovalCriteria) Reset()         { *m = IncomingApprovalCriteria{} }
@@ -733,6 +756,13 @@ func (m *IncomingApprovalCriteria) GetEvmQueryChallenges() []*EVMQueryChallenge 
 		return m.EvmQueryChallenges
 	}
 	return nil
+}
+
+func (m *IncomingApprovalCriteria) GetRejectionMessage() string {
+	if m != nil {
+		return m.RejectionMessage
+	}
+	return ""
 }
 
 func init() {

@@ -115,7 +115,13 @@ func buildPotentialErrorsString(
 				}
 			}
 		}
-		return " - errors w/ prioritized approvals: " + strings.Join(prioritizedErrorsWithIdx, ", ")
+		result := " - errors w/ prioritized approvals: " + strings.Join(prioritizedErrorsWithIdx, ", ")
+		// Append any rejection messages from checked approvals
+		rejectionMessages := collectRejectionMessages(approvalIdxsChecked, approvals)
+		if rejectionMessages != "" {
+			result += " | " + rejectionMessages
+		}
+		return result
 	}
 
 	approvalsWithPluralConditional := "approval"
@@ -173,7 +179,29 @@ func buildPotentialErrorsString(
 		}
 	}
 
+	// Append any rejection messages from checked approvals
+	rejectionMessages := collectRejectionMessages(approvalIdxsChecked, approvals)
+	if rejectionMessages != "" {
+		potentialErrorsStr += " | " + rejectionMessages
+	}
+
 	return potentialErrorsStr
+}
+
+// collectRejectionMessages gathers custom rejection messages from approvals that were checked but failed.
+// Returns a concatenated string of all non-empty rejection messages, or empty string if none.
+func collectRejectionMessages(approvalIdxsChecked []int, approvals []*types.CollectionApproval) string {
+	messages := []string{}
+	for _, idx := range approvalIdxsChecked {
+		if idx < 0 || idx >= len(approvals) || approvals[idx] == nil {
+			continue
+		}
+		approval := approvals[idx]
+		if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.RejectionMessage != "" {
+			messages = append(messages, fmt.Sprintf("approval %s: %s", formatApprovalId(approval.ApprovalId), approval.ApprovalCriteria.RejectionMessage))
+		}
+	}
+	return strings.Join(messages, "; ")
 }
 
 // buildTransferString builds a descriptive string for the transfer attempt

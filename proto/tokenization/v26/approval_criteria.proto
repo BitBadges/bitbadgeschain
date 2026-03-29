@@ -96,6 +96,9 @@ message ApprovalCriteria {
   // EVM query challenges that must pass for approval. Read-only contract queries
   // that verify external EVM state (e.g., token ownership in another contract).
   repeated EVMQueryChallenge evmQueryChallenges = 25;
+  // Human-readable message shown when this approval's criteria are not met.
+  // Included in the error output when a transfer is rejected by this approval.
+  string rejectionMessage = 26;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -157,6 +160,9 @@ message OutgoingApprovalCriteria {
   // EVM query challenges that must pass for approval. Read-only contract queries
   // that verify external EVM state (e.g., token ownership in another contract).
   repeated EVMQueryChallenge evmQueryChallenges = 17;
+  // Human-readable message shown when this approval's criteria are not met.
+  // Included in the error output when a transfer is rejected by this approval.
+  string rejectionMessage = 18;
 }
 
 // IncomingApprovalCriteria defines the criteria for approving incoming transfers.
@@ -218,5 +224,8 @@ message IncomingApprovalCriteria {
   // EVM query challenges that must pass for approval. Read-only contract queries
   // that verify external EVM state (e.g., token ownership in another contract).
   repeated EVMQueryChallenge evmQueryChallenges = 17;
+  // Human-readable message shown when this approval's criteria are not met.
+  // Included in the error output when a transfer is rejected by this approval.
+  string rejectionMessage = 18;
 }
 
