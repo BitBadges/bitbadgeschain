@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"strconv"
+	sdkmath "cosmossdk.io/math"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -11,17 +11,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdCreateDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-dynamic-store [default-value]",
 		Short: "Broadcast message createDynamicStore",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			defaultValue, err := strconv.ParseBool(args[0])
-			if err != nil {
-				return err
+			defaultValue, ok := sdkmath.NewIntFromString(args[0])
+			if !ok {
+				return types.ErrInvalidRequest.Wrap("invalid default value: must be a non-negative integer")
+			}
+			if defaultValue.IsNegative() {
+				return types.ErrInvalidRequest.Wrap("invalid default value: must be a non-negative integer")
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -31,7 +32,7 @@ func CmdCreateDynamicStore() *cobra.Command {
 
 			msg := types.NewMsgCreateDynamicStore(
 				clientCtx.GetFromAddress().String(),
-				defaultValue,
+				sdkmath.NewUintFromBigInt(defaultValue.BigInt()),
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

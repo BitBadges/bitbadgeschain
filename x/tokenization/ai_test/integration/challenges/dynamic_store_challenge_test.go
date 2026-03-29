@@ -26,7 +26,7 @@ func (suite *DynamicStoreChallengeTestSuite) SetupTest() {
 }
 
 // createDynamicStore creates a new dynamic store and returns its ID
-func (suite *DynamicStoreChallengeTestSuite) createDynamicStore(creator string, defaultValue bool) sdkmath.Uint {
+func (suite *DynamicStoreChallengeTestSuite) createDynamicStore(creator string, defaultValue sdkmath.Uint) sdkmath.Uint {
 	msg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
 		DefaultValue: defaultValue,
@@ -42,7 +42,7 @@ func (suite *DynamicStoreChallengeTestSuite) createDynamicStore(creator string, 
 }
 
 // setDynamicStoreValue sets a value for an address in the dynamic store
-func (suite *DynamicStoreChallengeTestSuite) setDynamicStoreValue(storeId sdkmath.Uint, creator, address string, value bool) {
+func (suite *DynamicStoreChallengeTestSuite) setDynamicStoreValue(storeId sdkmath.Uint, creator, address string, value sdkmath.Uint) {
 	msg := &types.MsgSetDynamicStoreValue{
 		Creator: creator,
 		StoreId: storeId,
@@ -55,7 +55,7 @@ func (suite *DynamicStoreChallengeTestSuite) setDynamicStoreValue(storeId sdkmat
 }
 
 // updateDynamicStore updates the dynamic store configuration
-func (suite *DynamicStoreChallengeTestSuite) updateDynamicStore(storeId sdkmath.Uint, creator string, defaultValue, globalEnabled bool) {
+func (suite *DynamicStoreChallengeTestSuite) updateDynamicStore(storeId sdkmath.Uint, creator string, defaultValue sdkmath.Uint, globalEnabled bool) {
 	msg := &types.MsgUpdateDynamicStore{
 		Creator:       creator,
 		StoreId:       storeId,
@@ -70,10 +70,10 @@ func (suite *DynamicStoreChallengeTestSuite) updateDynamicStore(storeId sdkmath.
 // TestDynamicStoreChallenge_StoreValueTruePasses tests that store value=true passes (expected true)
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_StoreValueTruePasses() {
 	// Create dynamic store with default value false
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice's value to true
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 
 	// Create challenge that checks the store
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
@@ -111,10 +111,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_StoreValu
 // TestDynamicStoreChallenge_StoreValueFalseFails tests that store value=false fails (expected true)
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_StoreValueFalseFails() {
 	// Create dynamic store with default value false
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice's value to false explicitly
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, false)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(0))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -151,7 +151,7 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_StoreValu
 // TestDynamicStoreChallenge_DefaultValueUsed tests that defaultValue is used when address not set
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_DefaultValueUsed() {
 	// Create dynamic store with default value true
-	storeId := suite.createDynamicStore(suite.Manager, true)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(1))
 
 	// Do NOT set any value for Alice - it should use default
 
@@ -190,7 +190,7 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_DefaultVa
 // TestDynamicStoreChallenge_DefaultValueFalseFails tests default value false causes failure
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_DefaultValueFalseFails() {
 	// Create dynamic store with default value false
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Do NOT set any value for Alice - it should use default (false)
 
@@ -229,13 +229,13 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_DefaultVa
 // TestDynamicStoreChallenge_GlobalEnabledFalseFailsAll tests that globalEnabled=false fails all checks
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_GlobalEnabledFalseFailsAll() {
 	// Create dynamic store with default value true
-	storeId := suite.createDynamicStore(suite.Manager, true)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(1))
 
 	// Set Alice's value to true
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 
 	// Disable the store globally
-	suite.updateDynamicStore(storeId, suite.Manager, true, false)
+	suite.updateDynamicStore(storeId, suite.Manager, sdkmath.NewUint(1), false)
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -271,12 +271,12 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_GlobalEna
 
 // TestDynamicStoreChallenge_OwnershipCheckPartyInitiator tests ownershipCheckParty="initiator"
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartyInitiator() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice (initiator) value to true
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 	// Set Bob (recipient) value to false
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Bob, false)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Bob, sdkmath.NewUint(0))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -312,10 +312,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 
 // TestDynamicStoreChallenge_OwnershipCheckPartySender tests ownershipCheckParty="sender"
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartySender() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice (sender in this case) value to true
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -351,10 +351,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 
 // TestDynamicStoreChallenge_OwnershipCheckPartySenderFails tests sender check fails when sender=false
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartySenderFails() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice (sender) value to false
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, false)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(0))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -390,10 +390,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 
 // TestDynamicStoreChallenge_OwnershipCheckPartyRecipient tests ownershipCheckParty="recipient"
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartyRecipient() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Bob (recipient) value to true
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Bob, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Bob, sdkmath.NewUint(1))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -429,10 +429,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 
 // TestDynamicStoreChallenge_OwnershipCheckPartyRecipientFails tests recipient check fails when recipient=false
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartyRecipientFails() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Bob (recipient) value to false
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Bob, false)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Bob, sdkmath.NewUint(0))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -468,10 +468,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 
 // TestDynamicStoreChallenge_OwnershipCheckPartySpecificAddress tests ownershipCheckParty with specific address
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartySpecificAddress() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Charlie's value to true (Charlie is not involved in the transfer)
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Charlie, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Charlie, sdkmath.NewUint(1))
 
 	// Check a specific address (Charlie) instead of initiator/sender/recipient
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
@@ -508,10 +508,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 
 // TestDynamicStoreChallenge_OwnershipCheckPartySpecificAddressFails tests specific address check fails
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OwnershipCheckPartySpecificAddressFails() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Charlie's value to false
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Charlie, false)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Charlie, sdkmath.NewUint(0))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -548,12 +548,12 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_Ownership
 // TestDynamicStoreChallenge_MultipleChallengesAllMustPass tests multiple challenges must all pass
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_MultipleChallengesAllMustPass() {
 	// Create two stores
-	storeId1 := suite.createDynamicStore(suite.Manager, false)
-	storeId2 := suite.createDynamicStore(suite.Manager, false)
+	storeId1 := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
+	storeId2 := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice's values to true in both stores
-	suite.setDynamicStoreValue(storeId1, suite.Manager, suite.Alice, true)
-	suite.setDynamicStoreValue(storeId2, suite.Manager, suite.Alice, true)
+	suite.setDynamicStoreValue(storeId1, suite.Manager, suite.Alice, sdkmath.NewUint(1))
+	suite.setDynamicStoreValue(storeId2, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 
 	dynamicStoreChallenge1 := &types.DynamicStoreChallenge{
 		StoreId:             storeId1,
@@ -594,12 +594,12 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_MultipleC
 // TestDynamicStoreChallenge_MultipleChallengesOneFails tests that one failing challenge blocks transfer
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_MultipleChallengesOneFails() {
 	// Create two stores
-	storeId1 := suite.createDynamicStore(suite.Manager, false)
-	storeId2 := suite.createDynamicStore(suite.Manager, false)
+	storeId1 := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
+	storeId2 := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Set Alice's value to true in store1, but false in store2
-	suite.setDynamicStoreValue(storeId1, suite.Manager, suite.Alice, true)
-	suite.setDynamicStoreValue(storeId2, suite.Manager, suite.Alice, false)
+	suite.setDynamicStoreValue(storeId1, suite.Manager, suite.Alice, sdkmath.NewUint(1))
+	suite.setDynamicStoreValue(storeId2, suite.Manager, suite.Alice, sdkmath.NewUint(0))
 
 	dynamicStoreChallenge1 := &types.DynamicStoreChallenge{
 		StoreId:             storeId1,
@@ -639,10 +639,10 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_MultipleC
 
 // TestDynamicStoreChallenge_ValueChangeAffectsTransfer tests that changing value affects future transfers
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_ValueChangeAffectsTransfer() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Initially set Alice's value to true
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, true)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -676,7 +676,7 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_ValueChan
 	suite.Require().NoError(err, "first transfer should succeed")
 
 	// Change Alice's value to false
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, false)
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(0))
 
 	// Second transfer should fail (Alice=false now)
 	transferMsg2 := &types.MsgTransferTokens{
@@ -697,8 +697,8 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_ValueChan
 
 // TestDynamicStoreChallenge_GlobalEnabledToggle tests toggling globalEnabled
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_GlobalEnabledToggle() {
-	storeId := suite.createDynamicStore(suite.Manager, false)
-	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, true)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
+	suite.setDynamicStoreValue(storeId, suite.Manager, suite.Alice, sdkmath.NewUint(1))
 
 	dynamicStoreChallenge := &types.DynamicStoreChallenge{
 		StoreId:             storeId,
@@ -732,7 +732,7 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_GlobalEna
 	suite.Require().NoError(err, "transfer should succeed when globalEnabled=true")
 
 	// Disable globally
-	suite.updateDynamicStore(storeId, suite.Manager, false, false)
+	suite.updateDynamicStore(storeId, suite.Manager, sdkmath.NewUint(0), false)
 
 	// Second transfer should fail
 	transferMsg2 := &types.MsgTransferTokens{
@@ -751,7 +751,7 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_GlobalEna
 	suite.Require().Error(err, "transfer should fail when globalEnabled=false")
 
 	// Re-enable globally
-	suite.updateDynamicStore(storeId, suite.Manager, false, true)
+	suite.updateDynamicStore(storeId, suite.Manager, sdkmath.NewUint(0), true)
 
 	// Third transfer should succeed again
 	transferMsg3 := &types.MsgTransferTokens{
@@ -810,14 +810,14 @@ func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_NonExiste
 // TestDynamicStoreChallenge_OnlyCreatorCanSetValue tests that only creator can set values
 func (suite *DynamicStoreChallengeTestSuite) TestDynamicStoreChallenge_OnlyCreatorCanSetValue() {
 	// Manager creates the store
-	storeId := suite.createDynamicStore(suite.Manager, false)
+	storeId := suite.createDynamicStore(suite.Manager, sdkmath.NewUint(0))
 
 	// Alice (not creator) tries to set value
 	msg := &types.MsgSetDynamicStoreValue{
 		Creator: suite.Alice,
 		StoreId: storeId,
 		Address: suite.Bob,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	_, err := suite.MsgServer.SetDynamicStoreValue(sdk.WrapSDKContext(suite.Ctx), msg)

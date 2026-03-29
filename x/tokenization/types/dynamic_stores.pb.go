@@ -32,8 +32,8 @@ type DynamicStore struct {
 	StoreId Uint `protobuf:"bytes,1,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
 	// The address of the creator of this dynamic store.
 	CreatedBy string `protobuf:"bytes,2,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	// The default value for uninitialized addresses (true/false).
-	DefaultValue bool `protobuf:"varint,3,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+	// The default numeric value for uninitialized addresses (Uint as string).
+	DefaultValue Uint `protobuf:"bytes,3,opt,name=defaultValue,proto3,customtype=Uint" json:"defaultValue"`
 	// Global kill switch state (defaults to true on creation, can be toggled via UpdateDynamicStore).
 	// When false, all approvals using this store via DynamicStoreChallenge will fail immediately.
 	GlobalEnabled bool `protobuf:"varint,4,opt,name=globalEnabled,proto3" json:"globalEnabled,omitempty"`
@@ -83,13 +83,6 @@ func (m *DynamicStore) GetCreatedBy() string {
 	return ""
 }
 
-func (m *DynamicStore) GetDefaultValue() bool {
-	if m != nil {
-		return m.DefaultValue
-	}
-	return false
-}
-
 func (m *DynamicStore) GetGlobalEnabled() bool {
 	if m != nil {
 		return m.GlobalEnabled
@@ -111,15 +104,15 @@ func (m *DynamicStore) GetCustomData() string {
 	return ""
 }
 
-// A DynamicStoreValue stores a boolean value for a specific address in a dynamic store.
-// This allows the creator to set true/false values per address that can be checked during approval.
+// A DynamicStoreValue stores a numeric value (Uint) for a specific address in a dynamic store.
+// This allows the creator to set numeric values per address that can be checked during approval.
 type DynamicStoreValue struct {
 	// The unique identifier for this dynamic store.
 	StoreId Uint `protobuf:"bytes,1,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
 	// The address for which this value is stored.
 	Address string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	// The boolean value (true/false).
-	Value bool `protobuf:"varint,3,opt,name=value,proto3" json:"value,omitempty"`
+	// The numeric value (Uint as string).
+	Value Uint `protobuf:"bytes,3,opt,name=value,proto3,customtype=Uint" json:"value"`
 }
 
 func (m *DynamicStoreValue) Reset()         { *m = DynamicStoreValue{} }
@@ -160,13 +153,6 @@ func (m *DynamicStoreValue) GetAddress() string {
 		return m.Address
 	}
 	return ""
-}
-
-func (m *DynamicStoreValue) GetValue() bool {
-	if m != nil {
-		return m.Value
-	}
-	return false
 }
 
 func init() {
@@ -244,16 +230,16 @@ func (m *DynamicStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x20
 	}
-	if m.DefaultValue {
-		i--
-		if m.DefaultValue {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	{
+		size := m.DefaultValue.Size()
+		i -= size
+		if _, err := m.DefaultValue.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
 		}
-		i--
-		dAtA[i] = 0x18
+		i = encodeVarintDynamicStores(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
 	if len(m.CreatedBy) > 0 {
 		i -= len(m.CreatedBy)
 		copy(dAtA[i:], m.CreatedBy)
@@ -294,16 +280,16 @@ func (m *DynamicStoreValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Value {
-		i--
-		if m.Value {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	{
+		size := m.Value.Size()
+		i -= size
+		if _, err := m.Value.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
 		}
-		i--
-		dAtA[i] = 0x18
+		i = encodeVarintDynamicStores(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
 	if len(m.Address) > 0 {
 		i -= len(m.Address)
 		copy(dAtA[i:], m.Address)
@@ -347,9 +333,8 @@ func (m *DynamicStore) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDynamicStores(uint64(l))
 	}
-	if m.DefaultValue {
-		n += 2
-	}
+	l = m.DefaultValue.Size()
+	n += 1 + l + sovDynamicStores(uint64(l))
 	if m.GlobalEnabled {
 		n += 2
 	}
@@ -376,9 +361,8 @@ func (m *DynamicStoreValue) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDynamicStores(uint64(l))
 	}
-	if m.Value {
-		n += 2
-	}
+	l = m.Value.Size()
+	n += 1 + l + sovDynamicStores(uint64(l))
 	return n
 }
 
@@ -484,10 +468,10 @@ func (m *DynamicStore) Unmarshal(dAtA []byte) error {
 			m.CreatedBy = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultValue", wireType)
 			}
-			var v int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDynamicStores
@@ -497,12 +481,26 @@ func (m *DynamicStore) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.DefaultValue = bool(v != 0)
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDynamicStores
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDynamicStores
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DefaultValue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field GlobalEnabled", wireType)
@@ -704,10 +702,10 @@ func (m *DynamicStoreValue) Unmarshal(dAtA []byte) error {
 			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
 			}
-			var v int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDynamicStores
@@ -717,12 +715,26 @@ func (m *DynamicStoreValue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.Value = bool(v != 0)
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDynamicStores
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDynamicStores
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Value.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDynamicStores(dAtA[iNdEx:])

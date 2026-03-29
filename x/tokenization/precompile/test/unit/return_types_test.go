@@ -308,7 +308,7 @@ func (suite *ReturnTypesTestSuite) TestConvertDynamicStoreToSolidityStruct_Valid
 	store := &tokenizationtypes.DynamicStore{
 		StoreId:         sdkmath.NewUint(1),
 		CreatedBy:       "bb1xxx",
-		DefaultValue:    true,
+		DefaultValue:    sdkmath.NewUint(1),
 		GlobalEnabled:   true,
 		Uri:             "https://example.com",
 		CustomData:      "data",
@@ -334,7 +334,7 @@ func (suite *ReturnTypesTestSuite) TestConvertDynamicStoreValueToSolidityStruct_
 	val := &tokenizationtypes.DynamicStoreValue{
 		StoreId:  sdkmath.NewUint(1),
 		Address:  "bb1xxx",
-		Value:    true,
+		Value:    sdkmath.NewUint(1),
 	}
 	structData, err := tokenization.ConvertDynamicStoreValueToSolidityStruct(val)
 	suite.NoError(err)

@@ -19,7 +19,7 @@ func TestMsgUpdateDynamicStore_ValidateBasic_EmptyCreator(t *testing.T) {
 	msg := &types.MsgUpdateDynamicStore{
 		Creator:      "",
 		StoreId:      sdkmath.NewUint(1),
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -30,7 +30,7 @@ func TestMsgUpdateDynamicStore_ValidateBasic_InvalidCreator(t *testing.T) {
 	msg := &types.MsgUpdateDynamicStore{
 		Creator:      "invalid_address",
 		StoreId:      sdkmath.NewUint(1),
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -41,7 +41,7 @@ func TestMsgUpdateDynamicStore_ValidateBasic_ZeroStoreId(t *testing.T) {
 	msg := &types.MsgUpdateDynamicStore{
 		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		StoreId:      sdkmath.NewUint(0),
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -53,7 +53,7 @@ func TestMsgUpdateDynamicStore_ValidateBasic_Valid(t *testing.T) {
 	msg := &types.MsgUpdateDynamicStore{
 		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		StoreId:      sdkmath.NewUint(1),
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()

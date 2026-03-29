@@ -176,7 +176,7 @@ func (suite *QueryTestSuite) createTestDynamicStore() sdkmath.Uint {
 
 	createMsg := &tokenizationtypes.MsgCreateDynamicStore{
 		Creator:      suite.Alice.String(),
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 		Uri:          "https://example.com/store",
 		CustomData:   "test store",
 	}
@@ -184,12 +184,12 @@ func (suite *QueryTestSuite) createTestDynamicStore() sdkmath.Uint {
 	resp, err := msgServer.CreateDynamicStore(suite.Ctx, createMsg)
 	suite.Require().NoError(err)
 
-	// Set a value in the store (Value is a bool for dynamic stores)
+	// Set a value in the store (Value is a Uint for dynamic stores)
 	setValueMsg := &tokenizationtypes.MsgSetDynamicStoreValue{
 		Creator: suite.Alice.String(),
 		StoreId: resp.StoreId,
 		Address: suite.Alice.String(),
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = msgServer.SetDynamicStoreValue(suite.Ctx, setValueMsg)
 	suite.Require().NoError(err)

@@ -38,10 +38,7 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 	}
 
 	// Emit event
-	valueStr := "false"
-	if msg.Value {
-		valueStr = "true"
-	}
+	valueStr := msg.Value.String()
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),

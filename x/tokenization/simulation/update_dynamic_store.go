@@ -35,7 +35,7 @@ func SimulateMsgUpdateDynamicStore(
 				// No dynamic stores exist yet - try to create one first
 				createMsg := &types.MsgCreateDynamicStore{
 					Creator:      simAccount.Address.String(),
-					DefaultValue: r.Intn(2) == 0,
+					DefaultValue: sdkmath.NewUint(uint64(r.Intn(100))),
 				}
 				msgServer := keeper.NewMsgServerImpl(k)
 				_, err := msgServer.CreateDynamicStore(ctx, createMsg)
@@ -68,8 +68,8 @@ func SimulateMsgUpdateDynamicStore(
 			creatorAccount = simAccount
 		}
 
-		// Random boolean for defaultValue
-		defaultValue := r.Intn(2) == 0
+		// Random numeric value for defaultValue
+		defaultValue := sdkmath.NewUint(uint64(r.Intn(100)))
 
 		// Random boolean for globalEnabled (global kill switch)
 		globalEnabled := r.Intn(2) == 0

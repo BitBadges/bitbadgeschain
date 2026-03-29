@@ -590,7 +590,7 @@ func SetupSimulationState(ctx sdk.Context, k *keeper.Keeper, accs []simtypes.Acc
 	// Pre-create dynamic stores
 	for i := 0; i < DefaultSimDynamicStoreCount; i++ {
 		creator := EnsureAccountExists(r, accs)
-		defaultValue := r.Intn(2) == 0
+		defaultValue := sdkmath.NewUint(uint64(r.Intn(100)))
 
 		msg := &types.MsgCreateDynamicStore{
 			Creator:      creator.Address.String(),

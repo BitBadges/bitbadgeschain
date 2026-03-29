@@ -204,6 +204,8 @@ func (m *MustOwnTokens) GetOwnershipCheckParty() string {
 }
 
 // DynamicStoreChallenge defines a challenge that requires the initiator to pass a dynamic store check.
+// Supports numeric comparison operators for flexible value checks.
+// When comparisonOperator is empty, defaults to legacy behavior: value != 0 (backward compatible with old boolean true/false).
 type DynamicStoreChallenge struct {
 	// The ID of the dynamic store to check.
 	StoreId Uint `protobuf:"bytes,1,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
@@ -212,6 +214,11 @@ type DynamicStoreChallenge struct {
 	// This enables use cases like halt tokens where ownership is checked for an arbitrary address (e.g., halt token owner).
 	// Defaults to "initiator" if empty or if the value is not a recognized option or valid bb1 address.
 	OwnershipCheckParty string `protobuf:"bytes,2,opt,name=ownershipCheckParty,proto3" json:"ownershipCheckParty,omitempty"`
+	// The comparison operator to use when checking the value. Options: "eq", "ne", "gt", "gte", "lt", "lte".
+	// When empty, defaults to legacy behavior: value != 0 (backward compatible with old boolean check).
+	ComparisonOperator string `protobuf:"bytes,3,opt,name=comparisonOperator,proto3" json:"comparisonOperator,omitempty"`
+	// The value to compare against (Uint as string). Only used when comparisonOperator is set.
+	ComparisonValue Uint `protobuf:"bytes,4,opt,name=comparisonValue,proto3,customtype=Uint" json:"comparisonValue"`
 }
 
 func (m *DynamicStoreChallenge) Reset()         { *m = DynamicStoreChallenge{} }
@@ -250,6 +257,13 @@ var xxx_messageInfo_DynamicStoreChallenge proto.InternalMessageInfo
 func (m *DynamicStoreChallenge) GetOwnershipCheckParty() string {
 	if m != nil {
 		return m.OwnershipCheckParty
+	}
+	return ""
+}
+
+func (m *DynamicStoreChallenge) GetComparisonOperator() string {
+	if m != nil {
+		return m.ComparisonOperator
 	}
 	return ""
 }
@@ -678,6 +692,23 @@ func (m *DynamicStoreChallenge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	{
+		size := m.ComparisonValue.Size()
+		i -= size
+		if _, err := m.ComparisonValue.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintApprovalConditions(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	if len(m.ComparisonOperator) > 0 {
+		i -= len(m.ComparisonOperator)
+		copy(dAtA[i:], m.ComparisonOperator)
+		i = encodeVarintApprovalConditions(dAtA, i, uint64(len(m.ComparisonOperator)))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if len(m.OwnershipCheckParty) > 0 {
 		i -= len(m.OwnershipCheckParty)
 		copy(dAtA[i:], m.OwnershipCheckParty)
@@ -937,6 +968,12 @@ func (m *DynamicStoreChallenge) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovApprovalConditions(uint64(l))
 	}
+	l = len(m.ComparisonOperator)
+	if l > 0 {
+		n += 1 + l + sovApprovalConditions(uint64(l))
+	}
+	l = m.ComparisonValue.Size()
+	n += 1 + l + sovApprovalConditions(uint64(l))
 	return n
 }
 
@@ -1513,6 +1550,72 @@ func (m *DynamicStoreChallenge) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.OwnershipCheckParty = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComparisonOperator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApprovalConditions
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApprovalConditions
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApprovalConditions
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ComparisonOperator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ComparisonValue", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApprovalConditions
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApprovalConditions
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApprovalConditions
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ComparisonValue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

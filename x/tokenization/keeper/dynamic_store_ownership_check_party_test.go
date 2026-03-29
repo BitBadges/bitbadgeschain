@@ -26,7 +26,7 @@ func TestDynamicStoreOwnershipCheckParty_Initiator(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -38,7 +38,7 @@ func TestDynamicStoreOwnershipCheckParty_Initiator(t *testing.T) {
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: initiator,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
@@ -112,7 +112,7 @@ func TestDynamicStoreOwnershipCheckParty_Sender(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -124,7 +124,7 @@ func TestDynamicStoreOwnershipCheckParty_Sender(t *testing.T) {
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: sender,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
@@ -173,7 +173,7 @@ func TestDynamicStoreOwnershipCheckParty_Sender(t *testing.T) {
 	require.NoError(t, err, "should pass when checking sender and sender has permission")
 
 	// Should fail if sender doesn't have permission
-	setValueMsg.Value = false
+	setValueMsg.Value = sdkmath.NewUint(0)
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
 
@@ -197,7 +197,7 @@ func TestDynamicStoreOwnershipCheckParty_Recipient(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -209,7 +209,7 @@ func TestDynamicStoreOwnershipCheckParty_Recipient(t *testing.T) {
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: recipient,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
@@ -258,7 +258,7 @@ func TestDynamicStoreOwnershipCheckParty_Recipient(t *testing.T) {
 	require.NoError(t, err, "should pass when checking recipient and recipient has permission")
 
 	// Should fail if recipient doesn't have permission
-	setValueMsg.Value = false
+	setValueMsg.Value = sdkmath.NewUint(0)
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
 
@@ -283,7 +283,7 @@ func TestDynamicStoreOwnershipCheckParty_HardcodedAddress(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -295,7 +295,7 @@ func TestDynamicStoreOwnershipCheckParty_HardcodedAddress(t *testing.T) {
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: hardcodedAddress,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
@@ -344,7 +344,7 @@ func TestDynamicStoreOwnershipCheckParty_HardcodedAddress(t *testing.T) {
 	require.NoError(t, err, "should pass when checking hardcoded address and address has permission")
 
 	// Should fail if hardcoded address doesn't have permission
-	setValueMsg.Value = false
+	setValueMsg.Value = sdkmath.NewUint(0)
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
 
@@ -368,7 +368,7 @@ func TestDynamicStoreOwnershipCheckParty_InvalidAddressFallsBackToInitiator(t *t
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -380,7 +380,7 @@ func TestDynamicStoreOwnershipCheckParty_InvalidAddressFallsBackToInitiator(t *t
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: initiator,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)

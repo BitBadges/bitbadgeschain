@@ -2,6 +2,7 @@ package types
 
 import (
 	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -9,7 +10,7 @@ const TypeMsgCreateDynamicStore = "msg_create_dynamic_store"
 
 var _ sdk.Msg = &MsgCreateDynamicStore{}
 
-func NewMsgCreateDynamicStore(creator string, defaultValue bool) *MsgCreateDynamicStore {
+func NewMsgCreateDynamicStore(creator string, defaultValue sdkmath.Uint) *MsgCreateDynamicStore {
 	return &MsgCreateDynamicStore{
 		Creator:      creator,
 		DefaultValue: defaultValue,

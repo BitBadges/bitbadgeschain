@@ -83,7 +83,7 @@ func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		// Pre-create some dynamic stores in genesis state
 		for i := 0; i < tokenizationsimulation.DefaultSimDynamicStoreCount && i < len(simAccounts); i++ {
 			creator := simAccounts[i].Address.String()
-			defaultValue := r.Intn(2) == 0
+			defaultValue := sdkmath.NewUint(uint64(r.Intn(100)))
 
 			// Create dynamic store that will be initialized in InitGenesis
 			dynamicStore := &types.DynamicStore{

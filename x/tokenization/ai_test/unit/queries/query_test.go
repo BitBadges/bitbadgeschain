@@ -554,7 +554,7 @@ func (suite *QueryTestSuite) TestGetDynamicStore_Success() {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      suite.Manager,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 		Uri:          "https://example.com/store",
 		CustomData:   "test store data",
 	}
@@ -577,7 +577,7 @@ func (suite *QueryTestSuite) TestGetDynamicStore_Success() {
 	suite.Require().Equal(suite.Manager, store.CreatedBy, "createdBy should match")
 
 	// Field 3: DefaultValue
-	suite.Require().True(store.DefaultValue, "defaultValue should be true")
+	suite.Require().True(!store.DefaultValue.IsZero(), "defaultValue should be true")
 
 	// Field 4: GlobalEnabled
 	suite.Require().True(store.GlobalEnabled, "globalEnabled should be true by default")
@@ -605,7 +605,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_ReturnsDefaultValue() {
 	// Create a dynamic store with defaultValue=true
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      suite.Manager,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 	resp, err := suite.MsgServer.CreateDynamicStore(sdk.WrapSDKContext(suite.Ctx), createMsg)
 	suite.Require().NoError(err, "creating dynamic store should succeed")
@@ -620,7 +620,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_ReturnsDefaultValue() {
 		// Get the store to verify default value
 		store, storeFound := suite.Keeper.GetDynamicStoreFromStore(suite.Ctx, storeId)
 		suite.Require().True(storeFound, "store should exist")
-		suite.Require().True(store.DefaultValue, "store default value should be true")
+		suite.Require().True(!store.DefaultValue.IsZero(), "store default value should be true")
 	} else {
 		// If found, value was explicitly set
 		suite.Require().NotNil(storeValue, "store value should not be nil")
@@ -632,7 +632,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_ReturnsSetValue() {
 	// Create a dynamic store with defaultValue=false
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      suite.Manager,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 	resp, err := suite.MsgServer.CreateDynamicStore(sdk.WrapSDKContext(suite.Ctx), createMsg)
 	suite.Require().NoError(err, "creating dynamic store should succeed")
@@ -644,7 +644,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_ReturnsSetValue() {
 		Creator: suite.Manager,
 		StoreId: storeId,
 		Address: suite.Alice,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.MsgServer.SetDynamicStoreValue(sdk.WrapSDKContext(suite.Ctx), setValueMsg)
 	suite.Require().NoError(err, "setting dynamic store value should succeed")
@@ -653,7 +653,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_ReturnsSetValue() {
 	storeValue, found := suite.Keeper.GetDynamicStoreValueFromStore(suite.Ctx, storeId, suite.Alice)
 
 	suite.Require().True(found, "store value should be found after being set")
-	suite.Require().True(storeValue.Value, "value should be true (as set)")
+	suite.Require().True(!storeValue.Value.IsZero(), "value should be true (as set)")
 	suite.Require().True(storeValue.StoreId.Equal(storeId), "storeId should match")
 	suite.Require().Equal(suite.Alice, storeValue.Address, "address should match")
 }
@@ -670,7 +670,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_MultipleAddresses() {
 	// Create a dynamic store with defaultValue=false
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      suite.Manager,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 	resp, err := suite.MsgServer.CreateDynamicStore(sdk.WrapSDKContext(suite.Ctx), createMsg)
 	suite.Require().NoError(err, "creating dynamic store should succeed")
@@ -682,7 +682,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_MultipleAddresses() {
 		Creator: suite.Manager,
 		StoreId: storeId,
 		Address: suite.Alice,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.MsgServer.SetDynamicStoreValue(sdk.WrapSDKContext(suite.Ctx), setAliceMsg)
 	suite.Require().NoError(err, "setting Alice's value should succeed")
@@ -692,7 +692,7 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_MultipleAddresses() {
 		Creator: suite.Manager,
 		StoreId: storeId,
 		Address: suite.Bob,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.MsgServer.SetDynamicStoreValue(sdk.WrapSDKContext(suite.Ctx), setBobMsg)
 	suite.Require().NoError(err, "setting Bob's value should succeed")
@@ -703,10 +703,10 @@ func (suite *QueryTestSuite) TestGetDynamicStoreValue_MultipleAddresses() {
 	_, charlieFound := suite.Keeper.GetDynamicStoreValueFromStore(suite.Ctx, storeId, suite.Charlie)
 
 	suite.Require().True(aliceFound, "Alice's value should be found")
-	suite.Require().True(aliceValue.Value, "Alice's value should be true")
+	suite.Require().True(!aliceValue.Value.IsZero(), "Alice's value should be true")
 
 	suite.Require().True(bobFound, "Bob's value should be found")
-	suite.Require().True(bobValue.Value, "Bob's value should be true")
+	suite.Require().True(!bobValue.Value.IsZero(), "Bob's value should be true")
 
 	// Charlie was never set, should use default (false)
 	suite.Require().False(charlieFound, "Charlie's value should not be found (uses default)")

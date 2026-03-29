@@ -10,7 +10,7 @@ const TypeMsgUpdateDynamicStore = "msg_update_dynamic_store"
 
 var _ sdk.Msg = &MsgUpdateDynamicStore{}
 
-func NewMsgUpdateDynamicStore(creator string, storeId sdkmath.Uint, defaultValue bool) *MsgUpdateDynamicStore {
+func NewMsgUpdateDynamicStore(creator string, storeId sdkmath.Uint, defaultValue sdkmath.Uint) *MsgUpdateDynamicStore {
 	return &MsgUpdateDynamicStore{
 		Creator:       creator,
 		StoreId:       storeId,
@@ -20,7 +20,7 @@ func NewMsgUpdateDynamicStore(creator string, storeId sdkmath.Uint, defaultValue
 }
 
 // NewMsgUpdateDynamicStoreWithGlobalEnabled creates a new MsgUpdateDynamicStore with explicit globalEnabled
-func NewMsgUpdateDynamicStoreWithGlobalEnabled(creator string, storeId sdkmath.Uint, defaultValue bool, globalEnabled bool) *MsgUpdateDynamicStore {
+func NewMsgUpdateDynamicStoreWithGlobalEnabled(creator string, storeId sdkmath.Uint, defaultValue sdkmath.Uint, globalEnabled bool) *MsgUpdateDynamicStore {
 	return &MsgUpdateDynamicStore{
 		Creator:       creator,
 		StoreId:       storeId,

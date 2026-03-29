@@ -3,6 +3,7 @@ package simulation
 import (
 	"math/rand"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -25,8 +26,8 @@ func SimulateMsgCreateDynamicStore(
 
 		simAccount := EnsureAccountExists(r, accs)
 
-		// Random boolean for defaultValue
-		defaultValue := r.Intn(2) == 0
+		// Random numeric value for defaultValue
+		defaultValue := sdkmath.NewUint(uint64(r.Intn(100)))
 
 		// Random string for uri (sometimes empty, sometimes with value)
 		uri := ""

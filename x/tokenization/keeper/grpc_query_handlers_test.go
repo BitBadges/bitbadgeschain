@@ -230,7 +230,7 @@ func (suite *GRPCQueryHandlersTestSuite) TestGetDynamicStore_Success() {
 	// Create a dynamic store
 	_, err := suite.msgServer.CreateDynamicStore(wctx, &types.MsgCreateDynamicStore{
 		Creator:      bob,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	})
 	suite.Require().NoError(err)
 
@@ -274,7 +274,7 @@ func (suite *GRPCQueryHandlersTestSuite) TestGetDynamicStoreValue_ReturnsDefault
 	// Create a dynamic store with default value true
 	_, err := suite.msgServer.CreateDynamicStore(wctx, &types.MsgCreateDynamicStore{
 		Creator:      bob,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	})
 	suite.Require().NoError(err)
 
@@ -295,7 +295,7 @@ func (suite *GRPCQueryHandlersTestSuite) TestGetDynamicStoreValue_ReturnsSetValu
 	// Create a dynamic store with default false
 	_, err := suite.msgServer.CreateDynamicStore(wctx, &types.MsgCreateDynamicStore{
 		Creator:      bob,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	})
 	suite.Require().NoError(err)
 
@@ -304,7 +304,7 @@ func (suite *GRPCQueryHandlersTestSuite) TestGetDynamicStoreValue_ReturnsSetValu
 		Creator: bob,
 		StoreId: sdkmath.NewUint(1),
 		Address: alice,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	})
 	suite.Require().NoError(err)
 
@@ -612,7 +612,7 @@ func TestDynamicStoreQueries(t *testing.T) {
 	// Create a dynamic store with default true
 	_, err := msgServer.CreateDynamicStore(wctx, &types.MsgCreateDynamicStore{
 		Creator:      bob,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	})
 	require.NoError(t, err)
 
@@ -636,7 +636,7 @@ func TestDynamicStoreQueries(t *testing.T) {
 		Creator: bob,
 		StoreId: sdkmath.NewUint(1),
 		Address: alice,
-		Value:   false,
+		Value:   sdkmath.NewUint(0),
 	})
 	require.NoError(t, err)
 

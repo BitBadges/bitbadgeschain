@@ -27,7 +27,7 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 		return nil, sdkerrors.Wrap(types.ErrInvalidDynamicStoreID, "Only the creator can update the dynamic store")
 	}
 
-	// Update the default value if set (always set, since proto3 bools default to false)
+	// Update the default value
 	dynamicStore.DefaultValue = msg.DefaultValue
 
 	// Update the global kill switch state
@@ -52,6 +52,7 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "update_dynamic_store"),
 		sdk.NewAttribute("store_id", msg.StoreId.String()),
+		sdk.NewAttribute("default_value", msg.DefaultValue.String()),
 		sdk.NewAttribute("global_enabled", globalEnabledStr),
 	)
 

@@ -2436,8 +2436,8 @@ var xxx_messageInfo_MsgPurgeApprovalsResponse proto.InternalMessageInfo
 type MsgCreateDynamicStore struct {
 	// Address of the creator.
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	// The default value for uninitialized addresses (true/false).
-	DefaultValue bool `protobuf:"varint,2,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+	// The default numeric value for uninitialized addresses (Uint as string).
+	DefaultValue Uint `protobuf:"bytes,2,opt,name=defaultValue,proto3,customtype=Uint" json:"defaultValue"`
 	// URI for additional metadata or resources associated with this dynamic store.
 	Uri string `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
 	// Custom data field for storing arbitrary data associated with this dynamic store.
@@ -2482,13 +2482,6 @@ func (m *MsgCreateDynamicStore) GetCreator() string {
 		return m.Creator
 	}
 	return ""
-}
-
-func (m *MsgCreateDynamicStore) GetDefaultValue() bool {
-	if m != nil {
-		return m.DefaultValue
-	}
-	return false
 }
 
 func (m *MsgCreateDynamicStore) GetUri() string {
@@ -2550,8 +2543,8 @@ type MsgUpdateDynamicStore struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	// ID of the dynamic store to update.
 	StoreId Uint `protobuf:"bytes,2,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
-	// The new default value for uninitialized addresses (true/false).
-	DefaultValue bool `protobuf:"varint,3,opt,name=defaultValue,proto3" json:"defaultValue,omitempty"`
+	// The new default numeric value for uninitialized addresses (Uint as string).
+	DefaultValue Uint `protobuf:"bytes,3,opt,name=defaultValue,proto3,customtype=Uint" json:"defaultValue"`
 	// The global kill switch state (true = enabled, false = disabled/halted).
 	// Callers should query the current value first if they want to keep it unchanged.
 	GlobalEnabled bool `protobuf:"varint,4,opt,name=globalEnabled,proto3" json:"globalEnabled,omitempty"`
@@ -2599,13 +2592,6 @@ func (m *MsgUpdateDynamicStore) GetCreator() string {
 		return m.Creator
 	}
 	return ""
-}
-
-func (m *MsgUpdateDynamicStore) GetDefaultValue() bool {
-	if m != nil {
-		return m.DefaultValue
-	}
-	return false
 }
 
 func (m *MsgUpdateDynamicStore) GetGlobalEnabled() bool {
@@ -2759,8 +2745,8 @@ type MsgSetDynamicStoreValue struct {
 	StoreId Uint `protobuf:"bytes,2,opt,name=storeId,proto3,customtype=Uint" json:"storeId"`
 	// The address for which to set the value.
 	Address string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	// The boolean value to set (true/false).
-	Value bool `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
+	// The numeric value to set (Uint as string).
+	Value Uint `protobuf:"bytes,4,opt,name=value,proto3,customtype=Uint" json:"value"`
 }
 
 func (m *MsgSetDynamicStoreValue) Reset()         { *m = MsgSetDynamicStoreValue{} }
@@ -2808,13 +2794,6 @@ func (m *MsgSetDynamicStoreValue) GetAddress() string {
 		return m.Address
 	}
 	return ""
-}
-
-func (m *MsgSetDynamicStoreValue) GetValue() bool {
-	if m != nil {
-		return m.Value
-	}
-	return false
 }
 
 // MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
@@ -7695,16 +7674,16 @@ func (m *MsgCreateDynamicStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.DefaultValue {
-		i--
-		if m.DefaultValue {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	{
+		size := m.DefaultValue.Size()
+		i -= size
+		if _, err := m.DefaultValue.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
 		}
-		i--
-		dAtA[i] = 0x10
+		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x12
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
 		copy(dAtA[i:], m.Creator)
@@ -7792,16 +7771,16 @@ func (m *MsgUpdateDynamicStore) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x20
 	}
-	if m.DefaultValue {
-		i--
-		if m.DefaultValue {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	{
+		size := m.DefaultValue.Size()
+		i -= size
+		if _, err := m.DefaultValue.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
 		}
-		i--
-		dAtA[i] = 0x18
+		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
 	{
 		size := m.StoreId.Size()
 		i -= size
@@ -7928,16 +7907,16 @@ func (m *MsgSetDynamicStoreValue) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
-	if m.Value {
-		i--
-		if m.Value {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	{
+		size := m.Value.Size()
+		i -= size
+		if _, err := m.Value.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
 		}
-		i--
-		dAtA[i] = 0x20
+		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x22
 	if len(m.Address) > 0 {
 		i -= len(m.Address)
 		copy(dAtA[i:], m.Address)
@@ -9844,9 +9823,8 @@ func (m *MsgCreateDynamicStore) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.DefaultValue {
-		n += 2
-	}
+	l = m.DefaultValue.Size()
+	n += 1 + l + sovTx(uint64(l))
 	l = len(m.Uri)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -9881,9 +9859,8 @@ func (m *MsgUpdateDynamicStore) Size() (n int) {
 	}
 	l = m.StoreId.Size()
 	n += 1 + l + sovTx(uint64(l))
-	if m.DefaultValue {
-		n += 2
-	}
+	l = m.DefaultValue.Size()
+	n += 1 + l + sovTx(uint64(l))
 	if m.GlobalEnabled {
 		n += 2
 	}
@@ -9947,9 +9924,8 @@ func (m *MsgSetDynamicStoreValue) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Value {
-		n += 2
-	}
+	l = m.Value.Size()
+	n += 1 + l + sovTx(uint64(l))
 	return n
 }
 
@@ -16677,10 +16653,10 @@ func (m *MsgCreateDynamicStore) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultValue", wireType)
 			}
-			var v int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -16690,12 +16666,26 @@ func (m *MsgCreateDynamicStore) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.DefaultValue = bool(v != 0)
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DefaultValue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
@@ -16961,10 +16951,10 @@ func (m *MsgUpdateDynamicStore) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DefaultValue", wireType)
 			}
-			var v int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -16974,12 +16964,26 @@ func (m *MsgUpdateDynamicStore) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.DefaultValue = bool(v != 0)
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DefaultValue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field GlobalEnabled", wireType)
@@ -17429,10 +17433,10 @@ func (m *MsgSetDynamicStoreValue) Unmarshal(dAtA []byte) error {
 			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
 			}
-			var v int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -17442,12 +17446,26 @@ func (m *MsgSetDynamicStoreValue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.Value = bool(v != 0)
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Value.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

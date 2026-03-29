@@ -20,7 +20,7 @@ func TestMsgSetDynamicStoreValue_ValidateBasic_EmptyCreator(t *testing.T) {
 		Creator: "",
 		StoreId: sdkmath.NewUint(1),
 		Address: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -32,7 +32,7 @@ func TestMsgSetDynamicStoreValue_ValidateBasic_InvalidCreator(t *testing.T) {
 		Creator: "invalid_address",
 		StoreId: sdkmath.NewUint(1),
 		Address: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -44,7 +44,7 @@ func TestMsgSetDynamicStoreValue_ValidateBasic_ZeroStoreId(t *testing.T) {
 		Creator: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		StoreId: sdkmath.NewUint(0),
 		Address: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -57,7 +57,7 @@ func TestMsgSetDynamicStoreValue_ValidateBasic_EmptyAddress(t *testing.T) {
 		Creator: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		StoreId: sdkmath.NewUint(1),
 		Address: "",
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -69,7 +69,7 @@ func TestMsgSetDynamicStoreValue_ValidateBasic_InvalidAddress(t *testing.T) {
 		Creator: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		StoreId: sdkmath.NewUint(1),
 		Address: "invalid_address",
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -81,7 +81,7 @@ func TestMsgSetDynamicStoreValue_ValidateBasic_Valid(t *testing.T) {
 		Creator: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		StoreId: sdkmath.NewUint(1),
 		Address: "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()

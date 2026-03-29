@@ -35,7 +35,7 @@ func SimulateMsgSetDynamicStoreValue(
 				// No dynamic stores exist - try to create one first
 				createMsg := &types.MsgCreateDynamicStore{
 					Creator:      simAccount.Address.String(),
-					DefaultValue: r.Intn(2) == 0,
+					DefaultValue: sdkmath.NewUint(uint64(r.Intn(100))),
 				}
 				msgServer := keeper.NewMsgServerImpl(k)
 				createResp, err := msgServer.CreateDynamicStore(ctx, createMsg)
@@ -70,8 +70,8 @@ func SimulateMsgSetDynamicStoreValue(
 		// Random address (could be the creator or another account)
 		targetAccount := EnsureAccountExists(r, accs)
 
-		// Random boolean value
-		value := r.Intn(2) == 0
+		// Random numeric value
+		value := sdkmath.NewUint(uint64(r.Intn(100)))
 
 		// Use creator as the message creator (required for setting values)
 		msg := &types.MsgSetDynamicStoreValue{

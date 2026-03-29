@@ -49,6 +49,7 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_dynamic_store"),
 		sdk.NewAttribute("store_id", nextStoreId.String()),
+		sdk.NewAttribute("default_value", msg.DefaultValue.String()),
 	)
 
 	return &types.MsgCreateDynamicStoreResponse{

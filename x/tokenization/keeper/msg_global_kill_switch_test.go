@@ -23,7 +23,7 @@ func TestGlobalKillSwitch_CreateStore_DefaultsToEnabled(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -53,7 +53,7 @@ func TestGlobalKillSwitch_UpdateGlobalEnabled(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -71,7 +71,7 @@ func TestGlobalKillSwitch_UpdateGlobalEnabled(t *testing.T) {
 	updateMsg := &types.MsgUpdateDynamicStore{
 		Creator:       creator,
 		StoreId:      createResp.StoreId,
-		DefaultValue: true, // Keep defaultValue unchanged
+		DefaultValue: sdkmath.NewUint(1), // Keep defaultValue unchanged
 		GlobalEnabled: false,
 	}
 
@@ -112,7 +112,7 @@ func TestGlobalKillSwitch_BlocksApprovalsWhenDisabled(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -124,7 +124,7 @@ func TestGlobalKillSwitch_BlocksApprovalsWhenDisabled(t *testing.T) {
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: initiator,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
@@ -176,7 +176,7 @@ func TestGlobalKillSwitch_BlocksApprovalsWhenDisabled(t *testing.T) {
 	updateMsg := &types.MsgUpdateDynamicStore{
 		Creator:       creator,
 		StoreId:      createResp.StoreId,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 		GlobalEnabled: false,
 	}
 	_, err = suite.msgServer.UpdateDynamicStore(wctx, updateMsg)
@@ -203,7 +203,7 @@ func TestGlobalKillSwitch_AllowsApprovalsWhenEnabled(t *testing.T) {
 	// Create a dynamic store with defaultValue = false
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: false,
+		DefaultValue: sdkmath.NewUint(0),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -258,7 +258,7 @@ func TestGlobalKillSwitch_AllowsApprovalsWhenEnabled(t *testing.T) {
 		Creator: creator,
 		StoreId: createResp.StoreId,
 		Address: initiator,
-		Value:   true,
+		Value:   sdkmath.NewUint(1),
 	}
 	_, err = suite.msgServer.SetDynamicStoreValue(wctx, setValueMsg)
 	require.NoError(t, err)
@@ -282,7 +282,7 @@ func TestGlobalKillSwitch_OnlyCreatorCanUpdate(t *testing.T) {
 	// Create a dynamic store
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -293,7 +293,7 @@ func TestGlobalKillSwitch_OnlyCreatorCanUpdate(t *testing.T) {
 	updateMsg := &types.MsgUpdateDynamicStore{
 		Creator:       wrongCreator,
 		StoreId:      createResp.StoreId,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 		GlobalEnabled: false,
 	}
 
@@ -315,7 +315,7 @@ func TestGlobalKillSwitch_UpdatePreservesDefaultValue(t *testing.T) {
 	// Create a dynamic store with defaultValue = true
 	createMsg := &types.MsgCreateDynamicStore{
 		Creator:      creator,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	createResp, err := suite.msgServer.CreateDynamicStore(wctx, createMsg)
@@ -326,7 +326,7 @@ func TestGlobalKillSwitch_UpdatePreservesDefaultValue(t *testing.T) {
 	updateMsg := &types.MsgUpdateDynamicStore{
 		Creator:       creator,
 		StoreId:      createResp.StoreId,
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 		GlobalEnabled: false,
 	}
 
@@ -338,7 +338,7 @@ func TestGlobalKillSwitch_UpdatePreservesDefaultValue(t *testing.T) {
 		StoreId: createResp.StoreId.String(),
 	})
 	require.NoError(t, err)
-	require.True(t, queryResp.Store.DefaultValue, "defaultValue should remain unchanged")
+	require.True(t, !queryResp.Store.DefaultValue.IsZero(), "defaultValue should remain unchanged")
 	require.False(t, queryResp.Store.GlobalEnabled, "globalEnabled should be updated")
 }
 

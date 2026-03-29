@@ -342,12 +342,16 @@ func ConvertDynamicStoreToSolidityStruct(d *tokenizationtypes.DynamicStore) ([]i
 	if !d.StoreId.IsNil() {
 		storeId = d.StoreId.BigInt()
 	}
+	defaultValue := big.NewInt(0)
+	if !d.DefaultValue.IsNil() {
+		defaultValue = d.DefaultValue.BigInt()
+	}
 	// Convert CreatedBy address to EVM format for Solidity
 	createdByAddr := convertBech32ToEVMAddress(d.CreatedBy)
 	return []interface{}{
 		storeId,
 		createdByAddr,
-		d.DefaultValue,
+		defaultValue,
 		d.GlobalEnabled,
 		d.Uri,
 		d.CustomData,
@@ -363,9 +367,13 @@ func ConvertDynamicStoreValueToSolidityStruct(v *tokenizationtypes.DynamicStoreV
 	if !v.StoreId.IsNil() {
 		storeId = v.StoreId.BigInt()
 	}
+	value := big.NewInt(0)
+	if !v.Value.IsNil() {
+		value = v.Value.BigInt()
+	}
 	// Convert Address to EVM format for Solidity
 	evmAddr := convertBech32ToEVMAddress(v.Address)
-	return []interface{}{storeId, evmAddr, v.Value}, nil
+	return []interface{}{storeId, evmAddr, value}, nil
 }
 
 // ConvertVoteProofToSolidityStruct converts VoteProof to Solidity struct format.

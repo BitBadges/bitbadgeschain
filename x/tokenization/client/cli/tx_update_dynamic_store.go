@@ -3,6 +3,8 @@ package cli
 import (
 	"strconv"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -11,25 +13,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdUpdateDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-dynamic-store [store-id] [default-value] [global-enabled]",
 		Short: "Broadcast message updateDynamicStore",
-		Long: `Update a dynamic store. 
-		
+		Long: `Update a dynamic store.
+
 Arguments:
   store-id: The ID of the dynamic store to update
-  default-value: The default value for uninitialized addresses (true/false)
+  default-value: The default numeric value for uninitialized addresses (non-negative integer)
   global-enabled: The global kill switch state (true = enabled, false = disabled/halted)`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argStoreId := types.NewUintFromString(args[0])
-			defaultValue, err := strconv.ParseBool(args[1])
-			if err != nil {
-				return err
+			defaultValueInt, ok := sdkmath.NewIntFromString(args[1])
+			if !ok || defaultValueInt.IsNegative() {
+				return types.ErrInvalidRequest.Wrap("invalid default value: must be a non-negative integer")
 			}
+			defaultValue := sdkmath.NewUintFromBigInt(defaultValueInt.BigInt())
 			globalEnabled, err := strconv.ParseBool(args[2])
 			if err != nil {
 				return err

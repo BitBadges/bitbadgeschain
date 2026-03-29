@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -239,7 +240,8 @@ func MigrateApprovalTrackers(ctx context.Context, store storetypes.KVStore, k Ke
 }
 
 func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keeper) error {
-	// Migrate base dynamic stores
+	// Migrate base dynamic stores: convert DefaultValue from bool to Uint
+	// Old format: bool (true/false), New format: Uint ("1"/"0")
 	iterator := storetypes.KVStorePrefixIterator(store, DynamicStoreKey)
 	defer func() {
 		if err := iterator.Close(); err != nil {
@@ -250,16 +252,19 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		var oldDynamicStore oldtypes.DynamicStore
 		k.cdc.MustUnmarshal(iterator.Value(), &oldDynamicStore)
 
-		// Convert to JSON
-		jsonBytes, err := json.Marshal(oldDynamicStore)
-		if err != nil {
-			return err
+		// Convert boolean DefaultValue to Uint: true -> 1, false -> 0
+		defaultValueUint := sdkmath.NewUint(0)
+		if oldDynamicStore.DefaultValue {
+			defaultValueUint = sdkmath.NewUint(1)
 		}
 
-		// Unmarshal into new type
-		var newDynamicStore newtypes.DynamicStore
-		if err := json.Unmarshal(jsonBytes, &newDynamicStore); err != nil {
-			return err
+		newDynamicStore := newtypes.DynamicStore{
+			StoreId:       oldDynamicStore.StoreId,
+			CreatedBy:     oldDynamicStore.CreatedBy,
+			DefaultValue:  defaultValueUint,
+			GlobalEnabled: oldDynamicStore.GlobalEnabled,
+			Uri:           oldDynamicStore.Uri,
+			CustomData:    oldDynamicStore.CustomData,
 		}
 
 		// Save the updated dynamic store
@@ -268,7 +273,8 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		}
 	}
 
-	// Migrate dynamic store values
+	// Migrate dynamic store values: convert Value from bool to Uint
+	// Old format: bool (true/false), New format: Uint ("1"/"0")
 	valueIterator := storetypes.KVStorePrefixIterator(store, DynamicStoreValueKey)
 	defer func() {
 		if err := valueIterator.Close(); err != nil {
@@ -279,20 +285,14 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 		var oldDynamicStoreValue oldtypes.DynamicStoreValue
 		k.cdc.MustUnmarshal(valueIterator.Value(), &oldDynamicStoreValue)
 
-		// Convert to JSON
-		jsonBytes, err := json.Marshal(oldDynamicStoreValue)
-		if err != nil {
-			return err
-		}
-
-		// Unmarshal into new type
-		var newDynamicStoreValue newtypes.DynamicStoreValue
-		if err := json.Unmarshal(jsonBytes, &newDynamicStoreValue); err != nil {
-			return err
+		// Convert boolean Value to Uint: true -> 1, false -> 0
+		valueUint := sdkmath.NewUint(0)
+		if oldDynamicStoreValue.Value {
+			valueUint = sdkmath.NewUint(1)
 		}
 
 		// Save the updated dynamic store value
-		if err := k.SetDynamicStoreValueInStore(sdk.UnwrapSDKContext(ctx), newDynamicStoreValue.StoreId, newDynamicStoreValue.Address, newDynamicStoreValue.Value); err != nil {
+		if err := k.SetDynamicStoreValueInStore(sdk.UnwrapSDKContext(ctx), oldDynamicStoreValue.StoreId, oldDynamicStoreValue.Address, valueUint); err != nil {
 			return err
 		}
 	}

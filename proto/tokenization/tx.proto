@@ -610,8 +610,8 @@ message MsgCreateDynamicStore {
 
   // Address of the creator.
   string creator = 1;
-  // The default value for uninitialized addresses (true/false).
-  bool defaultValue = 2;
+  // The default numeric value for uninitialized addresses (Uint as string, e.g. "0", "1", "100").
+  string defaultValue = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // URI for additional metadata or resources associated with this dynamic store.
   string uri = 3;
   // Custom data field for storing arbitrary data associated with this dynamic store.
@@ -633,8 +633,8 @@ message MsgUpdateDynamicStore {
   string creator = 1;
   // ID of the dynamic store to update.
   string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  // The new default value for uninitialized addresses (true/false).
-  bool defaultValue = 3;
+  // The new default numeric value for uninitialized addresses (Uint as string).
+  string defaultValue = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The global kill switch state (true = enabled, false = disabled/halted).
   // Callers should query the current value first if they want to keep it unchanged.
   bool globalEnabled = 4;
@@ -662,22 +662,22 @@ message MsgDeleteDynamicStore {
 // MsgDeleteDynamicStoreResponse is the response to MsgDeleteDynamicStore.
 message MsgDeleteDynamicStoreResponse {}
 
-// MsgSetDynamicStoreValue is used to set a boolean value for a specific address in a dynamic store.
+// MsgSetDynamicStoreValue is used to set a numeric value for a specific address in a dynamic store.
 message MsgSetDynamicStoreValue {
   option (cosmos.msg.v1.signer) = "creator";
   option (amino.name) = "tokenization/SetDynamicStoreValue";
 
   // Address of the creator.
   string creator = 1;
-  
+
   // ID of the dynamic store.
   string storeId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
+
   // The address for which to set the value.
   string address = 3;
-  
-  // The boolean value to set (true/false).
-  bool value = 4;
+
+  // The numeric value to set (Uint as string, e.g. "0", "1", "100").
+  string value = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.

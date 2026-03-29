@@ -3,6 +3,7 @@ package messages
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/ai_test/validation"
@@ -17,7 +18,7 @@ func init() {
 func TestMsgCreateDynamicStore_ValidateBasic_EmptyCreator(t *testing.T) {
 	msg := &types.MsgCreateDynamicStore{
 		Creator:      "",
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -27,7 +28,7 @@ func TestMsgCreateDynamicStore_ValidateBasic_EmptyCreator(t *testing.T) {
 func TestMsgCreateDynamicStore_ValidateBasic_InvalidCreator(t *testing.T) {
 	msg := &types.MsgCreateDynamicStore{
 		Creator:      "invalid_address",
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -37,7 +38,7 @@ func TestMsgCreateDynamicStore_ValidateBasic_InvalidCreator(t *testing.T) {
 func TestMsgCreateDynamicStore_ValidateBasic_Valid(t *testing.T) {
 	msg := &types.MsgCreateDynamicStore{
 		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
-		DefaultValue: true,
+		DefaultValue: sdkmath.NewUint(1),
 	}
 
 	err := msg.ValidateBasic()
@@ -48,4 +49,3 @@ func TestMsgCreateDynamicStore_ValidateBasic_Valid(t *testing.T) {
 		require.NoError(t, err, "valid message should pass")
 	}
 }
-
