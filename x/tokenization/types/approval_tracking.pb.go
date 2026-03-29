@@ -155,6 +155,9 @@ type ApprovalAmounts struct {
 	AmountTrackerId string `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
 	// Time intervals to reset the trackers at.
 	ResetTimeIntervals *ResetTimeIntervals `protobuf:"bytes,7,opt,name=resetTimeIntervals,proto3" json:"resetTimeIntervals,omitempty"`
+	// Sliding-window velocity limit. Mutually exclusive with ResetTimeIntervals.
+	// When set, the tracker uses time-bucketed rolling windows instead of fixed resets.
+	VelocityLimit *VelocityLimit `json:"velocityLimit,omitempty"`
 }
 
 func (m *ApprovalAmounts) Reset()         { *m = ApprovalAmounts{} }
@@ -204,6 +207,13 @@ func (m *ApprovalAmounts) GetResetTimeIntervals() *ResetTimeIntervals {
 	return nil
 }
 
+func (m *ApprovalAmounts) GetVelocityLimit() *VelocityLimit {
+	if m != nil {
+		return m.VelocityLimit
+	}
+	return nil
+}
+
 // MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
 // If any of these are nil or "0", we assume unlimited approvals.
 // If they are set to a value, then the running tally of the number of transfers for the specified token IDs and ownership times
@@ -222,6 +232,9 @@ type MaxNumTransfers struct {
 	AmountTrackerId string `protobuf:"bytes,6,opt,name=amountTrackerId,proto3" json:"amountTrackerId,omitempty"`
 	// Time intervals to reset the trackers at.
 	ResetTimeIntervals *ResetTimeIntervals `protobuf:"bytes,7,opt,name=resetTimeIntervals,proto3" json:"resetTimeIntervals,omitempty"`
+	// Sliding-window velocity limit. Mutually exclusive with ResetTimeIntervals.
+	// When set, the tracker uses time-bucketed rolling windows instead of fixed resets.
+	VelocityLimit *VelocityLimit `json:"velocityLimit,omitempty"`
 }
 
 func (m *MaxNumTransfers) Reset()         { *m = MaxNumTransfers{} }
@@ -271,6 +284,13 @@ func (m *MaxNumTransfers) GetResetTimeIntervals() *ResetTimeIntervals {
 	return nil
 }
 
+func (m *MaxNumTransfers) GetVelocityLimit() *VelocityLimit {
+	if m != nil {
+		return m.VelocityLimit
+	}
+	return nil
+}
+
 // ApprovalTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.
 type ApprovalTracker struct {
 	// The number of transfers that have been processed.
@@ -279,6 +299,10 @@ type ApprovalTracker struct {
 	Amounts []*Balance `protobuf:"bytes,2,rep,name=amounts,proto3" json:"amounts,omitempty"`
 	// Last updated at time.
 	LastUpdatedAt Uint `protobuf:"bytes,3,opt,name=lastUpdatedAt,proto3,customtype=Uint" json:"lastUpdatedAt"`
+	// Time buckets for sliding-window velocity tracking.
+	// Only populated when the associated approval uses VelocityLimit instead of ResetTimeIntervals.
+	// Fixed array of MaxVelocityBuckets (24) entries, lazily pruned on each write.
+	TimeBuckets []TimeBucket `json:"timeBuckets,omitempty"`
 }
 
 func (m *ApprovalTracker) Reset()         { *m = ApprovalTracker{} }
@@ -317,6 +341,13 @@ var xxx_messageInfo_ApprovalTracker proto.InternalMessageInfo
 func (m *ApprovalTracker) GetAmounts() []*Balance {
 	if m != nil {
 		return m.Amounts
+	}
+	return nil
+}
+
+func (m *ApprovalTracker) GetTimeBuckets() []TimeBucket {
+	if m != nil {
+		return m.TimeBuckets
 	}
 	return nil
 }
