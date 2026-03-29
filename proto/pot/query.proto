@@ -1,0 +1,20 @@
+syntax = "proto3";
+package pot;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "pot/params.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/pot/types";
+
+service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/pot/params";
+  }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

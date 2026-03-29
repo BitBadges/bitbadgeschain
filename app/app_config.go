@@ -8,6 +8,7 @@ import (
 	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	pottypes "github.com/bitbadges/bitbadgeschain/x/pot/types"
 	_ "github.com/bitbadges/bitbadgeschain/x/sendmanager/module"
 	sendmanagermoduletypes "github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 
@@ -115,6 +116,7 @@ var (
 		// chain modules
 		anchormoduletypes.ModuleName,
 		tokenizationmoduletypes.ModuleName,
+		pottypes.ModuleName, // x/pot after tokenization
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -149,6 +151,7 @@ var (
 		// chain modules
 		anchormoduletypes.ModuleName,
 		tokenizationmoduletypes.ModuleName,
+		pottypes.ModuleName, // x/pot no-op BeginBlock but needed for module manager
 		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
@@ -166,6 +169,7 @@ var (
 		// cosmos sdk modules
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
+		pottypes.ModuleName, // x/pot MUST be BEFORE staking: it jails/unjails, then staking emits ValidatorUpdates
 		stakingtypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,
