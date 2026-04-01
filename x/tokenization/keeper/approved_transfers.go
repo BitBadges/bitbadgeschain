@@ -259,6 +259,15 @@ func (k Keeper) DeductAndGetUserApprovals(
 					continue
 				}
 
+				// Enforce maxScalingMultiplier cap
+				maxMul := approvalCriteria.PredeterminedBalances.IncrementedBalances.MaxScalingMultiplier
+				if !maxMul.IsNil() && !maxMul.IsZero() && scalingMultiplier.GT(maxMul) {
+					addPotentialError(isExplicitlyPrioritized, idx,
+						fmt.Sprintf("scaling multiplier %s exceeds max %s", scalingMultiplier, maxMul))
+					rollbackOnFailure()
+					continue
+				}
+
 				if scalingMultiplier.GT(sdkmath.NewUint(1)) && len(approvalCriteria.CoinTransfers) > 0 {
 					coinTransfersToExecute = scaleCoinTransfers(approvalCriteria.CoinTransfers, scalingMultiplier)
 				}

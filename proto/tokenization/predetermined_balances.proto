@@ -41,6 +41,10 @@ message IncrementedBalances {
   // approvalCriteria.coinTransfers are scaled by the same multiplier.
   // All other IncrementedBalances fields must be zero/false/nil when this is true.
   bool allowAmountScaling = 8;
+  // Maximum allowed scaling multiplier. Must be > 0 when allowAmountScaling is true.
+  // The chain rejects transfers where the computed multiplier exceeds this cap.
+  // Ignored (set to "0") when allowAmountScaling is false.
+  string maxScalingMultiplier = 9 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
