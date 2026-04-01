@@ -535,3 +535,267 @@ func (suite *TestSuite) TestAmountScalingMaxMultiplierZeroRejected() {
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Error(err, "maxScalingMultiplier == 0 with scaling on should be rejected")
 }
+
+// TestAmountScalingWithOverrideFromApprover verifies scaling works correctly when
+// coinTransfers use overrideFromWithApproverAddress (escrow/approver pays scaled amount).
+func (suite *TestSuite) TestAmountScalingWithOverrideFromApprover() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	mintApproval := collectionsToCreate[0].CollectionApprovals[0]
+	mintApproval.ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					TokenIds:       GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
+			AllowAmountScaling:        true,
+			MaxScalingMultiplier:      sdkmath.NewUint(100),
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+	mintApproval.ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To:                             alice,
+			OverrideFromWithApproverAddress: true,
+			Coins: []*sdk.Coin{
+				{Amount: sdkmath.NewInt(1000), Denom: "ubadge"},
+			},
+		},
+	}
+	mintApproval.ApprovalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(18446744073709551615)
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "collection with scaling + overrideFromApprover should create successfully")
+}
+
+// TestAmountScalingMultiplierOne verifies maxScalingMultiplier=1 behaves identically to non-scaling.
+func (suite *TestSuite) TestAmountScalingMultiplierOne() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.createScalingCollection(10, 100, 1)
+
+	// 1x transfer should succeed
+	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:       "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "1x transfer with maxMultiplier=1 should succeed")
+
+	// 2x should fail
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:       "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(20),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Error(err, "2x transfer with maxMultiplier=1 should fail")
+}
+
+// TestAmountScalingMultipleCoinTransfers verifies ALL coinTransfer entries scale.
+func (suite *TestSuite) TestAmountScalingMultipleCoinTransfers() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	mintApproval := collectionsToCreate[0].CollectionApprovals[0]
+	mintApproval.ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					TokenIds:       GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
+			AllowAmountScaling:        true,
+			MaxScalingMultiplier:      sdkmath.NewUint(100),
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+	// Two separate coinTransfer entries — both should scale
+	mintApproval.ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{
+		{
+			To: alice,
+			Coins: []*sdk.Coin{
+				{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+			},
+		},
+		{
+			To: charlie,
+			Coins: []*sdk.Coin{
+				{Amount: sdkmath.NewInt(50), Denom: "ubadge"},
+			},
+		},
+	}
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "collection with multiple coinTransfers should create")
+
+	// 5x transfer — alice gets 500, charlie gets 250
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:       "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(5),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "5x transfer with multiple coinTransfers should succeed")
+}
+
+// TestAmountScalingCumulativeNotCapped verifies per-tx semantics — multiple txs each at max.
+func (suite *TestSuite) TestAmountScalingCumulativeNotCapped() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.createScalingCollection(1, 100, 3)
+
+	// First 3x transfer
+	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:       "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(3),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "first 3x transfer should succeed")
+
+	// Second 3x transfer — cumulative 6x, but per-tx max is 3
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:       "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(3),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "second 3x transfer should succeed — maxScalingMultiplier is per-tx, not cumulative")
+}
+
+// TestAmountScalingLargeMultiplier verifies large maxScalingMultiplier doesn't cause issues.
+func (suite *TestSuite) TestAmountScalingLargeMultiplier() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	mintApproval := collectionsToCreate[0].CollectionApprovals[0]
+	mintApproval.ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					TokenIds:       GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
+			AllowAmountScaling:        true,
+			MaxScalingMultiplier:      sdkmath.NewUint(18446744073709551615), // MAX_UINT64
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+	mintApproval.ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{}
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "collection with MAX_UINT64 maxScalingMultiplier should create")
+
+	// 1000x transfer with no coin transfers — should succeed
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:       "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1000),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "1000x transfer with MAX_UINT64 maxScalingMultiplier should succeed")
+}
