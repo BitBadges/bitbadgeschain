@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type StandardNameTestSuite struct {
@@ -17,12 +18,12 @@ func TestStandardNameTestSuite(t *testing.T) {
 }
 
 func (suite *StandardNameTestSuite) TestStandardName_AliasDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	// Alias denom should return "x/tokenization"
-	name := suite.Keeper.StandardName(suite.Ctx, "badges:123:456")
+	name := suite.Keeper.StandardName(suite.Ctx, "badgeslp:123:456")
 	suite.Require().Equal("x/tokenization", name)
 }
 
@@ -43,4 +44,3 @@ func (suite *StandardNameTestSuite) TestStandardName_UnregisteredPrefix() {
 	name := suite.Keeper.StandardName(suite.Ctx, "tokens:123")
 	suite.Require().Equal("x/bank", name)
 }
-

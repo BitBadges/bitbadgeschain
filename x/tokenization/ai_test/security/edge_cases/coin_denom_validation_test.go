@@ -53,18 +53,13 @@ func getFullUintRanges() []*tokenizationtypes.UintRange {
 	}
 }
 
-// TestCoinDenomValidation_MultiCoinUnauthorizedDenom tests MED-012 fix:
-// Validates that ALL coins in a transfer are checked, not just the first.
-// This prevents unauthorized denoms from bypassing validation in multi-coin transfers.
-func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnauthorizedDenom() {
+// TestCoinDenomValidation_MultiCoinInsufficientBalance tests that coin transfers
+// with multiple coins fail gracefully when the sender has insufficient balance.
+// The allowed-denom whitelist was removed; any denom is accepted, but the sender
+// must hold sufficient funds for the transfer to succeed.
+func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinInsufficientBalance() {
 	wctx := sdk.WrapSDKContext(suite.Ctx)
 	collectionId := suite.CollectionId
-
-	// Set allowed denoms to only include "ubadge"
-	params := suite.Keeper.GetParams(suite.Ctx)
-	params.AllowedDenoms = []string{"ubadge"}
-	err := suite.Keeper.SetParams(suite.Ctx, params)
-	suite.Require().NoError(err, "should set params")
 
 	// Mint badges to Bob
 	suite.MintTokens(collectionId, suite.Bob, []*tokenizationtypes.Balance{
@@ -75,9 +70,9 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnau
 		},
 	})
 
-	// Create an approval with coin transfer that has multiple coins:
-	// - First coin: "ubadge" (allowed)
-	// - Second coin: "uatom" (NOT allowed - should cause failure)
+	// Create an approval with coin transfer that has multiple coins.
+	// The sender (Bob) does not hold these coins, so the transfer should fail
+	// with an insufficient balance error.
 	updateMsg := &tokenizationtypes.MsgUpdateUserApprovals{
 		Creator:                 suite.Bob,
 		CollectionId:            collectionId,
@@ -103,8 +98,8 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnau
 						{
 							To: suite.Alice,
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(100), Denom: "ubadge"}, // Allowed denom
-								{Amount: sdkmath.NewInt(50), Denom: "uatom"},   // Unauthorized denom - should fail
+								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+								{Amount: sdkmath.NewInt(50), Denom: "uatom"},
 							},
 						},
 					},
@@ -112,10 +107,10 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnau
 			},
 		},
 	}
-	_, err = suite.MsgServer.UpdateUserApprovals(wctx, updateMsg)
+	_, err := suite.MsgServer.UpdateUserApprovals(wctx, updateMsg)
 	suite.Require().NoError(err, "should create approval with multi-coin transfer")
 
-	// Set incoming approval for Alice (needed for transfer to succeed up to coin validation)
+	// Set incoming approval for Alice
 	incomingApproval := testutil.GenerateUserIncomingApproval("incoming1", "All")
 	setIncomingMsg := &tokenizationtypes.MsgSetIncomingApproval{
 		Creator:      suite.Alice,
@@ -135,7 +130,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnau
 		}
 	}
 
-	// Attempt to execute transfer - should FAIL because "uatom" is not in allowed denoms
+	// Attempt to execute transfer - should FAIL because Bob has insufficient coin balance
 	transferMsg := &tokenizationtypes.MsgTransferTokens{
 		Creator:      suite.Alice,
 		CollectionId: collectionId,
@@ -155,27 +150,23 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinUnau
 						ApprovalId:      "multi-coin-test",
 						ApprovalLevel:   "outgoing",
 						ApproverAddress: suite.Bob,
-						Version:         actualVersion, // Use the actual version from the created approval
+						Version:         actualVersion,
 					},
 				},
 			},
 		},
 	}
 	_, err = suite.MsgServer.TransferTokens(wctx, transferMsg)
-	suite.Require().Error(err, "should fail when unauthorized denom is in multi-coin transfer")
-	suite.Require().Contains(err.Error(), "denom uatom is not allowed", "error should mention unauthorized denom")
+	suite.Require().Error(err, "should fail when sender has insufficient coin balance")
+	suite.Require().Contains(err.Error(), "insufficient", "error should mention insufficient balance")
 }
 
-// TestCoinDenomValidation_AllCoinsValidated tests that all coins are validated even if first is allowed
-func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValidated() {
+// TestCoinDenomValidation_AllCoinsCheckedForBalance tests that all coins in a
+// multi-coin transfer are checked. Even if the first coin has sufficient balance,
+// the transfer should fail if a subsequent coin has insufficient balance.
+func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsCheckedForBalance() {
 	wctx := sdk.WrapSDKContext(suite.Ctx)
 	collectionId := suite.CollectionId
-
-	// Set allowed denoms to only include "ubadge"
-	params := suite.Keeper.GetParams(suite.Ctx)
-	params.AllowedDenoms = []string{"ubadge"}
-	err := suite.Keeper.SetParams(suite.Ctx, params)
-	suite.Require().NoError(err, "should set params")
 
 	// Mint badges to Bob
 	suite.MintTokens(collectionId, suite.Bob, []*tokenizationtypes.Balance{
@@ -186,8 +177,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 		},
 	})
 
-	// Test case: First coin is unauthorized, second is authorized
-	// Should fail on first coin check
+	// Coin transfer with a denom Bob doesn't hold
 	updateMsg := &tokenizationtypes.MsgUpdateUserApprovals{
 		Creator:                 suite.Bob,
 		CollectionId:            collectionId,
@@ -213,8 +203,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 						{
 							To: suite.Alice,
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(50), Denom: "uatom"},   // Unauthorized denom first
-								{Amount: sdkmath.NewInt(100), Denom: "ubadge"}, // Allowed denom second
+								{Amount: sdkmath.NewInt(50), Denom: "uatom"},
 							},
 						},
 					},
@@ -222,10 +211,10 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 			},
 		},
 	}
-	_, err = suite.MsgServer.UpdateUserApprovals(wctx, updateMsg)
+	_, err := suite.MsgServer.UpdateUserApprovals(wctx, updateMsg)
 	suite.Require().NoError(err, "should create approval")
 
-	// Set incoming approval for Alice (needed for transfer to succeed up to coin validation)
+	// Set incoming approval for Alice
 	incomingApproval := testutil.GenerateUserIncomingApproval("incoming1", "All")
 	setIncomingMsg := &tokenizationtypes.MsgSetIncomingApproval{
 		Creator:      suite.Alice,
@@ -235,7 +224,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 	_, err = suite.MsgServer.SetIncomingApproval(wctx, setIncomingMsg)
 	suite.Require().NoError(err, "should create incoming approval")
 
-	// Get the actual version of the approval that was created
+	// Get the actual version of the approval
 	bobBalance := suite.GetBalance(collectionId, suite.Bob)
 	var actualVersion sdkmath.Uint = sdkmath.NewUint(0)
 	for _, approval := range bobBalance.OutgoingApprovals {
@@ -245,7 +234,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 		}
 	}
 
-	// Attempt transfer - should fail on first coin
+	// Attempt transfer - should fail because Bob has no uatom
 	transferMsg := &tokenizationtypes.MsgTransferTokens{
 		Creator:      suite.Alice,
 		CollectionId: collectionId,
@@ -265,13 +254,13 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsValid
 						ApprovalId:      "reverse-order-test",
 						ApprovalLevel:   "outgoing",
 						ApproverAddress: suite.Bob,
-						Version:         actualVersion, // Use the actual version from the created approval
+						Version:         actualVersion,
 					},
 				},
 			},
 		},
 	}
 	_, err = suite.MsgServer.TransferTokens(wctx, transferMsg)
-	suite.Require().Error(err, "should fail when unauthorized denom is present")
-	suite.Require().Contains(err.Error(), "denom uatom is not allowed", "error should mention unauthorized denom")
+	suite.Require().Error(err, "should fail when sender has insufficient coin balance")
+	suite.Require().Contains(err.Error(), "insufficient", "error should mention insufficient balance")
 }

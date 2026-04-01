@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type SendFromModuleToAccountTestSuite struct {
@@ -19,15 +20,15 @@ func TestSendFromModuleToAccountTestSuite(t *testing.T) {
 }
 
 func (suite *SendFromModuleToAccountTestSuite) TestSendCoinsFromModuleToAccountWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("badgeslp:123:456", sdkmath.NewInt(1000)),
 	}
 	err = suite.Keeper.SendCoinsFromModuleToAccountWithAliasRouting(suite.Ctx, "mymodule", bobAddr, coins)
 	suite.Require().NoError(err)
@@ -58,4 +59,3 @@ func (suite *SendFromModuleToAccountTestSuite) TestSendCoinsFromModuleToAccountW
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "cannot be empty")
 }
-

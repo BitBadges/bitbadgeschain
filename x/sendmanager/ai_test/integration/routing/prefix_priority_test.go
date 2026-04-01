@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	"github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type PrefixPriorityTestSuite struct {
@@ -18,18 +19,24 @@ func TestPrefixPriorityTestSuite(t *testing.T) {
 	suite.Run(t, new(PrefixPriorityTestSuite))
 }
 
-func (suite *PrefixPriorityTestSuite) TestPrefixPriority_LongestPrefixWins() {
-	// Note: This test demonstrates that overlapping prefixes are prevented
-		// If we had "badges:" and "badgeslp:", the longer one should win
-	// But since overlapping is prevented, we test with non-overlapping prefixes
-	
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badgeslp:")
+func (suite *PrefixPriorityTestSuite) TestPrefixPriority_OnlyBadgeslpAccepted() {
+	// Only "badgeslp:" prefix is supported; other prefixes are rejected.
+	router := testutil.GenerateMockRouter(keeper.AliasDenomPrefix)
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter(keeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
-	err = suite.Keeper.RegisterRouter("badgeslp:", router2)
+	// Attempting a non-badgeslp prefix should fail
+	router2 := testutil.GenerateMockRouter("badges:")
+	err = suite.Keeper.RegisterRouter("badges:", router2)
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "only prefix")
+}
+
+func (suite *PrefixPriorityTestSuite) TestPrefixPriority_BadgeslpDenomRoutedCorrectly() {
+	router := testutil.GenerateMockRouter(keeper.AliasDenomPrefix)
+
+	err := suite.Keeper.RegisterRouter(keeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -37,23 +44,35 @@ func (suite *PrefixPriorityTestSuite) TestPrefixPriority_LongestPrefixWins() {
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
-	// Send tokenization denom - should route to router1
-	coin1 := sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000))
-	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin1)
+	// Send badgeslp denom - should route through the alias router
+	coin := sdk.NewCoin("badgeslp:789:012", sdkmath.NewInt(500))
+	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin)
 	suite.Require().NoError(err)
 
-	// Send badgeslp denom - should route to router2
-	coin2 := sdk.NewCoin("badgeslp:789:012", sdkmath.NewInt(500))
-	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin2)
-	suite.Require().NoError(err)
-
-	// Verify routers were called correctly
-	calls1 := router1.GetSendCalls()
-	suite.Require().Len(calls1, 1)
-	suite.Require().Equal("badges:123:456", calls1[0].Denom)
-
-	calls2 := router2.GetSendCalls()
-	suite.Require().Len(calls2, 1)
-	suite.Require().Equal("badgeslp:789:012", calls2[0].Denom)
+	calls := router.GetSendCalls()
+	suite.Require().Len(calls, 1)
+	suite.Require().Equal("badgeslp:789:012", calls[0].Denom)
 }
 
+func (suite *PrefixPriorityTestSuite) TestPrefixPriority_NonBadgeslpDenomFallsToBank() {
+	router := testutil.GenerateMockRouter(keeper.AliasDenomPrefix)
+
+	err := suite.Keeper.RegisterRouter(keeper.AliasDenomPrefix, router)
+	suite.Require().NoError(err)
+
+	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
+	suite.Require().NoError(err)
+	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
+	suite.Require().NoError(err)
+
+	// A denom that does NOT start with "badgeslp:" should route through bank
+	coin := sdk.NewCoin("uatom", sdkmath.NewInt(1000))
+	err = suite.Keeper.SendCoinWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, &coin)
+	// Bank keeper fails with insufficient funds — that's expected, it means routing went to bank
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "insufficient funds")
+
+	// Router should NOT have been called
+	calls := router.GetSendCalls()
+	suite.Require().Len(calls, 0)
+}

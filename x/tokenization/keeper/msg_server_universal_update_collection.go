@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
-	"slices"
 
 	errorsmod "cosmossdk.io/errors"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -417,11 +416,6 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 
 		for _, coin := range msg.MintEscrowCoinsToTransfer {
-			allowedDenoms := k.GetParams(ctx).AllowedDenoms
-			if !slices.Contains(allowedDenoms, coin.Denom) {
-				return nil, errorsmod.Wrapf(ErrDenomNotAllowed, "denom: %s", coin.Denom)
-			}
-
 			err = k.bankKeeper.SendCoins(ctx, from, to, sdk.NewCoins(*coin))
 			if err != nil {
 				return nil, err

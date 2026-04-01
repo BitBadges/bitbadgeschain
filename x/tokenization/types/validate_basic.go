@@ -560,7 +560,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					return sdkerrors.Wrapf(ErrInvalidRequest, "coin transfer is nil")
 				}
 
-				if !coinTransfer.OverrideToWithInitiator && ValidateAddress(coinTransfer.To, false) != nil {
+				if !coinTransfer.OverrideToWithInitiator && ValidateAddress(coinTransfer.To, true) != nil {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "invalid to address")
 				}
 

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 )
 
@@ -21,24 +22,23 @@ func TestSendWithAliasRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_ValidMessage() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
+
+	// Recreate msg server after registering router (msgServer embeds Keeper by value)
+	suite.MsgServer = sendmanagerkeeper.NewMsgServerImpl(suite.Keeper)
 
 	msg := &types.MsgSendWithAliasRouting{
 		FromAddress: suite.Alice,
 		ToAddress:   suite.Bob,
 		Amount: sdk.Coins{
-			sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+			sdk.NewCoin("badgeslp:123:456", sdkmath.NewInt(1000)),
 		},
 	}
 
 	// Alias denom routes through router
-	// The router may call underlying keepers that check balances
-	// For this test, we're verifying that routing works (router is called)
 	_, err = suite.MsgServer.SendWithAliasRouting(sdk.WrapSDKContext(suite.Ctx), msg)
-	// The router might call underlying keepers, so this may fail
-	// But we verify that the router was at least called
 	_ = err // Accept either success or failure - we're testing routing, not transfer execution
 }
 
@@ -117,15 +117,18 @@ func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_BankDenom()
 }
 
 func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_MixedDenoms() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
+
+	// Recreate msg server after registering router (msgServer embeds Keeper by value)
+	suite.MsgServer = sendmanagerkeeper.NewMsgServerImpl(suite.Keeper)
 
 	msg := &types.MsgSendWithAliasRouting{
 		FromAddress: suite.Alice,
 		ToAddress:   suite.Bob,
 		Amount: sdk.Coins{
-			sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+			sdk.NewCoin("badgeslp:123:456", sdkmath.NewInt(1000)),
 			sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 		},
 	}
@@ -135,4 +138,3 @@ func (suite *SendWithAliasRoutingTestSuite) TestSendWithAliasRouting_MixedDenoms
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "insufficient funds")
 }
-

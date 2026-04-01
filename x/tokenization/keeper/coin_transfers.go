@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -51,14 +50,14 @@ func (k Keeper) ExecuteCoinTransfers(
 
 	royaltyPercentage := royalties.Percentage
 	royaltyPayoutAddress := royalties.PayoutAddress
-	
+
 	// Validate royalty percentage doesn't exceed 100% (RoyaltyDivisor = 10000)
 	// This prevents panic when royaltyAmount > coin.Amount in the subtraction below
 	if royaltyPercentage.GT(sdkmath.NewUint(RoyaltyDivisor)) {
 		detErrMsg := fmt.Sprintf("royalty percentage cannot exceed %d (100%%), got %s", RoyaltyDivisor, royaltyPercentage.String())
 		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 	}
-	
+
 	if royaltyPercentage.GT(sdkmath.NewUint(0)) {
 		if royaltyPayoutAddress == "" {
 			detErrMsg := "payout address is required when royalty percentage is greater than 0"
@@ -71,12 +70,6 @@ func (k Keeper) ExecuteCoinTransfers(
 		}
 	}
 
-	allowedDenoms := k.GetAllowedDenoms(ctx)
-	if len(allowedDenoms) == 0 {
-		detErrMsg := "allowed denoms is empty"
-		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
-	}
-
 	for _, coinTransfer := range coinTransfers {
 		if coinTransfer == nil {
 			detErrMsg := "coin transfer is nil"
@@ -86,12 +79,22 @@ func (k Keeper) ExecuteCoinTransfers(
 			detErrMsg := "coin transfer cannot have empty coins slice"
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
-		// Security: Validate ALL coins in the transfer, not just the first
-		// This prevents unauthorized denoms from bypassing validation in multi-coin transfers
+	}
+
+	// Reject coinTransfers with badgeslp: denoms that reference the same collection.
+	// Alias-routed transfers create a nested MsgTransferTokens which reads/writes balances
+	// to the store, but the outer HandleTransfer holds stale in-memory copies that overwrite
+	// those changes. Cross-collection or non-alias denoms (e.g., USDC) are unaffected.
+	//
+	// We can probably enable this in the future. Just be mindful of the stale state bug.
+	for _, coinTransfer := range coinTransfers {
 		for _, coin := range coinTransfer.Coins {
-			if !slices.Contains(allowedDenoms, coin.Denom) {
-				detErrMsg := fmt.Sprintf("denom %s is not allowed", coin.Denom)
-				return detErrMsg, sdkerrors.Wrap(ErrInvalidDenom, detErrMsg)
+			if CheckStartsWithAliasDenom(coin.Denom) {
+				denomCollectionId, err := ParseDenomCollectionId(coin.Denom)
+				if err == nil && sdkmath.NewUint(denomCollectionId).Equal(collection.CollectionId) {
+					detErrMsg := fmt.Sprintf("coinTransfer denom %s references the same collection %s — use an intermediate denom (e.g., USDC) instead", coin.Denom, collection.CollectionId.String())
+					return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+				}
 			}
 		}
 	}
@@ -103,6 +106,11 @@ func (k Keeper) ExecuteCoinTransfers(
 		to := coinTransfer.To
 		if coinTransfer.OverrideToWithInitiator {
 			to = initiatedBy
+		} else if types.IsMintAddress(to) {
+			// "Mint" in the to field auto-resolves to the collection's mint escrow address.
+			// ValidateBasic allows Mint for coin transfer targets; the same resolution applies
+			// for collection, incoming, and outgoing approval execution paths.
+			to = collection.MintEscrowAddress
 		}
 
 		toAddressAcc, err := sdk.AccAddressFromBech32(to)

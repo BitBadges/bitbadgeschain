@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 // PrefixCollisionTestSuite tests prefix collision attack scenarios
@@ -18,38 +19,23 @@ func TestPrefixCollisionTestSuite(t *testing.T) {
 	suite.Run(t, new(PrefixCollisionTestSuite))
 }
 
-// TestPrefixCollision_OverlappingPrefixes tests that overlapping prefixes are detected
-func (s *PrefixCollisionTestSuite) TestPrefixCollision_OverlappingPrefixes() {
-	// Create mock routers with actually overlapping prefixes
-	// Use "a:" and "a:b:" which actually overlap (one is a prefix of the other)
+// TestPrefixCollision_NonBadgeslpPrefixRejected tests that non-badgeslp prefixes are rejected
+func (s *PrefixCollisionTestSuite) TestPrefixCollision_NonBadgeslpPrefixRejected() {
 	router1 := testutil.GenerateMockRouter("a:")
-	router2 := testutil.GenerateMockRouter("a:b:")
 
-	// Register first prefix
+	// Any prefix that is not "badgeslp:" should be rejected
 	err := s.Keeper.RegisterRouter("a:", router1)
-	s.Require().NoError(err)
-
-	// Attempt to register overlapping prefix - should fail
-	// "a:b:" starts with "a:", so they overlap
-	err = s.Keeper.RegisterRouter("a:b:", router2)
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "overlaps")
+	s.Require().Contains(err.Error(), "only prefix")
 }
 
-// TestPrefixCollision_SubPrefixRegistration tests sub-prefix registration
-func (s *PrefixCollisionTestSuite) TestPrefixCollision_SubPrefixRegistration() {
-	router1 := testutil.GenerateMockRouter("a:b:")
-	router2 := testutil.GenerateMockRouter("a:")
+// TestPrefixCollision_AnotherNonBadgeslpPrefixRejected tests that another custom prefix is rejected
+func (s *PrefixCollisionTestSuite) TestPrefixCollision_AnotherNonBadgeslpPrefixRejected() {
+	router := testutil.GenerateMockRouter("a:b:")
 
-	// Register longer prefix first
-	err := s.Keeper.RegisterRouter("a:b:", router1)
-	s.Require().NoError(err)
-
-	// Register shorter prefix (sub-prefix) - should be prevented
-	// "a:b:" starts with "a:", so they overlap
-	err = s.Keeper.RegisterRouter("a:", router2)
+	err := s.Keeper.RegisterRouter("a:b:", router)
 	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "overlaps")
+	s.Require().Contains(err.Error(), "only prefix")
 }
 
 // TestPrefixCollision_EmptyPrefix tests empty prefix handling
@@ -58,21 +44,20 @@ func (s *PrefixCollisionTestSuite) TestPrefixCollision_EmptyPrefix() {
 
 	err := s.Keeper.RegisterRouter("", router)
 	s.Require().Error(err, "Empty prefix should be rejected")
-	s.Require().Contains(err.Error(), "cannot be empty")
+	s.Require().Contains(err.Error(), "only prefix")
 }
 
-// TestPrefixCollision_DuplicatePrefix tests duplicate prefix registration
-func (s *PrefixCollisionTestSuite) TestPrefixCollision_DuplicatePrefix() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badges:")
+// TestPrefixCollision_DuplicateBadgeslpPrefix tests that re-registering badgeslp: overwrites successfully
+func (s *PrefixCollisionTestSuite) TestPrefixCollision_DuplicateBadgeslpPrefix() {
+	router1 := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	router2 := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
 
-	err := s.Keeper.RegisterRouter("badges:", router1)
+	err := s.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router1)
 	s.Require().NoError(err)
 
-	// Attempt to register same prefix again
-	err = s.Keeper.RegisterRouter("badges:", router2)
-	s.Require().Error(err, "Duplicate prefix should be rejected")
-	s.Require().Contains(err.Error(), "already registered")
+	// Re-registering badgeslp: should succeed (overwrites)
+	err = s.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router2)
+	s.Require().NoError(err)
 }
 
 // TestPrefixCollision_EmptyDenomRouting tests routing with empty denom
@@ -80,8 +65,6 @@ func (s *PrefixCollisionTestSuite) TestPrefixCollision_EmptyDenomRouting() {
 	// Test that empty denom is rejected (validation prevents empty denoms)
 	denom := ""
 
-	// Create a test address directly instead of parsing Bech32 to avoid prefix issues
-	// Use a simple address for testing
 	testAddr := sdk.AccAddress("test-address-123456")
 
 	// Empty denom should be rejected by validation

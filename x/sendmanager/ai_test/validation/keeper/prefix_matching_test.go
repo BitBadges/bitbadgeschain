@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type PrefixMatchingValidationTestSuite struct {
@@ -19,8 +20,8 @@ func TestPrefixMatchingValidationTestSuite(t *testing.T) {
 }
 
 func (suite *PrefixMatchingValidationTestSuite) TestGetBalanceWithAliasRouting_EmptyDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -32,8 +33,8 @@ func (suite *PrefixMatchingValidationTestSuite) TestGetBalanceWithAliasRouting_E
 }
 
 func (suite *PrefixMatchingValidationTestSuite) TestSendCoinWithAliasRouting_EmptyDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -58,4 +59,3 @@ func (suite *PrefixMatchingValidationTestSuite) TestStandardName_EmptyDenom() {
 	name := suite.Keeper.StandardName(suite.Ctx, "")
 	suite.Require().Equal("x/bank", name)
 }
-

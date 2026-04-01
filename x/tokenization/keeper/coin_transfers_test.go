@@ -812,3 +812,188 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	// The actual transfer uses sendNativeTokensToAddressWithPoolApprovals which transfers underlying tokens
 	// So we check token balances, not bank balances for the wrapped coins
 }
+
+// TestCoinTransfersBadgeslpSameCollectionRejected verifies that coinTransfers with badgeslp: denoms
+// referencing the same collection are rejected. This prevents stale-state bugs where the outer
+// HandleTransfer overwrites balance changes made by the nested alias-routed transfer.
+func (suite *TestSuite) TestCoinTransfersBadgeslpSameCollectionRejected() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{{
+		Denom: "uyes",
+		Conversion: &types.ConversionWithoutDenom{
+			SideA: &types.ConversionSideA{Amount: sdkmath.NewUint(1)},
+			SideB: []*types.Balance{{
+				Amount: sdkmath.NewUint(1), OwnershipTimes: GetFullUintRanges(), TokenIds: GetOneUintRange(),
+			}},
+		},
+	}}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId: "pm-transfer", TransferTimes: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges(),
+		TokenIds: GetOneUintRange(), FromListId: "AllWithoutMint", ToListId: "AllWithoutMint", InitiatedByListId: "AllWithoutMint",
+	})
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err)
+
+	collection, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err)
+	collectionId := collection.CollectionId
+	sameCollDenom := keeper.AliasDenomPrefix + collectionId.String() + ":uyes"
+
+	params := suite.app.TokenizationKeeper.GetParams(suite.ctx)
+	params.AllowedDenoms = append(params.AllowedDenoms, sameCollDenom)
+	err = suite.app.TokenizationKeeper.SetParams(suite.ctx, params)
+	suite.Require().Nil(err)
+
+	// Bob sets outgoing approval with coinTransfer referencing the SAME collection's alias denom
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator: bob, CollectionId: collectionId, UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{{
+			ToListId: "AllWithoutMint", InitiatedByListId: "AllWithoutMint",
+			TransferTimes: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges(), TokenIds: GetOneUintRange(),
+			ApprovalId: "same-coll-test",
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{
+				MustPrioritize: true,
+				MaxNumTransfers: &types.MaxNumTransfers{OverallMaxNumTransfers: sdkmath.NewUint(1), AmountTrackerId: "t"},
+				ApprovalAmounts: &types.ApprovalAmounts{OverallApprovalAmount: sdkmath.NewUint(1), AmountTrackerId: "t"},
+				CoinTransfers: []*types.CoinTransfer{{
+					To: bob, OverrideFromWithApproverAddress: false,
+					Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(1), Denom: sameCollDenom}},
+				}},
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	// Fill attempt should be rejected with "references the same collection"
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator: alice, CollectionId: collectionId,
+		Transfers: []*types.Transfer{{
+			From: bob, ToAddresses: []string{alice},
+			Balances: []*types.Balance{{Amount: sdkmath.NewUint(1), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "pm-transfer", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)},
+				{ApprovalId: "same-coll-test", ApprovalLevel: "outgoing", ApproverAddress: bob, Version: sdkmath.NewUint(0)},
+			},
+			OnlyCheckPrioritizedOutgoingApprovals: true,
+		}},
+	})
+	suite.Require().Error(err, "same-collection badgeslp coinTransfer should be rejected")
+	suite.Require().True(
+		strings.Contains(err.Error(), "references the same collection") || strings.Contains(err.Error(), "same collection"),
+		"error should mention same collection: %s", err.Error(),
+	)
+}
+
+// TestCoinTransfersBadgeslpCrossCollectionAllowed verifies that coinTransfers with badgeslp: denoms
+// referencing a DIFFERENT collection work correctly via alias routing.
+func (suite *TestSuite) TestCoinTransfersBadgeslpCrossCollectionAllowed() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	// Create collection 1 (the one we transfer badges from)
+	coll1ToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	coll1ToCreate[0].CollectionApprovals = append(coll1ToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId: "transfer", TransferTimes: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges(),
+		TokenIds: GetOneUintRange(), FromListId: "AllWithoutMint", ToListId: "AllWithoutMint", InitiatedByListId: "AllWithoutMint",
+	})
+	err := CreateCollections(suite, wctx, coll1ToCreate)
+	suite.Require().Nil(err, "error creating collection 1")
+
+	coll1, err := GetCollection(suite, wctx, sdkmath.NewUint(1))
+	suite.Require().Nil(err)
+	coll1Id := coll1.CollectionId
+
+	// Create collection 2 (the one whose alias denom is used in coinTransfer)
+	coll2ToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	coll2ToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{{
+		Denom: "upayment",
+		Conversion: &types.ConversionWithoutDenom{
+			SideA: &types.ConversionSideA{Amount: sdkmath.NewUint(1)},
+			SideB: []*types.Balance{{
+				Amount: sdkmath.NewUint(1), OwnershipTimes: GetFullUintRanges(), TokenIds: GetOneUintRange(),
+			}},
+		},
+	}}
+	coll2ToCreate[0].CollectionApprovals = append(coll2ToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId: "transfer", TransferTimes: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges(),
+		TokenIds: GetOneUintRange(), FromListId: "AllWithoutMint", ToListId: "AllWithoutMint", InitiatedByListId: "AllWithoutMint",
+	})
+	err = CreateCollections(suite, wctx, coll2ToCreate)
+	suite.Require().Nil(err, "error creating collection 2")
+
+	coll2, err := GetCollection(suite, wctx, sdkmath.NewUint(2))
+	suite.Require().Nil(err)
+	coll2Id := coll2.CollectionId
+	crossCollDenom := keeper.AliasDenomPrefix + coll2Id.String() + ":upayment"
+
+	// Mint collection 2 tokens to alice (she'll pay via coinTransfer)
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator: bob, CollectionId: coll2Id,
+		Transfers: []*types.Transfer{{
+			From: "Mint", ToAddresses: []string{alice},
+			Balances: []*types.Balance{{Amount: sdkmath.NewUint(10), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{{
+				ApprovalId: "mint-test", ApprovalLevel: "collection", Version: sdkmath.NewUint(0),
+			}},
+		}},
+	})
+	suite.Require().Nil(err, "error minting coll2 tokens to alice")
+
+	// Set auto-approve flags on both users for collection 2 (needed for nested transfer)
+	for _, addr := range []string{alice, bob} {
+		err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+			Creator: addr, CollectionId: coll2Id,
+			UpdateAutoApproveSelfInitiatedOutgoingTransfers: true, AutoApproveSelfInitiatedOutgoingTransfers: true,
+			UpdateAutoApproveAllIncomingTransfers: true, AutoApproveAllIncomingTransfers: true,
+		})
+		suite.Require().Nil(err, "error setting auto-approve for "+addr+" on coll2")
+	}
+
+	// Add cross-collection denom to allowed list
+	params := suite.app.TokenizationKeeper.GetParams(suite.ctx)
+	params.AllowedDenoms = append(params.AllowedDenoms, crossCollDenom)
+	err = suite.app.TokenizationKeeper.SetParams(suite.ctx, params)
+	suite.Require().Nil(err)
+
+	// Bob sets outgoing approval on collection 1 with coinTransfer referencing collection 2's denom
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator: bob, CollectionId: coll1Id, UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{{
+			ToListId: "AllWithoutMint", InitiatedByListId: "AllWithoutMint",
+			TransferTimes: GetFullUintRanges(), OwnershipTimes: GetFullUintRanges(), TokenIds: GetOneUintRange(),
+			ApprovalId: "cross-coll-test",
+			ApprovalCriteria: &types.OutgoingApprovalCriteria{
+				MustPrioritize: true,
+				MaxNumTransfers: &types.MaxNumTransfers{OverallMaxNumTransfers: sdkmath.NewUint(1), AmountTrackerId: "t"},
+				ApprovalAmounts: &types.ApprovalAmounts{OverallApprovalAmount: sdkmath.NewUint(1), AmountTrackerId: "t"},
+				CoinTransfers: []*types.CoinTransfer{{
+					To: bob, OverrideFromWithApproverAddress: false,
+					Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(2), Denom: crossCollDenom}},
+				}},
+			},
+		}},
+	})
+	suite.Require().Nil(err)
+
+	// Fill: transfer collection 1 badge from bob to alice, alice pays collection 2 tokens to bob
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator: alice, CollectionId: coll1Id,
+		Transfers: []*types.Transfer{{
+			From: bob, ToAddresses: []string{alice},
+			Balances: []*types.Balance{{Amount: sdkmath.NewUint(1), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+				{ApprovalId: "transfer", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)},
+				{ApprovalId: "cross-coll-test", ApprovalLevel: "outgoing", ApproverAddress: bob, Version: sdkmath.NewUint(0)},
+			},
+			OnlyCheckPrioritizedOutgoingApprovals: true,
+		}},
+	})
+	suite.Require().Nil(err, "cross-collection badgeslp coinTransfer should succeed")
+
+	// Verify bob received collection 2 tokens via the cross-collection coinTransfer
+	bobColl2Bal, err := GetUserBalance(suite, wctx, coll2Id, bob)
+	suite.Require().Nil(err)
+	suite.Require().True(len(bobColl2Bal.Balances) > 0, "bob should have received collection 2 tokens via cross-collection coinTransfer")
+}

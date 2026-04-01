@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type IsICS20CompatibleTestSuite struct {
@@ -17,12 +18,12 @@ func TestIsICS20CompatibleTestSuite(t *testing.T) {
 }
 
 func (suite *IsICS20CompatibleTestSuite) TestIsICS20Compatible_AliasDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	// Alias denom should not be ICS20 compatible
-	compatible := suite.Keeper.IsICS20Compatible(suite.Ctx, "badges:123:456")
+	compatible := suite.Keeper.IsICS20Compatible(suite.Ctx, "badgeslp:123:456")
 	suite.Require().False(compatible)
 }
 
@@ -43,4 +44,3 @@ func (suite *IsICS20CompatibleTestSuite) TestIsICS20Compatible_UnregisteredPrefi
 	compatible := suite.Keeper.IsICS20Compatible(suite.Ctx, "tokens:123")
 	suite.Require().True(compatible)
 }
-

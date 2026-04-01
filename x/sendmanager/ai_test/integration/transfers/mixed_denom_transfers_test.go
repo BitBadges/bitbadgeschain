@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type MixedDenomTransfersTestSuite struct {
@@ -19,8 +20,8 @@ func TestMixedDenomTransfersTestSuite(t *testing.T) {
 }
 
 func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_AliasAndBank() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -29,7 +30,7 @@ func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_AliasAndBank(
 	suite.Require().NoError(err)
 
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("badgeslp:123:456", sdkmath.NewInt(1000)),
 		sdk.NewCoin("uatom", sdkmath.NewInt(500)),
 	}
 
@@ -41,17 +42,13 @@ func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_AliasAndBank(
 	// Verify router was called for alias denom (before bank denom fails)
 	calls := router.GetSendCalls()
 	suite.Require().Len(calls, 1)
-	suite.Require().Equal("badges:123:456", calls[0].Denom)
+	suite.Require().Equal("badgeslp:123:456", calls[0].Denom)
 }
 
 func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_MultipleAliasDenoms() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("tokens:")
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
-	suite.Require().NoError(err)
-
-	err = suite.Keeper.RegisterRouter("tokens:", router2)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
@@ -59,19 +56,16 @@ func (suite *MixedDenomTransfersTestSuite) TestMixedDenomTransfers_MultipleAlias
 	bobAddr, err := sdk.AccAddressFromBech32(suite.Bob)
 	suite.Require().NoError(err)
 
+	// Both denoms use the single supported prefix
 	coins := sdk.Coins{
-		sdk.NewCoin("badges:123:456", sdkmath.NewInt(1000)),
-		sdk.NewCoin("tokens:789:012", sdkmath.NewInt(500)),
+		sdk.NewCoin("badgeslp:123:456", sdkmath.NewInt(1000)),
+		sdk.NewCoin("badgeslp:789:012", sdkmath.NewInt(500)),
 	}
 
 	err = suite.Keeper.SendCoinsWithAliasRouting(suite.Ctx, aliceAddr, bobAddr, coins)
 	suite.Require().NoError(err)
 
-	// Verify both routers were called
-	calls1 := router1.GetSendCalls()
-	suite.Require().Len(calls1, 1)
-
-	calls2 := router2.GetSendCalls()
-	suite.Require().Len(calls2, 1)
+	// Verify router was called for both alias denoms
+	calls := router.GetSendCalls()
+	suite.Require().Len(calls, 2)
 }
-

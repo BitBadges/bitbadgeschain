@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type RouterRegistrationValidationTestSuite struct {
@@ -20,44 +21,55 @@ func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_EmptyPref
 	router := testutil.GenerateMockRouter("")
 	err := suite.Keeper.RegisterRouter("", router)
 	suite.Require().Error(err)
-	suite.Require().Contains(err.Error(), "cannot be empty")
+	suite.Require().Contains(err.Error(), "only prefix")
 }
 
-func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_DuplicatePrefix() {
-	router1 := testutil.GenerateMockRouter("badges:")
-	router2 := testutil.GenerateMockRouter("badges:")
+func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_NonBadgeslpPrefix_Rejected() {
+	router := testutil.GenerateMockRouter("badges:")
 
-	err := suite.Keeper.RegisterRouter("badges:", router1)
+	err := suite.Keeper.RegisterRouter("badges:", router)
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "only prefix")
+}
+
+func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_AnotherInvalidPrefix_Rejected() {
+	router := testutil.GenerateMockRouter("a:")
+
+	err := suite.Keeper.RegisterRouter("a:", router)
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "only prefix")
+}
+
+func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_YetAnotherInvalidPrefix_Rejected() {
+	router := testutil.GenerateMockRouter("a:b:")
+
+	err := suite.Keeper.RegisterRouter("a:b:", router)
+	suite.Require().Error(err)
+	suite.Require().Contains(err.Error(), "only prefix")
+}
+
+func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_BadgeslpPrefix_Succeeds() {
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
-	err = suite.Keeper.RegisterRouter("badges:", router2)
-	suite.Require().Error(err)
-	suite.Require().Contains(err.Error(), "already registered")
+	prefixes := suite.Keeper.GetRegisteredPrefixes()
+	suite.Require().Len(prefixes, 1)
+	suite.Require().Contains(prefixes, sendmanagerkeeper.AliasDenomPrefix)
 }
 
-func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_OverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("a:")
-	router2 := testutil.GenerateMockRouter("a:b:")
+func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_BadgeslpDuplicate_Overwrites() {
+	router1 := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	router2 := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
 
-	err := suite.Keeper.RegisterRouter("a:", router1)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router1)
 	suite.Require().NoError(err)
 
-	// This should fail because "a:b:" starts with "a:"
-	err = suite.Keeper.RegisterRouter("a:b:", router2)
-	suite.Require().Error(err)
-	suite.Require().Contains(err.Error(), "overlaps")
-}
-
-func (suite *RouterRegistrationValidationTestSuite) TestRegisterRouter_ReverseOverlappingPrefixes() {
-	router1 := testutil.GenerateMockRouter("a:b:")
-	router2 := testutil.GenerateMockRouter("a:")
-
-	err := suite.Keeper.RegisterRouter("a:b:", router1)
+	// Re-registering badgeslp: should succeed (overwrites)
+	err = suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router2)
 	suite.Require().NoError(err)
 
-	// This should fail because "a:" is a prefix of "a:b:"
-	err = suite.Keeper.RegisterRouter("a:", router2)
-	suite.Require().Error(err)
-	suite.Require().Contains(err.Error(), "overlaps")
+	prefixes := suite.Keeper.GetRegisteredPrefixes()
+	suite.Require().Len(prefixes, 1)
 }
-

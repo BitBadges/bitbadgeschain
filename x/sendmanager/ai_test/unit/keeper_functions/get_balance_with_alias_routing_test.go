@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/ai_test/testutil"
+	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 )
 
 type GetBalanceWithAliasRoutingTestSuite struct {
@@ -18,16 +19,16 @@ func TestGetBalanceWithAliasRoutingTestSuite(t *testing.T) {
 }
 
 func (suite *GetBalanceWithAliasRoutingTestSuite) TestGetBalanceWithAliasRouting_AliasDenom() {
-	router := testutil.GenerateMockRouter("badges:")
-	err := suite.Keeper.RegisterRouter("badges:", router)
+	router := testutil.GenerateMockRouter(sendmanagerkeeper.AliasDenomPrefix)
+	err := suite.Keeper.RegisterRouter(sendmanagerkeeper.AliasDenomPrefix, router)
 	suite.Require().NoError(err)
 
 	aliceAddr, err := sdk.AccAddressFromBech32(suite.Alice)
 	suite.Require().NoError(err)
 
-	balance, err := suite.Keeper.GetBalanceWithAliasRouting(suite.Ctx, aliceAddr, "badges:123:456")
+	balance, err := suite.Keeper.GetBalanceWithAliasRouting(suite.Ctx, aliceAddr, "badgeslp:123:456")
 	suite.Require().NoError(err)
-	suite.Require().Equal("badges:123:456", balance.Denom)
+	suite.Require().Equal("badgeslp:123:456", balance.Denom)
 }
 
 func (suite *GetBalanceWithAliasRoutingTestSuite) TestGetBalanceWithAliasRouting_BankDenom() {
@@ -47,4 +48,3 @@ func (suite *GetBalanceWithAliasRoutingTestSuite) TestGetBalanceWithAliasRouting
 	suite.Require().Error(err)
 	suite.Require().Contains(err.Error(), "cannot be empty")
 }
-

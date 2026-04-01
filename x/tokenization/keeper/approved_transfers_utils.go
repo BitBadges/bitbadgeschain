@@ -53,13 +53,15 @@ func (k Keeper) DeductUserIncomingApprovals(
 	eventTracking *EventTracking,
 	royalties *types.UserRoyalties,
 ) error {
-	if userBalance.AutoApproveAllIncomingTransfers {
-		return nil
-	}
-
 	to := transferMetadata.To
 	currApprovals := userBalance.IncomingApprovals
-	if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
+
+	// Append synthetic approvals based on auto-approve flags.
+	// These are auto-scannable (InitiatedByListId = "AllWithMint" or address),
+	// so they don't require prioritization and are naturally skipped by onlyCheckPrioritized.
+	if userBalance.AutoApproveAllIncomingTransfers {
+		currApprovals = AppendAllIncomingApproval(currApprovals)
+	} else if userBalance.AutoApproveSelfInitiatedIncomingTransfers {
 		currApprovals = AppendSelfInitiatedIncomingApproval(currApprovals, to)
 	}
 

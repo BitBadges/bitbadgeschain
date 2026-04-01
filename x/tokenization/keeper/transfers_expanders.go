@@ -8,6 +8,37 @@ import (
 	sdkmath "cosmossdk.io/math"
 )
 
+func AppendAllIncomingApproval(currApprovals []*types.UserIncomingApproval) []*types.UserIncomingApproval {
+	currApprovals = append([]*types.UserIncomingApproval{
+		{
+			FromListId:        "AllWithMint",
+			InitiatedByListId: "AllWithMint",
+			TransferTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(uint64(math.MaxUint64)),
+				},
+			},
+			OwnershipTimes: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(uint64(math.MaxUint64)),
+				},
+			},
+			TokenIds: []*types.UintRange{
+				{
+					Start: sdkmath.NewUint(1),
+					End:   sdkmath.NewUint(math.MaxUint64),
+				},
+			},
+			ApprovalId: "all-incoming",
+			Version:    sdkmath.NewUint(0),
+		},
+	}, currApprovals...)
+
+	return currApprovals
+}
+
 func AppendSelfInitiatedIncomingApproval(currApprovals []*types.UserIncomingApproval, userAddress string) []*types.UserIncomingApproval {
 	currApprovals = append([]*types.UserIncomingApproval{
 		{

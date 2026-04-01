@@ -57,6 +57,5 @@ func (suite *EmptyInputsTestSuite) TestRegisterRouter_EmptyPrefix() {
 	router := testutil.GenerateMockRouter("")
 	err := suite.Keeper.RegisterRouter("", router)
 	suite.Require().Error(err)
-	suite.Require().Contains(err.Error(), "cannot be empty")
+	suite.Require().Contains(err.Error(), "only prefix")
 }
-
