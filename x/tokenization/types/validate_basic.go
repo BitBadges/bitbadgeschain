@@ -943,6 +943,11 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 							if len(sequentialTransfer.StartBalances) == 0 {
 								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires non-empty startBalances")
 							}
+							for _, bal := range sequentialTransfer.StartBalances {
+								if bal.Amount.IsZero() {
+									return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires all startBalances amounts > 0")
+								}
+							}
 							if sequentialTransfer.MaxScalingMultiplier.IsNil() || sequentialTransfer.MaxScalingMultiplier.IsZero() {
 								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires maxScalingMultiplier > 0")
 							}

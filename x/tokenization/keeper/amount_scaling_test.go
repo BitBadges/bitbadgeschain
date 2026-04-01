@@ -370,6 +370,37 @@ func (suite *TestSuite) TestAmountScalingValidateBasicEmptyStartBalances() {
 	suite.Require().Error(err, "allowAmountScaling with empty startBalances should be rejected")
 }
 
+// TestAmountScalingValidateBasicZeroAmountStartBalances verifies that startBalances with amount=0 are rejected.
+// This prevents a divide-by-zero panic in calculateConversionMultiplier.
+func (suite *TestSuite) TestAmountScalingValidateBasicZeroAmountStartBalances() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	approval := collectionsToCreate[0].CollectionApprovals[0]
+	approval.ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(0), // zero amount - should be rejected
+					TokenIds:       GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
+			AllowAmountScaling:        true,
+			MaxScalingMultiplier:      sdkmath.NewUint(100),
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Error(err, "allowAmountScaling with zero-amount startBalances should be rejected")
+}
+
 // TestAmountScalingMultipleTransfers verifies tracker increments correctly across multiple scaled transfers.
 func (suite *TestSuite) TestAmountScalingMultipleTransfers() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
