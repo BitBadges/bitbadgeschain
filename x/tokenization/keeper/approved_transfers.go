@@ -671,10 +671,16 @@ func (k Keeper) handlePredeterminedBalances(
 	if predeterminedBalances.IncrementedBalances != nil &&
 		predeterminedBalances.IncrementedBalances.AllowAmountScaling {
 		// Scaling: verify actual transfer is an evenly divisible integer multiple of base
-		_, err := k.calculateConversionMultiplier(ctx, originalTransferBalances, calculatedBalances)
+		scalingMul, err := k.calculateConversionMultiplier(ctx, originalTransferBalances, calculatedBalances)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
 				"transfer is not an evenly divisible multiple of the base balance: %s", err.Error())
+		}
+		// Enforce maxScalingMultiplier cap
+		maxMul := predeterminedBalances.IncrementedBalances.MaxScalingMultiplier
+		if !maxMul.IsNil() && !maxMul.IsZero() && scalingMul.GT(maxMul) {
+			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
+				"scaling multiplier %s exceeds max allowed %s", scalingMul.String(), maxMul.String())
 		}
 	} else {
 		// Exact match required
