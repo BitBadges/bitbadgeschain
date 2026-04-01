@@ -1182,6 +1182,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
+	// Transfer covers full range but each approval only covers half → GREEDY guard rejects split
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1200,28 +1201,7 @@ func (suite *TestSuite) TestSplittingIntoMultipleIsEquivalentSeparatePredetermin
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring tokens")
-
-	//Not exactly the predetermined balances, but the same number of transfers
-	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		Transfers: []*types.Transfer{
-			{
-				From:        bob,
-				ToAddresses: []string{alice},
-				Balances: []*types.Balance{
-					{
-						Amount:         sdkmath.NewUint(2),
-						TokenIds:       GetFullUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
-					},
-				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
-			},
-		},
-	})
-	suite.Require().Error(err, "Error transferring tokens")
+	suite.Require().Error(err, "Predetermined balances cannot split across approvals")
 }
 
 func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransferBalances() {
@@ -1281,7 +1261,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 	})
 	suite.Require().Nil(err, "Error updating collection approved transfers")
 
-	//Test that the number of balances does not matter as long as they are equivalent
+	// Transfer covers full range (top + bottom) but each approval only covers half → GREEDY guard rejects
 	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
 		CollectionId: sdkmath.NewUint(1),
@@ -1305,7 +1285,7 @@ func (suite *TestSuite) TestSplitPredetrminedBalancesEquivalentButNotSameTransfe
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring tokens")
+	suite.Require().Error(err, "Predetermined balances cannot split across approvals")
 }
 
 func (suite *TestSuite) TestGetMaxPossible() {

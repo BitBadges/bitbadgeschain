@@ -916,6 +916,34 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						if tokenIdOverrideCount > 1 {
 							return sdkerrors.Wrapf(ErrInvalidRequest, "only one of increment token ids by, or allow override with any valid ID can be set")
 						}
+
+						// When amount scaling is enabled, startBalances is a static 1x base.
+						// All other fields must be zero/false/nil.
+						if sequentialTransfer.AllowAmountScaling {
+							if !sequentialTransfer.IncrementTokenIdsBy.IsZero() {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires incrementTokenIdsBy == 0")
+							}
+							if !sequentialTransfer.IncrementOwnershipTimesBy.IsZero() {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires incrementOwnershipTimesBy == 0")
+							}
+							if !sequentialTransfer.DurationFromTimestamp.IsZero() {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires durationFromTimestamp == 0")
+							}
+							if sequentialTransfer.AllowOverrideTimestamp {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires allowOverrideTimestamp == false")
+							}
+							if sequentialTransfer.AllowOverrideWithAnyValidToken {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires allowOverrideWithAnyValidToken == false")
+							}
+							hasRecurring := sequentialTransfer.RecurringOwnershipTimes != nil &&
+								(!sequentialTransfer.RecurringOwnershipTimes.StartTime.IsNil() && !sequentialTransfer.RecurringOwnershipTimes.StartTime.IsZero())
+							if hasRecurring {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires recurringOwnershipTimes to be nil/zero")
+							}
+							if len(sequentialTransfer.StartBalances) == 0 {
+								return sdkerrors.Wrapf(ErrInvalidRequest, "allowAmountScaling requires non-empty startBalances")
+							}
+						}
 					} else if !manualBalancesIsBasicallyNil && sequentialTransferIsBasicallyNil {
 						for _, manualTransfer := range approvalCriteria.PredeterminedBalances.ManualBalances {
 							manualTransfer.Balances, err = ValidateBalances(ctx, manualTransfer.Balances, canChangeValues)
@@ -982,6 +1010,7 @@ func IsSequentialTransferBasicallyNil(incrementedBalances *IncrementedBalances) 
 	return incrementedBalances == nil || (len(incrementedBalances.StartBalances) == 0 &&
 		(!incrementedBalances.AllowOverrideWithAnyValidToken) &&
 		(!incrementedBalances.AllowOverrideTimestamp) &&
+		(!incrementedBalances.AllowAmountScaling) &&
 		(incrementedBalances.IncrementTokenIdsBy.IsNil() ||
 			incrementedBalances.IncrementTokenIdsBy.IsZero()) &&
 		(incrementedBalances.IncrementOwnershipTimesBy.IsNil() ||

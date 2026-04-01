@@ -130,13 +130,20 @@ func NewAppModule(
 	}
 }
 
-const ConsensusVersion = 27
+const ConsensusVersion = 28
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), *am.keeper)
 
+	if err := cfg.RegisterMigration(types.ModuleName, ConsensusVersion-2, func(ctx sdk.Context) error {
+		return nil
+	}); err != nil {
+		panic(fmt.Errorf("failed to register migration of %s: %w", types.ModuleName, err))
+	}
+
+	// v27 -> v28: No-op migration. AllowAmountScaling defaults to false (proto3 zero value).
 	if err := cfg.RegisterMigration(types.ModuleName, ConsensusVersion-1, func(ctx sdk.Context) error {
 		return nil
 	}); err != nil {

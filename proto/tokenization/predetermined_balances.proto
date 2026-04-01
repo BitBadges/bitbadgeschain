@@ -37,6 +37,10 @@ message IncrementedBalances {
   RecurringOwnershipTimes recurringOwnershipTimes = 6;
   // Allow override of any valid ID
   bool allowOverrideWithAnyValidToken = 7;
+  // When true, the actual transfer can be any evenly divisible integer multiple (>=1x) of startBalances.
+  // approvalCriteria.coinTransfers are scaled by the same multiplier.
+  // All other IncrementedBalances fields must be zero/false/nil when this is true.
+  bool allowAmountScaling = 8;
 }
 
 // PredeterminedOrderCalculationMethod defines the method to calculate predetermined balances order.
