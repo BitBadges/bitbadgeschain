@@ -405,6 +405,8 @@ struct IncrementedBalances {
     bool allowOverrideTimestamp;
     RecurringOwnershipTimes recurringOwnershipTimes;
     bool allowOverrideWithAnyValidToken;
+    bool allowAmountScaling;
+    uint256 maxScalingMultiplier;
 }
 
 /**
