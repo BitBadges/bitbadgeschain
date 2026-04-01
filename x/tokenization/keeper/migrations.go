@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
+	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"cosmossdk.io/store/prefix"
-	storetypes "cosmossdk.io/store/types"
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v26"
 )
@@ -49,26 +50,43 @@ func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApproval
 	if approvalCriteria == nil {
 		return
 	}
+	migratePredeterminedBalances(approvalCriteria.PredeterminedBalances)
 }
 
 // migrateOutgoingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
-// Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
-// so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
-// New EVM contract check fields (mustBeEvmContract, mustNotBeEvmContract) default to false if not present.
 func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
+	migratePredeterminedBalances(approvalCriteria.PredeterminedBalances)
 }
 
-// migrateApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
-// Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
-// so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
-// New EVM contract check fields (mustBeEvmContract, mustNotBeEvmContract) default to false if not present.
+// migrateIncrementedBalances ensures new scaling fields have explicit defaults after JSON migration.
+// allowAmountScaling defaults to false, maxScalingMultiplier defaults to zero Uint.
+func migrateIncrementedBalances(ib *newtypes.IncrementedBalances) {
+	if ib == nil {
+		return
+	}
+	ib.AllowAmountScaling = false
+	if ib.MaxScalingMultiplier.IsNil() {
+		ib.MaxScalingMultiplier = sdkmath.NewUint(0)
+	}
+}
+
+func migratePredeterminedBalances(pb *newtypes.PredeterminedBalances) {
+	if pb == nil {
+		return
+	}
+	migrateIncrementedBalances(pb.IncrementedBalances)
+}
+
+// migrateApprovalCriteria handles WASM contract check field removal, EVM contract check field defaults,
+// and amount scaling field defaults for IncrementedBalances.
 func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
+	migratePredeterminedBalances(approvalCriteria.PredeterminedBalances)
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
