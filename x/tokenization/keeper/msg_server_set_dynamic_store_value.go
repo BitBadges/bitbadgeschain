@@ -38,6 +38,11 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 	}
 
 	// Emit event
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
 	valueStr := "false"
 	if msg.Value {
 		valueStr = "true"
@@ -46,6 +51,7 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "set_dynamic_store_value"),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("store_id", msg.StoreId.String()),
 		sdk.NewAttribute("address", msg.Address),
 		sdk.NewAttribute("value", valueStr),

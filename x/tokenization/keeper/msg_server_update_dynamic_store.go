@@ -43,6 +43,11 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 	}
 
 	// Emit event
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
 	globalEnabledStr := "false"
 	if msg.GlobalEnabled {
 		globalEnabledStr = "true"
@@ -51,6 +56,7 @@ func (k msgServer) UpdateDynamicStore(goCtx context.Context, msg *types.MsgUpdat
 		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "update_dynamic_store"),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("store_id", msg.StoreId.String()),
 		sdk.NewAttribute("global_enabled", globalEnabledStr),
 	)
