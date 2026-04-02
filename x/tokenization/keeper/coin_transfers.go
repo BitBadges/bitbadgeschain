@@ -228,6 +228,10 @@ func (k Keeper) sendCoinWithRoyalty(
 // scaleCoinTransfers multiplies all coin amounts by the given integer multiplier.
 // Used by allowAmountScaling to scale payments proportionally with transfer quantity.
 func scaleCoinTransfers(base []*types.CoinTransfer, multiplier sdkmath.Uint) []*types.CoinTransfer {
+	if multiplier.IsZero() {
+		return []*types.CoinTransfer{}
+	}
+	
 	multiplierInt := sdkmath.NewIntFromBigInt(multiplier.BigInt())
 	scaled := make([]*types.CoinTransfer, len(base))
 	for i, ct := range base {

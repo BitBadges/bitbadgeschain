@@ -254,16 +254,21 @@ func (k Keeper) DeductAndGetUserApprovals(
 					baseBalances,
 				)
 				if scalingErr != nil {
-					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: "+scalingErr.Error())
+					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: transfer is not an evenly divisible multiple of the base balance")
 					rollbackOnFailure()
 					continue
 				}
 
 				// Enforce maxScalingMultiplier cap
 				maxMul := approvalCriteria.PredeterminedBalances.IncrementedBalances.MaxScalingMultiplier
-				if !maxMul.IsNil() && !maxMul.IsZero() && scalingMultiplier.GT(maxMul) {
-					addPotentialError(isExplicitlyPrioritized, idx,
-						fmt.Sprintf("scaling multiplier %s exceeds max %s", scalingMultiplier, maxMul))
+				if maxMul.IsNil() || maxMul.IsZero() {
+					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: max scaling multiplier is not set")
+					rollbackOnFailure()
+					continue
+				}
+
+				if scalingMultiplier.GT(maxMul) {
+					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: multiplier exceeds maximum allowed")
 					rollbackOnFailure()
 					continue
 				}
@@ -676,9 +681,14 @@ func (k Keeper) handlePredeterminedBalances(
 			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
 				"transfer is not an evenly divisible multiple of the base balance: %s", err.Error())
 		}
+
 		// Enforce maxScalingMultiplier cap
 		maxMul := predeterminedBalances.IncrementedBalances.MaxScalingMultiplier
-		if !maxMul.IsNil() && !maxMul.IsZero() && scalingMul.GT(maxMul) {
+		if maxMul.IsNil() || maxMul.IsZero() {
+			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer, "max scaling multiplier is not set")
+		}
+		
+		if scalingMul.GT(maxMul) {
 			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
 				"scaling multiplier %s exceeds max allowed %s", scalingMul.String(), maxMul.String())
 		}
