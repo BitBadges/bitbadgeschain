@@ -799,3 +799,161 @@ func (suite *TestSuite) TestAmountScalingLargeMultiplier() {
 	})
 	suite.Require().Nil(err, "1000x transfer with MAX_UINT64 maxScalingMultiplier should succeed")
 }
+
+// TestAmountScalingPrecalculation verifies that scalingMultiplier in PrecalculationOptions
+// correctly scales the precalculated balances and coin transfers.
+func (suite *TestSuite) TestAmountScalingPrecalculation() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.createScalingCollection(1, 100, 100)
+
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+
+	// Use precalculation with scalingMultiplier=5 instead of setting balances directly
+	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances:    []*types.Balance{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					ApprovalId:      "mint-test",
+					ApprovalLevel:   "collection",
+					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
+					PrecalculationOptions: &types.PrecalculationOptions{
+						ScalingMultiplier: sdkmath.NewUint(5),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "5x scaling via precalculation should succeed")
+
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 500 ubadge (5x via precalc)")
+}
+
+// TestAmountScalingPrecalcExceedsMax verifies that scalingMultiplier > maxScalingMultiplier is rejected.
+func (suite *TestSuite) TestAmountScalingPrecalcExceedsMax() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.createScalingCollection(1, 100, 3) // max 3x
+
+	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances:    []*types.Balance{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					ApprovalId:      "mint-test",
+					ApprovalLevel:   "collection",
+					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
+					PrecalculationOptions: &types.PrecalculationOptions{
+						ScalingMultiplier: sdkmath.NewUint(5),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Error(err, "scalingMultiplier 5 should fail with max 3")
+}
+
+// TestAmountScalingPrecalcOnNonScalingApproval verifies that scalingMultiplier on a
+// non-scaling approval is rejected.
+func (suite *TestSuite) TestAmountScalingPrecalcOnNonScalingApproval() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	// Standard approval with NO scaling
+	approval := collectionsToCreate[0].CollectionApprovals[0]
+	approval.ApprovalCriteria.PredeterminedBalances = &types.PredeterminedBalances{
+		IncrementedBalances: &types.IncrementedBalances{
+			StartBalances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					TokenIds:       GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
+				},
+			},
+			IncrementTokenIdsBy:       sdkmath.NewUint(0),
+			IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+			DurationFromTimestamp:     sdkmath.NewUint(0),
+			AllowAmountScaling:        false, // scaling disabled
+		},
+		OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{
+			UseOverallNumTransfers: true,
+		},
+	}
+	collectionsToCreate[0].Transfers = []*types.Transfer{}
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating collection")
+
+	// Attempt precalculation with scalingMultiplier on non-scaling approval
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances:    []*types.Balance{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					ApprovalId:      "mint-test",
+					ApprovalLevel:   "collection",
+					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
+					PrecalculationOptions: &types.PrecalculationOptions{
+						ScalingMultiplier: sdkmath.NewUint(5),
+					},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Error(err, "scalingMultiplier on non-scaling approval should be rejected")
+}
+
+// TestAmountScalingPrecalcZero verifies backward compat: scalingMultiplier=0 returns 1x base.
+func (suite *TestSuite) TestAmountScalingPrecalcZero() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.createScalingCollection(1, 100, 100)
+
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+
+	// Precalculation with scalingMultiplier=0 (default) should return 1x base
+	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{charlie},
+				Balances:    []*types.Balance{},
+				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+					ApprovalId:      "mint-test",
+					ApprovalLevel:   "collection",
+					ApproverAddress: "",
+					Version:         sdkmath.NewUint(0),
+					PrecalculationOptions: &types.PrecalculationOptions{},
+				},
+				PrioritizedApprovals:                    GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
+				OnlyCheckPrioritizedCollectionApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "precalculation with scalingMultiplier=0 should return 1x base")
+
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(100)), aliceAfter.Amount, "alice should receive 100 ubadge (1x base via precalc)")
+}

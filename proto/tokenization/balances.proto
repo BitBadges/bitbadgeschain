@@ -49,4 +49,7 @@ message PrecalculationOptions {
   string overrideTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The IDs to override for the transfer. Only applicable if using this option in precalculation.
   repeated UintRange tokenIdsOverride = 2;
+  // When > 0 and allowAmountScaling is true on the approval, all precalculated balance amounts
+  // are multiplied by this value. Must be <= maxScalingMultiplier. 0 means no scaling (returns 1x base).
+  string scalingMultiplier = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }

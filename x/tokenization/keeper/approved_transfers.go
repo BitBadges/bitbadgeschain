@@ -1112,6 +1112,35 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				}
 			}
 
+			// Apply scaling multiplier if provided in precalculation options
+			if precalculationOptions != nil &&
+				!precalculationOptions.ScalingMultiplier.IsNil() &&
+				precalculationOptions.ScalingMultiplier.GT(sdkmath.NewUint(0)) {
+				// Verify scaling is enabled on this approval
+				if approvalCriteria.PredeterminedBalances.IncrementedBalances == nil ||
+					!approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowAmountScaling {
+					return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer,
+						"scalingMultiplier provided but allowAmountScaling is not enabled on approval %s", precalculationId)
+				}
+
+				// Enforce maxScalingMultiplier cap
+				maxMul := approvalCriteria.PredeterminedBalances.IncrementedBalances.MaxScalingMultiplier
+				if maxMul.IsNil() || maxMul.IsZero() {
+					return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer,
+						"maxScalingMultiplier is not set on approval %s", precalculationId)
+				}
+				if precalculationOptions.ScalingMultiplier.GT(maxMul) {
+					return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer,
+						"scalingMultiplier %s exceeds maxScalingMultiplier %s",
+						precalculationOptions.ScalingMultiplier.String(), maxMul.String())
+				}
+
+				// Scale all balance amounts
+				for _, balance := range predeterminedBalances {
+					balance.Amount = balance.Amount.Mul(precalculationOptions.ScalingMultiplier)
+				}
+			}
+
 			return predeterminedBalances, nil
 		} else {
 			return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer, "no predetermined transfers found for approval id: %s", precalculationId)
