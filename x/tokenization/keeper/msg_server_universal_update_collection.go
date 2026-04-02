@@ -335,6 +335,17 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			types.EnforceMustPrioritizeForNonAutoScannable(approval.ApprovalCriteria)
 		}
 
+		// Resolve mustOwnTokens collectionId 0 → actual collection ID (self-reference)
+		for _, approval := range msg.CollectionApprovals {
+			if approval.ApprovalCriteria != nil {
+				for _, mot := range approval.ApprovalCriteria.MustOwnTokens {
+					if mot != nil && mot.CollectionId.IsZero() {
+						mot.CollectionId = collection.CollectionId
+					}
+				}
+			}
+		}
+
 		// Create a map of existing approvals for quick lookup
 		existingApprovals := make(map[string]*types.CollectionApproval)
 		for _, approval := range collection.CollectionApprovals {
