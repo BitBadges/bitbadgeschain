@@ -38,6 +38,7 @@ struct Balance {
 struct PrecalculationOptions {
     uint256 overrideTimestamp;
     UintRange[] tokenIdsOverride;
+    uint256 scalingMultiplier;
 }
 
 // ============================================================================
