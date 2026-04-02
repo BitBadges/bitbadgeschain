@@ -34,6 +34,10 @@ func (c *MustOwnTokensChecker) Check(ctx sdk.Context, approval *types.Collection
 
 	mustOwnTokens := approval.ApprovalCriteria.MustOwnTokens
 	for idx, mustOwnToken := range mustOwnTokens {
+		// Resolve collectionId 0 to self (the current collection)
+		if mustOwnToken.CollectionId.IsZero() {
+			mustOwnToken.CollectionId = collection.CollectionId
+		}
 		// Check if this requirement passes
 		requirementPassed, errMsg := c.checkSingleRequirement(ctx, mustOwnToken, idx, initiator, from, to)
 		if !requirementPassed {
