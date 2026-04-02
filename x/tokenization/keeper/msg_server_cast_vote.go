@@ -133,10 +133,16 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 	}
 
 	// Emit event
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "cast_vote"),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("collection_id", msg.CollectionId.String()),
 		sdk.NewAttribute("approval_level", msg.ApprovalLevel),
 		sdk.NewAttribute("approver_address", msg.ApproverAddress),

@@ -291,6 +291,7 @@ func incrementedBalancesToSolidity(i *tokenizationtypes.IncrementedBalances) []i
 		return []interface{}{
 			make([]interface{}, 0), big.NewInt(0), big.NewInt(0), big.NewInt(0),
 			false, recurringOwnershipTimesToSolidity(nil), false,
+			false, big.NewInt(0),
 		}
 	}
 	startBalances := make([]interface{}, 0, len(i.StartBalances))
@@ -312,6 +313,8 @@ func incrementedBalancesToSolidity(i *tokenizationtypes.IncrementedBalances) []i
 		i.AllowOverrideTimestamp,
 		recurringOwnershipTimesToSolidity(i.RecurringOwnershipTimes),
 		i.AllowOverrideWithAnyValidToken,
+		i.AllowAmountScaling,
+		bigIntFromUint(i.MaxScalingMultiplier),
 	}
 }
 

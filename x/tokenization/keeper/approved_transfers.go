@@ -227,8 +227,59 @@ func (k Keeper) DeductAndGetUserApprovals(
 				continue
 			}
 
-			// Handle coin transfers on cached context
-			detErrMsg, err := k.ExecuteCoinTransfers(cachedCtx, approvalCriteria.CoinTransfers, transferMetadata, eventTracking.CoinTransfers, collection, royalties)
+			// Predetermined balances cannot split across approvals.
+			// Fixes existing bug + required for amount scaling correctness.
+			if approvalCriteria.PredeterminedBalances != nil &&
+				!types.PredeterminedBalancesIsBasicallyNil(approvalCriteria.PredeterminedBalances) {
+				if !types.AreBalancesEqual(cachedCtx, transferBalancesToCheck, originalTransferBalances, false) {
+					addPotentialError(isExplicitlyPrioritized, idx,
+						"predetermined balances require the full transfer to match this approval (no splitting)")
+					rollbackOnFailure()
+					continue
+				}
+			}
+
+			// Pre-compute scaling multiplier and scale coin transfers if applicable.
+			// Safe because allowAmountScaling requires zero increments,
+			// so startBalances is always the static 1x base.
+			coinTransfersToExecute := approvalCriteria.CoinTransfers
+			if approvalCriteria.PredeterminedBalances != nil &&
+				!types.IsSequentialTransferBasicallyNil(approvalCriteria.PredeterminedBalances.IncrementedBalances) &&
+				approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowAmountScaling {
+
+				baseBalances := approvalCriteria.PredeterminedBalances.IncrementedBalances.StartBalances
+				scalingMultiplier, scalingErr := k.calculateConversionMultiplier(
+					cachedCtx,
+					originalTransferBalances,
+					baseBalances,
+				)
+				if scalingErr != nil {
+					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: transfer is not an evenly divisible multiple of the base balance")
+					rollbackOnFailure()
+					continue
+				}
+
+				// Enforce maxScalingMultiplier cap
+				maxMul := approvalCriteria.PredeterminedBalances.IncrementedBalances.MaxScalingMultiplier
+				if maxMul.IsNil() || maxMul.IsZero() {
+					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: max scaling multiplier is not set")
+					rollbackOnFailure()
+					continue
+				}
+
+				if scalingMultiplier.GT(maxMul) {
+					addPotentialError(isExplicitlyPrioritized, idx, "amount scaling: multiplier exceeds maximum allowed")
+					rollbackOnFailure()
+					continue
+				}
+
+				if scalingMultiplier.GT(sdkmath.NewUint(1)) && len(approvalCriteria.CoinTransfers) > 0 {
+					coinTransfersToExecute = scaleCoinTransfers(approvalCriteria.CoinTransfers, scalingMultiplier)
+				}
+			}
+
+			// Handle coin transfers on cached context (scaled if applicable)
+			detErrMsg, err := k.ExecuteCoinTransfers(cachedCtx, coinTransfersToExecute, transferMetadata, eventTracking.CoinTransfers, collection, royalties)
 			if err != nil {
 				if detErrMsg != "" {
 					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
@@ -560,8 +611,9 @@ func (k Keeper) GetMaxPossible(
 	return "", maxBalancesWeCanAdd, nil
 }
 
-// handlePredeterminedBalances checks if the transfer matches predetermined balance requirements
-func handlePredeterminedBalances(
+// handlePredeterminedBalances checks if the transfer matches predetermined balance requirements.
+// Keeper method to access calculateConversionMultiplier for amount scaling.
+func (k Keeper) handlePredeterminedBalances(
 	ctx sdk.Context,
 	predeterminedBalances *types.PredeterminedBalances,
 	originalTransferBalances []*types.Balance,
@@ -620,9 +672,31 @@ func handlePredeterminedBalances(
 		}
 	}
 
-	// Assert that we have exactly the amount specified in the original transfers
-	if !types.AreBalancesEqual(ctx, originalTransferBalances, calculatedBalances, false) {
-		return nil, sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because predetermined balances do not match")
+	// Check transfer matches predetermined expectation
+	if predeterminedBalances.IncrementedBalances != nil &&
+		predeterminedBalances.IncrementedBalances.AllowAmountScaling {
+		// Scaling: verify actual transfer is an evenly divisible integer multiple of base
+		scalingMul, err := k.calculateConversionMultiplier(ctx, originalTransferBalances, calculatedBalances)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
+				"transfer is not an evenly divisible multiple of the base balance: %s", err.Error())
+		}
+
+		// Enforce maxScalingMultiplier cap
+		maxMul := predeterminedBalances.IncrementedBalances.MaxScalingMultiplier
+		if maxMul.IsNil() || maxMul.IsZero() {
+			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer, "max scaling multiplier is not set")
+		}
+		
+		if scalingMul.GT(maxMul) {
+			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
+				"scaling multiplier %s exceeds max allowed %s", scalingMul.String(), maxMul.String())
+		}
+	} else {
+		// Exact match required
+		if !types.AreBalancesEqual(ctx, originalTransferBalances, calculatedBalances, false) {
+			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer, "transfer disallowed because predetermined balances do not match")
+		}
 	}
 
 	return calculatedBalances, nil
@@ -726,7 +800,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	}
 
 	// Handle predetermined balances check
-	_, err = handlePredeterminedBalances(
+	_, err = k.handlePredeterminedBalances(
 		ctx,
 		approvalCriteria.PredeterminedBalances,
 		originalTransferBalances,
@@ -1035,6 +1109,35 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				)
 				if err != nil {
 					return []*types.Balance{}, err
+				}
+			}
+
+			// Apply scaling multiplier if provided in precalculation options
+			if precalculationOptions != nil &&
+				!precalculationOptions.ScalingMultiplier.IsNil() &&
+				precalculationOptions.ScalingMultiplier.GT(sdkmath.NewUint(0)) {
+				// Verify scaling is enabled on this approval
+				if approvalCriteria.PredeterminedBalances.IncrementedBalances == nil ||
+					!approvalCriteria.PredeterminedBalances.IncrementedBalances.AllowAmountScaling {
+					return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer,
+						"scalingMultiplier provided but allowAmountScaling is not enabled on approval %s", precalculationId)
+				}
+
+				// Enforce maxScalingMultiplier cap
+				maxMul := approvalCriteria.PredeterminedBalances.IncrementedBalances.MaxScalingMultiplier
+				if maxMul.IsNil() || maxMul.IsZero() {
+					return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer,
+						"maxScalingMultiplier is not set on approval %s", precalculationId)
+				}
+				if precalculationOptions.ScalingMultiplier.GT(maxMul) {
+					return []*types.Balance{}, sdkerrors.Wrapf(ErrDisallowedTransfer,
+						"scalingMultiplier %s exceeds maxScalingMultiplier %s",
+						precalculationOptions.ScalingMultiplier.String(), maxMul.String())
+				}
+
+				// Scale all balance amounts
+				for _, balance := range predeterminedBalances {
+					balance.Amount = balance.Amount.Mul(precalculationOptions.ScalingMultiplier)
 				}
 			}
 

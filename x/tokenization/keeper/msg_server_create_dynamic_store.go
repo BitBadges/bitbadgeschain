@@ -44,10 +44,16 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 	}
 
 	// Emit event
+	msgStr, err := MarshalMessageForEvent(msg)
+	if err != nil {
+		return nil, err
+	}
+
 	EmitMessageAndIndexerEvents(ctx,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "tokenization"),
 		sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
 		sdk.NewAttribute("msg_type", "create_dynamic_store"),
+		sdk.NewAttribute("msg", msgStr),
 		sdk.NewAttribute("store_id", nextStoreId.String()),
 	)
 
