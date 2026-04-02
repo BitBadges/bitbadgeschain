@@ -635,9 +635,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 						return sdkerrors.Wrapf(err, "invalid transfer times")
 					}
 
-					if mustOwnTokenBalance.CollectionId.IsNil() || mustOwnTokenBalance.CollectionId.IsZero() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized")
+					if mustOwnTokenBalance.CollectionId.IsNil() {
+						return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized (nil)")
 					}
+					// CollectionId 0 is allowed — means "this collection" (self-reference, resolved at runtime)
 				}
 
 				// Validate dynamic store challenges
