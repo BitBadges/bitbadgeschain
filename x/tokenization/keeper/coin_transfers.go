@@ -99,6 +99,24 @@ func (k Keeper) ExecuteCoinTransfers(
 		}
 	}
 
+	// Enforce allowed denoms from params. If the allowlist is non-empty, every coin denom
+	// must either appear in the list or use the badgeslp: alias prefix (always allowed).
+	allowedDenoms := k.GetAllowedDenoms(ctx)
+	if len(allowedDenoms) > 0 {
+		allowedSet := make(map[string]bool, len(allowedDenoms))
+		for _, d := range allowedDenoms {
+			allowedSet[d] = true
+		}
+		for _, coinTransfer := range coinTransfers {
+			for _, coin := range coinTransfer.Coins {
+				if !allowedSet[coin.Denom] && !CheckStartsWithAliasDenom(coin.Denom) {
+					detErrMsg := fmt.Sprintf("denom %s is not in the allowed denoms list for coin transfers", coin.Denom)
+					return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+				}
+			}
+		}
+	}
+
 	// Execute coin transfers directly - if they fail, the cached context will rollback
 	for _, coinTransfer := range coinTransfers {
 		coinsToTransfer := coinTransfer.Coins
