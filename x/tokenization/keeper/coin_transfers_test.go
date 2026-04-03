@@ -1100,7 +1100,7 @@ func (suite *TestSuite) TestCoinTransfer_DenomNotInAllowedDenoms() {
 				},
 				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 					{ApprovalId: "transfer", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)},
-					{ApprovalId: "not-allowed-test", ApprovalLevel: "outgoing", ApproverAddress: bob, Version: sdkmath.NewUint(1)},
+					{ApprovalId: "not-allowed-test", ApprovalLevel: "outgoing", ApproverAddress: bob, Version: sdkmath.NewUint(0)},
 				},
 				OnlyCheckPrioritizedOutgoingApprovals: true,
 			},
