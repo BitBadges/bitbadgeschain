@@ -55,8 +55,7 @@ func getFullUintRanges() []*tokenizationtypes.UintRange {
 
 // TestCoinDenomValidation_MultiCoinInsufficientBalance tests that coin transfers
 // with multiple coins fail gracefully when the sender has insufficient balance.
-// The allowed-denom whitelist was removed; any denom is accepted, but the sender
-// must hold sufficient funds for the transfer to succeed.
+// Uses allowed denoms (ubadge) so that the transfer reaches the balance check.
 func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinInsufficientBalance() {
 	wctx := sdk.WrapSDKContext(suite.Ctx)
 	collectionId := suite.CollectionId
@@ -99,7 +98,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinInsu
 							To: suite.Alice,
 							Coins: []*sdk.Coin{
 								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
-								{Amount: sdkmath.NewInt(50), Denom: "uatom"},
+								{Amount: sdkmath.NewInt(50), Denom: "ubadge"},
 							},
 						},
 					},
@@ -177,7 +176,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsCheck
 		},
 	})
 
-	// Coin transfer with a denom Bob doesn't hold
+	// Coin transfer with an allowed denom Bob doesn't hold enough of
 	updateMsg := &tokenizationtypes.MsgUpdateUserApprovals{
 		Creator:                 suite.Bob,
 		CollectionId:            collectionId,
@@ -203,7 +202,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsCheck
 						{
 							To: suite.Alice,
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(50), Denom: "uatom"},
+								{Amount: sdkmath.NewInt(50), Denom: "ubadge"},
 							},
 						},
 					},
