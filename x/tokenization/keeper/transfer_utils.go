@@ -128,6 +128,7 @@ func (k Keeper) HandleAutoDeletions(
 			"",
 			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
 			true,
+			approvalCriteria.MaxNumTransfers.VelocityLimit,
 		)
 		if err != nil {
 			return false
@@ -165,6 +166,7 @@ func (k Keeper) HandleAutoDeletions(
 			"",
 			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
 			true,
+			approvalCriteria.MaxNumTransfers.VelocityLimit,
 		)
 		if err != nil {
 			return false
@@ -202,6 +204,7 @@ func (k Keeper) HandleAutoDeletions(
 			"",
 			approvalCriteria.MaxNumTransfers.ResetTimeIntervals,
 			true,
+			approvalCriteria.MaxNumTransfers.VelocityLimit,
 		)
 		if err != nil {
 			return false

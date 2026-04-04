@@ -385,7 +385,8 @@ func MaxNumTransfersIsBasicallyNil(maxNumTransfers *MaxNumTransfers) bool {
 		(maxNumTransfers.PerToAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerToAddressMaxNumTransfers.IsZero()) &&
 		(maxNumTransfers.PerFromAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerFromAddressMaxNumTransfers.IsZero()) &&
 		(maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsNil() || maxNumTransfers.PerInitiatedByAddressMaxNumTransfers.IsZero()) &&
-		(maxNumTransfers.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(maxNumTransfers.ResetTimeIntervals)))
+		(maxNumTransfers.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(maxNumTransfers.ResetTimeIntervals)) &&
+		IsVelocityLimitBasicallyNil(maxNumTransfers.VelocityLimit))
 }
 
 func IsResetTimeIntervalBasicallyNil(resetTimeInterval *ResetTimeIntervals) bool {
@@ -398,7 +399,8 @@ func ApprovalAmountsIsBasicallyNil(approvalAmounts *ApprovalAmounts) bool {
 		(approvalAmounts.PerToAddressApprovalAmount.IsNil() || approvalAmounts.PerToAddressApprovalAmount.IsZero()) &&
 		(approvalAmounts.PerFromAddressApprovalAmount.IsNil() || approvalAmounts.PerFromAddressApprovalAmount.IsZero()) &&
 		(approvalAmounts.PerInitiatedByAddressApprovalAmount.IsNil() || approvalAmounts.PerInitiatedByAddressApprovalAmount.IsZero()) &&
-		(approvalAmounts.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(approvalAmounts.ResetTimeIntervals)))
+		(approvalAmounts.ResetTimeIntervals == nil || IsResetTimeIntervalBasicallyNil(approvalAmounts.ResetTimeIntervals)) &&
+		IsVelocityLimitBasicallyNil(approvalAmounts.VelocityLimit))
 }
 
 func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool {
@@ -734,6 +736,23 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				if hasNonNilFields && approvalCriteria.ApprovalAmounts.AmountTrackerId == "" {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "approvalAmounts has non-nil fields set but amountTrackerId is empty or nil")
 				}
+
+				// Reject if both resetTimeIntervals AND velocityLimit are set — they are mutually exclusive
+				hasResetIntervals := approvalCriteria.ApprovalAmounts.ResetTimeIntervals != nil && !IsResetTimeIntervalBasicallyNil(approvalCriteria.ApprovalAmounts.ResetTimeIntervals)
+				hasVelocityLimit := !IsVelocityLimitBasicallyNil(approvalCriteria.ApprovalAmounts.VelocityLimit)
+				if hasResetIntervals && hasVelocityLimit {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "approvalAmounts cannot have both resetTimeIntervals and velocityLimit set — they are mutually exclusive")
+				}
+
+				// If velocityLimit is set, require an amountTrackerId
+				if hasVelocityLimit && approvalCriteria.ApprovalAmounts.AmountTrackerId == "" {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "approvalAmounts has velocityLimit set but amountTrackerId is empty or nil")
+				}
+
+				// Validate velocity limit window duration produces a non-zero bucket size (must be >= 24ms)
+				if hasVelocityLimit && approvalCriteria.ApprovalAmounts.VelocityLimit.WindowDuration.LT(sdkmath.NewUint(MaxVelocityBuckets)) {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "approvalAmounts velocityLimit windowDuration must be at least %d ms to produce non-zero bucket sizes", MaxVelocityBuckets)
+				}
 			}
 
 			if canChangeValues {
@@ -792,6 +811,23 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 				if hasNonNilFields && approvalCriteria.MaxNumTransfers.AmountTrackerId == "" {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "maxNumTransfers has non-nil fields set but amountTrackerId is empty or nil")
+				}
+
+				// Reject if both resetTimeIntervals AND velocityLimit are set — they are mutually exclusive
+				hasResetIntervals := approvalCriteria.MaxNumTransfers.ResetTimeIntervals != nil && !IsResetTimeIntervalBasicallyNil(approvalCriteria.MaxNumTransfers.ResetTimeIntervals)
+				hasVelocityLimit := !IsVelocityLimitBasicallyNil(approvalCriteria.MaxNumTransfers.VelocityLimit)
+				if hasResetIntervals && hasVelocityLimit {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "maxNumTransfers cannot have both resetTimeIntervals and velocityLimit set — they are mutually exclusive")
+				}
+
+				// If velocityLimit is set, require an amountTrackerId
+				if hasVelocityLimit && approvalCriteria.MaxNumTransfers.AmountTrackerId == "" {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "maxNumTransfers has velocityLimit set but amountTrackerId is empty or nil")
+				}
+
+				// Validate velocity limit window duration produces a non-zero bucket size (must be >= 24ms)
+				if hasVelocityLimit && approvalCriteria.MaxNumTransfers.VelocityLimit.WindowDuration.LT(sdkmath.NewUint(MaxVelocityBuckets)) {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "maxNumTransfers velocityLimit windowDuration must be at least %d ms to produce non-zero bucket sizes", MaxVelocityBuckets)
 				}
 			}
 

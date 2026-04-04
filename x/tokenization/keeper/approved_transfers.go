@@ -524,7 +524,19 @@ func (k Keeper) ResetApprovalTrackerIfNeeded(ctx sdk.Context, approvalTracker *t
 	return *approvalTracker
 }
 
-func (k Keeper) GetApprovalTrackerFromStoreAndResetIfNeeded(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId string, amountTrackerId string, level string, trackerType string, address string, resetTimeIntervals *types.ResetTimeIntervals, isNumTransfers bool) (types.ApprovalTracker, error) {
+func (k Keeper) GetApprovalTrackerFromStoreAndResetIfNeeded(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId string, amountTrackerId string, level string, trackerType string, address string, resetTimeIntervals *types.ResetTimeIntervals, isNumTransfers bool, velocityLimit ...*types.VelocityLimit) (types.ApprovalTracker, error) {
+	// If a VelocityLimit is provided and is not nil/zero, use the sliding-window path.
+	// VelocityLimit and ResetTimeIntervals are mutually exclusive — velocity takes precedence
+	// if both are somehow present (ValidateBasic should prevent this).
+	if len(velocityLimit) > 0 && !types.IsVelocityLimitBasicallyNil(velocityLimit[0]) {
+		return k.GetApprovalTrackerWithVelocity(
+			ctx, collectionId, addressForApproval, approvalId,
+			amountTrackerId, level, trackerType, address,
+			velocityLimit[0], isNumTransfers,
+		)
+	}
+
+	// Existing reset-time-intervals path (unchanged)
 	approvalTracker, found := k.GetApprovalTrackerFromStore(ctx, collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)
 	if !found {
 		return types.ApprovalTracker{
@@ -580,6 +592,7 @@ func (k Keeper) GetMaxPossible(
 		address,
 		approval.ApprovalCriteria.ApprovalAmounts.ResetTimeIntervals,
 		false,
+		approval.ApprovalCriteria.ApprovalAmounts.VelocityLimit,
 	)
 	if err != nil {
 		return "", nil, err
@@ -759,8 +772,10 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	var err error
 	if needToFetchApprovalTrackerDetails {
 		var resetTimeIntervals *types.ResetTimeIntervals
+		var amountsVelocityLimit *types.VelocityLimit
 		if approvalCriteria.ApprovalAmounts != nil {
 			resetTimeIntervals = approvalCriteria.ApprovalAmounts.ResetTimeIntervals
+			amountsVelocityLimit = approvalCriteria.ApprovalAmounts.VelocityLimit
 		}
 		amountsTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
@@ -773,14 +788,17 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			address,
 			resetTimeIntervals,
 			false,
+			amountsVelocityLimit,
 		)
 		if err != nil {
 			return "", err
 		}
 
 		var maxNumTransfersResetTimeIntervals *types.ResetTimeIntervals
+		var maxNumTransfersVelocityLimit *types.VelocityLimit
 		if approvalCriteria.MaxNumTransfers != nil {
 			maxNumTransfersResetTimeIntervals = approvalCriteria.MaxNumTransfers.ResetTimeIntervals
+			maxNumTransfersVelocityLimit = approvalCriteria.MaxNumTransfers.VelocityLimit
 		}
 		maxNumTransfersTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 			ctx,
@@ -793,6 +811,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			address,
 			maxNumTransfersResetTimeIntervals,
 			true,
+			maxNumTransfersVelocityLimit,
 		)
 		if err != nil {
 			return "", err
@@ -813,6 +832,18 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	if err != nil {
 		return "", err
 	}
+
+	// Determine if velocity limits are active for amounts and/or max num transfers
+	var amountsVelocityLimit *types.VelocityLimit
+	if approvalCriteria.ApprovalAmounts != nil {
+		amountsVelocityLimit = approvalCriteria.ApprovalAmounts.VelocityLimit
+	}
+	var maxNumTransfersVelocityLimit *types.VelocityLimit
+	if approvalCriteria.MaxNumTransfers != nil {
+		maxNumTransfersVelocityLimit = approvalCriteria.MaxNumTransfers.VelocityLimit
+	}
+	amountsHasVelocity := !types.IsVelocityLimitBasicallyNil(amountsVelocityLimit)
+	maxTransfersHasVelocity := !types.IsVelocityLimitBasicallyNil(maxNumTransfersVelocityLimit)
 
 	// Handle amount approvals
 	if approvedAmount.GT(sdkmath.NewUint(0)) {
@@ -842,19 +873,46 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			return "", err
 		}
 
-		amountsTrackerDetails.Amounts, err = types.AddBalances(
-			ctx,
-			amountsTrackerDetails.Amounts,
-			transferBalances,
-		)
-		if err != nil {
-			return "", err
+		if amountsHasVelocity {
+			// For velocity tracking: record the transfer in the appropriate time bucket.
+			// The Amounts field already holds the rolling total from GetApprovalTrackerWithVelocity;
+			// we update it for event emission but the authoritative data is in TimeBuckets.
+			amountsTrackerDetails = k.IncrementVelocityTracker(
+				ctx, &amountsTrackerDetails, amountsVelocityLimit, transferBalances, false,
+			)
+			// Also update the flat Amounts for event emission / same-transaction reads
+			amountsTrackerDetails.Amounts, err = types.AddBalances(
+				ctx,
+				amountsTrackerDetails.Amounts,
+				transferBalances,
+			)
+			if err != nil {
+				return "", err
+			}
+		} else {
+			amountsTrackerDetails.Amounts, err = types.AddBalances(
+				ctx,
+				amountsTrackerDetails.Amounts,
+				transferBalances,
+			)
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 
 	// Handle max transfers tracking
 	if maxNumTransfers.GT(sdkmath.NewUint(0)) || isCustomChallengeOrderCalculation(approvalCriteria.PredeterminedBalances, trackerType) {
-		maxNumTransfersTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
+		if maxTransfersHasVelocity {
+			// For velocity tracking: record the transfer count in the appropriate time bucket.
+			maxNumTransfersTrackerDetails = k.IncrementVelocityTracker(
+				ctx, &maxNumTransfersTrackerDetails, maxNumTransfersVelocityLimit, nil, true,
+			)
+			// Update flat NumTransfers for event emission / same-transaction reads
+			maxNumTransfersTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
+		} else {
+			maxNumTransfersTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
+		}
 		if maxNumTransfers.GT(sdkmath.NewUint(0)) && maxNumTransfersTrackerDetails.NumTransfers.GT(maxNumTransfers) {
 			detErrMsg := fmt.Sprintf("exceeded max transfers allowed - %s", maxNumTransfers.String())
 			return detErrMsg, sdkerrors.Wrap(ErrDisallowedTransfer, detErrMsg)
@@ -1080,6 +1138,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					approvedAddress,
 					approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals,
 					true,
+					approval.ApprovalCriteria.MaxNumTransfers.VelocityLimit,
 				)
 				if err != nil {
 					return nil, err
