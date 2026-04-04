@@ -1,0 +1,13 @@
+syntax = "proto3";
+package pot;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/pot/types";
+
+message Params {
+  uint64 credential_collection_id = 1;
+  uint64 credential_token_id = 2;
+  uint64 min_credential_balance = 3;
+  string mode = 4;
+}

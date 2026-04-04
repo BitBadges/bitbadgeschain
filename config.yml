@@ -43,7 +43,8 @@ accounts:
       address: bb1zecxs0n0kjqr0vjc5ug3kk594zg4s7jn6lj5dj
     - name: charlie
       coins:
-          - 1ubadge
+          - 99999999999999996ubadge
+          - 500000000000000ustake
     - name: keplr
       address: bb1w63npeee74ewuudzf8cgvy6at4jn4mjr0a9r5p
       coins:

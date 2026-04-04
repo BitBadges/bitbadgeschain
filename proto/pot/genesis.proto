@@ -1,0 +1,12 @@
+syntax = "proto3";
+package pot;
+
+import "gogoproto/gogo.proto";
+import "pot/params.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/pot/types";
+
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  repeated bytes compliance_jailed_validators = 2;
+}

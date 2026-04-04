@@ -102,6 +102,7 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
+	potkeeper "github.com/bitbadges/bitbadgeschain/x/pot/keeper"
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
@@ -173,6 +174,7 @@ type App struct {
 	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
 
+	PotKeeper         potkeeper.Keeper
 	GammKeeper        gammkeeper.Keeper
 	PoolManagerKeeper poolmanager.Keeper
 	SendmanagerKeeper sendmanagermodulekeeper.Keeper
@@ -350,6 +352,11 @@ func New(
 		return nil, err
 	}
 
+	// Register x/pot module (Proof of Token — credential-gated validator power)
+	if err := app.registerPotModule(appOpts); err != nil {
+		return nil, fmt.Errorf("failed to register pot module: %w", err)
+	}
+
 	// Register EVM modules first (PreciseBank depends on EVM keeper)
 	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
@@ -379,8 +386,9 @@ func New(
 	})
 
 	// Register custom global transfer checkers (optional)
+	// Note: x/pot no longer uses a transfer hook. It iterates all validators in
+	// its EndBlocker to catch both transfer-based and time-dependent credential changes.
 	app.TokenizationKeeper.RegisterCustomGlobalTransferChecker(func(ctx sdk.Context, from string, to string, initiatedBy string, collection *types.TokenCollection, transferBalances []*types.Balance, memo string) []tokenizationmodulekeeper.GlobalTransferChecker {
-		// Add custom logic as needed here
 		return nil
 	})
 
