@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -184,12 +185,10 @@ func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 // storeKey safely builds a prefixed store key from a prefix and a string suffix.
 // It guards against integer overflow when computing the allocation size.
 func storeKey(prefix []byte, suffix string) []byte {
-	suffixLen := len(suffix)
-	size := len(prefix) + suffixLen
-	if size < len(prefix) {
+	if len(suffix) > math.MaxInt-len(prefix) {
 		panic("store key allocation size overflow")
 	}
-	key := make([]byte, size)
+	key := make([]byte, len(prefix)+len(suffix))
 	copy(key, prefix)
 	copy(key[len(prefix):], suffix)
 	return key
