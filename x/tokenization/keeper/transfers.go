@@ -349,7 +349,7 @@ func (k Keeper) HandleTransfer(
 				transferMetadata.ApproverAddress = from
 				transferMetadata.ApprovalLevel = "outgoing"
 
-				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, fromUserBalance, eventTracking, userApproval.UserRoyalties)
+				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, fromUserBalance, eventTracking, userApproval.UserApprovalSettings)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s", from)
 				}
@@ -357,7 +357,7 @@ func (k Keeper) HandleTransfer(
 				transferMetadata.ApproverAddress = to
 				transferMetadata.ApprovalLevel = "incoming"
 
-				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, toUserBalance, eventTracking, userApproval.UserRoyalties)
+				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, toUserBalance, eventTracking, userApproval.UserApprovalSettings)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s", to)
 				}

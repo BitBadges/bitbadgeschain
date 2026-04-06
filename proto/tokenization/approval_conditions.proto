@@ -88,10 +88,35 @@ message AddressChecks {
 // offlineHours: ranges of hours (0-23) when transfers should be denied
 // offlineDays: ranges of days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied
 message AltTimeChecks {
-  // Hours (0-23) when transfers should be denied. Uses UTC timezone.
+  // Hours (0-23) when transfers should be denied.
   repeated UintRange offlineHours = 1;
-  // Days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied. Uses UTC timezone.
+  // Days (0-6, where 0=Sunday, 1=Monday, ..., 6=Saturday) when transfers should be denied.
   repeated UintRange offlineDays = 2;
+  // Months (1-12, where 1=January, 12=December) when transfers should be denied.
+  repeated UintRange offlineMonths = 3;
+  // Days of month (1-31) when transfers should be denied.
+  repeated UintRange offlineDaysOfMonth = 4;
+  // Weeks of year (1-52) when transfers should be denied. Uses ISO 8601 week numbering.
+  repeated UintRange offlineWeeksOfYear = 5;
+  // Timezone offset magnitude in minutes from UTC. Default 0 = UTC. Examples: 300 for EST (UTC-5), 330 for IST (UTC+5:30).
+  // All time checks are evaluated after applying this offset to the block time.
+  string timezoneOffsetMinutes = 6 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  // If true, the timezone offset is subtracted (west of UTC). If false, it is added (east of UTC).
+  // Example: EST (UTC-5) = timezoneOffsetMinutes: 300, timezoneOffsetNegative: true
+  bool timezoneOffsetNegative = 7;
+}
+
+// UserApprovalSettings defines issuer-imposed constraints on user-level approvals.
+// Set on collection-level ApprovalCriteria and propagated to user-level approvals
+// during greedy transfer matching. Each balance slice carries its own settings.
+message UserApprovalSettings {
+  // Restricts which denoms user-level coinTransfers can reference (beyond params-level AllowedDenoms).
+  // If empty, all params-allowed denoms are permitted.
+  repeated string allowedDenoms = 1;
+  // If true, user-level approvals cannot trigger coinTransfers at all for transfers matched by this collection approval.
+  bool disableUserCoinTransfers = 2;
+  // User-level royalties to enforce for transfers matched by this collection approval.
+  UserRoyalties userRoyalties = 3;
 }
 
 // UserRoyalties defines the royalties for a user.

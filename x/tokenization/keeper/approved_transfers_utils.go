@@ -2,7 +2,6 @@ package keeper
 
 import (
 	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,7 +16,7 @@ func (k Keeper) DeductUserOutgoingApprovals(
 	transferMetadata TransferMetadata,
 	userBalance *types.UserBalanceStore,
 	eventTracking *EventTracking,
-	royalties *types.UserRoyalties,
+	userApprovalSettings *types.UserApprovalSettings,
 ) error {
 	from := transferMetadata.From
 	currApprovals := userBalance.OutgoingApprovals
@@ -37,8 +36,8 @@ func (k Keeper) DeductUserOutgoingApprovals(
 		castedApprovals,
 		transferMetadata,
 		eventTracking,
-		royalties,
 		"outgoing",
+		userApprovalSettings,
 	)
 	return err
 }
@@ -51,7 +50,7 @@ func (k Keeper) DeductUserIncomingApprovals(
 	transferMetadata TransferMetadata,
 	userBalance *types.UserBalanceStore,
 	eventTracking *EventTracking,
-	royalties *types.UserRoyalties,
+	userApprovalSettings *types.UserApprovalSettings,
 ) error {
 	to := transferMetadata.To
 	currApprovals := userBalance.IncomingApprovals
@@ -77,8 +76,8 @@ func (k Keeper) DeductUserIncomingApprovals(
 		castedApprovals,
 		transferMetadata,
 		eventTracking,
-		royalties,
 		"incoming",
+		userApprovalSettings,
 	)
 	return err
 }
@@ -92,11 +91,6 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 	eventTracking *EventTracking,
 	approvalLevel string,
 ) ([]*UserApprovalsToCheck, error) {
-	blankRoyalties := &types.UserRoyalties{
-		Percentage:    sdkmath.NewUint(0),
-		PayoutAddress: "",
-	}
-
 	return k.DeductAndGetUserApprovals(
 		ctx,
 		collection,
@@ -105,8 +99,8 @@ func (k Keeper) DeductCollectionApprovalsAndGetUserApprovalsToCheck(
 		collection.CollectionApprovals,
 		transferMetadata,
 		eventTracking,
-		blankRoyalties,
 		approvalLevel,
+		nil, // no userApprovalSettings at collection level
 	)
 }
 

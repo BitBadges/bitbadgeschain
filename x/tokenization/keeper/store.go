@@ -941,6 +941,60 @@ func (k Keeper) DeleteVoteFromStore(ctx sdk.Context, key string) error {
 	return nil
 }
 
+/****************************************VOTING CHALLENGE TRACKERS****************************************/
+
+// SetVotingChallengeTrackerInStore sets the voting challenge tracker (quorum state) in the store.
+func (k Keeper) SetVotingChallengeTrackerInStore(ctx sdk.Context, key string, tracker *types.VotingChallengeTracker) error {
+	marshaled, err := k.cdc.Marshal(tracker)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Marshal types.VotingChallengeTracker failed")
+	}
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set(votingChallengeTrackerStoreKey(key), marshaled)
+	return nil
+}
+
+// GetVotingChallengeTrackerFromStore retrieves the voting challenge tracker from the store.
+func (k Keeper) GetVotingChallengeTrackerFromStore(ctx sdk.Context, key string) (*types.VotingChallengeTracker, bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	marshaled := store.Get(votingChallengeTrackerStoreKey(key))
+
+	if len(marshaled) == 0 {
+		return nil, false
+	}
+
+	var tracker types.VotingChallengeTracker
+	k.cdc.MustUnmarshal(marshaled, &tracker)
+	return &tracker, true
+}
+
+// DeleteVotingChallengeTrackerFromStore deletes the voting challenge tracker from the store.
+func (k Keeper) DeleteVotingChallengeTrackerFromStore(ctx sdk.Context, key string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Delete(votingChallengeTrackerStoreKey(key))
+}
+
+// DeleteAllVotesForProposal deletes all votes for a given proposal (used for reset after execution).
+func (k Keeper) DeleteAllVotesForProposal(ctx sdk.Context, collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string, voters []*types.Voter) error {
+	for _, voter := range voters {
+		if voter == nil {
+			continue
+		}
+		voteKey := ConstructVotingTrackerKey(collectionId, approverAddress, approvalLevel, approvalId, proposalId, voter.Address)
+		if err := k.DeleteVoteFromStore(ctx, voteKey); err != nil {
+			return err
+		}
+	}
+	// Also clear the challenge tracker
+	trackerKey := ConstructVotingChallengeTrackerKey(collectionId, approverAddress, approvalLevel, approvalId, proposalId)
+	k.DeleteVotingChallengeTrackerFromStore(ctx, trackerKey)
+	return nil
+}
+
 /****************************************RESERVED PROTOCOL ADDRESSES****************************************/
 
 // SetReservedProtocolAddressInStore sets a reserved protocol address in the store.

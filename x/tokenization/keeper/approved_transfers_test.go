@@ -47,7 +47,7 @@ func DeductUserOutgoingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 			PrecalculationOptions: precalculationOptions,
 		},
-	}, transferMetadata, userBalance, eventTracking, userRoyalties)
+	}, transferMetadata, userBalance, eventTracking, nil)
 }
 
 func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance, collection *types.TokenCollection, userBalance *types.UserBalanceStore, tokenIds []*types.UintRange, times []*types.UintRange, from string, to string, requester string, amount sdkmath.Uint, solutions []*types.MerkleProof, prioritizedApprovals []*types.ApprovalIdentifierDetails,
@@ -81,7 +81,7 @@ func DeductUserIncomingApprovals(suite *TestSuite, ctx sdk.Context, overallTrans
 		PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
 			PrecalculationOptions: precalculationOptions,
 		},
-	}, transferMetadata, userBalance, eventTracking, userRoyalties)
+	}, transferMetadata, userBalance, eventTracking, nil)
 }
 
 func DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite *TestSuite, ctx sdk.Context, overallTransferBalances []*types.Balance,

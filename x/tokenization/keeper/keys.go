@@ -30,7 +30,8 @@ var (
 	ReservedProtocolAddressKey = []byte{0x11}
 	PoolAddressCacheKey        = []byte{0x13}
 	VotingTrackerKey           = []byte{0x14}
-	CollectionStatsKey        = []byte{0x15}
+	CollectionStatsKey         = []byte{0x15}
+	VotingChallengeTrackerKey  = []byte{0x16}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 	BackedPathGenerationPrefix  = []byte{0x12}
@@ -128,6 +129,12 @@ func ConstructVotingTrackerKey(collectionId sdkmath.Uint, approverAddress string
 	approval_level_str := approvalLevel
 	voter_address_str := voterAddress
 	return collection_id_str + BalanceKeyDelimiter + approver_address_str + BalanceKeyDelimiter + approval_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposal_id_str + BalanceKeyDelimiter + voter_address_str
+}
+
+// ConstructVotingChallengeTrackerKey constructs a unique key for the voting challenge tracker.
+// Unlike ConstructVotingTrackerKey, this is per-proposal (not per-voter) and tracks quorum state.
+func ConstructVotingChallengeTrackerKey(collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string) string {
+	return collectionId.String() + BalanceKeyDelimiter + approverAddress + BalanceKeyDelimiter + approvalLevel + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposalId
 }
 
 // Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.
@@ -265,6 +272,13 @@ func votingTrackerStoreKey(votingTrackerKey string) []byte {
 	copy(key, VotingTrackerKey)
 	copy(key[len(VotingTrackerKey):], []byte(votingTrackerKey))
 	return key
+}
+
+func votingChallengeTrackerStoreKey(key string) []byte {
+	result := make([]byte, len(VotingChallengeTrackerKey)+len(key))
+	copy(result, VotingChallengeTrackerKey)
+	copy(result[len(VotingChallengeTrackerKey):], []byte(key))
+	return result
 }
 
 func reservedProtocolAddressStoreKey(address string) []byte {

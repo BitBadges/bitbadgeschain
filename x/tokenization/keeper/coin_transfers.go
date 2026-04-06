@@ -29,7 +29,7 @@ func (k Keeper) ExecuteCoinTransfers(
 	transferMetadata TransferMetadata,
 	coinTransfersUsed *[]CoinTransfers,
 	collection *types.TokenCollection,
-	royalties *types.UserRoyalties,
+	userApprovalSettings *types.UserApprovalSettings,
 ) (string, error) {
 	initiatedBy := transferMetadata.InitiatedBy
 	approverAddress := transferMetadata.ApproverAddress
@@ -38,9 +38,38 @@ func (k Keeper) ExecuteCoinTransfers(
 		return "", nil
 	}
 
-	if royalties == nil {
-		detErrMsg := "royalties is nil"
-		return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+	// Enforce UserApprovalSettings from collection-level for user-level coin transfers
+	if userApprovalSettings != nil && (approvalLevel == "incoming" || approvalLevel == "outgoing") {
+		if userApprovalSettings.DisableUserCoinTransfers {
+			detErrMsg := "user-level coin transfers are disabled by collection approval settings"
+			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
+		if len(userApprovalSettings.AllowedDenoms) > 0 {
+			for _, ct := range coinTransfers {
+				for _, coin := range ct.Coins {
+					allowed := false
+					for _, denom := range userApprovalSettings.AllowedDenoms {
+						if coin.Denom == denom {
+							allowed = true
+							break
+						}
+					}
+					if !allowed {
+						detErrMsg := fmt.Sprintf("denom %s is not allowed by collection approval settings (allowed: %v)", coin.Denom, userApprovalSettings.AllowedDenoms)
+						return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+					}
+				}
+			}
+		}
+	}
+
+	// Extract royalties from UserApprovalSettings
+	royalties := &types.UserRoyalties{
+		Percentage:    sdkmath.NewUint(0),
+		PayoutAddress: "",
+	}
+	if userApprovalSettings != nil && userApprovalSettings.UserRoyalties != nil {
+		royalties = userApprovalSettings.UserRoyalties
 	}
 
 	if collection == nil {

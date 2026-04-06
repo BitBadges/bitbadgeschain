@@ -15,10 +15,10 @@ import (
 
 // The UserApprovalsToCheck struct is used to keep track of which incoming / outgoing approvals for which addresses we need to check.
 type UserApprovalsToCheck struct {
-	Address       string
-	Balances      []*types.Balance
-	Outgoing      bool
-	UserRoyalties *types.UserRoyalties
+	Address              string
+	Balances             []*types.Balance
+	Outgoing             bool
+	UserApprovalSettings *types.UserApprovalSettings
 }
 
 // All in one approval deduction function. We also return the user approvals to check (only used when collection approvals)
@@ -30,8 +30,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 	_approvals []*types.CollectionApproval,
 	transferMetadata TransferMetadata,
 	eventTracking *EventTracking,
-	royalties *types.UserRoyalties,
 	approvalLevel string,
+	userApprovalSettings *types.UserApprovalSettings,
 ) ([]*UserApprovalsToCheck, error) {
 	fromAddress := transferMetadata.From
 	toAddress := transferMetadata.To
@@ -85,12 +85,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 			break
 		}
 
-		userRoyalties := &types.UserRoyalties{
-			Percentage:    sdkmath.NewUint(0),
-			PayoutAddress: "",
-		}
-		if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.UserRoyalties != nil {
-			userRoyalties = approval.ApprovalCriteria.UserRoyalties
+		var approvalUserSettings *types.UserApprovalSettings
+		if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.UserApprovalSettings != nil {
+			approvalUserSettings = approval.ApprovalCriteria.UserApprovalSettings
 		}
 
 		isExplicitlyPrioritized := false
@@ -157,12 +154,12 @@ func (k Keeper) DeductAndGetUserApprovals(
 			})
 		}
 
-		addToUserApprovalsToCheck := func(address string, balances []*types.Balance, outgoing bool, userRoyalties *types.UserRoyalties) {
+		addToUserApprovalsToCheck := func(address string, balances []*types.Balance, outgoing bool, settings *types.UserApprovalSettings) {
 			userApprovalsToCheck = append(userApprovalsToCheck, &UserApprovalsToCheck{
-				Address:       address,
-				Balances:      balances,
-				Outgoing:      outgoing,
-				UserRoyalties: userRoyalties,
+				Address:              address,
+				Balances:             balances,
+				Outgoing:             outgoing,
+				UserApprovalSettings: settings,
 			})
 		}
 
@@ -180,8 +177,8 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// If we do not override the approved outgoing / incoming transfers, we need to check the user approvals
-			addToUserApprovalsToCheck(fromAddress, allBalancesForIdsAndTimes, true, userRoyalties)
-			addToUserApprovalsToCheck(toAddress, allBalancesForIdsAndTimes, false, userRoyalties)
+			addToUserApprovalsToCheck(fromAddress, allBalancesForIdsAndTimes, true, nil)
+			addToUserApprovalsToCheck(toAddress, allBalancesForIdsAndTimes, false, nil)
 			markApprovalAsUsed(approval)
 		} else {
 			// Use AtomicContext for state management with rollback support.
@@ -279,7 +276,7 @@ func (k Keeper) DeductAndGetUserApprovals(
 			}
 
 			// Handle coin transfers on cached context (scaled if applicable)
-			detErrMsg, err := k.ExecuteCoinTransfers(cachedCtx, coinTransfersToExecute, transferMetadata, eventTracking.CoinTransfers, collection, royalties)
+			detErrMsg, err := k.ExecuteCoinTransfers(cachedCtx, coinTransfersToExecute, transferMetadata, eventTracking.CoinTransfers, collection, userApprovalSettings)
 			if err != nil {
 				if detErrMsg != "" {
 					addPotentialError(isExplicitlyPrioritized, idx, detErrMsg)
@@ -446,12 +443,21 @@ func (k Keeper) DeductAndGetUserApprovals(
 			// Write the cache back to the main context atomically
 			writeCache()
 
+			// Handle voting challenge reset-after-execution
+			if approvalCriteria != nil && len(approvalCriteria.VotingChallenges) > 0 {
+				for _, challenge := range approvalCriteria.VotingChallenges {
+					if challenge != nil && challenge.ResetAfterExecution {
+						_ = k.DeleteAllVotesForProposal(ctx, collection.CollectionId, approverAddress, approvalLevel, approval.ApprovalId, challenge.ProposalId, challenge.Voters)
+					}
+				}
+			}
+
 			if !approvalCriteria.OverridesFromOutgoingApprovals {
-				addToUserApprovalsToCheck(fromAddress, transferBalancesToCheck, true, userRoyalties)
+				addToUserApprovalsToCheck(fromAddress, transferBalancesToCheck, true, approvalUserSettings)
 			}
 
 			if !approvalCriteria.OverridesToIncomingApprovals {
-				addToUserApprovalsToCheck(toAddress, transferBalancesToCheck, false, userRoyalties)
+				addToUserApprovalsToCheck(toAddress, transferBalancesToCheck, false, approvalUserSettings)
 			}
 
 			markApprovalAsUsed(approval)
@@ -467,19 +473,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 		return []*UserApprovalsToCheck{}, buildApprovalFailureError(ctx, approvalLevel, transferStr, potentialErrorsStr)
 	}
 
-	// cannot have two different user royalty percentages
-	if len(userApprovalsToCheck) > 0 {
-		userRoyalties := userApprovalsToCheck[0].UserRoyalties
-		for _, userApproval := range userApprovalsToCheck {
-			if userApproval.UserRoyalties == nil || userApproval.UserRoyalties.Percentage.IsNil() {
-				continue
-			}
-
-			if !userApproval.UserRoyalties.Percentage.Equal(userRoyalties.Percentage) {
-				return []*UserApprovalsToCheck{}, buildMultipleRoyaltiesError(ctx)
-			}
-		}
-	}
+	// Note: Different collection approvals in a greedy match may have different UserRoyalties
+	// and UserApprovalSettings. This is fine — each UserApprovalsToCheck entry carries its own
+	// settings for its balance slice, and user-level deduction runs independently per slice.
 
 	return userApprovalsToCheck, nil
 }
@@ -850,6 +846,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		if err != nil {
 			return "", err
 		}
+
 	}
 
 	// Handle max transfers tracking
@@ -859,6 +856,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			detErrMsg := fmt.Sprintf("exceeded max transfers allowed - %s", maxNumTransfers.String())
 			return detErrMsg, sdkerrors.Wrap(ErrDisallowedTransfer, detErrMsg)
 		}
+
 	}
 
 	// Handle event emission and store updates

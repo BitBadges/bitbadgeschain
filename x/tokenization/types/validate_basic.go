@@ -741,12 +741,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					approvalCriteria.AutoDeletionOptions = &AutoDeletionOptions{}
 				}
 
-				if approvalCriteria.UserRoyalties == nil {
-					approvalCriteria.UserRoyalties = &UserRoyalties{}
-				}
-
-				if approvalCriteria.UserRoyalties.Percentage.IsNil() {
-					approvalCriteria.UserRoyalties.Percentage = sdkmath.NewUint(0)
+				if approvalCriteria.UserApprovalSettings != nil && approvalCriteria.UserApprovalSettings.UserRoyalties != nil {
+					if approvalCriteria.UserApprovalSettings.UserRoyalties.Percentage.IsNil() {
+						approvalCriteria.UserApprovalSettings.UserRoyalties.Percentage = sdkmath.NewUint(0)
+					}
 				}
 
 				if approvalCriteria.MaxNumTransfers == nil {
