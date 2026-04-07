@@ -177,6 +177,15 @@ func (k Keeper) replacePostTransferInvariantPlaceholders(
 	calldata = strings.ReplaceAll(calldata, "$initiator", initiatorHex)
 	calldata = strings.ReplaceAll(calldata, "$collectionId", postTransferUint256ToHexPadded(collectionId))
 
+	// $recipients = concatenated addresses (for contracts that need all recipients)
+	// NOTE: $recipients MUST be replaced BEFORE $recipient because "$recipient" is a
+	// prefix of "$recipients" and replacing it first would corrupt the longer placeholder.
+	recipientsHex, err := encodePostTransferAddressArray(toAddresses)
+	if err != nil {
+		return "", sdkerrors.Wrapf(err, "recipients")
+	}
+	calldata = strings.ReplaceAll(calldata, "$recipients", recipientsHex)
+
 	// $recipient = first recipient (convenience for single-recipient transfers)
 	if len(toAddresses) > 0 {
 		recipientHex, err := postTransferAddressToHexPadded(toAddresses[0])
@@ -185,13 +194,6 @@ func (k Keeper) replacePostTransferInvariantPlaceholders(
 		}
 		calldata = strings.ReplaceAll(calldata, "$recipient", recipientHex)
 	}
-
-	// $recipients = concatenated addresses (for contracts that need all recipients)
-	recipientsHex, err := encodePostTransferAddressArray(toAddresses)
-	if err != nil {
-		return "", sdkerrors.Wrapf(err, "recipients")
-	}
-	calldata = strings.ReplaceAll(calldata, "$recipients", recipientsHex)
 
 	return calldata, nil
 }
