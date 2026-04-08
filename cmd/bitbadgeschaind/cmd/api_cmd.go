@@ -14,8 +14,14 @@ import (
 func ApiCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                "api [args...]",
-		Short:              "API query commands (delegates to bitbadges-cli)",
-		Long:               "Delegates to the Node.js bitbadges-cli for API commands like fetching collections, balances, and other chain data.",
+		Short:              "BitBadges off-chain indexer API — collections, balances, claims, DEX (via bitbadges-cli)",
+		Long: `BitBadges off-chain indexer API client. Delegates to the bitbadges-cli Node.js tool.
+
+Queries the BitBadges indexer (not the on-chain node). Includes: collections,
+balances, claims, plugins, DEX pools, asset pairs, dynamic stores, and 100+ routes.
+
+Requires: Node.js + bitbadges-cli (npm install -g bitbadgesjs-sdk)
+Configure: BITBADGES_API_KEY env var or bitbadges-cli config set apiKey <key>`,
 		DisableFlagParsing: true, // Pass all flags through to Node.js CLI
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return execNodeCLI("api", args)
