@@ -3,8 +3,9 @@ package cli
 import "fmt"
 
 const (
-	docsBaseURL  = "https://docs.bitbadges.io"
-	protoBaseURL = "https://github.com/BitBadges/bitbadgeschain/blob/master/proto/tokenization"
+	docsBaseURL    = "https://docs.bitbadges.io"
+	protoBaseURL   = "https://github.com/BitBadges/bitbadgeschain/blob/master/proto/tokenization"
+	repoBaseURL    = "https://github.com/BitBadges/bitbadgeschain/blob/master"
 )
 
 // msgDocLinks maps CLI command names to their docs page paths and proto file.
@@ -95,7 +96,7 @@ Schema & Documentation:
   Proto definition:  %s/%s
   Full OpenAPI spec: %s/docs/static/openapi.yml
   SDK CLI docs:      bitbadgeschaind sdk docs messages (if SDK CLI is installed)`,
-		protoBaseURL, protoFile, protoBaseURL)
+		protoBaseURL, protoFile, repoBaseURL)
 }
 
 func docsLink(docsPath string) string {
