@@ -153,7 +153,7 @@ jobs:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
           draft: false
-          prerelease: false
+          prerelease: true
           files: |
             build/bitbadgeschain-linux-amd64
             build/bitbadgeschain-linux-arm64
