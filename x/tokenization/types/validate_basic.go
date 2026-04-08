@@ -98,6 +98,11 @@ func ValidateAddress(address string, alowMint bool) error {
 		return nil
 	}
 
+	// Accept address aliases (resolved to real addresses at msg handler level)
+	if IsAddressAlias(address) {
+		return ValidateAddressAlias(address)
+	}
+
 	// Validate address using global SDK config (should be "bb" prefix)
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
@@ -333,6 +338,10 @@ func ValidateAddressListInput(addressListInput *AddressListInput) error {
 		addressListInput.ListId == "AllWithoutMint" ||
 		addressListInput.ListId == "None" {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized")
+	}
+
+	if IsReservedAliasListId(addressListInput.ListId) {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID %q is reserved for address aliases", addressListInput.ListId)
 	}
 
 	if err := ValidateAddress(addressListInput.ListId, false); err == nil {

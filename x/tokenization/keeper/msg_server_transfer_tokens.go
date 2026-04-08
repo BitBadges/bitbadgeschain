@@ -27,6 +27,11 @@ func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferT
 		return nil, ErrCollectionNotExists
 	}
 
+	// Resolve address aliases in transfer fields
+	if err := ResolveTransferAliases(collection, msg); err != nil {
+		return nil, err
+	}
+
 	if err := k.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
 		return nil, err
 	}

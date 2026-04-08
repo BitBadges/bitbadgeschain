@@ -285,6 +285,12 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
+	// Resolve address aliases (MintEscrow, CosmosWrapper/N, IBCBacking) to real bb1... addresses.
+	// Must happen after collection is fetched/created so we have the real addresses to resolve against.
+	if err := ResolveAllMsgAliases(collection, msg); err != nil {
+		return nil, errorsmod.Wrap(types.ErrInvalidRequest, err.Error())
+	}
+
 	// Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,

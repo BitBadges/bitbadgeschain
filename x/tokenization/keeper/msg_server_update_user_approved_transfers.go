@@ -39,6 +39,18 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		return nil, ErrCollectionNotExists
 	}
 
+	// Resolve address aliases in user approval fields
+	for _, approval := range msg.OutgoingApprovals {
+		if err := resolveOutgoingApprovalAliases(collection, approval); err != nil {
+			return nil, err
+		}
+	}
+	for _, approval := range msg.IncomingApprovals {
+		if err := resolveIncomingApprovalAliases(collection, approval); err != nil {
+			return nil, err
+		}
+	}
+
 	isArchived := types.GetIsArchived(ctx, collection)
 	if isArchived {
 		return nil, ErrCollectionIsArchived
