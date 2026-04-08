@@ -25,6 +25,7 @@ func CmdGetETHSignatureTracker() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "num-used-for-eth-signature-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [signature]",
 		Short: "Query ETH signature tracker",
+		Long:  QueryHelpLinks("num-used-for-eth-signature-challenge"),
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

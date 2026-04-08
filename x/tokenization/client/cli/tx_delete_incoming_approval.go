@@ -17,6 +17,7 @@ func CmdDeleteIncomingApproval() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-incoming-approval [collection-id] [approval-id]",
 		Short: "Broadcast message DeleteIncomingApproval",
+		Long:  MsgHelpLinks("delete-incoming-approval"),
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCollectionId := args[0]

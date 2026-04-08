@@ -16,6 +16,7 @@ func CmdGetApprovalTrackers() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "approvals-trackers [collectionId] [approvalLevel] [approverAddress] [approvalId] [amountTrackerId] [trackerType] [approvedAddress]",
 		Short: "Query approval trackers",
+		Long:  QueryHelpLinks("approvals-trackers"),
 		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

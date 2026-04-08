@@ -18,7 +18,7 @@ func CmdSetValidTokenIds() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-valid-token-ids [tx-json-or-file]",
 		Short: "Broadcast message setValidTokenIds",
-		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
+		Long:  MsgHelpLinks("set-valid-token-ids"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

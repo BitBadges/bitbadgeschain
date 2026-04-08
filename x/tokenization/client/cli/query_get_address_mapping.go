@@ -16,6 +16,7 @@ func CmdGetAddressList() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "address-list [id]",
 		Short: "Query address list",
+		Long:  QueryHelpLinks("address-list"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
