@@ -13,15 +13,15 @@ import (
 func execNodeCLI(subcommand string, args []string) error {
 	cliPath, useNpx := findNodeCLI()
 	if cliPath == "" {
-		fmt.Fprintln(os.Stderr, "SDK CLI not available. Install with: npm install -g bitbadgesjs-sdk")
+		fmt.Fprintln(os.Stderr, "SDK CLI not available. Install with: npm install -g bitbadgesjs-sdk (provides bitbadges-cli command)")
 		fmt.Fprintln(os.Stderr, "Or set BITBADGES_SDK_CLI_PATH environment variable.")
 		return nil // Don't error - chain operations should still work
 	}
 
 	var fullArgs []string
 	if useNpx {
-		// npx bitbadges-cli <subcommand> <args...>
-		fullArgs = append([]string{"bitbadges-cli", subcommand}, args...)
+		// npx -p bitbadgesjs-sdk bitbadges-cli <subcommand> <args...>
+		fullArgs = append([]string{"-p", "bitbadgesjs-sdk", "bitbadges-cli", subcommand}, args...)
 	} else {
 		// <binary> <subcommand> <args...>
 		fullArgs = append([]string{subcommand}, args...)
