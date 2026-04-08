@@ -109,19 +109,28 @@ message VotingChallenge {
   // The ID of this voting challenge for tracking votes (scoped like challengeTrackerId).
   // Format: collectionId-approverAddress-approvalLevel-approvalId-challengeId
   string proposalId = 1;
-  
+
   // The quorum threshold as a percentage (0-100) of total possible weight that must vote "yes".
   // Example: 50 means 50% of total voter weight must vote yes for approval.
   string quorumThreshold = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
-  
+
   // List of voters with their weights. Each voter can cast a weighted vote.
   repeated Voter voters = 3;
-  
+
   // The URI associated with this voting challenge.
   string uri = 4;
-  
+
   // Arbitrary custom data associated with this voting challenge.
   string customData = 5;
+
+  // If true, all votes for this challenge are cleared after a successful transfer execution.
+  // This makes the challenge reusable (e.g., for vault withdrawals that need fresh approval each time).
+  bool resetAfterExecution = 6;
+
+  // Mandatory delay in milliseconds after quorum is reached before the transfer can execute.
+  // If set, the transfer will fail until: now >= quorumReachedTimestamp + delayAfterQuorum.
+  // During the delay, signers can remove their votes to cancel (quorum drops = delay resets).
+  string delayAfterQuorum = 7 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 // Voter defines a voter with their address and weight.
@@ -145,6 +154,16 @@ message VoteProof {
   // The remaining percentage (100 - yesWeight) is allocated to "no" vote.
   // Example: yesWeight=70 means 70% yes, 30% no.
   string yesWeight = 3 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+
+  // Timestamp (unix ms) when this vote was cast. Set automatically by the chain.
+  string votedAt = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+}
+
+// VotingChallengeTracker tracks the quorum state for a voting challenge.
+// Stored per (collectionId, approverAddress, approvalLevel, approvalId, proposalId).
+message VotingChallengeTracker {
+  // Timestamp (unix ms) when quorum was first reached. Cleared when quorum drops or after reset.
+  string quorumReachedTimestamp = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 }
 
 /*

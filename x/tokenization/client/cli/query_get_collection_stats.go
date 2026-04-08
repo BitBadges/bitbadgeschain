@@ -12,6 +12,7 @@ func CmdGetCollectionStats() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "collection-stats [collection-id]",
 		Short: "Query collection stats (holder count and circulating supply) by collection ID",
+		Long:  QueryHelpLinks("collection-stats"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

@@ -54,9 +54,9 @@ message ApprovalCriteria {
   // automatically deleted (e.g., after a certain number of uses or time period).
   AutoDeletionOptions autoDeletionOptions = 12;
 
-  // User level royalties to apply to the transfer. Defines the percentage and payout address for
-  // royalties that should be collected when this approval is used for a transfer.
-  UserRoyalties userRoyalties = 13;
+  // DEPRECATED: User royalties moved to UserApprovalSettings.userRoyalties (field 26).
+  // Field number 13 is reserved for backwards compatibility.
+  reserved 13;
 
   // Must own tokens for approval. Defines token ownership requirements that must be satisfied for
   // the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
@@ -96,6 +96,10 @@ message ApprovalCriteria {
   // EVM query challenges that must pass for approval. Read-only contract queries
   // that verify external EVM state (e.g., token ownership in another contract).
   repeated EVMQueryChallenge evmQueryChallenges = 25;
+  // Issuer-imposed constraints on user-level coin transfers. Propagated to user-level approvals
+  // during greedy transfer matching (same pattern as userRoyalties). Only applicable on collection-level approvals.
+  // If conflicting settings across multiple matched approvals, the transfer is rejected (like royalties).
+  UserApprovalSettings userApprovalSettings = 26;
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.

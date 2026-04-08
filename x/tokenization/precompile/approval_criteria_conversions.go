@@ -176,12 +176,29 @@ func addressChecksToSolidity(a *tokenizationtypes.AddressChecks) []interface{} {
 // altTimeChecksToSolidity converts AltTimeChecks to Solidity struct format.
 func altTimeChecksToSolidity(a *tokenizationtypes.AltTimeChecks) []interface{} {
 	if a == nil {
-		return []interface{}{uintRangesToSolidity(nil), uintRangesToSolidity(nil)}
+		return []interface{}{uintRangesToSolidity(nil), uintRangesToSolidity(nil), uintRangesToSolidity(nil), uintRangesToSolidity(nil), uintRangesToSolidity(nil), big.NewInt(0), false}
 	}
 	return []interface{}{
 		uintRangesToSolidity(a.OfflineHours),
 		uintRangesToSolidity(a.OfflineDays),
+		uintRangesToSolidity(a.OfflineMonths),
+		uintRangesToSolidity(a.OfflineDaysOfMonth),
+		uintRangesToSolidity(a.OfflineWeeksOfYear),
+		bigIntFromUint(a.TimezoneOffsetMinutes),
+		a.TimezoneOffsetNegative,
 	}
+}
+
+// userApprovalSettingsToSolidity converts UserApprovalSettings to Solidity struct format.
+func userApprovalSettingsToSolidity(u *tokenizationtypes.UserApprovalSettings) []interface{} {
+	if u == nil {
+		return []interface{}{make([]string, 0), false, userRoyaltiesToSolidity(nil)}
+	}
+	denoms := u.AllowedDenoms
+	if denoms == nil {
+		denoms = make([]string, 0)
+	}
+	return []interface{}{denoms, u.DisableUserCoinTransfers, userRoyaltiesToSolidity(u.UserRoyalties)}
 }
 
 // userRoyaltiesToSolidity converts UserRoyalties to Solidity struct format.
@@ -239,7 +256,7 @@ func voterToSolidity(v *tokenizationtypes.Voter) []interface{} {
 // votingChallengeToSolidity converts VotingChallenge to Solidity struct format.
 func votingChallengeToSolidity(v *tokenizationtypes.VotingChallenge) []interface{} {
 	if v == nil {
-		return []interface{}{"", big.NewInt(0), make([]interface{}, 0), "", ""}
+		return []interface{}{"", big.NewInt(0), make([]interface{}, 0), "", "", false, big.NewInt(0)}
 	}
 	voters := make([]interface{}, 0, len(v.Voters))
 	for _, x := range v.Voters {
@@ -251,6 +268,8 @@ func votingChallengeToSolidity(v *tokenizationtypes.VotingChallenge) []interface
 		voters,
 		v.Uri,
 		v.CustomData,
+		v.ResetAfterExecution,
+		bigIntFromUint(v.DelayAfterQuorum),
 	}
 }
 
@@ -397,7 +416,6 @@ func approvalCriteriaToSolidity(a *tokenizationtypes.ApprovalCriteria) []interfa
 		a.OverridesFromOutgoingApprovals,
 		a.OverridesToIncomingApprovals,
 		autoDeletionOptionsToSolidity(a.AutoDeletionOptions),
-		userRoyaltiesToSolidity(a.UserRoyalties),
 		mustOwn,
 		dynStore,
 		ethSig,
@@ -409,6 +427,7 @@ func approvalCriteriaToSolidity(a *tokenizationtypes.ApprovalCriteria) []interfa
 		voting,
 		a.AllowBackedMinting,
 		a.AllowSpecialWrapping,
+		userApprovalSettingsToSolidity(a.UserApprovalSettings),
 	}
 }
 
@@ -423,7 +442,6 @@ func approvalCriteriaEmptySolidity() []interface{} {
 		false, false, false, false,
 		false, false,
 		autoDeletionOptionsToSolidity(nil),
-		userRoyaltiesToSolidity(nil),
 		empty,
 		empty,
 		empty,
@@ -435,6 +453,7 @@ func approvalCriteriaEmptySolidity() []interface{} {
 		empty,
 		false,
 		false,
+		userApprovalSettingsToSolidity(nil),
 	}
 }
 

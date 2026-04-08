@@ -14,10 +14,10 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
-	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserRoyalties = &types.UserRoyalties{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserApprovalSettings = &types.UserApprovalSettings{UserRoyalties: &types.UserRoyalties{
 		Percentage:    sdkmath.NewUint(1000), // 10%
 		PayoutAddress: charlie,
-	}
+	}}
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "error creating tokens")
 
@@ -105,16 +105,16 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	collectionsToCreate[0].CollectionApprovals[1].OwnershipTimes = GetBottomHalfUintRanges()
-	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserRoyalties = &types.UserRoyalties{
+	collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria.UserApprovalSettings = &types.UserApprovalSettings{UserRoyalties: &types.UserRoyalties{
 		Percentage:    sdkmath.NewUint(1000), // 10%
 		PayoutAddress: charlie,
-	}
+	}}
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, GetCollectionsToCreate()[0].CollectionApprovals[0])
 	collectionsToCreate[0].CollectionApprovals[2].OwnershipTimes = GetTopHalfUintRanges()
-	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria.UserRoyalties = &types.UserRoyalties{
+	collectionsToCreate[0].CollectionApprovals[2].ApprovalCriteria.UserApprovalSettings = &types.UserApprovalSettings{UserRoyalties: &types.UserRoyalties{
 		Percentage:    sdkmath.NewUint(2000), // 20%
 		PayoutAddress: charlie,
-	}
+	}}
 	collectionsToCreate[0].CollectionApprovals[2].ApprovalId = "test2"
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
@@ -322,9 +322,11 @@ func (suite *TestSuite) TestCoinTransfersWithWrappedDenoms() {
 				ToListId:          "AllWithoutMint",
 				InitiatedByListId: "AllWithoutMint",
 				ApprovalCriteria: &types.ApprovalCriteria{
-					UserRoyalties: &types.UserRoyalties{
-						Percentage:    sdkmath.NewUint(1000), // 10%
-						PayoutAddress: charlie,
+					UserApprovalSettings: &types.UserApprovalSettings{
+						UserRoyalties: &types.UserRoyalties{
+							Percentage:    sdkmath.NewUint(1000), // 10%
+							PayoutAddress: charlie,
+						},
 					},
 					OverridesFromOutgoingApprovals: true, // Override outgoing approvals for wrapped denom coin transfers
 					OverridesToIncomingApprovals:   true, // Override incoming approvals for wrapped denom coin transfers

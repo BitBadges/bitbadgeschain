@@ -71,6 +71,18 @@ func (a *votingServiceAdapter) GetVoteFromStore(ctx sdk.Context, key string) (*t
 	return vote, true
 }
 
+func (a *votingServiceAdapter) GetVotingChallengeTrackerFromStore(ctx sdk.Context, key string) (*types.VotingChallengeTracker, bool) {
+	return a.keeper.GetVotingChallengeTrackerFromStore(ctx, key)
+}
+
+func (a *votingServiceAdapter) ConstructVoteKey(collectionId sdkmath.Uint, approverAddress, approvalLevel, approvalId, proposalId, voterAddress string) string {
+	return ConstructVotingTrackerKey(collectionId, approverAddress, approvalLevel, approvalId, proposalId, voterAddress)
+}
+
+func (a *votingServiceAdapter) ConstructChallengeTrackerKey(collectionId sdkmath.Uint, approverAddress, approvalLevel, approvalId, proposalId string) string {
+	return ConstructVotingChallengeTrackerKey(collectionId, approverAddress, approvalLevel, approvalId, proposalId)
+}
+
 // evmQueryServiceAdapter adapts the Keeper to the EVMQueryService interface
 type evmQueryServiceAdapter struct {
 	keeper *Keeper

@@ -12,6 +12,7 @@ func CmdGetVotes() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "votes [collection-id] [approval-level] [approver-address] [approval-id] [proposal-id]",
 		Short: "Query votes",
+		Long:  QueryHelpLinks("votes"),
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqCollectionId := args[0]

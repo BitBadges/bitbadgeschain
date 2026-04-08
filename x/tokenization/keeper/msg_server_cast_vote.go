@@ -120,16 +120,54 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 		msg.Creator,
 	)
 
-	// Create the vote
+	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+
+	// Create the vote with timestamp
 	vote := &types.VoteProof{
 		ProposalId: msg.ProposalId,
 		Voter:      msg.Creator,
 		YesWeight:  msg.YesWeight,
+		VotedAt:    now,
 	}
 
 	// Store the vote (this will overwrite any existing vote)
 	if err := k.SetVoteInStore(ctx, voteKey, vote); err != nil {
 		return nil, sdkerrors.Wrap(err, "Failed to store vote")
+	}
+
+	// Update quorum tracking for challenges with delay or reset
+	if votingChallenge.DelayAfterQuorum.GT(sdkmath.NewUint(0)) || votingChallenge.ResetAfterExecution {
+		trackerKey := ConstructVotingChallengeTrackerKey(
+			msg.CollectionId,
+			msg.ApproverAddress,
+			msg.ApprovalLevel,
+			msg.ApprovalId,
+			msg.ProposalId,
+		)
+
+		// Calculate current quorum to determine if threshold is met
+		quorumMet := k.calculateQuorumMet(ctx, votingChallenge, collection.CollectionId, msg.ApproverAddress, msg.ApprovalLevel, msg.ApprovalId)
+
+		tracker, found := k.GetVotingChallengeTrackerFromStore(ctx, trackerKey)
+		if !found {
+			tracker = &types.VotingChallengeTracker{
+				QuorumReachedTimestamp: sdkmath.NewUint(0),
+			}
+		}
+
+		if quorumMet {
+			// Only set quorumReachedTimestamp if it wasn't already set
+			if tracker.QuorumReachedTimestamp.IsZero() {
+				tracker.QuorumReachedTimestamp = now
+			}
+		} else {
+			// Quorum dropped — clear the timestamp (delay resets)
+			tracker.QuorumReachedTimestamp = sdkmath.NewUint(0)
+		}
+
+		if err := k.SetVotingChallengeTrackerInStore(ctx, trackerKey, tracker); err != nil {
+			return nil, sdkerrors.Wrap(err, "Failed to store voting challenge tracker")
+		}
 	}
 
 	// Emit event
@@ -154,4 +192,31 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 	)
 
 	return &types.MsgCastVoteResponse{}, nil
+}
+
+// calculateQuorumMet checks if the current votes meet the quorum threshold
+func (k Keeper) calculateQuorumMet(ctx sdk.Context, challenge *types.VotingChallenge, collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string) bool {
+	totalPossibleWeight := sdkmath.NewUint(0)
+	totalYesWeight := sdkmath.NewUint(0)
+
+	for _, voter := range challenge.Voters {
+		if voter == nil {
+			continue
+		}
+		totalPossibleWeight = totalPossibleWeight.Add(voter.Weight)
+
+		voteKey := ConstructVotingTrackerKey(collectionId, approverAddress, approvalLevel, approvalId, challenge.ProposalId, voter.Address)
+		vote, found := k.GetVoteFromStore(ctx, voteKey)
+		if found && vote != nil && vote.YesWeight.GT(sdkmath.NewUint(0)) {
+			yesContribution := voter.Weight.Mul(vote.YesWeight).Quo(sdkmath.NewUint(100))
+			totalYesWeight = totalYesWeight.Add(yesContribution)
+		}
+	}
+
+	if totalPossibleWeight.IsZero() {
+		return false
+	}
+
+	percentage := totalYesWeight.Mul(sdkmath.NewUint(100)).Quo(totalPossibleWeight)
+	return percentage.GTE(challenge.QuorumThreshold)
 }

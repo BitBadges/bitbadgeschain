@@ -17,6 +17,7 @@ func CmdGetBalance() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "balance [collection-id] [address]",
 		Short: "Query balance",
+		Long:  QueryHelpLinks("balance"),
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqCollectionId := args[0]

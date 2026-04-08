@@ -255,6 +255,8 @@ struct VotingChallenge {
     Voter[] voters;
     string uri;
     string customData;
+    bool resetAfterExecution;
+    uint256 delayAfterQuorum;
 }
 
 /**
@@ -365,6 +367,20 @@ struct AddressChecks {
 struct AltTimeChecks {
     UintRange[] offlineHours;
     UintRange[] offlineDays;
+    UintRange[] offlineMonths;
+    UintRange[] offlineDaysOfMonth;
+    UintRange[] offlineWeeksOfYear;
+    uint256 timezoneOffsetMinutes;
+    bool timezoneOffsetNegative;
+}
+
+/**
+ * @notice User approval settings (issuer-imposed constraints on user-level coin transfers)
+ */
+struct UserApprovalSettings {
+    string[] allowedDenoms;
+    bool disableUserCoinTransfers;
+    UserRoyalties userRoyalties;
 }
 
 /**
@@ -451,7 +467,6 @@ struct ApprovalCriteria {
     bool overridesFromOutgoingApprovals;
     bool overridesToIncomingApprovals;
     AutoDeletionOptions autoDeletionOptions;
-    UserRoyalties userRoyalties;
     MustOwnTokens[] mustOwnTokens;
     DynamicStoreChallenge[] dynamicStoreChallenges;
     ETHSignatureChallenge[] ethSignatureChallenges;
@@ -463,6 +478,7 @@ struct ApprovalCriteria {
     VotingChallenge[] votingChallenges;
     bool allowBackedMinting;
     bool allowSpecialWrapping;
+    UserApprovalSettings userApprovalSettings;
 }
 
 /**

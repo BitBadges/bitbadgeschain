@@ -27,7 +27,8 @@ func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferT
 		return nil, ErrCollectionNotExists
 	}
 
-	if err := k.HandleTransfers(ctx, collection, msg.Transfers, msg.Creator); err != nil {
+	trackingResult, err := k.HandleTransfersEnriched(ctx, collection, msg.Transfers, msg.Creator)
+	if err != nil {
 		return nil, err
 	}
 
@@ -44,5 +45,12 @@ func (k msgServer) TransferTokens(goCtx context.Context, msg *types.MsgTransferT
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
-	return &types.MsgTransferTokensResponse{}, nil
+	reviewItems := TransferReviewItems(trackingResult.AllApprovalsUsed)
+
+	return &types.MsgTransferTokensResponse{
+		ApprovalsUsed:       ConvertApprovalsUsedToProto(trackingResult.AllApprovalsUsed),
+		CoinTransfers:       ConvertCoinTransfersToProto(trackingResult.AllCoinTransfers),
+		BalancesTransferred: trackingResult.AllBalances,
+		ReviewItems:         reviewItems,
+	}, nil
 }

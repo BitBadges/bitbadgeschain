@@ -43,7 +43,29 @@ type EventTracking struct {
 	CoinTransfers *[]CoinTransfers
 }
 
+// TransferTrackingResult holds accumulated tracking data across all transfers in a message.
+type TransferTrackingResult struct {
+	AllApprovalsUsed []ApprovalsUsed
+	AllCoinTransfers []CoinTransfers
+	AllBalances      []*types.Balance
+}
+
+// HandleTransfersEnriched is like HandleTransfers but also returns accumulated tracking data
+// for use in enriched Msg responses.
+func (k Keeper) HandleTransfersEnriched(ctx sdk.Context, collection *types.TokenCollection, transfers []*types.Transfer, initiatedBy string) (*TransferTrackingResult, error) {
+	result := &TransferTrackingResult{}
+	err := k.handleTransfersInternal(ctx, collection, transfers, initiatedBy, result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollection, transfers []*types.Transfer, initiatedBy string) error {
+	return k.handleTransfersInternal(ctx, collection, transfers, initiatedBy, nil)
+}
+
+func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.TokenCollection, transfers []*types.Transfer, initiatedBy string, tracking *TransferTrackingResult) error {
 	isArchived := types.GetIsArchived(ctx, collection)
 	if isArchived {
 		return customhookstypes.WrapErr(&ctx, ErrCollectionIsArchived, "collection is currently archived (read-only)")
@@ -210,6 +232,13 @@ func (k Keeper) HandleTransfers(ctx sdk.Context, collection *types.TokenCollecti
 			if err != nil {
 				return err
 			}
+
+			// Accumulate tracking data if requested
+			if tracking != nil {
+				tracking.AllApprovalsUsed = append(tracking.AllApprovalsUsed, approvalsUsed...)
+				tracking.AllCoinTransfers = append(tracking.AllCoinTransfers, coinTransfers...)
+				tracking.AllBalances = append(tracking.AllBalances, transfer.Balances...)
+			}
 		}
 
 		// Note: fromUserBalance is already saved after each recipient in the loop above.
@@ -349,7 +378,7 @@ func (k Keeper) HandleTransfer(
 				transferMetadata.ApproverAddress = from
 				transferMetadata.ApprovalLevel = "outgoing"
 
-				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, fromUserBalance, eventTracking, userApproval.UserRoyalties)
+				err = k.DeductUserOutgoingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, fromUserBalance, eventTracking, userApproval.UserApprovalSettings)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "outgoing approvals for %s", from)
 				}
@@ -357,7 +386,7 @@ func (k Keeper) HandleTransfer(
 				transferMetadata.ApproverAddress = to
 				transferMetadata.ApprovalLevel = "incoming"
 
-				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, toUserBalance, eventTracking, userApproval.UserRoyalties)
+				err = k.DeductUserIncomingApprovals(ctx, collection, transferBalancesCopy, newTransfer, transferMetadata, toUserBalance, eventTracking, userApproval.UserApprovalSettings)
 				if err != nil {
 					return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "incoming approvals for %s", to)
 				}

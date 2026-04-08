@@ -17,6 +17,7 @@ func CmdDeleteCollection() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-collection [collection-id]",
 		Short: "Broadcast message deleteCollection",
+		Long:  MsgHelpLinks("delete-collection"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCollectionId := types.NewUintFromString(args[0])

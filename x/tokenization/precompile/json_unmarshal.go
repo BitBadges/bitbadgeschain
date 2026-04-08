@@ -324,9 +324,9 @@ func convertAddressesInApprovalCriteria(criteria *tokenizationtypes.ApprovalCrit
 			}
 		}
 	}
-	// Convert address in UserRoyalties (single struct, not slice)
-	if criteria.UserRoyalties != nil && criteria.UserRoyalties.PayoutAddress != "" {
-		criteria.UserRoyalties.PayoutAddress = convertEVMAddressToBech32(criteria.UserRoyalties.PayoutAddress)
+	// Convert address in UserApprovalSettings.UserRoyalties
+	if criteria.UserApprovalSettings != nil && criteria.UserApprovalSettings.UserRoyalties != nil && criteria.UserApprovalSettings.UserRoyalties.PayoutAddress != "" {
+		criteria.UserApprovalSettings.UserRoyalties.PayoutAddress = convertEVMAddressToBech32(criteria.UserApprovalSettings.UserRoyalties.PayoutAddress)
 	}
 }
 

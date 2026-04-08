@@ -13,6 +13,7 @@ func CmdGetWrappableBalances() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "wrappable-balances [denom] [address]",
 		Short: "Query wrappable balances",
+		Long:  QueryHelpLinks("wrappable-balances"),
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqDenom := args[0]

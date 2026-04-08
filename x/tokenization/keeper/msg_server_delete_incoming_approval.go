@@ -65,8 +65,17 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 		UpdateUserPermissions:                           false,
 	}
 
+	// Capture version of deleted approval
+	deletedVersion := ""
+	for _, approval := range userBalance.IncomingApprovals {
+		if approval.ApprovalId == msg.ApprovalId {
+			deletedVersion = approval.Version.String()
+			break
+		}
+	}
+
 	// Execute the update using the helper function
-	err = k.executeUpdateUserApprovals(ctx, msg.Creator, collectionId, updateMsg)
+	updateResp, err := k.executeUpdateUserApprovals(ctx, msg.Creator, collectionId, updateMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -85,5 +94,9 @@ func (k msgServer) DeleteIncomingApproval(goCtx context.Context, msg *types.MsgD
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
-	return &types.MsgDeleteIncomingApprovalResponse{}, nil
+	return &types.MsgDeleteIncomingApprovalResponse{
+		Found:       foundApproval,
+		Version:     deletedVersion,
+		ReviewItems: updateResp.ReviewItems,
+	}, nil
 }

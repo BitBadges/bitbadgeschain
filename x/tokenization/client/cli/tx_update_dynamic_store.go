@@ -22,7 +22,7 @@ func CmdUpdateDynamicStore() *cobra.Command {
 Arguments:
   store-id: The ID of the dynamic store to update
   default-value: The default value for uninitialized addresses (true/false)
-  global-enabled: The global kill switch state (true = enabled, false = disabled/halted)`,
+  global-enabled: The global kill switch state (true = enabled, false = disabled/halted)` + "\n" + MsgHelpLinks("update-dynamic-store"),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argStoreId := types.NewUintFromString(args[0])

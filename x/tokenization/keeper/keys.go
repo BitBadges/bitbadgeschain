@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -30,7 +31,8 @@ var (
 	ReservedProtocolAddressKey = []byte{0x11}
 	PoolAddressCacheKey        = []byte{0x13}
 	VotingTrackerKey           = []byte{0x14}
-	CollectionStatsKey        = []byte{0x15}
+	CollectionStatsKey         = []byte{0x15}
+	VotingChallengeTrackerKey  = []byte{0x16}
 
 	WrapperPathGenerationPrefix = []byte{0x0C}
 	BackedPathGenerationPrefix  = []byte{0x12}
@@ -130,6 +132,12 @@ func ConstructVotingTrackerKey(collectionId sdkmath.Uint, approverAddress string
 	return collection_id_str + BalanceKeyDelimiter + approver_address_str + BalanceKeyDelimiter + approval_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposal_id_str + BalanceKeyDelimiter + voter_address_str
 }
 
+// ConstructVotingChallengeTrackerKey constructs a unique key for the voting challenge tracker.
+// Unlike ConstructVotingTrackerKey, this is per-proposal (not per-voter) and tracks quorum state.
+func ConstructVotingChallengeTrackerKey(collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string) string {
+	return collectionId.String() + BalanceKeyDelimiter + approverAddress + BalanceKeyDelimiter + approvalLevel + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposalId
+}
+
 // Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.
 
 // Helper function to unparse a balance key and get the information from it.
@@ -174,6 +182,18 @@ func GetDetailsFromBalanceKey(id string) (BalanceKeyDetails, error) {
 
 // Prefixer functions
 
+// storeKey safely builds a prefixed store key from a prefix and a string suffix.
+// It guards against integer overflow when computing the allocation size.
+func storeKey(prefix []byte, suffix string) []byte {
+	if len(suffix) > math.MaxInt-len(prefix) {
+		panic("store key allocation size overflow")
+	}
+	key := make([]byte, len(prefix)+len(suffix))
+	copy(key, prefix)
+	copy(key[len(prefix):], suffix)
+	return key
+}
+
 // collectionStoreKey returns the byte representation of the collection key ([]byte{0x01} + collectionId as 8-byte big-endian)
 // Uses fixed-width binary encoding to prevent key collisions from decimal string truncation
 func collectionStoreKey(collectionId sdkmath.Uint) []byte {
@@ -187,17 +207,11 @@ func collectionStoreKey(collectionId sdkmath.Uint) []byte {
 
 // userBalanceStoreKey returns the byte representation of the collection balance store key ([]byte{0x02} + balanceKey)
 func userBalanceStoreKey(balanceKey string) []byte {
-	key := make([]byte, len(UserBalanceKey)+len(balanceKey))
-	copy(key, UserBalanceKey)
-	copy(key[len(UserBalanceKey):], []byte(balanceKey))
-	return key
+	return storeKey(UserBalanceKey, balanceKey)
 }
 
 func usedClaimChallengeStoreKey(usedClaimChallengeKey string) []byte {
-	key := make([]byte, len(UsedClaimChallengeKey)+len(usedClaimChallengeKey))
-	copy(key, UsedClaimChallengeKey)
-	copy(key[len(UsedClaimChallengeKey):], []byte(usedClaimChallengeKey))
-	return key
+	return storeKey(UsedClaimChallengeKey, usedClaimChallengeKey)
 }
 
 // nextCollectionIdKey returns the byte representation of the next asset id key ([]byte{0x03})
@@ -210,24 +224,15 @@ func nextAddressListCounterKey() []byte {
 }
 
 func addressListStoreKey(addressListKey string) []byte {
-	key := make([]byte, len(AddressListKey)+len(addressListKey))
-	copy(key, AddressListKey)
-	copy(key[len(AddressListKey):], []byte(addressListKey))
-	return key
+	return storeKey(AddressListKey, addressListKey)
 }
 
 func approvalTrackerStoreKey(approvalTrackerKey string) []byte {
-	key := make([]byte, len(ApprovalTrackerKey)+len(approvalTrackerKey))
-	copy(key, ApprovalTrackerKey)
-	copy(key[len(ApprovalTrackerKey):], []byte(approvalTrackerKey))
-	return key
+	return storeKey(ApprovalTrackerKey, approvalTrackerKey)
 }
 
 func approvalVersionStoreKey(approvalVersionKey string) []byte {
-	key := make([]byte, len(ApprovalVersionKey)+len(approvalVersionKey))
-	copy(key, ApprovalVersionKey)
-	copy(key[len(ApprovalVersionKey):], []byte(approvalVersionKey))
-	return key
+	return storeKey(ApprovalVersionKey, approvalVersionKey)
 }
 
 func dynamicStoreStoreKey(storeId sdkmath.Uint) []byte {
@@ -254,31 +259,23 @@ func dynamicStoreValueStoreKey(storeId sdkmath.Uint, address string) []byte {
 }
 
 func ethSignatureTrackerStoreKey(ethSignatureTrackerKey string) []byte {
-	key := make([]byte, len(ETHSignatureTrackerKey)+len(ethSignatureTrackerKey))
-	copy(key, ETHSignatureTrackerKey)
-	copy(key[len(ETHSignatureTrackerKey):], []byte(ethSignatureTrackerKey))
-	return key
+	return storeKey(ETHSignatureTrackerKey, ethSignatureTrackerKey)
 }
 
 func votingTrackerStoreKey(votingTrackerKey string) []byte {
-	key := make([]byte, len(VotingTrackerKey)+len(votingTrackerKey))
-	copy(key, VotingTrackerKey)
-	copy(key[len(VotingTrackerKey):], []byte(votingTrackerKey))
-	return key
+	return storeKey(VotingTrackerKey, votingTrackerKey)
+}
+
+func votingChallengeTrackerStoreKey(key string) []byte {
+	return storeKey(VotingChallengeTrackerKey, key)
 }
 
 func reservedProtocolAddressStoreKey(address string) []byte {
-	key := make([]byte, len(ReservedProtocolAddressKey)+len(address))
-	copy(key, ReservedProtocolAddressKey)
-	copy(key[len(ReservedProtocolAddressKey):], []byte(address))
-	return key
+	return storeKey(ReservedProtocolAddressKey, address)
 }
 
 func poolAddressCacheStoreKey(address string) []byte {
-	key := make([]byte, len(PoolAddressCacheKey)+len(address))
-	copy(key, PoolAddressCacheKey)
-	copy(key[len(PoolAddressCacheKey):], []byte(address))
-	return key
+	return storeKey(PoolAddressCacheKey, address)
 }
 
 // collectionStatsStoreKey returns the byte representation of the collection stats key ([]byte{0x15} + collectionId as 8-byte big-endian)

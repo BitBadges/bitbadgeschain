@@ -198,8 +198,3 @@ func buildApprovalFailureError(
 	return customhookstypes.WrapErrSimple(&ctx, ErrInadequateApprovals, detErrMsg)
 }
 
-// buildMultipleRoyaltiesError builds an error message when multiple different user royalty percentages are found
-func buildMultipleRoyaltiesError(ctx sdk.Context) error {
-	detErrMsg := "multiple user-level royalties found - please split your transfer up to use one collection approval w/ royalty per transfer"
-	return customhookstypes.WrapErrSimple(&ctx, ErrInadequateApprovals, detErrMsg)
-}

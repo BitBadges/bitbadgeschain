@@ -9,9 +9,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// VotingService defines the interface for accessing vote data
+// VotingService defines the interface for accessing vote data and constructing keys
 type VotingService interface {
 	GetVoteFromStore(ctx sdk.Context, key string) (*types.VoteProof, bool)
+	GetVotingChallengeTrackerFromStore(ctx sdk.Context, key string) (*types.VotingChallengeTracker, bool)
+	ConstructVoteKey(collectionId sdkmath.Uint, approverAddress, approvalLevel, approvalId, proposalId, voterAddress string) string
+	ConstructChallengeTrackerKey(collectionId sdkmath.Uint, approverAddress, approvalLevel, approvalId, proposalId string) string
 }
 
 // VotingChallengesChecker implements ApprovalCriteriaChecker for VotingChallenges
@@ -44,8 +47,7 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 
-		// Construct the scoped proposal ID: collectionId-approverAddress-approvalLevel-approvalId-challengeId
-		// The challenge.ProposalId should already be scoped, but we use it as-is
+		// Construct the scoped proposal ID
 		proposalId := challenge.ProposalId
 
 		// Calculate total possible weight from all voters
@@ -77,15 +79,7 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 		totalYesWeight := sdkmath.NewUint(0)
 		collectionId := collection.CollectionId
 		for voterAddress := range voterMap {
-			// Construct the vote key using the same pattern as ConstructVotingTrackerKey
-			// Format: collectionId-approverAddress-approvalLevel-approvalId-proposalId-voterAddress
-			voteKey := fmt.Sprintf("%s-%s-%s-%s-%s-%s",
-				collectionId.String(),
-				approverAddress,
-				approvalLevel,
-				approval.ApprovalId,
-				proposalId,
-				voterAddress)
+			voteKey := c.votingService.ConstructVoteKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, proposalId, voterAddress)
 
 			vote, found := c.votingService.GetVoteFromStore(ctx, voteKey)
 			if found && vote != nil {
@@ -104,23 +98,41 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 				}
 
 				// Calculate the yes weight contribution from this voter
-				// yesWeight is a percentage (0-100), so we multiply voter weight by (yesWeight/100)
 				voterWeight := voterMap[voterAddress]
 				yesWeightPercent := vote.YesWeight
-				// Calculate: (voterWeight * yesWeightPercent) / 100
 				yesContribution := voterWeight.Mul(yesWeightPercent).Quo(sdkmath.NewUint(100))
 				totalYesWeight = totalYesWeight.Add(yesContribution)
 			}
 		}
 
 		// Calculate the percentage of total possible weight that voted yes
-		// totalYesWeight * 100 / totalPossibleWeight
 		percentage := totalYesWeight.Mul(sdkmath.NewUint(100)).Quo(totalPossibleWeight)
 
 		// Check if percentage meets the quorum threshold
 		if percentage.LT(challenge.QuorumThreshold) {
 			detErrMsg := fmt.Sprintf("voting challenge threshold not met: got %s%%, need %s%%", percentage.String(), challenge.QuorumThreshold.String())
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+		}
+
+		// Check delay-after-quorum if configured
+		if challenge.DelayAfterQuorum.GT(sdkmath.NewUint(0)) {
+			trackerKey := c.votingService.ConstructChallengeTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, proposalId)
+
+			tracker, found := c.votingService.GetVotingChallengeTrackerFromStore(ctx, trackerKey)
+			if !found || tracker == nil || tracker.QuorumReachedTimestamp.IsZero() {
+				detErrMsg := "voting challenge delay: quorum was reached but tracker not found (vote again to initialize)"
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
+
+			now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+			executeAfter := tracker.QuorumReachedTimestamp.Add(challenge.DelayAfterQuorum)
+
+			if now.LT(executeAfter) {
+				remainingMs := executeAfter.Sub(now)
+				detErrMsg := fmt.Sprintf("voting challenge delay not elapsed: %s ms remaining (quorum reached at %s, delay is %s ms)",
+					remainingMs.String(), tracker.QuorumReachedTimestamp.String(), challenge.DelayAfterQuorum.String())
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
 		}
 	}
 

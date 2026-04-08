@@ -32,6 +32,12 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 		return nil, sdkerrors.Wrap(err, "Invalid address")
 	}
 
+	// Get previous value before setting new one
+	previousValue := dynamicStore.DefaultValue
+	if storedVal, found := k.GetDynamicStoreValueFromStore(ctx, msg.StoreId, msg.Address); found {
+		previousValue = storedVal.Value
+	}
+
 	// Set the dynamic store value
 	if err := k.SetDynamicStoreValueInStore(ctx, msg.StoreId, msg.Address, msg.Value); err != nil {
 		return nil, sdkerrors.Wrap(err, "Failed to store dynamic store value")
@@ -57,5 +63,12 @@ func (k msgServer) SetDynamicStoreValue(goCtx context.Context, msg *types.MsgSet
 		sdk.NewAttribute("value", valueStr),
 	)
 
-	return &types.MsgSetDynamicStoreValueResponse{}, nil
+	prevStr := "false"
+	if previousValue {
+		prevStr = "true"
+	}
+
+	return &types.MsgSetDynamicStoreValueResponse{
+		PreviousValue: prevStr,
+	}, nil
 }

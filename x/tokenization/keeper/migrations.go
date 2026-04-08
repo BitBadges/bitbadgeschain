@@ -14,7 +14,17 @@ import (
 	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v27"
 )
 
-// MigrateTokenizationKeeper migrates the tokenization keeper from v21 to current version
+// MigrateTokenizationKeeper migrates the tokenization keeper from v28 to v29.
+//
+// v29 changes:
+// - AltTimeChecks: added offlineMonths, offlineDaysOfMonth, offlineWeeksOfYear (default: empty slices via JSON)
+// - VotingChallenge: added resetAfterExecution (default: false), delayAfterQuorum (default: "0")
+// - VoteProof: added votedAt timestamp (default: "0")
+// - ApprovalCriteria: added userApprovalSettings (default: nil via JSON)
+// - New VotingChallengeTracker message (no migration needed, new store key)
+//
+// All new fields have zero-value defaults, so JSON marshal/unmarshal handles the migration automatically.
+// Explicit default-setting functions below ensure correctness even if JSON omits zero-value fields.
 func (k Keeper) MigrateTokenizationKeeper(ctx sdk.Context) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -42,51 +52,85 @@ func (k Keeper) MigrateTokenizationKeeper(ctx sdk.Context) error {
 	return nil
 }
 
-// migrateIncomingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
-// Note: The JSON marshal/unmarshal process automatically drops fields that don't exist in the target struct,
-// so the removed mustBeWasmContract and mustNotBeWasmContract fields will be automatically ignored.
-// New EVM contract check fields (mustBeEvmContract, mustNotBeEvmContract) default to false if not present.
+// migrateIncomingApprovalCriteria ensures new v29 fields have explicit defaults after JSON migration.
 func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
-	migratePredeterminedBalances(approvalCriteria.PredeterminedBalances)
+	migrateVotingChallenges(approvalCriteria.VotingChallenges)
 }
 
-// migrateOutgoingApprovalCriteria handles WASM contract check field removal and EVM contract check field defaults
+// migrateOutgoingApprovalCriteria ensures new v29 fields have explicit defaults after JSON migration.
 func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
-	migratePredeterminedBalances(approvalCriteria.PredeterminedBalances)
+	migrateVotingChallenges(approvalCriteria.VotingChallenges)
 }
 
-// migrateIncrementedBalances ensures new scaling fields have explicit defaults after JSON migration.
-// allowAmountScaling defaults to false, maxScalingMultiplier defaults to zero Uint.
-func migrateIncrementedBalances(ib *newtypes.IncrementedBalances) {
-	if ib == nil {
-		return
-	}
-	ib.AllowAmountScaling = false
-	if ib.MaxScalingMultiplier.IsNil() {
-		ib.MaxScalingMultiplier = sdkmath.NewUint(0)
-	}
-}
-
-func migratePredeterminedBalances(pb *newtypes.PredeterminedBalances) {
-	if pb == nil {
-		return
-	}
-	migrateIncrementedBalances(pb.IncrementedBalances)
-}
-
-// migrateApprovalCriteria handles WASM contract check field removal, EVM contract check field defaults,
-// and amount scaling field defaults for IncrementedBalances.
+// migrateApprovalCriteria ensures new v29 fields have explicit defaults after JSON migration.
+// Also migrates UserRoyalties from the old standalone field into UserApprovalSettings.
 func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
-	migratePredeterminedBalances(approvalCriteria.PredeterminedBalances)
+	migrateVotingChallenges(approvalCriteria.VotingChallenges)
+
+	// Migrate AltTimeChecks: new fields default to empty slices via JSON (no explicit action needed)
+
+	// Migrate UserApprovalSettings: ensure royalties from old field are preserved.
+	// The old ApprovalCriteria.UserRoyalties (field 13) is now reserved.
+	// During JSON migration, the old field is dropped. We need to check if the old proto bytes
+	// had a UserRoyalties and move it. Since we use JSON marshal/unmarshal, the old field is lost.
+	// However, the v27 type still has it — we handle this in MigrateCollections directly.
+}
+
+// migrateVotingChallenges ensures new v29 voting challenge fields have explicit defaults.
+// resetAfterExecution defaults to false, delayAfterQuorum defaults to zero Uint.
+func migrateVotingChallenges(challenges []*newtypes.VotingChallenge) {
+	for _, challenge := range challenges {
+		if challenge == nil {
+			continue
+		}
+		// resetAfterExecution defaults to false (Go zero value, no action needed)
+		if challenge.DelayAfterQuorum.IsNil() {
+			challenge.DelayAfterQuorum = sdkmath.NewUint(0)
+		}
+	}
+}
+
+// migrateCollectionApprovalRoyalties moves UserRoyalties from the old standalone field (field 13)
+// into UserApprovalSettings.UserRoyalties on each collection approval.
+// The old and new approval slices must be the same length and in the same order (from JSON marshal/unmarshal).
+func migrateCollectionApprovalRoyalties(oldApprovals []*oldtypes.CollectionApproval, newApprovals []*newtypes.CollectionApproval) {
+	for i, oldApproval := range oldApprovals {
+		if i >= len(newApprovals) {
+			break
+		}
+		if oldApproval.ApprovalCriteria == nil || oldApproval.ApprovalCriteria.UserRoyalties == nil {
+			continue
+		}
+
+		oldRoyalties := oldApproval.ApprovalCriteria.UserRoyalties
+		// Skip if royalties are effectively empty
+		if oldRoyalties.Percentage.IsNil() || oldRoyalties.Percentage.IsZero() {
+			continue
+		}
+
+		newCriteria := newApprovals[i].ApprovalCriteria
+		if newCriteria == nil {
+			continue
+		}
+
+		if newCriteria.UserApprovalSettings == nil {
+			newCriteria.UserApprovalSettings = &newtypes.UserApprovalSettings{}
+		}
+
+		newCriteria.UserApprovalSettings.UserRoyalties = &newtypes.UserRoyalties{
+			Percentage:    oldRoyalties.Percentage,
+			PayoutAddress: oldRoyalties.PayoutAddress,
+		}
+	}
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
@@ -147,11 +191,14 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 			return err
 		}
 
+		// Migrate UserRoyalties from old standalone field into UserApprovalSettings
+		migrateCollectionApprovalRoyalties(oldCollection.CollectionApprovals, newCollection.CollectionApprovals)
+
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
 
-		// Save the updated collection (with migrated addresses)
+		// Save the updated collection (with migrated fields)
 		if err := k.SetCollectionInStore(ctx, &newCollection, true); err != nil {
 			return err
 		}

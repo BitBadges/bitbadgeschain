@@ -85,6 +85,8 @@ func initRootCmd(
 		queryCommand(),
 		txCommand(),
 		bitbadgesclient.KeyCommands(app.DefaultNodeHome, false), // false = don't default to eth keys, but support them
+		SdkCmd(),
+		ApiCmd(),
 	)
 }
 

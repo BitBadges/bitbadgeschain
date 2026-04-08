@@ -72,6 +72,8 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	)
 
 	return &types.MsgCreateCollectionResponse{
-		CollectionId: res.CollectionId,
+		CollectionId:    res.CollectionId,
+		ApprovalChanges: res.ApprovalChanges,
+		ReviewItems:     res.ReviewItems,
 	}, nil
 }
