@@ -17,6 +17,20 @@ LDFLAGS_MAINNET := $(LDFLAGS) \
 LDFLAGS_TESTNET := $(LDFLAGS) \
 	-X github.com/bitbadges/bitbadgeschain/app/params.BuildTimeEVMChainID=50025
 
+# Cross-compile CC detection:
+# On macOS: uses native cc (supports both amd64 and arm64).
+# On Linux: uses osxcross (o64-clang / oa64-clang). Requires macOS SDK.
+# Override with: make build-mainnet-darwin/amd64 CC_DARWIN_AMD64=o64-clang
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+  CC_DARWIN_AMD64 ?= cc
+  CC_DARWIN_ARM64 ?= cc
+else
+  CC_DARWIN_AMD64 ?= o64-clang
+  CC_DARWIN_ARM64 ?= oa64-clang
+endif
+CC_WINDOWS_AMD64 ?= x86_64-w64-mingw32-gcc
+
 # Generic build (no chain ID set - defaults to 90123 for local development)
 # Alias to mainnet builds for production use
 build-linux/amd64: build-mainnet-linux/amd64
@@ -36,17 +50,27 @@ build-local-linux/arm64:
 	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
 
-build-local-darwin:
+build-local-darwin/amd64:
 	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="$(CC_DARWIN_AMD64)" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
 
-build-darwin:
-	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/amd64..."
+build-local-darwin/arm64:
+	@echo "Building binary (EVM Chain ID: 90123 - local dev) for darwin/arm64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
-	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
+	CGO_ENABLED=1 CC="$(CC_DARWIN_ARM64)" GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-darwin-arm64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-darwin-arm64"
+
+build-local-windows/amd64:
+	@echo "Building binary (EVM Chain ID: 90123 - local dev) for windows/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="$(CC_WINDOWS_AMD64)" GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o ./build/bitbadgeschain-windows-amd64.exe ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-windows-amd64.exe"
+
+# Legacy aliases
+build-local-darwin: build-local-darwin/amd64
+build-darwin: build-local-darwin/amd64
 
 # Mainnet builds (with EVM Chain ID 50024 compiled in)
 build-mainnet-linux/amd64:
@@ -61,11 +85,26 @@ build-mainnet-linux/arm64:
 	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-linux-arm64"
 
-build-mainnet-darwin:
+build-mainnet-darwin/amd64:
 	@echo "Building mainnet binary (EVM Chain ID: 50024) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="$(CC_DARWIN_AMD64)" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-darwin-amd64"
+
+build-mainnet-darwin/arm64:
+	@echo "Building mainnet binary (EVM Chain ID: 50024) for darwin/arm64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="$(CC_DARWIN_ARM64)" GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-darwin-arm64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-darwin-arm64"
+
+build-mainnet-windows/amd64:
+	@echo "Building mainnet binary (EVM Chain ID: 50024) for windows/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="$(CC_WINDOWS_AMD64)" GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_MAINNET)" -o ./build/bitbadgeschain-windows-amd64.exe ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-windows-amd64.exe"
+
+# Legacy alias
+build-mainnet-darwin: build-mainnet-darwin/amd64
 
 # Testnet builds (with EVM Chain ID 50025 compiled in)
 build-testnet-linux/amd64:
@@ -80,42 +119,103 @@ build-testnet-linux/arm64:
 	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-linux-arm64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-testnet-linux-arm64"
 
-build-testnet-darwin:
+build-testnet-darwin/amd64:
 	@echo "Building testnet binary (EVM Chain ID: 50025) for darwin/amd64..."
 	@mkdir -p ./build
-	CGO_ENABLED=1 CC="o64-clang" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-amd64 ./cmd/bitbadgeschaind/main.go
+	CGO_ENABLED=1 CC="$(CC_DARWIN_AMD64)" GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-amd64 ./cmd/bitbadgeschaind/main.go
 	@echo "✓ Built: ./build/bitbadgeschain-testnet-darwin-amd64"
 
-# build-all builds all 4 production binaries:
-# - 2 mainnet binaries (bitbadgeschain-linux-amd64, bitbadgeschain-linux-arm64) with chain ID 50024
-# - 2 testnet binaries (bitbadgeschain-testnet-linux-amd64, bitbadgeschain-testnet-linux-arm64) with chain ID 50025
-build-all: 
-	make build-mainnet-linux/amd64
-	make build-mainnet-linux/arm64
-	make build-testnet-linux/amd64
-	make build-testnet-linux/arm64
+build-testnet-darwin/arm64:
+	@echo "Building testnet binary (EVM Chain ID: 50025) for darwin/arm64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="$(CC_DARWIN_ARM64)" GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-darwin-arm64 ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-testnet-darwin-arm64"
+
+build-testnet-windows/amd64:
+	@echo "Building testnet binary (EVM Chain ID: 50025) for windows/amd64..."
+	@mkdir -p ./build
+	CGO_ENABLED=1 CC="$(CC_WINDOWS_AMD64)" GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS_TESTNET)" -o ./build/bitbadgeschain-testnet-windows-amd64.exe ./cmd/bitbadgeschaind/main.go
+	@echo "✓ Built: ./build/bitbadgeschain-testnet-windows-amd64.exe"
+
+# Legacy alias
+build-testnet-darwin: build-testnet-darwin/amd64
+
+# build-all builds all production binaries for all platforms:
+# - Mainnet (chain ID 50024): linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+# - Testnet (chain ID 50025): linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+#
+# Note: Darwin targets require macOS SDK headers (CGO deps: IOKit, CoreFoundation, secp256k1).
+#   - On macOS: works natively (CC=cc)
+#   - On Linux: requires osxcross. zig cc alone is NOT sufficient (missing Apple frameworks).
+#   - Recommended: build darwin binaries on macOS, everything else on Linux.
+#
+# Quick reference:
+#   make build-all              # All platforms (needs macOS SDK for darwin)
+#   make build-all-cross        # Linux + Windows only (no macOS SDK needed)
+#   make build-all-linux        # Linux only
+build-all:
+	make build-all-mainnet
+	make build-all-testnet
+
+# Linux + Windows (buildable from Linux without macOS SDK)
+build-all-cross:
+	make build-all-cross-mainnet
+	make build-all-cross-testnet
 
 build-all-mainnet:
 	make build-mainnet-linux/amd64
 	make build-mainnet-linux/arm64
+	make build-mainnet-darwin/amd64
+	make build-mainnet-darwin/arm64
+	make build-mainnet-windows/amd64
+
+build-all-cross-mainnet:
+	make build-mainnet-linux/amd64
+	make build-mainnet-linux/arm64
+	make build-mainnet-windows/amd64
 
 build-all-testnet:
 	make build-testnet-linux/amd64
 	make build-testnet-linux/arm64
+	make build-testnet-darwin/amd64
+	make build-testnet-darwin/arm64
+	make build-testnet-windows/amd64
+
+build-all-cross-testnet:
+	make build-testnet-linux/amd64
+	make build-testnet-linux/arm64
+	make build-testnet-windows/amd64
 
 build-all-local:
 	make build-local-linux/amd64
 	make build-local-linux/arm64
+	make build-local-darwin/amd64
+	make build-local-darwin/arm64
+	make build-local-windows/amd64
+
+# Linux-only build targets (for CI environments without cross-compile toolchains)
+build-all-linux:
+	make build-mainnet-linux/amd64
+	make build-mainnet-linux/arm64
+	make build-testnet-linux/amd64
+	make build-testnet-linux/arm64
 
 do-checksum-testnet:
-	cd build && sha256sum bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 > bitbadgeschain-testnet_checksum
+	cd build && sha256sum bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 bitbadgeschain-testnet-darwin-amd64 bitbadgeschain-testnet-darwin-arm64 bitbadgeschain-testnet-windows-amd64.exe > bitbadgeschain-testnet_checksum
 
 do-checksum-mainnet:
-	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 > bitbadgeschain-mainnet_checksum
+	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 bitbadgeschain-darwin-amd64 bitbadgeschain-darwin-arm64 bitbadgeschain-windows-amd64.exe > bitbadgeschain-mainnet_checksum
 
-# Checksum for all 4 binaries
+# Checksum for all binaries
 do-checksum:
-	cd build && sha256sum bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 > bitbadgeschain_checksum
+	cd build && sha256sum \
+		bitbadgeschain-linux-amd64 bitbadgeschain-linux-arm64 \
+		bitbadgeschain-darwin-amd64 bitbadgeschain-darwin-arm64 \
+		bitbadgeschain-windows-amd64.exe \
+		bitbadgeschain-testnet-linux-amd64 bitbadgeschain-testnet-linux-arm64 \
+		bitbadgeschain-testnet-darwin-amd64 bitbadgeschain-testnet-darwin-arm64 \
+		bitbadgeschain-testnet-windows-amd64.exe \
+		> bitbadgeschain_checksum
 
 # Run all tests. Requires -tags=test for EVM/cosmos-evm test helpers (ResetTestConfig).
 test:
