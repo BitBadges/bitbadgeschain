@@ -17,6 +17,7 @@ func CmdSetDynamicStoreValue() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-dynamic-store-value [store-id] [address] [value]",
 		Short: "Broadcast message setDynamicStoreValue",
+		Long:  MsgHelpLinks("set-dynamic-store-value"),
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argStoreId := types.NewUintFromString(args[0])

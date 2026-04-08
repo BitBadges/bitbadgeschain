@@ -16,6 +16,7 @@ func CmdGetCollection() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "collection [id]",
 		Short: "Query collection",
+		Long:  QueryHelpLinks("collection"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqId := types.NewUintFromString(args[0])

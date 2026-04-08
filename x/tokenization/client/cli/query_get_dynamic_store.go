@@ -16,6 +16,7 @@ func CmdGetDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dynamic-store [store-id]",
 		Short: "Query dynamic store",
+		Long:  QueryHelpLinks("dynamic-store"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqStoreId := args[0]

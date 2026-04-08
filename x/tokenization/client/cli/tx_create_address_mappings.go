@@ -18,7 +18,7 @@ func CmdCreateAddressLists() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-address-lists [tx-json-or-file]",
 		Short: "Broadcast message createAddressLists",
-		Long:  "Accepts JSON either inline or from a file path. If the argument is a valid file path, it will read the JSON from that file.",
+		Long:  MsgHelpLinks("create-address-lists"),
 		Args:  cobra.ExactArgs(1), // Accept exactly one argument (the JSON string or file path)
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

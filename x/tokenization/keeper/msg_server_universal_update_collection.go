@@ -310,6 +310,10 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		return nil, errorsmod.Wrapf(ErrCollectionIsArchived, "collection ID %s is currently archived (read-only)", msg.CollectionId.String())
 	}
 
+	// Capture existing approvals before any changes for change detection
+	existingCollectionApprovals := make([]*types.CollectionApproval, len(collection.CollectionApprovals))
+	copy(existingCollectionApprovals, collection.CollectionApprovals)
+
 	if msg.UpdateCollectionApprovals {
 		// Create a temporary collection with invariants from the message for validation
 		// This ensures invariants are checked even if they haven't been set on the collection yet
@@ -638,8 +642,29 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		sdk.NewAttribute("collectionId", fmt.Sprint(collection.CollectionId)),
 	)
 
+	// Compute approval changes and emit granular events
+	var approvalChanges []*types.ApprovalChange
+	if msg.UpdateCollectionApprovals {
+		approvalChanges = ComputeCollectionApprovalChanges(existingCollectionApprovals, collection.CollectionApprovals)
+
+		// Build JSON map for event emission: use new approvals for created/edited, existing for deleted
+		allApprovalsJSON := BuildCollectionApprovalJSONMap(collection.CollectionApprovals)
+		existingJSON := BuildCollectionApprovalJSONMap(existingCollectionApprovals)
+		for k, v := range existingJSON {
+			if _, ok := allApprovalsJSON[k]; !ok {
+				allApprovalsJSON[k] = v
+			}
+		}
+
+		EmitApprovalChangeEventsWithJSON(ctx, collection.CollectionId, "", approvalChanges, allApprovalsJSON)
+	}
+
+	reviewItems := CollectionReviewItems(collection, approvalChanges)
+
 	return &types.MsgUniversalUpdateCollectionResponse{
-		CollectionId: collection.CollectionId,
+		CollectionId:    collection.CollectionId,
+		ApprovalChanges: approvalChanges,
+		ReviewItems:     reviewItems,
 	}, nil
 }
 

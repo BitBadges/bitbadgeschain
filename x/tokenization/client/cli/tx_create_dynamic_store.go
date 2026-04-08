@@ -17,6 +17,7 @@ func CmdCreateDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-dynamic-store [default-value]",
 		Short: "Broadcast message createDynamicStore",
+		Long:  MsgHelpLinks("create-dynamic-store"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			defaultValue, err := strconv.ParseBool(args[0])

@@ -24,6 +24,7 @@ func CmdGetChallengeTracker() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "num-used-for-merkle-challenge [collectionId] [approvalLevel] [approverAddress] [approvalId] [challengeTrackerId] [leafIndex]",
 		Short: "Query challenge tracker",
+		Long:  QueryHelpLinks("num-used-for-merkle-challenge"),
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)

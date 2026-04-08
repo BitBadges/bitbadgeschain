@@ -66,7 +66,7 @@ func (k msgServer) SetOutgoingApproval(goCtx context.Context, msg *types.MsgSetO
 	}
 
 	// Execute the update using the helper function
-	err = k.executeUpdateUserApprovals(ctx, msg.Creator, collectionId, updateMsg)
+	updateResp, err := k.executeUpdateUserApprovals(ctx, msg.Creator, collectionId, updateMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -85,5 +85,23 @@ func (k msgServer) SetOutgoingApproval(goCtx context.Context, msg *types.MsgSetO
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
-	return &types.MsgSetOutgoingApprovalResponse{}, nil
+	// Determine action and version from the update response
+	action := "created"
+	version := ""
+	if foundExisting {
+		action = "edited"
+	}
+	for _, change := range updateResp.OutgoingChanges {
+		if change.ApprovalId == msg.Approval.ApprovalId {
+			version = change.Version
+			action = change.Action
+			break
+		}
+	}
+
+	return &types.MsgSetOutgoingApprovalResponse{
+		Action:      action,
+		Version:     version,
+		ReviewItems: updateResp.ReviewItems,
+	}, nil
 }

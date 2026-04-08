@@ -28,7 +28,7 @@ Example inline: '[{"approvalId":"approval1","approvalLevel":"collection","approv
 Rules:
 - For self-purge (creator purging own approvals): purgeExpired must be true, purgeCounterpartyApprovals must be false
 - For other-purge (creator purging someone else's approvals): can set either purgeExpired or purgeCounterpartyApprovals
-- approvalsToPurge cannot be empty - you must specify exactly which approvals to purge`,
+- approvalsToPurge cannot be empty - you must specify exactly which approvals to purge` + "\n" + MsgHelpLinks("purge-approvals"),
 		Args: cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCollectionId := args[0]

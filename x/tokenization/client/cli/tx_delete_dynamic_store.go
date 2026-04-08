@@ -17,6 +17,7 @@ func CmdDeleteDynamicStore() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-dynamic-store [store-id]",
 		Short: "Broadcast message deleteDynamicStore",
+		Long:  MsgHelpLinks("delete-dynamic-store"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argStoreId := types.NewUintFromString(args[0])

@@ -55,6 +55,8 @@ func (k msgServer) UpdateCollection(goCtx context.Context, msg *types.MsgUpdateC
 	)
 
 	return &types.MsgUpdateCollectionResponse{
-		CollectionId: res.CollectionId,
+		CollectionId:    res.CollectionId,
+		ApprovalChanges: res.ApprovalChanges,
+		ReviewItems:     res.ReviewItems,
 	}, nil
 }

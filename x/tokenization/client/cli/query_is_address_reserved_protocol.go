@@ -13,6 +13,7 @@ func CmdIsAddressReservedProtocol() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "is-address-reserved-protocol [address]",
 		Short: "Query if an address is a reserved protocol address",
+		Long:  QueryHelpLinks("is-address-reserved-protocol"),
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqAddress, err := cast.ToStringE(args[0])

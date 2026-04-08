@@ -18,7 +18,7 @@ func CmdGetBalanceForToken() *cobra.Command {
 		Short: "Query the balance amount for a specific token ID at a specific time",
 		Long: `Query the balance amount for a specific token ID at a specific time.
 The time parameter is optional and defaults to the current block time.
-Time should be specified in milliseconds since epoch.`,
+Time should be specified in milliseconds since epoch.` + "\n" + QueryHelpLinks("balance-for-token"),
 		Args: cobra.RangeArgs(3, 4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqCollectionId := args[0]

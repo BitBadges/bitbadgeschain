@@ -91,7 +91,7 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 	}
 
 	// Execute the update using the helper function
-	err = k.executeUpdateUserApprovals(ctx, targetAddress, collectionId, updateMsg)
+	updateResp, err := k.executeUpdateUserApprovals(ctx, targetAddress, collectionId, updateMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,25 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
-	return &types.MsgPurgeApprovalsResponse{NumPurged: numPurged}, nil
+	// Collect purged approval IDs from the changes
+	purgedIds := []string{}
+	allChanges := append(updateResp.OutgoingChanges, updateResp.IncomingChanges...)
+	for _, change := range allChanges {
+		if change.Action == "deleted" {
+			purgedIds = append(purgedIds, change.ApprovalId)
+		}
+	}
+
+	reviewItems := updateResp.ReviewItems
+	if numPurged.GT(sdkmath.NewUint(0)) {
+		reviewItems = append(reviewItems, fmt.Sprintf("%s approvals purged", numPurged.String()))
+	}
+
+	return &types.MsgPurgeApprovalsResponse{
+		NumPurged:        numPurged,
+		PurgedApprovalIds: purgedIds,
+		ReviewItems:      reviewItems,
+	}, nil
 }
 
 // filterApprovalsToPurge filters out approvals that should be purged

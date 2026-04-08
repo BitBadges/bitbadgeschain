@@ -13,6 +13,7 @@ func CmdCastVote() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cast-vote [collection-id] [approval-level] [approver-address] [approval-id] [proposal-id] [yes-weight]",
 		Short: "Broadcast message castVote",
+		Long:  MsgHelpLinks("cast-vote"),
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCollectionId := types.NewUintFromString(args[0])
