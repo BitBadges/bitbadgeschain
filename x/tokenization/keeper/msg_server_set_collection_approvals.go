@@ -63,6 +63,8 @@ func (k msgServer) SetCollectionApprovals(goCtx context.Context, msg *types.MsgS
 	)
 
 	return &types.MsgSetCollectionApprovalsResponse{
-		CollectionId: response.CollectionId,
+		CollectionId:    response.CollectionId,
+		ApprovalChanges: response.ApprovalChanges,
+		ReviewItems:     response.ReviewItems,
 	}, nil
 }

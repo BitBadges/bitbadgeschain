@@ -11,14 +11,13 @@ import (
 )
 
 // Helper function to create and execute an UpdateUserApprovals message
-func (k msgServer) executeUpdateUserApprovals(ctx sdk.Context, creator string, collectionId sdkmath.Uint, updateMsg *types.MsgUpdateUserApprovals) error {
+func (k msgServer) executeUpdateUserApprovals(ctx sdk.Context, creator string, collectionId sdkmath.Uint, updateMsg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
 	// Set the basic fields
 	updateMsg.Creator = creator
 	updateMsg.CollectionId = collectionId
 
 	// Execute the update
-	_, err := k.UpdateUserApprovals(ctx, updateMsg)
-	return err
+	return k.UpdateUserApprovals(ctx, updateMsg)
 }
 
 func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
@@ -51,6 +50,12 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 	if userBalance.UserPermissions == nil {
 		userBalance.UserPermissions = &types.UserPermissions{}
 	}
+
+	// Capture existing approvals before changes for change detection
+	existingOutgoing := make([]*types.UserOutgoingApproval, len(userBalance.OutgoingApprovals))
+	copy(existingOutgoing, userBalance.OutgoingApprovals)
+	existingIncoming := make([]*types.UserIncomingApproval, len(userBalance.IncomingApprovals))
+	copy(existingIncoming, userBalance.IncomingApprovals)
 
 	if msg.UpdateOutgoingApprovals {
 		// Enforce mustPrioritize=true for non-auto-scannable approvals
@@ -196,5 +201,43 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 		sdk.NewAttribute("collectionId", fmt.Sprint(collectionId)),
 	)
 
-	return &types.MsgUpdateUserApprovalsResponse{}, nil
+	// Compute approval changes and emit granular events
+	var outgoingChanges []*types.ApprovalChange
+	var incomingChanges []*types.ApprovalChange
+
+	if msg.UpdateOutgoingApprovals {
+		outgoingChanges = ComputeOutgoingApprovalChanges(existingOutgoing, userBalance.OutgoingApprovals)
+		outgoingJSON := BuildOutgoingApprovalJSONMap(userBalance.OutgoingApprovals)
+		existingOutJSON := BuildOutgoingApprovalJSONMap(existingOutgoing)
+		for k, v := range existingOutJSON {
+			if _, ok := outgoingJSON[k]; !ok {
+				outgoingJSON[k] = v
+			}
+		}
+		EmitApprovalChangeEventsWithJSON(ctx, collectionId, msg.Creator, outgoingChanges, outgoingJSON)
+	}
+
+	if msg.UpdateIncomingApprovals {
+		incomingChanges = ComputeIncomingApprovalChanges(existingIncoming, userBalance.IncomingApprovals)
+		incomingJSON := BuildIncomingApprovalJSONMap(userBalance.IncomingApprovals)
+		existingInJSON := BuildIncomingApprovalJSONMap(existingIncoming)
+		for k, v := range existingInJSON {
+			if _, ok := incomingJSON[k]; !ok {
+				incomingJSON[k] = v
+			}
+		}
+		EmitApprovalChangeEventsWithJSON(ctx, collectionId, msg.Creator, incomingChanges, incomingJSON)
+	}
+
+	allChanges := append(outgoingChanges, incomingChanges...)
+	reviewItems := []string{}
+	if len(allChanges) > 0 {
+		reviewItems = append(reviewItems, ApprovalChangeSummary(allChanges))
+	}
+
+	return &types.MsgUpdateUserApprovalsResponse{
+		OutgoingChanges: outgoingChanges,
+		IncomingChanges: incomingChanges,
+		ReviewItems:     reviewItems,
+	}, nil
 }

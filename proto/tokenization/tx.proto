@@ -255,6 +255,8 @@ message MsgUniversalUpdateCollection {
 message MsgUniversalUpdateCollectionResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ApprovalChange approvalChanges = 2;
+  repeated string reviewItems = 3;
 }
 
 // MsgUpdateCollection is used to update a collection.
@@ -342,6 +344,8 @@ message MsgUpdateCollection {
 message MsgUpdateCollectionResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ApprovalChange approvalChanges = 2;
+  repeated string reviewItems = 3;
 }
 
 // MsgCreateCollection is used to create a new collection.
@@ -400,6 +404,8 @@ message MsgCreateCollection {
 message MsgCreateCollectionResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ApprovalChange approvalChanges = 2;
+  repeated string reviewItems = 3;
 }
 
 // MsgCreateAddressLists is used to create address lists.
@@ -433,7 +439,12 @@ message MsgTransferTokens {
 }
 
 // MsgTransferTokensResponse is the response to MsgTransferTokens.
-message MsgTransferTokensResponse {}
+message MsgTransferTokensResponse {
+  repeated ApprovalUsed approvalsUsed = 1;
+  repeated CoinTransferProto coinTransfers = 2;
+  repeated Balance balancesTransferred = 3;
+  repeated string reviewItems = 4;
+}
 
 // MsgDeleteCollection is used to delete a collection.
 message MsgDeleteCollection {
@@ -499,7 +510,11 @@ message MsgUpdateUserApprovals {
 }
 
 // MsgUpdateUserApprovalsResponse is the response to MsgUpdateUserApprovals.
-message MsgUpdateUserApprovalsResponse {}
+message MsgUpdateUserApprovalsResponse {
+  repeated ApprovalChange incomingChanges = 1;
+  repeated ApprovalChange outgoingChanges = 2;
+  repeated string reviewItems = 3;
+}
 
 // MsgSetIncomingApproval is a helper message to set a single incoming approval.
 message MsgSetIncomingApproval {
@@ -517,7 +532,11 @@ message MsgSetIncomingApproval {
 }
 
 // MsgSetIncomingApprovalResponse is the response to MsgSetIncomingApproval.
-message MsgSetIncomingApprovalResponse {}
+message MsgSetIncomingApprovalResponse {
+  string action = 1;
+  string version = 2;
+  repeated string reviewItems = 3;
+}
 
 // MsgDeleteIncomingApproval is a helper message to delete a single incoming approval.
 message MsgDeleteIncomingApproval {
@@ -535,7 +554,11 @@ message MsgDeleteIncomingApproval {
 }
 
 // MsgDeleteIncomingApprovalResponse is the response to MsgDeleteIncomingApproval.
-message MsgDeleteIncomingApprovalResponse {}
+message MsgDeleteIncomingApprovalResponse {
+  bool found = 1;
+  string version = 2;
+  repeated string reviewItems = 3;
+}
 
 // MsgSetOutgoingApproval is a helper message to set a single outgoing approval.
 message MsgSetOutgoingApproval {
@@ -553,7 +576,11 @@ message MsgSetOutgoingApproval {
 }
 
 // MsgSetOutgoingApprovalResponse is the response to MsgSetOutgoingApproval.
-message MsgSetOutgoingApprovalResponse {}
+message MsgSetOutgoingApprovalResponse {
+  string action = 1;
+  string version = 2;
+  repeated string reviewItems = 3;
+}
 
 // MsgDeleteOutgoingApproval is a helper message to delete a single outgoing approval.
 message MsgDeleteOutgoingApproval {
@@ -571,7 +598,11 @@ message MsgDeleteOutgoingApproval {
 }
 
 // MsgDeleteOutgoingApprovalResponse is the response to MsgDeleteOutgoingApproval.
-message MsgDeleteOutgoingApprovalResponse {}
+message MsgDeleteOutgoingApprovalResponse {
+  bool found = 1;
+  string version = 2;
+  repeated string reviewItems = 3;
+}
 
 // MsgPurgeApprovals is a helper message to purge expired approvals.
 message MsgPurgeApprovals {
@@ -601,6 +632,8 @@ message MsgPurgeApprovals {
 message MsgPurgeApprovalsResponse {
   // Number of approvals purged.
   string numPurged = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string purgedApprovalIds = 2;
+  repeated string reviewItems = 3;
 }
 
 // MsgCreateDynamicStore is used to create a new dynamic store.
@@ -622,6 +655,7 @@ message MsgCreateDynamicStore {
 message MsgCreateDynamicStoreResponse {
   // ID of the dynamic store.
   string storeId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string reviewItems = 2;
 }
 
 // MsgUpdateDynamicStore is used to update an existing dynamic store.
@@ -681,7 +715,10 @@ message MsgSetDynamicStoreValue {
 }
 
 // MsgSetDynamicStoreValueResponse is the response to MsgSetDynamicStoreValue.
-message MsgSetDynamicStoreValueResponse {}
+message MsgSetDynamicStoreValueResponse {
+  string previousValue = 1;
+  repeated string reviewItems = 2;
+}
 
 // Helper message types for UniversalUpdateCollection subsets
 // These are convenience messages that set specific subsets of the UniversalUpdateCollection message
@@ -852,6 +889,8 @@ message MsgSetCollectionApprovals {
 message MsgSetCollectionApprovalsResponse {
   // ID of the collection.
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated ApprovalChange approvalChanges = 2;
+  repeated string reviewItems = 3;
 }
 
 // MsgSetIsArchived sets the isArchived and canArchiveCollection permission
@@ -926,3 +965,30 @@ message MsgCastVote {
 }
 
 message MsgCastVoteResponse {}
+
+// Shared response types
+
+// ApprovalUsed represents an approval that was consumed during a transfer.
+message ApprovalUsed {
+  string approvalId = 1;
+  string approvalLevel = 2;
+  string approverAddress = 3;
+  string version = 4;
+}
+
+// CoinTransferProto represents a coin transfer that occurred during a transaction.
+message CoinTransferProto {
+  string from = 1;
+  string to = 2;
+  string amount = 3;
+  string denom = 4;
+  bool isProtocolFee = 5;
+}
+
+// ApprovalChange represents a change to an approval (created, edited, or deleted).
+message ApprovalChange {
+  string approvalId = 1;
+  string approvalLevel = 2;
+  string action = 3;
+  string version = 4;
+}
