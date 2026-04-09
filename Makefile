@@ -1,5 +1,5 @@
 # Version must be provided as a CLI argument
-VERSION := v28
+VERSION := v29
 
 # Common ldflags for version information
 LDFLAGS := -X github.com/cosmos/cosmos-sdk/version.Name=bitbadgeschain \
