@@ -2,7 +2,7 @@ package app
 
 import (
 	storetypes "cosmossdk.io/store/types"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v30 "github.com/bitbadges/bitbadgeschain/app/upgrades/v30"
 )
 
@@ -37,8 +37,9 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v30.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			// v30: remove deprecated x/anchor and x/maps modules
-			Deleted: []string{"anchor", "maps"},
+			// v30: remove x/anchor, x/maps, x/group, x/crisis
+			// (group/crisis removed by SDK v0.54 migration; anchor/maps deprecated)
+			Deleted: []string{"anchor", "maps", "group", "crisis"},
 			Added:   []string{},
 		}
 	}
