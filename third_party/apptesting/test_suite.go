@@ -8,7 +8,7 @@ import (
 	"time"
 
 	coreheader "cosmossdk.io/core/header"
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"cosmossdk.io/math"
 	"cosmossdk.io/store/rootmulti"
 	storetypes "cosmossdk.io/store/types"
@@ -238,7 +238,7 @@ func (s *KeeperTestHelper) Commit() {
 	header.Time = newBlockTime
 	header.Height++
 
-	s.Ctx = s.App.BaseApp.NewUncachedContext(false, header).WithHeaderInfo(coreheader.Info{
+	s.Ctx = s.App.BaseApp.NewNextBlockContext(header).WithHeaderInfo(coreheader.Info{
 		Height: header.Height,
 		Time:   header.Time,
 	})

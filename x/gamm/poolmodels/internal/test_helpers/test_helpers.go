@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"cosmossdk.io/store/metrics"
 	"cosmossdk.io/store/rootmulti"
 	tmtypes "github.com/cometbft/cometbft/proto/tendermint/types"
