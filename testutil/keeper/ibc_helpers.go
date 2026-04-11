@@ -9,10 +9,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	storetypes "cosmossdk.io/store/types"
-	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
-	ibcclienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
-	ibctypes "github.com/cosmos/ibc-go/v10/modules/core/types"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibcclienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	ibctypes "github.com/cosmos/ibc-go/v11/modules/core/types"
 )
 
 // noopParamSubspace is a no-op implementation of ParamSubspace for testing

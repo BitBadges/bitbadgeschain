@@ -3,7 +3,7 @@ package keeper
 import (
 	"testing"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
@@ -15,7 +15,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
+	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/x/anchor/keeper"

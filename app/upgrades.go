@@ -2,7 +2,7 @@ package app
 
 import (
 	storetypes "cosmossdk.io/store/types"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v29 "github.com/bitbadges/bitbadgeschain/app/upgrades/v29"
 )
 
@@ -37,7 +37,7 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v29.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			Deleted: []string{},
+			Deleted: []string{"group", "crisis"}, // x/group and x/crisis removed in v0.54
 			Added:   []string{},
 		}
 	}
