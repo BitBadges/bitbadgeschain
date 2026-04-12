@@ -313,6 +313,7 @@ func (suite *TestSuite) TestUpdateAndGetBalancesForIds() {
 }
 
 func (suite *TestSuite) TestDefaultBalances() {
+	// DefaultBalances.Balances must be empty — only approvals/permissions are allowed
 	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
 		CollectionId:        sdkmath.NewUint(0),
 		Creator:             alice,
@@ -329,18 +330,18 @@ func (suite *TestSuite) TestDefaultBalances() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error updating collection: %s")
+	suite.Require().NotNil(err, "Should reject truthy DefaultBalances.Balances")
 
-	bal, err := GetUserBalance(suite, suite.ctx, sdkmath.NewUint(1), "address1")
-	suite.Require().Nil(err, "Error getting user balance: %s")
-
-	AssertBalancesEqual(suite, bal.Balances, []*types.Balance{
-		{
-			Amount:         sdkmath.NewUint(1),
-			OwnershipTimes: GetFullUintRanges(),
-			TokenIds:       GetFullUintRanges(),
-		},
+	// Empty Balances should be accepted
+	err = UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
+		CollectionId:        sdkmath.NewUint(0),
+		Creator:             alice,
+		Manager:             "",
+		UpdateValidTokenIds: true,
+		ValidTokenIds:       GetFullUintRanges(),
+		DefaultBalances:     &types.UserBalanceStore{},
 	})
+	suite.Require().Nil(err, "Error updating collection with empty DefaultBalances: %s")
 }
 
 func GetBobApproval() *types.CollectionApproval {

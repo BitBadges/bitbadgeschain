@@ -256,7 +256,7 @@ func CreateCollections(suite *TestSuite, ctx context.Context, collectionsToCreat
 			CollectionPermissions: collectionToCreate.Permissions,
 			CollectionApprovals:   collectionToCreate.CollectionApprovals,
 			DefaultBalances: &types.UserBalanceStore{
-				Balances:          collectionToCreate.DefaultBalances,
+				Balances:          []*types.Balance{},
 				OutgoingApprovals: []*types.UserOutgoingApproval{},
 				IncomingApprovals: []*types.UserIncomingApproval{},
 				AutoApproveSelfInitiatedOutgoingTransfers: true,

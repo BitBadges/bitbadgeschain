@@ -83,26 +83,16 @@ func (k Keeper) SwapExactAmountIn(
 		return osmomath.Int{}, err
 	}
 
-	// Calculate affiliate fees if provided
-	totalFeeAmount := osmomath.ZeroInt()
+	// Adjust return value to reflect affiliate fees already deducted in updatePoolForSwap.
+	// The pool sent (tokenOut - fees) to the user, so the return value should match.
 	if len(affiliates) > 0 {
-		var calcErr error
-		totalFeeAmount, _, calcErr = k.calculateAffiliateFees(ctx, affiliates, tokenOutMinAmount, tokenOutDenom)
+		totalFeeAmount, _, calcErr := k.calculateAffiliateFees(ctx, affiliates, tokenOutMinAmount, tokenOutDenom)
 		if calcErr != nil {
 			return osmomath.Int{}, calcErr
 		}
-
-		// Validate that fees don't exceed output
 		if totalFeeAmount.IsPositive() {
-			if tokenOutAmount.LT(totalFeeAmount) {
-				return osmomath.Int{}, customhookstypes.Err(&ctx, "affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOutAmount.String())
-			}
+			tokenOutAmount = tokenOutAmount.Sub(totalFeeAmount)
 		}
-	}
-
-	// Return adjusted tokenOutAmount after affiliate fees
-	if totalFeeAmount.IsPositive() {
-		tokenOutAmount = tokenOutAmount.Sub(totalFeeAmount)
 	}
 
 	return tokenOutAmount, nil
