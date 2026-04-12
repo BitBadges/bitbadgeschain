@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"strconv"
 	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -319,7 +320,7 @@ func (k Keeper) EmitFullBalanceQueryResponseEvent(ctx sdk.Context, response *typ
 	if response.Error != "" {
 		attrs = append(attrs, sdk.NewAttribute(types.AttributeKeyError, response.Error))
 	} else {
-		attrs = append(attrs, sdk.NewAttribute("balance_store_size", string(rune(len(response.BalanceStore)))))
+		attrs = append(attrs, sdk.NewAttribute("balance_store_size", strconv.Itoa(len(response.BalanceStore))))
 	}
 
 	ctx.EventManager().EmitEvent(

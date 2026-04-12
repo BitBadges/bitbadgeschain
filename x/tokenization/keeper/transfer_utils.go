@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -39,7 +40,15 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 		denomAmounts[coinTransfer.Denom] = denomAmounts[coinTransfer.Denom].Add(amount)
 	}
 
-	for denom, totalAmount := range denomAmounts {
+	// Sort map keys for deterministic iteration order
+	denoms := make([]string, 0, len(denomAmounts))
+	for denom := range denomAmounts {
+		denoms = append(denoms, denom)
+	}
+	sort.Strings(denoms)
+
+	for _, denom := range denoms {
+		totalAmount := denomAmounts[denom]
 		// 0.1% of the total amount for this denom
 		// Safety check to prevent division by zero
 		if ProtocolFeeDenominator == 0 {
@@ -49,7 +58,7 @@ func (k Keeper) CalculateAndDistributeProtocolFees(
 
 		// For other denoms, just use 0.1%
 		if !protocolFee.IsZero() {
-			protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromUint64(protocolFee.Uint64())))
+			protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromBigInt(protocolFee.BigInt())))
 		}
 	}
 
