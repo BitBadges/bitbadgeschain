@@ -368,8 +368,18 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasRangesOverlap
 	case SearchInRangesMethod:
 		baseGas = GasSearchInRanges
+		// Add input-size-proportional gas to prevent gas griefing with large JSON inputs
+		if len(input) > 4 {
+			inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
+			baseGas += inputSizeGas
+		}
 	case GetBalanceForIdAndTimeMethod:
 		baseGas = GasGetBalanceForIdAndTime
+		// Add input-size-proportional gas to prevent gas griefing with large JSON inputs
+		if len(input) > 4 {
+			inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
+			baseGas += inputSizeGas
+		}
 	case GetReservedListIdMethod:
 		baseGas = GasGetReservedListId
 	default:

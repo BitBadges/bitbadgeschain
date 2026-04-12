@@ -978,6 +978,28 @@ func (k Keeper) DeleteVotingChallengeTrackerFromStore(ctx sdk.Context, key strin
 	store.Delete(votingChallengeTrackerStoreKey(key))
 }
 
+// GetAllVotingChallengeTrackersFromStore iterates all voting challenge trackers for genesis export.
+func (k Keeper) GetAllVotingChallengeTrackersFromStore(ctx sdk.Context) ([]*types.VotingChallengeTracker, []string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	iterator := storetypes.KVStorePrefixIterator(store, VotingChallengeTrackerKey)
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			k.Logger().Error("failed to close voting challenge tracker iterator", "error", err)
+		}
+	}()
+
+	var trackers []*types.VotingChallengeTracker
+	var keys []string
+	for ; iterator.Valid(); iterator.Next() {
+		var tracker types.VotingChallengeTracker
+		k.cdc.MustUnmarshal(iterator.Value(), &tracker)
+		trackers = append(trackers, &tracker)
+		keys = append(keys, string(iterator.Key()[len(VotingChallengeTrackerKey):]))
+	}
+	return trackers, keys
+}
+
 // DeleteAllVotesForProposal deletes all votes for a given proposal (used for reset after execution).
 func (k Keeper) DeleteAllVotesForProposal(ctx sdk.Context, collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string, voters []*types.Voter) error {
 	for _, voter := range voters {

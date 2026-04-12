@@ -47,6 +47,12 @@ type GenesisState struct {
 	VotingTrackerStoreKeys           []string             `protobuf:"bytes,20,rep,name=votingTrackerStoreKeys,proto3" json:"votingTrackerStoreKeys,omitempty"`
 	CollectionStats                  []*CollectionStats   `protobuf:"bytes,21,rep,name=collectionStats,proto3" json:"collectionStats,omitempty"`
 	CollectionStatsIds               []Uint               `protobuf:"bytes,22,rep,name=collectionStatsIds,proto3,customtype=Uint" json:"collectionStatsIds"`
+	// Non-proto fields for genesis completeness (serialized via JSON, not proto binary).
+	// These fields are exported/imported by the module's genesis JSON codec.
+	VotingChallengeTrackers          []*VotingChallengeTracker `json:"votingChallengeTrackers,omitempty"`
+	VotingChallengeTrackerStoreKeys  []string                  `json:"votingChallengeTrackerStoreKeys,omitempty"`
+	NextAddressListCounter           Uint                      `json:"nextAddressListCounter"`
+	ReservedProtocolAddresses        []string                  `json:"reservedProtocolAddresses,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }

@@ -119,6 +119,9 @@ func (k Keeper) SendCoinWithAliasRouting(
 
 	router, found := k.getRouterForDenom(coin.Denom)
 	if found {
+		if coin.Amount.IsNegative() {
+			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
+		}
 		amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 		return router.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, amountUint)
 	}
@@ -140,6 +143,9 @@ func (k Keeper) SendCoinsWithAliasRouting(
 
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
+			if coin.Amount.IsNegative() {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
+			}
 			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			err := router.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, amountUint)
 			if err != nil {
@@ -172,6 +178,9 @@ func (k Keeper) FundCommunityPoolWithAliasRouting(
 
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
+			if coin.Amount.IsNegative() {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
+			}
 			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			err := router.FundCommunityPoolViaAliasDenom(ctx, fromAddressAcc.String(), moduleAddress, coin.Denom, amountUint)
 			if err != nil {
@@ -205,6 +214,9 @@ func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
 
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
+			if coin.Amount.IsNegative() {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
+			}
 			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			err := router.SpendFromCommunityPoolViaAliasDenom(ctx, moduleAddress.String(), toAddressAcc.String(), coin.Denom, amountUint)
 			if err != nil {
@@ -273,6 +285,9 @@ func (k Keeper) SendCoinsFromModuleToAccountWithAliasRouting(
 
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
+			if coin.Amount.IsNegative() {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
+			}
 			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			err := router.SendFromModuleToAccountViaAliasDenom(ctx, moduleAddress.String(), toAddressAcc.String(), coin.Denom, amountUint)
 			if err != nil {
@@ -306,6 +321,9 @@ func (k Keeper) SendCoinsFromAccountToModuleWithAliasRouting(
 
 		router, found := k.getRouterForDenom(coin.Denom)
 		if found {
+			if coin.Amount.IsNegative() {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
+			}
 			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			err := router.SendFromAccountToModuleViaAliasDenom(ctx, fromAddressAcc.String(), moduleAddress.String(), coin.Denom, amountUint)
 			if err != nil {

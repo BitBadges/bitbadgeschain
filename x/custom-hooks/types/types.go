@@ -29,39 +29,29 @@ import (
 //   - Creating an allowlist of safe error message formats
 //   - Implementing more sophisticated validation based on error source
 func SetDeterministicError(ctx sdk.Context, errorMsg string) {
-	// Validate that the error message doesn't contain stack traces or non-deterministic patterns
+	// Sanitize the error message by replacing non-deterministic patterns instead of panicking.
+	// This prevents chain halts from unexpected error messages while still ensuring determinism.
 
-	// Check for file paths (indicated by ".go" or file extensions)
-	// Note: This may false-positive on legitimate messages about Go files
-	if strings.Contains(errorMsg, ".go") {
-		panic(fmt.Sprintf("SetDeterministicError: error message contains '.go' (likely a stack trace), which is non-deterministic. Error message: %s", errorMsg))
-	}
+	// Sanitize file paths (indicated by ".go" or file extensions)
+	errorMsg = strings.ReplaceAll(errorMsg, ".go", ".[redacted]")
 
-	// Check for goroutine IDs (e.g., "goroutine 123")
-	if strings.Contains(errorMsg, "goroutine") {
-		panic(fmt.Sprintf("SetDeterministicError: error message contains 'goroutine' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
-	}
+	// Sanitize goroutine IDs (e.g., "goroutine 123")
+	errorMsg = strings.ReplaceAll(errorMsg, "goroutine", "[redacted]")
 
-	// Check for runtime package references (runtime.xxx)
-	if strings.Contains(errorMsg, "runtime.") {
-		panic(fmt.Sprintf("SetDeterministicError: error message contains 'runtime.' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
-	}
+	// Sanitize runtime package references (runtime.xxx)
+	errorMsg = strings.ReplaceAll(errorMsg, "runtime.", "[redacted].")
 
-	// Check for "panic" keyword (often in stack traces)
-	if strings.Contains(errorMsg, "panic(") || strings.Contains(errorMsg, "panic:") {
-		panic(fmt.Sprintf("SetDeterministicError: error message contains 'panic' (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
-	}
+	// Sanitize "panic" keyword (often in stack traces)
+	errorMsg = strings.ReplaceAll(errorMsg, "panic(", "[redacted](")
+	errorMsg = strings.ReplaceAll(errorMsg, "panic:", "[redacted]:")
 
-	// Check for full package paths (github.com/... or similar)
-	// Using regex for more precise matching of package paths
-	if matched, _ := regexp.MatchString(`(github\.com|golang\.org|go\.pkg\.dev|gopkg\.in)/`, errorMsg); matched {
-		panic(fmt.Sprintf("SetDeterministicError: error message contains package path (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
-	}
+	// Sanitize full package paths (github.com/... or similar)
+	rePackagePath := regexp.MustCompile(`(github\.com|golang\.org|go\.pkg\.dev|gopkg\.in)/[^\s]*`)
+	errorMsg = rePackagePath.ReplaceAllString(errorMsg, "[redacted-path]")
 
-	// Check for common stack trace patterns: file paths with line numbers (e.g., "file.go:123")
-	if matched, _ := regexp.MatchString(`\w+\.go:\d+`, errorMsg); matched {
-		panic(fmt.Sprintf("SetDeterministicError: error message contains file path with line number (likely from stack trace), which is non-deterministic. Error message: %s", errorMsg))
-	}
+	// Sanitize file paths with line numbers (e.g., "file.go:123")
+	reFileLine := regexp.MustCompile(`\w+\.\[redacted\]:\d+`)
+	errorMsg = reFileLine.ReplaceAllString(errorMsg, "[redacted-location]")
 
 	// Store in transient store - this persists across function calls even when context is passed by value
 	// Transient stores are automatically cleared at the end of each transaction

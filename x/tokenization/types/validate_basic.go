@@ -24,6 +24,10 @@ var (
 	// Cosmos wrapper path denom/symbol validation: only a-zA-Z, _, {, }, and -
 	reCosmosWrapperPathString = `^[a-zA-Z_{}-]+$`
 	reCosmosWrapperPath       = regexp.MustCompile(reCosmosWrapperPathString)
+
+	// Approval ID validation: only alphanumeric characters, hyphens, and underscores
+	reApprovalIdString = `^[a-zA-Z0-9_-]+$`
+	reApprovalId       = regexp.MustCompile(reApprovalIdString)
 )
 
 func duplicateInStringArray(arr []string) bool {
@@ -88,6 +92,19 @@ func ValidateCosmosWrapperPathSymbol(symbol string) error {
 	regexMatch := reCosmosWrapperPath.MatchString(symbol)
 	if !regexMatch {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "symbol contains invalid characters - only a-zA-Z, _, {, }, and - are allowed: %s", symbol)
+	}
+
+	return nil
+}
+
+// ValidateApprovalId validates that an approval ID contains only alphanumeric characters, hyphens, and underscores.
+func ValidateApprovalId(approvalId string) error {
+	if approvalId == "" {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "approval id cannot be empty")
+	}
+
+	if !reApprovalId.MatchString(approvalId) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "approval id contains invalid characters (only alphanumeric, hyphens, and underscores allowed): %s", approvalId)
 	}
 
 	return nil
@@ -489,6 +506,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 	for i := 0; i < len(collectionApprovals); i++ {
 		if collectionApprovals[i].ApprovalId == "" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized at index %d", i)
+		}
+
+		if err := ValidateApprovalId(collectionApprovals[i].ApprovalId); err != nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "invalid approval id at index %d: %s", i, err.Error())
 		}
 
 		if collectionApprovals[i].ApprovalId == "All" {

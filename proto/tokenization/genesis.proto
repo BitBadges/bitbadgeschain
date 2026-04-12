@@ -39,5 +39,9 @@ message GenesisState {
   repeated string votingTrackerStoreKeys = 20;
   repeated CollectionStats collectionStats = 21;
   repeated string collectionStatsIds = 22 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated VotingChallengeTracker votingChallengeTrackers = 23;
+  repeated string votingChallengeTrackerStoreKeys = 24;
+  string nextAddressListCounter = 25 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  repeated string reservedProtocolAddresses = 26;
   // this line is used by starport scaffolding # genesis/proto/state
 }
