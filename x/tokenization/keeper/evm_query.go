@@ -118,5 +118,11 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 		return nil, fmt.Errorf("EVM execution error: %s", response.VmError)
 	}
 
+	// Charge the EVM query gas to the Cosmos gas meter so validators are
+	// compensated proportionally for EVM computation during approval checks
+	if response.GasUsed > 0 {
+		ctx.GasMeter().ConsumeGas(response.GasUsed, "evm_query_challenge")
+	}
+
 	return response.Ret, nil
 }

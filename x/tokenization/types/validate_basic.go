@@ -755,6 +755,11 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 				if hasNonNilFields && approvalCriteria.ApprovalAmounts.AmountTrackerId == "" {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "approvalAmounts has non-nil fields set but amountTrackerId is empty or nil")
 				}
+				if approvalCriteria.ApprovalAmounts.AmountTrackerId != "" {
+					if err := ValidateApprovalId(approvalCriteria.ApprovalAmounts.AmountTrackerId); err != nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "invalid amountTrackerId in approvalAmounts: %s", err)
+					}
+				}
 			}
 
 			if canChangeValues {
@@ -811,6 +816,11 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 
 				if hasNonNilFields && approvalCriteria.MaxNumTransfers.AmountTrackerId == "" {
 					return sdkerrors.Wrapf(ErrInvalidRequest, "maxNumTransfers has non-nil fields set but amountTrackerId is empty or nil")
+				}
+				if approvalCriteria.MaxNumTransfers.AmountTrackerId != "" {
+					if err := ValidateApprovalId(approvalCriteria.MaxNumTransfers.AmountTrackerId); err != nil {
+						return sdkerrors.Wrapf(ErrInvalidRequest, "invalid amountTrackerId in maxNumTransfers: %s", err)
+					}
 				}
 			}
 
@@ -1074,6 +1084,12 @@ func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTr
 
 		if challenge.MaxUsesPerLeaf.IsNil() {
 			return sdkerrors.Wrapf(ErrUintUnititialized, "max uses per leaf is uninitialized")
+		}
+
+		if challenge.ChallengeTrackerId != "" {
+			if err := ValidateApprovalId(challenge.ChallengeTrackerId); err != nil {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "invalid challengeTrackerId: %s", err)
+			}
 		}
 
 		maxOneUsePerLeaf := challenge.MaxUsesPerLeaf.Equal(sdkmath.NewUint(1))

@@ -267,12 +267,12 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 		return sdkerrors.Wrapf(err, "transfer failed for one-time approval: %s", approvalId)
 	}
 
-	// Transfer succeeded - delete the approval
+	// Transfer succeeded - delete the approval. This MUST succeed: the
+	// approval is permissive (no amount/use limits), so leaving it in place
+	// would let the recipient drain the pool. If cleanup fails, revert the
+	// entire transaction so the approval creation is also rolled back.
 	err = deleteOneTimeApproval()
 	if err != nil {
-		// Log error but don't fail - transfer already succeeded
-		// This is a cleanup operation, so we return success even if cleanup fails
-		// The approval will be cleaned up on next access or can be manually deleted
 		return sdkerrors.Wrapf(err, "transfer succeeded but failed to delete one-time approval: %s", approvalId)
 	}
 
