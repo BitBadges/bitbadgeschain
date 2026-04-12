@@ -304,98 +304,24 @@ func (suite *TestSuite) TestTokenIdsWeirdJSThing() {
 	suite.Require().Equal(1, len(currBalances[0].TokenIds))
 }
 
-func (suite *TestSuite) TestDefaultsCannotBeDoubleUsedAfterSpent() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
-
-	collectionsToCreate := GetCollectionsToCreate()
-	collectionsToCreate[0].TokensToCreate = []*types.Balance{
-		{
-			Amount:         sdkmath.NewUint(1),
-			TokenIds:       GetOneUintRange(),
-			OwnershipTimes: GetFullUintRanges(),
-		},
-	}
-
-	collectionsToCreate[0].Transfers = []*types.Transfer{}
-	collectionsToCreate[0].DefaultBalances = []*types.Balance{
-		{
-			Amount:         sdkmath.NewUint(1),
-			TokenIds:       GetOneUintRange(),
-			OwnershipTimes: GetFullUintRanges(),
-		},
-	}
-
-	collectionsToCreate[0].CollectionApprovals[0].FromListId = "AllWithoutMint"
-	collectionsToCreate[0].CollectionApprovals[0].ApprovalCriteria = &types.ApprovalCriteria{
-		OverridesToIncomingApprovals:   true,
-		OverridesFromOutgoingApprovals: true,
-	}
-
-	err := CreateCollections(suite, wctx, collectionsToCreate)
-	suite.Require().Nil(err, "Error creating token: %s")
-
-	balance := &types.UserBalanceStore{}
-	// totalSupplys, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), "Total")
-	// suite.Require().Nil(err, "Error getting user balance: %s")
-	// AssertBalancesEqual(suite, totalSupplys.Balances, []*types.Balance{
-	// 	{
-	// 		Amount:         sdkmath.NewUint(1),
-	// 		TokenIds:       GetOneUintRange(),
-	// 		OwnershipTimes: GetFullUintRanges(),
-	// 	},
-	// })
-
-	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting user balance: %s")
-	AssertUintsEqual(suite, balance.Balances[0].Amount, sdkmath.NewUint(1))
-	AssertUintRangesEqual(suite, balance.Balances[0].TokenIds, []*types.UintRange{
-		{
-			Start: sdkmath.NewUint(1),
-			End:   sdkmath.NewUint(1),
-		},
-	})
-
-	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		Transfers: []*types.Transfer{
-			{
-				From:        bob,
-				ToAddresses: []string{alice},
-				Balances: []*types.Balance{
-					{
-						Amount:         sdkmath.NewUint(1),
-						TokenIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
-					},
+func (suite *TestSuite) TestDefaultBalancesWithTruthyAmountsRejected() {
+	// Directly call UpdateCollection to verify truthy DefaultBalances.Balances is rejected
+	err := UpdateCollection(suite, suite.ctx, &types.MsgUniversalUpdateCollection{
+		CollectionId:        sdkmath.NewUint(0),
+		Creator:             alice,
+		UpdateValidTokenIds: true,
+		ValidTokenIds:       GetFullUintRanges(),
+		DefaultBalances: &types.UserBalanceStore{
+			Balances: []*types.Balance{
+				{
+					Amount:         sdkmath.NewUint(1),
+					TokenIds:       GetOneUintRange(),
+					OwnershipTimes: GetFullUintRanges(),
 				},
 			},
 		},
 	})
-	suite.Require().Nil(err, "Error transferring token")
-
-	bobBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err, "Error getting user balance: %s")
-	AssertBalancesEqual(suite, bobBalance.Balances, []*types.Balance{})
-
-	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		Transfers: []*types.Transfer{
-			{
-				From:        bob,
-				ToAddresses: []string{alice},
-				Balances: []*types.Balance{
-					{
-						Amount:         sdkmath.NewUint(1),
-						TokenIds:       GetOneUintRange(),
-						OwnershipTimes: GetFullUintRanges(),
-					},
-				},
-			},
-		},
-	})
-	suite.Require().Error(err, "Error transferring token")
+	suite.Require().Error(err, "Should reject collections with truthy DefaultBalances.Balances")
 }
 
 func (suite *TestSuite) TestValidUpdateTokenIdsWithPermission() {

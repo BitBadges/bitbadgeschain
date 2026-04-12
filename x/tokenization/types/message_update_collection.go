@@ -113,6 +113,12 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		msg.DefaultBalances = &UserBalanceStore{}
 	}
 
+	// DefaultBalances.Balances must be empty — default balances are only for setting
+	// approvals and permissions, not for granting token amounts to users.
+	if len(msg.DefaultBalances.Balances) > 0 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "default balances must not contain token amounts (DefaultBalances.Balances must be empty)")
+	}
+
 	if _, err := ValidateBalances(ctx, msg.DefaultBalances.Balances, canChangeValues); err != nil {
 		return err
 	}
