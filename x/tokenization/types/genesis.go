@@ -14,9 +14,10 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		PortId: PortID,
 		// this line is used by starport scaffolding # genesis/types/default
-		Params:             DefaultParams(),
-		NextCollectionId:   types.NewUint(1),
-		NextDynamicStoreId: types.NewUint(1),
+		Params:                 DefaultParams(),
+		NextCollectionId:       types.NewUint(1),
+		NextDynamicStoreId:     types.NewUint(1),
+		NextAddressListCounter: types.NewUint(0),
 	}
 }
 

@@ -260,8 +260,8 @@ func GetDefaultPrioritizedApprovals(ctx sdk.Context, k *keeper.Keeper, collectio
 	otherIds := []string{
 		"asadsdas", // most common
 		"fasdfasdf",
-		"target approval",
-		"random approval",
+		"target-approval",
+		"random-approval",
 		"asadsdasfghdsfasdfasdf",
 		"asadsdasfghaaadsd",
 		"asadsdasfghd",

@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math/big"
 
 	sdkmath "cosmossdk.io/math"
@@ -141,7 +142,7 @@ func (suite *TestSuite) TestEVMQueryChallenges_ValidationErrors() {
 							TransferTimes:     GetFullUintRanges(),
 							OwnershipTimes:    GetFullUintRanges(),
 							TokenIds:          GetFullUintRanges(),
-							ApprovalId:        "test-validation-" + string(rune(i)),
+							ApprovalId:        fmt.Sprintf("test-validation-%d", i),
 							ApprovalCriteria: &types.ApprovalCriteria{
 								EvmQueryChallenges: tt.challenges,
 								MaxNumTransfers: &types.MaxNumTransfers{

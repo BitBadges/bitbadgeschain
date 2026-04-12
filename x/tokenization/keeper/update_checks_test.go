@@ -358,7 +358,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdate() {
 				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
-				ApprovalId:        "something different",
+				ApprovalId:        "something-different",
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
@@ -466,7 +466,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIds() {
 				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
-				ApprovalId:        "something that is not the same",
+				ApprovalId:        "something-not-the-same",
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 			{
@@ -721,7 +721,7 @@ func (suite *TestSuite) TestCheckCollectionApprovalUpdateAmountTrackerIdsSpecifi
 				TokenIds:          GetFullUintRanges(),
 				TransferTimes:     GetFullUintRanges(),
 				OwnershipTimes:    GetFullUintRanges(),
-				ApprovalId:        "different id",
+				ApprovalId:        "different-id",
 				ApprovalCriteria:  collectionsToCreate[0].CollectionApprovals[1].ApprovalCriteria,
 			},
 		},

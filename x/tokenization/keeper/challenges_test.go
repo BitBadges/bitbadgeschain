@@ -2576,7 +2576,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 			FromListId:        "AllWithoutMint",
 			ToListId:          "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
-			ApprovalId:        "target approval",
+			ApprovalId:        "target-approval",
 
 			TransferTimes:  GetFullUintRanges(),
 			TokenIds:       GetFullUintRanges(),
@@ -2624,7 +2624,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovals() {
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
 				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
-					ApprovalId:      "target approval",
+					ApprovalId:      "target-approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
 					Version:         sdkmath.NewUint(0),
@@ -2688,7 +2688,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 			FromListId:        "AllWithoutMint",
 			ToListId:          "AllWithoutMint",
 			InitiatedByListId: "AllWithoutMint",
-			ApprovalId:        "target approval",
+			ApprovalId:        "target-approval",
 
 			TransferTimes:  GetFullUintRanges(),
 			TokenIds:       GetFullUintRanges(),
@@ -2735,14 +2735,14 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
 				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
-					ApprovalId:      "target approval",
+					ApprovalId:      "target-approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
 					Version:         sdkmath.NewUint(0),
 				},
 				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
 					{
-						ApprovalId:      "random approval",
+						ApprovalId:      "random-approval",
 						ApprovalLevel:   "collection",
 						ApproverAddress: "",
 						Version:         sdkmath.NewUint(0),
@@ -2763,7 +2763,7 @@ func (suite *TestSuite) TestMultipleApprovalCriteriaPrioritizedApprovalsOnlyChec
 				ToAddresses: []string{alice},
 				Balances:    []*types.Balance{},
 				PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
-					ApprovalId:      "target approval",
+					ApprovalId:      "target-approval",
 					ApprovalLevel:   "collection",
 					ApproverAddress: "",
 					Version:         sdkmath.NewUint(0),

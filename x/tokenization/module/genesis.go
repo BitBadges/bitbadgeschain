@@ -115,6 +115,29 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(err)
 		}
 	}
+
+	// Initialize voting challenge trackers
+	if len(genState.VotingChallengeTrackers) != len(genState.VotingChallengeTrackerStoreKeys) {
+		panic(fmt.Errorf("genesis voting challenge trackers and store keys length mismatch: %d vs %d",
+			len(genState.VotingChallengeTrackers), len(genState.VotingChallengeTrackerStoreKeys)))
+	}
+	for idx, tracker := range genState.VotingChallengeTrackers {
+		if err := k.SetVotingChallengeTrackerInStore(ctx, genState.VotingChallengeTrackerStoreKeys[idx], tracker); err != nil {
+			panic(err)
+		}
+	}
+
+	// Initialize next address list counter
+	if !genState.NextAddressListCounter.IsNil() && !genState.NextAddressListCounter.IsZero() {
+		k.SetNextAddressListCounter(ctx, genState.NextAddressListCounter)
+	}
+
+	// Initialize reserved protocol addresses
+	for _, address := range genState.ReservedProtocolAddresses {
+		if err := k.SetReservedProtocolAddressInStore(ctx, address, true); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -165,6 +188,15 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.CollectionStats = stats
 	genesis.CollectionStatsIds = make([]types.Uint, len(ids))
 	copy(genesis.CollectionStatsIds, ids)
+
+	// Export voting challenge trackers
+	genesis.VotingChallengeTrackers, genesis.VotingChallengeTrackerStoreKeys = k.GetAllVotingChallengeTrackersFromStore(ctx)
+
+	// Export next address list counter
+	genesis.NextAddressListCounter = k.GetNextAddressListCounter(ctx)
+
+	// Export reserved protocol addresses
+	genesis.ReservedProtocolAddresses = k.GetAllReservedProtocolAddressesFromStore(ctx)
 
 	// this line is used by starport scaffolding # genesis/module/export
 
