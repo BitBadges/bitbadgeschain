@@ -35,8 +35,19 @@ func getDefaultBalanceStoreForCollection(collection *types.TokenCollection) *typ
 // GetBalanceOrApplyDefault retrieves user balance or applies default balance store
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error) {
 	// Mint has unlimited balances
-	if types.IsMintOrTotalAddress(userAddress) {
+	if types.IsMintAddress(userAddress) {
 		return &types.UserBalanceStore{}, false, nil
+	}
+
+	// Total address tracks minted supply — read from store or return empty.
+	// Never inherits DefaultBalances since it's a protocol accumulator, not a user.
+	if types.IsTotalAddress(userAddress) {
+		balanceKey := ConstructBalanceKey(userAddress, collection.CollectionId)
+		balance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
+		if !found {
+			return &types.UserBalanceStore{}, false, nil
+		}
+		return balance, false, nil
 	}
 
 	// Special backed addresses also have unlimited balances

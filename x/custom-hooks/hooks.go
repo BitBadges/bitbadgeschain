@@ -147,34 +147,23 @@ func isIcs20Packet(data []byte) (bool, transfertypes.FungibleTokenPacketData) {
 	return true, packetData
 }
 
-// extractDenomFromPacketOnRecv extracts the denom from the packet on receive
-// This is similar to the wasm hooks implementation
-// Returns the denom and an error if the packet data cannot be unmarshalled
+// extractDenomFromPacketOnRecv resolves the local denom from a received IBC packet.
+// Mirrors the denom resolution logic in ibc-go's OnRecvPacket (relay.go).
 func extractDenomFromPacketOnRecv(packet channeltypes.Packet) (string, error) {
 	var data transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &data); err != nil {
 		return "", fmt.Errorf("cannot unmarshal ICS-20 transfer packet data: %w", err)
 	}
 
-	// The denom in the packet is the denom in the sender chain.
-	// We need to convert it to the local denom.
-	denom := data.Denom
-	if transfertypes.ReceiverChainIsSource(packet.GetSourcePort(), packet.GetSourceChannel(), denom) {
-		// Remove prefix added by sender chain
-		voucherPrefix := transfertypes.GetDenomPrefix(packet.GetSourcePort(), packet.GetSourceChannel())
-		unprefixedDenom := denom[len(voucherPrefix):]
+	d := transfertypes.ExtractDenomFromPath(data.Denom)
 
-		// coin denomination used in sending from the source chain
-		denom = unprefixedDenom
-
-		// The denomination used to send the coins is either the native denom or the hash of the path
-		// if the denomination is not native.
-		denomTrace := transfertypes.ParseDenomTrace(unprefixedDenom)
-		if denomTrace.Path() != "" {
-			denom = denomTrace.IBCDenom()
-		} else {
-			denom = unprefixedDenom
-		}
+	if d.HasPrefix(packet.GetSourcePort(), packet.GetSourceChannel()) {
+		// Token is returning home — strip the sender's prefix
+		d.Trace = d.Trace[1:]
+	} else {
+		// Foreign token arriving — prepend our dest port/channel
+		d.Trace = append([]transfertypes.Hop{transfertypes.NewHop(packet.GetDestPort(), packet.GetDestChannel())}, d.Trace...)
 	}
-	return denom, nil
+
+	return d.IBCDenom(), nil
 }
