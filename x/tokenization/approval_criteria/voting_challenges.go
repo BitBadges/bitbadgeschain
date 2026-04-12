@@ -76,9 +76,11 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 		}
 
 		// Retrieve all votes for this proposal and calculate total yes weight
+		// Iterate over the original slice (not the map) for deterministic ordering
 		totalYesWeight := sdkmath.NewUint(0)
 		collectionId := collection.CollectionId
-		for voterAddress := range voterMap {
+		for _, voter := range challenge.Voters {
+			voterAddress := voter.Address
 			voteKey := c.votingService.ConstructVoteKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, proposalId, voterAddress)
 
 			vote, found := c.votingService.GetVoteFromStore(ctx, voteKey)
@@ -98,7 +100,7 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 				}
 
 				// Calculate the yes weight contribution from this voter
-				voterWeight := voterMap[voterAddress]
+				voterWeight := voter.Weight
 				yesWeightPercent := vote.YesWeight
 				yesContribution := voterWeight.Mul(yesWeightPercent).Quo(sdkmath.NewUint(100))
 				totalYesWeight = totalYesWeight.Add(yesContribution)

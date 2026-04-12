@@ -447,7 +447,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 			if approvalCriteria != nil && len(approvalCriteria.VotingChallenges) > 0 {
 				for _, challenge := range approvalCriteria.VotingChallenges {
 					if challenge != nil && challenge.ResetAfterExecution {
-						_ = k.DeleteAllVotesForProposal(ctx, collection.CollectionId, approverAddress, approvalLevel, approval.ApprovalId, challenge.ProposalId, challenge.Voters)
+						if err := k.DeleteAllVotesForProposal(ctx, collection.CollectionId, approverAddress, approvalLevel, approval.ApprovalId, challenge.ProposalId, challenge.Voters); err != nil {
+							return nil, sdkerrors.Wrapf(err, "failed to reset votes after execution for proposal %s", challenge.ProposalId)
+						}
 					}
 				}
 			}
