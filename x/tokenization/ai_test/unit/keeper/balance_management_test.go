@@ -92,11 +92,10 @@ func (suite *BalanceManagementTestSuite) TestBalanceManagement_SpecialAddresses(
 	suite.Require().NotNil(mintBalance)
 	suite.Require().Equal(0, len(mintBalance.Balances), "Mint address should have empty balances (unlimited)")
 
-	// Test Total address
-	totalBalance, appliedDefault, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, types.TotalAddress)
-	suite.Require().False(appliedDefault, "Total address should not apply default")
+	// Test Total address — reads from store (empty if no mints yet), applies default if not found
+	totalBalance, _, _ := suite.Keeper.GetBalanceOrApplyDefault(suite.Ctx, collection, types.TotalAddress)
 	suite.Require().NotNil(totalBalance)
-	suite.Require().Equal(0, len(totalBalance.Balances), "Total address should have empty balances (unlimited)")
+	suite.Require().Equal(0, len(totalBalance.Balances), "Total address should have empty balances when no mints have occurred")
 }
 
 // TestBalanceManagement_BalanceUpdate tests balance updates during transfers

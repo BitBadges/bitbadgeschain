@@ -195,8 +195,10 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		migrateCollectionApprovalRoyalties(oldCollection.CollectionApprovals, newCollection.CollectionApprovals)
 
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
-		newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
-		newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
+		if newCollection.DefaultBalances != nil {
+			newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
+			newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
+		}
 
 		// Save the updated collection (with migrated fields)
 		if err := k.SetCollectionInStore(ctx, &newCollection, true); err != nil {
