@@ -77,8 +77,10 @@ func (k Keeper) UpdateCirculatingSupplyOnBacking(
 
 	var err error
 	if isBacking {
-		// Backing removes from circulation
-		stats.Balances, err = types.SubtractBalancesWithZeroForUnderflows(ctx, balances, stats.Balances)
+		// Backing removes from circulation. Use non-clamping Subtract so any drift
+		// between stats.Balances and the real balance store surfaces as a loud
+		// error instead of silently sticking at zero.
+		stats.Balances, err = types.SubtractBalances(ctx, balances, stats.Balances)
 		if err != nil {
 			return err
 		}

@@ -211,7 +211,10 @@ func TestCollectionStats_UpdateCirculatingSupplyOnBacking(t *testing.T) {
 	require.True(t, got.Balances[0].Amount.Equal(sdkmath.NewUint(90)))
 }
 
-func TestCollectionStats_UpdateCirculatingSupplyOnBacking_UnderflowClampsToZero(t *testing.T) {
+func TestCollectionStats_UpdateCirculatingSupplyOnBacking_UnderflowErrors(t *testing.T) {
+	// v30: the backing path now uses non-clamping SubtractBalances. Drift between
+	// stats.Balances and a backing request must surface as a loud error instead
+	// of silently sticking at zero, so any upstream accounting bug is caught here.
 	suite := new(TestSuite)
 	suite.SetT(t)
 	suite.SetupTest()
@@ -219,7 +222,6 @@ func TestCollectionStats_UpdateCirculatingSupplyOnBacking_UnderflowClampsToZero(
 	k := suite.app.TokenizationKeeper
 
 	collectionId := sdkmath.NewUint(1)
-	// Set initial supply
 	err := k.SetCollectionStatsInStore(ctx, collectionId, &types.CollectionStats{
 		HolderCount: sdkmath.NewUint(1),
 		Balances: []*types.Balance{{
@@ -230,22 +232,20 @@ func TestCollectionStats_UpdateCirculatingSupplyOnBacking_UnderflowClampsToZero(
 	})
 	require.NoError(t, err)
 
-	// Backing more than supply clamps to zero (uses SubtractBalancesWithZeroForUnderflows)
+	// Attempt to back more than the recorded circulating supply.
 	backingBalances := []*types.Balance{{
-		Amount:         sdkmath.NewUint(200), // More than 100
+		Amount:         sdkmath.NewUint(200), // more than 100
 		TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
 		OwnershipTimes: GetFullUintRanges(),
 	}}
 	err = k.UpdateCirculatingSupplyOnBacking(ctx, collectionId, backingBalances, true)
-	require.NoError(t, err)
-	got, _ := k.GetCollectionStatsFromStore(ctx, collectionId)
+	require.Error(t, err, "backing more than circulating supply must return an error")
 
-	// Should clamp to zero
-	totalSupply := sdkmath.ZeroUint()
-	for _, bal := range got.Balances {
-		totalSupply = totalSupply.Add(bal.Amount)
-	}
-	require.True(t, totalSupply.IsZero() || got.Balances[0].Amount.IsZero())
+	// Stats must not have been mutated by the failed operation.
+	got, _ := k.GetCollectionStatsFromStore(ctx, collectionId)
+	require.Len(t, got.Balances, 1)
+	require.True(t, got.Balances[0].Amount.Equal(sdkmath.NewUint(100)),
+		"circulating supply must remain unchanged after a failed backing, got %s", got.Balances[0].Amount.String())
 }
 
 func TestCollectionStats_UpdateHolderCount_NewHolder(t *testing.T) {

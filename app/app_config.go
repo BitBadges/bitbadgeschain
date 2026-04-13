@@ -3,9 +3,6 @@ package app
 import (
 	"time"
 
-	anchormodulev1 "github.com/bitbadges/bitbadgeschain/api/anchor/module"
-	_ "github.com/bitbadges/bitbadgeschain/x/anchor/module" // import for side-effects
-	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	_ "github.com/bitbadges/bitbadgeschain/x/sendmanager/module"
@@ -61,10 +58,6 @@ import (
 	_ "github.com/bitbadges/bitbadgeschain/x/tokenization/module" // import for side-effects
 	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	mapsmodulev1 "github.com/bitbadges/bitbadgeschain/api/maps/module"
-	_ "github.com/bitbadges/bitbadgeschain/x/maps/module" // import for side-effects
-	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
-
 	managersplittermodulev1 "github.com/bitbadges/bitbadgeschain/api/managersplitter/module"
 	_ "github.com/bitbadges/bitbadgeschain/x/managersplitter/module" // import for side-effects
 	managersplittermoduletypes "github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
@@ -113,9 +106,7 @@ var (
 		consensustypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
-		anchormoduletypes.ModuleName,
 		tokenizationmoduletypes.ModuleName,
-		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		gammtypes.ModuleName,
@@ -147,9 +138,7 @@ var (
 		icatypes.ModuleName,
 		ibcratelimittypes.ModuleName,
 		// chain modules
-		anchormoduletypes.ModuleName,
 		tokenizationmoduletypes.ModuleName,
-		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		gammtypes.ModuleName,
@@ -176,9 +165,7 @@ var (
 		icatypes.ModuleName,
 		ibcratelimittypes.ModuleName,
 		// chain modules
-		anchormoduletypes.ModuleName,
 		tokenizationmoduletypes.ModuleName,
-		mapsmoduletypes.ModuleName,
 		managersplittermoduletypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		gammtypes.ModuleName,
@@ -347,16 +334,8 @@ var (
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
 			{
-				Name:   anchormoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&anchormodulev1.Module{}),
-			},
-			{
 				Name:   tokenizationmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&tokenizationmodulev1.Module{}),
-			},
-			{
-				Name:   mapsmoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&mapsmodulev1.Module{}),
 			},
 			{
 				Name:   managersplittermoduletypes.ModuleName,

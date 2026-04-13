@@ -37,7 +37,8 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v30.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			Deleted: []string{},
+			// v30: remove deprecated x/anchor and x/maps modules
+			Deleted: []string{"anchor", "maps"},
 			Added:   []string{},
 		}
 	}

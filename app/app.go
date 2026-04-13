@@ -91,12 +91,10 @@ import (
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
-	anchormodulekeeper "github.com/bitbadges/bitbadgeschain/x/anchor/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	sendmanagermodulekeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 
 	managersplittermodulekeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
-	mapsmodulekeeper "github.com/bitbadges/bitbadgeschain/x/maps/keeper"
 	approvalcriteria "github.com/bitbadges/bitbadgeschain/x/tokenization/approval_criteria"
 	tokenizationmodulekeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -168,9 +166,7 @@ type App struct {
 	// IBC Rate Limit
 	IBCRateLimitKeeper ibcratelimitkeeper.Keeper
 
-	AnchorKeeper          anchormodulekeeper.Keeper
 	TokenizationKeeper    *tokenizationmodulekeeper.Keeper
-	MapsKeeper            mapsmodulekeeper.Keeper
 	ManagerSplitterKeeper managersplittermodulekeeper.Keeper
 
 	GammKeeper        gammkeeper.Keeper
@@ -296,9 +292,7 @@ func New(
 		&app.FeeGrantKeeper,
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
-		&app.AnchorKeeper,
 		&app.TokenizationKeeper,
-		&app.MapsKeeper,
 		&app.ManagerSplitterKeeper,
 		&app.SendmanagerKeeper,
 
