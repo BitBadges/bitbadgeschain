@@ -31,7 +31,9 @@ jobs:
   build-linux-windows:
     name: Build Linux & Windows
     needs: test
-    runs-on: ubuntu-latest
+    # Pinned to 22.04 (glibc 2.35) so release binaries run on Ubuntu 22.04+,
+    # Debian 12+, RHEL 9+. ubuntu-latest (24.04, glibc 2.39) breaks older hosts.
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
