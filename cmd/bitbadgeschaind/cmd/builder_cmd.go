@@ -24,7 +24,7 @@ protocol round-trip.
 
 Supports 50+ tools spanning session builders (add_approval, set_collection_metadata,
 get_transaction, ...), query tools (query_collection, simulate_transaction, ...),
-reviews (review_collection, audit_collection, verify_standards), and utilities
+reviews (review_collection), and utilities
 (convert_address, diagnose_error, get_skill_instructions, ...).
 
 Session state persists per-id under ~/.bitbadges/sessions/<id>.json so you can
