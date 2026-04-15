@@ -20,7 +20,7 @@ func ApiCmd() *cobra.Command {
 Queries the BitBadges indexer (not the on-chain node). Includes: collections,
 balances, claims, plugins, DEX pools, asset pairs, dynamic stores, and 100+ routes.
 
-Requires: Node.js + bitbadges-cli (npm install -g bitbadgesjs-sdk)
+Requires: Node.js + bitbadges-cli (npm install -g bitbadges)
 Configure: BITBADGES_API_KEY env var or bitbadges-cli config set apiKey <key>`,
 		DisableFlagParsing: true, // Pass all flags through to Node.js CLI
 		RunE: func(cmd *cobra.Command, args []string) error {

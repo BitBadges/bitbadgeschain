@@ -20,7 +20,7 @@ func SdkCmd() *cobra.Command {
 Includes: collection/transaction review, interpret, address conversion,
 alias generation, token lookup, builder skill docs, and more.
 
-Requires: Node.js + bitbadges-cli (npm install -g bitbadgesjs-sdk)`,
+Requires: Node.js + bitbadges-cli (npm install -g bitbadges)`,
 		DisableFlagParsing: true, // Pass all flags through to Node.js CLI
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return execNodeCLI("sdk", args)

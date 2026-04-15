@@ -30,7 +30,7 @@ reviews (review_collection), and utilities
 Session state persists per-id under ~/.bitbadges/sessions/<id>.json so you can
 compose a collection across multiple invocations.
 
-Requires: Node.js + bitbadges-cli (npm install -g bitbadgesjs-sdk)`,
+Requires: Node.js + bitbadges-cli (npm install -g bitbadges)`,
 		DisableFlagParsing: true, // Pass all flags through to Node.js CLI
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return execNodeCLI("builder", args)
