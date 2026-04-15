@@ -202,13 +202,13 @@ main() {
   echo ""
   if command -v bun >/dev/null 2>&1; then
     echo "Installing BitBadges SDK CLI (bitbadges-cli) via bun..."
-    bun install -g bitbadgesjs-sdk 2>&1 | tail -1
+    bun install -g bitbadges 2>&1 | tail -1
   elif command -v npm >/dev/null 2>&1; then
     echo "Installing BitBadges SDK CLI (bitbadges-cli) via npm..."
-    npm install -g bitbadgesjs-sdk 2>&1 | tail -1
+    npm install -g bitbadges 2>&1 | tail -1
   else
     echo "npm/bun not found — skipping SDK CLI install. To install later:"
-    echo "  npm install -g bitbadgesjs-sdk"
+    echo "  npm install -g bitbadges"
   fi
 
   if command -v bitbadges-cli >/dev/null 2>&1; then
