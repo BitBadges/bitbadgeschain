@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/app/params"
@@ -111,6 +111,9 @@ func (m *MockIBCModule) OnAcknowledgementPacket(ctx sdk.Context, packetID string
 func (m *MockIBCModule) OnTimeoutPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
 	return nil
 }
+
+// IBC v11: IBCModule now requires SetICS4Wrapper. Mock is a no-op.
+func (m *MockIBCModule) SetICS4Wrapper(wrapper porttypes.ICS4Wrapper) {}
 
 // MockICS4Wrapper is a mock implementation of ICS4Wrapper for testing
 type MockICS4Wrapper struct {

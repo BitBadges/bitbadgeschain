@@ -3,12 +3,12 @@ package keeper
 import (
 	"fmt"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	sdkmath "cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
