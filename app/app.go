@@ -8,7 +8,7 @@ import (
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log/v2"
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	_ "github.com/cosmos/cosmos-sdk/contrib/x/circuit" // import for side-effects
 	circuitkeeper "github.com/cosmos/cosmos-sdk/contrib/x/circuit/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/evidence" // import for side-effects

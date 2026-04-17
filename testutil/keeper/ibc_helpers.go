@@ -6,29 +6,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ibcclienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
-	ibctypes "github.com/cosmos/ibc-go/v11/modules/core/types"
 )
 
-// noopParamSubspace is a no-op implementation of ParamSubspace for testing
-type noopParamSubspace struct{}
-
-var _ ibctypes.ParamSubspace = (*noopParamSubspace)(nil)
-
-// GetParamSet implements ibctypes.ParamSubspace
-func (n *noopParamSubspace) GetParamSet(ctx sdk.Context, ps paramtypes.ParamSet) {
-	// No-op
-}
-
-// NewNoopParamSubspace creates a new no-op ParamSubspace
-func NewNoopParamSubspace() ibctypes.ParamSubspace {
-	return &noopParamSubspace{}
-}
+// IBC v11 removed ibctypes.ParamSubspace entirely; the noop helper that
+// previously lived here is no longer needed.
 
 // noopUpgradeKeeper is a no-op implementation of UpgradeKeeper for testing
 type noopUpgradeKeeper struct{}

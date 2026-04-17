@@ -68,3 +68,8 @@ func (w *customHooksWrapper) OnAcknowledgementPacket(ctx sdk.Context, packetID s
 func (w *customHooksWrapper) OnTimeoutPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
 	return w.app.OnTimeoutPacket(ctx, packetID, packet, relayer)
 }
+
+// IBC v11: IBCModule now requires SetICS4Wrapper. Forward to the wrapped app.
+func (w *customHooksWrapper) SetICS4Wrapper(wrapper porttypes.ICS4Wrapper) {
+	w.app.SetICS4Wrapper(wrapper)
+}

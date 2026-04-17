@@ -13,8 +13,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	"cosmossdk.io/store/prefix"
-	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 )
 
 // The following methods are used for the store and everything associated with tokens.

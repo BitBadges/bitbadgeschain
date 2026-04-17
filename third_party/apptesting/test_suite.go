@@ -10,8 +10,8 @@ import (
 	coreheader "cosmossdk.io/core/header"
 	"cosmossdk.io/log/v2"
 	"cosmossdk.io/math"
-	"cosmossdk.io/store/rootmulti"
-	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/store/v2/rootmulti"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -38,7 +38,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 
-	storemetrics "cosmossdk.io/store/metrics"
 
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 
@@ -216,7 +215,7 @@ func (s *KeeperTestHelper) CreateTestContextWithMultiStore() (sdk.Context, store
 	db := dbm.NewMemDB()
 	logger := log.NewNopLogger()
 
-	ms := rootmulti.NewStore(db, logger, storemetrics.NewNoOpMetrics())
+	ms := rootmulti.NewStore(db, logger)
 
 	return sdk.NewContext(ms, cmtproto.Header{}, false, logger), ms
 }

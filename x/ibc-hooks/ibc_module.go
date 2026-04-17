@@ -266,3 +266,18 @@ func (im IBCMiddleware) WriteAcknowledgement(
 func (im IBCMiddleware) GetAppVersion(ctx sdk.Context, portID, channelID string) (string, bool) {
 	return im.ICS4Middleware.GetAppVersion(ctx, portID, channelID)
 }
+
+// SetICS4Wrapper satisfies porttypes.Middleware (ibc-go v11). Called by the
+// IBC stack wiring to inject the ICS4Wrapper sitting above this middleware.
+// We forward the assignment to the inner ICS4Middleware, whose `channel`
+// field is the outgoing ICS4Wrapper used by SendPacket/WriteAcknowledgement.
+func (im *IBCMiddleware) SetICS4Wrapper(wrapper porttypes.ICS4Wrapper) {
+	im.ICS4Middleware.channel = wrapper
+}
+
+// SetUnderlyingApplication satisfies porttypes.Middleware (ibc-go v11). Called
+// by the IBC stack wiring to inject the IBCModule sitting below this
+// middleware in the application stack.
+func (im *IBCMiddleware) SetUnderlyingApplication(app porttypes.IBCModule) {
+	im.App = app
+}

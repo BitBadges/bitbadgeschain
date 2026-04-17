@@ -112,6 +112,9 @@ func (m *MockIBCModule) OnTimeoutPacket(ctx sdk.Context, packetID string, packet
 	return nil
 }
 
+// IBC v11: IBCModule now requires SetICS4Wrapper. Mock is a no-op.
+func (m *MockIBCModule) SetICS4Wrapper(wrapper porttypes.ICS4Wrapper) {}
+
 // MockICS4Wrapper is a mock implementation of ICS4Wrapper for testing
 type MockICS4Wrapper struct {
 	SendPacketCalled bool
