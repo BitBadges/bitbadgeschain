@@ -9,8 +9,8 @@ import (
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log/v2"
 	storetypes "cosmossdk.io/store/types"
-	_ "cosmossdk.io/x/circuit" // import for side-effects
-	circuitkeeper "cosmossdk.io/x/circuit/keeper"
+	_ "github.com/cosmos/cosmos-sdk/contrib/x/circuit" // import for side-effects
+	circuitkeeper "github.com/cosmos/cosmos-sdk/contrib/x/circuit/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/evidence" // import for side-effects
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
