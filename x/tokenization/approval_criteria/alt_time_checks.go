@@ -38,7 +38,20 @@ func (c *AltTimeChecksChecker) Check(ctx sdk.Context, approval *types.Collection
 	blockTime := ctx.BlockTime()
 	localTime := blockTime.UTC()
 	if c.altTimeChecks.TimezoneOffsetMinutes.GT(sdkmath.NewUint(0)) {
-		offsetDuration := time.Duration(c.altTimeChecks.TimezoneOffsetMinutes.Uint64()) * time.Minute
+		// Defense-in-depth: ValidateAltTimeChecks bounds this to ≤ 14*60
+		// minutes, but if a checker is ever constructed outside that path
+		// (e.g. corrupt migrated state), reject rather than panic or wrap.
+		// Values that don't fit in uint64 would panic in .Uint64(); values
+		// in [2^63, 2^64-1] would silently wrap through int64 overflow
+		// when multiplied by time.Minute.
+		if !c.altTimeChecks.TimezoneOffsetMinutes.BigInt().IsUint64() {
+			return "", sdkerrors.Wrapf(types.ErrInvalidRequest, "timezoneOffsetMinutes exceeds uint64 range")
+		}
+		offsetMinutes := c.altTimeChecks.TimezoneOffsetMinutes.Uint64()
+		if offsetMinutes > types.MaxTimezoneOffsetMinutes {
+			return "", sdkerrors.Wrapf(types.ErrInvalidRequest, "timezoneOffsetMinutes %d exceeds maximum real-world offset of %d minutes", offsetMinutes, types.MaxTimezoneOffsetMinutes)
+		}
+		offsetDuration := time.Duration(offsetMinutes) * time.Minute
 		if c.altTimeChecks.TimezoneOffsetNegative {
 			localTime = localTime.Add(-offsetDuration)
 		} else {
