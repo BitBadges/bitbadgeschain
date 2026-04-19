@@ -232,9 +232,11 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 		return sdkerrors.Wrapf(err, "failed to create one-time approval: %s", approvalId)
 	}
 
-	// Important: We should only allow auto-scanned approvals here
-	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
-	// The one-time outgoing approval is safe because it uses a unique ID and version
+	// Restrict the outgoing (pool) side to only the one-time prioritized approval we just set
+	// up — the pool cannot be drained via any other outgoing approval it happens to have.
+	// The incoming (recipient) side is intentionally left unrestricted so normal auto-scannable
+	// approvals (including the synthetic "all-incoming" for intermediate swap addresses with
+	// AutoApproveAllIncomingTransfers=true) can satisfy the transfer.
 	msg := &tokenizationtypes.MsgTransferTokens{
 		Creator:      recipientAddress,
 		CollectionId: collection.CollectionId,
@@ -251,7 +253,7 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 						Version:         approvalVersion,
 					},
 				},
-				OnlyCheckPrioritizedIncomingApprovals: true,
+				OnlyCheckPrioritizedOutgoingApprovals: true,
 			},
 		},
 	}

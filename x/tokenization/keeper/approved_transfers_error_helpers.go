@@ -133,11 +133,35 @@ func buildPotentialErrorsString(
 	potentialErrorsStr += ")"
 
 	if len(approvalIdxsChecked) == 0 && len(unfilteredApprovals) > 0 {
-		skippedIds := []string{}
-		for _, a := range unfilteredApprovals {
-			skippedIds = append(skippedIds, fmt.Sprintf("%q", a.ApprovalId))
+		// Distinguish approvals that were dropped by the priority filter (genuinely "require
+		// prioritization") from those that survived the filter but failed address/time checks.
+		// The old code lumped both under "require prioritization", which was misleading when
+		// e.g. a Transfer set OnlyCheckPrioritized*Approvals=true and filtered out an otherwise-
+		// matching auto-scannable approval.
+		postFilterIds := make(map[string]struct{}, len(approvals))
+		for _, a := range approvals {
+			if a != nil {
+				postFilterIds[a.ApprovalId] = struct{}{}
+			}
 		}
-		potentialErrorsStr += fmt.Sprintf(". Approvals not checked (require prioritization): [%s]", strings.Join(skippedIds, ", "))
+		filteredOut := []string{}
+		survivedButFailed := []string{}
+		for _, a := range unfilteredApprovals {
+			if a == nil {
+				continue
+			}
+			if _, kept := postFilterIds[a.ApprovalId]; kept {
+				survivedButFailed = append(survivedButFailed, fmt.Sprintf("%q", a.ApprovalId))
+			} else {
+				filteredOut = append(filteredOut, fmt.Sprintf("%q", a.ApprovalId))
+			}
+		}
+		if len(filteredOut) > 0 {
+			potentialErrorsStr += fmt.Sprintf(". Approvals dropped by prioritization filter (set OnlyCheckPrioritized*Approvals or missing from PrioritizedApprovals): [%s]", strings.Join(filteredOut, ", "))
+		}
+		if len(survivedButFailed) > 0 {
+			potentialErrorsStr += fmt.Sprintf(". Approvals checked but failed address/time match: [%s]", strings.Join(survivedButFailed, ", "))
+		}
 	}
 
 	// Try to be smart about error logs. If we only checked one approval via auto-scan, we can just log the errors for that approval
