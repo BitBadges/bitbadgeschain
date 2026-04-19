@@ -230,7 +230,22 @@ func ValidateNoStringElementIsX(addresses []string, x string) error {
 	return nil
 }
 
-// ValidateAltTimeChecks validates alt time checks for offline hours and days
+// MaxTimezoneOffsetMinutes is the widest real-world UTC offset in minutes
+// (UTC+14:00 is observed in Kiribati; UTC-12:00 is the westernmost common
+// offset). We bound |offset| ≤ 14 * 60 = 840 regardless of sign. Anything
+// larger is either a malformed client or a griefing attempt.
+const MaxTimezoneOffsetMinutes = uint64(14 * 60)
+
+// ValidateAltTimeChecks validates alt time checks for offline hours, days,
+// months, days-of-month, weeks-of-year, and the timezone offset magnitude.
+//
+// All fields originate from attacker-controlled messages (e.g.
+// MsgSetIncomingApproval). Without these bounds, a caller can set
+// TimezoneOffsetMinutes to an arbitrary sdkmath.Uint, which would later
+// panic during transfer evaluation when the consumer calls .Uint64() on an
+// out-of-uint64-range value, or silently wrap through int64 overflow for
+// values in [2^63, 2^64-1]. We reject at validate-basic time so the producer
+// fails fast rather than the consumer band-aiding.
 func ValidateAltTimeChecks(altTimeChecks *AltTimeChecks) error {
 	if altTimeChecks == nil {
 		return nil
@@ -241,9 +256,40 @@ func ValidateAltTimeChecks(altTimeChecks *AltTimeChecks) error {
 		return err
 	}
 
-	// Validate offline days (0-6)
+	// Validate offline days of week (0-6, Sunday..Saturday)
 	if err := validateTimeRanges(altTimeChecks.OfflineDays, 0, 6, "offline days"); err != nil {
 		return err
+	}
+
+	// Validate offline months (1-12, January..December)
+	if err := validateTimeRanges(altTimeChecks.OfflineMonths, 1, 12, "offline months"); err != nil {
+		return err
+	}
+
+	// Validate offline days of month (1-31)
+	if err := validateTimeRanges(altTimeChecks.OfflineDaysOfMonth, 1, 31, "offline days of month"); err != nil {
+		return err
+	}
+
+	// Validate offline weeks of year (1-53, ISO 8601 week numbering).
+	// ISO weeks can be 53 in long years (e.g. 2020, 2026), so upper bound is 53.
+	if err := validateTimeRanges(altTimeChecks.OfflineWeeksOfYear, 1, 53, "offline weeks of year"); err != nil {
+		return err
+	}
+
+	// Validate timezone offset magnitude. The proto field is an sdkmath.Uint
+	// (arbitrary 256-bit), so we must defend against values that would panic
+	// or silently wrap when converted to a time.Duration later in
+	// x/tokenization/approval_criteria/alt_time_checks.go.
+	if !altTimeChecks.TimezoneOffsetMinutes.IsNil() {
+		// Reject anything that doesn't fit in uint64 (would panic in .Uint64()).
+		if !altTimeChecks.TimezoneOffsetMinutes.BigInt().IsUint64() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "timezoneOffsetMinutes exceeds uint64 range (max real-world offset is %d minutes)", MaxTimezoneOffsetMinutes)
+		}
+		offsetMinutes := altTimeChecks.TimezoneOffsetMinutes.Uint64()
+		if offsetMinutes > MaxTimezoneOffsetMinutes {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "timezoneOffsetMinutes %d exceeds maximum real-world offset of %d minutes (±14 hours from UTC)", offsetMinutes, MaxTimezoneOffsetMinutes)
+		}
 	}
 
 	return nil
@@ -271,10 +317,29 @@ func validateTimeRanges(ranges []*UintRange, min, max uint64, fieldName string) 
 			return sdkerrors.Wrapf(ErrUintUnititialized, "%s range at index %d has nil start or end", fieldName, i)
 		}
 
+		// Reject values that do not fit in uint64 before calling .Uint64(),
+		// which would panic on overflow. The subsequent `start > max` /
+		// `end > max` checks will then reject values that fit in uint64 but
+		// exceed the field's logical max.
+		if !r.Start.BigInt().IsUint64() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has start value that exceeds uint64 range (maximum is %d)", fieldName, i, max)
+		}
+		if !r.End.BigInt().IsUint64() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has end value that exceeds uint64 range (maximum is %d)", fieldName, i, max)
+		}
+
 		start := r.Start.Uint64()
 		end := r.End.Uint64()
 
-		// Check that start and end are within valid range (0 to max, inclusive)
+		// Check that start and end are within valid range [min, max] inclusive.
+		if start < min {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has start value %d which is below minimum %d", fieldName, i, start, min)
+		}
+
+		if end < min {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has end value %d which is below minimum %d", fieldName, i, end, min)
+		}
+
 		if start > max {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "%s range at index %d has start value %d which exceeds maximum %d", fieldName, i, start, max)
 		}
