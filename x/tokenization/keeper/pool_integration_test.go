@@ -342,3 +342,136 @@ func (suite *PoolIntegrationTestSuite) TestGetBalancesToTransferWithAlias_Invali
 	suite.Require().Error(err)
 }
 
+// createCollectionWithAliasPathNoIncomingOverride builds a collection with alias paths but,
+// unlike createCollectionWithAliasPath, leaves OverridesToIncomingApprovals=false so the
+// recipient's incoming approvals are actually exercised on transfer.
+func (suite *PoolIntegrationTestSuite) createCollectionWithAliasPathNoIncomingOverride(creator string, denom string) (*types.TokenCollection, string, error) {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(creator)
+	collectionsToCreate[0].AliasPathsToAdd = []*types.AliasPathAddObject{
+		{
+			Denom: denom,
+			Conversion: &types.ConversionWithoutDenom{
+				SideA: &types.ConversionSideA{Amount: sdkmath.NewUint(1)},
+				SideB: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(1),
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+					},
+				},
+			},
+			Symbol:     "SWAPHOOK",
+			DenomUnits: []*types.DenomUnit{{Decimals: sdkmath.NewUint(6), Symbol: denom, IsDefaultDisplay: true}},
+		},
+	}
+	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals, &types.CollectionApproval{
+		ApprovalId:        "wrapper-transfer",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetOneUintRange(),
+		FromListId:        "AllWithoutMint",
+		ToListId:          "AllWithoutMint",
+		InitiatedByListId: "AllWithoutMint",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			OverridesFromOutgoingApprovals: true,
+			// Deliberately NOT setting OverridesToIncomingApprovals — we want the recipient's
+			// incoming approvals to run, which is how the swap-and-action-hooks flow actually
+			// behaves for intermediate addresses.
+		},
+	})
+
+	if err := CreateCollections(&suite.TestSuite, wctx, collectionsToCreate); err != nil {
+		return nil, "", err
+	}
+
+	collection, err := GetCollection(&suite.TestSuite, wctx, sdkmath.NewUint(1))
+	if err != nil {
+		return nil, "", err
+	}
+
+	wrapperDenom := keeper.AliasDenomPrefix + collection.CollectionId.String() + ":" + denom
+	return collection, wrapperDenom, nil
+}
+
+// TestSendNativeTokensFromAddressWithPoolApprovals_RecipientUsesAutoApproveAllIncoming simulates
+// the swap-and-action-hooks flow where a pool sends wrapped tokens to an intermediate address
+// that was just flagged with AutoApproveAllIncomingTransfers=true (e.g., an IBC-derived swap
+// recipient). The synthetic "all-incoming" approval must satisfy the transfer.
+//
+// Regression: previously this path set OnlyCheckPrioritizedIncomingApprovals=true on the
+// generated transfer, which dropped the synthetic (and every other non-prioritized incoming
+// approval) from the filter, causing "incoming approvals not satisfied" even though the
+// recipient had explicitly opted into receiving everything.
+func (suite *PoolIntegrationTestSuite) TestSendNativeTokensFromAddressWithPoolApprovals_RecipientUsesAutoApproveAllIncoming() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	collection, wrapperDenom, err := suite.createCollectionWithAliasPathNoIncomingOverride(bob, "swaphooktest")
+	suite.Require().NoError(err)
+
+	// Mint tokens to bob (stand-in for the pool's pre-funded source).
+	err = TransferTokens(&suite.TestSuite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        "Mint",
+				ToAddresses: []string{bob},
+				Balances: []*types.Balance{
+					{
+						Amount:         sdkmath.NewUint(10),
+						TokenIds:       GetOneUintRange(),
+						OwnershipTimes: GetFullUintRanges(),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{
+						ApprovalId:      "mint-test",
+						ApprovalLevel:   "collection",
+						ApproverAddress: "",
+						Version:         sdkmath.NewUint(0),
+					},
+				},
+			},
+		},
+	})
+	suite.Require().NoError(err)
+
+	// Recipient = alice, standing in for the IBC-derived intermediate swap address.
+	// Simulate swap-and-action-hooks flagging the intermediate for auto-approve.
+	err = UpdateUserApprovals(&suite.TestSuite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                               alice,
+		CollectionId:                          sdkmath.NewUint(1),
+		UpdateAutoApproveAllIncomingTransfers: true,
+		AutoApproveAllIncomingTransfers:       true,
+	})
+	suite.Require().NoError(err)
+
+	aliceBalanceBefore, err := GetUserBalance(&suite.TestSuite, wctx, collection.CollectionId, alice)
+	suite.Require().NoError(err)
+	suite.Require().True(aliceBalanceBefore.AutoApproveAllIncomingTransfers)
+
+	// The call under test — mirrors what SendCoinsFromPoolWithAliasRouting invokes after the
+	// gamm swap finishes and needs to move tokenized output to the recipient.
+	err = suite.app.TokenizationKeeper.SendNativeTokensFromAddressWithPoolApprovals(
+		suite.ctx,
+		bob,   // fromAddress (pool stand-in)
+		alice, // recipient (intermediate swap address)
+		wrapperDenom,
+		sdkmath.NewUint(1),
+	)
+	suite.Require().NoError(err, "pool->intermediate transfer must succeed when recipient has AutoApproveAllIncomingTransfers")
+
+	// Sanity: alice received the tokens and the one-time outgoing approval was cleaned up on bob.
+	aliceBalanceAfter, err := GetUserBalance(&suite.TestSuite, wctx, collection.CollectionId, alice)
+	suite.Require().NoError(err)
+	suite.Require().True(len(aliceBalanceAfter.Balances) > 0, "recipient should have received tokens")
+
+	bobBalanceAfter, err := GetUserBalance(&suite.TestSuite, wctx, collection.CollectionId, bob)
+	suite.Require().NoError(err)
+	for _, ap := range bobBalanceAfter.OutgoingApprovals {
+		suite.Require().NotContains(ap.ApprovalId, "one-time-outgoing-", "one-time approval must be deleted after transfer")
+	}
+}
+
