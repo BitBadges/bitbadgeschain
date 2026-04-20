@@ -130,7 +130,7 @@ func NewAppModule(
 	}
 }
 
-const ConsensusVersion = 29
+const ConsensusVersion = 30
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
