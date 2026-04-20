@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -57,7 +56,6 @@ func migrateIncomingApprovalCriteria(approvalCriteria *newtypes.IncomingApproval
 	if approvalCriteria == nil {
 		return
 	}
-	migrateVotingChallenges(approvalCriteria.VotingChallenges)
 }
 
 // migrateOutgoingApprovalCriteria ensures new v29 fields have explicit defaults after JSON migration.
@@ -65,7 +63,6 @@ func migrateOutgoingApprovalCriteria(approvalCriteria *newtypes.OutgoingApproval
 	if approvalCriteria == nil {
 		return
 	}
-	migrateVotingChallenges(approvalCriteria.VotingChallenges)
 }
 
 // migrateApprovalCriteria ensures new v29 fields have explicit defaults after JSON migration.
@@ -74,7 +71,6 @@ func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	if approvalCriteria == nil {
 		return
 	}
-	migrateVotingChallenges(approvalCriteria.VotingChallenges)
 
 	// Migrate AltTimeChecks: new fields default to empty slices via JSON (no explicit action needed)
 
@@ -83,54 +79,6 @@ func migrateApprovalCriteria(approvalCriteria *newtypes.ApprovalCriteria) {
 	// During JSON migration, the old field is dropped. We need to check if the old proto bytes
 	// had a UserRoyalties and move it. Since we use JSON marshal/unmarshal, the old field is lost.
 	// However, the v27 type still has it — we handle this in MigrateCollections directly.
-}
-
-// migrateVotingChallenges ensures new v29 voting challenge fields have explicit defaults.
-// resetAfterExecution defaults to false, delayAfterQuorum defaults to zero Uint.
-func migrateVotingChallenges(challenges []*newtypes.VotingChallenge) {
-	for _, challenge := range challenges {
-		if challenge == nil {
-			continue
-		}
-		// resetAfterExecution defaults to false (Go zero value, no action needed)
-		if challenge.DelayAfterQuorum.IsNil() {
-			challenge.DelayAfterQuorum = sdkmath.NewUint(0)
-		}
-	}
-}
-
-// migrateCollectionApprovalRoyalties moves UserRoyalties from the old standalone field (field 13)
-// into UserApprovalSettings.UserRoyalties on each collection approval.
-// The old and new approval slices must be the same length and in the same order (from JSON marshal/unmarshal).
-func migrateCollectionApprovalRoyalties(oldApprovals []*oldtypes.CollectionApproval, newApprovals []*newtypes.CollectionApproval) {
-	for i, oldApproval := range oldApprovals {
-		if i >= len(newApprovals) {
-			break
-		}
-		if oldApproval.ApprovalCriteria == nil || oldApproval.ApprovalCriteria.UserRoyalties == nil {
-			continue
-		}
-
-		oldRoyalties := oldApproval.ApprovalCriteria.UserRoyalties
-		// Skip if royalties are effectively empty
-		if oldRoyalties.Percentage.IsNil() || oldRoyalties.Percentage.IsZero() {
-			continue
-		}
-
-		newCriteria := newApprovals[i].ApprovalCriteria
-		if newCriteria == nil {
-			continue
-		}
-
-		if newCriteria.UserApprovalSettings == nil {
-			newCriteria.UserApprovalSettings = &newtypes.UserApprovalSettings{}
-		}
-
-		newCriteria.UserApprovalSettings.UserRoyalties = &newtypes.UserRoyalties{
-			Percentage:    oldRoyalties.Percentage,
-			PayoutAddress: oldRoyalties.PayoutAddress,
-		}
-	}
 }
 
 func MigrateIncomingApprovals(incomingApprovals []*newtypes.UserIncomingApproval) []*newtypes.UserIncomingApproval {
@@ -190,9 +138,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		if err := json.Unmarshal(jsonBytes, &newCollection); err != nil {
 			return err
 		}
-
-		// Migrate UserRoyalties from old standalone field into UserApprovalSettings
-		migrateCollectionApprovalRoyalties(oldCollection.CollectionApprovals, newCollection.CollectionApprovals)
 
 		newCollection.CollectionApprovals = MigrateApprovals(newCollection.CollectionApprovals)
 		if newCollection.DefaultBalances != nil {

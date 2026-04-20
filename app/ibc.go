@@ -34,10 +34,6 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
 
 	// this line is used by starport scaffolding # ibc/app/import
-	anchormodule "github.com/bitbadges/bitbadgeschain/x/anchor/module"
-	anchormoduletypes "github.com/bitbadges/bitbadgeschain/x/anchor/types"
-	mapsmodule "github.com/bitbadges/bitbadgeschain/x/maps/module"
-	mapsmoduletypes "github.com/bitbadges/bitbadgeschain/x/maps/types"
 	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
@@ -67,8 +63,10 @@ type CombinedIBCHooks struct {
 
 // Implement hook interfaces by delegating to the appropriate hook
 var (
-	_ ibchooks.OnRecvPacketOverrideHooks = &CombinedIBCHooks{}
-	_ ibchooks.SendPacketOverrideHooks   = &CombinedIBCHooks{}
+	_ ibchooks.OnRecvPacketOverrideHooks              = &CombinedIBCHooks{}
+	_ ibchooks.SendPacketOverrideHooks                = &CombinedIBCHooks{}
+	_ ibchooks.OnAcknowledgementPacketOverrideHooks   = &CombinedIBCHooks{}
+	_ ibchooks.OnTimeoutPacketOverrideHooks           = &CombinedIBCHooks{}
 )
 
 func (h *CombinedIBCHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
@@ -102,6 +100,24 @@ func (h *CombinedIBCHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk
 
 	// Fallback to default behavior
 	return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+}
+
+// OnAcknowledgementPacketOverride forwards to the rate-limit hook so that
+// failed outbound transfers refund their quota. If no rate-limit hook is
+// configured, fall through to the underlying app.
+func (h *CombinedIBCHooks) OnAcknowledgementPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
+	if h.RateLimitOverrideHooks != nil {
+		return h.RateLimitOverrideHooks.OnAcknowledgementPacketOverride(im, ctx, channelID, packet, acknowledgement, relayer)
+	}
+	return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
+}
+
+// OnTimeoutPacketOverride forwards to the rate-limit hook for quota refund on timeout.
+func (h *CombinedIBCHooks) OnTimeoutPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+	if h.RateLimitOverrideHooks != nil {
+		return h.RateLimitOverrideHooks.OnTimeoutPacketOverride(im, ctx, channelID, packet, relayer)
+	}
+	return im.App.OnTimeoutPacket(ctx, channelID, packet, relayer)
 }
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -207,10 +223,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerIBCModule).
 		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 
-	anchorIBCModule := anchormodule.NewIBCModule(app.AnchorKeeper)
-	ibcRouter.AddRoute(anchormoduletypes.ModuleName, anchorIBCModule)
-	mapsIBCModule := mapsmodule.NewIBCModule(app.MapsKeeper)
-	ibcRouter.AddRoute(mapsmoduletypes.ModuleName, mapsIBCModule)
 	tokenizationIBCModule := tokenizationmodule.NewIBCModule(app.TokenizationKeeper)
 	ibcRouter.AddRoute(tokenizationmoduletypes.ModuleName, tokenizationIBCModule)
 

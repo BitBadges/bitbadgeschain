@@ -16,8 +16,12 @@ import (
 )
 
 var (
-	_ ibchooks.OnRecvPacketBeforeHooks = &RateLimitHooks{}
-	_ ibchooks.SendPacketBeforeHooks   = &RateLimitHooks{}
+	_ ibchooks.OnRecvPacketBeforeHooks                = &RateLimitHooks{}
+	_ ibchooks.SendPacketBeforeHooks                  = &RateLimitHooks{}
+	_ ibchooks.OnRecvPacketOverrideHooks              = &RateLimitOverrideHooks{}
+	_ ibchooks.SendPacketOverrideHooks                = &RateLimitOverrideHooks{}
+	_ ibchooks.OnAcknowledgementPacketOverrideHooks   = &RateLimitOverrideHooks{}
+	_ ibchooks.OnTimeoutPacketOverrideHooks           = &RateLimitOverrideHooks{}
 )
 
 type RateLimitHooks struct {
@@ -202,6 +206,87 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	}
 
 	return seq, err
+}
+
+// OnAcknowledgementPacketOverride refunds outbound quota when the counterparty
+// returns an error acknowledgement. A failed ACK means the sent tokens are
+// refunded to the sender by the transfer module, so the quota we consumed on
+// SendPacket must also be refunded or it is permanently burned. Successful
+// ACKs are a no-op — the tracking applied at send time is correct.
+func (h *RateLimitOverrideHooks) OnAcknowledgementPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
+	// Only refund on error acknowledgements.
+	var ack channeltypes.Acknowledgement
+	if err := transfertypes.ModuleCdc.UnmarshalJSON(acknowledgement, &ack); err != nil {
+		// Malformed ack — let the inner module handle it; do not refund.
+		return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
+	}
+	if ack.Success() {
+		return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
+	}
+
+	h.refundSendTracking(ctx, packet)
+	return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
+}
+
+// OnTimeoutPacketOverride refunds outbound quota on packet timeout. A timeout
+// means the packet was never received on the counterparty, so the transfer
+// module refunds the coins and we must refund the quota we consumed.
+func (h *RateLimitOverrideHooks) OnTimeoutPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+	h.refundSendTracking(ctx, packet)
+	return im.App.OnTimeoutPacket(ctx, channelID, packet, relayer)
+}
+
+// refundSendTracking undoes the tracking performed by updateTrackingAfterTransfer
+// for a failed outbound transfer. The outflow was recorded as amount.Neg() on
+// the netFlow, so the inverse is to add amount.Abs() back.
+func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet channeltypes.Packet) {
+	var packetData transfertypes.FungibleTokenPacketData
+	if err := json.Unmarshal(packet.GetData(), &packetData); err != nil {
+		return
+	}
+	amount, ok := sdkmath.NewIntFromString(packetData.Amount)
+	if !ok {
+		return
+	}
+	sourceChannel := packet.GetSourceChannel()
+	denom := extractDenomFromPacketOnSend(packet.GetSourcePort(), sourceChannel, packetData.Denom)
+	senderAddr := packetData.Sender
+
+	params := h.keeper.GetParams(ctx)
+	config := params.FindMatchingConfig(sourceChannel, denom)
+	if config == nil {
+		return
+	}
+
+	// Reverse supply shift tracking. Outflow added amount.Neg(); undo by adding amount.
+	for _, limit := range config.SupplyShiftLimits {
+		if limit.MaxAmount.IsZero() {
+			continue
+		}
+		flow, _ := h.keeper.GetChannelFlowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		flow.NetFlow = flow.NetFlow.Add(amount)
+		h.keeper.SetChannelFlowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration, flow)
+	}
+
+	// Reverse per-address tracking. TotalAmount is tracked as Abs(), so subtract Abs().
+	if senderAddr != "" {
+		for _, limit := range config.AddressLimits {
+			data, _ := h.keeper.GetAddressTransferData(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			if data.TransferCount > 0 {
+				data.TransferCount--
+			}
+			absAmt := amount.Abs()
+			if data.TotalAmount.GTE(absAmt) {
+				data.TotalAmount = data.TotalAmount.Sub(absAmt)
+			} else {
+				data.TotalAmount = sdkmath.ZeroInt()
+			}
+			h.keeper.SetAddressTransferData(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration, data)
+		}
+	}
+	// Unique-sender tracking is not reversed: we cannot know whether this sender
+	// had other in-window transfers, and the cost of an over-count is a slightly
+	// tighter limit, not a quota drain.
 }
 
 // updateTrackingAfterTransfer updates all tracking after a successful transfer

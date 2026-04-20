@@ -183,7 +183,7 @@ jobs:
 
             **SDK CLI:**
             ```bash
-            npm install -g bitbadgesjs-sdk
+            npm install -g bitbadges
             ```
 
             ## Binaries
