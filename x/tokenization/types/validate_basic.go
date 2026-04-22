@@ -1225,7 +1225,19 @@ func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChan
 			}
 		}
 
-		// If cosmosCoinBackedPath is set, transfers from Mint address are not allowed
+		// If cosmosCoinBackedPath is set, transfers from Mint address are not allowed.
+		//
+		// SECURITY: this check is load-bearing for cross-collection drain safety, not just
+		// a UX/accounting rule. The backed-path escrow address is derived from (denom, prefix)
+		// only, so two collections declaring the same SideA.Denom share one on-chain address
+		// that may hold real bank coins deposited by a victim collection's users. Blocking
+		// from=Mint here means an attacker cannot conjure collection tokens out of thin air
+		// to feed into the backing direction -- they can only obtain tokens via the legitimate
+		// unbacking flow, which requires depositing the real bank coin first. Combined with
+		// evenly-divisible symmetric conversion, this makes the shared-escrow drain net-zero.
+		// See HandleSpecialAddressBacking in keeper/transfer_wrap.go for the full argument.
+		// Do NOT relax this check without also scoping the backed-path address derivation
+		// by collection ID, or the drain becomes live.
 		if collection.Invariants.CosmosCoinBackedPath != nil {
 			if IsMintAddress(transfer.From) {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "transfers from Mint address are not allowed when cosmosCoinBackedPath is set")

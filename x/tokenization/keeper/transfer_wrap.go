@@ -163,8 +163,36 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	return nil
 }
 
-// HandleSpecialAddressBacking processes cosmos coin backing/unbacking for special addresses
-// This uses bankKeeper.SendCoins instead of minting/burning coins
+// HandleSpecialAddressBacking processes cosmos coin backing/unbacking for special addresses.
+// This uses bankKeeper.SendCoins instead of minting/burning coins.
+//
+// Cross-collection shared-escrow note (not exploitable under current invariants):
+// The escrow address `path.Address` is derived from (denom, BackedPathGenerationPrefix) only,
+// so two collections declaring the same SideA.Denom resolve to the same bech32. A naive read
+// of the code below (SendCoins from specialAddressAcc -> initiator) looks like it would let a
+// new collection drain a victim collection's pre-existing bank balance at the shared address.
+// That drain is currently blocked upstream by:
+//   1. ValidateTransferWithInvariants (validate_basic.go) rejects from=Mint transfers on any
+//      collection with CosmosCoinBackedPath, so an attacker cannot mint collection tokens
+//      from thin air to feed into the backing direction.
+//   2. The only way to obtain collection tokens is the legitimate unbacking flow, which
+//      requires SendCoins(initiator -> specialAddress, ibcDenom) first -- i.e. the attacker
+//      has to deposit the real bank coin before they can redeem it.
+//   3. calculateConversionMultiplier enforces evenly-divisible conversions, so the same
+//      SideA/SideB ratio applies in both directions -- redeem returns exactly what was deposited.
+// Together (1)+(2)+(3) make the drain net-zero for an attacker under their OWN collection's
+// conversion, regardless of what other collections have deposited at the shared address.
+//
+// Caveats / do NOT remove lightly:
+//   - Defense-in-depth gap: ValidateCollectionApprovalsWithInvariants does not reject
+//     from=Mint approvals at creation time on backed collections; the block only fires
+//     at transfer time. Hardening would move the check earlier.
+//   - If a future change introduces any collection-token issuance path that bypasses the
+//     from=Mint invariant (e.g. a new message type, a cross-chain inbound mint, a relaxed
+//     invariant), the shared-address drain becomes live and this comment is no longer true.
+//   - Scoping the derived address by collectionId (mixing collection.CollectionId into the
+//     module-credential input in generatePathAddress) would make this defense structural
+//     rather than invariant-dependent, and is the recommended long-term fix.
 func (k Keeper) HandleSpecialAddressBacking(
 	ctx sdk.Context,
 	collection *types.TokenCollection,

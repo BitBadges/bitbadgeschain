@@ -79,6 +79,19 @@ func ensureMintForbiddenPermission(permissions *types.CollectionPermissions, has
 // Security: Module addresses are derived using NewModuleCredential which uses the module name,
 // a unique prefix, and the path bytes. This makes collisions with user addresses extremely unlikely.
 // All generated path addresses are automatically marked as reserved protocol addresses to prevent conflicts.
+//
+// Cross-collection shared-address note:
+// For backed paths (prefix=BackedPathGenerationPrefix, pathString=SideA.Denom), this
+// derivation is NOT scoped by collection ID. Two collections declaring the same SideA.Denom
+// produce the same bech32. That is intentionally tolerated today because the escrow drain
+// path (see HandleSpecialAddressBacking in transfer_wrap.go) is gated by the from=Mint
+// invariant in ValidateTransferWithInvariants, which prevents an attacker from minting
+// tokens in a second collection that targets the same denom. Wrapper paths have the same
+// shape but are safe for a different reason -- they operate on WrappedDenomPrefix+collectionId
+// denoms, not raw bank coins. If the Mint-block invariant is ever relaxed, this derivation
+// should be changed to mix the collection ID into fullPathBytes (or the reservation store
+// extended to bind {address -> collectionId}) before that lands, or cross-collection drain
+// becomes live for the backed path.
 func generatePathAddress(pathString string, prefix []byte) (sdk.AccAddress, error) {
 	// Validate path string is not empty
 	if pathString == "" {
