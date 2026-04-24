@@ -95,6 +95,32 @@ func (suite *TestSuite) TestNewCollectionDuplicateTokenIds() {
 	suite.Require().Error(err, "Error creating token: %s")
 }
 
+// Regression: MsgCreateCollection wraps MsgUniversalUpdateCollection and must
+// set UpdateValidTokenIds=true so ValidTokenIds persists to chain state.
+func (suite *TestSuite) TestCreateCollectionPersistsValidTokenIds() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	validTokenIds := []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}}
+
+	res, err := suite.msgServer.CreateCollection(wctx, &types.MsgCreateCollection{
+		Creator:       bob,
+		ValidTokenIds: validTokenIds,
+		CollectionPermissions: &types.CollectionPermissions{
+			CanUpdateValidTokenIds: []*types.TokenIdsActionPermission{{PermanentlyPermittedTimes: GetFullUintRanges()}},
+		},
+		DefaultBalances: &types.UserBalanceStore{
+			AutoApproveSelfInitiatedOutgoingTransfers: true,
+			AutoApproveSelfInitiatedIncomingTransfers: true,
+		},
+	})
+	suite.Require().NoError(err, "CreateCollection failed")
+	suite.Require().NotNil(res)
+
+	collection, err := GetCollection(suite, wctx, res.CollectionId)
+	suite.Require().NoError(err)
+	AssertUintRangesEqual(suite, validTokenIds, collection.ValidTokenIds)
+}
+
 func (suite *TestSuite) TestNewCollectionNonSequentialTokenIds() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
