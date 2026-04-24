@@ -30,6 +30,7 @@ func (k msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		DefaultBalances: msg.DefaultBalances,
 
 		// Applicable to creations and updates
+		UpdateValidTokenIds:         true,
 		ValidTokenIds:               msg.ValidTokenIds,
 		UpdateCollectionPermissions: true,
 		CollectionPermissions:       msg.CollectionPermissions,
