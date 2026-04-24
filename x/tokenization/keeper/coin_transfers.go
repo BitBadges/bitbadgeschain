@@ -8,10 +8,16 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 const (
 	RoyaltyDivisor = 10000
+	// ProtocolFeeDenominator is the divisor for the inclusive protocol fee
+	// (0.1% = amount / 1000). Applied per-coin before royalty/recipient split,
+	// so the payer sends exactly the quoted amount.
+	ProtocolFeeDenominator = 1000
 )
 
 // formatDenomForDisplay formats a denom for display in error messages
@@ -189,10 +195,28 @@ func (k Keeper) ExecuteCoinTransfers(
 		}
 
 		for _, coin := range coinsToTransfer {
+			// Inclusive protocol fee: taken out of the payer's gross amount first,
+			// so the payer sends exactly coin.Amount (not amount + fee on top).
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
+			protocolFeeUint := coinAmountUint.Quo(sdkmath.NewUint(ProtocolFeeDenominator))
+			protocolFeeInt := sdkmath.NewIntFromBigInt(protocolFeeUint.BigInt())
+
 			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
-			remainingAmount := coin.Amount.Sub(royaltyAmountInt)
+
+			// Both fees come off the gross. With royalty capped at 100% the two could add
+			// to more than gross; reject rather than silently shortchange the recipient.
+			if protocolFeeInt.Add(royaltyAmountInt).GT(coin.Amount) {
+				detErrMsg := fmt.Sprintf("royalty %s + protocol fee %s exceeds transfer amount %s for denom %s", royaltyAmountInt.String(), protocolFeeInt.String(), coin.Amount.String(), formatDenomForDisplay(coin.Denom))
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
+
+			remainingAmount := coin.Amount.Sub(royaltyAmountInt).Sub(protocolFeeInt)
+
+			if err := k.sendProtocolFee(ctx, coin, protocolFeeInt, fromAddressAcc, coinTransfersUsed); err != nil {
+				detErrMsg := fmt.Sprintf("insufficient %s balance to cover protocol fee", formatDenomForDisplay(coin.Denom))
+				return detErrMsg, sdkerrors.Wrap(types.ErrUnderflow, err.Error())
+			}
 
 			err := k.sendCoinWithRoyalty(
 				ctx,
@@ -217,6 +241,35 @@ func (k Keeper) ExecuteCoinTransfers(
 	}
 
 	return "", nil
+}
+
+// sendProtocolFee routes the inclusive protocol fee from the payer to the community pool.
+// No-op when the fee rounds to zero (amounts below ProtocolFeeDenominator).
+func (k Keeper) sendProtocolFee(
+	ctx sdk.Context,
+	coin *sdk.Coin,
+	feeAmount sdkmath.Int,
+	fromAddressAcc sdk.AccAddress,
+	coinTransfersUsed *[]CoinTransfers,
+) error {
+	if feeAmount.IsZero() {
+		return nil
+	}
+
+	feeCoins := sdk.NewCoins(sdk.NewCoin(coin.Denom, feeAmount))
+	if err := k.sendManagerKeeper.FundCommunityPoolWithAliasRouting(ctx, fromAddressAcc, feeCoins); err != nil {
+		return sdkerrors.Wrapf(err, "error funding community pool with protocol fee: %s", feeCoins)
+	}
+
+	*coinTransfersUsed = append(*coinTransfersUsed, CoinTransfers{
+		From:          fromAddressAcc.String(),
+		To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
+		Amount:        feeAmount.String(),
+		Denom:         coin.Denom,
+		IsProtocolFee: true,
+	})
+
+	return nil
 }
 
 // sendCoinWithRoyalty handles sending a coin with royalty deduction
