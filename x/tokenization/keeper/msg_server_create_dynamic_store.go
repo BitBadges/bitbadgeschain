@@ -17,10 +17,16 @@ func (k msgServer) CreateDynamicStore(goCtx context.Context, msg *types.MsgCreat
 		return nil, err
 	}
 
-	// Get the next dynamic store ID
+	// Get the next dynamic store ID. If the counter has never been written
+	// (chain launched without genesis init for this field, or upgraded onto a
+	// chain where it was missing), GetNextDynamicStoreId returns 0. Treat 0 as
+	// "use 1" AND persist it, so the subsequent IncrementNextDynamicStoreId
+	// lands at 2 instead of 1 — otherwise the second create would re-use id 1
+	// and silently overwrite the first store.
 	nextStoreId := k.GetNextDynamicStoreId(ctx)
-	if nextStoreId.Equal(sdkmath.NewUint(0)) {
+	if nextStoreId.IsZero() {
 		nextStoreId = sdkmath.NewUint(1)
+		k.SetNextDynamicStoreId(ctx, nextStoreId)
 	}
 
 	// Create the dynamic store
