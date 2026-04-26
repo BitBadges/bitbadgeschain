@@ -173,12 +173,12 @@ jobs:
 
             **One-liner:**
             ```bash
-            curl -fsSL https://raw.githubusercontent.com/BitBadges/bitbadgeschain/master/install.sh | sh
+            curl -fsSL https://install.bitbadges.io | sh
             ```
 
             **Testnet:**
             ```bash
-            curl -fsSL https://raw.githubusercontent.com/BitBadges/bitbadgeschain/master/install.sh | sh -s -- --testnet
+            curl -fsSL https://install.bitbadges.io | sh -s -- --testnet
             ```
 
             **SDK CLI:**
