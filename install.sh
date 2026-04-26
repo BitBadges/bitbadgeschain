@@ -213,8 +213,16 @@ main() {
 
   if command -v bitbadges-cli >/dev/null 2>&1; then
     echo "Successfully installed bitbadges-cli"
-  elif command -v bun >/dev/null 2>&1 || command -v npm >/dev/null 2>&1; then
-    echo "Note: bitbadges-cli installed but may not be in PATH. Check your global bin directory."
+  elif command -v bun >/dev/null 2>&1; then
+    bun_bin="$(bun pm bin -g 2>/dev/null || echo "$HOME/.bun/bin")"
+    echo "Note: bitbadges-cli installed via bun but may not be in PATH. Add it with:"
+    echo "  export PATH=\"${bun_bin}:\$PATH\""
+  elif command -v npm >/dev/null 2>&1; then
+    npm_prefix="$(npm config get prefix 2>/dev/null)"
+    if [ -n "$npm_prefix" ]; then
+      echo "Note: bitbadges-cli installed via npm but may not be in PATH. Add it with:"
+      echo "  export PATH=\"${npm_prefix}/bin:\$PATH\""
+    fi
   fi
 
   echo ""
