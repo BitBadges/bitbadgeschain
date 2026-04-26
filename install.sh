@@ -1,9 +1,9 @@
 #!/bin/sh
 # BitBadges Chain — One-liner installer
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/BitBadges/bitbadgeschain/master/install.sh | sh
-#   curl -fsSL https://raw.githubusercontent.com/BitBadges/bitbadgeschain/master/install.sh | sh -s -- --testnet
-#   curl -fsSL https://raw.githubusercontent.com/BitBadges/bitbadgeschain/master/install.sh | sh -s -- --version v28
+#   curl -fsSL https://install.bitbadges.io | sh
+#   curl -fsSL https://install.bitbadges.io | sh -s -- --testnet
+#   curl -fsSL https://install.bitbadges.io | sh -s -- --version v28
 #
 # Options:
 #   --testnet           Install testnet binary (default: mainnet)
@@ -42,7 +42,7 @@ while [ $# -gt 0 ]; do
     --help)
       echo "BitBadges Chain Installer"
       echo ""
-      echo "Usage: curl -fsSL https://raw.githubusercontent.com/BitBadges/bitbadgeschain/master/install.sh | sh"
+      echo "Usage: curl -fsSL https://install.bitbadges.io | sh"
       echo ""
       echo "Options:"
       echo "  --testnet           Install testnet binary (default: mainnet)"
