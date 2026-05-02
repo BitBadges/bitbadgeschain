@@ -186,8 +186,25 @@ main() {
     exit 1
   fi
 
+  # Friendly alias for agents and humans — `bb` is the entry point
+  # documented in docs.bitbadges.io/for-developers/cli/. Skip on Windows
+  # where symlinks need elevated perms and the `.exe` suffix is mandatory.
+  if [ "$os" != "windows" ]; then
+    if [ -w "$INSTALL_DIR" ] || [ "$USE_SUDO" = "no" ]; then
+      ln -sfn "${INSTALL_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/bb"
+    elif [ "$USE_SUDO" = "auto" ] && command -v sudo >/dev/null 2>&1; then
+      sudo ln -sfn "${INSTALL_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/bb"
+    else
+      echo "Error: ${INSTALL_DIR} is not writable for bb symlink. Run with sudo or use --install-dir." >&2
+      exit 1
+    fi
+  fi
+
   echo ""
   echo "Successfully installed bitbadgeschaind ${VERSION} (${NETWORK}) to ${INSTALL_DIR}/${BINARY_NAME}"
+  if [ "$os" != "windows" ]; then
+    echo "Linked ${INSTALL_DIR}/bb -> ${INSTALL_DIR}/${BINARY_NAME}"
+  fi
   echo ""
 
   # Verify
