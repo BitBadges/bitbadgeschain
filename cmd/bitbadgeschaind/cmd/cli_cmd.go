@@ -41,7 +41,6 @@ Where <subcommand> is any top-level bitbadges-cli subcommand:
   builder   — template builders, create-with-burner, burner wallets,
               review/verify/simulate/doctor, session tools, builder tools
   config    — manage ~/.bitbadges/config.json (base URL, API keys per network)
-  auth      — login/logout/status (ships via the SDK CLI release for #0360)
 
 New top-level bitbadges-cli subcommands automatically reach here without
 needing a Go alias — this wrapper is the single bridge between the chain
