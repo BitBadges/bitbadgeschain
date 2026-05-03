@@ -95,7 +95,7 @@ func schemaHelpFooter(protoFile string) string {
 Schema & Documentation:
   Proto definition:  %s/%s
   Full OpenAPI spec: %s/docs/static/openapi.yml
-  SDK CLI docs:      bitbadgeschaind cli sdk docs messages (if SDK CLI is installed)`,
+  SDK CLI docs:      bitbadgeschaind cli docs messages (if SDK CLI is installed)`,
 		protoBaseURL, protoFile, repoBaseURL)
 }
 

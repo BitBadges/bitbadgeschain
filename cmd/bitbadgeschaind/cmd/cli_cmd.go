@@ -12,16 +12,12 @@ import (
 // through this one command — `bitbadgeschaind cli <anything>` — without
 // needing a dedicated Go file per alias.
 //
-// This is the canonical form going forward. The existing short aliases
-// (sdk / api / builder) stay around for one release cycle for backwards
-// compat but redirect through this same forwarder.
-//
 // Examples:
 //
-//	bitbadgeschaind cli sdk review tx.json
+//	bitbadgeschaind cli check tx.json
 //	bitbadgeschaind cli api tokens get-collection 1
-//	bitbadgeschaind cli builder templates vault --backing-coin USDC
-//	bitbadgeschaind cli builder create-with-burner --msg-file col.json --manager bb1...
+//	bitbadgeschaind cli build vault --backing-coin USDC
+//	bitbadgeschaind cli deploy --burner --msg-file col.json --manager bb1...
 //	bitbadgeschaind cli config set apiKey <key>
 //
 // Any future top-level subcommand added to bitbadges-cli is automatically
@@ -35,12 +31,23 @@ func CliCmd() *cobra.Command {
 Usage:
   bitbadgeschaind cli <subcommand> [args...]
 
-Where <subcommand> is any top-level bitbadges-cli subcommand:
-  sdk       — SDK analysis, review, interpret, address tools, docs
-  api       — 104+ indexer API routes from your terminal
-  builder   — template builders, create-with-burner, burner wallets,
-              review/verify/simulate/doctor, session tools, builder tools
-  config    — manage ~/.bitbadges/config.json (base URL, API keys per network)
+The bitbadges-cli surface is flat — every verb is top-level. Common
+subcommands (run ` + "`bitbadgeschaind cli --help`" + ` for the full grouped list):
+
+  Build & ship a transaction:
+    build, tools, tool, check, explain, simulate, preview, deploy
+
+  Indexer access:
+    api, auth
+
+  Local state:
+    config, burner, session
+
+  Discovery:
+    docs, skills, resources, doctor
+
+  Address & lookup:
+    address, alias, lookup, gen-list-id
 
 New top-level bitbadges-cli subcommands automatically reach here without
 needing a Go alias — this wrapper is the single bridge between the chain
