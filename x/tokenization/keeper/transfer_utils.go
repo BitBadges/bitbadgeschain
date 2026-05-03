@@ -3,93 +3,12 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
-
-const (
-	// ProtocolFeeDenominator represents the denominator for protocol fee calculation (0.1% = 1/1000)
-	ProtocolFeeDenominator = 1000
-)
-
-// CalculateAndDistributeProtocolFees calculates protocol fees from coin transfers and distributes them
-// to the community pool
-func (k Keeper) CalculateAndDistributeProtocolFees(
-	ctx sdk.Context,
-	coinTransfers []CoinTransfers,
-	initiatedBy string,
-) ([]CoinTransfers, error) {
-	// Calculate protocol fees for all denoms (0.1% of each denom transferred)
-	protocolFees := sdk.NewCoins()
-	denomAmounts := make(map[string]sdkmath.Uint)
-
-	for _, coinTransfer := range coinTransfers {
-		amount := sdkmath.NewUintFromString(coinTransfer.Amount)
-		// initialize it if it doesn't exist
-		if _, ok := denomAmounts[coinTransfer.Denom]; !ok {
-			denomAmounts[coinTransfer.Denom] = sdkmath.NewUint(0)
-		}
-
-		denomAmounts[coinTransfer.Denom] = denomAmounts[coinTransfer.Denom].Add(amount)
-	}
-
-	// Sort map keys for deterministic iteration order
-	denoms := make([]string, 0, len(denomAmounts))
-	for denom := range denomAmounts {
-		denoms = append(denoms, denom)
-	}
-	sort.Strings(denoms)
-
-	for _, denom := range denoms {
-		totalAmount := denomAmounts[denom]
-		// 0.1% of the total amount for this denom
-		// Safety check to prevent division by zero
-		if ProtocolFeeDenominator == 0 {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "protocol fee denominator cannot be zero")
-		}
-		protocolFee := totalAmount.Quo(sdkmath.NewUint(ProtocolFeeDenominator))
-
-		// For other denoms, just use 0.1%
-		if !protocolFee.IsZero() {
-			protocolFees = protocolFees.Add(sdk.NewCoin(denom, sdkmath.NewIntFromBigInt(protocolFee.BigInt())))
-		}
-	}
-
-	fromAddressAcc, err := sdk.AccAddressFromBech32(initiatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	var protocolFeeTransfers []CoinTransfers
-
-	if !protocolFees.IsZero() {
-		// Send all fees to community pool using FundCommunityPoolWithAliasRouting to support wrapped badge denoms
-		err = k.sendManagerKeeper.FundCommunityPoolWithAliasRouting(ctx, fromAddressAcc, protocolFees)
-		if err != nil {
-			return nil, sdkerrors.Wrapf(err, "error funding community pool with protocol fees: %s", protocolFees)
-		}
-
-		// Add all protocol fees to coinTransfers for community pool
-		for _, protocolFee := range protocolFees {
-			protocolFeeTransfers = append(protocolFeeTransfers, CoinTransfers{
-				From:          initiatedBy,
-				To:            authtypes.NewModuleAddress(distrtypes.ModuleName).String(),
-				Amount:        protocolFee.Amount.String(),
-				Denom:         protocolFee.Denom,
-				IsProtocolFee: true,
-			})
-		}
-	}
-
-	return protocolFeeTransfers, nil
-}
 
 // HandleAutoDeletions processes auto-deletion logic for approvals after transfers
 func (k Keeper) HandleAutoDeletions(
