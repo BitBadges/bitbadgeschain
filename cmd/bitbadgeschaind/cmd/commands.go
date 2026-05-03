@@ -86,6 +86,7 @@ func initRootCmd(
 		txCommand(),
 		bitbadgesclient.KeyCommands(app.DefaultNodeHome, false), // false = don't default to eth keys, but support them
 		CliCmd(), // canonical forwarder — `bitbadgeschaind cli <subcmd> [args...]` reaches every bitbadges-cli subcommand
+		SignArbitraryCmd(),
 	)
 }
 
