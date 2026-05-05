@@ -7,7 +7,7 @@ import (
 	"time"
 
 	clienthelpers "cosmossdk.io/client/v2/helpers"
-	log "cosmossdk.io/log"
+	log "cosmossdk.io/log/v2"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"

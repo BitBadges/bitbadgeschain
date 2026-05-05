@@ -6,7 +6,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"

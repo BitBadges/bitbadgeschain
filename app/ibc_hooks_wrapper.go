@@ -2,9 +2,9 @@ package app
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 
 	customhooks "github.com/bitbadges/bitbadgeschain/x/custom-hooks"
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
@@ -67,4 +67,9 @@ func (w *customHooksWrapper) OnAcknowledgementPacket(ctx sdk.Context, packetID s
 // IBC v10: packetID parameter added
 func (w *customHooksWrapper) OnTimeoutPacket(ctx sdk.Context, packetID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
 	return w.app.OnTimeoutPacket(ctx, packetID, packet, relayer)
+}
+
+// IBC v11: IBCModule now requires SetICS4Wrapper. Forward to the wrapped app.
+func (w *customHooksWrapper) SetICS4Wrapper(wrapper porttypes.ICS4Wrapper) {
+	w.app.SetICS4Wrapper(wrapper)
 }

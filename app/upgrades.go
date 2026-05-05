@@ -1,8 +1,8 @@
 package app
 
 import (
-	storetypes "cosmossdk.io/store/types"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v33 "github.com/bitbadges/bitbadgeschain/app/upgrades/v33"
 )
 
