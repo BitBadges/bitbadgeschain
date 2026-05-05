@@ -2,181 +2,16 @@ package keeper
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/json"
 
-	errorsmod "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
-	"cosmossdk.io/store/prefix"
-	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v29"
 )
-
-// The x/badges module was renamed to x/tokenization in v23, but the migration that
-// re-derives collection addresses with the new module name (and moves the corresponding
-// bank balances) was never wired into an upgrade handler. As a result, every existing
-// collection on mainnet still has a mintEscrowAddress / cosmosCoinBackedPath.address /
-// cosmosCoinWrapperPath.address derived from module="badges", while today's msg handlers
-// and every downstream consumer (SDK, indexer, frontend) derives with module="tokenization".
-// v30 is the catch-up migration: for each collection we compute the new tokenization-derived
-// address, move all bank balances from the old address, rewrite the stored address on the
-// collection, and flip the reserved-protocol-address flag. Idempotent — if old == new
-// (which happens for any collection created after the migration ships), we skip.
-const (
-	oldAddressModuleName = "badges"
-)
-
-// generateMintEscrowAddressWithModuleName reproduces UniversalUpdateCollection's address
-// derivation with a pluggable module name. Used to compute both the legacy (badges) and
-// new (tokenization) addresses for a collection so we can migrate between them.
-func generateMintEscrowAddressWithModuleName(moduleName string, collectionId sdkmath.Uint) (sdk.AccAddress, error) {
-	derivationKey := make([]byte, DerivationKeyLength)
-	binary.BigEndian.PutUint64(derivationKey, collectionId.Uint64())
-	ac, err := authtypes.NewModuleCredential(moduleName, AccountGenerationPrefix, derivationKey)
-	if err != nil {
-		return nil, err
-	}
-	return sdk.AccAddress(ac.Address()), nil
-}
-
-// generatePathAddressWithModuleName mirrors generatePathAddress with a pluggable module name.
-func generatePathAddressWithModuleName(moduleName string, pathString string, prefix []byte) (sdk.AccAddress, error) {
-	fullPathBytes := []byte(pathString)
-	ac, err := authtypes.NewModuleCredential(moduleName, prefix, fullPathBytes)
-	if err != nil {
-		return nil, errorsmod.Wrap(err, "failed to generate module credential")
-	}
-	return sdk.AccAddress(ac.Address()), nil
-}
-
-// migrateBankBalancesBetweenAddresses moves every coin held by oldAddress to newAddress.
-// No-op when the balance is zero (common for fresh wrapper/backed paths that never held funds).
-func (k Keeper) migrateBankBalancesBetweenAddresses(ctx sdk.Context, oldAddress, newAddress string) error {
-	if oldAddress == newAddress {
-		return nil
-	}
-	oldAddr, err := sdk.AccAddressFromBech32(oldAddress)
-	if err != nil {
-		return errorsmod.Wrapf(err, "invalid old address %s", oldAddress)
-	}
-	newAddr, err := sdk.AccAddressFromBech32(newAddress)
-	if err != nil {
-		return errorsmod.Wrapf(err, "invalid new address %s", newAddress)
-	}
-
-	balances := k.bankKeeper.GetAllBalances(ctx, oldAddr)
-	if balances.IsZero() {
-		return nil
-	}
-	if err := k.bankKeeper.SendCoins(ctx, oldAddr, newAddr, balances); err != nil {
-		return errorsmod.Wrapf(err, "failed to migrate balances from %s to %s", oldAddress, newAddress)
-	}
-	return nil
-}
-
-// migrateReservedProtocolAddressMapping flips the reserved-protocol-address flag from the
-// old address to the new one. The old flag is cleared so future lookups don't accidentally
-// treat a stale module address as reserved.
-func (k Keeper) migrateReservedProtocolAddressMapping(ctx sdk.Context, oldAddress, newAddress string) error {
-	if oldAddress == newAddress {
-		return nil
-	}
-	if err := k.SetReservedProtocolAddressInStore(ctx, oldAddress, false); err != nil {
-		return errorsmod.Wrapf(err, "failed to clear reserved flag on old address %s", oldAddress)
-	}
-	if err := k.SetReservedProtocolAddressInStore(ctx, newAddress, true); err != nil {
-		return errorsmod.Wrapf(err, "failed to set reserved flag on new address %s", newAddress)
-	}
-	return nil
-}
-
-// migrateCollectionAddressesFromBadgesToTokenization updates a single collection's derived
-// addresses in-place (mintEscrowAddress + cosmosCoinBackedPath.address + wrapper path
-// addresses), moving bank balances from each old address to each new one. Mutates the
-// passed-in collection pointer so the caller can persist it.
-func (k Keeper) migrateCollectionAddressesFromBadgesToTokenization(ctx sdk.Context, collection *newtypes.TokenCollection) error {
-	newModuleName := newtypes.ModuleName // "tokenization"
-
-	// 1. mintEscrowAddress
-	oldMint, err := generateMintEscrowAddressWithModuleName(oldAddressModuleName, collection.CollectionId)
-	if err != nil {
-		return errorsmod.Wrapf(err, "mint old derivation for collection %s", collection.CollectionId)
-	}
-	newMint, err := generateMintEscrowAddressWithModuleName(newModuleName, collection.CollectionId)
-	if err != nil {
-		return errorsmod.Wrapf(err, "mint new derivation for collection %s", collection.CollectionId)
-	}
-	oldMintStr, newMintStr := oldMint.String(), newMint.String()
-	if oldMintStr != newMintStr {
-		if err := k.migrateBankBalancesBetweenAddresses(ctx, oldMintStr, newMintStr); err != nil {
-			return errorsmod.Wrapf(err, "mint bank migration for collection %s", collection.CollectionId)
-		}
-		if err := k.migrateReservedProtocolAddressMapping(ctx, oldMintStr, newMintStr); err != nil {
-			return errorsmod.Wrapf(err, "mint reserved-flag migration for collection %s", collection.CollectionId)
-		}
-		collection.MintEscrowAddress = newMintStr
-	}
-
-	// 2. cosmosCoinBackedPath.address (if present)
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
-		backed := collection.Invariants.CosmosCoinBackedPath
-		if backed.Conversion != nil && backed.Conversion.SideA != nil && backed.Conversion.SideA.Denom != "" {
-			denom := backed.Conversion.SideA.Denom
-			oldAddr, err := generatePathAddressWithModuleName(oldAddressModuleName, denom, BackedPathGenerationPrefix)
-			if err != nil {
-				return errorsmod.Wrapf(err, "backed old derivation for denom %s", denom)
-			}
-			newAddr, err := generatePathAddressWithModuleName(newModuleName, denom, BackedPathGenerationPrefix)
-			if err != nil {
-				return errorsmod.Wrapf(err, "backed new derivation for denom %s", denom)
-			}
-			oldStr, newStr := oldAddr.String(), newAddr.String()
-			if oldStr != newStr {
-				if err := k.migrateBankBalancesBetweenAddresses(ctx, oldStr, newStr); err != nil {
-					return errorsmod.Wrapf(err, "backed bank migration for denom %s", denom)
-				}
-				if err := k.migrateReservedProtocolAddressMapping(ctx, oldStr, newStr); err != nil {
-					return errorsmod.Wrapf(err, "backed reserved-flag migration for denom %s", denom)
-				}
-				backed.Address = newStr
-			}
-		}
-	}
-
-	// 3. cosmosCoinWrapperPaths[].address
-	for i := range collection.CosmosCoinWrapperPaths {
-		path := collection.CosmosCoinWrapperPaths[i]
-		if path == nil || path.Denom == "" {
-			continue
-		}
-		oldAddr, err := generatePathAddressWithModuleName(oldAddressModuleName, path.Denom, WrapperPathGenerationPrefix)
-		if err != nil {
-			return errorsmod.Wrapf(err, "wrapper old derivation for denom %s", path.Denom)
-		}
-		newAddr, err := generatePathAddressWithModuleName(newModuleName, path.Denom, WrapperPathGenerationPrefix)
-		if err != nil {
-			return errorsmod.Wrapf(err, "wrapper new derivation for denom %s", path.Denom)
-		}
-		oldStr, newStr := oldAddr.String(), newAddr.String()
-		if oldStr == newStr {
-			continue
-		}
-		if err := k.migrateBankBalancesBetweenAddresses(ctx, oldStr, newStr); err != nil {
-			return errorsmod.Wrapf(err, "wrapper bank migration for denom %s", path.Denom)
-		}
-		if err := k.migrateReservedProtocolAddressMapping(ctx, oldStr, newStr); err != nil {
-			return errorsmod.Wrapf(err, "wrapper reserved-flag migration for denom %s", path.Denom)
-		}
-		path.Address = newStr
-	}
-
-	return nil
-}
 
 // MigrateTokenizationKeeper migrates the tokenization keeper from v28 to v29.
 //
@@ -308,13 +143,6 @@ func MigrateCollections(ctx sdk.Context, store storetypes.KVStore, k Keeper) err
 		if newCollection.DefaultBalances != nil {
 			newCollection.DefaultBalances.IncomingApprovals = MigrateIncomingApprovals(newCollection.DefaultBalances.IncomingApprovals)
 			newCollection.DefaultBalances.OutgoingApprovals = MigrateOutgoingApprovals(newCollection.DefaultBalances.OutgoingApprovals)
-		}
-
-		// Re-derive module addresses with the current "tokenization" module name and move
-		// any bank balances off the legacy "badges"-derived addresses. See the comment on
-		// migrateCollectionAddressesFromBadgesToTokenization for the full history.
-		if err := k.migrateCollectionAddressesFromBadgesToTokenization(ctx, &newCollection); err != nil {
-			return err
 		}
 
 		// Save the updated collection (with migrated fields)

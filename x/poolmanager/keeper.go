@@ -12,7 +12,7 @@ import (
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 

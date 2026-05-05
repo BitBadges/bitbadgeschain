@@ -5,15 +5,15 @@ import (
 	"errors"
 	"fmt"
 
-	"cosmossdk.io/store/prefix"
+	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
 	db "github.com/cosmos/cosmos-db"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 
-	"cosmossdk.io/store"
+	store "github.com/cosmos/cosmos-sdk/store/v2"
 	"github.com/cosmos/gogoproto/proto"
 )
 
