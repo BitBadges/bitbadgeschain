@@ -483,10 +483,14 @@ func (k Keeper) DeductAndGetUserApprovals(
 }
 
 func isCustomChallengeOrderCalculation(predeterminedBalances *types.PredeterminedBalances, trackerType string) bool {
-	return (predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers && trackerType == "overall") ||
-		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers && trackerType == "to") ||
-		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from") ||
-		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy")
+	if predeterminedBalances == nil || predeterminedBalances.OrderCalculationMethod == nil {
+		return false
+	}
+	ocm := predeterminedBalances.OrderCalculationMethod
+	return (ocm.UseOverallNumTransfers && trackerType == "overall") ||
+		(ocm.UsePerToAddressNumTransfers && trackerType == "to") ||
+		(ocm.UsePerFromAddressNumTransfers && trackerType == "from") ||
+		(ocm.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy")
 }
 
 func (k Keeper) ResetApprovalTrackerIfNeeded(ctx sdk.Context, approvalTracker *types.ApprovalTracker, resetTimeIntervals *types.ResetTimeIntervals, isNumTransfers bool) types.ApprovalTracker {
@@ -631,15 +635,15 @@ func (k Keeper) handlePredeterminedBalances(
 
 	// Determine how to calculate the number of increments
 	switch {
-	case orderCalculationMethod.UseMerkleChallengeLeafIndex:
+	case orderCalculationMethod != nil && orderCalculationMethod.UseMerkleChallengeLeafIndex:
 		numIncrements = challengeNumIncrements
-	case orderCalculationMethod.UseOverallNumTransfers && trackerType == "overall":
+	case orderCalculationMethod != nil && orderCalculationMethod.UseOverallNumTransfers && trackerType == "overall":
 		numIncrements = trackerNumTransfers
-	case orderCalculationMethod.UsePerToAddressNumTransfers && trackerType == "to":
+	case orderCalculationMethod != nil && orderCalculationMethod.UsePerToAddressNumTransfers && trackerType == "to":
 		numIncrements = trackerNumTransfers
-	case orderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from":
+	case orderCalculationMethod != nil && orderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from":
 		numIncrements = trackerNumTransfers
-	case orderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy":
+	case orderCalculationMethod != nil && orderCalculationMethod.UsePerInitiatedByAddressNumTransfers && trackerType == "initiatedBy":
 		numIncrements = trackerNumTransfers
 	default:
 		toBeCalculated = false
@@ -1030,7 +1034,8 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 		if approvalCriteria.PredeterminedBalances != nil {
 			var numIncrements sdkmath.Uint
 			hasOrderCalculationMethod := false
-			if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+			ocm := approvalCriteria.PredeterminedBalances.OrderCalculationMethod
+			if ocm != nil && ocm.UseMerkleChallengeLeafIndex {
 				hasOrderCalculationMethod = true
 
 				// If the approval has challenges, we need to check that a valid solutions is provided for every challenge
@@ -1052,15 +1057,15 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 				trackerType := ""
 				approvedAddress := ""
 
-				if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers {
+				if ocm != nil && ocm.UseOverallNumTransfers {
 					trackerType = "overall"
-				} else if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers {
+				} else if ocm != nil && ocm.UsePerFromAddressNumTransfers {
 					trackerType = "from"
 					approvedAddress = transfer.From
-				} else if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers {
+				} else if ocm != nil && ocm.UsePerToAddressNumTransfers {
 					trackerType = "to"
 					approvedAddress = to
-				} else if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UsePerInitiatedByAddressNumTransfers {
+				} else if ocm != nil && ocm.UsePerInitiatedByAddressNumTransfers {
 					trackerType = "initiatedBy"
 					approvedAddress = initiatedBy
 				}
@@ -1069,6 +1074,10 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					hasOrderCalculationMethod = true
 				}
 
+				var maxNumResetIntervals *types.ResetTimeIntervals
+				if approval.ApprovalCriteria.MaxNumTransfers != nil {
+					maxNumResetIntervals = approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals
+				}
 				numTransfersTracker, err := k.GetApprovalTrackerFromStoreAndResetIfNeeded(
 					ctx,
 					collection.CollectionId,
@@ -1078,7 +1087,7 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 					approvalLevel,
 					trackerType,
 					approvedAddress,
-					approval.ApprovalCriteria.MaxNumTransfers.ResetTimeIntervals,
+					maxNumResetIntervals,
 					true,
 				)
 				if err != nil {
