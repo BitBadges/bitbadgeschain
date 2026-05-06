@@ -620,7 +620,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	// Auto-set collection permission to forbid Mint address approvals if cosmosCoinBackedPath is set
-	hasCosmosCoinBackedPath := !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath)
+	hasCosmosCoinBackedPath := collection.Invariants != nil && !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath)
 	if hasCosmosCoinBackedPath {
 		if collection.CollectionPermissions == nil {
 			collection.CollectionPermissions = &types.CollectionPermissions{}
@@ -646,7 +646,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
+	if collection.Invariants != nil && !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		if err := k.setAutoApproveFlagsForPathAddress(ctx, collection, collection.Invariants.CosmosCoinBackedPath.Address, "cosmoscoinbacked"); err != nil {
 			return nil, err
 		}

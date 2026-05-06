@@ -45,7 +45,7 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 	}
 
 	// If cosmosCoinBackedPath is set, collection approvals cannot include the Mint address
-	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
+	if collection.Invariants != nil && !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		for _, approval := range collection.CollectionApprovals {
 			// Check if FromListId includes Mint
 			fromIncludesMint, err := k.CheckAddresses(ctx, approval.FromListId, types.MintAddress)

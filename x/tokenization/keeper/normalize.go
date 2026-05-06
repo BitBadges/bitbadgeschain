@@ -32,8 +32,21 @@ import (
 )
 
 // NormalizeNilPointers recursively walks `v` (must be a pointer) and
-// replaces nil pointer-to-struct fields with fresh zero-value structs.
-// Slices are iterated; each element is recursed.
+// initializes any uninitialized `sdkmath.Uint` / `sdkmath.Int` field
+// with `NewUint(0)` / `NewInt(0)`. The Go zero value of those types
+// holds a nil internal `*big.Int`, so any arithmetic op (.GT, .Cmp,
+// .Uint64, etc.) panics. Proto fields tagged `customtype = "Uint",
+// nullable = false` deserialize to the broken zero value when the
+// wire bytes don't include the field — common after the SDK side
+// strips empty Uint customtype strings before broadcasting.
+//
+// This intentionally DOES NOT fill nil pointer-to-struct fields with
+// fresh empty structs. Earlier versions did, but that broke the
+// nil-vs-empty distinction many code paths rely on (equality checks,
+// "user explicitly set this" semantic checks, change-detection in
+// approval-update tracking, etc.). Callers that need direct field
+// access on potentially-nil pointers must use explicit nil guards or
+// the proto-generated `GetX()` accessors.
 func NormalizeNilPointers(v interface{}) {
 	if v == nil {
 		return
@@ -106,10 +119,9 @@ func walkStructForNormalize(v reflect.Value, depth int) {
 
 		switch field.Kind() {
 		case reflect.Ptr:
-			if field.Type().Elem().Kind() == reflect.Struct {
-				if field.IsNil() {
-					field.Set(reflect.New(field.Type().Elem()))
-				}
+			// Only recurse into ALREADY-non-nil pointers — don't fill
+			// nil pointers (would break nil-vs-empty equality semantics).
+			if !field.IsNil() && field.Type().Elem().Kind() == reflect.Struct {
 				walkStructForNormalize(field.Elem(), depth+1)
 			}
 		case reflect.Struct:
@@ -119,10 +131,7 @@ func walkStructForNormalize(v reflect.Value, depth int) {
 				elem := field.Index(j)
 				switch elem.Kind() {
 				case reflect.Ptr:
-					if elem.Type().Elem().Kind() == reflect.Struct {
-						if elem.IsNil() {
-							elem.Set(reflect.New(elem.Type().Elem()))
-						}
+					if !elem.IsNil() && elem.Type().Elem().Kind() == reflect.Struct {
 						walkStructForNormalize(elem.Elem(), depth+1)
 					}
 				case reflect.Struct:
