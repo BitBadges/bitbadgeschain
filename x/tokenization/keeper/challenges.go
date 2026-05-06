@@ -39,7 +39,11 @@ func (k Keeper) HandleMerkleChallenges(
 	merkleProofs := transfer.MerkleProofs
 
 	// Sanity check to make sure the challenge tracker id is valid
-	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+	if approval.ApprovalCriteria != nil &&
+		approval.ApprovalCriteria.PredeterminedBalances != nil &&
+		approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil &&
+		approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" &&
+		approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 		hasMatchingChallenge := false
 		for _, challenge := range challenges {
 			if challenge.ChallengeTrackerId == approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId {
