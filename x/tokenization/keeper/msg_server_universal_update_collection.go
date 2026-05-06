@@ -323,7 +323,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	// not previouslyArchived && not stillArchived - unarchived before and now so we allow
 	previouslyArchived := types.GetIsArchived(ctx, collection)
 	if msg.UpdateIsArchived {
-		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchived, msg.IsArchived, collection.CollectionPermissions.CanArchiveCollection); err != nil {
+		if err := k.ValidateIsArchivedUpdate(ctx, collection.IsArchived, msg.IsArchived, collection.GetCollectionPermissions().GetCanArchiveCollection()); err != nil {
 			return nil, err
 		}
 		collection.IsArchived = msg.IsArchived
@@ -353,7 +353,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			// It will be validated separately in validateCollectionBeforeStore
 		}
 
-		if err := k.ValidateCollectionApprovalsUpdate(ctx, &tempCollection, collection.CollectionApprovals, msg.CollectionApprovals, collection.CollectionPermissions.CanUpdateCollectionApprovals); err != nil {
+		if err := k.ValidateCollectionApprovalsUpdate(ctx, &tempCollection, collection.CollectionApprovals, msg.CollectionApprovals, collection.GetCollectionPermissions().GetCanUpdateCollectionApprovals()); err != nil {
 			return nil, err
 		}
 
@@ -402,35 +402,35 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if msg.UpdateCollectionMetadata {
-		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadata, msg.CollectionMetadata, collection.CollectionPermissions.CanUpdateCollectionMetadata); err != nil {
+		if err := k.ValidateCollectionMetadataUpdate(ctx, collection.CollectionMetadata, msg.CollectionMetadata, collection.GetCollectionPermissions().GetCanUpdateCollectionMetadata()); err != nil {
 			return nil, err
 		}
 		collection.CollectionMetadata = msg.CollectionMetadata
 	}
 
 	if msg.UpdateTokenMetadata {
-		if err := k.ValidateTokenMetadataUpdate(ctx, collection.TokenMetadata, msg.TokenMetadata, collection.CollectionPermissions.CanUpdateTokenMetadata); err != nil {
+		if err := k.ValidateTokenMetadataUpdate(ctx, collection.TokenMetadata, msg.TokenMetadata, collection.GetCollectionPermissions().GetCanUpdateTokenMetadata()); err != nil {
 			return nil, err
 		}
 		collection.TokenMetadata = msg.TokenMetadata
 	}
 
 	if msg.UpdateManager {
-		if err := k.ValidateManagerUpdate(ctx, collection.Manager, msg.Manager, collection.CollectionPermissions.CanUpdateManager); err != nil {
+		if err := k.ValidateManagerUpdate(ctx, collection.Manager, msg.Manager, collection.GetCollectionPermissions().GetCanUpdateManager()); err != nil {
 			return nil, err
 		}
 		collection.Manager = msg.Manager
 	}
 
 	if msg.UpdateStandards {
-		if err := k.ValidateStandardsUpdate(ctx, collection.Standards, msg.Standards, collection.CollectionPermissions.CanUpdateStandards); err != nil {
+		if err := k.ValidateStandardsUpdate(ctx, collection.Standards, msg.Standards, collection.GetCollectionPermissions().GetCanUpdateStandards()); err != nil {
 			return nil, err
 		}
 		collection.Standards = msg.Standards
 	}
 
 	if msg.UpdateCustomData {
-		if err := k.ValidateCustomDataUpdate(ctx, collection.CustomData, msg.CustomData, collection.CollectionPermissions.CanUpdateCustomData); err != nil {
+		if err := k.ValidateCustomDataUpdate(ctx, collection.CustomData, msg.CustomData, collection.GetCollectionPermissions().GetCanUpdateCustomData()); err != nil {
 			return nil, err
 		}
 		collection.CustomData = msg.CustomData
@@ -462,7 +462,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if len(msg.CosmosCoinWrapperPathsToAdd) > 0 {
-		if err := k.ValidateCosmosCoinWrapperPathsAdd(ctx, collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths); err != nil {
+		if err := k.ValidateCosmosCoinWrapperPathsAdd(ctx, collection.GetCollectionPermissions().GetCanAddMoreCosmosCoinWrapperPaths()); err != nil {
 			return nil, err
 		}
 		pathsToAdd := make([]*types.CosmosCoinWrapperPath, len(msg.CosmosCoinWrapperPathsToAdd))
@@ -501,7 +501,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	if len(msg.AliasPathsToAdd) > 0 {
-		if err := k.ValidateAliasPathsAdd(ctx, collection.CollectionPermissions.CanAddMoreAliasPaths); err != nil {
+		if err := k.ValidateAliasPathsAdd(ctx, collection.GetCollectionPermissions().GetCanAddMoreAliasPaths()); err != nil {
 			return nil, err
 		}
 		pathsToAdd := make([]*types.AliasPath, len(msg.AliasPathsToAdd))

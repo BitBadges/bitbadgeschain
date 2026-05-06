@@ -25,7 +25,7 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 	}
 
 	// Check deleted permission is valid for current time
-	err = k.CheckIfActionPermissionPermits(ctx, collection.CollectionPermissions.CanDeleteCollection, "can delete collection")
+	err = k.CheckIfActionPermissionPermits(ctx, collection.GetCollectionPermissions().GetCanDeleteCollection(), "can delete collection")
 	if err != nil {
 		return nil, err
 	}

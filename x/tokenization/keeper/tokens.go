@@ -41,7 +41,7 @@ func (k Keeper) CreateTokens(ctx sdk.Context, collection *types.TokenCollection,
 			})
 		}
 
-		err = k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, collection.CollectionPermissions.CanUpdateValidTokenIds, "can create more tokens")
+		err = k.CheckIfTokenIdsActionPermissionPermits(ctx, detailsToCheck, collection.GetCollectionPermissions().GetCanUpdateValidTokenIds(), "can create more tokens")
 		if err != nil {
 			return &types.TokenCollection{}, err
 		}

@@ -31,16 +31,16 @@ func (k msgServer) SetStandards(goCtx context.Context, msg *types.MsgSetStandard
 		CollectionPermissions: &types.CollectionPermissions{
 			CanUpdateStandards: msg.CanUpdateStandards,
 			// Copy existing permissions for other fields
-			CanDeleteCollection:              collection.CollectionPermissions.CanDeleteCollection,
-			CanArchiveCollection:             collection.CollectionPermissions.CanArchiveCollection,
-			CanUpdateCustomData:              collection.CollectionPermissions.CanUpdateCustomData,
-			CanUpdateManager:                 collection.CollectionPermissions.CanUpdateManager,
-			CanUpdateValidTokenIds:           collection.CollectionPermissions.CanUpdateValidTokenIds,
-			CanUpdateCollectionMetadata:      collection.CollectionPermissions.CanUpdateCollectionMetadata,
-			CanUpdateTokenMetadata:           collection.CollectionPermissions.CanUpdateTokenMetadata,
-			CanUpdateCollectionApprovals:     collection.CollectionPermissions.CanUpdateCollectionApprovals,
-			CanAddMoreAliasPaths:             collection.CollectionPermissions.CanAddMoreAliasPaths,
-			CanAddMoreCosmosCoinWrapperPaths: collection.CollectionPermissions.CanAddMoreCosmosCoinWrapperPaths,
+			CanDeleteCollection:              collection.GetCollectionPermissions().GetCanDeleteCollection(),
+			CanArchiveCollection:             collection.GetCollectionPermissions().GetCanArchiveCollection(),
+			CanUpdateCustomData:              collection.GetCollectionPermissions().GetCanUpdateCustomData(),
+			CanUpdateManager:                 collection.GetCollectionPermissions().GetCanUpdateManager(),
+			CanUpdateValidTokenIds:           collection.GetCollectionPermissions().GetCanUpdateValidTokenIds(),
+			CanUpdateCollectionMetadata:      collection.GetCollectionPermissions().GetCanUpdateCollectionMetadata(),
+			CanUpdateTokenMetadata:           collection.GetCollectionPermissions().GetCanUpdateTokenMetadata(),
+			CanUpdateCollectionApprovals:     collection.GetCollectionPermissions().GetCanUpdateCollectionApprovals(),
+			CanAddMoreAliasPaths:             collection.GetCollectionPermissions().GetCanAddMoreAliasPaths(),
+			CanAddMoreCosmosCoinWrapperPaths: collection.GetCollectionPermissions().GetCanAddMoreCosmosCoinWrapperPaths(),
 		},
 	}
 
