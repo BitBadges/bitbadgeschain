@@ -10,6 +10,7 @@ import (
 	solana "github.com/bitbadges/bitbadgeschain/chain-handlers/solana/utils"
 
 	// EVM module types - required for JSON-RPC tx decoding
+	evmcryptocodec "github.com/cosmos/evm/crypto/codec"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
@@ -34,6 +35,13 @@ func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 	ethereum.RegisterInterfaces(interfaceRegistry)
 	solana.RegisterInterfaces(interfaceRegistry)
 	bitcoin.RegisterInterfaces(interfaceRegistry)
+
+	// cosmos/evm crypto types — registers `cosmos.evm.crypto.v1.ethsecp256k1.PubKey`
+	// on the InterfaceRegistry so the chain can decode EIP-712-signed txs whose
+	// SignerInfo wraps the pubkey under that canonical type URL. The legacy
+	// `ethereum.PubKey` registration above is kept only for already-existing
+	// accounts; new EVM signing flows route through this path.
+	evmcryptocodec.RegisterInterfaces(interfaceRegistry)
 
 	// EVM module types - required for JSON-RPC tx decoding (MsgEthereumTx, etc.)
 	evmtypes.RegisterInterfaces(interfaceRegistry)
