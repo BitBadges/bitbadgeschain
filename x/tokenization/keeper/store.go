@@ -96,6 +96,12 @@ func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uin
 		return &collection, false
 	}
 	k.cdc.MustUnmarshal(marshaled_collection, &collection)
+	// Fill nil pointer-to-struct fields with fresh zero-value instances.
+	// See normalize.go for the rationale — short version: nullable=true
+	// proto fields can deserialize to nil pointers, but ~170 keeper
+	// access sites assume non-nil. Normalizing on load preserves the
+	// pre-nullable=true zero-value semantics without touching every site.
+	NormalizeNilPointers(&collection)
 	return &collection, true
 }
 
@@ -112,6 +118,7 @@ func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.T
 	for ; iterator.Valid(); iterator.Next() {
 		var collection types.TokenCollection
 		k.cdc.MustUnmarshal(iterator.Value(), &collection)
+		NormalizeNilPointers(&collection)
 		collections = append(collections, &collection)
 	}
 	return
@@ -241,6 +248,7 @@ func (k Keeper) GetUserBalanceFromStore(ctx sdk.Context, balanceKey string) (*ty
 		return &UserBalance, false
 	}
 	k.cdc.MustUnmarshal(marshaled_token_balance_info, &UserBalance)
+	NormalizeNilPointers(&UserBalance)
 	return &UserBalance, true
 }
 
@@ -258,6 +266,7 @@ func (k Keeper) GetUserBalancesFromStore(ctx sdk.Context) (balances []*types.Use
 	for ; iterator.Valid(); iterator.Next() {
 		var UserBalance types.UserBalanceStore
 		k.cdc.MustUnmarshal(iterator.Value(), &UserBalance)
+		NormalizeNilPointers(&UserBalance)
 
 		balanceKeyDetails, err := GetDetailsFromBalanceKey(string(iterator.Key()[1:]))
 		if err != nil {
