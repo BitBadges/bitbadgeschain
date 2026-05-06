@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"bytes"
-
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	"github.com/gogo/protobuf/proto"
 )
@@ -20,24 +18,15 @@ func compareUintRanges(a, b []*types.UintRange) bool {
 	return true
 }
 
-// compareApprovalCriteria compares two protobuf messages for equality using
-// canonical binary marshaling. proto.MarshalTextString is not deterministic
-// across gogo/protobuf versions (whitespace, field ordering), so binary Marshal
-// is used instead — it is the same encoding used for consensus state and is
-// stable across nodes.
+// compareApprovalCriteria compares two ApprovalCriteria values for
+// semantic equality under the nullable=true schema. Old storage bytes
+// (written under the pre-upgrade nullable=false binary) carry explicit
+// `&Empty{}` sub-messages with length-0 tags; new submissions via the
+// SDK omit those tags. types.ProtoEqualNullableAware collapses both
+// to a canonical form before comparing, so a no-op resubmission of an
+// existing approval doesn't falsely register as "edited."
 func compareApprovalCriteria(a, b proto.Message) bool {
-	if (a == nil) != (b == nil) {
-		return false
-	}
-	if a == nil && b == nil {
-		return true
-	}
-	aBytes, errA := proto.Marshal(a)
-	bBytes, errB := proto.Marshal(b)
-	if errA != nil || errB != nil {
-		return false
-	}
-	return bytes.Equal(aBytes, bBytes)
+	return types.ProtoEqualNullableAware(a, b)
 }
 
 // collectionApprovalEqual compares two CollectionApproval objects for equality,

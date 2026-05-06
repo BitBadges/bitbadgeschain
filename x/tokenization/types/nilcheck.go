@@ -24,9 +24,103 @@
 package types
 
 import (
+	"bytes"
 	"reflect"
 	"strings"
+
+	"github.com/gogo/protobuf/proto"
 )
+
+// ProtoEqualNullableAware reports whether two proto messages are
+// semantically equal under the nullable=true schema, treating any
+// IsBasicallyEmpty sub-message as equivalent to a nil pointer.
+//
+// Plain proto.Marshal byte-comparison is incorrect post-upgrade
+// because storage written under the old (nullable=false) binary has
+// explicit `&Empty{}` sub-messages serialized with a length-0 tag,
+// while a fresh submission via the new SDK omits the tag entirely.
+// Same semantic content, different bytes — naive byte.Equal returns
+// false. This helper deep-clones both sides, recursively replaces
+// IsBasicallyEmpty pointer-to-struct fields with nil, then marshals.
+// Nil and empty collapse to the same canonical form.
+//
+// Use at change-detection sites (approval edits, CanUpdate permission
+// gates) — anywhere "did the user change this" matters.
+func ProtoEqualNullableAware(a, b proto.Message) bool {
+	if (a == nil) != (b == nil) {
+		return false
+	}
+	if a == nil {
+		return true
+	}
+	aBytes, errA := canonicalProtoBytes(a)
+	bBytes, errB := canonicalProtoBytes(b)
+	if errA != nil || errB != nil {
+		return false
+	}
+	return bytes.Equal(aBytes, bBytes)
+}
+
+func canonicalProtoBytes(m proto.Message) ([]byte, error) {
+	cloned := proto.Clone(m)
+	if cloned != nil {
+		canonicalizeProtoMessage(cloned)
+	}
+	return proto.Marshal(cloned)
+}
+
+// canonicalizeProtoMessage walks a proto message and replaces any
+// IsBasicallyEmpty pointer-to-struct field with nil. Mutates in place.
+// Caller is responsible for cloning if the input must be preserved.
+func canonicalizeProtoMessage(m proto.Message) {
+	if m == nil {
+		return
+	}
+	rv := reflect.ValueOf(m)
+	if rv.Kind() != reflect.Ptr || rv.IsNil() {
+		return
+	}
+	canonicalizeStructValue(rv.Elem(), 0)
+}
+
+func canonicalizeStructValue(rv reflect.Value, depth int) {
+	if depth > 50 || rv.Kind() != reflect.Struct {
+		return
+	}
+	t := rv.Type()
+	for i := 0; i < rv.NumField(); i++ {
+		f := rv.Field(i)
+		if !f.CanSet() || strings.HasPrefix(t.Field(i).Name, "XXX_") {
+			continue
+		}
+		switch f.Kind() {
+		case reflect.Ptr:
+			if f.IsNil() {
+				continue
+			}
+			if f.Type().Elem().Kind() != reflect.Struct {
+				continue
+			}
+			// Recurse first (children may turn this struct into all-zero)
+			canonicalizeStructValue(f.Elem(), depth+1)
+			// Then collapse if now basically empty
+			if isStructAllZero(f.Elem(), depth+1) {
+				f.Set(reflect.Zero(f.Type()))
+			}
+		case reflect.Struct:
+			canonicalizeStructValue(f, depth+1)
+		case reflect.Slice:
+			for j := 0; j < f.Len(); j++ {
+				e := f.Index(j)
+				if e.Kind() == reflect.Ptr && !e.IsNil() && e.Type().Elem().Kind() == reflect.Struct {
+					canonicalizeStructValue(e.Elem(), depth+1)
+				} else if e.Kind() == reflect.Struct {
+					canonicalizeStructValue(e, depth+1)
+				}
+			}
+		}
+	}
+}
 
 // IsBasicallyEmpty reports whether `m` is conceptually unset.
 //

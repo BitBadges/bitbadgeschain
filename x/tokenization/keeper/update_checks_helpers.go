@@ -5,7 +5,6 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	proto "github.com/gogo/protobuf/proto"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
@@ -243,8 +242,11 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 					for i := 0; i < len(oldVal); i++ {
 						oldApprovalCriteria := oldVal[i].ApprovalCriteria
 						newApprovalCriteria := newVal[i].ApprovalCriteria
-						// Check approval criteria changes using stringification
-						if proto.MarshalTextString(oldApprovalCriteria) != proto.MarshalTextString(newApprovalCriteria) {
+						// Use nullable-aware equality so a no-op resubmission via the
+						// new SDK (which strips empty sub-messages) doesn't falsely
+						// register as "different" against pre-upgrade stored bytes that
+						// still have explicit `&Empty{}` sub-messages.
+						if !types.ProtoEqualNullableAware(oldApprovalCriteria, newApprovalCriteria) {
 							different = true
 						}
 						// Check URI changes
