@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
+	eip712 "github.com/cosmos/evm/ethereum/eip712"
 	precompiletypes "github.com/cosmos/evm/precompiles/types"
 	erc20 "github.com/cosmos/evm/x/erc20"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
@@ -83,6 +84,12 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	if err != nil {
 		return err
 	}
+
+	// The cosmos/evm EIP-712 verifier decodes sign docs through package-level
+	// codec singletons. Without this call ethsecp256k1.PubKey.VerifySignature
+	// cannot verify a Cosmos tx signed via EIP-712 and rejects it as
+	// unauthorized.
+	eip712.SetEncodingConfig(app.legacyAmino, app.interfaceRegistry, evmChainIDUint64)
 
 	// The EVM keeper needs every non-transient store so precompiles can reach
 	// the state they need (account, bank, tokenization, ...). v0.7 takes a
