@@ -41,7 +41,7 @@ message QueryGetManagerSplitterRequest {
 
 // QueryGetManagerSplitterResponse is response type for the Query/ManagerSplitter RPC method.
 message QueryGetManagerSplitterResponse {
-  ManagerSplitter managerSplitter = 1;
+  ManagerSplitter managerSplitter = 1 [(gogoproto.nullable) = true];
 }
 
 // QueryAllManagerSplittersRequest is request type for the Query/AllManagerSplitters RPC method.

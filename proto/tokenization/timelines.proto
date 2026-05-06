@@ -13,7 +13,7 @@ option go_package = "github.com/bitbadges/bitbadgeschain/x/tokenization/types";
 // CollectionMetadataTimeline defines the metadata for a collection at different timeline times.
 message CollectionMetadataTimeline {
   // The collection metadata for a specific timeline element.
-  CollectionMetadata collectionMetadata = 1;
+  CollectionMetadata collectionMetadata = 1 [(gogoproto.nullable) = true];
 
   // The timeline times when the collection metadata is valid. Can not overlap with other timeline elements in same array.
   repeated UintRange timelineTimes = 2;

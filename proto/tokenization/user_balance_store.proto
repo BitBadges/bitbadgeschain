@@ -51,6 +51,6 @@ message UserBalanceStore {
   bool autoApproveAllIncomingTransfers = 6;
 
   // The permissions for this user's actions and transfers.
-  UserPermissions userPermissions = 7;
+  UserPermissions userPermissions = 7 [(gogoproto.nullable) = true];
 }
 

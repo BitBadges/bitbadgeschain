@@ -54,7 +54,7 @@ message ManagerSplitter {
   string admin = 2;
 
   // Permissions mapping each CollectionPermission field to execution criteria.
-  ManagerSplitterPermissions permissions = 3;
+  ManagerSplitterPermissions permissions = 3 [(gogoproto.nullable) = true];
 }
 
 // MsgCreateManagerSplitter creates a new manager splitter entity.
@@ -66,7 +66,7 @@ message MsgCreateManagerSplitter {
   string admin = 1;
 
   // Permissions mapping each CollectionPermission field to execution criteria.
-  ManagerSplitterPermissions permissions = 2;
+  ManagerSplitterPermissions permissions = 2 [(gogoproto.nullable) = true];
 }
 
 // MsgCreateManagerSplitterResponse is the response to MsgCreateManagerSplitter.
@@ -87,7 +87,7 @@ message MsgUpdateManagerSplitter {
   string address = 2;
 
   // New permissions to set.
-  ManagerSplitterPermissions permissions = 3;
+  ManagerSplitterPermissions permissions = 3 [(gogoproto.nullable) = true];
 }
 
 // MsgUpdateManagerSplitterResponse is the response to MsgUpdateManagerSplitter.
@@ -132,9 +132,9 @@ message MsgExecuteUniversalUpdateCollectionResponse {
 
 // Used for WASM bindings and JSON parsing
 message ManagersplitterCustomMsgType {
-  MsgCreateManagerSplitter createManagerSplitterMsg = 1;
-  MsgUpdateManagerSplitter updateManagerSplitterMsg = 2;
-  MsgDeleteManagerSplitter deleteManagerSplitterMsg = 3;
-  MsgExecuteUniversalUpdateCollection executeUniversalUpdateCollectionMsg = 4;
+  MsgCreateManagerSplitter createManagerSplitterMsg = 1 [(gogoproto.nullable) = true];
+  MsgUpdateManagerSplitter updateManagerSplitterMsg = 2 [(gogoproto.nullable) = true];
+  MsgDeleteManagerSplitter deleteManagerSplitterMsg = 3 [(gogoproto.nullable) = true];
+  MsgExecuteUniversalUpdateCollection executeUniversalUpdateCollectionMsg = 4 [(gogoproto.nullable) = true];
 }
 

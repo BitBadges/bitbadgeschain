@@ -18,7 +18,7 @@ message Transfer {
   repeated Balance balances = 3;
   // If defined, we will use the predeterminedBalances from the specified approval to calculate the balances at execution time.
   // We will override the balances field with the precalculated balances. Only applicable for approvals with predeterminedBalances set.
-  PrecalculateBalancesFromApprovalDetails precalculateBalancesFromApproval = 4;
+  PrecalculateBalancesFromApprovalDetails precalculateBalancesFromApproval = 4 [(gogoproto.nullable) = true];
   // The Merkle proofs / solutions for all Merkle challenges required for the transfer.
   repeated MerkleProof merkleProofs = 5;
   // The ETH signature proofs / solutions for all ETH signature challenges required for the transfer.
@@ -53,5 +53,5 @@ message PrecalculateBalancesFromApprovalDetails {
   // The version of the approval.
   string version = 4 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   // The options for precalculating the balances.
-  PrecalculationOptions precalculationOptions = 5;
+  PrecalculationOptions precalculationOptions = 5 [(gogoproto.nullable) = true];
 }

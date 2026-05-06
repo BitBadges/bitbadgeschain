@@ -17,13 +17,13 @@ message ApprovalCriteria {
   repeated MerkleChallenge merkleChallenges = 1;
   // Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
   // that can be transferred when using this approval.
-  PredeterminedBalances predeterminedBalances = 2;
+  PredeterminedBalances predeterminedBalances = 2 [(gogoproto.nullable) = true];
   // Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
   // transferred and enforces maximum limits per approval.
-  ApprovalAmounts approvalAmounts = 3;
+  ApprovalAmounts approvalAmounts = 3 [(gogoproto.nullable) = true];
   // Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
   // and enforces the limit to prevent exceeding the allowed number of uses.
-  MaxNumTransfers maxNumTransfers = 4;
+  MaxNumTransfers maxNumTransfers = 4 [(gogoproto.nullable) = true];
   // The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
   // royalties) that must be executed alongside the token transfer for the approval to be valid.
   repeated CoinTransfer coinTransfers = 5;
@@ -52,7 +52,7 @@ message ApprovalCriteria {
 
   // Auto-deletion options for this approval. Defines conditions under which this approval should be
   // automatically deleted (e.g., after a certain number of uses or time period).
-  AutoDeletionOptions autoDeletionOptions = 12;
+  AutoDeletionOptions autoDeletionOptions = 12 [(gogoproto.nullable) = true];
 
   // DEPRECATED: User royalties moved to UserApprovalSettings.userRoyalties (field 26).
   // Field number 13 is reserved for backwards compatibility.
@@ -69,16 +69,16 @@ message ApprovalCriteria {
   repeated ETHSignatureChallenge ethSignatureChallenges = 16;
   // Address checks for the sender of the transfer. Validates that the sender address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
-  AddressChecks senderChecks = 17;
+  AddressChecks senderChecks = 17 [(gogoproto.nullable) = true];
   // Address checks for the recipient of the transfer. Validates that the recipient address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
-  AddressChecks recipientChecks = 18;
+  AddressChecks recipientChecks = 18 [(gogoproto.nullable) = true];
   // Address checks for the initiator of the transfer. Validates that the initiator address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
-  AddressChecks initiatorChecks = 19;
+  AddressChecks initiatorChecks = 19 [(gogoproto.nullable) = true];
   // Alternative time-based checks for approval denial (offline hours/days). Defines time periods
   // during which this approval should be denied, such as specific hours of the day or days of the week.
-  AltTimeChecks altTimeChecks = 20;
+  AltTimeChecks altTimeChecks = 20 [(gogoproto.nullable) = true];
   // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
   // This allows fine-grained control over which approvals are applied when multiple approvals could match.
   bool mustPrioritize = 21;
@@ -99,7 +99,7 @@ message ApprovalCriteria {
   // Issuer-imposed constraints on user-level coin transfers. Propagated to user-level approvals
   // during greedy transfer matching (same pattern as userRoyalties). Only applicable on collection-level approvals.
   // If conflicting settings across multiple matched approvals, the transfer is rejected (like royalties).
-  UserApprovalSettings userApprovalSettings = 26;
+  UserApprovalSettings userApprovalSettings = 26 [(gogoproto.nullable) = true];
 }
 
 // OutgoingApprovalCriteria defines the criteria for approving outgoing transfers.
@@ -111,13 +111,13 @@ message OutgoingApprovalCriteria {
   repeated MerkleChallenge merkleChallenges = 1;
   // Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
   // that can be transferred when using this approval.
-  PredeterminedBalances predeterminedBalances = 2;
+  PredeterminedBalances predeterminedBalances = 2 [(gogoproto.nullable) = true];
   // Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
   // transferred and enforces maximum limits per approval.
-  ApprovalAmounts approvalAmounts = 3;
+  ApprovalAmounts approvalAmounts = 3 [(gogoproto.nullable) = true];
   // Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
   // and enforces the limit to prevent exceeding the allowed number of uses.
-  MaxNumTransfers maxNumTransfers = 4;
+  MaxNumTransfers maxNumTransfers = 4 [(gogoproto.nullable) = true];
   // The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
   // royalties) that must be executed alongside the token transfer for the approval to be valid.
   repeated CoinTransfer coinTransfers = 5;
@@ -131,7 +131,7 @@ message OutgoingApprovalCriteria {
 
   // Auto-deletion options for this approval. Defines conditions under which this approval should be
   // automatically deleted (e.g., after a certain number of uses or time period).
-  AutoDeletionOptions autoDeletionOptions = 8;
+  AutoDeletionOptions autoDeletionOptions = 8 [(gogoproto.nullable) = true];
 
   // Must own tokens for approval. Defines token ownership requirements that must be satisfied for
   // the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
@@ -145,13 +145,13 @@ message OutgoingApprovalCriteria {
   // Address checks for the recipient of the transfer. Validates that the recipient address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
   // Note: No sender checks are included for outgoing approvals since the sender is the user themselves.
-  AddressChecks recipientChecks = 12;
+  AddressChecks recipientChecks = 12 [(gogoproto.nullable) = true];
   // Address checks for the initiator of the transfer. Validates that the initiator address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
-  AddressChecks initiatorChecks = 13;
+  AddressChecks initiatorChecks = 13 [(gogoproto.nullable) = true];
   // Alternative time-based checks for approval denial (offline hours/days). Defines time periods
   // during which this approval should be denied, such as specific hours of the day or days of the week.
-  AltTimeChecks altTimeChecks = 14;
+  AltTimeChecks altTimeChecks = 14 [(gogoproto.nullable) = true];
   // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
   // This allows fine-grained control over which approvals are applied when multiple approvals could match.
   bool mustPrioritize = 15;
@@ -172,13 +172,13 @@ message IncomingApprovalCriteria {
   repeated MerkleChallenge merkleChallenges = 1;
   // Predetermined balances that must be used for each approval. Defines the exact token amounts and IDs
   // that can be transferred when using this approval.
-  PredeterminedBalances predeterminedBalances = 2;
+  PredeterminedBalances predeterminedBalances = 2 [(gogoproto.nullable) = true];
   // Threshold limit of amounts that can be transferred using this approval. Tracks cumulative amounts
   // transferred and enforces maximum limits per approval.
-  ApprovalAmounts approvalAmounts = 3;
+  ApprovalAmounts approvalAmounts = 3 [(gogoproto.nullable) = true];
   // Maximum number of transfers that can be processed using this approval. Tracks the count of transfers
   // and enforces the limit to prevent exceeding the allowed number of uses.
-  MaxNumTransfers maxNumTransfers = 4;
+  MaxNumTransfers maxNumTransfers = 4 [(gogoproto.nullable) = true];
   // The sdk.Coins that need to be transferred for approval. Defines required coin transfers (e.g., fees,
   // royalties) that must be executed alongside the token transfer for the approval to be valid.
   repeated CoinTransfer coinTransfers = 5;
@@ -192,7 +192,7 @@ message IncomingApprovalCriteria {
 
   // Auto-deletion options for this approval. Defines conditions under which this approval should be
   // automatically deleted (e.g., after a certain number of uses or time period).
-  AutoDeletionOptions autoDeletionOptions = 8;
+  AutoDeletionOptions autoDeletionOptions = 8 [(gogoproto.nullable) = true];
 
   // Must own tokens for approval. Defines token ownership requirements that must be satisfied for
   // the approval to be valid. The initiator must own the specified tokens at the specified ownership times.
@@ -206,13 +206,13 @@ message IncomingApprovalCriteria {
   // Address checks for the sender of the transfer. Validates that the sender address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
   // Note: No recipient checks are included for incoming approvals since the recipient is the user themselves.
-  AddressChecks senderChecks = 12;
+  AddressChecks senderChecks = 12 [(gogoproto.nullable) = true];
   // Address checks for the initiator of the transfer. Validates that the initiator address meets the
   // specified criteria (e.g., whitelist, blacklist, protocol address requirements).
-  AddressChecks initiatorChecks = 13;
+  AddressChecks initiatorChecks = 13 [(gogoproto.nullable) = true];
   // Alternative time-based checks for approval denial (offline hours/days). Defines time periods
   // during which this approval should be denied, such as specific hours of the day or days of the week.
-  AltTimeChecks altTimeChecks = 14;
+  AltTimeChecks altTimeChecks = 14 [(gogoproto.nullable) = true];
   // If true, this approval must be explicitly prioritized in PrioritizedApprovals to be used.
   // This allows fine-grained control over which approvals are applied when multiple approvals could match.
   bool mustPrioritize = 15;

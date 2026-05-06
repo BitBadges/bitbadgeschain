@@ -38,9 +38,7 @@ func RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
 
 	// cosmos/evm crypto types — registers `cosmos.evm.crypto.v1.ethsecp256k1.PubKey`
 	// on the InterfaceRegistry so the chain can decode EIP-712-signed txs whose
-	// SignerInfo wraps the pubkey under that canonical type URL. The legacy
-	// `ethereum.PubKey` registration above is kept only for already-existing
-	// accounts; new EVM signing flows route through this path.
+	// SignerInfo wraps the pubkey under that canonical type URL.
 	evmcryptocodec.RegisterInterfaces(interfaceRegistry)
 
 	// EVM module types - required for JSON-RPC tx decoding (MsgEthereumTx, etc.)

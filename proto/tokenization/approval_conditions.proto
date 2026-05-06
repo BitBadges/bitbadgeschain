@@ -37,7 +37,7 @@ message MustOwnTokens {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   // The range of amounts the user must own (min to max).
-  UintRange amountRange = 2;
+  UintRange amountRange = 2 [(gogoproto.nullable) = true];
 
   // The time ranges during which the user must own the tokens.
   repeated UintRange ownershipTimes = 3;
@@ -116,7 +116,7 @@ message UserApprovalSettings {
   // If true, user-level approvals cannot trigger coinTransfers at all for transfers matched by this collection approval.
   bool disableUserCoinTransfers = 2;
   // User-level royalties to enforce for transfers matched by this collection approval.
-  UserRoyalties userRoyalties = 3;
+  UserRoyalties userRoyalties = 3 [(gogoproto.nullable) = true];
 }
 
 // UserRoyalties defines the royalties for a user.

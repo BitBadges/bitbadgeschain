@@ -43,7 +43,7 @@ message ApprovalAmounts {
   // We use this ID to track the number of transfers and amounts transferred.
   string amountTrackerId = 6;
   // Time intervals to reset the trackers at.
-  ResetTimeIntervals resetTimeIntervals = 7;
+  ResetTimeIntervals resetTimeIntervals = 7 [(gogoproto.nullable) = true];
 }
 
 // MaxNumTransfers defines the maximum number of transfers per unique "from," "to," and/or "initiated by" address.
@@ -63,7 +63,7 @@ message MaxNumTransfers {
   // We use this ID to track the number of transfers and amounts transferred.
   string amountTrackerId = 6;
   // Time intervals to reset the trackers at.
-  ResetTimeIntervals resetTimeIntervals = 7;
+  ResetTimeIntervals resetTimeIntervals = 7 [(gogoproto.nullable) = true];
 }
 
 // ApprovalTracker defines the tracker for approvals. This tracks the cumulative number of transfers and associated balances transferred.

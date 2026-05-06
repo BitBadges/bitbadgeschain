@@ -117,7 +117,7 @@ message QueryGetCollectionRequest {
 }
 
 message QueryGetCollectionResponse {
-  TokenCollection collection = 1;
+  TokenCollection collection = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetBalanceRequest {
@@ -126,7 +126,7 @@ message QueryGetBalanceRequest {
 }
 
 message QueryGetBalanceResponse {
-  UserBalanceStore balance = 1;
+  UserBalanceStore balance = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetAddressListRequest {
@@ -134,7 +134,7 @@ message QueryGetAddressListRequest {
 }
 
 message QueryGetAddressListResponse {
-  AddressList list = 1;
+  AddressList list = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetApprovalTrackerRequest {
@@ -148,7 +148,7 @@ message QueryGetApprovalTrackerRequest {
 }
 
 message QueryGetApprovalTrackerResponse {
-  ApprovalTracker tracker = 1;
+  ApprovalTracker tracker = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetChallengeTrackerRequest {
@@ -169,7 +169,7 @@ message QueryGetDynamicStoreRequest {
 }
 
 message QueryGetDynamicStoreResponse {
-  DynamicStore store = 1;
+  DynamicStore store = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetDynamicStoreValueRequest {
@@ -178,7 +178,7 @@ message QueryGetDynamicStoreValueRequest {
 }
 
 message QueryGetDynamicStoreValueResponse {
-  DynamicStoreValue value = 1;
+  DynamicStoreValue value = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetETHSignatureTrackerRequest {
@@ -227,7 +227,7 @@ message QueryGetVoteRequest {
 }
 
 message QueryGetVoteResponse {
-  VoteProof vote = 1;
+  VoteProof vote = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetVotesRequest {
@@ -247,7 +247,7 @@ message QueryGetCollectionStatsRequest {
 }
 
 message QueryGetCollectionStatsResponse {
-  CollectionStats stats = 1;
+  CollectionStats stats = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetBalanceForTokenRequest {

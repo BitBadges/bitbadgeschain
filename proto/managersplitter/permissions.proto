@@ -16,36 +16,36 @@ message PermissionCriteria {
 // but maps each permission to criteria for execution.
 message ManagerSplitterPermissions {
   // Permissions related to deleting the collection.
-  PermissionCriteria canDeleteCollection = 1;
+  PermissionCriteria canDeleteCollection = 1 [(gogoproto.nullable) = true];
 
   // Permissions related to archiving the collection.
-  PermissionCriteria canArchiveCollection = 2;
+  PermissionCriteria canArchiveCollection = 2 [(gogoproto.nullable) = true];
 
   // Permissions related to updating standards for the collection.
-  PermissionCriteria canUpdateStandards = 3;
+  PermissionCriteria canUpdateStandards = 3 [(gogoproto.nullable) = true];
 
   // Permissions related to updating custom data for the collection.
-  PermissionCriteria canUpdateCustomData = 4;
+  PermissionCriteria canUpdateCustomData = 4 [(gogoproto.nullable) = true];
 
   // Permissions related to updating the collection's manager.
-  PermissionCriteria canUpdateManager = 5;
+  PermissionCriteria canUpdateManager = 5 [(gogoproto.nullable) = true];
 
   // Permissions related to updating the metadata of the collection.
-  PermissionCriteria canUpdateCollectionMetadata = 6;
+  PermissionCriteria canUpdateCollectionMetadata = 6 [(gogoproto.nullable) = true];
 
   // Permissions related to creating more tokens for the collection.
-  PermissionCriteria canUpdateValidTokenIds = 7;
+  PermissionCriteria canUpdateValidTokenIds = 7 [(gogoproto.nullable) = true];
 
   // Permissions related to updating token metadata for specific tokens.
-  PermissionCriteria canUpdateTokenMetadata = 8;
+  PermissionCriteria canUpdateTokenMetadata = 8 [(gogoproto.nullable) = true];
 
   // Permissions related to updating collection approvals.
-  PermissionCriteria canUpdateCollectionApprovals = 9;
+  PermissionCriteria canUpdateCollectionApprovals = 9 [(gogoproto.nullable) = true];
 
   // Permissions related to adding more alias paths to the collection.
-  PermissionCriteria canAddMoreAliasPaths = 10;
+  PermissionCriteria canAddMoreAliasPaths = 10 [(gogoproto.nullable) = true];
 
   // Permissions related to adding more cosmos coin wrapper paths to the collection.
-  PermissionCriteria canAddMoreCosmosCoinWrapperPaths = 11;
+  PermissionCriteria canAddMoreCosmosCoinWrapperPaths = 11 [(gogoproto.nullable) = true];
 }
 

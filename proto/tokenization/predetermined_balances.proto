@@ -34,7 +34,7 @@ message IncrementedBalances {
   // Whether to allow overriding the timestamp for the balances (only applicable with durationFromTimestamp set).
   bool allowOverrideTimestamp = 5;
   // Recurring ownership times.
-  RecurringOwnershipTimes recurringOwnershipTimes = 6;
+  RecurringOwnershipTimes recurringOwnershipTimes = 6 [(gogoproto.nullable) = true];
   // Allow override of any valid ID
   bool allowOverrideWithAnyValidToken = 7;
   // When true, the actual transfer can be any evenly divisible integer multiple (>=1x) of startBalances.
@@ -68,8 +68,8 @@ message PredeterminedBalances {
   // Manual balances that can be entered. If this is nil, then we use the incremented balances.
   repeated ManualBalances manualBalances = 1;
   // Balances that have a starting amount and increment. If this is nil, then we use the manual balances.
-  IncrementedBalances incrementedBalances = 2;
+  IncrementedBalances incrementedBalances = 2 [(gogoproto.nullable) = true];
   // The method to calculate the order of predetermined balances.
-  PredeterminedOrderCalculationMethod orderCalculationMethod = 3;
+  PredeterminedOrderCalculationMethod orderCalculationMethod = 3 [(gogoproto.nullable) = true];
 }
 

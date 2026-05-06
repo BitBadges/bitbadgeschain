@@ -31,7 +31,7 @@ message TokenCollection {
   string collectionId = 1 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
   
   // The metadata for the collection itself.
-  CollectionMetadata collectionMetadata = 2;
+  CollectionMetadata collectionMetadata = 2 [(gogoproto.nullable) = true];
   
   // The metadata for each token in the collection.
   repeated TokenMetadata tokenMetadata = 3;
@@ -43,7 +43,7 @@ message TokenCollection {
   string manager = 5;
   
   // Permissions that define what the manager of the collection can do or not do.
-  CollectionPermissions collectionPermissions = 6;
+  CollectionPermissions collectionPermissions = 6 [(gogoproto.nullable) = true];
   
   // Transferability of the collection for collections with standard balances, subject to changes over time.
   // Overrides user approvals for a transfer if specified.
@@ -59,7 +59,7 @@ message TokenCollection {
   bool isArchived = 9;
 
   // The default store of a balance / approvals for a user, upon genesis.
-  UserBalanceStore defaultBalances = 10;
+  UserBalanceStore defaultBalances = 10 [(gogoproto.nullable) = true];
 
   // The user or entity who created the collection.
   string createdBy = 11;
@@ -75,7 +75,7 @@ message TokenCollection {
 
   // Collection-level invariants that cannot be broken.
   // These are set upon genesis and cannot be modified.
-  CollectionInvariants invariants = 15;
+  CollectionInvariants invariants = 15 [(gogoproto.nullable) = true];
 
   // The alias (non-wrapping) paths for the collection.
   repeated AliasPath aliasPaths = 16;
@@ -84,7 +84,7 @@ message TokenCollection {
 // Conversion defines a bidirectional conversion between a cosmos coin (with denom) and token balances.
 message Conversion {
   // Side A: The cosmos coin side of the conversion (amount + denom).
-  ConversionSideAWithDenom sideA = 1;
+  ConversionSideAWithDenom sideA = 1 [(gogoproto.nullable) = true];
   // Side B: The token balances side of the conversion.
   repeated Balance sideB = 2;
 }
@@ -101,7 +101,7 @@ message ConversionSideAWithDenom {
 // The denom is stored at the base level (e.g., in AliasPath or CosmosCoinWrapperPath).
 message ConversionWithoutDenom {
   // Side A: The cosmos coin amount side of the conversion (amount only, denom stored separately).
-  ConversionSideA sideA = 1;
+  ConversionSideA sideA = 1 [(gogoproto.nullable) = true];
   // Side B: The token balances side of the conversion.
   repeated Balance sideB = 2;
 }
@@ -118,7 +118,7 @@ message CosmosCoinWrapperPath {
   // The denomination (denom) to be used for the wrapped coin or the alias denom.
   string denom = 2;
   // The conversion between cosmos coin and token balances.
-  ConversionWithoutDenom conversion = 3;
+  ConversionWithoutDenom conversion = 3 [(gogoproto.nullable) = true];
   // The symbol for the wrapped coin (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 4;
   // Denomination units for the wrapped coin. Defines how the coin can be displayed with different
@@ -127,27 +127,27 @@ message CosmosCoinWrapperPath {
   // If true, allows this wrapper path to be used with any valid token ID in the collection via an {id} placeholder.
   bool allowOverrideWithAnyValidToken = 6;
   // The metadata for this wrapper path.
-  PathMetadata metadata = 7;
+  PathMetadata metadata = 7 [(gogoproto.nullable) = true];
 }
 
 message AliasPath {
   // The denomination (denom) to be used for the alias.
   string denom = 1;
   // The conversion between cosmos coin and token balances.
-  ConversionWithoutDenom conversion = 2;
+  ConversionWithoutDenom conversion = 2 [(gogoproto.nullable) = true];
   // The symbol for the alias (e.g., "BADGE", "NFT"). Used for display purposes. Note that this may not be the default.
   string symbol = 3;
   // Denomination units for the alias. Defines how the coin can be displayed with different decimal places and symbols.
   repeated DenomUnit denomUnits = 4;
   // The metadata for this alias path.
-  PathMetadata metadata = 5;
+  PathMetadata metadata = 5 [(gogoproto.nullable) = true];
 }
 
 message CosmosCoinBackedPath {
   // The address associated with this backed path. Used for routing and escrowing IBC tokens.
   string address = 1;
   // The conversion between IBC cosmos coin and token balances.
-  Conversion conversion = 2;
+  Conversion conversion = 2 [(gogoproto.nullable) = true];
 }
 
 message DenomUnit {
@@ -159,7 +159,7 @@ message DenomUnit {
   // This unit will be used by default when displaying the coin amount. If none are marked default, we use the base level.
   bool isDefaultDisplay = 3;
   // The metadata for this denomination unit.
-  PathMetadata metadata = 4;
+  PathMetadata metadata = 4 [(gogoproto.nullable) = true];
 }
 
 // CollectionInvariants defines the invariants that apply to a collection.
@@ -173,7 +173,7 @@ message CollectionInvariants {
   string maxSupplyPerId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
 
   // The IBC backed (sdk.coin) path for the collection. Only one path is allowed.
-  CosmosCoinBackedPath cosmosCoinBackedPath = 3;
+  CosmosCoinBackedPath cosmosCoinBackedPath = 3 [(gogoproto.nullable) = true];
 
   // If true, disallows any collection approvals that have overridesFromOutgoingApprovals or overridesToIncomingApprovals set to true.
   // This prevents forceful transfers that bypass user-level approvals.
