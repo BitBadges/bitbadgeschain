@@ -38,5 +38,5 @@ message MsgCreateBalancerPoolResponse {
 
 // Used for WASM bindings and JSON parsing
 message BalancerCustomMsgType {
-  MsgCreateBalancerPool createBalancerPoolMsg = 1;
+  MsgCreateBalancerPool createBalancerPoolMsg = 1 [(gogoproto.nullable) = true];
 }

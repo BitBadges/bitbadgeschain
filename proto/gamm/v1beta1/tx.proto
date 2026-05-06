@@ -325,13 +325,13 @@ message MsgExitSwapExternAmountOutResponse {
 
 // Used for WASM bindings and JSON parsing
 message GammCustomMsgType {
-  MsgJoinPool joinPoolMsg = 1;
-  MsgExitPool exitPoolMsg = 2;
-  MsgSwapExactAmountIn swapExactAmountInMsg = 3;
-  MsgSwapExactAmountOut swapExactAmountOutMsg = 4;
-  MsgJoinSwapExternAmountIn joinSwapExternAmountInMsg = 5;
-  MsgJoinSwapShareAmountOut joinSwapShareAmountOutMsg = 6;
-  MsgExitSwapShareAmountIn exitSwapShareAmountInMsg = 7;
-  MsgExitSwapExternAmountOut exitSwapExternAmountOutMsg = 8;
-  MsgSwapExactAmountInWithIBCTransfer swapExactAmountInWithIBCTransferMsg = 9;
+  MsgJoinPool joinPoolMsg = 1 [(gogoproto.nullable) = true];
+  MsgExitPool exitPoolMsg = 2 [(gogoproto.nullable) = true];
+  MsgSwapExactAmountIn swapExactAmountInMsg = 3 [(gogoproto.nullable) = true];
+  MsgSwapExactAmountOut swapExactAmountOutMsg = 4 [(gogoproto.nullable) = true];
+  MsgJoinSwapExternAmountIn joinSwapExternAmountInMsg = 5 [(gogoproto.nullable) = true];
+  MsgJoinSwapShareAmountOut joinSwapShareAmountOutMsg = 6 [(gogoproto.nullable) = true];
+  MsgExitSwapShareAmountIn exitSwapShareAmountInMsg = 7 [(gogoproto.nullable) = true];
+  MsgExitSwapExternAmountOut exitSwapExternAmountOutMsg = 8 [(gogoproto.nullable) = true];
+  MsgSwapExactAmountInWithIBCTransfer swapExactAmountInWithIBCTransferMsg = 9 [(gogoproto.nullable) = true];
 }
