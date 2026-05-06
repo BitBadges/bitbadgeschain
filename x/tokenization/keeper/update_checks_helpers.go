@@ -302,7 +302,7 @@ func (k Keeper) ValidateCollectionApprovalsWithInvariants(ctx sdk.Context, colle
 		}
 
 		// Rule 4: Reject if collection has no cosmosCoinBackedPath
-		if collection == nil || collection.Invariants == nil || collection.Invariants.CosmosCoinBackedPath == nil {
+		if collection == nil || collection.Invariants == nil || types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "approval %s has allowBackedMinting=true but collection has no cosmosCoinBackedPath in invariants", collectionApproval.ApprovalId)
 		}
 

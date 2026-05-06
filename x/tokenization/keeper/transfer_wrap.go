@@ -206,7 +206,7 @@ func (k Keeper) HandleSpecialAddressBacking(
 	isSendingToSpecialAddress := false
 	isSendingFromSpecialAddress := false
 
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		path := collection.Invariants.CosmosCoinBackedPath
 		if path.Address == to {
 			isSendingToSpecialAddress = true

@@ -1238,7 +1238,12 @@ func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChan
 		// See HandleSpecialAddressBacking in keeper/transfer_wrap.go for the full argument.
 		// Do NOT relax this check without also scoping the backed-path address derivation
 		// by collection ID, or the drain becomes live.
-		if collection.Invariants.CosmosCoinBackedPath != nil {
+		// SEMANTIC "is set" check: after normalize-on-load every nullable
+		// pointer is non-nil even when the user didn't configure it, so a
+		// raw `!= nil` would block Mint transfers for every collection.
+		// Use IsBasicallyEmpty to recover the true "user explicitly set
+		// this" intent (proto-encoded size > 0).
+		if !IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 			if IsMintAddress(transfer.From) {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "transfers from Mint address are not allowed when cosmosCoinBackedPath is set")
 			}

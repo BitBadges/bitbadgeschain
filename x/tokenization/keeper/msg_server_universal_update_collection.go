@@ -265,7 +265,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			}
 
 			// Handle cosmos coin backed path - generate address
-			if msg.Invariants.CosmosCoinBackedPath != nil {
+			if !types.IsBasicallyEmpty(msg.Invariants.CosmosCoinBackedPath) {
 				pathAddObject := msg.Invariants.CosmosCoinBackedPath
 				if pathAddObject.Conversion == nil || pathAddObject.Conversion.SideA == nil {
 					return nil, errorsmod.Wrap(ErrCosmosCoinBackedPathConversionNil, "")
@@ -527,7 +527,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		collection.Invariants.EvmQueryChallenges = msg.Invariants.EvmQueryChallenges
 
 		// Handle cosmos coin backed path - generate address
-		if msg.Invariants.CosmosCoinBackedPath != nil {
+		if !types.IsBasicallyEmpty(msg.Invariants.CosmosCoinBackedPath) {
 			pathAddObject := msg.Invariants.CosmosCoinBackedPath
 			if pathAddObject.Conversion == nil || pathAddObject.Conversion.SideA == nil {
 				return nil, errorsmod.Wrap(ErrCosmosCoinBackedPathConversionNil, "")
@@ -610,7 +610,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 	}
 
 	// Auto-set collection permission to forbid Mint address approvals if cosmosCoinBackedPath is set
-	hasCosmosCoinBackedPath := collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil
+	hasCosmosCoinBackedPath := !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath)
 	if hasCosmosCoinBackedPath {
 		if collection.CollectionPermissions == nil {
 			collection.CollectionPermissions = &types.CollectionPermissions{}
@@ -636,7 +636,7 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		if err := k.setAutoApproveFlagsForPathAddress(ctx, collection, collection.Invariants.CosmosCoinBackedPath.Address, "cosmoscoinbacked"); err != nil {
 			return nil, err
 		}

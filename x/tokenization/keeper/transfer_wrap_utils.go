@@ -14,7 +14,7 @@ func (k Keeper) IsBackedOrWrappingPathAddress(ctx sdk.Context, collection *types
 			return true
 		}
 	}
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		if collection.Invariants.CosmosCoinBackedPath.Address == address {
 			return true
 		}
@@ -24,7 +24,7 @@ func (k Keeper) IsBackedOrWrappingPathAddress(ctx sdk.Context, collection *types
 
 // IsBackedOrWrappingPathAddress checks if an address is a cosmos coin wrapper path address or backed path address
 func (k Keeper) IsSpecialBackedAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		if collection.Invariants.CosmosCoinBackedPath.Address == address {
 			return true
 		}
@@ -34,7 +34,7 @@ func (k Keeper) IsSpecialBackedAddress(ctx sdk.Context, collection *types.TokenC
 
 // IsBackingPathAddress checks if an address is a cosmos coin backed path address
 func (k Keeper) IsBackingPathAddress(ctx sdk.Context, collection *types.TokenCollection, address string) bool {
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+	if !types.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		if collection.Invariants.CosmosCoinBackedPath.Address == address {
 			return true
 		}

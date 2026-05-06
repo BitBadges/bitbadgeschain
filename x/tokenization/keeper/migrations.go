@@ -123,7 +123,7 @@ func (k Keeper) migrateCollectionAddressesFromBadgesToTokenization(ctx sdk.Conte
 	}
 
 	// 2. cosmosCoinBackedPath.address (if present)
-	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+	if !newtypes.IsBasicallyEmpty(collection.Invariants.CosmosCoinBackedPath) {
 		backed := collection.Invariants.CosmosCoinBackedPath
 		if backed.Conversion != nil && backed.Conversion.SideA != nil && backed.Conversion.SideA.Denom != "" {
 			denom := backed.Conversion.SideA.Denom
