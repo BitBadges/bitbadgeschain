@@ -57,6 +57,39 @@ func TestIsBasicallyEmpty_AutoDeletionOptions(t *testing.T) {
 	require.False(t, IsBasicallyEmpty(&AutoDeletionOptions{AfterOneUse: true}))
 }
 
+// Critical regression: after `keeper.NormalizeNilPointers` walks a
+// fresh struct it leaves every sub-field as a non-nil pointer to a
+// zero-value struct. `Size()` on the parent returns nonzero (it
+// counts the embedded-message tag + length-0 marker), but the
+// container is conceptually still unset. IsBasicallyEmpty must
+// see through this.
+func TestIsBasicallyEmpty_NormalizeFilledStillEmpty(t *testing.T) {
+	// `&CosmosCoinBackedPath{Conversion: &Conversion{}}` — exactly the
+	// shape after a normalize fill on a fresh struct that started nil.
+	post := &CosmosCoinBackedPath{
+		Conversion: &Conversion{},
+	}
+	require.True(t, IsBasicallyEmpty(post),
+		"normalize-filled empty chain must be reported as 'unset' even though Size() > 0")
+
+	// And a deeper nest still empty.
+	deeper := &CosmosCoinBackedPath{
+		Conversion: &Conversion{
+			SideA: &ConversionSideAWithDenom{},
+			SideB: nil,
+		},
+	}
+	require.True(t, IsBasicallyEmpty(deeper))
+
+	// Once any leaf has a real value, it's no longer empty.
+	withValue := &CosmosCoinBackedPath{
+		Conversion: &Conversion{
+			SideA: &ConversionSideAWithDenom{Denom: "ucredit"},
+		},
+	}
+	require.False(t, IsBasicallyEmpty(withValue))
+}
+
 // Verify the actual bootstrap-blocking scenario: a CollectionInvariants
 // with CosmosCoinBackedPath set vs unset.
 func TestIsBasicallyEmpty_BootstrapScenario(t *testing.T) {
