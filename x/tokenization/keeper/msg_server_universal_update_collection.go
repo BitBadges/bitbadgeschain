@@ -298,6 +298,16 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 	}
 
+	// Normalize nil pointers on the freshly-built/loaded collection so the
+	// rest of this handler can read direct field paths
+	// (`collection.Invariants.CosmosCoinBackedPath`,
+	//  `collection.CollectionPermissions.X`, etc.) without nil-deref. The
+	// CREATE branch only sets `collection.Invariants` when `msg.Invariants`
+	// is non-nil, so a no-op invariants create would otherwise panic at
+	// line 613. The UPDATE branch's GetCollectionFromStore already
+	// normalizes; this call is a no-op there.
+	NormalizeNilPointers(collection)
+
 	// Check must be manager
 	err = k.UniversalValidate(ctx, collection, UniversalValidationParams{
 		Creator:       msg.Creator,
