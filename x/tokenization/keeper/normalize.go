@@ -27,6 +27,8 @@ package keeper
 import (
 	"reflect"
 	"strings"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // NormalizeNilPointers recursively walks `v` (must be a pointer) and
@@ -43,6 +45,22 @@ func NormalizeNilPointers(v interface{}) {
 	walkStructForNormalize(rv.Elem(), 0)
 }
 
+// uintZero / intZero are pre-built non-nil zero values used to replace
+// uninitialized sdkmath.Uint{} / sdkmath.Int{} fields. Those types wrap
+// `*big.Int`; their Go zero value has a nil internal pointer, so any
+// `.GT() / .Cmp() / .Uint64()` etc. panics. Proto fields with
+// `customtype = "Uint"` and `nullable = false` deserialize to the zero
+// value when the wire bytes don't include the field — typical when the
+// SDK side dropped the empty string. Normalize-time replacement
+// guarantees downstream math operations never see nil internals.
+var (
+	uintZero = sdkmath.NewUint(0)
+	intZero  = sdkmath.NewInt(0)
+
+	uintType = reflect.TypeOf(uintZero)
+	intType  = reflect.TypeOf(intZero)
+)
+
 func walkStructForNormalize(v reflect.Value, depth int) {
 	if depth > 50 {
 		return // safety: bounded recursion
@@ -50,6 +68,30 @@ func walkStructForNormalize(v reflect.Value, depth int) {
 	if v.Kind() != reflect.Struct {
 		return
 	}
+
+	// sdkmath.Uint / sdkmath.Int are struct values (non-pointer), but
+	// their Go zero state is *invalid* — internal *big.Int is nil and any
+	// arithmetic operation panics. Detect and replace with a properly-
+	// initialized zero. Must run BEFORE the field walk because the
+	// recursive call would skip these (Int/Uint internals aren't fields
+	// we want to recurse into).
+	if v.Type() == uintType {
+		if (sdkmath.Uint{}) == v.Interface().(sdkmath.Uint) {
+			if v.CanSet() {
+				v.Set(reflect.ValueOf(uintZero))
+			}
+		}
+		return
+	}
+	if v.Type() == intType {
+		if (sdkmath.Int{}) == v.Interface().(sdkmath.Int) {
+			if v.CanSet() {
+				v.Set(reflect.ValueOf(intZero))
+			}
+		}
+		return
+	}
+
 	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)

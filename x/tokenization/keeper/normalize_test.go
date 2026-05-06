@@ -3,6 +3,7 @@ package keeper
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	"github.com/stretchr/testify/require"
 )
@@ -161,4 +162,47 @@ func TestNormalize_UserBalanceStore(t *testing.T) {
 	ub := &types.UserBalanceStore{}
 	NormalizeNilPointers(ub)
 	require.NotNil(t, ub.UserPermissions)
+}
+
+// `sdkmath.Uint{}` (the Go zero value) wraps a nil `*big.Int`; any math
+// op panics on it. Proto fields tagged `customtype = "Uint", nullable
+// = false` deserialize to the zero value when the wire bytes don't
+// include the field — common after our SDK strips empty Uint strings.
+// Normalize must replace with `NewUint(0)` so downstream math is safe.
+func TestNormalize_RecoversNilUintInternals(t *testing.T) {
+	// AltTimeChecks.TimezoneOffsetMinutes is exactly such a field.
+	atc := &types.AltTimeChecks{}
+	require.True(t, atc.TimezoneOffsetMinutes.IsNil(), "before normalize: nil internal big.Int")
+
+	NormalizeNilPointers(atc)
+
+	require.False(t, atc.TimezoneOffsetMinutes.IsNil(), "after normalize: must be initialized to 0")
+
+	// Math operations must no longer panic.
+	require.NotPanics(t, func() {
+		_ = atc.TimezoneOffsetMinutes.GT(sdkmath.NewUint(0))
+	})
+}
+
+// Same fix should apply through nested chains: Approval →
+// ApprovalCriteria → ApprovalAmounts → resetTimeIntervals → uint
+// fields, etc.
+func TestNormalize_RecoversNilUintsThroughNesting(t *testing.T) {
+	approval := &types.CollectionApproval{}
+	NormalizeNilPointers(approval)
+
+	require.NotPanics(t, func() {
+		ac := approval.ApprovalCriteria
+		require.NotNil(t, ac)
+		require.NotNil(t, ac.AltTimeChecks)
+		_ = ac.AltTimeChecks.TimezoneOffsetMinutes.GT(sdkmath.NewUint(0))
+
+		require.NotNil(t, ac.ApprovalAmounts)
+		require.NotNil(t, ac.ApprovalAmounts.ResetTimeIntervals)
+		_ = ac.ApprovalAmounts.ResetTimeIntervals.StartTime.GT(sdkmath.NewUint(0))
+		_ = ac.ApprovalAmounts.ResetTimeIntervals.IntervalLength.GT(sdkmath.NewUint(0))
+
+		require.NotNil(t, ac.MaxNumTransfers)
+		_ = ac.MaxNumTransfers.OverallMaxNumTransfers.GT(sdkmath.NewUint(0))
+	})
 }
