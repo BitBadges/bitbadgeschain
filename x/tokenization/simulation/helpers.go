@@ -498,8 +498,13 @@ func GetOrCreateCollection(ctx sdk.Context, k *keeper.Keeper, creator string, r 
 		return collectionId, nil
 	}
 
-	// Create a minimal valid collection
-	validTokenIds := GetBoundedTimelineTimes(r, 1, MinTimelineRange, MaxTimelineRange)
+	// Create a minimal valid collection.
+	// Token IDs must be sequential starting from 1 (see keeper.CreateTokens).
+	// `GetBoundedTimelineTimes` produces randomly-positioned ranges, which
+	// is correct for timeline-time fields but invalid for ValidTokenIds.
+	validTokenIds := []*types.UintRange{
+		{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(uint64(1 + r.Intn(1000)))},
+	}
 	collectionPermissions := GetRandomCollectionPermissions(r, accs)
 
 	collectionMetadata := &types.CollectionMetadata{

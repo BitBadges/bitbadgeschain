@@ -348,9 +348,10 @@ func (suite *GenesisTestSuite) TestGenesis_ValidTokenIdsPreserved() {
 		DefaultBalances: &types.UserBalanceStore{
 			Balances: []*types.Balance{},
 		},
+		// Token IDs must be sequential starting from 1 (see keeper.CreateTokens).
+		// A single contiguous range satisfies that; multi-range with a gap does not.
 		ValidTokenIds: []*types.UintRange{
-			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(50)},
-			{Start: sdkmath.NewUint(100), End: sdkmath.NewUint(200)},
+			{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(200)},
 		},
 		CollectionPermissions: &types.CollectionPermissions{},
 		Manager:               suite.Manager,
