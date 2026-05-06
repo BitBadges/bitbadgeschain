@@ -13,7 +13,11 @@ import (
 // all necessary codec types are registered once for the tokens module.
 // This is required for proper serialization/deserialization across the module.
 
-func RegisterCodec(cdc *codec.LegacyAmino) {
+// RegisterAminoConcretes registers only the tokenization module's concrete
+// amino types. Idempotent across module-level calls because each concrete
+// is unique to this module's namespace, so it's safe to call from the
+// AppModuleBasic.RegisterLegacyAminoCodec depinject path.
+func RegisterAminoConcretes(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgTransferTokens{}, "tokenization/TransferTokens", nil)
 	cdc.RegisterConcrete(&MsgDeleteCollection{}, "tokenization/DeleteCollection", nil)
 	cdc.RegisterConcrete(&MsgUpdateUserApprovals{}, "tokenization/UpdateUserApprovals", nil)
@@ -40,6 +44,15 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetIsArchived{}, "tokenization/SetIsArchived", nil)
 	cdc.RegisterConcrete(&MsgSetReservedProtocolAddress{}, "tokenization/SetReservedProtocolAddress", nil)
 	cdc.RegisterConcrete(&MsgCastVote{}, "tokenization/CastVote", nil)
+}
+
+// RegisterCodec performs the full registration including the chain-wide
+// encoding stack. ONLY call this on a fresh codec (e.g. the package-level
+// `Amino` from init below) — not on the chain's main legacy amino, which
+// already has the encoding stack wired by depinject and would panic with
+// "TypeInfo already exists for types.PubKey" on re-registration.
+func RegisterCodec(cdc *codec.LegacyAmino) {
+	RegisterAminoConcretes(cdc)
 
 	encodingcodec.RegisterLegacyAminoCodec(cdc)
 	// this line is used by starport scaffolding # 2
