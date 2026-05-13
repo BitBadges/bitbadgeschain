@@ -285,31 +285,17 @@ func IncreaseCoinByDenomFromPrefix(ctx sdk.Context, storeKey storetypes.StoreKey
 	return nil
 }
 
-var kvGasConfig = storetypes.KVGasConfig()
-
-// Get returns a value at key by mutating the result parameter. Returns true if the value was found and the
-// result mutated correctly. If the value is not in the store, returns false.
-// Returns error only when database or serialization errors occur. (And when an error occurs, returns false)
+// ChargeKVReadGas charges the gas meter for a KV-store read of a value with the given
+// key and value byte lengths, using the gas config from the provided context.
 //
-// This function also returns three gas numbers:
-// Gas flat, gas for key read, gas for value read.
-// You must charge all 3 for the gas accounting to be correct in the current SDK version.
-func TrackGasUsedInGet(store storetypes.KVStore, key []byte, result proto.Message) (found bool, gasFlat, gasKey, gasVal uint64, err error) {
-	gasFlat = kvGasConfig.ReadCostFlat
-	gasKey = uint64(len(key)) * kvGasConfig.ReadCostPerByte
-	b := store.Get(key)
-	gasVal = uint64(len(b)) * kvGasConfig.ReadCostPerByte
-	if b == nil {
-		return false, gasFlat, gasKey, gasVal, nil
-	}
-	if err := proto.Unmarshal(b, result); err != nil {
-		return true, gasFlat, gasKey, gasVal, err
-	}
-	return true, gasFlat, gasKey, gasVal, nil
-}
-
-func ChargeMockReadGas(ctx sdk.Context, gasFlat, gasKey, gasVal uint64) {
-	ctx.GasMeter().ConsumeGas(gasFlat, storetypes.GasReadCostFlatDesc)
-	ctx.GasMeter().ConsumeGas(gasKey, storetypes.GasReadPerByteDesc)
-	ctx.GasMeter().ConsumeGas(gasVal, storetypes.GasReadPerByteDesc)
+// Use this on cache-hit paths that want to replay the gas a real store.Get would charge.
+// Reading the gas config from ctx (rather than a hardcoded default) is critical for
+// consensus determinism: EVM precompiles set ctx's KVGasConfig to zero, and a cache hit
+// using a hardcoded default would charge ~1000+ gas while a cache miss against the same
+// ctx would charge 0. That mismatch caused the 2026-05-12 mainnet halt at height 10183154.
+func ChargeKVReadGas(ctx sdk.Context, keyLen, valLen uint64) {
+	gc := ctx.KVGasConfig()
+	ctx.GasMeter().ConsumeGas(gc.ReadCostFlat, storetypes.GasReadCostFlatDesc)
+	ctx.GasMeter().ConsumeGas(keyLen*gc.ReadCostPerByte, storetypes.GasReadPerByteDesc)
+	ctx.GasMeter().ConsumeGas(valLen*gc.ReadCostPerByte, storetypes.GasReadPerByteDesc)
 }

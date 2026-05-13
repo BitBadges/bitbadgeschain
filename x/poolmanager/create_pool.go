@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -171,12 +172,15 @@ func (k *Keeper) SetPoolRoute(ctx sdk.Context, poolId uint64, poolType types.Poo
 	k.cachedPoolModules.Delete(poolId)
 }
 
+// poolModuleCacheValue caches the result of a ModuleRoute lookup along with the byte lengths
+// of the key/value that produced it. Storing byte lengths (instead of pre-computed gas amounts)
+// lets cache hits charge gas using the *caller's* ctx.KVGasConfig at hit time, matching what a
+// real store.Get would charge — critical inside EVM precompiles, which set KVGasConfig to zero.
 type poolModuleCacheValue struct {
 	pooltype types.PoolType
 	module   types.PoolModuleI
-	gasFlat  uint64
-	gasKey   uint64
-	gasValue uint64
+	keyLen   uint64
+	valLen   uint64
 }
 
 func (k *Keeper) GetPoolType(ctx sdk.Context, poolId uint64) (types.PoolType, error) {
@@ -189,10 +193,7 @@ func (k *Keeper) GetPoolType(ctx sdk.Context, poolId uint64) (types.PoolType, er
 		return moduleRoute.PoolType, nil
 	}
 	v, _ := poolModuleCandidate.(poolModuleCacheValue)
-	if cacheHit {
-		osmoutils.ChargeMockReadGas(ctx, v.gasFlat, v.gasKey, v.gasValue)
-	}
-
+	osmoutils.ChargeKVReadGas(ctx, v.keyLen, v.valLen)
 	return v.pooltype, nil
 }
 
@@ -208,18 +209,19 @@ func (k *Keeper) GetPoolModule(ctx sdk.Context, poolId uint64) (types.PoolModule
 	poolModuleCandidate, ok := k.cachedPoolModules.Load(poolId)
 	if ok {
 		v, _ := poolModuleCandidate.(poolModuleCacheValue)
-		osmoutils.ChargeMockReadGas(ctx, v.gasFlat, v.gasKey, v.gasValue)
+		osmoutils.ChargeKVReadGas(ctx, v.keyLen, v.valLen)
 		return v.module, nil
 	}
-	store := ctx.KVStore(k.storeKey)
 
-	moduleRoute := &types.ModuleRoute{}
-	found, gasFlat, gasKey, gasVal, err := osmoutils.TrackGasUsedInGet(store, types.FormatModuleRouteKey(poolId), moduleRoute)
-	if err != nil {
-		return nil, err
-	}
-	if !found {
+	key := types.FormatModuleRouteKey(poolId)
+	// store.Get auto-charges gas via ctx's wrapped KVStore, honoring ctx.KVGasConfig.
+	bz := ctx.KVStore(k.storeKey).Get(key)
+	if bz == nil {
 		return nil, types.FailedToFindRouteError{PoolId: poolId}
+	}
+	moduleRoute := &types.ModuleRoute{}
+	if err := proto.Unmarshal(bz, moduleRoute); err != nil {
+		return nil, err
 	}
 
 	swapModule, routeExists := k.routes[moduleRoute.PoolType]
@@ -231,9 +233,8 @@ func (k *Keeper) GetPoolModule(ctx sdk.Context, poolId uint64) (types.PoolModule
 		k.cachedPoolModules.Store(poolId, poolModuleCacheValue{
 			pooltype: moduleRoute.PoolType,
 			module:   swapModule,
-			gasFlat:  gasFlat,
-			gasKey:   gasKey,
-			gasValue: gasVal,
+			keyLen:   uint64(len(key)),
+			valLen:   uint64(len(bz)),
 		})
 	}
 
