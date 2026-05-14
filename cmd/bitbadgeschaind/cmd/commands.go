@@ -85,9 +85,17 @@ func initRootCmd(
 		queryCommand(),
 		txCommand(),
 		bitbadgesclient.KeyCommands(app.DefaultNodeHome, false), // false = don't default to eth keys, but support them
-		CliCmd(), // canonical forwarder — `bitbadgeschaind cli <subcmd> [args...]` reaches every bitbadges-cli subcommand
+		CliCmd(), // canonical back-compat forwarder — `bitbadgeschaind cli <subcmd> [args...]` reaches every bitbadges-cli subcommand
 		SignArbitraryCmd(),
 	)
+
+	// Register named top-level SDK CLI forwarders so `bb build vault`,
+	// `bb auctions place-bid 42`, `bb account all`, etc. resolve
+	// directly without the `cli` infix. Each forwarder is tagged with
+	// its Cobra GroupID for `bb --help` grouping. See sdk_forwarders.go
+	// for the canonical list. Must run after chain natives are added so
+	// the collision check has the full set to compare against.
+	registerSDKForwarders(rootCmd)
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
