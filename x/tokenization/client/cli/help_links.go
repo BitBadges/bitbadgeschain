@@ -71,10 +71,10 @@ func MsgHelpLinks(cmdName string) string {
 
 	links, ok := msgDocLinks[cmdName]
 	if !ok {
-		return base + schemaHelpFooter("tx.proto")
+		return base + schemaHelpFooter("tx.proto") + builderCrossLink()
 	}
 
-	return base + schemaHelpFooter(links.protoFile) + docsLink(links.docsPath)
+	return base + schemaHelpFooter(links.protoFile) + docsLink(links.docsPath) + builderCrossLink()
 }
 
 // QueryHelpLinks returns help text with documentation links for a query command.
@@ -87,6 +87,27 @@ func QueryHelpLinks(cmdName string) string {
 	}
 
 	return base + schemaHelpFooter(links.protoFile) + docsLink(links.docsPath)
+}
+
+// builderCrossLink is the v2 CLI cross-link from raw `tx tokenization
+// <action>` commands to the friendlier `bb build <type>` builder
+// pipeline. See outputs/flagship-plans/cli-v2-design.md "Locked
+// Decisions" decision 5 (Option 1: parallel + cross-link).
+//
+// We use a generic phrasing rather than per-command type mapping
+// because the relationship between tokenization tx actions and SDK
+// builders isn't strictly 1:1 (e.g. `create-collection` covers
+// vault/auction/bounty/crowdfund/subscription/... builders, all of
+// which emit MsgCreateCollection under the hood).
+func builderCrossLink() string {
+	return `
+
+Guided builder:
+  For a guided builder with validation, review, and helpful defaults,
+  see the BitBadges SDK CLI:
+    bitbadgeschaind build <type> --help    (e.g. vault, auction, crowdfund, subscription)
+  The builder emits a ready-to-sign tx JSON that you can pipe into
+  'bitbadgeschaind deploy' to sign and broadcast.`
 }
 
 func schemaHelpFooter(protoFile string) string {
