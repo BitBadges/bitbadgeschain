@@ -107,6 +107,11 @@ func NewRootCmd() *cobra.Command {
 		autoCliOpts.Modules[name] = mod
 	}
 
+	// Install `bb --help` Cobra groups before commands are added so the
+	// initRootCmd / autocli / SDK-forwarder registrations can attach
+	// each command to its group as it's wired up.
+	registerHelpGroups(rootCmd)
+
 	initRootCmd(rootCmd, clientCtx.TxConfig, moduleBasicManager)
 
 	overwriteFlagDefaults(rootCmd, map[string]string{
@@ -117,6 +122,13 @@ func NewRootCmd() *cobra.Command {
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)
 	}
+
+	// Tag every chain-native top-level command with its GroupID for
+	// the `bb --help` grouping. Runs after autocli enhancement so it
+	// catches commands the enhancer adds (e.g. module tx/query
+	// shortcuts). SDK CLI forwarders register their own GroupID
+	// inline in sdk_forwarders.go and are skipped here.
+	tagChainCommandGroups(rootCmd)
 
 	return rootCmd
 }
