@@ -25,7 +25,7 @@ const (
 // registration in sdk_forwarders.go (for SDK CLI commands).
 func registerHelpGroups(rootCmd *cobra.Command) {
 	rootCmd.AddGroup(
-		&cobra.Group{ID: groupChain, Title: "Chain operations:"},
+		&cobra.Group{ID: groupChain, Title: "Chain node (Cosmos SDK):"},
 		&cobra.Group{ID: groupSDKBuild, Title: "BitBadges SDK — Build & Deploy:"},
 		&cobra.Group{ID: groupSDKStandards, Title: "BitBadges SDK — Standards:"},
 		&cobra.Group{ID: groupSDKIndexer, Title: "BitBadges SDK — Indexer & Auth:"},
