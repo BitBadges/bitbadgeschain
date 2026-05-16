@@ -30,7 +30,6 @@ jobs:
 
   build-linux-windows:
     name: Build Linux & Windows
-    needs: test
     # Pinned to 22.04 (glibc 2.35) so release binaries run on Ubuntu 22.04+,
     # Debian 12+, RHEL 9+. ubuntu-latest (24.04, glibc 2.39) breaks older hosts.
     runs-on: ubuntu-22.04
@@ -71,7 +70,6 @@ jobs:
 
   build-darwin:
     name: Build macOS
-    needs: test
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
