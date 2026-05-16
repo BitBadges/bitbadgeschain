@@ -137,6 +137,13 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), *am.keeper)
 
+
+	if err := cfg.RegisterMigration(types.ModuleName, ConsensusVersion-2, func(ctx sdk.Context) error {
+		return nil
+	}); err != nil {
+		panic(fmt.Errorf("failed to register migration of %s: %w", types.ModuleName, err))
+	}
+
 	if err := cfg.RegisterMigration(types.ModuleName, ConsensusVersion-1, func(ctx sdk.Context) error {
 		return nil
 	}); err != nil {
