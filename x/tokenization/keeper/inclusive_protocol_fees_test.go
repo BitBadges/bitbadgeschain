@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -10,6 +11,19 @@ import (
 // Inclusive protocol fee: the payer sends exactly the coin transfer amount.
 // The chain skims 0.1% for the community pool out of that amount (not on top).
 // See backlog #0335.
+//
+// When ProtocolFeeDenominator == 0 (local-dev / e2e), the fee is disabled
+// entirely so the 1:1 redeem math on prediction-market escrows works without
+// the fee leaving the escrow short. Tests that assert the fee behavior are
+// no-ops in that mode — see `skipIfFeeDisabled`.
+
+func (suite *TestSuite) skipIfFeeDisabled() bool {
+	if keeper.ProtocolFeeDenominator == 0 {
+		suite.T().Skip("protocol fee disabled (ProtocolFeeDenominator=0)")
+		return true
+	}
+	return false
+}
 
 // configureSingleCoinTransferApproval wires up a mint approval whose coinTransfer
 // sends `amount` of ubadge from bob (creator) to alice on behalf of a mint.
@@ -57,6 +71,9 @@ func (suite *TestSuite) runMintTransferForCoinTransferApproval() error {
 // TestInclusiveProtocolFeeDebitsPayerExactly verifies the payer is debited exactly
 // the coin transfer amount (not amount + fee). The fee is carved out of the payment.
 func (suite *TestSuite) TestInclusiveProtocolFeeDebitsPayerExactly() {
+	if suite.skipIfFeeDisabled() {
+		return
+	}
 	const gross int64 = 10_000 // 0.1% = 10 → non-zero fee
 	const expectedFee int64 = 10
 
@@ -103,6 +120,9 @@ func (suite *TestSuite) TestInclusiveProtocolFeeDebitsPayerExactly() {
 // denominator (1000 ubadge) pay no fee — matches the previous behavior at
 // the low end, so existing integrations with small amounts are unaffected.
 func (suite *TestSuite) TestInclusiveProtocolFeeRoundsToZero() {
+	if suite.skipIfFeeDisabled() {
+		return
+	}
 	const gross int64 = 100 // 0.1% = 0.1 → rounds down to 0
 
 	suite.configureSingleCoinTransferApproval(sdkmath.NewInt(gross))
@@ -131,6 +151,9 @@ func (suite *TestSuite) TestInclusiveProtocolFeeRoundsToZero() {
 // carved out of the gross payment. The payer still sends exactly the quoted
 // amount, and the recipient gets gross - royalty - fee.
 func (suite *TestSuite) TestInclusiveProtocolFeeWithRoyalty() {
+	if suite.skipIfFeeDisabled() {
+		return
+	}
 	const gross int64 = 10_000
 	const royaltyBps = 1000 // 10%
 	const expectedFee int64 = 10
@@ -231,6 +254,9 @@ func (suite *TestSuite) TestInclusiveProtocolFeeWithRoyalty() {
 // percentage high enough that royalty + fee > gross is rejected rather than
 // silently shortchanging the recipient by making them negative.
 func (suite *TestSuite) TestInclusiveProtocolFeeRejectsRoyaltyPlusFeeOverflow() {
+	if suite.skipIfFeeDisabled() {
+		return
+	}
 	const gross int64 = 10_000
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)

@@ -17,7 +17,12 @@ const (
 	// ProtocolFeeDenominator is the divisor for the inclusive protocol fee
 	// (0.1% = amount / 1000). Applied per-coin before royalty/recipient split,
 	// so the payer sends exactly the quoted amount.
-	ProtocolFeeDenominator = 1000
+	//
+	// Set to 0 to disable the protocol fee entirely — useful for local dev
+	// + e2e suites where the 0.1% skim breaks the 1:1 redeem math on
+	// prediction-market escrows (deposit fee leaves escrow short for the
+	// matching redeem). ExecuteCoinTransfers guards on this value.
+	ProtocolFeeDenominator = 0
 )
 
 // formatDenomForDisplay formats a denom for display in error messages
@@ -197,9 +202,14 @@ func (k Keeper) ExecuteCoinTransfers(
 		for _, coin := range coinsToTransfer {
 			// Inclusive protocol fee: taken out of the payer's gross amount first,
 			// so the payer sends exactly coin.Amount (not amount + fee on top).
+			// When ProtocolFeeDenominator == 0 the fee is disabled entirely;
+			// callers receive the full gross amount (modulo royalty).
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-			protocolFeeUint := coinAmountUint.Quo(sdkmath.NewUint(ProtocolFeeDenominator))
-			protocolFeeInt := sdkmath.NewIntFromBigInt(protocolFeeUint.BigInt())
+			protocolFeeInt := sdkmath.ZeroInt()
+			if ProtocolFeeDenominator > 0 {
+				protocolFeeUint := coinAmountUint.Quo(sdkmath.NewUint(ProtocolFeeDenominator))
+				protocolFeeInt = sdkmath.NewIntFromBigInt(protocolFeeUint.BigInt())
+			}
 
 			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
