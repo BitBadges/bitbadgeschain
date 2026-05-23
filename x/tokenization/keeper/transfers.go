@@ -219,8 +219,14 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 				return err
 			}
 
-			// Protocol fees are now deducted inclusively inside ExecuteCoinTransfers and
-			// are already present in coinTransfers as entries with IsProtocolFee=true.
+			// Calculate and distribute protocol fees
+			protocolFeeTransfers, err := k.CalculateAndDistributeProtocolFees(ctx, coinTransfers, initiatedBy)
+			if err != nil {
+				return err
+			}
+
+			// Add protocol fee transfers to the main coinTransfers slice
+			coinTransfers = append(coinTransfers, protocolFeeTransfers...)
 
 			err = EmitUsedApprovalDetailsEvent(ctx, collection.CollectionId, transfer.From, to, initiatedBy, coinTransfers, approvalsUsed, transfer.Balances)
 			if err != nil {
