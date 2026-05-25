@@ -83,12 +83,48 @@ detect_arch() {
   esac
 }
 
-# Get latest release tag from GitHub API
+# Get latest release tag.
+#
+# PRIMARY: resolve via the github.com web redirect. /releases/latest 302s to
+# /releases/tag/<tag>; we read the tag off the final URL. This path does NOT
+# touch api.github.com, so it is immune to the 60/hr unauthenticated API rate
+# limit that returns HTTP 403 on shared/NAT'd IPs (corp networks, CI, boxes
+# already running `gh`).
+#
+# FALLBACK: only if the redirect yields no tag, query the API as before. Send
+# `Authorization: Bearer $GITHUB_TOKEN` when that env var is set (lifts the
+# limit to 5,000/hr).
+#
+# Note: each network call is piped into sed, whose exit 0 masks any upstream
+# `-f` failure, so `set -e` does not abort before the fallback can run.
 get_latest_version() {
+  tag=""
+
+  # PRIMARY: follow the releases/latest redirect (no API rate limit).
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p'
+    tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/${REPO}/releases/latest" 2>/dev/null | sed -n 's#.*/releases/tag/##p')"
   elif command -v wget >/dev/null 2>&1; then
-    wget -qO- "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p'
+    tag="$(wget -S --spider "https://github.com/${REPO}/releases/latest" 2>&1 | sed -n 's#.*/releases/tag/##p' | tr -d '\r' | sed 's/ .*//' | tail -n1)"
+  fi
+
+  if [ -n "$tag" ]; then
+    echo "$tag"
+    return 0
+  fi
+
+  # FALLBACK: api.github.com (rate-limited unless GITHUB_TOKEN is set).
+  if command -v curl >/dev/null 2>&1; then
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+      curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p'
+    else
+      curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p'
+    fi
+  elif command -v wget >/dev/null 2>&1; then
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+      wget -qO- --header="Authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p'
+    else
+      wget -qO- "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p'
+    fi
   else
     echo "Error: curl or wget required" >&2
     exit 1
