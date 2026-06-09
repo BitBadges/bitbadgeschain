@@ -172,3 +172,6 @@ genesis:
 validators:
     - name: alice
       bonded: 1000000000000000ustake
+      config:
+        consensus:
+          timeout_commit: "1500ms"
