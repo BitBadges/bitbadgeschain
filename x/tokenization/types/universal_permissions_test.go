@@ -6,9 +6,11 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/testutil"
 )
 
 const (
@@ -837,4 +839,36 @@ func TestRemoveAddresses(t *testing.T) {
 	}
 
 	require.Equal(t, expected, remaining)
+}
+
+// Pins the metered cost of UniversalRemoveOverlaps. The function is the
+// per-iteration body of the O(n*m) overlap algorithm, so this constant is
+// multiplied across every pair compared in a permission update — a regression
+// here is a chain-wide fee/throughput change, not a local detail.
+func TestRemoveOverlapsGasCost(t *testing.T) {
+	key := storetypes.NewKVStoreKey("test")
+	tkey := storetypes.NewTransientStoreKey("transient_test")
+	ctx := testutil.DefaultContext(key, tkey).
+		WithGasMeter(storetypes.NewGasMeter(1_000_000))
+
+	a := &types.UniversalPermissionDetails{
+		TokenId: &types.UintRange{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(10)},
+	}
+	b := &types.UniversalPermissionDetails{
+		TokenId: &types.UintRange{Start: sdkmath.NewUint(5), End: sdkmath.NewUint(15)},
+	}
+
+	before := ctx.GasMeter().GasConsumed()
+	types.UniversalRemoveOverlaps(ctx, a, b)
+	require.Equal(t, uint64(20), ctx.GasMeter().GasConsumed()-before,
+		"one call must charge exactly 20 gas")
+
+	// A second call charges exactly one more increment (no hidden double-billing).
+	before = ctx.GasMeter().GasConsumed()
+	types.UniversalRemoveOverlaps(ctx, a, b)
+	require.Equal(t, uint64(20), ctx.GasMeter().GasConsumed()-before)
+
+	// Zero context (no multistore) must skip the charge entirely.
+	r, _ := types.UniversalRemoveOverlaps(sdk.Context{}, a, b)
+	require.NotNil(t, r)
 }
