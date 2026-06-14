@@ -113,7 +113,11 @@ func UniversalRemoveOverlapFromValues(ctx sdk.Context, overlap *UniversalPermiss
 
 func UniversalRemoveOverlaps(ctx sdk.Context, toRemove *UniversalPermissionDetails, base *UniversalPermissionDetails) ([]*UniversalPermissionDetails, []*UniversalPermissionDetails) {
 	if !ctx.IsZero() {
-		ctx.GasMeter().ConsumeGas(500, "UniversalRemoveOverlaps")
+		// Pure in-memory bigint/range arithmetic, no state access. Anchored just
+		// below the SDK's IterNextCostFlat (30) — a store-iterator step does
+		// strictly more work than this. The tx gas limit bounds the O(n*m) call
+		// fan-out; no separate input-length cap is needed.
+		ctx.GasMeter().ConsumeGas(20, "UniversalRemoveOverlaps")
 	}
 
 	toRemove = AddDefaultsIfNil(toRemove)
