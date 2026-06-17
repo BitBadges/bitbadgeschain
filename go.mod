@@ -3,7 +3,14 @@ module github.com/bitbadges/bitbadgeschain
 go 1.25.8
 
 replace (
-	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.16.2-cosmos-1
+	// BitBadges fork of cosmos/go-ethereum with a single patch to
+	// signer/core/apitypes/types.go::EncodeType: emit "TypeName()" for
+	// empty types instead of "TypeName)" (mismatched paren). Required
+	// for EIP-712 signature verification of Cosmos messages whose
+	// typed-data tree references types with zero fields. See the fork
+	// commit for details. Local path while the fork PR is in review;
+	// switch to a published tag before mainnet deploy.
+	github.com/ethereum/go-ethereum => /home/trevormil/CompSci/bitbadges/go-ethereum-eip712-fork
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
 

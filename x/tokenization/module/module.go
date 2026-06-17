@@ -64,7 +64,20 @@ func (AppModuleBasic) Name() string {
 
 // RegisterLegacyAminoCodec registers the amino codec for the module, which is used
 // to marshal and unmarshal structs to/from []byte in order to persist them in the module's KVStore.
-func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
+//
+// Required for EIP-712 signature verification: cosmos/evm's verifier amino-decodes
+// the StdSignDoc messages on the chain's main legacy amino codec, so every Msg that
+// can be signed via EIP-712 must be registered here. Without this call the verifier
+// fails with "unrecognized concrete type name tokenization/..." and signature
+// verification falls back to ECDSA-on-raw-msg, which never matches an EIP-712 sig.
+//
+// Calls `RegisterAminoConcretes` (module-only types) — NOT `RegisterCodec`,
+// which would also re-register the chain-wide encoding stack and panic with
+// "TypeInfo already exists for types.PubKey" since depinject has already
+// wired those interfaces.
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	types.RegisterAminoConcretes(cdc)
+}
 
 // RegisterInterfaces registers a module's interface types and their concrete implementations as proto.Message.
 func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {

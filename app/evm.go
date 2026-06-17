@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
+	eip712 "github.com/cosmos/evm/ethereum/eip712"
 	precompiletypes "github.com/cosmos/evm/precompiles/types"
 	erc20 "github.com/cosmos/evm/x/erc20"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
@@ -81,6 +82,15 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	if err != nil {
 		return err
 	}
+
+	// Initialize the cosmos/evm EIP-712 verifier's package-level codec/chain-id
+	// singletons. Without this call, every `verifySignatureAsEIP712` call inside
+	// `ethsecp256k1.PubKey.VerifySignature` errors out at `validateCodecInit`
+	// and silently returns false, falling back to standard ECDSA verification of
+	// raw cosmos sign bytes — which never matches an EIP-712 signature.
+	// Symptom: "signature verification failed; ... unauthorized" on every
+	// EIP-712-signed broadcast.
+	eip712.SetEncodingConfig(app.legacyAmino, app.interfaceRegistry, evmChainIDUint64)
 
 	// Get all non-transient KV store keys for the EVM keeper
 	// The EVM keeper needs access to all stores so precompiles can access any store they need
