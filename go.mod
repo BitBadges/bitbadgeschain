@@ -507,3 +507,10 @@ tool (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	google.golang.org/protobuf/cmd/protoc-gen-go
 )
+
+// July 2026 cosmos/evm security hotfix. Points at the PRIVATE embargoed repo
+// cosmos/evm-priv-jul2026 (tag v0.6.x-july-2026-hotfix). Building from source
+// requires read access to that repo; the released binaries are the supported
+// upgrade path for node operators. Revert to the public cosmos/evm module once
+// the fix lands in a public release.
+replace github.com/cosmos/evm => github.com/cosmos/evm-priv-jul2026 v0.0.0-20260705202320-bd7755ce7565
