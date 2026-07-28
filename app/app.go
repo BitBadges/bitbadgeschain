@@ -19,6 +19,7 @@ import (
 
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -79,6 +80,7 @@ import (
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
+	evmmodule "github.com/cosmos/evm/x/vm"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -170,6 +172,7 @@ type App struct {
 
 	// EVM mempool and pending tx listeners for JSON-RPC support
 	EVMMempool         sdkmempool.ExtMempool
+	evmModule          evmmodule.AppModule
 	pendingTxListeners []evmante.PendingTxListener
 
 	// simulation manager
@@ -447,6 +450,17 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		return nil, err
+	}
+
+	if loadLatest {
+		// cosmos/evm v0.7 keeps EVM configuration in process globals that are
+		// seeded from the KV store. Without this, EVM execution paths that
+		// build their own StateDB (notably the EVM query challenge path in
+		// x/tokenization) run against unhydrated globals.
+		app.evmModule.HydrateGlobals(app.NewContextLegacy(true, cmtproto.Header{
+			Height:  app.LastBlockHeight(),
+			ChainID: app.ChainID(),
+		}))
 	}
 
 	return app, nil

@@ -214,6 +214,8 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.AccountKeeper.AddressCodec(),
 	)
 
+	app.evmModule = evmModule
+
 	if err := app.RegisterModules(evmModule); err != nil {
 		return err
 	}
