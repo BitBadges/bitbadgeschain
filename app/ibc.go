@@ -162,12 +162,12 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler)
 
-	// Create IBC-Go transfer keeper (IBC v11: AddressCodec added)
+	// Create IBC-Go transfer keeper. IBC v11 dropped the ICS4Wrapper argument
+	// (set later via WithICS4Wrapper) and returns a pointer.
 	app.TransferKeeper = transferkeeper.NewKeeper(
 		app.appCodec,
 		app.AccountKeeper.AddressCodec(),
 		runtime.NewKVStoreService(app.GetKey(ibctransfertypes.StoreKey)),
-		nil,                         // ICS4Wrapper - set later via WithICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
 		app.MsgServiceRouter(),      // MessageRouter
 		app.AccountKeeper,
@@ -188,11 +188,11 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// Create interchain account keepers (IBC v11 - ParamSubspace removed)
+	// Create interchain account keepers. IBC v11 removed ParamSubspace and the
+	// separate ICS4Wrapper argument, and the constructors return pointers.
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(icahosttypes.StoreKey)),
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
 		app.AccountKeeper,
 		app.MsgServiceRouter(),
@@ -203,7 +203,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(icacontrollertypes.StoreKey)),
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
 		app.MsgServiceRouter(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -234,9 +233,13 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// If callbacks are needed in the future, we'll need to create a ContractKeeper adapter
 	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
 	// Using a reasonable default: 1,000,000 gas units
-	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCKeeper.ChannelKeeper, NewNoopContractKeeper(), 1_000_000)
-	icaICS4Wrapper := icaControllerStack.(porttypes.ICS4Wrapper)
-	app.ICAControllerKeeper.WithICS4Wrapper(icaICS4Wrapper)
+	// v11: the callbacks middleware takes only the contract keeper and gas
+	// limit; the wrapped app and ICS4Wrapper are attached with setters.
+	icaCallbacks := ibccallbacks.NewIBCMiddleware(NewNoopContractKeeper(), 1_000_000)
+	icaCallbacks.SetUnderlyingApplication(icaControllerStack)
+	icaCallbacks.SetICS4Wrapper(app.IBCKeeper.ChannelKeeper)
+	icaControllerStack = icaCallbacks
+	app.ICAControllerKeeper.WithICS4Wrapper(icaCallbacks)
 
 	// Create Transfer Stack (IBC v10 - callbacks wraps transfer, packetforward wraps callbacks)
 	var transferStack porttypes.IBCModule
@@ -250,7 +253,9 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// If callbacks are needed in the future, we'll need to create a ContractKeeper adapter
 	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
 	// Using a reasonable default: 1,000,000 gas units
-	cbStack := ibccallbacks.NewIBCMiddleware(transferStack, app.PacketForwardKeeper, NewNoopContractKeeper(), 1_000_000)
+	cbStack := ibccallbacks.NewIBCMiddleware(NewNoopContractKeeper(), 1_000_000)
+	cbStack.SetUnderlyingApplication(transferStack)
+	cbStack.SetICS4Wrapper(app.PacketForwardKeeper)
 	// PFM v11 splits construction from wiring: the underlying app is attached
 	// via SetUnderlyingApplication rather than passed to the constructor.
 	pfmStack := packetforward.NewIBCMiddleware(
@@ -314,8 +319,10 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Add IBC Hooks middleware last (outermost) to have full control over acknowledgements
 	// This ensures error acknowledgements from hooks are properly returned
+	// Take the address: the v11 porttypes.IBCModule interface includes
+	// SetICS4Wrapper, which IBCMiddleware implements on a pointer receiver.
 	hooksTransferModule := ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
-	transferStack = hooksTransferModule
+	transferStack = &hooksTransferModule
 	app.TransferKeeper.WithICS4Wrapper(cbStack)
 
 	// Add the transfer stack (with hooks) to the router
@@ -328,7 +335,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	if err := app.RegisterModules(
 		ibc.NewAppModule(app.IBCKeeper),
 		ibctransfer.NewAppModule(app.TransferKeeper),
-		icamodule.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		icamodule.NewAppModule(app.ICAControllerKeeper, app.ICAHostKeeper),
 		ibctm.NewAppModule(ibctm.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
 		solomachine.NewAppModule(solomachine.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
 		packetforward.NewAppModule(app.PacketForwardKeeper),

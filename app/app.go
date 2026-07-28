@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"io"
 
 	_ "cosmossdk.io/api/cosmos/tx/config/v1" // import for side-effects
 	clienthelpers "cosmossdk.io/client/v2/helpers"
@@ -77,13 +76,9 @@ import (
 	sdkmempool "github.com/cosmos/cosmos-sdk/types/mempool"
 	evmante "github.com/cosmos/evm/ante"
 	antetypes "github.com/cosmos/evm/ante/types"
-	evmmempool "github.com/cosmos/evm/mempool"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
-	precisebank "github.com/cosmos/evm/contrib/x/precisebank"
-	precisebankkeeper "github.com/cosmos/evm/contrib/x/precisebank/keeper"
-	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -132,7 +127,6 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
-	PreciseBankKeeper     precisebankkeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
@@ -151,9 +145,9 @@ type App struct {
 
 	// IBC
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	ICAControllerKeeper icacontrollerkeeper.Keeper
-	ICAHostKeeper       icahostkeeper.Keeper
-	TransferKeeper      transferkeeper.Keeper // IBC-Go transfer keeper (v0.6.0: ERC20 conversions handled by ICS20 precompile)
+	ICAControllerKeeper *icacontrollerkeeper.Keeper
+	ICAHostKeeper       *icahostkeeper.Keeper
+	TransferKeeper      *transferkeeper.Keeper // IBC-Go transfer keeper (v11 returns a pointer)
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 
 	// IBC Hooks
@@ -175,7 +169,7 @@ type App struct {
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// EVM mempool and pending tx listeners for JSON-RPC support
-	EVMMempool         *evmmempool.ExperimentalEVMMempool
+	EVMMempool         sdkmempool.ExtMempool
 	pendingTxListeners []evmante.PendingTxListener
 
 	// simulation manager
@@ -224,7 +218,6 @@ func AppConfig() depinject.Config {
 func New(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	loadLatest bool,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
@@ -314,21 +307,11 @@ func New(
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	// build app
-	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
+	//
+	// NOTE: cosmos-sdk v0.54 dropped the traceStore parameter from Build, and
+	// from AppCreator/AppExporter, along with SetCommitMultiStoreTracer.
+	app.App = appBuilder.Build(db, baseAppOptions...)
 	app.BaseApp.SetCircuitBreaker(&app.CircuitBreakerKeeper)
-
-	// Create PreciseBankKeeper after app is built
-	// PreciseBankKeeper wraps BankKeeper to support fractional balances for non-18 decimal tokens
-	precisebankKey := storetypes.NewKVStoreKey(precisebanktypes.StoreKey)
-	if err := app.RegisterStores(precisebankKey); err != nil {
-		return nil, fmt.Errorf("failed to register precisebank store: %w", err)
-	}
-	app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
-		app.appCodec,
-		precisebankKey,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
 
 	// register legacy modules
 
@@ -340,20 +323,8 @@ func New(
 		return nil, err
 	}
 
-	// Register EVM modules first (PreciseBank depends on EVM keeper)
 	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
-	}
-
-	// Register PreciseBank module only if EVM keeper was successfully created
-	// PreciseBank's InitGenesis requires EVM keeper to be initialized
-	precisebankModule := precisebank.NewAppModule(
-		app.PreciseBankKeeper,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
-	if err := app.RegisterModules(precisebankModule); err != nil {
-		return nil, fmt.Errorf("failed to register precisebank module: %w", err)
 	}
 
 	// Wire up keepers for address checks

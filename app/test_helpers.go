@@ -85,7 +85,7 @@ func Setup(
 	randomHomeDir := origDefault + "/test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	app, err := New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+	app, err := New(log.NewNopLogger(), db, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
 	if err != nil {
 		panic(err)
 	}

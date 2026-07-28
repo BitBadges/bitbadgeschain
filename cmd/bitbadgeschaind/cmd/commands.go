@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io"
 
 	"cosmossdk.io/log/v2"
 	confixcmd "cosmossdk.io/tools/confix/cmd"
@@ -45,8 +44,8 @@ func initRootCmd(
 	// The cosmos/evm server expects an AppCreator that returns cosmosevmserver.Application
 	// which extends types.Application with AppWithPendingTxStream and GetMempool()
 	// We wrap newApp to match the expected signature
-	evmAppCreator := func(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) cosmosevmserver.Application {
-		appInterface := newApp(logger, db, traceStore, appOpts)
+	evmAppCreator := func(logger log.Logger, db dbm.DB, appOpts servertypes.AppOptions) cosmosevmserver.Application {
+		appInterface := newApp(logger, db, appOpts)
 		// Use type assertion to verify *app.App implements cosmosevmserver.Application
 		// This should work since we've implemented GetMempool(), RegisterPendingTxListener(), and SetClientCtx()
 		evmApp, ok := appInterface.(cosmosevmserver.Application)
@@ -164,13 +163,12 @@ func txCommand() *cobra.Command {
 func newApp(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	appOpts servertypes.AppOptions,
 ) servertypes.Application {
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	app, err := app.New(
-		logger, db, traceStore, true,
+		logger, db, true,
 		appOpts,
 		baseappOptions...,
 	)
@@ -184,7 +182,6 @@ func newApp(
 func appExport(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	height int64,
 	forZeroHeight bool,
 	jailAllowedAddrs []string,
@@ -213,7 +210,7 @@ func appExport(
 	appOpts = viperAppOpts
 
 	if height != -1 {
-		bApp, err = app.New(logger, db, traceStore, false, appOpts)
+		bApp, err = app.New(logger, db, false, appOpts)
 		if err != nil {
 			return servertypes.ExportedApp{}, err
 		}
@@ -222,7 +219,7 @@ func appExport(
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		bApp, err = app.New(logger, db, traceStore, true, appOpts)
+		bApp, err = app.New(logger, db, true, appOpts)
 		if err != nil {
 			return servertypes.ExportedApp{}, err
 		}
