@@ -94,7 +94,7 @@ func SetupBitBadgesTestingApp() (ibctesting.TestingApp, map[string]json.RawMessa
 	randomHomeDir := origDefault + "/ibc_test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	bitbadgesApp, err := app.New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+	bitbadgesApp, err := app.New(log.NewNopLogger(), db, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
 	if err != nil {
 		panic(err)
 	}
@@ -167,7 +167,7 @@ func SetupBitBadgesTestingAppWithGenesis(genState map[string]json.RawMessage) ib
 	randomHomeDir := origDefault + "/ibc_test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	bitbadgesApp, err := app.New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+	bitbadgesApp, err := app.New(log.NewNopLogger(), db, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
 	if err != nil {
 		panic(err)
 	}
