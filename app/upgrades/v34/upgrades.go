@@ -1,28 +1,30 @@
-package v33
+package v34
 
 import (
 	"context"
 
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	poolmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	// Uncomment when configuring rate limits:
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 const (
-	UpgradeName = "v33"
+	UpgradeName = "v34"
 )
 
-// This is in a separate function so we can test it locally with a snapshot
+// CustomUpgradeHandlerLogic runs chain-specific migration work for v34.
+//
+// v34 is a dependency/infrastructure upgrade — cosmos-sdk v0.54, ibc-go v11
+// (which absorbed packet-forward-middleware), and cosmos/evm v0.7. It carries
+// no tokenization state-schema change, so unlike v33 there is no tokenization
+// keeper migration to run here. The store deletions this upgrade needs
+// (x/crisis and x/precisebank, both removed upstream) are declared as
+// StoreUpgrades in app/upgrades.go rather than performed here.
+//
+// This is in a separate function so we can test it locally with a snapshot.
 func CustomUpgradeHandlerLogic(ctx context.Context, tokenizationKeeper tokenizationkeeper.Keeper, poolManagerKeeper poolmanagerkeeper.Keeper, rateLimitKeeper ibcratelimitkeeper.Keeper) error {
-	// Run badges migrations
-	if err := tokenizationKeeper.MigrateTokenizationKeeper(sdk.UnwrapSDKContext(ctx)); err != nil {
-		return err
-	}
-
 	return nil
 }
 

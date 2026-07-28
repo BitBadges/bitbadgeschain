@@ -3,14 +3,14 @@ package app
 import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	v33 "github.com/bitbadges/bitbadgeschain/app/upgrades/v33"
+	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v33.UpgradeName,
-		v33.CreateUpgradeHandler(
+		v34.UpgradeName,
+		v34.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
 			*app.TokenizationKeeper,
@@ -34,11 +34,12 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v33.UpgradeName:
+	case v34.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			// v33: remove deprecated x/anchor and x/maps modules
-			Deleted: []string{"anchor", "maps"},
+			// v34: x/crisis left the SDK in v0.54 and cosmos/evm v0.7 removed
+			// x/precisebank, so both module stores are dropped here.
+			Deleted: []string{"crisis", "precisebank"},
 			Added:   []string{},
 		}
 	}
