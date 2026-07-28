@@ -23,7 +23,8 @@
 package gamm
 
 import (
-	"embed"
+	"bytes"
+	_ "embed"
 	"fmt"
 	"math/big"
 
@@ -46,18 +47,23 @@ import (
 
 var _ vm.PrecompiledContract = &Precompile{}
 
+// Name implements vm.PrecompiledContract (geth 1.17).
+func (Precompile) Name() string {
+	return "gamm"
+}
+
 var (
 	// Embed abi json file to the executable binary. Needed when importing as dependency.
 	//
 	//go:embed abi.json
-	f   embed.FS
+	f   []byte
 	ABI abi.ABI
 	// abiLoadError stores any error from ABI loading for lazy error reporting
 	abiLoadError error
 )
 
 func init() {
-	ABI, abiLoadError = cmn.LoadABI(f, "abi.json")
+	ABI, abiLoadError = abi.JSON(bytes.NewReader(f))
 	if abiLoadError != nil {
 		// Log the error but don't panic - the error will be returned when the precompile is used
 		// This allows the chain to start even if the ABI is malformed, but the precompile will be disabled

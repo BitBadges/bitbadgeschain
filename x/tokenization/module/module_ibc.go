@@ -26,6 +26,11 @@ func NewIBCModule(k *keeper.Keeper) IBCModule {
 	}
 }
 
+// SetICS4Wrapper implements the ibc-go v11 IBCModule interface. This is a
+// terminal application module — it wraps nothing and never writes
+// acknowledgements through an ICS4Wrapper — so there is nothing to store.
+func (im IBCModule) SetICS4Wrapper(porttypes.ICS4Wrapper) {}
+
 // OnChanOpenInit implements the IBCModule interface
 // IBC v10: capabilities removed
 func (im IBCModule) OnChanOpenInit(

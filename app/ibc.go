@@ -39,9 +39,9 @@ import (
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationmodule "github.com/bitbadges/bitbadgeschain/x/tokenization/module"
 
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
+	packetforward "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware"
+	packetforwardkeeper "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/types"
 
 	customhooks "github.com/bitbadges/bitbadgeschain/x/custom-hooks"
 	customhookskeeper "github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
@@ -251,12 +251,15 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
 	// Using a reasonable default: 1,000,000 gas units
 	cbStack := ibccallbacks.NewIBCMiddleware(transferStack, app.PacketForwardKeeper, NewNoopContractKeeper(), 1_000_000)
-	transferStack = packetforward.NewIBCMiddleware(
-		cbStack,
+	// PFM v11 splits construction from wiring: the underlying app is attached
+	// via SetUnderlyingApplication rather than passed to the constructor.
+	pfmStack := packetforward.NewIBCMiddleware(
 		app.PacketForwardKeeper,
 		0, // retries on timeout
 		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
 	)
+	pfmStack.SetUnderlyingApplication(cbStack)
+	transferStack = pfmStack
 	app.TransferICS4Wrapper = app.PacketForwardKeeper
 
 	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
@@ -328,7 +331,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		icamodule.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		ibctm.NewAppModule(ibctm.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
 		solomachine.NewAppModule(solomachine.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
-		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
+		packetforward.NewAppModule(app.PacketForwardKeeper),
 		ibcratelimitmodule.NewAppModule(app.appCodec, app.IBCRateLimitKeeper),
 	); err != nil {
 		return err
