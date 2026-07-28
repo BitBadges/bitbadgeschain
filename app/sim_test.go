@@ -379,7 +379,6 @@ func TestAppStateDeterminism(t *testing.T) {
 			bApp, err := app.New(
 				logger,
 				db,
-				nil,
 				true,
 				appOptions,
 				interBlockCacheOpt(),

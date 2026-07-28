@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"github.com/cosmos/cosmos-sdk/store/v2"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdkmath "cosmossdk.io/math"
@@ -17,6 +17,7 @@ import (
 	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/require"
 
@@ -132,6 +133,9 @@ func seedOutboundTracking(t *testing.T, k keeper.Keeper, ctx sdk.Context, amount
 // noopIBCModule implements porttypes.IBCModule with no-op behavior.
 // Used to satisfy the IBCMiddleware.App interface in override-hook tests.
 type noopIBCModule struct{}
+
+// SetICS4Wrapper satisfies the ibc-go v11 IBCModule interface (no-op).
+func (noopIBCModule) SetICS4Wrapper(porttypes.ICS4Wrapper) {}
 
 func (noopIBCModule) OnChanOpenInit(sdk.Context, channeltypes.Order, []string, string, string, channeltypes.Counterparty, string) (string, error) {
 	return "", nil
