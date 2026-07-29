@@ -15,8 +15,12 @@ import (
 const (
 	// MaxTotalPostTransferInvariantGas limits total gas across all post-transfer invariants
 	MaxTotalPostTransferInvariantGas = uint64(1000000)
-	// DefaultPostTransferEVMQueryGasLimit is the default gas limit for post-transfer EVM queries
-	DefaultPostTransferEVMQueryGasLimit = uint64(100000)
+	// DefaultPostTransferEVMQueryGasLimit is the default gas limit for post-transfer EVM queries.
+	// Raised from 100000 in v34: cosmos/evm v0.7 charges a stateful precompile the Cosmos KV
+	// gas already consumed inside the EVM call before the precompile handler runs, so a query
+	// whose contract calls a precompile needs materially more headroom than under v0.6.
+	// Measured floor for a single getCollectionStats call is ~145000; this leaves ~1.7x margin.
+	DefaultPostTransferEVMQueryGasLimit = uint64(250000)
 	// MaxPostTransferEVMQueryGasLimit is the maximum gas limit for a single post-transfer EVM query
 	MaxPostTransferEVMQueryGasLimit = uint64(500000)
 )

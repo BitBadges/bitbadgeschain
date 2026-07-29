@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/evm/x/vm/statedb"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
@@ -103,13 +104,39 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 	}
 
 	gasCap := new(big.Int).SetUint64(gasLimit)
+
+	// Run the EVM call against an isolated gas meter.
+	//
+	// cosmos/evm v0.7's stateful-precompile entrypoint (RunNativeAction) starts
+	// by charging the *already consumed* gas of the incoming context against a
+	// fresh meter capped at the gas the EVM forwarded to the precompile:
+	//
+	//	initialGas := ctx.GasMeter().GasConsumed()
+	//	ctx = ctx.WithGasMeter(storetypes.NewGasMeter(contract.Gas))
+	//	ctx.GasMeter().ConsumeGas(initialGas, "creating a new gas meter")
+	//
+	// A normal EVM transaction survives that because its context starts with a
+	// fresh ante-handler meter. EVM queries do not: they run in the middle of a
+	// Cosmos message (approval checks and post-transfer invariants), so the
+	// incoming meter has already consumed far more than the forwarded gas and
+	// the precompile aborts with "out of gas" before its handler ever runs.
+	//
+	// Metering the call separately is also what this function already assumes:
+	// the EVM gas actually used is charged back onto the caller's meter below.
+	evmCtx := ctx
+	if gasLimit > 0 {
+		evmCtx = ctx.WithGasMeter(storetypes.NewGasMeter(gasLimit))
+	} else {
+		evmCtx = ctx.WithGasMeter(storetypes.NewInfiniteGasMeter())
+	}
+
 	// v0.6.0: Create stateDB for non-precompile context
 	// Type-assert to real EVM keeper for stateDB creation; nil stateDB for mock keepers in tests
 	var sdb *statedb.StateDB
 	if realKeeper, ok := k.evmKeeper.(*evmkeeper.Keeper); ok {
-		sdb = statedb.New(ctx, realKeeper, statedb.NewEmptyTxConfig())
+		sdb = statedb.New(evmCtx, realKeeper, statedb.NewEmptyTxConfig())
 	}
-	response, err := k.evmKeeper.CallEVMWithData(ctx, sdb, callerAddr, &contractAddr, calldata, false, false, gasCap)
+	response, err := k.evmKeeper.CallEVMWithData(evmCtx, sdb, callerAddr, &contractAddr, calldata, false, false, gasCap)
 	if err != nil {
 		return nil, fmt.Errorf("EVM call failed: %w", err)
 	}

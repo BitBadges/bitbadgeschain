@@ -13,10 +13,16 @@ import (
 )
 
 const (
-	DefaultEVMQueryGasLimit = uint64(100000)
+	// Raised from 100000 in v34 for the same reason as the post-transfer default:
+	// cosmos/evm v0.7 stateful precompiles need more gas headroom. See
+	// x/tokenization/keeper/post_transfer_invariants.go.
+	DefaultEVMQueryGasLimit = uint64(250000)
 	MaxEVMQueryGasLimit     = uint64(500000)
-	// MaxTotalEVMQueryGas limits total gas across all challenges to prevent DoS
-	// Even with 10 challenges, total gas is capped at 1M to prevent excessive computation
+	// MaxTotalEVMQueryGas limits total gas across all challenges to prevent DoS.
+	// The budget is reserved per challenge from its gas limit rather than from
+	// measured usage, so with the raised default above 4 challenges fit at the
+	// default instead of the 10 that fit at the old 100000. A challenge that
+	// does not call a precompile can set an explicit lower GasLimit to fit more.
 	MaxTotalEVMQueryGas = uint64(1000000)
 )
 
