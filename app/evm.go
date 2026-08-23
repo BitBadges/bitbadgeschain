@@ -151,7 +151,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		nonTransientKeys,
 		authority,
 		app.AccountKeeper,
-		app.BankKeeper, // v0.7 removed x/precisebank; bank is used directly
+		app.PreciseBankKeeper, // 9-decimal chain: EVM must see precisebank, not raw x/bank
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
@@ -162,7 +162,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		precompiletypes.DefaultStaticPrecompiles(
 			*app.StakingKeeper,
 			app.DistrKeeper,
-			app.BankKeeper,
+			app.PreciseBankKeeper,
 			&app.ERC20Keeper,
 			app.TransferKeeper,
 			app.IBCKeeper.ChannelKeeper,
@@ -179,7 +179,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.appCodec,
 		authority,
 		app.AccountKeeper,
-		app.BankKeeper, // v0.7 removed x/precisebank
+		app.PreciseBankKeeper, // 9-decimal chain: see app.go
 		app.EVMKeeper,
 		app.StakingKeeper,
 		app.TransferKeeper, // ibc-go transfer keeper (now a pointer)
@@ -210,7 +210,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	evmModule := evmmodule.NewAppModule(
 		app.EVMKeeper,
 		app.AccountKeeper,
-		app.BankKeeper, // v0.7 removed x/precisebank
+		app.PreciseBankKeeper, // 9-decimal chain: see app.go
 		app.AccountKeeper.AddressCodec(),
 	)
 

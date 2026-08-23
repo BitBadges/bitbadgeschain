@@ -62,6 +62,7 @@ import (
 
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 
+	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
@@ -89,6 +90,8 @@ var (
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
 		erc20types.ModuleName,
+		// precisebank must come after EVM: its InitGenesis needs the EVM keeper.
+		precisebanktypes.ModuleName,
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -145,6 +148,7 @@ var (
 		feemarkettypes.ModuleName, // FeeMarket must come before EVM
 		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
 		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -170,6 +174,7 @@ var (
 		feemarkettypes.ModuleName, // FeeMarket must come before EVM
 		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
 		evmtypes.ModuleName,
+		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -197,6 +202,7 @@ var (
 		{Account: feemarkettypes.ModuleName, Permissions: []string{}},                               // FeeMarket module account
 		{Account: erc20types.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}}, // ERC20 module account
 		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: precisebanktypes.ModuleName, Permissions: []string{}}, // PreciseBank reserve account
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
