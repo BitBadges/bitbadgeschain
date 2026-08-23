@@ -1,23 +1,39 @@
 package params
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	BaseCoinUnit         = "ubadge"
+	// BaseCoinUnit is the chain's atomic unit. As of the 18-decimal migration
+	// this is abadge (atto-badge, 10^-18 BADGE), not the old 9-decimal ubadge.
+	//
+	// x/vm requires base == extended for an 18-decimal chain: validateCoinInfo
+	// rejects any config where Decimals == 18 and Denom != ExtendedDenom. That
+	// is also what lets x/precisebank go away — there is no longer a precision
+	// gap for it to bridge.
+	BaseCoinUnit         = "abadge"
 	AccountAddressPrefix = "bb"
 
-	// ExtendedCoinUnit is the 18-decimal denom the EVM operates in. BADGE is a
-	// 9-decimal chain (ubadge); cosmos/evm v0.7 bridges that to the EVM's
-	// 18-decimal world via x/vm's extended denom, which replaced x/precisebank.
-	ExtendedCoinUnit = "abadge"
+	// LegacyBaseCoinUnit is the pre-migration 9-decimal atomic unit. Retained
+	// so the upgrade handler can find and convert balances still denominated
+	// in it. Nothing new should be written in this denom.
+	LegacyBaseCoinUnit = "ubadge"
+
+	// ExtendedCoinUnit is what the EVM operates in. At 18 decimals it is the
+	// same denom as the base unit.
+	ExtendedCoinUnit = BaseCoinUnit
 
 	// DisplayCoinUnit is the bank display unit; its exponent (BaseCoinDecimals)
 	// is what x/vm LoadEvmCoinInfo reads to determine the chain's decimals.
 	DisplayCoinUnit  = "badge"
-	BaseCoinDecimals = 9
+	BaseCoinDecimals = 18
+
+	// LegacyBaseCoinDecimals is the pre-migration exponent. The conversion
+	// factor is 10^(BaseCoinDecimals - LegacyBaseCoinDecimals) = 10^9.
+	LegacyBaseCoinDecimals = 9
 
 	// EVMChainIDMainnet is the EVM chain ID for BitBadges mainnet
 	// Chain ID: 50024 (to be claimed in ethereum-lists/chains registry)
@@ -57,6 +73,29 @@ func GetEVMChainID() string {
 	return EVMChainIDLocalDev
 }
 
+// PowerReduction is how many atomic units make one unit of consensus power.
+//
+// This MUST move with the decimals. Consensus power is tokens/PowerReduction,
+// so redenominating balances by 10^9 while leaving the SDK's default 10^6 in
+// place would multiply every validator's power by 10^9. With a supply on the
+// order of 10^15 ubadge, post-migration power would land around 10^18 —
+// against CometBFT's MaxTotalVotingPower ceiling of ~8.2e18, with no headroom
+// for supply growth.
+//
+// 10^15 = the SDK default 10^6 scaled by the same 10^9, which leaves every
+// validator's power numerically identical across the upgrade.
+//
+// Setting this is a consensus-affecting global, so it takes effect for whatever
+// binary is running. That is correct under cosmovisor, which replays each
+// height range with the binary that produced it.
+var PowerReduction = sdkmath.NewIntWithDecimal(1, 15)
+
+// SetPowerReduction installs PowerReduction as the SDK-wide value. Called from
+// the same place as the address prefixes, before any staking math runs.
+func SetPowerReduction() {
+	sdk.DefaultPowerReduction = PowerReduction
+}
+
 func SetAddressPrefixes() {
 	InitSDKConfigWithoutSeal()
 }
@@ -85,6 +124,7 @@ func InitSDKConfigWithoutSeal() *sdk.Config {
 }
 
 func InitSDKConfig() {
+	SetPowerReduction()
 	config := InitSDKConfigWithoutSeal()
 	config.SetCoinType(60) // Ethereum's coin type
 	config.SetPurpose(hd.CreateHDPath(60, 0, 0).Purpose)

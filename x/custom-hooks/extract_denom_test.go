@@ -29,29 +29,29 @@ func makePacket(denom string, sourcePort, sourceChannel, destPort, destChannel s
 }
 
 // Case 1: Native token returning home
-// ubadge sent to Osmosis via transfer/channel-0, coming back
-// Packet denom: "transfer/channel-0/ubadge" (Osmosis prefixed it with its source port/channel)
-// Expected local denom: "ubadge"
+// abadge sent to Osmosis via transfer/channel-0, coming back
+// Packet denom: "transfer/channel-0/abadge" (Osmosis prefixed it with its source port/channel)
+// Expected local denom: "abadge"
 func TestExtractDenom_NativeReturning(t *testing.T) {
 	packet := makePacket(
-		"transfer/channel-0/ubadge", // packet denom (prefixed by sender chain)
+		"transfer/channel-0/abadge", // packet denom (prefixed by sender chain)
 		"transfer", "channel-0",     // source (sender's port/channel)
 		"transfer", "channel-1",     // dest (our port/channel)
 	)
 
 	denom, err := extractDenomFromPacketOnRecv(packet)
 	require.NoError(t, err)
-	require.Equal(t, "ubadge", denom, "native token returning home should resolve to base denom")
+	require.Equal(t, "abadge", denom, "native token returning home should resolve to base denom")
 }
 
 // Case 2: Multi-hop native token returning
-// ubadge went BB -> Osmosis(channel-0) -> Hub -> back to BB
-// Hub sends it with denom "transfer/channel-0/transfer/channel-99/ubadge"
+// abadge went BB -> Osmosis(channel-0) -> Hub -> back to BB
+// Hub sends it with denom "transfer/channel-0/transfer/channel-99/abadge"
 // ReceiverChainIsSource = true (first prefix matches source port/channel)
 // After stripping first hop: remaining trace has transfer/channel-99 prefix = IBC denom
 func TestExtractDenom_MultiHopNativeReturning(t *testing.T) {
 	packet := makePacket(
-		"transfer/channel-0/transfer/channel-99/ubadge",
+		"transfer/channel-0/transfer/channel-99/abadge",
 		"transfer", "channel-0", // source (Hub's side — matches first trace hop)
 		"transfer", "channel-1", // dest (our side)
 	)
@@ -59,12 +59,12 @@ func TestExtractDenom_MultiHopNativeReturning(t *testing.T) {
 	denom, err := extractDenomFromPacketOnRecv(packet)
 	require.NoError(t, err)
 
-	// After stripping the source hop, remaining trace is transfer/channel-99/ubadge
-	// This should be an IBC denom (has a trace), not the bare "ubadge"
+	// After stripping the source hop, remaining trace is transfer/channel-99/abadge
+	// This should be an IBC denom (has a trace), not the bare "abadge"
 	require.Contains(t, denom, "ibc/", "multi-hop native should be an IBC hash denom")
-	require.NotEqual(t, "ubadge", denom, "should not resolve to bare base denom")
+	require.NotEqual(t, "abadge", denom, "should not resolve to bare base denom")
 	// Verify it matches what ibc-go would produce: NewDenom with the remaining hop
-	expected := transfertypes.NewDenom("ubadge", transfertypes.NewHop("transfer", "channel-99")).IBCDenom()
+	expected := transfertypes.NewDenom("abadge", transfertypes.NewHop("transfer", "channel-99")).IBCDenom()
 	require.Equal(t, expected, denom)
 }
 

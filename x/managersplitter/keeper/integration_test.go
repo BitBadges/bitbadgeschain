@@ -61,11 +61,11 @@ func (suite *TestSuite) SetupTest() {
 
 	suite.ctx = suite.ctx.WithBlockTime(time.Now())
 
-	ubadgeAmount := sdkmath.NewInt(100 * 1e9) // 100 BADGE
+	abadgeAmount := sdkmath.NewInt(100 * 1e9) // 100 BADGE
 
-	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
-	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(alice), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
-	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(charlie), sdk.NewCoins(sdk.NewInt64Coin("ubadge", ubadgeAmount.Int64())))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(bob), sdk.NewCoins(sdk.NewInt64Coin("abadge", abadgeAmount.Int64())))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(alice), sdk.NewCoins(sdk.NewInt64Coin("abadge", abadgeAmount.Int64())))
+	banktestutil.FundAccount(suite.ctx, suite.app.BankKeeper, sdk.MustAccAddressFromBech32(charlie), sdk.NewCoins(sdk.NewInt64Coin("abadge", abadgeAmount.Int64())))
 }
 
 func TestManagerSplitterKeeperTestSuite(t *testing.T) {

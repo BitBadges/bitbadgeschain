@@ -126,7 +126,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	}
 
 	// This is important. Prefixing allows only our module to control such denominations
-	// and doesn't allow users to mint other coins like "ubadge" or "factory/..."
+	// and doesn't allow users to mint other coins like "abadge" or "factory/..."
 	ibcDenom = WrappedDenomPrefix + collection.CollectionId.String() + ":" + ibcDenom
 	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
 

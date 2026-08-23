@@ -55,7 +55,7 @@ func getFullUintRanges() []*tokenizationtypes.UintRange {
 
 // TestCoinDenomValidation_MultiCoinInsufficientBalance tests that coin transfers
 // with multiple coins fail gracefully when the sender has insufficient balance.
-// Uses allowed denoms (ubadge) so that the transfer reaches the balance check.
+// Uses allowed denoms (abadge) so that the transfer reaches the balance check.
 func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinInsufficientBalance() {
 	wctx := sdk.WrapSDKContext(suite.Ctx)
 	collectionId := suite.CollectionId
@@ -97,8 +97,8 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_MultiCoinInsu
 						{
 							To: suite.Alice,
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
-								{Amount: sdkmath.NewInt(50), Denom: "ubadge"},
+								{Amount: sdkmath.NewInt(100), Denom: "abadge"},
+								{Amount: sdkmath.NewInt(50), Denom: "abadge"},
 							},
 						},
 					},
@@ -202,7 +202,7 @@ func (suite *CoinDenomValidationTestSuite) TestCoinDenomValidation_AllCoinsCheck
 						{
 							To: suite.Alice,
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(50), Denom: "ubadge"},
+								{Amount: sdkmath.NewInt(50), Denom: "abadge"},
 							},
 						},
 					},

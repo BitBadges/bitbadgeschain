@@ -2,8 +2,10 @@ package app
 
 import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
+	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -17,6 +19,22 @@ func (app *App) RegisterUpgradeHandlers() {
 			*app.TokenizationKeeper,
 			app.PoolManagerKeeper,
 			app.IBCRateLimitKeeper,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v35.UpgradeName,
+		v35.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.Configurator(),
+			v35.Keepers{
+				Bank:    app.BankKeeper.(bankkeeper.BaseKeeper),
+				Staking: app.StakingKeeper,
+				Mint:    app.MintKeeper,
+				Gov:     app.GovKeeper,
+				EVM:          app.EVMKeeper,
+				Tokenization: *app.TokenizationKeeper,
+			},
 		),
 	)
 
@@ -35,6 +53,14 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
+	case v35.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Renamed: []storetypes.StoreRename{},
+			// The 18-decimal migration makes base == extended denom, so
+			// x/precisebank has nothing left to bridge and is unwired.
+			Deleted: []string{"precisebank"},
+			Added:   []string{},
+		}
 	case v34.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},

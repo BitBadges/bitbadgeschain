@@ -80,9 +80,6 @@ import (
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
-	precisebank "github.com/cosmos/evm/contrib/x/precisebank"
-	precisebankkeeper "github.com/cosmos/evm/contrib/x/precisebank/keeper"
-	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	evmmodule "github.com/cosmos/evm/x/vm"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
@@ -132,7 +129,6 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
-	PreciseBankKeeper     precisebankkeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
@@ -333,52 +329,12 @@ func New(
 		return nil, err
 	}
 
-	// x/precisebank is what makes a 9-decimal chain usable from the EVM.
-	//
-	// cosmos/evm v0.7 moved the module to contrib and stopped wiring it by
-	// default, on the assumption that chains are 18-decimal. BADGE is not.
-	// x/vm's BankWrapper.GetBalance reads the *extended* denom straight out of
-	// x/bank with no scaling:
-	//
-	//	return w.BankKeeper.GetBalance(ctx, addr, types.GetEVMCoinExtendedDenom())
-	//
-	// Nothing mints abadge, so wiring x/bank directly makes every EVM balance
-	// read as zero — eth_getBalance returns 0x0 for a fully funded account, and
-	// EVM value transfer and gas payment are dead. Verified on a live node
-	// before this was restored.
-	//
-	// x/precisebank is the bridge: every abadge is backed 1:1 by a ubadge in
-	// x/bank, so EVM and Cosmos see the same money at different precision.
-	// Upstream's own migration guide names pinning contrib/x/precisebank as the
-	// supported option for non-18-decimal chains, the alternative being a
-	// decimals migration.
-	//
-	// Virtual fee collection is deliberately NOT enabled: EnableVirtualFeeCollection
-	// panics unless the display unit is 18 decimals.
-	precisebankKey := storetypes.NewKVStoreKey(precisebanktypes.StoreKey)
-	if err := app.RegisterStores(precisebankKey); err != nil {
-		return nil, fmt.Errorf("failed to register precisebank store: %w", err)
-	}
-	app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
-		app.appCodec,
-		precisebankKey,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
-
-	// EVM modules first: precisebank's InitGenesis needs the EVM keeper.
+	// x/precisebank is gone as of the 18-decimal migration: base denom and
+	// extended denom are now the same, so there is no precision gap to bridge.
 	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
 	}
 
-	precisebankModule := precisebank.NewAppModule(
-		app.PreciseBankKeeper,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
-	if err := app.RegisterModules(precisebankModule); err != nil {
-		return nil, fmt.Errorf("failed to register precisebank module: %w", err)
-	}
 
 	// Wire up keepers for address checks
 	app.TokenizationKeeper.SetGammKeeper(&app.GammKeeper)

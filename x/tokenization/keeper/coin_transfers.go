@@ -15,9 +15,9 @@ const (
 )
 
 // formatDenomForDisplay formats a denom for display in error messages
-// Shows "BADGE" for "ubadge" and prints others as-is
+// Shows "BADGE" for "abadge" and prints others as-is
 func formatDenomForDisplay(denom string) string {
-	if denom == "ubadge" {
+	if denom == "abadge" {
 		return "BADGE"
 	}
 	return denom

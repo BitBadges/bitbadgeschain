@@ -23,7 +23,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_GovernanceAuthorityRequired
 	authority := suite.Keeper.GetAuthority()
 
 	params := types.Params{
-		AllowedDenoms:       []string{"ubadge", "stake"},
+		AllowedDenoms:       []string{"abadge", "stake"},
 		AffiliatePercentage: sdkmath.NewUint(10),
 	}
 
@@ -37,14 +37,14 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_GovernanceAuthorityRequired
 
 	// Verify params were updated
 	updatedParams := suite.Keeper.GetParams(suite.Ctx)
-	suite.Require().Equal([]string{"ubadge", "stake"}, updatedParams.AllowedDenoms)
+	suite.Require().Equal([]string{"abadge", "stake"}, updatedParams.AllowedDenoms)
 	suite.Require().Equal(sdkmath.NewUint(10), updatedParams.AffiliatePercentage)
 }
 
 // TestUpdateParams_NonGovernanceRejected tests that non-governance authority is rejected
 func (suite *UpdateParamsTestSuite) TestUpdateParams_NonGovernanceRejected() {
 	params := types.Params{
-		AllowedDenoms:       []string{"ubadge"},
+		AllowedDenoms:       []string{"abadge"},
 		AffiliatePercentage: sdkmath.NewUint(5),
 	}
 
@@ -65,7 +65,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_AllowedDenomsUpdate() {
 
 	// Set initial params with some denoms
 	initialParams := types.Params{
-		AllowedDenoms:       []string{"ubadge"},
+		AllowedDenoms:       []string{"abadge"},
 		AffiliatePercentage: sdkmath.NewUint(0),
 	}
 	initialMsg := &types.MsgUpdateParams{
@@ -77,11 +77,11 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_AllowedDenomsUpdate() {
 
 	// Verify initial params
 	params := suite.Keeper.GetParams(suite.Ctx)
-	suite.Require().Equal([]string{"ubadge"}, params.AllowedDenoms)
+	suite.Require().Equal([]string{"abadge"}, params.AllowedDenoms)
 
 	// Update to different denoms
 	updatedParams := types.Params{
-		AllowedDenoms:       []string{"ubadge", "uatom", "uosmo"},
+		AllowedDenoms:       []string{"abadge", "uatom", "uosmo"},
 		AffiliatePercentage: sdkmath.NewUint(0),
 	}
 	updateMsg := &types.MsgUpdateParams{
@@ -93,7 +93,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_AllowedDenomsUpdate() {
 
 	// Verify updated params
 	params = suite.Keeper.GetParams(suite.Ctx)
-	suite.Require().Equal([]string{"ubadge", "uatom", "uosmo"}, params.AllowedDenoms)
+	suite.Require().Equal([]string{"abadge", "uatom", "uosmo"}, params.AllowedDenoms)
 }
 
 // TestUpdateParams_EmptyAllowedDenoms tests setting empty allowed_denoms
@@ -124,7 +124,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_ParamsPersistedCorrectly() 
 
 	// Set params
 	params := types.Params{
-		AllowedDenoms:       []string{"ubadge", "ustake", "utest"},
+		AllowedDenoms:       []string{"abadge", "ustake", "utest"},
 		AffiliatePercentage: sdkmath.NewUint(25),
 	}
 
@@ -138,7 +138,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_ParamsPersistedCorrectly() 
 
 	// Verify all params are persisted correctly
 	updatedParams := suite.Keeper.GetParams(suite.Ctx)
-	suite.Require().Equal([]string{"ubadge", "ustake", "utest"}, updatedParams.AllowedDenoms, "allowed denoms should be persisted")
+	suite.Require().Equal([]string{"abadge", "ustake", "utest"}, updatedParams.AllowedDenoms, "allowed denoms should be persisted")
 	suite.Require().Equal(sdkmath.NewUint(25), updatedParams.AffiliatePercentage, "affiliate percentage should be persisted")
 }
 
@@ -175,11 +175,11 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_MultipleDenomTypes() {
 	}{
 		{
 			name:   "single denom",
-			denoms: []string{"ubadge"},
+			denoms: []string{"abadge"},
 		},
 		{
 			name:   "multiple denoms",
-			denoms: []string{"ubadge", "uatom", "uosmo", "ustake"},
+			denoms: []string{"abadge", "uatom", "uosmo", "ustake"},
 		},
 		{
 			name:   "ibc denom",
@@ -187,7 +187,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_MultipleDenomTypes() {
 		},
 		{
 			name:   "mixed denoms",
-			denoms: []string{"ubadge", "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2"},
+			denoms: []string{"abadge", "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2"},
 		},
 	}
 
@@ -242,7 +242,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_AffiliatePercentage() {
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
 			params := types.Params{
-				AllowedDenoms:       []string{"ubadge"},
+				AllowedDenoms:       []string{"abadge"},
 				AffiliatePercentage: tc.percentage,
 			}
 
@@ -267,7 +267,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_SequentialUpdates() {
 
 	// First update
 	params1 := types.Params{
-		AllowedDenoms:       []string{"ubadge"},
+		AllowedDenoms:       []string{"abadge"},
 		AffiliatePercentage: sdkmath.NewUint(10),
 	}
 	msg1 := &types.MsgUpdateParams{
@@ -279,12 +279,12 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_SequentialUpdates() {
 
 	// Verify first update
 	updatedParams := suite.Keeper.GetParams(suite.Ctx)
-	suite.Require().Equal([]string{"ubadge"}, updatedParams.AllowedDenoms)
+	suite.Require().Equal([]string{"abadge"}, updatedParams.AllowedDenoms)
 	suite.Require().Equal(sdkmath.NewUint(10), updatedParams.AffiliatePercentage)
 
 	// Second update
 	params2 := types.Params{
-		AllowedDenoms:       []string{"ubadge", "uatom"},
+		AllowedDenoms:       []string{"abadge", "uatom"},
 		AffiliatePercentage: sdkmath.NewUint(20),
 	}
 	msg2 := &types.MsgUpdateParams{
@@ -296,7 +296,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_SequentialUpdates() {
 
 	// Verify second update
 	updatedParams = suite.Keeper.GetParams(suite.Ctx)
-	suite.Require().Equal([]string{"ubadge", "uatom"}, updatedParams.AllowedDenoms)
+	suite.Require().Equal([]string{"abadge", "uatom"}, updatedParams.AllowedDenoms)
 	suite.Require().Equal(sdkmath.NewUint(20), updatedParams.AffiliatePercentage)
 
 	// Third update - completely different
@@ -343,7 +343,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_PartialUpdate() {
 
 	// First set known values
 	initialParams := types.Params{
-		AllowedDenoms:       []string{"ubadge", "uatom"},
+		AllowedDenoms:       []string{"abadge", "uatom"},
 		AffiliatePercentage: sdkmath.NewUint(50),
 	}
 	initialMsg := &types.MsgUpdateParams{
@@ -376,7 +376,7 @@ func (suite *UpdateParamsTestSuite) TestUpdateParams_ZeroAffiliatePercentage() {
 	authority := suite.Keeper.GetAuthority()
 
 	params := types.Params{
-		AllowedDenoms:       []string{"ubadge"},
+		AllowedDenoms:       []string{"abadge"},
 		AffiliatePercentage: sdkmath.NewUint(0),
 	}
 
