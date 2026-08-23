@@ -13,6 +13,7 @@ func (app *App) RegisterUpgradeHandlers() {
 		v34.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
+			app.AccountKeeper,
 			*app.TokenizationKeeper,
 			app.PoolManagerKeeper,
 			app.IBCRateLimitKeeper,
