@@ -46,6 +46,7 @@ func initRootCmd(
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(initBasicManager, app.DefaultNodeHome),
+		NewPreUpgradeCmd(),
 		debug.Cmd(),
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, app.DefaultNodeHome),

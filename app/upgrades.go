@@ -37,9 +37,18 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v34.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			// v34: x/crisis left the SDK in v0.54 and cosmos/evm v0.7 removed
-			// x/precisebank, so both module stores are dropped here.
-			Deleted: []string{"crisis", "precisebank"},
+			// v34 drops three module stores:
+			//   crisis      - x/crisis left the SDK in v0.54
+			//   group       - x/group moved out of the SDK in v0.54 (enterprise)
+			//   precisebank - removed by cosmos/evm v0.7
+			//
+			// All three are registered modules in v33 (see the v33 genesis, which
+			// carries "crisis" and "group" app_state) and are gone in v34, so
+			// their stores would otherwise be orphaned on disk forever. The
+			// upgrade completes either way — the SDK tolerates an unmounted
+			// store — but leaving them behind keeps dead state around and is
+			// inconsistent with how crisis is handled.
+			Deleted: []string{"crisis", "group", "precisebank"},
 			Added:   []string{},
 		}
 	}
