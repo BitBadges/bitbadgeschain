@@ -77,6 +77,18 @@ var (
 		// cosmos-sdk/ibc modules
 		authtypes.ModuleName,
 		banktypes.ModuleName,
+		// The EVM modules must initialize BEFORE genutiltypes below. genutil
+		// delivers the genesis txs, and those run through the EVM ante handler,
+		// which needs the process-global EVM coin config that x/vm InitGenesis
+		// installs. They also come after banktypes because x/vm resolves its
+		// coin info from the bank denom metadata for ubadge.
+		//
+		// Order within the group: feemarket, then vm, then erc20 (erc20 depends
+		// on the EVM keeper). This matches the intent the comments always
+		// stated; the previous list had erc20 ahead of evm, contradicting it.
+		feemarkettypes.ModuleName,
+		evmtypes.ModuleName,
+		erc20types.ModuleName,
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -102,9 +114,6 @@ var (
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-		feemarkettypes.ModuleName, // FeeMarket must come before EVM
-		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
-		evmtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 

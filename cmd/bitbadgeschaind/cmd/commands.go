@@ -32,8 +32,20 @@ func initRootCmd(
 	txConfig client.TxConfig,
 	basicManager module.BasicManager,
 ) {
+	// The EVM modules are wired at runtime rather than through depinject, so the
+	// injected basicManager has no entry for them and `init` would write a
+	// genesis with no vm/feemarket/erc20 state — which in turn skips x/vm's
+	// InitGenesis, the thing that seeds the global EVM coin config. Give InitCmd
+	// its own copy that knows about them, leaving the shared manager untouched
+	// so no interface registration happens twice.
+	initBasicManager := make(module.BasicManager, len(basicManager)+3)
+	for name, mod := range basicManager {
+		initBasicManager[name] = mod
+	}
+	app.RegisterEVMModuleBasics(initBasicManager)
+
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(basicManager, app.DefaultNodeHome),
+		genutilcli.InitCmd(initBasicManager, app.DefaultNodeHome),
 		debug.Cmd(),
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, app.DefaultNodeHome),

@@ -4,9 +4,7 @@
 package app
 
 import (
-	evmmodule "github.com/cosmos/evm/x/vm"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
-	evmtypes "github.com/cosmos/evm/x/vm/types"
 )
 
 // configureEVMKeeper applies EVM configuration for production builds.
@@ -21,11 +19,17 @@ import (
 // migrating to 18 decimals, which upstream now treats as the only fully
 // supported configuration.
 func configureEVMKeeper(keeper *evmkeeper.Keeper) *evmkeeper.Keeper {
-	evmmodule.SetGlobalConfigVariables(evmtypes.EvmCoinInfo{
-		Denom:         "ubadge", // Base 9-decimal denomination
-		ExtendedDenom: "abadge", // Extended 18-decimal denomination used by the EVM
-		DisplayDenom:  "BADGE",
-		Decimals:      9, // Base decimals
-	})
+	// Deliberately does NOT call evmmodule.SetGlobalConfigVariables.
+	//
+	// That function registers the extended EIP activators into a process-global
+	// registry and is not idempotent — a second call panics with
+	// "duplicate activation: 2 is already present in [...]".
+	//
+	// Upstream x/vm already calls it exactly once, guarded by the module's own
+	// sync.Once, from InitGenesis (fresh chain) / PreBlock / HydrateGlobals
+	// (existing chain). Calling it here as well meant the chain panicked at the
+	// first block on a new chain and at startup on an upgraded one. Seeding the
+	// globals is upstream's job; ours is to make sure genesis carries the right
+	// denominations for it to read (see app/evm_genesis.go).
 	return keeper
 }

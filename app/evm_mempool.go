@@ -25,19 +25,23 @@ func (app *App) configureEVMMempool(appOpts servertypes.AppOptions, logger log.L
 		return nil
 	}
 
-	// Check if JSON-RPC is enabled - mempool is only needed for JSON-RPC
-	// If JSON-RPC is disabled, we can skip mempool configuration (it's an advanced feature)
-	jsonRPCEnabled := false
-	if val := appOpts.Get("json-rpc.enable"); val != nil {
-		if b, ok := val.(bool); ok {
-			jsonRPCEnabled = b
-		}
-	}
-	if !jsonRPCEnabled {
-		logger.Debug("JSON-RPC is disabled, skipping EVM mempool configuration (advanced feature)")
-		return nil
-	}
-
+	// NOTE: this deliberately does NOT gate on json-rpc.enable.
+	//
+	// Whether the EVM mempool is active is decided by app.toml's
+	// mempool.max-txs, and cosmos/evm enforces that it agree with config.toml's
+	// mempool.type (see server/config.ValidateCrossConfig). JSON-RPC is not part
+	// of that contract.
+	//
+	// Gating here on json-rpc.enable broke the default configuration: the
+	// cross-config check saw the EVM mempool as enabled and required
+	// mempool.type = "app", but this function returned before installing any of
+	// the handlers. CometBFT then routed to an app mempool with no ReapTxs
+	// handler, so the node logged "ReapTxs handler not set" on every block and
+	// could never include a transaction — while still producing empty blocks,
+	// so it looked healthy.
+	//
+	// The cosmosPoolMaxTx < 0 check below is the correct gate and mirrors
+	// upstream's own condition exactly.
 	mpConfig := server.ResolveMempoolConfig(app.BaseApp.AnteHandler(), appOpts, logger)
 
 	cosmosPoolMaxTx := server.GetCosmosPoolMaxTx(appOpts, logger)

@@ -9,6 +9,16 @@ const (
 	BaseCoinUnit         = "ubadge"
 	AccountAddressPrefix = "bb"
 
+	// ExtendedCoinUnit is the 18-decimal denom the EVM operates in. BADGE is a
+	// 9-decimal chain (ubadge); cosmos/evm v0.7 bridges that to the EVM's
+	// 18-decimal world via x/vm's extended denom, which replaced x/precisebank.
+	ExtendedCoinUnit = "abadge"
+
+	// DisplayCoinUnit is the bank display unit; its exponent (BaseCoinDecimals)
+	// is what x/vm LoadEvmCoinInfo reads to determine the chain's decimals.
+	DisplayCoinUnit  = "badge"
+	BaseCoinDecimals = 9
+
 	// EVMChainIDMainnet is the EVM chain ID for BitBadges mainnet
 	// Chain ID: 50024 (to be claimed in ethereum-lists/chains registry)
 	// This should match the chain_id in genesis under app_state.evm.params.chain_config.chain_id
