@@ -42,9 +42,30 @@ a representation change, not a movement of value, and routing it through
 transfer hooks for something that is not a transfer. Supply is moved once, via a
 burn and a mint through a module account whose own balance is restored exactly.
 
+### Verified on a live node
+
+A fresh 18-decimal chain boots and produces blocks with no precisebank in the
+graph, and the EVM and Cosmos views are now the *same number*:
+
+```
+cosmos  abadge : 999000000000000000000000
+eth_getBalance : 0xd38be6051f27c2600000  = 999000000000000000000000   (1:1, = 999,000 BADGE)
+```
+
+That 1:1 is the point of the migration — at 9 decimals those two numbers differ
+by 10^9 and only agree because precisebank sits between them.
+
+Suite is green at 76 packages on the 18-decimal branch.
+
 ## Three hazards this surfaced
 
 **1. `PowerReduction` has to move with the decimals, and nobody would notice.**
+
+Confirmed the hard way: with `PowerReduction` left at 10^6 the chain refuses to
+start — *"validator set is empty after InitGenesis, please ensure at least one
+validator is initialized with a delegation greater than or equal to the
+DefaultPowerReduction"*. A genesis validator staking what used to be a healthy
+amount now falls below a single unit of consensus power.
 
 The chain never overrides `sdk.DefaultPowerReduction`, so it is 10⁶. Consensus
 power is `tokens / PowerReduction`. Multiplying every balance by 10⁹ without
