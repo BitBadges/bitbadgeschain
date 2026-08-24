@@ -105,10 +105,10 @@ func (s *HooksTestSuite) TestOnRecvPacketNoHooks() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -150,10 +150,10 @@ func (s *HooksTestSuite) TestOnRecvPacketWithInvalidMemo() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -200,10 +200,10 @@ func (s *HooksTestSuite) TestOnRecvPacketWithNonSwapMemo() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -251,10 +251,10 @@ func (s *HooksTestSuite) TestOnRecvPacketWithHookMemo() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -313,7 +313,7 @@ func (s *HooksTestSuite) TestAtomicRollbackOnSwapFailure() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(5000000)
 
 	// Fund sender with extra tokens
@@ -397,10 +397,10 @@ func (s *HooksTestSuite) TestSwapWithFallback() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -469,7 +469,7 @@ func (s *HooksTestSuite) TestHookDataParsing() {
 					"operations": [
 						{
 							"pool": "1",
-							"denom_in": "ubadge",
+							"denom_in": "abadge",
 							"denom_out": "uatom"
 						}
 					]

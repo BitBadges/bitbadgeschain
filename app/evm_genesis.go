@@ -49,10 +49,9 @@ func RegisterEVMModuleBasics(bm module.BasicManager) {
 // default the lookup is for "aatom", which has no bank metadata on this chain,
 // so InitGenesis panics with "denom metadata aatom could not be found".
 //
-// ExtendedDenomOptions must also be set: LoadEvmCoinInfo rejects a nil value for
-// any chain whose display unit is not 18 decimals. BADGE is 9-decimal (ubadge),
-// with abadge as the 18-decimal denom the EVM operates in — the mechanism that
-// replaced x/precisebank in cosmos/evm v0.7.
+// ExtendedDenomOptions is set to the base denom. At 18 decimals x/vm requires
+// base == extended, and LoadEvmCoinInfo only rejects a nil value for chains
+// below 18 decimals.
 type bitbadgesEVMModuleBasic struct {
 	evmmodule.AppModuleBasic
 }

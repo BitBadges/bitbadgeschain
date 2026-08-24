@@ -14,10 +14,8 @@ import (
 // rather than by decorating the keeper. The keeper is returned unchanged so the
 // call site in registerEVMModules is unaffected.
 //
-// The chain stays 9-decimal (ubadge), with abadge as the 18-decimal extended
-// denom the EVM operates in. See ticket #0467 for the open question of
-// migrating to 18 decimals, which upstream now treats as the only fully
-// supported configuration.
+// The chain is 18-decimal (abadge). Base and extended denom are the same, which
+// is what x/vm requires at 18 decimals, and is why x/precisebank is gone.
 func configureEVMKeeper(keeper *evmkeeper.Keeper) *evmkeeper.Keeper {
 	// Deliberately does NOT call evmmodule.SetGlobalConfigVariables.
 	//

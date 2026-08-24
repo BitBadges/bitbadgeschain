@@ -278,7 +278,7 @@ func (s *KeeperTestSuite) TestRouteGetPoolDenoms() {
 		"valid balancer pool": {
 			preCreatePoolType: types.Balancer,
 			poolId:            1,
-			expectedDenoms:    []string{"bar", "baz", "foo", appparams.BaseCoinUnit},
+			expectedDenoms:    []string{appparams.BaseCoinUnit, "bar", "baz", "foo"},
 		},
 		"valid stableswap pool": {
 			preCreatePoolType: types.Stableswap,

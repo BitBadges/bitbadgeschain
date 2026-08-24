@@ -62,7 +62,6 @@ import (
 
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 
-	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
@@ -82,7 +81,7 @@ var (
 		// delivers the genesis txs, and those run through the EVM ante handler,
 		// which needs the process-global EVM coin config that x/vm InitGenesis
 		// installs. They also come after banktypes because x/vm resolves its
-		// coin info from the bank denom metadata for ubadge.
+		// coin info from the bank denom metadata for abadge.
 		//
 		// Order within the group: feemarket, then vm, then erc20 (erc20 depends
 		// on the EVM keeper). This matches the intent the comments always
@@ -90,8 +89,6 @@ var (
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
 		erc20types.ModuleName,
-		// precisebank must come after EVM: its InitGenesis needs the EVM keeper.
-		precisebanktypes.ModuleName,
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -148,7 +145,6 @@ var (
 		feemarkettypes.ModuleName, // FeeMarket must come before EVM
 		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
 		evmtypes.ModuleName,
-		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -174,7 +170,6 @@ var (
 		feemarkettypes.ModuleName, // FeeMarket must come before EVM
 		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
 		evmtypes.ModuleName,
-		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -202,7 +197,6 @@ var (
 		{Account: feemarkettypes.ModuleName, Permissions: []string{}},                               // FeeMarket module account
 		{Account: erc20types.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}}, // ERC20 module account
 		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
-		{Account: precisebanktypes.ModuleName, Permissions: []string{}}, // PreciseBank reserve account
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 

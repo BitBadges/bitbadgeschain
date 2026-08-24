@@ -15,6 +15,7 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -156,52 +157,52 @@ func GenesisStateWithValSet(app *App, genesisState GenesisState,
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
 
-	// Ensure bank module has metadata for "ubadge" so EVM module can find it
+	// Ensure bank module has metadata for the base denom so EVM module can find it
 	// The EVM module's InitEvmCoinInfo looks up denom metadata from the bank module
 	if bankGenesisBytes, ok := genesisState[banktypes.ModuleName]; ok {
 		var bankGenesis banktypes.GenesisState
 		app.AppCodec().MustUnmarshalJSON(bankGenesisBytes, &bankGenesis)
 
-		// Check if ubadge metadata already exists
+		// Check if abadge metadata already exists
 		hasUbadgeMetadata := false
 		for _, metadata := range bankGenesis.DenomMetadata {
-			if metadata.Base == "ubadge" {
+			if metadata.Base == appparams.BaseCoinUnit {
 				hasUbadgeMetadata = true
 				break
 			}
 		}
 
-		// Add ubadge metadata if it doesn't exist
+		// Add abadge metadata if it doesn't exist
 		if !hasUbadgeMetadata {
-			ubadgeMetadata := banktypes.Metadata{
+			abadgeMetadata := banktypes.Metadata{
 				Description: "The native token of BitBadges Chain",
 				DenomUnits: []*banktypes.DenomUnit{
 					{
-						Denom:    "ubadge",
+						Denom:    appparams.BaseCoinUnit,
 						Exponent: 0,
 					},
 					{
-						Denom:    "badge",
-						Exponent: 9,
+						Denom:    appparams.DisplayCoinUnit,
+						Exponent: appparams.BaseCoinDecimals,
 					},
 				},
-				Base:    "ubadge",
-				Display: "badge",
+				Base:    appparams.BaseCoinUnit,
+				Display: appparams.DisplayCoinUnit,
 				Name:    "Badge",
 				Symbol:  "BADGE",
 			}
-			bankGenesis.DenomMetadata = append(bankGenesis.DenomMetadata, ubadgeMetadata)
+			bankGenesis.DenomMetadata = append(bankGenesis.DenomMetadata, abadgeMetadata)
 			genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(&bankGenesis)
 		}
 	}
 
-	// Override EVM genesis params to use "ubadge" instead of default "aatom"
+	// Override EVM genesis params to use "abadge" instead of default "aatom"
 	// The EVM module's InitEvmCoinInfo uses params.EvmDenom to look up metadata
 	if evmGenesisBytes, ok := genesisState["evm"]; ok {
 		var evmGenesis evmtypes.GenesisState
 		app.AppCodec().MustUnmarshalJSON(evmGenesisBytes, &evmGenesis)
-		// Set EvmDenom to "ubadge" in params
-		evmGenesis.Params.EvmDenom = "ubadge"
+		// Set EvmDenom to "abadge" in params
+		evmGenesis.Params.EvmDenom = "abadge"
 		genesisState["evm"] = app.AppCodec().MustMarshalJSON(&evmGenesis)
 	}
 

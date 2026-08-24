@@ -33,7 +33,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_TransferredOnApprovalUse(
 				To: suite.Manager, // Payment goes to manager
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(1000000), // 1 BADGE
 					},
 				},
@@ -62,7 +62,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_TransferredOnApprovalUse(
 	// The transfer may fail due to insufficient funds (expected in test environment)
 	// but the approval structure should be valid
 	_, err := suite.MsgServer.TransferTokens(sdk.WrapSDKContext(suite.Ctx), msg)
-	// We expect an error here because Alice likely doesn't have ubadge tokens
+	// We expect an error here because Alice likely doesn't have abadge tokens
 	// This validates that the coin transfer requirement is being enforced
 	suite.Require().Error(err, "transfer should fail without sufficient coin balance for payment")
 }
@@ -77,7 +77,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_MultipleCoinTypes() {
 				To: suite.Manager,
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(1000000),
 					},
 					{
@@ -120,7 +120,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_MultipleRecipients() {
 				To: suite.Manager, // First recipient
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(500000),
 					},
 				},
@@ -129,7 +129,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_MultipleRecipients() {
 				To: suite.Charlie, // Second recipient
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(300000),
 					},
 				},
@@ -170,7 +170,7 @@ func (suite *CoinTransfersTestSuite) TestOverrideToWithInitiator_Works() {
 				OverrideToWithInitiator: true,          // Coins go to whoever initiates
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(100000),
 					},
 				},
@@ -238,7 +238,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_ApprovalStructureValidati
 				To: suite.Manager,
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(1000000),
 					},
 				},
@@ -264,7 +264,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_ApprovalStructureValidati
 			ct := app.ApprovalCriteria.CoinTransfers[0]
 			suite.Require().Equal(suite.Manager, ct.To, "recipient should match")
 			suite.Require().Len(ct.Coins, 1, "should have one coin")
-			suite.Require().Equal("ubadge", ct.Coins[0].Denom, "denom should match")
+			suite.Require().Equal("abadge", ct.Coins[0].Denom, "denom should match")
 			break
 		}
 	}
@@ -282,7 +282,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_RoyaltyPayment() {
 				To: suite.Manager, // Creator receives royalty
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(50000), // 0.05 BADGE royalty
 					},
 				},
@@ -347,7 +347,7 @@ func (suite *CoinTransfersTestSuite) TestCoinTransfers_LargeCoinAmount() {
 				To: suite.Manager,
 				Coins: []*sdk.Coin{
 					{
-						Denom:  "ubadge",
+						Denom:  "abadge",
 						Amount: sdkmath.NewInt(1000000000000), // 1 million BADGE
 					},
 				},

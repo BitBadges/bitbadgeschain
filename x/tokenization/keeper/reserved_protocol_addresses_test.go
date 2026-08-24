@@ -78,7 +78,7 @@ func (suite *TestSuite) createTestPool() uint64 {
 	// Fund bob with pool assets
 	bobAcc := sdk.MustAccAddressFromBech32(bob)
 	poolAssets := sdk.NewCoins(
-		sdk.NewCoin("ubadge", sdkmath.NewInt(1000000)),
+		sdk.NewCoin("abadge", sdkmath.NewInt(1000000)),
 		sdk.NewCoin("stake", sdkmath.NewInt(1000000)),
 	)
 
@@ -88,7 +88,7 @@ func (suite *TestSuite) createTestPool() uint64 {
 	// Create a simple balancer pool for testing
 	poolAssetsList := []balancer.PoolAsset{
 		{
-			Token:  sdk.NewCoin("ubadge", sdkmath.NewInt(1000000)),
+			Token:  sdk.NewCoin("abadge", sdkmath.NewInt(1000000)),
 			Weight: sdkmath.NewInt(1),
 		},
 		{

@@ -206,12 +206,12 @@ func (s *ComprehensiveHooksTestSuite) TestSuccessfulSwapAndTransfer() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	outputDenom := "ustake"
 	transferAmount := sdkmath.NewInt(500_000)
 	poolLiquidity := sdkmath.NewInt(10_000_000)
 
-	// Step 1: Compute the IBC denom that will exist on Chain B for ubadge
+	// Step 1: Compute the IBC denom that will exist on Chain B for abadge
 	ibcDenom := s.GetIBCDenom(s.TransferPath, baseDenom)
 	s.T().Logf("IBC denom on Chain B: %s", ibcDenom)
 
@@ -281,7 +281,7 @@ func (s *ComprehensiveHooksTestSuite) TestSuccessfulSwapAndIBCForward() {
 	receiver := s.ChainB.SenderAccount.GetAddress()
 	finalReceiver := sender // forward back to Chain A
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	// The output denom must be ICS20-compatible and have a channel to forward on.
 	// We use a native denom on ChainB that we'll swap into, then IBC forward it.
 	outputDenom := "ustake"
@@ -355,7 +355,7 @@ func (s *ComprehensiveHooksTestSuite) TestSuccessfulMultiHopSwap() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	intermediaryDenom := "umid"
 	finalDenom := "ufinal"
 	transferAmount := sdkmath.NewInt(500_000)
@@ -426,7 +426,7 @@ func (s *ComprehensiveHooksTestSuite) TestSwapFailsWithFallback_TokensGoToRecove
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	transferAmount := sdkmath.NewInt(500_000)
 	ibcDenom := s.GetIBCDenom(s.TransferPath, baseDenom)
 
@@ -487,7 +487,7 @@ func (s *ComprehensiveHooksTestSuite) TestSwapFailsWithoutFallback_AtomicRollbac
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	transferAmount := sdkmath.NewInt(500_000)
 	ibcDenom := s.GetIBCDenom(s.TransferPath, baseDenom)
 
@@ -549,7 +549,7 @@ func (s *ComprehensiveHooksTestSuite) TestSwapFailsSlippageExceeded() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	outputDenom := "ustake"
 	transferAmount := sdkmath.NewInt(100_000) // relatively small swap
 	poolLiquidity := sdkmath.NewInt(10_000_000)
@@ -605,7 +605,7 @@ func (s *ComprehensiveHooksTestSuite) TestZeroAmountTransfer() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	outputDenom := "ustake"
 	poolLiquidity := sdkmath.NewInt(10_000_000)
 
@@ -655,7 +655,7 @@ func (s *ComprehensiveHooksTestSuite) TestHookWithEmptyOperations() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	transferAmount := sdkmath.NewInt(500_000)
 
 	// Fund sender
@@ -693,7 +693,7 @@ func (s *ComprehensiveHooksTestSuite) TestHookMemoTooLarge() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	transferAmount := sdkmath.NewInt(500_000)
 
 	// Fund sender
@@ -721,7 +721,7 @@ func (s *ComprehensiveHooksTestSuite) TestMultipleTransfersWithHooksSameBlock() 
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	outputDenom := "ustake"
 	transferAmount := sdkmath.NewInt(100_000)
 	poolLiquidity := sdkmath.NewInt(50_000_000) // large pool for multiple swaps
@@ -802,7 +802,7 @@ func (s *ComprehensiveHooksTestSuite) TestHookWithTransferTokensAction() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	baseDenom := "ubadge"
+	baseDenom := "abadge"
 	transferAmount := sdkmath.NewInt(500_000)
 
 	// Fund sender

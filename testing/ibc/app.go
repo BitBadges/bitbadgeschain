@@ -81,7 +81,7 @@ func SetupBitBadgesTestingApp() (ibctesting.TestingApp, map[string]json.RawMessa
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
 		Coins: sdk.NewCoins(
-			sdk.NewCoin("ubadge", sdkmath.NewInt(100000000000000)),
+			sdk.NewCoin("abadge", sdkmath.NewInt(100000000000000)),
 			sdk.NewCoin("ustake", sdkmath.NewInt(100000000000000)),
 		),
 	}
@@ -103,51 +103,51 @@ func SetupBitBadgesTestingApp() (ibctesting.TestingApp, map[string]json.RawMessa
 	genesisState := bitbadgesApp.DefaultGenesis()
 	genesisState = app.GenesisStateWithValSet(bitbadgesApp, genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
 
-	// Ensure bank module has ubadge metadata for EVM module
+	// Ensure bank module has abadge metadata for EVM module
 	genesisState = ensureBankMetadata(bitbadgesApp, genesisState)
 
 	return bitbadgesApp, genesisState
 }
 
-// ensureBankMetadata ensures the bank module genesis has ubadge denom metadata
+// ensureBankMetadata ensures the bank module genesis has abadge denom metadata
 func ensureBankMetadata(bitbadgesApp *app.App, genesisState map[string]json.RawMessage) map[string]json.RawMessage {
 	var bankGenesis banktypes.GenesisState
 	if bankGenesisBytes, ok := genesisState[banktypes.ModuleName]; ok {
 		bitbadgesApp.AppCodec().MustUnmarshalJSON(bankGenesisBytes, &bankGenesis)
 	}
 
-	// Check if ubadge metadata already exists
+	// Check if abadge metadata already exists
 	hasUbadgeMetadata := false
 	for _, metadata := range bankGenesis.DenomMetadata {
-		if metadata.Base == "ubadge" {
+		if metadata.Base == "abadge" {
 			hasUbadgeMetadata = true
 			break
 		}
 	}
 
-	// Add ubadge metadata if it doesn't exist
+	// Add abadge metadata if it doesn't exist
 	if !hasUbadgeMetadata {
-		ubadgeMetadata := banktypes.Metadata{
+		abadgeMetadata := banktypes.Metadata{
 			Description: "The native token of BitBadges Chain",
 			DenomUnits: []*banktypes.DenomUnit{
-				{Denom: "ubadge", Exponent: 0},
+				{Denom: "abadge", Exponent: 0},
 				{Denom: "badge", Exponent: 9},
 			},
-			Base:    "ubadge",
+			Base:    "abadge",
 			Display: "badge",
 			Name:    "Badge",
 			Symbol:  "BADGE",
 		}
-		bankGenesis.DenomMetadata = append(bankGenesis.DenomMetadata, ubadgeMetadata)
+		bankGenesis.DenomMetadata = append(bankGenesis.DenomMetadata, abadgeMetadata)
 	}
 
 	genesisState[banktypes.ModuleName] = bitbadgesApp.AppCodec().MustMarshalJSON(&bankGenesis)
 
-	// Also ensure EVM genesis params use ubadge as the EVM denom
+	// Also ensure EVM genesis params use abadge as the EVM denom
 	if evmGenesisBytes, ok := genesisState["evm"]; ok {
 		var evmGenesis evmtypes.GenesisState
 		bitbadgesApp.AppCodec().MustUnmarshalJSON(evmGenesisBytes, &evmGenesis)
-		evmGenesis.Params.EvmDenom = "ubadge"
+		evmGenesis.Params.EvmDenom = "abadge"
 		genesisState["evm"] = bitbadgesApp.AppCodec().MustMarshalJSON(&evmGenesis)
 	}
 

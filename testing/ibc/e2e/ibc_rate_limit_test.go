@@ -131,7 +131,7 @@ func (s *RateLimitTestSuite) TestRateLimitNotExceeded() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(1000000) // 1 million
 
 	// Get IBC denom for rate limit config
@@ -191,7 +191,7 @@ func (s *RateLimitTestSuite) TestRateLimitExceeded() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(10000000) // 10 million
 
 	// Get IBC denom for rate limit config
@@ -268,7 +268,7 @@ func (s *RateLimitTestSuite) TestCumulativeRateLimit() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	singleAmount := sdkmath.NewInt(500000) // 500k per transfer
 
 	// Get IBC denom for rate limit config
@@ -377,7 +377,7 @@ func (s *RateLimitTestSuite) TestCombinedHooksOrder() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(10000000) // 10 million
 
 	// Get IBC denom for rate limit config
@@ -452,7 +452,7 @@ func (s *RateLimitTestSuite) TestRateLimitWithDifferentDenoms() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom1 := "ubadge"
+	denom1 := "abadge"
 	denom2 := "ustake"
 	amount := sdkmath.NewInt(5000000)
 
@@ -557,7 +557,7 @@ func (s *RateLimitTestSuite) TestRateLimitWindowReset() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(600000)
 
 	// Get IBC denom
