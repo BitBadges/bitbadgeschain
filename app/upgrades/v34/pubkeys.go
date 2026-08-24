@@ -10,10 +10,6 @@ import (
 	legacyethsecp256k1 "github.com/bitbadges/bitbadgeschain/chain-handlers/ethereum/crypto/ethsecp256k1"
 )
 
-// LegacyEthereumPubKeyTypeURL is the proto type URL of the pre-cosmos/evm
-// EVM public key this chain shipped before adopting cosmos/evm.
-const LegacyEthereumPubKeyTypeURL = "/ethereum.PubKey"
-
 // PubKeyMigrationResult reports what MigrateLegacyEthereumPubKeys did, so the
 // upgrade handler can log it and a test can assert on it.
 type PubKeyMigrationResult struct {
@@ -63,17 +59,28 @@ type PubKeyMigrationResult struct {
 // whereas a nil pub_key is repopulated correctly by the ante handler's
 // SetPubKeyDecorator on the owner's next signed transaction.
 func MigrateLegacyEthereumPubKeys(ctx sdk.Context, ak authkeeper.AccountKeeper) (PubKeyMigrationResult, error) {
-	var (
-		res     PubKeyMigrationResult
-		iterErr error
-	)
+	var res PubKeyMigrationResult
+
+	// Collect first, write second. IterateAccounts walks an open store
+	// iterator, and calling SetAccount inside the callback mutates the store
+	// underneath it. Gathering the affected accounts up front keeps the
+	// iteration read-only.
+	var legacyAccounts []sdk.AccountI
 
 	ak.IterateAccounts(ctx, func(acc sdk.AccountI) bool {
 		res.Scanned++
+		if _, ok := acc.GetPubKey().(*legacyethsecp256k1.PubKey); ok {
+			legacyAccounts = append(legacyAccounts, acc)
+		}
+		return false
+	})
 
+	for _, acc := range legacyAccounts {
 		legacy, ok := acc.GetPubKey().(*legacyethsecp256k1.PubKey)
 		if !ok {
-			return false
+			// Cannot happen given the filter above, but a silent skip here
+			// would be worse than an explicit error.
+			return res, fmt.Errorf("account %s changed pubkey type mid-migration", acc.GetAddress())
 		}
 
 		converted := &evmethsecp256k1.PubKey{Key: legacy.Key}
@@ -83,8 +90,7 @@ func MigrateLegacyEthereumPubKeys(ctx sdk.Context, ak authkeeper.AccountKeeper) 
 		// working-looking key for it.
 		if addr := converted.Address(); addr == nil || !sdk.AccAddress(addr).Equals(acc.GetAddress()) {
 			if err := acc.SetPubKey(nil); err != nil {
-				iterErr = fmt.Errorf("clearing unusable legacy pubkey on %s: %w", acc.GetAddress(), err)
-				return true
+				return res, fmt.Errorf("clearing unusable legacy pubkey on %s: %w", acc.GetAddress(), err)
 			}
 			ak.SetAccount(ctx, acc)
 			res.Cleared++
@@ -92,20 +98,14 @@ func MigrateLegacyEthereumPubKeys(ctx sdk.Context, ak authkeeper.AccountKeeper) 
 				"v34: cleared unusable legacy /ethereum.PubKey",
 				"address", acc.GetAddress().String(),
 			)
-			return false
+			continue
 		}
 
 		if err := acc.SetPubKey(converted); err != nil {
-			iterErr = fmt.Errorf("converting legacy pubkey on %s: %w", acc.GetAddress(), err)
-			return true
+			return res, fmt.Errorf("converting legacy pubkey on %s: %w", acc.GetAddress(), err)
 		}
 		ak.SetAccount(ctx, acc)
 		res.Converted++
-		return false
-	})
-
-	if iterErr != nil {
-		return res, iterErr
 	}
 
 	ctx.Logger().Info(
