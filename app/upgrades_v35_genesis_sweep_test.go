@@ -15,7 +15,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/stretchr/testify/require"
 
+	erc20types "github.com/cosmos/evm/x/erc20/types"
+
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
+	ratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
 
 // TestV35NoLegacyDenomSurvivesInExportedGenesis is the backstop for the whole
@@ -127,4 +130,23 @@ func seedLegacyDenomEverywhere(t *testing.T, app *App, ctx sdk.Context, bk bankk
 
 	// IBC total-escrow accounting for the native denom.
 	app.TransferKeeper.SetTotalEscrowForDenom(ctx, sdk.NewCoin(legacyDenom, sdkmath.NewInt(2_500_000)))
+
+	// An IBC rate-limit config keyed on the native denom. This one is worth
+	// seeding explicitly: a stale config fails *open* — the module allows any
+	// transfer with no matching config — so a missed rename silently removes
+	// the throttle rather than blocking transfers.
+	rlParams := app.IBCRateLimitKeeper.GetParams(ctx)
+	rlParams.RateLimits = append(rlParams.RateLimits, ratelimittypes.RateLimitConfig{
+		ChannelId: "channel-0",
+		Denom:     legacyDenom,
+	})
+	require.NoError(t, app.IBCRateLimitKeeper.SetParams(ctx, rlParams))
+
+	// An erc20 token pair mapping the native denom to a contract.
+	app.ERC20Keeper.SetTokenPair(ctx, erc20types.TokenPair{
+		Erc20Address:  "0x0000000000000000000000000000000000000bad",
+		Denom:         legacyDenom,
+		Enabled:       true,
+		ContractOwner: erc20types.OWNER_MODULE,
+	})
 }

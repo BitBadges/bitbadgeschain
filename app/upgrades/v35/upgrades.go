@@ -11,6 +11,7 @@ import (
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
+	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -20,6 +21,7 @@ import (
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	poolmanager "github.com/bitbadges/bitbadgeschain/x/poolmanager"
+	ratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
@@ -35,7 +37,9 @@ type Keepers struct {
 	Authz        authzkeeper.Keeper
 	Bank         bankkeeper.BaseKeeper
 	FeeGrant     feegrantkeeper.Keeper
+	ERC20        erc20keeper.Keeper
 	FeeMarket    feemarketkeeper.Keeper
+	RateLimit    ratelimitkeeper.Keeper
 	Transfer     *transferkeeper.Keeper
 	Staking      *stakingkeeper.Keeper
 	Mint         mintkeeper.Keeper
@@ -97,13 +101,19 @@ func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 		return err
 	}
 
-	// 7. Store keys that embed the denom. Not an amount, but orphaned all the
+	// 7. State that names the denom without holding an amount of it — no
+	//    number changes, so a value-conservation check cannot catch these.
+	if _, err := RepointDenomReferences(ctx, k.ERC20, k.RateLimit); err != nil {
+		return err
+	}
+
+	// 8. Store keys that embed the denom. Not an amount, but orphaned all the
 	//    same by the rename.
 	if _, err := RekeyTakerFees(ctx, k.PoolManager); err != nil {
 		return err
 	}
 
-	// 8. Module params last, so nothing above reads a half-updated denom.
+	// 9. Module params last, so nothing above reads a half-updated denom.
 	if err := MigrateDenomParams(ctx, k.Staking, k.Mint, k.Gov, k.EVM, k.Tokenization); err != nil {
 		return err
 	}
