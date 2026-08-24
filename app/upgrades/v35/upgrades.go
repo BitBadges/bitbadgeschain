@@ -6,7 +6,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
+	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -26,7 +31,12 @@ const (
 // Keepers is the set this upgrade needs. Passed as a struct because the list is
 // long enough that positional arguments stop being readable.
 type Keepers struct {
+	Account      authkeeper.AccountKeeper
+	Authz        authzkeeper.Keeper
 	Bank         bankkeeper.BaseKeeper
+	FeeGrant     feegrantkeeper.Keeper
+	FeeMarket    feemarketkeeper.Keeper
+	Transfer     *transferkeeper.Keeper
 	Staking      *stakingkeeper.Keeper
 	Mint         mintkeeper.Keeper
 	Gov          *govkeeper.Keeper
@@ -75,6 +85,15 @@ func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 		return err
 	}
 	if _, err := RescaleTokenizationCoinTransfers(ctx, k.Tokenization); err != nil {
+		return err
+	}
+	if _, err := RescaleVestingAccounts(ctx, k.Account); err != nil {
+		return err
+	}
+	if _, err := RescaleGrants(ctx, k.FeeGrant, k.Authz); err != nil {
+		return err
+	}
+	if _, err := RescaleEconomics(ctx, k.Mint, k.FeeMarket, k.Transfer, k.PoolManager); err != nil {
 		return err
 	}
 

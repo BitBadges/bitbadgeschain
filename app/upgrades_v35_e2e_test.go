@@ -21,7 +21,12 @@ import (
 // individual migrations.
 func v35Keepers(app *App) v35.Keepers {
 	return v35.Keepers{
+		Account:      app.AccountKeeper,
+		Authz:        app.AuthzKeeper,
 		Bank:         app.BankKeeper.(bankkeeper.BaseKeeper),
+		FeeGrant:     app.FeeGrantKeeper,
+		FeeMarket:    app.FeeMarketKeeper,
+		Transfer:     app.TransferKeeper,
 		Staking:      app.StakingKeeper,
 		Mint:         app.MintKeeper,
 		Gov:          app.GovKeeper,
