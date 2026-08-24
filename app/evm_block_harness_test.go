@@ -66,6 +66,13 @@ const logsPerCall = 2
 // the display denom per gas. Accounts are funded well above the resulting cost.
 var testGasPrice = new(big.Int).SetUint64(2_000_000_000_000_000_000)
 
+// maxTestGasLimit is the largest gas limit any transaction in this harness
+// uses; txFundingHeadroom covers several such transactions per account.
+const (
+	maxTestGasLimit   = 500_000
+	txFundingHeadroom = 100
+)
+
 func evmChainID(t *testing.T) *big.Int {
 	t.Helper()
 	id, err := strconv.ParseUint(appparams.GetEVMChainID(), 10, 64)
@@ -82,9 +89,13 @@ func newFundedEVMAccount(t *testing.T, app *App, ctx sdk.Context) (*ecdsa.Privat
 	require.NoError(t, err)
 	addr := ethcrypto.PubkeyToAddress(key.PublicKey)
 
-	// Generous: the EVM prices gas in the 18-decimal extended denom, so a single
-	// 500k-gas tx at the default base fee costs on the order of 10^14 ubadge.
-	funds := sdk.NewCoins(sdk.NewCoin(appparams.BaseCoinUnit, sdkmath.NewInt(1).MulRaw(1_000_000_000_000_000_000)))
+	// Funded from the actual worst-case cost rather than a magic constant: the
+	// EVM prices gas in the 18-decimal extended denom, so the right amount
+	// depends on the chain's decimals and a fixed number silently stops being
+	// enough if those change.
+	maxCost := new(big.Int).Mul(testGasPrice, big.NewInt(int64(maxTestGasLimit)))
+	maxCost.Mul(maxCost, big.NewInt(txFundingHeadroom))
+	funds := sdk.NewCoins(sdk.NewCoin(appparams.BaseCoinUnit, sdkmath.NewIntFromBigInt(maxCost)))
 	require.NoError(t, app.BankKeeper.MintCoins(ctx, "mint", funds))
 	require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", sdk.AccAddress(addr.Bytes()), funds))
 
