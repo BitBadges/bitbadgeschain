@@ -8,6 +8,32 @@ import (
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 )
 
+// V35Keepers is the keeper set the v35 decimals migration needs.
+//
+// Built here rather than inline so there is exactly one place that wires it.
+// An earlier version constructed this inline while the tests built their own
+// equivalent struct; when new keepers were added to only one of them the tests
+// kept passing against a correctly-populated struct while the chain ran the
+// migration with nil keepers and panicked at the upgrade height.
+func (app *App) V35Keepers() v35.Keepers {
+	return v35.Keepers{
+		Account:      app.AccountKeeper,
+		Authz:        app.AuthzKeeper,
+		Bank:         app.BankKeeper.(bankkeeper.BaseKeeper),
+		Distribution: app.DistrKeeper,
+		EVM:          app.EVMKeeper,
+		FeeGrant:     app.FeeGrantKeeper,
+		FeeMarket:    app.FeeMarketKeeper,
+		Gamm:         app.GammKeeper,
+		Gov:          app.GovKeeper,
+		Mint:         app.MintKeeper,
+		PoolManager:  app.PoolManagerKeeper,
+		Staking:      app.StakingKeeper,
+		Tokenization: *app.TokenizationKeeper,
+		Transfer:     app.TransferKeeper,
+	}
+}
+
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
@@ -27,17 +53,7 @@ func (app *App) RegisterUpgradeHandlers() {
 		v35.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
-			v35.Keepers{
-				Bank:    app.BankKeeper.(bankkeeper.BaseKeeper),
-				Staking: app.StakingKeeper,
-				Mint:    app.MintKeeper,
-				Gov:     app.GovKeeper,
-				Distribution: app.DistrKeeper,
-				EVM:          app.EVMKeeper,
-				Gamm:         app.GammKeeper,
-				PoolManager:  app.PoolManagerKeeper,
-				Tokenization: *app.TokenizationKeeper,
-			},
+			app.V35Keepers(),
 		),
 	)
 

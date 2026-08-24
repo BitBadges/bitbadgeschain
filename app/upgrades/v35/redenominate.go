@@ -181,6 +181,21 @@ func MigrateDenomMetadata(ctx sdk.Context, bk bankkeeper.BaseKeeper) {
 		Symbol:  "BADGE",
 	})
 
+	// Remove the retired denom's metadata. SetDenomMetaData only writes; leaving
+	// the old entry behind means the chain advertises two BADGE denominations,
+	// one of which has zero supply — wallets and explorers enumerate bank
+	// metadata, so users would see a phantom second token indefinitely.
+	//
+	// This surfaced from the exported-genesis sweep: everything else converted
+	// and two stale "ubadge" references remained, both from this entry.
+	//
+	// Reached through BaseViewKeeper because BaseKeeper.DenomMetadata resolves
+	// to the gRPC query method of the same name, not the collection.
+	if err := bk.BaseViewKeeper.DenomMetadata.Remove(ctx, appparams.LegacyBaseCoinUnit); err != nil {
+		ctx.Logger().Error("v35: could not remove legacy denom metadata",
+			"denom", appparams.LegacyBaseCoinUnit, "error", err)
+	}
+
 	ctx.Logger().Info(
 		"v35: set denom metadata",
 		"base", appparams.BaseCoinUnit,

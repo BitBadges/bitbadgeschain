@@ -19,23 +19,11 @@ import (
 // v35Keepers assembles the keeper set the upgrade handler takes, so the test
 // exercises the same entry point the chain does rather than calling the
 // individual migrations.
+// v35Keepers delegates to the production wiring on purpose. Building an
+// equivalent struct here is what previously let the tests pass while the chain
+// ran the migration with nil keepers.
 func v35Keepers(app *App) v35.Keepers {
-	return v35.Keepers{
-		Account:      app.AccountKeeper,
-		Authz:        app.AuthzKeeper,
-		Bank:         app.BankKeeper.(bankkeeper.BaseKeeper),
-		FeeGrant:     app.FeeGrantKeeper,
-		FeeMarket:    app.FeeMarketKeeper,
-		Transfer:     app.TransferKeeper,
-		Staking:      app.StakingKeeper,
-		Mint:         app.MintKeeper,
-		Gov:          app.GovKeeper,
-		Distribution: app.DistrKeeper,
-		EVM:          app.EVMKeeper,
-		Gamm:         app.GammKeeper,
-		PoolManager:  app.PoolManagerKeeper,
-		Tokenization: *app.TokenizationKeeper,
-	}
+	return app.V35Keepers()
 }
 
 // seedLegacyChainState makes the test app look like the real chain before the
