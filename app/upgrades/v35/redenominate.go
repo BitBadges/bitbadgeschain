@@ -24,6 +24,12 @@ var ConversionFactor = sdkmath.NewIntWithDecimal(1, appparams.BaseCoinDecimals-a
 // balance is restored exactly, so borrowing it has no lasting effect.
 const redenominationModule = evmtypes.ModuleName
 
+// legacyDenom and newDenom name the two sides of the migration. Small helpers
+// rather than bare constant references so every module's migration reads the
+// same way and there is one place to look when auditing which denom moved.
+func legacyDenom() string { return appparams.LegacyBaseCoinUnit }
+func newDenom() string    { return appparams.BaseCoinUnit }
+
 // RedenominationResult reports what the migration did.
 type RedenominationResult struct {
 	Holders      int
