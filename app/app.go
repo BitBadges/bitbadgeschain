@@ -22,7 +22,6 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/baseapp/txnrunner"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -86,7 +85,6 @@ import (
 	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	evmmodule "github.com/cosmos/evm/x/vm"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
-	vmrunner "github.com/cosmos/evm/x/vm/runner"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 
@@ -179,6 +177,9 @@ type App struct {
 	// EVM mempool and pending tx listeners for JSON-RPC support
 	EVMMempool         sdkmempool.ExtMempool
 	evmModule          evmmodule.AppModule
+	// evmNonTransientKeys is the KV + object store surface the EVM snapshotter
+	// uses; block-STM needs the same set for conflict detection.
+	evmNonTransientKeys []storetypes.StoreKey
 	pendingTxListeners []evmante.PendingTxListener
 
 	// simulation manager
@@ -512,26 +513,9 @@ func New(
 		}))
 	}
 
-	// Install the EVM block tx runner.
-	//
-	// This is required for correctness, not performance. In cosmos/evm v0.6 the
-	// StateDB numbered logs block-globally during execution:
-	//
-	//	log.Index = s.txConfig.LogIndex + uint(len(s.logs))
-	//
-	// v0.7 changed that to per-transaction numbering (log.Index =
-	// uint(len(s.logs)), restarting at 0 for every tx) and moved block-global
-	// renumbering into evmtypes.PatchTxResponses, which only runs if a runner
-	// is installed. Without this call every EVM tx in a block would report
-	// logIndex starting at 0, so (blockHash, logIndex) -- the standard
-	// uniqueness key for EVM logs -- would collide across txs in a block.
-	//
-	// We use the sequential DefaultRunner, which preserves current execution
-	// semantics. Upstream evmd uses txnrunner.NewSTMRunner for parallel
-	// block execution; adopting that is a separate performance change that
-	// needs its own evaluation against this chain's custom modules and
-	// precompiles, and should not ride along with this upgrade.
-	vmrunner.SetRunner(app.BaseApp, txnrunner.NewDefaultRunner(app.txConfig.TxDecoder()))
+	if err := app.configureTxRunner(appOpts); err != nil {
+		return nil, err
+	}
 
 	return app, nil
 }

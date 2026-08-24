@@ -14,6 +14,7 @@ import (
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -55,8 +56,34 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 // }
 
 // Setup initializes a new app.
+// overlaidAppOptions layers a small map over an existing AppOptions. The
+// simapp helper returns a concrete map type that is awkward to extend in place,
+// and a wrapper keeps the base behaviour intact.
+type overlaidAppOptions struct {
+	base    servertypes.AppOptions
+	overlay map[string]interface{}
+}
+
+func (o overlaidAppOptions) Get(key string) interface{} {
+	if v, ok := o.overlay[key]; ok {
+		return v
+	}
+	return o.base.Get(key)
+}
+
+// Setup builds a test app with default options.
 func Setup(
 	isCheckTx bool,
+) *App {
+	return SetupWithAppOptions(isCheckTx, nil)
+}
+
+// SetupWithAppOptions is Setup with extra app options merged in, so a test can
+// exercise a code path that is selected by configuration — the block-STM tx
+// runner behind evm.parallel-execution being the reason this exists.
+func SetupWithAppOptions(
+	isCheckTx bool,
+	extraOpts map[string]interface{},
 ) *App {
 	// Reset EVM config for testing - required when running parallel tests
 	// because the EVM module uses global state that persists between test runs
@@ -85,7 +112,13 @@ func Setup(
 	randomHomeDir := origDefault + "/test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	app, err := New(log.NewNopLogger(), db, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+
+	var appOpts servertypes.AppOptions = simapp.NewAppOptionsWithFlagHome(randomHomeDir)
+	if len(extraOpts) > 0 {
+		appOpts = overlaidAppOptions{base: appOpts, overlay: extraOpts}
+	}
+
+	app, err := New(log.NewNopLogger(), db, true, appOpts)
 	if err != nil {
 		panic(err)
 	}

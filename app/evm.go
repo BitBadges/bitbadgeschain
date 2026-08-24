@@ -119,6 +119,10 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		panic("EVM keeper requires at least one KV store key for snapshotter initialization")
 	}
 
+	// Retained for the block-STM runner, which needs the same store-key surface
+	// to detect read/write conflicts. See configureTxRunner in app.go.
+	app.evmNonTransientKeys = nonTransientKeys
+
 	// Verify critical stores are included (stores that precompiles might access)
 	criticalStores := []string{
 		"acc",          // Account store (for address lookups)
