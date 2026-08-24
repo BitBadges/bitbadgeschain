@@ -15,6 +15,7 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -156,7 +157,7 @@ func GenesisStateWithValSet(app *App, genesisState GenesisState,
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
 
-	// Ensure bank module has metadata for "abadge" so EVM module can find it
+	// Ensure bank module has metadata for the base denom so EVM module can find it
 	// The EVM module's InitEvmCoinInfo looks up denom metadata from the bank module
 	if bankGenesisBytes, ok := genesisState[banktypes.ModuleName]; ok {
 		var bankGenesis banktypes.GenesisState
@@ -165,7 +166,7 @@ func GenesisStateWithValSet(app *App, genesisState GenesisState,
 		// Check if abadge metadata already exists
 		hasUbadgeMetadata := false
 		for _, metadata := range bankGenesis.DenomMetadata {
-			if metadata.Base == "abadge" {
+			if metadata.Base == appparams.BaseCoinUnit {
 				hasUbadgeMetadata = true
 				break
 			}
@@ -177,16 +178,16 @@ func GenesisStateWithValSet(app *App, genesisState GenesisState,
 				Description: "The native token of BitBadges Chain",
 				DenomUnits: []*banktypes.DenomUnit{
 					{
-						Denom:    "abadge",
+						Denom:    appparams.BaseCoinUnit,
 						Exponent: 0,
 					},
 					{
-						Denom:    "badge",
-						Exponent: 9,
+						Denom:    appparams.DisplayCoinUnit,
+						Exponent: appparams.BaseCoinDecimals,
 					},
 				},
-				Base:    "abadge",
-				Display: "badge",
+				Base:    appparams.BaseCoinUnit,
+				Display: appparams.DisplayCoinUnit,
 				Name:    "Badge",
 				Symbol:  "BADGE",
 			}
