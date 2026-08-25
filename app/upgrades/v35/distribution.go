@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 )
 
 // DistributionMigrationResult reports what RescaleDistribution touched.
@@ -30,15 +31,26 @@ type DistributionMigrationResult struct {
 // the pool backing it, so the first withdrawals drain far less than they should
 // and the module account never reconciles.
 //
-// DelegatorStartingInfo.Stake is a share amount, not coins, and scales for the
-// same reason delegator shares do in RescaleStaking: the reward calculation is
-// (current period cumulative ratio - starting period ratio) * stake, so stake
-// must stay in the same units as the shares it was recorded against.
+// DelegatorStartingInfo.Stake is a *token* amount (x/distribution records it as
+// validator.TokensFromSharesTruncated), so it scales with the tokens. The
+// cumulative reward ratios it is multiplied against do not — see the comment on
+// the historical-rewards loop below.
 //
 // Slash events are deliberately not touched: ValidatorSlashEvent stores a
 // *fraction*, which is dimensionless and unaffected by a change of denomination.
-func RescaleDistribution(ctx sdk.Context, dk distrkeeper.Keeper) (DistributionMigrationResult, error) {
+func RescaleDistribution(ctx sdk.Context, dk distrkeeper.Keeper, sk *stakingkeeper.Keeper) (DistributionMigrationResult, error) {
 	var res DistributionMigrationResult
+
+	// Every DecCoins field below is denom-tagged, so re-running is a no-op for
+	// them. DelegatorStartingInfo.Stake is not: it is a bare LegacyDec in bond
+	// denom units, so it needs the same gate RescaleStaking uses, for the same
+	// reason — the stake and the validator tokens it is compared against must
+	// move together, or neither.
+	bondDenom, bondErr := sk.BondDenom(ctx)
+	if bondErr != nil {
+		return res, fmt.Errorf("reading bond denom: %w", bondErr)
+	}
+	scaleStake := bondDenom == legacyDenom()
 
 	// Collected before writing throughout: these iterate open store iterators,
 	// and writing back inside the callback mutates the store underneath them.
@@ -107,11 +119,22 @@ func RescaleDistribution(ctx sdk.Context, dk distrkeeper.Keeper) (DistributionMi
 		res.CurrentRewards++
 	}
 
-	// Historical rewards. These are cumulative reward *ratios* per share, so
-	// they scale with the coins, not with the shares — a delegator's payout is
-	// ratio * stake, and stake scales separately in RescaleStaking. Scaling both
-	// would square the factor, so only the ratio moves here and stake moves
-	// there, exactly as tokens and shares do for staking.
+	// Historical rewards. CumulativeRewardRatio is coins *per token* — x/distribution
+	// builds it as rewards.QuoDecTruncate(LegacyNewDecFromInt(val.GetTokens())) — and
+	// DelegatorStartingInfo.Stake below is a token amount. A delegator's payout is
+	// ratio * stake.
+	//
+	// A redenomination multiplies coins and tokens by the same factor, so the
+	// ratio is INVARIANT: only its denom changes. Scaling both the ratio and the
+	// stake squares the factor and turns a 10^9 redenomination into a 10^18 one,
+	// at which point the pending reward exceeds the outstanding rewards backing
+	// it. cosmos-sdk v0.54.4 does not fail on that — withdrawDelegationRewards
+	// clamps with rewardsRaw.Intersect(outstanding) and only logs — so the first
+	// delegator to claim drains the validator's entire outstanding pot and every
+	// other delegator gets nothing. Silently.
+	//
+	// So the amounts here are left alone and only the denom is rewritten; the
+	// stake moves in RescaleStaking, exactly as tokens and shares do for staking.
 	type historical struct {
 		val     sdk.ValAddress
 		period  uint64
@@ -123,14 +146,14 @@ func RescaleDistribution(ctx sdk.Context, dk distrkeeper.Keeper) (DistributionMi
 		return false
 	})
 	for _, h := range historicals {
-		h.rewards.CumulativeRewardRatio = scaleDecCoins(h.rewards.CumulativeRewardRatio)
+		h.rewards.CumulativeRewardRatio = renameDecCoins(h.rewards.CumulativeRewardRatio)
 		if err := dk.SetValidatorHistoricalRewards(ctx, h.val, h.period, h.rewards); err != nil {
 			return res, fmt.Errorf("setting historical rewards for %s period %d: %w", h.val, h.period, err)
 		}
 		res.HistoricalRewards++
 	}
 
-	// Delegator starting info: Stake is in share units.
+	// Delegator starting info: Stake is a token amount, in bond denom units.
 	type startingInfo struct {
 		val  sdk.ValAddress
 		del  sdk.AccAddress
@@ -141,12 +164,14 @@ func RescaleDistribution(ctx sdk.Context, dk distrkeeper.Keeper) (DistributionMi
 		startingInfos = append(startingInfos, startingInfo{val: val, del: del, info: info})
 		return false
 	})
-	for _, s := range startingInfos {
-		s.info.Stake = s.info.Stake.Mul(conversionDec)
-		if err := dk.SetDelegatorStartingInfo(ctx, s.val, s.del, s.info); err != nil {
-			return res, fmt.Errorf("setting starting info for %s/%s: %w", s.val, s.del, err)
+	if scaleStake {
+		for _, s := range startingInfos {
+			s.info.Stake = s.info.Stake.Mul(conversionDec)
+			if err := dk.SetDelegatorStartingInfo(ctx, s.val, s.del, s.info); err != nil {
+				return res, fmt.Errorf("setting starting info for %s/%s: %w", s.val, s.del, err)
+			}
+			res.StartingInfos++
 		}
-		res.StartingInfos++
 	}
 
 	ctx.Logger().Info(
@@ -174,6 +199,25 @@ func scaleDecCoins(coins sdk.DecCoins) sdk.DecCoins {
 	for _, c := range coins {
 		if c.Denom == legacyDenom() {
 			out = append(out, sdk.NewDecCoinFromDec(newDenom(), c.Amount.Mul(conversionDec)))
+			continue
+		}
+		out = append(out, c)
+	}
+	return out.Sort()
+}
+
+// renameDecCoins repoints the legacy denom at the new one without touching the
+// amount. Used for quantities that are per-token ratios rather than coin
+// amounts: a redenomination scales the numerator (coins) and the denominator
+// (tokens) equally, so the ratio itself does not move.
+func renameDecCoins(coins sdk.DecCoins) sdk.DecCoins {
+	if coins.IsZero() {
+		return coins
+	}
+	out := make(sdk.DecCoins, 0, len(coins))
+	for _, c := range coins {
+		if c.Denom == legacyDenom() {
+			out = append(out, sdk.NewDecCoinFromDec(newDenom(), c.Amount))
 			continue
 		}
 		out = append(out, c)

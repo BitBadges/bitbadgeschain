@@ -42,7 +42,25 @@ func seedLegacyChainState(t *testing.T, app *App, ctx sdk.Context) stakingtypes.
 	mintParams, err := app.MintKeeper.Params.Get(ctx)
 	require.NoError(t, err)
 	mintParams.MintDenom = legacyDenom
+	mintParams.MaxSupply = sdkmath.NewInt(10_000_000_000_000)
 	require.NoError(t, app.MintKeeper.Params.Set(ctx, mintParams))
+
+	minter, err := app.MintKeeper.Minter.Get(ctx)
+	require.NoError(t, err)
+	minter.AnnualProvisions = sdkmath.LegacyNewDec(500_000_000)
+	require.NoError(t, app.MintKeeper.Minter.Set(ctx, minter))
+
+	// The EVM's gas token is the legacy denom before the upgrade, and the
+	// feemarket prices are denominated in it. Both are what the real chain
+	// looks like at the upgrade height.
+	evmParams := app.EVMKeeper.GetParams(ctx)
+	evmParams.EvmDenom = legacyDenom
+	require.NoError(t, app.EVMKeeper.SetParams(ctx, evmParams))
+
+	feeParams := app.FeeMarketKeeper.GetParams(ctx)
+	feeParams.BaseFee = sdkmath.LegacyNewDec(1_000)
+	feeParams.MinGasPrice = sdkmath.LegacyNewDec(10)
+	require.NoError(t, app.FeeMarketKeeper.SetParams(ctx, feeParams))
 
 	pk := ed25519.GenPrivKey().PubKey()
 	pkAny, err := codectypes.NewAnyWithValue(pk)
@@ -177,22 +195,60 @@ func TestV35UpgradeRepointsParams(t *testing.T) {
 // Running the handler twice must not double-scale. Upgrade handlers get re-run
 // during replay and recovery, and a migration that is not idempotent turns a
 // routine restart into a 10^18 inflation event.
+//
+// Seeding the full legacy chain state rather than a bank balance alone is the
+// point of this test. RedenominateBank early-returns once the legacy supply is
+// zero, so a bank-only seed exercises the one path that is idempotent by
+// construction and proves nothing about the unconditional Mul sites in
+// staking, distribution, mint and feemarket.
 func TestV35UpgradeIsIdempotent(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
 	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
 
+	seeded := seedLegacyChainState(t, app, ctx)
+
 	alice := randAddr()
 	fundLegacy(t, ctx, bk, alice, 12_345)
 
-	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
-	afterFirst := bk.GetBalance(ctx, alice, appparams.BaseCoinUnit).Amount
-	supplyAfterFirst := bk.GetSupply(ctx, appparams.BaseCoinUnit).Amount
+	snapshot := func() map[string]string {
+		vals, err := app.StakingKeeper.GetAllValidators(ctx)
+		require.NoError(t, err)
+		require.Len(t, vals, 1)
+
+		minter, err := app.MintKeeper.Minter.Get(ctx)
+		require.NoError(t, err)
+		mintParams, err := app.MintKeeper.Params.Get(ctx)
+		require.NoError(t, err)
+		feeParams := app.FeeMarketKeeper.GetParams(ctx)
+
+		return map[string]string{
+			"balance":           bk.GetBalance(ctx, alice, appparams.BaseCoinUnit).Amount.String(),
+			"supply":            bk.GetSupply(ctx, appparams.BaseCoinUnit).Amount.String(),
+			"validator_tokens":  vals[0].Tokens.String(),
+			"validator_shares":  vals[0].DelegatorShares.String(),
+			"min_self_delegate": vals[0].MinSelfDelegation.String(),
+			"annual_provisions": minter.AnnualProvisions.String(),
+			"max_supply":        mintParams.MaxSupply.String(),
+			"base_fee":          feeParams.BaseFee.String(),
+			"min_gas_price":     feeParams.MinGasPrice.String(),
+		}
+	}
 
 	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
+	afterFirst := snapshot()
 
-	require.Equal(t, afterFirst, bk.GetBalance(ctx, alice, appparams.BaseCoinUnit).Amount,
-		"a second run must not scale balances again")
-	require.Equal(t, supplyAfterFirst, bk.GetSupply(ctx, appparams.BaseCoinUnit).Amount,
-		"a second run must not scale supply again")
+	// Every seeded quantity must actually have moved on the first run, or the
+	// idempotency assertion below would hold vacuously.
+	factor := v35.ConversionFactor
+	require.Equal(t, seeded.Tokens.Mul(factor).String(), afterFirst["validator_tokens"])
+	require.NotEqual(t, "0.000000000000000000", afterFirst["annual_provisions"])
+	require.NotEqual(t, "0", afterFirst["max_supply"])
+	require.NotEqual(t, "0.000000000000000000", afterFirst["base_fee"])
+
+	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
+	afterSecond := snapshot()
+
+	require.Equal(t, afterFirst, afterSecond,
+		"a second run must not scale anything again")
 }

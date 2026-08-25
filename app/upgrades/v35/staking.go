@@ -42,6 +42,24 @@ type StakingMigrationResult struct {
 func RescaleStaking(ctx sdk.Context, sk *stakingkeeper.Keeper) (StakingMigrationResult, error) {
 	var res StakingMigrationResult
 
+	// Nothing in this module carries a denom on the amounts it stores — a
+	// validator's Tokens is a bare Int — so a re-run has no way to tell scaled
+	// state from unscaled state and would multiply again. Upgrade handlers do
+	// get re-run (replay, a node recovering from a crash at the upgrade height),
+	// and 10^9 applied twice is a 10^18 inflation event.
+	//
+	// The bond denom is the gate: it is the denom every amount here is
+	// implicitly quoted in, MigrateDenomParams moves it as the last step of the
+	// upgrade, and it is exactly what stops being true once this has run.
+	bondDenom, err := sk.BondDenom(ctx)
+	if err != nil {
+		return res, fmt.Errorf("reading bond denom: %w", err)
+	}
+	if bondDenom != legacyDenom() {
+		ctx.Logger().Info("v35: staking already migrated, skipping", "bond_denom", bondDenom)
+		return res, nil
+	}
+
 	// Validators: token totals and the share denominator.
 	vals, err := sk.GetAllValidators(ctx)
 	if err != nil {

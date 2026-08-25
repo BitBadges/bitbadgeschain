@@ -79,7 +79,7 @@ func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 	if _, err := RescaleStaking(ctx, k.Staking); err != nil {
 		return err
 	}
-	if _, err := RescaleDistribution(ctx, k.Distribution); err != nil {
+	if _, err := RescaleDistribution(ctx, k.Distribution, k.Staking); err != nil {
 		return err
 	}
 	if _, err := RescaleGovDeposits(ctx, k.Gov); err != nil {
@@ -97,7 +97,7 @@ func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 	if _, err := RescaleGrants(ctx, k.FeeGrant, k.Authz); err != nil {
 		return err
 	}
-	if _, err := RescaleEconomics(ctx, k.Mint, k.FeeMarket, k.Transfer, k.PoolManager); err != nil {
+	if _, err := RescaleEconomics(ctx, k.Mint, k.FeeMarket, k.Transfer, k.PoolManager, k.EVM); err != nil {
 		return err
 	}
 

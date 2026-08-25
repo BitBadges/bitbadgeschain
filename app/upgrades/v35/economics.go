@@ -10,6 +10,7 @@ import (
 	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
 	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
+	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 
 	poolmanager "github.com/bitbadges/bitbadgeschain/x/poolmanager"
 )
@@ -33,6 +34,7 @@ func RescaleEconomics(
 	fmk feemarketkeeper.Keeper,
 	tk *transferkeeper.Keeper,
 	pmk poolmanager.Keeper,
+	ek *evmkeeper.Keeper,
 ) (EconomicsMigrationResult, error) {
 	var res EconomicsMigrationResult
 
@@ -47,27 +49,34 @@ func RescaleEconomics(
 	// are dimensionless ratios and are deliberately untouched. MaxSupply is a
 	// token amount and does scale; leaving it would cap supply at 10^-9 of the
 	// intended ceiling and stop minting entirely once reached.
-	minter, err := mk.Minter.Get(ctx)
-	if err != nil {
-		return res, fmt.Errorf("reading minter: %w", err)
-	}
-	if !minter.AnnualProvisions.IsNil() && !minter.AnnualProvisions.IsZero() {
-		minter.AnnualProvisions = minter.AnnualProvisions.Mul(conversionDec)
-		if err := mk.Minter.Set(ctx, minter); err != nil {
-			return res, fmt.Errorf("setting minter: %w", err)
-		}
-		res.MinterRescaled = true
-	}
-
+	// Neither AnnualProvisions nor MaxSupply carries a denom, so a re-run would
+	// scale them again. MintDenom is the denom they are quoted in and is moved
+	// by MigrateDenomParams at the end of the upgrade, which makes it the gate.
 	mintParams, err := mk.Params.Get(ctx)
 	if err != nil {
 		return res, fmt.Errorf("reading mint params: %w", err)
 	}
-	if !mintParams.MaxSupply.IsNil() && !mintParams.MaxSupply.IsZero() {
-		mintParams.MaxSupply = mintParams.MaxSupply.Mul(ConversionFactor)
-		if err := mk.Params.Set(ctx, mintParams); err != nil {
-			return res, fmt.Errorf("setting mint params: %w", err)
+	if mintParams.MintDenom == legacyDenom() {
+		minter, err := mk.Minter.Get(ctx)
+		if err != nil {
+			return res, fmt.Errorf("reading minter: %w", err)
 		}
+		if !minter.AnnualProvisions.IsNil() && !minter.AnnualProvisions.IsZero() {
+			minter.AnnualProvisions = minter.AnnualProvisions.Mul(conversionDec)
+			if err := mk.Minter.Set(ctx, minter); err != nil {
+				return res, fmt.Errorf("setting minter: %w", err)
+			}
+			res.MinterRescaled = true
+		}
+
+		if !mintParams.MaxSupply.IsNil() && !mintParams.MaxSupply.IsZero() {
+			mintParams.MaxSupply = mintParams.MaxSupply.Mul(ConversionFactor)
+			if err := mk.Params.Set(ctx, mintParams); err != nil {
+				return res, fmt.Errorf("setting mint params: %w", err)
+			}
+		}
+	} else {
+		ctx.Logger().Info("v35: mint already migrated, skipping", "mint_denom", mintParams.MintDenom)
 	}
 
 	// --- x/feemarket ---
@@ -78,21 +87,29 @@ func RescaleEconomics(
 	// filling blocks collapses.
 	//
 	// MinGasMultiplier is a ratio and is left alone.
-	feeParams := fmk.GetParams(ctx)
-	changed := false
-	if !feeParams.BaseFee.IsNil() && !feeParams.BaseFee.IsZero() {
-		feeParams.BaseFee = feeParams.BaseFee.Mul(conversionDec)
-		changed = true
-	}
-	if !feeParams.MinGasPrice.IsNil() && !feeParams.MinGasPrice.IsZero() {
-		feeParams.MinGasPrice = feeParams.MinGasPrice.Mul(conversionDec)
-		changed = true
-	}
-	if changed {
-		if err := fmk.SetParams(ctx, feeParams); err != nil {
-			return res, fmt.Errorf("setting feemarket params: %w", err)
+	//
+	// Neither price carries a denom either. x/vm's EvmDenom is the denom they
+	// are quoted in and MigrateDenomParams moves it, so it is the gate.
+	evmDenom := ek.GetParams(ctx).EvmDenom
+	if evmDenom == legacyDenom() {
+		feeParams := fmk.GetParams(ctx)
+		changed := false
+		if !feeParams.BaseFee.IsNil() && !feeParams.BaseFee.IsZero() {
+			feeParams.BaseFee = feeParams.BaseFee.Mul(conversionDec)
+			changed = true
 		}
-		res.FeeMarket = true
+		if !feeParams.MinGasPrice.IsNil() && !feeParams.MinGasPrice.IsZero() {
+			feeParams.MinGasPrice = feeParams.MinGasPrice.Mul(conversionDec)
+			changed = true
+		}
+		if changed {
+			if err := fmk.SetParams(ctx, feeParams); err != nil {
+				return res, fmt.Errorf("setting feemarket params: %w", err)
+			}
+			res.FeeMarket = true
+		}
+	} else {
+		ctx.Logger().Info("v35: feemarket already migrated, skipping", "evm_denom", evmDenom)
 	}
 
 	// --- ibc-go transfer escrow totals ---
