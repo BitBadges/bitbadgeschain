@@ -14,9 +14,6 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.ModuleManager,
 			app.Configurator(),
 			app.AccountKeeper,
-			*app.TokenizationKeeper,
-			app.PoolManagerKeeper,
-			app.IBCRateLimitKeeper,
 		),
 	)
 
@@ -38,7 +35,7 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v34.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			// v34 drops three module stores:
+			// v34 drops two module stores:
 			//   crisis - x/crisis left the SDK in v0.54
 			//   group  - x/group moved out of the SDK in v0.54 (enterprise)
 			//
@@ -47,7 +44,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			// needs it (see app.go) because BADGE is 9-decimal. Its v33 store
 			// carries the fractional balances and must survive the upgrade.
 			//
-			// All three are registered modules in v33 (see the v33 genesis, which
+			// Both are registered modules in v33 (see the v33 genesis, which
 			// carries "crisis" and "group" app_state) and are gone in v34, so
 			// their stores would otherwise be orphaned on disk forever. The
 			// upgrade completes either way — the SDK tolerates an unmounted

@@ -51,8 +51,10 @@ func RegisterEVMModuleBasics(bm module.BasicManager) {
 //
 // ExtendedDenomOptions must also be set: LoadEvmCoinInfo rejects a nil value for
 // any chain whose display unit is not 18 decimals. BADGE is 9-decimal (ubadge),
-// with abadge as the 18-decimal denom the EVM operates in — the mechanism that
-// replaced x/precisebank in cosmos/evm v0.7.
+// with abadge as the 18-decimal denom the EVM operates in.
+//
+// The extended denom is not a replacement for x/precisebank — both are required
+// together. See app/params/constants.go.
 type bitbadgesEVMModuleBasic struct {
 	evmmodule.AppModuleBasic
 }

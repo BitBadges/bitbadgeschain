@@ -3,9 +3,6 @@ package v34
 import (
 	"context"
 
-	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
-	poolmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/poolmanager"
-	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -29,7 +26,7 @@ const (
 // Those accounts cannot transact today — see pubkeys.go and BB-12.
 //
 // This is in a separate function so we can test it locally with a snapshot.
-func CustomUpgradeHandlerLogic(ctx context.Context, accountKeeper authkeeper.AccountKeeper, tokenizationKeeper tokenizationkeeper.Keeper, poolManagerKeeper poolmanagerkeeper.Keeper, rateLimitKeeper ibcratelimitkeeper.Keeper) error {
+func CustomUpgradeHandlerLogic(ctx context.Context, accountKeeper authkeeper.AccountKeeper) error {
 	if _, err := MigrateLegacyEthereumPubKeys(sdk.UnwrapSDKContext(ctx), accountKeeper); err != nil {
 		return err
 	}
@@ -40,12 +37,9 @@ func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
 	accountKeeper authkeeper.AccountKeeper,
-	tokenizationKeeper tokenizationkeeper.Keeper,
-	poolManagerKeeper poolmanagerkeeper.Keeper,
-	rateLimitKeeper ibcratelimitkeeper.Keeper,
 ) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		err := CustomUpgradeHandlerLogic(ctx, accountKeeper, tokenizationKeeper, poolManagerKeeper, rateLimitKeeper)
+		err := CustomUpgradeHandlerLogic(ctx, accountKeeper)
 		if err != nil {
 			return nil, err
 		}

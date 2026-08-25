@@ -11,7 +11,14 @@ const (
 
 	// ExtendedCoinUnit is the 18-decimal denom the EVM operates in. BADGE is a
 	// 9-decimal chain (ubadge); cosmos/evm v0.7 bridges that to the EVM's
-	// 18-decimal world via x/vm's extended denom, which replaced x/precisebank.
+	// 18-decimal world via x/vm's extended denom.
+	//
+	// The extended denom did NOT replace x/precisebank. cosmos/evm v0.7 moved
+	// precisebank to contrib rather than deleting it, and this chain needs both:
+	// the extended denom gives the EVM an 18-decimal view of balances, while
+	// precisebank holds the sub-ubadge fractional remainder that a 9-decimal
+	// bank cannot represent. Dropping precisebank on the assumption that the
+	// extended denom superseded it made every EVM balance read zero.
 	ExtendedCoinUnit = "abadge"
 
 	// DisplayCoinUnit is the bank display unit; its exponent (BaseCoinDecimals)
