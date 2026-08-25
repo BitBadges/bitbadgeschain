@@ -456,12 +456,23 @@ func New(
 	}
 	app.SetAnteHandler(evmante.NewAnteHandler(evmAnteOptions))
 
-	// Configure EVM mempool for JSON-RPC support (advanced feature, optional)
-	// Only create if JSON-RPC is enabled - otherwise GetMempool() will return nil
+	// Configure the EVM mempool.
+	//
+	// A failure here is fatal, not advisory. configureEVMMempool returns nil for
+	// both cases where the mempool is legitimately not wanted (no EVM chain
+	// config; app-side mempool disabled via a negative cosmos pool max-tx), so a
+	// non-nil error means the app-side mempool IS expected and we failed to
+	// install it.
+	//
+	// Continuing past that is the exact silent-dead-node failure this release
+	// exists to fix: ValidateReapBounds rejecting the operator's reap settings
+	// would leave BaseApp with no Insert/Reap/CheckTx handler, so CometBFT routes
+	// to an app mempool that can never include a transaction. The node keeps
+	// producing empty blocks and looks healthy while logging "ReapTxs handler
+	// not set" once a block. Failing to start is loud, immediate, and fixable.
 	if app.EVMKeeper != nil {
 		if err := app.configureEVMMempool(appOpts, logger); err != nil {
-			logger.Error("failed to configure EVM mempool", "error", err)
-			// Don't panic - mempool is optional unless JSON-RPC is enabled
+			return nil, fmt.Errorf("failed to configure EVM mempool: %w", err)
 		}
 	}
 
