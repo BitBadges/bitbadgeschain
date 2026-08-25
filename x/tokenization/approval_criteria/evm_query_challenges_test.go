@@ -265,25 +265,12 @@ func TestEVMQueryChallengesChecker_TotalGasLimit(t *testing.T) {
 	}
 	checker := NewEVMQueryChallengesChecker(mockService)
 
-	// Create 3 challenges with 500k gas each = 1.5M total, exceeds 1M limit
-	challenges := []*types.EVMQueryChallenge{
-		{
-			ContractAddress: "0x1234567890123456789012345678901234567890",
-			Calldata:        "70a08231",
-			GasLimit:        sdkmath.NewUint(500000),
-		},
-		{
-			ContractAddress: "0x1234567890123456789012345678901234567890",
-			Calldata:        "70a08231",
-			GasLimit:        sdkmath.NewUint(500000),
-		},
-		{
-			ContractAddress: "0x1234567890123456789012345678901234567890",
-			Calldata:        "70a08231",
-			GasLimit:        sdkmath.NewUint(500000), // This would exceed 1M total
-		},
-	}
-	approval := createApprovalWithEVMQueryChallenges(challenges)
+	// One more max-gas challenge than the total cap admits. Derived from the
+	// constants rather than hardcoded: this previously asserted 3 x 500k against
+	// a hardcoded 1M cap, so raising the cap would have left it passing
+	// vacuously instead of failing.
+	n := int(MaxTotalEVMQueryGas/MaxEVMQueryGasLimit) + 1
+	approval := createApprovalWithEVMQueryChallenges(evmChallenges(n, MaxEVMQueryGasLimit))
 
 	errMsg, err := checker.Check(mockContext(), approval, createCollection(), testAddrTo, testAddrFrom, testAddrInitiator, "collection", "approver", nil, nil, "", false)
 	require.Error(t, err, "should fail when total gas exceeds limit")
@@ -296,20 +283,10 @@ func TestEVMQueryChallengesChecker_TotalGasLimitPasses(t *testing.T) {
 	}
 	checker := NewEVMQueryChallengesChecker(mockService)
 
-	// Create 2 challenges with 500k gas each = 1M total, exactly at limit
-	challenges := []*types.EVMQueryChallenge{
-		{
-			ContractAddress: "0x1234567890123456789012345678901234567890",
-			Calldata:        "70a08231",
-			GasLimit:        sdkmath.NewUint(500000),
-		},
-		{
-			ContractAddress: "0x1234567890123456789012345678901234567890",
-			Calldata:        "70a08231",
-			GasLimit:        sdkmath.NewUint(500000),
-		},
-	}
-	approval := createApprovalWithEVMQueryChallenges(challenges)
+	// Exactly as many max-gas challenges as the total cap admits, derived from
+	// the constants so the boundary stays pinned if either one moves.
+	n := int(MaxTotalEVMQueryGas / MaxEVMQueryGasLimit)
+	approval := createApprovalWithEVMQueryChallenges(evmChallenges(n, MaxEVMQueryGasLimit))
 
 	errMsg, err := checker.Check(mockContext(), approval, createCollection(), testAddrTo, testAddrFrom, testAddrInitiator, "collection", "approver", nil, nil, "", false)
 	require.NoError(t, err, "should pass when total gas is at limit")
@@ -508,4 +485,114 @@ func (m *sequentialMockService) ExecuteEVMQuery(ctx sdk.Context, callerAddress s
 		return m.results[idx], nil
 	}
 	return nil, fmt.Errorf("no more results")
+}
+
+// evmChallenge builds a challenge with the given declared gas limit. A zero
+// limit means "use the module default", which is what the overwhelming majority
+// of real collections carry: GasLimit is optional and almost nobody sets it.
+func evmChallenge(gasLimit uint64) *types.EVMQueryChallenge {
+	return &types.EVMQueryChallenge{
+		ContractAddress: "0x1234567890123456789012345678901234567890",
+		Calldata:        "70a08231",
+		GasLimit:        sdkmath.NewUint(gasLimit),
+	}
+}
+
+func evmChallenges(n int, gasLimit uint64) []*types.EVMQueryChallenge {
+	out := make([]*types.EVMQueryChallenge, 0, n)
+	for i := 0; i < n; i++ {
+		out = append(out, evmChallenge(gasLimit))
+	}
+	return out
+}
+
+// v33DefaultEVMQueryGasLimit is the per-challenge default this module shipped in
+// v33. It is deliberately a literal and not a reference to the current
+// constant: the invariant being protected is "as many default-gas challenges
+// fit as fit on v33", which is meaningless if both sides move together.
+const v33DefaultEVMQueryGasLimit = uint64(100000)
+
+// v33MaxTotalEVMQueryGas is the total cap this module shipped in v33.
+const v33MaxTotalEVMQueryGas = uint64(1000000)
+
+// v33DefaultGasChallengeCapacity is how many default-gas challenges a single
+// approval could carry on v33: 1000000 / 100000 = 10.
+const v33DefaultGasChallengeCapacity = int(v33MaxTotalEVMQueryGas / v33DefaultEVMQueryGasLimit)
+
+// TestEVMQueryChallengesChecker_DefaultGasCapacityNotReducedFromV33 is the
+// regression guard for the v34 gas budget.
+//
+// v34 raised DefaultEVMQueryGasLimit from 100000 to 250000 because cosmos/evm
+// v0.7 stateful precompiles need more headroom. The total cap did not move, and
+// the loop reserves each challenge's DECLARED limit rather than its measured
+// usage. A collection that already exists on chain with N default-gas EVM query
+// challenges therefore silently changes from "fits" to "every transfer fails
+// forever" — and the transferring user cannot fix it, because the gas limits
+// live in the collection's approval criteria, not in their transaction.
+//
+// This asserts on behaviour (a Check that must not error), not on the constants,
+// so it fails for the reason that actually matters.
+func TestEVMQueryChallengesChecker_DefaultGasCapacityNotReducedFromV33(t *testing.T) {
+	for n := 1; n <= v33DefaultGasChallengeCapacity; n++ {
+		t.Run(fmt.Sprintf("%d_default_gas_challenges", n), func(t *testing.T) {
+			mockService := &mockEVMQueryService{returnValue: []byte{0x01}}
+			checker := NewEVMQueryChallengesChecker(mockService)
+
+			approval := createApprovalWithEVMQueryChallenges(evmChallenges(n, 0))
+
+			errMsg, err := checker.Check(mockContext(), approval, createCollection(), testAddrTo, testAddrFrom, testAddrInitiator, "collection", "approver", nil, nil, "", false)
+			require.NoError(t, err,
+				"a collection with %d default-gas EVM query challenges passed on v33 (%d x %d = %d <= %d) "+
+					"and must still pass; otherwise the upgrade permanently bricks it",
+				n, n, v33DefaultEVMQueryGasLimit, uint64(n)*v33DefaultEVMQueryGasLimit, v33MaxTotalEVMQueryGas)
+			require.Empty(t, errMsg)
+
+			// The default the challenges actually ran with is the v34 default,
+			// not the v33 one: the point is the capacity, not the per-call gas.
+			require.Equal(t, DefaultEVMQueryGasLimit, mockService.lastGasLimit)
+		})
+	}
+}
+
+// TestEVMQueryChallengesChecker_TotalGasCapStillRejectsExcess proves the DoS
+// ceiling did not simply get switched off. The cap is derived from the
+// constants so it cannot rot the way the hardcoded 1M assertions did.
+func TestEVMQueryChallengesChecker_TotalGasCapStillRejectsExcess(t *testing.T) {
+	// Smallest number of max-gas challenges whose declared total exceeds the cap.
+	n := int(MaxTotalEVMQueryGas/MaxEVMQueryGasLimit) + 1
+
+	mockService := &mockEVMQueryService{returnValue: []byte{0x01}}
+	checker := NewEVMQueryChallengesChecker(mockService)
+	approval := createApprovalWithEVMQueryChallenges(evmChallenges(n, MaxEVMQueryGasLimit))
+
+	errMsg, err := checker.Check(mockContext(), approval, createCollection(), testAddrTo, testAddrFrom, testAddrInitiator, "collection", "approver", nil, nil, "", false)
+	require.Error(t, err, "%d challenges at %d gas each must exceed the %d cap", n, MaxEVMQueryGasLimit, MaxTotalEVMQueryGas)
+	require.Contains(t, errMsg, "exceed total gas limit")
+}
+
+// TestEVMQueryChallengesChecker_TotalGasCapAllowsExactlyTheCap pins the
+// boundary: the check is `>` the cap, so a budget landing exactly on it passes.
+func TestEVMQueryChallengesChecker_TotalGasCapAllowsExactlyTheCap(t *testing.T) {
+	n := int(MaxTotalEVMQueryGas / MaxEVMQueryGasLimit)
+	require.Greater(t, n, 0, "the cap must admit at least one max-gas challenge")
+
+	mockService := &mockEVMQueryService{returnValue: []byte{0x01}}
+	checker := NewEVMQueryChallengesChecker(mockService)
+	approval := createApprovalWithEVMQueryChallenges(evmChallenges(n, MaxEVMQueryGasLimit))
+
+	errMsg, err := checker.Check(mockContext(), approval, createCollection(), testAddrTo, testAddrFrom, testAddrInitiator, "collection", "approver", nil, nil, "", false)
+	require.NoError(t, err, "a total landing exactly on the cap must pass")
+	require.Empty(t, errMsg)
+}
+
+// TestEVMQueryGasBudgetInvariants documents the arithmetic relationship the two
+// behavioural tests above depend on. Cheap, and it names the intent for whoever
+// next reaches for one of these constants.
+func TestEVMQueryGasBudgetInvariants(t *testing.T) {
+	require.LessOrEqual(t, DefaultEVMQueryGasLimit, MaxEVMQueryGasLimit,
+		"the default must be expressible as an explicit limit")
+	require.GreaterOrEqual(t,
+		MaxTotalEVMQueryGas/DefaultEVMQueryGasLimit,
+		v33MaxTotalEVMQueryGas/v33DefaultEVMQueryGasLimit,
+		"v34 must not fit fewer default-gas challenges than v33 did")
 }
