@@ -86,8 +86,8 @@
           "address": "bb19vd2vxpr9mnr5f06a4t64esdeck2gm244rfw5m",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             },
             {
               "denom": "ustake",
@@ -99,8 +99,8 @@
           "address": "bb147vptx8e2xvmz67fzjr9tzfpya9t4s4j92jzar",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             }
           ]
         },
@@ -108,8 +108,8 @@
           "address": "bb1kx9532ujful8vgg2dht6k544ax4k9qzsp0sany",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "99999999999999996"
+              "denom": "abadge",
+              "amount": "99999999999999996000000000"
             },
             {
               "denom": "ustake",
@@ -121,8 +121,8 @@
           "address": "bb1hx6cgd4cky0ua52x2s6mwl55gsrvauzjspsdr3",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             }
           ]
         },
@@ -130,16 +130,16 @@
           "address": "bb16mlss32x9pa3er2vpkq0zyhhqe8xzw2mv3grlm",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             }
           ]
         }
       ],
       "supply": [
         {
-          "denom": "ubadge",
-          "amount": "100000000000000000"
+          "denom": "abadge",
+          "amount": "100000000000000000000000000"
         },
         {
           "denom": "ustake",
@@ -160,8 +160,8 @@
     "consensus": null,
     "crisis": {
       "constant_fee": {
-        "amount": "10000000000",
-        "denom": "ubadge"
+        "amount": "10000000000000000000",
+        "denom": "abadge"
       }
     },
     "distribution": {

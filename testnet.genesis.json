@@ -86,8 +86,8 @@
           "address": "bb18yhheg2mf56cs2h6n2zx4k7ujf42sm4pvd7j4j",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             }
           ]
         },
@@ -95,8 +95,8 @@
           "address": "bb1j2w2y34fn7mtlvmu8ahwt0rahchxs46k4hjwe8",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             }
           ]
         },
@@ -104,8 +104,8 @@
           "address": "bb14zz5yvahhe8vpq2vgmp85rjsdcedsjwkmt0edd",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             }
           ]
         },
@@ -113,8 +113,8 @@
           "address": "bb1kx9532ujful8vgg2dht6k544ax4k9qzsp0sany",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "99999999999999996"
+              "denom": "abadge",
+              "amount": "99999999999999996000000000"
             },
             {
               "denom": "ustake",
@@ -126,8 +126,8 @@
           "address": "bb1lut8lcj32hht9m2l4vhtdnnrcuewhsr9660zen",
           "coins": [
             {
-              "denom": "ubadge",
-              "amount": "1"
+              "denom": "abadge",
+              "amount": "1000000000"
             },
             {
               "denom": "ustake",
@@ -138,8 +138,8 @@
       ],
       "supply": [
         {
-          "denom": "ubadge",
-          "amount": "100000000000000000"
+          "denom": "abadge",
+          "amount": "100000000000000000000000000"
         },
         {
           "denom": "ustake",
@@ -160,8 +160,8 @@
     "consensus": null,
     "crisis": {
       "constant_fee": {
-        "amount": "10000000000",
-        "denom": "ubadge"
+        "amount": "10000000000000000000",
+        "denom": "abadge"
       }
     },
     "distribution": {
