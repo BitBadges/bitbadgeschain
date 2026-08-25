@@ -31,14 +31,14 @@ func readConfig(t *testing.T, path string) string {
 // Two would be a TOML duplicate-key error and would stop the node just as
 // surely as the wrong value, so every success case asserts exactly one.
 func countMempoolTypeKeys(content string) int {
-	start := strings.Index(content, "[mempool]")
-	if start < 0 {
+	// Uses the production section finder on purpose: a hand-rolled substring
+	// scan here would carry the very bugs these tests exist to catch, and would
+	// have reported "0 type keys" for a file that is in fact correct.
+	start, end, ok := mempoolSectionBounds(content)
+	if !ok {
 		return 0
 	}
-	rest := content[start+len("[mempool]"):]
-	if next := strings.Index(rest, "\n["); next >= 0 {
-		rest = rest[:next]
-	}
+	rest := content[start:end]
 	n := 0
 	for _, line := range strings.Split(rest, "\n") {
 		trimmed := strings.TrimSpace(line)
@@ -64,6 +64,10 @@ func TestEnsureAppMempoolType(t *testing.T) {
 		wantContains []string
 		// wantNotContains: substrings the rewritten file must not contain.
 		wantNotContains []string
+		// wantExact: the entire rewritten file, byte for byte. Used where the
+		// defect is about WHICH bytes moved, so a substring check would pass on
+		// a file that is still wrong.
+		wantExact string
 	}{
 		{
 			name: "no mempool section is an error",
@@ -171,6 +175,57 @@ recheck = true
 			wantContains:    []string{`type = "app"`},
 			wantNotContains: []string{`"flood"`},
 		},
+		{
+			// A literal "[mempool]" inside a comment under another table used to
+			// win the strings.Index race, so `type = "app"` was inserted into
+			// [p2p], the real mempool.type stayed "flood", and the hook exited 0
+			// printing success. The node then died at the upgrade height: exactly
+			// the silent-success failure this hook exists to eliminate.
+			//
+			// Stock 0.38/0.39 templates carry one literal [mempool], but
+			// operators annotate their configs.
+			name: "a literal [mempool] in a comment does not steal the section",
+			in: `[p2p]
+# The [mempool] section below must switch to "app" for v34.
+laddr = "tcp://0.0.0.0:26656"
+
+[mempool]
+type = "flood"
+size = 5000
+`,
+			wantChanged: true,
+			wantExact: `[p2p]
+# The [mempool] section below must switch to "app" for v34.
+laddr = "tcp://0.0.0.0:26656"
+
+[mempool]
+type = "app"
+size = 5000
+`,
+		},
+		{
+			// Finding the section end with strings.Index(rest, "\n[") let a
+			// multi-line TOML string containing a line that starts with "["
+			// truncate the scan. A type key below such a string fell outside the
+			// section, so a SECOND one was inserted and config.toml became a
+			// duplicate-key parse error.
+			name: "a multi-line string containing a bracketed line does not truncate the section",
+			in: `[mempool]
+note = """
+[this is prose, not a table]
+"""
+type = "flood"
+size = 5000
+`,
+			wantChanged: true,
+			wantExact: `[mempool]
+note = """
+[this is prose, not a table]
+"""
+type = "app"
+size = 5000
+`,
+		},
 	}
 
 	for _, tc := range tests {
@@ -195,6 +250,9 @@ recheck = true
 			}
 
 			got := readConfig(t, path)
+			if tc.wantExact != "" && got != tc.wantExact {
+				t.Errorf("rewritten file differs\n--- got ---\n%s\n--- want ---\n%s", got, tc.wantExact)
+			}
 			for _, want := range tc.wantContains {
 				if !strings.Contains(got, want) {
 					t.Errorf("result missing %q:\n%s", want, got)

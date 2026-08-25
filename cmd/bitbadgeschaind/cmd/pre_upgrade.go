@@ -121,17 +121,9 @@ func ensureAppMempoolType(path string) (bool, error) {
 	}
 	content := string(raw)
 
-	start := strings.Index(content, "[mempool]")
-	if start < 0 {
+	start, end, ok := mempoolSectionBounds(content)
+	if !ok {
 		return false, fmt.Errorf("no [mempool] section in %s", path)
-	}
-
-	// The section runs until the next top-level table header. [p2p] may appear
-	// before [mempool] in the generated file, so scan forward rather than
-	// assuming any particular ordering.
-	end := len(content)
-	if next := strings.Index(content[start+len("[mempool]"):], "\n["); next >= 0 {
-		end = start + len("[mempool]") + next + 1
 	}
 
 	section := content[start:end]
@@ -153,6 +145,98 @@ func ensureAppMempoolType(path string) (bool, error) {
 	}
 
 	return true, atomicWriteFile(path, content[:start]+updated+content[end:])
+}
+
+// mempoolSectionBounds locates the [mempool] table in a config.toml and returns
+// the byte range it occupies. It scans LINES, because the obvious substring
+// search was wrong in two ways that both end with a dead node:
+//
+//   - strings.Index(content, "[mempool]") matches inside comments and strings.
+//     An operator note such as `# see the [mempool] section below` sitting under
+//     [p2p] won the race, so `type = "app"` was written into [p2p], the real
+//     mempool.type stayed "flood", and the hook exited 0 printing success. The
+//     node then died at the upgrade height: exactly the silent-success failure
+//     this hook exists to eliminate. Stock 0.38/0.39 templates carry only one
+//     literal [mempool], but operators annotate their configs.
+//
+//   - Finding the end with strings.Index(rest, "\n[") let a multi-line TOML
+//     string containing a line that starts with "[" truncate the scan. A type
+//     key below such a string fell outside the section, so a second one was
+//     inserted and config.toml became a duplicate-key parse error.
+//
+// The section starts at its header line and runs to the start of the next
+// top-level table header line, ignoring comment lines and anything inside a
+// multi-line string. ok is false when there is no [mempool] header line.
+func mempoolSectionBounds(content string) (start, end int, ok bool) {
+	inMultiline := false
+	offset := 0
+	found := false
+
+	for _, line := range strings.SplitAfter(content, "\n") {
+		if line == "" {
+			break
+		}
+		lineStart := offset
+		offset += len(line)
+
+		if inMultiline {
+			inMultiline = !closesMultilineString(line)
+			continue
+		}
+
+		trimmed := strings.TrimSpace(line)
+		// A comment is not a section header, whatever it happens to spell.
+		if strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+
+		if name, isHeader := tomlTableName(trimmed); isHeader {
+			if found {
+				return start, lineStart, true
+			}
+			if name == "mempool" {
+				start, found = lineStart, true
+			}
+			continue
+		}
+
+		if opensMultilineString(line) {
+			inMultiline = true
+		}
+	}
+
+	if !found {
+		return 0, 0, false
+	}
+	// [mempool] is the last table in the file.
+	return start, len(content), true
+}
+
+// tomlTableName returns the table name of a header line such as `[mempool]` or
+// `[mempool] # comment`. Array-of-tables headers ([[x]]) count as headers too:
+// they end the preceding section just the same.
+func tomlTableName(trimmed string) (string, bool) {
+	if !strings.HasPrefix(trimmed, "[") {
+		return "", false
+	}
+	closeIdx := strings.Index(trimmed, "]")
+	if closeIdx < 0 {
+		return "", false
+	}
+	return strings.Trim(trimmed[1:closeIdx], "[ \t"), true
+}
+
+// opensMultilineString reports whether line leaves a multi-line TOML string
+// open. An odd number of delimiters on the line means it is still open at the
+// end of the line.
+func opensMultilineString(line string) bool {
+	return strings.Count(line, `"""`)%2 == 1 || strings.Count(line, "'''")%2 == 1
+}
+
+// closesMultilineString reports whether line closes an already-open multi-line
+// TOML string.
+func closesMultilineString(line string) bool {
+	return strings.Contains(line, `"""`) || strings.Contains(line, "'''")
 }
 
 // insertAfterSectionHeader puts line directly beneath the section's header line.
@@ -223,6 +307,17 @@ func atomicWriteFile(path, content string) error {
 	}
 	if err := os.Rename(tmpName, path); err != nil {
 		return fmt.Errorf("replacing %s: %w", path, err)
+	}
+	// fsync the directory too. The rename itself is a directory metadata change,
+	// and on several filesystems that entry can still be only in the page cache
+	// after os.Rename returns: a crash immediately afterwards would lose the
+	// edit even though the file contents were durable. The file is never
+	// corrupted either way, so this is completeness rather than a fix, and a
+	// failure to sync the directory must not abort an upgrade whose config edit
+	// already landed.
+	if dirFile, err := os.Open(dir); err == nil {
+		_ = dirFile.Sync()
+		_ = dirFile.Close()
 	}
 	return nil
 }
