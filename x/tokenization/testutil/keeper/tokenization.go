@@ -41,6 +41,10 @@ func TokenizationKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
+	// Without the auth interfaces registered, the account keeper below cannot
+	// encode a BaseAccount, so any code path that creates an account (e.g. the
+	// EVM query caller bootstrap in ExecuteEVMQueryWithCaller) panics on write.
+	authtypes.RegisterInterfaces(registry)
 	appCodec := codec.NewProtoCodec(registry)
 
 	// Ensure SDK config is initialized with "bb" prefix before it gets sealed
