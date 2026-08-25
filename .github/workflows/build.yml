@@ -12,8 +12,16 @@ on:
 permissions:
   contents: read
 
+env:
+  # A hang should fail loudly with a goroutine dump rather than run until the
+  # runner kills the job with a bare exit 143 and no diagnosis.
+  GO_TEST_TIMEOUT: 30m
+  # Split out below; see the comment on the test-tokenization-keeper job.
+  HEAVY_PACKAGE: github.com/bitbadges/bitbadgeschain/x/tokenization/keeper
+
 jobs:
   build:
+    name: Build & test
     runs-on: ubuntu-latest
 
     steps:
@@ -35,5 +43,46 @@ jobs:
       - name: Build BitBadgesChain
         run: go build ./cmd/bitbadgeschaind/main.go
 
-      - name: Run Test Suite
-        run: go test -tags=test ./...
+      - name: Run test suite (everything but the heavy package)
+        run: |
+          set -euo pipefail
+          ALL=$(go list -tags=test ./...)
+          REST=$(printf '%s\n' "$ALL" | grep -vx "$HEAVY_PACKAGE")
+          # If the heavy package is ever renamed or moved, fail loudly here.
+          # Silently running a suite with one package quietly missing is exactly
+          # the kind of green-but-untested result this split must not create.
+          if [ "$(printf '%s\n' "$REST" | wc -l)" -ne "$(( $(printf '%s\n' "$ALL" | wc -l) - 1 ))" ]; then
+            echo "expected to exclude exactly one package ($HEAVY_PACKAGE)" >&2
+            echo "it is no longer in 'go list' output - update HEAVY_PACKAGE" >&2
+            exit 1
+          fi
+          go test -tags=test -timeout "$GO_TEST_TIMEOUT" $REST
+
+  # x/tokenization/keeper gets its own runner because its test binary does not
+  # fit alongside anything else.
+  #
+  # Measured: the compiled binary alone, with no build running, peaks at 12.88 GB
+  # RSS. A GitHub-hosted ubuntu-latest runner has 16 GB and 4 vCPU, and
+  # `go test ./...` runs up to GOMAXPROCS package binaries concurrently, so this
+  # package plus any neighbour exhausted memory. The job died with a bare
+  # exit 143 and no message, mid-package, on two consecutive runs.
+  #
+  # GOMEMLIMIT was measured and rejected as the fix: at 4GiB the same binary took
+  # 677s instead of 70s (9.6x) AND its peak RSS rose to 14.70 GB, so the
+  # footprint is not GC-compressible. Reducing it means changing how the package
+  # builds its test apps, which is tracked separately; until then it runs alone.
+  test-tokenization-keeper:
+    name: Test x/tokenization/keeper
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run test suite (x/tokenization/keeper)
+        run: go test -tags=test -timeout "$GO_TEST_TIMEOUT" ./x/tokenization/keeper/
