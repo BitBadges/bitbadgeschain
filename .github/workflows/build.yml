@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+  # Without this the suite never runs on a pull request. The only checks a PR
+  # got were CodeQL and Snyk, so "the tests pass" was an unverified claim right
+  # up to the moment of merge.
+  pull_request:
 
 permissions:
   contents: read
@@ -14,12 +18,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Go 1.24.5
-        uses: actions/setup-go@v2
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.24.5
+          # Read from go.mod so the CI toolchain cannot drift from the one the
+          # code actually requires. It was pinned to 1.24.5 while go.mod asks
+          # for 1.26.5, which does not build.
+          #
+          # go-version-file needs setup-go v3+, and checkout/setup-go v2 both
+          # run on the long-removed Node 12, so the actions are bumped to their
+          # current majors at the same time.
+          go-version-file: go.mod
 
       - name: Build BitBadgesChain
         run: go build ./cmd/bitbadgeschaind/main.go
