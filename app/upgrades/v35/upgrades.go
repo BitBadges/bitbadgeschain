@@ -16,6 +16,7 @@ import (
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 
@@ -49,6 +50,11 @@ type Keepers struct {
 	Gamm         gammkeeper.Keeper
 	PoolManager  poolmanager.Keeper
 	Tokenization tokenizationkeeper.Keeper
+
+	// PreciseBankStore is the retired x/precisebank store, mounted without its
+	// module so this upgrade can pay out the fractional balances it holds
+	// before the store goes away.
+	PreciseBankStore storetypes.StoreKey
 }
 
 // CustomUpgradeHandlerLogic runs the 9 -> 18 decimal migration.
@@ -70,6 +76,15 @@ func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 	//    staking pools, gov's deposit escrow, GAMM pool reserves, IBC escrow
 	//    accounts — converts as a side effect of this step.
 	if _, err := RedenominateBank(ctx, k.Bank); err != nil {
+		return err
+	}
+
+	// 2b. x/precisebank's fractional balances. The module is unwired as of this
+	//     upgrade, but the sub-ubadge remainders it held on behalf of EVM
+	//     accounts are real value and are not reflected in any bank balance.
+	//     After step 2 a fractional unit is exactly one unit of the new denom,
+	//     so this is a payout rather than a conversion.
+	if _, err := MigratePreciseBank(ctx, k.PreciseBankStore, k.Bank); err != nil {
 		return err
 	}
 

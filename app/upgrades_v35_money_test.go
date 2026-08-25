@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
@@ -354,4 +355,142 @@ func TestV35TakerFeeOverrideEqualToDefaultDoesNotHaltTheUpgrade(t *testing.T) {
 
 	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)),
 		"a redundant taker-fee override must not halt the chain")
+}
+
+// seedPreciseBankFractionalBalances writes the retired module's state directly:
+// per-account fractional remainders, an unowned remainder, and the ubadge
+// reserve on the module account that backs both.
+//
+// Written raw rather than through the module's keeper because the module is
+// unwired — which is exactly the situation the migration has to cope with.
+func seedPreciseBankFractionalBalances(
+	t *testing.T,
+	app *App,
+	ctx sdk.Context,
+	bk bankkeeper.BaseKeeper,
+	fractional map[string]int64,
+	remainder int64,
+) {
+	t.Helper()
+
+	store := ctx.KVStore(app.LegacyPreciseBankKey)
+
+	total := int64(0)
+	for addrStr, amount := range fractional {
+		addr, err := sdk.AccAddressFromBech32(addrStr)
+		require.NoError(t, err)
+		if amount == 0 {
+			// x/precisebank deletes rather than stores a zero, so a zero
+			// fractional balance is simply absent. Asserting on it still
+			// matters: the account must come out with its integer part intact.
+			continue
+		}
+		bz, err := sdkmath.NewInt(amount).Marshal()
+		require.NoError(t, err)
+		store.Set(append(append([]byte{}, v35.PreciseBankFractionalPrefix...), addr.Bytes()...), bz)
+		total += amount
+	}
+
+	if remainder > 0 {
+		bz, err := sdkmath.NewInt(remainder).Marshal()
+		require.NoError(t, err)
+		store.Set(v35.PreciseBankRemainderKey, bz)
+		total += remainder
+	}
+
+	// The reserve backs every fractional unit 1:1 in ubadge. The invariant the
+	// module maintains is sum(fractional) + remainder == reserve * 10^9.
+	require.Zero(t, total%1_000_000_000, "seed must leave a whole number of ubadge in the reserve")
+	reserveUbadge := total / 1_000_000_000
+	reserveAddr := authtypes.NewModuleAddress(v35.PreciseBankStoreKey)
+	coins := sdk.NewCoins(sdk.NewCoin(legacyDenom, sdkmath.NewInt(reserveUbadge)))
+	require.NoError(t, bk.MintCoins(ctx, "mint", coins))
+	require.NoError(t, bk.SendCoinsFromModuleToAccount(ctx, "mint", reserveAddr, coins))
+}
+
+// At 9 decimals an EVM account's balance was ubadge*10^9 + a fractional
+// remainder held by x/precisebank and backed by ubadge on its reserve. Deleting
+// that store as part of the upgrade destroys the fractional part of every
+// account that ever received a non-integer-ubadge transfer, and strands the
+// reserve on a module address whose module no longer exists.
+//
+// After the upgrade a fractional unit is one abadge, so the post-upgrade
+// balance must be exactly ubadge*10^9 + fractional.
+func TestV35PreciseBankFractionalBalancesSurviveTheUpgrade(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
+
+	// maxFractional is the largest a fractional balance can be: one below the
+	// 10^9 that would have carried into an integer ubadge.
+	const maxFractional = int64(999_999_999)
+
+	full := randAddr()   // integer balance plus the maximum fractional part
+	none := randAddr()   // integer balance, no fractional part at all
+	dustOnly := randAddr() // fractional part only, no integer balance
+
+	fundLegacy(t, ctx, bk, full, 5)
+	fundLegacy(t, ctx, bk, none, 7)
+
+	// The three fractional parts plus the remainder must come to a whole
+	// number of ubadge, which is what the reserve holds.
+	const dust = int64(3)
+	const remainder = int64(999_999_998) // maxFractional + dust + remainder == 2 ubadge
+	seedPreciseBankFractionalBalances(t, app, ctx, bk, map[string]int64{
+		full.String():     maxFractional,
+		none.String():     0,
+		dustOnly.String(): dust,
+	}, remainder)
+
+	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
+
+	factor := v35.ConversionFactor
+	require.Equal(t, sdkmath.NewInt(5).Mul(factor).AddRaw(maxFractional),
+		bk.GetBalance(ctx, full, appparams.BaseCoinUnit).Amount,
+		"an account's fractional remainder is real value and must survive")
+	require.Equal(t, sdkmath.NewInt(7).Mul(factor),
+		bk.GetBalance(ctx, none, appparams.BaseCoinUnit).Amount,
+		"an account with no fractional balance must be unaffected")
+	require.Equal(t, sdkmath.NewInt(dust),
+		bk.GetBalance(ctx, dustOnly, appparams.BaseCoinUnit).Amount,
+		"an account whose whole balance was fractional must still have it")
+
+	reserveAddr := authtypes.NewModuleAddress(v35.PreciseBankStoreKey)
+	require.True(t, bk.GetBalance(ctx, reserveAddr, appparams.BaseCoinUnit).IsZero(),
+		"the reserve's module no longer exists; anything left there is stranded")
+	require.True(t, bk.GetBalance(ctx, reserveAddr, legacyDenom).IsZero())
+
+	// Supply must still equal the sum of balances: the remainder was owned by
+	// nobody, so it is burned rather than left inflating supply.
+	summed := sdkmath.ZeroInt()
+	bk.IterateAllBalances(ctx, func(_ sdk.AccAddress, coin sdk.Coin) bool {
+		if coin.Denom == appparams.BaseCoinUnit {
+			summed = summed.Add(coin.Amount)
+		}
+		return false
+	})
+	require.Equal(t, bk.GetSupply(ctx, appparams.BaseCoinUnit).Amount, summed,
+		"balances must sum to supply after paying out the fractional balances")
+}
+
+// A reserve that does not back what the fractional balances claim means the
+// module's own invariant has been broken. Paying out anyway would mint value
+// out of nothing, so the upgrade must refuse rather than guess.
+func TestV35PreciseBankRefusesWhenTheReserveDoesNotBackTheBalances(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
+
+	alice := randAddr()
+	fundLegacy(t, ctx, bk, alice, 1)
+
+	// One whole ubadge of fractional balance, with no reserve behind it.
+	store := ctx.KVStore(app.LegacyPreciseBankKey)
+	bz, err := sdkmath.NewInt(500_000_000).Marshal()
+	require.NoError(t, err)
+	store.Set(append(append([]byte{}, v35.PreciseBankFractionalPrefix...), alice.Bytes()...), bz)
+
+	err = v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app))
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "does not back it")
 }

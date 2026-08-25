@@ -33,6 +33,8 @@ func (app *App) V35Keepers() v35.Keepers {
 		Staking:      app.StakingKeeper,
 		Tokenization: *app.TokenizationKeeper,
 		Transfer:     app.TransferKeeper,
+
+		PreciseBankStore: app.LegacyPreciseBankKey,
 	}
 }
 
@@ -77,9 +79,18 @@ func (app *App) RegisterUpgradeHandlers() {
 	case v35.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			// The 18-decimal migration makes base == extended denom, so
-			// x/precisebank has nothing left to bridge and is unwired.
-			Deleted: []string{"precisebank"},
+			// x/precisebank is unwired by this upgrade — base == extended denom
+			// at 18 decimals, so there is nothing left to bridge — but its store
+			// is deliberately NOT deleted here.
+			//
+			// Store upgrades are applied by the store loader when the new binary
+			// loads, which is *before* the upgrade handler runs in BeginBlock.
+			// Deleting it here would destroy the per-account fractional balances
+			// the handler has to pay out, and strand their backing on a module
+			// address that no longer has a module. The handler empties the store
+			// instead; the mount itself can be dropped in a later upgrade, once
+			// every node has passed this height.
+			Deleted: []string{},
 			Added:   []string{},
 		}
 	case v34.UpgradeName:

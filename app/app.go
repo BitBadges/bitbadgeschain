@@ -101,6 +101,8 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/bitbadges/bitbadgeschain/docs"
+
+	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 )
 
 const (
@@ -168,6 +170,11 @@ type App struct {
 	FeeMarketKeeper   feemarketkeeper.Keeper
 	ERC20Keeper       erc20keeper.Keeper
 	EVMKeeper         *evmkeeper.Keeper
+
+	// LegacyPreciseBankKey mounts the retired x/precisebank store so the v35
+	// upgrade can drain the fractional balances it holds. No module or keeper
+	// is attached to it.
+	LegacyPreciseBankKey *storetypes.KVStoreKey
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// EVM mempool and pending tx listeners for JSON-RPC support
@@ -331,6 +338,18 @@ func New(
 
 	// x/precisebank is gone as of the 18-decimal migration: base denom and
 	// extended denom are now the same, so there is no precision gap to bridge.
+	//
+	// Its store is still mounted, with no module and no keeper behind it. The
+	// v35 handler reads the per-account fractional balances out of it and pays
+	// them into ordinary bank balances; without the mount that state is
+	// unreachable and the value it represents is destroyed at the upgrade
+	// height. Once every node has passed v35 the store is empty and the mount
+	// can be dropped in a later upgrade.
+	app.LegacyPreciseBankKey = storetypes.NewKVStoreKey(v35.PreciseBankStoreKey)
+	if err := app.RegisterStores(app.LegacyPreciseBankKey); err != nil {
+		return nil, fmt.Errorf("failed to register the retired precisebank store: %w", err)
+	}
+
 	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
 	}
