@@ -101,6 +101,13 @@ func SetAddressPrefixes() {
 }
 
 func InitSDKConfigWithoutSeal() *sdk.Config {
+	// PowerReduction is consensus-affecting and must be installed here, not
+	// only in InitSDKConfig. Packages that import app/params without building
+	// the whole app — the x/gamm, x/tokenization, x/sendmanager and x/ibc-hooks
+	// test helpers — call only this function, and without it their staking math
+	// runs at the SDK default 10^6 while the chain runs at 10^15.
+	SetPowerReduction()
+
 	// Set prefixes
 	accountPubKeyPrefix := AccountAddressPrefix + "pub"
 	validatorAddressPrefix := AccountAddressPrefix + "valoper"
@@ -124,7 +131,6 @@ func InitSDKConfigWithoutSeal() *sdk.Config {
 }
 
 func InitSDKConfig() {
-	SetPowerReduction()
 	config := InitSDKConfigWithoutSeal()
 	config.SetCoinType(60) // Ethereum's coin type
 	config.SetPurpose(hd.CreateHDPath(60, 0, 0).Purpose)

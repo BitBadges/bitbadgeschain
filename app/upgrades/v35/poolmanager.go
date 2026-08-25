@@ -10,8 +10,9 @@ import (
 
 // PoolManagerMigrationResult reports what RekeyTakerFees touched.
 type PoolManagerMigrationResult struct {
-	Rekeyed int
-	Total   int
+	Rekeyed   int
+	Redundant int
+	Total     int
 }
 
 // RekeyTakerFees moves per-pair taker-fee overrides onto the new denom.
@@ -59,14 +60,23 @@ func RekeyTakerFees(ctx sdk.Context, pmk poolmanager.Keeper) (PoolManagerMigrati
 			newOut = newDenom()
 		}
 
-		// Guard against clobbering: if the override happens to equal the
-		// default, writing it would delete rather than store, quietly losing
-		// the record instead of moving it.
+		// An override that equals the current default carries no information:
+		// the keeper's own convention is that such a pair is simply not stored.
+		// Governance raising or lowering the default after an override was
+		// written leaves exactly this state, so it is a reachable configuration
+		// rather than corruption.
+		//
+		// Erroring here would abort CustomUpgradeHandlerLogic and halt the chain
+		// at the upgrade height, recoverable only with a new binary. Retire the
+		// stale key instead and say so in the log.
 		if pair.TakerFee.Equal(defaultFee) {
-			return res, fmt.Errorf(
-				"taker fee for %s/%s equals the default; SetDenomPairTakerFee would delete rather than move it",
-				inDenom, outDenom,
+			pmk.SetDenomPairTakerFee(ctx, inDenom, outDenom, defaultFee)
+			res.Redundant++
+			ctx.Logger().Info(
+				"v35: dropped a taker-fee override that already equals the default",
+				"token_in", inDenom, "token_out", outDenom, "fee", pair.TakerFee.String(),
 			)
+			continue
 		}
 
 		pmk.SetDenomPairTakerFee(ctx, newIn, newOut, pair.TakerFee)
@@ -83,6 +93,7 @@ func RekeyTakerFees(ctx sdk.Context, pmk poolmanager.Keeper) (PoolManagerMigrati
 		"from", legacyDenom(),
 		"to", newDenom(),
 		"rekeyed", res.Rekeyed,
+		"redundant_dropped", res.Redundant,
 		"total_pairs", res.Total,
 	)
 

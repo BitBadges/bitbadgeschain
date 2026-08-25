@@ -2,6 +2,7 @@ package v35
 
 import (
 	"fmt"
+	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -30,8 +31,12 @@ type TokenizationMigrationResult struct {
 // "1 BADGE" would, after the redenomination, charge 10^-9 of that — every
 // existing paid approval silently becomes free. Royalty legs likewise.
 //
-// Three places hold them: collection-level approvals, and the incoming and
-// outgoing approvals on each user balance store.
+// Four places hold them: collection-level approvals, the incoming and outgoing
+// approvals on each user balance store, and the collection's DefaultBalances —
+// the balance store every user inherits the first time they touch the
+// collection. Missing that last one is the same "paid mints become free" bug,
+// deferred: it only bites users who join after the upgrade, so it survives any
+// test that only looks at accounts which already exist.
 func RescaleTokenizationCoinTransfers(ctx sdk.Context, tk tokenizationkeeper.Keeper) (TokenizationMigrationResult, error) {
 	var res TokenizationMigrationResult
 
@@ -49,6 +54,10 @@ func RescaleTokenizationCoinTransfers(ctx sdk.Context, tk tokenizationkeeper.Kee
 			n := scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
 			res.CoinTransfers += n
 			changed = changed || n > 0
+		}
+		if n := scaleUserBalanceStoreApprovals(collection.DefaultBalances); n > 0 {
+			res.CoinTransfers += n
+			changed = true
 		}
 		if !changed {
 			continue
@@ -79,26 +88,10 @@ func RescaleTokenizationCoinTransfers(ctx sdk.Context, tk tokenizationkeeper.Kee
 		if balance == nil {
 			continue
 		}
-		changed := false
+		n := scaleUserBalanceStoreApprovals(balance)
+		res.CoinTransfers += n
 
-		for _, approval := range balance.IncomingApprovals {
-			if approval == nil || approval.ApprovalCriteria == nil {
-				continue
-			}
-			n := scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
-			res.CoinTransfers += n
-			changed = changed || n > 0
-		}
-		for _, approval := range balance.OutgoingApprovals {
-			if approval == nil || approval.ApprovalCriteria == nil {
-				continue
-			}
-			n := scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
-			res.CoinTransfers += n
-			changed = changed || n > 0
-		}
-
-		if !changed {
+		if n == 0 {
 			continue
 		}
 		if err := tk.SetUserBalanceInStore(ctx, balanceKeys[i], balance, true); err != nil {
@@ -118,23 +111,72 @@ func RescaleTokenizationCoinTransfers(ctx sdk.Context, tk tokenizationkeeper.Kee
 	return res, nil
 }
 
-// scaleCoinTransfers rewrites legacy-denom coins in place and reports how many
-// individual coin entries it changed. Other denoms are left alone — a paid mint
-// priced in USDC must stay priced in USDC.
+// scaleUserBalanceStoreApprovals converts the coin transfers on both approval
+// lists of a balance store, and reports how many coin entries it changed.
+//
+// Shared between the per-user stores and a collection's DefaultBalances, which
+// is the same type and carries the same approvals.
+func scaleUserBalanceStoreApprovals(balance *tokenizationtypes.UserBalanceStore) int {
+	if balance == nil {
+		return 0
+	}
+	changed := 0
+	for _, approval := range balance.IncomingApprovals {
+		if approval == nil || approval.ApprovalCriteria == nil {
+			continue
+		}
+		changed += scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
+	}
+	for _, approval := range balance.OutgoingApprovals {
+		if approval == nil || approval.ApprovalCriteria == nil {
+			continue
+		}
+		changed += scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
+	}
+	return changed
+}
+
+// scaleCoinTransfers rewrites legacy-denom coins and reports how many individual
+// coin entries it changed. Other denoms are left alone — a paid mint priced in
+// USDC must stay priced in USDC.
+//
+// The slice is rebuilt and re-sorted rather than mutated in place. Coins are
+// held in denom order, and the rename moves BADGE's position: [ibc/..., ubadge]
+// is sorted, [ibc/..., abadge] is not. An unsorted slice fails
+// sdk.Coins.Validate and makes AmountOf binary-search past the entry it wants.
+// Every other conversion in this migration re-sorts for the same reason.
 func scaleCoinTransfers(transfers []*tokenizationtypes.CoinTransfer) int {
 	changed := 0
 	for _, transfer := range transfers {
 		if transfer == nil {
 			continue
 		}
+		converted := 0
+		out := make([]*sdk.Coin, 0, len(transfer.Coins))
 		for _, coin := range transfer.Coins {
-			if coin == nil || coin.Denom != legacyDenom() {
+			if coin == nil {
+				out = append(out, coin)
 				continue
 			}
-			coin.Denom = newDenom()
-			coin.Amount = coin.Amount.Mul(ConversionFactor)
-			changed++
+			if coin.Denom != legacyDenom() {
+				out = append(out, coin)
+				continue
+			}
+			scaled := sdk.NewCoin(newDenom(), coin.Amount.Mul(ConversionFactor))
+			out = append(out, &scaled)
+			converted++
 		}
+		if converted == 0 {
+			continue
+		}
+		sort.SliceStable(out, func(i, j int) bool {
+			if out[i] == nil || out[j] == nil {
+				return out[j] == nil && out[i] != nil
+			}
+			return out[i].Denom < out[j].Denom
+		})
+		transfer.Coins = out
+		changed += converted
 	}
 	return changed
 }

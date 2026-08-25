@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	vestingexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
@@ -33,14 +34,19 @@ func RescaleVestingAccounts(ctx sdk.Context, ak authkeeper.AccountKeeper) (Accou
 	var res AccountMigrationResult
 
 	// Collect before writing: IterateAccounts walks an open store iterator.
+	//
+	// Selected by interface rather than by a list of concrete types on purpose.
+	// An allowlist of the four SDK vesting types silently skips anything else
+	// that locks coins — a chain-specific or newly added vesting account — and
+	// skipping is the dangerous direction here: the account's own figures stay
+	// at the old scale while its bank balance grows 10^9x, which unlocks funds
+	// that are supposed to be locked. Selecting by interface makes the default
+	// branch of the type switch below reachable, so an unhandled type fails the
+	// upgrade instead of quietly passing.
 	var vesting []sdk.AccountI
 	ak.IterateAccounts(ctx, func(acc sdk.AccountI) bool {
 		res.Scanned++
-		switch acc.(type) {
-		case *vestingtypes.ContinuousVestingAccount,
-			*vestingtypes.DelayedVestingAccount,
-			*vestingtypes.PeriodicVestingAccount,
-			*vestingtypes.PermanentLockedAccount:
+		if _, ok := acc.(vestingexported.VestingAccount); ok {
 			vesting = append(vesting, acc)
 		}
 		return false
@@ -63,7 +69,12 @@ func RescaleVestingAccounts(ctx sdk.Context, ak authkeeper.AccountKeeper) (Accou
 				v.VestingPeriods[i].Amount = convertCoins(v.VestingPeriods[i].Amount, legacyDenom(), newDenom())
 			}
 		default:
-			return res, fmt.Errorf("unhandled vesting account type %T for %s", acc, acc.GetAddress())
+			// Reachable: the collection above selects every VestingAccount, not
+			// just the four handled here. See gamm.go for the same stance on
+			// unrecognised pool types.
+			return res, fmt.Errorf(
+				"unhandled vesting account type %T for %s: refusing to leave its locked amounts unconverted",
+				acc, acc.GetAddress())
 		}
 
 		ak.SetAccount(ctx, acc)

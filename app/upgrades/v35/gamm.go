@@ -2,6 +2,8 @@ package v35
 
 import (
 	"fmt"
+	"math"
+	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -62,7 +64,11 @@ func RescaleGammPools(ctx sdk.Context, gk gammkeeper.Keeper) (GammMigrationResul
 			res.BalancerPools++
 
 		case *stableswap.Pool:
-			p.PoolLiquidity = convertCoins(p.PoolLiquidity, legacyDenom(), newDenom())
+			liquidity, factors, err := rescaleStableswapLegs(p.PoolLiquidity, p.ScalingFactors)
+			if err != nil {
+				return res, fmt.Errorf("stableswap pool %d: %w", p.Id, err)
+			}
+			p.PoolLiquidity, p.ScalingFactors = liquidity, factors
 			if err := gk.OverwritePoolV15MigrationUnsafe(ctx, p); err != nil {
 				return res, fmt.Errorf("writing stableswap pool %d: %w", p.Id, err)
 			}
@@ -94,4 +100,83 @@ func sortBalancerAssets(p *balancer.Pool) {
 			assets[j], assets[j-1] = assets[j-1], assets[j]
 		}
 	}
+}
+
+// rescaleStableswapLegs converts a stableswap pool's native-denom leg.
+//
+// Stableswap prices off liquidity[i] / scalingFactors[i], and the two arrays are
+// index-aligned with each other. So the migration has to do two things the
+// balancer path does not:
+//
+//   - scale the BADGE scaling factor along with the BADGE liquidity. Scaling
+//     only the liquidity makes the BADGE leg look 10^9 times deeper than it is,
+//     the pool quotes BADGE at effectively zero, and the first swapper drains
+//     the other side of the pool. This finding carries no denom string in the
+//     pool record, which is why the exported-genesis sweep cannot see it.
+//   - re-sort BOTH arrays together. PoolLiquidity is sorted by denom and abadge
+//     sorts where ubadge did not, so re-sorting the coins alone would leave
+//     every scaling factor attached to the wrong asset.
+func rescaleStableswapLegs(liquidity sdk.Coins, factors []uint64) (sdk.Coins, []uint64, error) {
+	if len(liquidity) != len(factors) {
+		return nil, nil, fmt.Errorf(
+			"pool has %d liquidity legs but %d scaling factors; refusing to guess the pairing",
+			len(liquidity), len(factors),
+		)
+	}
+
+	type leg struct {
+		coin   sdk.Coin
+		factor uint64
+	}
+
+	legs := make([]leg, 0, len(liquidity))
+	changed := false
+	for i, coin := range liquidity {
+		factor := factors[i]
+		if coin.Denom == legacyDenom() {
+			scaled, err := scaleScalingFactor(factor)
+			if err != nil {
+				return nil, nil, err
+			}
+			coin = sdk.NewCoin(newDenom(), coin.Amount.Mul(ConversionFactor))
+			factor = scaled
+			changed = true
+		}
+		legs = append(legs, leg{coin: coin, factor: factor})
+	}
+
+	if !changed {
+		return liquidity, factors, nil
+	}
+
+	sort.SliceStable(legs, func(i, j int) bool { return legs[i].coin.Denom < legs[j].coin.Denom })
+
+	outCoins := make(sdk.Coins, len(legs))
+	outFactors := make([]uint64, len(legs))
+	for i, l := range legs {
+		outCoins[i] = l.coin
+		outFactors[i] = l.factor
+	}
+	return outCoins, outFactors, nil
+}
+
+// maxScalingFactor is the largest scaling factor x/gamm can actually use.
+//
+// The field is uint64, but validateScalingFactors rejects anything where
+// int64(scalingFactor) <= 0 and getDescaledPoolAmt multiplies by
+// int64(scalingFactor), so the usable ceiling is MaxInt64 rather than MaxUint64.
+// Scaling by 10^9 crosses it for any factor above ~9.2e9 — reachable, unlike the
+// sdkmath.Int overflow bounds elsewhere in this migration.
+const maxScalingFactor = uint64(math.MaxInt64)
+
+func scaleScalingFactor(factor uint64) (uint64, error) {
+	multiplier := ConversionFactor.Uint64()
+	if factor > maxScalingFactor/multiplier {
+		return 0, fmt.Errorf(
+			"scaling factor %d overflows when multiplied by %d (max usable factor is %d): "+
+				"drain or re-parameterise this pool before the upgrade height",
+			factor, multiplier, maxScalingFactor/multiplier,
+		)
+	}
+	return factor * multiplier, nil
 }

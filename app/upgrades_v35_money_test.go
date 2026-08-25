@@ -11,6 +11,10 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	stableswap "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 )
@@ -170,4 +174,184 @@ func TestV35WithdrawDelegatorRewardPaysEachDelegatorTheirShare(t *testing.T) {
 		require.Equal(t, want, got,
 			"delegator %d must receive exactly its own redenominated share, not the whole pot", i)
 	}
+}
+
+// A stableswap pool prices swaps off liquidity[i] / scalingFactors[i]. Scaling
+// the BADGE liquidity by 10^9 and leaving its scaling factor alone makes the
+// BADGE leg look 10^9 times deeper than it is, so the pool quotes BADGE at
+// roughly zero and the first swapper drains the other side.
+//
+// The scaling factors are also index-aligned with PoolLiquidity, and the rename
+// moves BADGE's position in the sorted coin list — so the factors have to be
+// permuted with it, not just scaled.
+func TestV35StableswapSpotPriceIsUnchangedAcrossTheUpgrade(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+
+	// uatom sorts after abadge and before ubadge, so the rename reorders
+	// PoolLiquidity and any index-aligned array has to move with it.
+	const otherDenom = "uatom"
+
+	liquidity := sdk.NewCoins(
+		sdk.NewCoin(legacyDenom, sdkmath.NewInt(2_000_000_000)),
+		sdk.NewCoin(otherDenom, sdkmath.NewInt(3_000_000_000)),
+	)
+	require.Equal(t, otherDenom, liquidity[0].Denom, "seed assumes uatom sorts before ubadge")
+
+	// Non-1 scaling factors, index-aligned with the sorted liquidity above.
+	scalingFactors := []uint64{7, 100}
+
+	pool, err := stableswap.NewStableswapPool(
+		1,
+		stableswap.PoolParams{SwapFee: osmomath.ZeroDec(), ExitFee: osmomath.ZeroDec()},
+		liquidity,
+		scalingFactors,
+		"",
+		"",
+	)
+	require.NoError(t, err)
+	require.NoError(t, app.GammKeeper.OverwritePoolV15MigrationUnsafe(ctx, &pool))
+
+	// Quote BADGE against the other asset. This direction multiplies by the
+	// BADGE scaling factor at the end, so the post-upgrade figure is the
+	// pre-upgrade one times 10^9 exactly — the unit shrank by 10^9, the price
+	// per unit did not move.
+	before, err := pool.SpotPrice(ctx, legacyDenom, otherDenom)
+	require.NoError(t, err)
+	require.False(t, before.IsZero())
+
+	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
+
+	migrated, err := app.GammKeeper.GetPool(ctx, 1)
+	require.NoError(t, err)
+	after, ok := migrated.(*stableswap.Pool)
+	require.True(t, ok)
+
+	// The factors must still line up with the liquidity they scale.
+	require.Equal(t, len(after.PoolLiquidity), len(after.ScalingFactors))
+	require.Equal(t, appparams.BaseCoinUnit, after.PoolLiquidity[0].Denom,
+		"abadge sorts first, so the liquidity must have been re-sorted")
+	require.Equal(t, otherDenom, after.PoolLiquidity[1].Denom)
+
+	// The scaled reserve the AMM actually prices off — liquidity/factor — must
+	// be the same rational number on both sides of the upgrade.
+	require.Equal(t,
+		liquidity.AmountOf(legacyDenom).Mul(sdkmath.NewIntFromUint64(after.ScalingFactors[0])),
+		after.PoolLiquidity[0].Amount.Mul(sdkmath.NewIntFromUint64(scalingFactors[1])),
+		"the BADGE leg's scaled reserve must not move")
+	require.Equal(t, liquidity.AmountOf(otherDenom), after.PoolLiquidity[1].Amount,
+		"the non-BADGE leg must not move")
+	require.Equal(t, scalingFactors[0], after.ScalingFactors[1],
+		"the non-BADGE scaling factor must not move")
+
+	// The unit shrank by 10^9, so the price per unit grows by 10^9 and nothing
+	// else. Compared at the pre-upgrade decimal precision, because the larger
+	// descaling multiplier lets the post-upgrade figure carry more significant
+	// digits than the pre-upgrade one could represent.
+	afterPrice, err := after.SpotPrice(ctx, appparams.BaseCoinUnit, otherDenom)
+	require.NoError(t, err)
+	require.Equal(t, before.Dec().String(), afterPrice.QuoInt64(1_000_000_000).Dec().String(),
+		"a redenomination must not move the price of a stableswap pool")
+}
+
+// x/tokenization approvals also live on TokenCollection.DefaultBalances, which
+// every user inherits the first time they touch a collection. Skipping it makes
+// every paid mint priced through a default approval cost 10^-9 of its intent —
+// which is to say, free — for anyone who joins after the upgrade.
+func TestV35DefaultBalancesCoinTransfersAreScaled(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+
+	price := sdk.NewCoin(legacyDenom, sdkmath.NewInt(1_000_000_000)) // 1 BADGE
+	collection := &tokenizationtypes.TokenCollection{
+		CollectionId: sdkmath.NewUint(1),
+		DefaultBalances: &tokenizationtypes.UserBalanceStore{
+			IncomingApprovals: []*tokenizationtypes.UserIncomingApproval{{
+				ApprovalId: "default-incoming",
+				ApprovalCriteria: &tokenizationtypes.IncomingApprovalCriteria{
+					CoinTransfers: []*tokenizationtypes.CoinTransfer{{
+						To:    randAddr().String(),
+						Coins: []*sdk.Coin{&price},
+					}},
+				},
+			}},
+		},
+	}
+	require.NoError(t, app.TokenizationKeeper.SetCollectionInStore(ctx, collection, true))
+
+	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
+
+	got, found := app.TokenizationKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(1))
+	require.True(t, found)
+	coin := got.DefaultBalances.IncomingApprovals[0].ApprovalCriteria.CoinTransfers[0].Coins[0]
+	require.Equal(t, appparams.BaseCoinUnit, coin.Denom,
+		"a default approval priced in the retired denom is priced in nothing")
+	require.Equal(t, sdkmath.NewInt(1_000_000_000).Mul(v35.ConversionFactor), coin.Amount,
+		"a paid mint must cost the same after the upgrade as before it")
+}
+
+// The rename moves BADGE's sort position, so a multi-denom coin transfer that
+// was sorted before the migration is not sorted after it unless the slice is
+// rebuilt. Everywhere else in this migration re-sorts (convertCoins,
+// scaleDecCoins, the gamm pool assets); this path mutated in place.
+func TestV35CoinTransferCoinsStaySortedByDenom(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+
+	// ibc/... sorts after abadge and before ubadge.
+	const ibcDenom = "ibc/ABCDEF0123456789"
+	badge := sdk.NewCoin(legacyDenom, sdkmath.NewInt(5))
+	voucher := sdk.NewCoin(ibcDenom, sdkmath.NewInt(9))
+
+	collection := &tokenizationtypes.TokenCollection{
+		CollectionId: sdkmath.NewUint(1),
+		CollectionApprovals: []*tokenizationtypes.CollectionApproval{{
+			ApprovalId: "paid",
+			ApprovalCriteria: &tokenizationtypes.ApprovalCriteria{
+				CoinTransfers: []*tokenizationtypes.CoinTransfer{{
+					To:    randAddr().String(),
+					Coins: []*sdk.Coin{&voucher, &badge}, // sorted: ibc/... < ubadge
+				}},
+			},
+		}},
+	}
+	require.NoError(t, app.TokenizationKeeper.SetCollectionInStore(ctx, collection, true))
+
+	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
+
+	got, found := app.TokenizationKeeper.GetCollectionFromStore(ctx, sdkmath.NewUint(1))
+	require.True(t, found)
+	coins := got.CollectionApprovals[0].ApprovalCriteria.CoinTransfers[0].Coins
+
+	flat := sdk.Coins{}
+	for _, c := range coins {
+		flat = append(flat, *c)
+	}
+	require.NoError(t, flat.Validate(),
+		"the migrated coins must still be a valid, sorted sdk.Coins")
+	require.Equal(t, sdkmath.NewInt(5).Mul(v35.ConversionFactor), flat.AmountOf(appparams.BaseCoinUnit),
+		"AmountOf binary-searches a sorted slice; an unsorted one silently returns zero")
+	require.Equal(t, sdkmath.NewInt(9), flat.AmountOf(ibcDenom),
+		"a foreign denom must not move")
+}
+
+// A stored taker-fee override that happens to equal the current default is a
+// reachable configuration: governance can change the default after an override
+// was written. Erroring there aborts the whole upgrade handler and halts the
+// chain at the upgrade height with no recovery short of a new binary.
+func TestV35TakerFeeOverrideEqualToDefaultDoesNotHaltTheUpgrade(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+
+	defaultFee := app.PoolManagerKeeper.GetDefaultTakerFee(ctx)
+	app.PoolManagerKeeper.SetDenomPairTakerFee(ctx, legacyDenom, "uatom", defaultFee.Add(osmomath.NewDecWithPrec(1, 3)))
+
+	// Now move the default onto the override's value, which is exactly the
+	// state a governance parameter change leaves behind.
+	pmParams := app.PoolManagerKeeper.GetParams(ctx)
+	pmParams.TakerFeeParams.DefaultTakerFee = defaultFee.Add(osmomath.NewDecWithPrec(1, 3))
+	app.PoolManagerKeeper.SetParams(ctx, pmParams)
+
+	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)),
+		"a redundant taker-fee override must not halt the chain")
 }
