@@ -208,8 +208,8 @@ func atomicWriteFile(path, content string) error {
 		return fmt.Errorf("writing %s: %w", tmpName, err)
 	}
 	// fsync before rename: without it the rename can land while the new file's
-	// contents are still only in the page cache, which is the same truncated
-	// -config failure mode by another route.
+	// contents are still only in the page cache, which reaches the same
+	// truncated-config failure mode by another route.
 	if err := tmp.Sync(); err != nil {
 		tmp.Close()
 		return fmt.Errorf("syncing %s: %w", tmpName, err)
