@@ -41,5 +41,16 @@ jobs:
       - name: Build BitBadgesChain
         run: go build ./cmd/bitbadgeschaind/main.go
 
+      # -count=1 disables Go's test result cache.
+      #
+      # actions/setup-go restores ~/.cache/go-build between runs, and that
+      # includes cached test results, so without this the gate reports success
+      # for packages it did not run: a green "Build & test" on this PR ran 4 of
+      # 76 packages in 28 seconds and reported the other 72 as (cached).
+      #
+      # Go's cache is content-addressed and usually right, but "usually right"
+      # is the wrong bar for the check that decides whether a chain upgrade
+      # reaches validators, and it does not track every input a test can read.
+      # release.yml already runs with -count=1; this makes the two agree.
       - name: Run test suite
-        run: go test -tags=test -timeout "$GO_TEST_TIMEOUT" ./...
+        run: go test -tags=test -timeout "$GO_TEST_TIMEOUT" -count=1 ./...
