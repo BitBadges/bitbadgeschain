@@ -27,16 +27,10 @@ jobs:
           # cannot drift from the one the code requires. It was pinned to
           # 1.24.5 while go.mod asks for 1.26.5, which does not build.
           go-version-file: go.mod
-      # -p 1 runs one package binary at a time. x/tokenization/keeper's test
-      # binary peaks at 12.88 GB RSS and an ubuntu-latest runner has 16 GB, so
-      # the default (GOMAXPROCS concurrent packages) exhausts memory and the
-      # runner kills the job with a bare exit 143. build.yml solves this by
-      # giving that package its own runner; here, where the job is standalone
-      # and non-blocking, serialising is simpler and costs only wall time.
-      # -timeout makes a hang produce a goroutine dump instead of another
-      # undiagnosable 143.
+      # -timeout makes a hang produce a goroutine dump rather than run until
+      # the runner kills the job with a bare, undiagnosable exit 143.
       - name: Run tests
-        run: go test -tags=test -p 1 -timeout 45m ./... -count=1
+        run: go test -tags=test -timeout 45m ./... -count=1
 
   build-linux-windows:
     name: Build Linux & Windows
