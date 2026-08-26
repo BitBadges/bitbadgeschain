@@ -16,6 +16,26 @@ import (
 func initCometBFTConfig() *cmtcfg.Config {
 	cfg := cmtcfg.DefaultConfig()
 
+	// The EVM mempool is enabled on this chain, and cosmos/evm cross-validates
+	// the two config files at startup: with it enabled, config.toml's
+	// mempool.type must be "app" or the node refuses to boot with
+	//
+	//	EVM mempool enabled, but comet-bft has invalid config.toml:mempool.type
+	//	(want 'app', got 'flood')
+	//
+	// CometBFT's own default is "flood", so leaving this alone made every
+	// freshly initialised v34 node unstartable. The v33 -> v34 upgrade path did
+	// not expose it, because there the pre-upgrade hook rewrites an existing
+	// config.toml; nothing rewrites a config that `init` has just created. That
+	// is the path taken by anyone adding a sentry, rebuilding a node for state
+	// sync, joining the network after v34, or running a local dev chain.
+	//
+	// Enabling the mempool and defaulting its transport are two halves of one
+	// decision, so they belong together. Operators who disable the EVM mempool
+	// (app.toml mempool.max-txs = -1) must set this back to "flood": the
+	// cross-check is symmetric and rejects app-mempool-without-EVM-mempool too.
+	cfg.Mempool.Type = cmtcfg.MempoolTypeApp
+
 	// these values put a higher strain on node memory
 	// cfg.P2P.MaxNumInboundPeers = 100
 	// cfg.P2P.MaxNumOutboundPeers = 40
