@@ -32,8 +32,11 @@ func initCometBFTConfig() *cmtcfg.Config {
 	//
 	// Enabling the mempool and defaulting its transport are two halves of one
 	// decision, so they belong together. Operators who disable the EVM mempool
-	// (app.toml mempool.max-txs = -1) must set this back to "flood": the
-	// cross-check is symmetric and rejects app-mempool-without-EVM-mempool too.
+	// must set this back to "flood": the cross-check is symmetric and rejects
+	// app-mempool-without-EVM-mempool too. Note that disabling it requires
+	// passing --mempool.max-txs=-1 to `start` - editing app.toml alone is not
+	// enough, because cosmos/evm's start command force-sets that flag to 0 and
+	// a changed flag shadows the config file in viper (server/start.go:188-190).
 	cfg.Mempool.Type = cmtcfg.MempoolTypeApp
 
 	// these values put a higher strain on node memory
@@ -62,6 +65,18 @@ func initAppConfig() (string, interface{}) {
 	//
 	// In this application, we set the min gas prices to 0.
 	srvCfg.MinGasPrices = "0" + appparams.BaseCoinUnit
+
+	// 0 ("enabled, unbounded") rather than the SDK default of -1 ("disabled"),
+	// so that app.toml tells the truth. The EVM mempool is enabled on this
+	// chain no matter what this file says - cosmos/evm's start command
+	// force-sets mempool.max-txs to 0 and a changed flag shadows the config
+	// file in viper (server/start.go:188-190) - so -1 here produced a freshly
+	// initialised node whose config.toml (mempool.type = "app", above) and
+	// app.toml contradicted each other as written, a pair that
+	// ValidateCrossConfig rejects in its symmetric direction. The node only
+	// booted because of upstream's force-set workaround; the generated files
+	// must agree without it.
+	srvCfg.Mempool.MaxTxs = 0
 
 	// Default to local dev EVM chain ID (90123) for the app.toml configuration.
 	// The actual EVM chain ID used at runtime is set via build flags (ldflags):

@@ -50,12 +50,13 @@ func TestInitCometBFTConfigAgreesWithTheEVMMempoolDefault(t *testing.T) {
 		TLS:     appConfig.TLS,
 	}
 
-	// Model the value the node actually runs with, not the one app.toml holds.
-	// cosmos/evm's start command force-sets this flag to 0, which takes
-	// precedence over the config file, so the EVM mempool is enabled on a
-	// default node whatever app.toml says.
-	evmConfig.Mempool.MaxTxs = 0
-
+	// The pair is validated exactly as `init` writes it, with no runtime
+	// modelling. cosmos/evm's start command force-sets mempool.max-txs to 0
+	// (server/start.go:188-190), so the node would run with the EVM mempool
+	// enabled even if app.toml disagreed - but that force-set is upstream's own
+	// workaround ("explicitly override the app.toml default value"), and a
+	// config pair that only works because of it is one upstream release away
+	// from not working. The files must agree on their own.
 	if err := cosmosevmserverconfig.ValidateCrossConfig(cmtConfig, evmConfig); err != nil {
 		t.Fatalf("the config.toml and app.toml that `init` generates cannot run together: %v\n"+
 			"config.toml mempool.type = %q. A node created with `bitbadgeschaind init` will "+
@@ -70,5 +71,33 @@ func TestInitCometBFTConfigAgreesWithTheEVMMempoolDefault(t *testing.T) {
 func TestInitCometBFTConfigUsesTheAppMempool(t *testing.T) {
 	if got := initCometBFTConfig().Mempool.Type; got != cmtcfg.MempoolTypeApp {
 		t.Fatalf("initCometBFTConfig().Mempool.Type = %q, want %q", got, cmtcfg.MempoolTypeApp)
+	}
+}
+
+// TestInitAppConfigEnablesTheEVMMempoolOnDisk pins app.toml's mempool.max-txs
+// to 0 - the same "EVM mempool enabled" value the start command force-sets at
+// runtime (cosmos/evm server/start.go:188-190).
+//
+// The SDK default this replaced was -1, which app.toml documents as "disable
+// the mempool". That produced a freshly initialised node whose two config
+// files contradicted each other as written: config.toml said mempool.type =
+// "app" while app.toml said the app-side mempool is off, a pair
+// ValidateCrossConfig rejects in its symmetric direction. The node still
+// booted, but only because the start command's flag force-set shadows the
+// file - app.toml's max-txs is dead configuration on the start path, and an
+// operator reading or editing it was reading a lie. If upstream ever drops
+// its force-set workaround, an init'ed node with -1 on disk stops booting.
+func TestInitAppConfigEnablesTheEVMMempoolOnDisk(t *testing.T) {
+	_, rawAppConfig := initAppConfig()
+	appConfig, ok := rawAppConfig.(EVMAppConfig)
+	if !ok {
+		t.Fatalf("initAppConfig returned %T, want EVMAppConfig", rawAppConfig)
+	}
+
+	if got := appConfig.Mempool.MaxTxs; got != 0 {
+		t.Fatalf("initAppConfig() writes mempool.max-txs = %d, want 0.\n"+
+			"The runtime force-sets 0 whatever this file says, so any other value here is "+
+			"a lie to the operator - and -1 makes the generated config.toml/app.toml pair "+
+			"mutually inconsistent as written.", got)
 	}
 }
