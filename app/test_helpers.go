@@ -13,7 +13,9 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	sdkserver "github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -113,12 +115,40 @@ func SetupWithAppOptions(
 
 	db := dbm.NewMemDB()
 
-	var appOpts servertypes.AppOptions = simapp.NewAppOptionsWithFlagHome(randomHomeDir)
-	if len(extraOpts) > 0 {
-		appOpts = overlaidAppOptions{base: appOpts, overlay: extraOpts}
+	// Test apps run without the EVM mempool unless a test asks for it.
+	//
+	// -1 is upstream's own "app-side mempool disabled" gate (see
+	// server.GetCosmosPoolMaxTx and configureEVMMempool). It is used here
+	// because the mempool leaks: cosmos/evm v0.7.2's Mempool.Close closes the
+	// txpool and the recheck pool but never closes cosmosInsertQueue or
+	// evmInsertQueue, so two queue.waitForNewTxs goroutines survive per app and
+	// each one pins the mempool, its keepers, and the merged protobuf file
+	// descriptor set built during app construction - about 6.8 MB an app. A
+	// package that builds one app per test case retains every app it has made.
+	//
+	// No test app needs a mempool to reach a keeper or a msg server, so the
+	// cheap fix is not to build one. Tests that do exercise the mempool set
+	// mempool.max-txs themselves; see TestEVMMempoolHandlersInstalled.
+	opts := map[string]interface{}{
+		sdkserver.FlagMempoolMaxTxs: -1,
+	}
+	for k, v := range extraOpts {
+		opts[k] = v
 	}
 
-	app, err := New(log.NewNopLogger(), db, true, appOpts)
+	var appOpts servertypes.AppOptions = overlaidAppOptions{
+		base:    simapp.NewAppOptionsWithFlagHome(randomHomeDir),
+		overlay: opts,
+	}
+
+	// Prune synchronously. Async pruning is the production default and is right
+	// there, but it starts one goroutine per store key inside iavl's nodeDB, and
+	// nothing in the store API stops them again - rootmulti.Store has no Close.
+	// Each of those goroutines pins its whole IAVL tree and the MemDB behind it,
+	// so a test binary that builds an app per test case retains every app it has
+	// ever made. Nothing is ever pruned in a test app, so the two modes are
+	// behaviourally identical here; only the idle goroutine differs.
+	app, err := New(log.NewNopLogger(), db, true, appOpts, baseapp.SetIAVLSyncPruning(true))
 	if err != nil {
 		panic(err)
 	}

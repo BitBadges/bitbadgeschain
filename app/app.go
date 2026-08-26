@@ -1,7 +1,9 @@
 package app
 
 import (
+	"errors"
 	"fmt"
+	"io"
 
 	_ "cosmossdk.io/api/cosmos/tx/config/v1" // import for side-effects
 	clienthelpers "cosmossdk.io/client/v2/helpers"
@@ -614,6 +616,31 @@ func (app *App) InterfaceRegistry() codectypes.InterfaceRegistry {
 // GetMempool returns the EVM mempool for JSON-RPC support
 func (app *App) GetMempool() sdkmempool.ExtMempool {
 	return app.EVMMempool
+}
+
+// Close releases the resources the app holds, then delegates to BaseApp.Close.
+//
+// BaseApp.Close only closes the application db and the snapshot manager. The
+// EVM mempool that cosmos/evm v0.7 introduced owns its own goroutines - a
+// txpool loop, two legacypool loops, a recheck scheduler and queue waiters -
+// and none of them stop on their own. Every one of those goroutines holds a
+// reference back to the mempool, and through it to the keepers and the rest of
+// the app, so an app that is dropped without being closed is never collected.
+// In a test binary that builds one app per test case that is a linear leak.
+func (app *App) Close() error {
+	var errs []error
+
+	if closer, ok := app.EVMMempool.(io.Closer); ok {
+		if err := closer.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if err := app.App.Close(); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errors.Join(errs...)
 }
 
 // onPendingTx notifies all registered listeners about pending transactions

@@ -8,6 +8,7 @@ import (
 	log "cosmossdk.io/log/v2"
 	sdkmath "cosmossdk.io/math"
 	dbm "github.com/cosmos/cosmos-db"
+	sdkserver "github.com/cosmos/cosmos-sdk/server"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -209,10 +210,19 @@ func TestGenesisModuleOrderEVMBeforeGenutil(t *testing.T) {
 // "ReapTxs handler not set" once a block, while every health check said it was
 // fine.
 //
-// Setup() builds the app through the same New() the daemon uses, so if
+// The app is built through the same New() the daemon uses, so if
 // configureEVMMempool silently bailed out, EVMMempool would be nil here.
+//
+// mempool.max-txs is set explicitly rather than left to Setup's default. Setup
+// disables the mempool in test apps because it leaks goroutines (see the note
+// in test_helpers.go), so this test has to ask for the node configuration it is
+// making a claim about. 0 is the value cosmos/evm's own start command sets for
+// that flag - see server/start.go, which both registers the flag with a default
+// of 0 and then force-sets it - so this is what a default node runs with.
 func TestEVMMempoolHandlersInstalled(t *testing.T) {
-	app := Setup(false)
+	app := SetupWithAppOptions(false, map[string]interface{}{
+		sdkserver.FlagMempoolMaxTxs: 0,
+	})
 
 	require.NotNil(t, app.EVMMempool,
 		"the EVM mempool must be constructed under the default configuration; a nil value means "+
