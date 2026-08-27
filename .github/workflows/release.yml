@@ -25,7 +25,7 @@ jobs:
         with:
           # Read from go.mod so the toolchain that builds the released binaries
           # cannot drift from the one the code requires. It was pinned to
-          # 1.24.5 while go.mod asks for 1.26.5, which does not build.
+          # 1.24.5 while go.mod asks for 1.26.6, which does not build.
           go-version-file: go.mod
       # -timeout makes a hang produce a goroutine dump rather than run until
       # the runner kills the job with a bare, undiagnosable exit 143.
@@ -43,7 +43,7 @@ jobs:
         with:
           # Read from go.mod so the toolchain that builds the released binaries
           # cannot drift from the one the code requires. It was pinned to
-          # 1.24.5 while go.mod asks for 1.26.5, which does not build.
+          # 1.24.5 while go.mod asks for 1.26.6, which does not build.
           go-version-file: go.mod
 
       - name: Install cross-compile toolchains
@@ -84,7 +84,7 @@ jobs:
         with:
           # Read from go.mod so the toolchain that builds the released binaries
           # cannot drift from the one the code requires. It was pinned to
-          # 1.24.5 while go.mod asks for 1.26.5, which does not build.
+          # 1.24.5 while go.mod asks for 1.26.6, which does not build.
           go-version-file: go.mod
 
       - name: Determine version

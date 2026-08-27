@@ -31,7 +31,7 @@ jobs:
         with:
           # Read from go.mod so the CI toolchain cannot drift from the one the
           # code actually requires. It was pinned to 1.24.5 while go.mod asks
-          # for 1.26.5, which does not build.
+          # for 1.26.6, which does not build.
           #
           # go-version-file needs setup-go v3+, and checkout/setup-go v2 both
           # run on the long-removed Node 12, so the actions are bumped to their

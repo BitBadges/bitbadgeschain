@@ -34,9 +34,13 @@ var mempoolTypeRe = regexp.MustCompile(`(?m)^(\s*type\s*=\s*)("[^"]*"|'[^']*')`)
 //   - v33 runs CometBFT v0.38, which knows only the "flood" and "nop" mempool
 //     types and panics with `unknown mempool type: "app"` on anything else.
 //   - v34 runs CometBFT v0.39 and cosmos/evm v0.7, which enables the EVM mempool
-//     by default (app.toml mempool.max-txs defaults to 0, i.e. unbounded) and
-//     enforces via server/config.ValidateCrossConfig that config.toml's
+//     and enforces via server/config.ValidateCrossConfig that config.toml's
 //     mempool.type is "app". Otherwise it refuses to start.
+//
+//     The mempool is enabled because cosmos/evm's start command force-sets
+//     mempool.max-txs to 0 (server/start.go:188-190) and a Changed flag shadows
+//     the config file in viper - NOT because of app.toml's value. Editing
+//     app.toml alone neither enables nor disables it.
 //
 // So the value cannot be set ahead of the upgrade, and without this hook every
 // node would crash on restart at the upgrade height and stay down until an
