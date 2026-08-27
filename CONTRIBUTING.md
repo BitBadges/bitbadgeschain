@@ -20,6 +20,11 @@ Thank you for your interest in contributing to BitBadges! This document provides
 - Follow existing code patterns and conventions
 - Run `make lint` before submitting PRs
 - Ensure all tests pass with `make test`
+- Never add two paths that differ only in case. macOS and Windows are
+  case-insensitive by default, so only one of them can exist on disk. Git
+  tracks both, the checkout keeps whichever lands last, and the other is
+  reported as modified in every clone forever — which makes `git add -A`
+  silently commit a revert of the file that lost.
 
 ### Commits
 
