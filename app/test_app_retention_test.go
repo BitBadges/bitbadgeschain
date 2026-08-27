@@ -53,9 +53,15 @@ func buildAndDropApps(t *testing.T, n int) (goroutineGrowth int, heapGrowthBytes
 // as a defect in the code. Hence this test: the property has no other observable
 // consequence until the day it takes a runner down.
 //
-// The thresholds are deliberately loose. This test is not measuring an exact
-// footprint, it is separating "released" from "retained per app", and those two
-// are two orders of magnitude apart.
+// The thresholds are deliberately loose: this is separating "released" from
+// "retained per app", not measuring an exact footprint.
+//
+// The goroutine assertion is the load-bearing one and has the margin to match —
+// 360 leaked versus a threshold of 5. The heap assertion is a corroborating
+// check with a far narrower margin (68 MB pre-fix, 20 MB threshold, under 10 MB
+// steady state), so if this test ever flakes it will be that half. Either
+// regression cause, the iavl pruners or the EVM mempool, trips the goroutine
+// count on its own.
 func TestTestAppIsNotRetainedAfterUse(t *testing.T) {
 	const apps = 10
 

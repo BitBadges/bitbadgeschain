@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -67,31 +66,24 @@ func TestResolveHomePrefersExplicitFlagOverDaemonHome(t *testing.T) {
 	}
 }
 
-// TestResolveHomeFallsBackToFlagWhenDaemonHomeUnset covers running the hook
-// outside cosmovisor entirely, where the flag is the only signal available.
-func TestResolveHomeFallsBackToFlagWhenDaemonHomeUnset(t *testing.T) {
-	t.Setenv("DAEMON_HOME", "")
-
-	flagDefault := t.TempDir()
-	if got := resolveHome(newHomeCmd(flagDefault)); got != flagDefault {
-		t.Fatalf("resolveHome() = %q, want the --home value %q", got, flagDefault)
-	}
-}
-
-// TestResolveHomeIgnoresEmptyDaemonHome guards the case where cosmovisor (or a
-// systemd unit) exports DAEMON_HOME as an empty string. Treating "" as a home
-// would send the hook looking for /config/config.toml, fail to find it, and
-// exit 30 — aborting an upgrade that had nothing wrong with it.
-func TestResolveHomeIgnoresEmptyDaemonHome(t *testing.T) {
+// TestResolveHomeFallsBackToFlagWhenDaemonHomeIsAbsent covers running the hook
+// outside cosmovisor, and the case where a systemd unit exports DAEMON_HOME as
+// an empty string. Those are one test, not two: os.Getenv returns "" for both
+// unset and empty, so a separate "unset" case would execute an identical path
+// and only look like extra coverage.
+//
+// Treating "" as a home would send the hook to /config/config.toml, fail to
+// find it, and exit 30 — aborting an upgrade that had nothing wrong with it.
+func TestResolveHomeFallsBackToFlagWhenDaemonHomeIsAbsent(t *testing.T) {
 	t.Setenv("DAEMON_HOME", "")
 
 	flagDefault := t.TempDir()
 	got := resolveHome(newHomeCmd(flagDefault))
 
-	if got == "" || got == filepath.Join("", "config") {
-		t.Fatalf("resolveHome() = %q, an empty DAEMON_HOME must not be treated as a home", got)
+	if got == "" {
+		t.Fatal("resolveHome() = \"\", an absent DAEMON_HOME must not be treated as a home")
 	}
 	if got != flagDefault {
-		t.Fatalf("resolveHome() = %q, want %q", got, flagDefault)
+		t.Fatalf("resolveHome() = %q, want the --home value %q", got, flagDefault)
 	}
 }
