@@ -101,3 +101,35 @@ func TestInitAppConfigEnablesTheEVMMempoolOnDisk(t *testing.T) {
 			"mutually inconsistent as written.", got)
 	}
 }
+
+// TestInitCometBFTConfigPassesCometBFTValidation runs CometBFT's own
+// ValidateBasic over the config this binary generates.
+//
+// The tests above assert on the structs initCometBFTConfig/initAppConfig
+// return. That is one step removed from what a node actually loads, and it
+// leaves two ways to be green while broken: mempool.type = "app" activates
+// extra validation in CometBFT (the app-mempool branch requires
+// reap_interval > 0), and a template that stopped emitting a key would not
+// change the struct at all.
+//
+// This closes the first gap. The second — that EVMAppTemplate really writes
+// mempool.max-txs — is covered end to end by the Docker rehearsal in
+// scripts-dev/upgrade-rehearsal, which runs `init` and starts a real node;
+// asserting it here would mean rendering the template and re-parsing it, which
+// duplicates that harness without adding confidence.
+func TestInitCometBFTConfigPassesCometBFTValidation(t *testing.T) {
+	cfg := initCometBFTConfig()
+
+	if err := cfg.ValidateBasic(); err != nil {
+		t.Fatalf("the config.toml `init` generates fails CometBFT's own validation: %v\n"+
+			"mempool.type = %q selects a stricter validation branch, so a default that is "+
+			"fine for \"flood\" can still produce a node that refuses to start.",
+			err, cfg.Mempool.Type)
+	}
+
+	// The app-mempool branch reads these; a zero reap interval is rejected.
+	if cfg.Mempool.ReapInterval <= 0 {
+		t.Fatalf("mempool.reap_interval = %v, must be > 0 when mempool.type is %q",
+			cfg.Mempool.ReapInterval, cfg.Mempool.Type)
+	}
+}

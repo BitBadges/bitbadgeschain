@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 
 	_ "cosmossdk.io/api/cosmos/tx/config/v1" // import for side-effects
 	clienthelpers "cosmossdk.io/client/v2/helpers"
@@ -183,6 +184,9 @@ type App struct {
 	// uses; block-STM needs the same set for conflict detection.
 	evmNonTransientKeys []storetypes.StoreKey
 	pendingTxListeners []evmante.PendingTxListener
+
+	// closeOnce guards Close; see the note there.
+	closeOnce sync.Once
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -622,12 +626,39 @@ func (app *App) GetMempool() sdkmempool.ExtMempool {
 //
 // BaseApp.Close only closes the application db and the snapshot manager. The
 // EVM mempool that cosmos/evm v0.7 introduced owns its own goroutines - a
-// txpool loop, two legacypool loops, a recheck scheduler and queue waiters -
-// and none of them stop on their own. Every one of those goroutines holds a
-// reference back to the mempool, and through it to the keepers and the rest of
-// the app, so an app that is dropped without being closed is never collected.
-// In a test binary that builds one app per test case that is a linear leak.
+// txpool loop, two legacypool loops, a recheck scheduler and two queue waiters
+// - and none of them stop on their own, so a node that shuts down without this
+// leaves them running until the process exits.
+//
+// Calling this is an improvement, NOT a complete release. Measured over 10
+// apps: no Close leaves 6 goroutines and ~6.8 MB retained per app; calling
+// Close leaves 2 goroutines and ~6.8 MB. cosmos/evm's Mempool.Close
+// (mempool.go:552) closes the event bus, the recheck pool and the txpool, but
+// never closes cosmosInsertQueue or evmInsertQueue, whose queue.waitForNewTxs
+// goroutines each still pin the mempool, the keepers and the merged protobuf
+// descriptor set. Those fields are unexported on an internal type, so they
+// cannot be reached from here.
+//
+// That residue is why test apps do not build a mempool at all rather than
+// relying on this method - see the note in test_helpers.go. Do not read this
+// as "Close makes an app collectable" and re-enable the mempool in tests on
+// that basis; the binary will grow by ~6.8 MB per test case again.
 func (app *App) Close() error {
+	var errs []error
+
+	// geth's txpool signals shutdown on an unbuffered channel, so a second
+	// Close blocks forever rather than erroring - a silent hang during node
+	// shutdown, which for this chain happens at an upgrade height. Today only
+	// one deferred Close is reachable per process, so this guards a future
+	// caller rather than a live bug.
+	app.closeOnce.Do(func() {
+		errs = app.closeResources()
+	})
+
+	return errors.Join(errs...)
+}
+
+func (app *App) closeResources() []error {
 	var errs []error
 
 	if closer, ok := app.EVMMempool.(io.Closer); ok {
@@ -640,7 +671,7 @@ func (app *App) Close() error {
 		errs = append(errs, err)
 	}
 
-	return errors.Join(errs...)
+	return errs
 }
 
 // onPendingTx notifies all registered listeners about pending transactions
