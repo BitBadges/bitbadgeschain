@@ -103,12 +103,12 @@ const (
 	GasGetBalanceAmountBase      = 3_000
 	GasGetTotalSupplyBase        = 3_000
 	GasPerQueryRange             = 500
-	GasConvertAddress            = 500  // Pure address conversion (no state access)
-	GasRangeContains             = 200  // Simple range check
-	GasRangesOverlap             = 200  // Two range overlap check
-	GasSearchInRanges            = 500  // Search in JSON ranges array
-	GasGetBalanceForIdAndTime    = 500  // Parse JSON and search balances
-	GasGetReservedListId         = 300  // Reserved list ID generation
+	GasConvertAddress            = 500 // Pure address conversion (no state access)
+	GasRangeContains             = 200 // Simple range check
+	GasRangesOverlap             = 200 // Two range overlap check
+	GasSearchInRanges            = 500 // Search in JSON ranges array
+	GasGetBalanceForIdAndTime    = 500 // Parse JSON and search balances
+	GasGetReservedListId         = 300 // Reserved list ID generation
 	GasExecuteMultipleBase       = 10_000
 	GasPerMessageInBatch         = 1_000
 	GasPerInputChunk             = 100  // Gas per 32-byte chunk of input for JSON parsing cost (security fix)
@@ -325,7 +325,7 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 					}
 					// Calculate dynamic gas: base + (message count * per-message gas) + (input size gas)
 					// Input size gas accounts for JSON parsing complexity (security fix: prevents gas griefing)
-					inputSizeGas := uint64(len(input) / 32) * GasPerInputChunk
+					inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
 					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch) + inputSizeGas
 				} else {
 					// If parsing fails, use base gas (will be adjusted during execution)
@@ -1242,6 +1242,24 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		return nil, WrapError(err, ErrorCodeQueryFailed, "query failed")
 	}
 
+	// A nil *QueryFooResponse assigned to `resp` (an interface{}) is not an
+	// interface nil -- it is (type=*QueryFooResponse, value=nil). Every type
+	// assertion below therefore succeeds on it, and the branches that read a
+	// field off the concrete response then dereference the nil pointer and
+	// panic the node.
+	//
+	// The trailing ModuleCdc.Marshal path happens to survive a typed nil
+	// (codec.ProtoCodec returns empty bytes where gogoproto's proto.Marshal
+	// panics), but it would return an empty success to the caller, which is
+	// its own defect. Same guard covers both.
+	//
+	// No tokenization query handler returns (nil, nil) today; this guards the
+	// next one that does. Same shape as the mainnet panic fixed in PR #112.
+	if isTypedNil(resp) {
+		return nil, WrapError(fmt.Errorf("querier returned a nil %T with no error", resp),
+			ErrorCodeInternalError, "invalid response type")
+	}
+
 	// Handle special query methods that return uint256 instead of bytes
 	switch method.Name {
 	case GetChallengeTrackerMethod:
@@ -1283,6 +1301,21 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 	}
 
 	return nil, WrapError(fmt.Errorf("response is not a proto.Message"), ErrorCodeInternalError, "invalid response type")
+}
+
+// isTypedNil reports whether v holds a nil pointer inside a non-nil interface.
+// `v == nil` is false for those, which is exactly what makes them dangerous.
+func isTypedNil(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Slice, reflect.Interface, reflect.Func, reflect.Chan:
+		return rv.IsNil()
+	default:
+		return false
+	}
 }
 
 // validateQueryRequest validates query request inputs
@@ -1957,8 +1990,8 @@ func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []inte
 
 	// Parse JSON array of balances
 	var balances []struct {
-		Amount         string `json:"amount"`
-		BadgeIds       []struct {
+		Amount   string `json:"amount"`
+		BadgeIds []struct {
 			Start string `json:"start"`
 			End   string `json:"end"`
 		} `json:"badgeIds"`
