@@ -207,12 +207,6 @@ func ProvideClientContext(
 	return clientCtx
 }
 
-// dataStdoutCommands are the commands whose stdout is machine-readable output
-// rather than a place to talk to the operator.
-var dataStdoutCommands = map[string]bool{
-	"export": true,
-}
-
 // routeLogsAwayFromDataStdout moves the server logger onto stderr for commands
 // whose stdout carries data.
 //
@@ -235,7 +229,7 @@ var dataStdoutCommands = map[string]bool{
 // upgrade would break any operator whose unit file redirects stdout to a log
 // file, to fix a problem `start` does not have.
 func routeLogsAwayFromDataStdout(cmd *cobra.Command) error {
-	if !dataStdoutCommands[cmd.Name()] {
+	if cmd.Name() != "export" {
 		return nil
 	}
 

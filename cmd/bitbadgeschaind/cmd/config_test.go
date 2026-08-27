@@ -15,12 +15,10 @@ import (
 // startup: if the EVM mempool is enabled it demands config.toml's
 // mempool.type = "app", and refuses to start otherwise.
 //
-// v34 enables the EVM mempool by default — cosmos/evm's own start command
-// registers mempool.max-txs with a default of 0 and then force-sets it, so
-// app.toml cannot turn it off (see server/start.go:188-190). But
-// initCometBFTConfig returned CometBFT's stock default, whose mempool type is
-// "flood". The result was that a freshly initialised v34 node could not start
-// at all:
+// v34 enables the EVM mempool regardless of app.toml (see initCometBFTConfig),
+// but initCometBFTConfig returned CometBFT's stock default, whose mempool type
+// is "flood". The result was that a freshly initialised v34 node could not
+// start at all:
 //
 //	EVM mempool enabled, but comet-bft has invalid config.toml:mempool.type
 //	(want 'app', got 'flood'): error in app.toml

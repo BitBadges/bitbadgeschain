@@ -84,22 +84,21 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// Get all non-transient KV store keys for the EVM keeper
-	// The EVM keeper needs access to all stores so precompiles can access any store they need
-	// (e.g., account store, bank store, tokenization store, etc.)
-	// Note: Our version of EVM keeper expects a map, not a slice
-	// IMPORTANT: The EVM keeper's keys parameter only accepts KV store keys, not transient stores.
-	// Transient stores from other modules (like customhooks_transient) cannot be included in this map.
-	// The EVM keeper's snapshotmulti.Store is built from this map, so it won't have access to other modules' transient stores.
+	// The EVM keeper needs every non-transient store so precompiles can reach
+	// the state they need (account, bank, tokenization, ...). v0.7 takes a
+	// []StoreKey slice rather than the map earlier versions took, and the EVM
+	// object store is included alongside the KV stores (see evmd's
+	// nonTransientKeys).
 	//
-	// NOTE: There is a known issue with the EVM keeper's snapshot management when precompiles return errors.
-	// The snapshot stack can be empty when trying to revert, causing "snapshot index 0 out of bound [0..0)" panics.
-	// This is a bug in the upstream cosmos/evm module. As a workaround, precompiles should handle errors gracefully
-	// and avoid returning errors that would trigger EVM reverts.
+	// Transient stores from other modules (customhooks_transient and friends)
+	// must NOT be included: the snapshotter is built from this set, and adding a
+	// transient store to it is not supported.
 	//
-	// Collect all non-transient store keys for snapshotter initialization.
-	// v0.7 takes a []StoreKey slice rather than a map, and the EVM object
-	// store is included alongside the KV stores (see evmd's nonTransientKeys).
+	// Observed on v0.6 and not re-verified against v0.7: the keeper's snapshot
+	// stack could be empty when reverting after a precompile returned an error,
+	// panicking with "snapshot index 0 out of bound [0..0)". If that still
+	// reproduces, precompiles should avoid returning errors that trigger an EVM
+	// revert.
 	var nonTransientKeys []storetypes.StoreKey
 	kvStoreNames := make(map[string]struct{})
 

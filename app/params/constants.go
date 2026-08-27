@@ -13,12 +13,9 @@ const (
 	// 9-decimal chain (ubadge); cosmos/evm v0.7 bridges that to the EVM's
 	// 18-decimal world via x/vm's extended denom.
 	//
-	// The extended denom did NOT replace x/precisebank. cosmos/evm v0.7 moved
-	// precisebank to contrib rather than deleting it, and this chain needs both:
-	// the extended denom gives the EVM an 18-decimal view of balances, while
-	// precisebank holds the sub-ubadge fractional remainder that a 9-decimal
-	// bank cannot represent. Dropping precisebank on the assumption that the
-	// extended denom superseded it made every EVM balance read zero.
+	// The extended denom did NOT replace x/precisebank; this chain needs both.
+	// The full reasoning, with the live-node evidence, is at the precisebank
+	// registration in app/app.go.
 	ExtendedCoinUnit = "abadge"
 
 	// DisplayCoinUnit is the bank display unit; its exponent (BaseCoinDecimals)
