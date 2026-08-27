@@ -1,8 +1,6 @@
 package app
 
 import (
-	"time"
-
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	_ "github.com/bitbadges/bitbadgeschain/x/sendmanager/module"
@@ -13,15 +11,13 @@ import (
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
 	authzmodulev1 "cosmossdk.io/api/cosmos/authz/module/v1"
 	bankmodulev1 "cosmossdk.io/api/cosmos/bank/module/v1"
-	circuitmodulev1 "cosmossdk.io/api/cosmos/circuit/module/v1"
+	circuitmodulev1 "github.com/cosmos/cosmos-sdk/contrib/api/cosmos/circuit/module/v1"
 	consensusmodulev1 "cosmossdk.io/api/cosmos/consensus/module/v1"
-	crisismodulev1 "cosmossdk.io/api/cosmos/crisis/module/v1"
 	distrmodulev1 "cosmossdk.io/api/cosmos/distribution/module/v1"
 	evidencemodulev1 "cosmossdk.io/api/cosmos/evidence/module/v1"
 	feegrantmodulev1 "cosmossdk.io/api/cosmos/feegrant/module/v1"
 	genutilmodulev1 "cosmossdk.io/api/cosmos/genutil/module/v1"
 	govmodulev1 "cosmossdk.io/api/cosmos/gov/module/v1"
-	groupmodulev1 "cosmossdk.io/api/cosmos/group/module/v1"
 	mintmodulev1 "cosmossdk.io/api/cosmos/mint/module/v1"
 	paramsmodulev1 "cosmossdk.io/api/cosmos/params/module/v1"
 	slashingmodulev1 "cosmossdk.io/api/cosmos/slashing/module/v1"
@@ -31,28 +27,26 @@ import (
 	vestingmodulev1 "cosmossdk.io/api/cosmos/vesting/module/v1"
 
 	"cosmossdk.io/core/appconfig"
-	circuittypes "cosmossdk.io/x/circuit/types"
-	evidencetypes "cosmossdk.io/x/evidence/types"
-	"cosmossdk.io/x/feegrant"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
+	circuittypes "github.com/cosmos/cosmos-sdk/contrib/x/circuit/types"
+	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
-	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/cosmos/cosmos-sdk/x/group"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	icatypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 
 	tokenizationmodulev1 "github.com/bitbadges/bitbadgeschain/api/tokenization/module"
 	_ "github.com/bitbadges/bitbadgeschain/x/tokenization/module" // import for side-effects
@@ -64,16 +58,15 @@ import (
 
 	// import for side-effects
 
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
+	packetforwardtypes "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/types"
 
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 
+	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
-	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
-	"google.golang.org/protobuf/types/known/durationpb"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -85,12 +78,25 @@ var (
 		// cosmos-sdk/ibc modules
 		authtypes.ModuleName,
 		banktypes.ModuleName,
+		// The EVM modules must initialize BEFORE genutiltypes below. genutil
+		// delivers the genesis txs, and those run through the EVM ante handler,
+		// which needs the process-global EVM coin config that x/vm InitGenesis
+		// installs. They also come after banktypes because x/vm resolves its
+		// coin info from the bank denom metadata for ubadge.
+		//
+		// Order within the group: feemarket, then vm, then erc20 (erc20 depends
+		// on the EVM keeper). This matches the intent the comments always
+		// stated; the previous list had erc20 ahead of evm, contradicting it.
+		feemarkettypes.ModuleName,
+		evmtypes.ModuleName,
+		erc20types.ModuleName,
+		// precisebank must come after EVM: its InitGenesis needs the EVM keeper.
+		precisebanktypes.ModuleName,
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
 		minttypes.ModuleName,
-		crisistypes.ModuleName,
 		ibcexported.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -102,7 +108,6 @@ var (
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		group.ModuleName,
 		consensustypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
@@ -112,10 +117,6 @@ var (
 		gammtypes.ModuleName,
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
-		feemarkettypes.ModuleName, // FeeMarket must come before EVM
-		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
-		evmtypes.ModuleName,
-		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -153,11 +154,10 @@ var (
 
 	endBlockers = []string{
 		// cosmos sdk modules
-		crisistypes.ModuleName,
+		banktypes.ModuleName, // REQUIRED for v0.54 - must be first for BlockSTM support
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
 		feegrant.ModuleName,
-		group.ModuleName,
 		genutiltypes.ModuleName,
 		// ibc modules
 		ibcexported.ModuleName,
@@ -199,10 +199,10 @@ var (
 		{Account: packetforwardtypes.ModuleName},
 		{Account: gammtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: poolmanagertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
-		{Account: precisebanktypes.ModuleName, Permissions: []string{}},                             // PreciseBank module account
 		{Account: feemarkettypes.ModuleName, Permissions: []string{}},                               // FeeMarket module account
 		{Account: erc20types.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}}, // ERC20 module account
 		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: precisebanktypes.ModuleName, Permissions: []string{}}, // PreciseBank reserve account
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -306,13 +306,7 @@ var (
 				Name:   minttypes.ModuleName,
 				Config: appconfig.WrapAny(&mintmodulev1.Module{}),
 			},
-			{
-				Name: group.ModuleName,
-				Config: appconfig.WrapAny(&groupmodulev1.Module{
-					MaxExecutionPeriod: durationpb.New(time.Second * 1209600),
-					MaxMetadataLen:     255,
-				}),
-			},
+			// x/group removed in v0.54 (moved to Cosmos Enterprise)
 			{
 				Name:   feegrant.ModuleName,
 				Config: appconfig.WrapAny(&feegrantmodulev1.Module{}),
@@ -321,10 +315,7 @@ var (
 				Name:   govtypes.ModuleName,
 				Config: appconfig.WrapAny(&govmodulev1.Module{}),
 			},
-			{
-				Name:   crisistypes.ModuleName,
-				Config: appconfig.WrapAny(&crisismodulev1.Module{}),
-			},
+			// x/crisis removed in v0.54 (moved to contrib, no longer actively maintained)
 			{
 				Name:   consensustypes.ModuleName,
 				Config: appconfig.WrapAny(&consensusmodulev1.Module{}),

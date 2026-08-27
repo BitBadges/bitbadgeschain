@@ -13,10 +13,33 @@ import (
 )
 
 const (
-	// MaxTotalPostTransferInvariantGas limits total gas across all post-transfer invariants
-	MaxTotalPostTransferInvariantGas = uint64(1000000)
-	// DefaultPostTransferEVMQueryGasLimit is the default gas limit for post-transfer EVM queries
-	DefaultPostTransferEVMQueryGasLimit = uint64(100000)
+	// MaxTotalPostTransferInvariantGas limits total gas across all post-transfer
+	// invariants to prevent DoS.
+	//
+	// Raised from 1000000 in v34 in lockstep with
+	// DefaultPostTransferEVMQueryGasLimit — the identical fix already applied to
+	// MaxTotalEVMQueryGas in x/tokenization/approval_criteria/evm_query_challenges.go.
+	// The budget is reserved per invariant from its DECLARED limit, not from
+	// measured usage, so raising the default alone would have cut the number of
+	// default-gas invariants a collection can carry from 10 to 4. That is not a
+	// tightened policy but a regression against live state: a collection already
+	// on chain with 5 default-gas invariants validated on v33 and would fail
+	// every transfer forever on v34, with no way for the transferring user to
+	// work around it — the gas limits live in the collection's invariants, not in
+	// their transaction.
+	//
+	// 2500000 = 10 x DefaultPostTransferEVMQueryGasLimit preserves the v33
+	// capacity of 10 exactly (ValidateEVMQueryChallenges permits 10 invariants
+	// per collection), so no existing collection changes behaviour, while still
+	// bounding how much EVM work one transfer can demand. See
+	// TestPostTransferInvariants_DefaultGasCapacityNotReducedFromV33.
+	MaxTotalPostTransferInvariantGas = uint64(2500000)
+	// DefaultPostTransferEVMQueryGasLimit is the default gas limit for post-transfer EVM queries.
+	// Raised from 100000 in v34: cosmos/evm v0.7 charges a stateful precompile the Cosmos KV
+	// gas already consumed inside the EVM call before the precompile handler runs, so a query
+	// whose contract calls a precompile needs materially more headroom than under v0.6.
+	// Measured floor for a single getCollectionStats call is ~145000; this leaves ~1.7x margin.
+	DefaultPostTransferEVMQueryGasLimit = uint64(250000)
 	// MaxPostTransferEVMQueryGasLimit is the maximum gas limit for a single post-transfer EVM query
 	MaxPostTransferEVMQueryGasLimit = uint64(500000)
 )

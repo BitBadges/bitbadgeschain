@@ -2,7 +2,7 @@ package app
 
 import (
 	"cosmossdk.io/core/appmodule"
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -10,28 +10,28 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
-	icamodule "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts"
-	icacontroller "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller"
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
-	icacontrollertypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/types"
-	icahost "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
-	ibccallbacks "github.com/cosmos/ibc-go/v10/modules/apps/callbacks"
-	ibctransfer "github.com/cosmos/ibc-go/v10/modules/apps/transfer"
-	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
+	icamodule "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/types"
+	ibccallbacks "github.com/cosmos/ibc-go/v11/modules/apps/callbacks"
+	ibctransfer "github.com/cosmos/ibc-go/v11/modules/apps/transfer"
+	ibctransfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	ibc "github.com/cosmos/ibc-go/v10/modules/core"
-	ibcclienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
-	solomachine "github.com/cosmos/ibc-go/v10/modules/light-clients/06-solomachine"
-	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
+	ibc "github.com/cosmos/ibc-go/v11/modules/core"
+	ibcclienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
+	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
+	solomachine "github.com/cosmos/ibc-go/v11/modules/light-clients/06-solomachine"
+	ibctm "github.com/cosmos/ibc-go/v11/modules/light-clients/07-tendermint"
 
 	// this line is used by starport scaffolding # ibc/app/import
 	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -39,9 +39,9 @@ import (
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationmodule "github.com/bitbadges/bitbadgeschain/x/tokenization/module"
 
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
+	packetforward "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware"
+	packetforwardkeeper "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/types"
 
 	customhooks "github.com/bitbadges/bitbadgeschain/x/custom-hooks"
 	customhookskeeper "github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
@@ -52,7 +52,7 @@ import (
 	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	ibcratelimitmodule "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/module"
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
-	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
+	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
 )
 
 // CombinedIBCHooks combines rate limit and custom hooks
@@ -139,11 +139,10 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// register the key tables for legacy param subspaces
 	app.ParamsKeeper.Subspace(ibchookstypes.ModuleName).WithKeyTable(ibchookstypes.ParamKeyTable())
 
-	// Create IBC keeper (IBC v10 - no capability keeper needed)
+	// Create IBC keeper (IBC v11 - ParamSubspace removed)
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey)),
-		app.GetSubspace(ibcexported.ModuleName),
 		app.UpgradeKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
@@ -163,13 +162,13 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler)
 
-	// Create IBC-Go transfer keeper (v0.6.0: ERC20 conversions now handled by ICS20 precompile)
+	// Create IBC-Go transfer keeper. IBC v11 dropped the ICS4Wrapper argument
+	// (set later via WithICS4Wrapper) and returns a pointer.
 	app.TransferKeeper = transferkeeper.NewKeeper(
 		app.appCodec,
+		app.AccountKeeper.AddressCodec(),
 		runtime.NewKVStoreService(app.GetKey(ibctransfertypes.StoreKey)),
-		nil,                         // ICS4Wrapper - set later via WithICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
-		app.IBCKeeper.ChannelKeeper, // PortKeeper
 		app.MsgServiceRouter(),      // MessageRouter
 		app.AccountKeeper,
 		app.BankKeeper,
@@ -181,20 +180,19 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// We'll create it after the transfer stack is set up
 	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		app.appCodec,
+		app.AccountKeeper.AddressCodec(),
 		runtime.NewKVStoreService(app.GetKey(packetforwardtypes.StoreKey)),
 		app.TransferKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		app.BankKeeper,
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// Create interchain account keepers (IBC v10 - updated API)
+	// Create interchain account keepers. IBC v11 removed ParamSubspace and the
+	// separate ICS4Wrapper argument, and the constructors return pointers.
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(icahosttypes.StoreKey)),
-		app.GetSubspace(icatypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
 		app.AccountKeeper,
 		app.MsgServiceRouter(),
@@ -205,8 +203,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
 		app.appCodec,
 		runtime.NewKVStoreService(app.GetKey(icacontrollertypes.StoreKey)),
-		app.GetSubspace(icatypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
 		app.IBCKeeper.ChannelKeeper, // ChannelKeeper
 		app.MsgServiceRouter(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -237,9 +233,13 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// If callbacks are needed in the future, we'll need to create a ContractKeeper adapter
 	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
 	// Using a reasonable default: 1,000,000 gas units
-	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCKeeper.ChannelKeeper, NewNoopContractKeeper(), 1_000_000)
-	icaICS4Wrapper := icaControllerStack.(porttypes.ICS4Wrapper)
-	app.ICAControllerKeeper.WithICS4Wrapper(icaICS4Wrapper)
+	// v11: the callbacks middleware takes only the contract keeper and gas
+	// limit; the wrapped app and ICS4Wrapper are attached with setters.
+	icaCallbacks := ibccallbacks.NewIBCMiddleware(NewNoopContractKeeper(), 1_000_000)
+	icaCallbacks.SetUnderlyingApplication(icaControllerStack)
+	icaCallbacks.SetICS4Wrapper(app.IBCKeeper.ChannelKeeper)
+	icaControllerStack = icaCallbacks
+	app.ICAControllerKeeper.WithICS4Wrapper(icaCallbacks)
 
 	// Create Transfer Stack (IBC v10 - callbacks wraps transfer, packetforward wraps callbacks)
 	var transferStack porttypes.IBCModule
@@ -253,13 +253,18 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// If callbacks are needed in the future, we'll need to create a ContractKeeper adapter
 	// callbackGasLimit must be non-zero even though we use a no-op keeper (it's used for validation)
 	// Using a reasonable default: 1,000,000 gas units
-	cbStack := ibccallbacks.NewIBCMiddleware(transferStack, app.PacketForwardKeeper, NewNoopContractKeeper(), 1_000_000)
-	transferStack = packetforward.NewIBCMiddleware(
-		cbStack,
+	cbStack := ibccallbacks.NewIBCMiddleware(NewNoopContractKeeper(), 1_000_000)
+	cbStack.SetUnderlyingApplication(transferStack)
+	cbStack.SetICS4Wrapper(app.PacketForwardKeeper)
+	// PFM v11 splits construction from wiring: the underlying app is attached
+	// via SetUnderlyingApplication rather than passed to the constructor.
+	pfmStack := packetforward.NewIBCMiddleware(
 		app.PacketForwardKeeper,
 		0, // retries on timeout
 		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp, // forward timeout
 	)
+	pfmStack.SetUnderlyingApplication(cbStack)
+	transferStack = pfmStack
 	app.TransferICS4Wrapper = app.PacketForwardKeeper
 
 	// Setup Custom Hooks Keeper with the proper ICS4Wrapper
@@ -314,8 +319,10 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Add IBC Hooks middleware last (outermost) to have full control over acknowledgements
 	// This ensures error acknowledgements from hooks are properly returned
+	// Take the address: the v11 porttypes.IBCModule interface includes
+	// SetICS4Wrapper, which IBCMiddleware implements on a pointer receiver.
 	hooksTransferModule := ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
-	transferStack = hooksTransferModule
+	transferStack = &hooksTransferModule
 	app.TransferKeeper.WithICS4Wrapper(cbStack)
 
 	// Add the transfer stack (with hooks) to the router
@@ -328,10 +335,10 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	if err := app.RegisterModules(
 		ibc.NewAppModule(app.IBCKeeper),
 		ibctransfer.NewAppModule(app.TransferKeeper),
-		icamodule.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		icamodule.NewAppModule(app.ICAControllerKeeper, app.ICAHostKeeper),
 		ibctm.NewAppModule(ibctm.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
 		solomachine.NewAppModule(solomachine.NewLightClientModule(app.appCodec, ibcclienttypes.NewStoreProvider(runtime.NewKVStoreService(app.GetKey(ibcexported.StoreKey))))),
-		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
+		packetforward.NewAppModule(app.PacketForwardKeeper),
 		ibcratelimitmodule.NewAppModule(app.appCodec, app.IBCRateLimitKeeper),
 	); err != nil {
 		return err

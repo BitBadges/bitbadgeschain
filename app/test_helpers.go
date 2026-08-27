@@ -7,13 +7,16 @@ import (
 	"time"
 
 	clienthelpers "cosmossdk.io/client/v2/helpers"
-	log "cosmossdk.io/log"
+	log "cosmossdk.io/log/v2"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	sdkserver "github.com/cosmos/cosmos-sdk/server"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	simapp "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -55,8 +58,34 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 // }
 
 // Setup initializes a new app.
+// overlaidAppOptions layers a small map over an existing AppOptions. The
+// simapp helper returns a concrete map type that is awkward to extend in place,
+// and a wrapper keeps the base behaviour intact.
+type overlaidAppOptions struct {
+	base    servertypes.AppOptions
+	overlay map[string]interface{}
+}
+
+func (o overlaidAppOptions) Get(key string) interface{} {
+	if v, ok := o.overlay[key]; ok {
+		return v
+	}
+	return o.base.Get(key)
+}
+
+// Setup builds a test app with default options.
 func Setup(
 	isCheckTx bool,
+) *App {
+	return SetupWithAppOptions(isCheckTx, nil)
+}
+
+// SetupWithAppOptions is Setup with extra app options merged in, so a test can
+// exercise a code path that is selected by configuration — the block-STM tx
+// runner behind evm.parallel-execution being the reason this exists.
+func SetupWithAppOptions(
+	isCheckTx bool,
+	extraOpts map[string]interface{},
 ) *App {
 	// Reset EVM config for testing - required when running parallel tests
 	// because the EVM module uses global state that persists between test runs
@@ -85,7 +114,41 @@ func Setup(
 	randomHomeDir := origDefault + "/test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	app, err := New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+
+	// Test apps run without the EVM mempool unless a test asks for it.
+	//
+	// -1 is upstream's own "app-side mempool disabled" gate (see
+	// server.GetCosmosPoolMaxTx and configureEVMMempool). It is used here
+	// because the mempool leaks: cosmos/evm v0.7.2's Mempool.Close closes the
+	// txpool and the recheck pool but never closes cosmosInsertQueue or
+	// evmInsertQueue, so two queue.waitForNewTxs goroutines survive per app and
+	// each one pins the mempool, its keepers, and the merged protobuf file
+	// descriptor set built during app construction - about 6.8 MB an app. A
+	// package that builds one app per test case retains every app it has made.
+	//
+	// No test app needs a mempool to reach a keeper or a msg server, so the
+	// cheap fix is not to build one. Tests that do exercise the mempool set
+	// mempool.max-txs themselves; see TestEVMMempoolHandlersInstalled.
+	opts := map[string]interface{}{
+		sdkserver.FlagMempoolMaxTxs: -1,
+	}
+	for k, v := range extraOpts {
+		opts[k] = v
+	}
+
+	var appOpts servertypes.AppOptions = overlaidAppOptions{
+		base:    simapp.NewAppOptionsWithFlagHome(randomHomeDir),
+		overlay: opts,
+	}
+
+	// Prune synchronously. Async pruning is the production default and is right
+	// there, but it starts one goroutine per store key inside iavl's nodeDB, and
+	// nothing in the store API stops them again - rootmulti.Store has no Close.
+	// Each of those goroutines pins its whole IAVL tree and the MemDB behind it,
+	// so a test binary that builds an app per test case retains every app it has
+	// ever made. Nothing is ever pruned in a test app, so the two modes are
+	// behaviourally identical here; only the idle goroutine differs.
+	app, err := New(log.NewNopLogger(), db, true, appOpts, baseapp.SetIAVLSyncPruning(true))
 	if err != nil {
 		panic(err)
 	}

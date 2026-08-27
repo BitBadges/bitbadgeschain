@@ -1,21 +1,19 @@
 package app
 
 import (
-	storetypes "cosmossdk.io/store/types"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
-	v33 "github.com/bitbadges/bitbadgeschain/app/upgrades/v33"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v33.UpgradeName,
-		v33.CreateUpgradeHandler(
+		v34.UpgradeName,
+		v34.CreateUpgradeHandler(
 			app.ModuleManager,
 			app.Configurator(),
-			*app.TokenizationKeeper,
-			app.PoolManagerKeeper,
-			app.IBCRateLimitKeeper,
+			app.AccountKeeper,
 		),
 	)
 
@@ -34,11 +32,25 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v33.UpgradeName:
+	case v34.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},
-			// v33: remove deprecated x/anchor and x/maps modules
-			Deleted: []string{"anchor", "maps"},
+			// v34 drops two module stores:
+			//   crisis - x/crisis left the SDK in v0.54
+			//   group  - x/group moved out of the SDK in v0.54 (enterprise)
+			//
+			// precisebank is deliberately NOT deleted. cosmos/evm v0.7 moved the
+			// module to contrib rather than deleting it, and this chain still
+			// needs it (see app.go) because BADGE is 9-decimal. Its v33 store
+			// carries the fractional balances and must survive the upgrade.
+			//
+			// Both are registered modules in v33 (see the v33 genesis, which
+			// carries "crisis" and "group" app_state) and are gone in v34, so
+			// their stores would otherwise be orphaned on disk forever. The
+			// upgrade completes either way — the SDK tolerates an unmounted
+			// store — but leaving them behind keeps dead state around and is
+			// inconsistent with how crisis is handled.
+			Deleted: []string{"crisis", "group"},
 			Added:   []string{},
 		}
 	}

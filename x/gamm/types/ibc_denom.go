@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 )
 
 // TransferKeeper is the interface we need from the IBC transfer keeper.

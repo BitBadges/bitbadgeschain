@@ -9,7 +9,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"

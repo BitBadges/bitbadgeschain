@@ -9,9 +9,9 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 )
 
 // IBCModule implements the ICS26 interface for interchain accounts host chains
@@ -25,6 +25,11 @@ func NewIBCModule(k *keeper.Keeper) IBCModule {
 		keeper: k,
 	}
 }
+
+// SetICS4Wrapper implements the ibc-go v11 IBCModule interface. This is a
+// terminal application module — it wraps nothing and never writes
+// acknowledgements through an ICS4Wrapper — so there is nothing to store.
+func (im IBCModule) SetICS4Wrapper(porttypes.ICS4Wrapper) {}
 
 // OnChanOpenInit implements the IBCModule interface
 // IBC v10: capabilities removed

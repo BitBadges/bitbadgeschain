@@ -12,7 +12,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 
 	clienthelpers "cosmossdk.io/client/v2/helpers"
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -23,7 +23,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibctesting "github.com/cosmos/ibc-go/v10/testing"
+	ibctesting "github.com/cosmos/ibc-go/v11/testing"
 
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
@@ -94,7 +94,7 @@ func SetupBitBadgesTestingApp() (ibctesting.TestingApp, map[string]json.RawMessa
 	randomHomeDir := origDefault + "/ibc_test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	bitbadgesApp, err := app.New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+	bitbadgesApp, err := app.New(log.NewNopLogger(), db, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
 	if err != nil {
 		panic(err)
 	}
@@ -167,7 +167,7 @@ func SetupBitBadgesTestingAppWithGenesis(genState map[string]json.RawMessage) ib
 	randomHomeDir := origDefault + "/ibc_test_" + fmt.Sprint(rand.Int63n(1000000))
 
 	db := dbm.NewMemDB()
-	bitbadgesApp, err := app.New(log.NewNopLogger(), db, nil, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
+	bitbadgesApp, err := app.New(log.NewNopLogger(), db, true, simapp.NewAppOptionsWithFlagHome(randomHomeDir))
 	if err != nil {
 		panic(err)
 	}

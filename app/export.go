@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -79,8 +79,9 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 		allowedAddrsMap[addr] = true
 	}
 
-	/* Just to be safe, assert the invariants on current state. */
-	app.CrisisKeeper.AssertInvariants(ctx)
+	/* Invariant assertions previously ran here via x/crisis, which cosmos-sdk
+	   v0.54 moved out of the SDK. The module is no longer registered on this
+	   chain, so there are no invariants to assert at export time. */
 
 	/* Handle fee distribution state. */
 

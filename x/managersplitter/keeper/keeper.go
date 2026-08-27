@@ -8,7 +8,7 @@ import (
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 
 	"cosmossdk.io/core/store"
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 

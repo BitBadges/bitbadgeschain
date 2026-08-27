@@ -4,25 +4,53 @@ on:
   push:
     branches:
       - master
+  # Without this the suite never runs on a pull request. The only checks a PR
+  # got were CodeQL and Snyk, so "the tests pass" was an unverified claim right
+  # up to the moment of merge.
+  pull_request:
 
 permissions:
   contents: read
 
+env:
+  # A hang should fail loudly with a goroutine dump rather than run until the
+  # runner kills the job with a bare exit 143 and no diagnosis.
+  GO_TEST_TIMEOUT: 30m
+
 jobs:
   build:
+    name: Build & test
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Go 1.24.5
-        uses: actions/setup-go@v2
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.24.5
+          # Read from go.mod so the CI toolchain cannot drift from the one the
+          # code actually requires. It was pinned to 1.24.5 while go.mod asks
+          # for 1.26.6, which does not build.
+          #
+          # go-version-file needs setup-go v3+, and checkout/setup-go v2 both
+          # run on the long-removed Node 12, so the actions are bumped to their
+          # current majors at the same time.
+          go-version-file: go.mod
 
       - name: Build BitBadgesChain
         run: go build ./cmd/bitbadgeschaind/main.go
 
-      - name: Run Test Suite
-        run: go test -tags=test ./...
+      # -count=1 disables Go's test result cache.
+      #
+      # actions/setup-go restores ~/.cache/go-build between runs, and that
+      # includes cached test results, so without this the gate reports success
+      # for packages it did not run: a green "Build & test" on this PR ran 4 of
+      # 76 packages in 28 seconds and reported the other 72 as (cached).
+      #
+      # Go's cache is content-addressed and usually right, but "usually right"
+      # is the wrong bar for the check that decides whether a chain upgrade
+      # reaches validators, and it does not track every input a test can read.
+      # release.yml already runs with -count=1; this makes the two agree.
+      - name: Run test suite
+        run: go test -tags=test -timeout "$GO_TEST_TIMEOUT" -count=1 ./...

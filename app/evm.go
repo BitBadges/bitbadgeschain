@@ -17,7 +17,7 @@ import (
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -34,12 +34,11 @@ import (
 func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
-	// Create FeeMarket store keys
+	// Create FeeMarket store keys (v0.7 dropped the feemarket transient store)
 	feemarketKey := storetypes.NewKVStoreKey(feemarkettypes.StoreKey)
-	feemarketTransientKey := storetypes.NewTransientStoreKey(feemarkettypes.TransientKey)
 
 	// Register feemarket store keys
-	if err := app.RegisterStores(feemarketKey, feemarketTransientKey); err != nil {
+	if err := app.RegisterStores(feemarketKey); err != nil {
 		return err
 	}
 
@@ -48,7 +47,6 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.appCodec,
 		authority,
 		feemarketKey,
-		feemarketTransientKey,
 	)
 
 	// Register FeeMarket module
@@ -65,14 +63,18 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// Create EVM store keys
+	// Create EVM store keys. v0.7 replaced the EVM transient store with an
+	// object store, which is mounted directly on BaseApp rather than
+	// registered through the runtime module manager.
 	evmKey := storetypes.NewKVStoreKey(evmtypes.StoreKey)
-	evmTransientKey := storetypes.NewTransientStoreKey(evmtypes.TransientKey)
 
 	// Register EVM store keys
-	if err := app.RegisterStores(evmKey, evmTransientKey); err != nil {
+	if err := app.RegisterStores(evmKey); err != nil {
 		return err
 	}
+
+	evmObjectKeys := storetypes.NewObjectStoreKeys(evmtypes.ObjectKey)
+	app.MountObjectStores(evmObjectKeys)
 
 	// Get EVM chain ID from build-time flag (set via ldflags)
 	// Defaults to 90123 (local dev) if not set at build time
@@ -82,49 +84,43 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// Get all non-transient KV store keys for the EVM keeper
-	// The EVM keeper needs access to all stores so precompiles can access any store they need
-	// (e.g., account store, bank store, tokenization store, etc.)
-	// Note: Our version of EVM keeper expects a map, not a slice
-	// IMPORTANT: The EVM keeper's keys parameter only accepts KV store keys, not transient stores.
-	// Transient stores from other modules (like customhooks_transient) cannot be included in this map.
-	// The EVM keeper's snapshotmulti.Store is built from this map, so it won't have access to other modules' transient stores.
+	// The EVM keeper needs every non-transient store so precompiles can reach
+	// the state they need (account, bank, tokenization, ...). v0.7 takes a
+	// []StoreKey slice rather than the map earlier versions took, and the EVM
+	// object store is included alongside the KV stores (see evmd's
+	// nonTransientKeys).
 	//
-	// NOTE: There is a known issue with the EVM keeper's snapshot management when precompiles return errors.
-	// The snapshot stack can be empty when trying to revert, causing "snapshot index 0 out of bound [0..0)" panics.
-	// This is a bug in the upstream cosmos/evm module. As a workaround, precompiles should handle errors gracefully
-	// and avoid returning errors that would trigger EVM reverts.
+	// Transient stores from other modules (customhooks_transient and friends)
+	// must NOT be included: the snapshotter is built from this set, and adding a
+	// transient store to it is not supported.
 	//
-	// DEBUG: Collect all KV store keys for snapshotter initialization
-	storeKeysMap := make(map[string]*storetypes.KVStoreKey)
-	allStoreKeys := app.GetStoreKeys()
+	// Observed on v0.6 and not re-verified against v0.7: the keeper's snapshot
+	// stack could be empty when reverting after a precompile returned an error,
+	// panicking with "snapshot index 0 out of bound [0..0)". If that still
+	// reproduces, precompiles should avoid returning errors that trigger an EVM
+	// revert.
+	var nonTransientKeys []storetypes.StoreKey
+	kvStoreNames := make(map[string]struct{})
 
-	// Log store key collection for debugging
-	kvStoreCount := 0
-	transientStoreCount := 0
-	otherStoreCount := 0
-
-	for _, key := range allStoreKeys {
-		switch k := key.(type) {
-		case *storetypes.KVStoreKey:
-			storeKeysMap[k.Name()] = k
-			kvStoreCount++
-		case *storetypes.TransientStoreKey:
-			transientStoreCount++
-			// Transient stores are intentionally excluded from EVM keeper's storeKeysMap
-			// because the EVM keeper's snapshotmulti.Store only supports KV stores
-		default:
-			otherStoreCount++
-			// Note: ObjectStoreKeys are not currently used in this codebase
-			// If evmd pattern shows we need them, we would need to check if EVM keeper supports them
+	for _, key := range app.GetStoreKeys() {
+		if k, ok := key.(*storetypes.KVStoreKey); ok {
+			nonTransientKeys = append(nonTransientKeys, k)
+			kvStoreNames[k.Name()] = struct{}{}
 		}
+		// Transient stores are intentionally excluded: the EVM keeper's
+		// snapshotmulti.Store only supports KV and object stores.
+	}
+	for _, k := range evmObjectKeys {
+		nonTransientKeys = append(nonTransientKeys, k)
 	}
 
-	// Log store registration summary (only in debug/test builds)
-	// This helps diagnose snapshot issues by verifying all stores are registered
-	if len(storeKeysMap) == 0 {
+	if len(kvStoreNames) == 0 {
 		panic("EVM keeper requires at least one KV store key for snapshotter initialization")
 	}
+
+	// Retained for the block-STM runner, which needs the same store-key surface
+	// to detect read/write conflicts. See configureTxRunner in app.go.
+	app.evmNonTransientKeys = nonTransientKeys
 
 	// Verify critical stores are included (stores that precompiles might access)
 	criticalStores := []string{
@@ -136,7 +132,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 
 	missingStores := []string{}
 	for _, storeName := range criticalStores {
-		if _, found := storeKeysMap[storeName]; !found {
+		if _, found := kvStoreNames[storeName]; !found {
 			missingStores = append(missingStores, storeName)
 		}
 	}
@@ -154,11 +150,11 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	app.EVMKeeper = configureEVMKeeper(evmkeeper.NewKeeper(
 		app.appCodec,
 		evmKey,
-		evmTransientKey, // EVM keeper's own transient key (for EVM module use only)
-		storeKeysMap,    // Only KV store keys - cannot include other modules' transient stores
+		evmObjectKeys[evmtypes.ObjectKey], // v0.7: object store replaces the transient store
+		nonTransientKeys,
 		authority,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // Use PreciseBankKeeper for fractional balance support
+		app.PreciseBankKeeper, // 9-decimal chain: EVM must see precisebank, not raw x/bank
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
@@ -171,8 +167,9 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 			app.DistrKeeper,
 			app.PreciseBankKeeper,
 			&app.ERC20Keeper,
-			&app.TransferKeeper,
+			app.TransferKeeper,
 			app.IBCKeeper.ChannelKeeper,
+			app.IBCKeeper.ClientKeeper,
 			*app.GovKeeper,
 			app.SlashingKeeper,
 			app.appCodec,
@@ -185,10 +182,10 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.appCodec,
 		authority,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // Use PreciseBankKeeper for bank operations
+		app.PreciseBankKeeper, // 9-decimal chain: see app.go
 		app.EVMKeeper,
 		app.StakingKeeper,
-		&app.TransferKeeper, // ibc-go transfer keeper (v0.6.0)
+		app.TransferKeeper, // ibc-go transfer keeper (now a pointer)
 	)
 
 	// Register ERC20 module
@@ -216,9 +213,11 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	evmModule := evmmodule.NewAppModule(
 		app.EVMKeeper,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // Use PreciseBankKeeper for EVM module
+		app.PreciseBankKeeper, // 9-decimal chain: see app.go
 		app.AccountKeeper.AddressCodec(),
 	)
+
+	app.evmModule = evmModule
 
 	if err := app.RegisterModules(evmModule); err != nil {
 		return err

@@ -13,7 +13,9 @@
 package precompile
 
 import (
-	"embed"
+	"bytes"
+	_ "embed"
+	"encoding/json"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -22,7 +24,7 @@ import (
 
 	cmn "github.com/cosmos/evm/precompiles/common"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -43,18 +45,32 @@ const (
 
 var _ vm.PrecompiledContract = &Precompile{}
 
+// Name implements vm.PrecompiledContract (geth 1.17).
+func (Precompile) Name() string {
+	return "sendmanager"
+}
+
 var (
 	// Embed abi json file to the executable binary. Needed when importing as dependency.
 	//
 	//go:embed abi.json
-	f   embed.FS
+	f   []byte
 	ABI abi.ABI
 	// abiLoadError stores any error from ABI loading for lazy error reporting
 	abiLoadError error
 )
 
 func init() {
-	ABI, abiLoadError = cmn.LoadABI(f, "abi.json")
+	// abi.json is a Hardhat artifact ({_format, contractName, abi, ...}),
+	// not a bare ABI array. cosmos/evm v0.6's cmn.LoadABI unwrapped it; v0.7
+	// removed that helper and its replacement rejects contracts with no
+	// bytecode, which precompile interfaces always are. So unwrap it here.
+	var artifact struct {
+		ABI json.RawMessage `json:"abi"`
+	}
+	if abiLoadError = json.Unmarshal(f, &artifact); abiLoadError == nil {
+		ABI, abiLoadError = abi.JSON(bytes.NewReader(artifact.ABI))
+	}
 	if abiLoadError != nil {
 		// Log the error but don't panic - the error will be returned when the precompile is used
 		// This allows the chain to start even if the ABI is malformed, but the precompile will be disabled

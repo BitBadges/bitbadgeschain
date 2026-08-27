@@ -4,17 +4,16 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
-	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"context"
 
-	"cosmossdk.io/log"
-	"cosmossdk.io/store"
-	"cosmossdk.io/store/metrics"
-	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/log/v2"
+	"github.com/cosmos/cosmos-sdk/store/v2"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -45,7 +44,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	// Setup database
 	db := dbm.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger())
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(suite.T(), stateStore.LoadLatestVersion())

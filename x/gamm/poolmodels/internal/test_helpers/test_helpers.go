@@ -4,9 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"cosmossdk.io/log"
-	"cosmossdk.io/store/metrics"
-	"cosmossdk.io/store/rootmulti"
+	"cosmossdk.io/log/v2"
+	"github.com/cosmos/cosmos-sdk/store/v2/rootmulti"
 	tmtypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,7 +25,7 @@ type CfmmCommonTestSuite struct {
 
 func (suite *CfmmCommonTestSuite) CreateTestContext() sdk.Context {
 	logger := log.NewNopLogger()
-	ms := rootmulti.NewStore(dbm.NewMemDB(), logger, metrics.NewNoOpMetrics())
+	ms := rootmulti.NewStore(dbm.NewMemDB(), logger)
 
 	return sdk.NewContext(ms, tmtypes.Header{}, false, logger)
 }

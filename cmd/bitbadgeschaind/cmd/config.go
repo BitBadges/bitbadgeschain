@@ -16,6 +16,29 @@ import (
 func initCometBFTConfig() *cmtcfg.Config {
 	cfg := cmtcfg.DefaultConfig()
 
+	// The EVM mempool is enabled on this chain, and cosmos/evm cross-validates
+	// the two config files at startup: with it enabled, config.toml's
+	// mempool.type must be "app" or the node refuses to boot with
+	//
+	//	EVM mempool enabled, but comet-bft has invalid config.toml:mempool.type
+	//	(want 'app', got 'flood')
+	//
+	// CometBFT's own default is "flood", so leaving this alone made every
+	// freshly initialised v34 node unstartable. The v33 -> v34 upgrade path did
+	// not expose it, because there the pre-upgrade hook rewrites an existing
+	// config.toml; nothing rewrites a config that `init` has just created. That
+	// is the path taken by anyone adding a sentry, rebuilding a node for state
+	// sync, joining the network after v34, or running a local dev chain.
+	//
+	// Enabling the mempool and defaulting its transport are two halves of one
+	// decision, so they belong together. Operators who disable the EVM mempool
+	// must set this back to "flood": the cross-check is symmetric and rejects
+	// app-mempool-without-EVM-mempool too. Note that disabling it requires
+	// passing --mempool.max-txs=-1 to `start` - editing app.toml alone is not
+	// enough, because cosmos/evm's start command force-sets that flag to 0 and
+	// a changed flag shadows the config file in viper (server/start.go:188-190).
+	cfg.Mempool.Type = cmtcfg.MempoolTypeApp
+
 	// these values put a higher strain on node memory
 	// cfg.P2P.MaxNumInboundPeers = 100
 	// cfg.P2P.MaxNumOutboundPeers = 40
@@ -42,6 +65,14 @@ func initAppConfig() (string, interface{}) {
 	//
 	// In this application, we set the min gas prices to 0.
 	srvCfg.MinGasPrices = "0" + appparams.BaseCoinUnit
+
+	// 0 ("enabled, unbounded") rather than the SDK default of -1 ("disabled").
+	// The runtime enables the EVM mempool regardless of this file (see
+	// initCometBFTConfig above); writing -1 here produced a generated
+	// config.toml/app.toml pair that contradicted each other as written and
+	// only booted because of upstream's force-set. The two files must agree on
+	// their own.
+	srvCfg.Mempool.MaxTxs = 0
 
 	// Default to local dev EVM chain ID (90123) for the app.toml configuration.
 	// The actual EVM chain ID used at runtime is set via build flags (ldflags):

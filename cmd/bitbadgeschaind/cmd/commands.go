@@ -3,9 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	confixcmd "cosmossdk.io/tools/confix/cmd"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -18,7 +17,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	cosmosevmcmd "github.com/cosmos/evm/client"
 	cosmosevmserver "github.com/cosmos/evm/server"
@@ -34,8 +32,21 @@ func initRootCmd(
 	txConfig client.TxConfig,
 	basicManager module.BasicManager,
 ) {
+	// The EVM modules are wired at runtime rather than through depinject, so the
+	// injected basicManager has no entry for them and `init` would write a
+	// genesis with no vm/feemarket/erc20 state — which in turn skips x/vm's
+	// InitGenesis, the thing that seeds the global EVM coin config. Give InitCmd
+	// its own copy that knows about them, leaving the shared manager untouched
+	// so no interface registration happens twice.
+	initBasicManager := make(module.BasicManager, len(basicManager)+3)
+	for name, mod := range basicManager {
+		initBasicManager[name] = mod
+	}
+	app.RegisterEVMModuleBasics(initBasicManager)
+
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(basicManager, app.DefaultNodeHome),
+		genutilcli.InitCmd(initBasicManager, app.DefaultNodeHome),
+		NewPreUpgradeCmd(),
 		debug.Cmd(),
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
@@ -46,8 +57,8 @@ func initRootCmd(
 	// The cosmos/evm server expects an AppCreator that returns cosmosevmserver.Application
 	// which extends types.Application with AppWithPendingTxStream and GetMempool()
 	// We wrap newApp to match the expected signature
-	evmAppCreator := func(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) cosmosevmserver.Application {
-		appInterface := newApp(logger, db, traceStore, appOpts)
+	evmAppCreator := func(logger log.Logger, db dbm.DB, appOpts servertypes.AppOptions) cosmosevmserver.Application {
+		appInterface := newApp(logger, db, appOpts)
 		// Use type assertion to verify *app.App implements cosmosevmserver.Application
 		// This should work since we've implemented GetMempool(), RegisterPendingTxListener(), and SetClientCtx()
 		evmApp, ok := appInterface.(cosmosevmserver.Application)
@@ -99,7 +110,6 @@ func initRootCmd(
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
-	crisis.AddModuleInitFlags(startCmd)
 }
 
 // genesisCommand builds genesis-related `bitbadgeschaind genesis` command. Users may provide application specific commands as a parameter
@@ -166,13 +176,12 @@ func txCommand() *cobra.Command {
 func newApp(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	appOpts servertypes.AppOptions,
 ) servertypes.Application {
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	app, err := app.New(
-		logger, db, traceStore, true,
+		logger, db, true,
 		appOpts,
 		baseappOptions...,
 	)
@@ -186,7 +195,6 @@ func newApp(
 func appExport(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	height int64,
 	forZeroHeight bool,
 	jailAllowedAddrs []string,
@@ -215,7 +223,7 @@ func appExport(
 	appOpts = viperAppOpts
 
 	if height != -1 {
-		bApp, err = app.New(logger, db, traceStore, false, appOpts)
+		bApp, err = app.New(logger, db, false, appOpts)
 		if err != nil {
 			return servertypes.ExportedApp{}, err
 		}
@@ -224,7 +232,7 @@ func appExport(
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		bApp, err = app.New(logger, db, traceStore, true, appOpts)
+		bApp, err = app.New(logger, db, true, appOpts)
 		if err != nil {
 			return servertypes.ExportedApp{}, err
 		}

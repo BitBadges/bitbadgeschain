@@ -13,11 +13,28 @@ import (
 )
 
 const (
-	DefaultEVMQueryGasLimit = uint64(100000)
+	// Raised from 100000 in v34 for the same reason as the post-transfer default:
+	// cosmos/evm v0.7 stateful precompiles need more gas headroom. See
+	// x/tokenization/keeper/post_transfer_invariants.go.
+	DefaultEVMQueryGasLimit = uint64(250000)
 	MaxEVMQueryGasLimit     = uint64(500000)
-	// MaxTotalEVMQueryGas limits total gas across all challenges to prevent DoS
-	// Even with 10 challenges, total gas is capped at 1M to prevent excessive computation
-	MaxTotalEVMQueryGas = uint64(1000000)
+	// MaxTotalEVMQueryGas limits total gas across all challenges to prevent DoS.
+	//
+	// Raised from 1000000 in v34 in lockstep with DefaultEVMQueryGasLimit. The
+	// budget is reserved per challenge from its DECLARED limit, not from
+	// measured usage, so raising the default alone would have cut the number of
+	// default-gas challenges an approval can carry from 10 to 4. That is not a
+	// tightened policy but a regression against live state: a collection already
+	// on chain with 5 default-gas challenges validated on v33 and would fail
+	// every transfer forever on v34, and the transferring user could not fix it
+	// — the gas limits live in the collection's approval criteria, not in their
+	// transaction.
+	//
+	// 2500000 = 10 x DefaultEVMQueryGasLimit preserves the v33 capacity of 10
+	// exactly, so no existing collection changes behaviour, while still bounding
+	// how much EVM work a single approval can demand. See
+	// TestEVMQueryChallengesChecker_DefaultGasCapacityNotReducedFromV33.
+	MaxTotalEVMQueryGas = uint64(2500000)
 )
 
 // EVMQueryChallengesChecker implements ApprovalCriteriaChecker for EVMQueryChallenges

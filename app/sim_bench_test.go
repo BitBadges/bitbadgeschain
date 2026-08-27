@@ -1,11 +1,9 @@
 package app_test
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
-	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/server"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -43,7 +41,7 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 	appOptions[flags.FlagHome] = app.DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	bApp, err := app.New(logger, db, nil, true, appOptions, interBlockCacheOpt())
+	bApp, err := app.New(logger, db, true, appOptions, interBlockCacheOpt())
 	require.NoError(b, err)
 	require.Equal(b, app.Name, bApp.Name())
 
@@ -100,7 +98,7 @@ func BenchmarkInvariants(b *testing.B) {
 	appOptions[flags.FlagHome] = app.DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	bApp, err := app.New(logger, db, nil, true, appOptions, interBlockCacheOpt())
+	bApp, err := app.New(logger, db, true, appOptions, interBlockCacheOpt())
 	require.NoError(b, err)
 	require.Equal(b, app.Name, bApp.Name())
 
@@ -130,21 +128,8 @@ func BenchmarkInvariants(b *testing.B) {
 		simtestutil.PrintStats(db)
 	}
 
-	ctx := bApp.NewContextLegacy(true, cmtproto.Header{Height: bApp.LastBlockHeight() + 1})
-
-	// 3. Benchmark each invariant separately
-	//
-	// NOTE: We use the crisis keeper as it has all the invariants registered with
-	// their respective metadata which makes it useful for testing/benchmarking.
-	for _, cr := range bApp.CrisisKeeper.Routes() {
-		cr := cr
-		b.Run(fmt.Sprintf("%s/%s", cr.ModuleName, cr.Route), func(b *testing.B) {
-			if res, stop := cr.Invar(ctx); stop {
-				b.Fatalf(
-					"broken invariant at block %d of %d\n%s",
-					ctx.BlockHeight()-1, config.NumBlocks, res,
-				)
-			}
-		})
-	}
+	// 3. Per-invariant benchmarking previously ran here, driven by the crisis
+	// keeper's invariant routes. cosmos-sdk v0.54 moved x/crisis out of the
+	// SDK and this chain no longer registers it, so there is no invariant
+	// registry to enumerate. The simulation above still exercises the app.
 }

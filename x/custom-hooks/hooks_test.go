@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
@@ -52,6 +53,9 @@ func (s *HooksTestSuite) SetupTest() {
 
 // mockIBCModule is a simple mock IBC module that returns success acknowledgements
 type mockIBCModule struct{}
+
+// SetICS4Wrapper satisfies the ibc-go v11 IBCModule interface (no-op for this mock).
+func (m *mockIBCModule) SetICS4Wrapper(porttypes.ICS4Wrapper) {}
 
 // IBC v10: capabilities removed from channel handshake
 func (m *mockIBCModule) OnChanOpenInit(ctx sdk.Context, order channeltypes.Order, connectionHops []string, portID, channelID string, counterparty channeltypes.Counterparty, version string) (string, error) {

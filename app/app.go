@@ -1,25 +1,28 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"sync"
 
 	_ "cosmossdk.io/api/cosmos/tx/config/v1" // import for side-effects
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	"cosmossdk.io/depinject"
-	"cosmossdk.io/log"
-	storetypes "cosmossdk.io/store/types"
-	_ "cosmossdk.io/x/circuit" // import for side-effects
-	circuitkeeper "cosmossdk.io/x/circuit/keeper"
-	_ "cosmossdk.io/x/evidence" // import for side-effects
-	evidencekeeper "cosmossdk.io/x/evidence/keeper"
-	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
-	_ "cosmossdk.io/x/feegrant/module" // import for side-effects
-	txsigning "cosmossdk.io/x/tx/signing"
-	_ "cosmossdk.io/x/upgrade" // import for side-effects
+	"cosmossdk.io/log/v2"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	_ "github.com/cosmos/cosmos-sdk/contrib/x/circuit" // import for side-effects
+	circuitkeeper "github.com/cosmos/cosmos-sdk/contrib/x/circuit/keeper"
+	_ "github.com/cosmos/cosmos-sdk/x/evidence" // import for side-effects
+	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
+	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+	_ "github.com/cosmos/cosmos-sdk/x/feegrant/module" // import for side-effects
+	txsigning "github.com/cosmos/cosmos-sdk/x/tx/signing"
+	_ "github.com/cosmos/cosmos-sdk/x/upgrade" // import for side-effects
 
-	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -44,8 +47,6 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/consensus" // import for side-effects
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
-	_ "github.com/cosmos/cosmos-sdk/x/crisis" // import for side-effects
-	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/distribution" // import for side-effects
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 
@@ -55,8 +56,7 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
-	_ "github.com/cosmos/cosmos-sdk/x/group/module" // import for side-effects
+// x/group removed in v0.54 (moved to Cosmos Enterprise)
 	_ "github.com/cosmos/cosmos-sdk/x/mint"         // import for side-effects
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/params" // import for side-effects
@@ -68,25 +68,25 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/staking" // import for side-effects
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v10/packetforward/types"
-	_ "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts" // import for side-effects
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
-	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
-	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
+	packetforward "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware"
+	packetforwardkeeper "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
+	packetforwardtypes "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/types"
+	_ "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts" // import for side-effects
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
+	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
+	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
 
 	sdkmempool "github.com/cosmos/cosmos-sdk/types/mempool"
 	evmante "github.com/cosmos/evm/ante"
 	antetypes "github.com/cosmos/evm/ante/types"
-	evmmempool "github.com/cosmos/evm/mempool"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
-	transferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
-	precisebank "github.com/cosmos/evm/x/precisebank"
-	precisebankkeeper "github.com/cosmos/evm/x/precisebank/keeper"
-	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
+	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
+	precisebank "github.com/cosmos/evm/contrib/x/precisebank"
+	precisebankkeeper "github.com/cosmos/evm/contrib/x/precisebank/keeper"
+	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
+	evmmodule "github.com/cosmos/evm/x/vm"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -143,20 +143,20 @@ type App struct {
 	SlashingKeeper       slashingkeeper.Keeper
 	MintKeeper           mintkeeper.Keeper
 	GovKeeper            *govkeeper.Keeper
-	CrisisKeeper         *crisiskeeper.Keeper
+	// CrisisKeeper removed in v0.54 (moved to contrib)
 	UpgradeKeeper        *upgradekeeper.Keeper
 	ParamsKeeper         paramskeeper.Keeper
 	AuthzKeeper          authzkeeper.Keeper
 	EvidenceKeeper       evidencekeeper.Keeper
 	FeeGrantKeeper       feegrantkeeper.Keeper
-	GroupKeeper          groupkeeper.Keeper
+	
 	CircuitBreakerKeeper circuitkeeper.Keeper
 
 	// IBC
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	ICAControllerKeeper icacontrollerkeeper.Keeper
-	ICAHostKeeper       icahostkeeper.Keeper
-	TransferKeeper      transferkeeper.Keeper // IBC-Go transfer keeper (v0.6.0: ERC20 conversions handled by ICS20 precompile)
+	ICAControllerKeeper *icacontrollerkeeper.Keeper
+	ICAHostKeeper       *icahostkeeper.Keeper
+	TransferKeeper      *transferkeeper.Keeper // IBC-Go transfer keeper (v11 returns a pointer)
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 
 	// IBC Hooks
@@ -178,8 +178,15 @@ type App struct {
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// EVM mempool and pending tx listeners for JSON-RPC support
-	EVMMempool         *evmmempool.ExperimentalEVMMempool
+	EVMMempool         sdkmempool.ExtMempool
+	evmModule          evmmodule.AppModule
+	// evmNonTransientKeys is the KV + object store surface the EVM snapshotter
+	// uses; block-STM needs the same set for conflict detection.
+	evmNonTransientKeys []storetypes.StoreKey
 	pendingTxListeners []evmante.PendingTxListener
+
+	// closeOnce guards Close; see the note there.
+	closeOnce sync.Once
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -227,7 +234,6 @@ func AppConfig() depinject.Config {
 func New(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	loadLatest bool,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
@@ -284,13 +290,12 @@ func New(
 		&app.SlashingKeeper,
 		&app.MintKeeper,
 		&app.GovKeeper,
-		&app.CrisisKeeper,
 		&app.UpgradeKeeper,
 		&app.ParamsKeeper,
 		&app.AuthzKeeper,
 		&app.EvidenceKeeper,
 		&app.FeeGrantKeeper,
-		&app.GroupKeeper,
+		
 		&app.CircuitBreakerKeeper,
 		&app.TokenizationKeeper,
 		&app.ManagerSplitterKeeper,
@@ -318,21 +323,11 @@ func New(
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	// build app
-	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
+	//
+	// NOTE: cosmos-sdk v0.54 dropped the traceStore parameter from Build, and
+	// from AppCreator/AppExporter, along with SetCommitMultiStoreTracer.
+	app.App = appBuilder.Build(db, baseAppOptions...)
 	app.BaseApp.SetCircuitBreaker(&app.CircuitBreakerKeeper)
-
-	// Create PreciseBankKeeper after app is built
-	// PreciseBankKeeper wraps BankKeeper to support fractional balances for non-18 decimal tokens
-	precisebankKey := storetypes.NewKVStoreKey(precisebanktypes.StoreKey)
-	if err := app.RegisterStores(precisebankKey); err != nil {
-		return nil, fmt.Errorf("failed to register precisebank store: %w", err)
-	}
-	app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
-		app.appCodec,
-		precisebankKey,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
 
 	// register legacy modules
 
@@ -344,13 +339,44 @@ func New(
 		return nil, err
 	}
 
-	// Register EVM modules first (PreciseBank depends on EVM keeper)
+	// x/precisebank is what makes a 9-decimal chain usable from the EVM.
+	//
+	// cosmos/evm v0.7 moved the module to contrib and stopped wiring it by
+	// default, on the assumption that chains are 18-decimal. BADGE is not.
+	// x/vm's BankWrapper.GetBalance reads the *extended* denom straight out of
+	// x/bank with no scaling:
+	//
+	//	return w.BankKeeper.GetBalance(ctx, addr, types.GetEVMCoinExtendedDenom())
+	//
+	// Nothing mints abadge, so wiring x/bank directly makes every EVM balance
+	// read as zero — eth_getBalance returns 0x0 for a fully funded account, and
+	// EVM value transfer and gas payment are dead. Verified on a live node
+	// before this was restored.
+	//
+	// x/precisebank is the bridge: every abadge is backed 1:1 by a ubadge in
+	// x/bank, so EVM and Cosmos see the same money at different precision.
+	// Upstream's own migration guide names pinning contrib/x/precisebank as the
+	// supported option for non-18-decimal chains, the alternative being a
+	// decimals migration.
+	//
+	// Virtual fee collection is deliberately NOT enabled: EnableVirtualFeeCollection
+	// panics unless the display unit is 18 decimals.
+	precisebankKey := storetypes.NewKVStoreKey(precisebanktypes.StoreKey)
+	if err := app.RegisterStores(precisebankKey); err != nil {
+		return nil, fmt.Errorf("failed to register precisebank store: %w", err)
+	}
+	app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
+		app.appCodec,
+		precisebankKey,
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+
+	// EVM modules first: precisebank's InitGenesis needs the EVM keeper.
 	if err := app.registerEVMModules(appOpts); err != nil {
 		return nil, err
 	}
 
-	// Register PreciseBank module only if EVM keeper was successfully created
-	// PreciseBank's InitGenesis requires EVM keeper to be initialized
 	precisebankModule := precisebank.NewAppModule(
 		app.PreciseBankKeeper,
 		app.BankKeeper,
@@ -395,7 +421,7 @@ func New(
 	}
 	/****  Module Options ****/
 
-	app.ModuleManager.RegisterInvariants(app.CrisisKeeper)
+	// Crisis invariants removed in v0.54
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	overrideModules := map[string]module.AppModuleSimulation{
@@ -436,12 +462,12 @@ func New(
 	}
 	app.SetAnteHandler(evmante.NewAnteHandler(evmAnteOptions))
 
-	// Configure EVM mempool for JSON-RPC support (advanced feature, optional)
-	// Only create if JSON-RPC is enabled - otherwise GetMempool() will return nil
+	// Configure the EVM mempool. A failure here is fatal, not advisory:
+	// configureEVMMempool documents the silent failure a swallowed error
+	// produces.
 	if app.EVMKeeper != nil {
 		if err := app.configureEVMMempool(appOpts, logger); err != nil {
-			logger.Error("failed to configure EVM mempool", "error", err)
-			// Don't panic - mempool is optional unless JSON-RPC is enabled
+			return nil, fmt.Errorf("failed to configure EVM mempool: %w", err)
 		}
 	}
 
@@ -479,6 +505,21 @@ func New(
 	app.RegisterUpgradeHandlers()
 
 	if err := app.Load(loadLatest); err != nil {
+		return nil, err
+	}
+
+	if loadLatest {
+		// cosmos/evm v0.7 keeps EVM configuration in process globals that are
+		// seeded from the KV store. Without this, EVM execution paths that
+		// build their own StateDB (notably the EVM query challenge path in
+		// x/tokenization) run against unhydrated globals.
+		app.evmModule.HydrateGlobals(app.NewContextLegacy(true, cmtproto.Header{
+			Height:  app.LastBlockHeight(),
+			ChainID: app.ChainID(),
+		}))
+	}
+
+	if err := app.configureTxRunner(appOpts); err != nil {
 		return nil, err
 	}
 
@@ -568,6 +609,58 @@ func (app *App) InterfaceRegistry() codectypes.InterfaceRegistry {
 // GetMempool returns the EVM mempool for JSON-RPC support
 func (app *App) GetMempool() sdkmempool.ExtMempool {
 	return app.EVMMempool
+}
+
+// Close releases the resources the app holds, then delegates to BaseApp.Close.
+//
+// BaseApp.Close only closes the application db and the snapshot manager. The
+// EVM mempool that cosmos/evm v0.7 introduced owns its own goroutines - a
+// txpool loop, two legacypool loops, a recheck scheduler and two queue waiters
+// - and none of them stop on their own, so a node that shuts down without this
+// leaves them running until the process exits.
+//
+// Calling this is an improvement, NOT a complete release. Measured over 10
+// apps: no Close leaves 6 goroutines and ~6.8 MB retained per app; calling
+// Close leaves 2 goroutines and ~6.8 MB. cosmos/evm's Mempool.Close
+// (mempool.go:552) closes the event bus, the recheck pool and the txpool, but
+// never closes cosmosInsertQueue or evmInsertQueue, whose queue.waitForNewTxs
+// goroutines each still pin the mempool, the keepers and the merged protobuf
+// descriptor set. Those fields are unexported on an internal type, so they
+// cannot be reached from here.
+//
+// That residue is why test apps do not build a mempool at all rather than
+// relying on this method - see the note in test_helpers.go. Do not read this
+// as "Close makes an app collectable" and re-enable the mempool in tests on
+// that basis; the binary will grow by ~6.8 MB per test case again.
+func (app *App) Close() error {
+	var errs []error
+
+	// geth's txpool signals shutdown on an unbuffered channel, so a second
+	// Close blocks forever rather than erroring - a silent hang during node
+	// shutdown, which for this chain happens at an upgrade height. Today only
+	// one deferred Close is reachable per process, so this guards a future
+	// caller rather than a live bug.
+	app.closeOnce.Do(func() {
+		errs = app.closeResources()
+	})
+
+	return errors.Join(errs...)
+}
+
+func (app *App) closeResources() []error {
+	var errs []error
+
+	if closer, ok := app.EVMMempool.(io.Closer); ok {
+		if err := closer.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if err := app.App.Close(); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errs
 }
 
 // onPendingTx notifies all registered listeners about pending transactions

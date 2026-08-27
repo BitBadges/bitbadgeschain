@@ -6,6 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
+
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 )
 
 // ensureBankDenomMetadata sets the ubadge denom metadata in the bank keeper.
@@ -61,8 +63,13 @@ func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
 	if evmParams.EvmDenom != "ubadge" {
 		evmParams.EvmDenom = "ubadge"
 	}
-	if evmParams.ExtendedDenomOptions == nil {
-		evmParams.ExtendedDenomOptions = &evmtypes.ExtendedDenomOptions{ExtendedDenom: "abadge"}
+	// Set unconditionally, not only when nil. Upstream's DefaultParams seeds
+	// ExtendedDenomOptions with sdk.DefaultBondDenom ("stake"), so a nil-guard
+	// leaves a wrong-but-non-nil value in place — and the EVM then reads
+	// balances in a denom nobody holds, reporting every account as empty. That
+	// is a silent failure: no error, just zeros.
+	evmParams.ExtendedDenomOptions = &evmtypes.ExtendedDenomOptions{
+		ExtendedDenom: appparams.ExtendedCoinUnit,
 	}
 	if err := app.EVMKeeper.SetParams(ctx, evmParams); err != nil {
 		return err
