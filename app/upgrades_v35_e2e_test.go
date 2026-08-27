@@ -3,6 +3,8 @@ package app
 import (
 	"testing"
 
+	"cosmossdk.io/collections"
+
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -11,6 +13,12 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+
+	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	balancer "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
+	ratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
@@ -31,13 +39,30 @@ func v35Keepers(app *App) v35.Keepers {
 // shares in the staking store. Setup() leaves the SDK default "stake" and no
 // bonded validator, so without this the migration correctly finds nothing to do
 // and the test would assert on a no-op.
-func seedLegacyChainState(t *testing.T, app *App, ctx sdk.Context) stakingtypes.Validator {
+// seedLegacyBondDenom puts the staking module on the denom this upgrade
+// redenominates.
+//
+// Every test that runs the handler needs this, not just the ones that assert on
+// staking. Setup() leaves the SDK default "stake", and the handler now refuses
+// outright to run on a chain whose bond denom it does not redenominate, because
+// PowerReduction is compiled in at 10^15 and consensus power is
+// tokens/PowerReduction. A test app bonding "stake" at 10^15 is exactly the
+// configuration the guard exists to reject, so seeding it here is not a
+// workaround — it is the test finally describing a chain this upgrade can run
+// on.
+func seedLegacyBondDenom(t *testing.T, app *App, ctx sdk.Context) {
 	t.Helper()
 
 	params, err := app.StakingKeeper.GetParams(ctx)
 	require.NoError(t, err)
 	params.BondDenom = legacyDenom
 	require.NoError(t, app.StakingKeeper.SetParams(ctx, params))
+}
+
+func seedLegacyChainState(t *testing.T, app *App, ctx sdk.Context) stakingtypes.Validator {
+	t.Helper()
+
+	seedLegacyBondDenom(t, app, ctx)
 
 	mintParams, err := app.MintKeeper.Params.Get(ctx)
 	require.NoError(t, err)
@@ -91,6 +116,8 @@ func TestV35UpgradeConservesValue(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
 	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
+
+	seedLegacyBondDenom(t, app, ctx)
 
 	alice, bob := randAddr(), randAddr()
 	fundLegacy(t, ctx, bk, alice, 1_000_000_000) // 1 BADGE at 9 decimals
@@ -206,10 +233,38 @@ func TestV35UpgradeIsIdempotent(t *testing.T) {
 	ctx := app.NewContext(false)
 	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
 
-	seeded := seedLegacyChainState(t, app, ctx)
+	// A validator, delegations with pending rewards, and the mint/feemarket
+	// figures. seedDelegationsWithPendingRewards returns a context one block
+	// later, which is what makes the reward calculation non-zero.
+	ctx, seededVal, delegators := seedDelegationsWithPendingRewards(t, app, ctx, 1_000, 2)
+	valAddr, err := sdk.ValAddressFromBech32(seededVal.OperatorAddress)
+	require.NoError(t, err)
 
 	alice := randAddr()
 	fundLegacy(t, ctx, bk, alice, 12_345)
+
+	// A gamm pool, so the pool record's own copy of its reserves is in the
+	// snapshot rather than only the bank balances behind it.
+	poolID := seedIdempotencyGammPool(t, app, ctx)
+
+	// A gov proposal with a paid deposit: the module account holds the coins but
+	// gov keeps its own copy in TotalDeposit and the Deposit record.
+	proposalID, depositor := seedIdempotencyGovDeposit(t, app, ctx, bk, 5_000)
+
+	// A backed collection, whose escrow balance moves to a re-derived address.
+	escrowTotal := int64(4_000_000_000)
+	oldEscrow, newEscrow := seedIdempotencyBackedCollection(t, app, ctx, bk, escrowTotal)
+
+	// x/precisebank fractional balances, paid out and then gone.
+	seedPreciseBankFractionalBalances(t, app, ctx, bk, map[string]int64{
+		alice.String(): 1_000_000_000,
+	}, 0)
+
+	// Rate limit caps and an accrued taker fee: both are amounts that live
+	// outside the bank entirely.
+	seedIdempotencyRateLimit(t, app, ctx)
+	require.NoError(t, app.PoolManagerKeeper.UpdateTakerFeeTrackerForStakersByDenom(
+		ctx, legacyDenom, osmomath.NewInt(7_000)))
 
 	snapshot := func() map[string]string {
 		vals, err := app.StakingKeeper.GetAllValidators(ctx)
@@ -222,16 +277,49 @@ func TestV35UpgradeIsIdempotent(t *testing.T) {
 		require.NoError(t, err)
 		feeParams := app.FeeMarketKeeper.GetParams(ctx)
 
+		// The stake recorded against the delegator, which is what the reward
+		// calculation multiplies the ratio delta by. Scaling it twice is the
+		// exact shape of the bug this test is looking for.
+		startingInfo, err := app.DistrKeeper.GetDelegatorStartingInfo(ctx, valAddr, delegators[0])
+		require.NoError(t, err)
+
+		pool, err := app.GammKeeper.GetPoolAndPoke(ctx, poolID)
+		require.NoError(t, err)
+
+		proposal, err := app.GovKeeper.Proposals.Get(ctx, proposalID)
+		require.NoError(t, err)
+		deposit, err := app.GovKeeper.Deposits.Get(ctx, collections.Join(proposalID, depositor))
+		require.NoError(t, err)
+
+		takerFee, err := app.PoolManagerKeeper.GetTakerFeeTrackerForStakersByDenom(ctx, appparams.BaseCoinUnit)
+		require.NoError(t, err)
+
+		rateLimits := app.IBCRateLimitKeeper.GetParams(ctx).RateLimits
+		require.Len(t, rateLimits, 1)
+
 		return map[string]string{
-			"balance":           bk.GetBalance(ctx, alice, appparams.BaseCoinUnit).Amount.String(),
-			"supply":            bk.GetSupply(ctx, appparams.BaseCoinUnit).Amount.String(),
-			"validator_tokens":  vals[0].Tokens.String(),
-			"validator_shares":  vals[0].DelegatorShares.String(),
-			"min_self_delegate": vals[0].MinSelfDelegation.String(),
-			"annual_provisions": minter.AnnualProvisions.String(),
-			"max_supply":        mintParams.MaxSupply.String(),
-			"base_fee":          feeParams.BaseFee.String(),
-			"min_gas_price":     feeParams.MinGasPrice.String(),
+			"balance":            bk.GetBalance(ctx, alice, appparams.BaseCoinUnit).Amount.String(),
+			"supply":             bk.GetSupply(ctx, appparams.BaseCoinUnit).Amount.String(),
+			"validator_tokens":   vals[0].Tokens.String(),
+			"validator_shares":   vals[0].DelegatorShares.String(),
+			"min_self_delegate":  vals[0].MinSelfDelegation.String(),
+			"annual_provisions":  minter.AnnualProvisions.String(),
+			"max_supply":         mintParams.MaxSupply.String(),
+			"base_fee":           feeParams.BaseFee.String(),
+			"min_gas_price":      feeParams.MinGasPrice.String(),
+			"starting_stake":     startingInfo.Stake.String(),
+			"pending_reward":     pendingReward(t, app, ctx, valAddr, delegators[0]).String(),
+			"pool_liquidity":     pool.GetTotalPoolLiquidity(ctx).String(),
+			"pool_shares":        pool.GetTotalShares().String(),
+			"gov_total_deposit":  sdk.Coins(proposal.TotalDeposit).String(),
+			"gov_deposit":        sdk.Coins(deposit.Amount).String(),
+			"escrow_old":         bk.GetBalance(ctx, oldEscrow, appparams.BaseCoinUnit).Amount.String(),
+			"escrow_new":         bk.GetBalance(ctx, newEscrow, appparams.BaseCoinUnit).Amount.String(),
+			"precisebank_paid":   bk.GetBalance(ctx, alice, appparams.BaseCoinUnit).Amount.String(),
+			"taker_fee_stakers":  takerFee.Amount.String(),
+			"rate_limit_cap":     rateLimits[0].SupplyShiftLimits[0].MaxAmount.String(),
+			"rate_limit_addr":    rateLimits[0].AddressLimits[0].MaxAmount.String(),
+			"gamm_liquidity_idx": app.GammKeeper.GetDenomLiquidity(ctx, appparams.BaseCoinUnit).String(),
 		}
 	}
 
@@ -239,16 +327,143 @@ func TestV35UpgradeIsIdempotent(t *testing.T) {
 	afterFirst := snapshot()
 
 	// Every seeded quantity must actually have moved on the first run, or the
-	// idempotency assertion below would hold vacuously.
+	// idempotency assertion below would hold vacuously. This is the half of the
+	// test that decays silently as state is added, so each new key gets a
+	// liveness assertion alongside it.
 	factor := v35.ConversionFactor
-	require.Equal(t, seeded.Tokens.Mul(factor).String(), afterFirst["validator_tokens"])
+	require.Equal(t, seededVal.Tokens.Mul(factor).String(), afterFirst["validator_tokens"])
 	require.NotEqual(t, "0.000000000000000000", afterFirst["annual_provisions"])
 	require.NotEqual(t, "0", afterFirst["max_supply"])
 	require.NotEqual(t, "0.000000000000000000", afterFirst["base_fee"])
+	require.Equal(t,
+		sdkmath.LegacyNewDecFromInt(seededVal.Tokens.Quo(sdkmath.NewInt(2)).Mul(factor)).String(),
+		afterFirst["starting_stake"],
+		"the delegator's recorded stake must have scaled exactly once")
+	require.Contains(t, afterFirst["pool_liquidity"], appparams.BaseCoinUnit)
+	require.Contains(t, afterFirst["gov_total_deposit"], appparams.BaseCoinUnit)
+	require.Equal(t, sdkmath.NewInt(5_000).Mul(factor).String()+appparams.BaseCoinUnit, afterFirst["gov_deposit"])
+	require.Equal(t, "0", afterFirst["escrow_old"], "the retired escrow must be empty")
+	require.Equal(t, sdkmath.NewInt(escrowTotal).Mul(factor).String(), afterFirst["escrow_new"],
+		"and the re-derived one must hold everything")
+	require.Equal(t, sdkmath.NewInt(7_000).Mul(factor).String(), afterFirst["taker_fee_stakers"])
+	require.Equal(t, sdkmath.NewInt(1_000_000).Mul(factor).String(), afterFirst["rate_limit_cap"])
+	require.Equal(t, sdkmath.NewInt(500_000).Mul(factor).String(), afterFirst["rate_limit_addr"])
+	require.Equal(t, sdkmath.NewInt(2_500).Mul(factor).String(), afterFirst["gamm_liquidity_idx"])
 
 	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35Keepers(app)))
 	afterSecond := snapshot()
 
 	require.Equal(t, afterFirst, afterSecond,
 		"a second run must not scale anything again")
+}
+
+// seedIdempotencyGammPool creates a balancer pool holding the legacy denom, so
+// the pool record's own copy of its reserves is exercised.
+func seedIdempotencyGammPool(t *testing.T, app *App, ctx sdk.Context) uint64 {
+	t.Helper()
+
+	const foreignDenom = "ibc/ABCDEF0123456789"
+	creator := randAddr()
+	assets := sdk.NewCoins(
+		sdk.NewCoin(legacyDenom, sdkmath.NewInt(2_500)),
+		sdk.NewCoin(foreignDenom, sdkmath.NewInt(2_500)),
+	)
+	require.NoError(t, app.BankKeeper.(bankkeeper.BaseKeeper).MintCoins(ctx, "mint", assets))
+	require.NoError(t, app.BankKeeper.(bankkeeper.BaseKeeper).SendCoinsFromModuleToAccount(ctx, "mint", creator, assets))
+
+	msg := balancer.NewMsgCreateBalancerPool(creator,
+		balancer.PoolParams{
+			SwapFee: osmomath.MustNewDecFromStr("0.003"),
+			ExitFee: osmomath.ZeroDec(),
+		},
+		[]balancer.PoolAsset{
+			{Weight: sdkmath.NewInt(1), Token: sdk.NewCoin(legacyDenom, sdkmath.NewInt(2_500))},
+			{Weight: sdkmath.NewInt(1), Token: sdk.NewCoin(foreignDenom, sdkmath.NewInt(2_500))},
+		})
+
+	poolID, err := app.PoolManagerKeeper.CreatePool(ctx, msg)
+	require.NoError(t, err)
+	return poolID
+}
+
+// seedIdempotencyGovDeposit files a proposal and pays a deposit on it, so gov's
+// own copy of the amount is exercised alongside the coins on the module account.
+func seedIdempotencyGovDeposit(
+	t *testing.T, app *App, ctx sdk.Context, bk bankkeeper.BaseKeeper, amount int64,
+) (uint64, sdk.AccAddress) {
+	t.Helper()
+
+	// Gov only accepts deposits in the denoms its MinDeposit names, which is
+	// "stake" out of Setup(). The real chain's is the legacy denom.
+	govParams, err := app.GovKeeper.Params.Get(ctx)
+	require.NoError(t, err)
+	govParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(legacyDenom, sdkmath.NewInt(1)))
+	require.NoError(t, app.GovKeeper.Params.Set(ctx, govParams))
+
+	depositor := randAddr()
+	deposit := sdk.NewCoins(sdk.NewCoin(legacyDenom, sdkmath.NewInt(amount)))
+	require.NoError(t, bk.MintCoins(ctx, "mint", deposit))
+	require.NoError(t, bk.SendCoinsFromModuleToAccount(ctx, "mint", depositor, deposit))
+
+	proposal, err := app.GovKeeper.SubmitProposal(ctx, nil, "", "idempotency", "idempotency", depositor, false)
+	require.NoError(t, err)
+
+	_, err = app.GovKeeper.AddDeposit(ctx, proposal.Id, depositor, deposit)
+	require.NoError(t, err)
+
+	return proposal.Id, depositor
+}
+
+// seedIdempotencyBackedCollection puts a backed collection and its escrowed
+// coins in place, and returns the addresses the escrow moves between.
+func seedIdempotencyBackedCollection(
+	t *testing.T, app *App, ctx sdk.Context, bk bankkeeper.BaseKeeper, escrowed int64,
+) (sdk.AccAddress, sdk.AccAddress) {
+	t.Helper()
+
+	oldEscrow, err := tokenizationkeeper.DerivePathAddress(legacyDenom, tokenizationkeeper.BackedPathGenerationPrefix)
+	require.NoError(t, err)
+	newEscrow, err := tokenizationkeeper.DerivePathAddress(appparams.BaseCoinUnit, tokenizationkeeper.BackedPathGenerationPrefix)
+	require.NoError(t, err)
+
+	require.NoError(t, app.TokenizationKeeper.SetCollectionInStore(ctx, &tokenizationtypes.TokenCollection{
+		CollectionId: sdkmath.NewUint(1),
+		Invariants: &tokenizationtypes.CollectionInvariants{
+			CosmosCoinBackedPath: &tokenizationtypes.CosmosCoinBackedPath{
+				Address: oldEscrow.String(),
+				Conversion: &tokenizationtypes.Conversion{
+					SideA: &tokenizationtypes.ConversionSideAWithDenom{
+						Amount: sdkmath.NewUint(1_000_000_000),
+						Denom:  legacyDenom,
+					},
+				},
+			},
+		},
+	}, true))
+
+	fundLegacy(t, ctx, bk, oldEscrow, escrowed)
+	return oldEscrow, newEscrow
+}
+
+// seedIdempotencyRateLimit installs a config on the legacy denom whose caps are
+// amounts and must scale exactly once.
+func seedIdempotencyRateLimit(t *testing.T, app *App, ctx sdk.Context) {
+	t.Helper()
+	require.NoError(t, app.IBCRateLimitKeeper.SetParams(ctx, ratelimittypes.Params{
+		RateLimits: []ratelimittypes.RateLimitConfig{{
+			ChannelId: "channel-0",
+			Denom:     legacyDenom,
+			SupplyShiftLimits: []ratelimittypes.TimeframeLimit{{
+				MaxAmount:         sdkmath.NewInt(1_000_000),
+				TimeframeType:     ratelimittypes.TimeframeType_TIMEFRAME_TYPE_DAY,
+				TimeframeDuration: 1,
+			}},
+			AddressLimits: []ratelimittypes.AddressLimit{{
+				MaxTransfers:      10,
+				MaxAmount:         sdkmath.NewInt(500_000),
+				TimeframeType:     ratelimittypes.TimeframeType_TIMEFRAME_TYPE_HOUR,
+				TimeframeDuration: 1,
+			}},
+		}},
+	}))
 }

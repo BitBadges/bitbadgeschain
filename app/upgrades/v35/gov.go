@@ -1,6 +1,7 @@
 package v35
 
 import (
+	"bytes"
 	"fmt"
 
 	"cosmossdk.io/collections"
@@ -13,6 +14,9 @@ import (
 type GovMigrationResult struct {
 	Proposals int
 	Deposits  int
+	// FlaggedMessages counts in-flight proposals whose Messages name the retired
+	// denom. Reported, never rewritten — see the note on RescaleGovDeposits.
+	FlaggedMessages int
 }
 
 // RescaleGovDeposits converts the deposit amounts recorded on in-flight
@@ -58,6 +62,10 @@ func RescaleGovDeposits(ctx sdk.Context, gk *govkeeper.Keeper) (GovMigrationResu
 	}
 
 	for _, proposal := range proposals {
+		if flagLegacyDenomInMessages(ctx, proposal) {
+			res.FlaggedMessages++
+		}
+
 		proposal.TotalDeposit = convertCoins(proposal.TotalDeposit, legacyDenom(), newDenom())
 		if err := gk.SetProposal(ctx, proposal); err != nil {
 			return res, fmt.Errorf("setting proposal %d: %w", proposal.Id, err)
@@ -78,7 +86,71 @@ func RescaleGovDeposits(ctx sdk.Context, gk *govkeeper.Keeper) (GovMigrationResu
 		"factor", ConversionFactor.String(),
 		"proposals", res.Proposals,
 		"deposits", res.Deposits,
+		"flagged_messages", res.FlaggedMessages,
 	)
 
 	return res, nil
+}
+
+// flagLegacyDenomInMessages warns about an undecided proposal whose payload
+// names the retired denom, and reports whether it found one.
+//
+// A proposal's Messages are executed *after* it passes, so a proposal still in
+// its deposit or voting period at the upgrade height carries an Any-packed
+// payload written against the old denom into a chain that no longer has one.
+// The consequences split two ways:
+//
+//   - Most are harmless and fail closed. A community-pool spend of ubadge, for
+//     instance, executes against a denom with zero supply and simply errors; the
+//     proposal fails and nothing is lost.
+//   - A MsgUpdateParams is not harmless. Mainnet's four ubadge-bearing proposals
+//     are all of exactly this shape (x/tokenization allowed_denoms). One of those
+//     passing after the upgrade would write "ubadge" straight back into the
+//     params this migration just moved, silently reverting part of it.
+//
+// They are flagged rather than rewritten, and rewriting is the wrong call twice
+// over. Messages are arbitrary Any-packed protos, so a generic rewrite would
+// have to guess which string fields are native-denom references and which are
+// not — and a governance payload is a thing voters approved verbatim, not
+// something an upgrade handler should edit underneath them.
+//
+// They are flagged rather than rejected for a sharper reason: erroring here
+// would be the same free DoS the precisebank reserve check used to be. Anyone
+// can file a deposit-period proposal containing the string "ubadge" for the cost
+// of a minimum deposit, and it would halt the chain at the upgrade height.
+//
+// At the time of writing mainnet has 43 proposals, all PASSED, and none in a
+// deposit or voting period — so this logs nothing today. It exists for the
+// window between now and the upgrade height.
+func flagLegacyDenomInMessages(ctx sdk.Context, proposal govv1.Proposal) bool {
+	switch proposal.Status {
+	case govv1.StatusDepositPeriod, govv1.StatusVotingPeriod:
+	default:
+		// Anything already passed, rejected or failed will never be executed
+		// again, so its payload cannot affect post-upgrade state.
+		return false
+	}
+
+	found := false
+	for _, msg := range proposal.Messages {
+		if msg == nil {
+			continue
+		}
+		if bytes.Contains(msg.Value, []byte(legacyDenom())) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return false
+	}
+
+	ctx.Logger().Error(
+		"v35: an undecided governance proposal names the retired denom in its messages; "+
+			"it is NOT rewritten, and executing it after the upgrade may fail or undo part of this migration",
+		"proposal", proposal.Id,
+		"status", proposal.Status.String(),
+		"denom", legacyDenom(),
+	)
+	return true
 }

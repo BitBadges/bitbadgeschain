@@ -207,6 +207,20 @@ var (
 		minttypes.ModuleName,
 		stakingtypes.BondedPoolName,
 		stakingtypes.NotBondedPoolName,
+		// x/precisebank is retired as of v35, but its reserve address is still a
+		// perfectly ordinary account that anyone can send coins to, and nothing
+		// can ever spend from it again. Blocking it stops value being burned by
+		// accident. It also closes the shape of a live DoS: while the module was
+		// wired, the v35 handler compared the reserve balance against what the
+		// fractional balances claimed, so one ubadge of dust sent here before the
+		// upgrade height would have failed that check and halted the chain. That
+		// check is now one-sided (see app/upgrades/v35/precisebank.go), and this
+		// is the second layer.
+		//
+		// A literal rather than a module-name constant because the module and its
+		// types package are gone; the string is what authtypes.NewModuleAddress
+		// hashed then and still hashes now.
+		"precisebank",
 		// We allow the following module accounts to receive funds:
 		// govtypes.ModuleName
 	}

@@ -53,20 +53,25 @@ func RescaleVestingAccounts(ctx sdk.Context, ak authkeeper.AccountKeeper) (Accou
 	})
 
 	for _, acc := range vesting {
+		changed := false
 		switch v := acc.(type) {
 		case *vestingtypes.ContinuousVestingAccount:
-			scaleBaseVesting(v.BaseVestingAccount)
+			changed = scaleBaseVesting(v.BaseVestingAccount)
 		case *vestingtypes.DelayedVestingAccount:
-			scaleBaseVesting(v.BaseVestingAccount)
+			changed = scaleBaseVesting(v.BaseVestingAccount)
 		case *vestingtypes.PermanentLockedAccount:
-			scaleBaseVesting(v.BaseVestingAccount)
+			changed = scaleBaseVesting(v.BaseVestingAccount)
 		case *vestingtypes.PeriodicVestingAccount:
-			scaleBaseVesting(v.BaseVestingAccount)
+			changed = scaleBaseVesting(v.BaseVestingAccount)
 			// Each period releases a fixed amount; the periods must sum to
 			// OriginalVesting, so they scale with it or the schedule stops
 			// adding up and the tail of the vesting never unlocks.
 			for i := range v.VestingPeriods {
-				v.VestingPeriods[i].Amount = convertCoins(v.VestingPeriods[i].Amount, legacyDenom(), newDenom())
+				scaledPeriod, did := convertCoinsChanged(v.VestingPeriods[i].Amount)
+				if did {
+					v.VestingPeriods[i].Amount = scaledPeriod
+					changed = true
+				}
 			}
 		default:
 			// Reachable: the collection above selects every VestingAccount, not
@@ -75,6 +80,14 @@ func RescaleVestingAccounts(ctx sdk.Context, ak authkeeper.AccountKeeper) (Accou
 			return res, fmt.Errorf(
 				"unhandled vesting account type %T for %s: refusing to leave its locked amounts unconverted",
 				acc, acc.GetAddress())
+		}
+
+		// A vesting account holding only foreign denoms has nothing to convert.
+		// Writing it back anyway is harmless but counts as a rescale, which made
+		// Rescaled overstate what the migration actually did — the one number a
+		// reader would use to sanity-check the upgrade log against the chain.
+		if !changed {
+			continue
 		}
 
 		ak.SetAccount(ctx, acc)
@@ -90,11 +103,24 @@ func RescaleVestingAccounts(ctx sdk.Context, ak authkeeper.AccountKeeper) (Accou
 	return res, nil
 }
 
-func scaleBaseVesting(b *vestingtypes.BaseVestingAccount) {
+// scaleBaseVesting converts the three coin fields every vesting account type
+// shares, reporting whether any of them actually held the legacy denom.
+func scaleBaseVesting(b *vestingtypes.BaseVestingAccount) bool {
 	if b == nil {
-		return
+		return false
 	}
-	b.OriginalVesting = convertCoins(b.OriginalVesting, legacyDenom(), newDenom())
-	b.DelegatedFree = convertCoins(b.DelegatedFree, legacyDenom(), newDenom())
-	b.DelegatedVesting = convertCoins(b.DelegatedVesting, legacyDenom(), newDenom())
+	changed := false
+	if converted, did := convertCoinsChanged(b.OriginalVesting); did {
+		b.OriginalVesting = converted
+		changed = true
+	}
+	if converted, did := convertCoinsChanged(b.DelegatedFree); did {
+		b.DelegatedFree = converted
+		changed = true
+	}
+	if converted, did := convertCoinsChanged(b.DelegatedVesting); did {
+		b.DelegatedVesting = converted
+		changed = true
+	}
+	return changed
 }

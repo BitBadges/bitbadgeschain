@@ -188,6 +188,7 @@ func TestV35WithdrawDelegatorRewardPaysEachDelegatorTheirShare(t *testing.T) {
 func TestV35StableswapSpotPriceIsUnchangedAcrossTheUpgrade(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
+	seedLegacyBondDenom(t, app, ctx)
 
 	// uatom sorts after abadge and before ubadge, so the rename reorders
 	// PoolLiquidity and any index-aligned array has to move with it.
@@ -262,6 +263,7 @@ func TestV35StableswapSpotPriceIsUnchangedAcrossTheUpgrade(t *testing.T) {
 func TestV35DefaultBalancesCoinTransfersAreScaled(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
+	seedLegacyBondDenom(t, app, ctx)
 
 	price := sdk.NewCoin(legacyDenom, sdkmath.NewInt(1_000_000_000)) // 1 BADGE
 	collection := &tokenizationtypes.TokenCollection{
@@ -298,6 +300,7 @@ func TestV35DefaultBalancesCoinTransfersAreScaled(t *testing.T) {
 func TestV35CoinTransferCoinsStaySortedByDenom(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
+	seedLegacyBondDenom(t, app, ctx)
 
 	// ibc/... sorts after abadge and before ubadge.
 	const ibcDenom = "ibc/ABCDEF0123456789"
@@ -343,6 +346,7 @@ func TestV35CoinTransferCoinsStaySortedByDenom(t *testing.T) {
 func TestV35TakerFeeOverrideEqualToDefaultDoesNotHaltTheUpgrade(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
+	seedLegacyBondDenom(t, app, ctx)
 
 	defaultFee := app.PoolManagerKeeper.GetDefaultTakerFee(ctx)
 	app.PoolManagerKeeper.SetDenomPairTakerFee(ctx, legacyDenom, "uatom", defaultFee.Add(osmomath.NewDecWithPrec(1, 3)))
@@ -398,14 +402,38 @@ func seedPreciseBankFractionalBalances(
 		total += remainder
 	}
 
-	// The reserve backs every fractional unit 1:1 in ubadge. The invariant the
-	// module maintains is sum(fractional) + remainder == reserve * 10^9.
+	// The reserve backs every fractional unit 1:1 in ubadge, so at genesis-time
+	// validation sum(fractional) + remainder == reserve * 10^9.
 	require.Zero(t, total%1_000_000_000, "seed must leave a whole number of ubadge in the reserve")
-	reserveUbadge := total / 1_000_000_000
+	fundPreciseBankReserve(t, ctx, bk, total/1_000_000_000)
+}
+
+// fundPreciseBankReserve puts ubadge on the retired module's reserve address.
+//
+// Deliberately not SendCoinsFromModuleToAccount: v35 adds "precisebank" to the
+// bank's blocked-address list, so a send there is refused. That block is the
+// point — nothing should be able to put coins on an address whose module is
+// gone — and the seeding here has to reach around it the same way the real
+// pre-upgrade chain got there, which was through x/precisebank's own keeper
+// while the module still existed.
+func fundPreciseBankReserve(t *testing.T, ctx sdk.Context, bk bankkeeper.BaseKeeper, ubadge int64) {
+	t.Helper()
+	if ubadge == 0 {
+		return
+	}
 	reserveAddr := authtypes.NewModuleAddress(v35.PreciseBankStoreKey)
-	coins := sdk.NewCoins(sdk.NewCoin(legacyDenom, sdkmath.NewInt(reserveUbadge)))
-	require.NoError(t, bk.MintCoins(ctx, "mint", coins))
-	require.NoError(t, bk.SendCoinsFromModuleToAccount(ctx, "mint", reserveAddr, coins))
+	mintAddr := authtypes.NewModuleAddress("mint")
+
+	require.NoError(t, bk.MintCoins(ctx, "mint",
+		sdk.NewCoins(sdk.NewCoin(legacyDenom, sdkmath.NewInt(ubadge)))))
+
+	// Hand the freshly minted coins over without a send. Supply is already
+	// right; only the two balances move, so they must move together or the
+	// balances stop summing to supply before the migration even starts.
+	require.NoError(t, bk.UncheckedSetBalance(ctx, mintAddr,
+		sdk.NewCoin(legacyDenom, bk.GetBalance(ctx, mintAddr, legacyDenom).Amount.SubRaw(ubadge))))
+	require.NoError(t, bk.UncheckedSetBalance(ctx, reserveAddr,
+		sdk.NewCoin(legacyDenom, bk.GetBalance(ctx, reserveAddr, legacyDenom).Amount.AddRaw(ubadge))))
 }
 
 // At 9 decimals an EVM account's balance was ubadge*10^9 + a fractional
@@ -419,6 +447,7 @@ func seedPreciseBankFractionalBalances(
 func TestV35PreciseBankFractionalBalancesSurviveTheUpgrade(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
+	seedLegacyBondDenom(t, app, ctx)
 	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
 
 	// maxFractional is the largest a fractional balance can be: one below the
@@ -479,6 +508,7 @@ func TestV35PreciseBankFractionalBalancesSurviveTheUpgrade(t *testing.T) {
 func TestV35PreciseBankRefusesWhenTheReserveDoesNotBackTheBalances(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
+	seedLegacyBondDenom(t, app, ctx)
 	bk := app.BankKeeper.(bankkeeper.BaseKeeper)
 
 	alice := randAddr()

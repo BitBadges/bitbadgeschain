@@ -36,6 +36,10 @@ type PreciseBankMigrationResult struct {
 	Credited  sdkmath.Int
 	Remainder sdkmath.Int
 	Reserve   sdkmath.Int
+	// Surplus is what the reserve held beyond what the fractional balances and
+	// the remainder claim. Non-zero means somebody sent coins to the reserve
+	// address, which anyone could do.
+	Surplus sdkmath.Int
 }
 
 // MigratePreciseBank pays out the fractional balances x/precisebank held and
@@ -56,11 +60,36 @@ type PreciseBankMigrationResult struct {
 // fractional unit is exactly one unit of it: 1 abadge. Which is the whole point
 // of the redenomination — the precision x/precisebank was faking is now real.
 //
-// The invariant sum(fractional) + remainder == reserve is what x/precisebank
-// maintains at all times (see its genesis validation). If it does not hold, the
-// reserve cannot cover what is owed and paying out anyway would mint or destroy
-// value, so the upgrade fails instead. Silent value loss is the thing this
-// exists to prevent; a halted upgrade is recoverable and a wrong payout is not.
+// The relation sum(fractional) + remainder == reserve is what x/precisebank's
+// genesis validation checks. It is *not* an invariant the module enforces at
+// runtime: x/precisebank registers no invariant function, so nothing re-checks
+// it between genesis and this upgrade. In particular the reserve address is a
+// plain module address that was never added to the bank's blocked list, so
+// anyone can send coins to it — and on mainnet somebody has: at the time this
+// was written the reserve held 3 ubadge of dust that no fractional balance
+// claims.
+//
+// So the check here is deliberately one-sided:
+//
+//   - reserve < owed  -> fail. The reserve genuinely cannot cover what the
+//     fractional balances claim, real value is at risk, and paying out anyway
+//     would mint from nothing. A halted upgrade is recoverable; a wrong payout
+//     is not.
+//   - reserve > owed  -> succeed. Pay out exactly what is owed and dispose of
+//     the surplus, logging it loudly.
+//
+// A two-sided equality check here was a free, public, chain-halting DoS: one
+// ubadge sent to the reserve before the upgrade height becomes 10^9 abadge of
+// surplus after step 2, the equality fails, CustomUpgradeHandlerLogic returns
+// an error, and the upgrade BeginBlocker panics every node at the upgrade
+// height. Cost to the attacker: 10^-9 BADGE plus gas.
+//
+// The surplus is burned rather than sent to the community pool. It is unowned
+// dust on an address whose module no longer exists and which nothing can spend
+// from after this upgrade, so leaving it anywhere keeps supply inflated against
+// coins nobody can reach. Burning is also exactly what the unowned remainder
+// below already gets, so both kinds of unowned residue are disposed of the same
+// way rather than by two different rules.
 func MigratePreciseBank(
 	ctx sdk.Context,
 	storeKey storetypes.StoreKey,
@@ -70,6 +99,7 @@ func MigratePreciseBank(
 		Credited:  sdkmath.ZeroInt(),
 		Remainder: sdkmath.ZeroInt(),
 		Reserve:   sdkmath.ZeroInt(),
+		Surplus:   sdkmath.ZeroInt(),
 	}
 
 	if storeKey == nil {
@@ -115,11 +145,22 @@ func MigratePreciseBank(
 	res.Reserve = bk.GetBalance(ctx, reserveAddr, newDenom()).Amount
 
 	owed := res.Credited.Add(res.Remainder)
-	if !owed.Equal(res.Reserve) {
+	if res.Reserve.LT(owed) {
 		return res, fmt.Errorf(
 			"precisebank reserve holds %s %s but owes %s (%s fractional + %s remainder): "+
 				"refusing to pay out from a reserve that does not back it",
 			res.Reserve, newDenom(), owed, res.Credited, res.Remainder,
+		)
+	}
+	res.Surplus = res.Reserve.Sub(owed)
+	if res.Surplus.IsPositive() {
+		ctx.Logger().Error(
+			"v35: precisebank reserve holds more than the fractional balances claim; "+
+				"burning the surplus rather than halting the upgrade",
+			"reserve", res.Reserve.String(),
+			"owed", owed.String(),
+			"surplus", res.Surplus.String(),
+			"denom", newDenom(),
 		)
 	}
 
@@ -145,18 +186,24 @@ func MigratePreciseBank(
 		return res, fmt.Errorf("draining the precisebank reserve: %w", err)
 	}
 
+	// Two kinds of unowned residue come out of the reserve and both are burned.
+	//
 	// The remainder was backed but owned by nobody: it is the rounding residue
-	// x/precisebank carried so its reserve stayed whole. Nothing can claim it,
-	// so it is burned rather than left inflating supply against no balance.
+	// x/precisebank carried so its reserve stayed whole. The surplus is
+	// whatever anyone sent to the reserve address on top of that. Neither can
+	// be claimed by any account after this upgrade, so leaving either one
+	// anywhere inflates supply against coins nothing can reach.
+	//
 	// Burned through the same module account RedenominateBank borrows, since
 	// precisebank has no burner permission any more — and no module account.
-	if res.Remainder.IsPositive() {
+	unowned := res.Remainder.Add(res.Surplus)
+	if unowned.IsPositive() {
 		burnAddr := authtypes.NewModuleAddress(redenominationModule)
-		staged := bk.GetBalance(ctx, burnAddr, newDenom()).Amount.Add(res.Remainder)
+		staged := bk.GetBalance(ctx, burnAddr, newDenom()).Amount.Add(unowned)
 		if err := bk.UncheckedSetBalance(ctx, burnAddr, sdk.NewCoin(newDenom(), staged)); err != nil {
 			return res, fmt.Errorf("staging the precisebank remainder for burn: %w", err)
 		}
-		burn := sdk.NewCoins(sdk.NewCoin(newDenom(), res.Remainder))
+		burn := sdk.NewCoins(sdk.NewCoin(newDenom(), unowned))
 		if err := bk.BurnCoins(ctx, redenominationModule, burn); err != nil {
 			return res, fmt.Errorf("burning the precisebank remainder: %w", err)
 		}
@@ -167,6 +214,7 @@ func MigratePreciseBank(
 		"accounts", res.Accounts,
 		"credited", res.Credited.String(),
 		"remainder_burned", res.Remainder.String(),
+		"surplus_burned", res.Surplus.String(),
 		"reserve_drained", res.Reserve.String(),
 	)
 

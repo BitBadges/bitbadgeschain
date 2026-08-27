@@ -9,6 +9,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 )
 
@@ -116,9 +117,50 @@ func RescaleGrants(
 			if changed {
 				scaled = a
 			}
-		default:
-			// Other authorization types carry no coin amount.
+
+		case *stakingtypes.StakeAuthorization:
+			// MaxTokens is a *single* optional coin, not an sdk.Coins, so
+			// convertCoinsChanged does not apply. The nil case is normal and
+			// means "no cap": StakeAuthorization.Accept reads nil as unlimited,
+			// so there is nothing to scale and nothing to write back.
+			//
+			// Left alone, a 100-BADGE delegation cap becomes 10^-7 BADGE. Worse
+			// than the fee-grant version of this bug, because Accept writes the
+			// remainder back after every partial spend, so the wrong scale gets
+			// baked into a fresh grant on first use.
+			if a.MaxTokens != nil && a.MaxTokens.Denom == legacyDenom() {
+				a.MaxTokens = &sdk.Coin{
+					Denom:  newDenom(),
+					Amount: a.MaxTokens.Amount.Mul(ConversionFactor),
+				}
+				scaled, changed = a, true
+			}
+
+		case *authz.GenericAuthorization:
+			// Carries a message type url and nothing else. Named explicitly
+			// rather than swept up by the default branch so the default can be
+			// an error.
 			continue
+
+		default:
+			// Every authorization type registered on this chain is handled
+			// above: x/authz registers GenericAuthorization, x/bank registers
+			// SendAuthorization, x/staking registers StakeAuthorization and
+			// ibc-go's transfer module registers TransferAuthorization. There
+			// is no fifth.
+			//
+			// This was a silent `continue`, and that is exactly how
+			// StakeAuthorization came to be missed: a type carrying a coin
+			// amount fell through a branch whose comment claimed no such type
+			// existed. A new authorization type arriving with a dependency bump
+			// must halt the upgrade so a human decides, the same stance
+			// gamm.go takes on unrecognised pool types and accounts.go takes on
+			// unrecognised vesting accounts.
+			return res, fmt.Errorf(
+				"unhandled authz authorization type %T on grant %s->%s: refusing to leave a possible "+
+					"coin amount unconverted",
+				auth, g.granter, g.grantee,
+			)
 		}
 
 		if !changed {

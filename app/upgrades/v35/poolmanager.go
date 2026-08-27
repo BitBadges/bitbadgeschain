@@ -13,6 +13,9 @@ type PoolManagerMigrationResult struct {
 	Rekeyed   int
 	Redundant int
 	Total     int
+	// TakerFeeState reports the accrued taker-fee accounting moved alongside the
+	// per-pair overrides. Those are configuration; this is money.
+	TakerFeeState poolmanager.RedenominationResult
 }
 
 // RekeyTakerFees moves per-pair taker-fee overrides onto the new denom.
@@ -87,6 +90,17 @@ func RekeyTakerFees(ctx sdk.Context, pmk poolmanager.Keeper) (PoolManagerMigrati
 
 		res.Rekeyed++
 	}
+
+	// The per-pair overrides above are configuration. The accrued taker fees,
+	// the taker-fee-share skim accruals and the share agreements are the other
+	// half of this module's denom-keyed state, and two of the three carry real
+	// amounts. Handled by the module because a re-key needs store access the
+	// keeper does not export.
+	takerFeeState, err := pmk.RedenominateTakerFeeState(ctx, legacyDenom(), newDenom(), ConversionFactor)
+	if err != nil {
+		return res, fmt.Errorf("redenominating taker fee state: %w", err)
+	}
+	res.TakerFeeState = takerFeeState
 
 	ctx.Logger().Info(
 		"v35: re-keyed poolmanager taker fees",

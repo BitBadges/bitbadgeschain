@@ -17,6 +17,9 @@ type GammMigrationResult struct {
 	BalancerPools   int
 	StableswapPools int
 	Skipped         int
+	// TotalLiquidityRekeyed reports whether the denom-keyed total-liquidity
+	// index entry was moved onto the new denom.
+	TotalLiquidityRekeyed bool
 }
 
 // RescaleGammPools converts the legacy-denom amounts recorded inside pool
@@ -46,6 +49,13 @@ func RescaleGammPools(ctx sdk.Context, gk gammkeeper.Keeper) (GammMigrationResul
 	if err != nil {
 		return res, fmt.Errorf("reading gamm pools: %w", err)
 	}
+
+	// The denom-keyed total-liquidity index sits beside the pools and holds the
+	// summed reserves per denom. It is written by the liquidity hooks and read
+	// by queries and genesis export, so the rename orphans it exactly the way it
+	// orphans a taker-fee key — with the added twist that its value is an amount
+	// and needs the same 10^9 as the pool assets below.
+	res.TotalLiquidityRekeyed = gk.RedenominateTotalLiquidity(ctx, legacyDenom(), newDenom(), ConversionFactor)
 
 	for _, pool := range pools {
 		switch p := pool.(type) {
@@ -87,6 +97,7 @@ func RescaleGammPools(ctx sdk.Context, gk gammkeeper.Keeper) (GammMigrationResul
 		"factor", ConversionFactor.String(),
 		"balancer", res.BalancerPools,
 		"stableswap", res.StableswapPools,
+		"total_liquidity_rekeyed", res.TotalLiquidityRekeyed,
 	)
 
 	return res, nil

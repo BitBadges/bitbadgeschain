@@ -19,13 +19,31 @@ import (
 // silently the moment the binary's denom or decimals change, and the failure
 // shows up as a chain that will not start rather than as a test failure.
 //
-// genesis-711316.json is deliberately NOT in this list. It is an export of
-// mainnet state at height 711316, i.e. a snapshot of the 9-decimal chain, and
-// the v35 upgrade handler is what converts that state. Rewriting it by hand
-// would produce a genesis labelled 18-decimal carrying 9-decimal amounts.
-// Whether the fork-restart path should ship a pre-converted genesis instead of
-// upgrading in place is an open decision, not something this test should
-// prejudge.
+// genesis-711316.json is deliberately NOT in this list, but not for the reason
+// originally given here. That reason — "it is the 9-decimal state the v35
+// handler converts" — is wrong, and worth correcting rather than deleting,
+// because it is the kind of plausible claim a reader would otherwise build on.
+//
+// The file is an export of bitbadges-1 at height 711316, but it long predates
+// v33. Its app_state carries 27 modules and NONE of evm, feemarket, erc20, gamm,
+// poolmanager, tokenization or precisebank; it still has the pre-rename badges
+// module alongside wasm and wasmx. Its staking bond_denom and mint_denom are
+// both "ustake", not "ubadge". So it is not a snapshot of the state this handler
+// converts, and it is structurally incapable of dry-running it — most of the
+// migrations would find no store to read.
+//
+// (That last detail is also the likeliest source of the belief that this chain
+// bonds ustake. Live bitbadges-1 returns "ubadge" from both
+// /cosmos/staking/v1beta1/params and /cosmos/mint/v1beta1/params today. The bond
+// denom has therefore changed at least once in this chain's history, which is
+// exactly why app/upgrades/v35/powerreduction.go checks it at runtime instead of
+// assuming it.)
+//
+// Excluding it from this list is still right: it is not a fresh-chain artifact,
+// nothing starts a chain from it, and hand-rewriting a historical export would
+// destroy its only value. Whether the fork-restart path should ship a
+// pre-converted genesis instead of upgrading in place is an open decision, not
+// something this test should prejudge.
 var shippedFreshChainArtifacts = []string{
 	"genesis.json",
 	"testnet.genesis.json",

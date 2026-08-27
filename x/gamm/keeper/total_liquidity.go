@@ -80,3 +80,40 @@ func (k Keeper) RecordTotalLiquidityDecrease(ctx sdk.Context, coins sdk.Coins) {
 		k.setDenomLiquidity(ctx, coin.Denom, amount)
 	}
 }
+
+// RedenominateTotalLiquidity moves the total-liquidity index entry for one denom
+// onto another, scaling the amount it holds.
+//
+// The index is keyed by denom (types.GetDenomPrefix) with the summed liquidity
+// across all pools as the value, so a denom rename orphans the entry: the old
+// key holds a figure nothing reads and the new denom reports zero liquidity.
+//
+// Low stakes on its own — the index is written at InitGenesis and by the
+// liquidity record hooks, and read only by queries and genesis export — but
+// leaving it wrong means the exported genesis of a redenominated chain disagrees
+// with its own pools, and a stale entry survives every future round-trip through
+// export/import.
+//
+// Exported for the v35 upgrade handler, which cannot reach setDenomLiquidity.
+func (k Keeper) RedenominateTotalLiquidity(ctx sdk.Context, legacyDenom, newDenom string, factor osmomath.Int) bool {
+	store := ctx.KVStore(k.storeKey)
+
+	oldKey := types.GetDenomPrefix(legacyDenom)
+	bz := store.Get(oldKey)
+	if bz == nil {
+		return false
+	}
+
+	var amount osmomath.Int
+	if err := amount.Unmarshal(bz); err != nil {
+		panic(err)
+	}
+
+	// An entry may already exist under the new denom on a re-run; add rather
+	// than overwrite so nothing is lost either way.
+	scaled := amount.Mul(factor).Add(k.GetDenomLiquidity(ctx, newDenom))
+
+	store.Delete(oldKey)
+	k.setDenomLiquidity(ctx, newDenom, scaled)
+	return true
+}

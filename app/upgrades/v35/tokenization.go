@@ -16,6 +16,10 @@ type TokenizationMigrationResult struct {
 	Collections   int
 	UserBalances  int
 	CoinTransfers int
+	// AllowedDenoms counts the entries repointed in per-approval
+	// UserApprovalSettings.AllowedDenoms lists. Distinct from the params-level
+	// AllowedDenoms list, which MigrateDenomParams handles.
+	AllowedDenoms int
 }
 
 // RescaleTokenizationCoinTransfers converts legacy-denom amounts embedded in
@@ -54,6 +58,10 @@ func RescaleTokenizationCoinTransfers(ctx sdk.Context, tk tokenizationkeeper.Kee
 			n := scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
 			res.CoinTransfers += n
 			changed = changed || n > 0
+
+			d := repointAllowedDenoms(approval.ApprovalCriteria.UserApprovalSettings)
+			res.AllowedDenoms += d
+			changed = changed || d > 0
 		}
 		if n := scaleUserBalanceStoreApprovals(collection.DefaultBalances); n > 0 {
 			res.CoinTransfers += n
@@ -106,6 +114,7 @@ func RescaleTokenizationCoinTransfers(ctx sdk.Context, tk tokenizationkeeper.Kee
 		"collections", res.Collections,
 		"user_balances", res.UserBalances,
 		"coin_transfers", res.CoinTransfers,
+		"allowed_denoms", res.AllowedDenoms,
 	)
 
 	return res, nil
@@ -132,6 +141,37 @@ func scaleUserBalanceStoreApprovals(balance *tokenizationtypes.UserBalanceStore)
 			continue
 		}
 		changed += scaleCoinTransfers(approval.ApprovalCriteria.CoinTransfers)
+	}
+	return changed
+}
+
+// repointAllowedDenoms renames the legacy denom in an approval's per-collection
+// allowlist, reporting how many entries it changed.
+//
+// Only collection-level ApprovalCriteria carries UserApprovalSettings; the
+// per-user incoming and outgoing criteria do not have the field at all, which
+// matches where CheckAndHandleCoinTransfers reads it from.
+//
+// This is a *second*, independent allowlist. MigrateDenomParams already moves
+// the module params one; this is the per-approval narrowing on top of it, read
+// by CheckAndHandleCoinTransfers when it validates a user-level coin transfer
+// (see x/tokenization/keeper/coin_transfers.go). An empty list means "no extra
+// restriction", so only a populated one matters.
+//
+// It fails closed, which is what makes it worth catching: a collection that
+// pinned its user-level transfers to ["ubadge"] would, after the rename, reject
+// every coin transfer priced in the live denom — including the ones this
+// migration just rescaled into it.
+func repointAllowedDenoms(settings *tokenizationtypes.UserApprovalSettings) int {
+	if settings == nil {
+		return 0
+	}
+	changed := 0
+	for i, denom := range settings.AllowedDenoms {
+		if denom == legacyDenom() {
+			settings.AllowedDenoms[i] = newDenom()
+			changed++
+		}
 	}
 	return changed
 }

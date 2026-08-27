@@ -67,6 +67,16 @@ type Keepers struct {
 func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// 0. Refuse outright on a chain whose bond denom this upgrade does not
+	//    redenominate. PowerReduction is compiled into the binary and moves with
+	//    the token scale; if the bond denom does not move with it, every
+	//    validator's consensus power does. Checked before anything is written so
+	//    a wrong chain fails with a message rather than a collapsed validator
+	//    set. See powerreduction.go for the mainnet/dev divergence this covers.
+	if err := AssertPowerReductionMatchesBondDenom(ctx, k.Staking); err != nil {
+		return err
+	}
+
 	// 1. Denom metadata. x/vm derives the chain's decimals from the display
 	//    unit's exponent here, so everything downstream that reads coin info
 	//    must see 18 rather than 9 before it runs.
@@ -104,6 +114,11 @@ func CustomUpgradeHandlerLogic(goCtx context.Context, k Keepers) error {
 		return err
 	}
 	if _, err := RescaleTokenizationCoinTransfers(ctx, k.Tokenization); err != nil {
+		return err
+	}
+	// Runs after RedenominateBank because it moves an escrow *balance*, and
+	// before MigrateDenomParams for the same reason as everything else here.
+	if _, err := RescaleTokenizationBackedPaths(ctx, k.Tokenization, k.Bank, k.Account); err != nil {
 		return err
 	}
 	if _, err := RescaleVestingAccounts(ctx, k.Account); err != nil {

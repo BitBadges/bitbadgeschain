@@ -723,3 +723,18 @@ func validatePathSymbols(pathSymbol string, denomUnits []*types.DenomUnit, symbo
 
 	return nil
 }
+
+// DerivePathAddress exposes the backed/wrapped path address derivation to the
+// v35 redenomination upgrade handler.
+//
+// This is exported for one narrow reason and should not grow more callers. The
+// escrow address of a CosmosCoinBackedPath is a pure function of the path
+// string — for a backed path, the bank denom — and of nothing else: not the
+// collection id, not the creator. So redenominating the denom on a backed
+// collection re-derives a *different* escrow address, and the coins already
+// escrowed at the old one do not follow. The upgrade has to compute both
+// addresses to move them, and duplicating the derivation there would let the
+// two drift apart silently, which strands real money.
+func DerivePathAddress(pathString string, prefix []byte) (sdk.AccAddress, error) {
+	return generatePathAddress(pathString, prefix)
+}
