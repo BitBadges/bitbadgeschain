@@ -14,10 +14,39 @@ permissions:
   contents: write
 
 jobs:
+  # While go.mod pins cosmos/evm to an embargoed hotfix repo, this workflow
+  # cannot build: the runner has no access to that private module, so every
+  # build job fails on `go mod download`. The release binaries are built
+  # locally and uploaded to the release by hand for those releases -- see
+  # docs/release.md.
+  #
+  # This gate makes that an explicit, green skip rather than a wall of red
+  # failures on the release tag, and stops the release job from running with
+  # partial artifacts and overwriting hand-uploaded assets.
+  preflight:
+    name: Can CI build this tag?
+    runs-on: ubuntu-latest
+    outputs:
+      can_build: ${{ steps.check.outputs.can_build }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if grep -qE '^\s*replace\s+github\.com/cosmos/evm\s+=>' go.mod; then
+            echo "go.mod redirects cosmos/evm to a private module; CI cannot build it." >&2
+            grep -E '^\s*replace\s+github\.com/cosmos/evm\s+=>' go.mod >&2
+            echo "Release binaries for this tag are built locally and uploaded by hand." >&2
+            echo "can_build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "can_build=true" >> "$GITHUB_OUTPUT"
+          fi
+
   # `test` runs in parallel and is intentionally NON-BLOCKING: no build or
   # release job uses `needs: test`, so a failing test will not block a release.
   test:
     name: Test
+    needs: preflight
+    if: needs.preflight.outputs.can_build == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +63,8 @@ jobs:
 
   build-linux-windows:
     name: Build Linux & Windows
+    needs: preflight
+    if: needs.preflight.outputs.can_build == 'true'
     # Pinned to 22.04 (glibc 2.35) so release binaries run on Ubuntu 22.04+,
     # Debian 12+, RHEL 9+. ubuntu-latest (24.04, glibc 2.39) breaks older hosts.
     runs-on: ubuntu-22.04
@@ -77,6 +108,8 @@ jobs:
 
   build-darwin:
     name: Build macOS
+    needs: preflight
+    if: needs.preflight.outputs.can_build == 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -115,7 +148,8 @@ jobs:
 
   release:
     name: Create Release
-    needs: [build-linux-windows, build-darwin]
+    needs: [preflight, build-linux-windows, build-darwin]
+    if: needs.preflight.outputs.can_build == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
