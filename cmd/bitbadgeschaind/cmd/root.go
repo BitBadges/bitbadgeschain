@@ -88,7 +88,11 @@ func NewRootCmd() *cobra.Command {
 			customAppTemplate, customAppConfig := initAppConfig()
 			customCMTConfig := initCometBFTConfig()
 
-			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
+			if err := server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig); err != nil {
+				return err
+			}
+
+			return routeLogsAwayFromDataStdout(cmd)
 		},
 	}
 
@@ -201,4 +205,46 @@ func ProvideClientContext(
 	clientCtx = clientCtx.WithTxConfig(txConfig)
 
 	return clientCtx
+}
+
+// dataStdoutCommands are the commands whose stdout is machine-readable output
+// rather than a place to talk to the operator.
+var dataStdoutCommands = map[string]bool{
+	"export": true,
+}
+
+// routeLogsAwayFromDataStdout moves the server logger onto stderr for commands
+// whose stdout carries data.
+//
+// InterceptConfigsPreRunHandler builds the logger with
+// CreateSDKLogger(serverCtx, cmd.OutOrStdout()), and ExportCmd writes the
+// exported genesis to cmd.OutOrStdout() as well, so the two share a stream.
+// Whether that corrupts anything depends only on whether the app happens to log
+// while the command runs — which makes it a latent bug that surfaces the first
+// time someone adds a log line on a construction path.
+//
+// It surfaced in v34. v33 logged nothing during export, so
+// `bitbadgeschaind export > genesis.json` produced a valid file; v34 logs a
+// max_gas warning and a RecheckMempool context error while building the app, so
+// the same command wrote a file beginning with two log lines that no genesis
+// parser accepts. The genesis was intact on the last line, which is worse than
+// an outright failure: the command still exits 0.
+//
+// Only these commands are redirected, deliberately. `start` is what validators
+// run under systemd and its stdout is not data; moving its logs to stderr mid
+// upgrade would break any operator whose unit file redirects stdout to a log
+// file, to fix a problem `start` does not have.
+func routeLogsAwayFromDataStdout(cmd *cobra.Command) error {
+	if !dataStdoutCommands[cmd.Name()] {
+		return nil
+	}
+
+	serverCtx := server.GetServerContextFromCmd(cmd)
+	logger, err := server.CreateSDKLogger(serverCtx, cmd.ErrOrStderr())
+	if err != nil {
+		return err
+	}
+	serverCtx.Logger = logger
+
+	return server.SetCmdServerContext(cmd, serverCtx)
 }
