@@ -28,6 +28,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"reflect"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -436,6 +437,27 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		return nil, WrapError(err, ErrorCodeQueryFailed, "query failed")
 	}
 
+	return p.packQueryResponse(method, resp)
+}
+
+// packQueryResponse encodes a querier response into the method's ABI outputs.
+//
+// Split out of HandleQuery so the typed-nil guard below is directly testable.
+func (p Precompile) packQueryResponse(method *abi.Method, resp interface{}) ([]byte, error) {
+	// A nil *QueryFooResponse assigned to this interface{} is not an interface
+	// nil -- it is (type=*QueryFooResponse, value=nil). Every type assertion
+	// below therefore succeeds on it, and the branch then either dereferences
+	// the nil pointer or hands it to proto.Marshal, which dereferences it too.
+	// Either way the node panics rather than returning an error to the caller.
+	//
+	// This is the shape that panicked mainnet in compareApprovalCriteria
+	// (PR #112). No gamm querier returns (nil, nil) today, so this is a guard
+	// against the next one that does, not a live fix.
+	if isTypedNil(resp) {
+		return nil, WrapError(fmt.Errorf("querier returned a nil %T with no error", resp),
+			ErrorCodeInternalError, "invalid response type")
+	}
+
 	// Handle different return types
 	// All BigInt values are checked for overflow before packing to prevent silent truncation
 	switch method.Name {
@@ -522,6 +544,21 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		return method.Outputs.Pack(bz)
 	}
 	return nil, WrapError(fmt.Errorf("response is not a proto.Message"), ErrorCodeInternalError, "invalid response type")
+}
+
+// isTypedNil reports whether v holds a nil pointer inside a non-nil interface.
+// `v == nil` is false for those, which is exactly what makes them dangerous.
+func isTypedNil(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Slice, reflect.Interface, reflect.Func, reflect.Chan:
+		return rv.IsNil()
+	default:
+		return false
+	}
 }
 
 // transactionMethods is a map of method names that are transactions (state-changing).
