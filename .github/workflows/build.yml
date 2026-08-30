@@ -18,8 +18,37 @@ env:
   GO_TEST_TIMEOUT: 30m
 
 jobs:
+  # While go.mod redirects cosmos/evm to the embargoed hotfix repo, the runner
+  # has no credentials for that private module and resolution fails before
+  # anything compiles. That made `Build & test` red on master and on every PR
+  # opened against it, so a red check stopped carrying any information about
+  # the change under review.
+  #
+  # release.yml already gates on this. Mirroring it here turns the wall of red
+  # into a deliberate skip, and keeps the gate honest the moment the public
+  # tag lands and the replace comes out.
+  preflight:
+    name: Can CI build this commit?
+    runs-on: ubuntu-latest
+    outputs:
+      can_build: ${{ steps.check.outputs.can_build }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if grep -qE '^\s*replace\s+github\.com/cosmos/evm\s+=>' go.mod; then
+            echo "go.mod redirects cosmos/evm to a private module; CI cannot build it." >&2
+            grep -E '^\s*replace\s+github\.com/cosmos/evm\s+=>' go.mod >&2
+            echo "Verify locally with: go test ./... -count=1 -tags=test" >&2
+            echo "can_build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "can_build=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build & test
+    needs: preflight
+    if: needs.preflight.outputs.can_build == 'true'
     runs-on: ubuntu-latest
 
     steps:
