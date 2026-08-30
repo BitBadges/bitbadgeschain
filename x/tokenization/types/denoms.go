@@ -6,14 +6,23 @@ package types
 // a token took to reach this chain. Two routes for the same underlying asset
 // produce two different denoms, which is why USDC appears twice below.
 const (
-	// USDCDenom is the canonical USDC on BitBadges, routed through Injective.
+	// USDCDenom is the canonical USDC on BitBadges: Circle's NATIVE USDC on
+	// Injective (USDC.inj, erc20 contract
+	// 0xa00C59fF5a080D2b954d0c75e46E22a0c371235a, held as an Injective bank
+	// denom), sent ONE hop over the existing BitBadges<->Injective channel.
 	//
-	//	trace: transfer/channel-40/transfer/channel-148/uusdc
+	//	trace: transfer/channel-40/erc20:0xa00C59fF5a080D2b954d0c75e46E22a0c371235a
 	//	       channel-40  BitBadges -> Injective
-	//	       channel-148 Injective -> Noble
 	//
+	// The erc20 address inside the trace is CHECKSUMMED, exactly as Injective's
+	// bank module spells the denom — the hash is case-sensitive, so the
+	// lowercase spelling would be a different (wrong) denom.
+	//
+	// Deliberately NOT the Noble voucher held on Injective
+	// (transfer/channel-148/uusdc there): forwarding that voucher would mint a
+	// 2-hop denom here. Canonical USDC is the single-hop native asset.
 	// Everything new should be priced and quoted in this denom.
-	USDCDenom = "ibc/0E485657AEF4C39D551E7D53463734E4C445A96E6C814DC4C2FF0031470B40BB"
+	USDCDenom = "ibc/E1116484B327AEE59CDC3DA73D319834781A13DB2A7DFC1F38A30CD45ABF58B8"
 
 	// USDCNobleDenom is the legacy Noble-direct USDC.
 	//

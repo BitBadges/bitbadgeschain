@@ -41,8 +41,8 @@ func TestIBCDenomConstantsMatchTheirTraces(t *testing.T) {
 		got   string
 	}{
 		{
-			name:  "canonical USDC via Injective",
-			trace: "transfer/channel-40/transfer/channel-148/uusdc",
+			name:  "canonical USDC: native Injective USDC, single hop",
+			trace: "transfer/channel-40/erc20:0xa00C59fF5a080D2b954d0c75e46E22a0c371235a",
 			got:   tokenizationtypes.USDCDenom,
 		},
 		{
@@ -73,7 +73,18 @@ func TestIBCDenomConstantsMatchTheirTraces(t *testing.T) {
 // change exists to avoid.
 func TestUSDCDenomsAreDistinct(t *testing.T) {
 	require.NotEqual(t, tokenizationtypes.USDCDenom, tokenizationtypes.USDCNobleDenom)
-	require.NotEqual(t, "transfer/channel-40/transfer/channel-148/uusdc", "transfer/channel-2/uusdc")
+
+	// The trace hash is case-sensitive and Injective's bank module spells the
+	// erc20 denom with a CHECKSUMMED address. A lowercase spelling silently
+	// yields a different denom nobody would ever receive.
+	require.NotEqual(t, tokenizationtypes.USDCDenom,
+		ibcDenom("transfer/channel-40/erc20:0xa00c59ff5a080d2b954d0c75e46e22a0c371235a"),
+		"lowercased erc20 address must not produce the canonical denom")
+
+	// Nor is the canonical denom the forwarded Noble voucher (2-hop) route.
+	require.NotEqual(t, tokenizationtypes.USDCDenom,
+		ibcDenom("transfer/channel-40/transfer/channel-148/uusdc"),
+		"canonical USDC is the single-hop native asset, not the forwarded Noble voucher")
 }
 
 // Mainnet does not get the canonical denom from DefaultParams (a running chain
