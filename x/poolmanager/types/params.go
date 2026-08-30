@@ -61,7 +61,16 @@ func DefaultParams() Params {
 				CommunityPool:  osmomath.MustNewDecFromStr("0.33"), // 33%
 			},
 			AdminAddresses: []string{},
-			CommunityPoolDenomToSwapNonWhitelistedAssetsTo: "ibc/D189335C6E4A68B513C10AB227BF1C1D38C746766278BA3EEB4FB14124F1D858", // USDC
+			// Stage 1 of a two-stage plan: use native ubadge (deep native
+			// liquidity, always exists) as the community-pool swap target. The
+			// previous value was Osmosis's USDC IBC denom inherited from the
+			// upstream fork, which has zero supply on BitBadges. Stage 2:
+			// switch to canonical USDC
+			// (ibc/E1116484B327AEE59CDC3DA73D319834781A13DB2A7DFC1F38A30CD45ABF58B8)
+			// via governance once a ubadge/USDC pool exists. Note: no non-test
+			// code reads this param today (the epoch community-pool swap path
+			// was not ported), so this value is inert until that path exists.
+			CommunityPoolDenomToSwapNonWhitelistedAssetsTo: "ubadge",
 			ReducedFeeWhitelist:                            []string{},
 			CommunityPoolDenomWhitelist:                    []string{},
 		},
