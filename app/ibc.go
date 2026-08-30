@@ -10,6 +10,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
 	icamodule "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller"
@@ -161,6 +163,11 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// See: https://docs.cosmos.network/main/modules/gov#proposal-messages
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler)
+	// Route legacy ParameterChangeProposal content (submitted via
+	// MsgExecLegacyContent) to the x/params keeper. Needed for gov-driven
+	// updates of subspace-backed params (e.g. poolmanager), which have no
+	// MsgUpdateParams of their own.
+	govRouter.AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper))
 
 	// Create IBC-Go transfer keeper. IBC v11 dropped the ICS4Wrapper argument
 	// (set later via WithICS4Wrapper) and returns a pointer.
