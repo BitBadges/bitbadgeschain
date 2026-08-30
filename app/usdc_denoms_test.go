@@ -17,7 +17,7 @@ import (
 func TestDefaultParamsCarryBothUSDCDenoms(t *testing.T) {
 	allowed := tokenizationtypes.DefaultParams().AllowedDenoms
 	require.Contains(t, allowed, tokenizationtypes.USDCDenom, "canonical USDC")
-	require.Contains(t, allowed, tokenizationtypes.USDCNobleDenom, "legacy USDC.noble")
+	require.Contains(t, allowed, tokenizationtypes.USDCNobleDenom, "legacy USDC.n")
 	require.Contains(t, allowed, tokenizationtypes.NativeDenom)
 }
 

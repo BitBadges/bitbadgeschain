@@ -34,8 +34,8 @@ const (
 	// (see generatePathAddress in x/tokenization/keeper), so those collections
 	// cannot be repointed without moving their escrow. They stay on this denom.
 	//
-	// Displayed to users as "USDC.noble" to distinguish it from the canonical
-	// USDC above.
+	// Displayed to users as "USDC.n" (Skip Go's ecosystem-wide name for the
+	// Noble voucher) to distinguish it from the canonical USDC above.
 	USDCNobleDenom = "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349"
 
 	// ATOMDenom is Cosmos Hub ATOM (trace: transfer/channel-3/uatom).
