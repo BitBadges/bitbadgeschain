@@ -77,13 +77,17 @@ This is a Cosmos SDK blockchain built with Ignite CLI that implements cross-chai
 ### Key Modules
 - **x/tokenization** - Core token functionality (collections, transfers, balances, permissions)
   - `precompile/` - EVM precompile for Solidity integration
+- **x/badges** - Legacy badges types retained for proto/message compatibility
 - **x/gamm** - AMM liquidity pools
   - `precompile/` - EVM precompile for pool operations
+- **x/poolmanager** - GAMM pool creation and routing
 - **x/sendmanager** - Native coin transfer management
   - `precompile/` - EVM precompile for sending native coins
-- **x/maps** - Key-value mapping functionality  
-- **x/anchor** - Anchoring and verification system
-- **x/wasmx** - Extended WASM functionality
+- **x/managersplitter** - Manager-side fee splitting for collection creators
+- **x/custom-hooks** - Chain-level hook registration surface
+- **x/ibc-hooks** - IBC middleware hooks (wasm-addressable callbacks on IBC transfers)
+- **x/ibc-rate-limit** - IBC rate limiting / throttling
+- **x/wasm** - CosmWasm integration
 
 ### EVM Integration
 The blockchain includes full EVM compatibility via the `cosmos/evm` module:
@@ -96,10 +100,10 @@ The blockchain includes full EVM compatibility via the `cosmos/evm` module:
   - Documentation in `app/PRECOMPILE_MANAGEMENT.md`
 
 ### Multi-Chain Support
-The blockchain supports signatures from multiple chains:
-- **Ethereum** - Uses EIP712 signatures (schemas in `chain-handlers/ethereum/ethereum/eip712/schemas.go`)
-- **Bitcoin** - JSON schema with alphabetical sorting
-- **Solana** - JSON schema with alphabetical sorting
+The blockchain supports signatures from multiple chains (see `chain-handlers/README.md` for the layout):
+- **Ethereum** - Uses EIP712 signatures (handler code under `chain-handlers/ethereum/`)
+- **Bitcoin** - JSON schema with alphabetical sorting (`chain-handlers/bitcoin/`)
+- **Solana** - JSON schema with alphabetical sorting (`chain-handlers/solana/`)
 - **Cosmos** - Standard Cosmos signatures
 
 ### Directory Structure
@@ -109,7 +113,7 @@ The blockchain supports signatures from multiple chains:
   - `keeper/` - Business logic and state management
   - `types/` - Type definitions and validation
   - `module/` - Module initialization and routing
-- `x/maps/`, `x/anchor/`, `x/wasmx/` - Other custom modules
+- `x/gamm/`, `x/poolmanager/`, `x/sendmanager/`, `x/managersplitter/`, `x/custom-hooks/`, `x/ibc-hooks/`, `x/ibc-rate-limit/`, `x/wasm/`, `x/badges/` - Other custom modules (see **Key Modules** above for roles)
 
 #### Protocol Definitions
 - `proto/` - Protobuf definitions organized by module
