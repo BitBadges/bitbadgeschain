@@ -22,6 +22,12 @@ func DefaultParams() Params {
 	return Params{
 		AllowedDenoms: []string{
 			NativeDenom,
+			// These defaults only apply to chains starting from genesis. Mainnet
+			// keeps its params in state — the canonical USDC denom reaches it via
+			// a governance proposal carrying tokenization.MsgUpdateParams (which
+			// replaces the WHOLE params object: submit the full current params
+			// with the denom appended), not via an upgrade migration.
+			//
 			// Canonical USDC, routed via Injective. Preferred for anything new.
 			USDCDenom,
 			// Legacy Noble-direct USDC. Still allowed: collections with a backed
