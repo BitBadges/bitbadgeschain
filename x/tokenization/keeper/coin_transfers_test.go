@@ -1222,3 +1222,104 @@ func (suite *TestSuite) TestCoinTransfer_AliasDenomAutoAllowed() {
 	suite.Require().Nil(err)
 	suite.Require().True(len(bobColl2Bal.Balances) > 0, "bob should have received collection 2 tokens via alias denom auto-allow")
 }
+
+// The point of BB-10 is that the canonical Injective-routed USDC denom is
+// actually spendable through x/tokenization — paid mints, payment requests,
+// subscriptions and prediction markets all settle through this path. The
+// allowlist reject path is covered by TestCoinTransfer_DenomNotInAllowedDenoms;
+// this covers the accept side for the specific denom the migration adds, and
+// asserts the coins really move rather than just that no error came back.
+func (suite *TestSuite) TestCoinTransfer_CanonicalUSDCIsSpendable() {
+	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+
+	wctx := sdk.WrapSDKContext(suite.ctx)
+
+	err := CreateCollections(suite, wctx, collectionsToCreate)
+	suite.Require().Nil(err, "error creating tokens")
+
+	// Canonical USDC must already be allowed out of the box — no test-local
+	// params edit. If DefaultParams stops carrying it, this test fails.
+	suite.Require().Contains(
+		suite.app.TokenizationKeeper.GetParams(suite.ctx).AllowedDenoms,
+		types.USDCDenom,
+		"canonical USDC must be allowed without a test-local params override",
+	)
+
+	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
+	suite.Require().Nil(err)
+	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
+	suite.Require().Nil(err)
+
+	usdcCoins := sdk.NewCoins(sdk.NewCoin(types.USDCDenom, sdkmath.NewInt(1000)))
+	err = suite.app.BankKeeper.MintCoins(suite.ctx, "mint", usdcCoins)
+	suite.Require().Nil(err, "Error minting canonical USDC")
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, "mint", bobAccAddr, usdcCoins)
+	suite.Require().Nil(err, "Error sending canonical USDC to bob")
+
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, types.USDCDenom)
+	suite.Require().Equal(sdkmath.NewInt(0), aliceBefore.Amount)
+
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 bob,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateOutgoingApprovals: true,
+		OutgoingApprovals: []*types.UserOutgoingApproval{
+			{
+				ToListId:          "AllWithoutMint",
+				InitiatedByListId: alice,
+				TransferTimes:     GetFullUintRanges(),
+				OwnershipTimes:    GetFullUintRanges(),
+				TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+				ApprovalId:        "canonical-usdc-test",
+				ApprovalCriteria: &types.OutgoingApprovalCriteria{
+					MaxNumTransfers: &types.MaxNumTransfers{
+						OverallMaxNumTransfers: sdkmath.NewUint(1000),
+						AmountTrackerId:        "canonical-usdc-tracker",
+					},
+					ApprovalAmounts: &types.ApprovalAmounts{
+						PerFromAddressApprovalAmount: sdkmath.NewUint(1),
+						AmountTrackerId:              "canonical-usdc-tracker",
+					},
+					CoinTransfers: []*types.CoinTransfer{
+						{
+							To:                              alice,
+							OverrideFromWithApproverAddress: true,
+							Coins: []*sdk.Coin{
+								{Amount: sdkmath.NewInt(100), Denom: types.USDCDenom},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	suite.Require().Nil(err, "error updating user approvals")
+
+	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      alice,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{
+			{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances: []*types.Balance{
+					{
+						OwnershipTimes: GetFullUintRanges(),
+						TokenIds:       GetOneUintRange(),
+						Amount:         sdkmath.NewUint(1),
+					},
+				},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{ApprovalId: "transfer", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)},
+					{ApprovalId: "canonical-usdc-test", ApprovalLevel: "outgoing", ApproverAddress: bob, Version: sdkmath.NewUint(0)},
+				},
+				OnlyCheckPrioritizedOutgoingApprovals: true,
+			},
+		},
+	})
+	suite.Require().Nil(err, "canonical USDC must be spendable through a coin transfer")
+
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, types.USDCDenom)
+	suite.Require().Equal(sdkmath.NewInt(100), aliceAfter.Amount,
+		"alice must actually receive the canonical USDC")
+}
