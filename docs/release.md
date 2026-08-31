@@ -4,13 +4,13 @@ Normally `.github/workflows/release.yml` does everything: push a `v*` tag and it
 builds the six binaries, generates `checksums.txt`, and creates the GitHub
 release.
 
-This document covers the case where it cannot — an **embargoed release**.
+This document covers the case where it cannot — a **private-module release**.
 
 ## When CI cannot build
 
 If `go.mod` carries a `replace` pointing `github.com/cosmos/evm` at a private
-hotfix repository, the Actions runner has no access to that module and every
-build job fails on `go mod download`. v33 and v34 were both in this position.
+repository, the Actions runner has no access to that module and every build job
+fails on `go mod download`. v33 and v34 were both in this position.
 
 `release.yml`'s `preflight` job detects that replace and skips the build and
 release jobs, so the tag produces a clean skip instead of a wall of red — and,
@@ -46,7 +46,7 @@ Two things that will cost you an hour if you miss them:
   no `CC`, so it assumes a native amd64 host, exactly like the runner. On an
   arm64 machine use `docker run --platform linux/amd64` (emulated).
 
-Then, with the embargoed module already in your local module cache:
+Then, with the private module already in your local module cache:
 
 ```sh
 make build-all-cross VERSION=v34
@@ -80,9 +80,9 @@ Do not upload a binary you have only compiled. At minimum:
 go version -m ./bitbadgeschain-linux-amd64 | grep cosmos/evm   # shows the replace
 ```
 
-The second one is the check that matters for an embargoed release: it proves the
-hotfix module is actually linked into the artifact operators will run, rather
-than the public module the tag *claims* to replace.
+The second one is the check that matters for a private-module release: it proves
+the pinned module is actually linked into the artifact operators will run,
+rather than the public module the tag *claims* to replace.
 
 Then start a single-validator chain from the real artifact and confirm it
 produces blocks. `scripts-dev/upgrade-rehearsal/` has the harness.

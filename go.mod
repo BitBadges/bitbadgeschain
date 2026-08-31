@@ -583,10 +583,8 @@ tool (
 	google.golang.org/protobuf/cmd/protoc-gen-go
 )
 
-// August 2026 cosmos/evm security hotfix (critical, fund loss, exploitable).
-// Points at the PRIVATE embargoed repo cosmos/evm-ghsa-aug-2026, tag
-// v0.7.3-august-2026-hotfix, which is public v0.7.2 plus the fix in
-// x/vm/statedb. Building from source requires read access to that repo; the
-// released binaries are the supported path for node operators. Revert to the
-// public cosmos/evm module once the fix lands in a public release.
+// cosmos/evm is pinned to a private module. Building from source requires read
+// access to it; the released binaries are the supported path for node
+// operators. Revert to the public cosmos/evm module once this pin is no longer
+// needed.
 replace github.com/cosmos/evm => github.com/cosmos/evm-ghsa-aug-2026 v0.7.3-august-2026-hotfix

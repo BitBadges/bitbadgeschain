@@ -18,15 +18,14 @@ env:
   GO_TEST_TIMEOUT: 30m
 
 jobs:
-  # While go.mod redirects cosmos/evm to the embargoed hotfix repo, the runner
-  # has no credentials for that private module and resolution fails before
-  # anything compiles. That made `Build & test` red on master and on every PR
-  # opened against it, so a red check stopped carrying any information about
-  # the change under review.
+  # While go.mod redirects cosmos/evm to a private module, the runner has no
+  # credentials for it and resolution fails before anything compiles. That made
+  # `Build & test` red on master and on every PR opened against it, so a red
+  # check stopped carrying any information about the change under review.
   #
   # release.yml already gates on this. Mirroring it here turns the wall of red
-  # into a deliberate skip, and keeps the gate honest the moment the public
-  # tag lands and the replace comes out.
+  # into a deliberate skip, and keeps the gate honest the moment the replace
+  # comes out.
   preflight:
     name: Can CI build this commit?
     runs-on: ubuntu-latest

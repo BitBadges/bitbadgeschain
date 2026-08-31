@@ -14,11 +14,10 @@ permissions:
   contents: write
 
 jobs:
-  # While go.mod pins cosmos/evm to an embargoed hotfix repo, this workflow
-  # cannot build: the runner has no access to that private module, so every
-  # build job fails on `go mod download`. The release binaries are built
-  # locally and uploaded to the release by hand for those releases -- see
-  # docs/release.md.
+  # While go.mod pins cosmos/evm to a private module, this workflow cannot
+  # build: the runner has no access to that module, so every build job fails on
+  # `go mod download`. The release binaries are built locally and uploaded to
+  # the release by hand for those releases -- see docs/release.md.
   #
   # This gate makes that an explicit, green skip rather than a wall of red
   # failures on the release tag, and stops the release job from running with
