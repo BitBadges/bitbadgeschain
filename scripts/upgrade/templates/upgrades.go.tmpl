@@ -1,0 +1,29 @@
+package __VERSION__
+
+import (
+	"context"
+
+	"github.com/cosmos/cosmos-sdk/types/module"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+)
+
+const UpgradeName = "__VERSION__"
+
+// CustomUpgradeHandlerLogic runs the chain-specific __VERSION__ work. It is
+// separate from the handler so it can be exercised directly in tests.
+func CustomUpgradeHandlerLogic(ctx context.Context) error {
+	_ = ctx
+	return nil
+}
+
+func CreateUpgradeHandler(
+	mm *module.Manager,
+	configurator module.Configurator,
+) func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		if err := CustomUpgradeHandlerLogic(ctx); err != nil {
+			return nil, err
+		}
+		return mm.RunMigrations(ctx, configurator, fromVM)
+	}
+}
