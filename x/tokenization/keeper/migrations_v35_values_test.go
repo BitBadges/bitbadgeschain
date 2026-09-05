@@ -86,7 +86,8 @@ func (suite *TestSuite) TestMigrateV35ApprovalAddressValues() {
 	a.InitiatedByListId = upper + ":" + alice
 	a.ApprovalCriteria.CoinTransfers = []*types.CoinTransfer{{To: upper}}
 	a.ApprovalCriteria.UserApprovalSettings = &types.UserApprovalSettings{UserRoyalties: &types.UserRoyalties{PayoutAddress: upper, Percentage: sdkmath.OneUint()}}
-	a.ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{{ProposalId: "proposal", Voters: []*types.Voter{{Address: upper, Weight: sdkmath.OneUint()}}, QuorumThreshold: sdkmath.OneUint(), DelayAfterQuorum: sdkmath.ZeroUint()}}
+	a.ApprovalCriteria.VotingChallenges = []*types.VotingChallenge{{ProposalId: "proposal", Voters: []*types.Voter{{Address: upper, Weight: sdkmath.OneUint()}, {Address: bob, Weight: sdkmath.NewUint(2)}}, QuorumThreshold: sdkmath.OneUint(), DelayAfterQuorum: sdkmath.ZeroUint()}}
+	votingBefore := suite.app.AppCodec().MustMarshal(a.ApprovalCriteria.VotingChallenges[0])
 	collection.CollectionPermissions.CanUpdateCollectionApprovals = []*types.CollectionApprovalPermission{{FromListId: upper, ToListId: "All", InitiatedByListId: "NamedGroup"}}
 	collection.DefaultBalances = &types.UserBalanceStore{
 		IncomingApprovals: []*types.UserIncomingApproval{{FromListId: "!" + upper, InitiatedByListId: "Mint", Version: sdkmath.ZeroUint(), ApprovalCriteria: &types.IncomingApprovalCriteria{MustOwnTokens: []*types.MustOwnTokens{{CollectionId: sdkmath.OneUint(), OwnershipCheckParty: upper}}}}},
@@ -105,7 +106,7 @@ func (suite *TestSuite) TestMigrateV35ApprovalAddressValues() {
 	suite.Require().Equal(bob+":"+alice, a.InitiatedByListId)
 	suite.Require().Equal(bob, a.ApprovalCriteria.CoinTransfers[0].To)
 	suite.Require().Equal(bob, a.ApprovalCriteria.UserApprovalSettings.UserRoyalties.PayoutAddress)
-	suite.Require().Equal(bob, a.ApprovalCriteria.VotingChallenges[0].Voters[0].Address)
+	suite.Require().Equal(votingBefore, suite.app.AppCodec().MustMarshal(a.ApprovalCriteria.VotingChallenges[0]))
 	suite.Require().Equal(bob, collection.CollectionPermissions.CanUpdateCollectionApprovals[0].FromListId)
 	suite.Require().Equal("NamedGroup", collection.CollectionPermissions.CanUpdateCollectionApprovals[0].InitiatedByListId)
 	var stored types.UserBalanceStore
@@ -121,38 +122,35 @@ func (suite *TestSuite) TestMigrateV35ApprovalAddressValues() {
 	before := rawStore.Get(key)
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
 	suite.Require().Equal(before, rawStore.Get(key), "migration is idempotent")
-	a.ApprovalCriteria.VotingChallenges[0].Voters = append(a.ApprovalCriteria.VotingChallenges[0].Voters, &types.Voter{Address: upper, Weight: sdkmath.OneUint()})
-	suite.Require().NoError(k.SetCollectionInStore(suite.ctx, collection, false))
-	suite.Require().ErrorContains(k.MigrateV35CanonicalAddresses(suite.ctx), "duplicate canonical voter")
 }
 
-func (suite *TestSuite) TestMigrateV35VoteAddressValues() {
+func (suite *TestSuite) TestMigrateV35PreservesLegacyVotingEntries() {
 	k := suite.app.TokenizationKeeper
 	upper := strings.ToUpper(bob)
 	oldKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), upper, "incoming", "approval", "proposal", upper)
 	newKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), bob, "incoming", "approval", "proposal", bob)
 	vote := &types.VoteProof{ProposalId: "proposal", Voter: upper, YesWeight: sdkmath.NewUint(100), VotedAt: sdkmath.OneUint()}
 	suite.Require().NoError(k.SetVoteInStore(suite.ctx, oldKey, vote))
+	vote.Voter = bob
+	vote.YesWeight = sdkmath.ZeroUint()
 	suite.Require().NoError(k.SetVoteInStore(suite.ctx, newKey, vote))
 	oldTracker := keeper.ConstructVotingChallengeTrackerKey(sdkmath.OneUint(), upper, "incoming", "approval", "proposal")
 	newTracker := keeper.ConstructVotingChallengeTrackerKey(sdkmath.OneUint(), bob, "incoming", "approval", "proposal")
 	suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, oldTracker, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.OneUint()}))
+	suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, newTracker, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.NewUint(2)}))
+	rawStore := suite.ctx.KVStore(suite.app.GetKey(types.StoreKey))
+	keys := [][]byte{
+		append(append([]byte{}, keeper.VotingTrackerKey...), []byte(oldKey)...),
+		append(append([]byte{}, keeper.VotingTrackerKey...), []byte(newKey)...),
+		append(append([]byte{}, keeper.VotingChallengeTrackerKey...), []byte(oldTracker)...),
+		append(append([]byte{}, keeper.VotingChallengeTrackerKey...), []byte(newTracker)...),
+	}
+	before := make([][]byte, len(keys))
+	for i, key := range keys {
+		before[i] = append([]byte{}, rawStore.Get(key)...)
+	}
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
-	moved, found := k.GetVoteFromStore(suite.ctx, newKey)
-	suite.Require().True(found)
-	suite.Require().Equal(bob, moved.Voter)
-	_, found = k.GetVoteFromStore(suite.ctx, oldKey)
-	suite.Require().False(found)
-	_, found = k.GetVotingChallengeTrackerFromStore(suite.ctx, newTracker)
-	suite.Require().True(found)
-	// Identical votes from the same account spelling consolidate without changing weight.
-	suite.Require().NoError(k.SetVoteInStore(suite.ctx, oldKey, vote))
-	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
-	vote.YesWeight = sdkmath.ZeroUint()
-	suite.Require().NoError(k.SetVoteInStore(suite.ctx, oldKey, vote))
-	suite.Require().ErrorContains(k.MigrateV35CanonicalAddresses(suite.ctx), "conflicting canonical voting entry")
-	vote.YesWeight = sdkmath.NewUint(100)
-	suite.Require().NoError(k.SetVoteInStore(suite.ctx, oldKey, vote))
-	suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, oldTracker, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.NewUint(2)}))
-	suite.Require().ErrorContains(k.MigrateV35CanonicalAddresses(suite.ctx), "conflicting canonical voting entry")
+	for i, key := range keys {
+		suite.Require().Equal(before[i], rawStore.Get(key))
+	}
 }

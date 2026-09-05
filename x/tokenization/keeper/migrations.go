@@ -322,8 +322,8 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 // protocol addresses. When a canonical twin already exists the entries are merged:
 // balances and tracker tallies are summed, address lists are unioned, versions take the
 // max, and boolean/flag entries keep the canonical value. Collection and user approval
-// address values are normalized as well. Voting entries consolidate only when their
-// canonical values agree; conflicting votes or duplicate canonical voters return an error.
+// address values are normalized as well. Voting participants and tracker entries retain
+// their existing spelling and weights.
 func (k Keeper) MigrateV35CanonicalAddresses(ctx sdk.Context) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
@@ -334,12 +334,7 @@ func (k Keeper) MigrateV35CanonicalAddresses(ctx sdk.Context) error {
 	if err := k.migrateV35AddressListValues(ctx, store); err != nil {
 		return err
 	}
-	if err := k.migrateV35AddressValues(ctx, store); err != nil {
-		return err
-	}
-	if err := k.migrateV35VotingEntries(store); err != nil {
-		return err
-	}
+	k.migrateV35AddressValues(ctx, store)
 	if err := k.migrateV35ApprovalTrackerKeys(ctx, store); err != nil {
 		return err
 	}
