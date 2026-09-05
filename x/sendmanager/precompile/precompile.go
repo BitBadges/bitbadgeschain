@@ -28,6 +28,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 	sendmanagertypes "github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 )
@@ -114,7 +115,7 @@ func NewPrecompile(
 		sendManagerKeeper: sendManagerKeeper,
 	}
 	if bankKeeper != nil {
-		p.BalanceHandlerFactory = cmn.NewBalanceHandlerFactory(bankKeeper)
+		p.BalanceHandlerFactory = evmcompat.NewBalanceHandlerFactory(bankKeeper)
 	}
 	return p
 }

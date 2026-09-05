@@ -42,6 +42,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
@@ -161,7 +162,7 @@ func NewPrecompile(
 		gammKeeper: gammKeeper,
 	}
 	if bankKeeper != nil {
-		p.BalanceHandlerFactory = cmn.NewBalanceHandlerFactory(bankKeeper)
+		p.BalanceHandlerFactory = evmcompat.NewBalanceHandlerFactory(bankKeeper)
 	}
 	return p
 }

@@ -188,7 +188,7 @@ func NewPrecompile(
 		tokenizationKeeper: tokenizationKeeper,
 	}
 	if bankKeeper != nil {
-		p.BalanceHandlerFactory = cmn.NewBalanceHandlerFactory(bankKeeper)
+		p.BalanceHandlerFactory = evmcompat.NewBalanceHandlerFactory(bankKeeper)
 	}
 	return p
 }
