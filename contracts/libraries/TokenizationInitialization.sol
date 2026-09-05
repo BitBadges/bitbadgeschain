@@ -29,6 +29,18 @@ library TokenizationInitialization {
         precompile.setCollectionApprovals(TokenizationJSONHelpers.setCollectionApprovalsJSON(collectionId, "[]", "[]"));
     }
 
+    // The wrapper enforces holder authorization and compliance before calling the precompile.
+    function approveWrapperTransfers(ITokenizationPrecompile precompile, uint256 collectionId) internal {
+        string memory fullRange = '[{"start":"1","end":"18446744073709551615"}]';
+        string memory approval = string(abi.encodePacked(
+            '[{"approvalId":"wrapper-transfers","fromListId":"!Mint","toListId":"All",',
+            '"initiatedByListId":"', _addressToBech32(address(this)),
+            '","transferTimes":', fullRange, ',"tokenIds":[{"start":"1","end":"1"}],"ownershipTimes":', fullRange,
+            ',"approvalCriteria":{"overridesFromOutgoingApprovals":true,"overridesToIncomingApprovals":true}}]'
+        ));
+        precompile.setCollectionApprovals(TokenizationJSONHelpers.setCollectionApprovalsJSON(collectionId, approval, "[]"));
+    }
+
     // Approval list literals use the chain's bb address format.
     function _addressToBech32(address account) private pure returns (string memory) {
         bytes memory alphabet = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";

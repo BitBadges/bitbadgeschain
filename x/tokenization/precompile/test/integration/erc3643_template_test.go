@@ -6,6 +6,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (suite *ERC3643TokenizationTestSuite) TestTemplateInitializationAndRegistry() {
@@ -50,7 +51,10 @@ func (suite *ERC3643TokenizationTestSuite) checkTemplateInitialization(supply *b
 	collectionID := sdkmath.NewUintFromBigInt(call("collectionId", true)[0].(*big.Int))
 	collection, found := suite.TokenizationKeeper.GetCollectionFromStore(suite.Ctx, collectionID)
 	suite.Require().True(found)
-	suite.Empty(collection.CollectionApprovals, "initial issuance permission must be removed")
+	suite.Require().Len(collection.CollectionApprovals, 1)
+	suite.Equal("wrapper-transfers", collection.CollectionApprovals[0].ApprovalId)
+	suite.Equal("!Mint", collection.CollectionApprovals[0].FromListId, "initial issuance permission must be removed")
+	suite.Equal(sdk.AccAddress(address.Bytes()).String(), collection.CollectionApprovals[0].InitiatedByListId)
 	suite.Empty(collection.DefaultBalances.Balances)
 	balance, _, err := suite.TokenizationKeeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice.String())
 	suite.Require().NoError(err)
