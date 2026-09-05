@@ -5,8 +5,10 @@ go 1.26.6
 replace (
 	// use cosmos fork of keyring (cosmos/evm v0.7.0-beta.0)
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	// use Cosmos geth fork — branch release/1.17 (cosmos/evm v0.7.0-beta.0)
-	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.17.2-cosmos-0
+	// use Cosmos geth fork — branch release/1.17 (cosmos/evm v0.7.0-beta.0).
+	// v1.17.2-cosmos-1 adds the EIP-712 EncodeType fix for empty types
+	// (cosmos/go-ethereum#16, upstream go-ethereum#33702).
+	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.17.2-cosmos-1
 	// Security advisory GHSA-h395-qcrw-5vmq (cosmos/evm v0.7.0-beta.0)
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 	// replace broken goleveldb

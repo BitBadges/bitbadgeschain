@@ -15,6 +15,23 @@ import (
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
+// EIP-712 acceptance change (no store migration).
+//
+// v35 also changes which Cosmos-tx signatures the ante handler accepts, so
+// every validator must run the same binary from the upgrade height:
+//
+//   - go-ethereum moves to cosmos/go-ethereum v1.17.2-cosmos-1, whose
+//     EncodeType renders an empty struct type as `Name()` (upstream
+//     go-ethereum#33702). EIP-712-signed txs whose typed-data tree contains an
+//     empty sub-struct now verify; before, the chain-side hash never matched
+//     the wallet's.
+//   - The app now initialises cosmos/evm's EIP-712 verifier codecs
+//     (eip712.SetEncodingConfig in app/evm.go) and registers the tokenization
+//     and managersplitter amino msg types on the app's legacy amino codec, so
+//     EIP-712 signatures over those msgs verify at all.
+//
+// Regression coverage: app/eip712_sign_test.go.
+
 const (
 	UpgradeName = "v35"
 
