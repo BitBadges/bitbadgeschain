@@ -73,7 +73,7 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
 		}
 		// JSON syntax is valid but protobuf unmarshaling failed
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s. JSON was: %s", msg, err, jsonStr))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s", msg, err))
 	}
 
 	// Set Sender field from contract caller (security: override any value in JSON)
@@ -163,7 +163,7 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
 		}
 		// JSON syntax is valid but protobuf unmarshaling failed
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal query JSON into %T: %s. JSON was: %s", queryReq, err, jsonStr))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal query JSON into %T: %s", queryReq, err))
 	}
 
 	// Validate query request using ValidateBasic if available

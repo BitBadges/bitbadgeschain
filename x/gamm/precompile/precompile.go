@@ -634,16 +634,16 @@ func LogPrecompileUsage(ctx sdk.Context, method string, success bool, gasUsed ui
 			if precompileErr.Details != "" {
 				logFields = append(logFields, "error_details", precompileErr.Details)
 			}
-			logger.Error("precompile error", logFields...)
+			logger.Debug("precompile error", logFields...)
 		} else {
-			logger.Error("precompile error",
+			logger.Debug("precompile error",
 				"method", method,
 				"error", err.Error(),
 				"gas_used", gasUsed,
 			)
 		}
 	} else {
-		logger.Info("precompile success",
+		logger.Debug("precompile success",
 			"method", method,
 			"gas_used", gasUsed,
 		)

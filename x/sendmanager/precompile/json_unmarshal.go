@@ -72,7 +72,7 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
 		}
 		// JSON syntax is valid but protobuf unmarshaling failed
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s. JSON was: %s", msg, err, jsonStr))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s", msg, err))
 	}
 
 	// Set from_address field from contract caller (security: override any value in JSON)
