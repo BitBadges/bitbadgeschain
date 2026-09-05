@@ -2,7 +2,6 @@ package poolmanager
 
 import (
 	"fmt"
-	"sync"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -27,11 +26,6 @@ type Keeper struct {
 
 	// routes is a map to get the pool module by id.
 	routes map[types.PoolType]types.PoolModuleI
-
-	// map from poolId to the swap module + Gas consumed amount
-	// note that after getPoolModule doesn't return an error
-	// it will always return the same result. Meaning its perfect for a sync.map cache.
-	cachedPoolModules *sync.Map
 
 	// poolModules is a list of all pool modules.
 	// It is used when an operation has to be applied to all pool
@@ -63,7 +57,6 @@ func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gam
 		gammKeeper,
 	}
 
-	cachedPoolModules := &sync.Map{}
 	cachedTakerFeeShareAgreementMap := make(map[string]types.TakerFeeShareAgreement)
 	cachedRegisteredAlloyPoolMap := make(map[string]types.AlloyContractTakerFeeShareState)
 
@@ -77,15 +70,14 @@ func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gam
 		routes:                                   routesMap,
 		poolModules:                              routesList,
 		stakingKeeper:                            stakingKeeper,
-		cachedPoolModules:                        cachedPoolModules,
 		cachedTakerFeeShareAgreementMap:          cachedTakerFeeShareAgreementMap,
 		cachedRegisteredAlloyPoolByAlloyDenomMap: cachedRegisteredAlloyPoolMap,
 	}
 }
 
-func (k *Keeper) ResetCaches() {
-	k.cachedPoolModules = &sync.Map{}
-}
+// ResetCaches is retained for callers that previously reset the route cache.
+// Routes are now read directly from the caller's context.
+func (k *Keeper) ResetCaches() {}
 
 // GetParams returns the total set of poolmanager parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
