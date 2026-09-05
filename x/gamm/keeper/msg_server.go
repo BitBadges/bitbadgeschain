@@ -35,6 +35,9 @@ var (
 // CreateBalancerPool is a create balancer pool message.
 func (server msgServer) CreateBalancerPool(goCtx context.Context, msg *balancer.MsgCreateBalancerPool) (*balancer.MsgCreateBalancerPoolResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 	poolId, err := server.CreatePool(goCtx, msg)
 	if err != nil {
 		return nil, err
@@ -83,6 +86,9 @@ func (server msgServer) CreatePool(goCtx context.Context, msg poolmanagertypes.C
 // * For the case of a not containing tokens, we simply perform calculation of sharesOut and needed amount of tokens for joining the pool
 func (server msgServer) JoinPool(goCtx context.Context, msg *types.MsgJoinPool) (*types.MsgJoinPoolResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -114,6 +120,9 @@ func (server msgServer) JoinPool(goCtx context.Context, msg *types.MsgJoinPool) 
 
 func (server msgServer) ExitPool(goCtx context.Context, msg *types.MsgExitPool) (*types.MsgExitPoolResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -144,6 +153,9 @@ func (server msgServer) ExitPool(goCtx context.Context, msg *types.MsgExitPool) 
 
 func (server msgServer) SwapExactAmountIn(goCtx context.Context, msg *types.MsgSwapExactAmountIn) (*types.MsgSwapExactAmountInResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -184,6 +196,9 @@ func (server msgServer) SwapExactAmountIn(goCtx context.Context, msg *types.MsgS
 
 func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, msg *types.MsgSwapExactAmountInWithIBCTransfer) (*types.MsgSwapExactAmountInWithIBCTransferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -240,6 +255,9 @@ func (server msgServer) SwapExactAmountInWithIBCTransfer(goCtx context.Context, 
 
 func (server msgServer) SwapExactAmountOut(goCtx context.Context, msg *types.MsgSwapExactAmountOut) (*types.MsgSwapExactAmountOutResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -272,6 +290,9 @@ func (server msgServer) SwapExactAmountOut(goCtx context.Context, msg *types.Msg
 // For more details on the calculation of the number of shares look at the CalcJoinPoolShares function for the appropriate pool style
 func (server msgServer) JoinSwapExternAmountIn(goCtx context.Context, msg *types.MsgJoinSwapExternAmountIn) (*types.MsgJoinSwapExternAmountInResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -301,6 +322,9 @@ func (server msgServer) JoinSwapExternAmountIn(goCtx context.Context, msg *types
 
 func (server msgServer) JoinSwapShareAmountOut(goCtx context.Context, msg *types.MsgJoinSwapShareAmountOut) (*types.MsgJoinSwapShareAmountOutResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -329,6 +353,9 @@ func (server msgServer) JoinSwapShareAmountOut(goCtx context.Context, msg *types
 
 func (server msgServer) ExitSwapExternAmountOut(goCtx context.Context, msg *types.MsgExitSwapExternAmountOut) (*types.MsgExitSwapExternAmountOutResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
@@ -357,6 +384,9 @@ func (server msgServer) ExitSwapExternAmountOut(goCtx context.Context, msg *type
 
 func (server msgServer) ExitSwapShareAmountIn(goCtx context.Context, msg *types.MsgExitSwapShareAmountIn) (*types.MsgExitSwapShareAmountInResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
