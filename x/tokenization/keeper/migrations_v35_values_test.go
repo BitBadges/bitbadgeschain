@@ -124,7 +124,7 @@ func (suite *TestSuite) TestMigrateV35ApprovalAddressValues() {
 	suite.Require().Equal(before, rawStore.Get(key), "migration is idempotent")
 }
 
-func (suite *TestSuite) TestMigrateV35PreservesLegacyVotingEntries() {
+func (suite *TestSuite) TestMigrateV35PreservesVoterEntriesAndNormalizesApproverScope() {
 	k := suite.app.TokenizationKeeper
 	upper := strings.ToUpper(bob)
 	oldKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), upper, "incoming", "approval", "proposal", upper)
@@ -150,7 +150,13 @@ func (suite *TestSuite) TestMigrateV35PreservesLegacyVotingEntries() {
 		before[i] = append([]byte{}, rawStore.Get(key)...)
 	}
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
-	for i, key := range keys {
-		suite.Require().Equal(before[i], rawStore.Get(key))
-	}
+	movedKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), bob, "incoming", "approval", "proposal", upper)
+	movedStoreKey := append(append([]byte{}, keeper.VotingTrackerKey...), []byte(movedKey)...)
+	suite.Require().False(rawStore.Has(keys[0]))
+	suite.Require().Equal(before[0], rawStore.Get(movedStoreKey), "legacy voter spelling and vote bytes are preserved in the canonical approver scope")
+	suite.Require().Equal(before[1], rawStore.Get(keys[1]), "the existing canonical voter record is not combined with a different spelling")
+	suite.Require().False(rawStore.Has(keys[2]))
+	tracker, found := k.GetVotingChallengeTrackerFromStore(suite.ctx, newTracker)
+	suite.Require().True(found)
+	suite.Require().True(tracker.QuorumReachedTimestamp.IsZero(), "a combined approver scope requires a fresh vote to restart its delay")
 }

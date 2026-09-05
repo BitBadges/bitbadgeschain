@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -322,12 +322,13 @@ func MigrateDynamicStores(ctx context.Context, store storetypes.KVStore, k Keepe
 // protocol addresses. When a canonical twin already exists the entries are merged:
 // balances and tracker tallies are summed, address lists are unioned, versions take the
 // max, and boolean/flag entries keep the canonical value. Collection and user approval
-// address values are normalized as well. Voting participants and tracker entries retain
-// their existing spelling and weights.
+// address values are normalized as well. Voting participant slots retain their spelling
+// and weights; only their user-level approver scope is normalized.
 func (k Keeper) MigrateV35CanonicalAddresses(ctx sdk.Context) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 
+	votingBalanceCollisions := collectV35VotingBalanceCollisions(store)
 	if err := k.migrateV35BalanceKeys(ctx, store); err != nil {
 		return err
 	}
@@ -351,6 +352,7 @@ func (k Keeper) MigrateV35CanonicalAddresses(ctx sdk.Context) error {
 	}
 	migrateV35DynamicStoreValueKeys(store)
 	migrateV35ReservedProtocolAddressKeys(store)
+	k.migrateV35VotingApproverKeys(store, votingBalanceCollisions)
 	return nil
 }
 
