@@ -29,18 +29,7 @@ FUND=100000000000000
 "$BIN" genesis gentx v "50000000000${BOND_DENOM}" --chain-id "$CHAIN_ID" "${KR[@]}" --home "$DH" >/dev/null 2>&1
 "$BIN" genesis collect-gentxs --home "$DH" >/dev/null 2>&1
 
-python3 - "$DH/config/app.toml" <<'PY'
-import re,sys
-p=sys.argv[1]; s=open(p).read()
-def fix(section, key, val, s):
-    m=re.search(r'(?ms)^\['+re.escape(section)+r'\].*?(?=^\[|\Z)', s)
-    if not m: return s
-    nb=re.sub(r'(?m)^'+re.escape(key)+r'\s*=.*$', f'{key} = {val}', m.group(0))
-    return s[:m.start()]+nb+s[m.end():]
-s=fix('json-rpc','enable','true',s)
-s=fix('json-rpc','address','"127.0.0.1:8545"',s)
-open(p,'w').write(s)
-PY
+enable_rpc_and_api "$DH/config/app.toml"
 
 step "2. Start the node"
 "$BIN" start --home "$DH" --minimum-gas-prices "0${BOND_DENOM}" > "$LOG_DIR/evmnode.log" 2>&1 &
@@ -81,6 +70,11 @@ if [ -n "$TXH" ]; then
 else
   red "  FAIL  could not parse tx hash"; head -5 <<<"$SEND_OUT"; FAILED=$((FAILED+1))
 fi
+
+step "5. EVM value transfers over JSON-RPC"
+# shellcheck source=../lib/evm_transfer.sh
+. "$(dirname "$0")/../lib/evm_transfer.sh"
+HOME_DIR=$DH RPC_URL=$RPC API_URL=http://127.0.0.1:1317 EVMTX=${EVMTX:-/out/evmtx} FUNDER=v evm_transfer_checks
 
 kill "$PID" 2>/dev/null || true
 wait "$PID" 2>/dev/null || true

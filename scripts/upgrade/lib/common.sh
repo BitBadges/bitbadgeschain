@@ -56,6 +56,24 @@ go_version_of_gomod() {
   echo "${tc:-$go}"
 }
 
+# enable_rpc_and_api <app.toml>: turn on the EVM JSON-RPC server (8545) and
+# the REST API (1317), each within its own section only.
+enable_rpc_and_api() {
+  python3 - "$1" <<'PYEOF'
+import re,sys
+p=sys.argv[1]; s=open(p).read()
+def fix(section, key, val, s):
+    m=re.search(r'(?ms)^\['+re.escape(section)+r'\].*?(?=^\[|\Z)', s)
+    if not m: return s
+    nb=re.sub(r'(?m)^'+re.escape(key)+r'\s*=.*$', f'{key} = {val}', m.group(0))
+    return s[:m.start()]+nb+s[m.end():]
+s=fix('json-rpc','enable','true',s)
+s=fix('json-rpc','address','"127.0.0.1:8545"',s)
+s=fix('api','enable','true',s)
+open(p,'w').write(s)
+PYEOF
+}
+
 summary() {
   echo
   if [ "$FAILED" -eq 0 ]; then grn "$1"; else red "$FAILED check(s) failed"; fi

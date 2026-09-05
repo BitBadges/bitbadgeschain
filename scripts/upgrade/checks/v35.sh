@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Post-upgrade assertions for v35. Run by container/upgrade.sh after the
 # upgrade applied, with BIN (the v35 binary), HOME_DIR, UPGRADE_HEIGHT, LOG
-# and API_URL (REST) in the environment. Exit code = number of failed checks.
+# API_URL (REST), RPC_URL (JSON-RPC), EVMTX, CHAIN_ID and FUNDER in the
+# environment. Exit code = number of failed checks.
 set -uo pipefail
 # shellcheck source=../lib/common.sh
 . "$(dirname "$0")/../lib/common.sh"
@@ -15,5 +16,10 @@ MIN_GAS_PRICE=$(curl -s --max-time 10 "$API_URL/cosmos/evm/feemarket/v1/params" 
 ylw "  feemarket min_gas_price : ${MIN_GAS_PRICE:-<none>}"
 check "feemarket min_gas_price is 10 after v35" \
   python3 -c 'import sys; from decimal import Decimal; sys.exit(0 if Decimal(sys.argv[1]) == 10 else 1)' "${MIN_GAS_PRICE:-0}"
+
+# EVM value transfers on the upgraded node (see lib/evm_transfer.sh).
+# shellcheck source=../lib/evm_transfer.sh
+. "$(dirname "$0")/../lib/evm_transfer.sh"
+evm_transfer_checks
 
 exit "$FAILED"

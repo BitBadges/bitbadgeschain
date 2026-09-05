@@ -102,13 +102,13 @@ export_src() { # <sha> <dir>
   rm -rf "$2"; mkdir -p "$2"
   git -C "$REPO" archive "$1" | tar -x -C "$2"
 }
-build_in_docker() { # <label> <src> <go> <out> <commit>
-  docker run --rm \
+build_in_docker() { # <label> <src> <go> <out> <commit> [evmtx src]
+  docker run --rm -e "EVMTX_SRC=${6:-}" -v "$SCRIPT_DIR/evmtx:/scripts/evmtx:ro" \
     -v "$HOST_MODCACHE:/hostmod:ro" -v bb-gomod:/gomodcache -v bb-gobuild:/gobuild \
     -v "$2:/src/$1:ro" -v "$WORKDIR/bin:/out" -v "$SCRIPT_DIR/container:/scripts/container:ro" \
     "$IMAGE" bash /scripts/container/build.sh "$1" "/src/$1" "$3" "$4" "$5"
 }
-if $SKIP_BUILD && [ -x "$WORKDIR/bin/bitbadgeschaind-$FROM_LABEL" ] && [ -x "$WORKDIR/bin/bitbadgeschaind-$TO_LABEL" ] && [ -x "$WORKDIR/bin/cosmovisor" ]; then
+if $SKIP_BUILD && [ -x "$WORKDIR/bin/bitbadgeschaind-$FROM_LABEL" ] && [ -x "$WORKDIR/bin/bitbadgeschaind-$TO_LABEL" ] && [ -x "$WORKDIR/bin/cosmovisor" ] && [ -x "$WORKDIR/bin/evmtx" ]; then
   ylw "--skip-build: reusing binaries in $WORKDIR/bin"
 else
   step "Build $FROM_LABEL (go$FROM_GO)"
@@ -116,7 +116,7 @@ else
   build_in_docker "$FROM_LABEL" "$WORKDIR/src/$FROM_LABEL" "$FROM_GO" "$FROM_BIN" "$FROM_SHA" || die "build of $FROM failed"
   step "Build $TO_LABEL (go$TO_GO)"
   export_src "$TO_SHA" "$WORKDIR/src/$TO_LABEL"
-  build_in_docker "$TO_LABEL" "$WORKDIR/src/$TO_LABEL" "$TO_GO" "$TO_BIN" "$TO_SHA" || die "build of $TO failed"
+  build_in_docker "$TO_LABEL" "$WORKDIR/src/$TO_LABEL" "$TO_GO" "$TO_BIN" "$TO_SHA" /scripts/evmtx || die "build of $TO failed"
   step "Build cosmovisor (go$CV_GO)"
   build_in_docker cosmovisor "$SCRIPT_DIR/cosmovisor" "$CV_GO" /out/cosmovisor "$(git -C "$REPO" rev-parse HEAD)" || die "build of cosmovisor failed"
 fi
@@ -129,7 +129,7 @@ run_stage() { # <name> <script>
   set +e
   docker run --rm \
     -e FROM_BIN="$FROM_BIN" -e TO_BIN="$TO_BIN" -e CV=/out/cosmovisor \
-    -e UPGRADE_NAME="$NAME" -e CHECKS_DIR=/scripts/checks -e LOG_DIR=/logs \
+    -e UPGRADE_NAME="$NAME" -e CHECKS_DIR=/scripts/checks -e LOG_DIR=/logs -e EVMTX=/out/evmtx \
     -v "$WORKDIR/bin:/out:ro" -v "$SCRIPT_DIR:/scripts:ro" -v "$WORKDIR/logs:/logs" \
     "$IMAGE" bash "/scripts/container/$2" 2>&1 | tee "$WORKDIR/logs/stage-$1.txt"
   rc=${PIPESTATUS[0]}

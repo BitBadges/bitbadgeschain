@@ -30,3 +30,12 @@ else
 fi
 chmod +x "$OUT"
 "$OUT" version 2>/dev/null | head -1 || true
+
+# The evmtx helper is built inside the TO tree so go-ethereum resolves from
+# the chain's own go.mod. EVMTX_SRC points at scripts/upgrade/evmtx.
+if [ -n "${EVMTX_SRC:-}" ] && [ -f cmd/bitbadgeschaind/main.go ]; then
+  rm -rf scripts/upgrade/evmtx; mkdir -p scripts/upgrade/evmtx
+  cp "$EVMTX_SRC"/*.go scripts/upgrade/evmtx/
+  echo "building evmtx -> /out/evmtx"
+  CGO_ENABLED=1 go build -trimpath -o /out/evmtx ./scripts/upgrade/evmtx
+fi

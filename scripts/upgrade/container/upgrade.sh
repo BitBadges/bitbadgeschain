@@ -47,17 +47,13 @@ genesis_json_set "$G" '.app_state.gov.params.voting_period="15s"
 "$FROM_BIN" genesis validate-genesis --home "$DH" >/dev/null 2>&1 || die "genesis did not validate"
 grn "chain initialised (bond denom $BOND_DENOM, deposit denom $DEPOSIT_DENOM)"
 
-# The REST API server is enabled so checks/<name>.sh can read module params
-# that have no CLI query (cosmos/evm's feemarket, for one). This is the only
-# app.toml edit, and it happens before the snapshot below.
-python3 - "$DH/config/app.toml" <<'PYEOF'
-import re,sys
-p=sys.argv[1]; s=open(p).read()
-m=re.search(r'(?ms)^\[api\].*?(?=^\[|\Z)', s)
-blk=re.sub(r'(?m)^enable\s*=.*$', 'enable = true', m.group(0))
-open(p,'w').write(s[:m.start()]+blk+s[m.end():])
-PYEOF
+# The REST API and EVM JSON-RPC servers are enabled so checks/<name>.sh can
+# read module params that have no CLI query (cosmos/evm's feemarket) and
+# exercise EVM transfers on the upgraded node. This is the only app.toml
+# edit, and it happens before the snapshot below.
+enable_rpc_and_api "$DH/config/app.toml"
 API_URL=http://127.0.0.1:1317
+RPC_URL=http://127.0.0.1:8545
 
 # Snapshot the config files. Nothing in this script writes to them after this
 # point, so any change at the end was made by the TO binary's pre-upgrade hook.
@@ -131,7 +127,8 @@ step "7. Post-upgrade assertions for $UPGRADE_NAME"
 HOOK="$CHECKS_DIR/$UPGRADE_NAME.sh"
 if [ -f "$HOOK" ] && [ "$UPGRADED" = 1 ]; then
   set +e
-  BIN="$TO_BIN" HOME_DIR="$DH" UPGRADE_HEIGHT="$UPGRADE_HEIGHT" LOG="$LOG" API_URL="$API_URL" bash "$HOOK"
+  BIN="$TO_BIN" HOME_DIR="$DH" UPGRADE_HEIGHT="$UPGRADE_HEIGHT" LOG="$LOG" API_URL="$API_URL" \
+    RPC_URL="$RPC_URL" EVMTX="${EVMTX:-/out/evmtx}" CHAIN_ID="$CHAIN_ID" FUNDER=validator bash "$HOOK"
   HOOK_FAILED=$?
   set -e
   FAILED=$((FAILED + HOOK_FAILED))
