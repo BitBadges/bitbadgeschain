@@ -116,9 +116,15 @@ func ValidateAddress(address string, alowMint bool) error {
 	}
 
 	// Validate address using global SDK config (should be "bb" prefix)
-	_, err := sdk.AccAddressFromBech32(address)
+	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s", err)
+	}
+
+	// bech32 decoding also accepts the all-uppercase spelling; addresses are used as
+	// store keys and compared as strings, so only the canonical spelling is accepted.
+	if accAddr.String() != address {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s is not in canonical form (expected %s)", address, accAddr.String())
 	}
 	return nil
 }

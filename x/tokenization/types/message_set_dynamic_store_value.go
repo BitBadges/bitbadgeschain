@@ -49,7 +49,7 @@ func (msg *MsgSetDynamicStoreValue) ValidateBasic() error {
 	if len(msg.Address) == 0 {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "address cannot be empty")
 	}
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	err := ValidateAddress(msg.Creator, false)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
