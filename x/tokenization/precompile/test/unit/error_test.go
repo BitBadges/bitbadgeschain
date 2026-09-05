@@ -22,7 +22,7 @@ import (
 // TestPrecompile_ErrorScenarios tests various error conditions
 func TestPrecompile_ErrorScenarios(t *testing.T) {
 	tokenizationKeeper, _ := keepertest.TokenizationKeeper(t)
-	precompile := tokenization.NewPrecompile(tokenizationKeeper)
+	precompile := tokenization.NewPrecompile(tokenizationKeeper, nil)
 
 	// Test address for building JSON
 	testAddr := common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")

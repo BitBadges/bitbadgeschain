@@ -37,11 +37,11 @@ func (suite *CallerVerificationTestSuite) SetupTest() {
 
 	// Create tokenization precompile
 	tokenizationKeeper := suite.TestSuite.App.TokenizationKeeper
-	suite.TokenizationPrecompile = tokenization.NewPrecompile(tokenizationKeeper)
+	suite.TokenizationPrecompile = tokenization.NewPrecompile(tokenizationKeeper, nil)
 
 	// Create gamm precompile
 	gammKeeper := suite.TestSuite.App.GammKeeper
-	suite.GammPrecompile = gamm.NewPrecompile(gammKeeper)
+	suite.GammPrecompile = gamm.NewPrecompile(gammKeeper, nil)
 }
 
 func (suite *CallerVerificationTestSuite) TestSendManager_CallerIsAutoSet() {

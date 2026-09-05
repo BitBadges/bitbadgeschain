@@ -63,7 +63,7 @@ func NewTestSuite() *TestSuite {
 	params.InitSDKConfigWithoutSeal()
 
 	keeper, ctx := keepertest.TokenizationKeeper(nil)
-	precompile := tokenization.NewPrecompile(keeper)
+	precompile := tokenization.NewPrecompile(keeper, nil)
 	msgServer := tokenizationkeeper.NewMsgServerImpl(keeper)
 
 	// Create test EVM addresses

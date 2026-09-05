@@ -141,10 +141,17 @@ type Precompile struct {
 
 // NewPrecompile creates a new gamm Precompile instance implementing the
 // PrecompiledContract interface.
+//
+// bankKeeper feeds the balance handler that replays the bank events emitted
+// by the keeper (swap inputs and outputs, pool joins and exits) into the EVM
+// StateDB, so that a balance the precompile moved is not overwritten by the
+// StateDB at commit. It may be nil only for unit tests that never run inside
+// the EVM.
 func NewPrecompile(
 	gammKeeper gammkeeper.Keeper,
+	bankKeeper cmn.BankKeeper,
 ) *Precompile {
-	return &Precompile{
+	p := &Precompile{
 		Precompile: cmn.Precompile{
 			KvGasConfig:          storetypes.GasConfig{},
 			TransientKVGasConfig: storetypes.GasConfig{},
@@ -153,6 +160,10 @@ func NewPrecompile(
 		ABI:        ABI,
 		gammKeeper: gammKeeper,
 	}
+	if bankKeeper != nil {
+		p.BalanceHandlerFactory = cmn.NewBalanceHandlerFactory(bankKeeper)
+	}
+	return p
 }
 
 // GammPrecompileAddress is the address of the gamm precompile

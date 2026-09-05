@@ -14,7 +14,7 @@ import (
 // which should be done in the tokenization module's integration test suite
 func TestIntegration_PrecompileSetup(t *testing.T) {
 	tokenizationKeeper, ctx := keepertest.TokenizationKeeper(t)
-	precompile := tokenization.NewPrecompile(tokenizationKeeper)
+	precompile := tokenization.NewPrecompile(tokenizationKeeper, nil)
 
 	require.NotNil(t, precompile)
 	require.NotNil(t, ctx)

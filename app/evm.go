@@ -230,17 +230,17 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 // This ensures all custom precompiles are registered and prevents address collisions
 func (app *App) registerCustomPrecompiles() {
 	// Register tokenization precompile
-	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper, app.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 
 	// Register gamm precompile
-	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper, app.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 
 	// Register sendmanager precompile
-	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper)
+	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper, app.PreciseBankKeeper)
 	sendManagerPrecompileAddr := common.HexToAddress(sendmanagerprecompile.SendManagerPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(sendManagerPrecompileAddr, sendManagerPrecompile)
 
