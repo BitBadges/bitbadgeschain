@@ -154,6 +154,17 @@ func (p Params) FindMatchingConfig(channelID, denom string) *RateLimitConfig {
 	return nil
 }
 
+// FlowChannelID returns the channel id under which flow for a packet on
+// channelID is tracked. A wildcard config (empty ChannelId) matches every
+// channel and aggregates all of them under the empty id, so opening more
+// channels does not grant more quota.
+func (c RateLimitConfig) FlowChannelID(channelID string) string {
+	if c.ChannelId == "" {
+		return ""
+	}
+	return channelID
+}
+
 // NewCustomErrorAcknowledgement creates a custom error acknowledgement with a deterministic error string
 // IMPORTANT: The error string must be deterministic (no traces, logs, or non-deterministic values)
 // This is used instead of channeltypes.NewErrorAcknowledgement to provide more friendly error messages

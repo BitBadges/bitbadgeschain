@@ -428,3 +428,71 @@ func TestOnAcknowledgementPacketOverride_SuccessAckClearsPendingRecord(t *testin
 		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
 	require.True(t, flow.NetFlow.Equal(sdkmath.NewInt(-500)), "flow must stay debited, got %s", flow.NetFlow.String())
 }
+
+// newWildcardTestHooks configures a single config with an empty ChannelId so
+// it matches every channel, with a 1000-unit supply shift limit.
+func newWildcardTestHooks(t *testing.T) (*RateLimitOverrideHooks, keeper.Keeper, sdk.Context) {
+	t.Helper()
+	k, ctx := newTestKeeper(t)
+	params := ratelimittypes.DefaultParams()
+	params.RateLimits = []ratelimittypes.RateLimitConfig{{
+		ChannelId: "",
+		Denom:     testDenom,
+		SupplyShiftLimits: []ratelimittypes.TimeframeLimit{{
+			MaxAmount:         sdkmath.NewInt(1000),
+			TimeframeType:     ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK,
+			TimeframeDuration: 1000,
+		}},
+	}}
+	require.NoError(t, k.SetParams(ctx, params))
+	return NewRateLimitOverrideHooks(k), k, ctx
+}
+
+func sendOutboundOn(t *testing.T, h *RateLimitOverrideHooks, ctx sdk.Context, channel, amount string, seq uint64) (channeltypes.Packet, error) {
+	t.Helper()
+	packet := buildICS20Packet(t, amount)
+	packet.SourceChannel = channel
+	packet.Sequence = seq
+	ics4 := ibchooks.NewICS4Middleware(stubChannel{seq: seq}, nil)
+	_, err := h.SendPacketOverride(ics4, ctx, packet.SourcePort, packet.SourceChannel, packet.TimeoutHeight, packet.TimeoutTimestamp, packet.Data)
+	return packet, err
+}
+
+func TestWildcardConfig_AggregatesFlowAcrossChannels(t *testing.T) {
+	h, k, ctx := newWildcardTestHooks(t)
+
+	_, err := sendOutboundOn(t, h, ctx, "channel-1", "600", 1)
+	require.NoError(t, err)
+
+	// The wildcard config shares one quota; a second channel must not get its own.
+	_, err = sendOutboundOn(t, h, ctx, "channel-2", "600", 1)
+	require.Error(t, err, "second channel must share the wildcard quota")
+	require.Contains(t, err.Error(), "rate limit exceeded")
+
+	// Flow is tracked under the config's aggregate key, not the packet channel.
+	flow, found := k.GetChannelFlowWithTimeframe(ctx, "", testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, found)
+	require.True(t, flow.NetFlow.Equal(sdkmath.NewInt(-600)), "aggregate flow must hold the debit, got %s", flow.NetFlow.String())
+	_, found = k.GetChannelFlowWithTimeframe(ctx, "channel-1", testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.False(t, found, "no per-channel flow may be written for a wildcard config")
+
+	// Remaining quota is still usable on any channel.
+	_, err = sendOutboundOn(t, h, ctx, "channel-3", "400", 1)
+	require.NoError(t, err)
+}
+
+func TestWildcardConfig_ErrorAckRefundsAggregateFlow(t *testing.T) {
+	h, k, ctx := newWildcardTestHooks(t)
+
+	packet, err := sendOutboundOn(t, h, ctx, "channel-1", "600", 1)
+	require.NoError(t, err)
+
+	err = h.OnAcknowledgementPacketOverride(newTestMiddleware(), ctx, "channel-1", packet, errorAckBytes(), sdk.AccAddress{})
+	require.NoError(t, err)
+
+	flow, _ := k.GetChannelFlowWithTimeframe(ctx, "", testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, flow.NetFlow.IsZero(), "refund must land on the aggregate key, got %s", flow.NetFlow.String())
+}

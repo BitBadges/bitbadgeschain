@@ -220,17 +220,19 @@ func (h *RateLimitOverrideHooks) recordPendingSend(ctx sdk.Context, sourcePort, 
 		return
 	}
 
+	flowChannel := config.FlowChannelID(sourceChannel)
+
 	for _, limit := range config.SupplyShiftLimits {
 		if limit.MaxAmount.IsZero() {
 			continue
 		}
-		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 		h.keeper.SetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
 	}
 
 	if senderAddr != "" {
 		for _, limit := range config.AddressLimits {
-			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 			h.keeper.SetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
 		}
 	}
@@ -292,6 +294,7 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 	if config == nil {
 		return
 	}
+	flowChannel := config.FlowChannelID(sourceChannel)
 
 	// Reverse supply shift tracking. Outflow added amount.Neg(); undo by adding amount.
 	for _, limit := range config.SupplyShiftLimits {
@@ -302,14 +305,14 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 		if !found {
 			continue
 		}
-		h.keeper.ResetChannelFlowWindowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
-		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		h.keeper.ResetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 		if window.WindowStart != debitedAt {
 			continue
 		}
-		flow, _ := h.keeper.GetChannelFlowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		flow, _ := h.keeper.GetChannelFlowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 		flow.NetFlow = flow.NetFlow.Add(amount)
-		h.keeper.SetChannelFlowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration, flow)
+		h.keeper.SetChannelFlowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration, flow)
 	}
 
 	// Reverse per-address tracking. TotalAmount is tracked as Abs(), so subtract Abs().
@@ -319,12 +322,12 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 			if !found {
 				continue
 			}
-			h.keeper.ResetAddressTransferWindow(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
-			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			h.keeper.ResetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 			if window.WindowStart != debitedAt {
 				continue
 			}
-			data, _ := h.keeper.GetAddressTransferData(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			data, _ := h.keeper.GetAddressTransferData(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 			if data.TransferCount > 0 {
 				data.TransferCount--
 			}
@@ -334,7 +337,7 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 			} else {
 				data.TotalAmount = sdkmath.ZeroInt()
 			}
-			h.keeper.SetAddressTransferData(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration, data)
+			h.keeper.SetAddressTransferData(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration, data)
 		}
 	}
 	// Unique-sender tracking is not reversed: we cannot know whether this sender
@@ -350,6 +353,7 @@ func (h *RateLimitOverrideHooks) updateTrackingAfterTransfer(ctx sdk.Context, ch
 	if config == nil {
 		return // No config, no tracking
 	}
+	channelID = config.FlowChannelID(channelID)
 
 	// Update multiple timeframe supply shift limits
 	for _, limit := range config.SupplyShiftLimits {

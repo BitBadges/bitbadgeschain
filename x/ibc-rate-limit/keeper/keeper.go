@@ -164,6 +164,7 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 	if config == nil {
 		return types.NewSuccessAcknowledgement()
 	}
+	channelID = config.FlowChannelID(channelID)
 
 	// Check multiple timeframe supply shift limits
 	for _, limit := range config.SupplyShiftLimits {
