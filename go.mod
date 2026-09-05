@@ -43,7 +43,7 @@ require (
 	cosmossdk.io/log/v2 v2.1.0
 	cosmossdk.io/math v1.5.3
 	github.com/cosmos/cosmos-sdk/store/v2 v2.0.0
-	github.com/cosmos/evm v0.7.2
+	github.com/cosmos/evm v0.7.3
 	github.com/cosmos/ibc-go/v11 v11.2.0
 	github.com/ethereum/go-ethereum v1.17.2
 	github.com/gogo/protobuf v1.3.2
@@ -582,9 +582,3 @@ tool (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	google.golang.org/protobuf/cmd/protoc-gen-go
 )
-
-// cosmos/evm is pinned to a private module. Building from source requires read
-// access to it; the released binaries are the supported path for node
-// operators. Revert to the public cosmos/evm module once this pin is no longer
-// needed.
-replace github.com/cosmos/evm => github.com/cosmos/evm-ghsa-aug-2026 v0.7.3-august-2026-hotfix
