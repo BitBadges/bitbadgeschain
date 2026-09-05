@@ -426,7 +426,7 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		return nil, fmt.Errorf("contract.Input is empty - precompile cannot execute without input data")
 	}
 
-	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
+	return evmcompat.RunNativeAction(p.Precompile, evm, contract, func(ctx sdk.Context) ([]byte, error) {
 		// Add panic recovery to catch any unexpected panics
 		defer func() {
 			if r := recover(); r != nil {

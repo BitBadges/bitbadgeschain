@@ -265,7 +265,7 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		return nil, fmt.Errorf("gamm precompile unavailable: ABI failed to load: %w", abiLoadError)
 	}
 
-	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
+	return evmcompat.RunNativeAction(p.Precompile, evm, contract, func(ctx sdk.Context) ([]byte, error) {
 		result, methodName, err := p.ExecuteWithMethodName(ctx, contract, readonly)
 
 		// Gas is tracked by the EVM, we log the method for monitoring
