@@ -192,6 +192,28 @@ scripts/upgrade/propose.sh --name v35 --home ~/.bitbadgeschain --from faucet \
   --info '{"binaries":{"linux/amd64":"https://github.com/BitBadges/bitbadgeschain/releases/download/v35/bitbadgeschain-linux-amd64","linux/arm64":"https://github.com/BitBadges/bitbadgeschain/releases/download/v35/bitbadgeschain-linux-arm64"}}'
 ```
 
+## What the v34 -> v35 rehearsal established
+
+Recorded here because each item shapes how the next rehearsal is read.
+
+- **Hands-off.** The v35 handler applies under cosmovisor with no operator
+  action; four validators agree on every app hash through the upgrade.
+- **Fee floor semantics.** `feemarket.min_gas_price = 10` is enforced on
+  Cosmos transactions as exactly 10 ubadge per gas, in `ubadge` only: a
+  200k-gas transaction needs `--gas-prices 10ubadge` (2000000ubadge), 9.99
+  is rejected, and a fee paid in `stake` is rejected outright. The EIP-1559
+  `base_fee` (18-decimal EVM units, starts at 1e9 and decays on empty
+  blocks) does not gate Cosmos transactions. After v35, `propose.sh` and any
+  other CLI use on mainnet must pass `--gas-prices 10ubadge` (or higher).
+- **Fresh-chain gotcha.** A genesis with `min_gas_price > 0` fails at
+  `InitGenesis` because the gentx carries no fee ("minimum global fee for
+  this tx is: 2000000ubadge"). Local/test chains that want the floor must
+  either raise it after genesis or create the gentx with `--fees`.
+- **Hook is a no-op for v35.** `pre-upgrade` finds `mempool.type` already
+  `"app"` on a v34 home, rewrites nothing, and rollback is binary-only.
+- **No feemarket CLI.** The chain binary registers no `query feemarket`
+  command; read `/cosmos/evm/feemarket/v1/params` over REST.
+
 ## Self-tests
 
 `make upgrade-tooling-test` runs `scripts/upgrade/test/*.sh` (new-version
