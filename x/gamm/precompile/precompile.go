@@ -153,8 +153,8 @@ func NewPrecompile(
 ) *Precompile {
 	p := &Precompile{
 		Precompile: cmn.Precompile{
-			KvGasConfig:          storetypes.GasConfig{},
-			TransientKVGasConfig: storetypes.GasConfig{},
+			KvGasConfig:          storetypes.KVGasConfig(),
+			TransientKVGasConfig: storetypes.TransientGasConfig(),
 			ContractAddress:      common.HexToAddress(GammPrecompileAddress),
 		},
 		ABI:        ABI,
@@ -206,6 +206,10 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 	// much more gas due to state reads/writes, bank transfers, and pool calculations.
 	// We add a buffer to help estimateGas converge on a working value.
 	baseGas := p.getBaseGas(method.Name)
+
+	// Every method is priced by input size: the JSON has to be parsed and
+	// validated before the per-element charges in MeterMessage can apply.
+	baseGas += uint64(len(input)/32) * GasPerInputChunk
 
 	// For transaction methods, add a significant buffer for Cosmos SDK operations
 	// Swaps typically use 150k-300k gas depending on pool complexity
@@ -311,6 +315,10 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 	// Unmarshal JSON to Msg
 	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := MeterMessage(ctx, msg); err != nil {
 		return nil, err
 	}
 

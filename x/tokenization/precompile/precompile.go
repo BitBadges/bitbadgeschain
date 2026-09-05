@@ -83,6 +83,7 @@ const (
 	GasPerTokenIdRange       = 1_000
 	GasPerOwnershipTimeRange = 1_000
 	GasPerApprovalField      = 500
+	GasPerAddressListEntry   = 200
 
 	// Gas costs for queries (lower since they're read-only)
 	GasGetCollectionBase         = 3_000
@@ -178,8 +179,8 @@ func NewPrecompile(
 ) *Precompile {
 	p := &Precompile{
 		Precompile: cmn.Precompile{
-			KvGasConfig:          storetypes.GasConfig{},
-			TransientKVGasConfig: storetypes.GasConfig{},
+			KvGasConfig:          storetypes.KVGasConfig(),
+			TransientKVGasConfig: storetypes.TransientGasConfig(),
 			ContractAddress:      common.HexToAddress(TokenizationPrecompileAddress),
 		},
 		ABI:                ABI,
@@ -333,10 +334,8 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 					if msgCount > MaxMessagesPerBatch {
 						msgCount = MaxMessagesPerBatch
 					}
-					// Calculate dynamic gas: base + (message count * per-message gas) + (input size gas)
-					// Input size gas accounts for JSON parsing complexity (security fix: prevents gas griefing)
-					inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
-					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch) + inputSizeGas
+					// Calculate dynamic gas: base + (message count * per-message gas)
+					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch)
 				} else {
 					// If parsing fails, use base gas (will be adjusted during execution)
 					baseGas = GasExecuteMultipleBase
@@ -393,23 +392,17 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasRangesOverlap
 	case SearchInRangesMethod:
 		baseGas = GasSearchInRanges
-		// Add input-size-proportional gas to prevent gas griefing with large JSON inputs
-		if len(input) > 4 {
-			inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
-			baseGas += inputSizeGas
-		}
 	case GetBalanceForIdAndTimeMethod:
 		baseGas = GasGetBalanceForIdAndTime
-		// Add input-size-proportional gas to prevent gas griefing with large JSON inputs
-		if len(input) > 4 {
-			inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
-			baseGas += inputSizeGas
-		}
 	case GetReservedListIdMethod:
 		baseGas = GasGetReservedListId
 	default:
 		return 0
 	}
+
+	// Every method is priced by input size: the JSON has to be parsed and
+	// validated before the per-element charges in MeterMessage can apply.
+	baseGas += uint64(len(input)/32) * GasPerInputChunk
 
 	// Add buffer for Cosmos SDK operations to help estimateGas converge
 	// Transactions need more buffer due to state writes, bank transfers, etc.
@@ -603,6 +596,10 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON for method %s: %w", method.Name, err)
+	}
+
+	if err := MeterMessage(ctx, msg); err != nil {
+		return nil, err
 	}
 
 	// Execute message via keeper
@@ -865,6 +862,10 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 				"failed to route message",
 				fmt.Sprintf("message index %d, type: %s", i, messageType),
 			)
+		}
+
+		if err := MeterMessage(ctx, msg); err != nil {
+			return nil, WrapErrorWithContext(err, ErrorCodeInvalidInput, "message rejected", fmt.Sprintf("message index %d, type: %s", i, messageType))
 		}
 
 		// Execute message via keeper
