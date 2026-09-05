@@ -45,7 +45,7 @@ wait_for_height() {
 }
 
 # tx_hash_of <cli output> -> first 64-hex token
-tx_hash_of() { grep -oE '[A-F0-9]{64}' <<<"$1" | head -1; }
+tx_hash_of() { grep -oE '[A-F0-9]{64}' <<<"$1" | head -1 || true; }
 
 # go_version_of_gomod <path or - for stdin> -> "1.26.6"
 go_version_of_gomod() {

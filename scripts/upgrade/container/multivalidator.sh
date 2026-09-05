@@ -89,6 +89,7 @@ def sec(name,key,val,s):
 s=sec('grpc','address',f'"127.0.0.1:{9090+i}"',s)
 s=sec('grpc-web','address',f'"127.0.0.1:{9091+i*10}"',s)
 s=sec('api','address',f'"tcp://127.0.0.1:{1317+i}"',s)
+s=sec('api','enable','true',s)
 s=sec('json-rpc','address',f'"127.0.0.1:{8545+i*10}"',s)
 s=sec('json-rpc','ws-address',f'"127.0.0.1:{8546+i*10}"',s)
 open(p,'w').write(s)
@@ -111,6 +112,18 @@ done
 height_of(){ curl -s --max-time 5 "http://127.0.0.1:$(rpc "$1")/status" 2>/dev/null | jq -r '.result.sync_info.latest_block_height // empty' 2>/dev/null || true; }
 apphash_at(){ curl -s --max-time 5 "http://127.0.0.1:$(rpc "$1")/block?height=$2" 2>/dev/null | jq -r '.result.block.header.app_hash // empty' 2>/dev/null || true; }
 NODE0="tcp://127.0.0.1:$(rpc 0)"
+API0="http://127.0.0.1:1317"
+
+# fee_flags: the gas price the chain demands right now, read from node0. An
+# upgrade may raise the fee-market floor (v35 does), so a fee that cleared
+# before the upgrade is not evidence it clears after it. For Cosmos txs the
+# ante enforces feemarket min_gas_price in ubadge per gas; the EIP-1559
+# base_fee (18-decimal EVM units) gates EVM txs only, so it is not used here.
+fee_flags(){
+  local mgp
+  mgp=$(curl -s --max-time 5 "$API0/cosmos/evm/feemarket/v1/params" | jq -r '.params.min_gas_price // "0"' 2>/dev/null || echo 0)
+  echo "--gas-prices $(python3 -c 'import sys; from decimal import Decimal; print(format(Decimal(sys.argv[1] or 0), "f"))' "$mgp")ubadge"
+}
 
 for _ in $(seq 1 90); do
   H=$(height_of 0); [ -n "${H:-}" ] && [ "$H" -ge 3 ] 2>/dev/null && break; sleep 2
@@ -141,12 +154,14 @@ compare_apphashes(){
 # command substitution would swallow the PASS/FAIL output and the FAILED count.
 TX_HEIGHT=""
 send_and_confirm(){
-  local label=$1 bin=$2 amount=$3 out code h txh
+  local label=$1 bin=$2 amount=$3 out code h txh fees
   TX_HEIGHT=""
+  read -r -a fees <<<"$(fee_flags)"
+  ylw "     paying ${fees[*]}"
   out=$("$bin" tx bank send "$A0" "$A1" "${amount}ubadge" --from val0 "${KR[@]}" \
     --home "$(home 0)" --node "$NODE0" --chain-id "$CHAIN_ID" \
-    --gas auto --gas-adjustment 1.5 --fees "0${BOND_DENOM}" -y 2>&1) || true
-  txh=$(tx_hash_of "$out")
+    --gas auto --gas-adjustment 1.5 "${fees[@]}" -y 2>&1) || true
+  txh=$(tx_hash_of "$out" || true)
   if [ -z "$txh" ]; then
     red "  FAIL  $label: transfer was never submitted"; echo "$out" | tail -3
     FAILED=$((FAILED+1)); return
