@@ -11,6 +11,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
 
+	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
@@ -34,6 +35,7 @@ const (
 type Keepers struct {
 	ConsensusParams consensuskeeper.Keeper
 	FeeMarket       feemarketkeeper.Keeper
+	IBCRateLimit    ibcratelimitkeeper.Keeper
 	Tokenization    *tokenizationkeeper.Keeper
 }
 
@@ -47,6 +49,9 @@ func CustomUpgradeHandlerLogic(ctx context.Context, k Keepers) error {
 	}
 	if err := setMinGasPrice(sdkCtx, k.FeeMarket); err != nil {
 		return fmt.Errorf("v35: min gas price: %w", err)
+	}
+	if err := k.IBCRateLimit.MigrateV35WindowsToBlockTime(sdkCtx); err != nil {
+		return fmt.Errorf("v35: rate-limit windows: %w", err)
 	}
 	if err := runTokenizationMigrations(sdkCtx, k.Tokenization); err != nil {
 		return fmt.Errorf("v35: tokenization: %w", err)

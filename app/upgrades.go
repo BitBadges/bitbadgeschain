@@ -25,6 +25,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			v35.Keepers{
 				ConsensusParams: app.ConsensusParamsKeeper,
 				FeeMarket:       app.FeeMarketKeeper,
+				IBCRateLimit:    app.IBCRateLimitKeeper,
 				Tokenization:    app.TokenizationKeeper,
 			},
 		),

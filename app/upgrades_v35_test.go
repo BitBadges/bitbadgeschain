@@ -26,6 +26,7 @@ func TestV35SetsBlockMaxGasAndMinGasPrice(t *testing.T) {
 	require.NoError(t, v35.CustomUpgradeHandlerLogic(ctx, v35.Keepers{
 		ConsensusParams: app.ConsensusParamsKeeper,
 		FeeMarket:       app.FeeMarketKeeper,
+		IBCRateLimit:    app.IBCRateLimitKeeper,
 		Tokenization:    app.TokenizationKeeper,
 	}))
 
