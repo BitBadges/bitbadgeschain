@@ -1,6 +1,7 @@
 package types
 
 import (
+	"strings"
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -46,8 +47,8 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.CollectionId.IsNil() {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
+	if err := ValidateUintId(msg.CollectionId, true); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
 	}
 
 	if msg.ValidTokenIds != nil {
@@ -172,6 +173,12 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		// Validate denom format
 		if err := ValidateCosmosWrapperPathDenom(path.Denom); err != nil {
 			return err
+		}
+
+		// The {id} placeholder is what keeps each token id in its own bank denom, so it must
+		// be present exactly when the path may wrap any valid token id.
+		if path.AllowOverrideWithAnyValidToken != strings.Contains(path.Denom, "{id}") {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "allowOverrideWithAnyValidToken requires the {id} placeholder in the denom and vice versa: %s", path.Denom)
 		}
 
 		// Validate symbol format

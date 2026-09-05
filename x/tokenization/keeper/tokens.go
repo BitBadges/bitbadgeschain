@@ -27,15 +27,17 @@ func (k Keeper) CreateTokens(ctx sdk.Context, collection *types.TokenCollection,
 		return collection, nil
 	}
 
-	// Only check permissions for NEW token IDs (not already in collection.ValidTokenIds)
+	// Only check permissions for token IDs that are added or removed relative to collection.ValidTokenIds
 	existingTokenIds := types.DeepCopyRanges(collection.ValidTokenIds)
 	newTokenIdsCopy := types.DeepCopyRanges(newValidTokenIds)
 	newTokenIdsOnly, _ := types.RemoveUintRangesFromUintRanges(existingTokenIds, newTokenIdsCopy)
+	removedTokenIdsOnly, _ := types.RemoveUintRangesFromUintRanges(types.DeepCopyRanges(newValidTokenIds), types.DeepCopyRanges(collection.ValidTokenIds))
+	changedTokenIds := append(newTokenIdsOnly, removedTokenIdsOnly...)
 
-	// Only check permissions if there are actually new token IDs
-	if len(newTokenIdsOnly) > 0 {
+	// Only check permissions if the id set actually changes
+	if len(changedTokenIds) > 0 {
 		detailsToCheck := []*types.UniversalPermissionDetails{}
-		for _, tokenIdRange := range newTokenIdsOnly {
+		for _, tokenIdRange := range changedTokenIds {
 			detailsToCheck = append(detailsToCheck, &types.UniversalPermissionDetails{
 				TokenId: tokenIdRange,
 			})

@@ -45,6 +45,10 @@ func (msg *MsgUpdateUserApprovals) CheckAndCleanMsg(ctx sdk.Context, canChangeVa
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	if err := ValidateUintId(msg.CollectionId, true); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
+	}
+
 	if err := ValidateUserIncomingApprovals(ctx, msg.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
 		return err
 	}

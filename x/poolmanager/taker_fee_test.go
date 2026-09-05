@@ -460,3 +460,29 @@ func (s *KeeperTestSuite) setupTakerFeeShareAgreement(denom string, skimPercent 
 		SkimAddress: skimAddress,
 	})
 }
+
+// Taker fees are only charged in denoms the community pool can actually spend. Alias
+// (badgeslp:) denoms are routed as tokenization transfers and have no spend path, so no
+// taker fee is taken on them.
+func (s *KeeperTestSuite) TestChargeTakerFeeSkipsAliasDenoms() {
+	s.SetupTest()
+	k := s.App.PoolManagerKeeper
+	aliasDenom := "badgeslp:1:foo"
+	fee := osmomath.MustNewDecFromStr("0.01")
+	k.SetDenomPairTakerFee(s.Ctx, aliasDenom, FOO, fee)
+	k.SetDenomPairTakerFee(s.Ctx, BAR, FOO, fee)
+	s.FundAcc(s.TestAccs[0], sdk.NewCoins(sdk.NewCoin(BAR, osmomath.NewInt(1_000_000))))
+
+	tokenIn := sdk.NewCoin(aliasDenom, osmomath.NewInt(1000))
+	after, charged, err := k.ChargeTakerFee(s.Ctx, tokenIn, FOO, s.TestAccs[0], true)
+	s.Require().NoError(err)
+	s.Require().Equal(tokenIn.String(), after.String(), "alias denom input must be untouched")
+	s.Require().True(charged.Amount.IsZero(), "no taker fee is taken in an alias denom")
+
+	// Control: a bank denom pair with the same fee is still charged
+	bankIn := sdk.NewCoin(BAR, osmomath.NewInt(1000))
+	afterBank, chargedBank, err := k.ChargeTakerFee(s.Ctx, bankIn, FOO, s.TestAccs[0], true)
+	s.Require().NoError(err)
+	s.Require().Equal(osmomath.NewInt(990), afterBank.Amount)
+	s.Require().Equal(osmomath.NewInt(10), chargedBank.Amount)
+}

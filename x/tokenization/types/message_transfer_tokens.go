@@ -44,6 +44,10 @@ func (msg *MsgTransferTokens) CheckAndCleanMsg(ctx sdk.Context, canChangeValues 
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	if err := ValidateUintId(msg.CollectionId, true); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
+	}
+
 	if len(msg.Transfers) == 0 {
 		return sdkerrors.Wrapf(ErrInvalidTransfers, "transfers cannot be empty")
 	}

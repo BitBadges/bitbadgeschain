@@ -142,7 +142,7 @@ func (msg MsgStableSwapAdjustScalingFactors) Route() string {
 func (msg MsgStableSwapAdjustScalingFactors) Type() string { return TypeMsgCreateStableswapPool }
 func (msg MsgStableSwapAdjustScalingFactors) ValidateBasic() error {
 	if msg.Sender == "" {
-		return nil
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "sender cannot be empty")
 	}
 
 	_, err := sdk.AccAddressFromBech32(msg.Sender)

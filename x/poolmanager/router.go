@@ -434,6 +434,11 @@ func (k Keeper) RouteExactAmountOut(ctx sdk.Context,
 		}
 	}
 
+	// The user pays the taker fee on top of the first pool's input; the cap applies to that total.
+	if tokenInAmount.GT(tokenInMaxAmount) {
+		return osmomath.Int{}, types.ErrTokenInExceedsMax
+	}
+
 	// Run taker fee skim logic
 	err = k.TakerFeeSkim(ctx, denomsInvolvedInRoute, totalTakerFeesCharged)
 	if err != nil {

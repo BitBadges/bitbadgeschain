@@ -26,6 +26,8 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState, unpack
 		if err != nil {
 			panic(err)
 		}
+		// The tokenization pool-address cache is not part of any genesis export; rebuild it here.
+		k.tokenizationKeeper.SetPoolAddressInCache(ctx, pool.GetAddress().String(), pool.GetId())
 
 		poolAssets := pool.GetTotalPoolLiquidity(ctx)
 		for _, asset := range poolAssets {

@@ -60,7 +60,7 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 	// register IBC modules
 	if err := app.RegisterModules(
 		gamm.NewAppModule(app.appCodec, app.GammKeeper, app.AccountKeeper, app.BankKeeper),
-		poolmanagermodule.NewAppModule(app.PoolManagerKeeper, app.GammKeeper),
+		poolmanagermodule.NewAppModule(&app.PoolManagerKeeper, app.GammKeeper),
 	); err != nil {
 		return err
 	}

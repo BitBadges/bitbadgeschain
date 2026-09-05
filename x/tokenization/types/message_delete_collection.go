@@ -43,8 +43,8 @@ func (msg *MsgDeleteCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.CollectionId.IsNil() || msg.CollectionId.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id")
+	if err := ValidateUintId(msg.CollectionId, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid collection id: %s", err)
 	}
 
 	return nil

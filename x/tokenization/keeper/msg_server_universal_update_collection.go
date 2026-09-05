@@ -55,13 +55,21 @@ func ensureMintForbiddenPermission(permissions *types.CollectionPermissions, has
 
 	mintForbiddenPerm := createMintForbiddenPermission()
 
-	// Check if the permission already exists (compare key fields)
+	// Check if the exact forbidden permission already exists (list ids and all time/id ranges)
+	sameRanges := func(a, b []*types.UintRange) bool {
+		return compareUintRanges(types.SortUintRangesAndMergeAdjacentAndIntersecting(types.DeepCopyRanges(a)), types.SortUintRangesAndMergeAdjacentAndIntersecting(types.DeepCopyRanges(b)))
+	}
 	alreadyExists := false
 	for _, perm := range permissions.CanUpdateCollectionApprovals {
-		if perm.FromListId == types.MintAddress &&
-			perm.ToListId == "All" &&
-			perm.InitiatedByListId == "All" &&
-			perm.ApprovalId == "All" {
+		if perm.FromListId == mintForbiddenPerm.FromListId &&
+			perm.ToListId == mintForbiddenPerm.ToListId &&
+			perm.InitiatedByListId == mintForbiddenPerm.InitiatedByListId &&
+			perm.ApprovalId == mintForbiddenPerm.ApprovalId &&
+			sameRanges(perm.TransferTimes, mintForbiddenPerm.TransferTimes) &&
+			sameRanges(perm.TokenIds, mintForbiddenPerm.TokenIds) &&
+			sameRanges(perm.OwnershipTimes, mintForbiddenPerm.OwnershipTimes) &&
+			len(perm.PermanentlyPermittedTimes) == 0 &&
+			sameRanges(perm.PermanentlyForbiddenTimes, mintForbiddenPerm.PermanentlyForbiddenTimes) {
 			alreadyExists = true
 			break
 		}

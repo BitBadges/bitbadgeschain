@@ -51,8 +51,8 @@ func (msg *MsgCastVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.CollectionId.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "collectionId cannot be zero")
+	if err := ValidateUintId(msg.CollectionId, false); err != nil {
+		return sdkerrors.Wrapf(err, "invalid collectionId")
 	}
 
 	if msg.ApprovalLevel != "collection" && msg.ApprovalLevel != "incoming" && msg.ApprovalLevel != "outgoing" {

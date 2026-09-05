@@ -357,3 +357,25 @@ func (s *KeeperTestSuite) TestExitPool_Events() {
 		})
 	}
 }
+
+// The msg server runs ValidateBasic itself so callers that skip the ante handler
+// (internal callers such as the precompile) get the same message validation.
+func (s *KeeperTestSuite) TestMsgServerRunsValidateBasic() {
+	s.SetupTest()
+	msgServer := keeper.NewMsgServerImpl(&s.App.GammKeeper)
+
+	_, err := msgServer.SwapExactAmountIn(s.Ctx, &types.MsgSwapExactAmountIn{
+		Sender:            s.TestAccs[0].String(),
+		Routes:            []poolmanagertypes.SwapAmountInRoute{{PoolId: 1, TokenOutDenom: "bar"}},
+		TokenIn:           sdk.NewCoin("foo", osmomath.NewInt(100)),
+		TokenOutMinAmount: osmomath.ZeroInt(),
+	})
+	s.Require().ErrorIs(err, types.ErrNotPositiveCriteria)
+
+	_, err = msgServer.JoinPool(s.Ctx, &types.MsgJoinPool{
+		Sender:         s.TestAccs[0].String(),
+		PoolId:         1,
+		ShareOutAmount: osmomath.ZeroInt(),
+	})
+	s.Require().ErrorIs(err, types.ErrNotPositiveRequireAmount)
+}

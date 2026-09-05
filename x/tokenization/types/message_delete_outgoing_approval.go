@@ -46,8 +46,8 @@ func (msg *MsgDeleteOutgoingApproval) ValidateBasic() error {
 	// Validate collection ID
 	// Allow collectionId = 0 for auto-prev resolution (used in multi-msg transactions)
 	// The actual validation and resolution happens in resolveCollectionIdWithAutoPrev
-	if msg.CollectionId.IsNil() {
-		return sdkerrors.Wrapf(ErrInvalidCollectionID, "collection ID cannot be nil")
+	if err := ValidateUintId(msg.CollectionId, true); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
 	}
 
 	// Validate approval ID

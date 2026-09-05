@@ -23,3 +23,13 @@ func TestDefaultParamsCommunityPoolSwapDenom(t *testing.T) {
 func TestDefaultParamsValidate(t *testing.T) {
 	require.NoError(t, types.DefaultParams().Validate())
 }
+
+// A taker fee of exactly 1 would zero every exact-in swap and divide by zero on exact-out.
+func TestDefaultTakerFeeMustBeBelowOne(t *testing.T) {
+	params := types.DefaultParams()
+	params.TakerFeeParams.DefaultTakerFee = types.OneDec
+	require.Error(t, params.Validate())
+
+	params.TakerFeeParams.DefaultTakerFee = types.OneDec.Sub(types.OneDec.Quo(types.OneDec.MulInt64(100)))
+	require.NoError(t, params.Validate())
+}

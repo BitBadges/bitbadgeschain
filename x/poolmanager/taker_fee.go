@@ -13,6 +13,7 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
 var zero = osmomath.ZeroInt()
@@ -136,6 +137,12 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 	// if osmoutils.Contains(reducedFeeWhitelist, sender.String()) {
 	// 	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
 	// }
+
+	// Alias (badgeslp:) denoms are routed as tokenization transfers; the community pool has
+	// no way to spend them, so no taker fee is taken in that denom.
+	if tokenizationkeeper.CheckStartsWithAliasDenom(tokenIn.Denom) {
+		return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
+	}
 
 	takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
 	if err != nil {

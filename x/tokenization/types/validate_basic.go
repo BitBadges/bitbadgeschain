@@ -80,6 +80,19 @@ func ValidateCosmosWrapperPathDenom(denom string) error {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains invalid characters - only a-zA-Z, _, {, }, and - are allowed: %s", denom)
 	}
 
+	// Braces are only allowed as a single {id} placeholder; the substituted denom must be a
+	// valid bank denom once the module prefix ("badges:<collectionId>:") is applied.
+	if strings.Count(denom, "{id}") > 1 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom may contain the {id} placeholder at most once: %s", denom)
+	}
+	substituted := strings.ReplaceAll(denom, "{id}", "1")
+	if strings.ContainsAny(substituted, "{}") {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains braces other than the {id} placeholder: %s", denom)
+	}
+	if err := sdk.ValidateDenom("badges:1:" + substituted); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom is not a valid bank denom: %s", denom)
+	}
+
 	return nil
 }
 
@@ -1335,6 +1348,9 @@ func ValidateTokenMetadata(tokenMetadata []*TokenMetadata, canChangeValues bool)
 	handledTokenIds := []*UintRange{}
 	if len(tokenMetadata) > 0 {
 		for _, tokenMetadata := range tokenMetadata {
+			if tokenMetadata == nil {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "token metadata is nil")
+			}
 			// Validate well-formedness of the message entries
 			if err := ValidateURI(tokenMetadata.Uri); err != nil {
 				return err

@@ -184,6 +184,8 @@ func (suite *TestSuite) TestNewTokensPermissionIsApproved() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
+	collectionsToCreate[0].TokensToCreate[0].TokenIds = GetOneUintRange()
+	collectionsToCreate[0].Transfers[0].Balances[0].TokenIds = GetOneUintRange()
 
 	err := CreateCollections(suite, wctx, collectionsToCreate)
 	suite.Require().Nil(err, "Error creating token: %s")

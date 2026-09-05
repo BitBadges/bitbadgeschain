@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"testing"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/testutil/sample"
@@ -24,13 +25,15 @@ func TestMsgUpdateUserApprovals_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid address",
 			msg: types.MsgUpdateUserApprovals{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 			},
 		},
 		{
 			name: "ID = ID of another approval",
 			msg: types.MsgUpdateUserApprovals{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 				OutgoingApprovals: []*types.UserOutgoingApproval{
 					{
 						ToListId:          "All",
