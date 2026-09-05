@@ -264,8 +264,10 @@ func (k Keeper) HandleETHSignatureChallenges(
 				continue
 			}
 
-			// Check if this signature has already been used
-			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Signature)
+			// Usage is tracked per nonce: the signed message binds the nonce to this exact
+			// (initiator, collection, approver, level, approval, challenge) context, so a valid
+			// signature for a nonce is one use regardless of how the signature bytes are encoded.
+			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Nonce)
 			numUsed, exists := k.GetETHSignatureTrackerFromStore(ctx, signatureKey)
 			if !exists {
 				numUsed = sdkmath.NewUint(0)
