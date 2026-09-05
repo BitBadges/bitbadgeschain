@@ -185,14 +185,14 @@ func (suite *HelperLibrariesTestSuite) setupAppWithEVM() {
 	suite.TokenizationKeeper = suite.App.TokenizationKeeper
 
 	// Register and enable precompile
-	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper)
+	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper, suite.App.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 	suite.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, suite.Precompile)
 	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, tokenizationPrecompileAddr)
 	require.NoError(suite.T(), err)
 
 	// Also register gamm precompile
-	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	suite.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, gammPrecompileAddr)

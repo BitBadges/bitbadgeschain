@@ -55,7 +55,7 @@ func (suite *E2ETestSuite) SetupTest() {
 	suite.Ctx = ctx
 
 	// Create precompile instance
-	suite.Precompile = tokenization.NewPrecompile(keeper)
+	suite.Precompile = tokenization.NewPrecompile(keeper, nil)
 
 	// Create test addresses - use EVM addresses first, then convert to Cosmos
 	// This ensures the addresses match when converting back and forth

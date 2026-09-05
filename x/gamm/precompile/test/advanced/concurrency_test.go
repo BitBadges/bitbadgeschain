@@ -33,7 +33,7 @@ func TestConcurrencyTestSuite(t *testing.T) {
 
 func (suite *ConcurrencyTestSuite) SetupTest() {
 	suite.Reset()
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Create a test pool
 	alice := suite.TestAccs[0]

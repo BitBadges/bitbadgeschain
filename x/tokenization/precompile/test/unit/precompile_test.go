@@ -26,7 +26,7 @@ func TestPrecompile_RequiredGas(t *testing.T) {
 
 func TestPrecompile_TransferTokens_Structure(t *testing.T) {
 	tokenizationKeeper, _ := keepertest.TokenizationKeeper(t)
-	precompile := tokenization.NewPrecompile(tokenizationKeeper)
+	precompile := tokenization.NewPrecompile(tokenizationKeeper, nil)
 
 	// Verify precompile is created correctly
 	require.NotNil(t, precompile)
@@ -46,5 +46,5 @@ func TestPrecompile_TransferTokens_Structure(t *testing.T) {
 
 func createTestPrecompile(t *testing.T) *tokenization.Precompile {
 	tokenizationKeeper, _ := keepertest.TokenizationKeeper(t)
-	return tokenization.NewPrecompile(tokenizationKeeper)
+	return tokenization.NewPrecompile(tokenizationKeeper, nil)
 }

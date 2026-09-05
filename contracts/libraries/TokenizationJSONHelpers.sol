@@ -50,14 +50,15 @@ library TokenizationJSONHelpers {
         string memory tokenIdsJson,
         string memory ownershipTimesJson
     ) internal pure returns (string memory) {
+        // MsgTransferTokens shape: transfers[].balances[] (from defaults to the caller)
         string memory toAddressesJson = _addressArrayToJson(toAddresses);
         return string(abi.encodePacked(
             '{"collectionId":"', _uintToString(collectionId),
-            '","toAddresses":', toAddressesJson,
-            ',"amount":"', _uintToString(amount),
+            '","transfers":[{"toAddresses":', toAddressesJson,
+            ',"balances":[{"amount":"', _uintToString(amount),
             '","tokenIds":', tokenIdsJson,
             ',"ownershipTimes":', ownershipTimesJson,
-            '}'
+            '}]}]}'
         ));
     }
 

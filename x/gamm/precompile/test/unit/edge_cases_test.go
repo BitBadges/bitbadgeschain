@@ -28,7 +28,7 @@ func TestEdgeCasesTestSuite(t *testing.T) {
 
 func (suite *EdgeCasesTestSuite) SetupTest() {
 	suite.Reset()
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Create a test pool for edge case testing
 	alice := suite.TestAccs[0]
