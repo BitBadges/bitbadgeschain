@@ -1,5 +1,5 @@
 # Version must be provided as a CLI argument
-VERSION := v34
+VERSION := v35
 
 # Common ldflags for version information
 LDFLAGS := -X github.com/cosmos/cosmos-sdk/version.Name=bitbadgeschain \
@@ -443,3 +443,24 @@ test-e2e-all:
 	@go test ./testing/... -count=1 -tags=test -v
 
 .PHONY: test-cli test-cross-module test-cross-module-pool test-cross-module-collection test-cross-module-combined test-e2e-all
+
+# ---------------------------------------------------------------------------
+# Upgrade tooling (scripts/upgrade). See _docs/UPGRADE_REHEARSAL.md.
+#
+#   make new-version V=v35                 scaffold + wire vNN, bump VERSION
+#   make upgrade-rehearsal FROM=v34 TO=HEAD [NAME=v35] [REHEARSAL_FLAGS=--all]
+#   make upgrade-tooling-test              self-tests + shellcheck
+REHEARSAL_FLAGS ?= --evmcheck --rollback
+
+new-version:
+	@test -n "$(V)" || { echo "usage: make new-version V=vNN [NEW_VERSION_FLAGS=--snapshot-proto]"; exit 1; }
+	@scripts/upgrade/new-version.sh $(V) $(NEW_VERSION_FLAGS)
+
+upgrade-rehearsal:
+	@test -n "$(FROM)" && test -n "$(TO)" || { echo "usage: make upgrade-rehearsal FROM=v34 TO=HEAD [NAME=v35]"; exit 1; }
+	@scripts/upgrade/rehearse.sh --from $(FROM) --to $(TO) $(if $(NAME),--name $(NAME),) $(REHEARSAL_FLAGS)
+
+upgrade-tooling-test:
+	@scripts/upgrade/test/run.sh
+
+.PHONY: new-version upgrade-rehearsal upgrade-tooling-test
