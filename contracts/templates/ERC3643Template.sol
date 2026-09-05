@@ -4,6 +4,8 @@ pragma solidity ^0.8.20;
 import "../interfaces/ITokenizationPrecompile.sol";
 import "../interfaces/IERC3643.sol";
 import "../libraries/TokenizationJSONHelpers.sol";
+import "../libraries/TokenizationDecoders.sol";
+import "../libraries/TokenizationInitialization.sol";
 
 /**
  * @title ERC3643Template
@@ -149,7 +151,7 @@ contract ERC3643Template is IERC3643 {
 
         // Default balances with auto-approve for self-initiated transfers
         string memory defaultBalancesJson = string(abi.encodePacked(
-            '{"balances":', balanceJson,
+            '{"balances":[]',
             ',"autoApproveSelfInitiatedOutgoingTransfers":true',
             ',"autoApproveSelfInitiatedIncomingTransfers":true',
             ',"autoApproveAllIncomingTransfers":false',
@@ -179,6 +181,9 @@ contract ERC3643Template is IERC3643 {
         );
 
         collectionId = PRECOMPILE.createCollection(createJson);
+        if (_totalSupply > 0) {
+            TokenizationInitialization.mintInitialSupply(PRECOMPILE, collectionId, admin, balanceJson);
+        }
         emit CollectionInitialized(collectionId);
     }
 
@@ -360,7 +365,7 @@ contract ERC3643Template is IERC3643 {
             TokenizationJSONHelpers.getDynamicStoreValueJSON(kycRegistryId, investor)
         );
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     /**
@@ -373,7 +378,7 @@ contract ERC3643Template is IERC3643 {
             TokenizationJSONHelpers.getDynamicStoreValueJSON(accreditedRegistryId, investor)
         );
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     /**
@@ -416,7 +421,7 @@ contract ERC3643Template is IERC3643 {
             TokenizationJSONHelpers.getDynamicStoreValueJSON(frozenRegistryId, investor)
         );
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     /**
