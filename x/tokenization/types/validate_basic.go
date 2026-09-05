@@ -627,7 +627,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidRequest, "initiated by list id cannot be Mint")
 		}
 
-		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, false); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, true); err != nil {
 			return sdkerrors.Wrapf(err, "invalid token IDs")
 		}
 
@@ -896,6 +896,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			if approvalCriteria.PredeterminedBalances != nil {
+				if approvalCriteria.PredeterminedBalances.OrderCalculationMethod == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "predetermined balances require an order calculation method")
+				}
+
 				isBasicallyNil := PredeterminedBalancesIsBasicallyNil(approvalCriteria.PredeterminedBalances)
 				manualBalancesIsBasicallyNil := IsManualBalancesBasicallyNil(approvalCriteria.PredeterminedBalances.ManualBalances)
 				sequentialTransferIsBasicallyNil := IsSequentialTransferBasicallyNil(approvalCriteria.PredeterminedBalances.IncrementedBalances)

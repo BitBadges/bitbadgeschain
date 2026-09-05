@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"math/big"
 	"strings"
@@ -252,4 +253,100 @@ func (suite *TestSuite) TestMigrateV35CanonicalAddressesMergesEntries() {
 	suite.Require().True(value.Value)
 	suite.Require().True(k.IsAddressReservedProtocolInStore(suite.ctx, charlie))
 	suite.Require().False(k.IsAddressReservedProtocolInStore(suite.ctx, upperCharlie))
+}
+
+// Validation rejects an approval without token ids, at collection and user level.
+func (suite *TestSuite) TestApprovalWithoutTokenIdsIsRejected() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := CreateCollections(suite, wctx, []*types.MsgNewCollection{v35MintCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+	}, []*types.UintRange{})})
+	suite.Require().Error(err, "collection approval without token ids")
+
+	err = CreateCollections(suite, wctx, []*types.MsgNewCollection{v35MintCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+	}, GetFullUintRanges())})
+	suite.Require().NoError(err)
+
+	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 alice,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateIncomingApprovals: true,
+		IncomingApprovals: []*types.UserIncomingApproval{{
+			FromListId:        "All",
+			InitiatedByListId: "All",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          []*types.UintRange{},
+			ApprovalId:        "in",
+		}},
+	})
+	suite.Require().Error(err, "incoming approval without token ids")
+}
+
+// Validation rejects predetermined balances that carry no order calculation method.
+func (suite *TestSuite) TestPredeterminedBalancesRequireOrderCalculationMethod() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := CreateCollections(suite, wctx, []*types.MsgNewCollection{v35MintCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+		PredeterminedBalances:          &types.PredeterminedBalances{},
+	}, GetFullUintRanges())})
+	suite.Require().Error(err)
+}
+
+// v35StoreClaimCollection writes a collection with the "claim" mint approval straight into the
+// store, skipping message validation, to model state written by an earlier version.
+func (suite *TestSuite) v35StoreClaimCollection(criteria *types.ApprovalCriteria, tokenIds []*types.UintRange) {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	err := CreateCollections(suite, wctx, []*types.MsgNewCollection{v35MintCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+	}, GetFullUintRanges())})
+	suite.Require().NoError(err)
+
+	collection, found := suite.app.TokenizationKeeper.GetCollectionFromStore(suite.ctx, sdkmath.NewUint(1))
+	suite.Require().True(found)
+	collection.CollectionApprovals[0].ApprovalCriteria = criteria
+	collection.CollectionApprovals[0].TokenIds = tokenIds
+	suite.Require().NoError(suite.app.TokenizationKeeper.SetCollectionInStore(suite.ctx, collection, true))
+}
+
+// Stored approvals without token ids are skipped with an error rather than aborting the transfer.
+func (suite *TestSuite) TestTransferSkipsStoredApprovalWithoutTokenIds() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.v35StoreClaimCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+	}, []*types.UintRange{})
+
+	var err error
+	suite.Require().NotPanics(func() { err = TransferTokens(suite, wctx, v35Claim(alice, alice, nil)) })
+	suite.Require().Error(err)
+}
+
+// Stored predetermined balances without an order calculation method impose no ordering and
+// do not abort the transfer.
+func (suite *TestSuite) TestTransferHandlesStoredPredeterminedBalancesWithoutMethod() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	suite.v35StoreClaimCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+		PredeterminedBalances:          &types.PredeterminedBalances{},
+	}, GetFullUintRanges())
+
+	var err error
+	suite.Require().NotPanics(func() { err = TransferTokens(suite, wctx, v35Claim(alice, alice, nil)) })
+	suite.Require().NoError(err)
+
+	// The precalculation path reads the same field and must also stay deterministic.
+	collection, _ := suite.app.TokenizationKeeper.GetCollectionFromStore(suite.ctx, sdkmath.NewUint(1))
+	suite.Require().NotPanics(func() {
+		err = TransferTokens(suite, wctx, v35Claim(alice, alice, func(t *types.Transfer) {
+			t.PrecalculateBalancesFromApproval = &types.PrecalculateBalancesFromApprovalDetails{ApprovalId: "claim", ApprovalLevel: "collection", Version: collection.CollectionApprovals[0].Version}
+		}))
+	})
+	suite.Require().Error(err)
 }
