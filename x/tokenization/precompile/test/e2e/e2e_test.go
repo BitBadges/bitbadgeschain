@@ -1022,8 +1022,15 @@ func (suite *E2ETestSuite) TestPrecompile_EdgeCases() {
 
 // TestPrecompile_LargeTransfer tests transfers with large amounts
 func (suite *E2ETestSuite) TestPrecompile_LargeTransfer() {
-	// First, mint more tokens to Alice for large transfer test
+	// First, widen the valid token ids and mint more tokens to Alice for large transfer test
 	msgServer := tokenizationkeeper.NewMsgServerImpl(suite.TokenizationKeeper)
+	_, err := msgServer.UniversalUpdateCollection(suite.Ctx, &tokenizationtypes.MsgUniversalUpdateCollection{
+		Creator:             suite.Alice.String(),
+		CollectionId:        suite.CollectionId,
+		UpdateValidTokenIds: true,
+		ValidTokenIds:       []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1050)}},
+	})
+	suite.Require().NoError(err)
 	mintMsg := &tokenizationtypes.MsgTransferTokens{
 		Creator:      suite.Alice.String(),
 		CollectionId: suite.CollectionId,
@@ -1045,7 +1052,7 @@ func (suite *E2ETestSuite) TestPrecompile_LargeTransfer() {
 			},
 		},
 	}
-	_, err := msgServer.TransferTokens(suite.Ctx, mintMsg)
+	_, err = msgServer.TransferTokens(suite.Ctx, mintMsg)
 	suite.Require().NoError(err)
 
 	// Now test large transfer
