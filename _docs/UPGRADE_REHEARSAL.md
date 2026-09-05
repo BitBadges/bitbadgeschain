@@ -102,7 +102,22 @@ and the vote, via `propose.sh`. Asserts:
    `UPGRADE_HEIGHT`, `LOG` and `API_URL` in the environment and its exit code is the
    number of failed checks. `checks/v35.sh` asserts
    `consensus block.max_gas == 100000000` and
-   `feemarket min_gas_price == 10`. Add one file per version.
+   `feemarket min_gas_price == 10`, then runs the EVM value-transfer
+   assertions from `lib/evm_transfer.sh` (below). Add one file per version.
+
+**EVM value transfers** (`lib/evm_transfer.sh`, run by `checks/v35.sh` in
+the upgrade stage and by the evmcheck stage) — creates two `eth_secp256k1`
+keys, funds the sender with 2 BADGE by bank send at `--gas-prices 10ubadge`,
+exports its hex key and signs two legacy EIP-155 transfers with the tracked
+`scripts/upgrade/evmtx` helper (built in the container from the TO tree; gas
+price = max(`eth_gasPrice`, 10 gwei)). Asserts, for a 0.5 BADGE transfer:
+receipt status `0x1`, recipient `eth_getBalance == value`, recipient bank
+`ubadge` up by value/1e9, sender bank `ubadge` down by (value+fee)/1e9 with
+the fee a whole number of ubadge; and for a second 1e9+5 wei transfer:
+status `0x1`, recipient EVM balance exactly v1+v2 and bank balance holding
+the whole part. After both, `/cosmos/bank/v1beta1/denom_owners/abadge` has
+zero owners and `supply/by_denom?denom=abadge` is 0 — the 18-decimal denom
+never reaches x/bank.
 
 **rollback** (`--rollback`) — runs the TO `pre-upgrade` hook the way
 cosmovisor does (no `--home`, only `DAEMON_HOME`) on a stock FROM home and
@@ -137,7 +152,9 @@ assumed.
 
 Config: the upgrade stage enables the REST API server (`[api] enable = true`
 in `app.toml`, before the snapshot the hook diff is taken against) so
-`checks/<name>.sh` can read module params that have no CLI query. The chain
+`checks/<name>.sh` can read module params that have no CLI query, and the
+EVM JSON-RPC server (`[json-rpc] enable = true`, 127.0.0.1:8545) for the EVM
+transfer assertions. The chain
 binary registers no `query feemarket`/`query vm` commands, so `checks/v35.sh`
 reads `$API_URL/cosmos/evm/feemarket/v1/params`.
 
@@ -209,6 +226,17 @@ Recorded here because each item shapes how the next rehearsal is read.
   `InitGenesis` because the gentx carries no fee ("minimum global fee for
   this tx is: 2000000ubadge"). Local/test chains that want the floor must
   either raise it after genesis or create the gentx with `--fees`.
+- **EVM value transfers work through precisebank.** Legacy EIP-155
+  transfers of 0.5 BADGE and of 1e9+5 wei both land with status `0x1`;
+  `eth_getBalance`, bank `ubadge` and the fee reconcile exactly, and `abadge`
+  never appears in x/bank (zero denom owners, zero supply).
+- **Young-chain gas price.** The feemarket `base_fee` starts at its genesis
+  default of 1e9 and is applied as ubadge per gas, so `eth_gasPrice` on a
+  fresh chain is ~6e17 wei/gas and a 21000-gas transfer costs ~12,000 BADGE;
+  it decays 12.5% per empty block (about 140 blocks to reach the 10 ubadge
+  floor). Mainnet's base fee decayed long ago and sits at the floor, so this
+  only bites fresh testnets/local chains. The rehearsal funds its EVM sender
+  from the live `eth_gasPrice` for that reason.
 - **Hook is a no-op for v35.** `pre-upgrade` finds `mempool.type` already
   `"app"` on a v34 home, rewrites nothing, and rollback is binary-only.
 - **No feemarket CLI.** The chain binary registers no `query feemarket`
@@ -218,6 +246,7 @@ Recorded here because each item shapes how the next rehearsal is read.
 
 `make upgrade-tooling-test` runs `scripts/upgrade/test/*.sh` (new-version
 fixtures including the proto snapshot, `propose.sh --dry-run`, `rehearse.sh
---dry-run`, and a fake-docker test that a failing stage fails the run) and
+--dry-run`, a fake-docker test that a failing stage fails the run, and
+`go vet`/`go build` plus flag validation of the `evmtx` helper) and
 shellcheck (local binary, else `koalaman/shellcheck` via Docker). No chain
 binary is built by the tests.
