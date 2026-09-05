@@ -1220,6 +1220,13 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 	return balances, nil
 }
 
+func ValidateMaxSupplyWithBacking(maxSupply Uint, hasBacking bool) error {
+	if hasBacking && !maxSupply.IsNil() && !maxSupply.IsZero() {
+		return sdkerrors.Wrap(ErrInvalidRequest, "maxSupplyPerId cannot be used with cosmosCoinBackedPath")
+	}
+	return nil
+}
+
 // ValidateTransferWithInvariants validates a transfer and checks invariants
 func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *TokenCollection) error {
 	// First validate the basic transfer

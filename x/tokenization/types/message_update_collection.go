@@ -346,6 +346,9 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 	// Validate cosmos coin backed path in invariants
 	// If validation fails, the entire backed path step is disabled/rejected
 	if msg.Invariants != nil && msg.Invariants.CosmosCoinBackedPath != nil {
+		if err := ValidateMaxSupplyWithBacking(msg.Invariants.MaxSupplyPerId, true); err != nil {
+			return err
+		}
 		path := msg.Invariants.CosmosCoinBackedPath
 		// Validate conversion
 		if path.Conversion == nil {
