@@ -1338,6 +1338,9 @@ func ValidateTokenMetadata(tokenMetadata []*TokenMetadata, canChangeValues bool)
 	handledTokenIds := []*UintRange{}
 	if len(tokenMetadata) > 0 {
 		for _, tokenMetadata := range tokenMetadata {
+			if tokenMetadata == nil {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "token metadata is nil")
+			}
 			// Validate well-formedness of the message entries
 			if err := ValidateURI(tokenMetadata.Uri); err != nil {
 				return err

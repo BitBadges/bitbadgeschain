@@ -220,6 +220,10 @@ func (k Keeper) ExecuteCoinTransfers(
 		}
 
 		for _, coin := range coinsToTransfer {
+			if coin == nil || coin.Amount.IsNil() || !coin.Amount.IsPositive() {
+				detErrMsg := "coin transfer amount must be positive"
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
