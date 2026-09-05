@@ -27,6 +27,7 @@ import (
 func TestNativeActionRevertBillsConsumedGas(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false).WithGasMeter(storetypes.NewInfiniteGasMeter())
+	ctx.GasMeter().ConsumeGas(123_456, "work before native action")
 	db := statedb.New(ctx, app.EVMKeeper, statedb.TxConfig{})
 	evm := vm.NewEVM(vm.BlockContext{}, db, params.AllEthashProtocolChanges, vm.Config{})
 	contract := vm.NewContract(common.HexToAddress("0x1234"), common.HexToAddress("0x1001"), uint256.NewInt(0), 2_000_000, nil)
@@ -37,7 +38,7 @@ func TestNativeActionRevertBillsConsumedGas(t *testing.T) {
 	})
 	require.ErrorIs(t, err, vm.ErrExecutionReverted)
 	t.Logf("native gas consumed=1000000, EVM gas charged=%d", 2_000_000-contract.Gas)
-	require.LessOrEqual(t, contract.Gas, uint64(1_000_000), "ordinary reverts must charge native work")
+	require.Equal(t, uint64(1_000_000), contract.Gas, "ordinary reverts must charge only this action's native work")
 }
 
 type nativeGasProbe struct {
