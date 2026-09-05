@@ -350,3 +350,79 @@ func (suite *TestSuite) TestTransferHandlesStoredPredeterminedBalancesWithoutMet
 	})
 	suite.Require().Error(err)
 }
+
+// Precalculation from a user-level approval reads merkle-leaf usage under that approval's
+// own (approver, level) key, not the collection-level key.
+func (suite *TestSuite) TestPrecalculationChecksLeafUsageAtUserLevel() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	k := suite.app.TokenizationKeeper
+	one := sdkmath.NewUint(1)
+
+	err := CreateCollections(suite, wctx, []*types.MsgNewCollection{v35MintCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+	}, GetFullUintRanges())})
+	suite.Require().NoError(err)
+	collection, found := k.GetCollectionFromStore(suite.ctx, one)
+	suite.Require().True(found)
+
+	// Two-leaf tree; alice's proof is leaf index 0.
+	aliceLeaf, bobLeaf := "-"+alice+"-1-0-0", "-"+bob+"-1-0-0"
+	aliceHash, bobHash := sha256.Sum256([]byte(aliceLeaf)), sha256.Sum256([]byte(bobLeaf))
+	root := sha256.Sum256(append(aliceHash[:], bobHash[:]...))
+
+	incoming := []*types.UserIncomingApproval{{
+		FromListId:        "All",
+		InitiatedByListId: "All",
+		TransferTimes:     GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		ApprovalId:        "in",
+		Version:           sdkmath.NewUint(0),
+		ApprovalCriteria: &types.IncomingApprovalCriteria{
+			MaxNumTransfers: &types.MaxNumTransfers{AmountTrackerId: "t"},
+			MerkleChallenges: []*types.MerkleChallenge{{
+				Root:                hex.EncodeToString(root[:]),
+				ExpectedProofLength: one,
+				MaxUsesPerLeaf:      one,
+				ChallengeTrackerId:  "c",
+			}},
+			PredeterminedBalances: &types.PredeterminedBalances{
+				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseMerkleChallengeLeafIndex: true, ChallengeTrackerId: "c"},
+				IncrementedBalances: &types.IncrementedBalances{
+					StartBalances:             []*types.Balance{{Amount: one, TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}},
+					IncrementTokenIdsBy:       one,
+					IncrementOwnershipTimesBy: sdkmath.NewUint(0),
+					DurationFromTimestamp:     sdkmath.NewUint(0),
+				},
+			},
+		},
+	}}
+	approvals := types.CastIncomingTransfersToCollectionTransfers(incoming, alice)
+
+	transfer := &types.Transfer{
+		From:        bob,
+		ToAddresses: []string{alice},
+		MerkleProofs: []*types.MerkleProof{{
+			Leaf:  aliceLeaf,
+			Aunts: []*types.MerklePathItem{{Aunt: hex.EncodeToString(bobHash[:]), OnRight: true}},
+		}},
+		PrecalculateBalancesFromApproval: &types.PrecalculateBalancesFromApprovalDetails{
+			ApprovalId: "in", ApprovalLevel: "incoming", ApproverAddress: alice, Version: sdkmath.NewUint(0),
+		},
+	}
+	// Metadata as built by the transfer path before the approval level is known.
+	metadata := keeper.TransferMetadata{From: bob, To: alice, InitiatedBy: bob, ApproverAddress: "", ApprovalLevel: "collection"}
+
+	// Leaf 0 already used under a collection-level approval with the same ids: irrelevant here.
+	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, keeper.ConstructUsedClaimChallengeKey(one, "", "collection", "in", "c", sdkmath.NewUint(0)), one))
+	balances, err := k.GetPredeterminedBalancesForPrecalculationId(suite.ctx, collection, approvals, transfer, metadata)
+	suite.Require().NoError(err)
+	suite.Require().Len(balances, 1)
+	suite.Require().Equal(one, balances[0].Amount)
+
+	// Leaf 0 used under alice's incoming approval: the precalculation must refuse it.
+	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, keeper.ConstructUsedClaimChallengeKey(one, alice, "incoming", "in", "c", sdkmath.NewUint(0)), one))
+	_, err = k.GetPredeterminedBalancesForPrecalculationId(suite.ctx, collection, approvals, transfer, metadata)
+	suite.Require().Error(err)
+}

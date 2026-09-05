@@ -1050,12 +1050,16 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 
 				// If the approval has challenges, we need to check that a valid solutions is provided for every challenge
 				// If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
+				// Leaf usage is tracked per (approver, level), so simulate under the approval being precalculated.
+				challengeMetadata := transferMetadata
+				challengeMetadata.ApproverAddress = approverAddress
+				challengeMetadata.ApprovalLevel = approvalLevel
 				_, numIncrementsFetched, err := k.HandleMerkleChallenges(
 					ctx,
 					collection.CollectionId,
 					transfer,
 					approval,
-					transferMetadata,
+					challengeMetadata,
 					true,
 				)
 				if err != nil {
