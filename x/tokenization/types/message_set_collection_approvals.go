@@ -57,7 +57,7 @@ func (msg *MsgSetCollectionApprovals) ToUniversalUpdateCollection() (*MsgUnivers
 			CanUpdateCollectionApprovals: msg.CanUpdateCollectionApprovals,
 		},
 	}
-	err := ms.CheckAndCleanMsg(sdk.Context{}, true)
+	err := ms.CheckAndCleanMsg(sdk.Context{}, false)
 	if err != nil {
 		return nil, err
 	}

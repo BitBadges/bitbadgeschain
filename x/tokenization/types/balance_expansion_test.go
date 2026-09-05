@@ -32,3 +32,13 @@ func TestBalanceExpansionChargesBeforeMaterialization(t *testing.T) {
 		})
 	}
 }
+
+func TestBalanceExpansionPreservesPureContext(t *testing.T) {
+	balance := &types.Balance{Amount: sdkmath.OneUint(), TokenIds: []*types.UintRange{{Start: sdkmath.OneUint(), End: sdkmath.OneUint()}}, OwnershipTimes: []*types.UintRange{{Start: sdkmath.OneUint(), End: sdkmath.OneUint()}}}
+	require.NotPanics(t, func() {
+		result, err := types.ValidateBalances(sdk.Context{}, []*types.Balance{balance, balance}, true)
+		require.NoError(t, err)
+		require.Len(t, result, 1)
+		require.Equal(t, sdkmath.NewUint(2), result[0].Amount)
+	})
+}

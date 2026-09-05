@@ -139,7 +139,9 @@ func chargeBalanceExpansion(ctx sdk.Context, ids, times int) {
 	if hi != 0 {
 		panic(storetypes.ErrorGasOverflow{Descriptor: "balance range expansion"})
 	}
-	ctx.GasMeter().ConsumeGas(gas, "balance range expansion")
+	if !ctx.IsZero() {
+		ctx.GasMeter().ConsumeGas(gas, "balance range expansion")
+	}
 }
 
 func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRange, balances []*Balance) (newBalances []*Balance, err error) {
