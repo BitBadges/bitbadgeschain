@@ -378,6 +378,8 @@ func (k Keeper) HandleTransfer(
 				ToAddresses:                             []string{to},
 				Balances:                                userApproval.Balances,
 				MerkleProofs:                            transfer.MerkleProofs,
+				EthSignatureProofs:                      transfer.EthSignatureProofs,
+				Memo:                                    transfer.Memo,
 				PrioritizedApprovals:                    transfer.PrioritizedApprovals,
 				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,

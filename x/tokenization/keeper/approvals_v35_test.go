@@ -431,7 +431,6 @@ func (suite *TestSuite) TestPrecalculationChecksLeafUsageAtUserLevel() {
 // the transfer's EthSignatureProofs (and Memo) reach the user-level approval checks.
 func (suite *TestSuite) TestIncomingApprovalETHSignatureChallengeCanBeSatisfied() {
 	// Passes once HandleTransfer copies EthSignatureProofs and Memo into the user-level transfer.
-	suite.T().Skip("pending EthSignatureProofs/Memo pass-through in transfers.go")
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	privateKeyHex, signerAddress, err := generateTestETHPrivateKey()
 	suite.Require().NoError(err)
