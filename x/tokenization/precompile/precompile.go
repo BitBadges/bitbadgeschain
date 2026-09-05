@@ -1660,6 +1660,9 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 		return nil, ErrCollectionNotFound(req.CollectionId)
 	}
 
+	// Balances are keyed by bech32 address; Solidity callers pass 0x.
+	req.Address = convertEVMAddressToBech32(req.Address)
+
 	// Get user balance store
 	userBalanceStore, _, err := p.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, req.Address)
 	if err != nil {

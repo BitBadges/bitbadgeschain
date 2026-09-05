@@ -298,6 +298,9 @@ compile-contracts:
 		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
 			interfaces/ITokenizationPrecompile.sol \
 			test/MaxUniqueHoldersChecker.sol && \
+		echo "Compiling ERC3643Tokenization..." && \
+		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
+			ERC3643Tokenization.sol && \
 		echo "Compiling GammHelperLibrariesTestContract..." && \
 		solcjs --bin --abi --optimize --base-path . --include-path . --output-dir test \
 			types/GammTypes.sol \
