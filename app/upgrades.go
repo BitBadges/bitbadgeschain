@@ -4,6 +4,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
+	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -14,6 +15,18 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.ModuleManager,
 			app.Configurator(),
 			app.AccountKeeper,
+		),
+	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v35.UpgradeName,
+		v35.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.Configurator(),
+			v35.Keepers{
+				ConsensusParams: app.ConsensusParamsKeeper,
+				FeeMarket:       app.FeeMarketKeeper,
+				Tokenization:    app.TokenizationKeeper,
+			},
 		),
 	)
 
