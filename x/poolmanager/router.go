@@ -306,7 +306,7 @@ func (k Keeper) multihopEstimateOutGivenExactAmountInInternal(
 		actualTokenIn := tokenIn
 		// apply taker fee if applicable
 		if applyTakerFee {
-			takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
+			takerFee, err := k.effectiveTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
 			if err != nil {
 				return osmomath.Int{}, err
 			}
@@ -672,7 +672,7 @@ func (k Keeper) createMultihopExpectedSwapOuts(
 
 		spreadFactor := poolI.GetSpreadFactor(ctx)
 
-		takerFee, err := k.GetTradingPairTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
+		takerFee, err := k.effectiveTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
 		if err != nil {
 			return nil, err
 		}
