@@ -204,6 +204,9 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 				return err
 			}
 
+			// Drop coin transfers whose approval attempt was rolled back
+			coinTransfers = k.CommittedCoinTransfers(ctx, collection.CollectionId, coinTransfers)
+
 			// Save balances after each recipient to ensure consistency.
 			// This ensures that if the transaction fails partway through,
 			// the state is consistent (though the cache context will roll back all changes).
