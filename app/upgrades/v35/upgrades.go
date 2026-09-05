@@ -85,11 +85,7 @@ func setMinGasPrice(ctx sdk.Context, fk feemarketkeeper.Keeper) error {
 // accompany v35's validation changes. Order matters: address canonicalisation
 // first, so every later walk sees one key per account.
 func runTokenizationMigrations(ctx sdk.Context, tk *tokenizationkeeper.Keeper) error {
-	// Populated as the v35 keeper migrations land:
-	//   tk.MigrateV35CanonicalAddresses(ctx)
-	//   tk.MigrateV35ETHSignatureTrackers(ctx)
-	_ = tk
-	return nil
+	return tk.MigrateV35CanonicalAddresses(ctx)
 }
 
 func CreateUpgradeHandler(
