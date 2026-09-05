@@ -65,6 +65,9 @@ func (q Querier) EstimateSwapExactAmountIn(ctx sdk.Context, req queryproto.Estim
 // EstimateSwapExactAmountInWithPrimitiveTypes runs same logic with EstimateSwapExactAmountIn
 // but instead takes array of primitive types in the request to support query through grpc-gateway.
 func (q Querier) EstimateSwapExactAmountInWithPrimitiveTypes(ctx sdk.Context, req queryproto.EstimateSwapExactAmountInWithPrimitiveTypesRequest) (*queryproto.EstimateSwapExactAmountInResponse, error) {
+	if len(req.RoutesPoolId) != len(req.RoutesTokenOutDenom) {
+		return nil, status.Error(codes.InvalidArgument, "route pool IDs and token denoms must have matching lengths")
+	}
 	if req.TokenIn == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid token")
 	}
@@ -121,6 +124,9 @@ func (q Querier) EstimateSwapExactAmountOut(ctx sdk.Context, req queryproto.Esti
 
 // EstimateSwapExactAmountOut estimates token output amount for a swap.
 func (q Querier) EstimateSwapExactAmountOutWithPrimitiveTypes(ctx sdk.Context, req queryproto.EstimateSwapExactAmountOutWithPrimitiveTypesRequest) (*queryproto.EstimateSwapExactAmountOutResponse, error) {
+	if len(req.RoutesPoolId) != len(req.RoutesTokenInDenom) {
+		return nil, status.Error(codes.InvalidArgument, "route pool IDs and token denoms must have matching lengths")
+	}
 	if req.TokenOut == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid token")
 	}
@@ -131,6 +137,7 @@ func (q Querier) EstimateSwapExactAmountOutWithPrimitiveTypes(ctx sdk.Context, r
 		var route types.SwapAmountOutRoute
 		route.PoolId = poolId
 		route.TokenInDenom = req.RoutesTokenInDenom[idx]
+		routes = append(routes, route)
 	}
 
 	if err := types.SwapAmountOutRoutes(routes).Validate(); err != nil {
