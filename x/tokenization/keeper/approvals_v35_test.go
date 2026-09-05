@@ -426,3 +426,96 @@ func (suite *TestSuite) TestPrecalculationChecksLeafUsageAtUserLevel() {
 	_, err = k.GetPredeterminedBalancesForPrecalculationId(suite.ctx, collection, approvals, transfer, metadata)
 	suite.Require().Error(err)
 }
+
+// A user-level (incoming) approval gated on an ETH signature challenge can be satisfied:
+// the transfer's EthSignatureProofs (and Memo) reach the user-level approval checks.
+func (suite *TestSuite) TestIncomingApprovalETHSignatureChallengeCanBeSatisfied() {
+	// Passes once HandleTransfer copies EthSignatureProofs and Memo into the user-level transfer.
+	suite.T().Skip("pending EthSignatureProofs/Memo pass-through in transfers.go")
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	privateKeyHex, signerAddress, err := generateTestETHPrivateKey()
+	suite.Require().NoError(err)
+
+	collectionsToCreate := GetCollectionsToCreate()
+	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{{
+		ToListId:          "AllWithoutMint",
+		FromListId:        "Mint",
+		InitiatedByListId: "AllWithoutMint",
+		TransferTimes:     GetFullUintRanges(),
+		TokenIds:          GetFullUintRanges(),
+		OwnershipTimes:    GetFullUintRanges(),
+		ApprovalId:        "mint-test",
+		ApprovalCriteria: &types.ApprovalCriteria{
+			MaxNumTransfers:                &types.MaxNumTransfers{OverallMaxNumTransfers: sdkmath.NewUint(1000), AmountTrackerId: "mint-test-tracker"},
+			ApprovalAmounts:                &types.ApprovalAmounts{PerFromAddressApprovalAmount: sdkmath.NewUint(1000), AmountTrackerId: "mint-test-tracker"},
+			OverridesFromOutgoingApprovals: true,
+			OverridesToIncomingApprovals:   true,
+		},
+	}}, collectionsToCreate[0].CollectionApprovals...)
+	suite.Require().NoError(CreateCollections(suite, wctx, collectionsToCreate))
+
+	suite.Require().NoError(TransferTokens(suite, wctx, &types.MsgTransferTokens{
+		Creator:      bob,
+		CollectionId: sdkmath.NewUint(1),
+		Transfers: []*types.Transfer{{
+			From:                 "Mint",
+			ToAddresses:          []string{bob},
+			Balances:             []*types.Balance{{Amount: sdkmath.NewUint(1), TokenIds: GetTopHalfUintRanges(), OwnershipTimes: GetFullUintRanges()}},
+			PrioritizedApprovals: []*types.ApprovalIdentifierDetails{{ApprovalId: "mint-test", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)}},
+		}},
+	}))
+
+	// alice only accepts transfers carrying a ticket signed for her incoming approval.
+	suite.Require().NoError(UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
+		Creator:                 alice,
+		CollectionId:            sdkmath.NewUint(1),
+		UpdateIncomingApprovals: true,
+		IncomingApprovals: []*types.UserIncomingApproval{{
+			FromListId:        "AllWithoutMint",
+			InitiatedByListId: "AllWithoutMint",
+			TransferTimes:     GetFullUintRanges(),
+			OwnershipTimes:    GetFullUintRanges(),
+			TokenIds:          GetFullUintRanges(),
+			ApprovalId:        "ticket",
+			ApprovalCriteria: &types.IncomingApprovalCriteria{
+				EthSignatureChallenges: []*types.ETHSignatureChallenge{{Signer: signerAddress, ChallengeTrackerId: "c"}},
+			},
+		}},
+	}))
+	aliceBalance, err := GetUserBalance(suite, wctx, sdkmath.NewUint(1), alice)
+	suite.Require().NoError(err)
+	suite.Require().Len(aliceBalance.IncomingApprovals, 1)
+	ticketVersion := aliceBalance.IncomingApprovals[0].Version
+
+	nonce := "ticket-1"
+	signature, err := generateETHSignature(nonce, bob, "1", alice, "incoming", "ticket", "c", privateKeyHex)
+	suite.Require().NoError(err)
+
+	transfer := func(ctx sdk.Context, proofs []*types.ETHSignatureProof) error {
+		return TransferTokens(suite, sdk.WrapSDKContext(ctx), &types.MsgTransferTokens{
+			Creator:      bob,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{{
+				From:        bob,
+				ToAddresses: []string{alice},
+				Balances:    []*types.Balance{{Amount: sdkmath.NewUint(1), TokenIds: GetTopHalfUintRanges(), OwnershipTimes: GetFullUintRanges()}},
+				Memo:        "ticket",
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					{ApprovalId: "test", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)},
+					{ApprovalId: "ticket", ApprovalLevel: "incoming", ApproverAddress: alice, Version: ticketVersion},
+				},
+				EthSignatureProofs: proofs,
+			}},
+		})
+	}
+
+	// The failed attempt runs on a cache context so its collection-level tally does not carry over.
+	cacheCtx, _ := suite.ctx.CacheContext()
+	suite.Require().Error(transfer(cacheCtx, nil), "no ticket")
+	suite.Require().NoError(transfer(suite.ctx, []*types.ETHSignatureProof{{Nonce: nonce, Signature: signature}}), "signed ticket")
+
+	numUsed, exists := suite.app.TokenizationKeeper.GetETHSignatureTrackerFromStore(suite.ctx,
+		keeper.ConstructETHSignatureTrackerKey(sdkmath.NewUint(1), alice, "incoming", "ticket", "c", nonce))
+	suite.Require().True(exists)
+	suite.Require().Equal(sdkmath.NewUint(1), numUsed)
+}
