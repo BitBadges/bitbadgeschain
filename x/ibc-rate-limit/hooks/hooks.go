@@ -17,12 +17,12 @@ import (
 )
 
 var (
-	_ ibchooks.OnRecvPacketBeforeHooks                = &RateLimitHooks{}
-	_ ibchooks.SendPacketBeforeHooks                  = &RateLimitHooks{}
-	_ ibchooks.OnRecvPacketOverrideHooks              = &RateLimitOverrideHooks{}
-	_ ibchooks.SendPacketOverrideHooks                = &RateLimitOverrideHooks{}
-	_ ibchooks.OnAcknowledgementPacketOverrideHooks   = &RateLimitOverrideHooks{}
-	_ ibchooks.OnTimeoutPacketOverrideHooks           = &RateLimitOverrideHooks{}
+	_ ibchooks.OnRecvPacketBeforeHooks              = &RateLimitHooks{}
+	_ ibchooks.SendPacketBeforeHooks                = &RateLimitHooks{}
+	_ ibchooks.OnRecvPacketOverrideHooks            = &RateLimitOverrideHooks{}
+	_ ibchooks.SendPacketOverrideHooks              = &RateLimitOverrideHooks{}
+	_ ibchooks.OnAcknowledgementPacketOverrideHooks = &RateLimitOverrideHooks{}
+	_ ibchooks.OnTimeoutPacketOverrideHooks         = &RateLimitOverrideHooks{}
 )
 
 type RateLimitHooks struct {
@@ -110,19 +110,19 @@ func NewRateLimitOverrideHooks(keeper keeper.Keeper) *RateLimitOverrideHooks {
 }
 
 // OnRecvPacketOverride implements OnRecvPacketOverrideHooks
-func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
+func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelVersion string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
 	// Parse ICS20 packet
 	var data transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &data); err != nil {
 		// Not an ICS20 packet, pass through
-		return im.App.OnRecvPacket(ctx, channelID, packet, relayer)
+		return im.App.OnRecvPacket(ctx, channelVersion, packet, relayer)
 	}
 
 	// Extract amount
 	amount, ok := sdkmath.NewIntFromString(data.Amount)
 	if !ok {
 		// Invalid amount, pass through (will fail later)
-		return im.App.OnRecvPacket(ctx, channelID, packet, relayer)
+		return im.App.OnRecvPacket(ctx, channelVersion, packet, relayer)
 	}
 
 	// Extract denom
@@ -132,6 +132,7 @@ func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware,
 	senderAddr := data.Sender
 
 	// Check rate limit for inflow
+	channelID := packet.GetDestChannel()
 	rateLimitAck := h.keeper.CheckRateLimit(ctx, channelID, denom, amount, true, senderAddr)
 	if !rateLimitAck.Success() {
 		// Rate limit exceeded - reject packet
@@ -146,11 +147,14 @@ func (h *RateLimitOverrideHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware,
 	}
 
 	// Rate limit check passed, process packet
-	ack := im.App.OnRecvPacket(ctx, channelID, packet, relayer)
+	ack := im.App.OnRecvPacket(ctx, channelVersion, packet, relayer)
 
 	// If packet was successful, update all tracking
-	if ack.Success() {
+	if ack == nil || ack.Success() {
 		h.updateTrackingAfterTransfer(ctx, channelID, denom, amount, true, senderAddr)
+		if ack == nil {
+			h.recordPendingTransfer(ctx, packet.GetDestPort(), channelID, packet.GetSequence(), denom, senderAddr, true)
+		}
 	}
 
 	return ack
@@ -214,6 +218,14 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 // so that a later error ack or timeout can refund exactly that debit. Must run
 // after updateTrackingAfterTransfer, which resets expired windows.
 func (h *RateLimitOverrideHooks) recordPendingSend(ctx sdk.Context, sourcePort, sourceChannel string, sequence uint64, denom, senderAddr string) {
+	h.recordPendingTransfer(ctx, sourcePort, sourceChannel, sequence, denom, senderAddr, false)
+}
+
+func (h *RateLimitOverrideHooks) recordPendingTransfer(ctx sdk.Context, sourcePort, sourceChannel string, sequence uint64, denom, senderAddr string, incoming bool) {
+	setWindow := h.keeper.SetPendingSendWindow
+	if incoming {
+		setWindow = h.keeper.SetPendingReceiveWindow
+	}
 	params := h.keeper.GetParams(ctx)
 	config := params.FindMatchingConfig(sourceChannel, denom)
 	if config == nil {
@@ -227,13 +239,13 @@ func (h *RateLimitOverrideHooks) recordPendingSend(ctx sdk.Context, sourcePort, 
 			continue
 		}
 		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
-		h.keeper.SetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
+		setWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
 	}
 
 	if senderAddr != "" {
 		for _, limit := range config.AddressLimits {
 			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
-			h.keeper.SetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
+			setWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
 		}
 	}
 }
@@ -274,6 +286,21 @@ func (h *RateLimitOverrideHooks) OnTimeoutPacketOverride(im ibchooks.IBCMiddlewa
 // that record points at is still the current one; the records are then
 // cleared so a packet can never be refunded twice.
 func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet channeltypes.Packet) {
+	h.refundTransferTracking(ctx, packet, false)
+}
+
+func (h *RateLimitOverrideHooks) WriteAcknowledgementAfterHook(ctx sdk.Context, packet ibcexported.PacketI, ack ibcexported.Acknowledgement, err error) {
+	if err != nil || ack == nil {
+		return
+	}
+	if ack.Success() {
+		h.keeper.DeletePendingReceive(ctx, packet.GetDestPort(), packet.GetDestChannel(), packet.GetSequence())
+		return
+	}
+	h.refundTransferTracking(ctx, packet, true)
+}
+
+func (h *RateLimitOverrideHooks) refundTransferTracking(ctx sdk.Context, packet ibcexported.PacketI, incoming bool) {
 	var packetData transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &packetData); err != nil {
 		return
@@ -286,8 +313,17 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 	sourceChannel := packet.GetSourceChannel()
 	sequence := packet.GetSequence()
 	denom := extractDenomFromPacketOnSend(sourcePort, sourceChannel, packetData.Denom)
+	getWindow := h.keeper.GetPendingSendWindow
+	deletePending := h.keeper.DeletePendingSend
+	if incoming {
+		sourcePort, sourceChannel = packet.GetDestPort(), packet.GetDestChannel()
+		denom = extractDenomFromPacketOnRecv(channeltypes.Packet{SourcePort: packet.GetSourcePort(), SourceChannel: packet.GetSourceChannel(), DestinationPort: sourcePort, DestinationChannel: sourceChannel}, packetData.Denom)
+		amount = amount.Neg()
+		getWindow = h.keeper.GetPendingReceiveWindow
+		deletePending = h.keeper.DeletePendingReceive
+	}
 	senderAddr := packetData.Sender
-	defer h.keeper.DeletePendingSend(ctx, sourcePort, sourceChannel, sequence)
+	defer deletePending(ctx, sourcePort, sourceChannel, sequence)
 
 	params := h.keeper.GetParams(ctx)
 	config := params.FindMatchingConfig(sourceChannel, denom)
@@ -301,7 +337,7 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 		if limit.MaxAmount.IsZero() {
 			continue
 		}
-		debitedAt, found := h.keeper.GetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration)
+		debitedAt, found := getWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration)
 		if !found {
 			continue
 		}
@@ -318,7 +354,7 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 	// Reverse per-address tracking. TotalAmount is tracked as Abs(), so subtract Abs().
 	if senderAddr != "" {
 		for _, limit := range config.AddressLimits {
-			debitedAt, found := h.keeper.GetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration)
+			debitedAt, found := getWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration)
 			if !found {
 				continue
 			}

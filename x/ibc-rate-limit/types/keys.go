@@ -42,8 +42,21 @@ var (
 	// the window the send was debited in. Ack/timeout refunds are only applied
 	// while that window is still current.
 	// Key: PendingSendKey(port, channel, sequence, scope, timeframeType, timeframeDuration) -> big-endian window start
-	KeyPrefixPendingSend = []byte{0x07}
+	KeyPrefixPendingSend    = []byte{0x07}
+	KeyPrefixPendingReceive = []byte{0x08}
 )
+
+func PendingReceivePrefix(port, channel string, sequence uint64) []byte {
+	key := PendingSendPrefix(port, channel, sequence)
+	key[0] = KeyPrefixPendingReceive[0]
+	return key
+}
+
+func PendingReceiveKey(port, channel string, sequence uint64, scope string, timeframeType int32, timeframeDuration int64) []byte {
+	key := PendingSendKey(port, channel, sequence, scope, timeframeType, timeframeDuration)
+	key[0] = KeyPrefixPendingReceive[0]
+	return key
+}
 
 const (
 	// PendingSendScopeSupplyShift marks a pending-send record for a supply shift limit

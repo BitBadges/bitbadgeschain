@@ -2,17 +2,16 @@ package app
 
 import (
 	"cosmossdk.io/core/appmodule"
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
 	icamodule "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
@@ -23,6 +22,7 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/types"
 	ibccallbacks "github.com/cosmos/ibc-go/v11/modules/apps/callbacks"
 	ibctransfer "github.com/cosmos/ibc-go/v11/modules/apps/transfer"
+	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -65,10 +65,11 @@ type CombinedIBCHooks struct {
 
 // Implement hook interfaces by delegating to the appropriate hook
 var (
-	_ ibchooks.OnRecvPacketOverrideHooks              = &CombinedIBCHooks{}
-	_ ibchooks.SendPacketOverrideHooks                = &CombinedIBCHooks{}
-	_ ibchooks.OnAcknowledgementPacketOverrideHooks   = &CombinedIBCHooks{}
-	_ ibchooks.OnTimeoutPacketOverrideHooks           = &CombinedIBCHooks{}
+	_ ibchooks.OnRecvPacketOverrideHooks            = &CombinedIBCHooks{}
+	_ ibchooks.SendPacketOverrideHooks              = &CombinedIBCHooks{}
+	_ ibchooks.OnAcknowledgementPacketOverrideHooks = &CombinedIBCHooks{}
+	_ ibchooks.OnTimeoutPacketOverrideHooks         = &CombinedIBCHooks{}
+	_ ibchooks.WriteAcknowledgementAfterHooks       = &CombinedIBCHooks{}
 )
 
 func (h *CombinedIBCHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) ibcexported.Acknowledgement {
@@ -92,6 +93,12 @@ func (h *CombinedIBCHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx s
 
 	// Fallback to default behavior
 	return im.App.OnRecvPacket(ctx, channelID, packet, relayer)
+}
+
+func (h *CombinedIBCHooks) WriteAcknowledgementAfterHook(ctx sdk.Context, packet ibcexported.PacketI, ack ibcexported.Acknowledgement, err error) {
+	if h.RateLimitOverrideHooks != nil {
+		h.RateLimitOverrideHooks.WriteAcknowledgementAfterHook(ctx, packet, ack, err)
+	}
 }
 
 func (h *CombinedIBCHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk.Context, sourcePort string, sourceChannel string, timeoutHeight ibcclienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
