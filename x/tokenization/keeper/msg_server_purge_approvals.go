@@ -65,6 +65,28 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 		}
 	}
 
+	// PurgeExpired sweeps every approval of the target; the expiry and permission checks in
+	// canPurgeUserApproval still decide which of them actually go.
+	if msg.PurgeExpired {
+		listed := map[string]bool{}
+		for _, approval := range incomingApprovalsToPurge {
+			listed["incoming:"+approval.ApprovalId] = true
+		}
+		for _, approval := range outgoingApprovalsToPurge {
+			listed["outgoing:"+approval.ApprovalId] = true
+		}
+		for _, approval := range userBalance.IncomingApprovals {
+			if !listed["incoming:"+approval.ApprovalId] {
+				incomingApprovalsToPurge = append(incomingApprovalsToPurge, &types.ApprovalIdentifierDetails{ApprovalId: approval.ApprovalId, ApprovalLevel: "incoming", ApproverAddress: targetAddress, Version: approval.Version})
+			}
+		}
+		for _, approval := range userBalance.OutgoingApprovals {
+			if !listed["outgoing:"+approval.ApprovalId] {
+				outgoingApprovalsToPurge = append(outgoingApprovalsToPurge, &types.ApprovalIdentifierDetails{ApprovalId: approval.ApprovalId, ApprovalLevel: "outgoing", ApproverAddress: targetAddress, Version: approval.Version})
+			}
+		}
+	}
+
 	// Filter incoming approvals
 	if len(incomingApprovalsToPurge) > 0 {
 		newIncomingApprovals := k.filterApprovalsToPurge(ctx, userBalance.IncomingApprovals, incomingApprovalsToPurge, msg, targetAddress, currentTime, &numPurged)
