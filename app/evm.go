@@ -154,7 +154,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		nonTransientKeys,
 		authority,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // 9-decimal chain: EVM must see precisebank, not raw x/bank
+		newEVMBankKeeper(app.PreciseBankKeeper), // 9-decimal chain: EVM must see precisebank, not raw x/bank; see evm_bank.go
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,

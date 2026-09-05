@@ -202,7 +202,7 @@ var (
 		{Account: feemarkettypes.ModuleName, Permissions: []string{}},                               // FeeMarket module account
 		{Account: erc20types.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}}, // ERC20 module account
 		{Account: evmtypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
-		{Account: precisebanktypes.ModuleName, Permissions: []string{}}, // PreciseBank reserve account
+		{Account: precisebanktypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}}, // PreciseBank reserve: mints/burns the integer coin that backs fractional balances
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
