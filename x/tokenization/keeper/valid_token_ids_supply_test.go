@@ -42,6 +42,41 @@ func (suite *TestSuite) TestMintOutsideValidTokenIdsIsRejected() {
 	suite.Require().Nil(types.ValidateBalancesWithinValidTokenIds(total.Balances, col.ValidTokenIds))
 }
 
+func (suite *TestSuite) TestPrecalculatedMintRespectsValidTokenIds() {
+	wctx := sdk.WrapSDKContext(suite.ctx)
+	msg := v35MintCollection(&types.ApprovalCriteria{
+		OverridesFromOutgoingApprovals: true,
+		OverridesToIncomingApprovals:   true,
+		PredeterminedBalances: &types.PredeterminedBalances{
+			IncrementedBalances: &types.IncrementedBalances{
+				StartBalances:             []*types.Balance{{Amount: sdkmath.OneUint(), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}},
+				IncrementTokenIdsBy:       sdkmath.OneUint(),
+				IncrementOwnershipTimesBy: sdkmath.ZeroUint(),
+				DurationFromTimestamp:     sdkmath.ZeroUint(),
+			},
+			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
+		},
+	}, GetFullUintRanges())
+	msg.TokensToCreate = []*types.Balance{{Amount: sdkmath.OneUint(), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}}
+	suite.Require().NoError(CreateCollections(suite, wctx, []*types.MsgNewCollection{msg}))
+	collection, err := GetCollection(suite, wctx, sdkmath.OneUint())
+	suite.Require().NoError(err)
+	claim := func() error {
+		return TransferTokens(suite, wctx, v35Claim(alice, alice, func(transfer *types.Transfer) {
+			transfer.Balances = nil
+			transfer.PrioritizedApprovals = []*types.ApprovalIdentifierDetails{{ApprovalId: "claim", ApprovalLevel: "collection", Version: collection.CollectionApprovals[0].Version}}
+			transfer.PrecalculateBalancesFromApproval = &types.PrecalculateBalancesFromApprovalDetails{
+				ApprovalId: "claim", ApprovalLevel: "collection", Version: collection.CollectionApprovals[0].Version,
+			}
+		}))
+	}
+	suite.Require().NoError(claim())
+	suite.Require().Error(claim(), "the second increment selects an id outside the collection")
+	total, err := GetUserBalance(suite, wctx, sdkmath.OneUint(), "Total")
+	suite.Require().NoError(err)
+	suite.Require().NoError(types.ValidateBalancesWithinValidTokenIds(total.Balances, collection.ValidTokenIds))
+}
+
 // Shrinking ValidTokenIds is gated by CanUpdateValidTokenIds for the removed ids, exactly like growing it.
 func (suite *TestSuite) TestShrinkValidTokenIdsRequiresPermission() {
 	wctx := sdk.WrapSDKContext(suite.ctx)

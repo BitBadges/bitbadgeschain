@@ -2,11 +2,13 @@ package types
 
 import (
 	"encoding/json"
+	"math/bits"
 	"sort"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -127,11 +129,25 @@ func UpdateBalance(ctx sdk.Context, newBalance *Balance, balances []*Balance) ([
 }
 
 // Gets the balances for specified ID ranges. Returns a new []*Balance where only the specified ID ranges and their balances are included. Appends balance == 0 objects so all IDs are accounted for, even if not found.
+func chargeBalanceExpansion(ctx sdk.Context, ids, times int) {
+	const gasPerDetail = uint64(1000)
+	hi, count := bits.Mul64(uint64(ids), uint64(times))
+	if hi != 0 {
+		panic(storetypes.ErrorGasOverflow{Descriptor: "balance range expansion"})
+	}
+	hi, gas := bits.Mul64(count, gasPerDetail)
+	if hi != 0 {
+		panic(storetypes.ErrorGasOverflow{Descriptor: "balance range expansion"})
+	}
+	ctx.GasMeter().ConsumeGas(gas, "balance range expansion")
+}
+
 func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRange, balances []*Balance) (newBalances []*Balance, err error) {
 	fetchedBalances := []*Balance{}
 
 	currPermissionDetails := []*UniversalPermissionDetails{}
 	for _, balanceObj := range balances {
+		chargeBalanceExpansion(ctx, len(balanceObj.TokenIds), len(balanceObj.OwnershipTimes))
 		for _, currRange := range balanceObj.TokenIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
@@ -144,6 +160,7 @@ func GetBalancesForIds(ctx sdk.Context, idRanges []*UintRange, times []*UintRang
 	}
 
 	toFetchPermissionDetails := []*UniversalPermissionDetails{}
+	chargeBalanceExpansion(ctx, len(idRanges), len(times))
 	for _, rangeToFetch := range idRanges {
 		for _, timeToFetch := range times {
 			toFetchPermissionDetails = append(toFetchPermissionDetails, &UniversalPermissionDetails{
@@ -343,6 +360,7 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 
 	for _, balanceObj := range balances {
 		currPermissionDetails := []*UniversalPermissionDetails{}
+		chargeBalanceExpansion(ctx, len(balanceObj.TokenIds), len(balanceObj.OwnershipTimes))
 		for _, currRange := range balanceObj.TokenIds {
 			for _, currTime := range balanceObj.OwnershipTimes {
 				currPermissionDetails = append(currPermissionDetails, &UniversalPermissionDetails{
@@ -353,6 +371,7 @@ func DeleteBalances(ctx sdk.Context, rangesToDelete []*UintRange, timesToDelete 
 		}
 
 		toDeletePermissionDetails := []*UniversalPermissionDetails{}
+		chargeBalanceExpansion(ctx, len(rangesToDelete), len(timesToDelete))
 		for _, rangeToDelete := range rangesToDelete {
 			for _, timeToDelete := range timesToDelete {
 				toDeletePermissionDetails = append(toDeletePermissionDetails, &UniversalPermissionDetails{

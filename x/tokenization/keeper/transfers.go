@@ -158,6 +158,12 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 					return err
 				}
 
+				if types.IsMintAddress(transfer.From) || k.IsBackingPathAddress(ctx, collection, transfer.From) {
+					if err := types.ValidateBalancesWithinValidTokenIds(transfer.Balances, collection.ValidTokenIds); err != nil {
+						return err
+					}
+				}
+
 				amountsJsonData, err := json.Marshal(transfer)
 				if err != nil {
 					return err

@@ -147,19 +147,8 @@ func DoRangesOverlap(ids []*UintRange) bool {
 	idsCopy := make([]*UintRange, len(ids))
 	copy(idsCopy, ids)
 
-	// Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	sortUintRanges(idsCopy)
 	n := len(idsCopy)
-	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 {
-			if idsCopy[j-1].Start.GT(idsCopy[j].Start) {
-				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
-			} else if idsCopy[j-1].Start.Equal(idsCopy[j].Start) && idsCopy[j-1].End.GT(idsCopy[j].End) {
-				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
-			}
-			j--
-		}
-	}
 
 	// Check if any overlap
 	for i := 1; i < n; i++ {
@@ -1553,9 +1542,9 @@ func ValidateEVMContractAddressFormat(address string) error {
 // evmQueryPlaceholders are the allowed calldata placeholders (replaced at runtime).
 // Address placeholders become 40 hex chars; $collectionId becomes 64 hex chars (uint256); $recipients becomes 64+ hex.
 var (
-	evmQueryPlaceholderAddress   = "0000000000000000000000000000000000000000" // 40 hex
-	evmQueryPlaceholderUint256   = "0000000000000000000000000000000000000000000000000000000000000000" // 64 hex
-	evmQueryPlaceholdersOrder    = []string{"$collectionId", "$recipients", "$initiator", "$sender", "$recipient"}
+	evmQueryPlaceholderAddress      = "0000000000000000000000000000000000000000"                         // 40 hex
+	evmQueryPlaceholderUint256      = "0000000000000000000000000000000000000000000000000000000000000000" // 64 hex
+	evmQueryPlaceholdersOrder       = []string{"$collectionId", "$recipients", "$initiator", "$sender", "$recipient"}
 	evmQueryPlaceholderReplacements = map[string]string{
 		"$initiator":    evmQueryPlaceholderAddress,
 		"$sender":       evmQueryPlaceholderAddress,
