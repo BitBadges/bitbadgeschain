@@ -16,6 +16,8 @@ type AuthKeeper interface {
 
 // BankKeeper defines the expected interface for the Bank module.
 type BankKeeper interface {
+	IsSendEnabledCoins(context.Context, ...sdk.Coin) error
+	BlockedAddr(sdk.AccAddress) bool
 	GetBalance(context.Context, sdk.AccAddress, string) sdk.Coin
 	GetAllBalances(context.Context, sdk.AccAddress) sdk.Coins
 	SpendableCoins(context.Context, sdk.AccAddress) sdk.Coins
