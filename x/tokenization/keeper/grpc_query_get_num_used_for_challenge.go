@@ -5,7 +5,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,8 +17,14 @@ func (k Keeper) GetChallengeTracker(goCtx context.Context, req *types.QueryGetCh
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
-	leafIndex := sdkmath.NewUintFromString(req.LeafIndex)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
+	leafIndex, err := parseQueryUint(req.LeafIndex, "LeafIndex")
+	if err != nil {
+		return nil, err
+	}
 	numUsed, err := k.GetChallengeTrackerFromStore(ctx, collectionId, req.ApproverAddress, req.ApprovalLevel, req.ApprovalId, req.ChallengeTrackerId, leafIndex)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

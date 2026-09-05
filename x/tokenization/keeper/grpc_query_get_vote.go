@@ -5,7 +5,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,7 +17,10 @@ func (k Keeper) GetVote(goCtx context.Context, req *types.QueryGetVoteRequest) (
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
 
 	// Construct the vote key
 	voteKey := ConstructVotingTrackerKey(
