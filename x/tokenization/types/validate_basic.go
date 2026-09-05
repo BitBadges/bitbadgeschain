@@ -116,9 +116,15 @@ func ValidateAddress(address string, alowMint bool) error {
 	}
 
 	// Validate address using global SDK config (should be "bb" prefix)
-	_, err := sdk.AccAddressFromBech32(address)
+	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s", err)
+	}
+
+	// bech32 decoding also accepts the all-uppercase spelling; addresses are used as
+	// store keys and compared as strings, so only the canonical spelling is accepted.
+	if accAddr.String() != address {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s is not in canonical form (expected %s)", address, accAddr.String())
 	}
 	return nil
 }
@@ -621,7 +627,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidRequest, "initiated by list id cannot be Mint")
 		}
 
-		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, false); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, true); err != nil {
 			return sdkerrors.Wrapf(err, "invalid token IDs")
 		}
 
@@ -890,6 +896,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			if approvalCriteria.PredeterminedBalances != nil {
+				if approvalCriteria.PredeterminedBalances.OrderCalculationMethod == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "predetermined balances require an order calculation method")
+				}
+
 				isBasicallyNil := PredeterminedBalancesIsBasicallyNil(approvalCriteria.PredeterminedBalances)
 				manualBalancesIsBasicallyNil := IsManualBalancesBasicallyNil(approvalCriteria.PredeterminedBalances.ManualBalances)
 				sequentialTransferIsBasicallyNil := IsSequentialTransferBasicallyNil(approvalCriteria.PredeterminedBalances.IncrementedBalances)

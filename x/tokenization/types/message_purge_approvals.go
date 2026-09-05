@@ -41,7 +41,7 @@ func (msg *MsgPurgeApprovals) GetSignBytes() []byte {
 }
 
 func (msg *MsgPurgeApprovals) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	err := ValidateAddress(msg.Creator, false)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
@@ -61,7 +61,7 @@ func (msg *MsgPurgeApprovals) ValidateBasic() error {
 
 	// Validate approver address if provided
 	if msg.ApproverAddress != "" {
-		_, err := sdk.AccAddressFromBech32(msg.ApproverAddress)
+		err := ValidateAddress(msg.ApproverAddress, false)
 		if err != nil {
 			return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approver address (%s)", err)
 		}
@@ -96,7 +96,7 @@ func (msg *MsgPurgeApprovals) ValidateBasic() error {
 
 		// Validate approver address in approval if provided
 		if approval.ApproverAddress != "" {
-			_, err := sdk.AccAddressFromBech32(approval.ApproverAddress)
+			err := ValidateAddress(approval.ApproverAddress, false)
 			if err != nil {
 				return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approver address in approval at index %d (%s)", i, err)
 			}
