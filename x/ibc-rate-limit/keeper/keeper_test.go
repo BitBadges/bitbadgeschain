@@ -491,24 +491,6 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_AddressAmountLimit() {
 	suite.Require().True(ack.Success())
 }
 
-// TestTimeframeDurationInBlocks tests timeframe conversion
-func (suite *KeeperTestSuite) TestTimeframeDurationInBlocks() {
-	// Test with default block time (3 seconds for BitBadges chain)
-	blockTimeSeconds := int64(3)
-
-	// Test block timeframe (should return as-is)
-	blocks := ratelimittypes.TimeframeDurationInBlocks(ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 100, blockTimeSeconds)
-	suite.Require().Equal(int64(100), blocks)
-
-	// Test hour timeframe (1 hour = 3600 seconds = 1200 blocks at 3s/block)
-	blocks = ratelimittypes.TimeframeDurationInBlocks(ratelimittypes.TimeframeType_TIMEFRAME_TYPE_HOUR, 1, blockTimeSeconds)
-	suite.Require().Equal(int64(1200), blocks)
-
-	// Test day timeframe (1 day = 86400 seconds = 28800 blocks at 3s/block)
-	blocks = ratelimittypes.TimeframeDurationInBlocks(ratelimittypes.TimeframeType_TIMEFRAME_TYPE_DAY, 1, blockTimeSeconds)
-	suite.Require().Equal(int64(28800), blocks)
-}
-
 // TestValidateParams_EmptyDenom tests that empty denoms are rejected
 func (suite *KeeperTestSuite) TestValidateParams_EmptyDenom() {
 	params := ratelimittypes.DefaultParams()
