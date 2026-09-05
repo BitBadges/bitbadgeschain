@@ -88,6 +88,21 @@ func (k Keeper) checkPermission(ctx sdk.Context, executor string, managerSplitte
 
 // checkAllPermissions checks all permissions that would be used by the UniversalUpdateCollection message
 func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSplitter *types.ManagerSplitter, msg *tokenizationtypes.MsgUniversalUpdateCollection) error {
+	// Fields that create a collection, move the splitter's coins, or fix
+	// collection-wide rules have no delegated permission and stay admin-only.
+	// DefaultBalances only takes effect on the create path, so the create
+	// gate covers it.
+	if executor != managerSplitter.Admin {
+		switch {
+		case msg.CollectionId.IsZero():
+			return sdkerrors.Wrap(types.ErrPermissionDenied, "only admin can create a collection")
+		case len(msg.MintEscrowCoinsToTransfer) > 0:
+			return sdkerrors.Wrap(types.ErrPermissionDenied, "only admin can transfer mint escrow coins")
+		case msg.Invariants != nil:
+			return sdkerrors.Wrap(types.ErrPermissionDenied, "only admin can set invariants")
+		}
+	}
+
 	// Check permissions based on which fields are being updated
 	if msg.UpdateValidTokenIds {
 		if err := k.checkPermission(ctx, executor, managerSplitter, "canUpdateValidTokenIds"); err != nil {

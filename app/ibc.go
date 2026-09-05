@@ -101,7 +101,7 @@ func (h *CombinedIBCHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk
 	}
 
 	// Fallback to default behavior
-	return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+	return i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 }
 
 // OnAcknowledgementPacketOverride forwards to the rate-limit hook so that
@@ -318,11 +318,14 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 
 	// Setup ICS4 Wrapper for hooks (with rate limit + custom hooks)
 	// Use IBCKeeper.ChannelKeeper as the ICS4Wrapper since it implements the interface
-	// The channel field is only used for SendPacket operations, not OnRecvPacket hooks
 	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
 		app.IBCKeeper.ChannelKeeper,
 		combinedHooks,
 	)
+	// Outbound path: transfer -> callbacks -> PFM -> hooks (rate limit) -> channel.
+	// PFM defaults its ICS4Wrapper to the channel keeper, which would leave the
+	// SendPacket hooks out of the outbound chain.
+	app.PacketForwardKeeper.SetICS4Wrapper(&app.HooksICS4Wrapper)
 
 	// Add IBC Hooks middleware last (outermost) to have full control over acknowledgements
 	// This ensures error acknowledgements from hooks are properly returned

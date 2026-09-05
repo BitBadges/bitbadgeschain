@@ -26,10 +26,11 @@ message ChannelFlowWindow {
   option (amino.name) = "ibcratelimit/ChannelFlowWindow";
   option (gogoproto.equal) = true;
 
-  // window_start is the block height when the current window started
+  // window_start is when the current window started: block height for BLOCK
+  // timeframes, block time in unix seconds for HOUR and DAY timeframes
   int64 window_start = 1;
   
-  // window_duration is the duration of the window in blocks
+  // window_duration is the length of the window, in the same unit as window_start
   int64 window_duration = 2;
 }
 

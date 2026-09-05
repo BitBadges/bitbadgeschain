@@ -206,16 +206,11 @@ var (
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
-	// blocked account addresses
-	blockAccAddrs = []string{
-		authtypes.FeeCollectorName,
-		distrtypes.ModuleName,
-		minttypes.ModuleName,
-		stakingtypes.BondedPoolName,
-		stakingtypes.NotBondedPoolName,
-		// We allow the following module accounts to receive funds:
-		// govtypes.ModuleName
-	}
+	// blocked account addresses: every module account except gov, which
+	// receives proposal deposits. Module accounts move coins through keeper
+	// calls, never through MsgSend / ICS-20 receive, so blocking them only
+	// closes paths that would strand coins.
+	blockAccAddrs = blockedModuleAccounts()
 
 	// appConfig application configuration (used by depinject)
 	appConfig = appconfig.Compose(&appv1alpha1.Config{
@@ -341,3 +336,15 @@ var (
 		},
 	})
 )
+
+// blockedModuleAccounts returns the names of all module accounts except gov.
+func blockedModuleAccounts() []string {
+	blocked := make([]string, 0, len(moduleAccPerms))
+	for _, perm := range moduleAccPerms {
+		if perm.Account == govtypes.ModuleName {
+			continue
+		}
+		blocked = append(blocked, perm.Account)
+	}
+	return blocked
+}

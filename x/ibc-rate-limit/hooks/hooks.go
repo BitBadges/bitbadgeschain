@@ -13,6 +13,7 @@ import (
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
 
 var (
@@ -161,14 +162,14 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	var packetData transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(data, &packetData); err != nil {
 		// Not an ICS20 packet, pass through
-		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+		return i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
 	// Extract amount
 	amount, ok := sdkmath.NewIntFromString(packetData.Amount)
 	if !ok {
 		// Invalid amount, pass through (will fail later)
-		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+		return i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
 	// Extract denom using unified function (security fix: MEDIUM-4)
@@ -199,13 +200,42 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	}
 
 	// Rate limit check passed, send packet
-	seq, err := i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+	seq, err := i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	if err == nil {
 		// Update all tracking (negative for outflow)
 		h.updateTrackingAfterTransfer(ctx, sourceChannel, denom, amount.Neg(), false, senderAddr)
+		h.recordPendingSend(ctx, sourcePort, sourceChannel, seq, denom, senderAddr)
 	}
 
 	return seq, err
+}
+
+// recordPendingSend stores, per limit, the window the outbound debit landed in
+// so that a later error ack or timeout can refund exactly that debit. Must run
+// after updateTrackingAfterTransfer, which resets expired windows.
+func (h *RateLimitOverrideHooks) recordPendingSend(ctx sdk.Context, sourcePort, sourceChannel string, sequence uint64, denom, senderAddr string) {
+	params := h.keeper.GetParams(ctx)
+	config := params.FindMatchingConfig(sourceChannel, denom)
+	if config == nil {
+		return
+	}
+
+	flowChannel := config.FlowChannelID(sourceChannel)
+
+	for _, limit := range config.SupplyShiftLimits {
+		if limit.MaxAmount.IsZero() {
+			continue
+		}
+		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		h.keeper.SetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
+	}
+
+	if senderAddr != "" {
+		for _, limit := range config.AddressLimits {
+			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			h.keeper.SetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration, window.WindowStart)
+		}
+	}
 }
 
 // OnAcknowledgementPacketOverride refunds outbound quota when the counterparty
@@ -221,6 +251,7 @@ func (h *RateLimitOverrideHooks) OnAcknowledgementPacketOverride(im ibchooks.IBC
 		return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
 	}
 	if ack.Success() {
+		h.keeper.DeletePendingSend(ctx, packet.GetSourcePort(), packet.GetSourceChannel(), packet.GetSequence())
 		return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
 	}
 
@@ -238,7 +269,10 @@ func (h *RateLimitOverrideHooks) OnTimeoutPacketOverride(im ibchooks.IBCMiddlewa
 
 // refundSendTracking undoes the tracking performed by updateTrackingAfterTransfer
 // for a failed outbound transfer. The outflow was recorded as amount.Neg() on
-// the netFlow, so the inverse is to add amount.Abs() back.
+// the netFlow, so the inverse is to add amount.Abs() back. A limit is only
+// refunded when this packet holds a pending-send record for it and the window
+// that record points at is still the current one; the records are then
+// cleared so a packet can never be refunded twice.
 func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet channeltypes.Packet) {
 	var packetData transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(packet.GetData(), &packetData); err != nil {
@@ -248,30 +282,52 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 	if !ok {
 		return
 	}
+	sourcePort := packet.GetSourcePort()
 	sourceChannel := packet.GetSourceChannel()
-	denom := extractDenomFromPacketOnSend(packet.GetSourcePort(), sourceChannel, packetData.Denom)
+	sequence := packet.GetSequence()
+	denom := extractDenomFromPacketOnSend(sourcePort, sourceChannel, packetData.Denom)
 	senderAddr := packetData.Sender
+	defer h.keeper.DeletePendingSend(ctx, sourcePort, sourceChannel, sequence)
 
 	params := h.keeper.GetParams(ctx)
 	config := params.FindMatchingConfig(sourceChannel, denom)
 	if config == nil {
 		return
 	}
+	flowChannel := config.FlowChannelID(sourceChannel)
 
 	// Reverse supply shift tracking. Outflow added amount.Neg(); undo by adding amount.
 	for _, limit := range config.SupplyShiftLimits {
 		if limit.MaxAmount.IsZero() {
 			continue
 		}
-		flow, _ := h.keeper.GetChannelFlowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		debitedAt, found := h.keeper.GetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeSupplyShift, limit.TimeframeType, limit.TimeframeDuration)
+		if !found {
+			continue
+		}
+		h.keeper.ResetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		window, _ := h.keeper.GetChannelFlowWindowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+		if window.WindowStart != debitedAt {
+			continue
+		}
+		flow, _ := h.keeper.GetChannelFlowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 		flow.NetFlow = flow.NetFlow.Add(amount)
-		h.keeper.SetChannelFlowWithTimeframe(ctx, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration, flow)
+		h.keeper.SetChannelFlowWithTimeframe(ctx, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration, flow)
 	}
 
 	// Reverse per-address tracking. TotalAmount is tracked as Abs(), so subtract Abs().
 	if senderAddr != "" {
 		for _, limit := range config.AddressLimits {
-			data, _ := h.keeper.GetAddressTransferData(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			debitedAt, found := h.keeper.GetPendingSendWindow(ctx, sourcePort, sourceChannel, sequence, types.PendingSendScopeAddress, limit.TimeframeType, limit.TimeframeDuration)
+			if !found {
+				continue
+			}
+			h.keeper.ResetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			window, _ := h.keeper.GetAddressTransferWindow(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
+			if window.WindowStart != debitedAt {
+				continue
+			}
+			data, _ := h.keeper.GetAddressTransferData(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration)
 			if data.TransferCount > 0 {
 				data.TransferCount--
 			}
@@ -281,7 +337,7 @@ func (h *RateLimitOverrideHooks) refundSendTracking(ctx sdk.Context, packet chan
 			} else {
 				data.TotalAmount = sdkmath.ZeroInt()
 			}
-			h.keeper.SetAddressTransferData(ctx, senderAddr, sourceChannel, denom, limit.TimeframeType, limit.TimeframeDuration, data)
+			h.keeper.SetAddressTransferData(ctx, senderAddr, flowChannel, denom, limit.TimeframeType, limit.TimeframeDuration, data)
 		}
 	}
 	// Unique-sender tracking is not reversed: we cannot know whether this sender
@@ -297,6 +353,7 @@ func (h *RateLimitOverrideHooks) updateTrackingAfterTransfer(ctx sdk.Context, ch
 	if config == nil {
 		return // No config, no tracking
 	}
+	channelID = config.FlowChannelID(channelID)
 
 	// Update multiple timeframe supply shift limits
 	for _, limit := range config.SupplyShiftLimits {

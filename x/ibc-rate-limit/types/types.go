@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"math"
 
 	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
@@ -72,13 +73,7 @@ func (t TimeframeLimit) Validate() error {
 	if t.MaxAmount.IsNegative() {
 		return fmt.Errorf("max_amount cannot be negative: %s", t.MaxAmount)
 	}
-	if t.TimeframeType == TimeframeType_TIMEFRAME_TYPE_UNSPECIFIED {
-		return fmt.Errorf("timeframe_type must be specified")
-	}
-	if t.TimeframeDuration <= 0 {
-		return fmt.Errorf("timeframe_duration must be positive: %d", t.TimeframeDuration)
-	}
-	return nil
+	return validateTimeframeDuration(t.TimeframeType, t.TimeframeDuration)
 }
 
 // Validate validates a unique sender limit
@@ -86,13 +81,7 @@ func (u UniqueSenderLimit) Validate() error {
 	if u.MaxUniqueSenders < 0 {
 		return fmt.Errorf("max_unique_senders cannot be negative: %d", u.MaxUniqueSenders)
 	}
-	if u.TimeframeType == TimeframeType_TIMEFRAME_TYPE_UNSPECIFIED {
-		return fmt.Errorf("timeframe_type must be specified")
-	}
-	if u.TimeframeDuration <= 0 {
-		return fmt.Errorf("timeframe_duration must be positive: %d", u.TimeframeDuration)
-	}
-	return nil
+	return validateTimeframeDuration(u.TimeframeType, u.TimeframeDuration)
 }
 
 // Validate validates an address limit
@@ -103,32 +92,49 @@ func (a AddressLimit) Validate() error {
 	if a.MaxAmount.IsNegative() {
 		return fmt.Errorf("max_amount cannot be negative: %s", a.MaxAmount)
 	}
-	if a.TimeframeType == TimeframeType_TIMEFRAME_TYPE_UNSPECIFIED {
-		return fmt.Errorf("timeframe_type must be specified")
-	}
-	if a.TimeframeDuration <= 0 {
-		return fmt.Errorf("timeframe_duration must be positive: %d", a.TimeframeDuration)
-	}
-	return nil
+	return validateTimeframeDuration(a.TimeframeType, a.TimeframeDuration)
 }
 
-// TimeframeDurationInBlocks converts a timeframe duration to blocks
-// blockTime is the average block time in seconds (e.g., 6 seconds)
-func TimeframeDurationInBlocks(timeframeType TimeframeType, timeframeDuration int64, blockTimeSeconds int64) int64 {
+const (
+	SecondsPerHour int64 = 3600
+	SecondsPerDay  int64 = 24 * 3600
+)
+
+// TimeframeDurationInSeconds converts an HOUR or DAY timeframe duration to
+// seconds. BLOCK durations are returned unchanged (they are counted in blocks).
+func TimeframeDurationInSeconds(timeframeType TimeframeType, timeframeDuration int64) int64 {
 	switch timeframeType {
-	case TimeframeType_TIMEFRAME_TYPE_BLOCK:
-		return timeframeDuration
 	case TimeframeType_TIMEFRAME_TYPE_HOUR:
-		// Convert hours to seconds, then to blocks
-		seconds := timeframeDuration * 3600
-		return seconds / blockTimeSeconds
+		return timeframeDuration * SecondsPerHour
 	case TimeframeType_TIMEFRAME_TYPE_DAY:
-		// Convert days to seconds, then to blocks
-		seconds := timeframeDuration * 24 * 3600
-		return seconds / blockTimeSeconds
+		return timeframeDuration * SecondsPerDay
 	default:
-		return timeframeDuration // Fallback to treating as blocks
+		return timeframeDuration
 	}
+}
+
+// validateTimeframeDuration rejects unspecified types, non-positive durations
+// and HOUR/DAY durations whose second count does not fit in int64.
+func validateTimeframeDuration(timeframeType TimeframeType, timeframeDuration int64) error {
+	if timeframeType == TimeframeType_TIMEFRAME_TYPE_UNSPECIFIED {
+		return fmt.Errorf("timeframe_type must be specified")
+	}
+	if timeframeDuration <= 0 {
+		return fmt.Errorf("timeframe_duration must be positive: %d", timeframeDuration)
+	}
+	var secondsPerUnit int64
+	switch timeframeType {
+	case TimeframeType_TIMEFRAME_TYPE_HOUR:
+		secondsPerUnit = SecondsPerHour
+	case TimeframeType_TIMEFRAME_TYPE_DAY:
+		secondsPerUnit = SecondsPerDay
+	default:
+		return nil
+	}
+	if timeframeDuration > math.MaxInt64/secondsPerUnit {
+		return fmt.Errorf("timeframe_duration too large: %d", timeframeDuration)
+	}
+	return nil
 }
 
 // FindMatchingConfig finds the first rate limit config that matches the given channel and denom
@@ -152,6 +158,17 @@ func (p Params) FindMatchingConfig(channelID, denom string) *RateLimitConfig {
 		}
 	}
 	return nil
+}
+
+// FlowChannelID returns the channel id under which flow for a packet on
+// channelID is tracked. A wildcard config (empty ChannelId) matches every
+// channel and aggregates all of them under the empty id, so opening more
+// channels does not grant more quota.
+func (c RateLimitConfig) FlowChannelID(channelID string) string {
+	if c.ChannelId == "" {
+		return ""
+	}
+	return channelID
 }
 
 // NewCustomErrorAcknowledgement creates a custom error acknowledgement with a deterministic error string
