@@ -112,10 +112,41 @@ func buildICS20Packet(t *testing.T, amount string) channeltypes.Packet {
 	}
 }
 
-// seedOutboundTracking simulates the state that updateTrackingAfterTransfer
-// would have written after a successful SendPacket: supply-shift NetFlow
-// decreased by `amount` and per-address TransferCount/TotalAmount incremented.
-func seedOutboundTracking(t *testing.T, k keeper.Keeper, ctx sdk.Context, amount sdkmath.Int) {
+// stubChannel is the ICS4Wrapper under the hooks middleware in send tests.
+type stubChannel struct{ seq uint64 }
+
+func (c stubChannel) SendPacket(sdk.Context, string, string, clienttypes.Height, uint64, []byte) (uint64, error) {
+	return c.seq, nil
+}
+func (stubChannel) WriteAcknowledgement(sdk.Context, ibcexported.PacketI, ibcexported.Acknowledgement) error {
+	return nil
+}
+func (stubChannel) GetAppVersion(sdk.Context, string, string) (string, bool) { return "", false }
+
+// sendOutbound runs a real outbound send through SendPacketOverride so the
+// tracking and the pending-send record are written by production code.
+func sendOutbound(t *testing.T, h *RateLimitOverrideHooks, ctx sdk.Context, amount string, seq uint64) channeltypes.Packet {
+	t.Helper()
+	packet := buildICS20Packet(t, amount)
+	packet.Sequence = seq
+	ics4 := ibchooks.NewICS4Middleware(stubChannel{seq: seq}, nil)
+	gotSeq, err := h.SendPacketOverride(ics4, ctx, packet.SourcePort, packet.SourceChannel, packet.TimeoutHeight, packet.TimeoutTimestamp, packet.Data)
+	require.NoError(t, err)
+	require.Equal(t, seq, gotSeq)
+	return packet
+}
+
+// seedOutboundTracking performs a real outbound send of `amount` (sequence 1)
+// so that supply-shift NetFlow is decreased by `amount` and per-address
+// TransferCount/TotalAmount are incremented, with the pending-send record set.
+func seedOutboundTracking(t *testing.T, h *RateLimitOverrideHooks, ctx sdk.Context, amount sdkmath.Int) {
+	t.Helper()
+	sendOutbound(t, h, ctx, amount.String(), 1)
+}
+
+// seedOutboundTrackingWithoutRecord writes the tracking state directly, as if
+// a debit had happened, but without any pending-send record.
+func seedOutboundTrackingWithoutRecord(t *testing.T, k keeper.Keeper, ctx sdk.Context, amount sdkmath.Int) {
 	t.Helper()
 	k.SetChannelFlowWithTimeframe(ctx, testChannelID, testDenom,
 		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000,
@@ -169,7 +200,7 @@ func newTestMiddleware() ibchooks.IBCMiddleware {
 func TestRefundSendTracking_ReversesSupplyShiftAndAddress(t *testing.T) {
 	h, k, ctx := newTestHooks(t)
 	amount := sdkmath.NewInt(500)
-	seedOutboundTracking(t, k, ctx, amount)
+	seedOutboundTracking(t, h, ctx, amount)
 
 	h.refundSendTracking(ctx, buildICS20Packet(t, "500"))
 
@@ -216,9 +247,10 @@ func TestRefundSendTracking_NoConfigIsNoop(t *testing.T) {
 func TestRefundSendTracking_TotalAmountDoesNotUnderflow(t *testing.T) {
 	h, k, ctx := newTestHooks(t)
 
-	// Seed with a smaller TotalAmount than the refund amount. The refund path
-	// must clamp to zero instead of producing a negative TotalAmount (which
-	// would never happen in practice, but we defend against it).
+	// Debit for real, then shrink TotalAmount below the refund amount. The
+	// refund path must clamp to zero instead of producing a negative
+	// TotalAmount (which would never happen in practice, but we defend against it).
+	seedOutboundTracking(t, h, ctx, sdkmath.NewInt(500))
 	k.SetAddressTransferData(ctx, testSender, testChannelID, testDenom,
 		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000,
 		ratelimittypes.AddressTransferData{
@@ -237,7 +269,7 @@ func TestRefundSendTracking_TotalAmountDoesNotUnderflow(t *testing.T) {
 func TestOnAcknowledgementPacketOverride_SuccessAckDoesNotRefund(t *testing.T) {
 	h, k, ctx := newTestHooks(t)
 	amount := sdkmath.NewInt(500)
-	seedOutboundTracking(t, k, ctx, amount)
+	seedOutboundTracking(t, h, ctx, amount)
 
 	// Build a success ack and send it through the override.
 	successAck := channeltypes.NewResultAcknowledgement([]byte{0x01})
@@ -260,7 +292,7 @@ func TestOnAcknowledgementPacketOverride_SuccessAckDoesNotRefund(t *testing.T) {
 func TestOnAcknowledgementPacketOverride_ErrorAckRefunds(t *testing.T) {
 	h, k, ctx := newTestHooks(t)
 	amount := sdkmath.NewInt(500)
-	seedOutboundTracking(t, k, ctx, amount)
+	seedOutboundTracking(t, h, ctx, amount)
 
 	errorAck := channeltypes.NewErrorAcknowledgement(transfertypes.ErrReceiveDisabled)
 	ackBz := transfertypes.ModuleCdc.MustMarshalJSON(&errorAck)
@@ -281,7 +313,7 @@ func TestOnAcknowledgementPacketOverride_ErrorAckRefunds(t *testing.T) {
 func TestOnTimeoutPacketOverride_Refunds(t *testing.T) {
 	h, k, ctx := newTestHooks(t)
 	amount := sdkmath.NewInt(500)
-	seedOutboundTracking(t, k, ctx, amount)
+	seedOutboundTracking(t, h, ctx, amount)
 
 	err := h.OnTimeoutPacketOverride(newTestMiddleware(), ctx, testChannelID, buildICS20Packet(t, "500"), sdk.AccAddress{})
 	require.NoError(t, err)
@@ -294,4 +326,105 @@ func TestOnTimeoutPacketOverride_Refunds(t *testing.T) {
 		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
 	require.Equal(t, int64(0), data.TransferCount)
 	require.True(t, data.TotalAmount.IsZero())
+}
+
+func errorAckBytes() []byte {
+	errorAck := channeltypes.NewErrorAcknowledgement(transfertypes.ErrReceiveDisabled)
+	return transfertypes.ModuleCdc.MustMarshalJSON(&errorAck)
+}
+
+func TestSendPacketOverride_RecordsPendingSendWindow(t *testing.T) {
+	h, k, ctx := newTestHooks(t)
+	packet := sendOutbound(t, h, ctx, "500", 7)
+
+	window, found := k.GetChannelFlowWindowWithTimeframe(ctx, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, found)
+
+	start, found := k.GetPendingSendWindow(ctx, packet.SourcePort, packet.SourceChannel, 7,
+		ratelimittypes.PendingSendScopeSupplyShift, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, found, "supply-shift pending-send record must exist")
+	require.Equal(t, window.WindowStart, start)
+
+	_, found = k.GetPendingSendWindow(ctx, packet.SourcePort, packet.SourceChannel, 7,
+		ratelimittypes.PendingSendScopeAddress, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, found, "address pending-send record must exist")
+}
+
+func TestRefundSendTracking_NoRecordIsNoop(t *testing.T) {
+	h, k, ctx := newTestHooks(t)
+	amount := sdkmath.NewInt(500)
+	seedOutboundTrackingWithoutRecord(t, k, ctx, amount)
+
+	err := h.OnAcknowledgementPacketOverride(newTestMiddleware(), ctx, testChannelID, buildICS20Packet(t, "500"), errorAckBytes(), sdk.AccAddress{})
+	require.NoError(t, err)
+
+	flow, _ := k.GetChannelFlowWithTimeframe(ctx, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, flow.NetFlow.Equal(amount.Neg()), "refund without a pending-send record must not change the flow, got %s", flow.NetFlow.String())
+
+	data, _ := k.GetAddressTransferData(ctx, testSender, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.Equal(t, int64(1), data.TransferCount)
+	require.True(t, data.TotalAmount.Equal(amount))
+}
+
+func TestRefundSendTracking_AfterWindowRolloverIsNoop(t *testing.T) {
+	h, k, ctx := newTestHooks(t)
+	packet := sendOutbound(t, h, ctx, "500", 1)
+
+	// Move past the 1000-block window and debit again in the new window, then
+	// let the error ack for the old packet arrive.
+	laterCtx := ctx.WithBlockHeight(ctx.BlockHeight() + 1000)
+	sendOutbound(t, h, laterCtx, "200", 2)
+	err := h.OnAcknowledgementPacketOverride(newTestMiddleware(), laterCtx, testChannelID, packet, errorAckBytes(), sdk.AccAddress{})
+	require.NoError(t, err)
+
+	flow, _ := k.GetChannelFlowWithTimeframe(laterCtx, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, flow.NetFlow.Equal(sdkmath.NewInt(-200)), "a refund must not be credited to a window that saw no debit, got %s", flow.NetFlow.String())
+
+	data, _ := k.GetAddressTransferData(laterCtx, testSender, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.Equal(t, int64(1), data.TransferCount)
+	require.True(t, data.TotalAmount.Equal(sdkmath.NewInt(200)))
+
+	_, found := k.GetPendingSendWindow(laterCtx, packet.SourcePort, packet.SourceChannel, 1,
+		ratelimittypes.PendingSendScopeSupplyShift, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.False(t, found, "pending-send record must be cleared after the ack")
+}
+
+func TestOnAcknowledgementPacketOverride_ErrorAckRefundsOnlyOnce(t *testing.T) {
+	h, k, ctx := newTestHooks(t)
+	packet := sendOutbound(t, h, ctx, "500", 1)
+
+	for i := 0; i < 2; i++ {
+		err := h.OnAcknowledgementPacketOverride(newTestMiddleware(), ctx, testChannelID, packet, errorAckBytes(), sdk.AccAddress{})
+		require.NoError(t, err)
+	}
+
+	flow, _ := k.GetChannelFlowWithTimeframe(ctx, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, flow.NetFlow.IsZero(), "a second refund for the same packet must be a no-op, got %s", flow.NetFlow.String())
+}
+
+func TestOnAcknowledgementPacketOverride_SuccessAckClearsPendingRecord(t *testing.T) {
+	h, k, ctx := newTestHooks(t)
+	packet := sendOutbound(t, h, ctx, "500", 1)
+
+	successAck := channeltypes.NewResultAcknowledgement([]byte{0x01})
+	ackBz := transfertypes.ModuleCdc.MustMarshalJSON(&successAck)
+	err := h.OnAcknowledgementPacketOverride(newTestMiddleware(), ctx, testChannelID, packet, ackBz, sdk.AccAddress{})
+	require.NoError(t, err)
+
+	_, found := k.GetPendingSendWindow(ctx, packet.SourcePort, packet.SourceChannel, 1,
+		ratelimittypes.PendingSendScopeSupplyShift, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.False(t, found, "success ack must clear the pending-send record")
+
+	// A later error ack for the same packet must find nothing to refund.
+	err = h.OnAcknowledgementPacketOverride(newTestMiddleware(), ctx, testChannelID, packet, errorAckBytes(), sdk.AccAddress{})
+	require.NoError(t, err)
+	flow, _ := k.GetChannelFlowWithTimeframe(ctx, testChannelID, testDenom,
+		ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1000)
+	require.True(t, flow.NetFlow.Equal(sdkmath.NewInt(-500)), "flow must stay debited, got %s", flow.NetFlow.String())
 }
