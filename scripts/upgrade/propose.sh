@@ -50,7 +50,13 @@ done
 COMMON=(--home "$HOME_DIR")
 [ -n "$NODE" ] && COMMON+=(--node "$NODE")
 TXFLAGS=(--from "$FROM" --keyring-backend "$KR" --gas auto --gas-adjustment 1.5 -y --output json)
-if [ -n "$GAS_PRICES" ]; then TXFLAGS+=(--gas-prices "$GAS_PRICES"); else TXFLAGS+=(--fees "${FEES:-0ubadge}"); fi
+if [ -n "$GAS_PRICES" ]; then
+  TXFLAGS+=(--gas-prices "$GAS_PRICES")
+elif [ -n "$FEES" ]; then
+  TXFLAGS+=(--fees "$FEES")
+else
+  TXFLAGS+=(--gas-prices 10ubadge)
+fi
 
 q() { "$BIN" "$@" "${COMMON[@]}" --output json 2>/dev/null; }
 # The CLI prints "gas estimate: N" ahead of the JSON when --gas auto is used.
@@ -109,13 +115,16 @@ sleep "$WAIT"
 TX=$(q query tx "$TXHASH" || true)
 CODE=$(jq -r '.code // 1' <<<"$TX")
 [ "$CODE" = 0 ] || { echo "submit-proposal tx $TXHASH failed: $(jq -r '.raw_log // "not found yet"' <<<"$TX")" >&2; exit 1; }
-PROPOSAL_ID=$(jq -r '[.events[] | select(.type=="submit_proposal") | .attributes[] | select(.key=="proposal_id") | .value][0] // empty' <<<"$TX")
-[ -n "$PROPOSAL_ID" ] || PROPOSAL_ID=$(q query gov proposals | jq -r '.proposals | sort_by(.id|tonumber) | last.id')
-[ -n "$PROPOSAL_ID" ] && [ "$PROPOSAL_ID" != null ] || { echo "no proposal id found for tx $TXHASH" >&2; exit 1; }
+PROPOSAL_ID=$(jq -r '[.events[]? | select(.type=="submit_proposal") | .attributes[]? | select(.key=="proposal_id") | .value] | if length == 1 then .[0] else empty end' <<<"$TX")
+[[ $PROPOSAL_ID =~ ^[1-9][0-9]*$ ]] || { echo "no unambiguous proposal id found for tx $TXHASH; inspect that transaction before voting" >&2; exit 1; }
 
 if $VOTE; then
-  IFS=, read -r -a EXTRA <<<"$VOTERS"
-  for voter in "$FROM" "${EXTRA[@]}"; do
+  VOTER_KEYS=("$FROM")
+  if [ -n "$VOTERS" ]; then
+    IFS=, read -r -a EXTRA <<<"$VOTERS"
+    VOTER_KEYS+=("${EXTRA[@]}")
+  fi
+  for voter in "${VOTER_KEYS[@]}"; do
     [ -n "$voter" ] || continue
     VFLAGS=("${TXFLAGS[@]}")
     VFLAGS[1]=$voter   # --from <voter>

@@ -22,6 +22,11 @@ has   "not expedited by default"     '"expedited": false' "$OUT"
 has   "submits with --gas auto"      'tx gov submit-proposal <proposal> --from faucet --keyring-backend os --gas auto' "$OUT"
 has   "votes yes by default"         'tx gov vote <id> yes' "$OUT"
 has   "reports the height"           'UPGRADE_HEIGHT=<current height> + 30' "$OUT"
+has   "default gas price meets v35 floor" '--gas-prices 10ubadge' "$OUT"
+
+OUT_FEES=$("$PR" --name v35 --home /tmp/x --from k --fees 1000000ubadge --dry-run 2>&1)
+has   "explicit fees remain supported" '--fees 1000000ubadge' "$OUT_FEES"
+hasnt "explicit fees replace default gas price" '--gas-prices' "$OUT_FEES"
 
 OUT2=$("$PR" --name v35 --home /tmp/x --from k --height 12345 --expedited --deposit 20000000000ubadge --no-vote --gas-prices 10ubadge --chain-id bitbadges-1 --dry-run 2>&1)
 has   "absolute height"              '"height": "12345"' "$OUT2"
