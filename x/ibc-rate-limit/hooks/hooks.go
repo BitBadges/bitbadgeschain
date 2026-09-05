@@ -161,14 +161,14 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	var packetData transfertypes.FungibleTokenPacketData
 	if err := json.Unmarshal(data, &packetData); err != nil {
 		// Not an ICS20 packet, pass through
-		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+		return i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
 	// Extract amount
 	amount, ok := sdkmath.NewIntFromString(packetData.Amount)
 	if !ok {
 		// Invalid amount, pass through (will fail later)
-		return i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+		return i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	}
 
 	// Extract denom using unified function (security fix: MEDIUM-4)
@@ -199,7 +199,7 @@ func (h *RateLimitOverrideHooks) SendPacketOverride(i ibchooks.ICS4Middleware, c
 	}
 
 	// Rate limit check passed, send packet
-	seq, err := i.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+	seq, err := i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 	if err == nil {
 		// Update all tracking (negative for outflow)
 		h.updateTrackingAfterTransfer(ctx, sourceChannel, denom, amount.Neg(), false, senderAddr)
