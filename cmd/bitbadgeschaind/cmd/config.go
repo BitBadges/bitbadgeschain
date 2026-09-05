@@ -63,8 +63,10 @@ func initAppConfig() (string, interface{}) {
 	// - if you set srvCfg.MinGasPrices non-empty, validators CAN tweak their
 	//   own app.toml to override, or use this default value.
 	//
-	// In this application, we set the min gas prices to 0.
-	srvCfg.MinGasPrices = "0" + appparams.BaseCoinUnit
+	// v35 aligns the node default with the fee-market floor the v35 upgrade
+	// sets on chain (see app/upgrades/v35), so a fresh app.toml and the
+	// chain agree. Validators may still override it.
+	srvCfg.MinGasPrices = "10" + appparams.BaseCoinUnit
 
 	// 0 ("enabled, unbounded") rather than the SDK default of -1 ("disabled").
 	// The runtime enables the EVM mempool regardless of this file (see
