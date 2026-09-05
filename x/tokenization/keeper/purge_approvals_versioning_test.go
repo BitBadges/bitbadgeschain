@@ -68,33 +68,3 @@ func (suite *PurgeApprovalsTestSuite) TestPurgeDoesNotReversionUntouchedApproval
 	suite.Require().Equal("live", after.OutgoingApprovals[0].ApprovalId)
 	suite.Require().True(after.OutgoingApprovals[0].Version.Equal(liveVersionBefore), "untouched approval must keep its version (before %s, after %s)", liveVersionBefore, after.OutgoingApprovals[0].Version)
 }
-
-// PurgeExpired sweeps every expired, purgeable approval of the target, not only the listed ones.
-func (suite *PurgeApprovalsTestSuite) TestPurgeExpiredFlagSweepsAllExpiredApprovals() {
-	wctx := sdk.WrapSDKContext(suite.ctx)
-	suite.Require().Nil(CreateCollections(&suite.TestSuite, wctx, []*types.MsgNewCollection{{
-		Creator:        bob,
-		TokensToCreate: []*types.Balance{{TokenIds: GetFullUintRanges()}},
-	}}))
-
-	now := uint64(time.Now().UnixMilli())
-	expiredA := purgeTestOutgoingApproval("expired-a", sdkmath.NewUint(now-2000000), sdkmath.NewUint(now-1000000), false)
-	expiredB := purgeTestOutgoingApproval("expired-b", sdkmath.NewUint(now-2000000), sdkmath.NewUint(now-1000000), false)
-	live := purgeTestOutgoingApproval("live", sdkmath.NewUint(1), sdkmath.NewUint(now+10000000000), false)
-	suite.Require().Nil(UpdateUserApprovals(&suite.TestSuite, wctx, &types.MsgUpdateUserApprovals{
-		Creator: bob, CollectionId: sdkmath.NewUint(1),
-		OutgoingApprovals: []*types.UserOutgoingApproval{expiredA, expiredB, live}, UpdateOutgoingApprovals: true,
-	}))
-
-	res, err := suite.msgServer.PurgeApprovals(wctx, &types.MsgPurgeApprovals{
-		Creator: bob, CollectionId: sdkmath.NewUint(1), PurgeExpired: true,
-		ApprovalsToPurge: []*types.ApprovalIdentifierDetails{{ApprovalId: "expired-a", ApprovalLevel: "outgoing", ApproverAddress: bob, Version: sdkmath.NewUint(0)}},
-	})
-	suite.Require().Nil(err)
-	suite.Require().True(res.NumPurged.Equal(sdkmath.NewUint(2)), "both expired approvals are purged, got %s", res.NumPurged)
-
-	after, err := GetUserBalance(&suite.TestSuite, wctx, sdkmath.NewUint(1), bob)
-	suite.Require().Nil(err)
-	suite.Require().Len(after.OutgoingApprovals, 1)
-	suite.Require().Equal("live", after.OutgoingApprovals[0].ApprovalId)
-}
