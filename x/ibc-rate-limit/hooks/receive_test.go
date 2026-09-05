@@ -6,6 +6,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/require"
@@ -13,6 +14,18 @@ import (
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"
 	ratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
+
+func TestReceiveDenomMatchesLocalTrace(t *testing.T) {
+	packet := buildICS20Packet(t, "1")
+	for _, tc := range []struct{ wire, local string }{
+		{"uatom", "transfer/channel-99/uatom"},
+		{"transfer/channel-8/uatom", "transfer/channel-99/transfer/channel-8/uatom"},
+		{"transfer/" + packet.SourceChannel + "/uatom", "uatom"},
+		{"transfer/" + packet.SourceChannel + "/transfer/channel-8/uatom", "transfer/channel-8/uatom"},
+	} {
+		require.Equal(t, transfertypes.ExtractDenomFromPath(tc.local).IBCDenom(), extractDenomFromPacketOnRecv(packet, tc.wire))
+	}
+}
 
 type receiveModule struct {
 	noopIBCModule

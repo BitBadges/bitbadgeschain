@@ -446,7 +446,7 @@ func extractDenomFromPacketOnRecv(packet channeltypes.Packet, packetDenom string
 		}
 	} else {
 		// Chain is sink for the denom, build local denom
-		denomTrace := transfertypes.ParseDenomTrace(denom)
+		denomTrace := transfertypes.ParseDenomTrace(transfertypes.GetDenomPrefix(packet.GetDestPort(), packet.GetDestChannel()) + denom)
 		denom = denomTrace.IBCDenom()
 	}
 	return denom
