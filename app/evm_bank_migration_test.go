@@ -1,6 +1,7 @@
 package app
 
 import (
+	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
@@ -31,7 +32,7 @@ func TestMigrateV35PreciseBankModulePermissions(t *testing.T) {
 		_ = app.PreciseBankKeeper.MintCoins(ctx, "evm", half)
 	}, "precondition: reserve mint is refused before the migration")
 
-	require.NoError(t, MigrateV35PreciseBankModulePermissions(ctx, app.AccountKeeper))
+	require.NoError(t, v35.MigrateV35PreciseBankModulePermissions(ctx, app.AccountKeeper))
 
 	migrated := app.AccountKeeper.GetModuleAccount(ctx, precisebanktypes.ModuleName)
 	require.Equal(t, existing.GetAccountNumber(), migrated.GetAccountNumber(), "account number must be preserved")
@@ -45,5 +46,5 @@ func TestMigrateV35PreciseBankModulePermissions(t *testing.T) {
 		app.PreciseBankKeeper.GetBalance(ctx, addr, precisebanktypes.ExtendedCoinDenom()).Amount.String())
 
 	// Running it again is a no-op.
-	require.NoError(t, MigrateV35PreciseBankModulePermissions(ctx, app.AccountKeeper))
+	require.NoError(t, v35.MigrateV35PreciseBankModulePermissions(ctx, app.AccountKeeper))
 }

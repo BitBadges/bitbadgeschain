@@ -7,6 +7,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
@@ -50,6 +51,7 @@ const (
 // Keepers is the set of keepers the v35 handler needs. Held by value/pointer
 // exactly as app.App stores them.
 type Keepers struct {
+	Account         authkeeper.AccountKeeper
 	ConsensusParams consensuskeeper.Keeper
 	FeeMarket       feemarketkeeper.Keeper
 	IBCRateLimit    ibcratelimitkeeper.Keeper
@@ -60,6 +62,9 @@ type Keepers struct {
 // from the handler so it can be exercised directly in tests.
 func CustomUpgradeHandlerLogic(ctx context.Context, k Keepers) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	if err := MigrateV35PreciseBankModulePermissions(sdkCtx, k.Account); err != nil {
+		return fmt.Errorf("v35: precisebank permissions: %w", err)
+	}
 
 	if err := setBlockMaxGas(ctx, k.ConsensusParams); err != nil {
 		return fmt.Errorf("v35: block max gas: %w", err)

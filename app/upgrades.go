@@ -1,10 +1,10 @@
 package app
 
 import (
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 // RegisterUpgradeHandlers registers all upgrade handlers
@@ -23,6 +23,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.ModuleManager,
 			app.Configurator(),
 			v35.Keepers{
+				Account:         app.AccountKeeper,
 				ConsensusParams: app.ConsensusParamsKeeper,
 				FeeMarket:       app.FeeMarketKeeper,
 				IBCRateLimit:    app.IBCRateLimitKeeper,
