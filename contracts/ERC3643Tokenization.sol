@@ -4,16 +4,15 @@ pragma solidity ^0.8.0;
 import "./interfaces/IERC3643.sol";
 import "./interfaces/ITokenizationPrecompile.sol";
 import "./libraries/TokenizationWrappers.sol";
-import "./libraries/TokenizationHelpers.sol";
-import "./types/TokenizationTypes.sol";
+import "./libraries/TokenizationJSONHelpers.sol";
 
 /**
  * @title ERC3643Tokenization
  * @dev Minimal ERC-3643 style token backed by a BitBadges collection.
  *
  * All precompile methods take a single JSON string argument; the calls are
- * built through TokenizationWrappers so the encoding always matches the
- * precompile ABI. Token ID 1 is used for every balance, and balances are read
+ * built through the JSON helpers and TokenizationWrappers. Token ID 1 is used
+ * for every balance, and balances are read
  * at the current block time.
  */
 contract ERC3643Tokenization is IERC3643 {
@@ -50,16 +49,16 @@ contract ERC3643Tokenization is IERC3643 {
         require(to != address(0), "ERC3643: transfer to zero address");
         require(amount > 0, "ERC3643: transfer amount must be greater than zero");
 
-        address[] memory toAddresses = new address[](1);
-        toAddresses[0] = to;
-
-        UintRange[] memory tokenIds = new UintRange[](1);
-        tokenIds[0] = TokenizationHelpers.createSingleTokenIdRange(TOKEN_ID);
-
-        UintRange[] memory ownershipTimes = new UintRange[](1);
-        ownershipTimes[0] = TokenizationHelpers.createFullOwnershipTimeRange();
-
-        bool success = tokenizationPrecompile.transferTokens(collectionId, toAddresses, amount, tokenIds, ownershipTimes);
+        // The holder must authorize this wrapper as the transfer initiator.
+        string memory transferJson = string(abi.encodePacked(
+            '{"collectionId":"', TokenizationJSONHelpers.uintToString(collectionId),
+            '","transfers":[{"from":"', TokenizationJSONHelpers.addressToString(msg.sender),
+            '","toAddresses":["', TokenizationJSONHelpers.addressToString(to),
+            '"],"balances":[{"amount":"', TokenizationJSONHelpers.uintToString(amount),
+            '","tokenIds":[{"start":"1","end":"1"}],',
+            '"ownershipTimes":[{"start":"1","end":"18446744073709551615"}]}]}]}'
+        ));
+        bool success = tokenizationPrecompile.transferTokens(transferJson);
         require(success, "ERC3643: transfer failed");
 
         emit Transfer(msg.sender, to, amount);

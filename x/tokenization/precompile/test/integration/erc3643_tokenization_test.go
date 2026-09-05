@@ -45,9 +45,7 @@ func (suite *ERC3643TokenizationTestSuite) TestSampleContractTransfersThroughPre
 	suite.Require().NoError(err)
 	suite.Require().Empty(deployRes.VmError, "deployment must succeed")
 
-	// The contract transfers as itself, so give it the whole supply of token
-	// ID 1. The suite seeds balances directly rather than minting, so the
-	// "Total" store that getTotalSupply reads is seeded the same way.
+	// Keep separate wrapper inventory while the holder exercises transfers.
 	const contractSupply = uint64(100)
 	collection, found := suite.TokenizationKeeper.GetCollectionFromStore(suite.Ctx, suite.CollectionId)
 	suite.Require().True(found)
@@ -65,6 +63,10 @@ func (suite *ERC3643TokenizationTestSuite) TestSampleContractTransfersThroughPre
 			AutoApproveAllIncomingTransfers:           true,
 		}))
 	}
+	aliceStore, _, err := suite.TokenizationKeeper.GetBalanceOrApplyDefault(suite.Ctx, collection, suite.Alice.String())
+	suite.Require().NoError(err)
+	aliceStore.OutgoingApprovals = nil
+	suite.Require().NoError(suite.TokenizationKeeper.SetBalanceForAddress(suite.Ctx, collection, suite.Alice.String(), aliceStore))
 
 	// The suite runs every transaction on one context whose gas meter is
 	// never reset, and a precompile call starts by charging that meter's
@@ -100,6 +102,18 @@ func (suite *ERC3643TokenizationTestSuite) TestSampleContractTransfersThroughPre
 	suite.Require().Equal(big.NewInt(int64(contractSupply)).String(), supplyBefore.String(), "total supply of token ID 1 must be visible through the sample")
 
 	const amount = int64(7)
+	_, rejected, err := call("transfer", []interface{}{suite.BobEVM, big.NewInt(amount)}, false)
+	suite.Require().NoError(err)
+	suite.Require().NotEmpty(rejected.VmError, "holder must first authorize the wrapper")
+	suite.Require().Equal(big.NewInt(int64(contractSupply)).String(), balanceOf(contractAddr).String())
+	suite.Require().Equal(bobBefore.String(), balanceOf(suite.BobEVM).String())
+	aliceStore.OutgoingApprovals = []*tokenizationtypes.UserOutgoingApproval{{
+		ApprovalId: "wrapper-transfer", ToListId: "All", InitiatedByListId: contractAcc.String(),
+		TransferTimes: full, TokenIds: full, OwnershipTimes: full,
+		ApprovalCriteria: &tokenizationtypes.OutgoingApprovalCriteria{}, Version: sdkmath.NewUint(0),
+	}}
+	suite.Require().NoError(suite.TokenizationKeeper.SetBalanceForAddress(suite.Ctx, collection, suite.Alice.String(), aliceStore))
+	aliceBefore := balanceOf(suite.AliceEVM)
 	ret, res, err := call("transfer", []interface{}{suite.BobEVM, big.NewInt(amount)}, false)
 	suite.Require().NoError(err)
 	suite.Require().Empty(res.VmError, "transfer must not revert")
@@ -112,12 +126,16 @@ func (suite *ERC3643TokenizationTestSuite) TestSampleContractTransfersThroughPre
 	sawTransfer := false
 	for _, log := range res.Logs {
 		if len(log.Topics) > 0 && log.Topics[0] == transferEvent.ID.Hex() {
+			suite.Require().Len(log.Topics, 3)
+			suite.Equal(common.BytesToHash(suite.AliceEVM.Bytes()).Hex(), log.Topics[1])
+			suite.Equal(common.BytesToHash(suite.BobEVM.Bytes()).Hex(), log.Topics[2])
 			sawTransfer = true
 		}
 	}
 	suite.True(sawTransfer, "the sample must emit Transfer")
 
-	suite.Equal(big.NewInt(int64(contractSupply)-amount).String(), balanceOf(contractAddr).String(), "contract balance after transfer")
+	suite.Equal(big.NewInt(int64(contractSupply)).String(), balanceOf(contractAddr).String(), "wrapper inventory is unchanged")
+	suite.Equal(new(big.Int).Sub(aliceBefore, big.NewInt(amount)).String(), balanceOf(suite.AliceEVM).String(), "holder balance after transfer")
 	suite.Equal(new(big.Int).Add(bobBefore, big.NewInt(amount)).String(), balanceOf(suite.BobEVM).String(), "recipient balance after transfer")
 	suite.Equal(supplyBefore.String(), totalSupply().String(), "a transfer must not change total supply")
 }
