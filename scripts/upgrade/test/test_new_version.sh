@@ -15,14 +15,14 @@ assert_grep()  { if grep -qF -- "$2" "$3"; then ok "$1"; else fail "$1"; fi; }
 assert_ngrep() { if grep -qF -- "$2" "$3"; then fail "$1"; else ok "$1"; fi; }
 
 # --- fixture: v35 already wired by hand, Makefile still says v34 ------------
-mk_fixture() { rm -rf "${T:?}/$1"; cp -R "$HERE/fixtures/$1" "$T/$1"; }
+mk_fixture() { rm -rf "${T:?}/$1"; cp -R "$HERE/testdata/$1" "$T/$1"; }
 mk_fixture wired
 echo "== v35 on a tree where app/upgrades/v35 is already wired"
 BEFORE=$(shasum "$T/wired/app/upgrades.go" "$T/wired/app/upgrades/v35/upgrades.go")
 "$NV" v35 --repo "$T/wired" >/dev/null
 AFTER=$(shasum "$T/wired/app/upgrades.go" "$T/wired/app/upgrades/v35/upgrades.go")
 assert_grep "Makefile VERSION bumped to v35" 'VERSION := v35' "$T/wired/Makefile"
-assert "Makefile keeps its line count (no swallowed blank line)" [ "$(wc -l < "$T/wired/Makefile")" = "$(wc -l < "$HERE/fixtures/wired/Makefile")" ]
+assert "Makefile keeps its line count (no swallowed blank line)" [ "$(wc -l < "$T/wired/Makefile")" = "$(wc -l < "$HERE/testdata/wired/Makefile")" ]
 if [ "$BEFORE" = "$AFTER" ]; then ok "app/upgrades.go and app/upgrades/v35 untouched"; else fail "app/upgrades.go or v35 handler were modified"; fi
 assert "previous app/upgrades/v34 kept" [ -d "$T/wired/app/upgrades/v34" ]
 
@@ -50,7 +50,7 @@ if command -v gofmt >/dev/null; then
   # The fixture mirrors the real file, which already has import-order drift;
   # the script must not add any: gofmt's diff before and after may differ only
   # by the v36 lines it inserted.
-  DRIFT_BEFORE=$(gofmt -d "$HERE/fixtures/fresh/app/upgrades.go" | grep -cE '^[-+][^-+]' || true)
+  DRIFT_BEFORE=$(gofmt -d "$HERE/testdata/fresh/app/upgrades.go" | grep -cE '^[-+][^-+]' || true)
   DRIFT_AFTER=$(gofmt -d "$T/fresh/app/upgrades.go" | grep -E '^[-+][^-+]' | grep -vc v36 || true)
   assert "no new gofmt drift in app/upgrades.go ($DRIFT_BEFORE -> $DRIFT_AFTER)" [ "$DRIFT_BEFORE" = "$DRIFT_AFTER" ]
 fi
@@ -63,7 +63,7 @@ assert "second run is a no-op" [ "$SNAP1" = "$SNAP2" ]
 # --- proto snapshot from a git ref ----------------------------------------
 echo "== --snapshot-proto copies the previous tag's tokenization protos"
 R="$T/protorepo"; mkdir -p "$R/proto/tokenization" "$R/x/tokenization/keeper" "$R/app/upgrades/v35"
-cp -R "$HERE/fixtures/fresh/." "$R/"
+cp -R "$HERE/testdata/fresh/." "$R/"
 cat > "$R/proto/tokenization/balances.proto" <<'P'
 syntax = "proto3";
 package tokenization;
