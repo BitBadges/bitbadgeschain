@@ -1,9 +1,9 @@
 package types
 
 import (
-	"strings"
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strings"
 )
 
 const TypeMsgUniversalUpdateCollection = "update_collection"
