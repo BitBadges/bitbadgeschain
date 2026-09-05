@@ -42,6 +42,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
@@ -571,23 +572,49 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 	}
 
 	// Route to transaction or query handler
-	// Note: GetBalanceAmount, GetTotalSupply, and GetAllReservedProtocolAddresses need special handling
 	var bz []byte
 	if p.IsTransaction(method) {
 		bz, err = p.HandleTransaction(ctx, method, jsonStr, contract)
-	} else if method.Name == GetBalanceAmountMethod {
-		bz, err = p.HandleGetBalanceAmount(ctx, method, jsonStr)
-	} else if method.Name == GetTotalSupplyMethod {
-		bz, err = p.HandleGetTotalSupply(ctx, method, jsonStr)
-	} else if method.Name == GetAllReservedProtocolAddressesMethod {
-		bz, err = p.HandleGetAllReservedProtocolAddresses(ctx, method, jsonStr)
-	} else if method.Name == IsAddressReservedProtocolMethod {
-		bz, err = p.HandleIsAddressReservedProtocol(ctx, method, jsonStr)
 	} else {
-		bz, err = p.HandleQuery(ctx, method, jsonStr)
+		bz, err = p.handleQueryReadOnly(ctx, method, jsonStr)
 	}
 
 	return bz, method.Name, err
+}
+
+// handleQueryReadOnly dispatches a query on a throw-away branch of the store.
+//
+// Some query paths share keeper code with transactions and write on first
+// access: GetBalanceOrApplyDefault initialises the approval versions of an
+// address that has no stored balance. A view method called from inside a
+// transaction must not leave that behind, so every write a query makes is
+// discarded. Gas already consumed stays charged and events are kept.
+func (p Precompile) handleQueryReadOnly(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
+	branch := evmcompat.NewAtomicContext(ctx)
+	defer branch.Rollback()
+	queryCtx := branch.Ctx()
+
+	var bz []byte
+	var err error
+	switch method.Name {
+	case GetBalanceAmountMethod:
+		bz, err = p.HandleGetBalanceAmount(queryCtx, method, jsonStr)
+	case GetTotalSupplyMethod:
+		bz, err = p.HandleGetTotalSupply(queryCtx, method, jsonStr)
+	case GetAllReservedProtocolAddressesMethod:
+		bz, err = p.HandleGetAllReservedProtocolAddresses(queryCtx, method, jsonStr)
+	case IsAddressReservedProtocolMethod:
+		bz, err = p.HandleIsAddressReservedProtocol(queryCtx, method, jsonStr)
+	default:
+		bz, err = p.HandleQuery(queryCtx, method, jsonStr)
+	}
+
+	// Outside the EVM the branch is a CacheContext with its own event
+	// manager; inside it the branch shares ctx and nothing is lost.
+	if !branch.IsEvmContext() {
+		ctx.EventManager().EmitEvents(queryCtx.EventManager().Events())
+	}
+	return bz, err
 }
 
 // HandleTransaction handles a transaction by unmarshaling JSON and executing via keeper
