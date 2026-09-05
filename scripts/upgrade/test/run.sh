@@ -12,7 +12,7 @@ for t in "$HERE"/test_*.sh; do
 done
 echo "### shellcheck"
 cd "$UP"
-FILES=(rehearse.sh new-version.sh propose.sh lib/common.sh container/*.sh checks/*.sh test/*.sh)
+FILES=(rehearse.sh new-version.sh propose.sh lib/*.sh container/*.sh checks/*.sh test/*.sh)
 if command -v shellcheck >/dev/null; then
   if shellcheck -x -P SCRIPTDIR -S style "${FILES[@]}"; then echo "shellcheck: clean"; else RC=1; fi
 elif command -v docker >/dev/null; then

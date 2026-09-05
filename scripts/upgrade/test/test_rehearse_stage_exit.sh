@@ -23,7 +23,7 @@ chmod +x "$T/bin/docker"
 # Fake `go` too, so the host toolchain is never invoked and the module cache
 # rehearse.sh mounts is the empty one under $T.
 printf '#!/usr/bin/env bash\necho "%s"\n' "$T/modcache" > "$T/bin/go"; chmod +x "$T/bin/go"
-for b in bitbadgeschaind-v34 bitbadgeschaind-HEAD cosmovisor; do printf '#!/bin/sh\n' > "$T/work/bin/$b"; chmod +x "$T/work/bin/$b"; done
+for b in bitbadgeschaind-v34 bitbadgeschaind-HEAD cosmovisor evmtx; do printf '#!/bin/sh\n' > "$T/work/bin/$b"; chmod +x "$T/work/bin/$b"; done
 
 run() { PATH="$T/bin:$PATH" FAKE_DOCKER_RC=$1 \
   "$RH" --from v34 --to HEAD --workdir "$T/work" --skip-build --rollback 2>&1; }
