@@ -120,6 +120,9 @@ else
   step "Build cosmovisor (go$CV_GO)"
   build_in_docker cosmovisor "$SCRIPT_DIR/cosmovisor" "$CV_GO" /out/cosmovisor "$(git -C "$REPO" rev-parse HEAD)" || die "build of cosmovisor failed"
 fi
+docker run --rm -v "$WORKDIR/bin:/out:ro" -v "$SCRIPT_DIR/container:/scripts/container:ro" \
+  "$IMAGE" bash /scripts/container/verify-binaries.sh "$FROM_BIN" "$FROM_SHA" "$TO_BIN" "$TO_SHA" \
+  || die "chain binary identity check failed"
 record build pass
 
 # --- stages ----------------------------------------------------------------

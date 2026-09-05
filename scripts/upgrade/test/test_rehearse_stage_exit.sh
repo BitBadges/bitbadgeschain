@@ -15,7 +15,11 @@ mkdir -p "$T/bin" "$T/modcache/cache/download" "$T/work/bin"
 cat > "$T/bin/docker" <<'SH'
 #!/usr/bin/env bash
 case $1 in
-  run) echo "fake stage output"; exit "${FAKE_DOCKER_RC:-0}" ;;
+  run)
+    case "$*" in
+      *'/scripts/container/verify-binaries.sh'*) exit "${FAKE_VERIFY_RC:-0}" ;;
+    esac
+    echo "fake stage output"; exit "${FAKE_DOCKER_RC:-0}" ;;
   *) exit 0 ;;
 esac
 SH
@@ -38,6 +42,10 @@ OUT=$(run 0); RC=$?
 assert "exit 0 when every stage passes"     [ "$RC" = 0 ]
 assert "summary marks upgrade as PASS"      grep -q 'PASS  upgrade' <<<"$OUT"
 assert "stage output is tee'd to logs"      grep -q 'fake stage output' "$T/work/logs/stage-upgrade.txt"
+
+OUT=$(FAKE_VERIFY_RC=1 run 0); RC=$?
+assert "exit 1 when cached binary identity differs" [ "$RC" = 1 ]
+assert "no stages run after identity mismatch" test "${OUT#*fake stage output}" = "$OUT"
 
 echo
 if [ "$FAILED" = 0 ]; then echo "rehearse stage exit: all passed"; else echo "rehearse stage exit: $FAILED failed"; exit 1; fi
