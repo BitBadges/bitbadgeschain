@@ -10,7 +10,7 @@ import (
 // it (new collection or auto-prev).
 func ValidateUintId(id sdkmath.Uint, allowZero bool) error {
 	if id.IsNil() {
-		return sdkerrors.Wrapf(ErrUintUnititialized, "id is uninitialized")
+		return sdkerrors.Wrapf(ErrUintUnititialized, "id cannot be nil")
 	}
 	if !allowZero && id.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "id cannot be zero")

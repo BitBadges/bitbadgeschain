@@ -40,12 +40,13 @@ func (msg *MsgUpdateUserApprovals) ValidateBasic() error {
 }
 
 func (msg *MsgUpdateUserApprovals) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
-	if err := ValidateUintId(msg.CollectionId, true); err != nil {
-		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
-	}
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if err := ValidateUintId(msg.CollectionId, true); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
 	}
 
 	if err := ValidateUserIncomingApprovals(ctx, msg.IncomingApprovals, msg.Creator, canChangeValues); err != nil {
