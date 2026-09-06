@@ -210,13 +210,11 @@ contract ERC3643Template is IERC3643 {
         require(allowed, reason);
 
         // Execute transfer via precompile
-        string memory transferJson = string(abi.encodePacked(
-            '{"collectionId":"', TokenizationJSONHelpers.uintToString(collectionId),
-            '","transfers":[{"from":"', TokenizationJSONHelpers.addressToString(msg.sender),
-            '","toAddresses":["', TokenizationJSONHelpers.addressToString(to),
-            '"],"balances":[{"amount":"', TokenizationJSONHelpers.uintToString(amount),
-            '","tokenIds":', _tokenIdsJson(), ',"ownershipTimes":', _ownershipTimesJson(), '}]}]}'
-        ));
+        address[] memory recipients = new address[](1);
+        recipients[0] = to;
+        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
+            collectionId, msg.sender, recipients, amount, _tokenIdsJson(), _ownershipTimesJson()
+        );
 
         bool success = PRECOMPILE.transferTokens(transferJson);
         require(success, "ERC3643: transfer failed");
