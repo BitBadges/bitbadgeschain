@@ -18,7 +18,10 @@ func (k Keeper) GetETHSignatureTracker(goCtx context.Context, req *types.QueryGe
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
 
 	// Construct the signature key using the same pattern as in challenges.go
 	signatureKey := ConstructETHSignatureTrackerKey(collectionId, req.ApproverAddress, req.ApprovalLevel, req.ApprovalId, req.ChallengeTrackerId, req.Signature)

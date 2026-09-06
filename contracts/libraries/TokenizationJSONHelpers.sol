@@ -50,14 +50,38 @@ library TokenizationJSONHelpers {
         string memory tokenIdsJson,
         string memory ownershipTimesJson
     ) internal pure returns (string memory) {
+        // Omitting from preserves the precompile's caller default.
+        return _transferTokensJSON(collectionId, "", toAddresses, amount, tokenIdsJson, ownershipTimesJson);
+    }
+
+    function transferTokensJSON(
+        uint256 collectionId,
+        address from,
+        address[] memory toAddresses,
+        uint256 amount,
+        string memory tokenIdsJson,
+        string memory ownershipTimesJson
+    ) internal pure returns (string memory) {
+        string memory fromField = string(abi.encodePacked('"from":"', _addressToString(from), '",'));
+        return _transferTokensJSON(collectionId, fromField, toAddresses, amount, tokenIdsJson, ownershipTimesJson);
+    }
+
+    function _transferTokensJSON(
+        uint256 collectionId,
+        string memory fromField,
+        address[] memory toAddresses,
+        uint256 amount,
+        string memory tokenIdsJson,
+        string memory ownershipTimesJson
+    ) private pure returns (string memory) {
         string memory toAddressesJson = _addressArrayToJson(toAddresses);
         return string(abi.encodePacked(
             '{"collectionId":"', _uintToString(collectionId),
-            '","toAddresses":', toAddressesJson,
-            ',"amount":"', _uintToString(amount),
+            '","transfers":[{', fromField, '"toAddresses":', toAddressesJson,
+            ',"balances":[{"amount":"', _uintToString(amount),
             '","tokenIds":', tokenIdsJson,
             ',"ownershipTimes":', ownershipTimesJson,
-            '}'
+            '}]}]}'
         ));
     }
 

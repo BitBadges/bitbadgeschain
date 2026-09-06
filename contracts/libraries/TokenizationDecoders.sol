@@ -34,6 +34,71 @@ import "../types/TokenizationTypes.sol";
  * ```
  */
 library TokenizationDecoders {
+    function parseDynamicStoreValue(bytes memory data) internal pure returns (bool value) {
+        uint256 position;
+        bool found;
+        while (position < data.length) {
+            uint256 tag;
+            (tag, position) = _storeVarint(data, position, data.length);
+            if (tag == 10) {
+                uint256 length;
+                (length, position) = _storeVarint(data, position, data.length);
+                require(length <= data.length - position, "Incomplete store response");
+                value = _storeValue(data, position, position + length);
+                position += length;
+                found = true;
+            } else {
+                position = _skipStoreField(data, position, data.length, tag);
+            }
+        }
+        require(found, "Missing store value");
+    }
+
+    function _storeValue(bytes memory data, uint256 position, uint256 end) private pure returns (bool value) {
+        while (position < end) {
+            uint256 tag;
+            (tag, position) = _storeVarint(data, position, end);
+            if (tag == 24) {
+                uint256 number;
+                (number, position) = _storeVarint(data, position, end);
+                value = number != 0;
+            } else {
+                position = _skipStoreField(data, position, end, tag);
+            }
+        }
+    }
+
+    function _storeVarint(bytes memory data, uint256 position, uint256 end) private pure returns (uint256 value, uint256 next) {
+        for (uint256 i = 0; i < 10; i++) {
+            require(position < end, "Incomplete store varint");
+            uint8 part = uint8(data[position++]);
+            value |= uint256(part & 127) << (7 * i);
+            if (part < 128) return (value, position);
+        }
+        revert("Invalid store varint");
+    }
+
+    function _skipStoreField(bytes memory data, uint256 position, uint256 end, uint256 tag) private pure returns (uint256) {
+        require(tag >> 3 != 0, "Invalid store tag");
+        uint256 wireType = tag & 7;
+        if (wireType == 0) {
+            (, position) = _storeVarint(data, position, end);
+        } else if (wireType == 2) {
+            uint256 length;
+            (length, position) = _storeVarint(data, position, end);
+            require(length <= end - position, "Incomplete store field");
+            position += length;
+        } else if (wireType == 1) {
+            position += 8;
+        } else if (wireType == 5) {
+            position += 4;
+        } else {
+            revert("Invalid store field");
+        }
+        require(position <= end, "Incomplete store field");
+        return position;
+    }
+
     // ============ Protobuf Parsing Helpers ============
     // These helpers enable on-chain parsing of simple protobuf fields
 
@@ -257,4 +322,3 @@ library TokenizationDecoders {
         // Documentation-only function
     }
 }
-

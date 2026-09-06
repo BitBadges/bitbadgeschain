@@ -140,6 +140,11 @@ func (k Keeper) DeductAndGetUserApprovals(
 			continue
 		}
 
+		if len(approval.TokenIds) == 0 {
+			addPotentialError(isExplicitlyPrioritized, idx, "approval has no token ids")
+			continue
+		}
+
 		// Only after we sanity check the addresses and times
 		approvalIdxsChecked = append(approvalIdxsChecked, idx)
 
@@ -483,6 +488,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 }
 
 func isCustomChallengeOrderCalculation(predeterminedBalances *types.PredeterminedBalances, trackerType string) bool {
+	if predeterminedBalances == nil || predeterminedBalances.OrderCalculationMethod == nil {
+		return false
+	}
 	return (predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UseOverallNumTransfers && trackerType == "overall") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerToAddressNumTransfers && trackerType == "to") ||
 		(predeterminedBalances != nil && predeterminedBalances.OrderCalculationMethod.UsePerFromAddressNumTransfers && trackerType == "from") ||
@@ -628,6 +636,9 @@ func (k Keeper) handlePredeterminedBalances(
 	numIncrements := sdkmath.NewUint(0)
 	toBeCalculated := true
 	orderCalculationMethod := predeterminedBalances.OrderCalculationMethod
+	if orderCalculationMethod == nil {
+		return nil, nil
+	}
 
 	// Determine how to calculate the number of increments
 	switch {
@@ -1028,6 +1039,10 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 		}
 
 		if approvalCriteria.PredeterminedBalances != nil {
+			if approvalCriteria.PredeterminedBalances.OrderCalculationMethod == nil {
+				return []*types.Balance{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "predetermined balances have no order calculation method")
+			}
+
 			var numIncrements sdkmath.Uint
 			hasOrderCalculationMethod := false
 			if approvalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
@@ -1035,12 +1050,16 @@ func (k Keeper) GetPredeterminedBalancesForPrecalculationId(
 
 				// If the approval has challenges, we need to check that a valid solutions is provided for every challenge
 				// If the challenge specifies to use the leaf index for the number of increments, we use this value for the number of increments later
+				// Leaf usage is tracked per (approver, level), so simulate under the approval being precalculated.
+				challengeMetadata := transferMetadata
+				challengeMetadata.ApproverAddress = approverAddress
+				challengeMetadata.ApprovalLevel = approvalLevel
 				_, numIncrementsFetched, err := k.HandleMerkleChallenges(
 					ctx,
 					collection.CollectionId,
 					transfer,
 					approval,
-					transferMetadata,
+					challengeMetadata,
 					true,
 				)
 				if err != nil {

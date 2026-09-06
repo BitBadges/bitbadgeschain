@@ -39,9 +39,13 @@ func (msg *MsgTransferTokens) GetSignBytes() []byte {
 }
 
 func (msg *MsgTransferTokens) CheckAndCleanMsg(ctx sdk.Context, canChangeValues bool) error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	err := ValidateAddress(msg.Creator, false)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if err := ValidateUintId(msg.CollectionId, true); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
 	}
 
 	if len(msg.Transfers) == 0 {

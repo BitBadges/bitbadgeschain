@@ -50,6 +50,20 @@ func (i ICS4Middleware) SendPacket(
 	return seq, err
 }
 
+// SendPacketNext forwards to the wrapped ICS4Wrapper without running the
+// hooks again. SendPacketOverride implementations must continue the chain
+// through this method; calling SendPacket from inside an override re-enters
+// the override.
+func (i ICS4Middleware) SendPacketNext(
+	ctx sdk.Context,
+	sourcePort string, sourceChannel string,
+	timeoutHeight clienttypes.Height,
+	timeoutTimestamp uint64,
+	data []byte,
+) (sequence uint64, err error) {
+	return i.channel.SendPacket(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+}
+
 func (i ICS4Middleware) WriteAcknowledgement(ctx sdk.Context, packet ibcexported.PacketI, ack ibcexported.Acknowledgement) error {
 	if hook, ok := i.Hooks.(WriteAcknowledgementOverrideHooks); ok {
 		return hook.WriteAcknowledgementOverride(i, ctx, packet, ack)

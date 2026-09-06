@@ -13,9 +13,8 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
-
-var zero = osmomath.ZeroInt()
 
 func (k *Keeper) GetDefaultTakerFee(ctx sdk.Context) osmomath.Dec {
 	defaultTakerFeeBz := k.paramSpace.GetRaw(ctx, types.KeyDefaultTakerFee)
@@ -122,6 +121,14 @@ func (k Keeper) GetAllTradingPairTakerFees(ctx sdk.Context) ([]types.DenomPairTa
 	return takerFees, nil
 }
 
+func (k Keeper) effectiveTakerFee(ctx sdk.Context, tokenInDenom, tokenOutDenom string) (osmomath.Dec, error) {
+	// Alias tokens have no community-pool spend path, so execution and quotes exempt them.
+	if tokenizationkeeper.CheckStartsWithAliasDenom(tokenInDenom) {
+		return osmomath.ZeroDec(), nil
+	}
+	return k.GetTradingPairTakerFee(ctx, tokenInDenom, tokenOutDenom)
+}
+
 // chargeTakerFee extracts the taker fee from the given tokenIn and sends it to the appropriate
 // module account. It returns the tokenIn after the taker fee has been extracted.
 // If the sender is in the taker fee reduced whitelisted, it returns the tokenIn without extracting the taker fee.
@@ -137,11 +144,10 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 	// 	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
 	// }
 
-	takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
+	takerFee, err := k.effectiveTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}
-
 	var tokenInAfterTakerFee sdk.Coin
 	var takerFeeCoin sdk.Coin
 	if exactIn {
@@ -150,9 +156,11 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
 	}
 
-	err = k.gammKeeper.FundCommunityPoolWithAliasRouting(ctx, sender, sdk.NewCoins(takerFeeCoin))
-	if err != nil {
-		return sdk.Coin{}, sdk.Coin{}, err
+	if !takerFeeCoin.IsZero() {
+		err = k.gammKeeper.FundCommunityPoolWithAliasRouting(ctx, sender, sdk.NewCoins(takerFeeCoin))
+		if err != nil {
+			return sdk.Coin{}, sdk.Coin{}, err
+		}
 	}
 
 	return tokenInAfterTakerFee, takerFeeCoin, nil

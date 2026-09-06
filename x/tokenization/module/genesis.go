@@ -14,13 +14,13 @@ import (
 // InitGenesis initializes the module's state from a provided genesis state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set if defined; default 0
-	if genState.NextCollectionId.Equal(sdkmath.NewUint(0)) {
+	if genState.NextCollectionId.IsNil() || genState.NextCollectionId.IsZero() {
 		genState.NextCollectionId = sdkmath.NewUint(1)
 	}
 	k.SetNextCollectionId(ctx, genState.NextCollectionId)
 
 	// Set next dynamic store ID if defined; default 0
-	if genState.NextDynamicStoreId.Equal(sdkmath.NewUint(0)) {
+	if genState.NextDynamicStoreId.IsNil() || genState.NextDynamicStoreId.IsZero() {
 		genState.NextDynamicStoreId = sdkmath.NewUint(1)
 	}
 	k.SetNextDynamicStoreId(ctx, genState.NextDynamicStoreId)

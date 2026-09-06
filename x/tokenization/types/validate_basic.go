@@ -80,6 +80,19 @@ func ValidateCosmosWrapperPathDenom(denom string) error {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains invalid characters - only a-zA-Z, _, {, }, and - are allowed: %s", denom)
 	}
 
+	// Braces are only allowed as a single {id} placeholder; the substituted denom must be a
+	// valid bank denom once the module prefix ("badges:<collectionId>:") is applied.
+	if strings.Count(denom, "{id}") > 1 {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom may contain the {id} placeholder at most once: %s", denom)
+	}
+	substituted := strings.ReplaceAll(denom, "{id}", "1")
+	if strings.ContainsAny(substituted, "{}") {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom contains braces other than the {id} placeholder: %s", denom)
+	}
+	if err := sdk.ValidateDenom("badges:1:" + substituted); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "denom is not a valid bank denom: %s", denom)
+	}
+
 	return nil
 }
 
@@ -116,9 +129,15 @@ func ValidateAddress(address string, alowMint bool) error {
 	}
 
 	// Validate address using global SDK config (should be "bb" prefix)
-	_, err := sdk.AccAddressFromBech32(address)
+	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s", err)
+	}
+
+	// bech32 decoding also accepts the all-uppercase spelling; addresses are used as
+	// store keys and compared as strings, so only the canonical spelling is accepted.
+	if accAddr.String() != address {
+		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid address: %s is not in canonical form (expected %s)", address, accAddr.String())
 	}
 	return nil
 }
@@ -128,19 +147,8 @@ func DoRangesOverlap(ids []*UintRange) bool {
 	idsCopy := make([]*UintRange, len(ids))
 	copy(idsCopy, ids)
 
-	// Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	sortUintRanges(idsCopy)
 	n := len(idsCopy)
-	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 {
-			if idsCopy[j-1].Start.GT(idsCopy[j].Start) {
-				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
-			} else if idsCopy[j-1].Start.Equal(idsCopy[j].Start) && idsCopy[j-1].End.GT(idsCopy[j].End) {
-				idsCopy[j-1], idsCopy[j] = idsCopy[j], idsCopy[j-1]
-			}
-			j--
-		}
-	}
 
 	// Check if any overlap
 	for i := 1; i < n; i++ {
@@ -621,7 +629,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidRequest, "initiated by list id cannot be Mint")
 		}
 
-		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, false); err != nil {
+		if err := ValidateRangesAreValid(collectionApproval.TokenIds, false, true); err != nil {
 			return sdkerrors.Wrapf(err, "invalid token IDs")
 		}
 
@@ -890,6 +898,10 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			}
 
 			if approvalCriteria.PredeterminedBalances != nil {
+				if approvalCriteria.PredeterminedBalances.OrderCalculationMethod == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "predetermined balances require an order calculation method")
+				}
+
 				isBasicallyNil := PredeterminedBalancesIsBasicallyNil(approvalCriteria.PredeterminedBalances)
 				manualBalancesIsBasicallyNil := IsManualBalancesBasicallyNil(approvalCriteria.PredeterminedBalances.ManualBalances)
 				sequentialTransferIsBasicallyNil := IsSequentialTransferBasicallyNil(approvalCriteria.PredeterminedBalances.IncrementedBalances)
@@ -1208,6 +1220,13 @@ func ValidateBalances(ctx sdk.Context, balances []*Balance, canChangeValues bool
 	return balances, nil
 }
 
+func ValidateMaxSupplyWithBacking(maxSupply Uint, hasBacking bool) error {
+	if hasBacking && !maxSupply.IsNil() && !maxSupply.IsZero() {
+		return sdkerrors.Wrap(ErrInvalidRequest, "maxSupplyPerId cannot be used with cosmosCoinBackedPath")
+	}
+	return nil
+}
+
 // ValidateTransferWithInvariants validates a transfer and checks invariants
 func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChangeValues bool, collection *TokenCollection) error {
 	// First validate the basic transfer
@@ -1325,6 +1344,9 @@ func ValidateTokenMetadata(tokenMetadata []*TokenMetadata, canChangeValues bool)
 	handledTokenIds := []*UintRange{}
 	if len(tokenMetadata) > 0 {
 		for _, tokenMetadata := range tokenMetadata {
+			if tokenMetadata == nil {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "token metadata is nil")
+			}
 			// Validate well-formedness of the message entries
 			if err := ValidateURI(tokenMetadata.Uri); err != nil {
 				return err
@@ -1527,9 +1549,9 @@ func ValidateEVMContractAddressFormat(address string) error {
 // evmQueryPlaceholders are the allowed calldata placeholders (replaced at runtime).
 // Address placeholders become 40 hex chars; $collectionId becomes 64 hex chars (uint256); $recipients becomes 64+ hex.
 var (
-	evmQueryPlaceholderAddress   = "0000000000000000000000000000000000000000" // 40 hex
-	evmQueryPlaceholderUint256   = "0000000000000000000000000000000000000000000000000000000000000000" // 64 hex
-	evmQueryPlaceholdersOrder    = []string{"$collectionId", "$recipients", "$initiator", "$sender", "$recipient"}
+	evmQueryPlaceholderAddress      = "0000000000000000000000000000000000000000"                         // 40 hex
+	evmQueryPlaceholderUint256      = "0000000000000000000000000000000000000000000000000000000000000000" // 64 hex
+	evmQueryPlaceholdersOrder       = []string{"$collectionId", "$recipients", "$initiator", "$sender", "$recipient"}
 	evmQueryPlaceholderReplacements = map[string]string{
 		"$initiator":    evmQueryPlaceholderAddress,
 		"$sender":       evmQueryPlaceholderAddress,

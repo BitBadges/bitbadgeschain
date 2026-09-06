@@ -46,6 +46,12 @@ func (k msgServer) SendWithAliasRouting(goCtx context.Context, msg *types.MsgSen
 	if coins.IsZero() {
 		return nil, sdkerrors.Wrapf(errortypes.ErrInvalidCoins, "coins cannot be empty")
 	}
+	if err := k.bankKeeper.IsSendEnabledCoins(ctx, coins...); err != nil {
+		return nil, err
+	}
+	if k.bankKeeper.BlockedAddr(toAddress) {
+		return nil, sdkerrors.Wrap(errortypes.ErrUnauthorized, "recipient is not allowed to receive funds")
+	}
 
 	// Use sendmanager's SendCoinsWithAliasRouting which handles both standard coins and alias denoms
 	if err := k.SendCoinsWithAliasRouting(ctx, fromAddress, toAddress, coins); err != nil {

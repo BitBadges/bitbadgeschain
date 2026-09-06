@@ -110,14 +110,14 @@ func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallen
 // ConstructETHSignatureTrackerKey constructs a unique key for tracking ETH signature usage.
 // The key includes: collectionId, approverAddress (addressForChallenge), approvalLevel, approvalId, challengeId, and the signature itself.
 // This key is used to track how many times a specific signature has been used for a given approval/challenge context.
-// Note: The signature field in the tracker key is the actual signature bytes (from the proof), not part of what gets signed.
-// The signed message includes: nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
-func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, signature string) string {
+// The tracker is keyed on the proof's nonce (v35+), which the signed message binds:
+// nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
+func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, nonce string) string {
 	collection_id_str := collectionId.String()
 	challenge_id_str := challengeId
 	address_for_challenge_str := addressForChallenge
 	challenge_level_str := approvalLevel
-	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + signature
+	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + nonce
 }
 
 // ConstructVotingTrackerKey constructs a unique key for tracking votes.

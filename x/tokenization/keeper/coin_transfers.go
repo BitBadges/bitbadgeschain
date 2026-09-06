@@ -7,12 +7,43 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
 	RoyaltyDivisor = 10000
 )
+
+// CoinTransferReceiptKey prefixes short-lived receipts written on the same (atomic) context
+// as each bank send. A receipt only survives if that context is committed, so the receipts
+// tell handleTransfersInternal which entries of the in-memory coin transfer list were
+// actually executed. They are deleted again before the message handler returns.
+var CoinTransferReceiptKey = []byte{0x17}
+
+func coinTransferReceiptStoreKey(collectionId sdkmath.Uint, idx int) []byte {
+	return storeKey(CoinTransferReceiptKey, collectionId.String()+BalanceKeyDelimiter+fmt.Sprint(idx))
+}
+
+func (k Keeper) setCoinTransferReceipt(ctx sdk.Context, collectionId sdkmath.Uint, idx int) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store.Set(coinTransferReceiptStoreKey(collectionId, idx), []byte{1})
+}
+
+// CommittedCoinTransfers keeps only the coin transfers whose receipt survived (i.e. whose
+// approval attempt was committed rather than rolled back) and clears all receipts.
+func (k Keeper) CommittedCoinTransfers(ctx sdk.Context, collectionId sdkmath.Uint, coinTransfers []CoinTransfers) []CoinTransfers {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	committed := []CoinTransfers{}
+	for idx, coinTransfer := range coinTransfers {
+		key := coinTransferReceiptStoreKey(collectionId, idx)
+		if store.Has(key) {
+			committed = append(committed, coinTransfer)
+			store.Delete(key)
+		}
+	}
+	return committed
+}
 
 // formatDenomForDisplay formats a denom for display in error messages
 // Shows "BADGE" for "ubadge" and prints others as-is
@@ -189,6 +220,10 @@ func (k Keeper) ExecuteCoinTransfers(
 		}
 
 		for _, coin := range coinsToTransfer {
+			if coin == nil || coin.Amount.IsNil() || !coin.Amount.IsPositive() {
+				detErrMsg := "coin transfer amount must be positive"
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
@@ -196,6 +231,7 @@ func (k Keeper) ExecuteCoinTransfers(
 
 			err := k.sendCoinWithRoyalty(
 				ctx,
+				collection.CollectionId,
 				coin,
 				royaltyAmountInt,
 				remainingAmount,
@@ -223,6 +259,7 @@ func (k Keeper) ExecuteCoinTransfers(
 // It sends the royalty to the payout address and the remaining amount to the recipient
 func (k Keeper) sendCoinWithRoyalty(
 	ctx sdk.Context,
+	collectionId sdkmath.Uint,
 	coin *sdk.Coin,
 	royaltyAmountInt sdkmath.Int,
 	remainingAmount sdkmath.Int,
@@ -250,6 +287,7 @@ func (k Keeper) sendCoinWithRoyalty(
 			Amount: royaltyAmountInt.String(),
 			Denom:  coin.Denom,
 		})
+		k.setCoinTransferReceipt(ctx, collectionId, len(*coinTransfersUsed)-1)
 	}
 
 	// Send remaining amount to recipient
@@ -267,6 +305,7 @@ func (k Keeper) sendCoinWithRoyalty(
 			Amount: remainingAmount.String(),
 			Denom:  coin.Denom,
 		})
+		k.setCoinTransferReceipt(ctx, collectionId, len(*coinTransfersUsed)-1)
 	}
 
 	return nil

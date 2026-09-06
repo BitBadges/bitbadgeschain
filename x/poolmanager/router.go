@@ -306,7 +306,7 @@ func (k Keeper) multihopEstimateOutGivenExactAmountInInternal(
 		actualTokenIn := tokenIn
 		// apply taker fee if applicable
 		if applyTakerFee {
-			takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
+			takerFee, err := k.effectiveTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
 			if err != nil {
 				return osmomath.Int{}, err
 			}
@@ -432,6 +432,11 @@ func (k Keeper) RouteExactAmountOut(ctx sdk.Context,
 		if !osmoutils.Contains(denomsInvolvedInRoute, routeStep.TokenInDenom) {
 			denomsInvolvedInRoute = append(denomsInvolvedInRoute, routeStep.TokenInDenom)
 		}
+	}
+
+	// The user pays the taker fee on top of the first pool's input; the cap applies to that total.
+	if tokenInAmount.GT(tokenInMaxAmount) {
+		return osmomath.Int{}, types.ErrTokenInExceedsMax
 	}
 
 	// Run taker fee skim logic
@@ -667,7 +672,7 @@ func (k Keeper) createMultihopExpectedSwapOuts(
 
 		spreadFactor := poolI.GetSpreadFactor(ctx)
 
-		takerFee, err := k.GetTradingPairTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
+		takerFee, err := k.effectiveTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
 		if err != nil {
 			return nil, err
 		}

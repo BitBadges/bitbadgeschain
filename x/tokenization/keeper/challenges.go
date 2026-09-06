@@ -39,7 +39,7 @@ func (k Keeper) HandleMerkleChallenges(
 	merkleProofs := transfer.MerkleProofs
 
 	// Sanity check to make sure the challenge tracker id is valid
-	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 		hasMatchingChallenge := false
 		for _, challenge := range challenges {
 			if challenge.ChallengeTrackerId == approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId {
@@ -264,8 +264,10 @@ func (k Keeper) HandleETHSignatureChallenges(
 				continue
 			}
 
-			// Check if this signature has already been used
-			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Signature)
+			// Usage is tracked per nonce: the signed message binds the nonce to this exact
+			// (initiator, collection, approver, level, approval, challenge) context, so a valid
+			// signature for a nonce is one use regardless of how the signature bytes are encoded.
+			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Nonce)
 			numUsed, exists := k.GetETHSignatureTrackerFromStore(ctx, signatureKey)
 			if !exists {
 				numUsed = sdkmath.NewUint(0)

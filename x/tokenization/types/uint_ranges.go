@@ -1,6 +1,8 @@
 package types
 
 import (
+	"slices"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 )
@@ -170,19 +172,8 @@ func SortUintRangesAndMergeAdjacentAndIntersecting(ids []*UintRange) []*UintRang
 // Will sort the ID ranges in order and merge overlapping IDs if we can
 // If mergeIntersecting is true, we will merge intersecting ranges. If false, we will panic if any intersect and only sort and merge adjacent ranges (i.e. [1-5], [6-10])
 func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRange, error) {
-	// Insertion sort in order of range.Start. If two have same range.Start, sort by range.End.
+	sortUintRanges(ids)
 	n := len(ids)
-	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 {
-			if ids[j-1].Start.GT(ids[j].Start) {
-				ids[j-1], ids[j] = ids[j], ids[j-1]
-			} else if ids[j-1].Start.Equal(ids[j].Start) && ids[j-1].End.GT(ids[j].End) {
-				ids[j-1], ids[j] = ids[j], ids[j-1]
-			}
-			j--
-		}
-	}
 
 	if !mergeIntersecting {
 		// We don't want to merge intersecting ranges, so we panic if any interesect
@@ -224,4 +215,22 @@ func SortUintRangesAndMerge(ids []*UintRange, mergeIntersecting bool) ([]*UintRa
 	} else {
 		return ids, nil
 	}
+}
+
+func sortUintRanges(ids []*UintRange) {
+	slices.SortStableFunc(ids, func(a, b *UintRange) int {
+		if a.Start.LT(b.Start) {
+			return -1
+		}
+		if a.Start.GT(b.Start) {
+			return 1
+		}
+		if a.End.LT(b.End) {
+			return -1
+		}
+		if a.End.GT(b.End) {
+			return 1
+		}
+		return 0
+	})
 }

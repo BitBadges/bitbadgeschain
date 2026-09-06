@@ -35,6 +35,9 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 
 		// Validate EVM query challenges in invariants (format + that each contract address has code)
 		if collection.Invariants != nil {
+			if err := types.ValidateMaxSupplyWithBacking(collection.Invariants.MaxSupplyPerId, collection.Invariants.CosmosCoinBackedPath != nil); err != nil {
+				return err
+			}
 			if err := types.ValidateEVMQueryChallenges(collection.Invariants.EvmQueryChallenges); err != nil {
 				return sdkerrors.Wrap(err, "collection invariants validation failed")
 			}

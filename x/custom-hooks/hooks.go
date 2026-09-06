@@ -62,6 +62,9 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 
 	// Execute IBC transfer in cached context
 	ack := im.App.OnRecvPacket(cacheCtx, channelID, packet, relayer)
+	if ack == nil {
+		return customhookstypes.NewCustomErrorAcknowledgement("custom hooks require synchronous transfer completion")
+	}
 
 	// If the IBC transfer itself failed, discard cache and return error
 	if !ack.Success() {

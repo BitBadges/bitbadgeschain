@@ -240,6 +240,7 @@ func (suite *PostTransferInvariantsTestSuite) TestMaxSupplyPerId_WithMultipleTok
 		},
 	}
 
+	collectionsToCreate[0].Transfers[0].Balances[0].TokenIds = types.DeepCopyRanges(collectionsToCreate[0].TokensToCreate[0].TokenIds)
 	err := CreateCollections(&suite.TestSuite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 }
@@ -323,6 +324,7 @@ func (suite *PostTransferInvariantsTestSuite) TestPostTransferInvariants_Combine
 		},
 	}
 
+	collectionsToCreate[0].Transfers[0].Balances[0].TokenIds = types.DeepCopyRanges(collectionsToCreate[0].TokensToCreate[0].TokenIds)
 	err := CreateCollections(&suite.TestSuite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
@@ -378,6 +380,7 @@ func (suite *PostTransferInvariantsTestSuite) TestPostTransferInvariants_CannotB
 		},
 	}
 
+	collectionsToCreate[0].Transfers[0].Balances[0].TokenIds = types.DeepCopyRanges(collectionsToCreate[0].TokensToCreate[0].TokenIds)
 	err := CreateCollections(&suite.TestSuite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 
@@ -452,6 +455,7 @@ func (suite *PostTransferInvariantsTestSuite) TestPostTransferInvariants_LargeMa
 		},
 	}
 
+	collectionsToCreate[0].Transfers[0].Balances[0].TokenIds = types.DeepCopyRanges(collectionsToCreate[0].TokensToCreate[0].TokenIds)
 	err := CreateCollections(&suite.TestSuite, wctx, collectionsToCreate)
 	suite.Require().NoError(err)
 

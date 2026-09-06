@@ -25,7 +25,7 @@ func (suite *IntegrationTestSuite) SetupTest() {
 // Full integration tests with actual pool operations require complete pool setup
 // which should be done in the gamm module's integration test suite
 func (suite *IntegrationTestSuite) TestIntegration_PrecompileSetup() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	suite.NotNil(precompile)
 	suite.NotNil(suite.Ctx)
@@ -48,7 +48,7 @@ func (suite *IntegrationTestSuite) TestIntegration_ABILoading() {
 
 // TestIntegration_KeeperIntegration verifies basic keeper integration
 func (suite *IntegrationTestSuite) TestIntegration_KeeperIntegration() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 	
 	// Verify precompile has access to keeper
 	suite.NotNil(precompile)

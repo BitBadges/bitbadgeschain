@@ -761,7 +761,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom: "overridecoin",
+			Denom: "overridecoin{id}",
 			Conversion: &types.ConversionWithoutDenom{
 				SideA: &types.ConversionSideA{
 					Amount: sdkmath.NewUint(1),
@@ -780,7 +780,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 		},
 	}
 
-	wrapperAddr := keeper.MustGenerateWrapperPathAddress("overridecoin")
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("overridecoin{id}")
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
 		&types.CollectionApproval{
 			ApprovalId:        "override-wrap",
@@ -844,7 +844,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsAllowOverrideWithAnyValidToken
 	// Verify cosmos coin was minted
 	bobAccAddr, err := sdk.AccAddressFromBech32(bob)
 	suite.Require().Nil(err, "Error getting bob's address")
-	fullDenom := generateWrappedWrapperDenom(collection.CollectionId, wrapperPath)
+	fullDenom := keeper.WrappedDenomPrefix + collection.CollectionId.String() + ":overridecoin1"
 	bobBalanceDenom := suite.app.BankKeeper.GetBalance(suite.ctx, bobAccAddr, fullDenom)
 	suite.Require().Equal(sdkmath.NewInt(1), bobBalanceDenom.Amount, "Cosmos coin should be minted when override is enabled")
 }
@@ -1093,7 +1093,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom: "validationcoin",
+			Denom: "validationcoin{id}",
 			Conversion: &types.ConversionWithoutDenom{
 				SideA: &types.ConversionSideA{
 					Amount: sdkmath.NewUint(1),
@@ -1114,7 +1114,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 
 	// Note: ValidTokenIds will be set after collection creation
 
-	wrapperAddr := keeper.MustGenerateWrapperPathAddress("validationcoin")
+	wrapperAddr := keeper.MustGenerateWrapperPathAddress("validationcoin{id}")
 	collectionsToCreate[0].CollectionApprovals = append(collectionsToCreate[0].CollectionApprovals,
 		&types.CollectionApproval{
 			ApprovalId:        "validation-wrap",
@@ -1197,7 +1197,7 @@ func (suite *TestSuite) TestCosmosCoinWrapperPathsOverrideValidation() {
 			},
 		},
 	})
-	suite.Require().Nil(err, "Transfer with invalid token ID should be allowed when override is enabled")
+	suite.Require().Error(err, "Transfer with a token ID outside ValidTokenIds must be rejected")
 }
 
 // ==================== GAMM KEEPER TOKENIZATION TESTS ====================
@@ -1599,7 +1599,7 @@ func (suite *TestSuite) TestGammKeeperErrorCases() {
 	collectionsToCreate := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	collectionsToCreate[0].CosmosCoinWrapperPathsToAdd = []*types.CosmosCoinWrapperPathAddObject{
 		{
-			Denom: "errortest",
+			Denom: "errortest{id}",
 			Conversion: &types.ConversionWithoutDenom{
 				SideA: &types.ConversionSideA{
 					Amount: sdkmath.NewUint(1),

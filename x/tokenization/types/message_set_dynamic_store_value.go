@@ -43,13 +43,13 @@ func (msg *MsgSetDynamicStoreValue) ValidateBasic() error {
 	if len(msg.Creator) == 0 {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "creator address cannot be empty")
 	}
-	if msg.StoreId.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "storeId cannot be zero")
+	if err := ValidateUintId(msg.StoreId, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid storeId: %s", err)
 	}
 	if len(msg.Address) == 0 {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "address cannot be empty")
 	}
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	err := ValidateAddress(msg.Creator, false)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}

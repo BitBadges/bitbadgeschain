@@ -19,7 +19,23 @@ func (k Keeper) GetBalanceForToken(goCtx context.Context, req *types.QueryGetBal
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
+	tokenId, err := parseQueryUint(req.TokenId, "TokenId")
+	if err != nil {
+		return nil, err
+	}
+	var timeVal sdkmath.Uint
+	if req.Time == "" || req.Time == "0" {
+		timeVal = sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
+	} else {
+		timeVal, err = parseQueryUint(req.Time, "Time")
+		if err != nil {
+			return nil, err
+		}
+	}
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return nil, sdkerrors.Wrapf(ErrCollectionNotExists, "collection %s not found", req.CollectionId)
@@ -29,17 +45,6 @@ func (k Keeper) GetBalanceForToken(goCtx context.Context, req *types.QueryGetBal
 	balanceStore, _, err := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
 	if err != nil {
 		return nil, err
-	}
-
-	// Parse tokenId
-	tokenId := sdkmath.NewUintFromString(req.TokenId)
-
-	// Parse time - default to current block time if empty or "0"
-	var timeVal sdkmath.Uint
-	if req.Time == "" || req.Time == "0" {
-		timeVal = sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-	} else {
-		timeVal = sdkmath.NewUintFromString(req.Time)
 	}
 
 	// Use GetBalancesForIds to look up the balance for the specific tokenId and time

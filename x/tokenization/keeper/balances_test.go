@@ -605,7 +605,7 @@ func (suite *TestSuite) TestBruteForcedBalances() {
 		},
 		DefaultBalances:       &types.UserBalanceStore{},
 		UpdateValidTokenIds:   true,
-		ValidTokenIds:         []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(100)}},
+		ValidTokenIds:         []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(200)}},
 	})
 	suite.Require().Nil(err, "Error updating collection: %s")
 

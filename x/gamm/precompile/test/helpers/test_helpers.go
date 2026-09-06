@@ -85,7 +85,7 @@ func NewTestSuite(t *testing.T) *TestSuite {
 	}
 	ts.TestAccs = []sdk.AccAddress{}
 	
-	precompile := gamm.NewPrecompile(ts.App.GammKeeper)
+	precompile := gamm.NewPrecompile(ts.App.GammKeeper, ts.App.PreciseBankKeeper)
 	msgServer := gammkeeper.NewMsgServerImpl(&ts.App.GammKeeper)
 
 	// Create test EVM addresses

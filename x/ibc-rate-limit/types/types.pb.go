@@ -69,9 +69,10 @@ var xxx_messageInfo_ChannelFlow proto.InternalMessageInfo
 
 // ChannelFlowWindow tracks the time window for rate limiting
 type ChannelFlowWindow struct {
-	// window_start is the block height when the current window started
+	// window_start is when the current window started: block height for BLOCK
+	// timeframes, block time in unix seconds for HOUR and DAY timeframes
 	WindowStart int64 `protobuf:"varint,1,opt,name=window_start,json=windowStart,proto3" json:"window_start,omitempty"`
-	// window_duration is the duration of the window in blocks
+	// window_duration is the length of the window, in the same unit as window_start
 	WindowDuration int64 `protobuf:"varint,2,opt,name=window_duration,json=windowDuration,proto3" json:"window_duration,omitempty"`
 }
 

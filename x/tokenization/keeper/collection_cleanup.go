@@ -94,6 +94,26 @@ func (k Keeper) PurgeCollectionState(ctx sdk.Context, collectionId sdkmath.Uint)
 		k.logger.Error("failed to close eth iterator", "error", err)
 	}
 
+	// 6. Purge votes and voting challenge trackers for this collection
+	// Keys format: collectionId-approverAddress-approvalLevel-approvalId-proposalId[-voter]
+	for _, votePrefix := range [][]byte{VotingTrackerKey, VotingChallengeTrackerKey} {
+		fullPrefix := append(append([]byte{}, votePrefix...), []byte(collectionIdStr+BalanceKeyDelimiter)...)
+		voteIterator := storetypes.KVStorePrefixIterator(store, fullPrefix)
+		voteKeysToDelete := [][]byte{}
+		for ; voteIterator.Valid(); voteIterator.Next() {
+			voteKeysToDelete = append(voteKeysToDelete, voteIterator.Key())
+		}
+		if err := voteIterator.Close(); err != nil {
+			k.logger.Error("failed to close vote iterator", "error", err)
+		}
+		for _, key := range voteKeysToDelete {
+			store.Delete(key)
+		}
+	}
+
+	// 7. Purge collection stats
+	store.Delete(collectionStatsStoreKey(collectionId))
+
 	// Log the cleanup for monitoring
 	k.logger.Info("purged collection state",
 		"collection_id", collectionIdStr,

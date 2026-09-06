@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
 import "../libraries/TokenizationJSONHelpers.sol";
+import "../libraries/TokenizationDecoders.sol";
+import "../libraries/TokenizationInitialization.sol";
 
 /**
  * @title PrivateEquityToken
@@ -173,13 +175,13 @@ contract PrivateEquityToken {
         uint256 initialAmount = fundSize / 1000;  // 1 token = $1000 of commitment
         string memory balanceJson = string(abi.encodePacked(
             '[{"amount":"', TokenizationJSONHelpers.uintToString(initialAmount),
-            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(block.timestamp, fundTermination),
+            '","ownershipTimes":', TokenizationJSONHelpers.uintRangeToJson(block.timestamp * 1000, fundTermination * 1000),
             ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
         ));
         
-        // Build defaultBalances JSON with initial balances (no auto-approval)
+        // User defaults retain the collection's approval settings.
         string memory defaultBalancesJson = string(abi.encodePacked(
-            '{"balances":', balanceJson,
+            '{"balances":[]',
             ',"autoApproveSelfInitiatedOutgoingTransfers":false',
             ',"autoApproveSelfInitiatedIncomingTransfers":false',
             ',"autoApproveAllIncomingTransfers":false',
@@ -214,6 +216,9 @@ contract PrivateEquityToken {
         );
         
         collectionId = TOKENIZATION.createCollection(createJson);
+        if (initialAmount > 0) {
+            TokenizationInitialization.mintInitialSupply(TOKENIZATION, collectionId, generalPartner, balanceJson);
+        }
     }
 
     // ============ Investor Onboarding ============
@@ -441,7 +446,7 @@ contract PrivateEquityToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getLockupJson);
         if (result.length == 0) return true;  // Default: locked
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     // ============ Compliance Registry Functions ============
@@ -480,7 +485,7 @@ contract PrivateEquityToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     function isAccreditedInvestor(address investor) public view returns (bool) {
@@ -490,7 +495,7 @@ contract PrivateEquityToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     function isBlacklisted(address investor) public view returns (bool) {
@@ -500,7 +505,7 @@ contract PrivateEquityToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     // ============ View Functions ============

@@ -159,7 +159,7 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		}
 		// JSON syntax is valid but protobuf unmarshaling failed
 		// Provide more detailed error information
-		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s. JSON was: %s", msg, err, jsonStr))
+		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s", msg, err))
 	}
 
 	// Set Creator field from contract caller (security: override any value in JSON)
@@ -167,9 +167,14 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 	switch m := msg.(type) {
 	case *tokenizationtypes.MsgTransferTokens:
 		m.Creator = creatorCosmosAddr
-		// Convert ToAddresses in transfers
+		// Convert ToAddresses in transfers; From defaults to the caller
 		for _, transfer := range m.Transfers {
 			if transfer != nil {
+				if transfer.From == "" {
+					transfer.From = creatorCosmosAddr
+				} else {
+					transfer.From = convertEVMAddressToBech32(transfer.From)
+				}
 				for i, toAddr := range transfer.ToAddresses {
 					transfer.ToAddresses[i] = convertEVMAddressToBech32(toAddr)
 				}

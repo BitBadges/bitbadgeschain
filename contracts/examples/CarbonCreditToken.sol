@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
 import "../libraries/TokenizationJSONHelpers.sol";
+import "../libraries/TokenizationDecoders.sol";
 
 /**
  * @title CarbonCreditToken
@@ -379,7 +380,7 @@ contract CarbonCreditToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     /**
@@ -392,7 +393,7 @@ contract CarbonCreditToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     // ============ View Functions ============

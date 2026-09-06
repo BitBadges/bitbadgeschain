@@ -28,6 +28,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	sendmanagerkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 	sendmanagertypes "github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 )
@@ -40,7 +41,8 @@ const (
 	GasSendBase = 30_000
 
 	// Gas costs per element for dynamic calculations
-	GasPerCoin = 2_000
+	GasPerCoin       = 2_000
+	GasPerInputChunk = 100 // Gas per 32-byte chunk of input, for JSON parsing
 )
 
 var _ vm.PrecompiledContract = &Precompile{}
@@ -94,18 +96,28 @@ type Precompile struct {
 
 // NewPrecompile creates a new sendmanager Precompile instance implementing the
 // PrecompiledContract interface.
+//
+// bankKeeper feeds the balance handler that replays the bank events emitted
+// by the keeper into the EVM StateDB, so that a balance the precompile moved
+// is not overwritten by the StateDB at commit. It may be nil only for unit
+// tests that never run inside the EVM.
 func NewPrecompile(
 	sendManagerKeeper sendmanagerkeeper.Keeper,
+	bankKeeper cmn.BankKeeper,
 ) *Precompile {
-	return &Precompile{
+	p := &Precompile{
 		Precompile: cmn.Precompile{
-			KvGasConfig:          storetypes.GasConfig{},
-			TransientKVGasConfig: storetypes.GasConfig{},
+			KvGasConfig:          storetypes.KVGasConfig(),
+			TransientKVGasConfig: storetypes.TransientGasConfig(),
 			ContractAddress:      common.HexToAddress(SendManagerPrecompileAddress),
 		},
 		ABI:               ABI,
 		sendManagerKeeper: sendManagerKeeper,
 	}
+	if bankKeeper != nil {
+		p.BalanceHandlerFactory = evmcompat.NewBalanceHandlerFactory(bankKeeper)
+	}
+	return p
 }
 
 // SendManagerPrecompileAddress is the address of the sendmanager precompile
@@ -152,6 +164,10 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		return 0
 	}
 
+	// Priced by input size: the JSON has to be parsed and validated before
+	// the per-coin charge in HandleTransaction can apply.
+	baseGas += uint64(len(input)/32) * GasPerInputChunk
+
 	// Add buffer for Cosmos SDK state operations (bank transfers, etc.)
 	return baseGas + 150_000
 }
@@ -176,7 +192,7 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		return nil, fmt.Errorf("sendmanager precompile does not support read-only operations")
 	}
 
-	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
+	return evmcompat.RunNativeAction(p.Precompile, evm, contract, func(ctx sdk.Context) ([]byte, error) {
 		result, methodName, err := p.ExecuteWithMethodName(ctx, contract, readonly)
 
 		// Gas is tracked by the EVM, we log the method for monitoring
@@ -246,6 +262,10 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 	var resp interface{}
 	switch m := msg.(type) {
 	case *sendmanagertypes.MsgSendWithAliasRouting:
+		if err := ValidateArraySize(len(m.Amount), MaxCoins, "amount"); err != nil {
+			return nil, err
+		}
+		ctx.GasMeter().ConsumeGas(uint64(len(m.Amount))*GasPerCoin, "precompile message elements")
 		_, err = msgServer.SendWithAliasRouting(ctx, m)
 		resp = true // ABI: bool success
 	default:

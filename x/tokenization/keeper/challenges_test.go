@@ -4108,7 +4108,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_ValidSignature() {
 		"collection",       // approvalLevel
 		"test",             // approvalId
 		"test-challenge-1", // challengeId
-		signature,
+		nonce,
 	)
 	numUsed, exists := suite.app.TokenizationKeeper.GetETHSignatureTrackerFromStore(suite.ctx, signatureKey)
 	suite.Require().True(exists, "Signature tracker should exist")
@@ -4463,7 +4463,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_SignatureReuse() {
 		"collection",
 		"test",
 		"test-challenge-1",
-		signature,
+		nonce,
 	)
 	numUsed, exists := suite.app.TokenizationKeeper.GetETHSignatureTrackerFromStore(suite.ctx, signatureKey)
 	suite.Require().True(exists)
@@ -5397,7 +5397,7 @@ func (suite *TestSuite) TestETHSignatureChallenge_TrackerQuery() {
 			ApprovalLevel:      "collection",
 			ApprovalId:         "test",
 			ChallengeTrackerId: "test-challenge-1",
-			Signature:          signature,
+			Signature:          nonce, // usage is tracked per nonce; the query's lookup field carries it
 		},
 	)
 	suite.Require().NoError(err)

@@ -50,7 +50,7 @@ func (suite *QueryTestSuite) SetupTest() {
 	keeper, ctx := keepertest.TokenizationKeeper(suite.T())
 	suite.TokenizationKeeper = keeper
 	suite.Ctx = ctx
-	suite.Precompile = tokenization.NewPrecompile(keeper)
+	suite.Precompile = tokenization.NewPrecompile(keeper, nil)
 
 	// Create test addresses
 	suite.AliceEVM = common.HexToAddress("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0")

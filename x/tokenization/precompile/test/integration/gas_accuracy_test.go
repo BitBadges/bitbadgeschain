@@ -8,8 +8,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
+	sdkmath "cosmossdk.io/math"
+
 	tokenization "github.com/bitbadges/bitbadgeschain/x/tokenization/precompile"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/precompile/test/helpers"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 // GasAccuracyTestSuite is a test suite for gas accuracy testing
@@ -196,4 +199,64 @@ func (suite *GasAccuracyTestSuite) TestGasLimits_Enforced() {
 			suite.T().Log("Gas limit enforcement verified - transaction failed as expected")
 		}
 	}
+}
+
+// TestGasUsed_GrowsWithRecipients runs the same transfer through the EVM
+// keeper with one and with five recipients and checks the gas the EVM charged
+// grows by at least the per-recipient price. This is the end-to-end view of
+// the SDK-side metering: store access and per-element charges taken inside
+// the precompile must reach the EVM's gas accounting.
+func (suite *GasAccuracyTestSuite) TestGasUsed_GrowsWithRecipients() {
+	chainID := suite.getChainID()
+	precompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
+	method := suite.Precompile.ABI.Methods["transferTokens"]
+
+	// Fresh recipients have no balance store, so let the collection's default
+	// balances accept incoming transfers.
+	collection, found := suite.TokenizationKeeper.GetCollectionFromStore(suite.Ctx, suite.CollectionId)
+	suite.Require().True(found)
+	collection.DefaultBalances = &tokenizationtypes.UserBalanceStore{
+		AutoApproveAllIncomingTransfers:           true,
+		AutoApproveSelfInitiatedIncomingTransfers: true,
+		AutoApproveSelfInitiatedOutgoingTransfers: true,
+	}
+	suite.Require().NoError(suite.TokenizationKeeper.SetCollectionInStore(suite.Ctx, collection, false))
+
+	// x/vm charges at least MinGasMultiplier (default 50%) of the gas limit,
+	// which would hide the actual usage behind a flat number.
+	feeParams := suite.App.FeeMarketKeeper.GetParams(suite.Ctx)
+	feeParams.MinGasMultiplier = sdkmath.LegacyZeroDec()
+	suite.Require().NoError(suite.App.FeeMarketKeeper.SetParams(suite.Ctx, feeParams))
+
+	gasFor := func(recipients int) uint64 {
+		toAddresses := make([]string, recipients)
+		for i := range toAddresses {
+			_, _, addr := helpers.CreateEVMAccount()
+			toAddresses[i] = addr.String()
+		}
+		jsonMsg, err := helpers.BuildTransferTokensJSON(
+			suite.CollectionId.BigInt(),
+			suite.Alice.String(),
+			toAddresses,
+			big.NewInt(1),
+			[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: big.NewInt(50)}},
+			[]struct{ Start, End *big.Int }{{Start: big.NewInt(1), End: new(big.Int).SetUint64(math.MaxUint64)}},
+		)
+		suite.Require().NoError(err)
+		input, err := helpers.PackMethodWithJSON(&method, jsonMsg)
+		suite.Require().NoError(err)
+
+		tx, err := helpers.BuildEVMTransaction(suite.AliceKey, &precompileAddr, input, big.NewInt(0), 5_000_000, big.NewInt(0), suite.getNonce(suite.AliceEVM), chainID)
+		suite.Require().NoError(err)
+		response, err := helpers.ExecuteEVMTransaction(suite.Ctx, suite.EVMKeeper, tx)
+		suite.Require().NoError(err)
+		suite.Require().Empty(response.VmError, "transfer to %d recipients must succeed", recipients)
+		return response.GasUsed
+	}
+
+	one := gasFor(1)
+	five := gasFor(5)
+	suite.T().Logf("gas used: 1 recipient=%d, 5 recipients=%d", one, five)
+	suite.GreaterOrEqual(five-one, uint64(4*tokenization.GasPerRecipient),
+		"gas charged by the EVM must grow with the number of recipients")
 }

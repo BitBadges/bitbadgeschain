@@ -37,7 +37,51 @@ var (
 	// KeyPrefixAddressTransferWindow stores the time window for address transfer tracking
 	// Key: addressTransferWindowKey(address, channelID, denom, timeframeType, timeframeDuration) -> ChannelFlowWindow
 	KeyPrefixAddressTransferWindow = []byte{0x06}
+
+	// KeyPrefixPendingSend stores, per outbound packet and per limit, the start of
+	// the window the send was debited in. Ack/timeout refunds are only applied
+	// while that window is still current.
+	// Key: PendingSendKey(port, channel, sequence, scope, timeframeType, timeframeDuration) -> big-endian window start
+	KeyPrefixPendingSend    = []byte{0x07}
+	KeyPrefixPendingReceive = []byte{0x08}
 )
+
+func PendingReceivePrefix(port, channel string, sequence uint64) []byte {
+	key := PendingSendPrefix(port, channel, sequence)
+	key[0] = KeyPrefixPendingReceive[0]
+	return key
+}
+
+func PendingReceiveKey(port, channel string, sequence uint64, scope string, timeframeType int32, timeframeDuration int64) []byte {
+	key := PendingSendKey(port, channel, sequence, scope, timeframeType, timeframeDuration)
+	key[0] = KeyPrefixPendingReceive[0]
+	return key
+}
+
+const (
+	// PendingSendScopeSupplyShift marks a pending-send record for a supply shift limit
+	PendingSendScopeSupplyShift = "s"
+	// PendingSendScopeAddress marks a pending-send record for a per-address limit
+	PendingSendScopeAddress = "a"
+)
+
+// PendingSendPrefix returns the key prefix shared by all pending-send records of one packet
+func PendingSendPrefix(port, channel string, sequence uint64) []byte {
+	key := append(KeyPrefixPendingSend, []byte(port)...)
+	key = append(key, []byte("|")...)
+	key = append(key, []byte(channel)...)
+	key = append(key, []byte("|")...)
+	key = append(key, []byte(fmt.Sprintf("%d|", sequence))...)
+	return key
+}
+
+// PendingSendKey returns the key for one limit's pending-send record of a packet
+func PendingSendKey(port, channel string, sequence uint64, scope string, timeframeType int32, timeframeDuration int64) []byte {
+	key := append(PendingSendPrefix(port, channel, sequence), []byte(scope)...)
+	key = append(key, []byte("|")...)
+	key = append(key, []byte(fmt.Sprintf("%d|%d", timeframeType, timeframeDuration))...)
+	return key
+}
 
 // ChannelFlowKeyLegacy returns the key for storing channel flow state (backward compatibility)
 func ChannelFlowKeyLegacy(channelID, denom string) []byte {

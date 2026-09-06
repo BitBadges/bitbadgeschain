@@ -174,7 +174,7 @@ func (im IBCMiddleware) OnRecvPacket(
 	if hook, ok := im.ICS4Middleware.Hooks.(OnRecvPacketOverrideHooks); ok {
 		ack := hook.OnRecvPacketOverride(im, ctx, channelID, packet, relayer)
 		// Log acknowledgement type for debugging - this helps identify if error acks are being returned
-		if !ack.Success() {
+		if ack != nil && !ack.Success() {
 			ctx.Logger().Error("ibc-hooks: override hook returned error acknowledgement",
 				"packet_sequence", packet.GetSequence(),
 				"packet_source_port", packet.GetSourcePort(),

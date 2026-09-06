@@ -1,7 +1,10 @@
 package stableswap_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	stableswap "github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/stableswap"
@@ -351,3 +354,8 @@ func baseCreatePoolMsgGen(sender sdk.AccAddress) *stableswap.MsgCreateStableswap
 // 		})
 // 	}
 // }
+
+func TestMsgStableSwapAdjustScalingFactorsRejectsEmptySender(t *testing.T) {
+	msg := stableswap.MsgStableSwapAdjustScalingFactors{Sender: "", PoolID: 1, ScalingFactors: []uint64{1, 1}}
+	require.Error(t, msg.ValidateBasic())
+}

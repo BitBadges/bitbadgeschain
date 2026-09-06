@@ -42,6 +42,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
@@ -83,6 +84,7 @@ const (
 	GasPerTokenIdRange       = 1_000
 	GasPerOwnershipTimeRange = 1_000
 	GasPerApprovalField      = 500
+	GasPerAddressListEntry   = 200
 
 	// Gas costs for queries (lower since they're read-only)
 	GasGetCollectionBase         = 3_000
@@ -167,18 +169,28 @@ type Precompile struct {
 
 // NewPrecompile creates a new tokenization Precompile instance implementing the
 // PrecompiledContract interface.
+//
+// bankKeeper feeds the balance handler that replays the bank events emitted
+// by the keeper (coin transfers, wrapping) into the EVM StateDB, so that a
+// balance the precompile moved is not overwritten by the StateDB at commit.
+// It may be nil only for unit tests that never run inside the EVM.
 func NewPrecompile(
 	tokenizationKeeper *tokenizationkeeper.Keeper,
+	bankKeeper cmn.BankKeeper,
 ) *Precompile {
-	return &Precompile{
+	p := &Precompile{
 		Precompile: cmn.Precompile{
-			KvGasConfig:          storetypes.GasConfig{},
-			TransientKVGasConfig: storetypes.GasConfig{},
+			KvGasConfig:          storetypes.KVGasConfig(),
+			TransientKVGasConfig: storetypes.TransientGasConfig(),
 			ContractAddress:      common.HexToAddress(TokenizationPrecompileAddress),
 		},
 		ABI:                ABI,
 		tokenizationKeeper: tokenizationKeeper,
 	}
+	if bankKeeper != nil {
+		p.BalanceHandlerFactory = evmcompat.NewBalanceHandlerFactory(bankKeeper)
+	}
+	return p
 }
 
 // TokenizationPrecompileAddress is the address of the tokenization precompile
@@ -323,10 +335,8 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 					if msgCount > MaxMessagesPerBatch {
 						msgCount = MaxMessagesPerBatch
 					}
-					// Calculate dynamic gas: base + (message count * per-message gas) + (input size gas)
-					// Input size gas accounts for JSON parsing complexity (security fix: prevents gas griefing)
-					inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
-					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch) + inputSizeGas
+					// Calculate dynamic gas: base + (message count * per-message gas)
+					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch)
 				} else {
 					// If parsing fails, use base gas (will be adjusted during execution)
 					baseGas = GasExecuteMultipleBase
@@ -383,23 +393,17 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasRangesOverlap
 	case SearchInRangesMethod:
 		baseGas = GasSearchInRanges
-		// Add input-size-proportional gas to prevent gas griefing with large JSON inputs
-		if len(input) > 4 {
-			inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
-			baseGas += inputSizeGas
-		}
 	case GetBalanceForIdAndTimeMethod:
 		baseGas = GasGetBalanceForIdAndTime
-		// Add input-size-proportional gas to prevent gas griefing with large JSON inputs
-		if len(input) > 4 {
-			inputSizeGas := uint64(len(input)/32) * GasPerInputChunk
-			baseGas += inputSizeGas
-		}
 	case GetReservedListIdMethod:
 		baseGas = GasGetReservedListId
 	default:
 		return 0
 	}
+
+	// Every method is priced by input size: the JSON has to be parsed and
+	// validated before the per-element charges in MeterMessage can apply.
+	baseGas += uint64(len(input)/32) * GasPerInputChunk
 
 	// Add buffer for Cosmos SDK operations to help estimateGas converge
 	// Transactions need more buffer due to state writes, bank transfers, etc.
@@ -422,7 +426,7 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		return nil, fmt.Errorf("contract.Input is empty - precompile cannot execute without input data")
 	}
 
-	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
+	return evmcompat.RunNativeAction(p.Precompile, evm, contract, func(ctx sdk.Context) ([]byte, error) {
 		// Add panic recovery to catch any unexpected panics
 		defer func() {
 			if r := recover(); r != nil {
@@ -568,23 +572,49 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 	}
 
 	// Route to transaction or query handler
-	// Note: GetBalanceAmount, GetTotalSupply, and GetAllReservedProtocolAddresses need special handling
 	var bz []byte
 	if p.IsTransaction(method) {
 		bz, err = p.HandleTransaction(ctx, method, jsonStr, contract)
-	} else if method.Name == GetBalanceAmountMethod {
-		bz, err = p.HandleGetBalanceAmount(ctx, method, jsonStr)
-	} else if method.Name == GetTotalSupplyMethod {
-		bz, err = p.HandleGetTotalSupply(ctx, method, jsonStr)
-	} else if method.Name == GetAllReservedProtocolAddressesMethod {
-		bz, err = p.HandleGetAllReservedProtocolAddresses(ctx, method, jsonStr)
-	} else if method.Name == IsAddressReservedProtocolMethod {
-		bz, err = p.HandleIsAddressReservedProtocol(ctx, method, jsonStr)
 	} else {
-		bz, err = p.HandleQuery(ctx, method, jsonStr)
+		bz, err = p.handleQueryReadOnly(ctx, method, jsonStr)
 	}
 
 	return bz, method.Name, err
+}
+
+// handleQueryReadOnly dispatches a query on a throw-away branch of the store.
+//
+// Some query paths share keeper code with transactions and write on first
+// access: GetBalanceOrApplyDefault initialises the approval versions of an
+// address that has no stored balance. A view method called from inside a
+// transaction must not leave that behind, so every write a query makes is
+// discarded. Gas already consumed stays charged and events are kept.
+func (p Precompile) handleQueryReadOnly(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
+	branch := evmcompat.NewAtomicContext(ctx)
+	defer branch.Rollback()
+	queryCtx := branch.Ctx()
+
+	var bz []byte
+	var err error
+	switch method.Name {
+	case GetBalanceAmountMethod:
+		bz, err = p.HandleGetBalanceAmount(queryCtx, method, jsonStr)
+	case GetTotalSupplyMethod:
+		bz, err = p.HandleGetTotalSupply(queryCtx, method, jsonStr)
+	case GetAllReservedProtocolAddressesMethod:
+		bz, err = p.HandleGetAllReservedProtocolAddresses(queryCtx, method, jsonStr)
+	case IsAddressReservedProtocolMethod:
+		bz, err = p.HandleIsAddressReservedProtocol(queryCtx, method, jsonStr)
+	default:
+		bz, err = p.HandleQuery(queryCtx, method, jsonStr)
+	}
+
+	// Outside the EVM the branch is a CacheContext with its own event
+	// manager; inside it the branch shares ctx and nothing is lost.
+	if !branch.IsEvmContext() {
+		ctx.EventManager().EmitEvents(queryCtx.EventManager().Events())
+	}
+	return bz, err
 }
 
 // HandleTransaction handles a transaction by unmarshaling JSON and executing via keeper
@@ -593,6 +623,10 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON for method %s: %w", method.Name, err)
+	}
+
+	if err := MeterMessage(ctx, msg); err != nil {
+		return nil, err
 	}
 
 	// Execute message via keeper
@@ -855,6 +889,10 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 				"failed to route message",
 				fmt.Sprintf("message index %d, type: %s", i, messageType),
 			)
+		}
+
+		if err := MeterMessage(ctx, msg); err != nil {
+			return nil, WrapErrorWithContext(err, ErrorCodeInvalidInput, "message rejected", fmt.Sprintf("message index %d, type: %s", i, messageType))
 		}
 
 		// Execute message via keeper
@@ -1621,6 +1659,9 @@ func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, 
 	if !found {
 		return nil, ErrCollectionNotFound(req.CollectionId)
 	}
+
+	// Balances are keyed by bech32 address; Solidity callers pass 0x.
+	req.Address = convertEVMAddressToBech32(req.Address)
 
 	// Get user balance store
 	userBalanceStore, _, err := p.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, req.Address)

@@ -59,6 +59,13 @@ func (s *KeeperTestSuite) TestGammInitGenesis() {
 	_, err = s.App.GammKeeper.GetPoolAndPoke(s.Ctx, 7)
 	s.Require().Error(err)
 
+	// The tokenization pool-address cache is rebuilt from the imported pools
+	for _, pool := range pools {
+		poolId, found := s.App.TokenizationKeeper.GetPoolIdFromAddressCache(s.Ctx, pool.GetAddress().String())
+		s.Require().True(found, "pool address %s must be cached after InitGenesis", pool.GetAddress())
+		s.Require().Equal(pool.GetId(), poolId)
+	}
+
 	liquidity, err := s.App.GammKeeper.GetTotalLiquidity(s.Ctx)
 	s.Require().NoError(err)
 	expectedLiquidity := sdk.NewCoins(sdk.NewInt64Coin("bar", 15000000), sdk.NewInt64Coin("baz", 15000000), sdk.NewInt64Coin("foo", 15000000), sdk.NewInt64Coin(appparams.BaseCoinUnit, 15000000))
