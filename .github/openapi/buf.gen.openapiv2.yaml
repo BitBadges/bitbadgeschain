@@ -1,0 +1,26 @@
+# PROPOSED — add as .github/openapi/buf.gen.openapiv2.yaml in
+# BitBadges/bitbadgeschain. Ships in the same PR as .github/workflows/openapi.yml.
+#
+# This is a CI-ONLY generation template. It does NOT replace
+# proto/buf.gen.swagger.yaml, which is ignite-managed ("This file is
+# auto-generated from Ignite ... do not change the file name or path") and is
+# what `ignite generate openapi` uses locally.
+#
+# The only difference from the ignite template is `allow_merge` +
+# `merge_file_name`: the ignite one emits one document per service and lets
+# ignite merge them afterwards, while CI drives the plugin directly and needs a
+# single merged document. Every other opt is copied verbatim — keep them in
+# sync if ignite ever regenerates its file.
+
+version: v1
+plugins:
+  - name: openapiv2
+    out: .
+    opt:
+      - logtostderr=true
+      - openapi_naming_strategy=fqn
+      - json_names_for_fields=false
+      - generate_unbound_methods=true
+      # CI-only additions:
+      - allow_merge=true
+      - merge_file_name=openapi
