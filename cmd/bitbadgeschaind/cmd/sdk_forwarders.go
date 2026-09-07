@@ -57,11 +57,12 @@ var sdkForwarderSpecs = []sdkForwarderSpec{
 	{name: "preview", short: "Preview a tx as it would land on chain", group: groupSDKBuild},
 	{name: "simulate", short: "Simulate a tx against a live node (no broadcast)", group: groupSDKBuild},
 
-	// SDK — Standards (12 end-user verbs)
+	// SDK — Standards (13 end-user verbs)
 	{name: "auctions", short: "Auction standard: list / show / place-bid / settle / ...", group: groupSDKStandards},
 	{name: "bounties", short: "Bounty standard: list / show / claim / ...", group: groupSDKStandards},
 	{name: "credit-tokens", short: "Credit-token standard: list / show / issue / ...", group: groupSDKStandards},
 	{name: "crowdfunds", short: "Crowdfund standard: list / show / contribute / ...", group: groupSDKStandards},
+	{name: "custom-2fa", short: "Custom 2FA standard: list / show / ...", group: groupSDKStandards},
 	{name: "dynamic-stores", short: "Dynamic-store standard: list / show / set-value / ...", group: groupSDKStandards},
 	{name: "intents", short: "Intent standard: list / show / submit / ...", group: groupSDKStandards},
 	{name: "nfts", short: "NFT standard: list / show / transfer / ...", group: groupSDKStandards},
@@ -73,10 +74,14 @@ var sdkForwarderSpecs = []sdkForwarderSpec{
 
 	// SDK — Indexer & Auth
 	{name: "account", short: "Account aggregator: profile, tokens, balances, activity, approvals", group: groupSDKIndexer},
+	{name: "amount", short: "Amount math: to-raw / to-display / slippage / wrap-preview / ...", group: groupSDKIndexer},
 	{name: "api", short: "Indexer API surface (106 routes, tag-grouped)", group: groupSDKIndexer},
 	{name: "auth", short: "Blockin session: login / logout / status / use / whoami", group: groupSDKIndexer},
+	{name: "url", short: "bitbadges.io links for an address, collection, token, or tx", group: groupSDKIndexer},
 
 	// SDK — Swap / DEX
+	{name: "assets", short: "Tradable asset listings: list / show / browse / price", group: groupSDKSwap},
+	{name: "balances", short: "Balances across ics20 / bitbadges / assets", group: groupSDKSwap},
 	{name: "pairs", short: "Asset-pair listings (promoted from `swap asset-pairs`)", group: groupSDKSwap},
 	{name: "pools", short: "Liquidity pool listings (promoted from `swap pools`)", group: groupSDKSwap},
 	{name: "price", short: "Spot price for a symbol", group: groupSDKSwap},
@@ -136,6 +141,45 @@ Run with --help to see the SDK subcommand's own help:
 		cmd.Deprecated = spec.deprecated
 	}
 	return cmd
+}
+
+// sdkTxSubforwarders are SDK verbs that live under the chain-owned `tx`
+// noun. `bb tx` is Cosmos SDK's transaction command, so the SDK's
+// `tx status` and `tx wait` cannot be registered as top-level
+// forwarders; instead they are attached as subcommands of the chain's
+// `tx` and forward to `bitbadges-cli tx <verb> [args...]`.
+var sdkTxSubforwarders = []sdkForwarderSpec{
+	{name: "status", short: "Look up a broadcast tx by hash on the indexer (SDK)"},
+	{name: "wait", short: "Wait for a broadcast tx to be indexed (SDK)"},
+}
+
+// registerSDKTxSubforwarders adds the SDK's `tx status` / `tx wait` to
+// the chain's `tx` command. Skips a name the chain already owns.
+func registerSDKTxSubforwarders(txCmd *cobra.Command) {
+	existing := map[string]bool{}
+	for _, c := range txCmd.Commands() {
+		existing[c.Name()] = true
+	}
+	for _, spec := range sdkTxSubforwarders {
+		if existing[spec.name] {
+			fmt.Fprintf(os.Stderr,
+				"sdk tx forwarder name collision: %q already registered under tx\n", spec.name)
+			continue
+		}
+		spec := spec
+		txCmd.AddCommand(&cobra.Command{
+			Use:                spec.name + " [args...]",
+			Short:              spec.short,
+			DisableFlagParsing: true,
+			Long: fmt.Sprintf(`Forwards to: bitbadges-cli tx %s
+
+All arguments and flags are passed through verbatim. Requires the
+bitbadges npm package (npm install -g bitbadges).`, spec.name),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				return execNodeCLI("tx", append([]string{spec.name}, args...))
+			},
+		})
+	}
 }
 
 // registerSDKForwarders adds every top-level SDK forwarder to the root

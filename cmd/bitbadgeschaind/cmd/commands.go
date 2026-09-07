@@ -169,6 +169,10 @@ func txCommand() *cobra.Command {
 	)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
+	// `bb tx status` / `bb tx wait` are SDK CLI verbs under the chain-owned
+	// `tx` noun. See sdk_forwarders.go.
+	registerSDKTxSubforwarders(cmd)
+
 	return cmd
 }
 
