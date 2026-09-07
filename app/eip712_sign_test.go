@@ -1,7 +1,11 @@
 package app
 
 import (
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 	"math/big"
+	"os"
 	"strings"
 	"testing"
 
@@ -216,4 +220,54 @@ func TestPrecompileEthTxDeliversThroughBaseApp(t *testing.T) {
 	out, err := tokenizationprecompile.ABI.Unpack("rangeContains", response.Ret)
 	require.NoError(t, err)
 	require.Equal(t, []interface{}{true}, out)
+}
+
+func TestEIP712ModuleHashesMatchSDK(t *testing.T) {
+	app := Setup(false)
+	eip712.SetEncodingConfig(app.legacyAmino, app.interfaceRegistry, 50024)
+	data, err := os.ReadFile("testdata/eip712-module-messages.json")
+	require.NoError(t, err)
+	var fixtures []struct {
+		Name    string
+		SignDoc json.RawMessage
+		Hash    string
+		Signer  string
+		TxBytes string
+	}
+	require.NoError(t, json.Unmarshal(data, &fixtures))
+	require.Len(t, fixtures, 12)
+	for _, fixture := range fixtures {
+		t.Run(fixture.Name, func(t *testing.T) {
+			typed, err := eip712.GetEIP712TypedDataForMsg(fixture.SignDoc)
+			require.NoError(t, err)
+			hash, _, err := apitypes.TypedDataAndHash(typed)
+			require.NoError(t, err)
+			require.Equal(t, fixture.Hash, hex.EncodeToString(hash))
+			ctx := app.NewContextLegacy(false, cmtproto.Header{Height: 1, ChainID: "bitbadges-1"})
+			ctx, _ = ctx.CacheContext()
+			signer, err := sdk.AccAddressFromBech32(fixture.Signer)
+			require.NoError(t, err)
+			funds := sdk.NewCoins(sdk.NewCoin(appparams.BaseCoinUnit, sdkmath.NewInt(1_000_000_000_000)))
+			require.NoError(t, app.BankKeeper.MintCoins(ctx, "mint", funds))
+			require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", signer, funds))
+			acc := app.AccountKeeper.GetAccount(ctx, signer)
+			require.NoError(t, acc.SetAccountNumber(1))
+			app.AccountKeeper.SetAccount(ctx, acc)
+			raw, err := base64.StdEncoding.DecodeString(fixture.TxBytes)
+			require.NoError(t, err)
+			tx, err := app.txConfig.TxDecoder()(raw)
+			require.NoError(t, err)
+			badCtx, _ := ctx.CacheContext()
+			builder, err := app.txConfig.WrapTxBuilder(tx)
+			require.NoError(t, err)
+			builder.SetMemo("tampered")
+			_, err = app.AnteHandler()(badCtx, builder.GetTx(), false)
+			require.ErrorContains(t, err, "signature verification failed")
+			tx, err = app.txConfig.TxDecoder()(raw)
+			require.NoError(t, err)
+			_, err = app.AnteHandler()(ctx, tx, false)
+			require.NoError(t, err, "SDK-signed envelope must pass the chain ante handler")
+
+		})
+	}
 }
