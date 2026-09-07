@@ -1,10 +1,9 @@
 package poolmanager_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // // validates that the pool manager keeper can charge taker fees correctly.
@@ -317,7 +316,7 @@ func (s *KeeperTestSuite) TestGetTakerFeeShareAgreements() {
 			s.SetupTest()
 			denomsInvolvedInRoute := tc.setupFunc()
 
-			denomShares, alloyedShares := s.App.PoolManagerKeeper.GetTakerFeeShareAgreements(denomsInvolvedInRoute)
+			denomShares, alloyedShares := s.App.PoolManagerKeeper.GetTakerFeeShareAgreements(s.Ctx, denomsInvolvedInRoute)
 			s.Require().Equal(tc.expectedDenomShares, denomShares)
 			s.Require().Equal(tc.expectedAlloyedShares, alloyedShares)
 		})

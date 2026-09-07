@@ -7,11 +7,10 @@ import (
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 // Shared helpers for the v35 approval regression tests below.
@@ -196,7 +195,7 @@ func (suite *TestSuite) TestMigrateV35CanonicalAddressesMergesEntries() {
 	// Used merkle-leaf and ETH signature trackers.
 	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, keeper.ConstructUsedClaimChallengeKey(one, upperBob, "incoming", "a", "c", one), one))
 	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, keeper.ConstructUsedClaimChallengeKey(one, bob, "incoming", "a", "c", one), one))
-	suite.Require().NoError(k.SetETHSignatureTrackerInStore(suite.ctx, keeper.ConstructETHSignatureTrackerKey(one, upperBob, "incoming", "a", "c", "n1"), one))
+	suite.Require().NoError(k.SetETHSignatureTrackerInStore(suite.ctx, "1-"+upperBob+"-incoming-a-c-n1", one))
 
 	// Approval versions.
 	k.SetApprovalTrackerVersionInStore(suite.ctx, keeper.ConstructApprovalVersionKey(one, "incoming", upperBob, "a"), sdkmath.NewUint(5))
@@ -238,7 +237,7 @@ func (suite *TestSuite) TestMigrateV35CanonicalAddressesMergesEntries() {
 	suite.Require().NoError(err)
 	suite.Require().True(numUsed.IsZero())
 
-	numUsed, found = k.GetETHSignatureTrackerFromStore(suite.ctx, keeper.ConstructETHSignatureTrackerKey(one, bob, "incoming", "a", "c", "n1"))
+	numUsed, found = k.GetETHSignatureTrackerFromStore(suite.ctx, "1-"+bob+"-incoming-a-c-n1")
 	suite.Require().True(found)
 	suite.Require().Equal(one, numUsed)
 

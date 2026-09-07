@@ -3,9 +3,9 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -117,6 +117,16 @@ func (suite *TestSuite) TestRolledBackCoinTransferIsNotChargedOrReported() {
 
 	bobBefore := suite.app.BankKeeper.GetBalance(suite.ctx, bobAddr, "ubadge").Amount
 	charlieBefore := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge").Amount
+
+	collection, found := suite.app.TokenizationKeeper.GetCollectionFromStore(suite.ctx, sdkmath.OneUint())
+	suite.Require().True(found)
+	tracking := &keeper.EventTracking{ApprovalsUsed: &[]keeper.ApprovalsUsed{}, CoinTransfers: &[]keeper.CoinTransfers{}}
+	_, err := DeductCollectionApprovalsAndGetUserApprovalsToCheck(suite, suite.ctx,
+		[]*types.Balance{{Amount: sdkmath.OneUint(), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}},
+		collection, GetOneUintRange(), GetFullUintRanges(), bob, alice, bob, sdkmath.OneUint(), nil,
+		[]*types.ApprovalIdentifierDetails{{ApprovalId: "priced-once", ApprovalLevel: "collection", Version: sdkmath.NewUint(0)}}, false, false, false, nil, tracking)
+	suite.Require().NoError(err)
+	suite.Require().Empty(*tracking.CoinTransfers, "failed approval attempts must not leak into their caller's payment accounting")
 
 	// Second use: priced-once runs its coin transfer, then fails the num-transfers
 	// threshold and is rolled back; free-fallback serves the transfer.

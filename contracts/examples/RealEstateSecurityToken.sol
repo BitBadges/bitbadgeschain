@@ -176,6 +176,7 @@ contract RealEstateSecurityToken {
         if (totalSupply > 0) {
             TokenizationInitialization.mintInitialSupply(TOKENIZATION, collectionId, issuer, balanceJson);
         }
+        TokenizationInitialization.approveWrapperTransfers(TOKENIZATION, collectionId);
     }
 
     // ============ ERC-3643 Identity Registry Functions ============
@@ -352,6 +353,7 @@ contract RealEstateSecurityToken {
         
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
+            msg.sender,
             recipients,
             amount,
             tokenIdsJson,

@@ -28,6 +28,7 @@ func (app *App) RegisterUpgradeHandlers() {
 				FeeMarket:       app.FeeMarketKeeper,
 				IBCRateLimit:    app.IBCRateLimitKeeper,
 				Tokenization:    app.TokenizationKeeper,
+				ManagerSplitter: app.ManagerSplitterKeeper,
 			},
 		),
 	)

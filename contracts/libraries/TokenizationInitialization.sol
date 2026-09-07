@@ -5,7 +5,7 @@ import "../interfaces/ITokenizationPrecompile.sol";
 import "./TokenizationJSONHelpers.sol";
 
 library TokenizationInitialization {
-    // Only used immediately after creating an approval-free collection.
+    // Temporarily replaces approvals; callers restore ongoing transfer approvals afterward.
     function mintInitialSupply(
         ITokenizationPrecompile precompile,
         uint256 collectionId,
@@ -31,11 +31,15 @@ library TokenizationInitialization {
 
     // The wrapper enforces holder authorization and compliance before calling the precompile.
     function approveWrapperTransfers(ITokenizationPrecompile precompile, uint256 collectionId) internal {
+        approveWrapperTransfers(precompile, collectionId, '[{"start":"1","end":"1"}]');
+    }
+
+    function approveWrapperTransfers(ITokenizationPrecompile precompile, uint256 collectionId, string memory tokenIdsJson) internal {
         string memory fullRange = '[{"start":"1","end":"18446744073709551615"}]';
         string memory approval = string(abi.encodePacked(
             '[{"approvalId":"wrapper-transfers","fromListId":"!Mint","toListId":"All",',
             '"initiatedByListId":"', _addressToBech32(address(this)),
-            '","transferTimes":', fullRange, ',"tokenIds":[{"start":"1","end":"1"}],"ownershipTimes":', fullRange,
+            '","transferTimes":', fullRange, ',"tokenIds":', tokenIdsJson, ',"ownershipTimes":', fullRange,
             ',"approvalCriteria":{"overridesFromOutgoingApprovals":true,"overridesToIncomingApprovals":true}}]'
         ));
         precompile.setCollectionApprovals(TokenizationJSONHelpers.setCollectionApprovalsJSON(collectionId, approval, "[]"));

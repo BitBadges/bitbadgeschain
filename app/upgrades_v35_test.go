@@ -4,11 +4,10 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
+	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	"github.com/stretchr/testify/require"
-
-	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 )
 
 func TestV35SetsBlockMaxGasAndMinGasPrice(t *testing.T) {
@@ -34,6 +33,7 @@ func TestV35SetsBlockMaxGasAndMinGasPrice(t *testing.T) {
 		FeeMarket:       app.FeeMarketKeeper,
 		IBCRateLimit:    app.IBCRateLimitKeeper,
 		Tokenization:    app.TokenizationKeeper,
+		ManagerSplitter: app.ManagerSplitterKeeper,
 	}))
 
 	params, err = app.ConsensusParamsKeeper.ParamsStore.Get(ctx)

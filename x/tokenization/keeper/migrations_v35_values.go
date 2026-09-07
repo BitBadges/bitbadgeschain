@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/storewalk"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -154,38 +155,29 @@ func (k Keeper) canonicalV35Collection(ctx sdk.Context, collection *types.TokenC
 	k.canonicalV35UserBalance(ctx, collection.DefaultBalances)
 }
 
-func (k Keeper) migrateV35AddressValues(ctx sdk.Context, store storetypes.KVStore) {
-	for _, keyPrefix := range [][]byte{CollectionKey, UserBalanceKey, DynamicStoreKey} {
-		iterator := storetypes.KVStorePrefixIterator(store, keyPrefix)
-		type update struct{ key, value []byte }
-		updates := []update{}
-		for ; iterator.Valid(); iterator.Next() {
+func (k Keeper) migrateV35AddressValues(ctx sdk.Context, store storetypes.KVStore) error {
+	for _, keyPrefix := range [][]byte{CollectionKey, DynamicStoreKey} {
+		if err := storewalk.Prefix(ctx, store, keyPrefix, func(key, bz []byte) error {
 			var value proto.Message
-			switch {
-			case bytes.Equal(keyPrefix, CollectionKey):
+			if bytes.Equal(keyPrefix, CollectionKey) {
 				collection := new(types.TokenCollection)
-				k.cdc.MustUnmarshal(iterator.Value(), collection)
+				k.cdc.MustUnmarshal(bz, collection)
 				k.canonicalV35Collection(ctx, collection)
 				value = collection
-			case bytes.Equal(keyPrefix, UserBalanceKey):
-				balance := new(types.UserBalanceStore)
-				k.cdc.MustUnmarshal(iterator.Value(), balance)
-				k.canonicalV35UserBalance(ctx, balance)
-				value = balance
-			case bytes.Equal(keyPrefix, DynamicStoreKey):
+			} else {
 				dynamicStore := new(types.DynamicStore)
-				k.cdc.MustUnmarshal(iterator.Value(), dynamicStore)
+				k.cdc.MustUnmarshal(bz, dynamicStore)
 				canonicalV35Address(&dynamicStore.CreatedBy)
 				value = dynamicStore
 			}
 			updated := k.cdc.MustMarshal(value)
-			if !bytes.Equal(updated, iterator.Value()) {
-				updates = append(updates, update{append([]byte(nil), iterator.Key()...), updated})
+			if !bytes.Equal(updated, bz) {
+				store.Set(key, updated)
 			}
-		}
-		iterator.Close()
-		for _, update := range updates {
-			store.Set(update.key, update.value)
+			return nil
+		}); err != nil {
+			return err
 		}
 	}
+	return nil
 }

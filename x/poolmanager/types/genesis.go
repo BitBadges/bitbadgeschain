@@ -28,5 +28,13 @@ func (gs GenesisState) Validate() error {
 	if err := gs.Params.Validate(); err != nil {
 		return err
 	}
+	for _, pair := range gs.DenomPairTakerFeeStore {
+		if pair.TakerFee.IsNil() {
+			return errors.New("uninitialized pair taker fee")
+		}
+		if err := validateDefaultTakerFee(pair.TakerFee); err != nil {
+			return err
+		}
+	}
 	return nil
 }

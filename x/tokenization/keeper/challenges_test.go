@@ -8,10 +8,9 @@ import (
 	"math"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
@@ -3955,11 +3954,10 @@ func generateTestETHPrivateKey() (string, string, error) {
 }
 
 // generateETHSignature generates a valid ETH signature for the given message components
-// Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
 // Uses ethers.signMessage format (EIP-191) which prefixes message with "\x19Ethereum Signed Message:\n<length>"
 func generateETHSignature(nonce, initiatorAddress, collectionId, approverAddress, approvalLevel, approvalId, challengeId string, privateKeyHex string) (string, error) {
 	// Construct the message to sign
-	message := nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
+	message := types.ETHSignatureChallengeMessage("", nonce, initiatorAddress, collectionId, approverAddress, approvalLevel, approvalId, challengeId)
 
 	// Get private key
 	privateKey, err := ethcrypto.HexToECDSA(privateKeyHex)

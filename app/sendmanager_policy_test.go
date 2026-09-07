@@ -3,13 +3,13 @@ package app
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/stretchr/testify/require"
-
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 	sendkeeper "github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 	sendtypes "github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSendmanagerPublicBankPolicy(t *testing.T) {
@@ -38,8 +38,23 @@ func TestSendmanagerPublicBankPolicy(t *testing.T) {
 			require.Error(t, err)
 			require.Equal(t, funds, app.BankKeeper.GetAllBalances(ctx, sender))
 			require.True(t, app.BankKeeper.GetBalance(ctx, receiver, appparams.BaseCoinUnit).IsZero())
-			// Internal module operations retain their own authorization policy.
-			require.NoError(t, app.SendmanagerKeeper.SendCoinsWithAliasRouting(ctx, sender, receiver, funds))
+			require.Error(t, app.SendmanagerKeeper.SendCoinsWithAliasRouting(ctx, sender, receiver, funds))
+			require.Error(t, app.SendmanagerKeeper.SendCoinWithAliasRouting(ctx, sender, receiver, &funds[0]))
+			require.Equal(t, funds, app.BankKeeper.GetAllBalances(ctx, sender))
 		})
+	}
+}
+
+func TestIBCReceiveRejectsBlockedModuleAccounts(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+	for _, name := range []string{"gamm", "tokenization", "evm", "precisebank"} {
+		receiver := authtypes.NewModuleAddress(name)
+		err := app.TransferKeeper.OnRecvPacket(ctx, transfertypes.InternalTransferRepresentation{
+			Token:  transfertypes.Token{Denom: transfertypes.Denom{Base: "uatom"}, Amount: "1"},
+			Sender: "remote-sender", Receiver: receiver.String(),
+		}, "transfer", "channel-0", "transfer", "channel-1")
+		require.ErrorContains(t, err, "not allowed to receive funds", name)
+		require.Empty(t, app.BankKeeper.GetAllBalances(ctx, receiver))
 	}
 }

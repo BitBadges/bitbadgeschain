@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 
 	types "cosmossdk.io/math"
 	host "github.com/cosmos/ibc-go/v11/modules/core/24-host"
@@ -26,7 +27,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 
-// IMPORTANT: We assume tokens are well-formed and validated here
 func (gs GenesisState) Validate() error {
 	if err := host.PortIdentifierValidator(gs.PortId); err != nil {
 		return err
@@ -61,6 +61,31 @@ func (gs GenesisState) Validate() error {
 		if collection.CollectionId.IsNil() || collection.CollectionId.IsZero() {
 			return fmt.Errorf("genesis collection at index %d has an invalid id", i)
 		}
+		for _, address := range []string{collection.Manager, collection.CreatedBy, collection.MintEscrowAddress} {
+			if address != "" {
+				if err := ValidateAddress(address, false); err != nil {
+					return err
+				}
+			}
+		}
+		for _, path := range collection.CosmosCoinWrapperPaths {
+			if path == nil {
+				return fmt.Errorf("nil wrapper path")
+			}
+			if err := ValidateAddress(path.Address, false); err != nil {
+				return err
+			}
+		}
+		if inv := collection.Invariants; inv != nil {
+			if err := ValidateMaxSupplyWithBacking(inv.MaxSupplyPerId, inv.CosmosCoinBackedPath != nil); err != nil {
+				return err
+			}
+			if inv.CosmosCoinBackedPath != nil {
+				if err := ValidateAddress(inv.CosmosCoinBackedPath.Address, false); err != nil {
+					return err
+				}
+			}
+		}
 		id := collection.CollectionId.String()
 		if seenCollections[id] {
 			return fmt.Errorf("duplicate genesis collection id %s", id)
@@ -83,6 +108,11 @@ func (gs GenesisState) Validate() error {
 		if store.StoreId.IsNil() || store.StoreId.IsZero() {
 			return fmt.Errorf("genesis dynamic store at index %d has an invalid id", i)
 		}
+		if store.CreatedBy != "" {
+			if err := ValidateAddress(store.CreatedBy, false); err != nil {
+				return err
+			}
+		}
 		id := store.StoreId.String()
 		if seenStores[id] {
 			return fmt.Errorf("duplicate genesis dynamic store id %s", id)
@@ -104,11 +134,21 @@ func (gs GenesisState) Validate() error {
 		if seenLists[list.ListId] {
 			return fmt.Errorf("duplicate genesis address list id %s", list.ListId)
 		}
+		if err := ValidateAddressList(list); err != nil {
+			return err
+		}
 		seenLists[list.ListId] = true
 	}
 
 	seenBalanceKeys := map[string]bool{}
 	for _, key := range gs.BalanceStoreKeys {
+		parts := strings.SplitN(key, "-", 2)
+		if len(parts) != 2 || !seenCollections[parts[0]] {
+			return fmt.Errorf("invalid balance store key %s", key)
+		}
+		if err := ValidateAddress(parts[1], true); err != nil {
+			return err
+		}
 		if seenBalanceKeys[key] {
 			return fmt.Errorf("duplicate genesis balance store key %s", key)
 		}

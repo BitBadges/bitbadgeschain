@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 // messageTypeToMethodMap maps message type strings to method names
@@ -44,7 +42,7 @@ var messageTypeToMethodMap = map[string]string{
 
 // routeMessageByType routes a message by its type string and unmarshals it
 // Returns the unmarshaled sdk.Msg ready for execution
-func (p Precompile) routeMessageByType(messageType string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
+func (p Precompile) routeMessageByType(ctx sdk.Context, messageType string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
 	// Look up method name from message type
 	methodName, ok := messageTypeToMethodMap[messageType]
 	if !ok {
@@ -52,7 +50,7 @@ func (p Precompile) routeMessageByType(messageType string, jsonStr string, contr
 	}
 
 	// Use existing unmarshal function which handles all the validation and creator setting
-	return p.unmarshalMsgFromJSON(methodName, jsonStr, contract)
+	return p.unmarshalMsgFromJSON(ctx, methodName, jsonStr, contract)
 }
 
 // convertEVMAddressToBech32 converts an EVM address (0x...) to bech32 format if needed
@@ -82,7 +80,7 @@ func convertEVMAddressToBech32(addr string) string {
 
 // unmarshalMsgFromJSON unmarshals a JSON string into the appropriate Msg type based on method name
 // and sets the Creator field from the contract caller for security.
-func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
+func (p Precompile) unmarshalMsgFromJSON(ctx sdk.Context, methodName string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
 	// Get caller address
 	caller := contract.Caller()
 	if err := VerifyCaller(caller); err != nil {
@@ -147,6 +145,10 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		return nil, ErrInvalidInput(fmt.Sprintf("unknown method: %s", methodName))
 	}
 
+	if err := meterJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(err.Error())
+	}
+
 	// Unmarshal JSON into the message
 	// Try direct protobuf JSON unmarshaling first (ModuleCdc handles both standard JSON and protobuf JSON)
 	// If that fails, try to provide better error messages
@@ -160,6 +162,10 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 		// JSON syntax is valid but protobuf unmarshaling failed
 		// Provide more detailed error information
 		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s", msg, err))
+	}
+
+	if err := MeterMessage(ctx, msg); err != nil {
+		return nil, err
 	}
 
 	// Set Creator field from contract caller (security: override any value in JSON)

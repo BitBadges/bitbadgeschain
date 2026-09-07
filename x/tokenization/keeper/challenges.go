@@ -5,13 +5,12 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	"github.com/storyicon/sigverify"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/storyicon/sigverify"
 )
 
 const (
@@ -120,6 +119,7 @@ func (k Keeper) HandleMerkleChallenges(
 					ethAddress := ethcommon.HexToAddress(leafSignerEthAddress)
 
 					leafSignatureString := leafValue + "-" + creatorAddress
+					ctx.GasMeter().ConsumeGas(types.ETHSignatureRecoveryGas, "ETH signature recovery")
 					isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 						ethAddress,
 						[]byte(leafSignatureString),
@@ -232,6 +232,9 @@ func (k Keeper) HandleETHSignatureChallenges(
 	approvalLevel := transferMetadata.ApprovalLevel
 	challenges := approval.ApprovalCriteria.EthSignatureChallenges
 	ethSignatureProofs := transfer.EthSignatureProofs
+	if err := types.ValidateETHSignatureProofs(ethSignatureProofs); err != nil {
+		return err.Error(), err
+	}
 
 	for _, challenge := range challenges {
 		if challenge == nil || challenge.Signer == "" {
@@ -250,10 +253,10 @@ func (k Keeper) HandleETHSignatureChallenges(
 			}
 
 			// Verify the signature
-			// Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
 			ethAddress := ethcommon.HexToAddress(signerAddress)
-			signatureString := proof.Nonce + "-" + initiatorAddress + "-" + collectionId.String() + "-" + approverAddress + "-" + approvalLevel + "-" + approval.ApprovalId + "-" + challengeId
+			signatureString := types.ETHSignatureChallengeMessage(ctx.ChainID(), proof.Nonce, initiatorAddress, collectionId.String(), approverAddress, approvalLevel, approval.ApprovalId, challengeId)
 
+			ctx.GasMeter().ConsumeGas(types.ETHSignatureRecoveryGas, "ETH signature recovery")
 			isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 				ethAddress,
 				[]byte(signatureString),

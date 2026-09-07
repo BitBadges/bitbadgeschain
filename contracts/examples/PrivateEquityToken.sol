@@ -219,6 +219,7 @@ contract PrivateEquityToken {
         if (initialAmount > 0) {
             TokenizationInitialization.mintInitialSupply(TOKENIZATION, collectionId, generalPartner, balanceJson);
         }
+        TokenizationInitialization.approveWrapperTransfers(TOKENIZATION, collectionId);
     }
 
     // ============ Investor Onboarding ============
@@ -291,8 +292,8 @@ contract PrivateEquityToken {
         uint256 tokensToIssue = amount / 1000;  // 1 token = $1000
 
         string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp,
-            fundTermination
+            block.timestamp * 1000,
+            fundTermination * 1000
         );
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
 
@@ -301,6 +302,7 @@ contract PrivateEquityToken {
 
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
+            generalPartner,
             recipients,
             tokensToIssue,
             tokenIdsJson,
@@ -358,8 +360,8 @@ contract PrivateEquityToken {
         require(eligible, reason);
 
         string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp,
-            fundTermination
+            block.timestamp * 1000,
+            fundTermination * 1000
         );
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 1);
 
@@ -368,6 +370,7 @@ contract PrivateEquityToken {
 
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
+            msg.sender,
             recipients,
             amount,
             tokenIdsJson,

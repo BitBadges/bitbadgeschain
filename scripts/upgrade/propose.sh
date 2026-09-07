@@ -9,14 +9,14 @@
 #     [--chain-id X] [--node tcp://...] [--bin bitbadgeschaind] \
 #     [--keyring-backend os] [--fees 0ubadge | --gas-prices 10ubadge] \
 #     [--expedited] [--info '<binaries json>'] [--voters key1,key2] \
-#     [--no-vote] [--wait 6] [--dry-run]
+#     [--no-vote] [--wait 6] [--dry-run] [--allow-mainnet]
 #
 # Prints PROPOSAL_ID=<id> and UPGRADE_HEIGHT=<height> on stdout when done.
 set -euo pipefail
 
 NAME="" HOME_DIR="" FROM="" DEPOSIT="10000000ubadge" HEIGHT="+30" CHAIN_ID="" NODE=""
 BIN="bitbadgeschaind" KR="os" FEES="" GAS_PRICES="" EXPEDITED=false INFO="" VOTERS=""
-VOTE=true WAIT=6 DRY_RUN=false AUTHORITY=""
+VOTE=true WAIT=6 DRY_RUN=false AUTHORITY="" ALLOW_MAINNET=false
 
 usage() { sed -n '2,15p' "$0"; exit "${1:-0}"; }
 while [ $# -gt 0 ]; do
@@ -35,6 +35,7 @@ while [ $# -gt 0 ]; do
     --expedited) EXPEDITED=true; shift ;;
     --info) INFO=$2; shift 2 ;;
     --voters) VOTERS=$2; shift 2 ;;
+    --allow-mainnet) ALLOW_MAINNET=true; shift ;;
     --no-vote) VOTE=false; shift ;;
     --wait) WAIT=$2; shift 2 ;;
     --authority) AUTHORITY=$2; shift 2 ;;
@@ -46,6 +47,8 @@ done
 [ -n "$NAME" ] && [ -n "$HOME_DIR" ] && [ -n "$FROM" ] || { echo "--name, --home and --from are required" >&2; usage 1; }
 [[ $DEPOSIT =~ ^[0-9]+[a-z][a-z0-9/]*$ ]] || { echo "--deposit must look like 10000000ubadge, got '$DEPOSIT'" >&2; exit 1; }
 [[ $DEPOSIT == *ustake ]] && { echo "--deposit uses 'ustake'; this chain's denom is 'ubadge'" >&2; exit 1; }
+
+[[ $HEIGHT =~ ^(\+[1-9][0-9]*|[1-9][0-9]*)$ ]] || { echo "--height must be a positive height or +N" >&2; exit 1; }
 
 COMMON=(--home "$HOME_DIR")
 [ -n "$NODE" ] && COMMON+=(--node "$NODE")
@@ -67,8 +70,17 @@ if $DRY_RUN; then
   CURRENT="<current height>"
   AUTHORITY=${AUTHORITY:-"<gov module account>"}
 else
-  CHAIN_ID=${CHAIN_ID:-$("$BIN" status "${COMMON[@]}" 2>/dev/null | jq -r '.node_info.network')}
-  CURRENT=$("$BIN" status "${COMMON[@]}" 2>/dev/null | jq -r '.sync_info.latest_block_height')
+  NODE_STATUS=$("$BIN" status "${COMMON[@]}" 2>/dev/null)
+  NODE_CHAIN_ID=$(jq -r '.node_info.network // .NodeInfo.network // empty' <<<"$NODE_STATUS")
+  [ -n "$NODE_CHAIN_ID" ] || { echo "node status did not identify its chain" >&2; exit 1; }
+  [ -z "$CHAIN_ID" ] || [ "$CHAIN_ID" = "$NODE_CHAIN_ID" ] || { echo "--chain-id does not match the connected node" >&2; exit 1; }
+  CHAIN_ID=$NODE_CHAIN_ID
+  CURRENT=$(jq -r '.sync_info.latest_block_height // .SyncInfo.latest_block_height' <<<"$NODE_STATUS")
+  if [ "$CHAIN_ID" = bitbadges-1 ]; then
+    $ALLOW_MAINNET || { echo "mainnet proposal requires --allow-mainnet" >&2; exit 1; }
+    ! $VOTE || { echo "mainnet proposal requires --no-vote; vote separately after reviewing it" >&2; exit 1; }
+    [[ $HEIGHT != +* ]] || { echo "mainnet proposal requires an explicit absolute --height" >&2; exit 1; }
+  fi
   [ -n "$CHAIN_ID" ] && [ -n "$CURRENT" ] && [ "$CURRENT" != null ] || { echo "cannot reach the node (--node/--home wrong?)" >&2; exit 1; }
   AUTHORITY=${AUTHORITY:-$(q query auth module-account gov | jq -r '.account.value.address // .account.base_account.address // empty')}
   [ -n "$AUTHORITY" ] || { echo "could not resolve the gov module account; pass --authority" >&2; exit 1; }

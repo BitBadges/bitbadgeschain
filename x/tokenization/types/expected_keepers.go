@@ -4,12 +4,11 @@ import (
 	"context"
 	"math/big"
 
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/evm/x/vm/statedb"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
-
-	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // AccountKeeper defines the expected interface for the Account module.
@@ -29,6 +28,7 @@ type BankKeeper interface {
 	SendCoinsFromModuleToAccount(context.Context, string, sdk.AccAddress, sdk.Coins) error
 	SendCoinsFromAccountToModule(context.Context, sdk.AccAddress, string, sdk.Coins) error
 	GetAllBalances(context.Context, sdk.AccAddress) sdk.Coins
+	GetSupply(context.Context, string) sdk.Coin
 	// Methods imported from bank should be defined here
 }
 
@@ -46,6 +46,7 @@ type ParamSubspace interface {
 // GammKeeper defines the expected interface for checking liquidity pools.
 type GammKeeper interface {
 	GetPool(ctx sdk.Context, poolId uint64) (poolmanagertypes.PoolI, error)
+	HasPoolForDenom(ctx sdk.Context, denom string) (bool, error)
 }
 
 // EVMKeeper defines the expected interface for checking EVM contracts.

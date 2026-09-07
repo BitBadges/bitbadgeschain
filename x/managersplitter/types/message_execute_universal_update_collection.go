@@ -66,5 +66,9 @@ func (msg *MsgExecuteUniversalUpdateCollection) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidRequest, "collection ID cannot be nil in UniversalUpdateCollection message")
 	}
 
+	if err := ValidateCanonicalAddresses(nil, msg.Executor, msg.ManagerSplitterAddress); err != nil {
+		return err
+	}
+
 	return nil
 }

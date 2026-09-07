@@ -1,10 +1,9 @@
 package keeper
 
 import (
+	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
 
 // SetPendingSendWindow records the window start an outbound debit landed in for one limit of a packet
@@ -31,7 +30,7 @@ func (k Keeper) DeletePendingSend(ctx sdk.Context, port, channel string, sequenc
 	iterator := storetypes.KVStorePrefixIterator(store, types.PendingSendPrefix(port, channel, sequence))
 	var keys [][]byte
 	for ; iterator.Valid(); iterator.Next() {
-		keys = append(keys, iterator.Key())
+		keys = append(keys, append([]byte(nil), iterator.Key()...))
 	}
 	iterator.Close()
 	for _, key := range keys {

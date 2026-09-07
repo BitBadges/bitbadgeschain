@@ -29,22 +29,17 @@ import (
 	"math/big"
 	"reflect"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/vm"
-
-	cmn "github.com/cosmos/evm/precompiles/common"
-
-	"github.com/cosmos/gogoproto/proto"
-
 	sdkmath "cosmossdk.io/math"
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	cmn "github.com/cosmos/evm/precompiles/common"
+	"github.com/cosmos/gogoproto/proto"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/vm"
 )
 
 const (
@@ -430,11 +425,12 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		// Add panic recovery to catch any unexpected panics
 		defer func() {
 			if r := recover(); r != nil {
-				// Security fix: Log panic for observability before re-panicking
-				ctx.Logger().Error("precompile panic recovered",
-					"panic", fmt.Sprintf("%v", r),
-					"caller", contract.Caller().Hex(),
-				)
+				switch r.(type) {
+				case storetypes.ErrorOutOfGas, storetypes.ErrorGasOverflow:
+					ctx.Logger().Debug("precompile gas exhausted", "caller", contract.Caller().Hex())
+				default:
+					ctx.Logger().Error("precompile panic recovered", "panic", fmt.Sprintf("%v", r), "caller", contract.Caller().Hex())
+				}
 				// Re-panic so it's properly handled by the EVM
 				panic(r)
 			}
@@ -620,13 +616,9 @@ func (p Precompile) handleQueryReadOnly(ctx sdk.Context, method *abi.Method, jso
 // HandleTransaction handles a transaction by unmarshaling JSON and executing via keeper
 func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonStr string, contract *vm.Contract) ([]byte, error) {
 	// Unmarshal JSON to Msg
-	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
+	msg, err := p.unmarshalMsgFromJSON(ctx, method.Name, jsonStr, contract)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON for method %s: %w", method.Name, err)
-	}
-
-	if err := MeterMessage(ctx, msg); err != nil {
-		return nil, err
 	}
 
 	// Execute message via keeper
@@ -881,7 +873,7 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 		}
 
 		// Route and unmarshal message
-		msg, err := p.routeMessageByType(messageType, msgJson, contract)
+		msg, err := p.routeMessageByType(ctx, messageType, msgJson, contract)
 		if err != nil {
 			return nil, WrapErrorWithContext(
 				err,
@@ -889,10 +881,6 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 				"failed to route message",
 				fmt.Sprintf("message index %d, type: %s", i, messageType),
 			)
-		}
-
-		if err := MeterMessage(ctx, msg); err != nil {
-			return nil, WrapErrorWithContext(err, ErrorCodeInvalidInput, "message rejected", fmt.Sprintf("message index %d, type: %s", i, messageType))
 		}
 
 		// Execute message via keeper

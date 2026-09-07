@@ -4,11 +4,10 @@ import (
 	"context"
 	"slices"
 
+	sdkerrors "cosmossdk.io/errors"
+	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
-
-	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -183,6 +182,9 @@ func (k msgServer) ExecuteUniversalUpdateCollection(goCtx context.Context, msg *
 	_, err := sdk.AccAddressFromBech32(msg.Executor)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAddress, "invalid executor address")
+	}
+	if err := types.ValidateCanonicalAddresses(nil, msg.Executor, msg.ManagerSplitterAddress); err != nil {
+		return nil, err
 	}
 
 	// Get manager splitter

@@ -2,12 +2,12 @@ package keeper
 
 import (
 	"bytes"
+	"math"
 	"strconv"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
+	"github.com/bitbadges/bitbadgeschain/pkg/storewalk"
 	"github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // legacyBlockTimeSeconds is the block time HOUR/DAY windows were converted to
@@ -34,35 +34,41 @@ func (k Keeper) MigrateV35WindowsToBlockTime(ctx sdk.Context) error {
 
 func (k Keeper) migrateWindowPrefix(ctx sdk.Context, prefix []byte) error {
 	store := ctx.KVStore(k.storeKey)
-	iterator := storetypes.KVStorePrefixIterator(store, prefix)
-	defer iterator.Close()
-
 	now := ctx.BlockTime().Unix()
 	height := ctx.BlockHeight()
-
-	for ; iterator.Valid(); iterator.Next() {
-		timeframeType, timeframeDuration, err := parseWindowKeyTimeframe(iterator.Key())
+	legacyParts := 2
+	if bytes.Equal(prefix, types.KeyPrefixUniqueSendersWindow) {
+		legacyParts = 1
+	}
+	if bytes.Equal(prefix, types.KeyPrefixAddressTransferWindow) {
+		legacyParts = 3
+	}
+	return storewalk.Prefix(ctx, store, prefix, func(key, value []byte) error {
+		// Unsuffixed windows are not consulted by the timeframe-aware limiter.
+		if len(bytes.Split(key, []byte("|"))) == legacyParts {
+			return nil
+		}
+		timeframeType, timeframeDuration, err := parseWindowKeyTimeframe(key)
 		if err != nil {
 			return err
 		}
 		if timeframeType == types.TimeframeType_TIMEFRAME_TYPE_BLOCK {
-			continue
+			return nil
 		}
-
 		var window types.ChannelFlowWindow
-		k.cdc.MustUnmarshal(iterator.Value(), &window)
-
+		if err := k.cdc.Unmarshal(value, &window); err != nil {
+			return err
+		}
 		durationSeconds := types.TimeframeDurationInSeconds(timeframeType, timeframeDuration)
 		if window.WindowDuration == durationSeconds {
-			continue // already converted
+			return nil
 		}
-
 		elapsedBlocks := height - window.WindowStart
 		window.WindowStart = now - elapsedBlocks*legacyBlockTimeSeconds
 		window.WindowDuration = durationSeconds
-		store.Set(iterator.Key(), k.cdc.MustMarshal(&window))
-	}
-	return nil
+		store.Set(key, k.cdc.MustMarshal(&window))
+		return nil
+	})
 }
 
 // parseWindowKeyTimeframe reads the trailing "|timeframeType|timeframeDuration"
@@ -79,6 +85,14 @@ func parseWindowKeyTimeframe(key []byte) (types.TimeframeType, int64, error) {
 	timeframeDuration, err := strconv.ParseInt(string(parts[len(parts)-1]), 10, 64)
 	if err != nil {
 		return 0, 0, types.ErrInvalidWindowKey.Wrapf("key %x: %v", key, err)
+	}
+	if timeframeDuration <= 0 || timeframeDuration > math.MaxInt64/86400 {
+		return 0, 0, types.ErrInvalidWindowKey.Wrap("invalid timeframe duration")
+	}
+	switch types.TimeframeType(timeframeType) {
+	case types.TimeframeType_TIMEFRAME_TYPE_BLOCK, types.TimeframeType_TIMEFRAME_TYPE_HOUR, types.TimeframeType_TIMEFRAME_TYPE_DAY:
+	default:
+		return 0, 0, types.ErrInvalidWindowKey.Wrap("unknown timeframe type")
 	}
 	return types.TimeframeType(timeframeType), timeframeDuration, nil
 }

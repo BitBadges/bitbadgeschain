@@ -16,7 +16,7 @@ FILES=(rehearse.sh new-version.sh propose.sh lib/*.sh container/*.sh checks/*.sh
 if command -v shellcheck >/dev/null; then
   if shellcheck -x -P SCRIPTDIR -S style "${FILES[@]}"; then echo "shellcheck: clean"; else RC=1; fi
 elif command -v docker >/dev/null; then
-  if docker run --rm -v "$UP:/mnt:ro" -w /mnt koalaman/shellcheck:stable -x -P SCRIPTDIR -S style "${FILES[@]}"; then echo "shellcheck: clean"; else RC=1; fi
+  if docker run --rm -v "$UP:/mnt:ro" -w /mnt koalaman/shellcheck:v0.11.0@sha256:61862eba1fcf09a484ebcc6feea46f1782532571a34ed51fedf90dd25f925a8d -x -P SCRIPTDIR -S style "${FILES[@]}"; then echo "shellcheck: clean"; else RC=1; fi
 else
   echo "shellcheck: skipped (no shellcheck or docker)"
 fi

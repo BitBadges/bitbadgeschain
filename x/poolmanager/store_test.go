@@ -3,12 +3,11 @@ package poolmanager_test
 import (
 	"math"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -179,58 +178,6 @@ func (s *KeeperTestSuite) TestGetAllTakerFeesShareAgreements() {
 	}
 }
 
-func (s *KeeperTestSuite) TestSetTakerFeeShareAgreementsMapCached() {
-	tests := map[string]struct {
-		setupFunc                       func()
-		expectedTakerFeeShareAgreements func() map[string]types.TakerFeeShareAgreement
-		expectErr                       bool
-	}{
-		"single taker fee share agreement": {
-			setupFunc: func() {
-				setTakerFeeShareAgreements(s.Ctx, &s.App.PoolManagerKeeper, defaultTakerFeeShareAgreements[:1])
-			},
-			expectedTakerFeeShareAgreements: func() map[string]types.TakerFeeShareAgreement {
-				return createExpectedTakerFeeShareAgreementsMap(defaultTakerFeeShareAgreements[:1])
-			},
-			expectErr: false,
-		},
-		"multiple taker fee share agreements": {
-			setupFunc: func() {
-				setTakerFeeShareAgreements(s.Ctx, &s.App.PoolManagerKeeper, defaultTakerFeeShareAgreements)
-			},
-			expectedTakerFeeShareAgreements: func() map[string]types.TakerFeeShareAgreement {
-				return createExpectedTakerFeeShareAgreementsMap(defaultTakerFeeShareAgreements)
-			},
-			expectErr: false,
-		},
-		"no taker fee share agreements": {
-			setupFunc: func() {},
-			expectedTakerFeeShareAgreements: func() map[string]types.TakerFeeShareAgreement {
-				return make(map[string]types.TakerFeeShareAgreement)
-			},
-			expectErr: false,
-		},
-	}
-
-	for name, tc := range tests {
-		s.Run(name, func() {
-			s.SetupTest()
-
-			tc.setupFunc()
-			expectedTakerFeeShareAgreements := tc.expectedTakerFeeShareAgreements()
-
-			err := s.App.PoolManagerKeeper.SetTakerFeeShareAgreementsMapCached(s.Ctx)
-			if tc.expectErr {
-				s.Require().Error(err)
-			} else {
-				s.Require().NoError(err)
-				cachedTakerFeeShareAgreementMap, _ := s.App.PoolManagerKeeper.GetCacheTrackers()
-				s.Require().Equal(expectedTakerFeeShareAgreements, cachedTakerFeeShareAgreementMap, "cachedTakerFeeShareAgreementMap = %v, want %v", cachedTakerFeeShareAgreementMap, expectedTakerFeeShareAgreements)
-			}
-		})
-	}
-}
-
 func (s *KeeperTestSuite) TestSetTakerFeeShareAgreementForDenom() {
 	tests := map[string]struct {
 		setupFunc                      func()
@@ -279,7 +226,7 @@ func (s *KeeperTestSuite) TestSetTakerFeeShareAgreementForDenom() {
 			s.SetupTest()
 			tc.setupFunc()
 
-			takerFeeShareAgreements, found := s.App.PoolManagerKeeper.GetTakerFeeShareAgreementFromDenom(tc.denomToRequest)
+			takerFeeShareAgreements, found := s.App.PoolManagerKeeper.GetTakerFeeShareAgreementFromDenom(s.Ctx, tc.denomToRequest)
 			if tc.expectedFound {
 				s.Require().True(found)
 				s.Require().Equal(tc.expectedTakerFeeShareAgreement, takerFeeShareAgreements)

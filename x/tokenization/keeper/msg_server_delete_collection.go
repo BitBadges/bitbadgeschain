@@ -3,10 +3,9 @@ package keeper
 import (
 	"context"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -53,6 +52,31 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 			if bal.Amount.GT(sdkmath.ZeroUint()) {
 				return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "backed tokens are still in circulation; they must be backed before the collection can be deleted")
 			}
+		}
+	}
+
+	for _, path := range collection.AliasPaths {
+		denom := AliasDenomPrefix + collection.CollectionId.String() + ":" + path.Denom
+		if k.bankKeeper.GetSupply(ctx, denom).IsPositive() {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "alias %s still has bank coins in circulation", denom)
+		}
+		if k.gammKeeper != nil {
+			used, err := k.gammKeeper.HasPoolForDenom(ctx, denom)
+			if err != nil {
+				return nil, err
+			}
+			if used {
+				return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "alias %s is still a pool asset", denom)
+			}
+		}
+	}
+	if collection.MintEscrowAddress != "" {
+		escrow, err := sdk.AccAddressFromBech32(collection.MintEscrowAddress)
+		if err != nil {
+			return nil, err
+		}
+		if !k.bankKeeper.GetAllBalances(ctx, escrow).IsZero() {
+			return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "mint escrow still holds bank coins")
 		}
 	}
 

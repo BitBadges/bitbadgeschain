@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
 	"math"
@@ -8,9 +9,8 @@ import (
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 var (
@@ -107,17 +107,10 @@ func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallen
 		codeLeafIndex.String())
 }
 
-// ConstructETHSignatureTrackerKey constructs a unique key for tracking ETH signature usage.
-// The key includes: collectionId, approverAddress (addressForChallenge), approvalLevel, approvalId, challengeId, and the signature itself.
-// This key is used to track how many times a specific signature has been used for a given approval/challenge context.
-// The tracker is keyed on the proof's nonce (v35+), which the signed message binds:
-// nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId
+// Keep the collection/approver prefix for purge and address-migration routines.
 func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, nonce string) string {
-	collection_id_str := collectionId.String()
-	challenge_id_str := challengeId
-	address_for_challenge_str := addressForChallenge
-	challenge_level_str := approvalLevel
-	return collection_id_str + BalanceKeyDelimiter + address_for_challenge_str + BalanceKeyDelimiter + challenge_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + challenge_id_str + BalanceKeyDelimiter + nonce
+	digest := sha256.Sum256([]byte(types.ETHSignatureTrackerScope(collectionId.String(), addressForChallenge, approvalLevel, approvalId, challengeId, nonce)))
+	return fmt.Sprintf("%s-%s-%s-v2-%x", collectionId.String(), addressForChallenge, approvalLevel, digest)
 }
 
 // ConstructVotingTrackerKey constructs a unique key for tracking votes.

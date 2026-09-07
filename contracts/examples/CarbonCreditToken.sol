@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
 import "../libraries/TokenizationJSONHelpers.sol";
+import "../libraries/TokenizationInitialization.sol";
 import "../libraries/TokenizationDecoders.sol";
 
 /**
@@ -131,7 +132,7 @@ contract CarbonCreditToken {
         require(collectionId == 0, "Already initialized");
 
         // Build JSON components for collection creation
-        string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(2020, 2100);
+        string memory validTokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(1, 2100);
         
         string memory defaultBalancesJson = TokenizationJSONHelpers.simpleUserBalanceStoreToJson(
             true,  // autoApproveSelfInitiatedOutgoingTransfers
@@ -167,6 +168,7 @@ contract CarbonCreditToken {
         );
         
         collectionId = TOKENIZATION.createCollection(createJson);
+        TokenizationInitialization.approveWrapperTransfers(TOKENIZATION, collectionId, TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max));
     }
 
     // ============ Vintage Management ============
@@ -217,22 +219,16 @@ contract CarbonCreditToken {
         // Build token ID and ownership time ranges
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
         string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp, 
-            vintages[vintage].expirationTime
+            block.timestamp * 1000,
+            vintages[vintage].expirationTime * 1000
         );
 
-        address[] memory recipients = new address[](1);
-        recipients[0] = to;
-
-        // Transfer from mint escrow (collection manager)
-        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
-            collectionId,
-            recipients,
-            amount,
-            tokenIdsJson,
-            ownershipTimesJson
-        );
-        TOKENIZATION.transferTokens(transferJson);
+        string memory mintBalancesJson = string(abi.encodePacked(
+            '[{"amount":"', TokenizationJSONHelpers.uintToString(amount), '","tokenIds":', tokenIdsJson,
+            ',"ownershipTimes":', ownershipTimesJson, '}]'
+        ));
+        TokenizationInitialization.mintInitialSupply(TOKENIZATION, collectionId, to, mintBalancesJson);
+        TokenizationInitialization.approveWrapperTransfers(TOKENIZATION, collectionId, TokenizationJSONHelpers.uintRangeToJson(1, type(uint64).max));
 
         emit CreditIssued(vintage, to, amount);
     }
@@ -275,8 +271,8 @@ contract CarbonCreditToken {
 
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
         string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp, 
-            vintages[vintage].expirationTime
+            block.timestamp * 1000,
+            vintages[vintage].expirationTime * 1000
         );
 
         address[] memory recipients = new address[](1);
@@ -284,6 +280,7 @@ contract CarbonCreditToken {
 
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
+            msg.sender,
             recipients,
             amount,
             tokenIdsJson,
@@ -315,8 +312,8 @@ contract CarbonCreditToken {
 
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(vintage, vintage);
         string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp, 
-            vintages[vintage].expirationTime
+            block.timestamp * 1000,
+            vintages[vintage].expirationTime * 1000
         );
 
         // Transfer to retirement sink (effectively burning)
@@ -325,6 +322,7 @@ contract CarbonCreditToken {
 
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             collectionId,
+            msg.sender,
             recipients,
             amount,
             tokenIdsJson,

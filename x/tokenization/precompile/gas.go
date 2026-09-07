@@ -1,13 +1,12 @@
 package tokenization
 
 import (
+	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 // MeterMessage validates the size of a parsed message's variable-length parts
@@ -28,6 +27,55 @@ func MeterMessage(ctx sdk.Context, msg sdk.Msg) error {
 
 func messageGas(msg sdk.Msg) (uint64, error) {
 	switch m := msg.(type) {
+	case *tokenizationtypes.MsgSetValidTokenIds:
+		gas, err := boundedElementsGas(len(m.ValidTokenIds), MaxTokenIdRanges, GasPerTokenIdRange, "validTokenIds")
+		if err != nil {
+			return 0, err
+		}
+		for _, permission := range m.CanUpdateValidTokenIds {
+			if permission == nil {
+				continue
+			}
+			extra, err := approvalGas(permission.PermanentlyPermittedTimes, permission.TokenIds, permission.PermanentlyForbiddenTimes, "", "", 0, 0, 0, 0, 0)
+			if err != nil {
+				return 0, err
+			}
+			gas += extra
+		}
+		extra, err := boundedElementsGas(len(m.CanUpdateValidTokenIds), MaxApprovalRanges, GasPerApprovalField, "canUpdateValidTokenIds")
+		return gas + extra, err
+	case *tokenizationtypes.MsgSetStandards:
+		gas, err := standardsGas(m.Standards)
+		if err != nil {
+			return 0, err
+		}
+		extra, err := boundedElementsGas(len(m.CanUpdateStandards), MaxApprovalRanges, GasPerApprovalField, "canUpdateStandards")
+		if err != nil {
+			return 0, err
+		}
+		gas += extra
+		for _, permission := range m.CanUpdateStandards {
+			if permission == nil {
+				continue
+			}
+			extra, err := approvalGas(permission.PermanentlyPermittedTimes, nil, permission.PermanentlyForbiddenTimes, "", "", 0, 0, 0, 0, 0)
+			if err != nil {
+				return 0, err
+			}
+			gas += extra
+		}
+		return gas, nil
+	case *tokenizationtypes.MsgPurgeApprovals:
+		return boundedElementsGas(len(m.ApprovalsToPurge), MaxApprovalRanges, GasPerApprovalField, "approvalsToPurge")
+	case *tokenizationtypes.MsgCreateDynamicStore:
+		return dynamicStoreMetadataGas(m.Uri, m.CustomData)
+	case *tokenizationtypes.MsgUpdateDynamicStore:
+		return dynamicStoreMetadataGas(m.Uri, m.CustomData)
+	case *tokenizationtypes.MsgSetDynamicStoreValue, *tokenizationtypes.MsgDeleteDynamicStore,
+		*tokenizationtypes.MsgDeleteCollection, *tokenizationtypes.MsgDeleteIncomingApproval,
+		*tokenizationtypes.MsgDeleteOutgoingApproval, *tokenizationtypes.MsgSetManager,
+		*tokenizationtypes.MsgSetIsArchived, *tokenizationtypes.MsgCastVote:
+		return 0, nil
 	case *tokenizationtypes.MsgTransferTokens:
 		return transfersGas(m.Transfers)
 	case *tokenizationtypes.MsgSetIncomingApproval:
@@ -56,7 +104,34 @@ func messageGas(msg sdk.Msg) (uint64, error) {
 	case *tokenizationtypes.MsgCreateAddressLists:
 		return addressListsGas(m.AddressLists)
 	}
-	return 0, nil
+	return 0, fmt.Errorf("unpriced precompile message %T", msg)
+}
+
+func boundedElementsGas(count, limit int, price uint64, field string) (uint64, error) {
+	if err := ValidateArraySizeAllowEmpty(count, limit, field); err != nil {
+		return 0, err
+	}
+	return uint64(count) * price, nil
+}
+
+func standardsGas(standards []string) (uint64, error) {
+	gas, err := boundedElementsGas(len(standards), MaxApprovalRanges, GasPerApprovalField, "standards")
+	if err != nil {
+		return 0, err
+	}
+	for _, standard := range standards {
+		if err := ValidateMetadataLength(standard, "standard"); err != nil {
+			return 0, err
+		}
+	}
+	return gas, nil
+}
+
+func dynamicStoreMetadataGas(uri, customData string) (uint64, error) {
+	if err := ValidateMetadataLength(uri, "uri"); err != nil {
+		return 0, err
+	}
+	return 0, ValidateMetadataLength(customData, "customData")
 }
 
 func sumGas(parts ...func() (uint64, error)) (uint64, error) {
@@ -88,6 +163,9 @@ func transfersGas(transfers []*tokenizationtypes.Transfer) (uint64, error) {
 	for _, t := range transfers {
 		if t == nil {
 			continue
+		}
+		if err := tokenizationtypes.ValidateETHSignatureProofs(t.EthSignatureProofs); err != nil {
+			return 0, err
 		}
 		if err := ValidateArraySizeAllowEmpty(len(t.ToAddresses), MaxRecipients, "toAddresses"); err != nil {
 			return 0, err
@@ -339,4 +417,3 @@ func CalculateQueryGasFromUintRanges(
 	gas += uint64(len(ownershipTimes)) * GasPerQueryRange
 	return gas
 }
-

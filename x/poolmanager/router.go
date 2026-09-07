@@ -6,17 +6,15 @@ import (
 	"math/big"
 	"strings"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -306,7 +304,7 @@ func (k Keeper) multihopEstimateOutGivenExactAmountInInternal(
 		actualTokenIn := tokenIn
 		// apply taker fee if applicable
 		if applyTakerFee {
-			takerFee, err := k.effectiveTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
+			takerFee, err := k.EffectiveTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
 			if err != nil {
 				return osmomath.Int{}, err
 			}
@@ -672,7 +670,7 @@ func (k Keeper) createMultihopExpectedSwapOuts(
 
 		spreadFactor := poolI.GetSpreadFactor(ctx)
 
-		takerFee, err := k.effectiveTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
+		takerFee, err := k.EffectiveTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
 		if err != nil {
 			return nil, err
 		}

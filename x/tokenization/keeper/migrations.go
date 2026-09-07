@@ -1,18 +1,19 @@
 package keeper
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/pkg/storewalk"
+	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v32"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	newtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	oldtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types/v32"
 )
 
 // MigrateTokenizationKeeper migrates the tokenization keeper from v28 to v29.
@@ -328,31 +329,38 @@ func (k Keeper) MigrateV35CanonicalAddresses(ctx sdk.Context) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 
-	votingBalanceCollisions := collectV35VotingBalanceCollisions(store)
+	if err := k.migrateV35VotingApproverKeys(ctx, store); err != nil {
+		return err
+	}
 	if err := k.migrateV35BalanceKeys(ctx, store); err != nil {
 		return err
 	}
 	if err := k.migrateV35AddressListValues(ctx, store); err != nil {
 		return err
 	}
-	k.migrateV35AddressValues(ctx, store)
+	if err := k.migrateV35AddressValues(ctx, store); err != nil {
+		return err
+	}
 	if err := k.migrateV35ApprovalTrackerKeys(ctx, store); err != nil {
 		return err
 	}
 	// Used merkle-leaf and ETH signature trackers share the "cid-approver-…" layout and a
 	// decimal-string counter value.
-	if err := migrateV35CounterKeys(store, UsedClaimChallengeKey, 1); err != nil {
+	if err := migrateV35CounterKeys(ctx, store, UsedClaimChallengeKey, 1); err != nil {
 		return err
 	}
-	if err := migrateV35CounterKeys(store, ETHSignatureTrackerKey, 1); err != nil {
+	if err := migrateV35CounterKeys(ctx, store, ETHSignatureTrackerKey, 1); err != nil {
 		return err
 	}
-	if err := migrateV35ApprovalVersionKeys(store); err != nil {
+	if err := migrateV35ApprovalVersionKeys(ctx, store); err != nil {
 		return err
 	}
-	migrateV35DynamicStoreValueKeys(store)
-	migrateV35ReservedProtocolAddressKeys(store)
-	k.migrateV35VotingApproverKeys(store, votingBalanceCollisions)
+	if err := k.migrateV35DynamicStoreValueKeys(ctx, store); err != nil {
+		return err
+	}
+	if err := migrateV35ReservedProtocolAddressKeys(ctx, store); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -372,25 +380,14 @@ type v35KeyRewrite struct {
 	newKey []byte
 }
 
-// collectV35KeyRewrites walks a prefix and returns, in iteration order, every key whose
-// address components rewrite to a different key.
-func collectV35KeyRewrites(store storetypes.KVStore, keyPrefix []byte, rewrite func(suffix string) (string, bool)) []v35KeyRewrite {
-	iterator := storetypes.KVStorePrefixIterator(store, keyPrefix)
-	defer iterator.Close()
-
-	rewrites := []v35KeyRewrite{}
-	for ; iterator.Valid(); iterator.Next() {
-		suffix := string(iterator.Key()[len(keyPrefix):])
-		newSuffix, changed := rewrite(suffix)
+func walkV35KeyRewrites(ctx sdk.Context, store storetypes.KVStore, keyPrefix []byte, rewrite func(string) (string, bool), visit func(v35KeyRewrite) error) error {
+	return storewalk.Prefix(ctx, store, keyPrefix, func(key, value []byte) error {
+		suffix, changed := rewrite(string(key[len(keyPrefix):]))
 		if !changed {
-			continue
+			return nil
 		}
-		rewrites = append(rewrites, v35KeyRewrite{
-			oldKey: append([]byte{}, iterator.Key()...),
-			newKey: storeKey(keyPrefix, newSuffix),
-		})
-	}
-	return rewrites
+		return visit(v35KeyRewrite{oldKey: key, newKey: storeKey(keyPrefix, suffix)})
+	})
 }
 
 // rewriteV35DelimitedKey canonicalises the address components at the given positions of a
@@ -417,46 +414,56 @@ func rewriteV35DelimitedKey(suffix string, positions ...int) (string, bool) {
 }
 
 func (k Keeper) migrateV35BalanceKeys(ctx sdk.Context, store storetypes.KVStore) error {
-	// Key layout: collectionId-address
-	rewrites := collectV35KeyRewrites(store, UserBalanceKey, func(suffix string) (string, bool) {
-		return rewriteV35DelimitedKey(suffix, -1)
-	})
-
-	for _, rw := range rewrites {
+	return storewalk.Prefix(ctx, store, UserBalanceKey, func(key, value []byte) error {
+		suffix, changed := rewriteV35DelimitedKey(string(key[len(UserBalanceKey):]), -1)
+		newKey := storeKey(UserBalanceKey, suffix)
 		var moved newtypes.UserBalanceStore
-		k.cdc.MustUnmarshal(store.Get(rw.oldKey), &moved)
-
+		k.cdc.MustUnmarshal(value, &moved)
 		merged := moved
-		if existingBz := store.Get(rw.newKey); existingBz != nil {
-			var existing newtypes.UserBalanceStore
-			k.cdc.MustUnmarshal(existingBz, &existing)
-			summed, err := newtypes.AddBalances(ctx, moved.Balances, existing.Balances)
-			if err != nil {
-				return err
+		if changed {
+			if existingBz := store.Get(newKey); existingBz != nil {
+				var existing newtypes.UserBalanceStore
+				k.cdc.MustUnmarshal(existingBz, &existing)
+				summed, err := newtypes.AddBalances(ctx, moved.Balances, existing.Balances)
+				if err != nil {
+					return err
+				}
+				if hasNonZeroBalance(&moved) && hasNonZeroBalance(&existing) {
+					parts := strings.SplitN(suffix, BalanceKeyDelimiter, 2)
+					id, err := sdkmath.ParseUint(parts[0])
+					if err != nil {
+						return err
+					}
+					if collection, found := k.GetCollectionFromStore(ctx, id); found && !k.isExcludedFromHolderCount(ctx, collection, parts[1]) {
+						stats, found := k.GetCollectionStatsFromStore(ctx, id)
+						if found && stats.HolderCount.GT(sdkmath.ZeroUint()) {
+							stats.HolderCount = stats.HolderCount.Sub(sdkmath.OneUint())
+							if err := k.SetCollectionStatsInStore(ctx, id, stats); err != nil {
+								return err
+							}
+						}
+					}
+				}
+				merged = existing
+				merged.Balances = summed
 			}
-			// Canonical entry wins for approvals, flags and permissions; balances are summed.
-			merged = existing
-			merged.Balances = summed
 		}
-
-		store.Set(rw.newKey, k.cdc.MustMarshal(&merged))
-		store.Delete(rw.oldKey)
-	}
-	return nil
+		k.canonicalV35UserBalance(ctx, &merged)
+		updated := k.cdc.MustMarshal(&merged)
+		if changed || !bytes.Equal(updated, value) {
+			store.Set(newKey, updated)
+		}
+		if changed {
+			store.Delete(key)
+		}
+		return nil
+	})
 }
 
 func (k Keeper) migrateV35AddressListValues(ctx sdk.Context, store storetypes.KVStore) error {
-	iterator := storetypes.KVStorePrefixIterator(store, AddressListKey)
-	defer iterator.Close()
-
-	type update struct {
-		key   []byte
-		value []byte
-	}
-	updates := []update{}
-	for ; iterator.Valid(); iterator.Next() {
+	return storewalk.Prefix(ctx, store, AddressListKey, func(key, value []byte) error {
 		var addressList newtypes.AddressList
-		k.cdc.MustUnmarshal(iterator.Value(), &addressList)
+		k.cdc.MustUnmarshal(value, &addressList)
 
 		changed := false
 		seen := map[string]bool{}
@@ -474,26 +481,20 @@ func (k Keeper) migrateV35AddressListValues(ctx sdk.Context, store storetypes.KV
 		}
 		createdBy, createdByChanged := canonicalBech32(addressList.CreatedBy)
 		if !changed && !createdByChanged {
-			continue
+			return nil
 		}
 		addressList.Addresses = addresses
 		addressList.CreatedBy = createdBy
-		updates = append(updates, update{key: append([]byte{}, iterator.Key()...), value: k.cdc.MustMarshal(&addressList)})
-	}
-
-	for _, u := range updates {
-		store.Set(u.key, u.value)
-	}
-	return nil
+		store.Set(key, k.cdc.MustMarshal(&addressList))
+		return nil
+	})
 }
 
 func (k Keeper) migrateV35ApprovalTrackerKeys(ctx sdk.Context, store storetypes.KVStore) error {
 	// Key layout: collectionId-approverAddress-approvalId-amountTrackerId-level-trackerType-address
-	rewrites := collectV35KeyRewrites(store, ApprovalTrackerKey, func(suffix string) (string, bool) {
+	return walkV35KeyRewrites(ctx, store, ApprovalTrackerKey, func(suffix string) (string, bool) {
 		return rewriteV35DelimitedKey(suffix, 1, -1)
-	})
-
-	for _, rw := range rewrites {
+	}, func(rw v35KeyRewrite) error {
 		var moved newtypes.ApprovalTracker
 		k.cdc.MustUnmarshal(store.Get(rw.oldKey), &moved)
 
@@ -515,18 +516,16 @@ func (k Keeper) migrateV35ApprovalTrackerKeys(ctx sdk.Context, store storetypes.
 
 		store.Set(rw.newKey, k.cdc.MustMarshal(&merged))
 		store.Delete(rw.oldKey)
-	}
-	return nil
+		return nil
+	})
 }
 
 // migrateV35CounterKeys rewrites the approver component of a "-"-joined key whose value is a
 // decimal counter, summing counters that land on the same canonical key.
-func migrateV35CounterKeys(store storetypes.KVStore, keyPrefix []byte, approverPosition int) error {
-	rewrites := collectV35KeyRewrites(store, keyPrefix, func(suffix string) (string, bool) {
+func migrateV35CounterKeys(ctx sdk.Context, store storetypes.KVStore, keyPrefix []byte, approverPosition int) error {
+	return walkV35KeyRewrites(ctx, store, keyPrefix, func(suffix string) (string, bool) {
 		return rewriteV35DelimitedKey(suffix, approverPosition)
-	})
-
-	for _, rw := range rewrites {
+	}, func(rw v35KeyRewrite) error {
 		moved, err := sdkmath.ParseUint(string(store.Get(rw.oldKey)))
 		if err != nil {
 			return err
@@ -540,17 +539,15 @@ func migrateV35CounterKeys(store storetypes.KVStore, keyPrefix []byte, approverP
 		}
 		store.Set(rw.newKey, []byte(moved.String()))
 		store.Delete(rw.oldKey)
-	}
-	return nil
+		return nil
+	})
 }
 
-func migrateV35ApprovalVersionKeys(store storetypes.KVStore) error {
+func migrateV35ApprovalVersionKeys(ctx sdk.Context, store storetypes.KVStore) error {
 	// Key layout: collectionId-approvalLevel-approverAddress-approvalId
-	rewrites := collectV35KeyRewrites(store, ApprovalVersionKey, func(suffix string) (string, bool) {
+	return walkV35KeyRewrites(ctx, store, ApprovalVersionKey, func(suffix string) (string, bool) {
 		return rewriteV35DelimitedKey(suffix, 2)
-	})
-
-	for _, rw := range rewrites {
+	}, func(rw v35KeyRewrite) error {
 		moved, err := sdkmath.ParseUint(string(store.Get(rw.oldKey)))
 		if err != nil {
 			return err
@@ -566,35 +563,38 @@ func migrateV35ApprovalVersionKeys(store storetypes.KVStore) error {
 		}
 		store.Set(rw.newKey, []byte(moved.String()))
 		store.Delete(rw.oldKey)
-	}
-	return nil
+		return nil
+	})
 }
 
-func migrateV35DynamicStoreValueKeys(store storetypes.KVStore) {
-	// Key layout: 8-byte storeId + address
-	rewrites := collectV35KeyRewrites(store, DynamicStoreValueKey, func(suffix string) (string, bool) {
+func (k Keeper) migrateV35DynamicStoreValueKeys(ctx sdk.Context, store storetypes.KVStore) error {
+	return walkV35KeyRewrites(ctx, store, DynamicStoreValueKey, func(suffix string) (string, bool) {
 		if len(suffix) < IDLength {
 			return suffix, false
 		}
-		canonical, changed := canonicalBech32(suffix[IDLength:])
-		return suffix[:IDLength] + canonical, changed
-	})
-
-	for _, rw := range rewrites {
-		if store.Get(rw.newKey) == nil {
-			store.Set(rw.newKey, store.Get(rw.oldKey))
+		address, changed := canonicalBech32(suffix[IDLength:])
+		return suffix[:IDLength] + address, changed
+	}, func(rw v35KeyRewrite) error {
+		var moved newtypes.DynamicStoreValue
+		k.cdc.MustUnmarshal(store.Get(rw.oldKey), &moved)
+		moved.Address, _ = canonicalBech32(moved.Address)
+		if bz := store.Get(rw.newKey); bz != nil {
+			var existing newtypes.DynamicStoreValue
+			k.cdc.MustUnmarshal(bz, &existing)
+			moved.Value = moved.Value && existing.Value
 		}
+		store.Set(rw.newKey, k.cdc.MustMarshal(&moved))
 		store.Delete(rw.oldKey)
-	}
+		return nil
+	})
 }
 
-func migrateV35ReservedProtocolAddressKeys(store storetypes.KVStore) {
-	rewrites := collectV35KeyRewrites(store, ReservedProtocolAddressKey, canonicalBech32)
-
-	for _, rw := range rewrites {
-		if store.Get(rw.newKey) == nil {
+func migrateV35ReservedProtocolAddressKeys(ctx sdk.Context, store storetypes.KVStore) error {
+	return walkV35KeyRewrites(ctx, store, ReservedProtocolAddressKey, canonicalBech32, func(rw v35KeyRewrite) error {
+		if !store.Has(rw.newKey) {
 			store.Set(rw.newKey, store.Get(rw.oldKey))
 		}
 		store.Delete(rw.oldKey)
-	}
+		return nil
+	})
 }

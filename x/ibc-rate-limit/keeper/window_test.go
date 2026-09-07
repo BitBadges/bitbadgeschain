@@ -5,7 +5,6 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
-
 	ratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
 )
 
@@ -148,4 +147,13 @@ func (suite *KeeperTestSuite) TestMigrateV35WindowsToBlockTime() {
 	suite.Require().NoError(suite.keeper.MigrateV35WindowsToBlockTime(suite.ctx))
 	w, _ = suite.keeper.GetChannelFlowWindowWithTimeframe(suite.ctx, windowTestChannel, windowTestDenom, hour, 1)
 	suite.Require().Equal(windowTestT0.Unix()-300*3, w.WindowStart, "migration must be idempotent")
+}
+
+func (suite *KeeperTestSuite) TestV35PreservesInactiveLegacyWindow() {
+	original := ratelimittypes.ChannelFlowWindow{WindowStart: 100, WindowDuration: 1200}
+	suite.keeper.SetChannelFlowWindow(suite.ctx, windowTestChannel, windowTestDenom, original)
+	suite.Require().NoError(suite.keeper.MigrateV35WindowsToBlockTime(suite.ctx))
+	got, found := suite.keeper.GetChannelFlowWindow(suite.ctx, windowTestChannel, windowTestDenom)
+	suite.Require().True(found)
+	suite.Require().Equal(original, got)
 }

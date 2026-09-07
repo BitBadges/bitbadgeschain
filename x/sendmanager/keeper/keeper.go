@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
-
 	"cosmossdk.io/core/store"
 	sdkerrors "cosmossdk.io/errors"
 	"cosmossdk.io/log/v2"
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -90,13 +89,15 @@ func (k Keeper) GetRegisteredPrefixes() []string {
 }
 
 // getRouterForDenom checks if the denom starts with the alias prefix and returns the router.
-// Simple string prefix check — no dynamic registry, no stale-copy issues.
-func (k Keeper) getRouterForDenom(denom string) (types.AliasDenomRouter, bool) {
+// Resolve against the current context so orphaned bank coins remain spendable.
+func (k Keeper) getRouterForDenom(ctx sdk.Context, denom string) (types.AliasDenomRouter, bool) {
 	if denom == "" {
 		return nil, false
 	}
 	if strings.HasPrefix(denom, AliasDenomPrefix) && k.aliasRouter != nil && *k.aliasRouter != nil {
-		return *k.aliasRouter, true
+		if (*k.aliasRouter).CheckIsAliasDenom(ctx, denom) {
+			return *k.aliasRouter, true
+		}
 	}
 	return nil, false
 }
@@ -117,7 +118,14 @@ func (k Keeper) SendCoinWithAliasRouting(
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
 	}
 
-	router, found := k.getRouterForDenom(coin.Denom)
+	if k.bankKeeper.BlockedAddr(toAddressAcc) {
+		return sdkerrors.Wrap(types.ErrInvalidRequest, "recipient is a blocked module account")
+	}
+	if err := k.bankKeeper.IsSendEnabledCoins(ctx, *coin); err != nil {
+		return err
+	}
+
+	router, found := k.getRouterForDenom(ctx, coin.Denom)
 	if found {
 		if coin.Amount.IsNegative() {
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
@@ -136,26 +144,14 @@ func (k Keeper) SendCoinsWithAliasRouting(
 	toAddressAcc sdk.AccAddress,
 	coins sdk.Coins,
 ) error {
+	if k.bankKeeper.BlockedAddr(toAddressAcc) {
+		return sdkerrors.Wrap(types.ErrInvalidRequest, "recipient is a blocked module account")
+	}
+	if err := k.bankKeeper.IsSendEnabledCoins(ctx, coins...); err != nil {
+		return err
+	}
 	for _, coin := range coins {
-		if coin.Denom == "" {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
-		}
-
-		router, found := k.getRouterForDenom(coin.Denom)
-		if found {
-			if coin.Amount.IsNegative() {
-				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
-			}
-			amountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-			err := router.SendNativeTokensViaAliasDenom(ctx, fromAddressAcc.String(), toAddressAcc.String(), coin.Denom, amountUint)
-			if err != nil {
-				return err
-			}
-			continue
-		}
-
-		err := k.bankKeeper.SendCoins(ctx, fromAddressAcc, toAddressAcc, sdk.NewCoins(coin))
-		if err != nil {
+		if err := k.SendCoinWithAliasRouting(ctx, fromAddressAcc, toAddressAcc, &coin); err != nil {
 			return err
 		}
 	}
@@ -176,7 +172,7 @@ func (k Keeper) FundCommunityPoolWithAliasRouting(
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
 		}
 
-		router, found := k.getRouterForDenom(coin.Denom)
+		router, found := k.getRouterForDenom(ctx, coin.Denom)
 		if found {
 			if coin.Amount.IsNegative() {
 				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
@@ -212,7 +208,7 @@ func (k Keeper) SpendFromCommunityPoolWithAliasRouting(
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
 		}
 
-		router, found := k.getRouterForDenom(coin.Denom)
+		router, found := k.getRouterForDenom(ctx, coin.Denom)
 		if found {
 			if coin.Amount.IsNegative() {
 				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
@@ -240,7 +236,7 @@ func (k Keeper) GetBalanceWithAliasRouting(ctx sdk.Context, address sdk.AccAddre
 		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidRequest, "denom cannot be empty")
 	}
 
-	router, found := k.getRouterForDenom(denom)
+	router, found := k.getRouterForDenom(ctx, denom)
 	if found {
 		return router.GetBalanceWithAliasRouting(ctx, address, denom)
 	}
@@ -253,7 +249,7 @@ func (k Keeper) IsICS20Compatible(ctx sdk.Context, denom string) bool {
 	if denom == "" {
 		return true
 	}
-	_, found := k.getRouterForDenom(denom)
+	_, found := k.getRouterForDenom(ctx, denom)
 	return !found
 }
 
@@ -262,7 +258,7 @@ func (k Keeper) StandardName(ctx sdk.Context, denom string) string {
 	if denom == "" {
 		return "x/bank"
 	}
-	_, found := k.getRouterForDenom(denom)
+	_, found := k.getRouterForDenom(ctx, denom)
 	if found {
 		return "x/tokenization"
 	}
@@ -283,7 +279,7 @@ func (k Keeper) SendCoinsFromModuleToAccountWithAliasRouting(
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
 		}
 
-		router, found := k.getRouterForDenom(coin.Denom)
+		router, found := k.getRouterForDenom(ctx, coin.Denom)
 		if found {
 			if coin.Amount.IsNegative() {
 				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)
@@ -319,7 +315,7 @@ func (k Keeper) SendCoinsFromAccountToModuleWithAliasRouting(
 			return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin denom cannot be empty")
 		}
 
-		router, found := k.getRouterForDenom(coin.Denom)
+		router, found := k.getRouterForDenom(ctx, coin.Denom)
 		if found {
 			if coin.Amount.IsNegative() {
 				return sdkerrors.Wrapf(types.ErrInvalidRequest, "coin amount cannot be negative: %s", coin.Denom)

@@ -1,6 +1,9 @@
 package client_test
 
 import (
+	"testing"
+
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/third_party/apptesting"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/client"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -8,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"testing"
 )
 
 func TestPrimitiveRouteLengths(t *testing.T) {
@@ -36,4 +38,14 @@ func TestPrimitiveExactOutMatchesStructuredRoutes(t *testing.T) {
 	actual, err := q.EstimateSwapExactAmountOutWithPrimitiveTypes(s.Ctx, types.EstimateSwapExactAmountOutWithPrimitiveTypesRequest{TokenOut: "10uosmo", RoutesPoolId: []uint64{pool}, RoutesTokenInDenom: []string{"uatom"}})
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
+}
+
+func TestTradingPairFeeQueryMatchesAliasExecutionExemption(t *testing.T) {
+	s := new(apptesting.KeeperTestHelper)
+	s.SetT(t)
+	s.Setup()
+	s.App.PoolManagerKeeper.SetDenomPairTakerFee(s.Ctx, "badgeslp:1:alias", "ubadge", sdkmath.LegacyMustNewDecFromStr("0.1"))
+	response, err := client.NewQuerier(&s.App.PoolManagerKeeper).TradingPairTakerFee(s.Ctx, types.TradingPairTakerFeeRequest{Denom_0: "badgeslp:1:alias", Denom_1: "ubadge"})
+	require.NoError(t, err)
+	require.True(t, response.TakerFee.IsZero())
 }

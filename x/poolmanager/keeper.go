@@ -1,24 +1,19 @@
 package poolmanager
 
 import (
-	"fmt"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	gogotypes "github.com/cosmos/gogoproto/types"
-
-	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
-
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 )
 
 type Keeper struct {
 	storeKey storetypes.StoreKey
 
-	gammKeeper          gammkeeper.Keeper
+	gammKeeper          *gammkeeper.Keeper
 	bankKeeper          types.BankI
 	accountKeeper       types.AccountI
 	communityPoolKeeper types.CommunityPoolI
@@ -34,15 +29,9 @@ type Keeper struct {
 	poolModules []types.PoolModuleI
 
 	paramSpace paramtypes.Subspace
-
-	defaultTakerFeeBz  []byte
-	defaultTakerFeeVal osmomath.Dec
-
-	cachedTakerFeeShareAgreementMap          map[string]types.TakerFeeShareAgreement
-	cachedRegisteredAlloyPoolByAlloyDenomMap map[string]types.AlloyContractTakerFeeShareState
 }
 
-func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gammKeeper gammkeeper.Keeper, bankKeeper types.BankI, accountKeeper types.AccountI, communityPoolKeeper types.CommunityPoolI, stakingKeeper types.StakingKeeper) *Keeper {
+func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gammKeeper *gammkeeper.Keeper, bankKeeper types.BankI, accountKeeper types.AccountI, communityPoolKeeper types.CommunityPoolI, stakingKeeper types.StakingKeeper) *Keeper {
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
@@ -57,21 +46,16 @@ func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gam
 		gammKeeper,
 	}
 
-	cachedTakerFeeShareAgreementMap := make(map[string]types.TakerFeeShareAgreement)
-	cachedRegisteredAlloyPoolMap := make(map[string]types.AlloyContractTakerFeeShareState)
-
 	return &Keeper{
-		storeKey:                                 storeKey,
-		paramSpace:                               paramSpace,
-		gammKeeper:                               gammKeeper,
-		bankKeeper:                               bankKeeper,
-		accountKeeper:                            accountKeeper,
-		communityPoolKeeper:                      communityPoolKeeper,
-		routes:                                   routesMap,
-		poolModules:                              routesList,
-		stakingKeeper:                            stakingKeeper,
-		cachedTakerFeeShareAgreementMap:          cachedTakerFeeShareAgreementMap,
-		cachedRegisteredAlloyPoolByAlloyDenomMap: cachedRegisteredAlloyPoolMap,
+		storeKey:            storeKey,
+		paramSpace:          paramSpace,
+		gammKeeper:          gammKeeper,
+		bankKeeper:          bankKeeper,
+		accountKeeper:       accountKeeper,
+		communityPoolKeeper: communityPoolKeeper,
+		routes:              routesMap,
+		poolModules:         routesList,
+		stakingKeeper:       stakingKeeper,
 	}
 }
 
@@ -196,22 +180,7 @@ func (k *Keeper) SetStakingKeeper(stakingKeeper types.StakingKeeper) {
 	k.stakingKeeper = stakingKeeper
 }
 
-// BeginBlock sets the poolmanager caches if they are empty
-func (k *Keeper) BeginBlock(ctx sdk.Context) {
-	// Here, the only time in which these caches are empty is during the start up of the node.
-	// Once the node has started up and runs the first BeginBlock of the poolmanager module,
-	// it will populate the caches. Every single subsequent BeginBlock, this logic will be a no-op.
-	if len(k.cachedTakerFeeShareAgreementMap) == 0 || len(k.cachedRegisteredAlloyPoolByAlloyDenomMap) == 0 {
-		err := k.setTakerFeeShareAgreementsMapCached(ctx)
-		if err != nil {
-			ctx.Logger().Error(fmt.Errorf("%w", types.ErrSetTakerFeeShareAgreementsMapCached).Error())
-		}
-		err = k.setAllRegisteredAlloyedPoolsByDenomCached(ctx)
-		if err != nil {
-			ctx.Logger().Error(fmt.Errorf("%w", types.ErrSetAllRegisteredAlloyedPoolsByDenomCached).Error())
-		}
-	}
-}
+func (k *Keeper) BeginBlock(ctx sdk.Context) {}
 
 // AlloyedAssetCompositionUpdateRate is the rate in blocks at which the taker fee share alloy composition is updated in the end block.
 var AlloyedAssetCompositionUpdateRate = int64(700)

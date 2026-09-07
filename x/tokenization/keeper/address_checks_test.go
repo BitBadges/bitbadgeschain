@@ -6,17 +6,15 @@ import (
 	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/evm/x/vm/statedb"
-	evmtypes "github.com/cosmos/evm/x/vm/types"
-	"github.com/ethereum/go-ethereum/common"
-
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
-	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/evm/x/vm/statedb"
+	evmtypes "github.com/cosmos/evm/x/vm/types"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 // contains checks if a string contains a substring (case-insensitive)
@@ -502,6 +500,10 @@ func (m *mockEVMKeeper) CallEVMWithData(ctx sdk.Context, stateDB *statedb.StateD
 
 type mockGammKeeper struct {
 	pools map[string]uint64 // address -> poolId
+}
+
+func (m *mockGammKeeper) HasPoolForDenom(ctx sdk.Context, denom string) (bool, error) {
+	return false, nil
 }
 
 func (m *mockGammKeeper) GetPool(ctx sdk.Context, poolId uint64) (poolmanagertypes.PoolI, error) {

@@ -1,10 +1,10 @@
 package app
 
 import (
-	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
+	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
@@ -47,4 +47,18 @@ func TestMigrateV35PreciseBankModulePermissions(t *testing.T) {
 
 	// Running it again is a no-op.
 	require.NoError(t, v35.MigrateV35PreciseBankModulePermissions(ctx, app.AccountKeeper))
+}
+
+func TestMigrateV35EVMModulePermissions(t *testing.T) {
+	app := Setup(false)
+	ctx := app.NewContext(false)
+	existing := app.AccountKeeper.GetModuleAccount(ctx, "evm")
+	base := authtypes.NewBaseAccount(existing.GetAddress(), nil, existing.GetAccountNumber(), 7)
+	app.AccountKeeper.SetModuleAccount(ctx, authtypes.NewModuleAccount(base, "evm"))
+	require.NoError(t, v35.MigrateV35PreciseBankModulePermissions(ctx, app.AccountKeeper))
+	migrated := app.AccountKeeper.GetModuleAccount(ctx, "evm")
+	require.True(t, migrated.HasPermission(authtypes.Minter))
+	require.True(t, migrated.HasPermission(authtypes.Burner))
+	require.Equal(t, existing.GetAccountNumber(), migrated.GetAccountNumber())
+	require.Equal(t, uint64(7), migrated.GetSequence())
 }

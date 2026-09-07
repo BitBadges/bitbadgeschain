@@ -382,7 +382,7 @@ func ValidateAddressList(addressList *AddressList) error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized")
 	}
 
-	if err := ValidateAddress(addressList.ListId, false); err == nil {
+	if _, err := sdk.AccAddressFromBech32(addressList.ListId); err == nil {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID cannot be a valid address")
 	}
 
@@ -1268,6 +1268,9 @@ func ValidateTransferWithInvariants(ctx sdk.Context, transfer *Transfer, canChan
 }
 
 func ValidateTransfer(ctx sdk.Context, transfer *Transfer, canChangeValues bool) error {
+	if err := ValidateETHSignatureProofs(transfer.EthSignatureProofs); err != nil {
+		return err
+	}
 	var err error
 
 	transfer.Balances, err = ValidateBalances(ctx, transfer.Balances, canChangeValues)

@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // The UserApprovalsToCheck struct is used to keep track of which incoming / outgoing approvals for which addresses we need to check.
@@ -193,7 +191,16 @@ func (k Keeper) DeductAndGetUserApprovals(
 			atomic := evmcompat.NewAtomicContext(ctx)
 			cachedCtx := atomic.Ctx()
 			writeCache := atomic.Commit
-			rollbackOnFailure := atomic.Rollback
+			coinTransfersStart := 0
+			if eventTracking != nil && eventTracking.CoinTransfers != nil {
+				coinTransfersStart = len(*eventTracking.CoinTransfers)
+			}
+			rollbackOnFailure := func() {
+				atomic.Rollback()
+				if eventTracking != nil && eventTracking.CoinTransfers != nil {
+					*eventTracking.CoinTransfers = (*eventTracking.CoinTransfers)[:coinTransfersStart]
+				}
+			}
 
 			// Run all applicable checkers dynamically (includes basic validation and approval criteria)
 			checkers := k.GetApprovalCriteriaCheckers(approval)
@@ -696,7 +703,7 @@ func (k Keeper) handlePredeterminedBalances(
 		if maxMul.IsNil() || maxMul.IsZero() {
 			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer, "max scaling multiplier is not set")
 		}
-		
+
 		if scalingMul.GT(maxMul) {
 			return nil, sdkerrors.Wrapf(ErrDisallowedTransfer,
 				"scaling multiplier %s exceeds max allowed %s", scalingMul.String(), maxMul.String())

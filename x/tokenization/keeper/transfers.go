@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"math"
 
-	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type TransferMetadata struct {
@@ -219,7 +217,6 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 			}
 
 			// Drop coin transfers whose approval attempt was rolled back
-			coinTransfers = k.CommittedCoinTransfers(ctx, collection.CollectionId, coinTransfers)
 
 			// Save balances after each recipient to ensure consistency.
 			// This ensures that if the transaction fails partway through,

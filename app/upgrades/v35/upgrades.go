@@ -5,15 +5,15 @@ import (
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
+	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
+	managersplitterkeeper "github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
-
-	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
-	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 )
 
 // EIP-712 acceptance change (no store migration).
@@ -51,6 +51,7 @@ const (
 // Keepers is the set of keepers the v35 handler needs. Held by value/pointer
 // exactly as app.App stores them.
 type Keepers struct {
+	ManagerSplitter managersplitterkeeper.Keeper
 	Account         authkeeper.AccountKeeper
 	ConsensusParams consensuskeeper.Keeper
 	FeeMarket       feemarketkeeper.Keeper
@@ -77,6 +78,9 @@ func CustomUpgradeHandlerLogic(ctx context.Context, k Keepers) error {
 	}
 	if err := runTokenizationMigrations(sdkCtx, k.Tokenization); err != nil {
 		return fmt.Errorf("v35: tokenization: %w", err)
+	}
+	if err := k.ManagerSplitter.MigrateV35CanonicalAddresses(sdkCtx); err != nil {
+		return fmt.Errorf("v35: manager splitter: %w", err)
 	}
 	return nil
 }

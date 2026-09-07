@@ -17,8 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential ca-certificates curl git jq procps python3 \
     && rm -rf /var/lib/apt/lists/*
 
+RUN curl -fsSL "https://go.dev/dl/?mode=json&include=all" -o /tmp/go-releases.json
+
 RUN set -eu; for v in $GO_VERSIONS; do \
       curl -fsSL "https://go.dev/dl/go${v}.linux-${TARGETARCH}.tar.gz" -o /tmp/go.tgz; \
+      checksum=$(jq -er --arg name "go${v}.linux-${TARGETARCH}.tar.gz" '[.[].files[] | select(.filename == $name) | .sha256] | if length == 1 then .[0] else error("missing or ambiguous Go checksum") end' /tmp/go-releases.json); \
+      echo "${checksum}  /tmp/go.tgz" | sha256sum -c -; \
       mkdir -p "/usr/local/go-${v}"; \
       tar -C "/usr/local/go-${v}" --strip-components=1 -xzf /tmp/go.tgz; \
       rm /tmp/go.tgz; \
@@ -27,14 +31,10 @@ RUN set -eu; for v in $GO_VERSIONS; do \
 ENV GOMODCACHE=/gomodcache
 ENV GOCACHE=/gobuild
 # Modules resolve from the host's download cache, mounted read-only as a file
-# proxy. Nothing is fetched from the network, which is also how private modules
-# pinned in go.mod are available without shipping a token into the image.
+# proxy. Version and content hashes must match the checked-in go.mod/go.sum.
+# Go checksum verification remains enabled.
 ENV GOPROXY=file:///hostmod/cache/download
-ENV GOFLAGS=-mod=mod
-ENV GOSUMDB=off
-ENV GONOSUMCHECK=1
-ENV GOPRIVATE=*
-ENV GONOSUMDB=*
+ENV GOFLAGS=-mod=readonly
 # Never let Go try to fetch a toolchain: build.sh selects one explicitly.
 ENV GOTOOLCHAIN=local
 

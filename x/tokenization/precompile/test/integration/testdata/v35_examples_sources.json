@@ -1,0 +1,11 @@
+{
+  "contracts/examples/CarbonCreditToken.sol": "4eb366a535fe19068063aa08dbf8fced594b5bfc66ba0bc5166555be78abc1f8",
+  "contracts/examples/PrivateEquityToken.sol": "75af2dc56db107fa5681bc73fd4b1b9edac97fb0f3bd941c2129131a0517a247",
+  "contracts/examples/RealEstateSecurityToken.sol": "9f08b0537a524d5bae2f79daecc88e98dd41fdf57196f2d680740f536547373a",
+  "contracts/examples/TwoFactorSecurityToken.sol": "e548827c4c23cdbc15e7ae461f6c63d7d91638ae26ba31b114711d4e19af241e",
+  "contracts/interfaces/ITokenizationPrecompile.sol": "5e71b584e7d8f667ccf140ae683896bc585ccb84976836eff102c69be503c7a1",
+  "contracts/libraries/TokenizationDecoders.sol": "372ef030ae09dbfb60bc1263ec1a54482821d113bad25157281041a3bb253cdf",
+  "contracts/libraries/TokenizationInitialization.sol": "477b1deccafb816a621c1a24e7430b1c58c31f7558a19cab3f411d0bd1339a64",
+  "contracts/libraries/TokenizationJSONHelpers.sol": "14db926a3d5312e372f55dfdd6fbf67011f0288c462019f9f288f67bb83d2a27",
+  "contracts/types/TokenizationTypes.sol": "0ad879ff2feed92c2f283a18c871fb678e7295fa134cbf6e9b0297a71b1886b2"
+}
