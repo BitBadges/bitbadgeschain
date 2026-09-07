@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"math"
 
-	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type TransferMetadata struct {
@@ -81,6 +79,14 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 	}
 
 	for _, transfer := range transfers {
+		// New supply (minting or unbacking) may only be created for ids in ValidTokenIds.
+		// Existing balances are left movable even if an older id set was wider.
+		if types.IsMintAddress(transfer.From) || k.IsBackingPathAddress(ctx, collection, transfer.From) {
+			if err := types.ValidateBalancesWithinValidTokenIds(transfer.Balances, collection.ValidTokenIds); err != nil {
+				return err
+			}
+		}
+
 		fromUserBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, transfer.From)
 		if err != nil {
 			return err
@@ -150,6 +156,12 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 					return err
 				}
 
+				if types.IsMintAddress(transfer.From) || k.IsBackingPathAddress(ctx, collection, transfer.From) {
+					if err := types.ValidateBalancesWithinValidTokenIds(transfer.Balances, collection.ValidTokenIds); err != nil {
+						return err
+					}
+				}
+
 				amountsJsonData, err := json.Marshal(transfer)
 				if err != nil {
 					return err
@@ -203,6 +215,8 @@ func (k Keeper) handleTransfersInternal(ctx sdk.Context, collection *types.Token
 			if err != nil {
 				return err
 			}
+
+			// Drop coin transfers whose approval attempt was rolled back
 
 			// Save balances after each recipient to ensure consistency.
 			// This ensures that if the transaction fails partway through,
@@ -367,6 +381,8 @@ func (k Keeper) HandleTransfer(
 				ToAddresses:                             []string{to},
 				Balances:                                userApproval.Balances,
 				MerkleProofs:                            transfer.MerkleProofs,
+				EthSignatureProofs:                      transfer.EthSignatureProofs,
+				Memo:                                    transfer.Memo,
 				PrioritizedApprovals:                    transfer.PrioritizedApprovals,
 				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
 				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,

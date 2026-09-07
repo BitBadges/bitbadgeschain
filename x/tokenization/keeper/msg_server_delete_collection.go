@@ -3,13 +3,18 @@ package keeper
 import (
 	"context"
 
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteCollection) (*types.MsgDeleteCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 
 	collection, found := k.GetCollectionFromStore(ctx, msg.CollectionId)
 	if !found {
@@ -28,6 +33,51 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 	err = k.CheckIfActionPermissionPermits(ctx, collection.CollectionPermissions.CanDeleteCollection, "can delete collection")
 	if err != nil {
 		return nil, err
+	}
+
+	// Escrowed supply stays redeemable only through this collection, so it must be
+	// fully unwound before the collection can go away.
+	for _, path := range collection.CosmosCoinWrapperPaths {
+		escrow, _, err := k.GetBalanceOrApplyDefault(ctx, collection, path.Address)
+		if err != nil {
+			return nil, err
+		}
+		if hasNonZeroBalance(escrow) {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "wrapper path %s still escrows tokens for outstanding %s coins", path.Denom, WrappedDenomPrefix+collection.CollectionId.String()+":"+path.Denom)
+		}
+	}
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		stats, _ := k.GetCollectionStatsFromStore(ctx, collection.CollectionId)
+		for _, bal := range stats.Balances {
+			if bal.Amount.GT(sdkmath.ZeroUint()) {
+				return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "backed tokens are still in circulation; they must be backed before the collection can be deleted")
+			}
+		}
+	}
+
+	for _, path := range collection.AliasPaths {
+		denom := AliasDenomPrefix + collection.CollectionId.String() + ":" + path.Denom
+		if k.bankKeeper.GetSupply(ctx, denom).IsPositive() {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "alias %s still has bank coins in circulation", denom)
+		}
+		if k.gammKeeper != nil {
+			used, err := k.gammKeeper.HasPoolForDenom(ctx, denom)
+			if err != nil {
+				return nil, err
+			}
+			if used {
+				return nil, sdkerrors.Wrapf(types.ErrInvalidRequest, "alias %s is still a pool asset", denom)
+			}
+		}
+	}
+	if collection.MintEscrowAddress != "" {
+		escrow, err := sdk.AccAddressFromBech32(collection.MintEscrowAddress)
+		if err != nil {
+			return nil, err
+		}
+		if !k.bankKeeper.GetAllBalances(ctx, escrow).IsZero() {
+			return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "mint escrow still holds bank coins")
+		}
 	}
 
 	// Purge all collection-related state before deleting the collection

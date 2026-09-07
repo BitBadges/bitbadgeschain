@@ -26,6 +26,10 @@ func (msg *MsgCreateManagerSplitter) ValidateBasic() error {
 		return err
 	}
 
+	if err := ValidateCanonicalAddresses(msg.Permissions, msg.Admin); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -69,4 +73,3 @@ func validatePermissions(perms *ManagerSplitterPermissions) error {
 
 	return nil
 }
-

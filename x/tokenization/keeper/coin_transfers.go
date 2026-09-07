@@ -3,10 +3,9 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -189,6 +188,10 @@ func (k Keeper) ExecuteCoinTransfers(
 		}
 
 		for _, coin := range coinsToTransfer {
+			if coin == nil || coin.Amount.IsNil() || !coin.Amount.IsPositive() {
+				detErrMsg := "coin transfer amount must be positive"
+				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+			}
 			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
 			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
 			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
@@ -196,6 +199,7 @@ func (k Keeper) ExecuteCoinTransfers(
 
 			err := k.sendCoinWithRoyalty(
 				ctx,
+				collection.CollectionId,
 				coin,
 				royaltyAmountInt,
 				remainingAmount,
@@ -223,6 +227,7 @@ func (k Keeper) ExecuteCoinTransfers(
 // It sends the royalty to the payout address and the remaining amount to the recipient
 func (k Keeper) sendCoinWithRoyalty(
 	ctx sdk.Context,
+	collectionId sdkmath.Uint,
 	coin *sdk.Coin,
 	royaltyAmountInt sdkmath.Int,
 	remainingAmount sdkmath.Int,
@@ -278,7 +283,7 @@ func scaleCoinTransfers(base []*types.CoinTransfer, multiplier sdkmath.Uint) []*
 	if multiplier.IsZero() {
 		return []*types.CoinTransfer{}
 	}
-	
+
 	multiplierInt := sdkmath.NewIntFromBigInt(multiplier.BigInt())
 	scaled := make([]*types.CoinTransfer, len(base))
 	for i, ct := range base {
@@ -288,8 +293,8 @@ func scaleCoinTransfers(base []*types.CoinTransfer, multiplier sdkmath.Uint) []*
 			scaledCoins[j] = &scaledCoin
 		}
 		scaled[i] = &types.CoinTransfer{
-			To:                             ct.To,
-			Coins:                          scaledCoins,
+			To:                              ct.To,
+			Coins:                           scaledCoins,
 			OverrideFromWithApproverAddress: ct.OverrideFromWithApproverAddress,
 			OverrideToWithInitiator:         ct.OverrideToWithInitiator,
 		}

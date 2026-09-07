@@ -42,6 +42,9 @@ func (msg *MsgCreateCollection) ValidateBasic() error {
 
 	// Validate invariants if present
 	if msg.Invariants != nil {
+		if err := ValidateMaxSupplyWithBacking(msg.Invariants.MaxSupplyPerId, msg.Invariants.CosmosCoinBackedPath != nil); err != nil {
+			return err
+		}
 		// Validate NoCustomOwnershipTimes with collection approvals
 		if msg.Invariants.NoCustomOwnershipTimes {
 			// Create a temporary collection to validate invariants

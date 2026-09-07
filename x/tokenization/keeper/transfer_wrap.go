@@ -107,8 +107,10 @@ func (k Keeper) HandleSpecialAddressWrapping(
 		return sdkerrors.Wrapf(ErrNotImplemented, "conversion or sideA is nil")
 	}
 
+	// Only substitute the transferred token id when the denom carries {id}; otherwise every
+	// id would share one bank denom and unwrapping could return a different id than deposited.
 	conversionBalances := types.DeepCopyBalances(denomInfo.Conversion.SideB)
-	if denomInfo.AllowOverrideWithAnyValidToken {
+	if denomInfo.AllowOverrideWithAnyValidToken && strings.Contains(denomInfo.Denom, "{id}") {
 		for _, balance := range conversionBalances {
 			balance.TokenIds = []*types.UintRange{
 				{
@@ -128,7 +130,13 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	// This is important. Prefixing allows only our module to control such denominations
 	// and doesn't allow users to mint other coins like "ubadge" or "factory/..."
 	ibcDenom = WrappedDenomPrefix + collection.CollectionId.String() + ":" + ibcDenom
+	if err := sdk.ValidateDenom(ibcDenom); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidConversion, "wrapped denom %s is not a valid bank denom", ibcDenom)
+	}
 	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
+	if amountInt.BitLen() > sdkmath.MaxBitLen {
+		return sdkerrors.Wrapf(ErrInvalidConversion, "wrapped amount exceeds the maximum bank coin amount")
+	}
 
 	if isSendingToSpecialAddress {
 		userAddressAcc, err := sdk.AccAddressFromBech32(from)
@@ -244,6 +252,9 @@ func (k Keeper) HandleSpecialAddressBacking(
 	}
 
 	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
+	if amountInt.BitLen() > sdkmath.MaxBitLen {
+		return sdkerrors.Wrapf(ErrInvalidConversion, "backed amount exceeds the maximum bank coin amount")
+	}
 
 	// Bank transfers always debit/credit the initiator (the tx signer).
 	// This enables "on behalf of" flows where the initiator pays/receives IBC coins

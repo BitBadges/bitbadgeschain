@@ -24,6 +24,9 @@ var _ types.MsgServer = msgServer{}
 // Returns the resolved collection ID and an error if underflow would occur or if the resolved collection doesn't exist.
 func (k msgServer) resolveCollectionIdWithAutoPrev(ctx sdk.Context, collectionId sdkmath.Uint) (sdkmath.Uint, error) {
 	var resolvedId sdkmath.Uint
+	if err := types.ValidateUintId(collectionId, true); err != nil {
+		return sdkmath.Uint{}, sdkerrors.Wrapf(types.ErrInvalidCollectionID, "invalid collection id: %s", err)
+	}
 	if collectionId.Equal(sdkmath.NewUint(0)) {
 		nextCollectionId := k.GetNextCollectionId(ctx)
 		// Prevent underflow by checking if nextCollectionId is greater than 0

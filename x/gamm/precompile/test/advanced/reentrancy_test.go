@@ -31,7 +31,7 @@ func TestReentrancyTestSuite(t *testing.T) {
 func (suite *ReentrancyTestSuite) SetupTest() {
 	suite.Reset()
 
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	alice := suite.TestAccs[0]
 	largeAmount, _ := new(big.Int).SetString("10000000000000000000", 10)

@@ -138,8 +138,8 @@ func validateDefaultTakerFee(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	// Ensure that the passed in discount rate is between 0 and 1.
-	if defaultTakerFee.IsNegative() || defaultTakerFee.GT(OneDec) {
+	// Ensure that the passed in taker fee is in [0, 1); a fee of 1 leaves nothing to swap.
+	if defaultTakerFee.IsNegative() || defaultTakerFee.GTE(OneDec) {
 		return fmt.Errorf("invalid default taker fee: %s", defaultTakerFee)
 	}
 

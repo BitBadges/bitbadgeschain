@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/ITokenizationPrecompile.sol";
 import "../libraries/TokenizationJSONHelpers.sol";
+import "../libraries/TokenizationDecoders.sol";
+import "../libraries/TokenizationInitialization.sol";
 
 /**
  * @title TwoFactorSecurityToken
@@ -130,9 +132,9 @@ contract TwoFactorSecurityToken {
             ',"tokenIds":', TokenizationJSONHelpers.uintRangeToJson(1, 1), '}]'
         ));
         
-        // Build defaultBalances JSON with initial balances
+        // User defaults retain the collection's approval settings.
         string memory defaultBalancesJson = string(abi.encodePacked(
-            '{"balances":', balanceJson,
+            '{"balances":[]',
             ',"autoApproveSelfInitiatedOutgoingTransfers":true',
             ',"autoApproveSelfInitiatedIncomingTransfers":true',
             ',"autoApproveAllIncomingTransfers":false',
@@ -166,6 +168,10 @@ contract TwoFactorSecurityToken {
         );
         
         securityTokenCollectionId = TOKENIZATION.createCollection(createJson);
+        if (totalSupply > 0) {
+            TokenizationInitialization.mintInitialSupply(TOKENIZATION, securityTokenCollectionId, issuer, balanceJson);
+        }
+        TokenizationInitialization.approveWrapperTransfers(TOKENIZATION, securityTokenCollectionId);
 
         // ===== Create 2FA Token Collection =====
         // 2FA tokens use incrementing token IDs (nonce-based)
@@ -221,22 +227,13 @@ contract TwoFactorSecurityToken {
         // Create time-limited ownership
         string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(nonce, nonce);
         string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-            block.timestamp, 
-            validUntil
+            block.timestamp * 1000,
+            validUntil * 1000
         );
 
-        address[] memory recipients = new address[](1);
-        recipients[0] = user;
+        string memory mintBalancesJson = string(abi.encodePacked('[{"amount":"1","tokenIds":', tokenIdsJson, ',"ownershipTimes":', ownershipTimesJson, '}]'));
 
-        // Issue the 2FA token (1 token with time-limited ownership)
-        string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
-            twoFactorCollectionId,
-            recipients,
-            1,
-            tokenIdsJson,
-            ownershipTimesJson
-        );
-        TOKENIZATION.transferTokens(transferJson);
+        TokenizationInitialization.mintInitialSupply(TOKENIZATION, twoFactorCollectionId, user, mintBalancesJson);
 
         lastTwoFactorIssued[user] = block.timestamp;
 
@@ -261,21 +258,13 @@ contract TwoFactorSecurityToken {
 
             string memory tokenIdsJson = TokenizationJSONHelpers.uintRangeToJson(nonce, nonce);
             string memory ownershipTimesJson = TokenizationJSONHelpers.uintRangeToJson(
-                block.timestamp,
-                validUntil
+                block.timestamp * 1000,
+                validUntil * 1000
             );
 
-            address[] memory recipients = new address[](1);
-            recipients[0] = user;
+            string memory mintBalancesJson = string(abi.encodePacked('[{"amount":"1","tokenIds":', tokenIdsJson, ',"ownershipTimes":', ownershipTimesJson, '}]'));
 
-            string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
-                twoFactorCollectionId,
-                recipients,
-                1,
-                tokenIdsJson,
-                ownershipTimesJson
-            );
-            TOKENIZATION.transferTokens(transferJson);
+            TokenizationInitialization.mintInitialSupply(TOKENIZATION, twoFactorCollectionId, user, mintBalancesJson);
 
             lastTwoFactorIssued[user] = block.timestamp;
 
@@ -337,6 +326,7 @@ contract TwoFactorSecurityToken {
         
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             securityTokenCollectionId,
+            msg.sender,
             recipients,
             amount,
             tokenIdsJson,
@@ -373,6 +363,7 @@ contract TwoFactorSecurityToken {
         
         string memory transferJson = TokenizationJSONHelpers.transferTokensJSON(
             securityTokenCollectionId,
+            msg.sender,
             recipients,
             amount,
             tokenIdsJson,
@@ -405,7 +396,7 @@ contract TwoFactorSecurityToken {
         );
         bytes memory result = TOKENIZATION.getDynamicStoreValue(getValueJson);
         if (result.length == 0) return false;
-        return abi.decode(result, (bool));
+        return TokenizationDecoders.parseDynamicStoreValue(result);
     }
 
     // ============ Configuration ============

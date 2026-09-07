@@ -24,7 +24,7 @@ func (suite *PrecompileTestSuite) SetupTest() {
 }
 
 func (suite *PrecompileTestSuite) TestPrecompile_RequiredGas() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Test with valid method ID - get the method selector manually
 	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
@@ -39,7 +39,7 @@ func (suite *PrecompileTestSuite) TestPrecompile_RequiredGas() {
 }
 
 func (suite *PrecompileTestSuite) TestPrecompile_Structure() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Verify precompile is created correctly
 	suite.NotNil(precompile)
@@ -71,7 +71,7 @@ func (suite *PrecompileTestSuite) TestPrecompile_Structure() {
 }
 
 func (suite *PrecompileTestSuite) TestPrecompile_IsTransaction() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Test transaction methods
 	transactionMethods := []string{

@@ -1,34 +1,20 @@
 package poolmanager
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
-
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var zero = osmomath.ZeroInt()
-
 func (k *Keeper) GetDefaultTakerFee(ctx sdk.Context) osmomath.Dec {
-	defaultTakerFeeBz := k.paramSpace.GetRaw(ctx, types.KeyDefaultTakerFee)
-	if !bytes.Equal(defaultTakerFeeBz, k.defaultTakerFeeBz) {
-		var defaultTakerFeeValue osmomath.Dec
-		err := json.Unmarshal(defaultTakerFeeBz, &defaultTakerFeeValue)
-		if err != nil {
-			defaultTakerFeeValue = osmomath.ZeroDec()
-		}
-		k.defaultTakerFeeBz = defaultTakerFeeBz
-		k.defaultTakerFeeVal = defaultTakerFeeValue
-	}
-	return k.defaultTakerFeeVal
+	var value osmomath.Dec
+	k.paramSpace.Get(ctx, types.KeyDefaultTakerFee, &value)
+	return value
 }
 
 // SetDenomPairTakerFee sets the taker fee for the given trading pair.
@@ -122,6 +108,14 @@ func (k Keeper) GetAllTradingPairTakerFees(ctx sdk.Context) ([]types.DenomPairTa
 	return takerFees, nil
 }
 
+func (k Keeper) EffectiveTakerFee(ctx sdk.Context, tokenInDenom, tokenOutDenom string) (osmomath.Dec, error) {
+	// Alias tokens have no community-pool spend path, so execution and quotes exempt them.
+	if tokenizationkeeper.CheckStartsWithAliasDenom(tokenInDenom) {
+		return osmomath.ZeroDec(), nil
+	}
+	return k.GetTradingPairTakerFee(ctx, tokenInDenom, tokenOutDenom)
+}
+
 // chargeTakerFee extracts the taker fee from the given tokenIn and sends it to the appropriate
 // module account. It returns the tokenIn after the taker fee has been extracted.
 // If the sender is in the taker fee reduced whitelisted, it returns the tokenIn without extracting the taker fee.
@@ -137,11 +131,10 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 	// 	return tokenIn, sdk.Coin{Denom: tokenIn.Denom, Amount: zero}, nil
 	// }
 
-	takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
+	takerFee, err := k.EffectiveTakerFee(ctx, tokenIn.Denom, tokenOutDenom)
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}
-
 	var tokenInAfterTakerFee sdk.Coin
 	var takerFeeCoin sdk.Coin
 	if exactIn {
@@ -150,9 +143,11 @@ func (k Keeper) chargeTakerFee(ctx sdk.Context, tokenIn sdk.Coin, tokenOutDenom 
 		tokenInAfterTakerFee, takerFeeCoin = CalcTakerFeeExactOut(tokenIn, takerFee)
 	}
 
-	err = k.gammKeeper.FundCommunityPoolWithAliasRouting(ctx, sender, sdk.NewCoins(takerFeeCoin))
-	if err != nil {
-		return sdk.Coin{}, sdk.Coin{}, err
+	if !takerFeeCoin.IsZero() {
+		err = k.gammKeeper.FundCommunityPoolWithAliasRouting(ctx, sender, sdk.NewCoins(takerFeeCoin))
+		if err != nil {
+			return sdk.Coin{}, sdk.Coin{}, err
+		}
 	}
 
 	return tokenInAfterTakerFee, takerFeeCoin, nil
@@ -197,7 +192,7 @@ func (k Keeper) TakerFeeSkim(ctx sdk.Context, denomsInvolvedInRoute []string, to
 	osmoutils.SortSlice(denomsInvolvedInRoute)
 
 	// Retrieve the share agreements for denoms.
-	denomShareAgreements, alloyedAssetShareAgreements := k.getTakerFeeShareAgreements(denomsInvolvedInRoute)
+	denomShareAgreements, alloyedAssetShareAgreements := k.getTakerFeeShareAgreements(ctx, denomsInvolvedInRoute)
 
 	shareAgreementsToProcess := []types.TakerFeeShareAgreement{}
 	if len(denomShareAgreements) > 0 {
@@ -210,20 +205,20 @@ func (k Keeper) TakerFeeSkim(ctx sdk.Context, denomsInvolvedInRoute []string, to
 }
 
 // getTakerFeeShareAgreements checks for individual denomShareAgreement and alloyedAssetShareAgreement denoms.
-func (k Keeper) getTakerFeeShareAgreements(denomsInvolvedInRoute []string) ([]types.TakerFeeShareAgreement, []types.TakerFeeShareAgreement) {
+func (k Keeper) getTakerFeeShareAgreements(ctx sdk.Context, denomsInvolvedInRoute []string) ([]types.TakerFeeShareAgreement, []types.TakerFeeShareAgreement) {
 	denomShareAgreements := []types.TakerFeeShareAgreement{}
 	alloyedAssetShareAgreements := []types.TakerFeeShareAgreement{}
 
 	for _, denom := range denomsInvolvedInRoute {
 		// We first check if this denom has a taker fee share agreement.
-		takerFeeShareAgreement, found := k.getTakerFeeShareAgreementFromDenom(denom)
+		takerFeeShareAgreement, found := k.getTakerFeeShareAgreementFromDenom(ctx, denom)
 		if found {
 			// If the denom has a denomShareAgreement, add the denomShareAgreement to the denomShareAgreements slice.
 			denomShareAgreements = append(denomShareAgreements, takerFeeShareAgreement)
 		} else {
 			// Check if the denom is an alloyedAssetShareAgreement denom.
 			// If it is, add the alloyedAssetShareAgreement to the alloyedAssetShareAgreements slice.
-			cachedAlloyContractState, found := k.getRegisteredAlloyedPoolFromDenom(denom)
+			cachedAlloyContractState, found := k.getRegisteredAlloyedPoolFromDenom(ctx, denom)
 			if found {
 				alloyedAssetShareAgreements = append(alloyedAssetShareAgreements, cachedAlloyContractState.TakerFeeShareAgreements...)
 			}

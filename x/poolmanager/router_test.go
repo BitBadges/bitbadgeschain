@@ -3899,3 +3899,36 @@ func (suite *KeeperTestSuite) TestListPoolsByDenom() {
 		})
 	}
 }
+
+// tokenInMaxAmount bounds what the user actually pays, taker fee included.
+func (s *KeeperTestSuite) TestRouteExactAmountOutRespectsTokenInMaxIncludingTakerFee() {
+	s.SetupTest()
+	k := s.App.PoolManagerKeeper
+	poolCoins := sdk.NewCoins(sdk.NewCoin(FOO, defaultInitPoolAmount), sdk.NewCoin(BAR, defaultInitPoolAmount))
+	s.FundAcc(s.TestAccs[0], poolCoins)
+	s.CreatePoolFromTypeWithCoinsAndSpreadFactor(types.Balancer, poolCoins, defaultPoolSpreadFactor)
+	s.FundAcc(s.TestAccs[0], poolCoins)
+
+	takerFee := osmomath.MustNewDecFromStr("0.01")
+	k.SetDenomPairTakerFee(s.Ctx, FOO, BAR, takerFee)
+	k.SetDenomPairTakerFee(s.Ctx, BAR, FOO, takerFee)
+
+	routes := []types.SwapAmountOutRoute{{PoolId: 1, TokenInDenom: BAR}}
+	tokenOut := sdk.NewCoin(FOO, defaultSwapAmount)
+
+	// The pool-level input before the taker fee is grossed up
+	preFeeIn := s.calcInGivenOutAmountAsSeparateSwaps(routes, tokenOut)
+	poolIn := preFeeIn.Amount.ToLegacyDec().Mul(osmomath.OneDec().Sub(takerFee)).TruncateInt()
+	s.Require().True(poolIn.LT(preFeeIn.Amount))
+
+	// A max that only covers the pool-level input must be refused (on a cached ctx, as a
+	// failed message would be rolled back)
+	cacheCtx, _ := s.Ctx.CacheContext()
+	_, err := k.RouteExactAmountOut(cacheCtx, s.TestAccs[0], routes, poolIn, tokenOut)
+	s.Require().ErrorIs(err, types.ErrTokenInExceedsMax, "paying more than tokenInMaxAmount once the taker fee is added must fail")
+
+	// A max that covers the grossed-up amount succeeds and is respected
+	paid, err := k.RouteExactAmountOut(s.Ctx, s.TestAccs[0], routes, preFeeIn.Amount, tokenOut)
+	s.Require().NoError(err)
+	s.Require().True(paid.LTE(preFeeIn.Amount))
+}

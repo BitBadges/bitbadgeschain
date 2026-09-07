@@ -91,17 +91,19 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 	}
 
 	// Verify the voter is in the voters list
-	voterFound := false
-	var voterWeight sdkmath.Uint
+	var voterAddresses []string
+	voterWeight := sdkmath.ZeroUint()
 	for _, voter := range votingChallenge.Voters {
-		if voter != nil && voter.Address == msg.Creator {
-			voterFound = true
-			voterWeight = voter.Weight
-			break
+		if voter != nil {
+			address, _ := canonicalBech32(voter.Address)
+			if address == msg.Creator {
+				voterAddresses = append(voterAddresses, voter.Address)
+				voterWeight = voterWeight.Add(voter.Weight)
+			}
 		}
 	}
 
-	if !voterFound {
+	if len(voterAddresses) == 0 {
 		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "Voter not found in voting challenge voters list")
 	}
 
@@ -110,29 +112,20 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, fmt.Sprintf("yesWeight must be between 0 and 100, got %s", msg.YesWeight.String()))
 	}
 
-	// Construct the vote key
-	voteKey := ConstructVotingTrackerKey(
-		msg.CollectionId,
-		msg.ApproverAddress,
-		msg.ApprovalLevel,
-		msg.ApprovalId,
-		msg.ProposalId,
-		msg.Creator,
-	)
-
 	now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
-	// Create the vote with timestamp
-	vote := &types.VoteProof{
-		ProposalId: msg.ProposalId,
-		Voter:      msg.Creator,
-		YesWeight:  msg.YesWeight,
-		VotedAt:    now,
-	}
-
-	// Store the vote (this will overwrite any existing vote)
-	if err := k.SetVoteInStore(ctx, voteKey, vote); err != nil {
-		return nil, sdkerrors.Wrap(err, "Failed to store vote")
+	// Keep legacy voter slots separate so quorum retains its per-slot rounding.
+	for _, voterAddress := range voterAddresses {
+		voteKey := ConstructVotingTrackerKey(msg.CollectionId, msg.ApproverAddress, msg.ApprovalLevel, msg.ApprovalId, msg.ProposalId, voterAddress)
+		vote := &types.VoteProof{
+			ProposalId: msg.ProposalId,
+			Voter:      voterAddress,
+			YesWeight:  msg.YesWeight,
+			VotedAt:    now,
+		}
+		if err := k.SetVoteInStore(ctx, voteKey, vote); err != nil {
+			return nil, sdkerrors.Wrap(err, "Failed to store vote")
+		}
 	}
 
 	// Update quorum tracking for challenges with delay or reset

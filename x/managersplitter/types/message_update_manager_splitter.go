@@ -42,6 +42,9 @@ func (msg *MsgUpdateManagerSplitter) ValidateBasic() error {
 		return err
 	}
 
+	if err := ValidateCanonicalAddresses(msg.Permissions, msg.Admin, msg.Address); err != nil {
+		return err
+	}
+
 	return nil
 }
-

@@ -7,6 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	cmn "github.com/cosmos/evm/precompiles/common"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
@@ -26,23 +27,24 @@ func RegisterAndEnableAllPrecompiles(
 	tokenizationKeeper *tokenizationkeeper.Keeper,
 	gammKeeper gammkeeper.Keeper,
 	sendManagerKeeper sendmanagerkeeper.Keeper,
+	bankKeeper cmn.BankKeeper,
 ) error {
 	// Register custom BitBadges precompiles
 	// Note: Default Cosmos precompiles are already registered via WithStaticPrecompiles
 	// during EVM keeper initialization, so we only need to register custom ones here
 
 	// Register tokenization precompile
-	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(tokenizationKeeper)
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(tokenizationKeeper, bankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	evmKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 
 	// Register gamm precompile
-	gammPrecompile := gammprecompile.NewPrecompile(gammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(gammKeeper, bankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	evmKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 
 	// Register sendmanager precompile
-	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(sendManagerKeeper)
+	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(sendManagerKeeper, bankKeeper)
 	sendManagerPrecompileAddr := common.HexToAddress(sendmanagerprecompile.SendManagerPrecompileAddress)
 	evmKeeper.RegisterStaticPrecompile(sendManagerPrecompileAddr, sendManagerPrecompile)
 

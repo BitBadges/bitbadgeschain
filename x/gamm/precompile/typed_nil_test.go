@@ -32,7 +32,7 @@ func TestPackQueryResponseRejectsTypedNil(t *testing.T) {
 		{"default marshal branch", GetTotalLiquidityMethod, (*gammtypes.QueryTotalLiquidityResponse)(nil)},
 	}
 
-	p := NewPrecompile(gammkeeper.Keeper{})
+	p := NewPrecompile(gammkeeper.Keeper{}, nil)
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			m, ok := p.Methods[tc.method]
@@ -66,7 +66,7 @@ func TestGogoprotoMarshalPanicsOnTypedNil(t *testing.T) {
 }
 
 func TestPackQueryResponseAcceptsRealResponse(t *testing.T) {
-	p := NewPrecompile(gammkeeper.Keeper{})
+	p := NewPrecompile(gammkeeper.Keeper{}, nil)
 	m, ok := p.Methods[GetPoolTypeMethod]
 	require.True(t, ok)
 

@@ -3,9 +3,8 @@ package keeper
 import (
 	"context"
 
-	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
-
 	sdkerrors "cosmossdk.io/errors"
+	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -16,6 +15,9 @@ func (k msgServer) UpdateManagerSplitter(goCtx context.Context, msg *types.MsgUp
 	_, err := sdk.AccAddressFromBech32(msg.Admin)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAdmin, err.Error())
+	}
+	if err := types.ValidateCanonicalAddresses(msg.Permissions, msg.Admin, msg.Address); err != nil {
+		return nil, err
 	}
 
 	// Get existing manager splitter
@@ -42,4 +44,3 @@ func (k msgServer) UpdateManagerSplitter(goCtx context.Context, msg *types.MsgUp
 
 	return &types.MsgUpdateManagerSplitterResponse{}, nil
 }
-

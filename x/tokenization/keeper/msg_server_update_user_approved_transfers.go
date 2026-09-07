@@ -6,9 +6,38 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+// normalizedOutgoingApproval returns a copy with the same mustPrioritize normalisation that
+// incoming messages receive, so a stored approval only counts as changed on a real edit.
+func normalizedOutgoingApproval(approval *types.UserOutgoingApproval) *types.UserOutgoingApproval {
+	bz, err := proto.Marshal(approval)
+	if err != nil {
+		return approval
+	}
+	copied := &types.UserOutgoingApproval{}
+	if err := proto.Unmarshal(bz, copied); err != nil {
+		return approval
+	}
+	types.EnforceMustPrioritizeForOutgoing(copied.ApprovalCriteria)
+	return copied
+}
+
+func normalizedIncomingApproval(approval *types.UserIncomingApproval) *types.UserIncomingApproval {
+	bz, err := proto.Marshal(approval)
+	if err != nil {
+		return approval
+	}
+	copied := &types.UserIncomingApproval{}
+	if err := proto.Unmarshal(bz, copied); err != nil {
+		return approval
+	}
+	types.EnforceMustPrioritizeForIncoming(copied.ApprovalCriteria)
+	return copied
+}
 
 // Helper function to create and execute an UpdateUserApprovals message
 func (k msgServer) executeUpdateUserApprovals(ctx sdk.Context, creator string, collectionId sdkmath.Uint, updateMsg *types.MsgUpdateUserApprovals) (*types.MsgUpdateUserApprovalsResponse, error) {
@@ -80,7 +109,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 
 				// Only increment version if approval is new or changed (excluding Version field)
-				if !exists || !userOutgoingApprovalEqual(existingApproval, newApproval) {
+				if !exists || !userOutgoingApprovalEqual(normalizedOutgoingApproval(existingApproval), newApproval) {
 					newVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", msg.Creator, newApproval.ApprovalId)
 					if err != nil {
 						return nil, err
@@ -125,7 +154,7 @@ func (k msgServer) UpdateUserApprovals(goCtx context.Context, msg *types.MsgUpda
 				existingApproval, exists := existingApprovals[newApproval.ApprovalId]
 
 				// Only increment version if approval is new or changed (excluding Version field)
-				if !exists || !userIncomingApprovalEqual(existingApproval, newApproval) {
+				if !exists || !userIncomingApprovalEqual(normalizedIncomingApproval(existingApproval), newApproval) {
 					newVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", msg.Creator, newApproval.ApprovalId)
 					if err != nil {
 						return nil, err

@@ -77,7 +77,7 @@ func NewTestSuite(t *testing.T) *TestSuite {
 	}
 	ts.TestAccs = []sdk.AccAddress{}
 
-	precompile := sendmanager.NewPrecompile(ts.App.SendmanagerKeeper)
+	precompile := sendmanager.NewPrecompile(ts.App.SendmanagerKeeper, ts.App.PreciseBankKeeper)
 	msgServer := sendmanagerkeeper.NewMsgServerImpl(ts.App.SendmanagerKeeper)
 
 	// Create test EVM addresses

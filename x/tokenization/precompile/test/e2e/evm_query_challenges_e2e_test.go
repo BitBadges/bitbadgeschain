@@ -100,12 +100,12 @@ func (s *EVMQueryChallengesE2ESuite) SetupTest() {
 	s.ChainID = big.NewInt(90123)
 
 	// Register and enable tokenization + gamm precompiles (required for contracts and EVM queries)
-	tokenizationPrecompile := tokenization.NewPrecompile(s.TokenizationKeeper)
+	tokenizationPrecompile := tokenization.NewPrecompile(s.TokenizationKeeper, s.App.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 	s.App.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 	err = s.App.EVMKeeper.EnableStaticPrecompiles(s.Ctx, tokenizationPrecompileAddr)
 	require.NoError(s.T(), err)
-	gammPrecompile := gammprecompile.NewPrecompile(s.App.GammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(s.App.GammKeeper, s.App.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	s.App.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 	_ = s.App.EVMKeeper.EnableStaticPrecompiles(s.Ctx, gammPrecompileAddr)
@@ -253,7 +253,7 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_ApprovalFlow_MinBankBalance() {
 		Creator: s.Alice.String(), CollectionId: collectionId,
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: "Mint", ToAddresses: []string{s.Alice.String()},
-			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(10), TokenIds: getFullRanges(), OwnershipTimes: getFullRanges()}},
+			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(10), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
 		}},
 	})
 	s.Require().NoError(err)
@@ -263,7 +263,7 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_ApprovalFlow_MinBankBalance() {
 		Creator: s.Alice.String(), CollectionId: collectionId,
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: s.Alice.String(), ToAddresses: []string{s.Bob.String()},
-			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(5), TokenIds: getFullRanges(), OwnershipTimes: getFullRanges()}},
+			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(5), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
 		}},
 	})
 	s.Require().NoError(err, "transfer with min bank balance approval should succeed")
@@ -359,7 +359,7 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_InvariantFlow_MaxUniqueHolders() {
 		Creator: s.Alice.String(), CollectionId: collectionId,
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: "Mint", ToAddresses: []string{s.Alice.String()},
-			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(30), TokenIds: getFullRanges(), OwnershipTimes: getFullRanges()}},
+			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(30), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
 		}},
 	})
 	s.Require().NoError(err)
@@ -369,7 +369,7 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_InvariantFlow_MaxUniqueHolders() {
 		Creator: s.Alice.String(), CollectionId: collectionId,
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: s.Alice.String(), ToAddresses: []string{s.Bob.String()},
-			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(10), TokenIds: getFullRanges(), OwnershipTimes: getFullRanges()}},
+			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(10), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
 		}},
 	})
 	s.Require().NoError(err, "transfer with 2 holders should pass invariant")
@@ -379,7 +379,7 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_InvariantFlow_MaxUniqueHolders() {
 		Creator: s.Alice.String(), CollectionId: collectionId,
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: s.Alice.String(), ToAddresses: []string{s.Charlie.String()},
-			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(10), TokenIds: getFullRanges(), OwnershipTimes: getFullRanges()}},
+			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(10), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
 		}},
 	})
 	s.Require().NoError(err, "transfer with 3 holders should pass invariant")
@@ -389,9 +389,14 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_InvariantFlow_MaxUniqueHolders() {
 		Creator: s.Alice.String(), CollectionId: collectionId,
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: s.Alice.String(), ToAddresses: []string{s.Dave.String()},
-			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(5), TokenIds: getFullRanges(), OwnershipTimes: getFullRanges()}},
+			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(5), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
 		}},
 	})
 	s.Require().Error(err, "transfer creating 4th holder should fail invariant")
 	s.Require().Contains(err.Error(), "invariant", "error should mention invariant")
+}
+
+// getValidIdRanges matches the ValidTokenIds the e2e collections are created with.
+func getValidIdRanges() []*tokenizationtypes.UintRange {
+	return []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(100)}}
 }

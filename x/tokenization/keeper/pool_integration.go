@@ -119,8 +119,9 @@ func (k *Keeper) SetAllAutoApprovalFlagsForIntermediateAddress(ctx sdk.Context, 
 	return nil
 }
 
-// sendNativeTokensToAddressWithPoolApprovals sends native tokens to an address
-func (k *Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, poolAddress string, toAddress string, denom string, amount sdkmath.Uint) error {
+// sendNativeTokensToAddressWithPoolApprovals sends native tokens from fromAddress to a pool address.
+// Only the pool (recipient) gets the auto-approval flags; the sender's own settings are never touched.
+func (k *Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, fromAddress string, poolAddress string, denom string, amount sdkmath.Uint) error {
 	collection, err := k.ParseCollectionFromDenom(ctx, denom)
 	if err != nil {
 		return err
@@ -142,12 +143,12 @@ func (k *Keeper) sendNativeTokensToAddressWithPoolApprovals(ctx sdk.Context, poo
 	// Important: We should only allow auto-scanned approvals here
 	//            Anything prioritized is potentially unsafe if we are using an IBC hook (where we cannot trust the sender)
 	msg := &tokenizationtypes.MsgTransferTokens{
-		Creator:      poolAddress,
+		Creator:      fromAddress,
 		CollectionId: collection.CollectionId,
 		Transfers: []*tokenizationtypes.Transfer{
 			{
-				From:        poolAddress,
-				ToAddresses: []string{toAddress},
+				From:        fromAddress,
+				ToAddresses: []string{poolAddress},
 				Balances:    balancesToTransfer,
 			},
 		},
@@ -356,6 +357,9 @@ func (k *Keeper) SpendFromCommunityPoolViaAliasDenom(ctx sdk.Context, fromAddres
 func (k *Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a tokenization denom, wrap it
 	for _, coin := range coins {
+		if coin.Amount.IsNil() || coin.Amount.IsNegative() {
+			return sdkerrors.Wrapf(tokenizationtypes.ErrInvalidRequest, "invalid coin amount for %s", coin.Denom)
+		}
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			err := k.sendNativeTokensToAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {
@@ -378,6 +382,9 @@ func (k *Keeper) SendCoinsToPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAd
 func (k *Keeper) SendCoinsFromPoolWithAliasRouting(ctx sdk.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) error {
 	// if denom is a tokenization denom, unwrap it
 	for _, coin := range coins {
+		if coin.Amount.IsNil() || coin.Amount.IsNegative() {
+			return sdkerrors.Wrapf(tokenizationtypes.ErrInvalidRequest, "invalid coin amount for %s", coin.Denom)
+		}
 		if k.CheckIsAliasDenom(ctx, coin.Denom) {
 			err := k.SendNativeTokensFromAddressWithPoolApprovals(ctx, from.String(), to.String(), coin.Denom, sdkmath.NewUintFromBigInt(coin.Amount.BigInt()))
 			if err != nil {

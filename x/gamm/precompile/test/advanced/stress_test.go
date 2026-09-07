@@ -30,7 +30,7 @@ func TestStressTestSuite(t *testing.T) {
 func (suite *StressTestSuite) SetupTest() {
 	suite.Reset()
 
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	alice := suite.TestAccs[0]
 	largeAmount, _ := new(big.Int).SetString("10000000000000000000", 10)

@@ -32,8 +32,7 @@ func ValidateManager(manager string) error {
 	if len(manager) == 0 {
 		return nil // empty manager is allowed
 	}
-	_, err := sdk.AccAddressFromBech32(manager)
-	return err
+	return ValidateAddress(manager, false)
 }
 
 // ValidateIsArchived validates isArchived (non-timeline version)

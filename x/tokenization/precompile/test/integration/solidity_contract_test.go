@@ -166,7 +166,7 @@ func (suite *SolidityContractTestSuite) setupAppWithEVM() {
 	suite.TokenizationKeeper = suite.App.TokenizationKeeper
 
 	// Create precompile instances
-	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper)
+	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper, suite.App.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 
 	// Register and ENABLE the precompile - both steps are required!
@@ -176,7 +176,7 @@ func (suite *SolidityContractTestSuite) setupAppWithEVM() {
 	require.Equal(suite.T(), tokenization.TokenizationPrecompileAddress, suite.Precompile.ContractAddress.Hex())
 
 	// Also register and enable gamm precompile for consistency
-	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	suite.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, gammPrecompileAddr)

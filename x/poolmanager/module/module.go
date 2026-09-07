@@ -94,10 +94,10 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	queryprotov2.RegisterQueryServer(cfg.QueryServer(), grpcv2.Querier{Q: pmclient.NewV2Querier(*am.k)})
 }
 
-func NewAppModule(poolmanagerKeeper poolmanager.Keeper, gammKeeper types.PoolModuleI) AppModule {
+func NewAppModule(poolmanagerKeeper *poolmanager.Keeper, gammKeeper types.PoolModuleI) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
-		k:              &poolmanagerKeeper,
+		k:              poolmanagerKeeper,
 		gammKeeper:     gammKeeper,
 	}
 }

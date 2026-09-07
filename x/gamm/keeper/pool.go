@@ -3,18 +3,16 @@ package keeper
 import (
 	"fmt"
 
-	gogotypes "github.com/cosmos/gogoproto/types"
-
 	errorsmod "cosmossdk.io/errors"
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	gogotypes "github.com/cosmos/gogoproto/types"
 )
 
 func (k Keeper) MarshalPool(pool poolmanagertypes.PoolI) ([]byte, error) {
@@ -44,6 +42,23 @@ func (k Keeper) GetPools(ctx sdk.Context) ([]poolmanagertypes.PoolI, error) {
 
 		return pool, nil
 	})
+}
+
+func (k Keeper) HasPoolForDenom(ctx sdk.Context, denom string) (bool, error) {
+	iterator := k.iterator(ctx, types.KeyPrefixPools)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		pool, err := k.UnmarshalPool(iterator.Value())
+		if err != nil {
+			return false, err
+		}
+		for _, asset := range pool.GetTotalPoolLiquidity(ctx) {
+			if asset.Denom == denom {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 // GetPoolAndPoke returns a PoolI based on it's identifier if one exists. If poolId corresponds

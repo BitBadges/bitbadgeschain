@@ -42,6 +42,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
@@ -141,18 +142,29 @@ type Precompile struct {
 
 // NewPrecompile creates a new gamm Precompile instance implementing the
 // PrecompiledContract interface.
+//
+// bankKeeper feeds the balance handler that replays the bank events emitted
+// by the keeper (swap inputs and outputs, pool joins and exits) into the EVM
+// StateDB, so that a balance the precompile moved is not overwritten by the
+// StateDB at commit. It may be nil only for unit tests that never run inside
+// the EVM.
 func NewPrecompile(
 	gammKeeper gammkeeper.Keeper,
+	bankKeeper cmn.BankKeeper,
 ) *Precompile {
-	return &Precompile{
+	p := &Precompile{
 		Precompile: cmn.Precompile{
-			KvGasConfig:          storetypes.GasConfig{},
-			TransientKVGasConfig: storetypes.GasConfig{},
+			KvGasConfig:          storetypes.KVGasConfig(),
+			TransientKVGasConfig: storetypes.TransientGasConfig(),
 			ContractAddress:      common.HexToAddress(GammPrecompileAddress),
 		},
 		ABI:        ABI,
 		gammKeeper: gammKeeper,
 	}
+	if bankKeeper != nil {
+		p.BalanceHandlerFactory = evmcompat.NewBalanceHandlerFactory(bankKeeper)
+	}
+	return p
 }
 
 // GammPrecompileAddress is the address of the gamm precompile
@@ -195,6 +207,10 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 	// much more gas due to state reads/writes, bank transfers, and pool calculations.
 	// We add a buffer to help estimateGas converge on a working value.
 	baseGas := p.getBaseGas(method.Name)
+
+	// Every method is priced by input size: the JSON has to be parsed and
+	// validated before the per-element charges in MeterMessage can apply.
+	baseGas += uint64(len(input)/32) * GasPerInputChunk
 
 	// For transaction methods, add a significant buffer for Cosmos SDK operations
 	// Swaps typically use 150k-300k gas depending on pool complexity
@@ -249,7 +265,7 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 		return nil, fmt.Errorf("gamm precompile unavailable: ABI failed to load: %w", abiLoadError)
 	}
 
-	return p.RunNativeAction(evm, contract, func(ctx sdk.Context) ([]byte, error) {
+	return evmcompat.RunNativeAction(p.Precompile, evm, contract, func(ctx sdk.Context) ([]byte, error) {
 		result, methodName, err := p.ExecuteWithMethodName(ctx, contract, readonly)
 
 		// Gas is tracked by the EVM, we log the method for monitoring
@@ -300,6 +316,10 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 	// Unmarshal JSON to Msg
 	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := MeterMessage(ctx, msg); err != nil {
 		return nil, err
 	}
 
@@ -615,16 +635,16 @@ func LogPrecompileUsage(ctx sdk.Context, method string, success bool, gasUsed ui
 			if precompileErr.Details != "" {
 				logFields = append(logFields, "error_details", precompileErr.Details)
 			}
-			logger.Error("precompile error", logFields...)
+			logger.Debug("precompile error", logFields...)
 		} else {
-			logger.Error("precompile error",
+			logger.Debug("precompile error",
 				"method", method,
 				"error", err.Error(),
 				"gas_used", gasUsed,
 			)
 		}
 	} else {
-		logger.Info("precompile success",
+		logger.Debug("precompile success",
 			"method", method,
 			"gas_used", gasUsed,
 		)

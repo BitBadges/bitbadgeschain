@@ -8,6 +8,31 @@ We use "v8", "v9", etc. naming conventions incremented by 1 each time.
 
 ## Release Flow
 
+Steps 0 and 0.5 are automated by `scripts/upgrade` (see
+[`UPGRADE_REHEARSAL.md`](./UPGRADE_REHEARSAL.md)); the legacy
+`scripts-dev/handle_upgrade_logic.sh`, `upgrade-helper.sh` and
+`propose-version.sh` are superseded.
+
+### 0. Start the version
+
+```bash
+make new-version V=v9            # scaffolds app/upgrades/v9, wires it, bumps Makefile VERSION
+# add --snapshot-proto only when tokenization proto types changed:
+# make new-version V=v9 NEW_VERSION_FLAGS=--snapshot-proto
+```
+
+Implement `app/upgrades/v9/upgrades.go`, add `scripts/upgrade/checks/v9.sh`
+with the assertions that prove the handler ran, and commit.
+
+### 0.5. Rehearse the upgrade (required before tagging)
+
+```bash
+make upgrade-rehearsal FROM=v8 TO=HEAD                       # upgrade + rollback + evmcheck
+make upgrade-rehearsal FROM=v8 TO=HEAD REHEARSAL_FLAGS=--all # + 4-validator determinism run
+```
+
+Exit code 0 means every check passed. Fix and re-run until it does.
+
 ### 1. Tag and Push to Origin
 
 Tag and push the current codebase as a git tag with the new version number:
@@ -93,7 +118,15 @@ Cosmovisor will automatically switch to the new binary at the specified block he
 
 #### 3.2 Mainnet Proposal
 
-Create a `mainnet-proposal.json` file in the `release-info/v9` directory:
+Create a `mainnet-proposal.json` file in the `release-info/v9` directory.
+To submit it (and vote) without hand-editing heights or keys, use
+`scripts/upgrade/propose.sh`:
+
+```bash
+scripts/upgrade/propose.sh --name v9 --home ~/.bitbadgeschain --from <key> \
+  --height <mainnet height> --expedited --deposit 1000000000000ubadge \
+  --info '<the "info" string below>'
+```
 
 **IMPORTANT: Use find-and-replace to update all version references:**
 
@@ -183,6 +216,7 @@ Summary of Upgrade: [INSERT_SUMMARY]
 -   Update all version references in the release notes template
 -   Ensure the upgrade block height and estimated time are accurate
 -   Include a comprehensive summary of changes in the release notes
+-   Run `make upgrade-rehearsal FROM=<previous> TO=<tag>` before creating the release
 -   Test the build process before creating the release
 -   Verify that all binaries are properly generated for different platforms
 -   **Double-check that no old version numbers remain in any generated files**

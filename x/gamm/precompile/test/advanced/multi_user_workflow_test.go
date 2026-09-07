@@ -44,7 +44,7 @@ func TestMultiUserWorkflowTestSuite(t *testing.T) {
 func (suite *MultiUserWorkflowTestSuite) SetupTest() {
 	suite.Reset()
 
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Create test EVM addresses
 	suite.AliceEVM = common.HexToAddress("0x1111111111111111111111111111111111111111")

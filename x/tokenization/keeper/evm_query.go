@@ -8,11 +8,14 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	evmconfig "github.com/cosmos/evm/server/config"
 	evmkeeper "github.com/cosmos/evm/x/vm/keeper"
 	"github.com/cosmos/evm/x/vm/statedb"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
 )
+
+type evmQueryContextKey struct{}
 
 // ValidateEVMQueryChallengesAreContracts ensures every EVM query challenge's contract address
 // has code on the EVM (is a contract). Call this when storing collections or approvals that
@@ -58,6 +61,9 @@ func (k Keeper) ExecuteEVMQuery(ctx sdk.Context, contractAddress string, calldat
 // Note: cosmos/evm requires the caller account to exist in auth keeper for GetSequence().
 // For read-only queries, we ensure the zero address account exists temporarily if needed.
 func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string, contractAddress string, calldata []byte, gasLimit uint64) ([]byte, error) {
+	if ctx.Value(evmQueryContextKey{}) != nil {
+		return nil, fmt.Errorf("nested EVM query is not supported")
+	}
 	if k.evmKeeper == nil {
 		return nil, fmt.Errorf("EVM keeper not available")
 	}
@@ -104,6 +110,15 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 		k.accountKeeper.SetAccount(ctx, acc)
 	}
 
+	if gasLimit == 0 {
+		gasLimit = evmconfig.DefaultGasCap
+	}
+	if remaining := ctx.GasMeter().GasRemaining(); gasLimit > remaining {
+		gasLimit = remaining
+	}
+	if gasLimit == 0 {
+		return nil, fmt.Errorf("no gas remaining for EVM query")
+	}
 	gasCap := new(big.Int).SetUint64(gasLimit)
 
 	// Run the EVM call against an isolated gas meter.
@@ -124,12 +139,7 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 	//
 	// Metering the call separately is also what this function already assumes:
 	// the EVM gas actually used is charged back onto the caller's meter below.
-	evmCtx := ctx
-	if gasLimit > 0 {
-		evmCtx = ctx.WithGasMeter(storetypes.NewGasMeter(gasLimit))
-	} else {
-		evmCtx = ctx.WithGasMeter(storetypes.NewInfiniteGasMeter())
-	}
+	evmCtx := ctx.WithValue(evmQueryContextKey{}, true).WithGasMeter(storetypes.NewGasMeter(gasLimit))
 
 	// v0.6.0: Create stateDB for non-precompile context
 	// Type-assert to real EVM keeper for stateDB creation; nil stateDB for mock keepers in tests

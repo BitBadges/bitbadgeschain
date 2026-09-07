@@ -22,6 +22,12 @@ func (gs GenesisState) Validate() error {
 
 	// Validate all manager splitters
 	for _, ms := range gs.ManagerSplitters {
+		if ms == nil {
+			return ErrInvalidAddress
+		}
+		if err := ValidateCanonicalAddresses(ms.Permissions, ms.Admin, ms.Address); err != nil {
+			return err
+		}
 		if ms.Admin == "" {
 			return ErrInvalidAdmin
 		}
@@ -32,4 +38,3 @@ func (gs GenesisState) Validate() error {
 
 	return nil
 }
-

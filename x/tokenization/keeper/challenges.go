@@ -5,13 +5,12 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-	"github.com/storyicon/sigverify"
-
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/storyicon/sigverify"
 )
 
 const (
@@ -39,7 +38,7 @@ func (k Keeper) HandleMerkleChallenges(
 	merkleProofs := transfer.MerkleProofs
 
 	// Sanity check to make sure the challenge tracker id is valid
-	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
+	if approval.ApprovalCriteria != nil && approval.ApprovalCriteria.PredeterminedBalances != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod != nil && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId != "" && approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.UseMerkleChallengeLeafIndex {
 		hasMatchingChallenge := false
 		for _, challenge := range challenges {
 			if challenge.ChallengeTrackerId == approval.ApprovalCriteria.PredeterminedBalances.OrderCalculationMethod.ChallengeTrackerId {
@@ -120,6 +119,7 @@ func (k Keeper) HandleMerkleChallenges(
 					ethAddress := ethcommon.HexToAddress(leafSignerEthAddress)
 
 					leafSignatureString := leafValue + "-" + creatorAddress
+					ctx.GasMeter().ConsumeGas(types.ETHSignatureRecoveryGas, "ETH signature recovery")
 					isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 						ethAddress,
 						[]byte(leafSignatureString),
@@ -232,6 +232,9 @@ func (k Keeper) HandleETHSignatureChallenges(
 	approvalLevel := transferMetadata.ApprovalLevel
 	challenges := approval.ApprovalCriteria.EthSignatureChallenges
 	ethSignatureProofs := transfer.EthSignatureProofs
+	if err := types.ValidateETHSignatureProofs(ethSignatureProofs); err != nil {
+		return err.Error(), err
+	}
 
 	for _, challenge := range challenges {
 		if challenge == nil || challenge.Signer == "" {
@@ -250,10 +253,10 @@ func (k Keeper) HandleETHSignatureChallenges(
 			}
 
 			// Verify the signature
-			// Signature scheme: ETHSign(nonce + "-" + initiatorAddress + "-" + collectionId + "-" + approverAddress + "-" + approvalLevel + "-" + approvalId + "-" + challengeId)
 			ethAddress := ethcommon.HexToAddress(signerAddress)
-			signatureString := proof.Nonce + "-" + initiatorAddress + "-" + collectionId.String() + "-" + approverAddress + "-" + approvalLevel + "-" + approval.ApprovalId + "-" + challengeId
+			signatureString := types.ETHSignatureChallengeMessage(ctx.ChainID(), proof.Nonce, initiatorAddress, collectionId.String(), approverAddress, approvalLevel, approval.ApprovalId, challengeId)
 
+			ctx.GasMeter().ConsumeGas(types.ETHSignatureRecoveryGas, "ETH signature recovery")
 			isValid, err := sigverify.VerifyEllipticCurveHexSignatureEx(
 				ethAddress,
 				[]byte(signatureString),
@@ -264,8 +267,10 @@ func (k Keeper) HandleETHSignatureChallenges(
 				continue
 			}
 
-			// Check if this signature has already been used
-			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Signature)
+			// Usage is tracked per nonce: the signed message binds the nonce to this exact
+			// (initiator, collection, approver, level, approval, challenge) context, so a valid
+			// signature for a nonce is one use regardless of how the signature bytes are encoded.
+			signatureKey := ConstructETHSignatureTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, challengeId, proof.Nonce)
 			numUsed, exists := k.GetETHSignatureTrackerFromStore(ctx, signatureKey)
 			if !exists {
 				numUsed = sdkmath.NewUint(0)

@@ -50,7 +50,7 @@ func (suite *E2ETestSuite) SetupTest() {
 	suite.Reset()
 
 	// Create precompile directly using our app's keeper
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Create test EVM addresses
 	suite.AliceEVM = common.HexToAddress("0x1111111111111111111111111111111111111111")

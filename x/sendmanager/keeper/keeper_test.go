@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"cosmossdk.io/core/address"
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
@@ -69,6 +69,9 @@ func initFixture(t *testing.T) *fixture {
 
 // mockBankKeeper is a minimal mock implementation of BankKeeper for testing
 type mockBankKeeper struct{}
+
+func (*mockBankKeeper) IsSendEnabledCoins(context.Context, ...sdk.Coin) error { return nil }
+func (*mockBankKeeper) BlockedAddr(sdk.AccAddress) bool                       { return false }
 
 func (m *mockBankKeeper) GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin {
 	allBalances := m.GetAllBalances(ctx, addr)

@@ -39,6 +39,9 @@ const (
 	ContractTypeMinBankBalanceChecker ContractType = "MinBankBalanceChecker"
 	// MaxUniqueHoldersChecker - EVM query invariant (maxUniqueHolders via collection stats)
 	ContractTypeMaxUniqueHoldersChecker ContractType = "MaxUniqueHoldersChecker"
+	// ERC3643Tokenization - the shipped ERC-3643 sample built on TokenizationWrappers
+	ContractTypeERC3643Tokenization ContractType = "ERC3643Tokenization"
+	ContractTypeERC3643Template     ContractType = "ERC3643Template"
 )
 
 // Contract compilation paths
@@ -81,6 +84,12 @@ func getContractPaths(contractType ContractType) (bytecodePath, abiPath string) 
 	case ContractTypeMaxUniqueHoldersChecker:
 		return "contracts/test/test_MaxUniqueHoldersChecker_sol_MaxUniqueHoldersChecker.bin",
 			"contracts/test/test_MaxUniqueHoldersChecker_sol_MaxUniqueHoldersChecker.abi"
+	case ContractTypeERC3643Tokenization:
+		return "contracts/test/ERC3643Tokenization_sol_ERC3643Tokenization.bin",
+			"contracts/test/ERC3643Tokenization_sol_ERC3643Tokenization.abi"
+	case ContractTypeERC3643Template:
+		return "contracts/test/templates_ERC3643Template_sol_ERC3643Template.bin",
+			"contracts/test/templates_ERC3643Template_sol_ERC3643Template.abi"
 	case ContractTypeMinimal:
 		fallthrough
 	default:

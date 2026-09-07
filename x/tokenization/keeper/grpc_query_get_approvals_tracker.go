@@ -8,8 +8,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	sdkmath "cosmossdk.io/math"
 )
 
 // Queries a balance for the given address and tokenId and returns its contents.
@@ -20,7 +18,10 @@ func (k Keeper) GetApprovalTracker(goCtx context.Context, req *types.QueryGetApp
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
 	address, found := k.GetApprovalTrackerFromStore(ctx, collectionId, req.ApproverAddress, req.ApprovalId, req.AmountTrackerId, req.ApprovalLevel, req.TrackerType, req.ApprovedAddress)
 	if !found {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

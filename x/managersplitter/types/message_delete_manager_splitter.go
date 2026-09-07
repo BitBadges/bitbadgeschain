@@ -32,6 +32,9 @@ func (msg *MsgDeleteManagerSplitter) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidRequest, "admin and manager splitter address cannot be the same")
 	}
 
+	if err := ValidateCanonicalAddresses(nil, msg.Admin, msg.Address); err != nil {
+		return err
+	}
+
 	return nil
 }
-

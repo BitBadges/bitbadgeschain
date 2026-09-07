@@ -2,9 +2,9 @@ package app
 
 import (
 	"cosmossdk.io/core/appmodule"
-	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
 	// this line is used by starport scaffolding # ibc/app/import
@@ -48,7 +48,7 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 	app.PoolManagerKeeper = *poolmanager.NewKeeper(
 		app.GetKey(poolmanagertypes.StoreKey),
 		app.GetSubspace(poolmanagertypes.ModuleName),
-		app.GammKeeper,
+		&app.GammKeeper,
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.DistrKeeper,
@@ -60,7 +60,7 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 	// register IBC modules
 	if err := app.RegisterModules(
 		gamm.NewAppModule(app.appCodec, app.GammKeeper, app.AccountKeeper, app.BankKeeper),
-		poolmanagermodule.NewAppModule(app.PoolManagerKeeper, app.GammKeeper),
+		poolmanagermodule.NewAppModule(&app.PoolManagerKeeper, app.GammKeeper),
 	); err != nil {
 		return err
 	}

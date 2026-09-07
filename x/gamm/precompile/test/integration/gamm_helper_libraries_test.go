@@ -113,7 +113,7 @@ func (suite *GammHelperLibrariesTestSuite) SetupTest() {
 	suite.EVMKeeper = suite.App.EVMKeeper
 
 	// Create precompile instances
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gamm.GammPrecompileAddress)
 
 	// Register and ENABLE the precompile - both steps are required!
@@ -126,7 +126,7 @@ func (suite *GammHelperLibrariesTestSuite) SetupTest() {
 	require.Equal(suite.T(), gamm.GammPrecompileAddress, suite.Precompile.ContractAddress.Hex())
 
 	// Also register and enable tokenization precompile for consistency
-	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(suite.App.TokenizationKeeper)
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(suite.App.TokenizationKeeper, suite.App.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	suite.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, tokenizationPrecompileAddr)

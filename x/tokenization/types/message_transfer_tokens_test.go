@@ -46,7 +46,8 @@ func TestMsgTransferTokens_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid state",
 			msg: types.MsgTransferTokens{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 
 				Transfers: []*types.Transfer{
 					{
@@ -77,7 +78,8 @@ func TestMsgTransferTokens_ValidateBasic(t *testing.T) {
 		}, {
 			name: "invalid amounts",
 			msg: types.MsgTransferTokens{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 
 				Transfers: []*types.Transfer{
 					{
@@ -109,7 +111,8 @@ func TestMsgTransferTokens_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid ID range",
 			msg: types.MsgTransferTokens{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 
 				Transfers: []*types.Transfer{
 					{
@@ -140,7 +143,8 @@ func TestMsgTransferTokens_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid times",
 			msg: types.MsgTransferTokens{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 
 				Transfers: []*types.Transfer{
 					{
@@ -165,7 +169,8 @@ func TestMsgTransferTokens_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid times 2",
 			msg: types.MsgTransferTokens{
-				Creator: sample.AccAddress(),
+				Creator:      sample.AccAddress(),
+				CollectionId: sdkmath.NewUint(1),
 
 				Transfers: []*types.Transfer{
 					{

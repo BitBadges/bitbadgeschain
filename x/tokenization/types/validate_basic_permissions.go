@@ -192,6 +192,9 @@ func ValidateActionPermission(permissions []*ActionPermission, canChangeValues b
 	}
 
 	for _, permission := range permissions {
+		if permission == nil {
+			return sdkerrors.Wrap(ErrInvalidRequest, "action permission is nil")
+		}
 		err := ValidatePermanentlyPermittedTimes(permission.PermanentlyPermittedTimes, permission.PermanentlyForbiddenTimes)
 		if err != nil {
 			return err

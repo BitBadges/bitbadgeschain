@@ -97,6 +97,32 @@ func (msg MsgSwapExactAmountIn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{sender}
 }
 
+var _ sdk.Msg = &MsgSwapExactAmountInWithIBCTransfer{}
+
+// ValidateBasic applies the same swap-side rules as MsgSwapExactAmountIn; the IBC leg is
+// validated by the transfer keeper when it runs.
+func (msg MsgSwapExactAmountInWithIBCTransfer) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "Invalid sender address (%s)", err)
+	}
+
+	err = SwapAmountInRoutes(msg.Routes).Validate()
+	if err != nil {
+		return err
+	}
+
+	if !msg.TokenIn.IsValid() || !msg.TokenIn.IsPositive() {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, msg.TokenIn.String())
+	}
+
+	if !msg.TokenOutMinAmount.IsPositive() {
+		return ErrNotPositiveCriteria
+	}
+
+	return nil
+}
+
 var _ sdk.Msg = &MsgSwapExactAmountOut{}
 
 func (msg MsgSwapExactAmountOut) Route() string { return RouterKey }

@@ -13,7 +13,7 @@ func TestNewPrecompile(t *testing.T) {
 	// For now, this is a placeholder test structure
 	var keeper gammkeeper.Keeper
 
-	precompile := NewPrecompile(keeper)
+	precompile := NewPrecompile(keeper, nil)
 	require.NotNil(t, precompile)
 	require.Equal(t, GammPrecompileAddress, precompile.ContractAddress.Hex())
 }

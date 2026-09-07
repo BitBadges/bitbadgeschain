@@ -5,16 +5,13 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
-
 	sdkerrors "cosmossdk.io/errors"
-	"github.com/cosmos/cosmos-sdk/runtime"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	sdkmath "cosmossdk.io/math"
-
+	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // The following methods are used for the store and everything associated with tokens.
@@ -35,6 +32,9 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 
 		// Validate EVM query challenges in invariants (format + that each contract address has code)
 		if collection.Invariants != nil {
+			if err := types.ValidateMaxSupplyWithBacking(collection.Invariants.MaxSupplyPerId, collection.Invariants.CosmosCoinBackedPath != nil); err != nil {
+				return err
+			}
 			if err := types.ValidateEVMQueryChallenges(collection.Invariants.EvmQueryChallenges); err != nil {
 				return sdkerrors.Wrap(err, "collection invariants validation failed")
 			}
@@ -1143,4 +1143,20 @@ func (k Keeper) GetAllCollectionStatsFromStore(ctx sdk.Context) (stats []*types.
 		ids = append(ids, sdkmath.NewUint(collectionId))
 	}
 	return stats, ids
+}
+
+func (k Keeper) HasCollectionsManagedBy(ctx sdk.Context, address string) (bool, error) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	iterator := storetypes.KVStorePrefixIterator(store, CollectionKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var collection types.TokenCollection
+		if err := k.cdc.Unmarshal(iterator.Value(), &collection); err != nil {
+			return false, err
+		}
+		if collection.Manager == address {
+			return true, nil
+		}
+	}
+	return false, nil
 }

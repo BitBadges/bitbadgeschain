@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
+	eip712 "github.com/cosmos/evm/ethereum/eip712"
 	precompiletypes "github.com/cosmos/evm/precompiles/types"
 	erc20 "github.com/cosmos/evm/x/erc20"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
@@ -84,6 +85,12 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
+	// The cosmos/evm EIP-712 verifier decodes sign docs through package-level
+	// codec singletons. Without this call ethsecp256k1.PubKey.VerifySignature
+	// cannot verify a Cosmos tx signed via EIP-712 and rejects it as
+	// unauthorized.
+	eip712.SetEncodingConfig(app.legacyAmino, app.interfaceRegistry, evmChainIDUint64)
+
 	// The EVM keeper needs every non-transient store so precompiles can reach
 	// the state they need (account, bank, tokenization, ...). v0.7 takes a
 	// []StoreKey slice rather than the map earlier versions took, and the EVM
@@ -154,7 +161,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		nonTransientKeys,
 		authority,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // 9-decimal chain: EVM must see precisebank, not raw x/bank
+		newEVMBankKeeper(app.PreciseBankKeeper), // 9-decimal chain: EVM must see precisebank, not raw x/bank; see evm_bank.go
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
@@ -230,17 +237,17 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 // This ensures all custom precompiles are registered and prevents address collisions
 func (app *App) registerCustomPrecompiles() {
 	// Register tokenization precompile
-	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper)
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper, app.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 
 	// Register gamm precompile
-	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper, app.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 
 	// Register sendmanager precompile
-	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper)
+	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper, app.PreciseBankKeeper)
 	sendManagerPrecompileAddr := common.HexToAddress(sendmanagerprecompile.SendManagerPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(sendManagerPrecompileAddr, sendManagerPrecompile)
 

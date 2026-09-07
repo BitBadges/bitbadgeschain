@@ -1,6 +1,8 @@
 package types
 
 import (
+	"math/big"
+
 	sdkmath "cosmossdk.io/math"
 )
 
@@ -11,15 +13,13 @@ func Add(left sdkmath.Uint, right sdkmath.Uint) sdkmath.Uint {
 }
 
 // SafeAddWithOverflowCheck adds two sdkmath.Uints and returns an error if the result overflows.
-// Note: sdkmath.Uint uses big.Int internally which handles arbitrary precision, but we keep this
-// check for defense-in-depth in case the underlying implementation changes.
+// sdkmath.Uint panics once a value needs more than 256 bits, so the bound is checked up front.
 func SafeAddWithOverflowCheck(left sdkmath.Uint, right sdkmath.Uint) (sdkmath.Uint, error) {
-	result := left.Add(right)
-	// If result is less than either operand, overflow occurred (security fix: changed && to ||)
-	if result.LT(left) || result.LT(right) {
+	sum := new(big.Int).Add(left.BigInt(), right.BigInt())
+	if sum.BitLen() > sdkmath.MaxBitLen {
 		return sdkmath.NewUint(0), ErrOverflow
 	}
-	return result, nil
+	return sdkmath.NewUintFromBigInt(sum), nil
 }
 
 // Safe subtracts two sdkmath.Uints and returns an error if the result underflows sdkmath.Uint.

@@ -277,7 +277,7 @@ library TokenizationHelpers {
      */
     function createOwnershipTimeRangeToExpiration(
         uint256 expirationTime
-    ) internal pure returns (UintRange memory range) {
+    ) internal view returns (UintRange memory range) {
         return createUintRange(block.timestamp, expirationTime);
     }
 

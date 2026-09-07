@@ -6,7 +6,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
 	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,7 +18,10 @@ func (k Keeper) GetBalance(goCtx context.Context, req *types.QueryGetBalanceRequ
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
 	collection, found := k.GetCollectionFromStore(ctx, collectionId)
 	if !found {
 		return nil, sdkerrors.Wrapf(ErrCollectionNotExists, "collection %s not found", req.CollectionId)

@@ -744,6 +744,8 @@ func (suite *TestSuite) TestMustOwnTokensBb1AddressSupport() {
 			OwnershipTimes: GetFullUintRanges(),
 		},
 	}
+	// The halt token is minted explicitly below so charlie ends up with exactly one
+	collectionsToCreate[0].Transfers = nil
 	// Keep the mint-test approval and add the default approval
 	collectionsToCreate[0].CollectionApprovals = append([]*types.CollectionApproval{
 		{

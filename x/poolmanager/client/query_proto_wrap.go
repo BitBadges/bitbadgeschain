@@ -1,17 +1,15 @@
 package client
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/client/queryprotov2"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // This file should evolve to being code gen'd, off of `proto/poolmanager/v1beta/query.yml`
@@ -65,6 +63,9 @@ func (q Querier) EstimateSwapExactAmountIn(ctx sdk.Context, req queryproto.Estim
 // EstimateSwapExactAmountInWithPrimitiveTypes runs same logic with EstimateSwapExactAmountIn
 // but instead takes array of primitive types in the request to support query through grpc-gateway.
 func (q Querier) EstimateSwapExactAmountInWithPrimitiveTypes(ctx sdk.Context, req queryproto.EstimateSwapExactAmountInWithPrimitiveTypesRequest) (*queryproto.EstimateSwapExactAmountInResponse, error) {
+	if len(req.RoutesPoolId) != len(req.RoutesTokenOutDenom) {
+		return nil, status.Error(codes.InvalidArgument, "route pool IDs and token denoms must have matching lengths")
+	}
 	if req.TokenIn == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid token")
 	}
@@ -121,6 +122,9 @@ func (q Querier) EstimateSwapExactAmountOut(ctx sdk.Context, req queryproto.Esti
 
 // EstimateSwapExactAmountOut estimates token output amount for a swap.
 func (q Querier) EstimateSwapExactAmountOutWithPrimitiveTypes(ctx sdk.Context, req queryproto.EstimateSwapExactAmountOutWithPrimitiveTypesRequest) (*queryproto.EstimateSwapExactAmountOutResponse, error) {
+	if len(req.RoutesPoolId) != len(req.RoutesTokenInDenom) {
+		return nil, status.Error(codes.InvalidArgument, "route pool IDs and token denoms must have matching lengths")
+	}
 	if req.TokenOut == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid token")
 	}
@@ -131,6 +135,7 @@ func (q Querier) EstimateSwapExactAmountOutWithPrimitiveTypes(ctx sdk.Context, r
 		var route types.SwapAmountOutRoute
 		route.PoolId = poolId
 		route.TokenInDenom = req.RoutesTokenInDenom[idx]
+		routes = append(routes, route)
 	}
 
 	if err := types.SwapAmountOutRoutes(routes).Validate(); err != nil {
@@ -323,7 +328,7 @@ func (q Querier) TotalVolumeForPool(ctx sdk.Context, req queryproto.TotalVolumeF
 
 // TradingPairTakerFee returns the taker fee for the given trading pair
 func (q Querier) TradingPairTakerFee(ctx sdk.Context, req queryproto.TradingPairTakerFeeRequest) (*queryproto.TradingPairTakerFeeResponse, error) {
-	tradingPairTakerFee, err := q.K.GetTradingPairTakerFee(ctx, req.Denom_0, req.Denom_1)
+	tradingPairTakerFee, err := q.K.EffectiveTakerFee(ctx, req.Denom_0, req.Denom_1)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -416,7 +421,7 @@ func (q Querier) AllTakerFeeShareAgreements(ctx sdk.Context, req queryproto.AllT
 }
 
 func (q Querier) TakerFeeShareAgreementFromDenom(ctx sdk.Context, req queryproto.TakerFeeShareAgreementFromDenomRequest) (*queryproto.TakerFeeShareAgreementFromDenomResponse, error) {
-	takerFeeShareAgreement, found := q.K.GetTakerFeeShareAgreementFromDenomUNSAFE(req.Denom)
+	takerFeeShareAgreement, found := q.K.GetTakerFeeShareAgreementFromDenomUNSAFE(ctx, req.Denom)
 	if !found {
 		return nil, status.Error(codes.NotFound, "taker fee share agreement not found")
 	}
@@ -448,7 +453,7 @@ func (q Querier) AllTakerFeeShareAccumulators(ctx sdk.Context, req queryproto.Al
 }
 
 func (q Querier) RegisteredAlloyedPoolFromDenom(ctx sdk.Context, req queryproto.RegisteredAlloyedPoolFromDenomRequest) (*queryproto.RegisteredAlloyedPoolFromDenomResponse, error) {
-	contractState, found := q.K.GetRegisteredAlloyedPoolFromDenomUNSAFE(req.Denom)
+	contractState, found := q.K.GetRegisteredAlloyedPoolFromDenomUNSAFE(ctx, req.Denom)
 	if !found {
 		return nil, status.Error(codes.NotFound, "denom not found")
 	}

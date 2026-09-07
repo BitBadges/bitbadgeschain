@@ -69,24 +69,39 @@ func (suite *TestSuite) TestCreateTokens() {
 		},
 	})
 
-	err = TransferTokens(suite, wctx, &types.MsgTransferTokens{
-		Creator:      bob,
-		CollectionId: sdkmath.NewUint(1),
-		Transfers: []*types.Transfer{
-			{
-				From:        "Mint",
-				ToAddresses: []string{bob},
-				Balances: []*types.Balance{
-					{
-						Amount:         sdkmath.NewUint(1),
-						TokenIds:       GetTwoUintRanges(),
-						OwnershipTimes: GetFullUintRanges(),
+	mintTokenTwo := func() error {
+		return TransferTokens(suite, wctx, &types.MsgTransferTokens{
+			Creator:      bob,
+			CollectionId: sdkmath.NewUint(1),
+			Transfers: []*types.Transfer{
+				{
+					From:        "Mint",
+					ToAddresses: []string{bob},
+					Balances: []*types.Balance{
+						{
+							Amount:         sdkmath.NewUint(1),
+							TokenIds:       GetTwoUintRanges(),
+							OwnershipTimes: GetFullUintRanges(),
+						},
 					},
+					PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
 				},
-				PrioritizedApprovals: GetDefaultPrioritizedApprovals(suite.ctx, suite.app.TokenizationKeeper, sdkmath.NewUint(1)),
 			},
-		},
+		})
+	}
+
+	// Token id 2 is not a valid token id yet
+	suite.Require().Error(mintTokenTwo(), "minting outside valid token ids must fail")
+
+	err = UpdateCollection(suite, wctx, &types.MsgUniversalUpdateCollection{
+		Creator:             bob,
+		CollectionId:        sdkmath.NewUint(1),
+		UpdateValidTokenIds: true,
+		ValidTokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(2)}},
 	})
+	suite.Require().Nil(err, "Error updating valid token ids")
+
+	err = mintTokenTwo()
 	suite.Require().Nil(err, "Error transferring token")
 
 	balance, err = GetUserBalance(suite, wctx, sdkmath.NewUint(1), bob)

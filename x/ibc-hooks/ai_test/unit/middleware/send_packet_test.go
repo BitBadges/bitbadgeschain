@@ -68,6 +68,20 @@ func (suite *SendPacketTestSuite) TestSendPacket_OverrideHook() {
 	_ = seq
 }
 
+// forwardingSendPacketOverrideHook continues the chain through SendPacketNext,
+// the way a real override (e.g. the rate limiter) does after its own check.
+type forwardingSendPacketOverrideHook struct {
+	calls int
+}
+
+func (m *forwardingSendPacketOverrideHook) SendPacketOverride(i ibc_hooks.ICS4Middleware, ctx sdk.Context, sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, data []byte) (uint64, error) {
+	m.calls++
+	if m.calls > 1 {
+		return 0, fmt.Errorf("override re-entered")
+	}
+	return i.SendPacketNext(ctx, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
+}
+
 // MockSendPacketOverrideHook is a mock implementation of SendPacketOverrideHooks
 type MockSendPacketOverrideHook struct {
 	shouldSucceed bool
@@ -83,3 +97,22 @@ func (m *MockSendPacketOverrideHook) SendPacketOverride(i ibc_hooks.ICS4Middlewa
 	return 0, fmt.Errorf("mock error")
 }
 
+
+func (suite *SendPacketTestSuite) TestSendPacket_OverrideHookContinuesToChannelOnce() {
+	hook := &forwardingSendPacketOverrideHook{}
+	ics4Middleware := ibc_hooks.NewICS4Middleware(suite.MockICS4, hook)
+	suite.ICS4Middleware = &ics4Middleware
+
+	seq, err := suite.ICS4Middleware.SendPacket(
+		suite.Ctx,
+		"transfer",
+		"channel-0",
+		clienttypes.Height{},
+		uint64(0),
+		[]byte("test data"),
+	)
+	suite.Require().NoError(err)
+	suite.Require().Equal(uint64(1), seq, "sequence must come from the wrapped channel")
+	suite.Require().Equal(1, hook.calls, "override must run exactly once")
+	suite.Require().True(suite.MockICS4.SendPacketCalled, "wrapped channel must be reached")
+}

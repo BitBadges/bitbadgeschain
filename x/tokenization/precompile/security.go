@@ -116,6 +116,14 @@ func ValidateArraySize(size int, maxSize int, fieldName string) error {
 	return nil
 }
 
+// ValidateArraySizeAllowEmpty validates array size but allows empty arrays
+func ValidateArraySizeAllowEmpty(size int, maxSize int, fieldName string) error {
+	if size > maxSize {
+		return ErrInvalidInput(fmt.Sprintf("%s size (%d) exceeds maximum allowed size (%d)", fieldName, size, maxSize))
+	}
+	return nil
+}
+
 // Maximum allowed sizes for arrays (DoS protection)
 const (
 	MaxRecipients          = 100

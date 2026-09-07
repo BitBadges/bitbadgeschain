@@ -40,8 +40,7 @@ jobs:
             echo "can_build=true" >> "$GITHUB_OUTPUT"
           fi
 
-  # `test` runs in parallel and is intentionally NON-BLOCKING: no build or
-  # release job uses `needs: test`, so a failing test will not block a release.
+  # Builds run in parallel, but publication requires passing tests.
   test:
     name: Test
     needs: preflight
@@ -147,7 +146,7 @@ jobs:
 
   release:
     name: Create Release
-    needs: [preflight, build-linux-windows, build-darwin]
+    needs: [preflight, test, build-linux-windows, build-darwin]
     if: needs.preflight.outputs.can_build == 'true'
     runs-on: ubuntu-latest
     steps:

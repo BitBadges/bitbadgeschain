@@ -32,7 +32,7 @@ func TestEventVerificationTestSuite(t *testing.T) {
 
 func (suite *EventVerificationTestSuite) SetupTest() {
 	suite.Reset()
-	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper)
+	suite.Precompile = gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 
 	// Create test addresses
 	suite.AliceEVM = common.HexToAddress("0x1111111111111111111111111111111111111111")

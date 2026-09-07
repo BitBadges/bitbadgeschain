@@ -97,7 +97,8 @@ func TestMsgUpdateUserApprovals_ValidateBasic_InvalidOutgoingApprovals(t *testin
 
 func TestMsgUpdateUserApprovals_ValidateBasic_ValidUserPermissions(t *testing.T) {
 	msg := &types.MsgUpdateUserApprovals{
-		Creator: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		Creator:      "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+		CollectionId: sdkmath.NewUint(1),
 		UserPermissions: &types.UserPermissions{
 			CanUpdateIncomingApprovals:                         []*types.UserIncomingApprovalPermission{},
 			CanUpdateOutgoingApprovals:                         []*types.UserOutgoingApprovalPermission{},

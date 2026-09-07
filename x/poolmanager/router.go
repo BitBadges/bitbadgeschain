@@ -6,17 +6,15 @@ import (
 	"math/big"
 	"strings"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 	customhookstypes "github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	queryproto "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -306,7 +304,7 @@ func (k Keeper) multihopEstimateOutGivenExactAmountInInternal(
 		actualTokenIn := tokenIn
 		// apply taker fee if applicable
 		if applyTakerFee {
-			takerFee, err := k.GetTradingPairTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
+			takerFee, err := k.EffectiveTakerFee(ctx, tokenIn.Denom, routeStep.TokenOutDenom)
 			if err != nil {
 				return osmomath.Int{}, err
 			}
@@ -432,6 +430,11 @@ func (k Keeper) RouteExactAmountOut(ctx sdk.Context,
 		if !osmoutils.Contains(denomsInvolvedInRoute, routeStep.TokenInDenom) {
 			denomsInvolvedInRoute = append(denomsInvolvedInRoute, routeStep.TokenInDenom)
 		}
+	}
+
+	// The user pays the taker fee on top of the first pool's input; the cap applies to that total.
+	if tokenInAmount.GT(tokenInMaxAmount) {
+		return osmomath.Int{}, types.ErrTokenInExceedsMax
 	}
 
 	// Run taker fee skim logic
@@ -667,7 +670,7 @@ func (k Keeper) createMultihopExpectedSwapOuts(
 
 		spreadFactor := poolI.GetSpreadFactor(ctx)
 
-		takerFee, err := k.GetTradingPairTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
+		takerFee, err := k.EffectiveTakerFee(ctx, routeStep.TokenInDenom, tokenOut.Denom)
 		if err != nil {
 			return nil, err
 		}

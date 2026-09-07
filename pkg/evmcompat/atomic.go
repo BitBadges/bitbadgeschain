@@ -29,7 +29,7 @@
 //	    return err // Rollback happens via defer
 //	}
 //
-//	atomic.Commit() // Commit changes (no-op in EVM context, writeCache in Cosmos)
+//	atomic.Commit() // Commit changes and events
 //	return nil
 package evmcompat
 
@@ -41,10 +41,10 @@ import (
 // AtomicContext provides atomic operations with automatic rollback support
 // that works correctly in both EVM precompile and normal Cosmos contexts.
 type AtomicContext struct {
-	ctx         sdk.Context
-	commit      func()
-	rollback    func()
-	committed   bool
+	ctx          sdk.Context
+	commit       func()
+	rollback     func()
+	committed    bool
 	isEvmContext bool
 }
 
@@ -64,9 +64,10 @@ type AtomicContext struct {
 func NewAtomicContext(ctx sdk.Context) *AtomicContext {
 	if snapshotter := tryGetEvmSnapshotter(ctx); snapshotter != nil {
 		idx := snapshotter.Snapshot()
+		branch := ctx.WithEventManager(sdk.NewEventManager())
 		return &AtomicContext{
-			ctx:          ctx, // Use original ctx directly in EVM context
-			commit:       func() {}, // No-op: changes already on ctx
+			ctx:          branch,
+			commit:       func() { ctx.EventManager().EmitEvents(branch.EventManager().Events()) },
 			rollback:     func() { snapshotter.RevertToSnapshot(idx) },
 			isEvmContext: true,
 		}
@@ -83,14 +84,14 @@ func NewAtomicContext(ctx sdk.Context) *AtomicContext {
 }
 
 // Ctx returns the context to use for operations.
-// In EVM context, this is the original context.
+// In EVM context, this shares the snapshot store with an isolated event manager.
 // In Cosmos context, this is the cached context.
 func (a *AtomicContext) Ctx() sdk.Context {
 	return a.ctx
 }
 
 // Commit finalizes the atomic operations.
-// In EVM context, this is a no-op (changes are already on the context).
+// In EVM context, this publishes events (store changes are already on the context).
 // In Cosmos context, this writes the cache to the parent context.
 // After Commit(), Rollback() becomes a no-op.
 func (a *AtomicContext) Commit() {

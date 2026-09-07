@@ -177,7 +177,7 @@ func (suite *EVMKeeperIntegrationTestSuite) setupAppWithEVM() {
 	// Create precompile instances
 	// Note: The precompiles should already be registered in app setup (app/evm.go:198-206)
 	// during app initialization, BEFORE InitChain is called
-	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper)
+	suite.Precompile = tokenization.NewPrecompile(suite.TokenizationKeeper, suite.App.PreciseBankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenization.TokenizationPrecompileAddress)
 
 	// Re-register to ensure it's available (workaround for test environment)
@@ -191,7 +191,7 @@ func (suite *EVMKeeperIntegrationTestSuite) setupAppWithEVM() {
 	require.Equal(suite.T(), tokenization.TokenizationPrecompileAddress, suite.Precompile.ContractAddress.Hex())
 
 	// Also register and enable gamm precompile for consistency
-	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	suite.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 	err = suite.EVMKeeper.EnableStaticPrecompiles(suite.Ctx, gammPrecompileAddr)

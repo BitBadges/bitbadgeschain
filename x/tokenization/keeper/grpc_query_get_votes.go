@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,7 +18,10 @@ func (k Keeper) GetVotes(goCtx context.Context, req *types.QueryGetVotesRequest)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	collectionId := sdkmath.NewUintFromString(req.CollectionId)
+	collectionId, err := parseQueryUint(req.CollectionId, "CollectionId")
+	if err != nil {
+		return nil, err
+	}
 
 	// Construct the prefix for all votes for this proposal
 	// The key format is: collectionId-approverAddress-approvalLevel-approvalId-proposalId-voterAddress

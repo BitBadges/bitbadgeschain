@@ -5,7 +5,6 @@ import (
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 
-	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,7 +17,10 @@ func (k Keeper) GetDynamicStoreValue(goCtx context.Context, req *types.QueryGetD
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	storeId := sdkmath.NewUintFromString(req.StoreId)
+	storeId, err := parseQueryUint(req.StoreId, "StoreId")
+	if err != nil {
+		return nil, err
+	}
 
 	dynamicStoreValue, found := k.GetDynamicStoreValueFromStore(ctx, storeId, req.Address)
 	if !found {

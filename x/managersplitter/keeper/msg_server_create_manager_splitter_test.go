@@ -5,12 +5,11 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
-
 	bitbadgesapp "github.com/bitbadges/bitbadgeschain/app"
 	"github.com/bitbadges/bitbadgeschain/x/managersplitter/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/managersplitter/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 )
 
 // Like setupMsgServer, but also hands back the keeper and sdk.Context so a test
@@ -34,7 +33,7 @@ func TestCreateManagerSplitterStoresAndReturnsDerivedAddress(t *testing.T) {
 
 	perms := &types.ManagerSplitterPermissions{
 		CanDeleteCollection: &types.PermissionCriteria{
-			ApprovedAddresses: []string{"bb1approved1", "bb1approved2"},
+			ApprovedAddresses: []string{sdk.AccAddress([]byte("splitter-delegate-01")).String(), sdk.AccAddress([]byte("splitter-delegate-02")).String()},
 		},
 	}
 

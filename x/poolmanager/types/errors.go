@@ -24,6 +24,7 @@ var (
 	ErrSetRegisteredAlloyedPool                  = errors.New("error setting registered alloyed pool")
 	ErrInvalidKeyFormat                          = errors.New("invalid key format")
 	ErrTotalAlloyedLiquidityIsZero               = errors.New("totalAlloyedLiquidity is zero")
+	ErrTokenInExceedsMax                         = errors.New("token in amount including taker fee exceeds tokenInMaxAmount")
 )
 
 type nonPositiveAmountError struct {
