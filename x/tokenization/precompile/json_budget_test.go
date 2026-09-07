@@ -31,3 +31,21 @@ func TestJSONBudgetChargesBeforeRunningOutOfGas(t *testing.T) {
 	ctx := sdk.Context{}.WithGasMeter(storetypes.NewGasMeter(GasPerApprovalField))
 	require.Panics(t, func() { _ = meterJSONInput(ctx, `{"standards":["a","b"]}`) })
 }
+
+func BenchmarkV35JSONBudget(b *testing.B) {
+	for _, size := range []int{100, 10000} {
+		b.Run(fmt.Sprintf("string-%d", size), func(b *testing.B) {
+			payload := `{"standards":["` + strings.Repeat("a", size) + `"]}`
+			b.ReportAllocs()
+			var gas uint64
+			for i := 0; i < b.N; i++ {
+				ctx := sdk.Context{}.WithGasMeter(storetypes.NewInfiniteGasMeter())
+				if err := meterJSONInput(ctx, payload); err != nil {
+					b.Fatal(err)
+				}
+				gas = ctx.GasMeter().GasConsumed()
+			}
+			b.ReportMetric(float64(gas), "gas/op")
+		})
+	}
+}

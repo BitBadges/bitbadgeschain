@@ -6,19 +6,17 @@ last-verified: 2026-09-06
 ## [1] Before setting an upgrade height
 
 The security regression suite and captured-state replay do not establish a
-validator's upgrade-block capacity. Do not set a height until these checks pass:
+validator's upgrade-block capacity. Complete the in-scope checks below before setting a height:
 
 1. Capture the migration prefixes at a recent fixed mainnet height using
    `python3 scripts/upgrade/scan-v35-state.py --height HEIGHT --out /tmp/v35-HEIGHT`.
    The RPC must retain that height and expose read-only ABCI subspace queries.
    Preserve the raw responses and counts. Recheck immediately before the proposal
    because pre-v35 state can still be inflated cheaply.
-2. Rehearse against a full mainnet database snapshot in an isolated environment,
-   with no production peer connectivity or validator signing key. Measure all
-   migrations, peak RSS, and disk writes on validator-class storage. The ordinary
-   `scripts/upgrade/rehearse.sh` initializes a new test chain; it does **not**
-   replace this prerequisite. The automated populated replay below injects only
-   captured module rows into a test app, not the complete IAVL database.
+2. Full-mainnet-database rehearsal is excluded from this release scope by the
+   release owner's explicit instruction on 2026-09-06. Use the populated-state
+   replay and the fresh local upgrade/rollback/EVM/multivalidator rehearsal.
+   These do not establish full-mainnet IAVL timing; record that limitation.
 3. Measure a block filled with the most expensive allowed JSON/precompile and
    ETH-recovery work on validator-class hardware, including nested alias routing.
    The 100,000,000 block gas limit is a ceiling, not a demonstrated throughput
@@ -120,3 +118,36 @@ actual tokenization precompile. Regenerate the checked-in ABI/bytecode with
 by digest. A source-hash regression rejects stale fixtures after Solidity edits.
 The examples restore wrapper approvals after minting, debit actual holders,
 use millisecond ownership times, and exercise credential/carbon issuance.
+
+
+## [5] Release-candidate evidence (2026-09-06)
+
+Consensus/application source tested: `815e88068cd5968c534863935557fcd0645ba35e`.
+Chain and SDK CI passed. The complete local `--all` rehearsal passed build,
+upgrade, rollback, EVM checks and four-validator app-hash agreement, including
+transaction-bearing blocks before and after upgrade. Fresh scan at height
+11,980,782 returned byte-identical audited module rows to height 11,979,578.
+Mainnet's enabled precompile list includes 0x1001, 0x1002 and 0x1003.
+
+On a local Apple M5 Pro Linux/arm64 container capped at **2 CPUs / 4 GiB**, two
+sampled near-cap transactions executed successfully with the reviewed binary:
+
+| Workload | Receipt gas | Finalize through commit (log timestamps) |
+| --- | --- | --- |
+| 28,000 valid-curve EVM signature recoveries | 95,410,717 | 1.088 s |
+| 400 rejected tokenization calls with a 10KB string, caught by Solidity | 99,545,863 | 0.140 s |
+
+Container peak memory during the probe was 331,165,696 bytes (~316 MiB).
+The precompile probe explicitly enables the custom precompiles; a call to an
+inactive precompile is not valid performance or functional evidence. Receipts
+were successful while every nested tokenization call failed, confirming the
+caller pays gas despite catching errors. These samples support retaining 100M
+for the candidate; they are **not exhaustive worst-case coverage** of state-heavy
+alias routing or a benchmark of the actual production validators.
+
+Packed SDK 0.45.0 consumer checks: frontend 276 unit tests and typecheck; indexer
+10 v35 tests and 32 EIP-712/auth tests. The HTTP smoke passed unsigned simulation,
+foreign-session/tampering/concurrent replay rejection, cookie rotation, private
+claim gating, and execution of the same EIP-712 signature on the reviewed binary.
+SDK publication, registry-backed consumer lockfiles/CI, and the final browser
+wallet check remain separate release steps.
