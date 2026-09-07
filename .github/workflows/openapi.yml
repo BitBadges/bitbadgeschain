@@ -1,0 +1,365 @@
+# Regenerates the chain's API spec from proto and commits BOTH:
+#
+#   docs/static/openapi.yml   Swagger 2.0, JSON-encoded despite the .yml
+#                             extension (that is what ignite already writes and
+#                             what docs/docs.go serves at /static/openapi.yml).
+#                             Regenerated in place; format unchanged.
+#
+#   docs/openapi/openapi.json OpenAPI 3.1, retagged by module. NEW path. The
+#                             docs site consumes this one.
+#
+# ==========================================================================
+# WHY docs/openapi/ AND NOT docs/static/  — DO NOT "TIDY" THIS BACK
+# ==========================================================================
+# docs/docs.go contains:
+#
+#     //go:embed static
+#     var Static embed.FS
+#
+# The embed pattern is the whole `static` DIRECTORY, so every byte under
+# docs/static is compiled into the bitbadgeschaind release binary. Today that
+# is one ~992 KB file. RegisterOpenAPIService only ever serves
+# `/static/openapi.yml`:
+#
+#     const apiFile = "/static/openapi.yml"
+#     rtr.Handle(apiFile, http.FileServer(http.FS(Static)))
+#
+# So dropping the converted OpenAPI 3.1 JSON into docs/static/ would add
+# roughly another megabyte to every release binary and every validator's
+# download, for a file the node never serves. docs/openapi/ sits outside the
+# embed pattern and costs the binary nothing. This mirrors how bitbadgesjs
+# keeps its published spec in openapi-hosted/ rather than in package source.
+#
+# ==========================================================================
+# WHY buf AND NOT `ignite generate openapi`
+# ==========================================================================
+# config.yml (client.openapi.path: docs/static/openapi.yml) makes
+# `ignite generate openapi` the canonical local command, and it stays the right
+# thing to run on a developer machine.
+#
+# HISTORY, so nobody re-litigates this from a stale premise: the original
+# argument for buf was that go.mod carried
+# `replace github.com/cosmos/evm => <private module>`, which CI had no
+# credentials for — .github/workflows/build.yml still carries the `preflight`
+# job written for exactly that. THAT IS NO LONGER TRUE. Commit aa1934c1
+# ("build: move to the public cosmos/evm v0.7.3 release") removed the replace;
+# go.mod now requires the public github.com/cosmos/evm v0.7.3, the preflight
+# gate evaluates to can_build=true, and `Build & test` runs for real on master.
+#
+# buf is kept anyway, on its own merits:
+#
+#   * It reads .proto files and buf.lock dependencies only, so spec generation
+#     never depends on the chain's Go module graph compiling. That decoupling
+#     is what keeps this job green through a dependency breakage that has
+#     nothing to do with the API surface — the exact failure mode that
+#     motivated the preflight job in the first place.
+#   * The ignite CLI is not installed in CI and pulls a large toolchain; buf is
+#     a pinned setup action plus one pinned `go install` of the plugin.
+#   * `ignite generate openapi` also rewrites unrelated generated trees, which
+#     would pollute the PR this job opens.
+#
+# Switching to ignite is now technically possible. If anyone does, verify the
+# output matches byte-for-byte first: the merge behaviour below is ignite's,
+# reimplemented via allow_merge.
+
+name: Generate OpenAPI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'proto/**'
+      - 'scripts/gen-openapi.ts'
+      - '.github/workflows/openapi.yml'
+      - '.github/openapi/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: generate-openapi
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          # The module graph is unresolvable (private cosmos/evm replace), and
+          # this job never builds the chain — only `go install` of an unrelated
+          # module, which does not read go.mod. Caching would try to resolve it.
+          cache: false
+
+      - name: Setup buf
+        # No floating major tag exists on this action (refs/tags/v1 is 404), so
+        # this is pinned to an exact release. Bump deliberately.
+        uses: bufbuild/buf-setup-action@v1.50.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install protoc-gen-openapiv2
+        run: |
+          set -euo pipefail
+          # Pinned. `go install pkg@version` runs outside the current module,
+          # so the private cosmos/evm replace in go.mod is not consulted.
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/cmd/protoc-gen-openapiv2@v2.27.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Verify the plugin is on PATH
+        run: protoc-gen-openapiv2 --version || true
+
+      - name: Generate Swagger 2.0 from proto
+        run: |
+          set -euo pipefail
+          # proto/buf.gen.swagger.yaml is ignite-managed ("auto-generated from
+          # Ignite") and emits one file PER SERVICE with out: `.` — ignite
+          # merges them afterwards. CI needs a single merged document, so it
+          # uses its own template that adds allow_merge. The plugin opts are
+          # otherwise copied verbatim from the ignite file; keep them in sync if
+          # ignite ever regenerates it.
+          if [ ! -f .github/openapi/buf.gen.openapiv2.yaml ]; then
+            echo "::error::.github/openapi/buf.gen.openapiv2.yaml is missing."
+            exit 1
+          fi
+          rm -rf .openapi-out
+          mkdir -p .openapi-out
+          buf generate --template .github/openapi/buf.gen.openapiv2.yaml -o .openapi-out proto
+
+          MERGED=$(find .openapi-out -name '*.swagger.json' | head -1)
+          if [ -z "$MERGED" ]; then
+            echo "::error::buf produced no *.swagger.json — allow_merge did not take effect, or generation failed."
+            find .openapi-out -type f | head -50
+            exit 1
+          fi
+          echo "merged=$MERGED"
+
+          # docs/static/openapi.yml holds JSON despite the extension. That is
+          # ignite's existing convention and docs.go serves it as-is; do not
+          # "fix" it to real YAML without checking the console template.
+          mkdir -p docs/static
+          cp "$MERGED" docs/static/openapi.yml
+
+      - name: Convert to OpenAPI 3.1 and retag by module
+        run: |
+          set -euo pipefail
+          if [ ! -f scripts/gen-openapi.ts ]; then
+            echo "::error::scripts/gen-openapi.ts is missing."
+            echo "::error::It must read docs/static/openapi.yml and write docs/openapi/openapi.json,"
+            echo "::error::converting Swagger 2.0 -> OpenAPI 3.1 and retagging operations by module."
+            exit 1
+          fi
+          mkdir -p docs/openapi
+          # --in and --out are passed explicitly and deliberately. The
+          # script's built-in default output IS docs/openapi/openapi.json
+          # already, but the destination must never be inferred: writing the
+          # converted document anywhere under docs/static/ puts ~1 MB into the
+          # //go:embed'd tree and therefore into every release binary (see the
+          # header). Stating the path here means a future change to the
+          # script's defaults cannot silently move it.
+          bun scripts/gen-openapi.ts \
+            --in docs/static/openapi.yml \
+            --out docs/openapi/openapi.json
+          if [ ! -f docs/openapi/openapi.json ]; then
+            echo "::error::scripts/gen-openapi.ts did not write docs/openapi/openapi.json."
+            echo "::error::Check that it still honours --out."
+            exit 1
+          fi
+
+      - name: Validate the converted document
+        run: |
+          set -euo pipefail
+          bun -e '
+            const fs = require("fs");
+            const f = "docs/openapi/openapi.json";
+            let doc;
+            try {
+              doc = JSON.parse(fs.readFileSync(f, "utf8"));
+            } catch (e) {
+              console.error(`FAIL: ${f} is not valid JSON — ${e.message}`);
+              process.exit(1);
+            }
+
+            const version = doc.openapi;
+            if (typeof version !== "string" || !/^3\./.test(version)) {
+              console.error(`FAIL: openapi is ${JSON.stringify(version)} (expected a 3.x string).`);
+              if (doc.swagger) console.error("Conversion did not run — this is still Swagger 2.0.");
+              process.exit(1);
+            }
+
+            // PATH FLOOR — read this before "fixing" the number.
+            //
+            // The Swagger source carries 282 paths, but 219 of them are gRPC
+            // selector pseudo-paths and the converter drops every one (the LCD
+            // answers them with 501). The published document therefore carries
+            // 62 paths, not 282. A floor of 200 would fail on every correct
+            // run. 40 is a truncation alarm: it catches buf merging only some
+            // services, while leaving room for modules to come and go.
+            const paths = Object.keys(doc.paths ?? {});
+            if (paths.length < 40) {
+              console.error(`FAIL: only ${paths.length} paths (expected at least 40; 62 today).`);
+              console.error("A drop this large means buf merged only some services, or the prune step over-matched.");
+              process.exit(1);
+            }
+
+            const resolve = (ptr) => {
+              if (!ptr.startsWith("#/")) return "external";
+              let node = doc;
+              for (const rawSeg of ptr.slice(2).split("/")) {
+                const seg = rawSeg.replace(/~1/g, "/").replace(/~0/g, "~");
+                if (node === null || typeof node !== "object" || !(seg in node)) return null;
+                node = node[seg];
+              }
+              return node;
+            };
+            const broken = new Set();
+            const external = new Set();
+            const walk = (node) => {
+              if (Array.isArray(node)) return node.forEach(walk);
+              if (node === null || typeof node !== "object") return;
+              if (typeof node.$ref === "string") {
+                const r = resolve(node.$ref);
+                if (r === null) broken.add(node.$ref);
+                else if (r === "external") external.add(node.$ref);
+              }
+              for (const v of Object.values(node)) walk(v);
+            };
+            walk(doc);
+            if (external.size) {
+              console.error(`FAIL: ${external.size} external $ref(s) — the published document must be self-contained:`);
+              for (const r of [...external].slice(0, 20)) console.error(`  - ${r}`);
+              process.exit(1);
+            }
+            if (broken.size) {
+              console.error(`FAIL: ${broken.size} unresolvable $ref(s) — conversion dropped definitions:`);
+              for (const r of [...broken].slice(0, 20)) console.error(`  - ${r}`);
+              if (broken.size > 20) console.error(`  ... and ${broken.size - 20} more`);
+              process.exit(1);
+            }
+
+            const METHODS = new Set(["get", "put", "post", "delete", "options", "head", "patch", "trace"]);
+            const GENERIC = new Set(["Query", "Msg"]);
+            const untagged = [];
+            let ops = 0;
+            for (const [p, item] of Object.entries(doc.paths ?? {})) {
+              for (const [method, op] of Object.entries(item ?? {})) {
+                if (!METHODS.has(method.toLowerCase())) continue;
+                ops++;
+                const tags = Array.isArray(op?.tags) ? op.tags : [];
+                if (tags.length === 0 || tags.every((t) => GENERIC.has(t))) {
+                  untagged.push(`${method.toUpperCase()} ${p} [${tags.join(", ") || "no tags"}]`);
+                }
+              }
+            }
+            if (untagged.length) {
+              console.error(`FAIL: ${untagged.length} of ${ops} operation(s) carry no module tag beyond Query/Msg:`);
+              for (const o of untagged.slice(0, 20)) console.error(`  - ${o}`);
+              if (untagged.length > 20) console.error(`  ... and ${untagged.length - 20} more`);
+              console.error("Every operation must be retagged by module (badges, gamm, tokenization, ...).");
+              process.exit(1);
+            }
+
+            // ZERO PSEUDO-PATHS. buf writes every gRPC method without a
+            // google.api.http annotation as a selector path
+            // (/tokenization.Msg/CreateCollection). The LCD answers those with
+            // 501, so publishing one hands the reader a playground button that
+            // cannot work. Same shape the converter prunes on.
+            const PSEUDO_PATH = /^\/[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)*\.[A-Z][A-Za-z0-9]*\/[A-Za-z0-9_]+$/;
+            const pseudo = paths.filter((p) => PSEUDO_PATH.test(p));
+            if (pseudo.length) {
+              console.error(`FAIL: ${pseudo.length} gRPC pseudo-path(s) survived the prune step:`);
+              for (const p of pseudo.slice(0, 20)) console.error(`  - ${p}`);
+              if (pseudo.length > 20) console.error(`  ... and ${pseudo.length - 20} more`);
+              process.exit(1);
+            }
+
+            // READ-ONLY SURFACE. The gateway implements queries only; a POST
+            // returns 501 whether or not the route is annotated. Transactions
+            // are signed and broadcast, never POSTed to the LCD.
+            const writes = [];
+            for (const [p, item] of Object.entries(doc.paths ?? {})) {
+              for (const method of Object.keys(item ?? {})) {
+                const m = method.toLowerCase();
+                if (METHODS.has(m) && m !== "get") writes.push(`${m.toUpperCase()} ${p}`);
+              }
+            }
+            if (writes.length) {
+              console.error(`FAIL: ${writes.length} non-GET operation(s) survived the prune step:`);
+              for (const o of writes.slice(0, 20)) console.error(`  - ${o}`);
+              process.exit(1);
+            }
+
+            console.log(`OK: openapi=${version}, paths=${paths.length}, operations=${ops}, all $refs resolve, all operations module-tagged, no pseudo-paths, GET-only.`);
+          '
+
+      - name: Guard the embedded binary size
+        run: |
+          set -euo pipefail
+          # docs/static is embedded in bitbadgeschaind. A runaway spec here ships
+          # to every validator, so a large jump is a bug until proven otherwise.
+          SIZE=$(wc -c < docs/static/openapi.yml | tr -d ' ')
+          echo "docs/static/openapi.yml: $SIZE bytes"
+          if [ "$SIZE" -gt 3000000 ]; then
+            echo "::error::Embedded spec exceeded 3 MB. It was ~992 KB. Investigate before this reaches a release binary."
+            exit 1
+          fi
+          if [ -d docs/openapi ]; then
+            echo "docs/openapi (NOT embedded): $(du -sh docs/openapi | cut -f1)"
+          fi
+          # Fail loudly if anyone ever moved the converted doc under the embed.
+          if [ -f docs/static/openapi.json ]; then
+            echo "::error::docs/static/openapi.json exists. That directory is //go:embed'd into the release"
+            echo "::error::binary and the node never serves this file. Move it back to docs/openapi/."
+            exit 1
+          fi
+
+      - name: Clean the scratch output
+        run: rm -rf .openapi-out
+
+      - name: Open PR
+        id: pr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: master
+          branch: chore/regen-openapi
+          delete-branch: true
+          add-paths: |
+            docs/static/openapi.yml
+            docs/openapi/openapi.json
+          commit-message: 'chore(openapi): regenerate chain API spec from proto'
+          title: 'chore(openapi): regenerate chain API spec from proto'
+          body: |
+            Automated regeneration from `proto/**`.
+
+            - `docs/static/openapi.yml` — Swagger 2.0 served by the node at
+              `/static/openapi.yml`. This directory is `//go:embed`'d into
+              `bitbadgeschaind`, so its size ships in every release binary.
+            - `docs/openapi/openapi.json` — OpenAPI 3.1, retagged by module,
+              consumed by the docs site. Deliberately **outside** the embed.
+
+            Gates passed: OpenAPI 3.x, path count above the truncation floor,
+            every `$ref` resolves, no operation left tagged only `Query`/`Msg`,
+            zero gRPC pseudo-paths, GET-only, embedded spec under the size
+            ceiling.
+          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+
+      - name: Report
+        run: |
+          if [ -n "${{ steps.pr.outputs.pull-request-number }}" ]; then
+            echo "PR #${{ steps.pr.outputs.pull-request-number }}: ${{ steps.pr.outputs.pull-request-url }}"
+          else
+            echo "Spec already up to date — nothing to do."
+          fi
