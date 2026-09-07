@@ -34,6 +34,7 @@ Balancer fee fields in proto messages contain scaled integer strings (for exampl
 3000000000000000), as supplied by the frontend. Decimal text such as 0.003 is not
 valid protobuf wire input for the Go custom decimal type.
 
-The published v35 tag/assets are unchanged. The sendmanager chain registration
-needs a subsequent coordinated binary release; merge alone does not activate it.
-Publish/adopt the companion SDK only in coordination with that chain support.
+v35 has not rolled out. After human merge, retag v35 at the merged chain commit
+and regenerate its release binaries and checksums before rollout. Merge alone
+does not activate this registration. Publish/adopt the companion SDK in
+coordination with the updated v35 binary.
