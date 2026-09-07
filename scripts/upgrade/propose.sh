@@ -7,7 +7,7 @@
 #   propose.sh --name v35 --home ~/.bitbadgeschain --from mykey \
 #     [--deposit 10000000ubadge] [--height +N | --height 12345] \
 #     [--chain-id X] [--node tcp://...] [--bin bitbadgeschaind] \
-#     [--keyring-backend os] [--fees 0ubadge | --gas-prices 10ubadge] \
+#     [--keyring-backend os] [--fees <amount>ubadge | --gas-prices 10ubadge] \
 #     [--expedited] [--info '<binaries json>'] [--voters key1,key2] \
 #     [--no-vote] [--wait 6] [--dry-run] [--allow-mainnet]
 #
