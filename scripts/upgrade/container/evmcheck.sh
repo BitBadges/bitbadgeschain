@@ -32,7 +32,7 @@ FUND=100000000000000
 enable_rpc_and_api "$DH/config/app.toml"
 
 step "2. Start the node"
-"$BIN" start --home "$DH" --minimum-gas-prices "0${BOND_DENOM}" > "$LOG_DIR/evmnode.log" 2>&1 &
+"$BIN" start --home "$DH" --minimum-gas-prices 10ubadge > "$LOG_DIR/evmnode.log" 2>&1 &
 PID=$!
 wait_for_height "$BIN" 2 120 --home "$DH" || { tail -20 "$LOG_DIR/evmnode.log"; die "node never started from a fresh init"; }
 grn "node at height $H"
@@ -61,7 +61,7 @@ check "eth_getBalance equals bank ubadge x 10^9"          [ "$WEI" = "$EXPECTED"
 step "4. A transaction still works"
 RECV=$("$BIN" keys show v -a "${KR[@]}" --home "$DH")
 SEND_OUT=$("$BIN" tx bank send "$ADDR" "$RECV" 1000ubadge --from user "${KR[@]}" --home "$DH" \
-  --chain-id "$CHAIN_ID" --gas auto --gas-adjustment 1.5 --fees "0${BOND_DENOM}" -y 2>&1 || true)
+  --chain-id "$CHAIN_ID" --gas auto --gas-adjustment 1.5 --gas-prices 10ubadge -y 2>&1 || true)
 sleep 6
 TXH=$(tx_hash_of "$SEND_OUT")
 if [ -n "$TXH" ]; then

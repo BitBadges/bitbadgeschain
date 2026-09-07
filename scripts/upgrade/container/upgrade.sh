@@ -69,7 +69,7 @@ export DAEMON_NAME=bitbadgeschaind DAEMON_HOME=$DH DAEMON_ALLOW_DOWNLOAD_BINARIE
 grn "cosmovisor laid out: genesis=FROM, upgrades/$UPGRADE_NAME=TO"
 
 step "3. Start cosmovisor (FROM) - nothing after this point is hands-on"
-"$CV" run start --home "$DH" --minimum-gas-prices "0${BOND_DENOM}" > "$LOG" 2>&1 &
+"$CV" run start --home "$DH" --minimum-gas-prices 10ubadge > "$LOG" 2>&1 &
 CV_PID=$!
 wait_for_height "$FROM_BIN" 2 120 --home "$DH" || { tail -30 "$LOG"; die "node never produced a block"; }
 grn "FROM node is producing blocks (height $H)"
@@ -77,7 +77,7 @@ grn "FROM node is producing blocks (height $H)"
 step "4. Submit and pass the $UPGRADE_NAME upgrade proposal"
 PROPOSE_OUT=$("$PROPOSE" --name "$UPGRADE_NAME" --home "$DH" --from validator \
   --bin "$FROM_BIN" --chain-id "$CHAIN_ID" --keyring-backend test \
-  --deposit "10${DEPOSIT_DENOM}" --fees "0${BOND_DENOM}" --height +25)
+  --deposit "10${DEPOSIT_DENOM}" --gas-prices 10ubadge --height +25)
 echo "$PROPOSE_OUT"
 UPGRADE_HEIGHT=$(sed -n 's/^UPGRADE_HEIGHT=//p' <<<"$PROPOSE_OUT")
 PID=$(sed -n 's/^PROPOSAL_ID=//p' <<<"$PROPOSE_OUT")

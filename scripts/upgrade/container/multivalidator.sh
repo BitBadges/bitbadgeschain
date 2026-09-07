@@ -105,7 +105,7 @@ export DAEMON_NAME=bitbadgeschaind DAEMON_ALLOW_DOWNLOAD_BINARIES=false \
        DAEMON_RESTART_AFTER_UPGRADE=true UNSAFE_SKIP_BACKUP=true
 PIDS=()
 for i in $(seq 0 $((N-1))); do
-  DAEMON_HOME=$(home "$i") "$CV" run start --home "$(home "$i")" --minimum-gas-prices "0${BOND_DENOM}" \
+  DAEMON_HOME=$(home "$i") "$CV" run start --home "$(home "$i")" --minimum-gas-prices 10ubadge \
     > "$LOG_DIR/mv-node$i.log" 2>&1 &
   PIDS+=($!)
 done
@@ -122,7 +122,7 @@ API0="http://127.0.0.1:1317"
 fee_flags(){
   local mgp
   mgp=$(curl -s --max-time 5 "$API0/cosmos/evm/feemarket/v1/params" | jq -r '.params.min_gas_price // "0"' 2>/dev/null || echo 0)
-  echo "--gas-prices $(python3 -c 'import sys; from decimal import Decimal; print(format(Decimal(sys.argv[1] or 0), "f"))' "$mgp")ubadge"
+  echo "--gas-prices $(python3 -c 'import sys; from decimal import Decimal; print(format(max(Decimal(sys.argv[1] or 0), Decimal(10)), "f"))' "$mgp")ubadge"
 }
 
 for _ in $(seq 1 90); do
@@ -189,7 +189,7 @@ send_and_confirm "pre-upgrade transfer" "$FROM_BIN" 1000
 step "6. Propose and pass the $UPGRADE_NAME upgrade"
 PROPOSE_OUT=$("$PROPOSE" --name "$UPGRADE_NAME" --home "$(home 0)" --from val0 --voters val1,val2,val3 \
   --bin "$FROM_BIN" --node "$NODE0" --chain-id "$CHAIN_ID" --keyring-backend test \
-  --deposit "10${DEPOSIT_DENOM}" --fees "0${BOND_DENOM}" --height +30)
+  --deposit "10${DEPOSIT_DENOM}" --gas-prices 10ubadge --height +30)
 echo "$PROPOSE_OUT"
 UPGRADE_HEIGHT=$(sed -n 's/^UPGRADE_HEIGHT=//p' <<<"$PROPOSE_OUT")
 PID_=$(sed -n 's/^PROPOSAL_ID=//p' <<<"$PROPOSE_OUT")
