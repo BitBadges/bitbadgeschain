@@ -168,6 +168,29 @@ func (s *KeeperTestSuite) TestBalancerPoolSimpleSwapExactAmountIn() {
 	}
 }
 
+func (s *KeeperTestSuite) TestSwapExactAmountInChecksMinimumAfterAffiliateFees() {
+	poolID := s.PrepareBalancerPool()
+	pool, err := s.App.GammKeeper.GetPool(s.Ctx, poolID)
+	s.Require().NoError(err)
+
+	affiliates := []poolmanagertypes.Affiliate{{
+		Address:        s.TestAccs[1].String(),
+		BasisPointsFee: "1000",
+	}}
+	_, err = s.App.GammKeeper.SwapExactAmountIn(
+		s.Ctx,
+		s.TestAccs[0],
+		pool,
+		sdk.NewCoin("foo", osmomath.NewInt(100000)),
+		"bar",
+		osmomath.NewInt(49000),
+		osmomath.ZeroDec(),
+		affiliates,
+	)
+
+	s.Require().ErrorIs(err, types.ErrLimitMinAmount)
+}
+
 // TestCalcOutAmtGivenIn only tests that balancer and stableswap pools are type casted correctly while concentratedliquidity pools fail
 // TODO: add failing CL pool tests.
 func (s *KeeperTestSuite) TestCalcOutAmtGivenIn() {

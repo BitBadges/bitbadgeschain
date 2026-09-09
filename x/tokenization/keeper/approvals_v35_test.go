@@ -15,6 +15,10 @@ import (
 
 // Shared helpers for the v35 approval regression tests below.
 
+func legacyApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, approvalID, amountTrackerID, level, trackerType, address string) string {
+	return strings.Join([]string{collectionID.String(), addressForApproval, approvalID, amountTrackerID, level, trackerType, address}, keeper.BalanceKeyDelimiter)
+}
+
 func v35Permissions() *types.CollectionPermissions {
 	return &types.CollectionPermissions{
 		CanArchiveCollection:         []*types.ActionPermission{},
@@ -185,16 +189,16 @@ func (suite *TestSuite) TestMigrateV35CanonicalAddressesMergesEntries() {
 	suite.Require().NoError(k.SetAddressListInStore(suite.ctx, types.AddressList{ListId: "l1", Addresses: []string{upperAlice, alice, bob}, Whitelist: true, CreatedBy: upperBob}))
 
 	// Approval trackers (approver component and per-address component).
-	upperTrackerKey := keeper.ConstructApprovalTrackerKey(one, "", "claim", "t", "collection", "initiatedBy", upperAlice)
-	canonTrackerKey := keeper.ConstructApprovalTrackerKey(one, "", "claim", "t", "collection", "initiatedBy", alice)
+	upperTrackerKey := legacyApprovalTrackerKey(one, "", "claim", "t", "collection", "initiatedBy", upperAlice)
+	canonTrackerKey := legacyApprovalTrackerKey(one, "", "claim", "t", "collection", "initiatedBy", alice)
 	suite.Require().NoError(k.SetApprovalTrackerInStoreViaKey(suite.ctx, upperTrackerKey, types.ApprovalTracker{NumTransfers: sdkmath.NewUint(2), Amounts: []*types.Balance{{Amount: sdkmath.NewUint(2), TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}}, LastUpdatedAt: sdkmath.NewUint(10)}))
 	suite.Require().NoError(k.SetApprovalTrackerInStoreViaKey(suite.ctx, canonTrackerKey, types.ApprovalTracker{NumTransfers: one, Amounts: []*types.Balance{{Amount: one, TokenIds: GetOneUintRange(), OwnershipTimes: GetFullUintRanges()}}, LastUpdatedAt: sdkmath.NewUint(5)}))
-	approverOnlyKey := keeper.ConstructApprovalTrackerKey(one, upperBob, "a", "t", "incoming", "overall", "")
+	approverOnlyKey := legacyApprovalTrackerKey(one, upperBob, "a", "t", "incoming", "overall", "")
 	suite.Require().NoError(k.SetApprovalTrackerInStoreViaKey(suite.ctx, approverOnlyKey, types.ApprovalTracker{NumTransfers: sdkmath.NewUint(7), Amounts: []*types.Balance{}, LastUpdatedAt: one}))
 
 	// Used merkle-leaf and ETH signature trackers.
-	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, keeper.ConstructUsedClaimChallengeKey(one, upperBob, "incoming", "a", "c", one), one))
-	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, keeper.ConstructUsedClaimChallengeKey(one, bob, "incoming", "a", "c", one), one))
+	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, legacyChallengeTrackerKeyForTest(one, upperBob, "incoming", "a", "c", one), one))
+	suite.Require().NoError(k.SetChallengeTrackerInStore(suite.ctx, legacyChallengeTrackerKeyForTest(one, bob, "incoming", "a", "c", one), one))
 	suite.Require().NoError(k.SetETHSignatureTrackerInStore(suite.ctx, "1-"+upperBob+"-incoming-a-c-n1", one))
 
 	// Approval versions.

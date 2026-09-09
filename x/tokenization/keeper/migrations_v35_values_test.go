@@ -127,15 +127,15 @@ func (suite *TestSuite) TestMigrateV35ApprovalAddressValues() {
 func (suite *TestSuite) TestMigrateV35PreservesVoterEntriesAndNormalizesApproverScope() {
 	k := suite.app.TokenizationKeeper
 	upper := strings.ToUpper(bob)
-	oldKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), upper, "incoming", "approval", "proposal", upper)
-	newKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), bob, "incoming", "approval", "proposal", bob)
+	oldKey := legacyVotingKeyForTest(sdkmath.OneUint(), upper, "incoming", "approval", "proposal", upper)
+	newKey := legacyVotingKeyForTest(sdkmath.OneUint(), bob, "incoming", "approval", "proposal", bob)
 	vote := &types.VoteProof{ProposalId: "proposal", Voter: upper, YesWeight: sdkmath.NewUint(100), VotedAt: sdkmath.OneUint()}
 	suite.Require().NoError(k.SetVoteInStore(suite.ctx, oldKey, vote))
 	vote.Voter = bob
 	vote.YesWeight = sdkmath.ZeroUint()
 	suite.Require().NoError(k.SetVoteInStore(suite.ctx, newKey, vote))
-	oldTracker := keeper.ConstructVotingChallengeTrackerKey(sdkmath.OneUint(), upper, "incoming", "approval", "proposal")
-	newTracker := keeper.ConstructVotingChallengeTrackerKey(sdkmath.OneUint(), bob, "incoming", "approval", "proposal")
+	oldTracker := legacyVotingChallengeKeyForTest(sdkmath.OneUint(), upper, "incoming", "approval", "proposal")
+	newTracker := legacyVotingChallengeKeyForTest(sdkmath.OneUint(), bob, "incoming", "approval", "proposal")
 	suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, oldTracker, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.OneUint()}))
 	suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, newTracker, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.NewUint(2)}))
 	rawStore := suite.ctx.KVStore(suite.app.GetKey(types.StoreKey))
@@ -150,7 +150,7 @@ func (suite *TestSuite) TestMigrateV35PreservesVoterEntriesAndNormalizesApprover
 		before[i] = append([]byte{}, rawStore.Get(key)...)
 	}
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
-	movedKey := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), bob, "incoming", "approval", "proposal", upper)
+	movedKey := legacyVotingKeyForTest(sdkmath.OneUint(), bob, "incoming", "approval", "proposal", upper)
 	movedStoreKey := append(append([]byte{}, keeper.VotingTrackerKey...), []byte(movedKey)...)
 	suite.Require().False(rawStore.Has(keys[0]))
 	suite.Require().Equal(before[0], rawStore.Get(movedStoreKey), "legacy voter spelling and vote bytes are preserved in the canonical approver scope")
