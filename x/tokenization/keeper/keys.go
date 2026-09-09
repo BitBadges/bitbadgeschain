@@ -3,6 +3,7 @@ package keeper
 import (
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"strconv"
@@ -43,6 +44,7 @@ var (
 	IDLength = 8
 
 	BalanceKeyDelimiter = "-"
+	trackerKeyV2Marker  = "-v2-"
 )
 
 const StoreKey = types.ModuleName
@@ -68,16 +70,25 @@ func ConstructAddressListKey(addressListId string) string {
 }
 
 func ConstructApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, approvalID, amountTrackerID, level, trackerType, address string) string {
-	keyParts := []string{
-		collectionID.String(),
+	return constructV2TrackerKey(collectionID,
 		addressForApproval,
 		approvalID,
 		amountTrackerID,
 		level,
 		trackerType,
 		address,
-	}
-	return strings.Join(keyParts, BalanceKeyDelimiter)
+	)
+}
+
+func constructLegacyApprovalTrackerKey(collectionID sdkmath.Uint, addressForApproval, approvalID, amountTrackerID, level, trackerType, address string) string {
+	return constructLegacyTrackerKey(collectionID,
+		addressForApproval,
+		approvalID,
+		amountTrackerID,
+		level,
+		trackerType,
+		address,
+	)
 }
 
 func ConstructApprovalVersionKey(collectionId sdkmath.Uint, approvalLevel string, approverAddress string, approvalId string) string {
@@ -98,13 +109,11 @@ func ConstructUsedClaimDataKey(collectionId sdkmath.Uint, claimId sdkmath.Uint) 
 }
 
 func ConstructUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, codeLeafIndex sdkmath.Uint) string {
-	return fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s%s",
-		collectionId.String(), BalanceKeyDelimiter,
-		addressForChallenge, BalanceKeyDelimiter,
-		approvalLevel, BalanceKeyDelimiter,
-		approvalId, BalanceKeyDelimiter,
-		challengeId, BalanceKeyDelimiter,
-		codeLeafIndex.String())
+	return constructV2TrackerKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, codeLeafIndex.String())
+}
+
+func constructLegacyUsedClaimChallengeKey(collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId string, challengeId string, codeLeafIndex sdkmath.Uint) string {
+	return constructLegacyTrackerKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, codeLeafIndex.String())
 }
 
 // Keep the collection/approver prefix for purge and address-migration routines.
@@ -117,18 +126,71 @@ func ConstructETHSignatureTrackerKey(collectionId sdkmath.Uint, addressForChalle
 // The key includes: collectionId, approverAddress, approvalLevel, approvalId, proposalId, and voterAddress.
 // This key is used to store and retrieve votes for a given voting challenge.
 func ConstructVotingTrackerKey(collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string, voterAddress string) string {
-	collection_id_str := collectionId.String()
-	proposal_id_str := proposalId
-	approver_address_str := approverAddress
-	approval_level_str := approvalLevel
-	voter_address_str := voterAddress
-	return collection_id_str + BalanceKeyDelimiter + approver_address_str + BalanceKeyDelimiter + approval_level_str + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposal_id_str + BalanceKeyDelimiter + voter_address_str
+	return constructV2TrackerKey(collectionId, approverAddress, approvalLevel, approvalId, proposalId, voterAddress)
 }
 
 // ConstructVotingChallengeTrackerKey constructs a unique key for the voting challenge tracker.
 // Unlike ConstructVotingTrackerKey, this is per-proposal (not per-voter) and tracks quorum state.
 func ConstructVotingChallengeTrackerKey(collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string, proposalId string) string {
-	return collectionId.String() + BalanceKeyDelimiter + approverAddress + BalanceKeyDelimiter + approvalLevel + BalanceKeyDelimiter + approvalId + BalanceKeyDelimiter + proposalId
+	return constructV2TrackerKey(collectionId, approverAddress, approvalLevel, approvalId, proposalId)
+}
+
+func constructV2TrackerKey(collectionID sdkmath.Uint, fields ...string) string {
+	encoded := make([]byte, 0)
+	for _, field := range fields {
+		encoded = binary.AppendUvarint(encoded, uint64(len(field)))
+		encoded = append(encoded, field...)
+	}
+	return collectionID.String() + trackerKeyV2Marker + hex.EncodeToString(encoded)
+}
+
+func constructLegacyTrackerKey(collectionID sdkmath.Uint, fields ...string) string {
+	return strings.Join(append([]string{collectionID.String()}, fields...), BalanceKeyDelimiter)
+}
+
+func decodeV2TrackerKey(key string, expectedFields int) (sdkmath.Uint, []string, bool) {
+	parts := strings.SplitN(key, trackerKeyV2Marker, 2)
+	if len(parts) != 2 {
+		return sdkmath.Uint{}, nil, false
+	}
+	collectionID, err := sdkmath.ParseUint(parts[0])
+	if err != nil {
+		return sdkmath.Uint{}, nil, false
+	}
+	encoded, err := hex.DecodeString(parts[1])
+	if err != nil {
+		return sdkmath.Uint{}, nil, false
+	}
+	fields := make([]string, 0, expectedFields)
+	for len(encoded) > 0 {
+		length, bytesRead := binary.Uvarint(encoded)
+		if bytesRead <= 0 || length > uint64(len(encoded)-bytesRead) {
+			return sdkmath.Uint{}, nil, false
+		}
+		encoded = encoded[bytesRead:]
+		fields = append(fields, string(encoded[:length]))
+		encoded = encoded[length:]
+	}
+	if len(fields) != expectedFields {
+		return sdkmath.Uint{}, nil, false
+	}
+	return collectionID, fields, true
+}
+
+func legacyVotingTrackerKey(key string) (string, bool) {
+	collectionID, fields, ok := decodeV2TrackerKey(key, 5)
+	if !ok {
+		return "", false
+	}
+	return constructLegacyTrackerKey(collectionID, fields...), true
+}
+
+func legacyVotingChallengeTrackerKey(key string) (string, bool) {
+	collectionID, fields, ok := decodeV2TrackerKey(key, 4)
+	if !ok {
+		return "", false
+	}
+	return constructLegacyTrackerKey(collectionID, fields...), true
 }
 
 // Note be careful when getting details from a key because there could be a "-" (BalanceKeyDelimiter) in other fields.

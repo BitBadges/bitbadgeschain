@@ -158,11 +158,6 @@ func FilterApprovalsWithPrioritizedHandling(
 	// Filter approvals where approvalCriteria != nil and not in prioritizedApprovals
 	filteredApprovals := []*types.CollectionApproval{}
 	for _, approval := range approvals {
-		if types.CollectionApprovalIsAutoScannable(approval.ApprovalCriteria) {
-			filteredApprovals = append(filteredApprovals, approval)
-			continue
-		}
-
 		// Check if this approval is explicitly prioritized and version is correct
 		prioritizedAndVersionCorrect := false
 		for _, prioritizedApproval := range prioritizedApprovals {
@@ -178,6 +173,11 @@ func FilterApprovalsWithPrioritizedHandling(
 				prioritizedAndVersionCorrect = true
 				break
 			}
+		}
+
+		if types.CollectionApprovalIsAutoScannable(approval.ApprovalCriteria) {
+			filteredApprovals = append(filteredApprovals, approval)
+			continue
 		}
 
 		// Check if this approval has mustPrioritize set

@@ -27,8 +27,8 @@ func (suite *TestSuite) TestV35LegacyVoterCanChangeVote() {
 	upper := strings.ToUpper(bob)
 	approval.ApprovalCriteria.VotingChallenges[0].Voters[0].Address = upper
 	suite.Require().NoError(k.SetCollectionInStore(suite.ctx, collection, false))
-	key := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), "", "collection", approval.ApprovalId, "legacy-vote", upper)
-	suite.Require().NoError(k.SetVoteInStore(suite.ctx, key, &types.VoteProof{ProposalId: "legacy-vote", Voter: upper, YesWeight: sdkmath.NewUint(100), VotedAt: sdkmath.OneUint()}))
+	legacyKey := legacyVotingKeyForTest(sdkmath.OneUint(), "", "collection", approval.ApprovalId, "legacy-vote", upper)
+	suite.Require().NoError(k.SetVoteInStore(suite.ctx, legacyKey, &types.VoteProof{ProposalId: "legacy-vote", Voter: upper, YesWeight: sdkmath.NewUint(100), VotedAt: sdkmath.OneUint()}))
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
 	server := keeper.NewMsgServerImpl(k)
@@ -38,6 +38,7 @@ func (suite *TestSuite) TestV35LegacyVoterCanChangeVote() {
 	msg.Creator = bob
 	_, err = server.CastVote(wctx, msg)
 	suite.Require().NoError(err)
+	key := keeper.ConstructVotingTrackerKey(sdkmath.OneUint(), "", "collection", approval.ApprovalId, "legacy-vote", upper)
 	vote, found := k.GetVoteFromStore(suite.ctx, key)
 	suite.Require().True(found)
 	suite.Require().Equal(upper, vote.Voter)
@@ -78,7 +79,7 @@ func (suite *TestSuite) TestV35DualSpellingVotersKeepSeparateWeights() {
 	challenge.Voters[1].Address = upper
 	suite.Require().NoError(k.SetCollectionInStore(suite.ctx, collection, false))
 	for i, voter := range challenge.Voters {
-		key := keeper.ConstructVotingTrackerKey(collection.CollectionId, "", "collection", approval.ApprovalId, challenge.ProposalId, voter.Address)
+		key := legacyVotingKeyForTest(collection.CollectionId, "", "collection", approval.ApprovalId, challenge.ProposalId, voter.Address)
 		suite.Require().NoError(k.SetVoteInStore(suite.ctx, key, &types.VoteProof{ProposalId: challenge.ProposalId, Voter: voter.Address, YesWeight: sdkmath.NewUint(uint64(25 + 75*i)), VotedAt: sdkmath.OneUint()}))
 	}
 	suite.Require().NoError(k.MigrateV35CanonicalAddresses(suite.ctx))
@@ -137,12 +138,12 @@ func (suite *TestSuite) TestV35VotingApproverMigrationCollisionsAndDelay() {
 	suite.Require().NoError(k.SetUserBalanceInStore(suite.ctx, keeper.ConstructBalanceKey(alice, collection.CollectionId), balance, false))
 	setVote := func(approver, proposal, voter string, yes, votedAt uint64) *types.VoteProof {
 		vote := &types.VoteProof{ProposalId: proposal, Voter: voter, YesWeight: sdkmath.NewUint(yes), VotedAt: sdkmath.NewUint(votedAt)}
-		key := keeper.ConstructVotingTrackerKey(collection.CollectionId, approver, "outgoing", approvalID, proposal, voter)
+		key := legacyVotingKeyForTest(collection.CollectionId, approver, "outgoing", approvalID, proposal, voter)
 		suite.Require().NoError(k.SetVoteInStore(suite.ctx, key, vote))
 		return vote
 	}
 	setTracker := func(approver, proposal string, timestamp uint64) {
-		key := keeper.ConstructVotingChallengeTrackerKey(collection.CollectionId, approver, "outgoing", approvalID, proposal)
+		key := legacyVotingChallengeKeyForTest(collection.CollectionId, approver, "outgoing", approvalID, proposal)
 		suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, key, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.NewUint(timestamp)}))
 	}
 	canonicalVote := setVote(alice, challenge.ProposalId, bob, 100, 10)
@@ -220,8 +221,8 @@ func (suite *TestSuite) TestV35VotingBalanceNamespaceCollisionResetsDelay() {
 	rawStore := suite.ctx.KVStore(suite.app.GetKey(types.StoreKey))
 	upperBalanceKey := append(append([]byte{}, keeper.UserBalanceKey...), []byte(keeper.ConstructBalanceKey(upper, collection.CollectionId))...)
 	rawStore.Set(upperBalanceKey, suite.app.AppCodec().MustMarshal(balance))
-	oldVoteKey := keeper.ConstructVotingTrackerKey(collection.CollectionId, upper, "outgoing", approvalID, challenge.ProposalId, bob)
-	oldTrackerKey := keeper.ConstructVotingChallengeTrackerKey(collection.CollectionId, upper, "outgoing", approvalID, challenge.ProposalId)
+	oldVoteKey := legacyVotingKeyForTest(collection.CollectionId, upper, "outgoing", approvalID, challenge.ProposalId, bob)
+	oldTrackerKey := legacyVotingChallengeKeyForTest(collection.CollectionId, upper, "outgoing", approvalID, challenge.ProposalId)
 	vote := &types.VoteProof{ProposalId: challenge.ProposalId, Voter: bob, YesWeight: sdkmath.NewUint(100), VotedAt: sdkmath.OneUint()}
 	suite.Require().NoError(k.SetVoteInStore(suite.ctx, oldVoteKey, vote))
 	suite.Require().NoError(k.SetVotingChallengeTrackerInStore(suite.ctx, oldTrackerKey, &types.VotingChallengeTracker{QuorumReachedTimestamp: sdkmath.OneUint()}))

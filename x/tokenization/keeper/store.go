@@ -374,7 +374,12 @@ func (k Keeper) IncrementNextAddressListCounter(ctx sdk.Context) error {
 func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForChallenge string, approvalLevel string, approvalId, challengeId string, leafIndex sdkmath.Uint) (sdkmath.Uint, error) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)))
+	key := ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)
+	currBytes := store.Get(usedClaimChallengeStoreKey(key))
+	if len(currBytes) == 0 {
+		legacyKey := constructLegacyUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)
+		currBytes = store.Get(usedClaimChallengeStoreKey(legacyKey))
+	}
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
@@ -391,7 +396,7 @@ func (k Keeper) IncrementChallengeTrackerInStore(ctx sdk.Context, collectionId s
 	}
 
 	incrementedNum := curr.AddUint64(1)
-	store.Set(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)), []byte(incrementedNum.String()))
+	store.Set(usedClaimChallengeStoreKey(key), []byte(incrementedNum.String()))
 	return incrementedNum, nil
 }
 
@@ -399,6 +404,10 @@ func (k Keeper) GetChallengeTrackerFromStore(ctx sdk.Context, collectionId sdkma
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	currBytes := store.Get(usedClaimChallengeStoreKey(ConstructUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)))
+	if len(currBytes) == 0 {
+		legacyKey := constructLegacyUsedClaimChallengeKey(collectionId, addressForChallenge, approvalLevel, approvalId, challengeId, leafIndex)
+		currBytes = store.Get(usedClaimChallengeStoreKey(legacyKey))
+	}
 	curr := sdkmath.NewUint(0)
 	if currBytes != nil {
 		currUint, err := strconv.ParseUint(string((currBytes)), 10, 64)
@@ -527,6 +536,10 @@ func (k Keeper) GetApprovalTrackerFromStore(ctx sdk.Context, collectionId sdkmat
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_transfer_tracker := store.Get(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
+	if len(marshaled_transfer_tracker) == 0 {
+		// Preserve consumed limits from before v2. New writes isolate any legacy-colliding tuples.
+		marshaled_transfer_tracker = store.Get(approvalTrackerStoreKey(constructLegacyApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
+	}
 
 	var approvalTracker types.ApprovalTracker
 	if len(marshaled_transfer_tracker) == 0 {
@@ -558,13 +571,15 @@ func (k Keeper) GetApprovalTrackersFromStore(ctx sdk.Context) (approvalTrackers 
 func (k Keeper) StoreHasApprovalTracker(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId, amountTrackerId string, level string, trackerType string, address string) bool {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-	return store.Has(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
+	return store.Has(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address))) ||
+		store.Has(approvalTrackerStoreKey(constructLegacyApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
 }
 
 func (k Keeper) DeleteApprovalTrackerFromStore(ctx sdk.Context, collectionId sdkmath.Uint, addressForApproval string, approvalId, amountTrackerId string, level string, trackerType string, address string) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(approvalTrackerStoreKey(ConstructApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
+	store.Delete(approvalTrackerStoreKey(constructLegacyApprovalTrackerKey(collectionId, addressForApproval, approvalId, amountTrackerId, level, trackerType, address)))
 }
 
 /** -------------------------------------- VERSION TRACKERS FOR APPROVAL IDS -------------------------------------- */
@@ -904,6 +919,11 @@ func (k Keeper) GetVoteFromStore(ctx sdk.Context, key string) (*types.VoteProof,
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_vote := store.Get(votingTrackerStoreKey(key))
+	if len(marshaled_vote) == 0 {
+		if legacyKey, ok := legacyVotingTrackerKey(key); ok {
+			marshaled_vote = store.Get(votingTrackerStoreKey(legacyKey))
+		}
+	}
 
 	if len(marshaled_vote) == 0 {
 		return nil, false
@@ -938,6 +958,9 @@ func (k Keeper) DeleteVoteFromStore(ctx sdk.Context, key string) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(votingTrackerStoreKey(key))
+	if legacyKey, ok := legacyVotingTrackerKey(key); ok {
+		store.Delete(votingTrackerStoreKey(legacyKey))
+	}
 	return nil
 }
 
@@ -961,6 +984,11 @@ func (k Keeper) GetVotingChallengeTrackerFromStore(ctx sdk.Context, key string) 
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled := store.Get(votingChallengeTrackerStoreKey(key))
+	if len(marshaled) == 0 {
+		if legacyKey, ok := legacyVotingChallengeTrackerKey(key); ok {
+			marshaled = store.Get(votingChallengeTrackerStoreKey(legacyKey))
+		}
+	}
 
 	if len(marshaled) == 0 {
 		return nil, false
@@ -976,6 +1004,9 @@ func (k Keeper) DeleteVotingChallengeTrackerFromStore(ctx sdk.Context, key strin
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(votingChallengeTrackerStoreKey(key))
+	if legacyKey, ok := legacyVotingChallengeTrackerKey(key); ok {
+		store.Delete(votingChallengeTrackerStoreKey(legacyKey))
+	}
 }
 
 // GetAllVotingChallengeTrackersFromStore iterates all voting challenge trackers for genesis export.

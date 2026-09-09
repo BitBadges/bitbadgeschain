@@ -178,13 +178,6 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 	blockHeight := ctx.BlockHeight()
 	approvalId := fmt.Sprintf("one-time-outgoing-%d-%s-%s", blockHeight, collection.CollectionId.String(), recipientAddress)
 
-	// Security: The version must be incremented to prevent replay attacks
-	// Using version 0 would allow the approval to be reused if deletion fails
-	approvalVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", fromAddress, approvalId)
-	if err != nil {
-		return err
-	}
-
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	tokenizationMsgServer := NewMsgServerImpl(k)
 
@@ -223,7 +216,6 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 				TransferTimes:     []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 				OwnershipTimes:    []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 				TokenIds:          []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-				Version:           approvalVersion,
 				ApprovalId:        approvalId,
 			},
 		},
@@ -232,6 +224,7 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 	if err != nil {
 		return sdkerrors.Wrapf(err, "failed to create one-time approval: %s", approvalId)
 	}
+	approvalVersion := updateApprovalsMsg.OutgoingApprovals[0].Version
 
 	// Restrict the outgoing (pool) side to only the one-time prioritized approval we just set
 	// up — the pool cannot be drained via any other outgoing approval it happens to have.

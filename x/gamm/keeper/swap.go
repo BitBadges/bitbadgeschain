@@ -70,6 +70,18 @@ func (k Keeper) SwapExactAmountIn(
 		return osmomath.Int{}, customhookstypes.WrapErr(&ctx, types.ErrInvalidMathApprox, "calculated token out amount must be positive")
 	}
 
+	totalFeeAmount := osmomath.ZeroInt()
+	if len(affiliates) > 0 {
+		totalFeeAmount, _, err = k.calculateAffiliateFees(ctx, affiliates, tokenOutMinAmount, tokenOutDenom)
+		if err != nil {
+			return osmomath.Int{}, err
+		}
+		if tokenOutAmount.LT(totalFeeAmount) {
+			return osmomath.Int{}, customhookstypes.Err(&ctx, "affiliate fees exceed swap output: fees=%s, output=%s", totalFeeAmount.String(), tokenOutAmount.String())
+		}
+	}
+
+	tokenOutAmount = tokenOutAmount.Sub(totalFeeAmount)
 	if tokenOutAmount.LT(tokenOutMinAmount) {
 		return osmomath.Int{}, customhookstypes.WrapErr(&ctx, types.ErrLimitMinAmount, "%s token calculated amount is lesser than min amount: got %s, required %s",
 			tokenOutDenom, tokenOutAmount.String(), tokenOutMinAmount.String())
@@ -81,18 +93,6 @@ func (k Keeper) SwapExactAmountIn(
 	err = k.updatePoolForSwap(ctx, pool, sender, tokenIn, tokenOutCoin, affiliates, tokenOutMinAmount)
 	if err != nil {
 		return osmomath.Int{}, err
-	}
-
-	// Adjust return value to reflect affiliate fees already deducted in updatePoolForSwap.
-	// The pool sent (tokenOut - fees) to the user, so the return value should match.
-	if len(affiliates) > 0 {
-		totalFeeAmount, _, calcErr := k.calculateAffiliateFees(ctx, affiliates, tokenOutMinAmount, tokenOutDenom)
-		if calcErr != nil {
-			return osmomath.Int{}, calcErr
-		}
-		if totalFeeAmount.IsPositive() {
-			tokenOutAmount = tokenOutAmount.Sub(totalFeeAmount)
-		}
 	}
 
 	return tokenOutAmount, nil
