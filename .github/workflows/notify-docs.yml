@@ -1,4 +1,4 @@
-# Tells BitBadges/bitbadges-docs to re-sync after chain sources land on master:
+# Tells BitBadges/bitbadges-monorepo to re-sync after chain sources land on master:
 #
 #   proto-updated          — proto/** changed, so the proto markdown reference
 #                            in the docs repo is stale.
@@ -87,10 +87,10 @@ jobs:
         if: steps.what.outputs.proto == 'true'
         uses: peter-evans/repository-dispatch@v4
         with:
-          # DOCS_DISPATCH_PAT: fine-grained PAT on BitBadges/bitbadges-docs with
+          # DOCS_DISPATCH_PAT: fine-grained PAT on BitBadges/bitbadges-monorepo with
           # Contents: read-write and Pull requests: read-write.
           token: ${{ secrets.DOCS_DISPATCH_PAT }}
-          repository: BitBadges/bitbadges-docs
+          repository: BitBadges/bitbadges-monorepo
           event-type: proto-updated
           client-payload: |
             {
@@ -105,7 +105,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.DOCS_DISPATCH_PAT }}
-          repository: BitBadges/bitbadges-docs
+          repository: BitBadges/bitbadges-monorepo
           event-type: chain-openapi-updated
           client-payload: |
             {
