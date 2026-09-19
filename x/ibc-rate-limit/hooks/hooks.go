@@ -456,18 +456,12 @@ func extractDenomFromPacketOnRecv(packet channeltypes.Packet, packetDenom string
 // This is the unified version that replaces duplicated inline logic
 // (security fix: MEDIUM-4 - consistent denom extraction between send/receive paths)
 func extractDenomFromPacketOnSend(sourcePort, sourceChannel, packetDenom string) string {
-	denom := packetDenom
-	if transfertypes.ReceiverChainIsSource(sourcePort, sourceChannel, denom) {
-		// This is a native token being sent out - remove the IBC prefix if present
-		voucherPrefix := transfertypes.GetDenomPrefix(sourcePort, sourceChannel)
-		if len(denom) > len(voucherPrefix) && denom[:len(voucherPrefix)] == voucherPrefix {
-			denom = denom[len(voucherPrefix):]
-		}
-		denomTrace := transfertypes.ParseDenomTrace(denom)
-		if denomTrace.Path() != "" {
-			denom = denomTrace.IBCDenom()
-		}
+	denomTrace := transfertypes.ParseDenomTrace(packetDenom)
+	if denomTrace.Path() == "" {
+		return packetDenom
 	}
-	// For non-source chains, denom is already in local format
-	return denom
+
+	// ICS-20 packet data carries the full trace, while the local bank stores
+	// vouchers under the hash of that full trace.
+	return denomTrace.IBCDenom()
 }
