@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "id": "clock",
+  "timeMs": "1893456000000",
+  "actors": [
+    {
+      "name": "manager",
+      "address": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+      "coins": []
+    },
+    {
+      "name": "payer",
+      "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+      "coins": []
+    },
+    {
+      "name": "merchant",
+      "address": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "coins": []
+    },
+    {
+      "name": "bob",
+      "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+      "coins": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "advance",
+      "advanceTimeMs": "1",
+      "assertions": [
+        {
+          "kind": "coins",
+          "address": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "denom": "ubadge",
+          "expected": "0"
+        }
+      ]
+    }
+  ]
+}

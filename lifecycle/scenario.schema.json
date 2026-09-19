@@ -1,0 +1,239 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timeMs": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "address": {
+            "type": "string",
+            "minLength": 1
+          },
+          "coins": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "denom": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                }
+              },
+              "required": [
+                "denom",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "address",
+          "coins"
+        ]
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "typeUrl": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "typeUrl",
+              "value"
+            ]
+          },
+          "expect": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "errorContains": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "success"
+            ]
+          },
+          "advanceTimeMs": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "assertions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "coins",
+                    "coinDelta",
+                    "balances",
+                    "balanceAt",
+                    "approvals",
+                    "permissions",
+                    "tracker",
+                    "manager"
+                  ]
+                },
+                "collectionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "address": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "denom": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "tokenId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ownershipTime": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approvalId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "amountTrackerId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "level": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "trackerType": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "addressForApproval": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expected": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "expected"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "assertions"
+        ],
+        "oneOf": [
+          {
+            "required": [
+              "message",
+              "actor",
+              "expect"
+            ],
+            "not": {
+              "required": [
+                "advanceTimeMs"
+              ]
+            }
+          },
+          {
+            "required": [
+              "advanceTimeMs"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "message"
+                  ]
+                },
+                {
+                  "required": [
+                    "actor"
+                  ]
+                },
+                {
+                  "required": [
+                    "expect"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "timeMs",
+    "actors",
+    "steps"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

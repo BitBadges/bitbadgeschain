@@ -1,0 +1,439 @@
+{
+  "version": 1,
+  "id": "invoice-direct-payment",
+  "timeMs": "1893456000000",
+  "actors": [
+    {
+      "name": "manager",
+      "address": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+      "coins": []
+    },
+    {
+      "name": "payer",
+      "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+      "coins": []
+    },
+    {
+      "name": "merchant",
+      "address": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "coins": []
+    },
+    {
+      "name": "bob",
+      "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+      "coins": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "create",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgCreateCollection",
+        "value": {
+          "aliasPathsToAdd": [],
+          "collectionApprovals": [
+            {
+              "approvalCriteria": {
+                "coinTransfers": [
+                  {
+                    "coins": [
+                      {
+                        "amount": "7000000000",
+                        "denom": "ubadge"
+                      }
+                    ],
+                    "overrideFromWithApproverAddress": false,
+                    "overrideToWithInitiator": false,
+                    "to": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7"
+                  }
+                ],
+                "maxNumTransfers": {
+                  "amountTrackerId": "payment-request-pay-tracker",
+                  "overallMaxNumTransfers": "1",
+                  "perFromAddressMaxNumTransfers": "0",
+                  "perInitiatedByAddressMaxNumTransfers": "0",
+                  "perToAddressMaxNumTransfers": "0",
+                  "resetTimeIntervals": {
+                    "intervalLength": "0",
+                    "startTime": "0"
+                  }
+                },
+                "overridesFromOutgoingApprovals": true,
+                "overridesToIncomingApprovals": true,
+                "predeterminedBalances": {
+                  "incrementedBalances": {
+                    "allowAmountScaling": false,
+                    "allowOverrideTimestamp": false,
+                    "allowOverrideWithAnyValidToken": false,
+                    "durationFromTimestamp": "0",
+                    "incrementOwnershipTimesBy": "0",
+                    "incrementTokenIdsBy": "0",
+                    "maxScalingMultiplier": "0",
+                    "recurringOwnershipTimes": {
+                      "chargePeriodLength": "0",
+                      "intervalLength": "0",
+                      "startTime": "0"
+                    },
+                    "startBalances": [
+                      {
+                        "amount": "1",
+                        "ownershipTimes": [
+                          {
+                            "end": "18446744073709551615",
+                            "start": "1"
+                          }
+                        ],
+                        "tokenIds": [
+                          {
+                            "end": "1",
+                            "start": "1"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "manualBalances": [],
+                  "orderCalculationMethod": {
+                    "challengeTrackerId": "",
+                    "useMerkleChallengeLeafIndex": false,
+                    "useOverallNumTransfers": true,
+                    "usePerFromAddressNumTransfers": false,
+                    "usePerInitiatedByAddressNumTransfers": false,
+                    "usePerToAddressNumTransfers": false
+                  }
+                }
+              },
+              "approvalId": "payment-request-pay",
+              "customData": "{\"name\":\"Pay\",\"description\":\"Approve and pay from your wallet\"}",
+              "fromListId": "Mint",
+              "initiatedByListId": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "toListId": "bb1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs7gvmv",
+              "tokenIds": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "transferTimes": [
+                {
+                  "end": "1896048000000",
+                  "start": "1"
+                }
+              ],
+              "version": "0"
+            },
+            {
+              "approvalCriteria": {
+                "maxNumTransfers": {
+                  "amountTrackerId": "payment-request-deny-tracker",
+                  "overallMaxNumTransfers": "1",
+                  "perFromAddressMaxNumTransfers": "0",
+                  "perInitiatedByAddressMaxNumTransfers": "0",
+                  "perToAddressMaxNumTransfers": "0",
+                  "resetTimeIntervals": {
+                    "intervalLength": "0",
+                    "startTime": "0"
+                  }
+                },
+                "overridesFromOutgoingApprovals": true,
+                "overridesToIncomingApprovals": true,
+                "predeterminedBalances": {
+                  "incrementedBalances": {
+                    "allowAmountScaling": false,
+                    "allowOverrideTimestamp": false,
+                    "allowOverrideWithAnyValidToken": false,
+                    "durationFromTimestamp": "0",
+                    "incrementOwnershipTimesBy": "0",
+                    "incrementTokenIdsBy": "0",
+                    "maxScalingMultiplier": "0",
+                    "recurringOwnershipTimes": {
+                      "chargePeriodLength": "0",
+                      "intervalLength": "0",
+                      "startTime": "0"
+                    },
+                    "startBalances": [
+                      {
+                        "amount": "1",
+                        "ownershipTimes": [
+                          {
+                            "end": "18446744073709551615",
+                            "start": "1"
+                          }
+                        ],
+                        "tokenIds": [
+                          {
+                            "end": "1",
+                            "start": "1"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "manualBalances": [],
+                  "orderCalculationMethod": {
+                    "challengeTrackerId": "",
+                    "useMerkleChallengeLeafIndex": false,
+                    "useOverallNumTransfers": true,
+                    "usePerFromAddressNumTransfers": false,
+                    "usePerInitiatedByAddressNumTransfers": false,
+                    "usePerToAddressNumTransfers": false
+                  }
+                }
+              },
+              "approvalId": "payment-request-deny",
+              "customData": "{\"name\":\"Deny\",\"description\":\"Reject this payment request\"}",
+              "fromListId": "Mint",
+              "initiatedByListId": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "toListId": "bb1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs7gvmv",
+              "tokenIds": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "transferTimes": [
+                {
+                  "end": "1896048000000",
+                  "start": "1"
+                }
+              ],
+              "version": "0"
+            }
+          ],
+          "collectionMetadata": {
+            "customData": "",
+            "uri": "https://example.com/golden-metadata.json"
+          },
+          "collectionPermissions": {
+            "canAddMoreAliasPaths": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canAddMoreCosmosCoinWrapperPaths": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canArchiveCollection": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canDeleteCollection": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateCollectionApprovals": [
+              {
+                "approvalId": "All",
+                "fromListId": "All",
+                "initiatedByListId": "All",
+                "ownershipTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": [],
+                "toListId": "All",
+                "tokenIds": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "transferTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ]
+              }
+            ],
+            "canUpdateCollectionMetadata": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateCustomData": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateManager": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateStandards": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateTokenMetadata": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": [],
+                "tokenIds": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ]
+              }
+            ],
+            "canUpdateValidTokenIds": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": [],
+                "tokenIds": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ]
+              }
+            ]
+          },
+          "cosmosCoinWrapperPathsToAdd": [],
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "customData": "",
+          "defaultBalances": {
+            "autoApproveAllIncomingTransfers": true,
+            "autoApproveSelfInitiatedIncomingTransfers": true,
+            "autoApproveSelfInitiatedOutgoingTransfers": true,
+            "balances": [],
+            "incomingApprovals": [],
+            "outgoingApprovals": [],
+            "userPermissions": {
+              "canUpdateAutoApproveAllIncomingTransfers": [],
+              "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
+              "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
+              "canUpdateIncomingApprovals": [],
+              "canUpdateOutgoingApprovals": []
+            }
+          },
+          "invariants": {
+            "disablePoolCreation": true,
+            "maxSupplyPerId": "0",
+            "noCustomOwnershipTimes": true,
+            "noForcefulPostMintTransfers": true
+          },
+          "isArchived": false,
+          "manager": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "mintEscrowCoinsToTransfer": [],
+          "standards": [
+            "PaymentRequest"
+          ],
+          "tokenMetadata": [
+            {
+              "customData": "",
+              "tokenIds": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "uri": "https://example.com/golden-metadata.json"
+            }
+          ],
+          "validTokenIds": [
+            {
+              "end": "1",
+              "start": "1"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "manager",
+          "collectionId": "1",
+          "expected": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430"
+        }
+      ]
+    }
+  ]
+}

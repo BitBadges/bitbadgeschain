@@ -1,0 +1,16 @@
+{
+  "sdkCommit": "f9ee3153200a132bac7afc791a52edb75c0eed80",
+  "sdkDirty": false,
+  "sdkVersion": "0.45.6",
+  "distSha256": "6d3fc554af3b6d834d028d448bc60fb4b60bcbef043d661c150048ec681c912d",
+  "fixtureTimeMs": "1893456000000",
+  "artifacts": {
+    "backed-token.json": "1135b24c941a085b2d729c42de85d764597544cc533501bbca8b1bef40b210ad",
+    "fungible.json": "3910369550d67ebe0c3adc12369427e22c3ed631d24d9513f73b9f1fb7c46ecb",
+    "invoice-direct-payment.json": "c21cf59fba4e547d697f346838368827eb89fdedc032a023f1c9bf25ce106ca7",
+    "nft.json": "fb8136e6cdc2caa49af01ff8ec455ccbebe01eac4f9002750e3a02c33ebdf91d",
+    "purchasable-credits.json": "516eeb157c1e274f1f76661220ffc44f7094061cba00f5bf597a1f930f06b986",
+    "spendable-service-credits.json": "08cc7c81698b85c8cc87d3ea4c019b6954a9083eec81439172e8aefdd125690a",
+    "subscription-fixed-price.json": "e119ccb8577252181f5a384fb3b864c078e55dcb5c1b883644fa320029d71f7c"
+  }
+}
