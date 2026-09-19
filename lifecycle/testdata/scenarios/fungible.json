@@ -1,0 +1,616 @@
+{
+  "version": 1,
+  "id": "fungible",
+  "timeMs": "1893456000000",
+  "actors": [
+    {
+      "name": "manager",
+      "address": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+      "coins": []
+    },
+    {
+      "name": "payer",
+      "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+      "coins": []
+    },
+    {
+      "name": "merchant",
+      "address": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "coins": []
+    },
+    {
+      "name": "bob",
+      "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+      "coins": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "create",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgCreateCollection",
+        "value": {
+          "aliasPathsToAdd": [],
+          "collectionApprovals": [
+            {
+              "approvalCriteria": {
+                "approvalAmounts": {
+                  "amountTrackerId": "mint-cap",
+                  "overallApprovalAmount": "10",
+                  "perFromAddressApprovalAmount": "0",
+                  "perInitiatedByAddressApprovalAmount": "0",
+                  "perToAddressApprovalAmount": "0",
+                  "resetTimeIntervals": {
+                    "intervalLength": "0",
+                    "startTime": "0"
+                  }
+                },
+                "overridesFromOutgoingApprovals": true
+              },
+              "approvalId": "manager-mint",
+              "customData": "",
+              "fromListId": "Mint",
+              "initiatedByListId": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "toListId": "All",
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ],
+              "transferTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "uri": "ipfs://METADATA_APPROVAL_manager-mint",
+              "version": "0"
+            },
+            {
+              "approvalCriteria": {
+                "requireFromEqualsInitiatedBy": true
+              },
+              "approvalId": "transferable-approval",
+              "customData": "",
+              "fromListId": "!Mint",
+              "initiatedByListId": "All",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "toListId": "All",
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ],
+              "transferTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "uri": "ipfs://METADATA_APPROVAL_transferable-approval",
+              "version": "0"
+            }
+          ],
+          "collectionMetadata": {
+            "customData": "",
+            "uri": "https://example.com/golden-metadata.json"
+          },
+          "collectionPermissions": {
+            "canAddMoreAliasPaths": [],
+            "canAddMoreCosmosCoinWrapperPaths": [],
+            "canArchiveCollection": [],
+            "canDeleteCollection": [],
+            "canUpdateCollectionApprovals": [],
+            "canUpdateCollectionMetadata": [],
+            "canUpdateCustomData": [],
+            "canUpdateManager": [],
+            "canUpdateStandards": [],
+            "canUpdateTokenMetadata": [],
+            "canUpdateValidTokenIds": []
+          },
+          "cosmosCoinWrapperPathsToAdd": [],
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "customData": "",
+          "defaultBalances": {
+            "autoApproveAllIncomingTransfers": true,
+            "autoApproveSelfInitiatedIncomingTransfers": true,
+            "autoApproveSelfInitiatedOutgoingTransfers": true,
+            "balances": [],
+            "incomingApprovals": [],
+            "outgoingApprovals": [],
+            "userPermissions": {
+              "canUpdateAutoApproveAllIncomingTransfers": [],
+              "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
+              "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
+              "canUpdateIncomingApprovals": [],
+              "canUpdateOutgoingApprovals": []
+            }
+          },
+          "invariants": {
+            "disablePoolCreation": true,
+            "maxSupplyPerId": "10",
+            "noCustomOwnershipTimes": true,
+            "noForcefulPostMintTransfers": true
+          },
+          "manager": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "mintEscrowCoinsToTransfer": [],
+          "standards": [
+            "Fungible Tokens"
+          ],
+          "tokenMetadata": [
+            {
+              "customData": "",
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ],
+              "uri": "https://example.com/golden-metadata.json"
+            }
+          ],
+          "validTokenIds": [
+            {
+              "end": "1",
+              "start": "1"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "manager",
+          "collectionId": "1",
+          "expected": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430"
+        }
+      ]
+    },
+    {
+      "id": "unauthorized-mint",
+      "actor": "bob",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "10",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "Mint",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "manager-mint",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": []
+        }
+      ]
+    },
+    {
+      "id": "mint-cap",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "10",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "Mint",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "manager-mint",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": [
+            {
+              "amount": "10",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cap-exhausted",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "1",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "Mint",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "manager-mint",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": [
+            {
+              "amount": "10",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transfer",
+      "actor": "payer",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "10",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "transferable-approval",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": []
+        },
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "expected": [
+            {
+              "amount": "10",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "burn",
+      "actor": "bob",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "10",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "transferable-approval",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs7gvmv"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "expected": []
+        }
+      ]
+    },
+    {
+      "id": "no-remint-after-burn",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "1",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "Mint",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "manager-mint",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": []
+        }
+      ]
+    },
+    {
+      "id": "unauthorized-update",
+      "actor": "bob",
+      "message": {
+        "typeUrl": "/tokenization.MsgUpdateCollection",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "manager": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "updateManager": true
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "manager",
+          "collectionId": "1",
+          "expected": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430"
+        }
+      ]
+    },
+    {
+      "id": "manager-update",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgUpdateCollection",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "manager": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "updateManager": true
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "manager",
+          "collectionId": "1",
+          "expected": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q"
+        }
+      ]
+    }
+  ]
+}

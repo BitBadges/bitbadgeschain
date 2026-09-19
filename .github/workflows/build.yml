@@ -82,3 +82,20 @@ jobs:
       # release.yml already runs with -count=1; this makes the two agree.
       - name: Run test suite
         run: go test -tags=test -timeout "$GO_TEST_TIMEOUT" -count=1 ./...
+
+      - name: Execute lifecycle CLI scenarios
+        run: |
+          go build -tags=test -ldflags "-X github.com/bitbadges/bitbadgeschain/lifecycle.ChainCommit=$GITHUB_SHA" -o /tmp/bitbadges-lifecycle ./cmd/bitbadges-lifecycle
+          mkdir -p lifecycle-reports
+          /tmp/bitbadges-lifecycle --version > lifecycle-reports/version.json
+          for scenario in lifecycle/testdata/scenarios/*.json; do
+            /tmp/bitbadges-lifecycle < "$scenario" > "lifecycle-reports/$(basename "$scenario")"
+          done
+
+      - name: Upload lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecycle-evidence
+          path: lifecycle-reports/
+          if-no-files-found: ignore

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "subscription-fixed-price",
+    "tool": "build_subscription",
+    "input": {
+      "uri": "https://example.com/golden-metadata.json",
+      "interval": "30d",
+      "price": 5,
+      "denom": "BADGE",
+      "recipient": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "transferable": false,
+      "updatableMint": false
+    }
+  },
+  {
+    "id": "invoice-direct-payment",
+    "tool": "build_payment_request",
+    "input": {
+      "uri": "https://example.com/golden-metadata.json",
+      "amount": 7,
+      "denom": "BADGE",
+      "payer": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+      "recipient": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "expiration": "30d"
+    }
+  },
+  {
+    "id": "backed-token",
+    "tool": "build_smart_token",
+    "input": {
+      "uri": "https://example.com/golden-metadata.json",
+      "backingCoin": "BADGE",
+      "symbol": "vBADGE",
+      "tradable": false
+    }
+  },
+  {
+    "id": "purchasable-credits",
+    "tool": "build_credit_token",
+    "input": {
+      "uri": "https://example.com/golden-metadata.json",
+      "paymentDenom": "BADGE",
+      "recipient": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "tokensPerUnit": 37
+    }
+  },
+  {
+    "id": "spendable-service-credits",
+    "tool": "build_spendable_credit",
+    "input": {
+      "uri": "https://example.com/golden-metadata.json",
+      "paymentDenom": "BADGE",
+      "provider": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+      "serviceId": "image-generation",
+      "purchaseOptions": [
+        {
+          "pricePerPack": "1000000",
+          "creditsPerPack": "10",
+          "purchaseType": "scaled",
+          "maxPacks": "3"
+        }
+      ],
+      "expiresAt": "1896048000000"
+    }
+  }
+]

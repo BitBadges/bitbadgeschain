@@ -1,0 +1,671 @@
+{
+  "version": 1,
+  "id": "credits-purchase",
+  "timeMs": "1893456000000",
+  "actors": [
+    {
+      "name": "manager",
+      "address": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+      "coins": []
+    },
+    {
+      "name": "payer",
+      "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+      "coins": [
+        {
+          "denom": "ubadge",
+          "amount": "100"
+        }
+      ]
+    },
+    {
+      "name": "merchant",
+      "address": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+      "coins": []
+    },
+    {
+      "name": "bob",
+      "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+      "coins": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "create",
+      "actor": "manager",
+      "message": {
+        "typeUrl": "/tokenization.MsgCreateCollection",
+        "value": {
+          "aliasPathsToAdd": [
+            {
+              "conversion": {
+                "sideA": {
+                  "amount": "1"
+                },
+                "sideB": [
+                  {
+                    "amount": "1",
+                    "ownershipTimes": [
+                      {
+                        "end": "18446744073709551615",
+                        "start": "1"
+                      }
+                    ],
+                    "tokenIds": [
+                      {
+                        "end": "1",
+                        "start": "1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "denom": "ucredit",
+              "denomUnits": [
+                {
+                  "decimals": "9",
+                  "isDefaultDisplay": true,
+                  "metadata": {
+                    "customData": "",
+                    "uri": "https://example.com/golden-metadata.json"
+                  },
+                  "symbol": "CREDIT"
+                }
+              ],
+              "metadata": {
+                "customData": "",
+                "uri": "https://example.com/golden-metadata.json"
+              },
+              "symbol": ""
+            }
+          ],
+          "collectionApprovals": [
+            {
+              "approvalCriteria": {
+                "coinTransfers": [
+                  {
+                    "coins": [
+                      {
+                        "amount": "1",
+                        "denom": "ubadge"
+                      }
+                    ],
+                    "overrideFromWithApproverAddress": false,
+                    "overrideToWithInitiator": false,
+                    "to": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7"
+                  }
+                ],
+                "mustPrioritize": true,
+                "overridesFromOutgoingApprovals": true,
+                "predeterminedBalances": {
+                  "incrementedBalances": {
+                    "allowAmountScaling": true,
+                    "allowOverrideTimestamp": false,
+                    "allowOverrideWithAnyValidToken": false,
+                    "durationFromTimestamp": "0",
+                    "incrementOwnershipTimesBy": "0",
+                    "incrementTokenIdsBy": "0",
+                    "maxScalingMultiplier": "18446744073709551615",
+                    "recurringOwnershipTimes": {
+                      "chargePeriodLength": "0",
+                      "intervalLength": "0",
+                      "startTime": "0"
+                    },
+                    "startBalances": [
+                      {
+                        "amount": "37",
+                        "ownershipTimes": [
+                          {
+                            "end": "18446744073709551615",
+                            "start": "1"
+                          }
+                        ],
+                        "tokenIds": [
+                          {
+                            "end": "1",
+                            "start": "1"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "manualBalances": [],
+                  "orderCalculationMethod": {
+                    "challengeTrackerId": "",
+                    "useMerkleChallengeLeafIndex": false,
+                    "useOverallNumTransfers": true,
+                    "usePerFromAddressNumTransfers": false,
+                    "usePerInitiatedByAddressNumTransfers": false,
+                    "usePerToAddressNumTransfers": false
+                  }
+                }
+              },
+              "approvalId": "credit-scaled",
+              "customData": "{\"name\":\"Mint credits\",\"description\":\"Pay the configured price to mint credit tokens at the fixed exchange rate.\"}",
+              "fromListId": "Mint",
+              "initiatedByListId": "All",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "toListId": "All",
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ],
+              "transferTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "version": "0"
+            }
+          ],
+          "collectionMetadata": {
+            "customData": "",
+            "uri": "https://example.com/golden-metadata.json"
+          },
+          "collectionPermissions": {
+            "canAddMoreAliasPaths": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canAddMoreCosmosCoinWrapperPaths": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canArchiveCollection": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canDeleteCollection": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateCollectionApprovals": [
+              {
+                "approvalId": "All",
+                "fromListId": "All",
+                "initiatedByListId": "All",
+                "ownershipTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": [],
+                "toListId": "All",
+                "tokenIds": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "transferTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ]
+              }
+            ],
+            "canUpdateCollectionMetadata": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateCustomData": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateManager": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateStandards": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": []
+              }
+            ],
+            "canUpdateTokenMetadata": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": [],
+                "tokenIds": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ]
+              }
+            ],
+            "canUpdateValidTokenIds": [
+              {
+                "permanentlyForbiddenTimes": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ],
+                "permanentlyPermittedTimes": [],
+                "tokenIds": [
+                  {
+                    "end": "18446744073709551615",
+                    "start": "1"
+                  }
+                ]
+              }
+            ]
+          },
+          "cosmosCoinWrapperPathsToAdd": [],
+          "creator": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "customData": "",
+          "defaultBalances": {
+            "autoApproveAllIncomingTransfers": true,
+            "autoApproveSelfInitiatedIncomingTransfers": true,
+            "autoApproveSelfInitiatedOutgoingTransfers": true,
+            "balances": [],
+            "incomingApprovals": [],
+            "outgoingApprovals": [],
+            "userPermissions": {
+              "canUpdateAutoApproveAllIncomingTransfers": [],
+              "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
+              "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
+              "canUpdateIncomingApprovals": [],
+              "canUpdateOutgoingApprovals": []
+            }
+          },
+          "invariants": {
+            "disablePoolCreation": true,
+            "noCustomOwnershipTimes": true,
+            "noForcefulPostMintTransfers": true
+          },
+          "isArchived": false,
+          "manager": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+          "mintEscrowCoinsToTransfer": [],
+          "standards": [
+            "Credit Token"
+          ],
+          "tokenMetadata": [
+            {
+              "customData": "",
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ],
+              "uri": "https://example.com/golden-metadata.json"
+            }
+          ],
+          "validTokenIds": [
+            {
+              "end": "1",
+              "start": "1"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "manager",
+          "collectionId": "1",
+          "expected": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430"
+        }
+      ]
+    },
+    {
+      "id": "buy-two-units",
+      "actor": "payer",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "74",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "Mint",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "credit-scaled",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": true
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": [
+            {
+              "amount": "74",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "coins",
+          "address": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+          "denom": "ubadge",
+          "expected": "2"
+        }
+      ]
+    },
+    {
+      "id": "non-multiple",
+      "actor": "payer",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "38",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "Mint",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "credit-scaled",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": [
+            {
+              "amount": "74",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "coins",
+          "address": "bb1zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zql3w7",
+          "denom": "ubadge",
+          "expected": "2"
+        }
+      ]
+    },
+    {
+      "id": "cannot-transfer",
+      "actor": "payer",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "1",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "credit-scaled",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1jmjfq0tplp9tmx4v9uemw72y4d2wa5nrjmmk3q",
+          "expected": []
+        }
+      ]
+    },
+    {
+      "id": "cannot-burn",
+      "actor": "payer",
+      "message": {
+        "typeUrl": "/tokenization.MsgTransferTokens",
+        "value": {
+          "collectionId": "1",
+          "creator": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "transfers": [
+            {
+              "balances": [
+                {
+                  "amount": "1",
+                  "ownershipTimes": [
+                    {
+                      "end": "18446744073709551615",
+                      "start": "1"
+                    }
+                  ],
+                  "tokenIds": [
+                    {
+                      "end": "1",
+                      "start": "1"
+                    }
+                  ]
+                }
+              ],
+              "from": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+              "prioritizedApprovals": [
+                {
+                  "approvalId": "credit-scaled",
+                  "approvalLevel": "collection",
+                  "approverAddress": "",
+                  "version": "0"
+                }
+              ],
+              "toAddresses": [
+                "bb1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs7gvmv"
+              ]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "success": false
+      },
+      "assertions": [
+        {
+          "kind": "balances",
+          "collectionId": "1",
+          "address": "bb1xvenxvenxvenxvenxvenxvenxvenxvenlrd2nm",
+          "expected": [
+            {
+              "amount": "74",
+              "ownershipTimes": [
+                {
+                  "end": "18446744073709551615",
+                  "start": "1"
+                }
+              ],
+              "tokenIds": [
+                {
+                  "end": "1",
+                  "start": "1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

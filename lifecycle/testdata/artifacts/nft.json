@@ -1,0 +1,143 @@
+{
+  "typeUrl": "/tokenization.MsgCreateCollection",
+  "value": {
+    "creator": "",
+    "collectionApprovals": [
+      {
+        "fromListId": "Mint",
+        "toListId": "All",
+        "initiatedByListId": "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
+        "approvalId": "manager-mint",
+        "tokenIds": [
+          {
+            "start": "1",
+            "end": "1"
+          }
+        ],
+        "transferTimes": [
+          {
+            "start": "1",
+            "end": "18446744073709551615"
+          }
+        ],
+        "ownershipTimes": [
+          {
+            "start": "1",
+            "end": "18446744073709551615"
+          }
+        ],
+        "version": "0",
+        "approvalCriteria": {
+          "overridesFromOutgoingApprovals": true,
+          "approvalAmounts": {
+            "overallApprovalAmount": "1",
+            "perToAddressApprovalAmount": "0",
+            "perFromAddressApprovalAmount": "0",
+            "perInitiatedByAddressApprovalAmount": "0",
+            "amountTrackerId": "mint-cap",
+            "resetTimeIntervals": {
+              "startTime": "0",
+              "intervalLength": "0"
+            }
+          }
+        },
+        "uri": "ipfs://METADATA_APPROVAL_manager-mint",
+        "customData": ""
+      },
+      {
+        "fromListId": "!Mint",
+        "toListId": "All",
+        "initiatedByListId": "All",
+        "approvalId": "transferable-approval",
+        "tokenIds": [
+          {
+            "start": "1",
+            "end": "1"
+          }
+        ],
+        "transferTimes": [
+          {
+            "start": "1",
+            "end": "18446744073709551615"
+          }
+        ],
+        "ownershipTimes": [
+          {
+            "start": "1",
+            "end": "18446744073709551615"
+          }
+        ],
+        "version": "0",
+        "approvalCriteria": {
+          "requireFromEqualsInitiatedBy": true
+        },
+        "uri": "ipfs://METADATA_APPROVAL_transferable-approval",
+        "customData": ""
+      }
+    ],
+    "standards": [
+      "NFTs"
+    ],
+    "validTokenIds": [
+      {
+        "start": "1",
+        "end": "1"
+      }
+    ],
+    "collectionMetadata": {
+      "uri": "https://example.com/golden-metadata.json",
+      "customData": ""
+    },
+    "tokenMetadata": [
+      {
+        "uri": "https://example.com/golden-metadata.json",
+        "customData": "",
+        "tokenIds": [
+          {
+            "start": "1",
+            "end": "1"
+          }
+        ]
+      }
+    ],
+    "collectionPermissions": {
+      "canDeleteCollection": [],
+      "canArchiveCollection": [],
+      "canUpdateStandards": [],
+      "canUpdateCustomData": [],
+      "canUpdateManager": [],
+      "canUpdateCollectionMetadata": [],
+      "canUpdateValidTokenIds": [],
+      "canUpdateTokenMetadata": [],
+      "canUpdateCollectionApprovals": [],
+      "canAddMoreAliasPaths": [],
+      "canAddMoreCosmosCoinWrapperPaths": []
+    },
+    "invariants": {
+      "noCustomOwnershipTimes": true,
+      "maxSupplyPerId": "1",
+      "noForcefulPostMintTransfers": true,
+      "disablePoolCreation": true
+    },
+    "defaultBalances": {
+      "balances": [],
+      "incomingApprovals": [],
+      "outgoingApprovals": [],
+      "autoApproveAllIncomingTransfers": true,
+      "autoApproveSelfInitiatedOutgoingTransfers": true,
+      "autoApproveSelfInitiatedIncomingTransfers": true,
+      "userPermissions": {
+        "canUpdateOutgoingApprovals": [],
+        "canUpdateIncomingApprovals": [],
+        "canUpdateAutoApproveSelfInitiatedOutgoingTransfers": [],
+        "canUpdateAutoApproveSelfInitiatedIncomingTransfers": [],
+        "canUpdateAutoApproveAllIncomingTransfers": []
+      }
+    },
+    "manager": "",
+    "customData": "",
+    "mintEscrowCoinsToTransfer": [],
+    "aliasPathsToAdd": [],
+    "cosmosCoinWrapperPathsToAdd": []
+  }
+}
