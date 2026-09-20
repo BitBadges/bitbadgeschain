@@ -96,6 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binaries-linux-windows
+          retention-days: 7
           path: |
             build/bitbadgeschain-linux-amd64
             build/bitbadgeschain-linux-arm64
@@ -138,6 +139,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binaries-darwin
+          retention-days: 7
           path: |
             build/bitbadgeschain-darwin-amd64
             build/bitbadgeschain-darwin-arm64
