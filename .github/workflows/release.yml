@@ -108,8 +108,11 @@ jobs:
   build-darwin:
     name: Build macOS
     needs: preflight
-    if: needs.preflight.outputs.can_build == 'true'
-    runs-on: macos-latest
+    # Darwin binaries need CGO with a macOS toolchain. Hosted macOS minutes cost
+    # 10x, so this job only runs on a self-hosted Mac when USE_SELF_HOSTED is set.
+    # Otherwise it is skipped and darwin binaries are uploaded by hand.
+    if: needs.preflight.outputs.can_build == 'true' && vars.USE_SELF_HOSTED == 'true'
+    runs-on: [self-hosted, macOS]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -149,7 +152,10 @@ jobs:
   release:
     name: Create Release
     needs: [preflight, test, build-linux-windows, build-darwin]
-    if: needs.preflight.outputs.can_build == 'true'
+    if: >-
+      always() && needs.preflight.outputs.can_build == 'true' &&
+      needs.test.result == 'success' && needs.build-linux-windows.result == 'success' &&
+      (needs.build-darwin.result == 'success' || needs.build-darwin.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -161,6 +167,7 @@ jobs:
           path: build/
 
       - name: Download macOS binaries
+        if: needs.build-darwin.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: binaries-darwin
@@ -169,18 +176,8 @@ jobs:
       - name: Generate checksums
         run: |
           cd build
-          sha256sum \
-            bitbadgeschain-linux-amd64 \
-            bitbadgeschain-linux-arm64 \
-            bitbadgeschain-darwin-amd64 \
-            bitbadgeschain-darwin-arm64 \
-            bitbadgeschain-windows-amd64.exe \
-            bitbadgeschain-testnet-linux-amd64 \
-            bitbadgeschain-testnet-linux-arm64 \
-            bitbadgeschain-testnet-darwin-amd64 \
-            bitbadgeschain-testnet-darwin-arm64 \
-            bitbadgeschain-testnet-windows-amd64.exe \
-            > checksums.txt
+          # Darwin binaries are absent when build-darwin was skipped.
+          sha256sum bitbadgeschain-* > checksums.txt
 
       - name: Determine version
         id: version
