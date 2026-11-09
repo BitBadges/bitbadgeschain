@@ -11,6 +11,12 @@ replace (
 	github.com/ethereum/go-ethereum => github.com/cosmos/go-ethereum v1.17.2-cosmos-1
 	// Security advisory GHSA-h395-qcrw-5vmq (cosmos/evm v0.7.0-beta.0)
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
+	// webtransport-go v0.11.1 still calls http3.ParseCapsule, which quic-go
+	// removed in v0.61.0 (replaced by CapsuleParser). buf v1.75.0 pulls
+	// quic-go v0.64.0 via MVS, which does not compile against webtransport-go
+	// v0.11.1. webtransport-go v0.12+ dropped Dialer, which libp2p v0.48.0
+	// still uses, so pin quic-go to the last ParseCapsule release instead.
+	github.com/quic-go/quic-go => github.com/quic-go/quic-go v0.60.0
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 	// btree fork required by bstm (cosmos/evm v0.7.0-beta.0)
