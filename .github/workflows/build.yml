@@ -32,7 +32,7 @@ jobs:
   # comes out.
   preflight:
     name: Can CI build this commit?
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.USE_SELF_HOSTED == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","macOS","mbp2"]') || 'ubuntu-latest' }}
     outputs:
       can_build: ${{ steps.check.outputs.can_build }}
     steps:
@@ -52,7 +52,7 @@ jobs:
     name: Build & test
     needs: preflight
     if: needs.preflight.outputs.can_build == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.USE_SELF_HOSTED == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","macOS","mbp2"]') || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout code
