@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -106,16 +107,21 @@ func NewSwapExactAmountInCmd() (*osmocli.TxCliDesc, *types.MsgSwapExactAmountIn)
 		Use:   "swap-exact-amount-in",
 		Short: "swap exact amount in",
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
-			"Routes": osmocli.FlagOnlyParser(swapAmountInRoutes),
+			"Routes":     osmocli.FlagOnlyParser(swapAmountInRoutes),
+			"Affiliates": osmocli.FlagOnlyParser(affiliatesParser),
 		},
-		Flags: osmocli.FlagDesc{RequiredFlags: []*flag.FlagSet{FlagSetMultihopSwapRoutes()}},
+		Flags: osmocli.FlagDesc{
+			RequiredFlags: []*flag.FlagSet{FlagSetMultihopSwapRoutes()},
+			OptionalFlags: []*flag.FlagSet{FlagSetAffiliates()},
+		},
 	}, &types.MsgSwapExactAmountIn{}
 }
 
 func NewSwapExactAmountOutCmd() (*osmocli.TxCliDesc, *types.MsgSwapExactAmountOut) {
 	// Can't get rid of this parser without a break, because the args are out of order.
+	// Explicit Use: osmocli skips auto-generation when Use already contains '['.
 	return &osmocli.TxCliDesc{
-		Use:              "swap-exact-amount-out",
+		Use:              "swap-exact-amount-out [token-out] [token-in-max-amount]",
 		Short:            "swap exact amount out",
 		NumArgs:          2,
 		ParseAndBuildMsg: NewBuildSwapExactAmountOutMsg,
@@ -164,9 +170,14 @@ func NewSwapExactAmountInWithIBCTransferCmd() (*osmocli.TxCliDesc, *types.MsgSwa
 		Use:   "swap-exact-amount-in-with-ibc-transfer",
 		Short: "swap exact amount in and initiate IBC transfer",
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
-			"Routes": osmocli.FlagOnlyParser(swapAmountInRoutes),
+			"Routes":          osmocli.FlagOnlyParser(swapAmountInRoutes),
+			"IbcTransferInfo": osmocli.FlagOnlyParser(ibcTransferInfoParser),
+			"Affiliates":      osmocli.FlagOnlyParser(affiliatesParser),
 		},
-		Flags: osmocli.FlagDesc{RequiredFlags: []*flag.FlagSet{FlagSetMultihopSwapRoutes()}},
+		Flags: osmocli.FlagDesc{
+			RequiredFlags: []*flag.FlagSet{FlagSetMultihopSwapRoutes(), FlagSetIBCTransferInfo()},
+			OptionalFlags: []*flag.FlagSet{FlagSetAffiliates()},
+		},
 	}, &types.MsgSwapExactAmountInWithIBCTransfer{}
 }
 
@@ -292,6 +303,43 @@ func swapAmountInRoutes(fs *flag.FlagSet) ([]poolmanagertypes.SwapAmountInRoute,
 		})
 	}
 	return routes, nil
+}
+
+func affiliatesParser(fs *flag.FlagSet) ([]poolmanagertypes.Affiliate, error) {
+	affiliatesStr, err := fs.GetString(FlagAffiliates)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAffiliatesJSON(affiliatesStr)
+}
+
+// ParseAffiliatesJSON unmarshals a JSON array of {address, basis_points_fee}.
+// Empty input, "[]", and "null" all yield an empty slice.
+func ParseAffiliatesJSON(affiliatesStr string) ([]poolmanagertypes.Affiliate, error) {
+	affiliatesStr = strings.TrimSpace(affiliatesStr)
+	if affiliatesStr == "" || affiliatesStr == "[]" || affiliatesStr == "null" {
+		return []poolmanagertypes.Affiliate{}, nil
+	}
+	var affiliates []poolmanagertypes.Affiliate
+	if err := json.Unmarshal([]byte(affiliatesStr), &affiliates); err != nil {
+		return nil, fmt.Errorf("invalid affiliates JSON: %w", err)
+	}
+	return affiliates, nil
+}
+
+func ibcTransferInfoParser(fs *flag.FlagSet) (types.IBCTransferInfo, error) {
+	infoStr, err := fs.GetString(FlagIBCTransferInfo)
+	if err != nil {
+		return types.IBCTransferInfo{}, err
+	}
+	if strings.TrimSpace(infoStr) == "" {
+		return types.IBCTransferInfo{}, fmt.Errorf("must pass in IBC transfer info JSON using the --%s flag", FlagIBCTransferInfo)
+	}
+	var info types.IBCTransferInfo
+	if err := json.Unmarshal([]byte(infoStr), &info); err != nil {
+		return types.IBCTransferInfo{}, fmt.Errorf("invalid ibc-transfer-info JSON: %w", err)
+	}
+	return info, nil
 }
 
 func swapAmountOutRoutes(fs *flag.FlagSet) ([]poolmanagertypes.SwapAmountOutRoute, error) {

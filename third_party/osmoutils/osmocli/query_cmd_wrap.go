@@ -46,6 +46,14 @@ func (desc QueryDescriptor) GetCustomFlagOverrides() map[string]string {
 	return desc.CustomFlagOverrides
 }
 
+func (desc QueryDescriptor) GetCustomFieldParsers() map[string]CustomFieldParserFn {
+	return desc.CustomFieldParsers
+}
+
+func (desc QueryDescriptor) GetUse() string {
+	return desc.Use
+}
+
 // Implement Descriptor interface
 func (desc *QueryDescriptor) AttachToUse(str string) {
 	desc.Use += str
