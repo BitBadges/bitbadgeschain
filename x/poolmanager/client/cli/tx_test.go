@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils/osmocli"
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/client/cli"
+	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 func TestParseCoinsNoSort(t *testing.T) {
@@ -68,4 +70,19 @@ func TestParseCoinsNoSort(t *testing.T) {
 			require.Equal(t, tc.expectedCoins, coins)
 		})
 	}
+}
+
+func TestTxCmdUseStrings(t *testing.T) {
+	t.Run("swap-exact-amount-in", func(t *testing.T) {
+		desc, _ := cli.NewSwapExactAmountInCmd()
+		cmd := osmocli.BuildTxCli[*types.MsgSwapExactAmountIn](desc)
+		require.Equal(t, "swap-exact-amount-in [token-in] [token-out-min-amount]", cmd.Use)
+		require.Equal(t, 2, desc.NumArgs)
+	})
+	t.Run("swap-exact-amount-out", func(t *testing.T) {
+		desc, _ := cli.NewSwapExactAmountOutCmd()
+		cmd := osmocli.BuildTxCli[*types.MsgSwapExactAmountOut](desc)
+		require.Equal(t, "swap-exact-amount-out [token-out] [token-in-max-amount]", cmd.Use)
+		require.Equal(t, 2, desc.NumArgs)
+	})
 }

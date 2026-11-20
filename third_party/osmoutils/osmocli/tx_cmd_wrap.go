@@ -43,6 +43,14 @@ func (desc TxCliDesc) GetCustomFlagOverrides() map[string]string {
 	return desc.CustomFlagOverrides
 }
 
+func (desc TxCliDesc) GetCustomFieldParsers() map[string]CustomFieldParserFn {
+	return desc.CustomFieldParsers
+}
+
+func (desc TxCliDesc) GetUse() string {
+	return desc.Use
+}
+
 // Implement Descriptor interface
 func (desc *TxCliDesc) AttachToUse(str string) {
 	desc.Use += str
