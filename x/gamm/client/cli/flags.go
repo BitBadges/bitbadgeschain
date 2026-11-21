@@ -16,9 +16,9 @@ const (
 	PoolFileExitFee        = "exit-fee"
 	PoolFileFutureGovernor = "future-governor"
 
-	PoolFileStartTime                = "start-time"
-	PoolFileDuration                 = "duration"
-	PoolFileTargetPoolWeights        = "target-pool-weights"
+	PoolFileStartTime         = "start-time"
+	PoolFileDuration          = "duration"
+	PoolFileTargetPoolWeights = "target-pool-weights"
 
 	FlagPoolId = "pool-id"
 	// Will be parsed to osmomath.Int.
@@ -37,6 +37,10 @@ const (
 	FlagSwapRouteAmounts = "swap-route-amounts"
 	// Will be parsed to []string.
 	FlagSwapRouteDenoms = "swap-route-denoms"
+	// Will be parsed to []poolmanager.Affiliate from JSON.
+	FlagAffiliates = "affiliates"
+	// Will be parsed to types.IBCTransferInfo from JSON.
+	FlagIBCTransferInfo = "ibc-transfer-info"
 	// FlagScalingFactors represents the flag name for the scaling factors.
 	FlagScalingFactors                 = "scaling-factors"
 	FlagScalingFactorControllerAddress = "scaling-factor-controller-address"
@@ -47,11 +51,11 @@ const (
 )
 
 type createBalancerPoolInputs struct {
-	Weights                  string                         `json:"weights"`
-	InitialDeposit           string                         `json:"initial-deposit"`
-	SwapFee                  string                         `json:"swap-fee"`
-	ExitFee                  string                         `json:"exit-fee"`
-	FutureGovernor           string                         `json:"future-governor"`
+	Weights        string `json:"weights"`
+	InitialDeposit string `json:"initial-deposit"`
+	SwapFee        string `json:"swap-fee"`
+	ExitFee        string `json:"exit-fee"`
+	FutureGovernor string `json:"future-governor"`
 }
 
 type createStableswapPoolInputs struct {
@@ -94,9 +98,21 @@ func FlagSetExitPool() *flag.FlagSet {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 
 	fs.Uint64(FlagPoolId, 0, "The id of pool")
-	fs.String(FlagShareAmountIn, "", "TODO: add description")
-	fs.StringArray(FlagMinAmountsOut, []string{""}, "TODO: add description")
+	fs.String(FlagShareAmountIn, "", "Amount of pool shares to redeem")
+	fs.StringArray(FlagMinAmountsOut, []string{""}, "Minimum amount of each denom to receive from the pool (specify multiple denoms with: --min-amounts-out=1ubadge --min-amounts-out=1uusdc)")
 
+	return fs
+}
+
+func FlagSetAffiliates() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.String(FlagAffiliates, "", `JSON array of affiliates [{"address":"<bech32>","basis_points_fee":"<uint>"}]; defaults to empty`)
+	return fs
+}
+
+func FlagSetIBCTransferInfo() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.String(FlagIBCTransferInfo, "", `JSON object {"source_channel":"...","receiver":"...","memo":"...","timeout_timestamp":0}`)
 	return fs
 }
 

@@ -47,7 +47,7 @@ func NewSwapExactAmountInCmd() (*osmocli.TxCliDesc, *types.MsgSwapExactAmountIn)
 	return &osmocli.TxCliDesc{
 		Use:     "swap-exact-amount-in",
 		Short:   "swap exact amount in",
-		Example: "osmosisd tx poolmanager swap-exact-amount-in 2000000uosmo 1 --swap-route-pool-ids 5 --swap-route-denoms uion --from val --keyring-backend test -b=block --chain-id=localosmosis --fees 10000uosmo",
+		Example: "bitbadgeschaind tx poolmanager swap-exact-amount-in 2000000ubadge 1 --swap-route-pool-ids 5 --swap-route-denoms uusdc --from val --keyring-backend test -b=block --chain-id=localbitbadges --fees 10000ubadge",
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
 			"Routes": osmocli.FlagOnlyParser(swapAmountInRoutes),
 		},
@@ -58,9 +58,9 @@ func NewSwapExactAmountInCmd() (*osmocli.TxCliDesc, *types.MsgSwapExactAmountIn)
 func NewSwapExactAmountOutCmd() (*osmocli.TxCliDesc, *types.MsgSwapExactAmountOut) {
 	// Can't get rid of this parser without a break, because the args are out of order.
 	return &osmocli.TxCliDesc{
-		Use:              "swap-exact-amount-out",
+		Use:              "swap-exact-amount-out [token-out] [token-in-max-amount]",
 		Short:            "swap exact amount out",
-		Example:          "osmosisd tx poolmanager swap-exact-amount-out 100uion 1000000 --swap-route-pool-ids 1 --swap-route-denoms uosmo --from val --keyring-backend test -b=block --chain-id=localosmosis --fees 10000uosmo",
+		Example:          "bitbadgeschaind tx poolmanager swap-exact-amount-out 100uusdc 1000000 --swap-route-pool-ids 1 --swap-route-denoms ubadge --from val --keyring-backend test -b=block --chain-id=localbitbadges --fees 10000ubadge",
 		NumArgs:          2,
 		ParseAndBuildMsg: NewBuildSwapExactAmountOutMsg,
 		Flags:            osmocli.FlagDesc{RequiredFlags: []*flag.FlagSet{FlagSetMultihopSwapRoutes()}},
@@ -71,7 +71,7 @@ func NewSplitRouteSwapExactAmountIn() (*osmocli.TxCliDesc, *types.MsgSplitRouteS
 	return &osmocli.TxCliDesc{
 		Use:   "split-route-swap-exact-amount-in",
 		Short: "split route swap exact amount in",
-		Example: `osmosisd tx poolmanager split-route-swap-exact-amount-in uosmo 1 --routes-file="./routes.json" --from val --keyring-backend test -b=block --chain-id=localosmosis --fees 10000uosmo
+		Example: `bitbadgeschaind tx poolmanager split-route-swap-exact-amount-in ubadge 1 --routes-file="./routes.json" --from val --keyring-backend test -b=block --chain-id=localbitbadges --fees 10000ubadge
 		- routes.json
 		{
 			"Route": [
@@ -79,11 +79,11 @@ func NewSplitRouteSwapExactAmountIn() (*osmocli.TxCliDesc, *types.MsgSplitRouteS
 			  "swap_amount_in_route": [
 				{
 				"pool_id": 1,
-				"token_out_denom": "uion"
+				"token_out_denom": "uusdc"
 				},
 				{
 				"pool_id": 2,
-				"token_out_denom": "uosmo"
+				"token_out_denom": "ubadge"
 				}
 			  ],
 			  "token_in_amount": 1000
@@ -96,7 +96,7 @@ func NewSplitRouteSwapExactAmountIn() (*osmocli.TxCliDesc, *types.MsgSplitRouteS
 				},
 				{
 				"pool_id": 4,
-				"token_out_denom": "uosmo"
+				"token_out_denom": "ubadge"
 				}
 			  ],
 			  "token_in_amount": 999
@@ -117,7 +117,7 @@ func NewSplitRouteSwapExactAmountOut() (*osmocli.TxCliDesc, *types.MsgSplitRoute
 	return &osmocli.TxCliDesc{
 		Use:   "split-route-swap-exact-amount-out",
 		Short: "split route swap exact amount out",
-		Example: `osmosisd tx poolmanager split-route-swap-exact-amount-out uosmo 1 --routes-file="./routes.json" --from val --keyring-backend test -b=block --chain-id=localosmosis --fees 10000uosmo
+		Example: `bitbadgeschaind tx poolmanager split-route-swap-exact-amount-out ubadge 1 --routes-file="./routes.json" --from val --keyring-backend test -b=block --chain-id=localbitbadges --fees 10000ubadge
 		- routes.json
 		{
 			"route": [
@@ -125,11 +125,11 @@ func NewSplitRouteSwapExactAmountOut() (*osmocli.TxCliDesc, *types.MsgSplitRoute
 				"swap_amount_out_route": [
 					{
 					"pool_id": 1,
-					"token_in_denom": "uion"
+					"token_in_denom": "uusdc"
 					},
 					{
 					"pool_id": 2,
-					"token_in_denom": "uosmo"
+					"token_in_denom": "ubadge"
 					}
 				],
 				"token_out_amount": 1000
@@ -138,11 +138,11 @@ func NewSplitRouteSwapExactAmountOut() (*osmocli.TxCliDesc, *types.MsgSplitRoute
 				"swap_amount_out_route": [
 					{
 					"pool_id": 3,
-					"token_in_denom": "uion"
+					"token_in_denom": "uusdc"
 					},
 					{
 					"pool_id": 4,
-					"token_in_denom": "uosmo"
+					"token_in_denom": "ubadge"
 					}
 				],
 				"token_out_amount": 999
