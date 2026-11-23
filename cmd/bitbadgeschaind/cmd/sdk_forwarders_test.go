@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -92,6 +93,61 @@ func TestChainTxCommandForwardsSDKStatusAndWait(t *testing.T) {
 		}
 		if !found.DisableFlagParsing {
 			t.Errorf("bb tx %s must pass flags through to bitbadges-cli", sub)
+		}
+	}
+}
+
+// sdkStandardSubcommands mirrors the subcommands each standards verb exposes
+// in bitbadgesjs (bitbadges npm 0.45.8, `bitbadges-cli <verb> --help`). The
+// `bb --help` one-liners for these verbs advertise example subcommands; every
+// one they name must exist, or agents reading `bb --help` try verbs that fail
+// with "unknown command" (QA session 17: 11 of 13 lines named a missing verb).
+var sdkStandardSubcommands = map[string][]string{
+	"auctions":           {"list", "show", "status", "place-bid", "cancel-bid", "accept-bid", "build"},
+	"bounties":           {"list", "show", "status", "accept", "deny", "claim-refund", "build"},
+	"credit-tokens":      {"list", "show", "quote", "purchase", "build"},
+	"crowdfunds":         {"list", "show", "status", "contribute", "withdraw", "refund", "build"},
+	"custom-2fa":         {"mint"},
+	"dynamic-stores":     {"create", "update", "delete", "set-value", "add", "remove", "show", "get-value", "list-values", "batch", "by-creator", "search"},
+	"intents":            {"list", "show", "create", "fill", "cancel", "build"},
+	"nfts":               {"bid", "list", "cancel", "buy", "sell", "orders", "history"},
+	"pay-requests":       {"list", "show", "status", "pay", "deny", "build", "build-v2"},
+	"prediction-markets": {"list", "show", "status", "buy-yes", "buy-no", "sell-yes", "sell-no", "cancel", "deposit", "quote", "redeem", "resolve", "build"},
+	"products":           {"list", "show", "purchase", "build"},
+	"smart-tokens":       {"list", "show", "status", "deposit", "withdraw", "build"},
+	"subscriptions":      {"list", "status", "claim", "enable-renewal", "cancel", "subscribe", "charge-due", "build"},
+}
+
+func TestStandardsHelpOnlyNamesRealSubcommands(t *testing.T) {
+	byName := map[string]string{}
+	for _, spec := range sdkForwarderSpecs {
+		byName[spec.name] = spec.short
+	}
+	for verb, subs := range sdkStandardSubcommands {
+		short, ok := byName[verb]
+		if !ok {
+			t.Errorf("no forwarder for standards verb %q", verb)
+			continue
+		}
+		known := map[string]bool{}
+		for _, s := range subs {
+			known[s] = true
+		}
+		rest := short
+		if i := strings.Index(rest, ":"); i >= 0 {
+			rest = rest[i+1:]
+		}
+		if !strings.Contains(rest, " / ") {
+			continue // prose description, no subcommand list
+		}
+		for _, tok := range strings.Split(rest, "/") {
+			tok = strings.TrimSpace(tok)
+			if tok == "" || tok == "..." {
+				continue
+			}
+			if !known[tok] {
+				t.Errorf("bb --help for %q advertises %q, which bitbadges-cli %s does not have", verb, tok, verb)
+			}
 		}
 	}
 }
