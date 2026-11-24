@@ -6,16 +6,29 @@ import (
 	"os/exec"
 )
 
+// exitNoSDKCLI is the exit status when an SDK verb is invoked but
+// bitbadges-cli cannot be found. 127 matches the shell's "command not
+// found", so scripts and agents can tell a missing dependency apart from a
+// real command failure.
+const exitNoSDKCLI = 127
+
+// osExit is swapped out in tests.
+var osExit = os.Exit
+
 // execNodeCLI delegates a subcommand to the Node.js bitbadges-cli binary.
 // It forwards all args, pipes stdio through, and preserves exit codes.
-// If the CLI is not found, it prints a helpful message and returns nil
-// so chain operations are unaffected.
+// If the CLI is not found, it prints an install hint and exits 127. This
+// path only runs for SDK verbs (`bb build`, `bb check`, `bb cli ...`), so
+// chain-native commands are unaffected. It used to return nil (exit 0),
+// which made `bb check tx.json` look like a passing check with empty
+// output.
 func execNodeCLI(subcommand string, args []string) error {
 	cliPath, useNpx := findNodeCLI()
 	if cliPath == "" {
-		fmt.Fprintln(os.Stderr, "SDK CLI not available. Install with: npm install -g bitbadges (provides bitbadges-cli command)")
+		fmt.Fprintf(os.Stderr, "SDK CLI not available: `bb %s` needs bitbadges-cli. Install with: npm install -g bitbadges (provides bitbadges-cli command)\n", subcommand)
 		fmt.Fprintln(os.Stderr, "Or set BITBADGES_SDK_CLI_PATH environment variable.")
-		return nil // Don't error - chain operations should still work
+		osExit(exitNoSDKCLI)
+		return nil
 	}
 
 	var fullArgs []string
