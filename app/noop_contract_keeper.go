@@ -2,10 +2,10 @@ package app
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	ibccallbackstypes "github.com/cosmos/ibc-go/v11/modules/apps/callbacks/types"
-	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
+	ibccallbackstypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/callbacks/types"
+	clienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
+	channeltypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/04-channel/types"
+	ibcexported "github.com/lfdt-ibc/ibc-go/v11/modules/core/exported"
 )
 
 // NoopContractKeeper is a no-op implementation of ibccallbackstypes.ContractKeeper

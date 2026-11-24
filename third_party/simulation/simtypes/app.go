@@ -8,7 +8,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -29,7 +28,6 @@ type App interface {
 	GetSDKStakingKeeper() stakingkeeper.Keeper
 	ModuleManager() module.Manager
 	GetPoolManagerKeeper() PoolManagerKeeper
-	GetSubspace(moduleName string) paramtypes.Subspace
 }
 
 type AccountKeeper interface {

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
-	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
+	channeltypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/04-channel/types"
+	ibcexported "github.com/lfdt-ibc/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 

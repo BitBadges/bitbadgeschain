@@ -16,8 +16,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
-	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
+	porttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/05-port/types"
+	ibckeeper "github.com/lfdt-ibc/ibc-go/v11/modules/core/keeper"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 

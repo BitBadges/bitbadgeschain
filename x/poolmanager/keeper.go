@@ -6,7 +6,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	gogotypes "github.com/cosmos/gogoproto/types"
 )
 
@@ -27,16 +26,9 @@ type Keeper struct {
 	// modules. Since map iterations are non-deterministic, we
 	// use this list to ensure deterministic iteration.
 	poolModules []types.PoolModuleI
-
-	paramSpace paramtypes.Subspace
 }
 
-func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gammKeeper *gammkeeper.Keeper, bankKeeper types.BankI, accountKeeper types.AccountI, communityPoolKeeper types.CommunityPoolI, stakingKeeper types.StakingKeeper) *Keeper {
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
-	}
-
+func NewKeeper(storeKey storetypes.StoreKey, gammKeeper *gammkeeper.Keeper, bankKeeper types.BankI, accountKeeper types.AccountI, communityPoolKeeper types.CommunityPoolI, stakingKeeper types.StakingKeeper) *Keeper {
 	routesMap := map[types.PoolType]types.PoolModuleI{
 		types.Balancer:   gammKeeper,
 		types.Stableswap: gammKeeper,
@@ -48,7 +40,6 @@ func NewKeeper(storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, gam
 
 	return &Keeper{
 		storeKey:            storeKey,
-		paramSpace:          paramSpace,
 		gammKeeper:          gammKeeper,
 		bankKeeper:          bankKeeper,
 		accountKeeper:       accountKeeper,
@@ -65,23 +56,30 @@ func (k *Keeper) ResetCaches() {}
 
 // GetParams returns the total set of poolmanager parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
-	k.paramSpace.GetParamSet(ctx, &params)
+	store := ctx.KVStore(k.storeKey)
+	found, err := osmoutils.Get(store, types.KeyParams, &params)
+	if err != nil {
+		panic(err)
+	}
+	if !found {
+		return types.DefaultParams()
+	}
+	if params.TakerFeeParams.AdminAddresses == nil {
+		params.TakerFeeParams.AdminAddresses = []string{}
+	}
+	if params.TakerFeeParams.ReducedFeeWhitelist == nil {
+		params.TakerFeeParams.ReducedFeeWhitelist = []string{}
+	}
+	if params.TakerFeeParams.CommunityPoolDenomWhitelist == nil {
+		params.TakerFeeParams.CommunityPoolDenomWhitelist = []string{}
+	}
 	return params
-}
-
-// GetParam returns a specific poolmanager module's parameter.
-func (k Keeper) GetParam(ctx sdk.Context, key []byte, ptr interface{}) {
-	k.paramSpace.Get(ctx, key, ptr)
 }
 
 // SetParams sets the total set of poolmanager parameters.
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
-// SetParam sets a specific poolmanger module's parameter with the provided parameter.
-func (k Keeper) SetParam(ctx sdk.Context, key []byte, value interface{}) {
-	k.paramSpace.Set(ctx, key, value)
+	store := ctx.KVStore(k.storeKey)
+	osmoutils.MustSet(store, types.KeyParams, &params)
 }
 
 // InitGenesis initializes the poolmanager module's state from a provided genesis

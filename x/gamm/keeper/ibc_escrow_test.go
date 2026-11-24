@@ -4,9 +4,9 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
-	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
+	channeltypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/04-channel/types"
+	clienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
 
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
@@ -99,7 +99,6 @@ func (s *KeeperTestSuite) TestExecuteIBCTransfer_EscrowsTokens() {
 	testKeeper := keeper.NewKeeper(
 		s.App.AppCodec(),
 		s.App.GetKey(types.StoreKey),
-		s.App.GetSubspace(types.ModuleName),
 		s.App.AccountKeeper,
 		s.App.BankKeeper,
 		s.App.DistrKeeper,
@@ -155,7 +154,6 @@ func (s *KeeperTestSuite) TestSwapExactAmountInWithIBCTransfer_EscrowsTokens() {
 	testKeeper := keeper.NewKeeper(
 		s.App.AppCodec(),
 		s.App.GetKey(types.StoreKey),
-		s.App.GetSubspace(types.ModuleName),
 		s.App.AccountKeeper,
 		s.App.BankKeeper,
 		s.App.DistrKeeper,

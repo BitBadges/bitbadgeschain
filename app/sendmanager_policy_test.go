@@ -8,7 +8,7 @@ import (
 	sendtypes "github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
+	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
 	"github.com/stretchr/testify/require"
 )
 

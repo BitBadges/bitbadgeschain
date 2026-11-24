@@ -59,30 +59,26 @@ import (
 // x/group removed in v0.54 (moved to Cosmos Enterprise)
 	_ "github.com/cosmos/cosmos-sdk/x/mint"         // import for side-effects
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	_ "github.com/cosmos/cosmos-sdk/x/params" // import for side-effects
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
-	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	_ "github.com/cosmos/cosmos-sdk/x/slashing" // import for side-effects
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	_ "github.com/cosmos/cosmos-sdk/x/staking" // import for side-effects
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	packetforward "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware"
-	packetforwardkeeper "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/types"
-	_ "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts" // import for side-effects
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
-	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
-	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
+	packetforward "github.com/lfdt-ibc/ibc-go/v11/modules/apps/packet-forward-middleware"
+	packetforwardkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
+	packetforwardtypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/packet-forward-middleware/types"
+	_ "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts" // import for side-effects
+	icacontrollerkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
+	porttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/05-port/types"
+	ibckeeper "github.com/lfdt-ibc/ibc-go/v11/modules/core/keeper"
 
 	sdkmempool "github.com/cosmos/cosmos-sdk/types/mempool"
 	evmante "github.com/cosmos/evm/ante"
 	antetypes "github.com/cosmos/evm/ante/types"
 	erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
 	feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
-	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
+	transferkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/keeper"
 	precisebank "github.com/cosmos/evm/contrib/x/precisebank"
 	precisebankkeeper "github.com/cosmos/evm/contrib/x/precisebank/keeper"
 	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
@@ -145,7 +141,6 @@ type App struct {
 	GovKeeper            *govkeeper.Keeper
 	// CrisisKeeper removed in v0.54 (moved to contrib)
 	UpgradeKeeper        *upgradekeeper.Keeper
-	ParamsKeeper         paramskeeper.Keeper
 	AuthzKeeper          authzkeeper.Keeper
 	EvidenceKeeper       evidencekeeper.Keeper
 	FeeGrantKeeper       feegrantkeeper.Keeper
@@ -204,13 +199,6 @@ func init() {
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
 	// this line is used by starport scaffolding # stargate/app/govProposalHandlers
-
-	govProposalHandlers = append(govProposalHandlers,
-		paramsclient.ProposalHandler,
-
-		// this line is used by starport scaffolding # stargate/app/govProposalHandler
-	)
-
 	return govProposalHandlers
 }
 
@@ -291,7 +279,6 @@ func New(
 		&app.MintKeeper,
 		&app.GovKeeper,
 		&app.UpgradeKeeper,
-		&app.ParamsKeeper,
 		&app.AuthzKeeper,
 		&app.EvidenceKeeper,
 		&app.FeeGrantKeeper,
@@ -425,7 +412,7 @@ func New(
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	overrideModules := map[string]module.AppModuleSimulation{
-		authtypes.ModuleName: auth.NewAppModule(app.appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
+		authtypes.ModuleName: auth.NewAppModule(app.appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
 	}
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders() // use custom AnteHandler
@@ -571,12 +558,6 @@ func (app *App) kvStoreKeys() map[string]*storetypes.KVStoreKey {
 	}
 
 	return keys
-}
-
-// GetSubspace returns a param subspace for a given module name.
-func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
-	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
-	return subspace
 }
 
 // GetIBCKeeper returns the IBC keeper.

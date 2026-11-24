@@ -6,9 +6,9 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
-	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
+	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
+	channeltypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/04-channel/types"
+	ibcexported "github.com/lfdt-ibc/ibc-go/v11/modules/core/exported"
 	"github.com/stretchr/testify/require"
 
 	ibchooks "github.com/bitbadges/bitbadgeschain/x/ibc-hooks"

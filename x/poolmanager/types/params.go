@@ -7,7 +7,6 @@ import (
 	"github.com/bitbadges/bitbadgeschain/third_party/osmoutils"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // Parameter store keys.
@@ -25,11 +24,6 @@ var (
 	ZeroDec = osmomath.ZeroDec()
 	OneDec  = osmomath.OneDec()
 )
-
-// ParamTable for gamm module.
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
-}
 
 func NewParams(poolCreationFee sdk.Coins,
 	defaultTakerFee osmomath.Dec,
@@ -102,19 +96,6 @@ func (p Params) Validate() error {
 	}
 
 	return nil
-}
-
-// Implements params.ParamSet.
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyDefaultTakerFee, &p.TakerFeeParams.DefaultTakerFee, validateDefaultTakerFee),
-		paramtypes.NewParamSetPair(KeyOsmoTakerFeeDistribution, &p.TakerFeeParams.OsmoTakerFeeDistribution, validateTakerFeeDistribution),
-		paramtypes.NewParamSetPair(KeyNonOsmoTakerFeeDistribution, &p.TakerFeeParams.NonOsmoTakerFeeDistribution, validateTakerFeeDistribution),
-		paramtypes.NewParamSetPair(KeyAdminAddresses, &p.TakerFeeParams.AdminAddresses, validateAdminAddresses),
-		paramtypes.NewParamSetPair(KeyCommunityPoolDenomToSwapNonWhitelistedAssetsTo, &p.TakerFeeParams.CommunityPoolDenomToSwapNonWhitelistedAssetsTo, validateCommunityPoolDenomToSwapNonWhitelistedAssetsTo),
-		paramtypes.NewParamSetPair(KeyReducedTakerFeeByWhitelist, &p.TakerFeeParams.ReducedFeeWhitelist, osmoutils.ValidateAddressList),
-		paramtypes.NewParamSetPair(KeyCommunityPoolDenomWhitelist, &p.TakerFeeParams.CommunityPoolDenomWhitelist, validateCommunityPoolDenomWhitelist),
-	}
 }
 
 func validatePoolCreationFee(i interface{}) error {

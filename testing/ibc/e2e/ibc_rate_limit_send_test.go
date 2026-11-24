@@ -6,9 +6,9 @@ package e2e
 import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
-	ibctesting "github.com/cosmos/ibc-go/v11/testing"
+	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
+	clienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
+	ibctesting "github.com/lfdt-ibc/ibc-go/v11/testing"
 
 	ibctest "github.com/bitbadges/bitbadgeschain/testing/ibc"
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"

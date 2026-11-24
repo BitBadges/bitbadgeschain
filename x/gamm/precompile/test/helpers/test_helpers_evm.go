@@ -79,6 +79,12 @@ func ExecuteEVMTransaction(
 	// Convert transaction to MsgEthereumTx
 	msg := &evmtypes.MsgEthereumTx{}
 	msg.FromEthereumTx(tx)
+	if sender, senderErr := types.LatestSignerForChainID(tx.ChainId()).Sender(tx); senderErr == nil {
+		if len(msg.From) == 0 {
+			msg.From = sender.Bytes()
+		}
+		evmKeeper.SetAnteVerifiedSender(ctx, msg.Hash(), sender)
+	}
 
 	// Use recover to catch panics from snapshot errors
 	// ROOT CAUSE: The upstream cosmos/evm module's RunNativeAction doesn't create a snapshot
