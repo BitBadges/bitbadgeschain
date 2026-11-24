@@ -17,7 +17,7 @@ func (a *collectionServiceAdapter) GetCollection(ctx sdk.Context, collectionId s
 }
 
 func (a *collectionServiceAdapter) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error) {
-	return a.keeper.GetBalanceOrApplyDefault(ctx, collection, userAddress)
+	return a.keeper.GetBalanceOrApplyDefaultReadOnly(ctx, collection, userAddress)
 }
 
 // addressCheckServiceAdapter adapts the Keeper to the AddressCheckService interface

@@ -250,7 +250,7 @@ func (p Precompile) IsTransaction(method *abi.Method) bool {
 // HandleTransaction handles a transaction by unmarshaling JSON and executing via keeper
 func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonStr string, contract *vm.Contract) ([]byte, error) {
 	// Unmarshal JSON to Msg
-	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
+	msg, err := p.unmarshalMsgFromJSON(ctx, method.Name, jsonStr, contract)
 	if err != nil {
 		return nil, err
 	}

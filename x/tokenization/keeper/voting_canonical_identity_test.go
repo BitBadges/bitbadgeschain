@@ -93,7 +93,7 @@ func (suite *TestSuite) TestV35DualSpellingVotersKeepSeparateWeights() {
 		suite.Require().Equal(sdkmath.NewUint(uint64(25+75*i)), vote.YesWeight, "migration preserves each existing vote")
 	}
 	server := keeper.NewMsgServerImpl(k)
-	msg := &types.MsgCastVote{Creator: bob, CollectionId: collection.CollectionId, ApprovalLevel: "collection", ApprovalId: approval.ApprovalId, ProposalId: challenge.ProposalId, YesWeight: sdkmath.NewUint(50)}
+	msg := &types.MsgCastVote{Creator: bob, CollectionId: collection.CollectionId, ApprovalLevel: "collection", ApprovalId: approval.ApprovalId, ProposalId: challenge.ProposalId, YesWeight: sdkmath.NewUint(39)}
 	_, err = server.CastVote(wctx, msg)
 	suite.Require().NoError(err)
 	for _, voter := range challenge.Voters {
@@ -101,19 +101,19 @@ func (suite *TestSuite) TestV35DualSpellingVotersKeepSeparateWeights() {
 		vote, found := k.GetVoteFromStore(suite.ctx, key)
 		suite.Require().True(found)
 		suite.Require().Equal(voter.Address, vote.Voter)
-		suite.Require().Equal(sdkmath.NewUint(50), vote.YesWeight)
+		suite.Require().Equal(sdkmath.NewUint(39), vote.YesWeight)
 	}
 	trackerKey := keeper.ConstructVotingChallengeTrackerKey(collection.CollectionId, "", "collection", approval.ApprovalId, challenge.ProposalId)
 	tracker, found := k.GetVotingChallengeTrackerFromStore(suite.ctx, trackerKey)
 	suite.Require().True(found)
-	suite.Require().True(tracker.QuorumReachedTimestamp.IsZero(), "floor(1*50%%)+floor(3*50%%)=1, not merged-weight 2")
+	suite.Require().True(tracker.QuorumReachedTimestamp.IsZero(), "39%% weighted yes is below 40%% quorum threshold")
 	for _, checker := range k.GetApprovalCriteriaCheckers(approval) {
 		if checker.Name() == "VotingChallenges" {
 			_, err := checker.Check(suite.ctx, approval, collection, alice, "Mint", alice, "collection", "", nil, nil, "", true)
 			suite.Require().ErrorContains(err, "threshold not met")
 		}
 	}
-	msg.YesWeight = sdkmath.NewUint(100)
+	msg.YesWeight = sdkmath.NewUint(50)
 	_, err = server.CastVote(wctx, msg)
 	suite.Require().NoError(err)
 	tracker, found = k.GetVotingChallengeTrackerFromStore(suite.ctx, trackerKey)

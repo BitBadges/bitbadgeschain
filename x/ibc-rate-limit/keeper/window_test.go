@@ -120,7 +120,7 @@ func (suite *KeeperTestSuite) TestMigrateV35WindowsToBlockTime() {
 	// Legacy windows: HOUR/1 started at height 100 (1200 blocks), DAY/1 at
 	// height 40 (28800 blocks), BLOCK/50 at height 120.
 	suite.keeper.SetChannelFlowWindowWithTimeframe(suite.ctx, windowTestChannel, windowTestDenom, hour, 1, ratelimittypes.ChannelFlowWindow{WindowStart: 100, WindowDuration: 1200})
-	suite.keeper.SetUniqueSendersWindow(suite.ctx, windowTestChannel, day, 1, ratelimittypes.ChannelFlowWindow{WindowStart: 40, WindowDuration: 28800})
+	suite.keeper.SetUniqueSendersWindow(suite.ctx, windowTestChannel, windowTestDenom, day, 1, ratelimittypes.ChannelFlowWindow{WindowStart: 40, WindowDuration: 28800})
 	suite.keeper.SetAddressTransferWindow(suite.ctx, windowTestAddr, windowTestChannel, windowTestDenom, hour, 2, ratelimittypes.ChannelFlowWindow{WindowStart: 100, WindowDuration: 2400})
 	suite.keeper.SetChannelFlowWindowWithTimeframe(suite.ctx, windowTestChannel, windowTestDenom, block, 50, ratelimittypes.ChannelFlowWindow{WindowStart: 120, WindowDuration: 50})
 
@@ -132,7 +132,7 @@ func (suite *KeeperTestSuite) TestMigrateV35WindowsToBlockTime() {
 	suite.Require().Equal(windowTestT0.Unix()-300*3, w.WindowStart, "HOUR window start must be shifted back by elapsed blocks * 3 s")
 	suite.Require().Equal(int64(3600), w.WindowDuration)
 
-	w, _ = suite.keeper.GetUniqueSendersWindow(suite.ctx, windowTestChannel, day, 1)
+	w, _ = suite.keeper.GetUniqueSendersWindow(suite.ctx, windowTestChannel, windowTestDenom, day, 1)
 	suite.Require().Equal(windowTestT0.Unix()-360*3, w.WindowStart)
 	suite.Require().Equal(int64(86400), w.WindowDuration)
 

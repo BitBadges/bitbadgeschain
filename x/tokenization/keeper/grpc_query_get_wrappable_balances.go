@@ -50,7 +50,7 @@ func (k Keeper) GetWrappableBalances(goCtx context.Context, req *types.QueryGetW
 	}
 
 	// Get user's native balances (non-wrapped)
-	userBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+	userBalances, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, req.Address)
 	if err != nil {
 		return nil, err
 	}

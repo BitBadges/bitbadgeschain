@@ -6,6 +6,9 @@ import (
 )
 
 func (msg *MsgCreateManagerSplitter) ValidateBasic() error {
+	if msg == nil {
+		return sdkerrors.Wrap(ErrInvalidRequest, "message cannot be nil")
+	}
 	// Validate admin address format
 	adminAddr, err := sdk.AccAddressFromBech32(msg.Admin)
 	if err != nil {
@@ -71,5 +74,47 @@ func validatePermissions(perms *ManagerSplitterPermissions) error {
 		}
 	}
 
+	if err := ValidateOptionalPermissions(perms); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateOptionalPermissions validates all populated permission criteria entries.
+func ValidateOptionalPermissions(perms *ManagerSplitterPermissions) error {
+	if perms == nil {
+		return nil
+	}
+	permissionFields := []struct {
+		name     string
+		criteria *PermissionCriteria
+	}{
+		{"canDeleteCollection", perms.CanDeleteCollection},
+		{"canArchiveCollection", perms.CanArchiveCollection},
+		{"canUpdateStandards", perms.CanUpdateStandards},
+		{"canUpdateCustomData", perms.CanUpdateCustomData},
+		{"canUpdateManager", perms.CanUpdateManager},
+		{"canUpdateCollectionMetadata", perms.CanUpdateCollectionMetadata},
+		{"canUpdateValidTokenIds", perms.CanUpdateValidTokenIds},
+		{"canUpdateTokenMetadata", perms.CanUpdateTokenMetadata},
+		{"canUpdateCollectionApprovals", perms.CanUpdateCollectionApprovals},
+		{"canAddMoreAliasPaths", perms.CanAddMoreAliasPaths},
+		{"canAddMoreCosmosCoinWrapperPaths", perms.CanAddMoreCosmosCoinWrapperPaths},
+	}
+
+	for _, field := range permissionFields {
+		if field.criteria == nil {
+			continue
+		}
+		for i, addr := range field.criteria.ApprovedAddresses {
+			if addr == "" {
+				return sdkerrors.Wrapf(ErrInvalidAddress, "approved address at index %d for %s cannot be empty", i, field.name)
+			}
+			if _, err := sdk.AccAddressFromBech32(addr); err != nil {
+				return sdkerrors.Wrapf(ErrInvalidAddress, "invalid approved address at index %d for %s (%s)", i, field.name, err)
+			}
+		}
+	}
 	return nil
 }

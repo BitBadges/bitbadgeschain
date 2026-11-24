@@ -144,20 +144,28 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 
 	// IMPORTANT: Default balances should only be able to specify general rules for incoming and outgoing approvals
 	//           They should not be able to specify approval criteria like coin transfers, approval amounts, etc.
-	//           This prevents default approval attacks where a creator can set an approval that approves a coin transfer
-	//           and then use that approval to transfer coins without their permissions
 	//           We can allow stuff on a more fine-grained level in the future but for now, we just disallow this
 	for _, incomingApproval := range msg.DefaultBalances.IncomingApprovals {
 		approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(incomingApproval.ApprovalCriteria)
 		if approvalCriteria != nil && !CollectionApprovalIsAutoScannable(approvalCriteria) {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "incoming approval criteria must be nil for default balances")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "incoming approval criteria must be auto-scannable for default balances")
+		}
+		if msg.CollectionId.IsZero() && msg.Invariants != nil && msg.Invariants.NoCustomOwnershipTimes {
+			if err := ValidateNoCustomOwnershipTimesInvariant(incomingApproval.OwnershipTimes, true); err != nil {
+				return sdkerrors.Wrap(err, "default balances incoming approval ownership times validation failed")
+			}
 		}
 	}
 
 	for _, outgoingApproval := range msg.DefaultBalances.OutgoingApprovals {
 		approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(outgoingApproval.ApprovalCriteria)
 		if approvalCriteria != nil && !CollectionApprovalIsAutoScannable(approvalCriteria) {
-			return sdkerrors.Wrapf(ErrInvalidRequest, "outgoing approval criteria must be nil for default balances")
+			return sdkerrors.Wrapf(ErrInvalidRequest, "outgoing approval criteria must be auto-scannable for default balances")
+		}
+		if msg.CollectionId.IsZero() && msg.Invariants != nil && msg.Invariants.NoCustomOwnershipTimes {
+			if err := ValidateNoCustomOwnershipTimesInvariant(outgoingApproval.OwnershipTimes, true); err != nil {
+				return sdkerrors.Wrap(err, "default balances outgoing approval ownership times validation failed")
+			}
 		}
 	}
 
@@ -169,7 +177,19 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		return err
 	}
 
-	for _, path := range msg.CosmosCoinWrapperPathsToAdd {
+	for i, coin := range msg.MintEscrowCoinsToTransfer {
+		if coin == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "mintEscrowCoinsToTransfer[%d] cannot be nil", i)
+		}
+		if !coin.IsValid() || !coin.Amount.IsPositive() {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "mintEscrowCoinsToTransfer[%d] must be a valid positive coin", i)
+		}
+	}
+
+	for i, path := range msg.CosmosCoinWrapperPathsToAdd {
+		if path == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "cosmosCoinWrapperPathsToAdd[%d] cannot be nil", i)
+		}
 		// Validate denom format
 		if err := ValidateCosmosWrapperPathDenom(path.Denom); err != nil {
 			return err
@@ -227,7 +247,10 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		// Validate that only one denom unit per path has isDefaultDisplay set to true
 		defaultDisplayCount := 0
 		decimalsSet := make(map[string]bool)
-		for _, denomUnit := range path.DenomUnits {
+		for j, denomUnit := range path.DenomUnits {
+			if denomUnit == nil {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "wrapper path denomUnits[%d] cannot be nil", j)
+			}
 			// Validate denom unit symbol format
 			if err := ValidateCosmosWrapperPathSymbol(denomUnit.Symbol); err != nil {
 				return err
@@ -238,7 +261,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 			}
 
 			// Check that decimals is not 0
-			if denomUnit.Decimals.IsZero() {
+			if denomUnit.Decimals.IsNil() || denomUnit.Decimals.IsZero() {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "denom unit decimals cannot be 0")
 			}
 
@@ -254,7 +277,10 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 		}
 	}
 
-	for _, path := range msg.AliasPathsToAdd {
+	for i, path := range msg.AliasPathsToAdd {
+		if path == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "aliasPathsToAdd[%d] cannot be nil", i)
+		}
 		// Validate denom format
 		if err := ValidateCosmosWrapperPathDenom(path.Denom); err != nil {
 			return err
@@ -299,7 +325,10 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 
 		defaultDisplayCount := 0
 		decimalsSet := make(map[string]bool)
-		for _, denomUnit := range path.DenomUnits {
+		for j, denomUnit := range path.DenomUnits {
+			if denomUnit == nil {
+				return sdkerrors.Wrapf(ErrInvalidRequest, "alias path denomUnits[%d] cannot be nil", j)
+			}
 			if err := ValidateCosmosWrapperPathSymbol(denomUnit.Symbol); err != nil {
 				return err
 			}
@@ -308,7 +337,7 @@ func (msg *MsgUniversalUpdateCollection) CheckAndCleanMsg(ctx sdk.Context, canCh
 				defaultDisplayCount++
 			}
 
-			if denomUnit.Decimals.IsZero() {
+			if denomUnit.Decimals.IsNil() || denomUnit.Decimals.IsZero() {
 				return sdkerrors.Wrapf(ErrInvalidRequest, "denom unit decimals cannot be 0")
 			}
 

@@ -110,21 +110,40 @@ func (h *CombinedIBCHooks) SendPacketOverride(i ibchooks.ICS4Middleware, ctx sdk
 }
 
 // OnAcknowledgementPacketOverride forwards to the rate-limit hook so that
-// failed outbound transfers refund their quota. If no rate-limit hook is
-// configured, fall through to the underlying app.
+// failed outbound transfers refund their quota, then triggers custom-hooks
+// recovery forwarding for swap_and_action outbound packets.
 func (h *CombinedIBCHooks) OnAcknowledgementPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
+	var err error
 	if h.RateLimitOverrideHooks != nil {
-		return h.RateLimitOverrideHooks.OnAcknowledgementPacketOverride(im, ctx, channelID, packet, acknowledgement, relayer)
+		err = h.RateLimitOverrideHooks.OnAcknowledgementPacketOverride(im, ctx, channelID, packet, acknowledgement, relayer)
+	} else {
+		err = im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
 	}
-	return im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer)
+	if err != nil {
+		return err
+	}
+	if h.CustomHooks != nil {
+		h.CustomHooks.OnAcknowledgementPacketAfterHook(ctx, packet, acknowledgement)
+	}
+	return nil
 }
 
-// OnTimeoutPacketOverride forwards to the rate-limit hook for quota refund on timeout.
+// OnTimeoutPacketOverride forwards to the rate-limit hook for quota refund on timeout,
+// then triggers custom-hooks recovery forwarding for swap_and_action outbound packets.
 func (h *CombinedIBCHooks) OnTimeoutPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+	var err error
 	if h.RateLimitOverrideHooks != nil {
-		return h.RateLimitOverrideHooks.OnTimeoutPacketOverride(im, ctx, channelID, packet, relayer)
+		err = h.RateLimitOverrideHooks.OnTimeoutPacketOverride(im, ctx, channelID, packet, relayer)
+	} else {
+		err = im.App.OnTimeoutPacket(ctx, channelID, packet, relayer)
 	}
-	return im.App.OnTimeoutPacket(ctx, channelID, packet, relayer)
+	if err != nil {
+		return err
+	}
+	if h.CustomHooks != nil {
+		h.CustomHooks.OnTimeoutPacketAfterHook(ctx, packet)
+	}
+	return nil
 }
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -286,7 +305,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		app.TransferICS4Wrapper,
 		app.IBCKeeper.ChannelKeeper,
 		tokenizationMsgServer,
-	)
+	).WithStoreKey(app.GetKey(ibchookstypes.StoreKey))
 
 	// Setup Custom Hooks (standalone)
 	customHooks := customhooks.NewCustomHooks(customHooksKeeper, bech32Prefix)

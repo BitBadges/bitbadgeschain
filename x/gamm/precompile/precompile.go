@@ -314,7 +314,7 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 // HandleTransaction handles a transaction by unmarshaling JSON and executing via keeper
 func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonStr string, contract *vm.Contract) ([]byte, error) {
 	// Unmarshal JSON to Msg
-	msg, err := p.unmarshalMsgFromJSON(method.Name, jsonStr, contract)
+	msg, err := p.unmarshalMsgFromJSON(ctx, method.Name, jsonStr, contract)
 	if err != nil {
 		return nil, err
 	}
@@ -397,7 +397,7 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 			return method.Outputs.Pack(tokensOut)
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for exitPool"), ErrorCodeInternalError, "expected MsgExitPoolResponse")
-	case SwapExactAmountInMethod, SwapExactAmountInWithIBCTransferMethod:
+	case SwapExactAmountInMethod:
 		if swapResp, ok := resp.(*gammtypes.MsgSwapExactAmountInResponse); ok {
 			tokenOut := swapResp.TokenOutAmount.BigInt()
 			if err := CheckUint256Overflow(tokenOut, "tokenOutAmount"); err != nil {
@@ -406,6 +406,15 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 			return method.Outputs.Pack(tokenOut)
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for swapExactAmountIn"), ErrorCodeInternalError, "expected MsgSwapExactAmountInResponse")
+	case SwapExactAmountInWithIBCTransferMethod:
+		if swapResp, ok := resp.(*gammtypes.MsgSwapExactAmountInWithIBCTransferResponse); ok {
+			tokenOut := swapResp.TokenOutAmount.BigInt()
+			if err := CheckUint256Overflow(tokenOut, "tokenOutAmount"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "token amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(tokenOut)
+		}
+		return nil, WrapError(fmt.Errorf("invalid response type for swapExactAmountInWithIBCTransfer"), ErrorCodeInternalError, "expected MsgSwapExactAmountInWithIBCTransferResponse")
 	case CreatePoolMethod:
 		if createResp, ok := resp.(*balancer.MsgCreateBalancerPoolResponse); ok {
 			// Convert uint64 to *big.Int for ABI packing (uint64 always fits in uint256)
@@ -421,7 +430,7 @@ func (p Precompile) HandleTransaction(ctx sdk.Context, method *abi.Method, jsonS
 // HandleQuery handles a query by unmarshaling JSON and executing via keeper
 func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
 	// Unmarshal JSON to QueryRequest
-	queryReq, err := p.unmarshalQueryFromJSON(method.Name, jsonStr)
+	queryReq, err := p.unmarshalQueryFromJSON(ctx, method.Name, jsonStr)
 	if err != nil {
 		return nil, err
 	}
@@ -434,14 +443,26 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 	case *gammtypes.QueryPoolRequest:
 		resp, err = querier.Pool(ctx, req)
 	case *gammtypes.QueryPoolsRequest:
+		const maxPoolsPageLimit uint64 = 100
+		if req.Pagination != nil && req.Pagination.Limit > maxPoolsPageLimit {
+			return nil, ErrInvalidInput(fmt.Sprintf("pagination limit (%d) exceeds maximum allowed (%d)", req.Pagination.Limit, maxPoolsPageLimit))
+		}
 		resp, err = querier.Pools(ctx, req)
 	case *gammtypes.QueryPoolTypeRequest:
 		resp, err = querier.PoolType(ctx, req)
 	case *gammtypes.QueryCalcJoinPoolNoSwapSharesRequest:
+		if err := ValidateArraySizeAllowEmpty(len(req.TokensIn), MaxCoins, "tokensIn"); err != nil {
+			return nil, err
+		}
+		ctx.GasMeter().ConsumeGas(uint64(len(req.TokensIn))*GasPerCoin, "precompile query elements")
 		resp, err = querier.CalcJoinPoolNoSwapShares(ctx, req)
 	case *gammtypes.QueryCalcExitPoolCoinsFromSharesRequest:
 		resp, err = querier.CalcExitPoolCoinsFromShares(ctx, req)
 	case *gammtypes.QueryCalcJoinPoolSharesRequest:
+		if err := ValidateArraySizeAllowEmpty(len(req.TokensIn), MaxCoins, "tokensIn"); err != nil {
+			return nil, err
+		}
+		ctx.GasMeter().ConsumeGas(uint64(len(req.TokensIn))*GasPerCoin, "precompile query elements")
 		resp, err = querier.CalcJoinPoolShares(ctx, req)
 	case *gammtypes.QueryPoolParamsRequest:
 		resp, err = querier.PoolParams(ctx, req)

@@ -100,6 +100,18 @@ func ValidateUserOutgoingApprovalPermissions(permissions []*UserOutgoingApproval
 			return err
 		}
 
+		if permission.ApprovalId == "" {
+			return ErrAmountTrackerIdIsNil
+		}
+
+		if permission.ToListId == "" {
+			return sdkerrors.Wrap(ErrInvalidRequest, "toListId is nil")
+		}
+
+		if permission.InitiatedByListId == "" {
+			return sdkerrors.Wrap(ErrInvalidRequest, "initiatedByListId is nil")
+		}
+
 		err = ValidatePermanentlyPermittedTimes(permission.PermanentlyPermittedTimes, permission.PermanentlyForbiddenTimes)
 		if err != nil {
 			return err
@@ -136,6 +148,18 @@ func ValidateUserIncomingApprovalPermissions(permissions []*UserIncomingApproval
 		err = ValidateRangesAreValid(permission.OwnershipTimes, false, false)
 		if err != nil {
 			return err
+		}
+
+		if permission.ApprovalId == "" {
+			return ErrAmountTrackerIdIsNil
+		}
+
+		if permission.FromListId == "" {
+			return sdkerrors.Wrap(ErrInvalidRequest, "fromListId is nil")
+		}
+
+		if permission.InitiatedByListId == "" {
+			return sdkerrors.Wrap(ErrInvalidRequest, "initiatedByListId is nil")
 		}
 
 		err = ValidatePermanentlyPermittedTimes(permission.PermanentlyPermittedTimes, permission.PermanentlyForbiddenTimes)
@@ -210,6 +234,10 @@ func ValidateActionPermission(permissions []*ActionPermission, canChangeValues b
 }
 
 func ValidateUserPermissions(permissions *UserPermissions, canChangeValues bool) error {
+	if permissions == nil {
+		return nil
+	}
+
 	if permissions.CanUpdateIncomingApprovals != nil {
 		if err := ValidateUserIncomingApprovalPermissions(permissions.CanUpdateIncomingApprovals, canChangeValues); err != nil {
 			return err
@@ -220,6 +248,18 @@ func ValidateUserPermissions(permissions *UserPermissions, canChangeValues bool)
 		if err := ValidateUserOutgoingApprovalPermissions(permissions.CanUpdateOutgoingApprovals, canChangeValues); err != nil {
 			return err
 		}
+	}
+
+	if err := ValidateActionPermission(permissions.CanUpdateAutoApproveSelfInitiatedIncomingTransfers, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateActionPermission(permissions.CanUpdateAutoApproveSelfInitiatedOutgoingTransfers, canChangeValues); err != nil {
+		return err
+	}
+
+	if err := ValidateActionPermission(permissions.CanUpdateAutoApproveAllIncomingTransfers, canChangeValues); err != nil {
+		return err
 	}
 
 	return nil

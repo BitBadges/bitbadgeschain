@@ -44,8 +44,8 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 	numPurged := sdkmath.NewUint(0)
 	currentTime := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
 
-	// Get current user balance to filter out approvals to purge
-	userBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, targetAddress)
+	// Get current user balance to filter out approvals to purge (read-only before any mutation)
+	userBalance, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, targetAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +75,16 @@ func (k msgServer) PurgeApprovals(goCtx context.Context, msg *types.MsgPurgeAppr
 	if len(outgoingApprovalsToPurge) > 0 {
 		newOutgoingApprovals := k.filterApprovalsToPurge(ctx, userBalance.OutgoingApprovals, outgoingApprovalsToPurge, msg, targetAddress, currentTime, &numPurged)
 		userBalance.OutgoingApprovals = newOutgoingApprovals.([]*types.UserOutgoingApproval)
+	}
+
+	// If nothing was actually purged, return early without mutating targetAddress state
+	// or emitting update_user_approvals events.
+	if numPurged.IsZero() {
+		return &types.MsgPurgeApprovalsResponse{
+			NumPurged:         numPurged,
+			PurgedApprovalIds: []string{},
+			ReviewItems:       []string{},
+		}, nil
 	}
 
 	// Create UpdateUserApprovals message with filtered approvals
@@ -185,14 +195,14 @@ func (k msgServer) canPurgeUserApproval(ctx sdk.Context, approval interface{}, m
 	switch a := approval.(type) {
 	case *types.UserIncomingApproval:
 		for _, transferTime := range a.TransferTimes {
-			if transferTime.End.GT(currentTime) {
+			if transferTime.End.GTE(currentTime) {
 				hasFutureTransferTimes = true
 				break
 			}
 		}
 	case *types.UserOutgoingApproval:
 		for _, transferTime := range a.TransferTimes {
-			if transferTime.End.GT(currentTime) {
+			if transferTime.End.GTE(currentTime) {
 				hasFutureTransferTimes = true
 				break
 			}

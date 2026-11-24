@@ -32,8 +32,20 @@ func getDefaultBalanceStoreForCollection(collection *types.TokenCollection) *typ
 	return &copied
 }
 
-// GetBalanceOrApplyDefault retrieves user balance or applies default balance store
+// GetBalanceOrApplyDefaultReadOnly retrieves a user balance or constructs the collection default
+// balance without writing approval version records to state. Callers that only inspect balances or
+// delegate persistence to a subsequent write helper should use this variant.
+func (k Keeper) GetBalanceOrApplyDefaultReadOnly(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error) {
+	return k.getBalanceOrApplyDefault(ctx, collection, userAddress, false)
+}
+
+// GetBalanceOrApplyDefault retrieves user balance or applies default balance store.
+// When initializing defaults for a state-writing flow, approval versions are recorded in store.
 func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string) (*types.UserBalanceStore, bool, error) {
+	return k.getBalanceOrApplyDefault(ctx, collection, userAddress, true)
+}
+
+func (k Keeper) getBalanceOrApplyDefault(ctx sdk.Context, collection *types.TokenCollection, userAddress string, persistDefaultVersions bool) (*types.UserBalanceStore, bool, error) {
 	// Mint has unlimited balances
 	if types.IsMintAddress(userAddress) {
 		return &types.UserBalanceStore{}, false, nil
@@ -53,8 +65,8 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 	// Special backed addresses also have unlimited balances
 	if k.IsSpecialBackedAddress(ctx, collection, userAddress) {
 		return &types.UserBalanceStore{
-			Balances:                        []*types.Balance{},
-			AutoApproveAllIncomingTransfers: true,
+			Balances:                                  []*types.Balance{},
+			AutoApproveAllIncomingTransfers:           true,
 			AutoApproveSelfInitiatedIncomingTransfers: true,
 			AutoApproveSelfInitiatedOutgoingTransfers: true,
 		}, false, nil
@@ -68,24 +80,32 @@ func (k Keeper) GetBalanceOrApplyDefault(ctx sdk.Context, collection *types.Toke
 		balance = getDefaultBalanceStoreForCollection(collection)
 		appliedDefault = true
 
-		// Initialize approval versions for default approvals when balance is first accessed.
-		// This is necessary to ensure approval versioning works correctly for default approvals.
-		// Note: This has a side effect - first access to a balance increments approval versions,
-		// which is intentional to prevent replay attacks using old default approval versions.
-		// The version is incremented (not set to 0) to ensure uniqueness and prevent conflicts.
-		for _, approval := range balance.IncomingApprovals {
-			version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
-			if err != nil {
-				return nil, false, sdkerrors.Wrap(err, "failed to increment approval version")
+		if persistDefaultVersions {
+			for _, approval := range balance.IncomingApprovals {
+				version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
+				if err != nil {
+					return nil, false, sdkerrors.Wrap(err, "failed to increment approval version")
+				}
+				approval.Version = version
 			}
-			approval.Version = version
-		}
-		for _, approval := range balance.OutgoingApprovals {
-			version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
-			if err != nil {
-				return nil, false, sdkerrors.Wrap(err, "failed to increment approval version")
+			for _, approval := range balance.OutgoingApprovals {
+				version, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
+				if err != nil {
+					return nil, false, sdkerrors.Wrap(err, "failed to increment approval version")
+				}
+				approval.Version = version
 			}
-			approval.Version = version
+		} else {
+			for _, approval := range balance.IncomingApprovals {
+				vKey := ConstructApprovalVersionKey(collection.CollectionId, "incoming", userAddress, approval.ApprovalId)
+				version, _ := k.GetApprovalTrackerVersionFromStore(ctx, vKey)
+				approval.Version = version
+			}
+			for _, approval := range balance.OutgoingApprovals {
+				vKey := ConstructApprovalVersionKey(collection.CollectionId, "outgoing", userAddress, approval.ApprovalId)
+				version, _ := k.GetApprovalTrackerVersionFromStore(ctx, vKey)
+				approval.Version = version
+			}
 		}
 	}
 

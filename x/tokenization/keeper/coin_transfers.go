@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"math/big"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -192,9 +193,9 @@ func (k Keeper) ExecuteCoinTransfers(
 				detErrMsg := "coin transfer amount must be positive"
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 			}
-			coinAmountUint := sdkmath.NewUintFromBigInt(coin.Amount.BigInt())
-			royaltyAmountUint := coinAmountUint.Mul(royaltyPercentage).Quo(sdkmath.NewUint(RoyaltyDivisor))
-			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountUint.BigInt())
+			royaltyAmountBig := new(big.Int).Mul(coin.Amount.BigInt(), royaltyPercentage.BigInt())
+			royaltyAmountBig.Quo(royaltyAmountBig, big.NewInt(RoyaltyDivisor))
+			royaltyAmountInt := sdkmath.NewIntFromBigInt(royaltyAmountBig)
 			remainingAmount := coin.Amount.Sub(royaltyAmountInt)
 
 			err := k.sendCoinWithRoyalty(
@@ -279,17 +280,27 @@ func (k Keeper) sendCoinWithRoyalty(
 
 // scaleCoinTransfers multiplies all coin amounts by the given integer multiplier.
 // Used by allowAmountScaling to scale payments proportionally with transfer quantity.
-func scaleCoinTransfers(base []*types.CoinTransfer, multiplier sdkmath.Uint) []*types.CoinTransfer {
-	if multiplier.IsZero() {
-		return []*types.CoinTransfer{}
+func scaleCoinTransfers(base []*types.CoinTransfer, multiplier sdkmath.Uint) ([]*types.CoinTransfer, error) {
+	if multiplier.IsNil() || multiplier.IsZero() {
+		return []*types.CoinTransfer{}, nil
 	}
 
-	multiplierInt := sdkmath.NewIntFromBigInt(multiplier.BigInt())
+	multiplierBig := multiplier.BigInt()
 	scaled := make([]*types.CoinTransfer, len(base))
 	for i, ct := range base {
+		if ct == nil {
+			return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "coin transfer is nil")
+		}
 		scaledCoins := make([]*sdk.Coin, len(ct.Coins))
 		for j, coin := range ct.Coins {
-			scaledCoin := sdk.NewCoin(coin.Denom, coin.Amount.Mul(multiplierInt))
+			if coin == nil || coin.Amount.IsNil() {
+				return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "coin amount is nil")
+			}
+			scaledAmt := new(big.Int).Mul(coin.Amount.BigInt(), multiplierBig)
+			if scaledAmt.BitLen() > sdkmath.MaxBitLen {
+				return nil, sdkerrors.Wrap(types.ErrOverflow, "scaled coin transfer amount exceeds 256-bit maximum")
+			}
+			scaledCoin := sdk.NewCoin(coin.Denom, sdkmath.NewIntFromBigInt(scaledAmt))
 			scaledCoins[j] = &scaledCoin
 		}
 		scaled[i] = &types.CoinTransfer{
@@ -299,5 +310,5 @@ func scaleCoinTransfers(base []*types.CoinTransfer, multiplier sdkmath.Uint) []*
 			OverrideToWithInitiator:         ct.OverrideToWithInitiator,
 		}
 	}
-	return scaled
+	return scaled, nil
 }

@@ -27,7 +27,8 @@ func (k msgServer) DeleteDynamicStore(goCtx context.Context, msg *types.MsgDelet
 		return nil, sdkerrors.Wrap(types.ErrInvalidDynamicStoreID, "Only the creator can delete the dynamic store")
 	}
 
-	// Delete the dynamic store
+	// Delete all values belonging to the dynamic store before deleting the store record.
+	k.DeleteAllDynamicStoreValues(ctx, msg.StoreId)
 	k.DeleteDynamicStoreFromStore(ctx, msg.StoreId)
 
 	// Emit event

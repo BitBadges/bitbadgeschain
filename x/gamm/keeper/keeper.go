@@ -177,8 +177,8 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 				return fmt.Errorf("failed to get balances to transfer for denom: %s: %w", coin.Denom, err)
 			}
 
-			// Get the pool's current balance
-			poolBalances, _, err := k.tokenizationKeeper.GetBalanceOrApplyDefault(ctx, collection, poolAddress.String())
+			// Get the pool's current balance without mutating store state
+			poolBalances, _, err := k.tokenizationKeeper.GetBalanceOrApplyDefaultReadOnly(ctx, collection, poolAddress.String())
 			if err != nil {
 				return err
 			}
@@ -191,9 +191,8 @@ func (k Keeper) CheckPoolLiquidityInvariant(ctx sdk.Context, pool poolmanagertyp
 					poolAddress.String(), coin.Denom)
 			}
 		} else {
-			// For all other denoms (including IBC and native), check bank balance
-			allBalances := k.bankKeeper.GetAllBalances(ctx, poolAddress)
-			poolBalance := allBalances.AmountOf(coin.Denom)
+			// For all other denoms (including IBC and native), check single-denom bank balance
+			poolBalance := k.bankKeeper.GetBalance(ctx, poolAddress, coin.Denom).Amount
 
 			if poolBalance.LT(coin.Amount) {
 				return fmt.Errorf("pool address %s has insufficient liquidity: required %s, available %s for denom %s",

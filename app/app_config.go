@@ -143,8 +143,8 @@ var (
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
 		feemarkettypes.ModuleName, // FeeMarket must come before EVM
-		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
 		evmtypes.ModuleName,
+		erc20types.ModuleName,       // ERC20 must come after EVM (depends on EVM keeper)
 		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
@@ -169,8 +169,8 @@ var (
 		poolmanagertypes.ModuleName,
 		sendmanagermoduletypes.ModuleName,
 		feemarkettypes.ModuleName, // FeeMarket must come before EVM
-		erc20types.ModuleName,     // ERC20 must come after EVM (depends on EVM keeper)
 		evmtypes.ModuleName,
+		erc20types.ModuleName,       // ERC20 must come after EVM (depends on EVM keeper)
 		precisebanktypes.ModuleName, // PreciseBank must come after EVM (depends on EVM keeper)
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}

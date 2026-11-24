@@ -85,10 +85,11 @@ func (c *EVMQueryChallengesChecker) Check(ctx sdk.Context, approval *types.Colle
 
 		// Determine gas limit
 		gasLimit := DefaultEVMQueryGasLimit
-		if !challenge.GasLimit.IsZero() {
-			gasLimit = challenge.GasLimit.Uint64()
-			if gasLimit > MaxEVMQueryGasLimit {
+		if !challenge.GasLimit.IsNil() && !challenge.GasLimit.IsZero() {
+			if !challenge.GasLimit.BigInt().IsUint64() || challenge.GasLimit.Uint64() > MaxEVMQueryGasLimit {
 				gasLimit = MaxEVMQueryGasLimit
+			} else {
+				gasLimit = challenge.GasLimit.Uint64()
 			}
 		}
 

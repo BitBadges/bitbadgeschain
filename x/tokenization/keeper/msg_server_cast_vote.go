@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"math/big"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -46,7 +47,7 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 		}
 	} else {
 		// Check user-level approvals (incoming/outgoing)
-		balanceStore, _, err := k.GetBalanceOrApplyDefault(ctx, collection, msg.ApproverAddress)
+		balanceStore, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, msg.ApproverAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -92,13 +93,15 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 
 	// Verify the voter is in the voters list
 	var voterAddresses []string
-	voterWeight := sdkmath.ZeroUint()
+	voterWeight := new(big.Int)
 	for _, voter := range votingChallenge.Voters {
 		if voter != nil {
 			address, _ := canonicalBech32(voter.Address)
 			if address == msg.Creator {
 				voterAddresses = append(voterAddresses, voter.Address)
-				voterWeight = voterWeight.Add(voter.Weight)
+				if !voter.Weight.IsNil() {
+					voterWeight.Add(voterWeight, voter.Weight.BigInt())
+				}
 			}
 		}
 	}
@@ -189,27 +192,30 @@ func (k msgServer) CastVote(goCtx context.Context, msg *types.MsgCastVote) (*typ
 
 // calculateQuorumMet checks if the current votes meet the quorum threshold
 func (k Keeper) calculateQuorumMet(ctx sdk.Context, challenge *types.VotingChallenge, collectionId sdkmath.Uint, approverAddress string, approvalLevel string, approvalId string) bool {
-	totalPossibleWeight := sdkmath.NewUint(0)
-	totalYesWeight := sdkmath.NewUint(0)
+	totalPossibleWeight := new(big.Int)
+	weightedYesSum := new(big.Int)
 
 	for _, voter := range challenge.Voters {
-		if voter == nil {
+		if voter == nil || voter.Weight.IsNil() {
 			continue
 		}
-		totalPossibleWeight = totalPossibleWeight.Add(voter.Weight)
+		totalPossibleWeight.Add(totalPossibleWeight, voter.Weight.BigInt())
 
 		voteKey := ConstructVotingTrackerKey(collectionId, approverAddress, approvalLevel, approvalId, challenge.ProposalId, voter.Address)
 		vote, found := k.GetVoteFromStore(ctx, voteKey)
-		if found && vote != nil && vote.YesWeight.GT(sdkmath.NewUint(0)) {
-			yesContribution := voter.Weight.Mul(vote.YesWeight).Quo(sdkmath.NewUint(100))
-			totalYesWeight = totalYesWeight.Add(yesContribution)
+		if found && vote != nil && !vote.YesWeight.IsNil() && vote.YesWeight.GT(sdkmath.NewUint(0)) {
+			weightedYesSum.Add(weightedYesSum, new(big.Int).Mul(voter.Weight.BigInt(), vote.YesWeight.BigInt()))
 		}
 	}
 
-	if totalPossibleWeight.IsZero() {
+	if totalPossibleWeight.Sign() <= 0 {
 		return false
 	}
 
-	percentage := totalYesWeight.Mul(sdkmath.NewUint(100)).Quo(totalPossibleWeight)
-	return percentage.GTE(challenge.QuorumThreshold)
+	quorumThreshold := big.NewInt(0)
+	if !challenge.QuorumThreshold.IsNil() {
+		quorumThreshold = challenge.QuorumThreshold.BigInt()
+	}
+	requiredWeightedYes := new(big.Int).Mul(totalPossibleWeight, quorumThreshold)
+	return weightedYesSum.Cmp(requiredWeightedYes) >= 0
 }

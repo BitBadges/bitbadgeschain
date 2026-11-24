@@ -87,6 +87,12 @@ func (k Keeper) checkPermission(ctx sdk.Context, executor string, managerSplitte
 
 // checkAllPermissions checks all permissions that would be used by the UniversalUpdateCollection message
 func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSplitter *types.ManagerSplitter, msg *tokenizationtypes.MsgUniversalUpdateCollection) error {
+	if msg == nil {
+		return sdkerrors.Wrap(types.ErrInvalidRequest, "universal update collection message cannot be nil")
+	}
+	if msg.CollectionId.IsNil() {
+		return sdkerrors.Wrap(types.ErrInvalidRequest, "collection ID cannot be nil in UniversalUpdateCollection message")
+	}
 	// Fields that create a collection, move the splitter's coins, or fix
 	// collection-wide rules have no delegated permission and stay admin-only.
 	// DefaultBalances only takes effect on the create path, so the create
@@ -176,16 +182,14 @@ func (k Keeper) checkAllPermissions(ctx sdk.Context, executor string, managerSpl
 }
 
 func (k msgServer) ExecuteUniversalUpdateCollection(goCtx context.Context, msg *types.MsgExecuteUniversalUpdateCollection) (*types.MsgExecuteUniversalUpdateCollectionResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// Validate executor address
-	_, err := sdk.AccAddressFromBech32(msg.Executor)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAddress, "invalid executor address")
+	if msg == nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "message cannot be nil")
 	}
-	if err := types.ValidateCanonicalAddresses(nil, msg.Executor, msg.ManagerSplitterAddress); err != nil {
+	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get manager splitter
 	managerSplitter, found := k.GetManagerSplitterFromStore(ctx, msg.ManagerSplitterAddress)

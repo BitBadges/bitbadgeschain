@@ -280,12 +280,11 @@ func (k Keeper) multihopEstimateOutGivenExactAmountInInternal(
 	// recover from panic
 	defer func() {
 		if r := recover(); r != nil {
-			tokenOutAmount = osmomath.Int{}
-			if isErr, d := osmoutils.IsOutOfGasError(r); isErr {
-				err = fmt.Errorf("function MultihopEstimateOutGivenExactAmountIn failed due to lack of gas: %v", d)
-			} else {
-				err = fmt.Errorf("function MultihopEstimateOutGivenExactAmountIn failed due to internal reason: %v", r)
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
 			}
+			tokenOutAmount = osmomath.Int{}
+			err = fmt.Errorf("function MultihopEstimateOutGivenExactAmountIn failed due to internal reason: %v", r)
 		}
 	}()
 
@@ -350,12 +349,11 @@ func (k Keeper) RouteExactAmountOut(ctx sdk.Context,
 
 	defer func() {
 		if r := recover(); r != nil {
-			tokenInAmount = osmomath.Int{}
-			if isErr, d := osmoutils.IsOutOfGasError(r); isErr {
-				err = fmt.Errorf("function RouteExactAmountOut failed due to lack of gas: %v", d)
-			} else {
-				err = fmt.Errorf("function RouteExactAmountOut failed due to internal reason: %v", r)
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
 			}
+			tokenInAmount = osmomath.Int{}
+			err = fmt.Errorf("function RouteExactAmountOut failed due to internal reason: %v", r)
 		}
 	}()
 
@@ -561,12 +559,11 @@ func (k Keeper) MultihopEstimateInGivenExactAmountOut(
 	// recover from panic
 	defer func() {
 		if r := recover(); r != nil {
-			insExpected = []osmomath.Int{}
-			if isErr, d := osmoutils.IsOutOfGasError(r); isErr {
-				err = fmt.Errorf("function MultihopEstimateInGivenExactAmountOut failed due to lack of gas: %v", d)
-			} else {
-				err = fmt.Errorf("function MultihopEstimateInGivenExactAmountOut failed due to internal reason: %v", r)
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
 			}
+			insExpected = []osmomath.Int{}
+			err = fmt.Errorf("function MultihopEstimateInGivenExactAmountOut failed due to internal reason: %v", r)
 		}
 	}()
 

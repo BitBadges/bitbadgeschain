@@ -120,7 +120,7 @@ func validateDefaultTakerFee(i interface{}) error {
 	}
 
 	// Ensure that the passed in taker fee is in [0, 1); a fee of 1 leaves nothing to swap.
-	if defaultTakerFee.IsNegative() || defaultTakerFee.GTE(OneDec) {
+	if defaultTakerFee.IsNil() || defaultTakerFee.IsNegative() || defaultTakerFee.GTE(OneDec) {
 		return fmt.Errorf("invalid default taker fee: %s", defaultTakerFee)
 	}
 
@@ -135,10 +135,10 @@ func validateTakerFeeDistribution(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if takerFeeDistribution.StakingRewards.IsNegative() || takerFeeDistribution.StakingRewards.GT(OneDec) {
+	if takerFeeDistribution.StakingRewards.IsNil() || takerFeeDistribution.StakingRewards.IsNegative() || takerFeeDistribution.StakingRewards.GT(OneDec) {
 		return fmt.Errorf("invalid staking rewards distribution: %s", takerFeeDistribution.StakingRewards)
 	}
-	if takerFeeDistribution.CommunityPool.IsNegative() || takerFeeDistribution.CommunityPool.GT(OneDec) {
+	if takerFeeDistribution.CommunityPool.IsNil() || takerFeeDistribution.CommunityPool.IsNegative() || takerFeeDistribution.CommunityPool.GT(OneDec) {
 		return fmt.Errorf("invalid community pool distribution: %s", takerFeeDistribution.CommunityPool)
 	}
 
@@ -241,7 +241,7 @@ func validateDenomPairTakerFees(pairs []DenomPairTakerFee) error {
 		}
 
 		takerFee := record.TakerFee
-		if takerFee.IsNegative() || takerFee.GTE(OneDec) {
+		if takerFee.IsNil() || takerFee.IsNegative() || takerFee.GTE(OneDec) {
 			return fmt.Errorf("taker fee must be between 0 and 1: %s", takerFee.String())
 		}
 	}

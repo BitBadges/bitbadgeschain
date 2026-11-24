@@ -106,16 +106,16 @@ func (k Keeper) ProcessBulkOwnershipQuery(
 }
 
 // normalizeAddressForICQ normalizes an address for ICQ queries.
-// It handles both bech32 Cosmos addresses and EVM hex addresses.
+// It handles both bech32 Cosmos addresses (canonicalized to lowercase) and 20-byte EVM hex addresses.
 func normalizeAddressForICQ(address string) string {
 	// If it starts with 0x, convert from EVM hex to bech32
 	if strings.HasPrefix(address, "0x") || strings.HasPrefix(address, "0X") {
 		// Remove 0x prefix and convert to lowercase
 		hexAddr := strings.ToLower(strings.TrimPrefix(strings.TrimPrefix(address, "0X"), "0x"))
 
-		// Pad to 40 characters if needed
-		for len(hexAddr) < 40 {
-			hexAddr = "0" + hexAddr
+		// Require exactly 20 bytes (40 hex chars); do not silently truncate oversized inputs.
+		if len(hexAddr) != 40 {
+			return address
 		}
 
 		// Convert hex to bytes
@@ -137,7 +137,11 @@ func normalizeAddressForICQ(address string) string {
 		return bech32Addr
 	}
 
-	// Already a bech32 address, return as-is
+	// Canonicalize valid bech32 addresses (e.g., uppercase BB1... -> lowercase bb1...)
+	if accAddr, err := sdk.AccAddressFromBech32(address); err == nil {
+		return accAddr.String()
+	}
+
 	return address
 }
 
@@ -273,8 +277,8 @@ func (k Keeper) ProcessFullBalanceQuery(
 	// Normalize address (handle both bech32 and EVM hex formats)
 	address := normalizeAddressForICQ(query.Address)
 
-	// Get user balance store with defaults applied
-	userBalanceStore, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address)
+	// Get user balance store with defaults applied (read-only: do not mutate approval versions)
+	userBalanceStore, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, address)
 	if err != nil {
 		return types.NewErrorFullBalanceQueryResponsePacket(query.QueryId,
 			sdkerrors.Wrapf(types.ErrInvalidRequest, "failed to get balance: %s", err.Error()))

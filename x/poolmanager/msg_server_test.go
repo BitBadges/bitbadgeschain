@@ -12,7 +12,7 @@ import (
 
 var (
 	amount     = osmomath.NewInt(100)
-	min_amount = osmomath.ZeroInt()
+	min_amount = osmomath.OneInt()
 	max_amount = osmomath.NewInt(10000000)
 
 	pool1_in = types.SwapAmountInRoute{PoolId: 1, TokenOutDenom: "bar"}

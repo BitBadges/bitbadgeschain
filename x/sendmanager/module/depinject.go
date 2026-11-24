@@ -8,6 +8,7 @@ import (
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/depinject/appconfig"
+	"cosmossdk.io/log/v2"
 	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -34,6 +35,7 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	Cdc          codec.Codec
 	AddressCodec address.Codec
+	Logger       log.Logger
 
 	AuthKeeper         types.AuthKeeper
 	BankKeeper         types.BankKeeper
@@ -68,6 +70,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.BankKeeper,
 		in.DistributionKeeper,
 	)
+	k.SetLogger(in.Logger)
 
 	// Note: Tokenization router registration is deferred to app.go after both keepers are created
 	// This avoids a circular dependency (sendmanager needs tokenization for router, tokenization needs sendmanager)

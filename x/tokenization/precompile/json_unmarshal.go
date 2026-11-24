@@ -384,7 +384,11 @@ func convertAddressesInCollectionApprovals(approvals []*tokenizationtypes.Collec
 }
 
 // unmarshalQueryFromJSON unmarshals a JSON string into the appropriate QueryRequest type
-func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (interface{}, error) {
+func (p Precompile) unmarshalQueryFromJSON(ctx sdk.Context, methodName string, jsonStr string) (interface{}, error) {
+	if err := meterJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid query JSON input: %s", err))
+	}
+
 	var queryReq interface{}
 
 	switch methodName {
@@ -460,10 +464,6 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 			q.Address = convertEVMAddressToBech32(q.Address)
 		}
 	case *tokenizationtypes.QueryGetWrappableBalancesRequest:
-		if q.Address != "" {
-			q.Address = convertEVMAddressToBech32(q.Address)
-		}
-	case *tokenizationtypes.QueryIsAddressReservedProtocolRequest:
 		if q.Address != "" {
 			q.Address = convertEVMAddressToBech32(q.Address)
 		}

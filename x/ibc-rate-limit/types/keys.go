@@ -22,12 +22,12 @@ var (
 	// Key: channelFlowWindowKey(channelID, denom, timeframeType, timeframeDuration) -> ChannelFlowWindow
 	KeyPrefixChannelFlowWindow = []byte{0x02}
 
-	// KeyPrefixUniqueSenders stores unique sender addresses for each channel+timeframe combination
-	// Key: uniqueSendersKey(channelID, timeframeType, timeframeDuration) -> UniqueSenders
+	// KeyPrefixUniqueSenders stores unique sender addresses for each channel+denom+timeframe combination
+	// Key: UniqueSendersKey(channelID, denom, timeframeType, timeframeDuration) -> UniqueSenders
 	KeyPrefixUniqueSenders = []byte{0x03}
 
 	// KeyPrefixUniqueSendersWindow stores the time window for unique sender tracking
-	// Key: uniqueSendersWindowKey(channelID, timeframeType, timeframeDuration) -> ChannelFlowWindow
+	// Key: UniqueSendersWindowKey(channelID, denom, timeframeType, timeframeDuration) -> ChannelFlowWindow
 	KeyPrefixUniqueSendersWindow = []byte{0x04}
 
 	// KeyPrefixAddressTransferData stores transfer data for each address+channel+denom+timeframe combination
@@ -119,17 +119,23 @@ func ChannelFlowWindowKey(channelID, denom string, timeframeType int32, timefram
 	return key
 }
 
-// uniqueSendersKey returns the key for storing unique senders for a specific channel and timeframe
-func UniqueSendersKey(channelID string, timeframeType int32, timeframeDuration int64) []byte {
-	key := append(KeyPrefixUniqueSenders, []byte(channelID)...)
+// UniqueSendersKey returns the key for storing unique senders for a specific channel, denom, and timeframe
+func UniqueSendersKey(channelID, denom string, timeframeType int32, timeframeDuration int64) []byte {
+	key := append([]byte(nil), KeyPrefixUniqueSenders...)
+	key = append(key, []byte(channelID)...)
+	key = append(key, []byte("|")...)
+	key = append(key, []byte(denom)...)
 	key = append(key, []byte("|")...)
 	key = append(key, []byte(fmt.Sprintf("%d|%d", timeframeType, timeframeDuration))...)
 	return key
 }
 
-// uniqueSendersWindowKey returns the key for storing unique senders window for a specific channel and timeframe
-func UniqueSendersWindowKey(channelID string, timeframeType int32, timeframeDuration int64) []byte {
-	key := append(KeyPrefixUniqueSendersWindow, []byte(channelID)...)
+// UniqueSendersWindowKey returns the key for storing unique senders window for a specific channel, denom, and timeframe
+func UniqueSendersWindowKey(channelID, denom string, timeframeType int32, timeframeDuration int64) []byte {
+	key := append([]byte(nil), KeyPrefixUniqueSendersWindow...)
+	key = append(key, []byte(channelID)...)
+	key = append(key, []byte("|")...)
+	key = append(key, []byte(denom)...)
 	key = append(key, []byte("|")...)
 	key = append(key, []byte(fmt.Sprintf("%d|%d", timeframeType, timeframeDuration))...)
 	return key

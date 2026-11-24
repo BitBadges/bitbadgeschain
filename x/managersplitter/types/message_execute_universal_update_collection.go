@@ -6,6 +6,9 @@ import (
 )
 
 func (msg *MsgExecuteUniversalUpdateCollection) ValidateBasic() error {
+	if msg == nil {
+		return sdkerrors.Wrap(ErrInvalidRequest, "message cannot be nil")
+	}
 	// Validate executor address format
 	executorAddr, err := sdk.AccAddressFromBech32(msg.Executor)
 	if err != nil {
@@ -38,9 +41,14 @@ func (msg *MsgExecuteUniversalUpdateCollection) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidRequest, "universal update collection message cannot be nil")
 	}
 
-	// Validate that at least one update flag is set
+	// Validate that at least one update or create action is present
 	tokenizationMsg := msg.UniversalUpdateCollectionMsg
-	hasUpdateFlag := tokenizationMsg.UpdateValidTokenIds ||
+	if tokenizationMsg.CollectionId.IsNil() {
+		return sdkerrors.Wrap(ErrInvalidRequest, "collection ID cannot be nil in UniversalUpdateCollection message")
+	}
+
+	hasUpdateFlag := tokenizationMsg.CollectionId.IsZero() ||
+		tokenizationMsg.UpdateValidTokenIds ||
 		tokenizationMsg.UpdateCollectionPermissions ||
 		tokenizationMsg.UpdateManager ||
 		tokenizationMsg.UpdateCollectionMetadata ||
@@ -48,7 +56,10 @@ func (msg *MsgExecuteUniversalUpdateCollection) ValidateBasic() error {
 		tokenizationMsg.UpdateCustomData ||
 		tokenizationMsg.UpdateCollectionApprovals ||
 		tokenizationMsg.UpdateStandards ||
-		tokenizationMsg.UpdateIsArchived
+		tokenizationMsg.UpdateIsArchived ||
+		len(tokenizationMsg.CosmosCoinWrapperPathsToAdd) > 0 ||
+		len(tokenizationMsg.AliasPathsToAdd) > 0 ||
+		len(tokenizationMsg.MintEscrowCoinsToTransfer) > 0
 
 	if !hasUpdateFlag {
 		return sdkerrors.Wrap(ErrInvalidRequest, "at least one update flag must be set in UniversalUpdateCollection message")
@@ -59,11 +70,6 @@ func (msg *MsgExecuteUniversalUpdateCollection) ValidateBasic() error {
 	// The creator field will be set to the manager splitter address in the keeper
 	if err := tokenizationMsg.ValidateBasic(); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "invalid UniversalUpdateCollection message: %s", err)
-	}
-
-	// Additional validation: ensure collection ID is valid (not nil)
-	if tokenizationMsg.CollectionId.IsNil() {
-		return sdkerrors.Wrap(ErrInvalidRequest, "collection ID cannot be nil in UniversalUpdateCollection message")
 	}
 
 	if err := ValidateCanonicalAddresses(nil, msg.Executor, msg.ManagerSplitterAddress); err != nil {

@@ -10,12 +10,22 @@ import (
 )
 
 func (k msgServer) CreateManagerSplitter(goCtx context.Context, msg *types.MsgCreateManagerSplitter) (*types.MsgCreateManagerSplitterResponse, error) {
+	if msg == nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "message cannot be nil")
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Validate admin address
-	_, err := sdk.AccAddressFromBech32(msg.Admin)
+	adminAddr, err := sdk.AccAddressFromBech32(msg.Admin)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAdmin, err.Error())
+	}
+	if adminAddr.Empty() {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAdmin, "admin address cannot be empty")
+	}
+	if err := types.ValidateOptionalPermissions(msg.Permissions); err != nil {
+		return nil, err
 	}
 	if err := types.ValidateCanonicalAddresses(msg.Permissions, msg.Admin); err != nil {
 		return nil, err

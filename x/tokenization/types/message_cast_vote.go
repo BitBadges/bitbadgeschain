@@ -82,8 +82,8 @@ func (msg *MsgCastVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "proposalId cannot be empty")
 	}
 
-	if msg.YesWeight.GT(sdkmath.NewUint(100)) {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100, got %s", msg.YesWeight.String())
+	if msg.YesWeight.IsNil() || msg.YesWeight.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100")
 	}
 
 	return nil

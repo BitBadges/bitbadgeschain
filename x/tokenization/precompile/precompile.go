@@ -306,42 +306,9 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasUniversalUpdateCollectionBase
 		isTransaction = true
 	case ExecuteMultipleMethod:
-		// For executeMultiple, we need to parse the input to count messages for dynamic gas calculation
-		// The input format is: methodID (4 bytes) + ABI-encoded tuple array
-		if len(input) >= 4 {
-			// Try to unpack the messages array to count messages
-			// This is a best-effort calculation - if parsing fails, we use base gas
-			method, err := p.MethodById(input[:4])
-			if err == nil && method.Name == ExecuteMultipleMethod {
-				unpacked, err := method.Inputs.Unpack(input[4:])
-				if err == nil && len(unpacked) == 1 {
-					// Count messages in the array
-					msgCount := uint64(0)
-					if msgs, ok := unpacked[0].([]interface{}); ok {
-						msgCount = uint64(len(msgs))
-					} else {
-						// Try reflection for struct slice
-						val := reflect.ValueOf(unpacked[0])
-						if val.Kind() == reflect.Slice {
-							msgCount = uint64(val.Len())
-						}
-					}
-					// Enforce max batch size in gas calculation
-					if msgCount > MaxMessagesPerBatch {
-						msgCount = MaxMessagesPerBatch
-					}
-					// Calculate dynamic gas: base + (message count * per-message gas)
-					baseGas = GasExecuteMultipleBase + (msgCount * GasPerMessageInBatch)
-				} else {
-					// If parsing fails, use base gas (will be adjusted during execution)
-					baseGas = GasExecuteMultipleBase
-				}
-			} else {
-				baseGas = GasExecuteMultipleBase
-			}
-		} else {
-			baseGas = GasExecuteMultipleBase
-		}
+		// Compute O(1) base gas estimate; per-message gas is charged in HandleExecuteMultiple
+		// after SetupABI validates input bounds and unpacks the arguments.
+		baseGas = GasExecuteMultipleBase
 		isTransaction = true
 	// Query methods
 	case GetCollectionMethod:
@@ -462,32 +429,20 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 
 	// Handle executeMultiple specially as it has different argument structure
 	if method.Name == ExecuteMultipleMethod {
-		// Manually unpack to handle tuple arrays correctly
-		// SetupABI may not handle tuple arrays the way we need
-		if len(contract.Input) < 4 {
-			return nil, method.Name, ErrInvalidInput("contract input too short")
+		if len(args) != 1 {
+			return nil, method.Name, ErrInvalidInput(fmt.Sprintf("expected 1 unpacked argument, got %d", len(args)))
 		}
 
-		// Unpack arguments using method's input definition (skip 4-byte method selector)
-		unpacked, err := method.Inputs.Unpack(contract.Input[4:])
-		if err != nil {
-			return nil, method.Name, WrapError(err, ErrorCodeInvalidInput, "failed to unpack method arguments")
-		}
-
-		if len(unpacked) != 1 {
-			return nil, method.Name, ErrInvalidInput(fmt.Sprintf("expected 1 unpacked argument, got %d", len(unpacked)))
-		}
-
-		// ABI unpacks tuple arrays - handle different formats
+		// ABI unpacks tuple arrays - handle different formats using args already validated by SetupABI
 		var messages []interface{}
 
 		// Case 1: []interface{} (most common)
-		if msgs, ok := unpacked[0].([]interface{}); ok {
+		if msgs, ok := args[0].([]interface{}); ok {
 			messages = msgs
 		} else {
 			// Case 2: Struct slice with JSON tags (what go-ethereum ABI returns for tuples)
 			// Use reflection to handle the struct slice
-			val := reflect.ValueOf(unpacked[0])
+			val := reflect.ValueOf(args[0])
 			if val.Kind() == reflect.Slice {
 				messages = make([]interface{}, val.Len())
 				for i := 0; i < val.Len(); i++ {
@@ -517,7 +472,7 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 					"expected messages array (slice), got type %T. "+
 						"Value: %+v. "+
 						"This indicates the ABI tuple array format is not as expected.",
-					unpacked[0], unpacked[0]))
+					args[0], args[0]))
 			}
 		}
 
@@ -545,11 +500,11 @@ func (p Precompile) ExecuteWithMethodName(ctx sdk.Context, contract *vm.Contract
 		return bz, method.Name, err
 	}
 	if method.Name == SearchInRangesMethod {
-		bz, err := p.HandleSearchInRanges(method, args)
+		bz, err := p.HandleSearchInRanges(ctx, method, args)
 		return bz, method.Name, err
 	}
 	if method.Name == GetBalanceForIdAndTimeMethod {
-		bz, err := p.HandleGetBalanceForIdAndTime(method, args)
+		bz, err := p.HandleGetBalanceForIdAndTime(ctx, method, args)
 		return bz, method.Name, err
 	}
 	if method.Name == GetReservedListIdMethod {
@@ -824,10 +779,13 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 		return nil, ErrInvalidInput("messages array cannot be empty")
 	}
 
-	// Enforce maximum batch size to prevent gas exhaustion attacks
+	// Enforce maximum batch size
 	if len(messages) > MaxMessagesPerBatch {
 		return nil, ErrInvalidInput(fmt.Sprintf("messages array exceeds maximum batch size: %d > %d", len(messages), MaxMessagesPerBatch))
 	}
+
+	// Charge per-message batch gas after SetupABI has verified input bounds.
+	ctx.GasMeter().ConsumeGas(uint64(len(messages))*GasPerMessageInBatch, "executeMultiple batch messages")
 
 	msgServer := tokenizationkeeper.NewMsgServerImpl(p.tokenizationKeeper)
 	results := make([][]byte, 0, len(messages))
@@ -1217,7 +1175,7 @@ func (p Precompile) HandleExecuteMultiple(ctx sdk.Context, method *abi.Method, m
 // HandleQuery handles a query by unmarshaling JSON and executing via keeper
 func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
 	// Unmarshal JSON to QueryRequest
-	queryReq, err := p.unmarshalQueryFromJSON(method.Name, jsonStr)
+	queryReq, err := p.unmarshalQueryFromJSON(ctx, method.Name, jsonStr)
 	if err != nil {
 		return nil, err
 	}
@@ -1613,6 +1571,10 @@ func (p Precompile) validateQueryRequest(queryReq interface{}) error {
 // This returns the exact balance amount for a single (tokenId, ownershipTime) combination.
 // Uses the same logic as the SDK's getBalanceForIdAndTime function.
 func (p Precompile) HandleGetBalanceAmount(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
+	if err := meterJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid query JSON input: %s", err))
+	}
+
 	// Parse JSON request - single token ID and ownership time
 	var req struct {
 		CollectionId  string `json:"collectionId"`
@@ -1718,6 +1680,10 @@ func getBalanceForIdAndTime(balances []*tokenizationtypes.Balance, tokenId sdkma
 // HandleGetTotalSupply handles getTotalSupply query with custom logic
 // This returns the exact total supply for a single (tokenId, ownershipTime) combination.
 func (p Precompile) HandleGetTotalSupply(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
+	if err := meterJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid query JSON input: %s", err))
+	}
+
 	// Parse JSON request - single token ID and ownership time
 	var req struct {
 		CollectionId  string `json:"collectionId"`
@@ -1784,6 +1750,9 @@ func (p Precompile) HandleGetAllReservedProtocolAddresses(ctx sdk.Context, metho
 	// Parse JSON request (empty request is fine)
 	var req struct{}
 	if jsonStr != "" && jsonStr != "{}" {
+		if err := meterJSONInput(ctx, jsonStr); err != nil {
+			return nil, ErrInvalidInput(fmt.Sprintf("invalid query JSON input: %s", err))
+		}
 		if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
 			return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON: %s", err))
 		}
@@ -1796,19 +1765,21 @@ func (p Precompile) HandleGetAllReservedProtocolAddresses(ctx sdk.Context, metho
 		return nil, WrapError(err, ErrorCodeQueryFailed, "query failed")
 	}
 
-	// Convert Cosmos addresses (strings) to EVM addresses
-	evmAddresses := make([]common.Address, len(resp.Addresses))
-	for i, cosmosAddr := range resp.Addresses {
-		// Try to parse as Cosmos address and convert to EVM
+	// Convert 20-byte EVM-representable Cosmos addresses to EVM addresses.
+	// Skip non-20-byte addresses (such as 32-byte module addresses) to avoid lossy truncation.
+	evmAddresses := make([]common.Address, 0, len(resp.Addresses))
+	for _, cosmosAddr := range resp.Addresses {
 		accAddr, parseErr := sdk.AccAddressFromBech32(cosmosAddr)
 		if parseErr != nil {
-			// If not a valid Cosmos address, try to convert directly from hex
-			evmAddr := common.HexToAddress(cosmosAddr)
-			evmAddresses[i] = evmAddr
-		} else {
-			// Convert Cosmos address bytes to EVM address
-			evmAddresses[i] = common.BytesToAddress(accAddr.Bytes())
+			if common.IsHexAddress(cosmosAddr) {
+				evmAddresses = append(evmAddresses, common.HexToAddress(cosmosAddr))
+			}
+			continue
 		}
+		if len(accAddr) != common.AddressLength {
+			continue
+		}
+		evmAddresses = append(evmAddresses, common.BytesToAddress(accAddr.Bytes()))
 	}
 
 	// Pack as address[] according to ABI
@@ -1817,6 +1788,10 @@ func (p Precompile) HandleGetAllReservedProtocolAddresses(ctx sdk.Context, metho
 
 // HandleIsAddressReservedProtocol handles isAddressReservedProtocol query with custom logic
 func (p Precompile) HandleIsAddressReservedProtocol(ctx sdk.Context, method *abi.Method, jsonStr string) ([]byte, error) {
+	if err := meterJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid query JSON input: %s", err))
+	}
+
 	// Parse JSON request
 	var req tokenizationtypes.QueryIsAddressReservedProtocolRequest
 	if err := json.Unmarshal([]byte(jsonStr), &req); err != nil {
@@ -1827,6 +1802,13 @@ func (p Precompile) HandleIsAddressReservedProtocol(ctx sdk.Context, method *abi
 	if req.Address == "" {
 		return nil, ErrInvalidInput("address cannot be empty or zero address")
 	}
+	if req.Address == "0x0000000000000000000000000000000000000000" || req.Address == "0000000000000000000000000000000000000000" {
+		return nil, ErrInvalidInput("address cannot be zero address")
+	}
+
+	// Normalize 0x EVM hex addresses to bech32 before lookup.
+	req.Address = convertEVMAddressToBech32(req.Address)
+
 	accAddr, err := sdk.AccAddressFromBech32(req.Address)
 	if err == nil {
 		if accAddr.Empty() {
@@ -1843,9 +1825,6 @@ func (p Precompile) HandleIsAddressReservedProtocol(ctx sdk.Context, method *abi
 		if allZero {
 			return nil, ErrInvalidInput("address cannot be zero address")
 		}
-	}
-	if req.Address == "0x0000000000000000000000000000000000000000" || req.Address == "0000000000000000000000000000000000000000" {
-		return nil, ErrInvalidInput("address cannot be zero address")
 	}
 
 	// Call keeper query
@@ -1892,6 +1871,9 @@ func (p Precompile) HandleConvertBech32ToEvmAddress(method *abi.Method, args []i
 	accAddr, err := sdk.AccAddressFromBech32(bech32Str)
 	if err != nil {
 		return nil, ErrInvalidInput(fmt.Sprintf("invalid bech32 address: %s", err))
+	}
+	if len(accAddr) != common.AddressLength {
+		return nil, ErrInvalidInput(fmt.Sprintf("bech32 address length (%d bytes) is not a 20-byte EVM address", len(accAddr)))
 	}
 
 	evmAddr := common.BytesToAddress(accAddr.Bytes())
@@ -1955,9 +1937,21 @@ func (p Precompile) HandleRangesOverlap(method *abi.Method, args []interface{}) 
 	return method.Outputs.Pack(result)
 }
 
+// parseBoundedUint256String parses a decimal string within uint256 bounds and rejects overly long digit strings.
+func parseBoundedUint256String(s string) (*big.Int, bool) {
+	if len(s) == 0 || len(s) > 78 {
+		return nil, false
+	}
+	n, ok := new(big.Int).SetString(s, 10)
+	if !ok || n.Sign() < 0 || n.Cmp(MaxUint256) > 0 {
+		return nil, false
+	}
+	return n, true
+}
+
 // HandleSearchInRanges searches if a value exists in any range in a JSON-encoded array
 // This is a pure function - no state access required
-func (p Precompile) HandleSearchInRanges(method *abi.Method, args []interface{}) ([]byte, error) {
+func (p Precompile) HandleSearchInRanges(ctx sdk.Context, method *abi.Method, args []interface{}) ([]byte, error) {
 	if len(args) != 2 {
 		return nil, ErrInvalidInput("expected 2 arguments (rangesJson, value)")
 	}
@@ -1969,6 +1963,10 @@ func (p Precompile) HandleSearchInRanges(method *abi.Method, args []interface{})
 	value, ok := args[1].(*big.Int)
 	if !ok {
 		return nil, ErrInvalidInput("expected uint256 for value")
+	}
+
+	if err := meterJSONInput(ctx, rangesJson); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid ranges JSON: %s", err))
 	}
 
 	// Parse JSON array of ranges
@@ -1983,8 +1981,8 @@ func (p Precompile) HandleSearchInRanges(method *abi.Method, args []interface{})
 
 	// Search through ranges
 	for _, r := range ranges {
-		start, startOk := new(big.Int).SetString(r.Start, 10)
-		end, endOk := new(big.Int).SetString(r.End, 10)
+		start, startOk := parseBoundedUint256String(r.Start)
+		end, endOk := parseBoundedUint256String(r.End)
 		if !startOk || !endOk {
 			continue // Skip invalid ranges
 		}
@@ -1999,7 +1997,7 @@ func (p Precompile) HandleSearchInRanges(method *abi.Method, args []interface{})
 
 // HandleGetBalanceForIdAndTime gets the balance amount for a specific token ID and time from a JSON-encoded balances array
 // This is a pure function - no state access required
-func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []interface{}) ([]byte, error) {
+func (p Precompile) HandleGetBalanceForIdAndTime(ctx sdk.Context, method *abi.Method, args []interface{}) ([]byte, error) {
 	if len(args) != 3 {
 		return nil, ErrInvalidInput("expected 3 arguments (balancesJson, tokenId, time)")
 	}
@@ -2015,6 +2013,10 @@ func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []inte
 	time, ok := args[2].(*big.Int)
 	if !ok {
 		return nil, ErrInvalidInput("expected uint256 for time")
+	}
+
+	if err := meterJSONInput(ctx, balancesJson); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid balances JSON: %s", err))
 	}
 
 	// Parse JSON array of balances
@@ -2039,8 +2041,8 @@ func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []inte
 		// Check if tokenId is in badgeIds ranges
 		tokenMatch := false
 		for _, r := range b.BadgeIds {
-			start, startOk := new(big.Int).SetString(r.Start, 10)
-			end, endOk := new(big.Int).SetString(r.End, 10)
+			start, startOk := parseBoundedUint256String(r.Start)
+			end, endOk := parseBoundedUint256String(r.End)
 			if !startOk || !endOk {
 				continue
 			}
@@ -2056,8 +2058,8 @@ func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []inte
 		// Check if time is in ownershipTimes ranges
 		timeMatch := false
 		for _, r := range b.OwnershipTimes {
-			start, startOk := new(big.Int).SetString(r.Start, 10)
-			end, endOk := new(big.Int).SetString(r.End, 10)
+			start, startOk := parseBoundedUint256String(r.Start)
+			end, endOk := parseBoundedUint256String(r.End)
 			if !startOk || !endOk {
 				continue
 			}
@@ -2071,7 +2073,7 @@ func (p Precompile) HandleGetBalanceForIdAndTime(method *abi.Method, args []inte
 		}
 
 		// Found matching balance
-		amount, amountOk := new(big.Int).SetString(b.Amount, 10)
+		amount, amountOk := parseBoundedUint256String(b.Amount)
 		if !amountOk {
 			amount = big.NewInt(0)
 		}

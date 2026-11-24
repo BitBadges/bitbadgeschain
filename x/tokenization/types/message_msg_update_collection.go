@@ -41,5 +41,9 @@ func (msg *MsgUpdateCollection) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	if err := ValidateUintId(msg.CollectionId, false); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidCollectionID, "invalid collection id: %s", err)
+	}
+
 	return nil
 }

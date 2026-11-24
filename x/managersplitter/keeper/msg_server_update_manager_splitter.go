@@ -9,12 +9,29 @@ import (
 )
 
 func (k msgServer) UpdateManagerSplitter(goCtx context.Context, msg *types.MsgUpdateManagerSplitter) (*types.MsgUpdateManagerSplitterResponse, error) {
+	if msg == nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "message cannot be nil")
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Validate admin address
-	_, err := sdk.AccAddressFromBech32(msg.Admin)
+	adminAddr, err := sdk.AccAddressFromBech32(msg.Admin)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAdmin, err.Error())
+	}
+	if adminAddr.Empty() {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAdmin, "admin address cannot be empty")
+	}
+	addr, err := sdk.AccAddressFromBech32(msg.Address)
+	if err != nil || addr.Empty() {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAddress, "invalid manager splitter address")
+	}
+	if msg.Admin == msg.Address {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "admin and manager splitter address cannot be the same")
+	}
+	if err := types.ValidateOptionalPermissions(msg.Permissions); err != nil {
+		return nil, err
 	}
 	if err := types.ValidateCanonicalAddresses(msg.Permissions, msg.Admin, msg.Address); err != nil {
 		return nil, err

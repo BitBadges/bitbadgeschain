@@ -11,7 +11,14 @@ import (
 func (k msgServer) CreateAddressLists(goCtx context.Context, msg *types.MsgCreateAddressLists) (*types.MsgCreateAddressListsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
 	for _, addressListInput := range msg.AddressLists {
+		if addressListInput == nil {
+			continue
+		}
 		// Convert AddressListInput to AddressList by adding createdBy field
 		addressList := &types.AddressList{
 			ListId:     addressListInput.ListId,

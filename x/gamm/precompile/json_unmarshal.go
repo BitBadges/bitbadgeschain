@@ -9,6 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 )
@@ -36,15 +37,26 @@ func convertEVMAddressToBech32(addr string) string {
 	return addr
 }
 
+func meterGammJSONInput(ctx sdk.Context, input string) error {
+	opts := evmcompat.DefaultJSONBudgetOptions()
+	opts.MaxStringLength = MaxStringLength
+	opts.GasPerValue = 100
+	return evmcompat.ValidateJSONInput(ctx, input, opts)
+}
+
 // unmarshalMsgFromJSON unmarshals a JSON string into the appropriate Msg type based on method name
-// and sets the Sender field from the contract caller for security.
-func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
+// and sets the Sender field from the contract caller.
+func (p Precompile) unmarshalMsgFromJSON(ctx sdk.Context, methodName string, jsonStr string, contract *vm.Contract) (sdk.Msg, error) {
 	// Get caller address
 	caller := contract.Caller()
 	if err := VerifyCaller(caller); err != nil {
 		return nil, err
 	}
 	senderCosmosAddr := sdk.AccAddress(caller.Bytes()).String()
+
+	if err := meterGammJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON input: %s", err))
+	}
 
 	// Create the appropriate Msg type based on method name
 	var msg sdk.Msg
@@ -64,15 +76,7 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 	}
 
 	// Unmarshal JSON into the message
-	// Use standard json.Unmarshal since gamm types use standard protobuf JSON
 	if err := json.Unmarshal([]byte(jsonStr), msg); err != nil {
-		// Validate JSON syntax separately for better error messages
-		var jsonMap map[string]interface{}
-		if jsonErr := json.Unmarshal([]byte(jsonStr), &jsonMap); jsonErr != nil {
-			// JSON syntax is invalid
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
-		}
-		// JSON syntax is valid but protobuf unmarshaling failed
 		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal JSON into %T: %s", msg, err))
 	}
 
@@ -127,7 +131,11 @@ func (p Precompile) unmarshalMsgFromJSON(methodName string, jsonStr string, cont
 }
 
 // unmarshalQueryFromJSON unmarshals a JSON string into the appropriate QueryRequest type
-func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (interface{}, error) {
+func (p Precompile) unmarshalQueryFromJSON(ctx sdk.Context, methodName string, jsonStr string) (interface{}, error) {
+	if err := meterGammJSONInput(ctx, jsonStr); err != nil {
+		return nil, ErrInvalidInput(fmt.Sprintf("invalid query JSON input: %s", err))
+	}
+
 	var queryReq interface{}
 
 	switch methodName {
@@ -154,15 +162,7 @@ func (p Precompile) unmarshalQueryFromJSON(methodName string, jsonStr string) (i
 	}
 
 	// Unmarshal JSON into the query request
-	// Use standard json.Unmarshal since gamm types use standard protobuf JSON
 	if err := json.Unmarshal([]byte(jsonStr), queryReq); err != nil {
-		// Validate JSON syntax separately for better error messages
-		var jsonMap map[string]interface{}
-		if jsonErr := json.Unmarshal([]byte(jsonStr), &jsonMap); jsonErr != nil {
-			// JSON syntax is invalid
-			return nil, ErrInvalidInput(fmt.Sprintf("invalid JSON syntax: %s", jsonErr))
-		}
-		// JSON syntax is valid but protobuf unmarshaling failed
 		return nil, ErrInvalidInput(fmt.Sprintf("failed to unmarshal query JSON into %T: %s", queryReq, err))
 	}
 

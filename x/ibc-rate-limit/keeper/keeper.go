@@ -203,10 +203,10 @@ func (k Keeper) CheckRateLimit(ctx sdk.Context, channelID string, denom string, 
 			}
 
 			// Reset window if needed
-			k.ResetUniqueSendersWindow(ctx, channelID, limit.TimeframeType, limit.TimeframeDuration)
+			k.ResetUniqueSendersWindow(ctx, channelID, denom, limit.TimeframeType, limit.TimeframeDuration)
 
 			// Get current unique senders
-			senders, _ := k.GetUniqueSenders(ctx, channelID, limit.TimeframeType, limit.TimeframeDuration)
+			senders, _ := k.GetUniqueSenders(ctx, channelID, denom, limit.TimeframeType, limit.TimeframeDuration)
 
 			// Check if sender is already in the list
 			senderExists := false

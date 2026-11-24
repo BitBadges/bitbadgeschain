@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,6 +14,9 @@ import (
 	"github.com/cosmos/evm/x/vm/statedb"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
 )
 
 type evmQueryContextKey struct{}
@@ -100,16 +104,6 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 	}
 	// If callerAddress is empty, callerAddr will be the zero address (default value)
 
-	// cosmos/evm's CallEVMWithData requires the caller account to exist for GetSequence().
-	// For read-only queries we use the zero address as caller; ensure that account exists.
-	// This write persists to chain state (once per chain). It is intentional so that staticcall-style
-	// EVM queries work without requiring a real signer account.
-	callerAccAddr := sdk.AccAddress(callerAddr.Bytes())
-	if k.accountKeeper != nil && k.accountKeeper.GetAccount(ctx, callerAccAddr) == nil {
-		acc := k.accountKeeper.NewAccountWithAddress(ctx, callerAccAddr)
-		k.accountKeeper.SetAccount(ctx, acc)
-	}
-
 	if gasLimit == 0 {
 		gasLimit = evmconfig.DefaultGasCap
 	}
@@ -120,6 +114,11 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 		return nil, fmt.Errorf("no gas remaining for EVM query")
 	}
 	gasCap := new(big.Int).SetUint64(gasLimit)
+
+	// Isolate the read-only query in an atomic context so any snapshot frames or
+	// transient writes are rolled back on return while preserving gas billing on ctx.
+	atomic := evmcompat.NewAtomicContext(ctx)
+	defer atomic.Rollback()
 
 	// Run the EVM call against an isolated gas meter.
 	//
@@ -139,29 +138,27 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 	//
 	// Metering the call separately is also what this function already assumes:
 	// the EVM gas actually used is charged back onto the caller's meter below.
-	evmCtx := ctx.WithValue(evmQueryContextKey{}, true).WithGasMeter(storetypes.NewGasMeter(gasLimit))
+	evmCtx := atomic.Ctx().WithValue(evmQueryContextKey{}, true).WithGasMeter(storetypes.NewGasMeter(gasLimit))
 
-	// v0.6.0: Create stateDB for non-precompile context
-	// Type-assert to real EVM keeper for stateDB creation; nil stateDB for mock keepers in tests
-	var sdb *statedb.StateDB
+	var (
+		response *evmtypes.MsgEthereumTxResponse
+		err      error
+	)
 	if realKeeper, ok := k.evmKeeper.(*evmkeeper.Keeper); ok {
-		sdb = statedb.New(evmCtx, realKeeper, statedb.NewEmptyTxConfig())
+		response, err = executeStaticEVMCall(evmCtx, realKeeper, callerAddr, contractAddr, calldata, gasLimit)
+	} else {
+		// Mock keeper path in unit tests: keep any account setup inside the rolled-back context.
+		callerAccAddr := sdk.AccAddress(callerAddr.Bytes())
+		if k.accountKeeper != nil && k.accountKeeper.GetAccount(evmCtx, callerAccAddr) == nil {
+			acc := k.accountKeeper.NewAccountWithAddress(evmCtx, callerAccAddr)
+			k.accountKeeper.SetAccount(evmCtx, acc)
+		}
+		response, err = k.evmKeeper.CallEVMWithData(evmCtx, nil, callerAddr, &contractAddr, calldata, false, false, gasCap)
 	}
-	response, err := k.evmKeeper.CallEVMWithData(evmCtx, sdb, callerAddr, &contractAddr, calldata, false, false, gasCap)
 
 	// Charge for the EVM work BEFORE deciding whether the query succeeded.
-	//
-	// This function used to return on `err != nil` / `VmError != ""` without
-	// reaching its ConsumeGas call, so a contract that burned its whole gas
-	// limit and then reverted cost the caller zero Cosmos gas while every
-	// validator still did the work. The gas limits live in the collection's
-	// approval criteria and invariants rather than in the transaction, so an
-	// attacker could publish a collection pointing several max-gas challenges at
-	// a gas-burning reverting contract and spam transfers for free compute.
-	//
-	// The EVM ran on evmCtx's isolated meter (see above), and on failure
-	// cosmos/evm drains that throwaway meter rather than the caller's, so
-	// nothing reaches ctx unless it is charged here explicitly.
+	// The EVM ran on evmCtx's isolated meter, so we bill the measured (or limit)
+	// gas directly onto the caller's outer gas meter.
 	chargeEVMQueryGas(ctx, response, err, gasLimit)
 
 	if err != nil {
@@ -173,6 +170,86 @@ func (k Keeper) ExecuteEVMQueryWithCaller(ctx sdk.Context, callerAddress string,
 	}
 
 	return response.Ret, nil
+}
+
+// executeStaticEVMCall runs a read-only EVM StaticCall using the real EVM keeper.
+// Using vm.EVM.StaticCall enforces EVM write-protection for state-changing opcodes
+// and stateful precompile transaction methods.
+func executeStaticEVMCall(
+	ctx sdk.Context,
+	realKeeper *evmkeeper.Keeper,
+	callerAddr common.Address,
+	contractAddr common.Address,
+	calldata []byte,
+	gasLimit uint64,
+) (*evmtypes.MsgEthereumTxResponse, error) {
+	cfg, err := realKeeper.EVMConfig(ctx, ctx.BlockHeader().ProposerAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load evm config: %w", err)
+	}
+
+	msg := core.Message{
+		From:       callerAddr,
+		To:         &contractAddr,
+		Nonce:      0,
+		Value:      big.NewInt(0),
+		GasLimit:   gasLimit,
+		GasPrice:   big.NewInt(0),
+		GasTipCap:  big.NewInt(0),
+		GasFeeCap:  big.NewInt(0),
+		Data:       calldata,
+		AccessList: ethtypes.AccessList{},
+	}
+
+	sdb := statedb.New(ctx, realKeeper, statedb.NewEmptyTxConfig())
+	ethCfg := evmtypes.GetEthChainConfig()
+	evm := realKeeper.NewEVMWithOverridePrecompiles(ctx, msg, cfg, nil, sdb, true)
+	rules := ethCfg.Rules(evm.Context.BlockNumber, true, evm.Context.Time)
+
+	leftoverGas := msg.GasLimit
+	intrinsicGas, err := realKeeper.GetEthIntrinsicGas(ctx, msg, ethCfg, false)
+	if err != nil {
+		return nil, fmt.Errorf("intrinsic gas failed: %w", err)
+	}
+	if leftoverGas < intrinsicGas {
+		return nil, fmt.Errorf("%w: have %d, want %d", core.ErrIntrinsicGas, leftoverGas, intrinsicGas)
+	}
+	if rules.IsPrague {
+		floorDataGas, err := core.FloorDataGas(msg.Data)
+		if err != nil {
+			return nil, err
+		}
+		if msg.GasLimit < floorDataGas {
+			return nil, fmt.Errorf("%w: have %d, want %d", core.ErrFloorDataGas, msg.GasLimit, floorDataGas)
+		}
+	}
+	leftoverGas -= intrinsicGas
+
+	sdb.Prepare(rules, msg.From, common.Address{}, msg.To, evm.ActivePrecompiles(), msg.AccessList)
+	if addr, ok := ethtypes.ParseDelegation(sdb.GetCode(contractAddr)); ok {
+		sdb.AddAddressToAccessList(addr)
+	}
+
+	ret, leftoverGas, vmErr := evm.StaticCall(msg.From, contractAddr, msg.Data, leftoverGas)
+	if msg.GasLimit < leftoverGas {
+		return nil, fmt.Errorf("message gas limit < leftover gas (%d < %d)", msg.GasLimit, leftoverGas)
+	}
+	gasUsed := msg.GasLimit - leftoverGas
+
+	var vmError string
+	if vmErr != nil {
+		vmError = vmErr.Error()
+		if vmError == vm.ErrExecutionReverted.Error() {
+			ret = evm.ReturnData()
+		}
+	}
+
+	return &evmtypes.MsgEthereumTxResponse{
+		GasUsed:    gasUsed,
+		MaxUsedGas: gasUsed,
+		VmError:    vmError,
+		Ret:        ret,
+	}, nil
 }
 
 // chargeEVMQueryGas bills the caller's Cosmos gas meter for an EVM query's

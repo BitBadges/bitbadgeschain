@@ -495,9 +495,9 @@ func (s *KeeperTestSuite) TestOutOfGasError() {
 	foocoin := sdk.NewCoin("foo", osmomath.NewInt(10))
 	spreadFactor := pool.GetSpreadFactor(s.Ctx)
 	ctx := s.Ctx.WithGasMeter(storetypes.NewGasMeter(10))
-	_, err = s.App.GammKeeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor, nil)
-	s.Require().Error(err)
-	s.Require().Contains(err.Error(), "lack of gas")
+	s.Require().Panics(func() {
+		_, _ = s.App.GammKeeper.SwapExactAmountIn(ctx, s.TestAccs[0], pool, foocoin, "bar", osmomath.ZeroInt(), spreadFactor, nil)
+	})
 }
 
 // UNFORKINGNOTE: This test really wasn't testing anything important
