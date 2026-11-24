@@ -177,6 +177,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 			app.TransferKeeper,
 			app.IBCKeeper.ChannelKeeper,
 			app.IBCKeeper.ClientKeeper,
+			app.IBCKeeper.ClientV2Keeper,
 			*app.GovKeeper,
 			app.SlashingKeeper,
 			app.appCodec,

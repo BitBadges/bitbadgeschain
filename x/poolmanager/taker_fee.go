@@ -12,9 +12,7 @@ import (
 )
 
 func (k *Keeper) GetDefaultTakerFee(ctx sdk.Context) osmomath.Dec {
-	var value osmomath.Dec
-	k.paramSpace.Get(ctx, types.KeyDefaultTakerFee, &value)
-	return value
+	return k.GetParams(ctx).TakerFeeParams.DefaultTakerFee
 }
 
 // SetDenomPairTakerFee sets the taker fee for the given trading pair.

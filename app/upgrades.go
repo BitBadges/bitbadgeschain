@@ -3,6 +3,7 @@ package app
 import (
 	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
+	v36 "github.com/bitbadges/bitbadgeschain/app/upgrades/v36"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
@@ -29,6 +30,19 @@ func (app *App) RegisterUpgradeHandlers() {
 				IBCRateLimit:    app.IBCRateLimitKeeper,
 				Tokenization:    app.TokenizationKeeper,
 				ManagerSplitter: app.ManagerSplitterKeeper,
+			},
+		),
+	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v36.UpgradeName,
+		v36.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.Configurator(),
+			v36.Keepers{
+				Account:         app.AccountKeeper,
+				LegacyAmino:     app.legacyAmino,
+				LegacyParamsKey: app.GetKey(v36.LegacyParamsStoreKey),
+				PoolManager:     &app.PoolManagerKeeper,
 			},
 		),
 	)

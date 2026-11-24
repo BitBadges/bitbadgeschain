@@ -10,30 +10,28 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	icamodule "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts"
-	icacontroller "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller"
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
-	icacontrollertypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/controller/types"
-	icahost "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v11/modules/apps/27-interchain-accounts/types"
-	ibccallbacks "github.com/cosmos/ibc-go/v11/modules/apps/callbacks"
-	ibctransfer "github.com/cosmos/ibc-go/v11/modules/apps/transfer"
-	transferkeeper "github.com/cosmos/ibc-go/v11/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
+	icamodule "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/27-interchain-accounts/types"
+	ibccallbacks "github.com/lfdt-ibc/ibc-go/v11/modules/apps/callbacks"
+	ibctransfer "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer"
+	transferkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	ibc "github.com/cosmos/ibc-go/v11/modules/core"
-	ibcclienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/v11/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v11/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
-	solomachine "github.com/cosmos/ibc-go/v11/modules/light-clients/06-solomachine"
-	ibctm "github.com/cosmos/ibc-go/v11/modules/light-clients/07-tendermint"
+	ibc "github.com/lfdt-ibc/ibc-go/v11/modules/core"
+	ibcclienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
+	porttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/05-port/types"
+	ibcexported "github.com/lfdt-ibc/ibc-go/v11/modules/core/exported"
+	ibckeeper "github.com/lfdt-ibc/ibc-go/v11/modules/core/keeper"
+	solomachine "github.com/lfdt-ibc/ibc-go/v11/modules/light-clients/06-solomachine"
+	ibctm "github.com/lfdt-ibc/ibc-go/v11/modules/light-clients/07-tendermint"
 
 	// this line is used by starport scaffolding # ibc/app/import
 	tokenizationmoduletypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -41,9 +39,9 @@ import (
 	tokenizationkeeper "github.com/bitbadges/bitbadgeschain/x/tokenization/keeper"
 	tokenizationmodule "github.com/bitbadges/bitbadgeschain/x/tokenization/module"
 
-	packetforward "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware"
-	packetforwardkeeper "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-go/v11/modules/apps/packet-forward-middleware/types"
+	packetforward "github.com/lfdt-ibc/ibc-go/v11/modules/apps/packet-forward-middleware"
+	packetforwardkeeper "github.com/lfdt-ibc/ibc-go/v11/modules/apps/packet-forward-middleware/keeper"
+	packetforwardtypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/packet-forward-middleware/types"
 
 	customhooks "github.com/bitbadges/bitbadgeschain/x/custom-hooks"
 	customhookskeeper "github.com/bitbadges/bitbadgeschain/x/custom-hooks/keeper"
@@ -54,7 +52,7 @@ import (
 	ibcratelimitkeeper "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/keeper"
 	ibcratelimitmodule "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/module"
 	ibcratelimittypes "github.com/bitbadges/bitbadgeschain/x/ibc-rate-limit/types"
-	channeltypes "github.com/cosmos/ibc-go/v11/modules/core/04-channel/types"
+	channeltypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/04-channel/types"
 )
 
 // CombinedIBCHooks combines rate limit and custom hooks
@@ -145,9 +143,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		return err
 	}
 
-	// register the key tables for legacy param subspaces
-	app.ParamsKeeper.Subspace(ibchookstypes.ModuleName).WithKeyTable(ibchookstypes.ParamKeyTable())
-
 	// Create IBC keeper (IBC v11 - ParamSubspace removed)
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		app.appCodec,
@@ -170,11 +165,6 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 	// See: https://docs.cosmos.network/main/modules/gov#proposal-messages
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler)
-	// Route legacy ParameterChangeProposal content (submitted via
-	// MsgExecLegacyContent) to the x/params keeper. Needed for gov-driven
-	// updates of subspace-backed params (e.g. poolmanager), which have no
-	// MsgUpdateParams of their own.
-	govRouter.AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper))
 
 	// Create IBC-Go transfer keeper. IBC v11 dropped the ICS4Wrapper argument
 	// (set later via WithICS4Wrapper) and returns a pointer.

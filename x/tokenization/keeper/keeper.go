@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	ibckeeper "github.com/cosmos/ibc-go/v11/modules/core/keeper"
+	ibckeeper "github.com/lfdt-ibc/ibc-go/v11/modules/core/keeper"
 )
 
 const (

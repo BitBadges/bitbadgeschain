@@ -8,8 +8,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
-	ibctesting "github.com/cosmos/ibc-go/v11/testing"
+	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
+	ibctesting "github.com/lfdt-ibc/ibc-go/v11/testing"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/bitbadges/bitbadgeschain/app"

@@ -9,9 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	transfertypes "github.com/cosmos/ibc-go/v11/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
+	clienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
 
 	sdkmath "cosmossdk.io/math"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
@@ -33,8 +32,6 @@ type Keeper struct {
 	storeKey storetypes.StoreKey
 	cdc      codec.BinaryCodec
 
-	paramSpace paramtypes.Subspace
-
 	// keepers
 	accountKeeper       types.AccountKeeper
 	bankKeeper          types.BankKeeper
@@ -50,7 +47,7 @@ type Keeper struct {
 }
 
 func NewKeeper(
-	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace paramtypes.Subspace, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, tokenizationKeeper *tokenizationkeeper.Keeper,
+	cdc codec.BinaryCodec, storeKey storetypes.StoreKey, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, communityPoolKeeper types.CommunityPoolKeeper, tokenizationKeeper *tokenizationkeeper.Keeper,
 	sendManagerKeeper types.SendManagerKeeper,
 	transferKeeper types.TransferKeeper,
 	ics4Wrapper types.ICS4Wrapper,
@@ -67,13 +64,9 @@ func NewKeeper(
 	if !permContains(perms, authtypes.Burner) {
 		panic(fmt.Sprintf("%s module account should have the burner permission", types.ModuleName))
 	}
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
-	}
 	return Keeper{
-		storeKey:   storeKey,
-		cdc:        cdc,
-		paramSpace: paramSpace,
+		storeKey: storeKey,
+		cdc:      cdc,
 		// keepers
 		accountKeeper:       accountKeeper,
 		bankKeeper:          bankKeeper,
@@ -81,8 +74,8 @@ func NewKeeper(
 		tokenizationKeeper:  tokenizationKeeper,
 		sendManagerKeeper:   sendManagerKeeper,
 		transferKeeper:      transferKeeper,
-		ics4Wrapper:   ics4Wrapper,
-		channelKeeper: channelKeeper,
+		ics4Wrapper:         ics4Wrapper,
+		channelKeeper:       channelKeeper,
 	}
 }
 
@@ -129,20 +122,12 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 }
 
 // GetParams returns the total set params.
-func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
+func (k Keeper) GetParams(_ sdk.Context) types.Params {
+	return types.DefaultParams()
 }
 
-// SetParams sets the total set of params.
-func (k Keeper) setParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
-}
-
-// SetParam sets a specific gamm module's parameter with the provided parameter.
-func (k Keeper) SetParam(ctx sdk.Context, key []byte, value interface{}) {
-	k.paramSpace.Set(ctx, key, value)
-}
+// setParams sets the total set of params.
+func (k Keeper) setParams(_ sdk.Context, _ types.Params) {}
 
 // Wrapper methods that delegate to badges keeper for pool integration
 

@@ -8,9 +8,10 @@ This document covers the case where it cannot — a **private-module release**.
 
 ## When CI cannot build
 
-If `go.mod` carries a `replace` pointing `github.com/cosmos/evm` at a private
-repository, the Actions runner has no access to that module and every build job
-fails on `go mod download`. v33 and v34 were both in this position.
+If `go.mod` carries a `replace` pointing `github.com/cosmos/evm`,
+`github.com/cosmos/cosmos-sdk`, or `github.com/cometbft/cometbft` at a private
+repository, the Actions runner has no access to those modules and every build
+job fails on `go mod download`. v33, v34, and v36 were in this position.
 
 `release.yml`'s `preflight` job detects that replace and skips the build and
 release jobs, so the tag produces a clean skip instead of a wall of red — and,

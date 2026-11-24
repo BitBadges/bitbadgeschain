@@ -19,22 +19,20 @@ import (
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
 func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
-	// set up non depinject support modules store keys
+	// set up non depinject support modules store keys.
+	// Keep the legacy "params" KV store mounted through v36 so the upgrade
+	// handler can migrate poolmanager params before the store is retired.
 	if err := app.RegisterStores(
 		storetypes.NewKVStoreKey(gammtypes.StoreKey),
 		storetypes.NewKVStoreKey(poolmanagertypes.StoreKey),
+		storetypes.NewKVStoreKey("params"),
 	); err != nil {
 		return err
 	}
 
-	// register thee gamm params
-	app.ParamsKeeper.Subspace(poolmanagertypes.ModuleName).WithKeyTable(poolmanagertypes.ParamKeyTable())
-	app.ParamsKeeper.Subspace(gammtypes.ModuleName).WithKeyTable(gammtypes.ParamKeyTable())
-
 	app.GammKeeper = gammkeeper.NewKeeper(
 		app.appCodec,
 		app.GetKey(gammtypes.StoreKey),
-		app.GetSubspace(gammtypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.DistrKeeper,
@@ -47,7 +45,6 @@ func (app *App) registerGammModules(appOpts servertypes.AppOptions) error {
 
 	app.PoolManagerKeeper = *poolmanager.NewKeeper(
 		app.GetKey(poolmanagertypes.StoreKey),
-		app.GetSubspace(poolmanagertypes.ModuleName),
 		&app.GammKeeper,
 		app.BankKeeper,
 		app.AccountKeeper,

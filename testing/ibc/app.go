@@ -23,7 +23,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibctesting "github.com/cosmos/ibc-go/v11/testing"
+	ibctesting "github.com/lfdt-ibc/ibc-go/v11/testing"
 
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 

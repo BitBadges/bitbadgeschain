@@ -9,7 +9,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibcclienttypes "github.com/cosmos/ibc-go/v11/modules/core/02-client/types"
+	ibcclienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
 )
 
 // IBC v11 removed ibctypes.ParamSubspace entirely; the noop helper that

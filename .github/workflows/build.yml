@@ -22,14 +22,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # While go.mod redirects cosmos/evm to a private module, the runner has no
-  # credentials for it and resolution fails before anything compiles. That made
-  # `Build & test` red on master and on every PR opened against it, so a red
-  # check stopped carrying any information about the change under review.
+  # While go.mod redirects core dependencies to private modules, the runner has
+  # no credentials for them and resolution fails before anything compiles. That
+  # made `Build & test` red on master and on every PR opened against it, so a
+  # red check stopped carrying any information about the change under review.
   #
   # release.yml already gates on this. Mirroring it here turns the wall of red
-  # into a deliberate skip, and keeps the gate honest the moment the replace
-  # comes out.
+  # into a deliberate skip, and keeps the gate honest the moment the replaces
+  # come out.
   preflight:
     name: Can CI build this commit?
     runs-on: ubuntu-latest
@@ -39,9 +39,10 @@ jobs:
       - uses: actions/checkout@v4
       - id: check
         run: |
-          if grep -qE '^\s*replace\s+github\.com/cosmos/evm\s+=>' go.mod; then
-            echo "go.mod redirects cosmos/evm to a private module; CI cannot build it." >&2
-            grep -E '^\s*replace\s+github\.com/cosmos/evm\s+=>' go.mod >&2
+          PRIVATE_RE='^\s*(replace\s+)?github\.com/(cosmos/(evm|cosmos-sdk)|cometbft/cometbft)(\S*)?\s+=>'
+          if grep -qE "$PRIVATE_RE" go.mod; then
+            echo "go.mod redirects one or more modules to a private repository; CI cannot build it." >&2
+            grep -E "$PRIVATE_RE" go.mod >&2
             echo "Verify locally with: go test ./... -count=1 -tags=test" >&2
             echo "can_build=false" >> "$GITHUB_OUTPUT"
           else

@@ -60,6 +60,9 @@ var (
 
 	// KeyTakerFeeBurnProtoRevArray defines key to store the taker fee for burn tracker coin array.
 	KeyTakerFeeBurnProtoRevArray = []byte{0x0D}
+
+	// KeyParams defines the key to store poolmanager module parameters.
+	KeyParams = []byte{0x0E}
 )
 
 // ModuleRouteToBytes serializes moduleRoute to bytes.

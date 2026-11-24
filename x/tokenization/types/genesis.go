@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	types "cosmossdk.io/math"
-	host "github.com/cosmos/ibc-go/v11/modules/core/24-host"
+	host "github.com/lfdt-ibc/ibc-go/v11/modules/core/24-host"
 	// this line is used by starport scaffolding # genesis/types/import
 )
 
