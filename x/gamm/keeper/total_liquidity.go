@@ -80,3 +80,27 @@ func (k Keeper) RecordTotalLiquidityDecrease(ctx sdk.Context, coins sdk.Coins) {
 		k.setDenomLiquidity(ctx, coin.Denom, amount)
 	}
 }
+
+// RedenominateTotalLiquidity moves the total-liquidity index entry for one denom
+// onto another, scaling the amount it holds.
+func (k Keeper) RedenominateTotalLiquidity(ctx sdk.Context, legacyDenom, newDenom string, factor osmomath.Int) bool {
+	store := ctx.KVStore(k.storeKey)
+
+	oldKey := types.GetDenomPrefix(legacyDenom)
+	bz := store.Get(oldKey)
+	if bz == nil {
+		return false
+	}
+
+	var amount osmomath.Int
+	if err := amount.Unmarshal(bz); err != nil {
+		panic(err)
+	}
+
+	// Accumulate onto any pre-existing newDenom entry so nothing is lost.
+	scaled := amount.Mul(factor).Add(k.GetDenomLiquidity(ctx, newDenom))
+
+	store.Delete(oldKey)
+	k.setDenomLiquidity(ctx, newDenom, scaled)
+	return true
+}

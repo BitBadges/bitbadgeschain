@@ -66,7 +66,7 @@ func (suite *TestSuite) TestRolledBackCoinTransferIsNotChargedOrReported() {
 
 	colA := GetTransferableCollectionToCreateAllMintedToCreator(bob)
 	priced := rollbackTestTransferApproval("priced-once", []*types.CoinTransfer{
-		{To: charlie, Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(1_000_000_000), Denom: "ubadge"}}},
+		{To: charlie, Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(1_000_000_000), Denom: types.NativeDenom}}},
 	})
 	priced.ApprovalCriteria.MaxNumTransfers.OverallMaxNumTransfers = sdkmath.NewUint(1)
 	free := rollbackTestTransferApproval("free-fallback", nil)
@@ -115,8 +115,8 @@ func (suite *TestSuite) TestRolledBackCoinTransferIsNotChargedOrReported() {
 	suite.Require().Equal("priced-once", res1.ApprovalsUsed[0].ApprovalId)
 	suite.Require().Len(res1.CoinTransfers, 2, "payment plus protocol fee")
 
-	bobBefore := suite.app.BankKeeper.GetBalance(suite.ctx, bobAddr, "ubadge").Amount
-	charlieBefore := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge").Amount
+	bobBefore := suite.app.BankKeeper.GetBalance(suite.ctx, bobAddr, types.NativeDenom).Amount
+	charlieBefore := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, types.NativeDenom).Amount
 
 	collection, found := suite.app.TokenizationKeeper.GetCollectionFromStore(suite.ctx, sdkmath.OneUint())
 	suite.Require().True(found)
@@ -132,8 +132,8 @@ func (suite *TestSuite) TestRolledBackCoinTransferIsNotChargedOrReported() {
 	// threshold and is rolled back; free-fallback serves the transfer.
 	res2 := doTransfer()
 
-	bobAfter := suite.app.BankKeeper.GetBalance(suite.ctx, bobAddr, "ubadge").Amount
-	charlieAfter := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge").Amount
+	bobAfter := suite.app.BankKeeper.GetBalance(suite.ctx, bobAddr, types.NativeDenom).Amount
+	charlieAfter := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, types.NativeDenom).Amount
 
 	suite.Require().Len(res2.ApprovalsUsed, 1)
 	suite.Require().Equal("free-fallback", res2.ApprovalsUsed[0].ApprovalId)

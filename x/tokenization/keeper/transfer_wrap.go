@@ -128,7 +128,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	}
 
 	// This is important. Prefixing allows only our module to control such denominations
-	// and doesn't allow users to mint other coins like "ubadge" or "factory/..."
+	// and doesn't allow users to mint other coins like "abadge" or "factory/..."
 	ibcDenom = WrappedDenomPrefix + collection.CollectionId.String() + ":" + ibcDenom
 	if err := sdk.ValidateDenom(ibcDenom); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidConversion, "wrapped denom %s is not a valid bank denom", ibcDenom)

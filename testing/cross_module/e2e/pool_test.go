@@ -282,7 +282,7 @@ func (s *PoolTestSuite) TestPoolWithSwapFee() {
 	}
 
 	fundCoins := sdk.NewCoins(
-		sdk.NewCoin("ubadge", sdkmath.NewInt(10000000000)),
+		sdk.NewCoin("abadge", sdkmath.NewInt(10000000000)),
 		sdk.NewCoin("foo", sdkmath.NewInt(10000000)),
 		sdk.NewCoin("bar", sdkmath.NewInt(10000000)),
 	)

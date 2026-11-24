@@ -10,26 +10,26 @@ import (
 	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 )
 
-// ensureBankDenomMetadata sets the ubadge denom metadata in the bank keeper.
+// ensureBankDenomMetadata sets the abadge denom metadata in the bank keeper.
 // This MUST be called BEFORE module InitGenesis runs because the EVM module's
 // InitGenesis requires bank denom metadata to be present.
 //
 // This is critical for ibc-go testing which creates bank genesis with empty metadata.
 func (app *App) ensureBankDenomMetadata(ctx sdk.Context) {
 	// Check if metadata already exists
-	if _, found := app.BankKeeper.GetDenomMetaData(ctx, "ubadge"); found {
+	if _, found := app.BankKeeper.GetDenomMetaData(ctx, appparams.BaseCoinUnit); found {
 		return
 	}
 
-	// Set the ubadge denom metadata
+	// Set the abadge denom metadata
 	app.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
 		Description: "The native token of BitBadges Chain",
 		DenomUnits: []*banktypes.DenomUnit{
-			{Denom: "ubadge", Exponent: 0},
-			{Denom: "badge", Exponent: 9},
+			{Denom: appparams.BaseCoinUnit, Exponent: 0},
+			{Denom: appparams.DisplayCoinUnit, Exponent: appparams.BaseCoinDecimals},
 		},
-		Base:    "ubadge",
-		Display: "badge",
+		Base:    appparams.BaseCoinUnit,
+		Display: appparams.DisplayCoinUnit,
 		Name:    "Badge",
 		Symbol:  "BADGE",
 	})
@@ -44,30 +44,13 @@ func (app *App) ensureBankDenomMetadata(ctx sdk.Context) {
 // app startup based on the Cosmos chain ID from appOpts.
 func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
 	// Set denom metadata if it doesn't exist
-	if _, found := app.BankKeeper.GetDenomMetaData(ctx, "ubadge"); !found {
-		app.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
-			Description: "The native token of BitBadges Chain",
-			DenomUnits: []*banktypes.DenomUnit{
-				{Denom: "ubadge", Exponent: 0},
-				{Denom: "badge", Exponent: 9},
-			},
-			Base:    "ubadge",
-			Display: "badge",
-			Name:    "Badge",
-			Symbol:  "BADGE",
-		})
-	}
+	app.ensureBankDenomMetadata(ctx)
 
 	// Ensure EVM params are configured correctly
 	evmParams := app.EVMKeeper.GetParams(ctx)
-	if evmParams.EvmDenom != "ubadge" {
-		evmParams.EvmDenom = "ubadge"
+	if evmParams.EvmDenom != appparams.BaseCoinUnit {
+		evmParams.EvmDenom = appparams.BaseCoinUnit
 	}
-	// Set unconditionally, not only when nil. Upstream's DefaultParams seeds
-	// ExtendedDenomOptions with sdk.DefaultBondDenom ("stake"), so a nil-guard
-	// leaves a wrong-but-non-nil value in place — and the EVM then reads
-	// balances in a denom nobody holds, reporting every account as empty. That
-	// is a silent failure: no error, just zeros.
 	evmParams.ExtendedDenomOptions = &evmtypes.ExtendedDenomOptions{
 		ExtendedDenom: appparams.ExtendedCoinUnit,
 	}
@@ -76,27 +59,24 @@ func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
 	}
 
 	// Initialize EvmCoinInfo (may already be initialized)
-	// CRITICAL: This must be set correctly or the ante handler will reject transactions with ubadge fees
+	// CRITICAL: This must be set correctly or the ante handler will reject transactions with abadge fees
 	coinInfo := evmtypes.EvmCoinInfo{
-		Denom:         "ubadge",
-		ExtendedDenom: "abadge",
-		DisplayDenom:  "BADGE",
-		Decimals:      9,
+		Denom:         appparams.BaseCoinUnit,
+		ExtendedDenom: appparams.ExtendedCoinUnit,
+		DisplayDenom:  appparams.DisplayCoinUnit,
+		Decimals:      appparams.BaseCoinDecimals,
 	}
 	if err := app.EVMKeeper.SetEvmCoinInfo(ctx, coinInfo); err != nil {
 		ctx.Logger().Info("EVM coin info initialization skipped", "error", err)
 	}
 
 	// CRITICAL: Verify coin info is set correctly - if it's still "aatom", force set it
-	// This is a safeguard to ensure coin info is always "ubadge" even if something resets it
 	currentCoinInfo := app.EVMKeeper.GetEvmCoinInfo(ctx)
-	if currentCoinInfo.Denom != "ubadge" {
-		ctx.Logger().Warn("CRITICAL: EVM coin info denom is not ubadge, fixing",
+	if currentCoinInfo.Denom != appparams.BaseCoinUnit {
+		ctx.Logger().Warn("CRITICAL: EVM coin info denom is not abadge, fixing",
 			"current", currentCoinInfo.Denom,
-			"expected", "ubadge",
+			"expected", appparams.BaseCoinUnit,
 			"evmParamsDenom", evmParams.EvmDenom)
-		// Force set it - this is critical for transaction fees to work
-		// Try multiple times to ensure it sticks
 		for i := 0; i < 3; i++ {
 			if err := app.EVMKeeper.SetEvmCoinInfo(ctx, coinInfo); err != nil {
 				ctx.Logger().Error("CRITICAL: Failed to fix EVM coin info denom",
@@ -104,23 +84,20 @@ func (app *App) initializeEVMCoinInfo(ctx sdk.Context) error {
 					"attempt", i+1,
 					"evmParamsDenom", evmParams.EvmDenom)
 				if i == 2 {
-					// Last attempt failed - this is critical
-					return fmt.Errorf("CRITICAL: failed to set EVM coin info to ubadge after 3 attempts: current denom is %s, params denom is %s, error: %w",
-						currentCoinInfo.Denom, evmParams.EvmDenom, err)
+					return fmt.Errorf("CRITICAL: failed to set EVM coin info to %s after 3 attempts: current denom is %s, params denom is %s, error: %w",
+						appparams.BaseCoinUnit, currentCoinInfo.Denom, evmParams.EvmDenom, err)
 				}
-				// Re-read params in case they changed
 				evmParams = app.EVMKeeper.GetParams(ctx)
 				continue
 			}
-			// Verify it was set
 			currentCoinInfo = app.EVMKeeper.GetEvmCoinInfo(ctx)
-			if currentCoinInfo.Denom == "ubadge" {
-				ctx.Logger().Info("CRITICAL: EVM coin info denom fixed to ubadge", "attempt", i+1)
+			if currentCoinInfo.Denom == appparams.BaseCoinUnit {
+				ctx.Logger().Info("CRITICAL: EVM coin info denom fixed", "denom", appparams.BaseCoinUnit, "attempt", i+1)
 				break
 			}
 			if i == 2 {
-				return fmt.Errorf("CRITICAL: EVM coin info still incorrect after 3 set attempts: got %s, expected ubadge, params denom is %s",
-					currentCoinInfo.Denom, evmParams.EvmDenom)
+				return fmt.Errorf("CRITICAL: EVM coin info still incorrect after 3 set attempts: got %s, expected %s, params denom is %s",
+					currentCoinInfo.Denom, appparams.BaseCoinUnit, evmParams.EvmDenom)
 			}
 		}
 	} else {

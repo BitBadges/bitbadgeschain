@@ -297,7 +297,7 @@ func (s *KeeperTestSuite) TestPoolsWithFilter() {
 			name:                        "only min liquidity specified - valid",
 			num_pools:                   1,
 			expected_num_pools_response: 6,
-			min_liquidity:               "0foo,0bar",
+			min_liquidity:               "0bar,0foo",
 			poolAssets: []balancer.PoolAsset{
 				{
 					Weight: osmomath.NewInt(100),
@@ -621,7 +621,7 @@ func (s *KeeperTestSuite) TestQueryBalancerPoolTotalLiquidity() {
 	// create pool
 	res, err = queryClient.TotalLiquidity(gocontext.Background(), &types.QueryTotalLiquidityRequest{})
 	s.Require().NoError(err)
-	s.Require().Equal("5000000bar,5000000baz,5000000foo,5000000ubadge", sdk.Coins(res.Liquidity).String())
+	s.Require().Equal("5000000abadge,5000000bar,5000000baz,5000000foo", sdk.Coins(res.Liquidity).String())
 }
 
 // TODO: Come fix

@@ -23,7 +23,7 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 
 	charlieAddr, err := sdk.AccAddressFromBech32(charlie)
 	suite.Require().Nil(err, "error getting charlie address")
-	charlieBalance := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge")
+	charlieBalance := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "abadge")
 	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000))
 
 	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
@@ -53,7 +53,7 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 							To:                              alice,
 							OverrideFromWithApproverAddress: true, // Coins come from bob (approver), not alice (initiator)
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+								{Amount: sdkmath.NewInt(100), Denom: "abadge"},
 							},
 						},
 					},
@@ -96,8 +96,8 @@ func (suite *TestSuite) TestUserLevelRoyalties() {
 	})
 	suite.Require().Nil(err, "Error deducting outgoing approvals")
 
-	charlieBalance = suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge")
-	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000+10)) //10% of 100 ubadge
+	charlieBalance = suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "abadge")
+	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000+10)) //10% of 100 abadge
 }
 
 func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
@@ -122,7 +122,7 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 
 	charlieAddr, err := sdk.AccAddressFromBech32(charlie)
 	suite.Require().Nil(err, "error getting charlie address")
-	charlieBalance := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "ubadge")
+	charlieBalance := suite.app.BankKeeper.GetBalance(suite.ctx, charlieAddr, "abadge")
 	suite.Require().Equal(charlieBalance.Amount, sdkmath.NewInt(100000000000))
 
 	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
@@ -151,7 +151,7 @@ func (suite *TestSuite) TestCannotHaveMoreThanOneUserRoyalties() {
 						{
 							To: alice,
 							Coins: []*sdk.Coin{
-								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+								{Amount: sdkmath.NewInt(100), Denom: "abadge"},
 							},
 						},
 					},
@@ -722,8 +722,8 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	err = suite.app.TokenizationKeeper.SetParams(suite.ctx, params)
 	suite.Require().Nil(err, "Error setting params with wrapped denom")
 
-	// Fund bob with regular ubadge coins
-	suite.app.BankKeeper.SendCoins(suite.ctx, suite.app.AccountKeeper.GetModuleAddress("mint"), bobAccAddr, sdk.NewCoins(sdk.NewCoin("ubadge", sdkmath.NewInt(1000))))
+	// Fund bob with regular abadge coins
+	suite.app.BankKeeper.SendCoins(suite.ctx, suite.app.AccountKeeper.GetModuleAddress("mint"), bobAccAddr, sdk.NewCoins(sdk.NewCoin("abadge", sdkmath.NewInt(1000))))
 
 	// Test coin transfer with both wrapped and non-wrapped denoms
 	err = UpdateUserApprovals(suite, wctx, &types.MsgUpdateUserApprovals{
@@ -753,7 +753,7 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 							OverrideFromWithApproverAddress: true, // Coins come from bob (approver), not alice (initiator)
 							Coins: []*sdk.Coin{
 								{Amount: sdkmath.NewInt(2), Denom: wrapperDenom}, // Wrapped denom
-								{Amount: sdkmath.NewInt(100), Denom: "ubadge"},   // Regular denom
+								{Amount: sdkmath.NewInt(100), Denom: "abadge"},   // Regular denom
 							},
 						},
 					},
@@ -800,9 +800,9 @@ func (suite *TestSuite) TestCoinTransfersWithMixedDenoms() {
 	// Verify alice received both types of coins
 	aliceAccAddr, err := sdk.AccAddressFromBech32(alice)
 	suite.Require().Nil(err, "Error getting alice's address")
-	aliceUbadgeBalance := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, "ubadge")
-	// Alice starts with 100 * 1e9 ubadge, so after receiving 100 more, she should have 100 * 1e9 + 100
-	suite.Require().True(aliceUbadgeBalance.Amount.GTE(sdkmath.NewInt(100)), "Alice should receive at least 100 ubadge coins")
+	aliceUbadgeBalance := suite.app.BankKeeper.GetBalance(suite.ctx, aliceAccAddr, "abadge")
+	// Alice starts with 100 * 1e9 abadge, so after receiving 100 more, she should have 100 * 1e9 + 100
+	suite.Require().True(aliceUbadgeBalance.Amount.GTE(sdkmath.NewInt(100)), "Alice should receive at least 100 abadge coins")
 
 	// For badgeslp: denoms, the wrapped approach transfers underlying tokens
 	// Verify alice received the underlying badges

@@ -73,12 +73,12 @@ func (s *EscrowTestSuite) TestGAMMSwapWithIBCTransfer_EscrowE2E() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denomIn := "ubadge"
+	denomIn := "abadge"
 	denomOut := "ustake"
 	poolLiquidity := sdkmath.NewInt(10_000_000)
 	swapAmount := sdkmath.NewInt(100_000)
 
-	// Create pool with ubadge/ustake on chain A
+	// Create pool with abadge/ustake on chain A
 	poolID := s.createPoolOnChainA(denomIn, denomOut, poolLiquidity, poolLiquidity)
 	s.T().Logf("Created pool %d with %s/%s", poolID, denomIn, denomOut)
 
@@ -157,7 +157,7 @@ func (s *EscrowTestSuite) TestDirectIBCTransfer_EscrowE2E() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(1_000_000)
 
 	// Fund sender
@@ -216,7 +216,7 @@ func (s *EscrowTestSuite) TestGAMMSwapWithIBCTransfer_TimeoutRefund() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denomIn := "ubadge"
+	denomIn := "abadge"
 	denomOut := "ustake"
 	poolLiquidity := sdkmath.NewInt(10_000_000)
 	swapAmount := sdkmath.NewInt(100_000)

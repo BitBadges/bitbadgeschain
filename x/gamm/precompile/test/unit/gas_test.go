@@ -47,7 +47,7 @@ func TestGasConstants(t *testing.T) {
 }
 
 func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.BankKeeper)
 
 	// Transaction methods add a 200k buffer to base gas for Cosmos SDK operations
 	const txBuffer = 200_000
@@ -79,7 +79,7 @@ func (suite *GasTestSuite) TestGasCosts_TransactionMethods() {
 }
 
 func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.BankKeeper)
 
 	// Query methods add a 50k buffer to base gas for state reads
 	const queryBuffer = 50_000
@@ -115,7 +115,7 @@ func (suite *GasTestSuite) TestGasCosts_QueryMethods() {
 }
 
 func (suite *GasTestSuite) TestGasCosts_CompareTransactionVsQuery() {
-	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.PreciseBankKeeper)
+	precompile := gamm.NewPrecompile(suite.App.GammKeeper, suite.App.BankKeeper)
 
 	// Transaction methods should generally cost more than query methods
 	transactionMethods := []string{"joinPool", "exitPool", "swapExactAmountIn"}

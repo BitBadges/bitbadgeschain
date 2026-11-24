@@ -293,10 +293,10 @@ create_genesis_from_config() {
     
     # Get bonded amount from config.yml
     local bonded_amount
-    bonded_amount=$(grep -A 2 "name: ${validator_name}" "${SCRIPT_DIR}/config.yml" | grep "bonded:" | awk '{print $2}' || echo "1000000000000000ustake")
+    bonded_amount=$(grep -A 2 "name: ${validator_name}" "${SCRIPT_DIR}/config.yml" | grep "bonded:" | awk '{print $2}' || echo "1000000000000000000000000ustake")
     
     # Get coins for validator from config.yml (simplified extraction)
-    local validator_coins="1ubadge,1000000000000000ustake"
+    local validator_coins="1000000000abadge,1000000000000000000000000ustake"
     # Try to extract from config, but use defaults if it fails
     local extracted_coins
     extracted_coins=$(awk "/name: ${validator_name}/,/^    - name:/" "${SCRIPT_DIR}/config.yml" | grep "^- " | awk '{print $2}' | tr '\n' ',' | sed 's/,$//' 2>/dev/null || echo "")
@@ -453,14 +453,14 @@ add_validator_to_genesis() {
     log_info "Adding validator ${val_addr} to genesis..."
     
     # Add genesis account with coins
-    if ! "${BINARY_PATH}" genesis add-genesis-account "${val_addr}" "1000000000000ustake,1000000000000ubadge" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1; then
+    if ! "${BINARY_PATH}" genesis add-genesis-account "${val_addr}" "1000000000000000000000ustake,1000000000000000000000abadge" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1; then
         log_error "Failed to add genesis account"
         return 1
     fi
     
     # Create validator gentx
     log_info "Creating validator gentx..."
-    if ! (yes "test1234" | head -1 | "${BINARY_PATH}" genesis gentx "${validator_key}" "1000000000000ustake" --chain-id "${CHAIN_ID}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1); then
+    if ! (yes "test1234" | head -1 | "${BINARY_PATH}" genesis gentx "${validator_key}" "1000000000000000000000ustake" --chain-id "${CHAIN_ID}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1); then
         log_error "Failed to create gentx"
         return 1
     fi

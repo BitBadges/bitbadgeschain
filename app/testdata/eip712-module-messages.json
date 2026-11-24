@@ -8,8 +8,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -23,7 +23,7 @@
             "share_out_amount": "1",
             "token_in_maxs": [
               {
-                "denom": "ubadge",
+                "denom": "abadge",
                 "amount": "100"
               }
             ]
@@ -32,9 +32,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "cd5bcf9ced56d10dbe893aa070bb1c34ff0195b1c2dc568ac9743a8f2bef8c07",
+    "hash": "0bd5f3f93de41706a25929c5dac4cbf2e36059aea4ceacf2fac95f501e2d40b8",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CnUKXAoZL2dhbW0udjFiZXRhMS5Nc2dKb2luUG9vbBI/CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGgExIg0KBnViYWRnZRIDMTAwEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQMh66u8DeahkvSBX3caqpmqMr7EtxjZDNtkNCK0SXoZPJrF2/BxozHNuhwDgBjGPx3gvZ0adWN+sdpuvhSeK6fs="
+    "txBytes": "CnUKXAoZL2dhbW0udjFiZXRhMS5Nc2dKb2luUG9vbBI/CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGgExIg0KBmFiYWRnZRIDMTAwEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQO81Kt4mamDi+g37lRzX/4qD9aqUpdO5MryndMHzoLTtWmYJ0VgecvRVUiMXciiBEjFULrqBZEdADjBSPLwT4bA="
   },
   {
     "name": "gamm.v1beta1.MsgExitPool",
@@ -45,8 +45,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -60,7 +60,7 @@
             "share_in_amount": "1",
             "token_out_mins": [
               {
-                "denom": "ubadge",
+                "denom": "abadge",
                 "amount": "100"
               }
             ]
@@ -69,9 +69,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "de7c2d43ab0096647d4776d5629370cb0d2f98940d59773c6f3f141f247375e6",
+    "hash": "ce0d7c8f371281c4dd25662e714616b0320f8f06ad53d443071be36041f0c955",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CnUKXAoZL2dhbW0udjFiZXRhMS5Nc2dFeGl0UG9vbBI/CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGgExIg0KBnViYWRnZRIDMTAwEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQA5rqsIyJdkwWck7cSKgV70plCstP/pb1BBdGMEbeiU3RJxBxGEGGNX12CYhlnqG0rNL7d1Abbil+tn8p0IUMTE="
+    "txBytes": "CnUKXAoZL2dhbW0udjFiZXRhMS5Nc2dFeGl0UG9vbBI/CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGgExIg0KBmFiYWRnZRIDMTAwEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQFeYyNZv8yrmTKyOr/gFflyKsHMMQgUFyyl5WCs5Mg+fMZ/ufFYZBpJ9RZCHp+VxJmFs+qOreztzqx0zEcsg1xQ="
   },
   {
     "name": "gamm.v1beta1.MsgSwapExactAmountIn",
@@ -82,8 +82,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -100,7 +100,7 @@
               }
             ],
             "token_in": {
-              "denom": "ubadge",
+              "denom": "abadge",
               "amount": "100"
             },
             "token_out_min_amount": "1"
@@ -109,9 +109,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "86fc0548a505ecc6e2cb24280e52c0c31c7f675280710b46074583d68213a83b",
+    "hash": "9c04e6a8d7020be49da9eecf11eb2cf1c2cb27a0b0447949a340b18df0fb4352",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CocBCm4KIi9nYW1tLnYxYmV0YTEuTXNnU3dhcEV4YWN0QW1vdW50SW4SSAopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXESCQgBEgVvdGhlchoNCgZ1YmFkZ2USAzEwMCIBMRIVbW9kdWxlIHNpZ24taW4gaW50ZW50EnMKWApQCikvY29zbW9zLmV2bS5jcnlwdG8udjEuZXRoc2VjcDI1NmsxLlB1YktleRIjCiECeb5mfvncu6xVoGKVzocLBwKb/NstzijZWfKBWxb4F5gSBAoCCH8SFwoRCgZ1YmFkZ2USBzMwMDAwMDAQ4KcSGkCMWpKmTOqXCorA+S+bytSBpm3bHKSg3/qCjZlZHTzdAgGL0ylFkzFDuDe2NUWiI/afBOgvVx6uK7rrm7JhOHpF"
+    "txBytes": "CocBCm4KIi9nYW1tLnYxYmV0YTEuTXNnU3dhcEV4YWN0QW1vdW50SW4SSAopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXESCQgBEgVvdGhlchoNCgZhYmFkZ2USAzEwMCIBMRIVbW9kdWxlIHNpZ24taW4gaW50ZW50EnwKWApQCikvY29zbW9zLmV2bS5jcnlwdG8udjEuZXRoc2VjcDI1NmsxLlB1YktleRIjCiECeb5mfvncu6xVoGKVzocLBwKb/NstzijZWfKBWxb4F5gSBAoCCH8SIAoaCgZhYmFkZ2USEDMwMDAwMDAwMDAwMDAwMDAQ4KcSGkA7jsUAl6BUnaNzxxIqzDC6+rUK54VKpDGyGbWfJHUYWWCePl+JXqwllBGgnZrRor9+4j3t33bAQlQYCm7QBNfo"
   },
   {
     "name": "gamm.v1beta1.MsgSwapExactAmountOut",
@@ -122,8 +122,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -141,7 +141,7 @@
             ],
             "token_in_max_amount": "1000",
             "token_out": {
-              "denom": "ubadge",
+              "denom": "abadge",
               "amount": "100"
             }
           }
@@ -149,9 +149,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "a092d71d69f4f6e3bfc4b23d276e2cb28be889ea30c07f495a768c5c0e11edee",
+    "hash": "77440caf805436720c5e621386bf83dae6e5680ccbf373b895c39cca0272103d",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CosBCnIKIy9nYW1tLnYxYmV0YTEuTXNnU3dhcEV4YWN0QW1vdW50T3V0EksKKWJiMTBlMDUyNXNmcmY1M3loMmFsam1tM3NuOWpxNW5qazdsOGF5NHVxEgkIARIFb3RoZXIaBDEwMDAiDQoGdWJhZGdlEgMxMDASFW1vZHVsZSBzaWduLWluIGludGVudBJzClgKUAopL2Nvc21vcy5ldm0uY3J5cHRvLnYxLmV0aHNlY3AyNTZrMS5QdWJLZXkSIwohAnm+Zn753LusVaBilc6HCwcCm/zbLc4o2VnygVsW+BeYEgQKAgh/EhcKEQoGdWJhZGdlEgczMDAwMDAwEOCnEhpA3j/adGmm7ITp4tWQeUZ5beSPy+NPAKHsAfU2ihGeOTRzgVKvJ4zQyNYfm+NaM1HtaLLHmA+nDUb/rGP7VESGQQ=="
+    "txBytes": "CosBCnIKIy9nYW1tLnYxYmV0YTEuTXNnU3dhcEV4YWN0QW1vdW50T3V0EksKKWJiMTBlMDUyNXNmcmY1M3loMmFsam1tM3NuOWpxNW5qazdsOGF5NHVxEgkIARIFb3RoZXIaBDEwMDAiDQoGYWJhZGdlEgMxMDASFW1vZHVsZSBzaWduLWluIGludGVudBJ8ClgKUAopL2Nvc21vcy5ldm0uY3J5cHRvLnYxLmV0aHNlY3AyNTZrMS5QdWJLZXkSIwohAnm+Zn753LusVaBilc6HCwcCm/zbLc4o2VnygVsW+BeYEgQKAgh/EiAKGgoGYWJhZGdlEhAzMDAwMDAwMDAwMDAwMDAwEOCnEhpAOJnfzuf4/GVKPRfa/KL1XKlvWRyOWpy+dcmK50WvVpIKiNWGOkmKn+OkZ0y4zo6YqK5XwuzDIp1uhl48dllVnQ=="
   },
   {
     "name": "gamm.v1beta1.MsgJoinSwapExternAmountIn",
@@ -162,8 +162,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -175,7 +175,7 @@
             "sender": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
             "pool_id": "1",
             "token_in": {
-              "denom": "ubadge",
+              "denom": "abadge",
               "amount": "100"
             },
             "share_out_min_amount": "1"
@@ -184,9 +184,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "69c824379555009919c5e17256a0bae21ab1fb15444eb6f68ef3f32f65ca06d3",
+    "hash": "f2230bad07b54425faa74ac3d9441e50f9519c92cbc2a5f08ce4db8c354adce0",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CoMBCmoKJy9nYW1tLnYxYmV0YTEuTXNnSm9pblN3YXBFeHRlcm5BbW91bnRJbhI/CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGg0KBnViYWRnZRIDMTAwIgExEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQDS1fDMwslbj/FTej0fNDjTOCdrkHdX1sJA/OQpb0EWyFtI3XCapaLveh5z6ZfyLijJxqcg08awoR/afN6howR0="
+    "txBytes": "CoMBCmoKJy9nYW1tLnYxYmV0YTEuTXNnSm9pblN3YXBFeHRlcm5BbW91bnRJbhI/CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGg0KBmFiYWRnZRIDMTAwIgExEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQI3EXWwMxckq05ieFXJXaIj0xxHspVuskc4MOK+UMWvjLXvAkV14cZZsvpTeetDDcsTUwtFAtHsEMQmtepDCPvg="
   },
   {
     "name": "gamm.v1beta1.MsgJoinSwapShareAmountOut",
@@ -197,8 +197,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -209,7 +209,7 @@
           "value": {
             "sender": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
             "pool_id": "1",
-            "token_in_denom": "ubadge",
+            "token_in_denom": "abadge",
             "share_out_amount": "1",
             "token_in_max_amount": "1000"
           }
@@ -217,9 +217,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "f2c953d7b1cb826029de0d04cf85e121ca5b3dcb9af5fd58e0aa9dd737d14842",
+    "hash": "9de0add8bccd7e72af891563058d890ba59031bc35b8a205e7876c994da58e44",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CoIBCmkKJy9nYW1tLnYxYmV0YTEuTXNnSm9pblN3YXBTaGFyZUFtb3VudE91dBI+CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGgZ1YmFkZ2UiATEqBDEwMDASFW1vZHVsZSBzaWduLWluIGludGVudBJzClgKUAopL2Nvc21vcy5ldm0uY3J5cHRvLnYxLmV0aHNlY3AyNTZrMS5QdWJLZXkSIwohAnm+Zn753LusVaBilc6HCwcCm/zbLc4o2VnygVsW+BeYEgQKAgh/EhcKEQoGdWJhZGdlEgczMDAwMDAwEOCnEhpAU503BoGg1dDUf/XSKaRdCKw0yPnasikJ8LuyBeZLCMx7GL+WwY0c9wfscl2zZk0fubn2jvjF9uJiI0XPxPTG3Q=="
+    "txBytes": "CoIBCmkKJy9nYW1tLnYxYmV0YTEuTXNnSm9pblN3YXBTaGFyZUFtb3VudE91dBI+CiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRABGgZhYmFkZ2UiATEqBDEwMDASFW1vZHVsZSBzaWduLWluIGludGVudBJ8ClgKUAopL2Nvc21vcy5ldm0uY3J5cHRvLnYxLmV0aHNlY3AyNTZrMS5QdWJLZXkSIwohAnm+Zn753LusVaBilc6HCwcCm/zbLc4o2VnygVsW+BeYEgQKAgh/EiAKGgoGYWJhZGdlEhAzMDAwMDAwMDAwMDAwMDAwEOCnEhpA1P+nCExnVme6NOeUezqtM6gzhzEm8J5qATlQ3bIX9C0Lo9cLnyhcNXxpWq9S16PGmPW5+cBD3OVipHaTTNVH+A=="
   },
   {
     "name": "gamm.v1beta1.MsgExitSwapExternAmountOut",
@@ -230,8 +230,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -243,7 +243,7 @@
             "sender": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
             "pool_id": "1",
             "token_out": {
-              "denom": "ubadge",
+              "denom": "abadge",
               "amount": "100"
             },
             "share_in_max_amount": "1000"
@@ -252,9 +252,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "49247ce9d224c7cbf36338727a906580a5f67422425ec2ba757c69da6fd73bbc",
+    "hash": "bec94534ab3626a65401c4f95019a4b47148219f56d3ef9d84717e18d9c25124",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CocBCm4KKC9nYW1tLnYxYmV0YTEuTXNnRXhpdFN3YXBFeHRlcm5BbW91bnRPdXQSQgopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXEQARoNCgZ1YmFkZ2USAzEwMCIEMTAwMBIVbW9kdWxlIHNpZ24taW4gaW50ZW50EnMKWApQCikvY29zbW9zLmV2bS5jcnlwdG8udjEuZXRoc2VjcDI1NmsxLlB1YktleRIjCiECeb5mfvncu6xVoGKVzocLBwKb/NstzijZWfKBWxb4F5gSBAoCCH8SFwoRCgZ1YmFkZ2USBzMwMDAwMDAQ4KcSGkCGWPVWGA70PvF1Bbsi8epTNpLLM91FXqXhTsl+/MjouWTv2EQBZwtQwWxVzpLMtrTcyRjDOFRQ62pi/pHTBE1P"
+    "txBytes": "CocBCm4KKC9nYW1tLnYxYmV0YTEuTXNnRXhpdFN3YXBFeHRlcm5BbW91bnRPdXQSQgopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXEQARoNCgZhYmFkZ2USAzEwMCIEMTAwMBIVbW9kdWxlIHNpZ24taW4gaW50ZW50EnwKWApQCikvY29zbW9zLmV2bS5jcnlwdG8udjEuZXRoc2VjcDI1NmsxLlB1YktleRIjCiECeb5mfvncu6xVoGKVzocLBwKb/NstzijZWfKBWxb4F5gSBAoCCH8SIAoaCgZhYmFkZ2USEDMwMDAwMDAwMDAwMDAwMDAQ4KcSGkA2wqKctEpDudUcyr53Qwv4Y/WzygzawvurT9L+ovltAx+lkfhCq+o8nY/Cy0meJlbqrYNRmCpnY0QAf2ZhnJqK"
   },
   {
     "name": "gamm.v1beta1.MsgExitSwapShareAmountIn",
@@ -265,8 +265,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -277,7 +277,7 @@
           "value": {
             "sender": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
             "pool_id": "1",
-            "token_out_denom": "ubadge",
+            "token_out_denom": "abadge",
             "share_in_amount": "1",
             "token_out_min_amount": "1"
           }
@@ -285,9 +285,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "18ec6461f9438bd577fa7b9b7fd2d76e66f974e36c22c3e2686683973ecf27f8",
+    "hash": "89c06cb89ad14d25ce6b65ed9c298122c7f6ba5dca1932065dccb8b9e004be48",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "Cn4KZQomL2dhbW0udjFiZXRhMS5Nc2dFeGl0U3dhcFNoYXJlQW1vdW50SW4SOwopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXEQARoGdWJhZGdlIgExKgExEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQNM4/kvRMm+x1lTP5EIoJM2PHYrqPbgv5SWUoPJA62JgSOJ3NLN6SlqLxBljkHcyRe0OE2vWU+fwgEvQpcPefqI="
+    "txBytes": "Cn4KZQomL2dhbW0udjFiZXRhMS5Nc2dFeGl0U3dhcFNoYXJlQW1vdW50SW4SOwopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXEQARoGYWJhZGdlIgExKgExEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQJZcZ31KCKHd+fytFiOSs3iuSnEiu1x4OlJQPm5+Ljm5bx/RoIcql8gJbKg9+MXv/LR6oOI82IjsZvE3S5Zz7Bs="
   },
   {
     "name": "gamm.v1beta1.MsgSwapExactAmountInWithIBCTransfer",
@@ -298,8 +298,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -316,7 +316,7 @@
               }
             ],
             "token_in": {
-              "denom": "ubadge",
+              "denom": "abadge",
               "amount": "100"
             },
             "token_out_min_amount": "1",
@@ -330,9 +330,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "99cfd0598e644899775c3cef1a19487c0a7a74e08832659f2054a774aa7f9275",
+    "hash": "d35f21f0649b2ac89bea269d473c2bb465bd68d0f71b4f8da9bcb98a228a8b7a",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CtoBCsABCjEvZ2FtbS52MWJldGExLk1zZ1N3YXBFeGFjdEFtb3VudEluV2l0aElCQ1RyYW5zZmVyEooBCiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRIJCAESBW90aGVyGg0KBnViYWRnZRIDMTAwIgExKkAKCWNoYW5uZWwtMBIpYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXEggID4ie/9ia8aEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQC6tdLkXpxwIeNP/EwTb/5tO7+0+0e6FPiKm/SJ8p0omAls3q0pW9E5TVPgWF4Au2n7c7faaPr5JDGTjj0zshOM="
+    "txBytes": "CtoBCsABCjEvZ2FtbS52MWJldGExLk1zZ1N3YXBFeGFjdEFtb3VudEluV2l0aElCQ1RyYW5zZmVyEooBCiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRIJCAESBW90aGVyGg0KBmFiYWRnZRIDMTAwIgExKkAKCWNoYW5uZWwtMBIpYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXEggID4ie/9ia8aEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQPZZStMT9G6EAmO7eAcWNU87SsFdqPqzWn6pxvoL6+oOQJrTVOZXu91ZVEGV7iUodWAERMCaKMKpHUWniLskkPA="
   },
   {
     "name": "gamm.poolmodels.balancer.MsgCreateBalancerPool",
@@ -343,8 +343,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -361,7 +361,7 @@
             "pool_assets": [
               {
                 "token": {
-                  "denom": "ubadge",
+                  "denom": "abadge",
                   "amount": "100"
                 },
                 "weight": "1"
@@ -379,9 +379,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "6e5ae7e2ebed0cbe735fe013e7d83ff1efccd9e7991b51f182b2149989331fb7",
+    "hash": "b5aca9d135afffe27b80efdabdd8f3c0aa974c9a8b1594b1cc883099a3dfeed1",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CrYBCpwBCi8vZ2FtbS5wb29sbW9kZWxzLmJhbGFuY2VyLk1zZ0NyZWF0ZUJhbGFuY2VyUG9vbBJpCiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRIVChAzMDAwMDAwMDAwMDAwMDAwEgEwGhIKDQoGdWJhZGdlEgMxMDASATEaEQoMCgVvdGhlchIDMTAwEgExEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQKTUSoCUX0sdNqIrm9S50oDdahdRW+psGgb5Jcnf/rKLbA5ZAZ4JTpJNsRT/tfpt6gFqFb9r98mvvTE5xx2DbNU="
+    "txBytes": "CrYBCpwBCi8vZ2FtbS5wb29sbW9kZWxzLmJhbGFuY2VyLk1zZ0NyZWF0ZUJhbGFuY2VyUG9vbBJpCiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRIVChAzMDAwMDAwMDAwMDAwMDAwEgEwGhIKDQoGYWJhZGdlEgMxMDASATEaEQoMCgVvdGhlchIDMTAwEgExEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQN4cUh1kfO+MR8LlZk7Wf1ta9ynq7KdZDPJTr3505IziXDBgviy2VoCE808U+WeZutbwDpUY/R/esl5NPIdTjWs="
   },
   {
     "name": "sendmanager.MsgSendWithAliasRouting",
@@ -392,8 +392,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -406,7 +406,7 @@
             "to_address": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
             "amount": [
               {
-                "denom": "ubadge",
+                "denom": "abadge",
                 "amount": "100"
               }
             ]
@@ -415,9 +415,9 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "75d53e3f76920c8661781ff34d30192f42961cd07f0e81416b081e4b6b0cb0f2",
+    "hash": "fcd4486a3b167c22e9d58ba72410e20239b2f4c8ec49cad6a29fbf7a573c8374",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CqcBCo0BCiQvc2VuZG1hbmFnZXIuTXNnU2VuZFdpdGhBbGlhc1JvdXRpbmcSZQopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXESKWJiMTBlMDUyNXNmcmY1M3loMmFsam1tM3NuOWpxNW5qazdsOGF5NHVxGg0KBnViYWRnZRIDMTAwEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQLOklabQpOnQM52LOaHyx7I9rQr55XI3M2JzkQaCcV9BNVV4zrIqeIvRxY9jyrSgyLi+YO5TROuzlWyhlF74Sbw="
+    "txBytes": "CqcBCo0BCiQvc2VuZG1hbmFnZXIuTXNnU2VuZFdpdGhBbGlhc1JvdXRpbmcSZQopYmIxMGUwNTI1c2ZyZjUzeWgyYWxqbW0zc245anE1bmprN2w4YXk0dXESKWJiMTBlMDUyNXNmcmY1M3loMmFsam1tM3NuOWpxNW5qazdsOGF5NHVxGg0KBmFiYWRnZRIDMTAwEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQK5Y3ublv7gHWvQWCw/rVPq8qPxH2qHlspIJnYV8sBkeLNl3RnfLTlT1r5scZMhjyZpTNh0wxZyEDr/gmMqGAzc="
   },
   {
     "name": "sendmanager.MsgUpdateParams",
@@ -428,8 +428,8 @@
       "fee": {
         "amount": [
           {
-            "denom": "ubadge",
-            "amount": "3000000"
+            "denom": "abadge",
+            "amount": "3000000000000000"
           }
         ],
         "gas": "300000"
@@ -445,8 +445,8 @@
       ],
       "memo": "module sign-in intent"
     },
-    "hash": "5c163b67cc27897c76f4823d69105521350d5d317a234cc358fc1b70748615bc",
+    "hash": "2a3db7533ab813f84ee1b754fbf28f3fa582dbf1b84ae97a9ae8b95d5a3ad331",
     "signer": "bb10e0525sfrf53yh2aljmm3sn9jq5njk7l8ay4uq",
-    "txBytes": "CmYKTQocL3NlbmRtYW5hZ2VyLk1zZ1VwZGF0ZVBhcmFtcxItCiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRIAEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQScwpYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIXChEKBnViYWRnZRIHMzAwMDAwMBDgpxIaQGW5rmwEM06HTBdiF3KN9c5gy0Ya+4SYUzXEbOTztbhIN9BDKdZ/bfifGr4COHsrNwjrTCyO1VWq7zV3Vh1w++I="
+    "txBytes": "CmYKTQocL3NlbmRtYW5hZ2VyLk1zZ1VwZGF0ZVBhcmFtcxItCiliYjEwZTA1MjVzZnJmNTN5aDJhbGptbTNzbjlqcTVuams3bDhheTR1cRIAEhVtb2R1bGUgc2lnbi1pbiBpbnRlbnQSfApYClAKKS9jb3Ntb3MuZXZtLmNyeXB0by52MS5ldGhzZWNwMjU2azEuUHViS2V5EiMKIQJ5vmZ++dy7rFWgYpXOhwsHApv82y3OKNlZ8oFbFvgXmBIECgIIfxIgChoKBmFiYWRnZRIQMzAwMDAwMDAwMDAwMDAwMBDgpxIaQJHRCyeB0o3OqsktzLkyYA9HgkwX5HvT1IkECJpvjKrZZVUjxw3SyzcR/51t2LRTmntp42IPyp8TM0856bRKuOI="
   }
 ]

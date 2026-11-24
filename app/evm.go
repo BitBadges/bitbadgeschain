@@ -161,7 +161,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		nonTransientKeys,
 		authority,
 		app.AccountKeeper,
-		newEVMBankKeeper(app.PreciseBankKeeper), // 9-decimal chain: EVM must see precisebank, not raw x/bank; see evm_bank.go
+		app.BankKeeper,
 		app.StakingKeeper,
 		app.FeeMarketKeeper, // Use FeeMarket keeper
 		app.ConsensusParamsKeeper,
@@ -172,7 +172,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		precompiletypes.DefaultStaticPrecompiles(
 			*app.StakingKeeper,
 			app.DistrKeeper,
-			app.PreciseBankKeeper,
+			app.BankKeeper,
 			&app.ERC20Keeper,
 			app.TransferKeeper,
 			app.IBCKeeper.ChannelKeeper,
@@ -190,7 +190,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 		app.appCodec,
 		authority,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // 9-decimal chain: see app.go
+		app.BankKeeper,
 		app.EVMKeeper,
 		app.StakingKeeper,
 		app.TransferKeeper, // ibc-go transfer keeper (now a pointer)
@@ -221,7 +221,7 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 	evmModule := evmmodule.NewAppModule(
 		app.EVMKeeper,
 		app.AccountKeeper,
-		app.PreciseBankKeeper, // 9-decimal chain: see app.go
+		app.BankKeeper,
 		app.AccountKeeper.AddressCodec(),
 	)
 
@@ -238,17 +238,17 @@ func (app *App) registerEVMModules(appOpts servertypes.AppOptions) error {
 // This ensures all custom precompiles are registered and prevents address collisions
 func (app *App) registerCustomPrecompiles() {
 	// Register tokenization precompile
-	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper, app.PreciseBankKeeper)
+	tokenizationPrecompile := tokenizationprecompile.NewPrecompile(app.TokenizationKeeper, app.BankKeeper)
 	tokenizationPrecompileAddr := common.HexToAddress(tokenizationprecompile.TokenizationPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(tokenizationPrecompileAddr, tokenizationPrecompile)
 
 	// Register gamm precompile
-	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper, app.PreciseBankKeeper)
+	gammPrecompile := gammprecompile.NewPrecompile(app.GammKeeper, app.BankKeeper)
 	gammPrecompileAddr := common.HexToAddress(gammprecompile.GammPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(gammPrecompileAddr, gammPrecompile)
 
 	// Register sendmanager precompile
-	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper, app.PreciseBankKeeper)
+	sendManagerPrecompile := sendmanagerprecompile.NewPrecompile(app.SendmanagerKeeper, app.BankKeeper)
 	sendManagerPrecompileAddr := common.HexToAddress(sendmanagerprecompile.SendManagerPrecompileAddress)
 	app.EVMKeeper.RegisterStaticPrecompile(sendManagerPrecompileAddr, sendManagerPrecompile)
 

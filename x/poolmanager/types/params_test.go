@@ -14,7 +14,7 @@ import (
 // once a ubadge/USDC pool exists. See DefaultParams for the rationale.
 func TestDefaultParamsCommunityPoolSwapDenom(t *testing.T) {
 	params := types.DefaultParams()
-	require.Equal(t, "ubadge",
+	require.Equal(t, "abadge",
 		params.TakerFeeParams.CommunityPoolDenomToSwapNonWhitelistedAssetsTo)
 }
 
