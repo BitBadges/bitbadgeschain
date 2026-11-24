@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	erc20types "github.com/cosmos/evm/x/erc20/types"
 	feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
@@ -176,7 +175,7 @@ func TestGenesisModuleOrderEVMBeforeGenutil(t *testing.T) {
 
 	for _, name := range []string{
 		banktypes.ModuleName, feemarkettypes.ModuleName, evmtypes.ModuleName,
-		erc20types.ModuleName, precisebanktypes.ModuleName, genutiltypes.ModuleName,
+		erc20types.ModuleName, genutiltypes.ModuleName,
 	} {
 		require.Contains(t, index, name, "genesisModuleOrder is missing %q", name)
 	}
@@ -195,9 +194,6 @@ func TestGenesisModuleOrderEVMBeforeGenutil(t *testing.T) {
 
 	require.Less(t, index[evmtypes.ModuleName], index[erc20types.ModuleName],
 		"erc20 depends on the EVM keeper, so it must initialise after vm")
-
-	require.Less(t, index[evmtypes.ModuleName], index[precisebanktypes.ModuleName],
-		"precisebank's InitGenesis needs the EVM keeper")
 }
 
 // TestEVMMempoolHandlersInstalled proves the app-side mempool is actually wired

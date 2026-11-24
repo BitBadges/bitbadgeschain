@@ -376,7 +376,7 @@ func (suite *ReturnTypesTestSuite) TestConvertVoteProofToSolidityStruct_Nil() {
 
 func (suite *ReturnTypesTestSuite) TestConvertParamsToSolidityStruct_Valid() {
 	params := &tokenizationtypes.Params{
-		AllowedDenoms:      []string{"uatom", "ubadge"},
+		AllowedDenoms:      []string{"uatom", "abadge"},
 		AffiliatePercentage: sdkmath.NewUint(5),
 	}
 	structData, err := tokenization.ConvertParamsToSolidityStruct(params)

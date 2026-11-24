@@ -1,0 +1,115 @@
+package v37
+
+import (
+	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	poolmanager "github.com/bitbadges/bitbadgeschain/x/poolmanager"
+)
+
+// PoolManagerMigrationResult reports what RekeyTakerFees touched.
+type PoolManagerMigrationResult struct {
+	Rekeyed   int
+	Redundant int
+	Total     int
+	// TakerFeeState reports the accrued taker-fee accounting moved alongside the
+	// per-pair overrides. Those are configuration; this is money.
+	TakerFeeState poolmanager.RedenominationResult
+}
+
+// RekeyTakerFees moves per-pair taker-fee overrides onto the new denom.
+//
+// This one is easy to miss because nothing about it looks like an amount.
+// x/poolmanager stores taker-fee overrides under a key built by string
+// concatenation:
+//
+//	FormatDenomTradePairKey -> <prefix>|<tokenInDenom>|<tokenOutDenom>
+//
+// The denom is *in the key*, not just the value. Renaming ubadge to abadge
+// therefore orphans every override involving the native denom: the record still
+// exists but nothing will ever look it up again, and the pair silently falls
+// back to the default taker fee. A fee change nobody asked for, on every BADGE
+// pair, with no error anywhere.
+//
+// Deleting the stale key uses the keeper's own quirk rather than reaching into
+// the store: SetDenomPairTakerFee deletes the entry when the fee it is given
+// equals the default. That keeps this migration on exported API.
+//
+// Note that a pair whose override already equals the default is not stored at
+// all, so it never appears here and needs no migration.
+func RekeyTakerFees(ctx sdk.Context, pmk poolmanager.Keeper) (PoolManagerMigrationResult, error) {
+	var res PoolManagerMigrationResult
+
+	pairs, err := pmk.GetAllTradingPairTakerFees(ctx)
+	if err != nil {
+		return res, fmt.Errorf("reading taker fees: %w", err)
+	}
+	res.Total = len(pairs)
+
+	defaultFee := pmk.GetDefaultTakerFee(ctx)
+
+	for _, pair := range pairs {
+		inDenom, outDenom := pair.TokenInDenom, pair.TokenOutDenom
+		if inDenom != legacyDenom() && outDenom != legacyDenom() {
+			continue
+		}
+
+		newIn, newOut := inDenom, outDenom
+		if newIn == legacyDenom() {
+			newIn = newDenom()
+		}
+		if newOut == legacyDenom() {
+			newOut = newDenom()
+		}
+
+		// An override that equals the current default carries no information:
+		// the keeper's own convention is that such a pair is simply not stored.
+		// Governance raising or lowering the default after an override was
+		// written leaves exactly this state, so it is a reachable configuration
+		// rather than corruption.
+		//
+		// Erroring here would abort CustomUpgradeHandlerLogic and halt the chain
+		// at the upgrade height, recoverable only with a new binary. Retire the
+		// stale key instead and say so in the log.
+		if pair.TakerFee.Equal(defaultFee) {
+			pmk.SetDenomPairTakerFee(ctx, inDenom, outDenom, defaultFee)
+			res.Redundant++
+			ctx.Logger().Info(
+				"v37: dropped a taker-fee override that already equals the default",
+				"token_in", inDenom, "token_out", outDenom, "fee", pair.TakerFee.String(),
+			)
+			continue
+		}
+
+		pmk.SetDenomPairTakerFee(ctx, newIn, newOut, pair.TakerFee)
+
+		// Retire the old key. Passing the default fee is how the keeper spells
+		// "delete this entry".
+		pmk.SetDenomPairTakerFee(ctx, inDenom, outDenom, defaultFee)
+
+		res.Rekeyed++
+	}
+
+	// The per-pair overrides above are configuration. The accrued taker fees,
+	// the taker-fee-share skim accruals and the share agreements are the other
+	// half of this module's denom-keyed state, and two of the three carry real
+	// amounts. Handled by the module because a re-key needs store access the
+	// keeper does not export.
+	takerFeeState, err := pmk.RedenominateTakerFeeState(ctx, legacyDenom(), newDenom(), ConversionFactor)
+	if err != nil {
+		return res, fmt.Errorf("redenominating taker fee state: %w", err)
+	}
+	res.TakerFeeState = takerFeeState
+
+	ctx.Logger().Info(
+		"v37: re-keyed poolmanager taker fees",
+		"from", legacyDenom(),
+		"to", newDenom(),
+		"rekeyed", res.Rekeyed,
+		"redundant_dropped", res.Redundant,
+		"total_pairs", res.Total,
+	)
+
+	return res, nil
+}

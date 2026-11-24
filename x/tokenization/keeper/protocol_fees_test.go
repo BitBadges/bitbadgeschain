@@ -46,13 +46,13 @@ func (suite *TestSuite) mintTransferTo(recipient string) error {
 	})
 }
 
-func (suite *TestSuite) ubadgeBalance(addr string) sdkmath.Int {
-	return suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(addr), "ubadge").Amount
+func (suite *TestSuite) abadgeBalance(addr string) sdkmath.Int {
+	return suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(addr), "abadge").Amount
 }
 
 func (suite *TestSuite) communityPoolUbadge() sdkmath.Int {
 	distrAddr := authtypes.NewModuleAddress(distrtypes.ModuleName)
-	return suite.app.BankKeeper.GetBalance(suite.ctx, distrAddr, "ubadge").Amount
+	return suite.app.BankKeeper.GetBalance(suite.ctx, distrAddr, "abadge").Amount
 }
 
 // TestProtocolFeeChargedOnTopOfTransfer verifies the payer is debited the transfer
@@ -67,20 +67,20 @@ func (suite *TestSuite) TestProtocolFeeChargedOnTopOfTransfer() {
 	collectionsToCreate := suite.protocolFeeCollection([]*types.CoinTransfer{
 		{
 			To:    alice,
-			Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(transferAmount), Denom: "ubadge"}},
+			Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(transferAmount), Denom: "abadge"}},
 		},
 	})
 	suite.Require().Nil(CreateCollections(suite, wctx, collectionsToCreate), "error creating tokens")
 
-	bobBefore := suite.ubadgeBalance(bob)
-	aliceBefore := suite.ubadgeBalance(alice)
+	bobBefore := suite.abadgeBalance(bob)
+	aliceBefore := suite.abadgeBalance(alice)
 	poolBefore := suite.communityPoolUbadge()
 
 	suite.Require().Nil(suite.mintTransferTo(alice), "error transferring tokens")
 
-	suite.Require().Equal(bobBefore.SubRaw(transferAmount).SubRaw(expectedFee), suite.ubadgeBalance(bob),
+	suite.Require().Equal(bobBefore.SubRaw(transferAmount).SubRaw(expectedFee), suite.abadgeBalance(bob),
 		"payer should be charged transfer amount + protocol fee")
-	suite.Require().Equal(aliceBefore.AddRaw(transferAmount), suite.ubadgeBalance(alice),
+	suite.Require().Equal(aliceBefore.AddRaw(transferAmount), suite.abadgeBalance(alice),
 		"recipient should receive the full transfer amount (fee not skimmed)")
 	suite.Require().Equal(poolBefore.AddRaw(expectedFee), suite.communityPoolUbadge(),
 		"community pool should receive the protocol fee")
@@ -96,23 +96,23 @@ func (suite *TestSuite) TestProtocolFeeAggregatesAcrossTransfers() {
 	const expectedFee = (toAlice + toCharlie) / keeper.ProtocolFeeDenominator // 0.1% of 150000 = 150
 
 	collectionsToCreate := suite.protocolFeeCollection([]*types.CoinTransfer{
-		{To: alice, Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(toAlice), Denom: "ubadge"}}},
-		{To: charlie, Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(toCharlie), Denom: "ubadge"}}},
+		{To: alice, Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(toAlice), Denom: "abadge"}}},
+		{To: charlie, Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(toCharlie), Denom: "abadge"}}},
 	})
 	suite.Require().Nil(CreateCollections(suite, wctx, collectionsToCreate), "error creating tokens")
 
-	bobBefore := suite.ubadgeBalance(bob)
-	aliceBefore := suite.ubadgeBalance(alice)
-	charlieBefore := suite.ubadgeBalance(charlie)
+	bobBefore := suite.abadgeBalance(bob)
+	aliceBefore := suite.abadgeBalance(alice)
+	charlieBefore := suite.abadgeBalance(charlie)
 	poolBefore := suite.communityPoolUbadge()
 
 	suite.Require().Nil(suite.mintTransferTo(charlie), "error transferring tokens")
 
-	suite.Require().Equal(bobBefore.SubRaw(toAlice).SubRaw(toCharlie).SubRaw(expectedFee), suite.ubadgeBalance(bob),
+	suite.Require().Equal(bobBefore.SubRaw(toAlice).SubRaw(toCharlie).SubRaw(expectedFee), suite.abadgeBalance(bob),
 		"payer should be charged both transfers + a single aggregated fee")
-	suite.Require().Equal(aliceBefore.AddRaw(toAlice), suite.ubadgeBalance(alice),
+	suite.Require().Equal(aliceBefore.AddRaw(toAlice), suite.abadgeBalance(alice),
 		"alice should receive her full amount")
-	suite.Require().Equal(charlieBefore.AddRaw(toCharlie), suite.ubadgeBalance(charlie),
+	suite.Require().Equal(charlieBefore.AddRaw(toCharlie), suite.abadgeBalance(charlie),
 		"charlie should receive his full amount")
 	suite.Require().Equal(poolBefore.AddRaw(expectedFee), suite.communityPoolUbadge(),
 		"community pool should receive the aggregated fee")
@@ -128,20 +128,20 @@ func (suite *TestSuite) TestProtocolFeeRoundsToZeroForSmallTransfers() {
 	collectionsToCreate := suite.protocolFeeCollection([]*types.CoinTransfer{
 		{
 			To:    alice,
-			Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(transferAmount), Denom: "ubadge"}},
+			Coins: []*sdk.Coin{{Amount: sdkmath.NewInt(transferAmount), Denom: "abadge"}},
 		},
 	})
 	suite.Require().Nil(CreateCollections(suite, wctx, collectionsToCreate), "error creating tokens")
 
-	bobBefore := suite.ubadgeBalance(bob)
-	aliceBefore := suite.ubadgeBalance(alice)
+	bobBefore := suite.abadgeBalance(bob)
+	aliceBefore := suite.abadgeBalance(alice)
 	poolBefore := suite.communityPoolUbadge()
 
 	suite.Require().Nil(suite.mintTransferTo(alice), "error transferring tokens")
 
-	suite.Require().Equal(bobBefore.SubRaw(transferAmount), suite.ubadgeBalance(bob),
+	suite.Require().Equal(bobBefore.SubRaw(transferAmount), suite.abadgeBalance(bob),
 		"payer should be charged only the transfer amount when the fee rounds to zero")
-	suite.Require().Equal(aliceBefore.AddRaw(transferAmount), suite.ubadgeBalance(alice),
+	suite.Require().Equal(aliceBefore.AddRaw(transferAmount), suite.abadgeBalance(alice),
 		"recipient should receive the full transfer amount")
 	suite.Require().Equal(poolBefore, suite.communityPoolUbadge(),
 		"community pool should be unchanged when the fee rounds to zero")

@@ -4,9 +4,35 @@ import (
 	v34 "github.com/bitbadges/bitbadgeschain/app/upgrades/v34"
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 	v36 "github.com/bitbadges/bitbadgeschain/app/upgrades/v36"
+	v37 "github.com/bitbadges/bitbadgeschain/app/upgrades/v37"
 	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
+
+// V37Keepers builds the keeper set the v37 9 -> 18 decimal migration needs.
+func (app *App) V37Keepers() v37.Keepers {
+	return v37.Keepers{
+		Account:      app.AccountKeeper,
+		Authz:        app.AuthzKeeper,
+		Bank:         app.BankKeeper.(bankkeeper.BaseKeeper),
+		Distribution: app.DistrKeeper,
+		ERC20:        app.ERC20Keeper,
+		EVM:          app.EVMKeeper,
+		FeeGrant:     app.FeeGrantKeeper,
+		FeeMarket:    app.FeeMarketKeeper,
+		Gamm:         app.GammKeeper,
+		Gov:          app.GovKeeper,
+		Mint:         app.MintKeeper,
+		PoolManager:  app.PoolManagerKeeper,
+		RateLimit:    app.IBCRateLimitKeeper,
+		Staking:      app.StakingKeeper,
+		Tokenization: *app.TokenizationKeeper,
+		Transfer:     app.TransferKeeper,
+
+		PreciseBankStore: app.LegacyPreciseBankKey,
+	}
+}
 
 // RegisterUpgradeHandlers registers all upgrade handlers
 func (app *App) RegisterUpgradeHandlers() {
@@ -46,6 +72,14 @@ func (app *App) RegisterUpgradeHandlers() {
 			},
 		),
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v37.UpgradeName,
+		v37.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.Configurator(),
+			app.V37Keepers(),
+		),
+	)
 
 	// When a planned upgrade height is reached, the old binary will panic
 	// writing on disk the height and name of the upgrade that triggered it
@@ -62,6 +96,15 @@ func (app *App) RegisterUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
+	case v37.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Renamed: []storetypes.StoreRename{},
+			// x/precisebank is retired by v37, but its KV store is deliberately
+			// kept mounted here (not deleted by the store loader) so the v37
+			// upgrade handler can read and pay out every fractional balance.
+			Deleted: []string{},
+			Added:   []string{},
+		}
 	case v34.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Renamed: []storetypes.StoreRename{},

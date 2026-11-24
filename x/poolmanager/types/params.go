@@ -64,7 +64,7 @@ func DefaultParams() Params {
 			// via governance once a ubadge/USDC pool exists. Note: no non-test
 			// code reads this param today (the epoch community-pool swap path
 			// was not ported), so this value is inert until that path exists.
-			CommunityPoolDenomToSwapNonWhitelistedAssetsTo: "ubadge",
+			CommunityPoolDenomToSwapNonWhitelistedAssetsTo: "abadge",
 			ReducedFeeWhitelist:                            []string{},
 			CommunityPoolDenomWhitelist:                    []string{},
 		},

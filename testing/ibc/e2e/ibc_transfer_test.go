@@ -34,10 +34,10 @@ func (s *TransferTestSuite) TestBasicTransfer() {
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
 	// Get initial balance
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -97,7 +97,7 @@ func (s *TransferTestSuite) TestTransferAndReceive() {
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
 	// Fund sender with extra tokens for this test
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(5000000)
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
@@ -187,10 +187,10 @@ func (s *TransferTestSuite) TestTransferTimeout() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -253,10 +253,10 @@ func (s *TransferTestSuite) TestTransferAcknowledgement() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Fund sender with ubadge tokens
+	// Fund sender with abadge tokens
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(2))))
 	s.Require().NoError(err)
 
@@ -326,7 +326,7 @@ func (s *TransferTestSuite) TestMultipleTransfers() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	singleAmount := sdkmath.NewInt(100000)
 	numTransfers := 5
 

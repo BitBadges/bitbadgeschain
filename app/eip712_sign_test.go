@@ -247,7 +247,7 @@ func TestEIP712ModuleHashesMatchSDK(t *testing.T) {
 			ctx, _ = ctx.CacheContext()
 			signer, err := sdk.AccAddressFromBech32(fixture.Signer)
 			require.NoError(t, err)
-			funds := sdk.NewCoins(sdk.NewCoin(appparams.BaseCoinUnit, sdkmath.NewInt(1_000_000_000_000)))
+			funds := sdk.NewCoins(sdk.NewCoin(appparams.BaseCoinUnit, sdkmath.NewInt(1_000_000_000_000_000_000)))
 			require.NoError(t, app.BankKeeper.MintCoins(ctx, "mint", funds))
 			require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", signer, funds))
 			acc := app.AccountKeeper.GetAccount(ctx, signer)

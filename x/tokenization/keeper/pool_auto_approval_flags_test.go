@@ -30,7 +30,7 @@ func (suite *PoolIntegrationTestSuite) TestSendCoinsToPoolSetsPoolFlagsNotSender
 	bobAcc := sdk.MustAccAddressFromBech32(bob)
 	poolAssets := []balancer.PoolAsset{
 		{Token: sdk.NewInt64Coin(aliasDenom, 1), Weight: osmomath.NewInt(1)},
-		{Token: sdk.NewInt64Coin("ubadge", 100), Weight: osmomath.NewInt(1)},
+		{Token: sdk.NewInt64Coin(types.NativeDenom, 100), Weight: osmomath.NewInt(1)},
 	}
 	poolId, err := suite.app.PoolManagerKeeper.CreatePool(suite.ctx,
 		balancer.NewMsgCreateBalancerPool(bobAcc, balancer.NewPoolParams(osmomath.ZeroDec(), osmomath.ZeroDec()), poolAssets))

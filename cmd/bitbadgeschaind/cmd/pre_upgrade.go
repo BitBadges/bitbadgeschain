@@ -7,9 +7,12 @@ import (
 	"regexp"
 	"strings"
 
+	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+	appparams "github.com/bitbadges/bitbadgeschain/app/params"
 )
 
 // preUpgradeFatal is the exit code cosmovisor treats as "pre-upgrade failed,
@@ -23,7 +26,10 @@ const preUpgradeFatal = 30
 // may use TOML literal (single-quoted) strings. Failing to match one would make
 // us append a second `type` key and turn config.toml into a duplicate-key
 // error, which stops the node just as surely as the wrong value.
-var mempoolTypeRe = regexp.MustCompile(`(?m)^(\s*type\s*=\s*)("[^"]*"|'[^']*')`)
+var (
+	mempoolTypeRe = regexp.MustCompile(`(?m)^(\s*type\s*=\s*)("[^"]*"|'[^']*')`)
+	minGasPriceRe = regexp.MustCompile(`(?m)^(\s*minimum-gas-prices\s*=\s*)("([^"]*)"|'([^']*)')`)
+)
 
 // NewPreUpgradeCmd returns the `pre-upgrade` command that cosmovisor invokes on
 // the new binary after swapping the symlink but before starting it.
@@ -75,6 +81,16 @@ outright, so it cannot be set in advance.`,
 				cmd.Printf("pre-upgrade: set mempool.type = \"app\" in %s\n", home)
 			} else {
 				cmd.Printf("pre-upgrade: mempool.type already \"app\" in %s, nothing to do\n", home)
+			}
+
+			gasChanged, err := migrateAppTomlMinGasPrices(filepath.Join(home, "config", "app.toml"))
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "pre-upgrade failed: %v\n", err)
+				os.Exit(preUpgradeFatal)
+			}
+			if gasChanged {
+				cmd.Printf("pre-upgrade: migrated minimum-gas-prices from %s to %s in %s\n",
+					appparams.LegacyBaseCoinUnit, appparams.BaseCoinUnit, home)
 			}
 			return nil
 		},
@@ -149,6 +165,106 @@ func ensureAppMempoolType(path string) (bool, error) {
 	}
 
 	return true, atomicWriteFile(path, content[:start]+updated+content[end:])
+}
+
+// migrateAppTomlMinGasPrices rewrites any legacy ubadge entry in app.toml's
+// top-level minimum-gas-prices setting to abadge scaled by 10^9 so operators
+// configuring minimum-gas-prices in app.toml upgrade smoothly via cosmovisor.
+// Missing app.toml or entries without ubadge are a no-op.
+func migrateAppTomlMinGasPrices(path string) (bool, error) {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, fmt.Errorf("reading %s: %w", path, err)
+	}
+	content := string(raw)
+
+	// Top-level minimum-gas-prices sits before the first TOML table header.
+	topEnd := len(content)
+	offset := 0
+	for _, line := range strings.SplitAfter(content, "\n") {
+		if line == "" {
+			break
+		}
+		trimmed := strings.TrimSpace(line)
+		if !strings.HasPrefix(trimmed, "#") {
+			if _, isHeader := tomlTableName(trimmed); isHeader {
+				topEnd = offset
+				break
+			}
+		}
+		offset += len(line)
+	}
+
+	top := content[:topEnd]
+	loc := minGasPriceRe.FindStringSubmatchIndex(top)
+	if loc == nil {
+		return false, nil
+	}
+
+	var val string
+	if loc[6] >= 0 {
+		val = top[loc[6]:loc[7]]
+	} else if loc[8] >= 0 {
+		val = top[loc[8]:loc[9]]
+	}
+	if strings.TrimSpace(val) == "" {
+		return false, nil
+	}
+
+	// Cosmos SDK accepts either ',' or ';' as coin list delimiters.
+	sep := ","
+	if strings.Contains(val, ";") && !strings.Contains(val, ",") {
+		sep = ";"
+	}
+	parts := strings.Split(val, sep)
+	factor := sdkmath.LegacyNewDecFromInt(sdkmath.NewIntWithDecimal(1, appparams.BaseCoinDecimals-appparams.LegacyBaseCoinDecimals))
+
+	changed := false
+	outParts := make([]string, 0, len(parts))
+	for _, p := range parts {
+		trimmed := strings.TrimSpace(p)
+		if trimmed == "" {
+			continue
+		}
+		dc, err := sdk.ParseDecCoin(trimmed)
+		if err != nil {
+			// Leave unrecognized entries untouched rather than aborting.
+			outParts = append(outParts, trimmed)
+			continue
+		}
+		if dc.Denom == appparams.LegacyBaseCoinUnit {
+			scaled := dc.Amount.Mul(factor)
+			outParts = append(outParts, formatCompactDec(scaled)+appparams.BaseCoinUnit)
+			changed = true
+			continue
+		}
+		outParts = append(outParts, trimmed)
+	}
+	if !changed {
+		return false, nil
+	}
+
+	newVal := strings.Join(outParts, sep)
+	updatedTop := top[:loc[0]] + top[loc[2]:loc[3]] + `"` + newVal + `"` + top[loc[1]:]
+	return true, atomicWriteFile(path, updatedTop+content[topEnd:])
+}
+
+// formatCompactDec formats a LegacyDec without trailing fractional zeros
+// (e.g. 10000000000.000000000000000000 -> "10000000000", 0.500000... -> "0.5").
+func formatCompactDec(d sdkmath.LegacyDec) string {
+	s := d.String()
+	if !strings.Contains(s, ".") {
+		return s
+	}
+	s = strings.TrimRight(s, "0")
+	s = strings.TrimRight(s, ".")
+	if s == "" {
+		return "0"
+	}
+	return s
 }
 
 // mempoolSectionBounds locates the [mempool] table in a config.toml and returns

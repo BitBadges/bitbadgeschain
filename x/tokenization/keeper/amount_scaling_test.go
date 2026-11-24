@@ -9,7 +9,7 @@ import (
 
 // Helper to create a collection with amount scaling enabled on the mint approval (index 0).
 // The approval uses incrementedBalances with startBalances as the 1x base and allowAmountScaling=true.
-// CoinTransfers charge `coinAmount` ubadge per base unit (initiator pays, sent to alice).
+// CoinTransfers charge `coinAmount` abadge per base unit (initiator pays, sent to alice).
 // maxMultiplier caps the scaling (must be > 0 when scaling is on).
 func (suite *TestSuite) createScalingCollection(baseTokenAmount uint64, coinAmount int64, maxMultiplier uint64) {
 	wctx := sdk.WrapSDKContext(suite.ctx)
@@ -42,7 +42,7 @@ func (suite *TestSuite) createScalingCollection(baseTokenAmount uint64, coinAmou
 			{
 				To: alice,
 				Coins: []*sdk.Coin{
-					{Amount: sdkmath.NewInt(coinAmount), Denom: "ubadge"},
+					{Amount: sdkmath.NewInt(coinAmount), Denom: "abadge"},
 				},
 			},
 		}
@@ -62,7 +62,7 @@ func (suite *TestSuite) TestAmountScaling1x() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	suite.createScalingCollection(1, 100, 100)
 
-	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
 
 	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
@@ -85,8 +85,8 @@ func (suite *TestSuite) TestAmountScaling1x() {
 	})
 	suite.Require().Nil(err, "1x scaling transfer should succeed")
 
-	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(100)), aliceAfter.Amount, "alice should receive 100 ubadge (1x)")
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(100)), aliceAfter.Amount, "alice should receive 100 abadge (1x)")
 }
 
 // TestAmountScaling5x verifies that a 5x multiplier scales coinTransfers by 5.
@@ -94,7 +94,7 @@ func (suite *TestSuite) TestAmountScaling5x() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	suite.createScalingCollection(1, 100, 100)
 
-	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
 
 	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
 		Creator:      bob,
@@ -117,8 +117,8 @@ func (suite *TestSuite) TestAmountScaling5x() {
 	})
 	suite.Require().Nil(err, "5x scaling transfer should succeed")
 
-	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 500 ubadge (5x)")
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 500 abadge (5x)")
 }
 
 // TestAmountScalingNotEvenlyDivisible verifies rejection when transfer is not evenly divisible.
@@ -406,7 +406,7 @@ func (suite *TestSuite) TestAmountScalingMultipleTransfers() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	suite.createScalingCollection(1, 100, 100)
 
-	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
 
 	// Transfer 3x
 	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -452,8 +452,8 @@ func (suite *TestSuite) TestAmountScalingMultipleTransfers() {
 	})
 	suite.Require().Nil(err, "second 2x transfer should succeed")
 
-	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 300+200=500 ubadge total")
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 300+200=500 abadge total")
 }
 
 // TestAmountScalingMaxMultiplierEnforced verifies the cap is enforced at runtime.
@@ -567,7 +567,7 @@ func (suite *TestSuite) TestAmountScalingWithOverrideFromApprover() {
 			To:                             alice,
 			OverrideFromWithApproverAddress: true,
 			Coins: []*sdk.Coin{
-				{Amount: sdkmath.NewInt(1000), Denom: "ubadge"},
+				{Amount: sdkmath.NewInt(1000), Denom: "abadge"},
 			},
 		},
 	}
@@ -658,13 +658,13 @@ func (suite *TestSuite) TestAmountScalingMultipleCoinTransfers() {
 		{
 			To: alice,
 			Coins: []*sdk.Coin{
-				{Amount: sdkmath.NewInt(100), Denom: "ubadge"},
+				{Amount: sdkmath.NewInt(100), Denom: "abadge"},
 			},
 		},
 		{
 			To: charlie,
 			Coins: []*sdk.Coin{
-				{Amount: sdkmath.NewInt(50), Denom: "ubadge"},
+				{Amount: sdkmath.NewInt(50), Denom: "abadge"},
 			},
 		},
 	}
@@ -806,7 +806,7 @@ func (suite *TestSuite) TestAmountScalingPrecalculation() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	suite.createScalingCollection(1, 100, 100)
 
-	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
 
 	// Use precalculation with scalingMultiplier=5 instead of setting balances directly
 	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -833,8 +833,8 @@ func (suite *TestSuite) TestAmountScalingPrecalculation() {
 	})
 	suite.Require().Nil(err, "5x scaling via precalculation should succeed")
 
-	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 500 ubadge (5x via precalc)")
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(500)), aliceAfter.Amount, "alice should receive 500 abadge (5x via precalc)")
 }
 
 // TestAmountScalingPrecalcExceedsMax verifies that scalingMultiplier > maxScalingMultiplier is rejected.
@@ -929,7 +929,7 @@ func (suite *TestSuite) TestAmountScalingPrecalcZero() {
 	wctx := sdk.WrapSDKContext(suite.ctx)
 	suite.createScalingCollection(1, 100, 100)
 
-	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
+	aliceBefore := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
 
 	// Precalculation with scalingMultiplier=0 (default) should return 1x base
 	err := TransferTokens(suite, wctx, &types.MsgTransferTokens{
@@ -954,6 +954,6 @@ func (suite *TestSuite) TestAmountScalingPrecalcZero() {
 	})
 	suite.Require().Nil(err, "precalculation with scalingMultiplier=0 should return 1x base")
 
-	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "ubadge")
-	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(100)), aliceAfter.Amount, "alice should receive 100 ubadge (1x base via precalc)")
+	aliceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.MustAccAddressFromBech32(alice), "abadge")
+	suite.Require().Equal(aliceBefore.Amount.Add(sdkmath.NewInt(100)), aliceAfter.Amount, "alice should receive 100 abadge (1x base via precalc)")
 }

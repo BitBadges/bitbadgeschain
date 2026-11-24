@@ -22,6 +22,10 @@ func MigrateV35PreciseBankModulePermissions(ctx sdk.Context, ak authkeeper.Accou
 	for _, moduleName := range []string{precisebanktypes.ModuleName, "evm"} {
 		acc := ak.GetModuleAccount(ctx, moduleName)
 		if acc == nil {
+			// x/precisebank is retired in the 18-decimal binary; skip if unregistered.
+			if moduleName == precisebanktypes.ModuleName {
+				continue
+			}
 			return fmt.Errorf("module account %s does not exist", moduleName)
 		}
 		if acc.HasPermission(authtypes.Minter) && acc.HasPermission(authtypes.Burner) {

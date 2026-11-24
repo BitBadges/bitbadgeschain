@@ -73,8 +73,8 @@ func TestParseTransferTokensMemo(t *testing.T) {
 	t.Run("swap_and_action only — still works", func(t *testing.T) {
 		memo := `{
 			"swap_and_action": {
-				"user_swap": {"swap_exact_asset_in": {"operations": [{"pool": "1", "denom_in": "uatom", "denom_out": "ubadge"}]}},
-				"min_asset": {"native": {"denom": "ubadge", "amount": "1"}},
+				"user_swap": {"swap_exact_asset_in": {"operations": [{"pool": "1", "denom_in": "uatom", "denom_out": "abadge"}]}},
+				"min_asset": {"native": {"denom": "abadge", "amount": "1"}},
 				"post_swap_action": {"transfer": {"to_address": "bb1abc"}}
 			}
 		}`

@@ -49,7 +49,7 @@ func (s *CrossModuleTestSuite) CreatePoolWithCoins(coins ...sdk.Coin) uint64 {
 	}
 
 	// Fund the test account
-	fundCoins := sdk.NewCoins(sdk.NewCoin("ubadge", sdkmath.NewInt(10000000000)))
+	fundCoins := sdk.NewCoins(sdk.NewCoin("abadge", sdkmath.NewInt(10000000000)))
 	for _, coin := range coins {
 		fundCoins = fundCoins.Add(coin)
 	}

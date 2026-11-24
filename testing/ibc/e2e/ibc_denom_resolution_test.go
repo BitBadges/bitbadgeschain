@@ -29,15 +29,15 @@ func TestDenomResolutionTestSuite(t *testing.T) {
 
 // TestForeignTokenDenomResolution tests that when a foreign token arrives via IBC
 // with a hook memo, the hook correctly resolves the local ibc/HASH denom.
-// Chain A sends "ubadge" to Chain B — on Chain B this is a foreign token
-// that becomes ibc/HASH(transfer/channelB/ubadge).
+// Chain A sends "abadge" to Chain B — on Chain B this is a foreign token
+// that becomes ibc/HASH(transfer/channelB/abadge).
 func (s *DenomResolutionTestSuite) TestForeignTokenDenomResolution() {
 	s.T().Log("Testing foreign token denom resolution in custom hooks")
 
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
 	// Fund sender
@@ -124,18 +124,18 @@ func (s *DenomResolutionTestSuite) TestForeignTokenDenomResolution() {
 
 // TestNativeTokenReturningDenomResolution tests that when a native token
 // returns home via IBC with a hook memo, the hook resolves to the base denom.
-// Chain A sends "ubadge" to Chain B, then Chain B sends ibc/HASH back to Chain A.
-// On Chain A, this should resolve back to "ubadge".
+// Chain A sends "abadge" to Chain B, then Chain B sends ibc/HASH back to Chain A.
+// On Chain A, this should resolve back to "abadge".
 func (s *DenomResolutionTestSuite) TestNativeTokenReturningDenomResolution() {
 	s.T().Log("Testing native token returning home denom resolution")
 
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := s.DefaultTransferAmount()
 
-	// Step 1: Send ubadge from A to B (creates IBC voucher on B)
+	// Step 1: Send abadge from A to B (creates IBC voucher on B)
 	err := ibctest.FundAccount(s.ChainA, sender, sdk.NewCoins(sdk.NewCoin(denom, amount.MulRaw(3))))
 	s.Require().NoError(err)
 
@@ -166,8 +166,8 @@ func (s *DenomResolutionTestSuite) TestNativeTokenReturningDenomResolution() {
 	s.Require().Equal(amount, receiverBalance.Amount, "chain B should have IBC tokens")
 
 	// Step 2: Send the IBC tokens back from B to A with a hook memo
-	// On chain A, these should resolve to the native "ubadge" denom
-	// The hook references "ubadge" as denom_in (the native denom on chain A)
+	// On chain A, these should resolve to the native "abadge" denom
+	// The hook references "abadge" as denom_in (the native denom on chain A)
 	memo := map[string]interface{}{
 		"swap_and_action": map[string]interface{}{
 			"user_swap": map[string]interface{}{
@@ -242,7 +242,7 @@ func (s *DenomResolutionTestSuite) TestTransferDenomConsistency() {
 	sender := s.ChainA.SenderAccount.GetAddress()
 	receiver := s.ChainB.SenderAccount.GetAddress()
 
-	denom := "ubadge"
+	denom := "abadge"
 	amount := sdkmath.NewInt(500000)
 
 	// Fund and send a plain transfer (no hooks) to establish the IBC denom

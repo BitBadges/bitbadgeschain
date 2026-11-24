@@ -6,16 +6,15 @@ import (
 	sdkmath "cosmossdk.io/math"
 	v35 "github.com/bitbadges/bitbadgeschain/app/upgrades/v35"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	precisebanktypes "github.com/cosmos/evm/contrib/x/precisebank/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestV35SetsBlockMaxGasAndMinGasPrice(t *testing.T) {
 	app := Setup(false)
 	ctx := app.NewContext(false)
-	existing := app.AccountKeeper.GetModuleAccount(ctx, precisebanktypes.ModuleName)
+	existing := app.AccountKeeper.GetModuleAccount(ctx, "evm")
 	base := authtypes.NewBaseAccount(existing.GetAddress(), nil, existing.GetAccountNumber(), existing.GetSequence())
-	app.AccountKeeper.SetModuleAccount(ctx, authtypes.NewModuleAccount(base, precisebanktypes.ModuleName))
+	app.AccountKeeper.SetModuleAccount(ctx, authtypes.NewModuleAccount(base, "evm"))
 
 	// Seed the pre-upgrade values so the test proves the handler changes them.
 	params, err := app.ConsensusParamsKeeper.ParamsStore.Get(ctx)
@@ -42,7 +41,7 @@ func TestV35SetsBlockMaxGasAndMinGasPrice(t *testing.T) {
 
 	want := sdkmath.LegacyMustNewDecFromStr(v35.MinGasPrice)
 	require.True(t, app.FeeMarketKeeper.GetParams(ctx).MinGasPrice.Equal(want))
-	migrated := app.AccountKeeper.GetModuleAccount(ctx, precisebanktypes.ModuleName)
+	migrated := app.AccountKeeper.GetModuleAccount(ctx, "evm")
 	require.True(t, migrated.HasPermission(authtypes.Minter))
 	require.True(t, migrated.HasPermission(authtypes.Burner))
 	require.Equal(t, existing.GetAccountNumber(), migrated.GetAccountNumber())

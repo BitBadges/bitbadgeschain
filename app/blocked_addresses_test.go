@@ -16,7 +16,11 @@ func TestModuleAccountsBlockedFromBankSends(t *testing.T) {
 	app := Setup(false)
 
 	blocked := BlockedAddresses()
-	require.Len(t, blocked, len(moduleAccPerms)-1, "all module accounts but gov must be blocked")
+	// All active module accounts except gov, plus the retired precisebank reserve.
+	require.Len(t, blocked, len(moduleAccPerms), "all module accounts but gov, plus retired precisebank, must be blocked")
+	require.True(t, blocked["precisebank"], "retired precisebank reserve must remain blocked")
+	require.True(t, app.BankKeeper.BlockedAddr(authtypes.NewModuleAddress("precisebank")),
+		"retired precisebank reserve must be blocked in BankKeeper")
 
 	for _, perm := range moduleAccPerms {
 		addr := authtypes.NewModuleAddress(perm.Account)

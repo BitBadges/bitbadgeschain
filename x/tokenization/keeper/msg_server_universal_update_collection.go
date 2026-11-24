@@ -731,3 +731,10 @@ func validatePathSymbols(pathSymbol string, denomUnits []*types.DenomUnit, symbo
 
 	return nil
 }
+
+// DerivePathAddress exposes the backed/wrapped path address derivation to the
+// v37 redenomination upgrade handler so escrow address re-derivation cannot
+// drift from generatePathAddress.
+func DerivePathAddress(pathString string, prefix []byte) (sdk.AccAddress, error) {
+	return generatePathAddress(pathString, prefix)
+}

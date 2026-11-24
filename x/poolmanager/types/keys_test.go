@@ -19,12 +19,12 @@ func TestFormatDenomTradePairKey(t *testing.T) {
 		"happy path": {
 			tokenInDenom:  appparams.BaseCoinUnit,
 			tokenOutDenom: "uion",
-			expectedKey:   "\x04|ubadge|uion",
+			expectedKey:   "\x04|abadge|uion",
 		},
 		"reversed denoms no longer get reordered": {
 			tokenInDenom:  "uion",
 			tokenOutDenom: appparams.BaseCoinUnit,
-			expectedKey:   "\x04|uion|ubadge",
+			expectedKey:   "\x04|uion|abadge",
 		},
 	}
 
