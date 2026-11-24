@@ -10,6 +10,8 @@
 #   --version <tag>     Install a specific release (default: latest)
 #   --install-dir <dir> Install to a custom directory (default: /usr/local/bin)
 #   --no-sudo           Don't use sudo even if install dir requires it
+#   --sdk-version <v>   bitbadges SDK CLI version to install (default: pinned below)
+#   --skip-checksum     Skip sha256 verification (only for old releases without checksums.txt)
 
 set -e
 
@@ -19,6 +21,9 @@ VERSION=""
 INSTALL_DIR="/usr/local/bin"
 USE_SUDO="auto"
 BINARY_NAME="bitbadgeschaind"
+# Pinned bitbadges SDK CLI version (npm package `bitbadges`). Bump on SDK releases.
+SDK_VERSION="0.45.11"
+SKIP_CHECKSUM="no"
 
 # Parse arguments
 while [ $# -gt 0 ]; do
@@ -39,6 +44,14 @@ while [ $# -gt 0 ]; do
       USE_SUDO="no"
       shift
       ;;
+    --sdk-version)
+      SDK_VERSION="$2"
+      shift 2
+      ;;
+    --skip-checksum)
+      SKIP_CHECKSUM="yes"
+      shift
+      ;;
     --help)
       echo "BitBadges Chain Installer"
       echo ""
@@ -49,6 +62,8 @@ while [ $# -gt 0 ]; do
       echo "  --version <tag>     Install a specific release (default: latest)"
       echo "  --install-dir <dir> Install directory (default: /usr/local/bin)"
       echo "  --no-sudo           Don't use sudo"
+      echo "  --sdk-version <v>   bitbadges SDK CLI version (default: ${SDK_VERSION})"
+      echo "  --skip-checksum     Skip sha256 verification (old releases only)"
       exit 0
       ;;
     *)
@@ -142,6 +157,51 @@ download() {
   fi
 }
 
+# Print the sha256 of a file, using whichever tool is available.
+sha256_of() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | awk '{print $1}'
+  elif command -v openssl >/dev/null 2>&1; then
+    openssl dgst -sha256 "$1" | awk '{print $NF}'
+  else
+    return 1
+  fi
+}
+
+# Verify a downloaded asset against the release's checksums.txt.
+verify_checksum() {
+  file="$1"
+  name="$2"
+  sums="$3"
+  if [ "$SKIP_CHECKSUM" = "yes" ]; then
+    echo "Warning: skipping checksum verification (--skip-checksum)" >&2
+    return 0
+  fi
+  if ! download "https://github.com/${REPO}/releases/download/${VERSION}/checksums.txt" "$sums" || [ ! -s "$sums" ]; then
+    echo "Error: could not download checksums.txt for ${VERSION}; refusing to install an unverified binary." >&2
+    echo "Re-run with --skip-checksum only if you trust this release and it predates checksums.txt." >&2
+    exit 1
+  fi
+  expected="$(awk -v n="$name" '{f=$2; sub(/^\*/, "", f); if (f == n) {print $1; exit}}' "$sums")"
+  if [ -z "$expected" ]; then
+    echo "Error: ${name} is not listed in checksums.txt for ${VERSION}." >&2
+    exit 1
+  fi
+  if ! actual="$(sha256_of "$file")" || [ -z "$actual" ]; then
+    echo "Error: no sha256 tool found (sha256sum, shasum or openssl); cannot verify the download." >&2
+    exit 1
+  fi
+  if [ "$actual" != "$expected" ]; then
+    echo "Error: checksum mismatch for ${name}" >&2
+    echo "  expected: ${expected}" >&2
+    echo "  actual:   ${actual}" >&2
+    exit 1
+  fi
+  echo "Checksum verified (sha256 ${actual})"
+}
+
 # Main
 main() {
   local os arch asset_name download_url tmp_dir
@@ -206,6 +266,8 @@ main() {
     exit 1
   fi
 
+  verify_checksum "${tmp_dir}/${asset_name}" "${asset_name}" "${tmp_dir}/checksums.txt"
+
   # Make executable (not needed on Windows but doesn't hurt)
   chmod +x "${tmp_dir}/${asset_name}"
 
@@ -254,14 +316,14 @@ main() {
   # Install SDK CLI
   echo ""
   if command -v bun >/dev/null 2>&1; then
-    echo "Installing BitBadges SDK CLI (bitbadges-cli) via bun..."
-    bun install -g bitbadges 2>&1 | tail -1
+    echo "Installing BitBadges SDK CLI (bitbadges-cli) bitbadges@${SDK_VERSION} via bun..."
+    bun install -g "bitbadges@${SDK_VERSION}" 2>&1 | tail -1
   elif command -v npm >/dev/null 2>&1; then
-    echo "Installing BitBadges SDK CLI (bitbadges-cli) via npm..."
-    npm install -g bitbadges 2>&1 | tail -1
+    echo "Installing BitBadges SDK CLI (bitbadges-cli) bitbadges@${SDK_VERSION} via npm..."
+    npm install -g "bitbadges@${SDK_VERSION}" 2>&1 | tail -1
   else
     echo "npm/bun not found — skipping SDK CLI install. To install later:"
-    echo "  npm install -g bitbadges"
+    echo "  npm install -g bitbadges@${SDK_VERSION}"
   fi
 
   if command -v bitbadges-cli >/dev/null 2>&1; then
