@@ -1,0 +1,95 @@
+syntax = "proto3";
+package poolmanager.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bitbadges/bitbadgeschain/x/poolmanager/types";
+
+// Params holds parameters for the poolmanager module
+message Params {
+  // taker_fee_params is the container of taker fee parameters.
+  TakerFeeParams taker_fee_params = 1 [
+    (gogoproto.moretags) = "yaml:\"taker_fee_params\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// TakerFeeParams consolidates the taker fee parameters for the poolmanager.
+message TakerFeeParams {
+  // default_taker_fee is the fee used when creating a new pool that doesn't
+  // fall under a custom pool taker fee or stableswap taker fee category.
+  string default_taker_fee = 1 [
+
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.customname) = "DefaultTakerFee",
+    (gogoproto.nullable) = false
+  ];
+  // osmo_taker_fee_distribution defines the distribution of taker fees
+  // generated in OSMO. As of this writing, it has two categories:
+  // - staking_rewards: the percent of the taker fee that gets distributed to
+  //   stakers.
+  // - community_pool: the percent of the taker fee that gets sent to the
+  //   community pool.
+  TakerFeeDistributionPercentage osmo_taker_fee_distribution = 2 [
+    (gogoproto.customname) = "OsmoTakerFeeDistribution",
+    (gogoproto.nullable) = false
+  ];
+  // non_osmo_taker_fee_distribution defines the distribution of taker fees
+  // generated in non-OSMO. As of this writing, it has two categories:
+  // - staking_rewards: the percent of the taker fee that gets swapped to OSMO
+  //   and then distributed to stakers.
+  // - community_pool: the percent of the taker fee that gets sent to the
+  //   community pool. Note: If the non-OSMO asset is an authorized_quote_denom,
+  //   that denom is sent directly to the community pool. Otherwise, it is
+  //   swapped to the community_pool_denom_to_swap_non_whitelisted_assets_to and
+  //   then sent to the community pool as that denom.
+  TakerFeeDistributionPercentage non_osmo_taker_fee_distribution = 3 [
+    (gogoproto.customname) = "NonOsmoTakerFeeDistribution",
+    (gogoproto.nullable) = false
+  ];
+  // admin_addresses is a list of addresses that are allowed to set and remove
+  // custom taker fees for denom pairs. Governance also has the ability to set
+  // and remove custom taker fees for denom pairs, but with the normal
+  // governance delay.
+  repeated string admin_addresses = 4
+      [ (gogoproto.moretags) = "yaml:\"admin_addresses\"" ];
+  // community_pool_denom_to_swap_non_whitelisted_assets_to is the denom that
+  // non-whitelisted taker fees will be swapped to before being sent to
+  // the community pool.
+  string community_pool_denom_to_swap_non_whitelisted_assets_to = 5
+      [ (gogoproto.moretags) =
+            "yaml:\"community_pool_denom_to_swap_non_whitelisted_assets_to\"" ];
+
+  // reduced_fee_whitelist is a list of addresses that are
+  // allowed to pay a reduce taker fee when performing a swap
+  // (i.e. swap without paying the taker fee).
+  // It is intended to be used for integrators who meet qualifying factors
+  // that are approved by governance.
+  // Initially, the taker fee is allowed to be bypassed completely. However
+  // In the future, we will charge a reduced taker fee instead of no fee at all.
+  repeated string reduced_fee_whitelist = 6
+      [ (gogoproto.moretags) = "yaml:\"reduced_fee_whitelist\"" ];
+
+  // community_pool_denom_whitelist is a list of denoms that should be sent
+  // directly to the community pool instead of being swapped to the
+  // `community_pool_denom_to_swap_non_whitelisted_assets_to`.
+  repeated string community_pool_denom_whitelist = 7
+      [ (gogoproto.moretags) = "yaml:\"community_pool_denom_whitelist\"" ];
+}
+
+// TakerFeeDistributionPercentage defines what percent of the taker fee category
+// gets distributed to the available categories.
+message TakerFeeDistributionPercentage {
+  string staking_rewards = 1 [
+
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.moretags) = "yaml:\"staking_rewards\"",
+    (gogoproto.nullable) = false
+  ];
+  string community_pool = 2 [
+
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.moretags) = "yaml:\"community_pool\"",
+    (gogoproto.nullable) = false
+  ];
+}

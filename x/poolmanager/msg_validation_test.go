@@ -92,3 +92,49 @@ func (s *KeeperTestSuite) TestRouterPropagatesOutOfGasPanic() {
 		_, _ = s.App.PoolManagerKeeper.RouteExactAmountOut(lowGasCtx, s.TestAccs[0], routesOut, osmomath.NewInt(100000), sdk.NewCoin("bar", osmomath.NewInt(100)))
 	})
 }
+
+func (s *KeeperTestSuite) TestMsgUpdateParams() {
+	s.SetupTest()
+	msgServer := poolmanagerKeeper.NewMsgServerImpl(&s.App.PoolManagerKeeper)
+	govAddr := s.App.AccountKeeper.GetModuleAccount(s.Ctx, govtypes.ModuleName).GetAddress().String()
+	initialParams := s.App.PoolManagerKeeper.GetParams(s.Ctx)
+
+	// Nil message rejected
+	_, err := msgServer.UpdateParams(s.Ctx, nil)
+	s.Require().Error(err)
+
+	// Non-gov authority rejected without mutating params
+	updated := initialParams
+	updated.TakerFeeParams.DefaultTakerFee = osmomath.MustNewDecFromStr("0.01")
+	updated.TakerFeeParams.AdminAddresses = []string{s.TestAccs[0].String()}
+	_, err = msgServer.UpdateParams(s.Ctx, &types.MsgUpdateParams{
+		Authority: s.TestAccs[0].String(),
+		Params:    updated,
+	})
+	s.Require().ErrorIs(err, types.ErrUnauthorizedGov)
+	s.Require().Equal(initialParams, s.App.PoolManagerKeeper.GetParams(s.Ctx))
+
+	// Invalid params rejected without mutating params
+	invalid := updated
+	invalid.TakerFeeParams.DefaultTakerFee = osmomath.OneDec()
+	_, err = msgServer.UpdateParams(s.Ctx, &types.MsgUpdateParams{
+		Authority: govAddr,
+		Params:    invalid,
+	})
+	s.Require().Error(err)
+	s.Require().Equal(initialParams, s.App.PoolManagerKeeper.GetParams(s.Ctx))
+
+	// Valid gov authority persists updated params and works via MsgServiceRouter
+	msg := &types.MsgUpdateParams{
+		Authority: govAddr,
+		Params:    updated,
+	}
+	handler := s.App.MsgServiceRouter().Handler(msg)
+	s.Require().NotNil(handler)
+	_, err = handler(s.Ctx, msg)
+	s.Require().NoError(err)
+
+	got := s.App.PoolManagerKeeper.GetParams(s.Ctx)
+	s.Require().Equal(updated.TakerFeeParams.DefaultTakerFee, got.TakerFeeParams.DefaultTakerFee)
+	s.Require().Equal(updated.TakerFeeParams.AdminAddresses, got.TakerFeeParams.AdminAddresses)
+}
