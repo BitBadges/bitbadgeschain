@@ -34,12 +34,12 @@ func (msg MsgSwapExactAmountIn) ValidateBasic() error {
 		return err
 	}
 
-	if !msg.TokenIn.IsValid() || !msg.TokenIn.IsPositive() {
+	if msg.TokenIn.Amount.IsNil() || !msg.TokenIn.IsValid() || !msg.TokenIn.IsPositive() {
 		// TODO: remove sdk errors
 		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, msg.TokenIn.String())
 	}
 
-	if !msg.TokenOutMinAmount.IsPositive() {
+	if msg.TokenOutMinAmount.IsNil() || !msg.TokenOutMinAmount.IsPositive() {
 		return nonPositiveAmountError{msg.TokenOutMinAmount.String()}
 	}
 
@@ -69,11 +69,11 @@ func (msg MsgSwapExactAmountOut) ValidateBasic() error {
 		return err
 	}
 
-	if !msg.TokenOut.IsValid() || !msg.TokenOut.IsPositive() {
+	if msg.TokenOut.Amount.IsNil() || !msg.TokenOut.IsValid() || !msg.TokenOut.IsPositive() {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, msg.TokenOut.String())
 	}
 
-	if !msg.TokenInMaxAmount.IsPositive() {
+	if msg.TokenInMaxAmount.IsNil() || !msg.TokenInMaxAmount.IsPositive() {
 		return nonPositiveAmountError{msg.TokenInMaxAmount.String()}
 	}
 
@@ -107,7 +107,7 @@ func (msg MsgSplitRouteSwapExactAmountIn) ValidateBasic() error {
 		return err
 	}
 
-	if !msg.TokenOutMinAmount.IsPositive() {
+	if msg.TokenOutMinAmount.IsNil() || !msg.TokenOutMinAmount.IsPositive() {
 		return nonPositiveAmountError{msg.TokenOutMinAmount.String()}
 	}
 
@@ -141,7 +141,7 @@ func (msg MsgSplitRouteSwapExactAmountOut) ValidateBasic() error {
 		return err
 	}
 
-	if !msg.TokenInMaxAmount.IsPositive() {
+	if msg.TokenInMaxAmount.IsNil() || !msg.TokenInMaxAmount.IsPositive() {
 		return nonPositiveAmountError{msg.TokenInMaxAmount.String()}
 	}
 
@@ -196,7 +196,7 @@ func (msg MsgSetTakerFeeShareAgreementForDenom) ValidateBasic() error {
 		return fmt.Errorf("invalid skim address: %s", msg.SkimAddress)
 	}
 
-	if msg.SkimPercent.GT(OneDec) || msg.SkimPercent.IsNegative() {
+	if msg.SkimPercent.IsNil() || msg.SkimPercent.GT(OneDec) || msg.SkimPercent.IsNegative() {
 		return fmt.Errorf("invalid skim percent: %s", msg.SkimPercent)
 	}
 

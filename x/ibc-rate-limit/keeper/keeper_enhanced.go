@@ -84,10 +84,10 @@ func (k Keeper) ResetChannelFlowWindowWithTimeframe(ctx sdk.Context, channelID, 
 	}
 }
 
-// GetUniqueSenders gets the unique senders for a channel and timeframe
-func (k Keeper) GetUniqueSenders(ctx sdk.Context, channelID string, timeframeType types.TimeframeType, timeframeDuration int64) (types.UniqueSenders, bool) {
+// GetUniqueSenders gets the unique senders for a channel, denom, and timeframe
+func (k Keeper) GetUniqueSenders(ctx sdk.Context, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64) (types.UniqueSenders, bool) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.UniqueSendersKey(channelID, int32(timeframeType), timeframeDuration)
+	key := types.UniqueSendersKey(channelID, denom, int32(timeframeType), timeframeDuration)
 	bz := store.Get(key)
 	if bz == nil {
 		return types.UniqueSenders{Senders: []string{}}, false
@@ -98,17 +98,17 @@ func (k Keeper) GetUniqueSenders(ctx sdk.Context, channelID string, timeframeTyp
 	return senders, true
 }
 
-// SetUniqueSenders sets the unique senders for a channel and timeframe
-func (k Keeper) SetUniqueSenders(ctx sdk.Context, channelID string, timeframeType types.TimeframeType, timeframeDuration int64, senders types.UniqueSenders) {
+// SetUniqueSenders sets the unique senders for a channel, denom, and timeframe
+func (k Keeper) SetUniqueSenders(ctx sdk.Context, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64, senders types.UniqueSenders) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.UniqueSendersKey(channelID, int32(timeframeType), timeframeDuration)
+	key := types.UniqueSendersKey(channelID, denom, int32(timeframeType), timeframeDuration)
 	bz := k.cdc.MustMarshal(&senders)
 	store.Set(key, bz)
 }
 
 // AddUniqueSender adds a sender to the unique senders list if not already present
-func (k Keeper) AddUniqueSender(ctx sdk.Context, channelID, senderAddr string, timeframeType types.TimeframeType, timeframeDuration int64) {
-	senders, _ := k.GetUniqueSenders(ctx, channelID, timeframeType, timeframeDuration)
+func (k Keeper) AddUniqueSender(ctx sdk.Context, channelID, denom, senderAddr string, timeframeType types.TimeframeType, timeframeDuration int64) {
+	senders, _ := k.GetUniqueSenders(ctx, channelID, denom, timeframeType, timeframeDuration)
 
 	// Check if sender already exists
 	for _, addr := range senders.Senders {
@@ -119,13 +119,13 @@ func (k Keeper) AddUniqueSender(ctx sdk.Context, channelID, senderAddr string, t
 
 	// Add new sender
 	senders.Senders = append(senders.Senders, senderAddr)
-	k.SetUniqueSenders(ctx, channelID, timeframeType, timeframeDuration, senders)
+	k.SetUniqueSenders(ctx, channelID, denom, timeframeType, timeframeDuration, senders)
 }
 
 // GetUniqueSendersWindow gets the time window for unique sender tracking
-func (k Keeper) GetUniqueSendersWindow(ctx sdk.Context, channelID string, timeframeType types.TimeframeType, timeframeDuration int64) (types.ChannelFlowWindow, bool) {
+func (k Keeper) GetUniqueSendersWindow(ctx sdk.Context, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64) (types.ChannelFlowWindow, bool) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.UniqueSendersWindowKey(channelID, int32(timeframeType), timeframeDuration)
+	key := types.UniqueSendersWindowKey(channelID, denom, int32(timeframeType), timeframeDuration)
 	bz := store.Get(key)
 	if bz == nil {
 		return types.ChannelFlowWindow{}, false
@@ -137,18 +137,18 @@ func (k Keeper) GetUniqueSendersWindow(ctx sdk.Context, channelID string, timefr
 }
 
 // SetUniqueSendersWindow sets the time window for unique sender tracking
-func (k Keeper) SetUniqueSendersWindow(ctx sdk.Context, channelID string, timeframeType types.TimeframeType, timeframeDuration int64, window types.ChannelFlowWindow) {
+func (k Keeper) SetUniqueSendersWindow(ctx sdk.Context, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64, window types.ChannelFlowWindow) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.UniqueSendersWindowKey(channelID, int32(timeframeType), timeframeDuration)
+	key := types.UniqueSendersWindowKey(channelID, denom, int32(timeframeType), timeframeDuration)
 	bz := k.cdc.MustMarshal(&window)
 	store.Set(key, bz)
 }
 
 // ResetUniqueSendersWindow resets the unique senders window if it has expired
 // Uses fixed window approach (see ResetChannelFlowWindowWithTimeframe for details)
-func (k Keeper) ResetUniqueSendersWindow(ctx sdk.Context, channelID string, timeframeType types.TimeframeType, timeframeDuration int64) {
+func (k Keeper) ResetUniqueSendersWindow(ctx sdk.Context, channelID, denom string, timeframeType types.TimeframeType, timeframeDuration int64) {
 	now, windowDuration := windowClock(ctx, timeframeType, timeframeDuration)
-	window, found := k.GetUniqueSendersWindow(ctx, channelID, timeframeType, timeframeDuration)
+	window, found := k.GetUniqueSendersWindow(ctx, channelID, denom, timeframeType, timeframeDuration)
 
 	// Fixed window expiration check: window expires when now >= WindowStart + WindowDuration
 	if !found || now >= window.WindowStart+windowDuration {
@@ -156,9 +156,9 @@ func (k Keeper) ResetUniqueSendersWindow(ctx sdk.Context, channelID string, time
 			WindowStart:    now, // Always set to the current clock (never future)
 			WindowDuration: windowDuration,
 		}
-		k.SetUniqueSendersWindow(ctx, channelID, timeframeType, timeframeDuration, newWindow)
+		k.SetUniqueSendersWindow(ctx, channelID, denom, timeframeType, timeframeDuration, newWindow)
 		// Reset unique senders when window expires
-		k.SetUniqueSenders(ctx, channelID, timeframeType, timeframeDuration, types.UniqueSenders{Senders: []string{}})
+		k.SetUniqueSenders(ctx, channelID, denom, timeframeType, timeframeDuration, types.UniqueSenders{Senders: []string{}})
 	}
 }
 

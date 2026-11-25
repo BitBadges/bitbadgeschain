@@ -19,6 +19,9 @@ func (k *Keeper) GetDefaultTakerFee(ctx sdk.Context) osmomath.Dec {
 // If the taker fee for this denom pair matches the default taker fee, then
 // it is deleted from state.
 func (k Keeper) SetDenomPairTakerFee(ctx sdk.Context, denom0, denom1 string, takerFee osmomath.Dec) {
+	if takerFee.IsNil() {
+		return
+	}
 	store := ctx.KVStore(k.storeKey)
 	key := types.FormatDenomTradePairKey(denom0, denom1)
 	// if given taker fee is equal to the default taker fee,
@@ -35,6 +38,19 @@ func (k Keeper) SetDenomPairTakerFee(ctx sdk.Context, denom0, denom1 string, tak
 // SenderValidationSetDenomPairTakerFee sets the taker fee for the given trading pair iff the sender's address
 // also exists in the pool manager taker fee admin address list.
 func (k Keeper) SenderValidationSetDenomPairTakerFee(ctx sdk.Context, sender, denom0, denom1 string, takerFee osmomath.Dec) error {
+	if denom0 == denom1 {
+		return fmt.Errorf("TokenInDenom and TokenOutDenom must be different")
+	}
+	if err := sdk.ValidateDenom(denom0); err != nil {
+		return fmt.Errorf("TokenInDenom is invalid: %w", err)
+	}
+	if err := sdk.ValidateDenom(denom1); err != nil {
+		return fmt.Errorf("TokenOutDenom is invalid: %w", err)
+	}
+	if takerFee.IsNil() || takerFee.IsNegative() || takerFee.GTE(types.OneDec) {
+		return fmt.Errorf("taker fee must be between 0 and 1: %s", takerFee.String())
+	}
+
 	adminAddresses := k.GetParams(ctx).TakerFeeParams.AdminAddresses
 	isAdmin := false
 	for _, admin := range adminAddresses {

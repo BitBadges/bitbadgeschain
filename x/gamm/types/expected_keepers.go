@@ -41,6 +41,7 @@ type BankKeeper interface {
 	// Only needed for simulation interface matching
 	// TODO: Look into golang syntax to make this "Everything in stakingtypes.bankkeeper + extra funcs"
 	// I think it has to do with listing another interface as the first line here?
+	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
 	GetAllBalances(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 }
 

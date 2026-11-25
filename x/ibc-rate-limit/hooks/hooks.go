@@ -408,8 +408,8 @@ func (h *RateLimitOverrideHooks) updateTrackingAfterTransfer(ctx sdk.Context, ch
 			if limit.MaxUniqueSenders == 0 {
 				continue
 			}
-			h.keeper.ResetUniqueSendersWindow(ctx, channelID, limit.TimeframeType, limit.TimeframeDuration)
-			h.keeper.AddUniqueSender(ctx, channelID, senderAddr, limit.TimeframeType, limit.TimeframeDuration)
+			h.keeper.ResetUniqueSendersWindow(ctx, channelID, denom, limit.TimeframeType, limit.TimeframeDuration)
+			h.keeper.AddUniqueSender(ctx, channelID, denom, senderAddr, limit.TimeframeType, limit.TimeframeDuration)
 		}
 	}
 

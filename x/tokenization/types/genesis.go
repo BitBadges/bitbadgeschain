@@ -146,8 +146,10 @@ func (gs GenesisState) Validate() error {
 		if len(parts) != 2 || !seenCollections[parts[0]] {
 			return fmt.Errorf("invalid balance store key %s", key)
 		}
-		if err := ValidateAddress(parts[1], true); err != nil {
-			return err
+		if parts[1] != TotalAddress {
+			if err := ValidateAddress(parts[1], true); err != nil {
+				return err
+			}
 		}
 		if seenBalanceKeys[key] {
 			return fmt.Errorf("duplicate genesis balance store key %s", key)

@@ -2,6 +2,7 @@ package approval_criteria
 
 import (
 	"fmt"
+	"math/big"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -50,9 +51,8 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 		// Construct the scoped proposal ID
 		proposalId := challenge.ProposalId
 
-		// Calculate total possible weight from all voters
-		totalPossibleWeight := sdkmath.NewUint(0)
-		voterMap := make(map[string]sdkmath.Uint) // voter address -> weight
+		// Calculate total possible weight from all voters using arbitrary-precision big.Int
+		totalPossibleWeight := new(big.Int)
 		for _, voter := range challenge.Voters {
 			if voter == nil {
 				detErrMsg := "voter is nil in voting challenge"
@@ -62,22 +62,21 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 				detErrMsg := "voter address is empty"
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 			}
-			if voter.Weight.IsZero() {
+			if voter.Weight.IsNil() || voter.Weight.IsZero() {
 				detErrMsg := fmt.Sprintf("voter %s has zero weight", voter.Address)
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 			}
-			totalPossibleWeight = totalPossibleWeight.Add(voter.Weight)
-			voterMap[voter.Address] = voter.Weight
+			totalPossibleWeight.Add(totalPossibleWeight, voter.Weight.BigInt())
 		}
 
-		if totalPossibleWeight.IsZero() {
+		if totalPossibleWeight.Sign() <= 0 {
 			detErrMsg := "total possible weight is zero - no voters defined"
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 
-		// Retrieve all votes for this proposal and calculate total yes weight
-		// Iterate over the original slice (not the map) for deterministic ordering
-		totalYesWeight := sdkmath.NewUint(0)
+		// Retrieve all votes for this proposal and sum voterWeight * yesWeight without intermediate truncation.
+		// Iterate over the original slice for deterministic ordering.
+		weightedYesSum := new(big.Int)
 		collectionId := collection.CollectionId
 		for _, voter := range challenge.Voters {
 			voterAddress := voter.Address
@@ -94,43 +93,47 @@ func (c *VotingChallengesChecker) Check(ctx sdk.Context, approval *types.Collect
 					detErrMsg := fmt.Sprintf("vote voter mismatch: expected %s, got %s", voterAddress, vote.Voter)
 					return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 				}
+				if vote.YesWeight.IsNil() {
+					detErrMsg := "vote yesWeight is nil"
+					return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
+				}
 				if vote.YesWeight.GT(sdkmath.NewUint(100)) {
 					detErrMsg := fmt.Sprintf("vote yesWeight exceeds 100: %s", vote.YesWeight.String())
 					return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 				}
 
-				// Calculate the yes weight contribution from this voter
-				voterWeight := voter.Weight
-				yesWeightPercent := vote.YesWeight
-				yesContribution := voterWeight.Mul(yesWeightPercent).Quo(sdkmath.NewUint(100))
-				totalYesWeight = totalYesWeight.Add(yesContribution)
+				weightedYesSum.Add(weightedYesSum, new(big.Int).Mul(voter.Weight.BigInt(), vote.YesWeight.BigInt()))
 			}
 		}
 
-		// Calculate the percentage of total possible weight that voted yes
-		percentage := totalYesWeight.Mul(sdkmath.NewUint(100)).Quo(totalPossibleWeight)
+		quorumThreshold := big.NewInt(0)
+		if !challenge.QuorumThreshold.IsNil() {
+			quorumThreshold = challenge.QuorumThreshold.BigInt()
+		}
+		requiredWeightedYes := new(big.Int).Mul(totalPossibleWeight, quorumThreshold)
 
-		// Check if percentage meets the quorum threshold
-		if percentage.LT(challenge.QuorumThreshold) {
-			detErrMsg := fmt.Sprintf("voting challenge threshold not met: got %s%%, need %s%%", percentage.String(), challenge.QuorumThreshold.String())
+		// Compare sum(voterWeight * yesWeight) >= totalPossibleWeight * quorumThreshold directly
+		if weightedYesSum.Cmp(requiredWeightedYes) < 0 {
+			percentage := new(big.Int).Quo(weightedYesSum, totalPossibleWeight)
+			detErrMsg := fmt.Sprintf("voting challenge threshold not met: got %s%%, need %s%%", percentage.String(), quorumThreshold.String())
 			return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 		}
 
 		// Check delay-after-quorum if configured
-		if challenge.DelayAfterQuorum.GT(sdkmath.NewUint(0)) {
+		if !challenge.DelayAfterQuorum.IsNil() && challenge.DelayAfterQuorum.GT(sdkmath.NewUint(0)) {
 			trackerKey := c.votingService.ConstructChallengeTrackerKey(collectionId, approverAddress, approvalLevel, approval.ApprovalId, proposalId)
 
 			tracker, found := c.votingService.GetVotingChallengeTrackerFromStore(ctx, trackerKey)
-			if !found || tracker == nil || tracker.QuorumReachedTimestamp.IsZero() {
+			if !found || tracker == nil || tracker.QuorumReachedTimestamp.IsNil() || tracker.QuorumReachedTimestamp.IsZero() {
 				detErrMsg := "voting challenge delay: quorum was reached but tracker not found (vote again to initialize)"
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)
 			}
 
-			now := sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli()))
-			executeAfter := tracker.QuorumReachedTimestamp.Add(challenge.DelayAfterQuorum)
+			now := new(big.Int).SetUint64(uint64(ctx.BlockTime().UnixMilli()))
+			executeAfter := new(big.Int).Add(tracker.QuorumReachedTimestamp.BigInt(), challenge.DelayAfterQuorum.BigInt())
 
-			if now.LT(executeAfter) {
-				remainingMs := executeAfter.Sub(now)
+			if now.Cmp(executeAfter) < 0 {
+				remainingMs := new(big.Int).Sub(executeAfter, now)
 				detErrMsg := fmt.Sprintf("voting challenge delay not elapsed: %s ms remaining (quorum reached at %s, delay is %s ms)",
 					remainingMs.String(), tracker.QuorumReachedTimestamp.String(), challenge.DelayAfterQuorum.String())
 				return detErrMsg, sdkerrors.Wrap(types.ErrInvalidRequest, detErrMsg)

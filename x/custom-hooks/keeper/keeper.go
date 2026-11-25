@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -9,16 +10,17 @@ import (
 	"cosmossdk.io/log/v2"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bitbadges/bitbadgeschain/third_party/osmomath"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	transfertypes "github.com/lfdt-ibc/ibc-go/v11/modules/apps/transfer/types"
 	clienttypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/02-client/types"
 	channeltypes "github.com/lfdt-ibc/ibc-go/v11/modules/core/04-channel/types"
 	ibcexported "github.com/lfdt-ibc/ibc-go/v11/modules/core/exported"
 
-	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 	"github.com/bitbadges/bitbadgeschain/x/custom-hooks/types"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
 	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
+	tokenizationtypes "github.com/bitbadges/bitbadgeschain/x/tokenization/types"
 )
 
 type (
@@ -75,16 +77,26 @@ type (
 		TransferTokens(ctx context.Context, msg *tokenizationtypes.MsgTransferTokens) (*tokenizationtypes.MsgTransferTokensResponse, error)
 	}
 
+	// PendingIBCRecovery tracks outbound swap_and_action IBC packets so refunds on
+	// error acknowledgement or timeout are forwarded to the configured recover address.
+	PendingIBCRecovery struct {
+		Sender         string `json:"sender"`
+		RecoverAddress string `json:"recover_address"`
+		Denom          string `json:"denom"`
+		Amount         string `json:"amount"`
+	}
+
 	Keeper struct {
-		logger                 log.Logger
-		gammKeeper             GammKeeper
-		bankKeeper             BankKeeper
-		tokenizationKeeper     TokenizationKeeper
-		sendManagerKeeper      SendManagerKeeper
-		transferKeeper         gammtypes.TransferKeeper
-		ics4Wrapper            ICS4Wrapper
-		channelKeeper          ChannelKeeper
-		tokenizationMsgServer  TokenizationMsgServer
+		logger                log.Logger
+		storeKey              storetypes.StoreKey
+		gammKeeper            GammKeeper
+		bankKeeper            BankKeeper
+		tokenizationKeeper    TokenizationKeeper
+		sendManagerKeeper     SendManagerKeeper
+		transferKeeper        gammtypes.TransferKeeper
+		ics4Wrapper           ICS4Wrapper
+		channelKeeper         ChannelKeeper
+		tokenizationMsgServer TokenizationMsgServer
 	}
 )
 
@@ -100,16 +112,136 @@ func NewKeeper(
 	tokenizationMsgServer TokenizationMsgServer,
 ) Keeper {
 	return Keeper{
-		logger:                 logger,
-		gammKeeper:             gammKeeper,
-		bankKeeper:             bankKeeper,
-		tokenizationKeeper:     tokenizationKeeper,
-		sendManagerKeeper:      sendManagerKeeper,
-		transferKeeper:         transferKeeper,
-		ics4Wrapper:            ics4Wrapper,
-		channelKeeper:          channelKeeper,
-		tokenizationMsgServer:  tokenizationMsgServer,
+		logger:                logger,
+		gammKeeper:            gammKeeper,
+		bankKeeper:            bankKeeper,
+		tokenizationKeeper:    tokenizationKeeper,
+		sendManagerKeeper:     sendManagerKeeper,
+		transferKeeper:        transferKeeper,
+		ics4Wrapper:           ics4Wrapper,
+		channelKeeper:         channelKeeper,
+		tokenizationMsgServer: tokenizationMsgServer,
 	}
+}
+
+// WithStoreKey attaches a persistent KVStoreKey for tracking outbound IBC packet recoveries.
+func (k Keeper) WithStoreKey(storeKey storetypes.StoreKey) Keeper {
+	k.storeKey = storeKey
+	return k
+}
+
+// SetPendingIBCRecovery persists recovery metadata for an outbound IBC packet.
+func (k Keeper) SetPendingIBCRecovery(ctx sdk.Context, portID, channelID string, sequence uint64, rec PendingIBCRecovery) error {
+	if k.storeKey == nil {
+		return nil
+	}
+	bz, err := json.Marshal(rec)
+	if err != nil {
+		return err
+	}
+	ctx.KVStore(k.storeKey).Set(types.PendingIBCRecoveryKey(portID, channelID, sequence), bz)
+	return nil
+}
+
+// GetPendingIBCRecovery retrieves recovery metadata for an outbound IBC packet if present.
+func (k Keeper) GetPendingIBCRecovery(ctx sdk.Context, portID, channelID string, sequence uint64) (PendingIBCRecovery, bool) {
+	if k.storeKey == nil {
+		return PendingIBCRecovery{}, false
+	}
+	bz := ctx.KVStore(k.storeKey).Get(types.PendingIBCRecoveryKey(portID, channelID, sequence))
+	if len(bz) == 0 {
+		return PendingIBCRecovery{}, false
+	}
+	var rec PendingIBCRecovery
+	if err := json.Unmarshal(bz, &rec); err != nil {
+		return PendingIBCRecovery{}, false
+	}
+	return rec, true
+}
+
+// DeletePendingIBCRecovery removes recovery metadata for an outbound IBC packet.
+func (k Keeper) DeletePendingIBCRecovery(ctx sdk.Context, portID, channelID string, sequence uint64) {
+	if k.storeKey == nil {
+		return
+	}
+	ctx.KVStore(k.storeKey).Delete(types.PendingIBCRecoveryKey(portID, channelID, sequence))
+}
+
+// HandleIBCAcknowledgement cleans up pending recovery state on packet acknowledgement and
+// forwards refunded tokens from the derived intermediate sender to recover_address on error acks.
+func (k Keeper) HandleIBCAcknowledgement(ctx sdk.Context, packet channeltypes.Packet, acknowledgement []byte) {
+	rec, found := k.GetPendingIBCRecovery(ctx, packet.SourcePort, packet.SourceChannel, packet.Sequence)
+	if !found {
+		return
+	}
+	k.DeletePendingIBCRecovery(ctx, packet.SourcePort, packet.SourceChannel, packet.Sequence)
+
+	var ack channeltypes.Acknowledgement
+	if err := transfertypes.ModuleCdc.UnmarshalJSON(acknowledgement, &ack); err != nil {
+		k.Logger(ctx).Error("custom-hooks: failed to unmarshal acknowledgement for pending recovery", "error", err, "channel", packet.SourceChannel, "sequence", packet.Sequence)
+		return
+	}
+	if ack.Success() {
+		return
+	}
+
+	k.forwardRefundToRecoverAddress(ctx, packet, rec, "acknowledgement_error")
+}
+
+// HandleIBCTimeout forwards timed-out outbound IBC tokens from the derived intermediate sender
+// to the recorded recover_address.
+func (k Keeper) HandleIBCTimeout(ctx sdk.Context, packet channeltypes.Packet) {
+	rec, found := k.GetPendingIBCRecovery(ctx, packet.SourcePort, packet.SourceChannel, packet.Sequence)
+	if !found {
+		return
+	}
+	k.DeletePendingIBCRecovery(ctx, packet.SourcePort, packet.SourceChannel, packet.Sequence)
+
+	k.forwardRefundToRecoverAddress(ctx, packet, rec, "timeout")
+}
+
+func (k Keeper) forwardRefundToRecoverAddress(ctx sdk.Context, packet channeltypes.Packet, rec PendingIBCRecovery, reason string) {
+	if rec.RecoverAddress == "" || rec.RecoverAddress == rec.Sender {
+		return
+	}
+
+	senderAddr, err := sdk.AccAddressFromBech32(rec.Sender)
+	if err != nil {
+		k.Logger(ctx).Error("custom-hooks: invalid stored sender in recovery record", "error", err, "sender", rec.Sender)
+		return
+	}
+	amt, ok := sdkmath.NewIntFromString(rec.Amount)
+	if !ok || !amt.IsPositive() {
+		k.Logger(ctx).Error("custom-hooks: invalid stored amount in recovery record", "amount", rec.Amount)
+		return
+	}
+
+	coin := sdk.NewCoin(rec.Denom, amt)
+	cacheCtx, writeCache := ctx.CacheContext()
+	ack := k.ExecuteLocalTransfer(cacheCtx, senderAddr, &types.TransferInfo{ToAddress: rec.RecoverAddress}, coin)
+	if !ack.Success() {
+		k.Logger(ctx).Error("custom-hooks: failed to forward refunded tokens to recover_address",
+			"reason", reason,
+			"channel", packet.SourceChannel,
+			"sequence", packet.Sequence,
+			"sender", rec.Sender,
+			"recover_address", rec.RecoverAddress,
+			"coin", coin.String(),
+		)
+		return
+	}
+	writeCache()
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		"custom_hooks_ibc_recovery",
+		sdk.NewAttribute("module", "custom-hooks"),
+		sdk.NewAttribute("reason", reason),
+		sdk.NewAttribute("source_channel", packet.SourceChannel),
+		sdk.NewAttribute("sequence", strconv.FormatUint(packet.Sequence, 10)),
+		sdk.NewAttribute("sender", rec.Sender),
+		sdk.NewAttribute("recover_address", rec.RecoverAddress),
+		sdk.NewAttribute("coin", coin.String()),
+	))
 }
 
 // Logger returns a logger for the x/custom-hooks module
@@ -439,26 +571,14 @@ func (k Keeper) ExecuteSwapAndAction(ctx sdk.Context, sender sdk.AccAddress, swa
 		}
 
 		recoverAddress := swapAndAction.PostSwapAction.IBCTransfer.IBCInfo.RecoverAddress
-		recoverAddressAddr, err := sdk.AccAddressFromBech32(recoverAddress)
-		if err != nil {
+		if _, err := sdk.AccAddressFromBech32(recoverAddress); err != nil {
 			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("invalid recover address: %s", recoverAddress))
 		}
 
-		// Send to recover address then IBC it out
-		// Clear any previous deterministic errors before starting the transfer
+		// Send the outbound IBC transfer from the derived intermediate sender and record
+		// (channel, sequence) -> recover_address so error acks and timeouts refund recover_address.
 		types.ClearDeterministicError(ctx)
-		ack := k.ExecuteLocalTransfer(ctx, sender, &types.TransferInfo{ToAddress: recoverAddress}, tokenIn)
-		if !ack.Success() {
-			// Combine ack error message with deterministic error from context
-			ackErrMsg, _ := types.GetAckError(ack)
-			if detErrMsg, found := types.GetDeterministicError(ctx); found {
-				combinedMsg := fmt.Sprintf("%s: %s", ackErrMsg, detErrMsg)
-				return types.NewCustomErrorAcknowledgement(combinedMsg)
-			}
-			return ack
-		}
-
-		ack = k.ExecuteIBCTransfer(ctx, recoverAddressAddr, swapAndAction.PostSwapAction.IBCTransfer, tokenIn, timeoutTimestamp)
+		ack = k.ExecuteIBCTransfer(ctx, sender, swapAndAction.PostSwapAction.IBCTransfer, tokenIn, timeoutTimestamp)
 		if !ack.Success() {
 			return ack
 		}
@@ -562,9 +682,21 @@ func (k Keeper) ExecuteIBCTransfer(ctx sdk.Context, sender sdk.AccAddress, ibcTr
 		Memo:             ibcInfo.Memo,
 	}
 
-	_, err := k.transferKeeper.Transfer(ctx, msg)
+	resp, err := k.transferKeeper.Transfer(ctx, msg)
 	if err != nil {
 		return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to execute IBC transfer: channel=%s, denom=%s, amount=%s", ibcInfo.SourceChannel, token.Denom, token.Amount.String()))
+	}
+
+	if resp != nil && ibcInfo.RecoverAddress != "" {
+		rec := PendingIBCRecovery{
+			Sender:         sender.String(),
+			RecoverAddress: ibcInfo.RecoverAddress,
+			Denom:          token.Denom,
+			Amount:         token.Amount.String(),
+		}
+		if err := k.SetPendingIBCRecovery(ctx, transfertypes.PortID, ibcInfo.SourceChannel, resp.Sequence, rec); err != nil {
+			return types.NewCustomErrorAcknowledgement(fmt.Sprintf("failed to store IBC recovery record: %v", err))
+		}
 	}
 
 	return types.NewSuccessAcknowledgement()

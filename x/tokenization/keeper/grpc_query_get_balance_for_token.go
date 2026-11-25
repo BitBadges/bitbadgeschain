@@ -42,7 +42,7 @@ func (k Keeper) GetBalanceForToken(goCtx context.Context, req *types.QueryGetBal
 	}
 
 	// Fetch the full balance store for this address
-	balanceStore, _, err := k.GetBalanceOrApplyDefault(ctx, collection, req.Address)
+	balanceStore, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, req.Address)
 	if err != nil {
 		return nil, err
 	}

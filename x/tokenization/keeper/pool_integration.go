@@ -172,59 +172,53 @@ func (k *Keeper) SendNativeTokensFromAddressWithPoolApprovals(ctx sdk.Context, f
 		return err
 	}
 
-	// Generate unique approval ID to prevent reuse attacks
-	// Format: "one-time-outgoing-{blockHeight}-{collectionId}-{hash}"
-	// This ensures each approval is unique and cannot be reused
+	// Generate unique approval ID per pool withdrawal operation.
+	// Format: "one-time-outgoing-{blockHeight}-{collectionId}-{recipient}"
 	blockHeight := ctx.BlockHeight()
 	approvalId := fmt.Sprintf("one-time-outgoing-%d-%s-%s", blockHeight, collection.CollectionId.String(), recipientAddress)
 
 	// Create and execute MsgTransferTokens to ensure proper event handling and validation
 	tokenizationMsgServer := NewMsgServerImpl(k)
 
-	// Helper function to delete the one-time approval
-	deleteOneTimeApproval := func() error {
-		cleanupMsg := &tokenizationtypes.MsgUpdateUserApprovals{
-			Creator:                 fromAddress,
-			CollectionId:            collection.CollectionId,
-			UpdateOutgoingApprovals: true,
-			OutgoingApprovals:       []*tokenizationtypes.UserOutgoingApproval{},
-		}
-		_, err := tokenizationMsgServer.UpdateUserApprovals(ctx, cleanupMsg)
-		return err
-	}
-
-	// Just for sanity checks, we override all approvals to be default allowed
-	// Incoming - All, no matter what
-	// Outgoing - Self-initiated
-	updateApprovalsMsg := &tokenizationtypes.MsgUpdateUserApprovals{
-		Creator:                               fromAddress,
-		CollectionId:                          collection.CollectionId,
-		UpdateAutoApproveAllIncomingTransfers: true,
-		AutoApproveAllIncomingTransfers:       true,
-		UpdateAutoApproveSelfInitiatedOutgoingTransfers: true,
-		AutoApproveSelfInitiatedOutgoingTransfers:       true,
-		UpdateAutoApproveSelfInitiatedIncomingTransfers: true,
-		AutoApproveSelfInitiatedIncomingTransfers:       true,
-
-		// One-time outgoing approval for the address to send tokens to the recipient
-		// Security: Uses unique approval ID to prevent reuse attacks
-		UpdateOutgoingApprovals: true,
-		OutgoingApprovals: []*tokenizationtypes.UserOutgoingApproval{
-			{
-				ToListId:          recipientAddress,
-				InitiatedByListId: recipientAddress,
-				TransferTimes:     []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-				OwnershipTimes:    []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-				TokenIds:          []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
-				ApprovalId:        approvalId,
-			},
-		},
-	}
-	_, err = tokenizationMsgServer.UpdateUserApprovals(ctx, updateApprovalsMsg)
+	// Configure pool auto-approval flags and the scoped one-time outgoing approval
+	// directly via SetBalanceForAddress (matching SetAllAutoApprovalFlagsForPoolAddress)
+	// so pools can always withdraw tokens even when collection DefaultBalances.UserPermissions
+	// restricts outgoing approval updates for regular users.
+	poolBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, fromAddress)
 	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to load pool balance store: %s", fromAddress)
+	}
+	setAutoApprovalFlagsIfNeeded(poolBalances)
+
+	approvalVersion, err := k.IncrementApprovalVersion(ctx, collection.CollectionId, "outgoing", fromAddress, approvalId)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to allocate version for one-time approval: %s", approvalId)
+	}
+
+	oneTimeApproval := &tokenizationtypes.UserOutgoingApproval{
+		ToListId:          recipientAddress,
+		InitiatedByListId: recipientAddress,
+		TransferTimes:     []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+		OwnershipTimes:    []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+		TokenIds:          []*tokenizationtypes.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+		ApprovalId:        approvalId,
+		Version:           approvalVersion,
+	}
+
+	poolBalances.OutgoingApprovals = []*tokenizationtypes.UserOutgoingApproval{oneTimeApproval}
+	if err := k.SetBalanceForAddress(ctx, collection, fromAddress, poolBalances); err != nil {
 		return sdkerrors.Wrapf(err, "failed to create one-time approval: %s", approvalId)
 	}
-	approvalVersion := updateApprovalsMsg.OutgoingApprovals[0].Version
+
+	// Helper function to remove the one-time approval directly from the pool balance store.
+	deleteOneTimeApproval := func() error {
+		updatedPoolBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, fromAddress)
+		if err != nil {
+			return err
+		}
+		updatedPoolBalances.OutgoingApprovals = []*tokenizationtypes.UserOutgoingApproval{}
+		return k.SetBalanceForAddress(ctx, collection, fromAddress, updatedPoolBalances)
+	}
 
 	// Restrict the outgoing (pool) side to only the one-time prioritized approval we just set
 	// up — the pool cannot be drained via any other outgoing approval it happens to have.
@@ -407,8 +401,8 @@ func (k *Keeper) GetSpendableCoinAmountTokenizationLPOnly(ctx sdk.Context, addre
 		return sdkmath.ZeroInt(), err
 	}
 
-	// Get user's token balance
-	userBalances, _, err := k.GetBalanceOrApplyDefault(ctx, collection, address.String())
+	// Get user's token balance (read-only)
+	userBalances, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, address.String())
 	if err != nil {
 		return sdkmath.ZeroInt(), err
 	}

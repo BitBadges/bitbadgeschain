@@ -92,6 +92,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_QuorumMetPasses() {
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -143,6 +146,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_QuorumNotMetFails() {
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -195,6 +201,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_VoterWeightsCalculate
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -297,6 +306,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_VoteUpdateRecalculate
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -327,6 +339,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_VoteUpdateRecalculate
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -445,6 +460,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_QuorumThreshold0Passe
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -496,6 +514,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_QuorumThreshold100Req
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -564,6 +585,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_PartialYesWeight() {
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -680,6 +704,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_MultipleVotersPartial
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}
@@ -716,6 +743,9 @@ func (suite *VotingChallengeTestSuite) TestVotingChallenge_NoVotesCastFails() {
 				From:        suite.Alice,
 				ToAddresses: []string{suite.Bob},
 				Balances:    []*types.Balance{testutil.GenerateSimpleBalance(5, 1)},
+				PrioritizedApprovals: []*types.ApprovalIdentifierDetails{
+					testutil.GeneratePrioritizedApproval("voting_approval"),
+				},
 			},
 		},
 	}

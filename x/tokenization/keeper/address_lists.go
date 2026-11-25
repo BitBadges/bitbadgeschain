@@ -11,11 +11,21 @@ import (
 )
 
 func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressList) error {
+	if addressList == nil {
+		return sdkerrors.Wrapf(types.ErrInvalidRequest, "address list cannot be nil")
+	}
+
 	id := addressList.ListId
 
 	// Check if ID is empty
 	if id == "" {
 		return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id cannot be empty")
+	}
+
+	// Reject reserved list identifiers
+	switch id {
+	case "Mint", "Total", "Manager", "All", "AllWithMint", "AllWithoutMint", "None":
+		return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id %s is reserved", id)
 	}
 
 	// Check if ID starts with !
@@ -27,6 +37,12 @@ func (k Keeper) CreateAddressList(ctx sdk.Context, addressList *types.AddressLis
 	for _, char := range id {
 		if (char < 'a' || char > 'z') && (char < 'A' || char > 'Z') && (char < '0' || char > '9') {
 			return sdkerrors.Wrapf(ErrInvalidAddressListId, "address list id can only contain alphanumeric characters")
+		}
+	}
+
+	if addressList.Uri != "" {
+		if err := types.ValidateURI(addressList.Uri); err != nil {
+			return err
 		}
 	}
 

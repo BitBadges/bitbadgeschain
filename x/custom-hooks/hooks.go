@@ -141,6 +141,38 @@ func (h *CustomHooks) OnRecvPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Co
 	return ack
 }
 
+// OnAcknowledgementPacketAfterHook handles post-acknowledgement recovery for outbound
+// packets originated by swap_and_action hooks.
+func (h *CustomHooks) OnAcknowledgementPacketAfterHook(ctx sdk.Context, packet channeltypes.Packet, acknowledgement []byte) {
+	h.keeper.HandleIBCAcknowledgement(ctx, packet, acknowledgement)
+}
+
+// OnTimeoutPacketAfterHook handles post-timeout recovery for outbound packets
+// originated by swap_and_action hooks.
+func (h *CustomHooks) OnTimeoutPacketAfterHook(ctx sdk.Context, packet channeltypes.Packet) {
+	h.keeper.HandleIBCTimeout(ctx, packet)
+}
+
+// OnAcknowledgementPacketOverride delegates to the underlying IBC application and then
+// runs custom-hooks outbound recovery handling.
+func (h *CustomHooks) OnAcknowledgementPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, acknowledgement []byte, relayer sdk.AccAddress) error {
+	if err := im.App.OnAcknowledgementPacket(ctx, channelID, packet, acknowledgement, relayer); err != nil {
+		return err
+	}
+	h.OnAcknowledgementPacketAfterHook(ctx, packet, acknowledgement)
+	return nil
+}
+
+// OnTimeoutPacketOverride delegates to the underlying IBC application and then
+// runs custom-hooks outbound recovery handling.
+func (h *CustomHooks) OnTimeoutPacketOverride(im ibchooks.IBCMiddleware, ctx sdk.Context, channelID string, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+	if err := im.App.OnTimeoutPacket(ctx, channelID, packet, relayer); err != nil {
+		return err
+	}
+	h.OnTimeoutPacketAfterHook(ctx, packet)
+	return nil
+}
+
 // isIcs20Packet checks if the packet data is an ICS20 transfer packet
 func isIcs20Packet(data []byte) (bool, transfertypes.FungibleTokenPacketData) {
 	var packetData transfertypes.FungibleTokenPacketData

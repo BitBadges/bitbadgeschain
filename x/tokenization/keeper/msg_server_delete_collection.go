@@ -38,7 +38,7 @@ func (k msgServer) DeleteCollection(goCtx context.Context, msg *types.MsgDeleteC
 	// Escrowed supply stays redeemable only through this collection, so it must be
 	// fully unwound before the collection can go away.
 	for _, path := range collection.CosmosCoinWrapperPaths {
-		escrow, _, err := k.GetBalanceOrApplyDefault(ctx, collection, path.Address)
+		escrow, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, path.Address)
 		if err != nil {
 			return nil, err
 		}

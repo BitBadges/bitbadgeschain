@@ -417,12 +417,19 @@ func ValidateAddressList(addressList *AddressList) error {
 
 // ValidateAddressListInput validates an AddressListInput (same validation as AddressList but without createdBy check)
 func ValidateAddressListInput(addressListInput *AddressListInput) error {
+	if addressListInput == nil {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "address list input cannot be nil")
+	}
+
 	if addressListInput.ListId == "" ||
 		addressListInput.ListId == "Mint" ||
+		addressListInput.ListId == "Total" ||
 		addressListInput.ListId == "Manager" ||
+		addressListInput.ListId == "All" ||
+		addressListInput.ListId == "AllWithMint" ||
 		addressListInput.ListId == "AllWithoutMint" ||
 		addressListInput.ListId == "None" {
-		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized")
+		return sdkerrors.Wrapf(ErrInvalidAddress, "list ID is uninitialized or reserved")
 	}
 
 	if err := ValidateAddress(addressListInput.ListId, false); err == nil {
@@ -520,6 +527,14 @@ func CollectionApprovalIsAutoScannable(approvalCriteria *ApprovalCriteria) bool 
 		return false
 	}
 
+	if len(approvalCriteria.EvmQueryChallenges) > 0 {
+		return false
+	}
+
+	if len(approvalCriteria.VotingChallenges) > 0 {
+		return false
+	}
+
 	// if approvalCriteria.MaxNumTransfers != nil && !MaxNumTransfersIsBasicallyNil(approvalCriteria.MaxNumTransfers) {
 	// 	return false
 	// }
@@ -589,7 +604,7 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id can not be All at index %d", i)
 		}
 
-		reservedApprovalIds := []string{"default-outgoing", "default-incoming", "self-initiated-outgoing", "self-initiated-incoming", "all-incoming-transfers"}
+		reservedApprovalIds := []string{"default-outgoing", "default-incoming", "self-initiated-outgoing", "self-initiated-incoming", "all-incoming", "all-incoming-transfers", "one-time-outgoing"}
 
 		for _, reservedApprovalId := range reservedApprovalIds {
 			if collectionApprovals[i].ApprovalId == reservedApprovalId {
@@ -712,77 +727,81 @@ func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*Collect
 					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
 				}
 
-				for _, mustOwnTokenBalance := range approvalCriteria.MustOwnTokens {
-					if mustOwnTokenBalance == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnTokens balance is nil")
-					}
-
-					if err := ValidateRangesAreValid(mustOwnTokenBalance.TokenIds, false, false); err != nil {
-						return sdkerrors.Wrapf(err, "invalid token IDs")
-					}
-
-					if err := ValidateRangesAreValid(mustOwnTokenBalance.OwnershipTimes, false, false); err != nil {
-						return sdkerrors.Wrapf(err, "invalid owned times")
-					}
-
-					if err := ValidateRangesAreValid([]*UintRange{mustOwnTokenBalance.AmountRange}, true, true); err != nil {
-						return sdkerrors.Wrapf(err, "invalid transfer times")
-					}
-
-					if mustOwnTokenBalance.CollectionId.IsNil() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized (nil)")
-					}
-					// CollectionId 0 is allowed — means "this collection" (self-reference, resolved at runtime)
-				}
-
-				// Validate dynamic store challenges
-				if approvalCriteria.DynamicStoreChallenges == nil {
-					approvalCriteria.DynamicStoreChallenges = []*DynamicStoreChallenge{}
-				}
-
-				// Check for duplicate store IDs
-				storeIds := make(map[string]bool)
-				for _, challenge := range approvalCriteria.DynamicStoreChallenges {
-					if challenge == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "dynamic store challenge is nil")
-					}
-
-					if challenge.StoreId.IsNil() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is uninitialized")
-					}
-
-					if challenge.StoreId.IsZero() {
-						return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is zero")
-					}
-
-					storeIdStr := challenge.StoreId.String()
-					if storeIds[storeIdStr] {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate dynamic store challenge storeId: %s", storeIdStr)
-					}
-					storeIds[storeIdStr] = true
-				}
-
-				// Validate voting challenges
 				if approvalCriteria.VotingChallenges == nil {
 					approvalCriteria.VotingChallenges = []*VotingChallenge{}
 				}
+			}
 
-				// Check for duplicate proposal IDs
-				proposalIds := make(map[string]bool)
-				for _, challenge := range approvalCriteria.VotingChallenges {
-					if challenge == nil {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "voting challenge is nil")
-					}
-
-					if err := challenge.ValidateBasic(); err != nil {
-						return sdkerrors.Wrapf(err, "invalid voting challenge")
-					}
-
-					if proposalIds[challenge.ProposalId] {
-						return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate voting challenge proposalId: %s", challenge.ProposalId)
-					}
-					proposalIds[challenge.ProposalId] = true
+			for _, mustOwnTokenBalance := range approvalCriteria.MustOwnTokens {
+				if mustOwnTokenBalance == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "mustOwnTokens balance is nil")
 				}
+
+				if err := ValidateRangesAreValid(mustOwnTokenBalance.TokenIds, false, false); err != nil {
+					return sdkerrors.Wrapf(err, "invalid token IDs")
+				}
+
+				if err := ValidateRangesAreValid(mustOwnTokenBalance.OwnershipTimes, false, false); err != nil {
+					return sdkerrors.Wrapf(err, "invalid owned times")
+				}
+
+				if err := ValidateRangesAreValid([]*UintRange{mustOwnTokenBalance.AmountRange}, true, true); err != nil {
+					return sdkerrors.Wrapf(err, "invalid transfer times")
+				}
+
+				if mustOwnTokenBalance.CollectionId.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "collection id is uninitialized (nil)")
+				}
+				if !mustOwnTokenBalance.CollectionId.BigInt().IsUint64() {
+					return sdkerrors.Wrapf(ErrInvalidCollectionID, "mustOwnTokens collectionId exceeds uint64 range")
+				}
+				// CollectionId 0 is allowed — means "this collection" (self-reference, resolved at runtime)
+			}
+
+			// Validate dynamic store challenges and check for duplicate store IDs
+			storeIds := make(map[string]bool)
+			for _, challenge := range approvalCriteria.DynamicStoreChallenges {
+				if challenge == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "dynamic store challenge is nil")
+				}
+
+				if challenge.StoreId.IsNil() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is uninitialized")
+				}
+
+				if challenge.StoreId.IsZero() {
+					return sdkerrors.Wrapf(ErrUintUnititialized, "dynamic store challenge storeId is zero")
+				}
+
+				if !challenge.StoreId.BigInt().IsUint64() {
+					return sdkerrors.Wrapf(ErrInvalidDynamicStoreID, "dynamic store challenge storeId exceeds uint64 range")
+				}
+
+				storeIdStr := challenge.StoreId.String()
+				if storeIds[storeIdStr] {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate dynamic store challenge storeId: %s", storeIdStr)
+				}
+				storeIds[storeIdStr] = true
+			}
+
+			// Validate voting challenges and check for duplicate proposal IDs
+			proposalIds := make(map[string]bool)
+			for _, challenge := range approvalCriteria.VotingChallenges {
+				if challenge == nil {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "voting challenge is nil")
+				}
+
+				if err := challenge.ValidateBasic(); err != nil {
+					return sdkerrors.Wrapf(err, "invalid voting challenge")
+				}
+
+				if proposalIds[challenge.ProposalId] {
+					return sdkerrors.Wrapf(ErrInvalidRequest, "duplicate voting challenge proposalId: %s", challenge.ProposalId)
+				}
+				proposalIds[challenge.ProposalId] = true
+			}
+
+			if canChangeValues {
 
 				if approvalCriteria.ApprovalAmounts == nil {
 					approvalCriteria.ApprovalAmounts = &ApprovalAmounts{}
@@ -1150,9 +1169,11 @@ func PredeterminedBalancesIsBasicallyNil(predeterminedBalances *PredeterminedBal
 
 func ValidateMerkleChallenges(challenges []*MerkleChallenge, usingLeafIndexForTransferOrder bool, challengeTrackerIdForTransferOrder string) error {
 	for i, challenge := range challenges {
-		if challenge == nil || challenge.Root == "" {
-			challenge = &MerkleChallenge{}
-			return nil
+		if challenge == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "merkle challenge at index %d is nil", i)
+		}
+		if challenge.Root == "" {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "merkle challenge at index %d has empty root", i)
 		}
 
 		if challenge.ExpectedProofLength.IsNil() {
@@ -1404,8 +1425,8 @@ func (vc *VotingChallenge) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "proposalId cannot be empty")
 	}
 
-	if vc.QuorumThreshold.GT(sdkmath.NewUint(100)) {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "quorumThreshold must be between 0 and 100, got %s", vc.QuorumThreshold.String())
+	if vc.QuorumThreshold.IsNil() || vc.QuorumThreshold.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "quorumThreshold must be between 0 and 100")
 	}
 
 	if len(vc.Voters) == 0 {
@@ -1415,6 +1436,9 @@ func (vc *VotingChallenge) ValidateBasic() error {
 	// Check for duplicate voters
 	voterAddresses := make(map[string]bool)
 	for _, voter := range vc.Voters {
+		if voter == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "voter cannot be nil")
+		}
 		if err := voter.ValidateBasic(); err != nil {
 			return err
 		}
@@ -1443,7 +1467,7 @@ func (v *Voter) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
 
-	if v.Weight.IsZero() {
+	if v.Weight.IsNil() || v.Weight.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidRequest, "voter weight cannot be zero")
 	}
 
@@ -1464,8 +1488,8 @@ func (vp *VoteProof) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
 
-	if vp.YesWeight.GT(sdkmath.NewUint(100)) {
-		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100, got %s", vp.YesWeight.String())
+	if vp.YesWeight.IsNil() || vp.YesWeight.GT(sdkmath.NewUint(100)) {
+		return sdkerrors.Wrapf(ErrInvalidRequest, "yesWeight must be between 0 and 100")
 	}
 
 	return nil
@@ -1514,7 +1538,7 @@ func ValidateEVMQueryChallenges(challenges []*EVMQueryChallenge) error {
 		}
 
 		// Validate gas limit
-		if !challenge.GasLimit.IsZero() && challenge.GasLimit.GT(sdkmath.NewUint(500000)) {
+		if !challenge.GasLimit.IsNil() && !challenge.GasLimit.IsZero() && challenge.GasLimit.GT(sdkmath.NewUint(500000)) {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "EVM query challenge %d: gas limit exceeds maximum (500000)", i)
 		}
 	}

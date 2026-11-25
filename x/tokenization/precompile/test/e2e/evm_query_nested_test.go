@@ -65,7 +65,11 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_QueryTransferNestedInvariant() {
 		s.Require().Positive(ctx.GasMeter().GasConsumed())
 		return err
 	}
-	s.Require().NoError(query(), "the contract transfer must reach the precompile before adding the invariant")
+	// Read-only EVM query execution rejects state-mutating precompile calls via staticcall.
+	s.Require().Error(query(), "read-only query must reject state-mutating precompile transfer")
+	afterBeforeInvariant, _, err := s.TokenizationKeeper.GetBalanceOrApplyDefault(s.Ctx, collection, contractAddress)
+	s.Require().NoError(err)
+	s.Require().Equal(before.Balances, afterBeforeInvariant.Balances, "query transfers must not persist balances")
 
 	check, err := contractABI.Pack("testGetCollection", created.CollectionId.BigInt())
 	s.Require().NoError(err)
@@ -73,7 +77,7 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_QueryTransferNestedInvariant() {
 		ContractAddress: contract.Hex(), Calldata: hex.EncodeToString(check), GasLimit: sdkmath.NewUint(500_000),
 	}}}
 	s.Require().NoError(s.TokenizationKeeper.SetCollectionInStore(s.Ctx, collection, false))
-	s.Require().Error(query(), "a query cannot start another query through a contract transfer invariant")
+	s.Require().Error(query(), "a query cannot execute a mutating transfer or nested query")
 	after, _, err := s.TokenizationKeeper.GetBalanceOrApplyDefault(s.Ctx, collection, contractAddress)
 	s.Require().NoError(err)
 	s.Require().Equal(before.Balances, after.Balances, "query transfers must not persist balances")

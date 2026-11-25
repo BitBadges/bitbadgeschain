@@ -1,6 +1,7 @@
 package poolmanager
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -85,6 +86,15 @@ func (k Keeper) GetTakerFeeShareAgreementFromDenomNoCache(ctx sdk.Context, taker
 // SetTakerFeeShareAgreementForDenom is used for setting a specific taker fee share agreement in the store.
 // Used in the MsgSetTakerFeeShareAgreementForDenom, by the gov address only.
 func (k *Keeper) SetTakerFeeShareAgreementForDenom(ctx sdk.Context, takerFeeShare types.TakerFeeShareAgreement) error {
+	if err := sdk.ValidateDenom(takerFeeShare.Denom); err != nil {
+		return err
+	}
+	if takerFeeShare.SkimAddress == "" {
+		return fmt.Errorf("invalid skim address: %s", takerFeeShare.SkimAddress)
+	}
+	if takerFeeShare.SkimPercent.IsNil() || takerFeeShare.SkimPercent.IsNegative() || takerFeeShare.SkimPercent.GT(types.OneDec) {
+		return fmt.Errorf("invalid skim percent: %s", takerFeeShare.SkimPercent)
+	}
 	store := ctx.KVStore(k.storeKey)
 	key := types.FormatTakerFeeShareAgreementKey(takerFeeShare.Denom)
 	bz, err := proto.Marshal(&takerFeeShare)

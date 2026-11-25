@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"math"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -163,7 +164,7 @@ func GetFirstMatchOnlyWithApprovalCriteria(ctx sdk.Context, permissions []*types
 		returnArr[idxToInsert] = handledItem
 	}
 
-	return handled, nil
+	return returnArr, nil
 }
 
 func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.CollectionApproval, newApprovals []*types.CollectionApproval) ([]*types.UniversalPermissionDetails, error) {
@@ -243,8 +244,8 @@ func (k Keeper) GetDetailsToCheck(ctx sdk.Context, collection *types.TokenCollec
 					for i := 0; i < len(oldVal); i++ {
 						oldApprovalCriteria := oldVal[i].ApprovalCriteria
 						newApprovalCriteria := newVal[i].ApprovalCriteria
-						// Check approval criteria changes using stringification
-						if proto.MarshalTextString(oldApprovalCriteria) != proto.MarshalTextString(newApprovalCriteria) {
+						// Compare approval criteria using deterministic binary marshaling.
+						if !approvalCriteriaEqual(oldApprovalCriteria, newApprovalCriteria) {
 							different = true
 						}
 						// Check URI changes
@@ -438,7 +439,30 @@ func (k Keeper) ValidateCollectionApprovalsUpdate(ctx sdk.Context, collection *t
 	return nil
 }
 
+func approvalCriteriaEqual(a, b *types.ApprovalCriteria) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	bzA, errA := proto.Marshal(a)
+	bzB, errB := proto.Marshal(b)
+	if errA != nil || errB != nil {
+		return false
+	}
+	return bytes.Equal(bzA, bzB)
+}
+
 func (k Keeper) ValidateUserOutgoingApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.UserOutgoingApproval, newApprovals []*types.UserOutgoingApproval, CanUpdateCollectionApprovals []*types.UserOutgoingApprovalPermission, fromAddress string) error {
+	for _, approval := range newApprovals {
+		if approval != nil && approval.ApprovalCriteria != nil && len(approval.ApprovalCriteria.EvmQueryChallenges) > 0 {
+			if err := k.ValidateEVMQueryChallengesAreContracts(ctx, approval.ApprovalCriteria.EvmQueryChallenges); err != nil {
+				return sdkerrors.Wrapf(err, "approval %s: %s", approval.ApprovalId, err.Error())
+			}
+		}
+	}
+
 	old := types.CastOutgoingTransfersToCollectionTransfers(oldApprovals, fromAddress)
 	new := types.CastOutgoingTransfersToCollectionTransfers(newApprovals, fromAddress)
 
@@ -456,6 +480,14 @@ func (k Keeper) ValidateUserOutgoingApprovalsUpdate(ctx sdk.Context, collection 
 }
 
 func (k Keeper) ValidateUserIncomingApprovalsUpdate(ctx sdk.Context, collection *types.TokenCollection, oldApprovals []*types.UserIncomingApproval, newApprovals []*types.UserIncomingApproval, CanUpdateCollectionApprovals []*types.UserIncomingApprovalPermission, toAddress string) error {
+	for _, approval := range newApprovals {
+		if approval != nil && approval.ApprovalCriteria != nil && len(approval.ApprovalCriteria.EvmQueryChallenges) > 0 {
+			if err := k.ValidateEVMQueryChallengesAreContracts(ctx, approval.ApprovalCriteria.EvmQueryChallenges); err != nil {
+				return sdkerrors.Wrapf(err, "approval %s: %s", approval.ApprovalId, err.Error())
+			}
+		}
+	}
+
 	old := types.CastIncomingTransfersToCollectionTransfers(oldApprovals, toAddress)
 	new := types.CastIncomingTransfersToCollectionTransfers(newApprovals, toAddress)
 

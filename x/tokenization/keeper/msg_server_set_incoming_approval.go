@@ -28,7 +28,7 @@ func (k msgServer) SetIncomingApproval(goCtx context.Context, msg *types.MsgSetI
 		return nil, ErrCollectionNotExists
 	}
 
-	userBalance, _, err := k.GetBalanceOrApplyDefault(ctx, collection, msg.Creator)
+	userBalance, _, err := k.GetBalanceOrApplyDefaultReadOnly(ctx, collection, msg.Creator)
 	if err != nil {
 		return nil, err
 	}

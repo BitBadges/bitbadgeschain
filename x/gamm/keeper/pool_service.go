@@ -37,6 +37,9 @@ func (k Keeper) CalculateSpotPrice(
 	// defer to catch panics, in case something internal overflows.
 	defer func() {
 		if r := recover(); r != nil {
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
+			}
 			spotPrice = osmomath.BigDec{}
 			err = types.ErrSpotPriceInternal
 		}
@@ -149,13 +152,12 @@ func (k Keeper) JoinPoolNoSwap(
 	// defer to catch panics, in case something internal overflows.
 	defer func() {
 		if r := recover(); r != nil {
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
+			}
 			tokenIn = sdk.Coins{}
 			sharesOut = osmomath.Int{}
-			if isErr, d := osmoutils.IsOutOfGasError(r); isErr {
-				err = fmt.Errorf("function JoinPoolNoSwap failed due to lack of gas: %v", d)
-			} else {
-				err = fmt.Errorf("function JoinPoolNoSwap failed due to internal reason: %v", r)
-			}
+			err = fmt.Errorf("function JoinPoolNoSwap failed due to internal reason: %v", r)
 		}
 	}()
 	// all pools handled within this method are pointer references, `JoinPool` directly updates the pools
@@ -246,12 +248,11 @@ func (k Keeper) JoinSwapExactAmountIn(
 	// defer to catch panics, in case something internal overflows.
 	defer func() {
 		if r := recover(); r != nil {
-			sharesOut = osmomath.Int{}
-			if isErr, d := osmoutils.IsOutOfGasError(r); isErr {
-				err = fmt.Errorf("function JoinSwapExactAmountIn failed due to lack of gas: %v", d)
-			} else {
-				err = fmt.Errorf("function JoinSwapExactAmountIn failed due to internal reason: %v", r)
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
 			}
+			sharesOut = osmomath.Int{}
+			err = fmt.Errorf("function JoinSwapExactAmountIn failed due to internal reason: %v", r)
 		}
 	}()
 
@@ -294,12 +295,11 @@ func (k Keeper) JoinSwapShareAmountOut(
 	// defer to catch panics, in case something internal overflows.
 	defer func() {
 		if r := recover(); r != nil {
-			tokenInAmount = osmomath.Int{}
-			if isErr, d := osmoutils.IsOutOfGasError(r); isErr {
-				err = fmt.Errorf("function JoinSwapShareAmountOut failed due to lack of gas: %v", d)
-			} else {
-				err = fmt.Errorf("function JoinSwapShareAmountOut failed due to internal reason: %v", r)
+			if isErr, _ := osmoutils.IsOutOfGasError(r); isErr {
+				panic(r)
 			}
+			tokenInAmount = osmomath.Int{}
+			err = fmt.Errorf("function JoinSwapShareAmountOut failed due to internal reason: %v", r)
 		}
 	}()
 

@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"math/big"
 	"math/bits"
 	"sort"
 
@@ -524,53 +525,87 @@ func IncrementBalances(
 				// Check within first charge period
 				firstChargeTime := startTime.Sub(chargePeriodLength)
 				if now.GTE(firstChargeTime) && now.LT(startTime) {
+					endTime, err := safeUintAddSubOne(startTime, intervalLength)
+					if err != nil {
+						return balances, err
+					}
 					startBalance.OwnershipTimes = []*UintRange{
 						{
 							Start: startTime,
-							End:   startTime.Add(intervalLength).Sub(sdkmath.OneUint()),
+							End:   endTime,
 						},
 					}
-
-					return balances, nil
-				}
-
-				return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
-			}
-
-			// 1. Calculate what interval we are in
-			interval := now.Sub(startTime).Quo(intervalLength)
-			nextInterval := interval.Add(sdkmath.OneUint())
-
-			// 2. Calculate the new intervals
-			newStartTime := startTime.Add(intervalLength.Mul(nextInterval))
-			newEndTime := newStartTime.Add(intervalLength).Sub(sdkmath.OneUint())
-			chargeAfterTime := newStartTime.Sub(chargePeriodLength)
-
-			// 3. Assert that we are in the charge period
-			if now.GTE(chargeAfterTime) && now.LT(newStartTime) {
-				startBalance.OwnershipTimes = []*UintRange{
-					{
-						Start: newStartTime,
-						End:   newEndTime,
-					},
+				} else {
+					return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
 				}
 			} else {
-				return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				// 1. Calculate what interval we are in
+				interval := now.Sub(startTime).Quo(intervalLength)
+				nextInterval, err := safeUintAdd(interval, sdkmath.OneUint())
+				if err != nil {
+					return balances, err
+				}
+
+				// 2. Calculate the new intervals
+				intervalOffset, err := safeUintMul(intervalLength, nextInterval)
+				if err != nil {
+					return balances, err
+				}
+				newStartTime, err := safeUintAdd(startTime, intervalOffset)
+				if err != nil {
+					return balances, err
+				}
+				newEndTime, err := safeUintAddSubOne(newStartTime, intervalLength)
+				if err != nil {
+					return balances, err
+				}
+				if chargePeriodLength.GT(newStartTime) {
+					return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				}
+				chargeAfterTime := newStartTime.Sub(chargePeriodLength)
+
+				// 3. Assert that we are in the charge period
+				if now.GTE(chargeAfterTime) && now.LT(newStartTime) {
+					startBalance.OwnershipTimes = []*UintRange{
+						{
+							Start: newStartTime,
+							End:   newEndTime,
+						},
+					}
+				} else {
+					return balances, errorsmod.Wrapf(ErrOutsideChargePeriod, "outside charge period")
+				}
 			}
-		} else if durationFromTimestamp.IsZero() || durationFromTimestamp.IsNil() {
+		} else if durationFromTimestamp.IsNil() || durationFromTimestamp.IsZero() {
+			timeOffset, err := safeUintMul(numIncrements, incrementOwnershipTimesBy)
+			if err != nil {
+				return balances, err
+			}
 			for _, time := range startBalance.OwnershipTimes {
-				time.Start = time.Start.Add(numIncrements.Mul(incrementOwnershipTimesBy))
-				time.End = time.End.Add(numIncrements.Mul(incrementOwnershipTimesBy))
+				newStart, err := safeUintAdd(time.Start, timeOffset)
+				if err != nil {
+					return balances, err
+				}
+				newEnd, err := safeUintAdd(time.End, timeOffset)
+				if err != nil {
+					return balances, err
+				}
+				time.Start = newStart
+				time.End = newEnd
 			}
 		} else {
 			if allowOverrideTimestamp && !overrideTimestamp.IsNil() && overrideTimestamp.GT(sdkmath.ZeroUint()) {
 				now = overrideTimestamp
 			}
 
+			endTime, err := safeUintAddSubOne(now, durationFromTimestamp)
+			if err != nil {
+				return balances, err
+			}
 			startBalance.OwnershipTimes = []*UintRange{
 				{
 					Start: now,
-					End:   now.Add(durationFromTimestamp).Sub(sdkmath.OneUint()),
+					End:   endTime,
 				},
 			}
 		}
@@ -597,12 +632,61 @@ func IncrementBalances(
 
 			startBalance.TokenIds = overrideTokenIds
 		} else {
+			tokenIdOffset, err := safeUintMul(numIncrements, incrementTokenIdsBy)
+			if err != nil {
+				return balances, err
+			}
 			for _, tokenId := range startBalance.TokenIds {
-				tokenId.Start = tokenId.Start.Add(numIncrements.Mul(incrementTokenIdsBy))
-				tokenId.End = tokenId.End.Add(numIncrements.Mul(incrementTokenIdsBy))
+				newStart, err := safeUintAdd(tokenId.Start, tokenIdOffset)
+				if err != nil {
+					return balances, err
+				}
+				newEnd, err := safeUintAdd(tokenId.End, tokenIdOffset)
+				if err != nil {
+					return balances, err
+				}
+				tokenId.Start = newStart
+				tokenId.End = newEnd
 			}
 		}
 	}
 
 	return balances, nil
+}
+
+func safeUintAdd(a, b sdkmath.Uint) (sdkmath.Uint, error) {
+	if a.IsNil() || b.IsNil() {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrUintUnititialized, "uint operand is nil")
+	}
+	res := new(big.Int).Add(a.BigInt(), b.BigInt())
+	if res.BitLen() > sdkmath.MaxBitLen {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrOverflow, "uint addition overflow")
+	}
+	return sdkmath.NewUintFromBigInt(res), nil
+}
+
+func safeUintMul(a, b sdkmath.Uint) (sdkmath.Uint, error) {
+	if a.IsNil() || b.IsNil() {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrUintUnititialized, "uint operand is nil")
+	}
+	res := new(big.Int).Mul(a.BigInt(), b.BigInt())
+	if res.BitLen() > sdkmath.MaxBitLen {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrOverflow, "uint multiplication overflow")
+	}
+	return sdkmath.NewUintFromBigInt(res), nil
+}
+
+func safeUintAddSubOne(a, b sdkmath.Uint) (sdkmath.Uint, error) {
+	if a.IsNil() || b.IsNil() {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrUintUnititialized, "uint operand is nil")
+	}
+	res := new(big.Int).Add(a.BigInt(), b.BigInt())
+	if res.Sign() <= 0 {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrUnderflow, "uint subtraction underflow")
+	}
+	res.Sub(res, big.NewInt(1))
+	if res.BitLen() > sdkmath.MaxBitLen {
+		return sdkmath.ZeroUint(), errorsmod.Wrap(ErrOverflow, "uint range end overflow")
+	}
+	return sdkmath.NewUintFromBigInt(res), nil
 }

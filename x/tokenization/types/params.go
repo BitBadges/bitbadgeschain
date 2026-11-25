@@ -1,7 +1,10 @@
 package types
 
 import (
+	"fmt"
+
 	sdkmath "cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // NewParams creates a new Params instance
@@ -35,5 +38,13 @@ func DefaultParams() Params {
 
 // Validate validates the set of params
 func (p Params) Validate() error {
+	if !p.AffiliatePercentage.IsNil() && p.AffiliatePercentage.GT(sdkmath.NewUint(10000)) {
+		return fmt.Errorf("affiliatePercentage cannot exceed 10000, got %s", p.AffiliatePercentage.String())
+	}
+	for _, denom := range p.AllowedDenoms {
+		if err := sdk.ValidateDenom(denom); err != nil {
+			return fmt.Errorf("invalid allowed denom %q: %w", denom, err)
+		}
+	}
 	return nil
 }

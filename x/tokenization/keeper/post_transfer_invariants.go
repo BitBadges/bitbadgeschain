@@ -78,17 +78,31 @@ func (k Keeper) CheckPostTransferInvariants(
 func (k Keeper) checkMaxSupplyPerIdInvariant(ctx sdk.Context, collection *types.TokenCollection, maxSupply types.Uint) error {
 	balanceKey := ConstructBalanceKey(types.TotalAddress, collection.CollectionId)
 	totalBalance, found := k.GetUserBalanceFromStore(ctx, balanceKey)
-	if !found {
-		return nil // No balances, invariant passes
-	}
-
-	for _, balance := range totalBalance.Balances {
-		if balance.Amount.GT(maxSupply) {
-			return sdkerrors.Wrapf(types.ErrInvalidRequest,
-				"maxSupplyPerId invariant violated: amount %s exceeds max %s",
-				balance.Amount.String(), maxSupply.String())
+	if found {
+		for _, balance := range totalBalance.Balances {
+			if balance.Amount.GT(maxSupply) {
+				return sdkerrors.Wrapf(types.ErrInvalidRequest,
+					"maxSupplyPerId invariant violated: amount %s exceeds max %s",
+					balance.Amount.String(), maxSupply.String())
+			}
 		}
 	}
+
+	// For collections with a backed path, circulating supply is tracked in collection stats
+	// rather than the Mint/Total accumulator.
+	if collection.Invariants != nil && collection.Invariants.CosmosCoinBackedPath != nil {
+		stats, statsFound := k.GetCollectionStatsFromStore(ctx, collection.CollectionId)
+		if statsFound {
+			for _, balance := range stats.Balances {
+				if balance.Amount.GT(maxSupply) {
+					return sdkerrors.Wrapf(types.ErrInvalidRequest,
+						"maxSupplyPerId invariant violated: backed circulating amount %s exceeds max %s",
+						balance.Amount.String(), maxSupply.String())
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -135,10 +149,11 @@ func (k Keeper) checkPostTransferEVMQueryInvariants(
 
 		// Determine gas limit
 		gasLimit := DefaultPostTransferEVMQueryGasLimit
-		if !challenge.GasLimit.IsZero() {
-			gasLimit = challenge.GasLimit.Uint64()
-			if gasLimit > MaxPostTransferEVMQueryGasLimit {
+		if !challenge.GasLimit.IsNil() && !challenge.GasLimit.IsZero() {
+			if !challenge.GasLimit.BigInt().IsUint64() || challenge.GasLimit.Uint64() > MaxPostTransferEVMQueryGasLimit {
 				gasLimit = MaxPostTransferEVMQueryGasLimit
+			} else {
+				gasLimit = challenge.GasLimit.Uint64()
 			}
 		}
 

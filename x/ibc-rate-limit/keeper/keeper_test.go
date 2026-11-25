@@ -384,15 +384,15 @@ func (suite *KeeperTestSuite) TestCheckRateLimit_UniqueSenders() {
 
 	ack := suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender1)
 	suite.Require().True(ack.Success())
-	suite.keeper.AddUniqueSender(suite.ctx, channelID, sender1, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
+	suite.keeper.AddUniqueSender(suite.ctx, channelID, denom, sender1, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 
 	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender2)
 	suite.Require().True(ack.Success())
-	suite.keeper.AddUniqueSender(suite.ctx, channelID, sender2, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
+	suite.keeper.AddUniqueSender(suite.ctx, channelID, denom, sender2, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 
 	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender3)
 	suite.Require().True(ack.Success())
-	suite.keeper.AddUniqueSender(suite.ctx, channelID, sender3, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
+	suite.keeper.AddUniqueSender(suite.ctx, channelID, denom, sender3, ratelimittypes.TimeframeType_TIMEFRAME_TYPE_BLOCK, 1)
 
 	// 4th unique sender should be rejected
 	ack = suite.keeper.CheckRateLimit(suite.ctx, channelID, denom, sdkmath.NewInt(1000), true, sender4)

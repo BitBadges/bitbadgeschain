@@ -49,9 +49,9 @@ func (k Keeper) DeductAndGetUserApprovals(
 
 	addToPotentialErrors := func(errorMsg string, idx int) {
 		exists := false
-		for _, errorWithIdx := range errorsWithIdx {
-			if errorWithIdx.Idx == idx {
-				errorWithIdx.ErrorMsgs = append(errorWithIdx.ErrorMsgs, errorMsg)
+		for i := range errorsWithIdx {
+			if errorsWithIdx[i].Idx == idx {
+				errorsWithIdx[i].ErrorMsgs = append(errorsWithIdx[i].ErrorMsgs, errorMsg)
 				exists = true
 				break
 			}
@@ -283,7 +283,13 @@ func (k Keeper) DeductAndGetUserApprovals(
 				}
 
 				if scalingMultiplier.GT(sdkmath.NewUint(1)) && len(approvalCriteria.CoinTransfers) > 0 {
-					coinTransfersToExecute = scaleCoinTransfers(approvalCriteria.CoinTransfers, scalingMultiplier)
+					var scaleErr error
+					coinTransfersToExecute, scaleErr = scaleCoinTransfers(approvalCriteria.CoinTransfers, scalingMultiplier)
+					if scaleErr != nil {
+						addPotentialError(isExplicitlyPrioritized, idx, scaleErr.Error())
+						rollbackOnFailure()
+						continue
+					}
 				}
 			}
 
@@ -768,50 +774,55 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		LastUpdatedAt: sdkmath.NewUint(uint64(ctx.BlockTime().UnixMilli())),
 	}
 
-	needToFetchApprovalTrackerDetails := maxNumTransfers.GT(sdkmath.NewUint(0)) ||
-		approvedAmount.GT(sdkmath.NewUint(0)) ||
+	amountsActive := approvedAmount.GT(sdkmath.NewUint(0))
+	maxNumActive := maxNumTransfers.GT(sdkmath.NewUint(0)) ||
 		isCustomChallengeOrderCalculation(approvalCriteria.PredeterminedBalances, trackerType)
+	needToFetchApprovalTrackerDetails := amountsActive || maxNumActive
 
 	var err error
 	if needToFetchApprovalTrackerDetails {
-		var resetTimeIntervals *types.ResetTimeIntervals
-		if approvalCriteria.ApprovalAmounts != nil {
-			resetTimeIntervals = approvalCriteria.ApprovalAmounts.ResetTimeIntervals
-		}
-		amountsTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
-			ctx,
-			collection.CollectionId,
-			approverAddress,
-			approval.ApprovalId,
-			amountsTrackerId,
-			approvalLevel,
-			trackerType,
-			address,
-			resetTimeIntervals,
-			false,
-		)
-		if err != nil {
-			return "", err
+		if amountsActive {
+			var resetTimeIntervals *types.ResetTimeIntervals
+			if approvalCriteria.ApprovalAmounts != nil {
+				resetTimeIntervals = approvalCriteria.ApprovalAmounts.ResetTimeIntervals
+			}
+			amountsTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
+				ctx,
+				collection.CollectionId,
+				approverAddress,
+				approval.ApprovalId,
+				amountsTrackerId,
+				approvalLevel,
+				trackerType,
+				address,
+				resetTimeIntervals,
+				false,
+			)
+			if err != nil {
+				return "", err
+			}
 		}
 
-		var maxNumTransfersResetTimeIntervals *types.ResetTimeIntervals
-		if approvalCriteria.MaxNumTransfers != nil {
-			maxNumTransfersResetTimeIntervals = approvalCriteria.MaxNumTransfers.ResetTimeIntervals
-		}
-		maxNumTransfersTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
-			ctx,
-			collection.CollectionId,
-			approverAddress,
-			approval.ApprovalId,
-			maxNumTransfersTrackerId,
-			approvalLevel,
-			trackerType,
-			address,
-			maxNumTransfersResetTimeIntervals,
-			true,
-		)
-		if err != nil {
-			return "", err
+		if maxNumActive {
+			var maxNumTransfersResetTimeIntervals *types.ResetTimeIntervals
+			if approvalCriteria.MaxNumTransfers != nil {
+				maxNumTransfersResetTimeIntervals = approvalCriteria.MaxNumTransfers.ResetTimeIntervals
+			}
+			maxNumTransfersTrackerDetails, err = k.GetApprovalTrackerFromStoreAndResetIfNeeded(
+				ctx,
+				collection.CollectionId,
+				approverAddress,
+				approval.ApprovalId,
+				maxNumTransfersTrackerId,
+				approvalLevel,
+				trackerType,
+				address,
+				maxNumTransfersResetTimeIntervals,
+				true,
+			)
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 
@@ -831,7 +842,7 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 	}
 
 	// Handle amount approvals
-	if approvedAmount.GT(sdkmath.NewUint(0)) {
+	if amountsActive {
 		currTallyForCurrentIdsAndTimes, err := types.GetBalancesForIds(
 			ctx,
 			approval.TokenIds,
@@ -866,20 +877,18 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 		if err != nil {
 			return "", err
 		}
-
 	}
 
 	// Handle max transfers tracking
-	if maxNumTransfers.GT(sdkmath.NewUint(0)) || isCustomChallengeOrderCalculation(approvalCriteria.PredeterminedBalances, trackerType) {
+	if maxNumActive {
 		maxNumTransfersTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers.Add(sdkmath.NewUint(1))
 		if maxNumTransfers.GT(sdkmath.NewUint(0)) && maxNumTransfersTrackerDetails.NumTransfers.GT(maxNumTransfers) {
 			detErrMsg := fmt.Sprintf("exceeded max transfers allowed - %s", maxNumTransfers.String())
 			return detErrMsg, sdkerrors.Wrap(ErrDisallowedTransfer, detErrMsg)
 		}
-
 	}
 
-	// Handle event emission and store updates
+	// Handle event emission and store updates only for active trackers
 	if needToFetchApprovalTrackerDetails {
 		marshalToString := func(v interface{}) (string, error) {
 			data, err := json.Marshal(v)
@@ -889,28 +898,23 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 			return string(data), nil
 		}
 
-		amountsStr, err := marshalToString(amountsTrackerDetails.Amounts)
-		if err != nil {
-			return "", err
-		}
-
-		numTransfersStr, err := marshalToString(maxNumTransfersTrackerDetails.NumTransfers)
-		if err != nil {
-			return "", err
-		}
-
-		amountsNumTransfersStr, err := marshalToString(amountsTrackerDetails.NumTransfers)
-		if err != nil {
-			return "", err
-		}
-
-		maxNumTransfersAmountsStr, err := marshalToString(maxNumTransfersTrackerDetails.Amounts)
-		if err != nil {
-			return "", err
-		}
-
-		isSameId := amountsTrackerId == maxNumTransfersTrackerId
+		isSameId := amountsActive && maxNumActive && amountsTrackerId == maxNumTransfersTrackerId
 		if isSameId {
+			mergedTracker := amountsTrackerDetails
+			mergedTracker.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers
+			if maxNumTransfersTrackerDetails.LastUpdatedAt.GT(mergedTracker.LastUpdatedAt) {
+				mergedTracker.LastUpdatedAt = maxNumTransfersTrackerDetails.LastUpdatedAt
+			}
+
+			amountsStr, err := marshalToString(mergedTracker.Amounts)
+			if err != nil {
+				return "", err
+			}
+			numTransfersStr, err := marshalToString(mergedTracker.NumTransfers)
+			if err != nil {
+				return "", err
+			}
+
 			EmitApprovalEvent(
 				ctx,
 				collection.CollectionId,
@@ -922,17 +926,16 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				address,
 				amountsStr,
 				numTransfersStr,
-				maxNumTransfersTrackerDetails.LastUpdatedAt,
+				mergedTracker.LastUpdatedAt,
 			)
 
-			amountsTrackerDetails.NumTransfers = maxNumTransfersTrackerDetails.NumTransfers
 			err = k.SetApprovalTrackerInStore(
 				ctx,
 				collection.CollectionId,
 				approverAddress,
 				approval.ApprovalId,
 				amountsTrackerId,
-				amountsTrackerDetails,
+				mergedTracker,
 				approvalLevel,
 				trackerType,
 				address,
@@ -941,62 +944,84 @@ func (k Keeper) IncrementApprovalsAndAssertWithinThreshold(
 				return "", err
 			}
 		} else {
-			EmitApprovalEvent(
-				ctx,
-				collection.CollectionId,
-				approverAddress,
-				approval.ApprovalId,
-				amountsTrackerId,
-				approvalLevel,
-				trackerType,
-				address,
-				amountsStr,
-				amountsNumTransfersStr,
-				maxNumTransfersTrackerDetails.LastUpdatedAt,
-			)
+			if amountsActive {
+				amountsStr, err := marshalToString(amountsTrackerDetails.Amounts)
+				if err != nil {
+					return "", err
+				}
+				amountsNumTransfersStr, err := marshalToString(amountsTrackerDetails.NumTransfers)
+				if err != nil {
+					return "", err
+				}
 
-			EmitApprovalEvent(
-				ctx,
-				collection.CollectionId,
-				approverAddress,
-				approval.ApprovalId,
-				maxNumTransfersTrackerId,
-				approvalLevel,
-				trackerType,
-				address,
-				maxNumTransfersAmountsStr,
-				numTransfersStr,
-				maxNumTransfersTrackerDetails.LastUpdatedAt,
-			)
+				EmitApprovalEvent(
+					ctx,
+					collection.CollectionId,
+					approverAddress,
+					approval.ApprovalId,
+					amountsTrackerId,
+					approvalLevel,
+					trackerType,
+					address,
+					amountsStr,
+					amountsNumTransfersStr,
+					amountsTrackerDetails.LastUpdatedAt,
+				)
 
-			err = k.SetApprovalTrackerInStore(
-				ctx,
-				collection.CollectionId,
-				approverAddress,
-				approval.ApprovalId,
-				amountsTrackerId,
-				amountsTrackerDetails,
-				approvalLevel,
-				trackerType,
-				address,
-			)
-			if err != nil {
-				return "", err
+				err = k.SetApprovalTrackerInStore(
+					ctx,
+					collection.CollectionId,
+					approverAddress,
+					approval.ApprovalId,
+					amountsTrackerId,
+					amountsTrackerDetails,
+					approvalLevel,
+					trackerType,
+					address,
+				)
+				if err != nil {
+					return "", err
+				}
 			}
 
-			err = k.SetApprovalTrackerInStore(
-				ctx,
-				collection.CollectionId,
-				approverAddress,
-				approval.ApprovalId,
-				maxNumTransfersTrackerId,
-				maxNumTransfersTrackerDetails,
-				approvalLevel,
-				trackerType,
-				address,
-			)
-			if err != nil {
-				return "", err
+			if maxNumActive {
+				maxNumTransfersAmountsStr, err := marshalToString(maxNumTransfersTrackerDetails.Amounts)
+				if err != nil {
+					return "", err
+				}
+				numTransfersStr, err := marshalToString(maxNumTransfersTrackerDetails.NumTransfers)
+				if err != nil {
+					return "", err
+				}
+
+				EmitApprovalEvent(
+					ctx,
+					collection.CollectionId,
+					approverAddress,
+					approval.ApprovalId,
+					maxNumTransfersTrackerId,
+					approvalLevel,
+					trackerType,
+					address,
+					maxNumTransfersAmountsStr,
+					numTransfersStr,
+					maxNumTransfersTrackerDetails.LastUpdatedAt,
+				)
+
+				err = k.SetApprovalTrackerInStore(
+					ctx,
+					collection.CollectionId,
+					approverAddress,
+					approval.ApprovalId,
+					maxNumTransfersTrackerId,
+					maxNumTransfersTrackerDetails,
+					approvalLevel,
+					trackerType,
+					address,
+				)
+				if err != nil {
+					return "", err
+				}
 			}
 		}
 	}

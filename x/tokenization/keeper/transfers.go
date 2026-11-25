@@ -314,10 +314,13 @@ func (k Keeper) HandleTransfer(
 	isSendingFromSpecialAddress := k.IsBackedOrWrappingPathAddress(ctx, collection, from)
 	isSendingToSpecialAddress := k.IsBackedOrWrappingPathAddress(ctx, collection, to)
 
-	// Little hacky way of doing this, but any transfer on the collection level that involves special addresses
-	// should always specify the collection approvals
+	// Transfers involving special addresses require explicit collection approval prioritization.
+	// Use a per-recipient shallow copy so this flag never leaks to subsequent recipients.
+	transferForRecipient := transfer
 	if isSendingFromSpecialAddress || isSendingToSpecialAddress {
-		transfer.OnlyCheckPrioritizedCollectionApprovals = true
+		copied := *transfer
+		copied.OnlyCheckPrioritizedCollectionApprovals = true
+		transferForRecipient = &copied
 	}
 
 	if isSendingFromSpecialAddress {
@@ -367,8 +370,8 @@ func (k Keeper) HandleTransfer(
 		ApprovalLevel:   "collection",
 	}
 
-	transferBalances := types.DeepCopyBalances(transfer.Balances)
-	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transfer, transferMetadata, eventTracking, "collection")
+	transferBalances := types.DeepCopyBalances(transferForRecipient.Balances)
+	userApprovals, err := k.DeductCollectionApprovalsAndGetUserApprovalsToCheck(ctx, collection, transferForRecipient, transferMetadata, eventTracking, "collection")
 	if err != nil {
 		return &types.UserBalanceStore{}, &types.UserBalanceStore{}, sdkerrors.Wrapf(err, "collection transferability error")
 	}
@@ -380,14 +383,14 @@ func (k Keeper) HandleTransfer(
 				From:                                    from,
 				ToAddresses:                             []string{to},
 				Balances:                                userApproval.Balances,
-				MerkleProofs:                            transfer.MerkleProofs,
-				EthSignatureProofs:                      transfer.EthSignatureProofs,
-				Memo:                                    transfer.Memo,
-				PrioritizedApprovals:                    transfer.PrioritizedApprovals,
-				OnlyCheckPrioritizedCollectionApprovals: transfer.OnlyCheckPrioritizedCollectionApprovals,
-				OnlyCheckPrioritizedIncomingApprovals:   transfer.OnlyCheckPrioritizedIncomingApprovals,
-				OnlyCheckPrioritizedOutgoingApprovals:   transfer.OnlyCheckPrioritizedOutgoingApprovals,
-				PrecalculateBalancesFromApproval:        transfer.PrecalculateBalancesFromApproval,
+				MerkleProofs:                            transferForRecipient.MerkleProofs,
+				EthSignatureProofs:                      transferForRecipient.EthSignatureProofs,
+				Memo:                                    transferForRecipient.Memo,
+				PrioritizedApprovals:                    transferForRecipient.PrioritizedApprovals,
+				OnlyCheckPrioritizedCollectionApprovals: transferForRecipient.OnlyCheckPrioritizedCollectionApprovals,
+				OnlyCheckPrioritizedIncomingApprovals:   transferForRecipient.OnlyCheckPrioritizedIncomingApprovals,
+				OnlyCheckPrioritizedOutgoingApprovals:   transferForRecipient.OnlyCheckPrioritizedOutgoingApprovals,
+				PrecalculateBalancesFromApproval:        transferForRecipient.PrecalculateBalancesFromApproval,
 			}
 
 			if userApproval.Outgoing {

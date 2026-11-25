@@ -50,12 +50,19 @@ func NewKeeper(
 	return Keeper{
 		cdc:                cdc,
 		storeService:       storeService,
-		logger:             nil, // Will be set via SetLogger if needed
+		logger:             log.NewNopLogger(),
 		authority:          authority,
 		addressCodec:       addressCodec,
 		bankKeeper:         bankKeeper,
 		distributionKeeper: distributionKeeper,
 		aliasRouter:        new(types.AliasDenomRouter), // allocate pointer, nil value inside
+	}
+}
+
+// SetLogger configures the logger used by the keeper.
+func (k *Keeper) SetLogger(logger log.Logger) {
+	if logger != nil {
+		k.logger = logger
 	}
 }
 
@@ -104,7 +111,11 @@ func (k Keeper) getRouterForDenom(ctx sdk.Context, denom string) (types.AliasDen
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger() log.Logger {
-	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
+	logger := k.logger
+	if logger == nil {
+		logger = log.NewNopLogger()
+	}
+	return logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 // SendCoinWithAliasRouting sends a coin using the appropriate routing (alias denom or bank)

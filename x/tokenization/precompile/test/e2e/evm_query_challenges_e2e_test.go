@@ -264,6 +264,11 @@ func (s *EVMQueryChallengesE2ESuite) TestE2E_ApprovalFlow_MinBankBalance() {
 		Transfers: []*tokenizationtypes.Transfer{{
 			From: s.Alice.String(), ToAddresses: []string{s.Bob.String()},
 			Balances: []*tokenizationtypes.Balance{{Amount: sdkmath.NewUint(5), TokenIds: getValidIdRanges(), OwnershipTimes: getFullRanges()}},
+			PrioritizedApprovals: []*tokenizationtypes.ApprovalIdentifierDetails{{
+				ApprovalId:    "transfer",
+				ApprovalLevel: "collection",
+				Version:       sdkmath.ZeroUint(),
+			}},
 		}},
 	})
 	s.Require().NoError(err, "transfer with min bank balance approval should succeed")

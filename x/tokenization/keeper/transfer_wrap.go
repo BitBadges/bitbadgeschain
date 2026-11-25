@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"math/big"
 	"strings"
 
 	"github.com/bitbadges/bitbadgeschain/x/tokenization/types"
@@ -133,7 +134,7 @@ func (k Keeper) HandleSpecialAddressWrapping(
 	if err := sdk.ValidateDenom(ibcDenom); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidConversion, "wrapped denom %s is not a valid bank denom", ibcDenom)
 	}
-	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
+	amountInt := new(big.Int).Mul(multiplier.BigInt(), denomInfo.Conversion.SideA.Amount.BigInt())
 	if amountInt.BitLen() > sdkmath.MaxBitLen {
 		return sdkerrors.Wrapf(ErrInvalidConversion, "wrapped amount exceeds the maximum bank coin amount")
 	}
@@ -251,7 +252,7 @@ func (k Keeper) HandleSpecialAddressBacking(
 		return err
 	}
 
-	amountInt := multiplier.Mul(denomInfo.Conversion.SideA.Amount).BigInt()
+	amountInt := new(big.Int).Mul(multiplier.BigInt(), denomInfo.Conversion.SideA.Amount.BigInt())
 	if amountInt.BitLen() > sdkmath.MaxBitLen {
 		return sdkerrors.Wrapf(ErrInvalidConversion, "backed amount exceeds the maximum bank coin amount")
 	}

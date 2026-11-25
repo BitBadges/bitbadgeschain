@@ -9,16 +9,14 @@ import (
 )
 
 func (k msgServer) DeleteManagerSplitter(goCtx context.Context, msg *types.MsgDeleteManagerSplitter) (*types.MsgDeleteManagerSplitterResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// Validate admin address
-	_, err := sdk.AccAddressFromBech32(msg.Admin)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAdmin, err.Error())
+	if msg == nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidRequest, "message cannot be nil")
 	}
-	if err := types.ValidateCanonicalAddresses(nil, msg.Admin, msg.Address); err != nil {
+	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get existing manager splitter
 	managerSplitter, found := k.GetManagerSplitterFromStore(ctx, msg.Address)

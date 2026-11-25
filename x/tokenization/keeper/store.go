@@ -41,6 +41,35 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 			if err := k.ValidateEVMQueryChallengesAreContracts(ctx, collection.Invariants.EvmQueryChallenges); err != nil {
 				return sdkerrors.Wrap(err, "collection invariants EVM query challenges")
 			}
+			if collection.Invariants.NoCustomOwnershipTimes && collection.DefaultBalances != nil {
+				for _, incomingApproval := range collection.DefaultBalances.IncomingApprovals {
+					if err := types.ValidateNoCustomOwnershipTimesInvariant(incomingApproval.OwnershipTimes, true); err != nil {
+						return sdkerrors.Wrap(err, "default balances incoming approval ownership times validation failed")
+					}
+				}
+				for _, outgoingApproval := range collection.DefaultBalances.OutgoingApprovals {
+					if err := types.ValidateNoCustomOwnershipTimesInvariant(outgoingApproval.OwnershipTimes, true); err != nil {
+						return sdkerrors.Wrap(err, "default balances outgoing approval ownership times validation failed")
+					}
+				}
+			}
+		}
+	}
+
+	if collection.DefaultBalances != nil {
+		for _, approval := range collection.DefaultBalances.IncomingApprovals {
+			if approval != nil && approval.ApprovalCriteria != nil && len(approval.ApprovalCriteria.EvmQueryChallenges) > 0 {
+				if err := k.ValidateEVMQueryChallengesAreContracts(ctx, approval.ApprovalCriteria.EvmQueryChallenges); err != nil {
+					return sdkerrors.Wrapf(err, "default balances incoming approval %s", approval.ApprovalId)
+				}
+			}
+		}
+		for _, approval := range collection.DefaultBalances.OutgoingApprovals {
+			if approval != nil && approval.ApprovalCriteria != nil && len(approval.ApprovalCriteria.EvmQueryChallenges) > 0 {
+				if err := k.ValidateEVMQueryChallengesAreContracts(ctx, approval.ApprovalCriteria.EvmQueryChallenges); err != nil {
+					return sdkerrors.Wrapf(err, "default balances outgoing approval %s", approval.ApprovalId)
+				}
+			}
 		}
 	}
 
@@ -60,6 +89,10 @@ func (k Keeper) validateCollectionBeforeStore(ctx sdk.Context, collection *types
 
 // Sets a token in the store using BadgeKey ([]byte{0x01}) as the prefix. No check if store has key already.
 func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCollection, skipInvariants bool) error {
+	if collection == nil || collection.CollectionId.IsNil() || !collection.CollectionId.BigInt().IsUint64() {
+		return sdkerrors.Wrap(types.ErrInvalidCollectionID, "collection ID must be a valid uint64")
+	}
+
 	// Validate collection before storing
 	if !skipInvariants {
 		if err := k.validateCollectionBeforeStore(ctx, collection); err != nil {
@@ -87,11 +120,14 @@ func (k Keeper) SetCollectionInStore(ctx sdk.Context, collection *types.TokenCol
 
 // Gets a token from the store according to the collectionId.
 func (k Keeper) GetCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.TokenCollection, bool) {
+	var collection types.TokenCollection
+	if collectionId.IsNil() || !collectionId.BigInt().IsUint64() {
+		return &collection, false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_collection := store.Get(collectionStoreKey(collectionId))
 
-	var collection types.TokenCollection
 	if len(marshaled_collection) == 0 {
 		return &collection, false
 	}
@@ -119,6 +155,9 @@ func (k Keeper) GetCollectionsFromStore(ctx sdk.Context) (collections []*types.T
 
 // StoreHasCollectionID determines whether the specified collectionId exists
 func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId sdkmath.Uint) bool {
+	if collectionId.IsNil() || !collectionId.BigInt().IsUint64() {
+		return false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(collectionStoreKey(collectionId))
@@ -126,6 +165,9 @@ func (k Keeper) StoreHasCollectionID(ctx sdk.Context, collectionId sdkmath.Uint)
 
 // DeleteCollectionFromStore deletes a token from the store.
 func (k Keeper) DeleteCollectionFromStore(ctx sdk.Context, collectionId sdkmath.Uint) {
+	if collectionId.IsNil() || !collectionId.BigInt().IsUint64() {
+		return
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(collectionStoreKey(collectionId))
@@ -657,6 +699,9 @@ func (k Keeper) GetApprovalTrackerVersionFromStore(ctx sdk.Context, key string) 
 /****************************************DYNAMIC STORES****************************************/
 
 func (k Keeper) SetDynamicStoreInStore(ctx sdk.Context, dynamicStore types.DynamicStore) error {
+	if dynamicStore.StoreId.IsNil() || !dynamicStore.StoreId.BigInt().IsUint64() {
+		return sdkerrors.Wrap(types.ErrInvalidDynamicStoreID, "store ID must be a valid uint64")
+	}
 	marshaled_dynamic_store, err := k.cdc.Marshal(&dynamicStore)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.DynamicStore failed")
@@ -669,11 +714,14 @@ func (k Keeper) SetDynamicStoreInStore(ctx sdk.Context, dynamicStore types.Dynam
 }
 
 func (k Keeper) GetDynamicStoreFromStore(ctx sdk.Context, storeId sdkmath.Uint) (types.DynamicStore, bool) {
+	var dynamicStore types.DynamicStore
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return dynamicStore, false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_dynamic_store := store.Get(dynamicStoreStoreKey(storeId))
 
-	var dynamicStore types.DynamicStore
 	if len(marshaled_dynamic_store) == 0 {
 		return dynamicStore, false
 	}
@@ -699,12 +747,18 @@ func (k Keeper) GetDynamicStoresFromStore(ctx sdk.Context) (dynamicStores []*typ
 }
 
 func (k Keeper) StoreHasDynamicStore(ctx sdk.Context, storeId sdkmath.Uint) bool {
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(dynamicStoreStoreKey(storeId))
 }
 
 func (k Keeper) DeleteDynamicStoreFromStore(ctx sdk.Context, storeId sdkmath.Uint) {
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(dynamicStoreStoreKey(storeId))
@@ -742,8 +796,8 @@ func (k Keeper) IncrementNextDynamicStoreId(ctx sdk.Context) error {
 // Sets a dynamic store value in the store using DynamicStoreValueKey ([]byte{0x0F}) as the prefix.
 func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uint, address string, value bool) error {
 	// Validate inputs
-	if storeId.IsZero() {
-		return sdkerrors.Wrapf(types.ErrInvalidRequest, "store ID cannot be zero")
+	if storeId.IsNil() || storeId.IsZero() || !storeId.BigInt().IsUint64() {
+		return sdkerrors.Wrapf(types.ErrInvalidDynamicStoreID, "store ID must be a non-zero uint64")
 	}
 	if address == "" {
 		return sdkerrors.Wrapf(types.ErrInvalidRequest, "address cannot be empty")
@@ -768,11 +822,14 @@ func (k Keeper) SetDynamicStoreValueInStore(ctx sdk.Context, storeId sdkmath.Uin
 
 // Gets a dynamic store value from the store according to the storeId and address.
 func (k Keeper) GetDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmath.Uint, address string) (types.DynamicStoreValue, bool) {
+	var dynamicStoreValue types.DynamicStoreValue
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return dynamicStoreValue, false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled_value := store.Get(dynamicStoreValueStoreKey(storeId, address))
 
-	var dynamicStoreValue types.DynamicStoreValue
 	if len(marshaled_value) == 0 {
 		return dynamicStoreValue, false
 	}
@@ -782,6 +839,9 @@ func (k Keeper) GetDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmath.U
 
 // GetDynamicStoreValuesFromStore defines a method for returning all dynamic store values for a given store.
 func (k Keeper) GetDynamicStoreValuesFromStore(ctx sdk.Context, storeId sdkmath.Uint) (dynamicStoreValues []*types.DynamicStoreValue) {
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return nil
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	// Use fixed-width binary encoding to prevent prefix collisions
@@ -823,6 +883,9 @@ func (k Keeper) GetAllDynamicStoreValuesFromStore(ctx sdk.Context) (dynamicStore
 
 // StoreHasDynamicStoreValue determines whether the specified dynamic store value exists in the store
 func (k Keeper) StoreHasDynamicStoreValue(ctx sdk.Context, storeId sdkmath.Uint, address string) bool {
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	return store.Has(dynamicStoreValueStoreKey(storeId, address))
@@ -830,9 +893,36 @@ func (k Keeper) StoreHasDynamicStoreValue(ctx sdk.Context, storeId sdkmath.Uint,
 
 // DeleteDynamicStoreValueFromStore deletes a dynamic store value from the store.
 func (k Keeper) DeleteDynamicStoreValueFromStore(ctx sdk.Context, storeId sdkmath.Uint, address string) {
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Delete(dynamicStoreValueStoreKey(storeId, address))
+}
+
+// DeleteAllDynamicStoreValues removes all values stored under the given dynamic store ID.
+func (k Keeper) DeleteAllDynamicStoreValues(ctx sdk.Context, storeId sdkmath.Uint) {
+	if storeId.IsNil() || !storeId.BigInt().IsUint64() {
+		return
+	}
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	valuePrefix := make([]byte, len(DynamicStoreValueKey)+IDLength)
+	copy(valuePrefix, DynamicStoreValueKey)
+	binary.BigEndian.PutUint64(valuePrefix[len(DynamicStoreValueKey):], storeId.Uint64())
+
+	iterator := storetypes.KVStorePrefixIterator(store, valuePrefix)
+	var keysToDelete [][]byte
+	for ; iterator.Valid(); iterator.Next() {
+		keysToDelete = append(keysToDelete, append([]byte(nil), iterator.Key()...))
+	}
+	if err := iterator.Close(); err != nil {
+		k.Logger().Error("failed to close dynamic store values delete iterator", "error", err)
+	}
+	for _, key := range keysToDelete {
+		store.Delete(key)
+	}
 }
 
 /****************************************ETH SIGNATURE TRACKERS****************************************/
@@ -1125,6 +1215,9 @@ func (k Keeper) GetAllReservedProtocolAddressesFromStore(ctx sdk.Context) []stri
 
 // SetCollectionStatsInStore stores collection stats by collection ID.
 func (k Keeper) SetCollectionStatsInStore(ctx sdk.Context, collectionId sdkmath.Uint, stats *types.CollectionStats) error {
+	if collectionId.IsNil() || !collectionId.BigInt().IsUint64() {
+		return sdkerrors.Wrap(types.ErrInvalidCollectionID, "collection ID must be a valid uint64")
+	}
 	marshaled, err := k.cdc.Marshal(stats)
 	if err != nil {
 		return sdkerrors.Wrap(err, "Marshal types.CollectionStats failed")
@@ -1138,6 +1231,12 @@ func (k Keeper) SetCollectionStatsInStore(ctx sdk.Context, collectionId sdkmath.
 // GetCollectionStatsFromStore returns collection stats by collection ID.
 // When not found, returns default zero stats and false.
 func (k Keeper) GetCollectionStatsFromStore(ctx sdk.Context, collectionId sdkmath.Uint) (*types.CollectionStats, bool) {
+	if collectionId.IsNil() || !collectionId.BigInt().IsUint64() {
+		return &types.CollectionStats{
+			HolderCount: sdkmath.ZeroUint(),
+			Balances:    []*types.Balance{},
+		}, false
+	}
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	marshaled := store.Get(collectionStatsStoreKey(collectionId))

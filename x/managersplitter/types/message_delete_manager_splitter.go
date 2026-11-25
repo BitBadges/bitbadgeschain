@@ -6,6 +6,9 @@ import (
 )
 
 func (msg *MsgDeleteManagerSplitter) ValidateBasic() error {
+	if msg == nil {
+		return sdkerrors.Wrap(ErrInvalidRequest, "message cannot be nil")
+	}
 	// Validate admin address format
 	adminAddr, err := sdk.AccAddressFromBech32(msg.Admin)
 	if err != nil {

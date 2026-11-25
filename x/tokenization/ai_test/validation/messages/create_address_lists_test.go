@@ -70,9 +70,6 @@ func TestMsgCreateAddressLists_ValidateBasic_ReservedListId_Mint(t *testing.T) {
 }
 
 func TestMsgCreateAddressLists_ValidateBasic_ReservedListId_All(t *testing.T) {
-	// Note: "All" is reserved at the keeper level, but ValidateBasic doesn't check for it
-	// ValidateAddressListInput only checks for: "", "Mint", "Manager", "AllWithoutMint", "None"
-	// So "All" passes ValidateBasic but will fail at keeper level
 	msg := &types.MsgCreateAddressLists{
 		Creator: "bb1e0w5t53nrq7p66fye6c8p0ynyhf6y24lke5430",
 		AddressLists: []*types.AddressListInput{
@@ -84,7 +81,7 @@ func TestMsgCreateAddressLists_ValidateBasic_ReservedListId_All(t *testing.T) {
 	}
 
 	err := msg.ValidateBasic()
-	require.NoError(t, err, "All passes ValidateBasic (rejected at keeper level)")
+	require.Error(t, err, "All as list ID should fail validation")
 }
 
 func TestMsgCreateAddressLists_ValidateBasic_ListIdWithColon(t *testing.T) {
