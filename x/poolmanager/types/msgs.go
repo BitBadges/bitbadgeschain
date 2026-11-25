@@ -17,6 +17,7 @@ const (
 	TypeMsgSetDenomPairTakerFee                  = "set_denom_pair_taker_fee"
 	TypeMsgSetTakerFeeShareAgreementForDenomPair = "set_taker_fee_share_agreement_for_denom_pair"
 	TypeMsgSetRegisteredAlloyedPool              = "set_registered_alloyed_pool"
+	TypeMsgUpdateParams                          = "update_params"
 )
 
 var _ sdk.Msg = &MsgSwapExactAmountIn{}
@@ -241,4 +242,24 @@ func (msg MsgSetRegisteredAlloyedPool) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{sender}
+}
+
+var _ sdk.Msg = &MsgUpdateParams{}
+
+func (msg MsgUpdateParams) Route() string { return RouterKey }
+func (msg MsgUpdateParams) Type() string  { return TypeMsgUpdateParams }
+func (msg MsgUpdateParams) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address (%s)", err)
+	}
+
+	return msg.Params.Validate()
+}
+
+func (msg MsgUpdateParams) GetSigners() []sdk.AccAddress {
+	authority, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{authority}
 }

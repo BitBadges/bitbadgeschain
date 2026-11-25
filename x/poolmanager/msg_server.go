@@ -187,3 +187,30 @@ func (server msgServer) SetTakerFeeShareAgreementForDenom(goCtx context.Context,
 
 	return &types.MsgSetTakerFeeShareAgreementForDenomResponse{}, nil
 }
+
+func (server msgServer) UpdateParams(goCtx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if msg == nil {
+		return nil, fmt.Errorf("message cannot be nil")
+	}
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	govAddr := server.keeper.accountKeeper.GetModuleAccount(ctx, govtypes.ModuleName)
+	if govAddr == nil || msg.Authority != govAddr.GetAddress().String() {
+		return nil, types.ErrUnauthorizedGov
+	}
+
+	server.keeper.SetParams(ctx, msg.Params)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.TypeMsgUpdateParams,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return &types.MsgUpdateParamsResponse{}, nil
+}

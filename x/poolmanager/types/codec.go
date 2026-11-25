@@ -14,6 +14,9 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSwapExactAmountOut{}, "poolmanager/SwapExactAmountOut", nil)
 	cdc.RegisterConcrete(&MsgSplitRouteSwapExactAmountIn{}, "poolmanager/SplitRouteSwapExactAmountIn", nil)
 	cdc.RegisterConcrete(&MsgSplitRouteSwapExactAmountOut{}, "poolmanager/SplitRouteSwapExactAmountOut", nil)
+	cdc.RegisterConcrete(&MsgSetDenomPairTakerFee{}, "poolmanager/SetDenomPairTakerFee", nil)
+	cdc.RegisterConcrete(&MsgSetTakerFeeShareAgreementForDenom{}, "poolmanager/SetTakerFeeShareAgreementForDenom", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "poolmanager/MsgUpdateParams", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -23,6 +26,9 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgSwapExactAmountOut{},
 		&MsgSplitRouteSwapExactAmountIn{},
 		&MsgSplitRouteSwapExactAmountOut{},
+		&MsgSetDenomPairTakerFee{},
+		&MsgSetTakerFeeShareAgreementForDenom{},
+		&MsgUpdateParams{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
