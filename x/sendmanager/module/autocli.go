@@ -22,6 +22,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:       "balance [address] [denom]",
 					Short:     "Query balance of a specific denom for an address with alias routing",
 					Long:      "Query the balance of a specific denomination for an address. Supports both standard coins and alias denoms (e.g., badgeslp:).",
+					Example:   "bitbadgeschaind query sendmanager balance bb1... badgeslp:1:utoken",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "address"},
+						{ProtoField: "denom"},
+					},
 				},
 				// this line is used by ignite scaffolding # autocli/query
 			},
@@ -36,10 +41,15 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod: "SendWithAliasRouting",
-					Use:       "send-with-alias-routing [from_address] [to_address] [amount]",
+					Use:       "send-with-alias-routing [from_key_or_address] [to_address] [amount]",
 					Short:     "Send coins with alias denom routing",
 					Long:      "Send coins from one address to another. Supports both standard coins and alias denoms (e.g., badgeslp:). This mirrors cosmos bank MsgSend but routes through sendmanager.",
-					Example:   "bitbadgeschaind tx sendmanager send-with-alias-routing cosmos1abc... cosmos1def... 1000uatom",
+					Example:   "bitbadgeschaind tx sendmanager send-with-alias-routing alice bb1... 1000ubadge 5badgeslp:1:utoken",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "from_address"},
+						{ProtoField: "to_address"},
+						{ProtoField: "amount", Varargs: true},
+					},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
