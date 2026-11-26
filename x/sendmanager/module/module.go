@@ -12,31 +12,30 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	
 
+	"github.com/bitbadges/bitbadgeschain/x/sendmanager/client/cli"
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/sendmanager/types"
-	
 )
 
 var (
 	_ module.AppModuleBasic = (*AppModule)(nil)
 	_ module.AppModule      = (*AppModule)(nil)
-	_ module.HasGenesis	  = (*AppModule)(nil)
+	_ module.HasGenesis     = (*AppModule)(nil)
 
 	_ appmodule.AppModule       = (*AppModule)(nil)
 	_ appmodule.HasBeginBlocker = (*AppModule)(nil)
 	_ appmodule.HasEndBlocker   = (*AppModule)(nil)
-	
 )
 
 // AppModule implements the AppModule interface that defines the inter-dependent methods that modules need to implement
 type AppModule struct {
-	cdc           codec.Codec
-	keeper        keeper.Keeper
-	authKeeper    types.AuthKeeper
-	bankKeeper    types.BankKeeper
+	cdc        codec.Codec
+	keeper     keeper.Keeper
+	authKeeper types.AuthKeeper
+	bankKeeper types.BankKeeper
 }
 
 func NewAppModule(
@@ -46,10 +45,10 @@ func NewAppModule(
 	bankKeeper types.BankKeeper,
 ) AppModule {
 	return AppModule{
-		cdc:           cdc,
-		keeper:        keeper,
-		authKeeper:    authKeeper,
-		bankKeeper:    bankKeeper,
+		cdc:        cdc,
+		keeper:     keeper,
+		authKeeper: authKeeper,
+		bankKeeper: bankKeeper,
 	}
 }
 
@@ -59,6 +58,18 @@ func (AppModule) IsAppModule() {}
 // Name returns the name of the module as a string.
 func (AppModule) Name() string {
 	return types.ModuleName
+}
+
+// GetTxCmd returns the custom tx commands that accept both positional args
+// and the v36 flag form for send-with-alias-routing.
+func (AppModule) GetTxCmd() *cobra.Command {
+	return cli.GetTxCmd()
+}
+
+// GetQueryCmd returns the custom query commands that accept both positional
+// args and the v36 flag form for balance.
+func (AppModule) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
 }
 
 // RegisterLegacyAminoCodec registers the amino codec
@@ -80,8 +91,8 @@ func (AppModule) RegisterInterfaces(registrar codectypes.InterfaceRegistry) {
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(registrar grpc.ServiceRegistrar) error {
-    types.RegisterMsgServer(registrar, keeper.NewMsgServerImpl(am.keeper))
-    types.RegisterQueryServer(registrar, keeper.NewQueryServerImpl(am.keeper))
+	types.RegisterMsgServer(registrar, keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterQueryServer(registrar, keeper.NewQueryServerImpl(am.keeper))
 
 	return nil
 }
@@ -146,4 +157,3 @@ func (am AppModule) BeginBlock(_ context.Context) error {
 func (am AppModule) EndBlock(_ context.Context) error {
 	return nil
 }
-
