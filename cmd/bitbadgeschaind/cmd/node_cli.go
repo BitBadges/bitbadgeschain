@@ -1,9 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"strings"
+	"time"
 )
 
 // exitNoSDKCLI is the exit status when an SDK verb is invoked but
@@ -23,10 +27,14 @@ var osExit = os.Exit
 // which made `bb check tx.json` look like a passing check with empty
 // output.
 func execNodeCLI(subcommand string, args []string) error {
+	return execNodeCLIWithIO(subcommand, args, os.Stdin, os.Stdout, os.Stderr)
+}
+
+func execNodeCLIWithIO(subcommand string, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	cliPath, useNpx := findNodeCLI()
 	if cliPath == "" {
-		fmt.Fprintf(os.Stderr, "SDK CLI not available: `bb %s` needs bitbadges-cli. Install with: npm install -g bitbadges (provides bitbadges-cli command)\n", subcommand)
-		fmt.Fprintln(os.Stderr, "Or set BITBADGES_SDK_CLI_PATH environment variable.")
+		fmt.Fprintf(stderr, "SDK CLI not available: `bb %s` needs bitbadges-cli. Install with: npm install -g bitbadges (provides bitbadges-cli command)\n", subcommand)
+		fmt.Fprintln(stderr, "Or set BITBADGES_SDK_CLI_PATH environment variable.")
 		osExit(exitNoSDKCLI)
 		return nil
 	}
@@ -41,17 +49,37 @@ func execNodeCLI(subcommand string, args []string) error {
 	}
 
 	execCmd := exec.Command(cliPath, fullArgs...)
-	execCmd.Stdout = os.Stdout
-	execCmd.Stderr = os.Stderr
-	execCmd.Stdin = os.Stdin
+	execCmd.Stdout = stdout
+	execCmd.Stderr = stderr
+	execCmd.Stdin = stdin
 
 	if err := execCmd.Run(); err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
-			os.Exit(exitErr.ExitCode())
+			osExit(exitErr.ExitCode())
+			return nil
 		}
 		return err
 	}
 	return nil
+}
+
+// lookupNodeCLIVersion queries an installed bitbadges-cli binary for its version.
+// It intentionally skips the npx fallback so `bb --version` stays fast and offline
+// when bitbadges-cli is not installed locally.
+func lookupNodeCLIVersion() string {
+	cliPath, useNpx := findNodeCLI()
+	if cliPath == "" || useNpx {
+		return ""
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	out, err := exec.CommandContext(ctx, cliPath, "--version").Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(out))
 }
 
 // findNodeCLI locates the bitbadges-cli binary.

@@ -15,6 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHAIN_ID="bitbadges-1"
+EVM_CHAIN_ID="${EVM_CHAIN_ID:-90123}"
 NODE_HOME="${HOME}/.bitbadgeschain"
 BINARY_NAME="bitbadgeschaind"
 BINARY_PATH="${SCRIPT_DIR}/${BINARY_NAME}"
@@ -307,6 +308,9 @@ create_genesis_from_config() {
     
     log_info "Adding validator ${validator_name} to genesis with coins: ${validator_coins}"
     
+    # Patch local genesis denominations, bank metadata, and EVM precompiles before gentx
+    patch_local_genesis
+
     # Add validator to genesis
     "${BINARY_PATH}" genesis add-genesis-account "${validator_addr}" "${validator_coins}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1
     
@@ -317,7 +321,7 @@ create_genesis_from_config() {
     # Create validator gentx
     log_info "Creating validator gentx for: ${validator_name}"
     
-    if ! (echo "test1234" | "${BINARY_PATH}" genesis gentx "${validator_name}" "${bonded_amount}" --chain-id "${CHAIN_ID}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1); then
+    if ! (printf 'test1234\n' | "${BINARY_PATH}" genesis gentx "${validator_name}" "${bonded_amount}" --chain-id "${CHAIN_ID}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1); then
         log_error "Failed to create gentx for ${validator_name}"
         return 1
     fi
@@ -328,12 +332,6 @@ create_genesis_from_config() {
         log_error "Failed to collect gentxs"
         return 1
     fi
-    
-    # Fix denomination mismatch: default genesis uses "stake" but we need "ustake"
-    log_info "Fixing denomination in genesis (stake -> ustake)..."
-    sed -i 's/"denom": "stake"/"denom": "ustake"/g' "${NODE_HOME}/config/genesis.json"
-    sed -i 's/"bond_denom": "stake"/"bond_denom": "ustake"/g' "${NODE_HOME}/config/genesis.json"
-    sed -i 's/"mint_denom": "stake"/"mint_denom": "ustake"/g' "${NODE_HOME}/config/genesis.json"
 
     log_info "Genesis created successfully with validator ${validator_name}"
 }
@@ -411,6 +409,118 @@ create_accounts_for_ignite() {
     create_accounts_for_ignite_fixed
 }
 
+# Patch local genesis.json and app.toml for BitBadges local development:
+# - Align staking/mint/gov/crisis denominations with ustake/ubadge
+# - Seed ubadge bank denom_metadata required by x/vm LoadEvmCoinInfo
+# - Activate default Cosmos + custom BitBadges EVM static precompiles
+# - Align app.toml evm-chain-id with local EVM_CHAIN_ID (default 90123) so
+#   eth_chainId and net_version agree
+patch_local_genesis() {
+    local genesis_file="${NODE_HOME}/config/genesis.json"
+    local app_toml="${NODE_HOME}/config/app.toml"
+
+    if [ ! -f "${genesis_file}" ]; then
+        log_error "Genesis file not found: ${genesis_file}"
+        return 1
+    fi
+
+    log_info "Patching local genesis denominations, bank metadata, and EVM precompiles..."
+    python3 - "${genesis_file}" "${app_toml}" "${EVM_CHAIN_ID}" <<'PYEOF'
+import json
+import os
+import re
+import sys
+
+genesis_path, app_toml_path, evm_chain_id = sys.argv[1], sys.argv[2], sys.argv[3]
+
+with open(genesis_path, "r", encoding="utf-8") as f:
+    genesis = json.load(f)
+
+app_state = genesis.setdefault("app_state", {})
+
+# Staking params
+staking_params = app_state.setdefault("staking", {}).setdefault("params", {})
+staking_params["bond_denom"] = "ustake"
+if isinstance(staking_params.get("key_rotation_fee"), dict):
+    staking_params["key_rotation_fee"]["denom"] = "ustake"
+
+# Mint params
+if "mint" in app_state:
+    app_state["mint"].setdefault("params", {})["mint_denom"] = "ustake"
+
+# Gov params
+if "gov" in app_state:
+    gov_params = app_state["gov"].setdefault("params", {})
+    for key in ("min_deposit", "expedited_min_deposit"):
+        coins = gov_params.get(key)
+        if isinstance(coins, list):
+            for coin in coins:
+                if isinstance(coin, dict) and coin.get("denom") == "stake":
+                    coin["denom"] = "ustake"
+
+# Crisis params (if module is present)
+if "crisis" in app_state and isinstance(app_state["crisis"].get("constant_fee"), dict):
+    app_state["crisis"]["constant_fee"]["denom"] = "ubadge"
+
+# Bank denom metadata for ubadge (required by x/vm InitGenesis -> LoadEvmCoinInfo)
+bank = app_state.setdefault("bank", {})
+denom_metadata = bank.setdefault("denom_metadata", [])
+if not any(isinstance(m, dict) and m.get("base") == "ubadge" for m in denom_metadata):
+    denom_metadata.append({
+        "description": "The native token of BitBadges Chain",
+        "denom_units": [
+            {"denom": "ubadge", "exponent": 0, "aliases": []},
+            {"denom": "badge", "exponent": 9, "aliases": []},
+        ],
+        "base": "ubadge",
+        "display": "badge",
+        "name": "Badge",
+        "symbol": "BADGE",
+        "uri": "",
+        "uri_hash": "",
+    })
+
+# EVM params: denom, extended denom, and sorted static precompiles (default Cosmos + custom BitBadges)
+evm_params = app_state.setdefault("evm", {}).setdefault("params", {})
+evm_params["evm_denom"] = "ubadge"
+evm_params["extended_denom_options"] = {"extended_denom": "abadge"}
+if isinstance(evm_params.get("chain_config"), dict):
+    evm_params["chain_config"]["chain_id"] = str(evm_chain_id)
+
+required_precompiles = [
+    "0x0000000000000000000000000000000000000800",  # Staking
+    "0x0000000000000000000000000000000000000801",  # Distribution
+    "0x0000000000000000000000000000000000000802",  # ICS20 (IBC)
+    "0x0000000000000000000000000000000000000803",  # Vesting
+    "0x0000000000000000000000000000000000000804",  # Bank
+    "0x0000000000000000000000000000000000000805",  # Governance
+    "0x0000000000000000000000000000000000000806",  # Slashing
+    "0x0000000000000000000000000000000000001001",  # BitBadges Tokenization
+    "0x0000000000000000000000000000000000001002",  # BitBadges Gamm
+    "0x0000000000000000000000000000000000001003",  # BitBadges SendManager
+]
+existing_precompiles = evm_params.get("active_static_precompiles") or []
+evm_params["active_static_precompiles"] = sorted(set(existing_precompiles) | set(required_precompiles))
+
+with open(genesis_path, "w", encoding="utf-8") as f:
+    json.dump(genesis, f, indent=2)
+    f.write("\n")
+
+# Keep app.toml evm-chain-id aligned with EVM_CHAIN_ID so net_version matches eth_chainId
+if os.path.isfile(app_toml_path):
+    with open(app_toml_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    updated = re.sub(
+        r"(?m)^(\s*evm-chain-id\s*=\s*).*$",
+        rf"\g<1>{evm_chain_id}",
+        content,
+    )
+    if updated != content:
+        with open(app_toml_path, "w", encoding="utf-8") as f:
+            f.write(updated)
+PYEOF
+}
+
 # Add a validator to genesis if it doesn't exist
 add_validator_to_genesis() {
     local genesis_file="${NODE_HOME}/config/genesis.json"
@@ -426,6 +536,9 @@ add_validator_to_genesis() {
         log_info "Validators already exist in genesis"
         return 0
     fi
+
+    # Patch denominations, bank metadata, and EVM precompiles before gentx
+    patch_local_genesis
     
     # Create a validator key - use --no-backup to avoid keyring issues
     local validator_key="validator"
@@ -434,8 +547,8 @@ add_validator_to_genesis() {
     # Remove old keyring to avoid conflicts
     rm -rf "${NODE_HOME}/keyring-test"
     
-    # Create key with password (use yes for confirmation prompt)
-    if ! (yes "test1234" | head -2 | "${BINARY_PATH}" keys add "${validator_key}" --keyring-backend test --home "${NODE_HOME}" --no-backup > /dev/null 2>&1); then
+    # Create key without SIGPIPE under set -euo pipefail
+    if ! (printf 'test1234\ntest1234\n' | "${BINARY_PATH}" keys add "${validator_key}" --keyring-backend test --home "${NODE_HOME}" --no-backup > /dev/null 2>&1); then
         log_error "Failed to create validator key"
         log_warn "You may need to manually add a validator to genesis"
         return 1
@@ -460,7 +573,7 @@ add_validator_to_genesis() {
     
     # Create validator gentx
     log_info "Creating validator gentx..."
-    if ! (yes "test1234" | head -1 | "${BINARY_PATH}" genesis gentx "${validator_key}" "1000000000000ustake" --chain-id "${CHAIN_ID}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1); then
+    if ! (printf 'test1234\n' | "${BINARY_PATH}" genesis gentx "${validator_key}" "1000000000000ustake" --chain-id "${CHAIN_ID}" --keyring-backend test --home "${NODE_HOME}" > /dev/null 2>&1); then
         log_error "Failed to create gentx"
         return 1
     fi

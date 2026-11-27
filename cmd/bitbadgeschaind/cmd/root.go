@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log/v2"
-	txsigning "github.com/cosmos/cosmos-sdk/x/tx/signing"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -15,8 +15,10 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	txsigning "github.com/cosmos/cosmos-sdk/x/tx/signing"
 	evmtypes "github.com/cosmos/evm/x/vm/types"
 
 	evmhd "github.com/cosmos/evm/crypto/hd"
@@ -24,6 +26,11 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/bitbadges/bitbadgeschain/app"
+)
+
+const (
+	flagVersion  = "version"
+	flagHelpJSON = "help-json"
 )
 
 // NewRootCmd creates a new root command for bitbadgeschaind. It is called once in the main function.
@@ -55,11 +62,24 @@ func NewRootCmd() *cobra.Command {
 	// Use Cosmos EVM's keyring option directly
 	clientCtx = clientCtx.WithKeyringOptions(evmhd.EthSecp256k1Option())
 
-	rootCmd := &cobra.Command{
+	var rootCmd *cobra.Command
+	rootCmd = &cobra.Command{
 		Use:           app.Name + "d",
 		Short:         "Start bitbadgeschain node",
 		SilenceErrors: true,
+		Args: func(cmd *cobra.Command, args []string) error {
+			if helpJSON, _ := cmd.Flags().GetBool(flagHelpJSON); helpJSON {
+				return nil
+			}
+			return cobra.NoArgs(cmd, args)
+		},
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			// Skip server/client config initialization for root-only flags
+			// (`bb`, `bb --version`, `bb --help-json`).
+			if cmd == rootCmd {
+				return nil
+			}
+
 			// set the default command outputs
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
@@ -93,7 +113,20 @@ func NewRootCmd() *cobra.Command {
 
 			return routeLogsAwayFromDataStdout(cmd)
 		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if showVersion, _ := cmd.Flags().GetBool(flagVersion); showVersion {
+				fmt.Fprintln(cmd.OutOrStdout(), formatRootVersion())
+				return nil
+			}
+			if helpJSON, _ := cmd.Flags().GetBool(flagHelpJSON); helpJSON {
+				return execNodeCLIWithIO("--help-json", args, cmd.InOrStdin(), cmd.OutOrStdout(), cmd.ErrOrStderr())
+			}
+			return cmd.Help()
+		},
 	}
+
+	rootCmd.Flags().Bool(flagVersion, false, "Print version information")
+	rootCmd.Flags().Bool(flagHelpJSON, false, "Output SDK CLI commands as structured JSON (forwards to bitbadges-cli --help-json)")
 
 	// Since the IBC modules don't support dependency injection, we need to
 	// manually register the modules on the client side.
@@ -238,4 +271,71 @@ func routeLogsAwayFromDataStdout(cmd *cobra.Command) error {
 	serverCtx.Logger = logger
 
 	return server.SetCmdServerContext(cmd, serverCtx)
+}
+
+// formatRootVersion builds the output for `bb --version` / `bitbadgeschaind --version`.
+// It always prints the chain binary version and appends the SDK CLI version when
+// bitbadges-cli is directly installed, without failing when bitbadges-cli is absent.
+func formatRootVersion() string {
+	info := version.NewInfo()
+	ver := strings.TrimSpace(info.Version)
+	if ver == "" {
+		ver = "dev"
+	}
+	line := fmt.Sprintf("%sd %s", app.Name, ver)
+	if commit := strings.TrimSpace(info.GitCommit); commit != "" {
+		line += fmt.Sprintf(" (%s)", commit)
+	}
+	if sdkVer := lookupNodeCLIVersion(); sdkVer != "" {
+		line += fmt.Sprintf("\nbitbadges-cli %s", sdkVer)
+	}
+	return line
+}
+
+// MatchRootHelpJSON reports whether args represent a root-level `--help-json`
+// invocation (before any subcommand or `-h`/`--help`) and returns any extra
+// flags/arguments to pass through to `bitbadges-cli --help-json`.
+func MatchRootHelpJSON(args []string) ([]string, bool) {
+	helpJSONIdx := -1
+	for i, arg := range args {
+		if arg == "--" {
+			break
+		}
+		if arg == "-h" || arg == "--help" {
+			return nil, false
+		}
+		if arg == "--"+flagHelpJSON {
+			helpJSONIdx = i
+			break
+		}
+		if !strings.HasPrefix(arg, "-") {
+			// A subcommand precedes --help-json (e.g. `bb build --help-json`);
+			// let Cobra route it to the subcommand forwarder.
+			return nil, false
+		}
+	}
+	if helpJSONIdx < 0 {
+		return nil, false
+	}
+
+	extra := make([]string, 0, len(args)-1)
+	for i, arg := range args {
+		if i == helpJSONIdx {
+			continue
+		}
+		if i > helpJSONIdx && arg == "--" {
+			extra = append(extra, args[i+1:]...)
+			break
+		}
+		if arg == "-h" || arg == "--help" {
+			return nil, false
+		}
+		extra = append(extra, arg)
+	}
+	return extra, true
+}
+
+// ExecRootHelpJSON forwards a root-level `--help-json` invocation to bitbadges-cli.
+func ExecRootHelpJSON(extraArgs []string) error {
+	return execNodeCLI("--"+flagHelpJSON, extraArgs)
 }
