@@ -10,7 +10,8 @@ import (
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
 		Query: &autocliv1.ServiceCommandDescriptor{
-			Service: types.Query_serviceDesc.ServiceName,
+			Service:              types.Query_serviceDesc.ServiceName,
+			EnhanceCustomCommand: true, // keep autocli `params` next to the custom `balance` command
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
 				{
 					RpcMethod: "Params",
@@ -18,10 +19,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:     "Shows the parameters of the module",
 				},
 				{
+					// Implemented by the custom CLI command so both the
+					// documented positional args and the v36 --address/--denom
+					// flags are accepted. Autocli PositionalArgs would drop the flags.
 					RpcMethod: "Balance",
-					Use:       "balance [address] [denom]",
-					Short:     "Query balance of a specific denom for an address with alias routing",
-					Long:      "Query the balance of a specific denomination for an address. Supports both standard coins and alias denoms (e.g., badgeslp:).",
+					Skip:      true,
 				},
 				// this line is used by ignite scaffolding # autocli/query
 			},
@@ -35,11 +37,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Skip:      true, // skipped because authority gated
 				},
 				{
+					// Implemented by the custom CLI command so both the
+					// documented positional args and the v36 --from/--to-address/--amount
+					// flags are accepted. Autocli PositionalArgs would drop the flags.
 					RpcMethod: "SendWithAliasRouting",
-					Use:       "send-with-alias-routing [from_address] [to_address] [amount]",
-					Short:     "Send coins with alias denom routing",
-					Long:      "Send coins from one address to another. Supports both standard coins and alias denoms (e.g., badgeslp:). This mirrors cosmos bank MsgSend but routes through sendmanager.",
-					Example:   "bitbadgeschaind tx sendmanager send-with-alias-routing cosmos1abc... cosmos1def... 1000uatom",
+					Skip:      true,
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
