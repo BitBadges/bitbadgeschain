@@ -6,7 +6,14 @@ import (
 )
 
 // KeyCommands wraps Cosmos EVM's KeyCommands to provide Ethereum-compatible key management.
-// This is a simple wrapper that delegates to the Cosmos EVM implementation.
+// It strips empty-name separator commands (such as flags.LineBreak) that otherwise sort to
+// the top of Cobra's alphabetical help listing as a blank row.
 func KeyCommands(defaultNodeHome string, defaultToEthKeys bool) *cobra.Command {
-	return cosmosevmclient.KeyCommands(defaultNodeHome, defaultToEthKeys)
+	cmd := cosmosevmclient.KeyCommands(defaultNodeHome, defaultToEthKeys)
+	for _, sub := range cmd.Commands() {
+		if sub.Name() == "" {
+			cmd.RemoveCommand(sub)
+		}
+	}
+	return cmd
 }
