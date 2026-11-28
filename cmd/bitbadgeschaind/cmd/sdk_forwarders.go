@@ -3,8 +3,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // SDK CLI forwarders.
@@ -29,6 +32,194 @@ import (
 // Runtime dependency: these only do useful work when bitbadges-cli
 // (npm package `bitbadges`) is on the user's PATH. They compile and
 // pass tests on their own, independent of the SDK CLI version.
+
+// annotationSDKForwarder marks Cobra commands that delegate verbatim to the
+// Node.js bitbadges-cli binary. rootCmd.PersistentPreRunE checks this
+// annotation to bypass Cosmos client.toml / server config loading so forwarded
+// commands work cleanly with an empty, missing, or read-only --home directory.
+const annotationSDKForwarder = "bitbadges.sdk_forwarder"
+
+// isSDKForwarderCmd reports whether cmd is an SDK CLI passthrough forwarder.
+func isSDKForwarderCmd(cmd *cobra.Command) bool {
+	if cmd == nil || cmd.Annotations == nil {
+		return false
+	}
+	return cmd.Annotations[annotationSDKForwarder] == "true"
+}
+
+// cliArgsProvider returns the raw CLI arguments (excluding argv[0]) that Cobra
+// dispatched from. Overridden only in unit tests if needed; production uses os.Args[1:].
+var cliArgsProvider = func() []string {
+	if len(os.Args) <= 1 {
+		return nil
+	}
+	return os.Args[1:]
+}
+
+// lookupCmdFlag looks up a flag (or shorthand) defined on cmd or inherited from
+// any ancestor's PersistentFlags.
+func lookupCmdFlag(c *cobra.Command, name string, shorthand bool) *pflag.Flag {
+	for cur := c; cur != nil; cur = cur.Parent() {
+		if cur == c {
+			if shorthand {
+				if f := cur.Flags().ShorthandLookup(name); f != nil {
+					return f
+				}
+			} else {
+				if f := cur.Flags().Lookup(name); f != nil {
+					return f
+				}
+			}
+		}
+		if shorthand {
+			if f := cur.PersistentFlags().ShorthandLookup(name); f != nil {
+				return f
+			}
+		} else {
+			if f := cur.PersistentFlags().Lookup(name); f != nil {
+				return f
+			}
+		}
+	}
+	return nil
+}
+
+// extractForwarderArgs locates cmd along its command path in rawArgs, confirms
+// that the leading root/parent flags plus trailing subcommand tokens reconstruct
+// cobraArgs verbatim, and returns ONLY the tokens appearing after cmd.
+//
+// Because SDK forwarders set DisableFlagParsing: true, Cobra leaves leading
+// persistent root flags (such as --home, --log_level, --log_format, --trace)
+// in args alongside the subcommand's own flags. Inspecting rawArgs by position
+// relative to the matched command token strips leading Cosmos root flags
+// (`bb --log_level info --home /tmp/empty dev --help` -> `["--help"]`) while
+// preserving any flags that appear AFTER the subcommand (`bb dev --home /foo`
+// -> `["--home", "/foo"]`, `bb cli --home /foo` -> `["--home", "/foo"]`).
+func extractForwarderArgs(cmd *cobra.Command, rawArgs, cobraArgs []string) ([]string, bool) {
+	if cmd == nil {
+		return nil, false
+	}
+
+	var path []*cobra.Command
+	for cur := cmd; cur != nil && cur.HasParent(); cur = cur.Parent() {
+		path = append(path, cur)
+	}
+	if len(path) == 0 {
+		return nil, false
+	}
+	slices.Reverse(path)
+
+	pos := 0
+	prefixTokens := make([]string, 0)
+	parent := cmd.Root()
+
+	for _, target := range path {
+		matched := false
+		for pos < len(rawArgs) {
+			tok := rawArgs[pos]
+			switch {
+			case tok == "--":
+				return nil, false
+			case strings.HasPrefix(tok, "--") && len(tok) > 2:
+				name, _, hasEq := strings.Cut(tok[2:], "=")
+				if name == "help" {
+					return nil, false
+				}
+				f := lookupCmdFlag(parent, name, false)
+				if f == nil {
+					return nil, false
+				}
+				prefixTokens = append(prefixTokens, tok)
+				if !hasEq && f.NoOptDefVal == "" {
+					if pos+1 >= len(rawArgs) {
+						return nil, false
+					}
+					pos++
+					prefixTokens = append(prefixTokens, rawArgs[pos])
+				}
+				pos++
+			case strings.HasPrefix(tok, "-") && len(tok) == 2 && tok != "--":
+				short := tok[1:]
+				if short == "h" {
+					return nil, false
+				}
+				f := lookupCmdFlag(parent, short, true)
+				if f == nil {
+					return nil, false
+				}
+				prefixTokens = append(prefixTokens, tok)
+				if f.NoOptDefVal == "" {
+					if pos+1 >= len(rawArgs) {
+						return nil, false
+					}
+					pos++
+					prefixTokens = append(prefixTokens, rawArgs[pos])
+				}
+				pos++
+			case strings.HasPrefix(tok, "-") && len(tok) > 2:
+				shorthands := tok[1:]
+				for i := 0; i < len(shorthands); i++ {
+					ch := shorthands[i : i+1]
+					if ch == "h" {
+						return nil, false
+					}
+					f := lookupCmdFlag(parent, ch, true)
+					if f == nil {
+						return nil, false
+					}
+					if f.NoOptDefVal == "" {
+						// Remainder of tok is the attached value for this short flag.
+						break
+					}
+					if i+1 < len(shorthands) && shorthands[i+1] == '=' {
+						// Explicit boolean value (e.g. -x=true).
+						break
+					}
+				}
+				prefixTokens = append(prefixTokens, tok)
+				pos++
+			default:
+				if tok == target.CalledAs() || tok == target.Name() || target.HasAlias(tok) {
+					pos++
+					matched = true
+				} else {
+					return nil, false
+				}
+			}
+			if matched {
+				break
+			}
+		}
+		if !matched {
+			return nil, false
+		}
+		parent = target
+	}
+
+	suffix := rawArgs[pos:]
+	reconstructed := make([]string, 0, len(prefixTokens)+len(suffix))
+	reconstructed = append(reconstructed, prefixTokens...)
+	reconstructed = append(reconstructed, suffix...)
+	if !slices.Equal(reconstructed, cobraArgs) {
+		return nil, false
+	}
+
+	out := make([]string, len(suffix))
+	copy(out, suffix)
+	return out, true
+}
+
+// forwarderArgs returns the exact arguments to pass through to bitbadges-cli
+// for an SDK forwarder command, stripping only leading Cosmos root/parent flags
+// that preceded the matched command token in the process argv.
+func forwarderArgs(cmd *cobra.Command, args []string) []string {
+	if raw := cliArgsProvider(); len(raw) > 0 {
+		if subArgs, ok := extractForwarderArgs(cmd, raw, args); ok {
+			return subArgs
+		}
+	}
+	return args
+}
 
 // sdkForwarderSpec describes a single top-level SDK forwarder.
 type sdkForwarderSpec struct {
@@ -124,6 +315,9 @@ func newSDKForwarder(spec sdkForwarderSpec) *cobra.Command {
 		Short:              spec.short,
 		GroupID:            spec.group,
 		DisableFlagParsing: true, // pass flags through to bitbadges-cli
+		Annotations: map[string]string{
+			annotationSDKForwarder: "true",
+		},
 		Long: fmt.Sprintf(`Forwards to: bitbadges-cli %s
 
 Runs the BitBadges SDK CLI subcommand of the same name. All arguments
@@ -133,7 +327,7 @@ bitbadges npm package (npm install -g bitbadges).
 Run with --help to see the SDK subcommand's own help:
   bitbadgeschaind %s --help`, spec.name, spec.name),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return execNodeCLI(spec.name, args)
+			return execNodeCLI(spec.name, forwarderArgs(cmd, args))
 		},
 	}
 	if spec.deprecated != "" {
@@ -171,12 +365,15 @@ func registerSDKTxSubforwarders(txCmd *cobra.Command) {
 			Use:                spec.name + " [args...]",
 			Short:              spec.short,
 			DisableFlagParsing: true,
+			Annotations: map[string]string{
+				annotationSDKForwarder: "true",
+			},
 			Long: fmt.Sprintf(`Forwards to: bitbadges-cli tx %s
 
 All arguments and flags are passed through verbatim. Requires the
 bitbadges npm package (npm install -g bitbadges).`, spec.name),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				return execNodeCLI("tx", append([]string{spec.name}, args...))
+				return execNodeCLI("tx", append([]string{spec.name}, forwarderArgs(cmd, args)...))
 			},
 		})
 	}
@@ -185,11 +382,10 @@ bitbadges npm package (npm install -g bitbadges).`, spec.name),
 // registerSDKForwarders adds every top-level SDK forwarder to the root
 // command. Called from initRootCmd after chain natives are registered.
 //
-// Collisions: this function panics if a forwarder name collides with a
-// chain-native command that's already registered. The spec list is
-// pre-filtered to avoid `config` (which the chain owns), but a future
-// chain command rename could surprise us — fail loud rather than
-// silently shadow.
+// Collisions: if a forwarder name collides with a chain-native command that is
+// already registered, this function logs a warning to stderr and skips the
+// colliding forwarder so chain-native commands are never shadowed. The spec
+// list is pre-filtered to avoid `config` (which the chain owns).
 func registerSDKForwarders(rootCmd *cobra.Command) {
 	existing := map[string]bool{}
 	for _, c := range rootCmd.Commands() {

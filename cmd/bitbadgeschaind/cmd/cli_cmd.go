@@ -55,7 +55,11 @@ binary and the JS CLI going forward.
 
 Requires: Node.js + bitbadges-cli (npm install -g bitbadges)`,
 		DisableFlagParsing: true, // Pass all flags through to Node.js CLI
+		Annotations: map[string]string{
+			annotationSDKForwarder: "true",
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			args = forwarderArgs(cmd, args)
 			if len(args) == 0 {
 				fmt.Fprintln(os.Stderr, "Usage: bitbadgeschaind cli <subcommand> [args...]")
 				fmt.Fprintln(os.Stderr, "Run `bitbadgeschaind cli --help` for the list of subcommands.")

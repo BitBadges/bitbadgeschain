@@ -82,8 +82,8 @@ func initRootCmd(
 	}
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
-	// Use custom KeyCommands wrapper that ensures eth_secp256k1 keyring options are applied
-	// This matches the Cosmos EVM reference implementation pattern
+	// Use custom KeyCommands wrapper (delegating to Cosmos EVM KeyCommands)
+	// so eth_secp256k1 keyring options are supported without registering `keys` twice.
 	rootCmd.AddCommand(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
