@@ -431,6 +431,22 @@ interface ITokenizationPrecompile {
         string calldata msgJson
     ) external view returns (bytes memory);
 
+    /// @notice Get the balance amount for a specific token ID at a specific time (defaults to current block time)
+    /// @dev JSON format: {"collectionId": "1", "address": "bb1... or 0x...", "tokenId": "1", "time": "1609459200000"}
+    /// @param msgJson JSON string matching QueryGetBalanceForTokenRequest protobuf format
+    /// @return balance The exact balance amount for the specified token ID and time
+    function getBalanceForToken(
+        string calldata msgJson
+    ) external view returns (uint256 balance);
+
+    /// @notice Resolve a wrapped (`badges:`) or alias (`badgeslp:`) denom to its collection ID and path metadata
+    /// @dev JSON format: {"denom": "badges:1:mytoken"} or {"denom": "badgeslp:1:myalias"}
+    /// @param msgJson JSON string matching QueryResolveDenomRequest protobuf format
+    /// @return result Protobuf-encoded QueryResolveDenomResponse bytes
+    function resolveDenom(
+        string calldata msgJson
+    ) external view returns (bytes memory result);
+
     /// @notice Get the balance amount for a specific (tokenId, ownershipTime) combination
     /// @dev JSON format: {"collectionId": "1", "address": "bb1...", "tokenId": "1", "ownershipTime": "1609459200000"}
     /// @param msgJson JSON string with collectionId, address, tokenId (single), ownershipTime (single)

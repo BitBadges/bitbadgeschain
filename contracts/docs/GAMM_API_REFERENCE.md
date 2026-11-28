@@ -167,6 +167,88 @@ Calculate shares for joining pool (with swap).
 - `shareOutAmount`: The shares that would be received
 - `tokensOut`: The tokens that would be provided
 
+#### `spotPrice(string calldata msgJson) → string`
+
+Query the spot price for a token pair in a pool.
+
+**Parameters:**
+- `msgJson`: JSON string with `pool_id`, `base_asset_denom`, and `quote_asset_denom`
+
+**Returns:**
+- `spotPrice`: Decimal string representation of the spot price (18 decimals)
+
+#### `getTotalVolumeForPool(string calldata msgJson) → Coin[]`
+
+Query cumulative tracked swap volume for a pool.
+
+**Parameters:**
+- `msgJson`: JSON string with `pool_id`
+
+**Returns:**
+- `volume`: Array of `Coin` structs representing tracked volume
+
+#### `getTakerFeesTracker(string calldata msgJson) → (Coin[], Coin[], int64)`
+
+Query cumulative taker fees tracked by `x/poolmanager`.
+
+**Parameters:**
+- `msgJson`: Empty JSON object `"{}"`
+
+**Returns:**
+- `takerFeesToStakers`: Cumulative taker fees distributed to stakers
+- `takerFeesToCommunityPool`: Cumulative taker fees sent to community pool
+- `heightAccountingStartsFrom`: Block height when taker fee accounting started
+
+#### `estimateSwapExactAmountIn(string calldata msgJson) → uint256`
+
+Estimate output token amount for an exact-input swap route without executing state writes.
+
+**Parameters:**
+- `msgJson`: JSON string matching `QuerySwapExactAmountInRequest` (`pool_id`, `token_in`, `routes`)
+
+**Returns:**
+- `tokenOutAmount`: Estimated output amount
+
+#### `estimateSwapExactAmountOut(string calldata msgJson) → uint256`
+
+Estimate required input token amount for an exact-output swap route without executing state writes.
+
+**Parameters:**
+- `msgJson`: JSON string matching `QuerySwapExactAmountOutRequest` (`pool_id`, `token_out`, `routes`)
+
+**Returns:**
+- `tokenInAmount`: Estimated required input amount
+
+#### `getTotalPoolLiquidity(string calldata msgJson) → Coin[]`
+
+Query total liquidity held in a specific pool.
+
+**Parameters:**
+- `msgJson`: JSON string with `pool_id`
+
+**Returns:**
+- `liquidity`: Array of `Coin` structs held by the pool
+
+#### `getTradingPairTakerFee(string calldata msgJson) → string`
+
+Query the configured taker fee rate for a trading pair.
+
+**Parameters:**
+- `msgJson`: JSON string with `denom_0` and `denom_1`
+
+**Returns:**
+- `takerFee`: Decimal string representation of the taker fee rate
+
+#### `getNumPools(string calldata msgJson) → uint64`
+
+Query total number of pools in the module.
+
+**Parameters:**
+- `msgJson`: Empty JSON object `"{}"`
+
+**Returns:**
+- `numPools`: Total pool count
+
 ## GammWrappers
 
 Type-safe wrapper functions that accept structs instead of JSON strings.

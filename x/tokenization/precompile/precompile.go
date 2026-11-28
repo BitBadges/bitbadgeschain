@@ -96,6 +96,8 @@ const (
 	GasGetVote                   = 5_000
 	GasGetVotes                  = 5_000
 	GasGetCollectionStats        = 3_000
+	GasGetBalanceForToken        = 3_000
+	GasResolveDenom              = 3_000
 	GasParams                    = 2_000
 	GasGetBalanceAmountBase      = 3_000
 	GasGetTotalSupplyBase        = 3_000
@@ -339,6 +341,10 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 		baseGas = GasGetVotes
 	case GetCollectionStatsMethod:
 		baseGas = GasGetCollectionStats
+	case GetBalanceForTokenMethod:
+		baseGas = GasGetBalanceForToken
+	case ResolveDenomMethod:
+		baseGas = GasResolveDenom
 	case ParamsMethod:
 		baseGas = GasParams
 	case GetBalanceAmountMethod:
@@ -1216,6 +1222,10 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		resp, err = p.tokenizationKeeper.GetVotes(ctx, req)
 	case *tokenizationtypes.QueryGetCollectionStatsRequest:
 		resp, err = p.tokenizationKeeper.GetCollectionStats(ctx, req)
+	case *tokenizationtypes.QueryGetBalanceForTokenRequest:
+		resp, err = p.tokenizationKeeper.GetBalanceForToken(ctx, req)
+	case *tokenizationtypes.QueryResolveDenomRequest:
+		resp, err = p.tokenizationKeeper.ResolveDenom(ctx, req)
 	case *tokenizationtypes.QueryParamsRequest:
 		resp, err = p.tokenizationKeeper.Params(ctx, req)
 	default:
@@ -1272,6 +1282,19 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 			return method.Outputs.Pack(wrappableResp.Amount.BigInt())
 		}
 		return nil, WrapError(fmt.Errorf("invalid response type for getWrappableBalances"), ErrorCodeInternalError, "expected QueryGetWrappableBalancesResponse")
+	case GetBalanceForTokenMethod:
+		if balResp, ok := resp.(*tokenizationtypes.QueryGetBalanceForTokenResponse); ok {
+			balUint, err := sdkmath.ParseUint(balResp.Balance)
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "failed to parse balance")
+			}
+			balBig := balUint.BigInt()
+			if err := CheckOverflow(balBig, "balance"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "balance exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(balBig)
+		}
+		return nil, WrapError(fmt.Errorf("invalid response type for getBalanceForToken"), ErrorCodeInternalError, "expected QueryGetBalanceForTokenResponse")
 	}
 
 	// Marshal response to bytes (protobuf) for all other queries
@@ -2187,6 +2210,8 @@ const (
 	GetVoteMethod                         = "getVote"
 	GetVotesMethod                        = "getVotes"
 	GetCollectionStatsMethod              = "getCollectionStats"
+	GetBalanceForTokenMethod              = "getBalanceForToken"
+	ResolveDenomMethod                    = "resolveDenom"
 	ParamsMethod                          = "params"
 	GetBalanceAmountMethod                = "getBalanceAmount"
 	GetTotalSupplyMethod                  = "getTotalSupply"

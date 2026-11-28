@@ -95,6 +95,14 @@ type PoolManager interface {
 	CreateConcentratedPoolAsPoolManager(ctx sdk.Context, msg poolmanagertypes.CreatePoolMsg) (poolmanagertypes.PoolI, error)
 
 	GetTradingPairTakerFee(ctx sdk.Context, denom0, denom1 string) (osmomath.Dec, error)
+
+	GetTotalVolumeForPool(ctx sdk.Context, poolId uint64) sdk.Coins
+
+	GetTakerFeeTrackerForStakers(ctx sdk.Context) []sdk.Coin
+
+	GetTakerFeeTrackerForCommunityPool(ctx sdk.Context) []sdk.Coin
+
+	GetTakerFeeTrackerStartHeight(ctx sdk.Context) int64
 }
 
 // ICS4Wrapper defines the interface needed for sending IBC packets

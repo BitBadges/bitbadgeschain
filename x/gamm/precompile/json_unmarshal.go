@@ -12,7 +12,11 @@ import (
 	"github.com/bitbadges/bitbadgeschain/pkg/evmcompat"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
+
+// GetTakerFeesTrackerRequest is an empty request wrapper for getTakerFeesTracker queries.
+type GetTakerFeesTrackerRequest struct{}
 
 // convertEVMAddressToBech32 converts an EVM address (0x...) to bech32 format if needed
 // If the address is already in bech32 format, it returns it unchanged
@@ -157,6 +161,22 @@ func (p Precompile) unmarshalQueryFromJSON(ctx sdk.Context, methodName string, j
 		queryReq = &gammtypes.QueryTotalSharesRequest{}
 	case GetTotalLiquidityMethod:
 		queryReq = &gammtypes.QueryTotalLiquidityRequest{}
+	case SpotPriceMethod:
+		queryReq = &gammtypes.QuerySpotPriceRequest{}
+	case GetTotalVolumeForPoolMethod:
+		queryReq = &poolmanagertypes.TotalVolumeForPoolRequest{}
+	case GetTakerFeesTrackerMethod:
+		queryReq = &GetTakerFeesTrackerRequest{}
+	case EstimateSwapExactAmountInMethod:
+		queryReq = &gammtypes.QuerySwapExactAmountInRequest{}
+	case EstimateSwapExactAmountOutMethod:
+		queryReq = &gammtypes.QuerySwapExactAmountOutRequest{}
+	case GetTotalPoolLiquidityMethod:
+		queryReq = &gammtypes.QueryTotalPoolLiquidityRequest{}
+	case GetTradingPairTakerFeeMethod:
+		queryReq = &poolmanagertypes.TradingPairTakerFeeRequest{}
+	case GetNumPoolsMethod:
+		queryReq = &gammtypes.QueryNumPoolsRequest{}
 	default:
 		return nil, ErrInvalidInput(fmt.Sprintf("unknown query method: %s", methodName))
 	}

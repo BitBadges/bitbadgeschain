@@ -79,6 +79,12 @@ message TokenCollection {
 
   // The alias (non-wrapping) paths for the collection.
   repeated AliasPath aliasPaths = 16;
+
+  // The block height at which this collection was created (0 for pre-upgrade collections).
+  uint64 createdBlock = 17;
+
+  // The Unix timestamp in milliseconds at which this collection was created (0 for pre-upgrade collections).
+  uint64 createdTimestamp = 18;
 }
 
 // Conversion defines a bidirectional conversion between a cosmos coin (with denom) and token balances.
