@@ -106,6 +106,44 @@
           "type": "string"
         }
       ],
+      "name": "getBalanceForToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "resolveDenom",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "result",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
       "name": "getBalance",
       "outputs": [
         {

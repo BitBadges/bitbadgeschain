@@ -46,7 +46,15 @@ import (
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	"github.com/bitbadges/bitbadgeschain/x/gamm/poolmodels/balancer"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
+
+// GetTakerFeesTrackerResponse holds cumulative taker fees tracked by x/poolmanager.
+type GetTakerFeesTrackerResponse struct {
+	TakerFeesToStakers         []sdk.Coin
+	TakerFeesToCommunityPool   []sdk.Coin
+	HeightAccountingStartsFrom int64
+}
 
 var _ vm.PrecompiledContract = &Precompile{}
 
@@ -255,6 +263,22 @@ func (p Precompile) getBaseGas(methodName string) uint64 {
 		return GasGetTotalSharesBase
 	case GetTotalLiquidityMethod:
 		return GasGetTotalLiquidityBase
+	case SpotPriceMethod:
+		return GasSpotPriceBase
+	case GetTotalVolumeForPoolMethod:
+		return GasGetTotalVolumeForPoolBase
+	case GetTakerFeesTrackerMethod:
+		return GasGetTakerFeesTrackerBase
+	case EstimateSwapExactAmountInMethod:
+		return GasEstimateSwapExactAmountInBase
+	case EstimateSwapExactAmountOutMethod:
+		return GasEstimateSwapExactAmountOutBase
+	case GetTotalPoolLiquidityMethod:
+		return GasGetTotalPoolLiquidityBase
+	case GetTradingPairTakerFeeMethod:
+		return GasGetTradingPairTakerFeeBase
+	case GetNumPoolsMethod:
+		return GasGetNumPoolsBase
 	}
 	return 0
 }
@@ -470,6 +494,62 @@ func (p Precompile) HandleQuery(ctx sdk.Context, method *abi.Method, jsonStr str
 		resp, err = querier.TotalShares(ctx, req)
 	case *gammtypes.QueryTotalLiquidityRequest:
 		resp, err = querier.TotalLiquidity(ctx, req)
+	case *gammtypes.QuerySpotPriceRequest:
+		resp, err = querier.SpotPrice(ctx, req)
+	case *poolmanagertypes.TotalVolumeForPoolRequest:
+		pm := p.gammKeeper.GetPoolManager()
+		if pm == nil {
+			return nil, WrapError(fmt.Errorf("pool manager not set"), ErrorCodeInternalError, "pool manager unavailable")
+		}
+		if err := ValidatePoolId(req.PoolId); err != nil {
+			return nil, err
+		}
+		// Ensure pool exists before returning its volume
+		if _, poolErr := pm.GetPool(ctx, req.PoolId); poolErr != nil {
+			err = poolErr
+		} else {
+			resp = &poolmanagertypes.TotalVolumeForPoolResponse{
+				Volume: pm.GetTotalVolumeForPool(ctx, req.PoolId),
+			}
+		}
+	case *GetTakerFeesTrackerRequest:
+		pm := p.gammKeeper.GetPoolManager()
+		if pm == nil {
+			return nil, WrapError(fmt.Errorf("pool manager not set"), ErrorCodeInternalError, "pool manager unavailable")
+		}
+		resp = &GetTakerFeesTrackerResponse{
+			TakerFeesToStakers:         pm.GetTakerFeeTrackerForStakers(ctx),
+			TakerFeesToCommunityPool:   pm.GetTakerFeeTrackerForCommunityPool(ctx),
+			HeightAccountingStartsFrom: pm.GetTakerFeeTrackerStartHeight(ctx),
+		}
+	case *gammtypes.QuerySwapExactAmountInRequest:
+		if err := ValidateArraySize(len(req.Routes), MaxRoutes, "routes"); err != nil {
+			return nil, err
+		}
+		ctx.GasMeter().ConsumeGas(uint64(len(req.Routes))*GasPerRoute, "estimateSwapExactAmountIn routes")
+		resp, err = querier.EstimateSwapExactAmountIn(ctx, req)
+	case *gammtypes.QuerySwapExactAmountOutRequest:
+		if err := ValidateArraySize(len(req.Routes), MaxRoutes, "routes"); err != nil {
+			return nil, err
+		}
+		ctx.GasMeter().ConsumeGas(uint64(len(req.Routes))*GasPerRoute, "estimateSwapExactAmountOut routes")
+		resp, err = querier.EstimateSwapExactAmountOut(ctx, req)
+	case *gammtypes.QueryTotalPoolLiquidityRequest:
+		resp, err = querier.TotalPoolLiquidity(ctx, req)
+	case *poolmanagertypes.TradingPairTakerFeeRequest:
+		if req.Denom_0 == "" || req.Denom_1 == "" {
+			return nil, ErrInvalidInput("denom_0 and denom_1 cannot be empty")
+		}
+		takerFee, feeErr := p.gammKeeper.GetTradingPairTakerFee(ctx, req.Denom_0, req.Denom_1)
+		if feeErr != nil {
+			err = feeErr
+		} else {
+			resp = &poolmanagertypes.TradingPairTakerFeeResponse{
+				TakerFee: takerFee,
+			}
+		}
+	case *gammtypes.QueryNumPoolsRequest:
+		resp, err = querier.NumPools(ctx, req)
 	default:
 		return nil, ErrInvalidInput(fmt.Sprintf("unsupported query type for method: %s", method.Name))
 	}
@@ -574,6 +654,70 @@ func (p Precompile) packQueryResponse(method *abi.Method, resp interface{}) ([]b
 			return method.Outputs.Pack(bz)
 		}
 		return nil, WrapError(fmt.Errorf("response is not a proto.Message"), ErrorCodeInternalError, "invalid response type")
+	case SpotPriceMethod:
+		if spResp, ok := resp.(*gammtypes.QuerySpotPriceResponse); ok {
+			return method.Outputs.Pack(spResp.SpotPrice)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QuerySpotPriceResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetTotalVolumeForPoolMethod:
+		if volResp, ok := resp.(*poolmanagertypes.TotalVolumeForPoolResponse); ok {
+			coinsStruct, err := ConvertCoinsToEVMSafe(volResp.Volume, "volume")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "volume amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(coinsStruct)
+		}
+		return nil, WrapError(fmt.Errorf("response is not TotalVolumeForPoolResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetTakerFeesTrackerMethod:
+		if trackerResp, ok := resp.(*GetTakerFeesTrackerResponse); ok {
+			stakersCoins, err := ConvertCoinsToEVMSafe(sdk.Coins(trackerResp.TakerFeesToStakers), "takerFeesToStakers")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "taker fee amount exceeds uint256 maximum")
+			}
+			communityCoins, err := ConvertCoinsToEVMSafe(sdk.Coins(trackerResp.TakerFeesToCommunityPool), "takerFeesToCommunityPool")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "taker fee amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(stakersCoins, communityCoins, trackerResp.HeightAccountingStartsFrom)
+		}
+		return nil, WrapError(fmt.Errorf("response is not GetTakerFeesTrackerResponse"), ErrorCodeInternalError, "invalid response type")
+	case EstimateSwapExactAmountInMethod:
+		if estResp, ok := resp.(*gammtypes.QuerySwapExactAmountInResponse); ok {
+			outBigInt := estResp.TokenOutAmount.BigInt()
+			if err := CheckUint256Overflow(outBigInt, "tokenOutAmount"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "tokenOutAmount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(outBigInt)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QuerySwapExactAmountInResponse"), ErrorCodeInternalError, "invalid response type")
+	case EstimateSwapExactAmountOutMethod:
+		if estResp, ok := resp.(*gammtypes.QuerySwapExactAmountOutResponse); ok {
+			inBigInt := estResp.TokenInAmount.BigInt()
+			if err := CheckUint256Overflow(inBigInt, "tokenInAmount"); err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "tokenInAmount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(inBigInt)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QuerySwapExactAmountOutResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetTotalPoolLiquidityMethod:
+		if liqResp, ok := resp.(*gammtypes.QueryTotalPoolLiquidityResponse); ok {
+			coinsStruct, err := ConvertCoinsToEVMSafe(liqResp.Liquidity, "liquidity")
+			if err != nil {
+				return nil, WrapError(err, ErrorCodeInternalError, "liquidity amount exceeds uint256 maximum")
+			}
+			return method.Outputs.Pack(coinsStruct)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryTotalPoolLiquidityResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetTradingPairTakerFeeMethod:
+		if feeResp, ok := resp.(*poolmanagertypes.TradingPairTakerFeeResponse); ok {
+			return method.Outputs.Pack(feeResp.TakerFee.String())
+		}
+		return nil, WrapError(fmt.Errorf("response is not TradingPairTakerFeeResponse"), ErrorCodeInternalError, "invalid response type")
+	case GetNumPoolsMethod:
+		if numResp, ok := resp.(*gammtypes.QueryNumPoolsResponse); ok {
+			return method.Outputs.Pack(numResp.NumPools)
+		}
+		return nil, WrapError(fmt.Errorf("response is not QueryNumPoolsResponse"), ErrorCodeInternalError, "invalid response type")
 	}
 
 	// Default: marshal to bytes
@@ -637,6 +781,14 @@ const (
 	GetPoolParamsMethod               = "getPoolParams"
 	GetTotalSharesMethod              = "getTotalShares"
 	GetTotalLiquidityMethod           = "getTotalLiquidity"
+	SpotPriceMethod                   = "spotPrice"
+	GetTotalVolumeForPoolMethod       = "getTotalVolumeForPool"
+	GetTakerFeesTrackerMethod         = "getTakerFeesTracker"
+	EstimateSwapExactAmountInMethod   = "estimateSwapExactAmountIn"
+	EstimateSwapExactAmountOutMethod  = "estimateSwapExactAmountOut"
+	GetTotalPoolLiquidityMethod       = "getTotalPoolLiquidity"
+	GetTradingPairTakerFeeMethod      = "getTradingPairTakerFee"
+	GetNumPoolsMethod                 = "getNumPools"
 )
 
 // LogPrecompileUsage logs precompile usage for monitoring

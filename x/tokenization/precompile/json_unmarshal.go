@@ -420,6 +420,10 @@ func (p Precompile) unmarshalQueryFromJSON(ctx sdk.Context, methodName string, j
 		queryReq = &tokenizationtypes.QueryGetVotesRequest{}
 	case GetCollectionStatsMethod:
 		queryReq = &tokenizationtypes.QueryGetCollectionStatsRequest{}
+	case GetBalanceForTokenMethod:
+		queryReq = &tokenizationtypes.QueryGetBalanceForTokenRequest{}
+	case ResolveDenomMethod:
+		queryReq = &tokenizationtypes.QueryResolveDenomRequest{}
 	case ParamsMethod:
 		queryReq = &tokenizationtypes.QueryParamsRequest{}
 	// Note: GetBalanceAmount and GetTotalSupply are handled separately as they don't use standard query requests
@@ -437,6 +441,19 @@ func (p Precompile) unmarshalQueryFromJSON(ctx sdk.Context, methodName string, j
 	switch q := queryReq.(type) {
 	case *tokenizationtypes.QueryGetBalanceRequest:
 		// Check for userAddress alias
+		if q.Address == "" {
+			var temp struct {
+				UserAddress string `json:"userAddress"`
+			}
+			json.Unmarshal([]byte(jsonStr), &temp)
+			if temp.UserAddress != "" {
+				q.Address = temp.UserAddress
+			}
+		}
+		if q.Address != "" {
+			q.Address = convertEVMAddressToBech32(q.Address)
+		}
+	case *tokenizationtypes.QueryGetBalanceForTokenRequest:
 		if q.Address == "" {
 			var temp struct {
 				UserAddress string `json:"userAddress"`

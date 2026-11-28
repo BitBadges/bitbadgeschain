@@ -252,6 +252,15 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 		}
 		accountAddr := sdk.AccAddress(ac.Address())
 
+		var createdBlock uint64
+		if ctx.BlockHeight() > 0 {
+			createdBlock = uint64(ctx.BlockHeight())
+		}
+		var createdTimestamp uint64
+		if ts := ctx.BlockTime().UnixMilli(); ts > 0 {
+			createdTimestamp = uint64(ts)
+		}
+
 		collection = &types.TokenCollection{
 			CollectionId:          nextCollectionId,
 			CollectionPermissions: &types.CollectionPermissions{},
@@ -260,6 +269,8 @@ func (k msgServer) UniversalUpdateCollection(goCtx context.Context, msg *types.M
 			// Default manager is the creator if not updating manager
 			Manager:           msg.Creator,
 			MintEscrowAddress: accountAddr.String(),
+			CreatedBlock:      createdBlock,
+			CreatedTimestamp:  createdTimestamp,
 		}
 
 		// Convert InvariantsAddObject to CollectionInvariants if present

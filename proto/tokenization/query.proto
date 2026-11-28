@@ -100,6 +100,11 @@ service Query {
     option (google.api.http).get = "/bitbadges/bitbadgeschain/tokenization/get_balance_for_token/{collectionId}/{address}/{tokenId}";
   }
 
+  // Resolves a wrapped (`badges:`) or alias (`badgeslp:`) denom to its collection ID and path metadata.
+  rpc ResolveDenom(QueryResolveDenomRequest) returns (QueryResolveDenomResponse) {
+    option (google.api.http).get = "/bitbadges/bitbadgeschain/tokenization/resolve_denom/{denom}";
+  }
+
   // this line is used by starport scaffolding # 2
 }
 
@@ -259,6 +264,21 @@ message QueryGetBalanceForTokenRequest {
 
 message QueryGetBalanceForTokenResponse {
   string balance = 1;
+}
+
+message QueryResolveDenomRequest {
+  string denom = 1;
+}
+
+message QueryResolveDenomResponse {
+  // "wrapper" for badges:, "alias" for badgeslp:
+  string pathType = 1;
+  string collectionId = 2 [(gogoproto.customtype) = "Uint", (gogoproto.nullable) = false];
+  string baseDenom = 3;
+  // Populated when matched via an {id} placeholder on a wrapper path.
+  string matchedTokenId = 4;
+  CosmosCoinWrapperPath wrapperPath = 5;
+  AliasPath aliasPath = 6;
 }
 
 // this line is used by starport scaffolding # 3

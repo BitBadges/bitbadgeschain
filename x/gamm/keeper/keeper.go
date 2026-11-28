@@ -83,6 +83,10 @@ func (k *Keeper) SetPoolManager(poolManager types.PoolManager) {
 	k.poolManager = poolManager
 }
 
+func (k Keeper) GetPoolManager() types.PoolManager {
+	return k.poolManager
+}
+
 // ExecuteIBCTransfer executes an IBC transfer by delegating to the IBC
 // transfer module, which correctly escrows native tokens or burns IBC
 // vouchers before sending the packet.

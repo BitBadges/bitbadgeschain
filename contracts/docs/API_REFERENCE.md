@@ -128,6 +128,26 @@ Get total supply for specific token/ownership ranges.
 **Returns:**
 - `amount`: The total supply amount
 
+#### `getBalanceForToken(string calldata msgJson) → uint256`
+
+Get a user's balance for a single token ID at a specific timestamp (defaults to current block time in ms if `time` is omitted or `"0"`).
+
+**Parameters:**
+- `msgJson`: JSON string with `collectionId`, `address` (or `userAddress`, accepts `bb1...` or `0x...`), `tokenId`, and optional `time` (Unix ms)
+
+**Returns:**
+- `balance`: The balance amount as `uint256`
+
+#### `resolveDenom(string calldata msgJson) → bytes`
+
+Resolve a wrapped (`badges:<collectionId>:<baseDenom>`) or alias (`badgeslp:<collectionId>:<baseDenom>`) Cosmos denom back to its collection ID, matched token ID (for `{id}` placeholder wrapper paths), and path metadata.
+
+**Parameters:**
+- `msgJson`: JSON string with `denom`
+
+**Returns:**
+- `response`: Protobuf-encoded `QueryResolveDenomResponse` bytes
+
 ## TokenizationWrappers
 
 Type-safe wrapper functions that accept structs instead of JSON strings.

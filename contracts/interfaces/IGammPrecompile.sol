@@ -118,12 +118,82 @@ interface IGammPrecompile {
         view
         returns (GammTypes.Coin memory totalShares);
 
-    /// @notice Get total liquidity for a pool
-    /// @param msgJson JSON string matching QueryTotalLiquidityRequest protobuf JSON format
+    /// @notice Get total liquidity across all pools
+    /// @param msgJson JSON string matching QueryTotalLiquidityRequest protobuf JSON format (e.g. "{}")
     /// @return liquidity The total liquidity as an array of Coin structs
     function getTotalLiquidity(string memory msgJson)
         external
         view
         returns (GammTypes.Coin[] memory liquidity);
+
+    /// @notice Get spot price for a pool asset pair (quote_asset_denom per 1 base_asset_denom, 18-dec string)
+    /// @param msgJson JSON string matching QuerySpotPriceRequest ({"pool_id": 1, "base_asset_denom": "...", "quote_asset_denom": "..."})
+    /// @return spotPrice The 18-decimal spot price string
+    function spotPrice(string memory msgJson)
+        external
+        view
+        returns (string memory spotPrice);
+
+    /// @notice Get cumulative swap volume recorded for a specific pool
+    /// @param msgJson JSON string matching poolmanager TotalVolumeForPoolRequest ({"pool_id": 1})
+    /// @return volume The cumulative pool volume as an array of Coin structs
+    function getTotalVolumeForPool(string memory msgJson)
+        external
+        view
+        returns (GammTypes.Coin[] memory volume);
+
+    /// @notice Get cumulative taker fees tracked by x/poolmanager
+    /// @param msgJson JSON string ("{}")
+    /// @return takerFeesToStakers Cumulative taker fees distributed to stakers
+    /// @return takerFeesToCommunityPool Cumulative taker fees sent to the community pool
+    /// @return heightAccountingStartsFrom Block height when taker fee accounting started
+    function getTakerFeesTracker(string memory msgJson)
+        external
+        view
+        returns (
+            GammTypes.Coin[] memory takerFeesToStakers,
+            GammTypes.Coin[] memory takerFeesToCommunityPool,
+            int64 heightAccountingStartsFrom
+        );
+
+    /// @notice Estimate output amount for a swap given an exact input coin and routes
+    /// @param msgJson JSON string matching QuerySwapExactAmountInRequest ({"token_in": "100ubadge", "routes": [{"pool_id": 1, "token_out_denom": "..."}]})
+    /// @return tokenOutAmount The estimated output token amount
+    function estimateSwapExactAmountIn(string memory msgJson)
+        external
+        view
+        returns (uint256 tokenOutAmount);
+
+    /// @notice Estimate input amount required for a swap given an exact output coin and routes
+    /// @param msgJson JSON string matching QuerySwapExactAmountOutRequest ({"token_out": "100uusdc", "routes": [{"pool_id": 1, "token_in_denom": "..."}]})
+    /// @return tokenInAmount The estimated input token amount
+    function estimateSwapExactAmountOut(string memory msgJson)
+        external
+        view
+        returns (uint256 tokenInAmount);
+
+    /// @notice Get total liquidity for a specific pool
+    /// @param msgJson JSON string matching QueryTotalPoolLiquidityRequest ({"pool_id": 1})
+    /// @return liquidity The pool liquidity as an array of Coin structs
+    function getTotalPoolLiquidity(string memory msgJson)
+        external
+        view
+        returns (GammTypes.Coin[] memory liquidity);
+
+    /// @notice Get the configured taker fee for an ordered trading pair (18-dec string)
+    /// @param msgJson JSON string matching poolmanager TradingPairTakerFeeRequest ({"denom_0": "...", "denom_1": "..."})
+    /// @return takerFee The taker fee decimal string
+    function getTradingPairTakerFee(string memory msgJson)
+        external
+        view
+        returns (string memory takerFee);
+
+    /// @notice Get the total number of pools created
+    /// @param msgJson JSON string ("{}")
+    /// @return numPools Total number of pools
+    function getNumPools(string memory msgJson)
+        external
+        view
+        returns (uint64 numPools);
 }
 

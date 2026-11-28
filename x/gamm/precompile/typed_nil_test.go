@@ -8,6 +8,7 @@ import (
 
 	gammkeeper "github.com/bitbadges/bitbadgeschain/x/gamm/keeper"
 	gammtypes "github.com/bitbadges/bitbadgeschain/x/gamm/types"
+	poolmanagertypes "github.com/bitbadges/bitbadgeschain/x/poolmanager/types"
 )
 
 // A nil *QueryPoolResponse handed to an interface is not an interface nil -- it
@@ -30,6 +31,14 @@ func TestPackQueryResponseRejectsTypedNil(t *testing.T) {
 		{"marshal branch", GetPoolMethod, (*gammtypes.QueryPoolResponse)(nil)},
 		{"field-access branch", GetPoolTypeMethod, (*gammtypes.QueryPoolTypeResponse)(nil)},
 		{"default marshal branch", GetTotalLiquidityMethod, (*gammtypes.QueryTotalLiquidityResponse)(nil)},
+		{"spotPrice branch", SpotPriceMethod, (*gammtypes.QuerySpotPriceResponse)(nil)},
+		{"getTotalVolumeForPool branch", GetTotalVolumeForPoolMethod, (*poolmanagertypes.TotalVolumeForPoolResponse)(nil)},
+		{"getTakerFeesTracker branch", GetTakerFeesTrackerMethod, (*GetTakerFeesTrackerResponse)(nil)},
+		{"estimateSwapExactAmountIn branch", EstimateSwapExactAmountInMethod, (*gammtypes.QuerySwapExactAmountInResponse)(nil)},
+		{"estimateSwapExactAmountOut branch", EstimateSwapExactAmountOutMethod, (*gammtypes.QuerySwapExactAmountOutResponse)(nil)},
+		{"getTotalPoolLiquidity branch", GetTotalPoolLiquidityMethod, (*gammtypes.QueryTotalPoolLiquidityResponse)(nil)},
+		{"getTradingPairTakerFee branch", GetTradingPairTakerFeeMethod, (*poolmanagertypes.TradingPairTakerFeeResponse)(nil)},
+		{"getNumPools branch", GetNumPoolsMethod, (*gammtypes.QueryNumPoolsResponse)(nil)},
 	}
 
 	p := NewPrecompile(gammkeeper.Keeper{}, nil)

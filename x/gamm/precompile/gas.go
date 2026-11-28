@@ -42,6 +42,12 @@ const (
 	GasGetTotalLiquidityBase           = 5_000
 	GasEstimateSwapExactAmountInBase   = 10_000
 	GasEstimateSwapExactAmountOutBase  = 10_000
+	GasSpotPriceBase                   = 3_000
+	GasGetTotalVolumeForPoolBase       = 3_000
+	GasGetTakerFeesTrackerBase         = 5_000
+	GasGetTotalPoolLiquidityBase       = 3_000
+	GasGetTradingPairTakerFeeBase      = 3_000
+	GasGetNumPoolsBase                 = 2_000
 )
 
 // CalculateDynamicGas calculates dynamic gas based on input complexity

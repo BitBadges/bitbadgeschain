@@ -367,6 +367,216 @@
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "spotPrice",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "spotPrice",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "getTotalVolumeForPool",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "volume",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "getTakerFeesTracker",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "takerFeesToStakers",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "takerFeesToCommunityPool",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "int64",
+          "name": "heightAccountingStartsFrom",
+          "type": "int64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "estimateSwapExactAmountIn",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenOutAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "estimateSwapExactAmountOut",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenInAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "getTotalPoolLiquidity",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "liquidity",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "getTradingPairTakerFee",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "takerFee",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "msgJson",
+          "type": "string"
+        }
+      ],
+      "name": "getNumPools",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "numPools",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
 }
