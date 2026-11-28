@@ -466,12 +466,22 @@ func ValidateAddressListInput(addressListInput *AddressListInput) error {
 }
 
 func ValidateUserOutgoingApprovals(ctx sdk.Context, userOutgoingApprovals []*UserOutgoingApproval, fromAddress string, canChangeValues bool) error {
+	for i, approval := range userOutgoingApprovals {
+		if approval == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "nil approval entry at index %d", i)
+		}
+	}
 	castedTransfers := CastOutgoingTransfersToCollectionTransfers(userOutgoingApprovals, fromAddress)
 	err := ValidateCollectionApprovals(ctx, castedTransfers, canChangeValues)
 	return err
 }
 
 func ValidateUserIncomingApprovals(ctx sdk.Context, userIncomingApprovals []*UserIncomingApproval, toAddress string, canChangeValues bool) error {
+	for i, approval := range userIncomingApprovals {
+		if approval == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "nil approval entry at index %d", i)
+		}
+	}
 	castedTransfers := CastIncomingTransfersToCollectionTransfers(userIncomingApprovals, toAddress)
 	err := ValidateCollectionApprovals(ctx, castedTransfers, canChangeValues)
 	return err
@@ -591,6 +601,12 @@ func EnforceMustPrioritizeForOutgoing(ac *OutgoingApprovalCriteria) {
 }
 
 func ValidateCollectionApprovals(ctx sdk.Context, collectionApprovals []*CollectionApproval, canChangeValues bool) error {
+	for i, collectionApproval := range collectionApprovals {
+		if collectionApproval == nil {
+			return sdkerrors.Wrapf(ErrInvalidRequest, "collection approved transfer is nil at index %d", i)
+		}
+	}
+
 	for i := 0; i < len(collectionApprovals); i++ {
 		if collectionApprovals[i].ApprovalId == "" {
 			return sdkerrors.Wrapf(ErrInvalidRequest, "approval id is uninitialized at index %d", i)

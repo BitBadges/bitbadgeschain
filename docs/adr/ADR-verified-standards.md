@@ -1,7 +1,7 @@
 # ADR: Deterministic Standard Verification (`VerifiedStandards` vs `ClaimedStandards`)
 
 - **Ticket:** BB-374
-- **Status:** Proposed / Implemented (Verification Engine)
+- **Status:** Scoping ADR (Implementation tracked under dedicated Standards Verification epic `BB-374`)
 - **Scope:** `BitBadges/bitbadgeschain` (`x/tokenization/types`), parity with `bitbadges-solana`, `services/indexer-rs/crates/bb-standards`, and `bitbadgesjs`
 
 ## 1. Context & Problem Statement
@@ -69,6 +69,6 @@ All 12 standards are checked deterministically with zero consolidation:
 
 ## 6. Cross-Repo Parity Plan
 
-- **Go (`bitbadgeschain`):** `x/tokenization/types/verify_standards.go` + `verify_standards_test.go` (implemented in this PR).
+- **Go (`bitbadgeschain`):** Dedicated `BB-374` Standards Verification PR introducing `x/tokenization/types/verify_standards.go` wired into query/validation surfaces.
 - **Rust (`bitbadges-monorepo` / `bitbadges-solana`):** `crates/bb-standards` mirrors the exact violation codes (`NON_TRANSFERABLE_UNFROZEN_APPROVALS`, `SUBSCRIPTION_MISSING_DURATION`, `BOUNTY_MISSING_MUTUAL_EXCLUSION`, etc.).
 - **TypeScript (`bitbadgesjs`):** `src/core/verify-standards.ts` shares golden pass/fail fixtures with Go and Rust to permanently eliminate `H-14` verification drift.

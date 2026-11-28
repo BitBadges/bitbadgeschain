@@ -2,7 +2,7 @@
 
 - **Ticket:** BB-379
 - **Aligned With:** `BB-146` (Subscriptions Redesign — Plan Changes, Proration, Renewal Consent Separation)
-- **Status:** Scoping ADR + Go Prototype (`x/tokenization/types/pull_allowance_prototype.go`)
+- **Status:** Scoping ADR (Implementation deferred to dedicated chain upgrade PR)
 - **Scope:** `bitbadgeschain` (`x/tokenization` + `x/bank`), parity analysis for `bitbadges-solana` (SPL Token Delegate / PDA)
 
 ## 1. Context & Alignment with Subscriptions Redesign (`BB-146`)
@@ -27,7 +27,7 @@ message CoinPullAllowance {
   uint64 collectionId = 4;
   string approvalId = 5;
   uint64 approvalVersion = 6;     // Pinned collection approval version
-  bytes termsHash = 7;            // SHA-256 over (collectionId, approvalId, version, denom, amount, payoutAddress, periodLengthMs)
+  bytes termsHash = 7;            // SHA-256 over canonical deterministic protobuf bytes of PullAllowanceTerms (NOT `|` string concatenation)
   string denom = 8;
   string maxAmountPerPeriod = 9;  // Hard cap per billing period (never overcharged)
   uint64 startTimeMs = 10;
@@ -36,16 +36,27 @@ message CoinPullAllowance {
   string maxExecutorFee = 13;     // Optional bounded fee paid to permissionless keeper/executor
   bool revoked = 14;
 }
+
+message PullAllowanceTerms {
+  uint64 collectionId = 1;
+  string approvalId = 2;
+  uint64 approvalVersion = 3;
+  string priceDenom = 4;
+  string priceAmount = 5;
+  string payoutAddress = 6;
+  uint64 periodLengthMs = 7;
+}
 ```
 
 ### Core Safety Guarantees
 
-1. **Hard Per-Period Cap (Never Overcharged):**
+1. **Hard Per-Period Cap & Executor Fee Validation (Never Overcharged):**
    - For any pull at timestamp `nowMs`, the current period index is computed deterministically: `periodIdx = (nowMs - startTimeMs) / periodLengthMs`.
-   - `spentInPeriod + pullAmount + executorFee <= maxAmountPerPeriod` is enforced unconditionally.
+   - `spentInPeriod + pullAmount + executorFee <= maxAmountPerPeriod` and `executorFee <= maxExecutorFee` are enforced unconditionally.
+   - **Non-empty `executorAddress` requirement:** Whenever `executorFee > 0`, `MsgExecutePullRenewal` MUST require a valid, non-empty `executorAddress` (rejecting empty or malformed addresses before any debit occurs) so executor fees can never be burned, lost, or misrouted.
    - Period quota resets cleanly when `periodIdx` advances; unused quota does **not** roll over (preventing burst drains after dormancy).
-2. **Immutable Terms Binding (Merchant Price-Mutation Rejection):**
-   - Because `CoinPullAllowance` pins BOTH `approvalVersion` AND `termsHash = SHA256(collectionId, approvalId, version, priceDenom, priceAmount, payoutAddress, periodLengthMs)`, a merchant **cannot** raise the subscription price, shorten the period, or redirect payout funds after consent.
+2. **Immutable Terms Binding via Canonical Protobuf Hashing (Merchant Price-Mutation Rejection):**
+   - Because `CoinPullAllowance` pins BOTH `approvalVersion` AND `termsHash = SHA256(proto.MarshalDeterministic(PullAllowanceTerms{...}))` using canonical deterministic protobuf serialization (explicitly avoiding delimiter-based `|` string concatenation, which is vulnerable to delimiter-collision ambiguity across string fields such as `approvalId`, `priceDenom`, or `payoutAddress`), a merchant **cannot** raise the subscription price, shorten the period, or redirect payout funds after consent.
    - Any modification to the collection approval bumps `approvalVersion` and changes `termsHash` -> pulls are immediately rejected (`ErrTermsMutated`) until the subscriber explicitly signs a new consent!
    - Aligns directly with `BB-146`'s rule: *"existing incoming consent contains explicit values and is not rewritten by changing collection terms."*
 3. **Instant 1-Tx Revocation:**
@@ -78,11 +89,12 @@ message CoinPullAllowance {
 - **Cosmos (`bitbadgeschain`):** Implemented natively inside `x/tokenization` using a dedicated module-scoped debit path via `bankKeeper.SendCoins` (gated strictly by `CoinPullAllowance` verification, never general arbitrary debit) inside `AtomicContext` so payment + token mint succeed or roll back atomically.
 - **Solana (`bitbadges-solana`):** Implemented via an Anchor `PullAllowance` PDA + SPL Token `ApproveChecked` delegation to the program's vault authority PDA. The program enforces `terms_hash`, `period_length`, `max_amount_per_period`, `valid_until`, and `revoked` before invoking `token::transfer_checked` and minting the time-bounded subscription entitlement in the same instruction.
 
-## 6. Prototype Verification
+## 6. Planned Implementation & Verification Criteria
 
-See `x/tokenization/types/pull_allowance_prototype.go` and `pull_allowance_prototype_test.go` for the executable Go prototype covering:
+Implementation is deferred to a dedicated chain upgrade PR introducing `CoinPullAllowance`, `PullAllowanceTerms`, `MsgGrantCoinPullAllowance`, `MsgRevokeCoinPullAllowance`, and `MsgExecutePullRenewal`. Acceptance tests must cover:
 1. Initial subscriber consent grant & first charge.
 2. Periodic capped pulls (rejects over-cap pulls within the same period, rolls over cleanly on next period boundary).
-3. Insufficient-balance grace handling (zero corruption, zero quota loss, succeeds after top-up).
-4. Instant mid-period revocation by subscriber (and rejection of unauthorized revocation attempts).
-5. Merchant price / payout / version mutation rejection via `TermsHash` & `ApprovalVersion` verification.
+3. Non-empty, valid `executorAddress` enforcement whenever `executorFee > 0` (and `executorFee <= maxExecutorFee`).
+4. Insufficient-balance grace handling (zero corruption, zero quota loss, succeeds after top-up).
+5. Instant mid-period revocation by subscriber (and rejection of unauthorized revocation attempts).
+6. Merchant price / payout / version mutation rejection via canonical protobuf `TermsHash` & `ApprovalVersion` verification.

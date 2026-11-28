@@ -3,9 +3,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // SDK CLI forwarders.
@@ -45,29 +47,147 @@ func isSDKForwarderCmd(cmd *cobra.Command) bool {
 	return cmd.Annotations[annotationSDKForwarder] == "true"
 }
 
-// stripLeadingChainHomeFlag removes a leading Cosmos root `--home <dir>` or
-// `--home=<dir>` flag that Cobra leaves in args when dispatching to a
-// DisableFlagParsing forwarder (e.g. `bb --home /tmp/empty dev --help`).
-// bitbadges-cli does not accept Cosmos's `--home` flag, so stripping it avoids
-// forwarding an unknown root flag while preserving all subcommand args verbatim.
-func stripLeadingChainHomeFlag(args []string) []string {
-	out := args
-	for len(out) > 0 {
-		if out[0] == "--home" {
-			if len(out) >= 2 {
-				out = out[2:]
-				continue
-			}
-			out = out[1:]
-			continue
-		}
-		if strings.HasPrefix(out[0], "--home=") {
-			out = out[1:]
-			continue
-		}
-		break
+// cliArgsProvider returns the raw CLI arguments (excluding argv[0]) that Cobra
+// dispatched from. Overridden only in unit tests if needed; production uses os.Args[1:].
+var cliArgsProvider = func() []string {
+	if len(os.Args) <= 1 {
+		return nil
 	}
-	return out
+	return os.Args[1:]
+}
+
+// lookupCmdFlag looks up a flag (or shorthand) defined on cmd or inherited from
+// any ancestor's PersistentFlags.
+func lookupCmdFlag(c *cobra.Command, name string, shorthand bool) *pflag.Flag {
+	for cur := c; cur != nil; cur = cur.Parent() {
+		if cur == c {
+			if shorthand {
+				if f := cur.Flags().ShorthandLookup(name); f != nil {
+					return f
+				}
+			} else {
+				if f := cur.Flags().Lookup(name); f != nil {
+					return f
+				}
+			}
+		}
+		if shorthand {
+			if f := cur.PersistentFlags().ShorthandLookup(name); f != nil {
+				return f
+			}
+		} else {
+			if f := cur.PersistentFlags().Lookup(name); f != nil {
+				return f
+			}
+		}
+	}
+	return nil
+}
+
+// extractForwarderArgs locates cmd along its command path in rawArgs, confirms
+// that the leading root/parent flags plus trailing subcommand tokens reconstruct
+// cobraArgs verbatim, and returns ONLY the tokens appearing after cmd.
+//
+// Because SDK forwarders set DisableFlagParsing: true, Cobra leaves leading
+// persistent root flags (such as --home, --log_level, --log_format, --trace)
+// in args alongside the subcommand's own flags. Inspecting rawArgs by position
+// relative to the matched command token strips leading Cosmos root flags
+// (`bb --log_level info --home /tmp/empty dev --help` -> `["--help"]`) while
+// preserving any flags that appear AFTER the subcommand (`bb dev --home /foo`
+// -> `["--home", "/foo"]`, `bb cli --home /foo` -> `["--home", "/foo"]`).
+func extractForwarderArgs(cmd *cobra.Command, rawArgs, cobraArgs []string) ([]string, bool) {
+	if cmd == nil {
+		return nil, false
+	}
+
+	var path []*cobra.Command
+	for cur := cmd; cur != nil && cur.HasParent(); cur = cur.Parent() {
+		path = append(path, cur)
+	}
+	if len(path) == 0 {
+		return nil, false
+	}
+	slices.Reverse(path)
+
+	pos := 0
+	prefixTokens := make([]string, 0)
+	parent := cmd.Root()
+
+	for _, target := range path {
+		matched := false
+		for pos < len(rawArgs) {
+			tok := rawArgs[pos]
+			switch {
+			case tok == "--":
+				return nil, false
+			case strings.HasPrefix(tok, "--") && len(tok) > 2:
+				prefixTokens = append(prefixTokens, tok)
+				if !strings.Contains(tok, "=") {
+					f := lookupCmdFlag(parent, tok[2:], false)
+					if f == nil || f.NoOptDefVal == "" {
+						if pos+1 >= len(rawArgs) {
+							return nil, false
+						}
+						pos++
+						prefixTokens = append(prefixTokens, rawArgs[pos])
+					}
+				}
+				pos++
+			case strings.HasPrefix(tok, "-") && len(tok) == 2 && tok != "--":
+				prefixTokens = append(prefixTokens, tok)
+				f := lookupCmdFlag(parent, tok[1:], true)
+				if f == nil || f.NoOptDefVal == "" {
+					if pos+1 >= len(rawArgs) {
+						return nil, false
+					}
+					pos++
+					prefixTokens = append(prefixTokens, rawArgs[pos])
+				}
+				pos++
+			case strings.HasPrefix(tok, "-") && len(tok) > 2:
+				prefixTokens = append(prefixTokens, tok)
+				pos++
+			default:
+				if tok == target.CalledAs() || tok == target.Name() || target.HasAlias(tok) {
+					pos++
+					matched = true
+				} else {
+					return nil, false
+				}
+			}
+			if matched {
+				break
+			}
+		}
+		if !matched {
+			return nil, false
+		}
+		parent = target
+	}
+
+	suffix := rawArgs[pos:]
+	reconstructed := make([]string, 0, len(prefixTokens)+len(suffix))
+	reconstructed = append(reconstructed, prefixTokens...)
+	reconstructed = append(reconstructed, suffix...)
+	if !slices.Equal(reconstructed, cobraArgs) {
+		return nil, false
+	}
+
+	out := make([]string, len(suffix))
+	copy(out, suffix)
+	return out, true
+}
+
+// forwarderArgs returns the exact arguments to pass through to bitbadges-cli
+// for an SDK forwarder command, stripping only leading Cosmos root/parent flags
+// that preceded the matched command token in the process argv.
+func forwarderArgs(cmd *cobra.Command, args []string) []string {
+	if raw := cliArgsProvider(); len(raw) > 0 {
+		if subArgs, ok := extractForwarderArgs(cmd, raw, args); ok {
+			return subArgs
+		}
+	}
+	return args
 }
 
 // sdkForwarderSpec describes a single top-level SDK forwarder.
@@ -176,7 +296,7 @@ bitbadges npm package (npm install -g bitbadges).
 Run with --help to see the SDK subcommand's own help:
   bitbadgeschaind %s --help`, spec.name, spec.name),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return execNodeCLI(spec.name, stripLeadingChainHomeFlag(args))
+			return execNodeCLI(spec.name, forwarderArgs(cmd, args))
 		},
 	}
 	if spec.deprecated != "" {
@@ -222,7 +342,7 @@ func registerSDKTxSubforwarders(txCmd *cobra.Command) {
 All arguments and flags are passed through verbatim. Requires the
 bitbadges npm package (npm install -g bitbadges).`, spec.name),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				return execNodeCLI("tx", append([]string{spec.name}, stripLeadingChainHomeFlag(args)...))
+				return execNodeCLI("tx", append([]string{spec.name}, forwarderArgs(cmd, args)...))
 			},
 		})
 	}

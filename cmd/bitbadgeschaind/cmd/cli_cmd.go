@@ -59,7 +59,7 @@ Requires: Node.js + bitbadges-cli (npm install -g bitbadges)`,
 			annotationSDKForwarder: "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			args = stripLeadingChainHomeFlag(args)
+			args = forwarderArgs(cmd, args)
 			if len(args) == 0 {
 				fmt.Fprintln(os.Stderr, "Usage: bitbadgeschaind cli <subcommand> [args...]")
 				fmt.Fprintln(os.Stderr, "Run `bitbadgeschaind cli --help` for the list of subcommands.")

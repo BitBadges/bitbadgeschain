@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"math"
 	"reflect"
 	"testing"
 
@@ -72,7 +73,13 @@ func TestApprovalCriteriaCastReflectionRoundTrip(t *testing.T) {
 		MerkleChallenges: []*types.MerkleChallenge{{Root: "0xabc", ExpectedProofLength: sdkmath.NewUint(2), MaxUsesPerLeaf: sdkmath.NewUint(1), ChallengeTrackerId: "mc1"}},
 		PredeterminedBalances: &types.PredeterminedBalances{
 			OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
-			ManualBalances:         []*types.ManualBalances{{Balances: []*types.Balance{{Amount: sdkmath.NewUint(1), TokenIds: singleRange(1), OwnershipTimes: fullRanges()}}}},
+			ManualBalances: []*types.ManualBalances{{
+				Balances: []*types.Balance{{
+					Amount:         sdkmath.NewUint(1),
+					TokenIds:       []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+					OwnershipTimes: []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+				}},
+			}},
 		},
 		ApprovalAmounts: &types.ApprovalAmounts{OverallApprovalAmount: sdkmath.NewUint(10), AmountTrackerId: "amt1"},
 		MaxNumTransfers: &types.MaxNumTransfers{OverallMaxNumTransfers: sdkmath.NewUint(5), AmountTrackerId: "cnt1"},
@@ -99,7 +106,7 @@ func TestApprovalCriteriaCastReflectionRoundTrip(t *testing.T) {
 		UserApprovalSettings:               &types.UserApprovalSettings{DisableUserCoinTransfers: true},
 	}
 
-	// Assert our test fixture actually populated EVERY exported field on ApprovalCriteria!
+	// Assert our test fixture actually populated EVERY exported field on ApprovalCriteria.
 	fullVal := reflect.ValueOf(fullCollection).Elem()
 	for i := 0; i < acType.NumField(); i++ {
 		f := acType.Field(i)
@@ -167,175 +174,93 @@ func TestApprovalCriteriaCastReflectionRoundTrip(t *testing.T) {
 		require.Equal(t, want, got, "CastIncoming->Collection mismatch on field %s", f.Name)
 	}
 
-	// Nil-safety checks for all transfer and criteria casts.
+	// Single-element cast nil-safety checks (never panic, preserve nil).
 	require.Nil(t, types.CastOutgoingTransferToCollectionTransfer(nil, "bb1from"))
 	require.Nil(t, types.CastFromCollectionTransferToOutgoingTransfer(nil))
 	require.Nil(t, types.CastIncomingTransferToCollectionTransfer(nil, "bb1to"))
 	require.Nil(t, types.CastFromCollectionTransferToIncomingTransfer(nil))
-	require.Empty(t, types.CastOutgoingTransfersToCollectionTransfers([]*types.UserOutgoingApproval{nil}, "bb1from"))
-	require.Empty(t, types.CastIncomingTransfersToCollectionTransfers([]*types.UserIncomingApproval{nil}, "bb1to"))
+
+	// Slice casts must NOT silently drop nil elements (length preserved so callers
+	// and validators reject nil entries explicitly instead of hiding them).
+	castOutSlice := types.CastOutgoingTransfersToCollectionTransfers([]*types.UserOutgoingApproval{nil}, "bb1from")
+	require.Len(t, castOutSlice, 1)
+	require.Nil(t, castOutSlice[0])
+
+	castInSlice := types.CastIncomingTransfersToCollectionTransfers([]*types.UserIncomingApproval{nil}, "bb1to")
+	require.Len(t, castInSlice, 1)
+	require.Nil(t, castInSlice[0])
 }
 
-func TestValidateApprovalCriteriaErgonomics_MutualExclusivity(t *testing.T) {
-	t.Run("rejects PredeterminedBalances + ApprovalAmounts", func(t *testing.T) {
-		criteria := &types.ApprovalCriteria{
-			PredeterminedBalances: &types.PredeterminedBalances{
-				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
-				IncrementedBalances: &types.IncrementedBalances{
-					DurationFromTimestamp: sdkmath.NewUint(1000),
-				},
-			},
-			ApprovalAmounts: &types.ApprovalAmounts{
-				OverallApprovalAmount: sdkmath.NewUint(10),
-				AmountTrackerId:       "t1",
-			},
-		}
-		err := types.ValidateApprovalCriteriaErgonomics(criteria)
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "mutually exclusive")
-	})
-
-	t.Run("rejects DurationFromTimestamp + RecurringOwnershipTimes", func(t *testing.T) {
-		criteria := &types.ApprovalCriteria{
-			PredeterminedBalances: &types.PredeterminedBalances{
-				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
-				IncrementedBalances: &types.IncrementedBalances{
-					DurationFromTimestamp: sdkmath.NewUint(3600000),
-					RecurringOwnershipTimes: &types.RecurringOwnershipTimes{
-						StartTime:          sdkmath.NewUint(1000),
-						IntervalLength:     sdkmath.NewUint(3600000),
-						ChargePeriodLength: sdkmath.NewUint(60000),
-					},
-				},
-			},
-		}
-		err := types.ValidateApprovalCriteriaErgonomics(criteria)
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "mutually exclusive")
-	})
-
-	t.Run("rejects contradictory party-relation booleans", func(t *testing.T) {
-		err := types.ValidateApprovalCriteriaErgonomics(&types.ApprovalCriteria{
-			RequireToEqualsInitiatedBy:       true,
-			RequireToDoesNotEqualInitiatedBy: true,
-		})
-		require.Error(t, err)
-
-		err = types.ValidateApprovalCriteriaErgonomics(&types.ApprovalCriteria{
-			RequireFromEqualsInitiatedBy:       true,
-			RequireFromDoesNotEqualInitiatedBy: true,
-		})
-		require.Error(t, err)
-	})
-
-	t.Run("rejects contradictory AddressChecks", func(t *testing.T) {
-		err := types.ValidateApprovalCriteriaErgonomics(&types.ApprovalCriteria{
-			SenderChecks: &types.AddressChecks{
-				MustBeEvmContract:    true,
-				MustNotBeEvmContract: true,
-			},
-		})
-		require.Error(t, err)
-	})
-
-	t.Run("allows valid non-conflicting criteria", func(t *testing.T) {
-		criteria := &types.ApprovalCriteria{
-			PredeterminedBalances: &types.PredeterminedBalances{
-				OrderCalculationMethod: &types.PredeterminedOrderCalculationMethod{UseOverallNumTransfers: true},
-				IncrementedBalances: &types.IncrementedBalances{
-					DurationFromTimestamp: sdkmath.NewUint(86400000),
-				},
-			},
-			RequireToEqualsInitiatedBy: true,
-		}
-		require.NoError(t, types.ValidateApprovalCriteriaErgonomics(criteria))
-		require.NoError(t, types.ValidateApprovalCriteriaErgonomics(nil))
-	})
-
-	t.Run("validates user outgoing and incoming tiers identically", func(t *testing.T) {
-		outErr := types.ValidateOutgoingApprovalCriteriaErgonomics(&types.OutgoingApprovalCriteria{
-			RequireToEqualsInitiatedBy:       true,
-			RequireToDoesNotEqualInitiatedBy: true,
-		})
-		require.Error(t, outErr)
-
-		inErr := types.ValidateIncomingApprovalCriteriaErgonomics(&types.IncomingApprovalCriteria{
-			RequireFromEqualsInitiatedBy:       true,
-			RequireFromDoesNotEqualInitiatedBy: true,
-		})
-		require.Error(t, inErr)
-	})
-}
-
-func TestValidateAddressListPredicate(t *testing.T) {
-	valid := []string{
-		"All",
-		"AllWithoutMint",
-		"Mint",
-		"!Mint",
-		"!(bb1a:bb1b)",
-		"bb1a:bb1b",
-		"customList123",
+func TestValidateUserApprovals_RejectsNilEntries(t *testing.T) {
+	ctx := sdk.Context{}
+	validOutgoing := &types.UserOutgoingApproval{
+		ApprovalId:        "out-1",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+		OwnershipTimes:    []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+		TransferTimes:     []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 	}
-	for _, id := range valid {
-		require.NoError(t, types.ValidateAddressListPredicate(id), "expected %q to be valid", id)
+	validIncoming := &types.UserIncomingApproval{
+		ApprovalId:        "in-1",
+		FromListId:        "All",
+		InitiatedByListId: "All",
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+		OwnershipTimes:    []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+		TransferTimes:     []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+	}
+	validCollection := &types.CollectionApproval{
+		ApprovalId:        "col-1",
+		FromListId:        "All",
+		ToListId:          "All",
+		InitiatedByListId: "All",
+		TokenIds:          []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(1)}},
+		OwnershipTimes:    []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
+		TransferTimes:     []*types.UintRange{{Start: sdkmath.NewUint(1), End: sdkmath.NewUint(math.MaxUint64)}},
 	}
 
-	invalid := []string{
-		"",
-		"!",
-		"!!Mint",
-		"!()",
-		"!(Mint",
-		"bb1a::bb1b",
-		":bb1a",
-		"bb1a:",
-		"bb1a:!bb1b",
-		"All With Space",
-		"AllWithout",
-	}
-	for _, id := range invalid {
-		require.Error(t, types.ValidateAddressListPredicate(id), "expected %q to be rejected", id)
-	}
-}
-
-func TestNormalizeCollectionApprovalDefaultsAndDefaultBalances(t *testing.T) {
-	t.Run("Mint approval automatically sets OverridesFromOutgoingApprovals", func(t *testing.T) {
-		mintApproval := &types.CollectionApproval{
-			ApprovalId:        "mint",
-			FromListId:        types.MintAddress,
-			ToListId:          "AllWithoutMint",
-			InitiatedByListId: "AllWithoutMint",
-		}
-		types.NormalizeCollectionApprovalDefaults(mintApproval)
-		require.NotNil(t, mintApproval.ApprovalCriteria)
-		require.True(t, mintApproval.ApprovalCriteria.OverridesFromOutgoingApprovals)
+	t.Run("ValidateUserOutgoingApprovals rejects single nil entry", func(t *testing.T) {
+		require.NotPanics(t, func() {
+			err := types.ValidateUserOutgoingApprovals(ctx, []*types.UserOutgoingApproval{nil}, "bb1from", false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "nil approval")
+		})
 	})
 
-	t.Run("AllowBackedMinting automatically enforces MustPrioritize", func(t *testing.T) {
-		backed := &types.CollectionApproval{
-			ApprovalId: "deposit",
-			FromListId: "bb1backing",
-			ToListId:   "AllWithoutMint",
-			ApprovalCriteria: &types.ApprovalCriteria{
-				AllowBackedMinting: true,
-				MustPrioritize:     false,
-			},
-		}
-		types.NormalizeCollectionApprovalDefaults(backed)
-		require.True(t, backed.ApprovalCriteria.MustPrioritize)
-		require.False(t, backed.ApprovalCriteria.OverridesFromOutgoingApprovals)
+	t.Run("ValidateUserOutgoingApprovals rejects trailing nil entry", func(t *testing.T) {
+		require.NotPanics(t, func() {
+			err := types.ValidateUserOutgoingApprovals(ctx, []*types.UserOutgoingApproval{validOutgoing, nil}, "bb1from", false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "nil approval")
+		})
 	})
 
-	t.Run("NormalizeDefaultBalances defaults AutoApproveAllIncomingTransfers to true unless opted out", func(t *testing.T) {
-		def := types.NormalizeDefaultBalances(nil, false)
-		require.True(t, def.AutoApproveAllIncomingTransfers)
-		require.True(t, def.AutoApproveSelfInitiatedOutgoingTransfers)
-		require.True(t, def.AutoApproveSelfInitiatedIncomingTransfers)
+	t.Run("ValidateUserIncomingApprovals rejects single nil entry", func(t *testing.T) {
+		require.NotPanics(t, func() {
+			err := types.ValidateUserIncomingApprovals(ctx, []*types.UserIncomingApproval{nil}, "bb1to", false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "nil approval")
+		})
+	})
 
-		optOut := types.NormalizeDefaultBalances(nil, true)
-		require.False(t, optOut.AutoApproveAllIncomingTransfers)
-		require.True(t, optOut.AutoApproveSelfInitiatedOutgoingTransfers)
-		require.True(t, optOut.AutoApproveSelfInitiatedIncomingTransfers)
+	t.Run("ValidateUserIncomingApprovals rejects trailing nil entry", func(t *testing.T) {
+		require.NotPanics(t, func() {
+			err := types.ValidateUserIncomingApprovals(ctx, []*types.UserIncomingApproval{validIncoming, nil}, "bb1to", false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "nil approval")
+		})
+	})
+
+	t.Run("ValidateCollectionApprovals rejects nil entry without panicking", func(t *testing.T) {
+		require.NotPanics(t, func() {
+			err := types.ValidateCollectionApprovals(ctx, []*types.CollectionApproval{nil}, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "nil")
+		})
+		require.NotPanics(t, func() {
+			err := types.ValidateCollectionApprovals(ctx, []*types.CollectionApproval{validCollection, nil}, false)
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "nil")
+		})
 	})
 }

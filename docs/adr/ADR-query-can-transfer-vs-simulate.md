@@ -1,8 +1,8 @@
 # ADR: Read-Only Policy Introspection (`EvaluateCanTransfer` / `QueryCanTransfer`) vs Native Cosmos `Simulate`
 
 - **Ticket:** BB-378
-- **Status:** Accepted & Keeper Core Implemented (`x/tokenization/keeper/can_transfer.go`)
-- **Scope:** `bitbadgeschain` (`x/tokenization/keeper`, future gRPC + EVM precompile `0x1001`), `bitbadges-solana`, `bb-api`, `bb-mcp`
+- **Status:** Scoping ADR (Implementation deferred to dedicated gRPC `Query/CanTransfer` PR)
+- **Scope:** `bitbadgeschain` (`x/tokenization/keeper`, gRPC `Query/CanTransfer`, EVM precompile `0x1001`), `bitbadges-solana`, `bb-api`, `bb-mcp`
 
 ## 1. Context & Problem Statement
 
@@ -53,7 +53,7 @@ Neither mechanism replaces the other; they complement each other in a two-tier p
    -> Verifies AnteHandler, accurate gas limit, fee balance, and multi-msg atomicity
 ```
 
-## 4. Implementation Architecture (`x/tokenization/keeper/can_transfer.go`)
+## 4. Planned Implementation Architecture (Dedicated gRPC `Query/CanTransfer` PR)
 
 1. **Strict Read-Only Isolation:**
    - Entry point `Keeper.EvaluateCanTransfer(ctx sdk.Context, req CanTransferRequest) CanTransferResult` immediately creates `cacheCtx, _ := ctx.CacheContext()`.
@@ -61,13 +61,15 @@ Neither mechanism replaces the other; they complement each other in a two-tier p
    - Caller-supplied `*types.Transfer` is deep-copied before evaluation so in-place normalization inside `HandleTransfersEnriched` never mutates caller memory.
 2. **Optional `AtTimestampMs` Override:**
    - When `req.AtTimestampMs > 0` (and within `math.MaxInt64`), `cacheCtx = cacheCtx.WithBlockTime(time.UnixMilli(int64(req.AtTimestampMs)))`.
-3. **Exact Execution Parity:**
+3. **Exact Execution Parity & Accurate `RequiredCoins` Accounting:**
    - Runs the real `k.HandleTransfersEnriched(cacheCtx, collection, []*types.Transfer{transferCopy}, req.InitiatedBy)` path so `Allowed == true` matches real consensus execution 1:1 (zero logic drift!).
-   - Extracts deduplicated `MatchedApprovalIds` and aggregated `RequiredCoins` (`sdk.Coins`) directly from `TransferTrackingResult`.
+   - **`RequiredCoins` semantics (Critical Design Requirement):**
+     - `RequiredCoins` MUST strictly distinguish **initiator-paid coins** (coins debited from `initiatedBy`) from **escrow / approver-paid payouts** (`OverrideFromWithApproverAddress: true`, where coins are debited from the collection/approver escrow rather than from the initiator — e.g. bounty payouts, crowdfund withdrawals, or refunds MUST NOT be misreported as coins the initiator must pay!).
+     - `RequiredCoins` MUST also include **backed / vault bank deposits** required when minting or wrapping via `CosmosCoinBackedPath` (e.g., `AllowBackedMinting: true` vault/smart-token deposits), not just `ApprovalCriteria.CoinTransfers`.
 4. **Structured Diagnostic Pass on Failure:**
-   - When execution fails, `diagnoseTransferFailure` inspects validation, archive status, sender token balances, every collection approval (address match, transfer time, token IDs / ownership times, prioritization, criteria checkers, coin transfers, merkle/eth challenges, trackers, predetermined balances), and user outgoing/incoming approvals — each inside its own discarded `CacheContext`.
+   - When execution fails, `diagnoseTransferFailure` inspects validation, archive status, sender token balances, every candidate collection approval (respecting `OnlyCheckPrioritizedCollectionApprovals`), and user outgoing/incoming approvals — each inside its own discarded `CacheContext`.
 
-## 5. Future Wire Surface (Next Step)
+## 5. Wire Surface & Rollout (Dedicated Follow-Up PR)
 
-- Wire `EvaluateCanTransfer` to a new gRPC query endpoint `Query/CanTransfer` in `proto/tokenization/query.proto` (additive, non-breaking) and to EVM precompile `0x1001` (`canTransfer(...) external view returns (bool, string[] memory, ...)`).
-- Mirror the same response shape in `bitbadges-solana` view planner and `bb-api` / `bb-mcp`.
+- Implement `EvaluateCanTransfer` and wire it directly to a new additive gRPC query endpoint `Query/CanTransfer` in `proto/tokenization/query.proto` (plus EVM precompile `0x1001` `canTransfer(...) external view returns (...)`) in a single cohesive PR rather than shipping unwired keeper code.
+- Mirror the same response shape (including initiator-paid vs escrow-paid coin distinction and backed/vault deposits) in `bitbadges-solana` view planner and `bb-api` / `bb-mcp`.
