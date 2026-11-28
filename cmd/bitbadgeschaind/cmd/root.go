@@ -64,6 +64,14 @@ func NewRootCmd() *cobra.Command {
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
 
+			// SDK-forwarded commands delegate verbatim to bitbadges-cli and do
+			// not consume Cosmos client.toml or server config files. Bypassing
+			// config loading here allows `bb dev --help`, `bb build --help`,
+			// etc. to work cleanly with an empty, missing, or read-only --home.
+			if isSDKForwarderCmd(cmd) {
+				return nil
+			}
+
 			clientCtx = clientCtx.WithCmdContext(cmd.Context())
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {

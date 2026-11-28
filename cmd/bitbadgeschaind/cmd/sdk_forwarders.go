@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -29,6 +30,45 @@ import (
 // Runtime dependency: these only do useful work when bitbadges-cli
 // (npm package `bitbadges`) is on the user's PATH. They compile and
 // pass tests on their own, independent of the SDK CLI version.
+
+// annotationSDKForwarder marks Cobra commands that delegate verbatim to the
+// Node.js bitbadges-cli binary. rootCmd.PersistentPreRunE checks this
+// annotation to bypass Cosmos client.toml / server config loading so forwarded
+// commands work cleanly with an empty, missing, or read-only --home directory.
+const annotationSDKForwarder = "bitbadges.sdk_forwarder"
+
+// isSDKForwarderCmd reports whether cmd is an SDK CLI passthrough forwarder.
+func isSDKForwarderCmd(cmd *cobra.Command) bool {
+	if cmd == nil || cmd.Annotations == nil {
+		return false
+	}
+	return cmd.Annotations[annotationSDKForwarder] == "true"
+}
+
+// stripLeadingChainHomeFlag removes a leading Cosmos root `--home <dir>` or
+// `--home=<dir>` flag that Cobra leaves in args when dispatching to a
+// DisableFlagParsing forwarder (e.g. `bb --home /tmp/empty dev --help`).
+// bitbadges-cli does not accept Cosmos's `--home` flag, so stripping it avoids
+// forwarding an unknown root flag while preserving all subcommand args verbatim.
+func stripLeadingChainHomeFlag(args []string) []string {
+	out := args
+	for len(out) > 0 {
+		if out[0] == "--home" {
+			if len(out) >= 2 {
+				out = out[2:]
+				continue
+			}
+			out = out[1:]
+			continue
+		}
+		if strings.HasPrefix(out[0], "--home=") {
+			out = out[1:]
+			continue
+		}
+		break
+	}
+	return out
+}
 
 // sdkForwarderSpec describes a single top-level SDK forwarder.
 type sdkForwarderSpec struct {
@@ -124,6 +164,9 @@ func newSDKForwarder(spec sdkForwarderSpec) *cobra.Command {
 		Short:              spec.short,
 		GroupID:            spec.group,
 		DisableFlagParsing: true, // pass flags through to bitbadges-cli
+		Annotations: map[string]string{
+			annotationSDKForwarder: "true",
+		},
 		Long: fmt.Sprintf(`Forwards to: bitbadges-cli %s
 
 Runs the BitBadges SDK CLI subcommand of the same name. All arguments
@@ -133,7 +176,7 @@ bitbadges npm package (npm install -g bitbadges).
 Run with --help to see the SDK subcommand's own help:
   bitbadgeschaind %s --help`, spec.name, spec.name),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return execNodeCLI(spec.name, args)
+			return execNodeCLI(spec.name, stripLeadingChainHomeFlag(args))
 		},
 	}
 	if spec.deprecated != "" {
@@ -171,12 +214,15 @@ func registerSDKTxSubforwarders(txCmd *cobra.Command) {
 			Use:                spec.name + " [args...]",
 			Short:              spec.short,
 			DisableFlagParsing: true,
+			Annotations: map[string]string{
+				annotationSDKForwarder: "true",
+			},
 			Long: fmt.Sprintf(`Forwards to: bitbadges-cli tx %s
 
 All arguments and flags are passed through verbatim. Requires the
 bitbadges npm package (npm install -g bitbadges).`, spec.name),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				return execNodeCLI("tx", append([]string{spec.name}, args...))
+				return execNodeCLI("tx", append([]string{spec.name}, stripLeadingChainHomeFlag(args)...))
 			},
 		})
 	}

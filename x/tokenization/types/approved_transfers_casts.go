@@ -1,8 +1,11 @@
 package types
 
 func CastOutgoingTransfersToCollectionTransfers(transfers []*UserOutgoingApproval, fromAddress string) []*CollectionApproval {
-	collectionTransfers := []*CollectionApproval{}
+	collectionTransfers := make([]*CollectionApproval, 0, len(transfers))
 	for _, transfer := range transfers {
+		if transfer == nil {
+			continue
+		}
 		collectionTransfers = append(collectionTransfers, CastOutgoingTransferToCollectionTransfer(transfer, fromAddress))
 	}
 
@@ -10,8 +13,11 @@ func CastOutgoingTransfersToCollectionTransfers(transfers []*UserOutgoingApprova
 }
 
 func CastIncomingTransfersToCollectionTransfers(transfers []*UserIncomingApproval, toAddress string) []*CollectionApproval {
-	collectionTransfers := []*CollectionApproval{}
+	collectionTransfers := make([]*CollectionApproval, 0, len(transfers))
 	for _, transfer := range transfers {
+		if transfer == nil {
+			continue
+		}
 		collectionTransfers = append(collectionTransfers, CastIncomingTransferToCollectionTransfer(transfer, toAddress))
 	}
 
@@ -19,6 +25,9 @@ func CastIncomingTransfersToCollectionTransfers(transfers []*UserIncomingApprova
 }
 
 func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fromAddress string) *CollectionApproval {
+	if transfer == nil {
+		return nil
+	}
 	approvalCriteria := CastOutgoingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 	return &CollectionApproval{
 		ToListId:          transfer.ToListId,
@@ -36,6 +45,9 @@ func CastOutgoingTransferToCollectionTransfer(transfer *UserOutgoingApproval, fr
 }
 
 func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) *UserOutgoingApproval {
+	if transfer == nil {
+		return nil
+	}
 	approvalCriteria := CastFromCollectionApprovalCriteriaToOutgoingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserOutgoingApproval{
@@ -53,6 +65,9 @@ func CastFromCollectionTransferToOutgoingTransfer(transfer *CollectionApproval) 
 }
 
 func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, toAddress string) *CollectionApproval {
+	if transfer == nil {
+		return nil
+	}
 	approvalCriteria := CastIncomingApprovalCriteriaToCollectionApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &CollectionApproval{
@@ -71,6 +86,9 @@ func CastIncomingTransferToCollectionTransfer(transfer *UserIncomingApproval, to
 }
 
 func CastFromCollectionTransferToIncomingTransfer(transfer *CollectionApproval) *UserIncomingApproval {
+	if transfer == nil {
+		return nil
+	}
 	approvalCriteria := CastFromCollectionApprovalCriteriaToIncomingApprovalCriteria(transfer.ApprovalCriteria)
 
 	return &UserIncomingApproval{

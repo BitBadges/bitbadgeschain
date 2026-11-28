@@ -18,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	cosmosevmcmd "github.com/cosmos/evm/client"
 	cosmosevmserver "github.com/cosmos/evm/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -81,15 +80,10 @@ func initRootCmd(
 	if cometCmd, _, err := rootCmd.Find([]string{"comet"}); err == nil {
 		cometCmd.Aliases = append(cometCmd.Aliases, "tendermint")
 	}
-	// Add Cosmos EVM key commands (for eth_secp256k1 key management)
-	// This provides EVM-specific key commands that work with eth_secp256k1 keys
-	rootCmd.AddCommand(
-		cosmosevmcmd.KeyCommands(app.DefaultNodeHome, false),
-	)
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
-	// Use custom KeyCommands wrapper that ensures eth_secp256k1 keyring options are applied
-	// This matches the Cosmos EVM reference implementation pattern
+	// Use custom KeyCommands wrapper (delegating to Cosmos EVM KeyCommands)
+	// so eth_secp256k1 keyring options are supported without registering `keys` twice.
 	rootCmd.AddCommand(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
