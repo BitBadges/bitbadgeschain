@@ -20,8 +20,8 @@ Per BB-374 scope, this ADR **does NOT consolidate, merge, rename, or retire any 
    - `ClaimedStandards`: The raw, untrusted `collection.Standards` tags declared on-chain.
    - `VerifiedStandards`: The deterministic subset of `ClaimedStandards` whose on-chain structural predicates pass with zero violations.
    - `FailedStandards`: A map of `standard -> []StandardViolation{Code, Message}` explaining every exact invariant that failed (including `UNKNOWN_STANDARD` for unrecognized tags).
-2. **Pure, deterministic, zero-store-read verification engine in `x/tokenization/types/verify_standards.go`:**
-   - Evaluates a `*TokenCollection` purely from its in-memory state (`CollectionApprovals`, `CollectionPermissions`, `Invariants`, `ValidTokenIds`, `DefaultBalances`, `AliasPaths`, `CosmosCoinWrapperPaths`).
+2. **Proposed pure, deterministic, zero-store-read verification engine (planned for `x/tokenization/types/verify_standards.go` in the dedicated `BB-374` PR):**
+   - Will evaluate a `*TokenCollection` purely from its in-memory state (`CollectionApprovals`, `CollectionPermissions`, `Invariants`, `ValidTokenIds`, `DefaultBalances`, `AliasPaths`, `CosmosCoinWrapperPaths`).
    - Can be called identically on-chain (e.g., query responses, optional strict validation on `MsgCreateCollection` / `MsgUpdateCollection`) and mirrored 1:1 in Rust (`crates/bb-standards`) and TypeScript (`bitbadgesjs/src/core/verify-standards.ts`).
 
 ## 3. On-Chain vs Indexer Verification Boundaries
@@ -35,7 +35,7 @@ Per BB-374 scope, this ADR **does NOT consolidate, merge, rename, or retire any 
 
 ### Gas Cost Analysis
 
-Every on-chain verifier in `verify_standards.go` performs a bounded linear scan over `collection.CollectionApprovals` (length `A`) and `collection.CollectionPermissions.CanUpdateCollectionApprovals` (length `P`), with zero IAVL store reads:
+Each proposed on-chain verifier in `verify_standards.go` will perform a bounded linear scan over `collection.CollectionApprovals` (length `A`) and `collection.CollectionPermissions.CanUpdateCollectionApprovals` (length `P`), with zero IAVL store reads:
 
 - **Time complexity:** `O(S * (A + P))` where `S = len(collection.Standards)` (typically `1..4`), `A` is bounded by collection approval limits, and `P` is bounded by permission list size.
 - **Estimated gas cost:** ~500 base gas + ~150 gas per approval/permission inspected (~2,000–5,000 gas typical), negligible relative to `MsgCreateCollection` (~150,000–300,000 gas).
@@ -45,7 +45,7 @@ Every on-chain verifier in `verify_standards.go` performs a bounded linear scan 
 
 - **Zero state migration required:** `proto/tokenization/collections.proto` field `standards` is untouched. Existing mainnet collections remain 100% readable and valid.
 - **Non-breaking rollout:**
-  1. **Phase 1 (Current):** Expose `VerifyCollectionStandards(collection)` as a pure deterministic function used by queries, indexers (`bb-standards`), SDK (`bitbadgesjs`), and AI tooling (`bb-mcp`) to surface `{ claimedStandards, verifiedStandards, failedStandards }`. Pre-existing collections with legacy/incomplete configs simply report unverified tags in `failedStandards` without breaking transfers or updates.
+  1. **Phase 1 (Planned — Dedicated `BB-374` PR):** Expose `VerifyCollectionStandards(collection)` as a pure deterministic function used by queries, indexers (`bb-standards`), SDK (`bitbadgesjs`), and AI tooling (`bb-mcp`) to surface `{ claimedStandards, verifiedStandards, failedStandards }`. Pre-existing collections with legacy/incomplete configs simply report unverified tags in `failedStandards` without breaking transfers or updates.
   2. **Phase 2 (Opt-in / Governance-gated):** Add an optional `strictStandardVerification` flag on `MsgCreateCollection` / `MsgUpdateCollection` (or governance param) that rejects transactions claiming a standard they do not satisfy. Pre-existing collections are grandfathered unless they opt in.
 
 ## 5. Canonical Verification Matrix (12 Standards)
@@ -54,7 +54,7 @@ All 12 standards are checked deterministically with zero consolidation:
 
 | Standard | Required On-Chain Invariants | Rejected Spoof Examples |
 | --- | --- | --- |
-| `Non-Transferable` | No post-mint collection approval (`FromListId != "Mint"` with active ranges); `canUpdateCollectionApprovals` permanently forbids updating post-mint approvals across `[1, MaxUint64]` | Unfrozen `canUpdateCollectionApprovals`; active peer-to-peer approval |
+| `Non-Transferable` | No post-mint peer-to-peer collection approval (`FromListId != "Mint"` with active ranges), except optional legitimate burn paths (e.g., holder-initiated transfers exclusively to a designated unspendable burn address); `canUpdateCollectionApprovals` permanently forbids updating post-mint approvals across `[1, MaxUint64]` | Unfrozen `canUpdateCollectionApprovals`; active peer-to-peer approval |
 | `Subscriptions` | `ValidTokenIds` non-empty; `NoCustomOwnershipTimes == false`; at least one active approval with `PredeterminedBalances.IncrementedBalances` setting `DurationFromTimestamp > 0` or active `RecurringOwnershipTimes` (`IntervalLength > 0`) | Missing `durationFromTimestamp` and `recurringOwnershipTimes`; `noCustomOwnershipTimes: true` |
 | `NFTs` | `ValidTokenIds` non-empty; `Invariants.MaxSupplyPerId == 1`; `Invariants.NoCustomOwnershipTimes == true` | `maxSupplyPerId == 0` or `> 1`; custom ownership times enabled |
 | `Fungible Tokens` | Single fungible token ID (`len(ValidTokenIds) == 1 && Start == End`); `Invariants.NoCustomOwnershipTimes == true`; `MaxSupplyPerId == 0 || MaxSupplyPerId > 1` | `maxSupplyPerId == 1` (NFT); multi-ID non-fungible range |
@@ -62,8 +62,8 @@ All 12 standards are checked deterministically with zero consolidation:
 | `Address List` | `ValidTokenIds` non-empty; at least one approval scoped to a concrete non-wildcard address list ID (`FromListId`, `ToListId`, or `InitiatedByListId` not in `All`, `AllWithMint`, `AllWithoutMint`, `None`, `Mint`) | Open collection using only `AllWithoutMint` wildcards |
 | `Vault` | Valid `CosmosCoinBackedPath`; both deposit (`FromListId == backingAddr`) and withdrawal (`ToListId == backingAddr`) approvals with `AllowBackedMinting && MustPrioritize`; `NoForcefulPostMintTransfers == true`; frozen `canUpdateCollectionApprovals` | Missing withdrawal path (honeypot vault); unfrozen approvals; forceful post-mint transfers allowed |
 | `Agent Wallet` | Has `CosmosCoinBackedPath` or escrow-funded `CoinTransfers` (`OverrideFromWithApproverAddress`); every spending/backed approval has a bounded cap (`MaxNumTransfers`, `ApprovalAmounts`, or finite `TransferTimes`); `NoForcefulPostMintTransfers` or frozen approvals | Unbounded agent spending approval with unlimited transfers and infinite window |
-| `PaymentRequestV2` | At least one approval with non-empty `CoinTransfers`; single-use bound (`MaxNumTransfers.OverallMaxNumTransfers == 1` or `AutoDeletionOptions.AfterOneUse`); frozen `canUpdateCollectionApprovals` | Unlimited repeatable invoice; unfrozen invoice terms |
-| `Bounty` | At least two outcome approvals (e.g., fulfill + refund) sharing a terminal mutual-exclusion latch (`MaxNumTransfers.OverallMaxNumTransfers == 1` and identical non-empty `AmountTrackerId`); escrow payout via `CoinTransfers` (`OverrideFromWithApproverAddress`); frozen `canUpdateCollectionApprovals` | Missing mutual-exclusion shared tracker (fulfill+refund double-spend); unfrozen approvals |
+| `PaymentRequestV2` | At least one approval with non-empty `CoinTransfers`; either a single-use bound (`MaxNumTransfers.OverallMaxNumTransfers == 1` with `ResetTimeIntervals` unset/zero, or `AutoDeletionOptions.AfterOneUse`) OR a bounded cumulative partial-payment cap (`ApprovalAmounts` with `ResetTimeIntervals` unset/zero, matching `ADR-approval-ergonomics.md`); frozen `canUpdateCollectionApprovals` | Unlimited repeatable invoice; resetting `ResetTimeIntervals` on payment latch/cap; unfrozen invoice terms |
+| `Bounty` | At least two outcome approvals (e.g., fulfill + refund) sharing a terminal mutual-exclusion latch (`MaxNumTransfers.OverallMaxNumTransfers == 1`, identical non-empty `AmountTrackerId`, and `ResetTimeIntervals` unset/zero); escrow payout via `CoinTransfers` (`OverrideFromWithApproverAddress`); frozen `canUpdateCollectionApprovals` | Missing mutual-exclusion shared tracker (fulfill+refund double-spend); resetting `ResetTimeIntervals` on latch; unfrozen approvals |
 | `Crowdfund` | Contribution approval (`FromListId == "Mint"`, `CoinTransfers` to escrow, finite deadline `TransferTimes.End < MaxUint64`); escrow release/refund approval (`OverrideFromWithApproverAddress`); frozen `canUpdateCollectionApprovals` | Infinite contribution window; missing escrow funding or release/refund branch |
 | `Spendable Credit` | `NoCustomOwnershipTimes == true`; issue/mint approval (`FromListId == "Mint"` with `CoinTransfers`, `AllowAmountScaling`, or `ApprovalAmounts`) and redemption/spend approval (`FromListId != "Mint"` or backed path); `NoForcefulPostMintTransfers == true`; frozen `canUpdateCollectionApprovals` | Forceful post-mint confiscation enabled; missing redemption path; unfrozen terms |
 
@@ -71,4 +71,4 @@ All 12 standards are checked deterministically with zero consolidation:
 
 - **Go (`bitbadgeschain`):** Dedicated `BB-374` Standards Verification PR introducing `x/tokenization/types/verify_standards.go` wired into query/validation surfaces.
 - **Rust (`bitbadges-monorepo` / `bitbadges-solana`):** `crates/bb-standards` mirrors the exact violation codes (`NON_TRANSFERABLE_UNFROZEN_APPROVALS`, `SUBSCRIPTION_MISSING_DURATION`, `BOUNTY_MISSING_MUTUAL_EXCLUSION`, etc.).
-- **TypeScript (`bitbadgesjs`):** `src/core/verify-standards.ts` shares golden pass/fail fixtures with Go and Rust to permanently eliminate `H-14` verification drift.
+- **TypeScript (`bitbadgesjs`):** `src/core/verify-standards.ts` shares golden pass/fail fixtures with Go and Rust to permanently eliminate `H-13` verification drift.

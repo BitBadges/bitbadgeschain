@@ -151,6 +151,21 @@ func TestSDKForwarderRootFlagStrippingAndHomeBypass(t *testing.T) {
 			args:     []string{"tx", "status", "--home", "/foo"},
 			wantArgs: "tx status --home /foo",
 		},
+		{
+			name:     "bb --unknown=1 dev --help does not strip unknown --flag=val",
+			args:     []string{"--unknown=1", "dev", "--help"},
+			wantArgs: "dev --unknown=1 --help",
+		},
+		{
+			name:     "bb -xyz dev --help does not strip unknown short flag cluster",
+			args:     []string{"-xyz", "dev", "--help"},
+			wantArgs: "dev -xyz --help",
+		},
+		{
+			name:     "bb --unknown dev dev --help does not guess or eat unknown flag + arg",
+			args:     []string{"--unknown", "dev", "dev", "--help"},
+			wantArgs: "dev --unknown dev --help",
+		},
 	}
 
 	origOSArgs := os.Args
@@ -183,6 +198,27 @@ func TestSDKForwarderRootFlagStrippingAndHomeBypass(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("bb -h dev renders root help and never invokes bitbadges-cli with stripped -h", func(t *testing.T) {
+		_ = os.Remove(recordFile)
+		viper.Reset()
+		os.Args = []string{"bitbadgeschaind", "-h", "dev"}
+
+		rootCmd := NewRootCmd()
+		var out bytes.Buffer
+		rootCmd.SetOut(&out)
+		rootCmd.SetErr(&out)
+		if err := svrcmd.Execute(rootCmd, "", missingHome); err != nil {
+			t.Fatalf("svrcmd.Execute([-h dev]) failed: %v", err)
+		}
+		if _, err := os.Stat(recordFile); err == nil {
+			gotBytes, _ := os.ReadFile(recordFile)
+			t.Fatalf("expected bb -h dev to show help rather than invoke bitbadges-cli, got %q", string(gotBytes))
+		}
+		if !strings.Contains(out.String(), "Usage:") {
+			t.Fatalf("expected root help output for bb -h dev, got:\n%s", out.String())
+		}
+	})
 }
 
 func TestIsSDKForwarderCmdClassification(t *testing.T) {
@@ -223,5 +259,67 @@ func TestIsSDKForwarderCmdClassification(t *testing.T) {
 		if isSDKForwarderCmd(cmd) {
 			t.Errorf("expected chain-native %v NOT to be classified as SDK forwarder", path)
 		}
+	}
+}
+
+func TestExtractForwarderArgs_RejectsUnknownAndHelpFlags(t *testing.T) {
+	rootCmd := NewRootCmd()
+	rootCmd.PersistentFlags().String("home", "", "home dir")
+	rootCmd.PersistentFlags().String("log_level", "info", "log level")
+	rootCmd.PersistentFlags().Bool("trace", false, "trace")
+	rootCmd.InitDefaultHelpFlag()
+
+	devCmd, _, err := rootCmd.Find([]string{"dev"})
+	if err != nil || devCmd == nil {
+		t.Fatalf("Find(dev) failed: %v", err)
+	}
+
+	rejectCases := []struct {
+		name      string
+		rawArgs   []string
+		cobraArgs []string
+	}{
+		{
+			name:      "unknown --flag=val",
+			rawArgs:   []string{"--unknown=1", "dev", "--help"},
+			cobraArgs: []string{"--unknown=1", "--help"},
+		},
+		{
+			name:      "unknown short cluster -xyz",
+			rawArgs:   []string{"-xyz", "dev", "--help"},
+			cobraArgs: []string{"-xyz", "--help"},
+		},
+		{
+			name:      "unknown --flag consuming next token",
+			rawArgs:   []string{"--unknown", "dev", "dev", "--help"},
+			cobraArgs: []string{"--unknown", "dev", "--help"},
+		},
+		{
+			name:      "short help flag -h before subcommand",
+			rawArgs:   []string{"-h", "dev"},
+			cobraArgs: []string{"-h"},
+		},
+		{
+			name:      "long help flag --help before subcommand",
+			rawArgs:   []string{"--help", "dev"},
+			cobraArgs: []string{"--help"},
+		},
+	}
+
+	origProvider := cliArgsProvider
+	t.Cleanup(func() { cliArgsProvider = origProvider })
+
+	for _, tc := range rejectCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, ok := extractForwarderArgs(devCmd, tc.rawArgs, tc.cobraArgs)
+			if ok || got != nil {
+				t.Fatalf("extractForwarderArgs(%v) = (%v, %v), want (nil, false)", tc.rawArgs, got, ok)
+			}
+			cliArgsProvider = func() []string { return tc.rawArgs }
+			forwarded := forwarderArgs(devCmd, tc.cobraArgs)
+			if strings.Join(forwarded, " ") != strings.Join(tc.cobraArgs, " ") {
+				t.Fatalf("forwarderArgs(%v) = %v, want fallback %v", tc.rawArgs, forwarded, tc.cobraArgs)
+			}
+		})
 	}
 }

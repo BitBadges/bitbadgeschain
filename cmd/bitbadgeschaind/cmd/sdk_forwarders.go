@@ -121,22 +121,34 @@ func extractForwarderArgs(cmd *cobra.Command, rawArgs, cobraArgs []string) ([]st
 			case tok == "--":
 				return nil, false
 			case strings.HasPrefix(tok, "--") && len(tok) > 2:
+				name, _, hasEq := strings.Cut(tok[2:], "=")
+				if name == "help" {
+					return nil, false
+				}
+				f := lookupCmdFlag(parent, name, false)
+				if f == nil {
+					return nil, false
+				}
 				prefixTokens = append(prefixTokens, tok)
-				if !strings.Contains(tok, "=") {
-					f := lookupCmdFlag(parent, tok[2:], false)
-					if f == nil || f.NoOptDefVal == "" {
-						if pos+1 >= len(rawArgs) {
-							return nil, false
-						}
-						pos++
-						prefixTokens = append(prefixTokens, rawArgs[pos])
+				if !hasEq && f.NoOptDefVal == "" {
+					if pos+1 >= len(rawArgs) {
+						return nil, false
 					}
+					pos++
+					prefixTokens = append(prefixTokens, rawArgs[pos])
 				}
 				pos++
 			case strings.HasPrefix(tok, "-") && len(tok) == 2 && tok != "--":
+				short := tok[1:]
+				if short == "h" {
+					return nil, false
+				}
+				f := lookupCmdFlag(parent, short, true)
+				if f == nil {
+					return nil, false
+				}
 				prefixTokens = append(prefixTokens, tok)
-				f := lookupCmdFlag(parent, tok[1:], true)
-				if f == nil || f.NoOptDefVal == "" {
+				if f.NoOptDefVal == "" {
 					if pos+1 >= len(rawArgs) {
 						return nil, false
 					}
@@ -145,6 +157,25 @@ func extractForwarderArgs(cmd *cobra.Command, rawArgs, cobraArgs []string) ([]st
 				}
 				pos++
 			case strings.HasPrefix(tok, "-") && len(tok) > 2:
+				shorthands := tok[1:]
+				for i := 0; i < len(shorthands); i++ {
+					ch := shorthands[i : i+1]
+					if ch == "h" {
+						return nil, false
+					}
+					f := lookupCmdFlag(parent, ch, true)
+					if f == nil {
+						return nil, false
+					}
+					if f.NoOptDefVal == "" {
+						// Remainder of tok is the attached value for this short flag.
+						break
+					}
+					if i+1 < len(shorthands) && shorthands[i+1] == '=' {
+						// Explicit boolean value (e.g. -x=true).
+						break
+					}
+				}
 				prefixTokens = append(prefixTokens, tok)
 				pos++
 			default:
@@ -351,11 +382,10 @@ bitbadges npm package (npm install -g bitbadges).`, spec.name),
 // registerSDKForwarders adds every top-level SDK forwarder to the root
 // command. Called from initRootCmd after chain natives are registered.
 //
-// Collisions: this function panics if a forwarder name collides with a
-// chain-native command that's already registered. The spec list is
-// pre-filtered to avoid `config` (which the chain owns), but a future
-// chain command rename could surprise us — fail loud rather than
-// silently shadow.
+// Collisions: if a forwarder name collides with a chain-native command that is
+// already registered, this function logs a warning to stderr and skips the
+// colliding forwarder so chain-native commands are never shadowed. The spec
+// list is pre-filtered to avoid `config` (which the chain owns).
 func registerSDKForwarders(rootCmd *cobra.Command) {
 	existing := map[string]bool{}
 	for _, c := range rootCmd.Commands() {
